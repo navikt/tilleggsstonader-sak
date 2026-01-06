@@ -37,6 +37,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -96,7 +97,10 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
                     typeAktivitet = TypeAktivitet.ENKELAMO,
                     fom = fomTiltaksenheten,
                     tom = tomTiltaksenheten,
-                    faktaOgSvar = FaktaOgSvarAktivitetDagligReiseTsrDto,
+                    faktaOgSvar =
+                        FaktaOgSvarAktivitetDagligReiseTsrDto(
+                            svarHarUtgifter = SvarJaNei.JA,
+                        ),
                 )
             },
             medMålgruppe = { behandlingId ->

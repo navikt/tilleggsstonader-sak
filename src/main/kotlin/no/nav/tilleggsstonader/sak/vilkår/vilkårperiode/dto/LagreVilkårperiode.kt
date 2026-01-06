@@ -76,7 +76,9 @@ data class FaktaOgSvarAktivitetDagligReiseTsoDto(
     val svarHarUtgifter: SvarJaNei? = null,
 ) : FaktaOgSvarDto()
 
-data object FaktaOgSvarAktivitetDagligReiseTsrDto : FaktaOgSvarDto()
+data class FaktaOgSvarAktivitetDagligReiseTsrDto(
+    val svarHarUtgifter: SvarJaNei? = null,
+) : FaktaOgSvarDto()
 
 fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
     when (this) {
@@ -133,6 +135,7 @@ fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
                         ?.lønnet
                         ?.svar,
             )
+
         is AktivitetDagligReiseTso ->
             FaktaOgSvarAktivitetDagligReiseTsoDto(
                 svarLønnet =
@@ -141,6 +144,13 @@ fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
                         ?.lønnet
                         ?.svar,
             )
+
         is AktivitetDagligReiseTsr ->
-            FaktaOgSvarAktivitetDagligReiseTsrDto
+            FaktaOgSvarAktivitetDagligReiseTsrDto(
+                svarHarUtgifter =
+                    this.vurderinger
+                        .takeIfVurderinger<HarUtgifterVurdering>()
+                        ?.harUtgifter
+                        ?.svar,
+            )
     }
