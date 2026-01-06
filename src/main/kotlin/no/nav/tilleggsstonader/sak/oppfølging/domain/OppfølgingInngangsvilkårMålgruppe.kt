@@ -41,6 +41,7 @@ data class OppfølgingInngangsvilkårMålgruppe(
             MålgruppeType.SYKEPENGER_100_PROSENT,
             MålgruppeType.INGEN_MÅLGRUPPE,
             MålgruppeType.KVALIFISERINGSSTØNAD,
+            MålgruppeType.INNSATT_I_FENGSEL,
             -> false
         }
 

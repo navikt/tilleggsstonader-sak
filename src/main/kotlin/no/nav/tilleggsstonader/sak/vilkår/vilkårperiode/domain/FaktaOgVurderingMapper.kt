@@ -30,6 +30,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.InnsattIFengselDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.KvalifiseringsstønadDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeDagligReiseTso
@@ -379,6 +380,7 @@ private fun mapMålgruppeBarnetilsyn(
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
         MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram")
+        MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel")
     }
 
 private fun mapMålgruppeLæremidler(
@@ -439,6 +441,7 @@ private fun mapMålgruppeLæremidler(
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
         MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram")
+        MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel")
     }
 
 private fun mapMålgruppeBoutgfiter(
@@ -503,6 +506,7 @@ private fun mapMålgruppeBoutgfiter(
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
         MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram")
+        MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel")
     }
 
 private fun mapMålgruppeDagligReiseTso(
@@ -567,6 +571,7 @@ private fun mapMålgruppeDagligReiseTso(
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
         MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram")
+        MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel")
     }
 
 private fun mapMålgruppeDagligReiseTsr(type: MålgruppeType): MålgruppeDagligReiseTsr =
@@ -581,4 +586,5 @@ private fun mapMålgruppeDagligReiseTsr(type: MålgruppeType): MålgruppeDagligR
         MålgruppeType.DAGPENGER -> DagpengerDagligReiseTsr()
         MålgruppeType.TILTAKSPENGER -> TiltakspengerDagligReiseTsr()
         MålgruppeType.KVALIFISERINGSSTØNAD -> KvalifiseringsstønadDagligReiseTsr()
+        MålgruppeType.INNSATT_I_FENGSEL -> InnsattIFengselDagligReiseTsr()
     }
