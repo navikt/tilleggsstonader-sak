@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 @Service
 @TaskStepBeskrivelse(
     taskStepType = SatsjusteringTask.TYPE,
-    maxAntallFeil = 1,
+    maxAntallFeil = 90,
     settTilManuellOppfølgning = true,
     beskrivelse = "Oppretter revurdering og iverksetter vedtak med satsjustering",
 )
