@@ -85,6 +85,8 @@ class DagligReiseBeregnYtelseSteg(
             "Foreløpig støttes kun beregning av offentlig transport."
         }
 
+        // TODO støtte generering av andeler for privat bil
+
         tilkjentYtelseService.lagreTilkjentYtelse(
             behandlingId = saksbehandling.id,
             andeler = beregningsresultat.offentligTransport.mapTilAndelTilkjentYtelse(saksbehandling),

@@ -52,38 +52,48 @@ enum class StegType(
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    BEREGNE_YTELSE(
+    BEREGNE_RAMMEVEDTAK_PRIVAT_BIL(
         rekkefølge = 3,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    SIMULERING(
+    KJORELISTE(
         rekkefølge = 4,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    SEND_TIL_BESLUTTER(
+    BEREGNE_YTELSE(
         rekkefølge = 5,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    BESLUTTE_VEDTAK(
+    SIMULERING(
         rekkefølge = 6,
+        tillattFor = BehandlerRolle.SAKSBEHANDLER,
+        gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
+    ),
+    SEND_TIL_BESLUTTER(
+        rekkefølge = 7,
+        tillattFor = BehandlerRolle.SAKSBEHANDLER,
+        gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
+    ),
+    BESLUTTE_VEDTAK(
+        rekkefølge = 8,
         tillattFor = BehandlerRolle.BESLUTTER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.FATTER_VEDTAK),
     ),
     JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV(
-        rekkefølge = 7,
+        rekkefølge = 9,
         tillattFor = BehandlerRolle.SYSTEM,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
     ),
     FERDIGSTILLE_BEHANDLING(
-        rekkefølge = 8,
+        rekkefølge = 10,
         tillattFor = BehandlerRolle.SYSTEM,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
     ),
     BEHANDLING_FERDIGSTILT(
-        rekkefølge = 9,
+        rekkefølge = 11,
         tillattFor = BehandlerRolle.SYSTEM,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.FERDIGSTILT),
     ),
@@ -98,18 +108,55 @@ enum class StegType(
 
     fun hentNesteSteg(stønadstype: Stønadstype): StegType =
         when (this) {
-            INNGANGSVILKÅR ->
+            INNGANGSVILKÅR -> {
                 when (stønadstype) {
                     Stønadstype.LÆREMIDLER -> BEREGNE_YTELSE
                     else -> VILKÅR
                 }
-            VILKÅR -> BEREGNE_YTELSE
-            BEREGNE_YTELSE -> SIMULERING
-            SIMULERING -> SEND_TIL_BESLUTTER
-            SEND_TIL_BESLUTTER -> BESLUTTE_VEDTAK
-            BESLUTTE_VEDTAK -> JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV
-            JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV -> FERDIGSTILLE_BEHANDLING
-            FERDIGSTILLE_BEHANDLING -> BEHANDLING_FERDIGSTILT
-            BEHANDLING_FERDIGSTILT -> BEHANDLING_FERDIGSTILT
+            }
+
+            VILKÅR -> {
+                when (stønadstype) {
+                    Stønadstype.DAGLIG_REISE_TSO -> BEREGNE_RAMMEVEDTAK_PRIVAT_BIL
+                    Stønadstype.DAGLIG_REISE_TSR -> BEREGNE_RAMMEVEDTAK_PRIVAT_BIL
+                    else -> BEREGNE_YTELSE
+                }
+            }
+
+            BEREGNE_RAMMEVEDTAK_PRIVAT_BIL -> {
+                KJORELISTE
+            }
+
+            KJORELISTE -> {
+                BEREGNE_YTELSE
+            }
+
+            BEREGNE_YTELSE -> {
+                SIMULERING
+            }
+
+            SIMULERING -> {
+                SEND_TIL_BESLUTTER
+            }
+
+            SEND_TIL_BESLUTTER -> {
+                BESLUTTE_VEDTAK
+            }
+
+            BESLUTTE_VEDTAK -> {
+                JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV
+            }
+
+            JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV -> {
+                FERDIGSTILLE_BEHANDLING
+            }
+
+            FERDIGSTILLE_BEHANDLING -> {
+                BEHANDLING_FERDIGSTILT
+            }
+
+            BEHANDLING_FERDIGSTILT -> {
+                BEHANDLING_FERDIGSTILT
+            }
         }
 }

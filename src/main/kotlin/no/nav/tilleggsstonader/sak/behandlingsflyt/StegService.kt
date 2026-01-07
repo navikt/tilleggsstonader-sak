@@ -16,6 +16,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringSteg
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.KjorelisteSteg
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.RammevedtakSteg
 import no.nav.tilleggsstonader.sak.vilkår.InngangsvilkårSteg
 import no.nav.tilleggsstonader.sak.vilkår.VilkårSteg
 import org.slf4j.LoggerFactory
@@ -78,6 +80,8 @@ class StegService(
         return when (steg) {
             StegType.INNGANGSVILKÅR -> håndterInngangsvilkår(behandlingId)
             StegType.VILKÅR -> håndterVilkår(behandlingId)
+            StegType.BEREGNE_RAMMEVEDTAK_PRIVAT_BIL -> håndterRammeVilkår(behandlingId)
+            StegType.KJORELISTE -> håndterKjøreliste(behandlingId)
             StegType.SIMULERING -> håndterSimulering(behandlingId)
             StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV -> håndterBrev(behandlingId)
             else -> error("Steg $steg kan ikke ferdigstilles her")
@@ -93,6 +97,18 @@ class StegService(
     private fun håndterVilkår(behandlingId: BehandlingId): Behandling {
         val vilkårSteg: VilkårSteg = behandlingSteg.filterIsInstance<VilkårSteg>().single()
         return håndterSteg(behandlingId, vilkårSteg)
+    }
+
+    private fun håndterRammeVilkår(behandlingId: BehandlingId): Behandling {
+        // TODO - implementer rammevedtak steg
+        val rammevedtakSteg: RammevedtakSteg = behandlingSteg.filterIsInstance<RammevedtakSteg>().single()
+        return håndterSteg(behandlingId, rammevedtakSteg)
+    }
+
+    private fun håndterKjøreliste(behandlingId: BehandlingId): Behandling {
+        // TODO - implementer kjøreliste steg
+        val kjorelisteSteg: KjorelisteSteg = behandlingSteg.filterIsInstance<KjorelisteSteg>().single()
+        return håndterSteg(behandlingId, kjorelisteSteg)
     }
 
     private fun håndterSimulering(behandlingId: BehandlingId): Behandling {
