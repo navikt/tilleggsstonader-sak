@@ -7,11 +7,11 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseServi
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
-import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
-import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import kotlin.collections.component1
+import kotlin.collections.component2
 
 @Service
 class UtbetalingV3Mapper(
@@ -21,12 +21,14 @@ class UtbetalingV3Mapper(
     fun lagSimuleringDtoer(
         behandling: Saksbehandling,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
-    ): Collection<SimuleringDto> =
-        lagUtbetalinger(
-            behandling = behandling,
-            andeler = andelerTilkjentYtelse,
-            erFørsteIverksetting = true,
-        ) { utbetalingsgrunnlag -> SimuleringDto(utbetalingsgrunnlag) }
+    ): SimuleringDto =
+        SimuleringDto(
+            sakId = behandling.eksternFagsakId.toString(),
+            behandlingId = behandling.eksternId.toString(),
+            personident = behandling.ident,
+            periodetype = mapPeriodetypeFraAndeler(andelerTilkjentYtelse),
+            utbetalinger = lagUtbetalinger(behandling, andelerTilkjentYtelse, erFørsteIverksettingForBehandling = true),
+        )
 
     fun lagIverksettingDtoer(
         behandling: Saksbehandling,
@@ -34,39 +36,51 @@ class UtbetalingV3Mapper(
         erFørsteIverksettingForBehandling: Boolean,
         totrinnskontroll: Totrinnskontroll?,
         vedtakstidspunkt: LocalDateTime,
-    ): Collection<IverksettingDto> =
-        lagUtbetalinger(
-            behandling = behandling,
-            andeler = andelerTilkjentYtelse,
-            erFørsteIverksetting = erFørsteIverksettingForBehandling,
-        ) { utbetalingsgrunnlag ->
-            IverksettingDto(
-                utbetalingsgrunnlag = utbetalingsgrunnlag,
-                saksbehandler = totrinnskontroll?.saksbehandler ?: error("Saksbehandler mangler"),
-                beslutter = totrinnskontroll.beslutter ?: error("Beslutter mangler"),
-                vedtakstidspunkt = vedtakstidspunkt,
-            )
-        }
-
-    private fun lagUtbetalingGrunnlag(
-        behandling: Saksbehandling,
-        type: TypeAndel,
-        andeler: Collection<AndelTilkjentYtelse>,
-    ): UtbetalingGrunnlagDto {
-        val utbetalingId = fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(behandling.fagsakId, type)
-        return UtbetalingGrunnlagDto(
-            id = utbetalingId.utbetalingId,
+    ): IverksettingDto =
+        IverksettingDto(
             sakId = behandling.eksternFagsakId.toString(),
             behandlingId = behandling.eksternId.toString(),
             personident = behandling.ident,
-            periodetype = mapPeriodetypeFraAndeler(andeler),
+            periodetype = mapPeriodetypeFraAndeler(andelerTilkjentYtelse),
+            utbetalinger = lagUtbetalinger(behandling, andelerTilkjentYtelse, erFørsteIverksettingForBehandling),
+            saksbehandler = totrinnskontroll?.saksbehandler ?: error("Saksbehandler mangler"),
+            beslutter = totrinnskontroll.beslutter ?: error("Beslutter mangler"),
+            vedtakstidspunkt = vedtakstidspunkt,
+        )
+
+    private fun lagUtbetalinger(
+        behandling: Saksbehandling,
+        andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
+        erFørsteIverksettingForBehandling: Boolean,
+    ): List<Utbetaling> =
+        andelerTilkjentYtelse
+            .groupBy { it.type }
+            .map { (type, andelerAvType) -> lagUtbetaling(behandling, type, andelerAvType) }
+            .let { utbetalinger ->
+                if (erFørsteIverksettingForBehandling) {
+                    utbetalinger + lagUtbetalingDtoForAnnulering(behandling, andelerTilkjentYtelse)
+                } else {
+                    utbetalinger
+                }
+            }
+
+    private fun lagUtbetaling(
+        behandling: Saksbehandling,
+        type: TypeAndel,
+        andeler: Collection<AndelTilkjentYtelse>,
+    ): Utbetaling {
+        val utbetalingId = fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(behandling.fagsakId, type)
+        return Utbetaling(
+            id = utbetalingId.utbetalingId,
             stønad = mapTilStønadUtbetaling(type),
-            perioder = grupperPåMånedOgMapTilPerioder(andeler),
+            perioder = grupperPåDagOgMapTilPerioder(andeler),
+            brukFagområdeTillst = false, // TODO - må settes til true for saker som har tatt i bruk dette fagområdet
         )
     }
 
     fun mapPeriodetypeFraAndeler(andeler: Collection<AndelTilkjentYtelse>): PeriodetypeUtbetaling {
         val satstyper = andeler.distinctBy { it.satstype }
+        println(satstyper)
         feilHvis(satstyper.size != 1) {
             "Håndterer ikke andeler med flere ulike satstyper samtidig"
         }
@@ -81,45 +95,25 @@ class UtbetalingV3Mapper(
             Satstype.UGYLDIG -> error("Andeler med satstype UGYLDIG skal ikke iverksettes")
         }
 
-    private fun <T : UtbetalingDto> lagUtbetalinger(
-        behandling: Saksbehandling,
-        andeler: Collection<AndelTilkjentYtelse>,
-        erFørsteIverksetting: Boolean,
-        utbetalingDtoFactory: (UtbetalingGrunnlagDto) -> T,
-    ): Collection<T> =
-        andeler
-            .groupBy { it.type }
-            .map { (type, andelerAvType) -> utbetalingDtoFactory(lagUtbetalingGrunnlag(behandling, type, andelerAvType)) }
-            .let { utbetalinger ->
-                if (erFørsteIverksetting) {
-                    utbetalinger + lagUtbetalingDtoForAnnulering(behandling, andeler, utbetalingDtoFactory)
-                } else {
-                    utbetalinger
-                }
-            }
-
-    private fun <T : UtbetalingDto> lagUtbetalingDtoForAnnulering(
+    private fun lagUtbetalingDtoForAnnulering(
         behandling: Saksbehandling,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
-        utbetalingDtoFactory: (UtbetalingGrunnlagDto) -> T,
-    ): Collection<T> =
+    ): List<Utbetaling> =
         finnTypeAndelerSomSkalAnnulleres(behandling, andelerTilkjentYtelse)
             .map { typeAndel ->
-                val grunnlag =
-                    lagUtbetalingGrunnlag(
-                        behandling = behandling,
-                        type = typeAndel,
-                        andeler = emptyList(), // periodene skal annuleres 💥
-                    )
-                utbetalingDtoFactory(grunnlag)
+                lagUtbetaling(
+                    behandling = behandling,
+                    type = typeAndel,
+                    andeler = emptyList(), // periodene skal annuleres 💥
+                )
             }
 
-    private fun grupperPåMånedOgMapTilPerioder(andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>): List<PerioderUtbetaling> =
+    private fun grupperPåDagOgMapTilPerioder(andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>): List<UtbetalingPeriodeDto> =
         andelerTilkjentYtelse
             .filter { it.beløp != 0 }
             .groupBy { it.utbetalingsdato }
             .map { (utbetalingsdato, andeler) ->
-                PerioderUtbetaling(
+                UtbetalingPeriodeDto(
                     fom = utbetalingsdato,
                     tom = utbetalingsdato,
                     beløp = andeler.sumOf { it.beløp }.toUInt(),

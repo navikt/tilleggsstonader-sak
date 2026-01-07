@@ -47,12 +47,14 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 medVilkår = reiser,
             )
 
+        val saksbehandling = testoppsettService.hentSaksbehandling(behandlingId)
         val utbetalinger = KafkaTestConfig.sendteMeldinger().finnPåTopic(kafkaTopics.utbetaling)
         val utbetaling = utbetalinger.single().verdiEllerFeil<IverksettingDto>()
 
-        with(utbetaling.utbetalingsgrunnlag) {
-            assertThat(periodetype).isEqualTo(PeriodetypeUtbetaling.UKEDAG)
-            assertThat(behandlingId).isEqualTo(behandlingId)
+        assertThat(utbetaling.periodetype).isEqualTo(PeriodetypeUtbetaling.UKEDAG)
+        assertThat(utbetaling.behandlingId).isEqualTo(saksbehandling.eksternId.toString())
+        assertThat(utbetaling.utbetalinger).hasSize(1)
+        with(utbetaling.utbetalinger.single()) {
             assertThat(perioder).hasSize(2)
 
             with(perioder.first()) {
@@ -92,7 +94,12 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 .fom
                 .datoEllerNesteMandagHvisLørdagEllerSøndag()
 
-        with(utbetaling.utbetalingsgrunnlag.perioder.single()) {
+        with(
+            utbetaling.utbetalinger
+                .single()
+                .perioder
+                .single(),
+        ) {
             assertThat(fom).isEqualTo(tom).isEqualTo(forventetUtbetalingsdato)
         }
     }
