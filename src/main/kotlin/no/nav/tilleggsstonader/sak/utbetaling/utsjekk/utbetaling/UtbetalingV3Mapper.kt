@@ -80,7 +80,6 @@ class UtbetalingV3Mapper(
 
     fun mapPeriodetypeFraAndeler(andeler: Collection<AndelTilkjentYtelse>): PeriodetypeUtbetaling {
         val satstyper = andeler.distinctBy { it.satstype }
-        println(satstyper)
         feilHvis(satstyper.size != 1) {
             "Håndterer ikke andeler med flere ulike satstyper samtidig"
         }
