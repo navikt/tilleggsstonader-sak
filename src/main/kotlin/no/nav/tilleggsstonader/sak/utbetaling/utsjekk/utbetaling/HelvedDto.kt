@@ -1,16 +1,16 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
-sealed interface UtbetalingDto {
+private sealed interface HelvedDto {
     val sakId: String
     val behandlingId: String
     val personident: String
     val periodetype: PeriodetypeUtbetaling
-    val utbetalinger: List<Utbetaling>
+    val vedtakstidspunkt: LocalDateTime
+    val utbetalinger: List<UtbetalingDto>
     val dryrun: Boolean
 }
 
@@ -19,9 +19,9 @@ data class SimuleringDto(
     override val behandlingId: String,
     override val personident: String,
     override val periodetype: PeriodetypeUtbetaling,
-    override val utbetalinger: List<Utbetaling>,
-    val vedtakstidspunkt: LocalDateTime = LocalDateTime.now(),
-) : UtbetalingDto {
+    override val vedtakstidspunkt: LocalDateTime = LocalDateTime.now(),
+    override val utbetalinger: List<UtbetalingDto>,
+) : HelvedDto {
     override val dryrun: Boolean = true
 }
 
@@ -30,11 +30,11 @@ class IverksettingDto(
     override val behandlingId: String,
     override val personident: String,
     override val periodetype: PeriodetypeUtbetaling,
-    override val utbetalinger: List<Utbetaling>,
+    override val vedtakstidspunkt: LocalDateTime,
+    override val utbetalinger: List<UtbetalingDto>,
     val saksbehandler: String,
     val beslutter: String,
-    val vedtakstidspunkt: LocalDateTime,
-) : UtbetalingDto {
+) : HelvedDto {
     override val dryrun: Boolean = false
 }
 
@@ -44,7 +44,7 @@ class IverksettingDto(
  * når man evt. ønsker å gjøre endringer eller opphør på en utbetaling.
  *
  */
-data class Utbetaling(
+data class UtbetalingDto(
     val id: UUID, // utbetalingId
     val stønad: StønadUtbetaling,
     val perioder: List<UtbetalingPeriodeDto>,

@@ -7,10 +7,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-class UtbetalingDtoTest {
+class HelvedDtoTest {
     private val testUtbetalinger =
         listOf(
-            Utbetaling(
+            UtbetalingDto(
                 id = UUID.fromString("7b78b166-9097-4117-b046-5f7e25b91d6b"),
                 stønad = StønadUtbetaling.DAGLIG_REISE_ENSLIG_FORSØRGER,
                 perioder =

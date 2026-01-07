@@ -52,7 +52,7 @@ class UtbetalingV3Mapper(
         behandling: Saksbehandling,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
         erFørsteIverksettingForBehandling: Boolean,
-    ): List<Utbetaling> =
+    ): List<UtbetalingDto> =
         andelerTilkjentYtelse
             .groupBy { it.type }
             .map { (type, andelerAvType) -> lagUtbetaling(behandling, type, andelerAvType) }
@@ -68,9 +68,9 @@ class UtbetalingV3Mapper(
         behandling: Saksbehandling,
         type: TypeAndel,
         andeler: Collection<AndelTilkjentYtelse>,
-    ): Utbetaling {
+    ): UtbetalingDto {
         val utbetalingId = fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(behandling.fagsakId, type)
-        return Utbetaling(
+        return UtbetalingDto(
             id = utbetalingId.utbetalingId,
             stønad = mapTilStønadUtbetaling(type),
             perioder = grupperPåDagOgMapTilPerioder(andeler),
@@ -98,7 +98,7 @@ class UtbetalingV3Mapper(
     private fun lagUtbetalingDtoForAnnulering(
         behandling: Saksbehandling,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
-    ): List<Utbetaling> =
+    ): List<UtbetalingDto> =
         finnTypeAndelerSomSkalAnnulleres(behandling, andelerTilkjentYtelse)
             .map { typeAndel ->
                 lagUtbetaling(
