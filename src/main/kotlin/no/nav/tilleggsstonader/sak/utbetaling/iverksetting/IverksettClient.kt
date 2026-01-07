@@ -80,7 +80,7 @@ class IverksettClient(
         }
     }
 
-    fun simulerV3(simuleringRequest: Collection<SimuleringDto>): SimuleringResponseDto? {
+    fun simulerV3(simuleringRequest: SimuleringDto): SimuleringResponseDto? {
         val url =
             UriComponentsBuilder
                 .fromUri(uri)

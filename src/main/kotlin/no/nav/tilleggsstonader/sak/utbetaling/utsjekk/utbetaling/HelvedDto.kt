@@ -1,26 +1,41 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
-sealed interface UtbetalingDto
+private sealed interface HelvedDto {
+    val sakId: String
+    val behandlingId: String
+    val personident: String
+    val periodetype: PeriodetypeUtbetaling
+    val vedtakstidspunkt: LocalDateTime
+    val utbetalinger: List<UtbetalingDto>
+    val dryrun: Boolean
+}
 
 data class SimuleringDto(
-    @JsonUnwrapped val utbetalingsgrunnlag: UtbetalingGrunnlagDto,
-    val vedtakstidspunkt: LocalDateTime = LocalDateTime.now(),
-) : UtbetalingDto {
-    val dryrun: Boolean = true
+    override val sakId: String,
+    override val behandlingId: String,
+    override val personident: String,
+    override val periodetype: PeriodetypeUtbetaling,
+    override val vedtakstidspunkt: LocalDateTime = LocalDateTime.now(),
+    override val utbetalinger: List<UtbetalingDto>,
+) : HelvedDto {
+    override val dryrun: Boolean = true
 }
 
 class IverksettingDto(
-    @JsonUnwrapped val utbetalingsgrunnlag: UtbetalingGrunnlagDto,
+    override val sakId: String,
+    override val behandlingId: String,
+    override val personident: String,
+    override val periodetype: PeriodetypeUtbetaling,
+    override val vedtakstidspunkt: LocalDateTime,
+    override val utbetalinger: List<UtbetalingDto>,
     val saksbehandler: String,
     val beslutter: String,
-    val vedtakstidspunkt: LocalDateTime,
-) : UtbetalingDto {
-    val dryrun: Boolean = false
+) : HelvedDto {
+    override val dryrun: Boolean = false
 }
 
 /**
@@ -29,15 +44,17 @@ class IverksettingDto(
  * når man evt. ønsker å gjøre endringer eller opphør på en utbetaling.
  *
  */
-data class UtbetalingGrunnlagDto(
-    val id: UUID,
-    val sakId: String,
-    val behandlingId: String,
-    val personident: String,
-    val periodetype: PeriodetypeUtbetaling,
+data class UtbetalingDto(
+    val id: UUID, // utbetalingId
     val stønad: StønadUtbetaling,
-    val perioder: List<PerioderUtbetaling>,
-    val brukFagområdeTillst: Boolean = false,
+    val perioder: List<UtbetalingPeriodeDto>,
+    val brukFagområdeTillst: Boolean,
+)
+
+data class UtbetalingPeriodeDto(
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val beløp: UInt,
 )
 
 enum class StønadUtbetaling {
@@ -64,12 +81,6 @@ enum class StønadUtbetaling {
     DAGLIG_REISE_TILTAK_UTVIDET_OPPFØLGING_I_NAV,
     DAGLIG_REISE_TILTAK_UTVIDET_OPPFØLGING_I_OPPLÆRING,
 }
-
-data class PerioderUtbetaling(
-    val fom: LocalDate,
-    val tom: LocalDate,
-    val beløp: UInt,
-)
 
 enum class PeriodetypeUtbetaling {
     UKEDAG,

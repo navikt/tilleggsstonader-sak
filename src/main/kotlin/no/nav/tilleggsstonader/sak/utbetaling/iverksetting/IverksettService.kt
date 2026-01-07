@@ -66,7 +66,7 @@ class IverksettService(
         val iverksettingId = behandlingId.id
         sendAndelerTilUtsjekk(
             tilkjentYtelse = tilkjentYtelse,
-            andelerTilkjentYtelse = andelerSomSkalIverksettesNå,
+            andelerTilUtbetaling = andelerSomSkalIverksettesNå,
             behandling = behandling,
             iverksettingId = iverksettingId,
             totrinnskontroll = totrinnskontroll,
@@ -129,7 +129,7 @@ class IverksettService(
         sendAndelerTilUtsjekk(
             behandling = behandling,
             iverksettingId = iverksettingId,
-            andelerTilkjentYtelse = andelerTilkjentYtelse,
+            andelerTilUtbetaling = andelerTilkjentYtelse,
             totrinnskontroll = totrinnskontroll,
             tilkjentYtelse = tilkjentYtelse,
             erFørsteIverksettingForBehandling = false,
@@ -139,26 +139,30 @@ class IverksettService(
     private fun sendAndelerTilUtsjekk(
         behandling: Saksbehandling,
         iverksettingId: UUID,
-        andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
+        andelerTilUtbetaling: Collection<AndelTilkjentYtelse>,
         totrinnskontroll: Totrinnskontroll,
         tilkjentYtelse: TilkjentYtelse,
         erFørsteIverksettingForBehandling: Boolean,
     ) {
         if (utbetalingSkalSendesPåKafka(behandling.stønadstype)) {
-            val utbetalingRecords =
-                utbetalingV3Mapper.lagIverksettingDtoer(
-                    behandling = behandling,
-                    andelerTilkjentYtelse = andelerTilkjentYtelse,
-                    totrinnskontroll = totrinnskontroll,
-                    erFørsteIverksettingForBehandling = erFørsteIverksettingForBehandling,
-                    vedtakstidspunkt = behandling.vedtakstidspunkt ?: feil("Vedtakstidspunkt er påkrevd"),
-                )
-            utbetalingMessageProducer.sendUtbetalinger(iverksettingId, utbetalingRecords)
+            if (andelerTilUtbetaling.isNotEmpty()) {
+                val utbetalingRecords =
+                    utbetalingV3Mapper.lagIverksettingDtoer(
+                        behandling = behandling,
+                        andelerTilkjentYtelse = andelerTilUtbetaling,
+                        totrinnskontroll = totrinnskontroll,
+                        erFørsteIverksettingForBehandling = erFørsteIverksettingForBehandling,
+                        vedtakstidspunkt = behandling.vedtakstidspunkt ?: feil("Vedtakstidspunkt er påkrevd"),
+                    )
+                utbetalingMessageProducer.sendUtbetalinger(iverksettingId, utbetalingRecords)
+            } else {
+                logger.info("Ingen andeler å iverksette for behandling=${behandling.id} ved iverksettingId=$iverksettingId")
+            }
         } else {
             val dto =
                 IverksettDtoMapper.map(
                     behandling = behandling,
-                    andelerTilkjentYtelse = andelerTilkjentYtelse,
+                    andelerTilkjentYtelse = andelerTilUtbetaling,
                     totrinnskontroll = totrinnskontroll,
                     iverksettingId = iverksettingId,
                     forrigeIverksetting = finnForrigeIverksetting(behandling, tilkjentYtelse),
