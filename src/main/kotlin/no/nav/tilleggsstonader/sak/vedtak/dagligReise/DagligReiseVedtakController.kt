@@ -34,7 +34,7 @@ class DagligReiseVedtakController(
     private val beregningService: DagligReiseBeregningService,
     private val tilgangService: TilgangService,
     private val stegService: StegService,
-    private val steg: DagligReiseBeregnYtelseSteg,
+    private val steg: DagligReiseVedtakSteg,
     private val vedtakService: VedtakService,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,

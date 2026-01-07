@@ -29,12 +29,12 @@ enum class TypeDagligReise {
 sealed interface VedtakDagligReise : Vedtaksdata
 
 sealed interface InnvilgelseEllerOpphørDagligReise : VedtakDagligReise {
-    val beregningsresultat: BeregningsresultatDagligReise
+    val beregningsresultat: BeregningsresultatDagligReise?
     val vedtaksperioder: List<Vedtaksperiode>
 }
 
 data class InnvilgelseDagligReise(
-    override val beregningsresultat: BeregningsresultatDagligReise,
+    override val beregningsresultat: BeregningsresultatDagligReise?,
     override val vedtaksperioder: List<Vedtaksperiode>,
     val begrunnelse: String? = null,
 ) : InnvilgelseEllerOpphørDagligReise,
