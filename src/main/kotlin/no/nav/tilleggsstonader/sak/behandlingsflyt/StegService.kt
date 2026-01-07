@@ -80,7 +80,7 @@ class StegService(
         return when (steg) {
             StegType.INNGANGSVILKÅR -> håndterInngangsvilkår(behandlingId)
             StegType.VILKÅR -> håndterVilkår(behandlingId)
-            StegType.BEREGNE_RAMMEVEDTAK_PRIVAT_BIL -> håndterRammeVilkår(behandlingId)
+            StegType.VEDTAK -> håndterRammeVilkår(behandlingId)
             StegType.KJORELISTE -> håndterKjøreliste(behandlingId)
             StegType.SIMULERING -> håndterSimulering(behandlingId)
             StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV -> håndterBrev(behandlingId)

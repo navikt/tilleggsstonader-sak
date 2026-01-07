@@ -20,5 +20,5 @@ class RammevedtakSteg(
         }
     }
 
-    override fun stegType(): StegType = StegType.BEREGNE_RAMMEVEDTAK_PRIVAT_BIL
+    override fun stegType(): StegType = StegType.VEDTAK
 }

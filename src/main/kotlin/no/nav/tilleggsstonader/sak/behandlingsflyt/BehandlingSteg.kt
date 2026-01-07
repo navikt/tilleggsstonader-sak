@@ -52,7 +52,7 @@ enum class StegType(
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    BEREGNE_RAMMEVEDTAK_PRIVAT_BIL(
+    VEDTAK(
         rekkefølge = 3,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
@@ -107,6 +107,12 @@ enum class StegType(
         this.gyldigIKombinasjonMedStatus.contains(behandlingStatus)
 
     fun hentNesteSteg(stønadstype: Stønadstype): StegType =
+        when (stønadstype) {
+            Stønadstype.DAGLIG_REISE_TSR, Stønadstype.DAGLIG_REISE_TSO -> hentNesteStegDagligReise()
+            else -> hentNesteStegStandard(stønadstype)
+        }
+
+    private fun hentNesteStegStandard(stønadstype: Stønadstype): StegType =
         when (this) {
             INNGANGSVILKÅR -> {
                 when (stønadstype) {
@@ -115,48 +121,30 @@ enum class StegType(
                 }
             }
 
-            VILKÅR -> {
-                when (stønadstype) {
-                    Stønadstype.DAGLIG_REISE_TSO -> BEREGNE_RAMMEVEDTAK_PRIVAT_BIL
-                    Stønadstype.DAGLIG_REISE_TSR -> BEREGNE_RAMMEVEDTAK_PRIVAT_BIL
-                    else -> BEREGNE_YTELSE
-                }
-            }
-
-            BEREGNE_RAMMEVEDTAK_PRIVAT_BIL -> {
-                KJORELISTE
-            }
-
-            KJORELISTE -> {
-                BEREGNE_YTELSE
-            }
-
-            BEREGNE_YTELSE -> {
-                SIMULERING
-            }
-
-            SIMULERING -> {
-                SEND_TIL_BESLUTTER
-            }
-
-            SEND_TIL_BESLUTTER -> {
-                BESLUTTE_VEDTAK
-            }
-
-            BESLUTTE_VEDTAK -> {
-                JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV
-            }
-
-            JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV -> {
-                FERDIGSTILLE_BEHANDLING
-            }
-
-            FERDIGSTILLE_BEHANDLING -> {
-                BEHANDLING_FERDIGSTILT
-            }
-
-            BEHANDLING_FERDIGSTILT -> {
-                BEHANDLING_FERDIGSTILT
-            }
+            VILKÅR -> BEREGNE_YTELSE
+            else -> fellesNesteSteg()
         }
+
+    fun hentNesteStegDagligReise(): StegType =
+        when (this) {
+            INNGANGSVILKÅR -> VILKÅR
+            VILKÅR -> VEDTAK
+            VEDTAK -> KJORELISTE
+            KJORELISTE -> BEREGNE_YTELSE
+            else -> fellesNesteSteg()
+        }
+
+    private fun fellesNesteSteg(): StegType =
+        when (this) {
+            BEREGNE_YTELSE -> SIMULERING
+            SIMULERING -> SEND_TIL_BESLUTTER
+            SEND_TIL_BESLUTTER -> BESLUTTE_VEDTAK
+            BESLUTTE_VEDTAK -> JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV
+            JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV -> FERDIGSTILLE_BEHANDLING
+            FERDIGSTILLE_BEHANDLING -> BEHANDLING_FERDIGSTILT
+            BEHANDLING_FERDIGSTILT -> BEHANDLING_FERDIGSTILT
+
+            else -> error("Finner ikke neste steg etter ${this.visningsnavn()}")
+        }
+
 }
