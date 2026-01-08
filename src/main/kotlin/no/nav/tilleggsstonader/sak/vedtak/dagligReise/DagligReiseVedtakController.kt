@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatDagl
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
@@ -75,7 +76,13 @@ class DagligReiseVedtakController(
         return vedtakDtoMapper.toDto(vedtak, behandling.forrigeIverksatteBehandlingId)
     }
 
-    // TODO: Endre denne slik at den bare henter ut beregningsresultatet fra vedtaket
+    @GetMapping("{behandlingId}/beregningsresultat")
+    fun hentBeregningsresultat(@PathVariable behandlingId: BehandlingId): BeregningsresultatDagligReiseDto? {
+        val vedtak = vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandlingId)
+
+        return vedtak?.data?.beregningsresultat?.tilDto(vedtak.tidligsteEndring)
+    }
+
     @PostMapping("{behandlingId}/beregn")
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
