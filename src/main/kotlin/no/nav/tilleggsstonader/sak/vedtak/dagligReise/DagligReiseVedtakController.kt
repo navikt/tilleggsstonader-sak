@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
@@ -85,12 +86,17 @@ class DagligReiseVedtakController(
         return vedtak?.data?.beregningsresultat?.tilDto(vedtak.tidligsteEndring)
     }
 
+    @GetMapping("{behandlingId}/rammevedtak")
+    fun hentRammevedtak(@PathVariable behandlingId: BehandlingId): BeregningsresultatPrivatBil? {
+        val vedtak = vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandlingId)
+
+        return vedtak?.data?.beregningsresultat?.privatBil
+    }
+
     @PutMapping("{behandlingId}/ferdigstill-beregn")
     fun ferdigstillBeregnSteg(@PathVariable behandlingId: BehandlingId) {
         stegService.håndterSteg(behandlingId, beregnSteg)
     }
-
-
 
     @PostMapping("{behandlingId}/beregn")
     fun beregn(
