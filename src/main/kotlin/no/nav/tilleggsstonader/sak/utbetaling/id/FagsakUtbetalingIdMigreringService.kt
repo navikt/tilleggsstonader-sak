@@ -26,7 +26,7 @@ class FagsakUtbetalingIdMigreringService(
     private val unleashService: UnleashService,
 ) {
     fun migrerForFagsak(fagsakId: FagsakId) {
-        if (unleashService.isEnabled(Toggle.SKAL_MIGRERE_UTBETALING_TIL_KAFKA)) {
+        if (unleashService.isEnabled(Toggle.SKAL_MIGRERE_UTBETALING_MOT_KAFKA)) {
             val sisteIverksatteBehandling = behandlingService.finnSisteIverksatteBehandling(fagsakId)
             val andelTilkjentYtelseListe =
                 sisteIverksatteBehandling?.let { iverksettService.hentAndelTilkjentYtelse(it.id) }

@@ -12,10 +12,11 @@ import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.oktober
 import no.nav.tilleggsstonader.libs.utils.dato.september
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
@@ -37,15 +38,19 @@ import no.nav.tilleggsstonader.sak.util.journalpost
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBoutgifterDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDate
 
-class FagsakUtbetalingIdMigreringServiceTest : IntegrationTest() {
+class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var fagsakUtbetalingIdService: FagsakUtbetalingIdService
 
@@ -59,45 +64,11 @@ class FagsakUtbetalingIdMigreringServiceTest : IntegrationTest() {
     lateinit var iverksettClient: IverksettClient
 
     @Test
-    fun `skal migrere til kafka`() {
+    fun `behandling blir iverksatt mot gammelt endepunkt, skrur på toggle for migrering, utbetaling for revurdering blir migrert`() {
         val fom = 1 september 2025
         val tom = 30 september 2025
 
-        val førstegangsbehandlingId =
-            gjennomførBehandlingsløp(
-                fraJournalpost =
-                    journalpost(
-                        journalpostId = "1",
-                        journalstatus = Journalstatus.MOTTATT,
-                        dokumenter = listOf(DokumentInfo("", brevkode = DokumentBrevkode.LÆREMIDLER.verdi)),
-                        bruker = Bruker("12345678910", BrukerIdType.FNR),
-                        tema = Tema.TSO.name,
-                    ),
-                medAktivitet = { behandlingId ->
-                    lagreVilkårperiodeAktivitet(
-                        behandlingId = behandlingId,
-                        aktivitetType = AktivitetType.UTDANNING,
-                        fom = fom,
-                        tom = tom,
-                        faktaOgSvar =
-                            FaktaOgSvarAktivitetLæremidlerDto(
-                                prosent = 100,
-                                studienivå = Studienivå.HØYERE_UTDANNING,
-                                svarHarUtgifter = SvarJaNei.JA,
-                                svarHarRettTilUtstyrsstipend = SvarJaNei.NEI,
-                            ),
-                    )
-                },
-                medMålgruppe = { behandlingId ->
-                    lagreVilkårperiodeMålgruppe(
-                        behandlingId = behandlingId,
-                        målgruppeType = MålgruppeType.AAP,
-                        fom = fom,
-                        tom = tom,
-                    )
-                },
-                medVilkår = emptyList(),
-            )
+        val førstegangsbehandlingId = opprettFørstegangsbehandling(fom, tom)
         kjørAlleTaskMedSenererTriggertid()
 
         val førstegangsbehandling = behandlingService.hentBehandling(førstegangsbehandlingId)
@@ -112,7 +83,7 @@ class FagsakUtbetalingIdMigreringServiceTest : IntegrationTest() {
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
 
-        every { unleashService.isEnabled(Toggle.SKAL_MIGRERE_UTBETALING_TIL_KAFKA) } returns true
+        every { unleashService.isEnabled(Toggle.SKAL_MIGRERE_UTBETALING_MOT_KAFKA) } returns true
         val revurderingId =
             opprettRevurdering(
                 opprettBehandlingDto =
@@ -156,4 +127,89 @@ class FagsakUtbetalingIdMigreringServiceTest : IntegrationTest() {
                 assertThat(iverksettingDto.utbetalinger.all { it.brukFagområdeTillst }).isTrue
             }
     }
+
+    @Test
+    fun `behandle ny læremidler-sak, feature-toggle for iverksette nytt grensesnitt på, skal sendes gjennom ny iverksetting`() {
+        every { unleashService.isEnabled(Toggle.SKAL_IVERKSETT_NYE_BEHANDLINGER_MOT_KAFKA) } returns true
+
+        val fom = 1 september 2025
+        val tom = 30 september 2025
+
+        val førstegangsbehandlingId = opprettFørstegangsbehandling(fom, tom)
+        kjørAlleTaskMedSenererTriggertid()
+
+        val førstegangsbehandling = behandlingService.hentBehandling(førstegangsbehandlingId)
+        val finnesUtbetalingIdEtterFørstegangsbehandling =
+            fagsakUtbetalingIdService.finnesUtbetalingsId(førstegangsbehandling.fagsakId, TypeAndel.LÆREMIDLER_AAP)
+
+        assertThat(finnesUtbetalingIdEtterFørstegangsbehandling).isTrue
+        verify(exactly = 0) { iverksettClient.simulerV2(any()) }
+        verify(exactly = 0) { iverksettClient.iverksett(any()) }
+        verify(exactly = 1) { iverksettClient.simulerV3(any()) }
+        KafkaTestConfig
+            .sendteMeldinger()
+            .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
+    }
+
+    @Test
+    fun `behandle ny læremidler-sak, feature-toggle for iverksette nytt grensesnitt av, skal sendes gjennom gammelt iverksetting`() {
+        every { unleashService.isEnabled(Toggle.SKAL_IVERKSETT_NYE_BEHANDLINGER_MOT_KAFKA) } returns false
+
+        val fom = 1 september 2025
+        val tom = 30 september 2025
+
+        val førstegangsbehandlingId = opprettFørstegangsbehandling(fom, tom)
+        kjørAlleTaskMedSenererTriggertid()
+
+        val førstegangsbehandling = behandlingService.hentBehandling(førstegangsbehandlingId)
+        val finnesUtbetalingIdEtterFørstegangsbehandling =
+            fagsakUtbetalingIdService.finnesUtbetalingsId(førstegangsbehandling.fagsakId, TypeAndel.LÆREMIDLER_AAP)
+
+        assertThat(finnesUtbetalingIdEtterFørstegangsbehandling).isFalse
+        verify(exactly = 1) { iverksettClient.simulerV2(any()) }
+        verify(exactly = 1) { iverksettClient.iverksett(any()) }
+        verify(exactly = 0) { iverksettClient.simulerV3(any()) }
+        KafkaTestConfig
+            .sendteMeldinger()
+            .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
+    }
+
+    private fun opprettFørstegangsbehandling(
+        fom: LocalDate,
+        tom: LocalDate,
+    ): BehandlingId =
+        gjennomførBehandlingsløp(
+            fraJournalpost =
+                journalpost(
+                    journalpostId = "1",
+                    journalstatus = Journalstatus.MOTTATT,
+                    dokumenter = listOf(DokumentInfo("", brevkode = DokumentBrevkode.LÆREMIDLER.verdi)),
+                    bruker = Bruker("12345678910", BrukerIdType.FNR),
+                    tema = Tema.TSO.name,
+                ),
+            medAktivitet = { behandlingId ->
+                lagreVilkårperiodeAktivitet(
+                    behandlingId = behandlingId,
+                    aktivitetType = AktivitetType.UTDANNING,
+                    fom = fom,
+                    tom = tom,
+                    faktaOgSvar =
+                        FaktaOgSvarAktivitetLæremidlerDto(
+                            prosent = 100,
+                            studienivå = Studienivå.HØYERE_UTDANNING,
+                            svarHarUtgifter = SvarJaNei.JA,
+                            svarHarRettTilUtstyrsstipend = SvarJaNei.NEI,
+                        ),
+                )
+            },
+            medMålgruppe = { behandlingId ->
+                lagreVilkårperiodeMålgruppe(
+                    behandlingId = behandlingId,
+                    målgruppeType = MålgruppeType.AAP,
+                    fom = fom,
+                    tom = tom,
+                )
+            },
+            medVilkår = emptyList(),
+        )
 }

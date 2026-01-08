@@ -71,7 +71,7 @@ class SimuleringService(
         val forrigeIverksetting = iverksettService.finnForrigeIverksetting(saksbehandling, tilkjentYtelse)
 
         return if (iverksettService.utbetalingSkalSendesPåKafka(
-                stønadstype = saksbehandling.stønadstype,
+                behandling = saksbehandling,
                 fagsakId = saksbehandling.fagsakId,
                 typeAndel = tilkjentYtelse.andelerTilkjentYtelse.map { it.type }.toSet(),
             )
