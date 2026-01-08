@@ -9,6 +9,8 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseServi
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
@@ -26,6 +28,7 @@ class DagligReiseVedtakSteg(
     private val vedtakRepository: VedtakRepository,
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val simuleringService: SimuleringService,
+    private val dagligReiseBeregningService: DagligReiseBeregningService,
 ) : BehandlingSteg<VedtakDagligReiseRequest> {
     override fun utførSteg(
         saksbehandling: Saksbehandling,
@@ -80,11 +83,20 @@ class DagligReiseVedtakSteg(
                 vedtaksperioder,
             )
 
+        val beregningsresultatOffentligTransportOgRammePrivatBil =
+            dagligReiseBeregningService.beregnOffentligTransportOgRammevedtak(
+                vedtaksperioder = vedtaksperioder,
+                behandling = saksbehandling,
+                typeVedtak = TypeVedtak.INNVILGELSE,
+                tidligsteEndring = tidligsteEndring,
+            )
+
         lagreInnvilgetVedtak(
             behandling = saksbehandling,
             vedtaksperioder = vedtaksperioder,
             begrunnelse = vedtak.begrunnelse,
             tidligsteEndring = tidligsteEndring,
+            beregningsresultat = beregningsresultatOffentligTransportOgRammePrivatBil,
         )
     }
 
@@ -112,6 +124,7 @@ class DagligReiseVedtakSteg(
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
         tidligsteEndring: LocalDate?,
+        beregningsresultat: BeregningsresultatDagligReise,
     ) {
         vedtakRepository.insert(
             GeneriskVedtak(
@@ -121,7 +134,7 @@ class DagligReiseVedtakSteg(
                     InnvilgelseDagligReise(
                         vedtaksperioder = vedtaksperioder,
                         begrunnelse = begrunnelse,
-                        beregningsresultat = null,
+                        beregningsresultat = beregningsresultat,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = tidligsteEndring,

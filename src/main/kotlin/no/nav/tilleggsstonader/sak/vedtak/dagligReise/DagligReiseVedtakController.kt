@@ -75,6 +75,7 @@ class DagligReiseVedtakController(
         return vedtakDtoMapper.toDto(vedtak, behandling.forrigeIverksatteBehandlingId)
     }
 
+    // TODO: Endre denne slik at den bare henter ut beregningsresultatet fra vedtaket
     @PostMapping("{behandlingId}/beregn")
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
@@ -89,7 +90,7 @@ class DagligReiseVedtakController(
             )
         val beregningsresultat =
             beregningService
-                .beregn(
+                .beregnOffentligTransportOgRammevedtak(
                     vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
                     behandling = behandling,
                     typeVedtak = TypeVedtak.INNVILGELSE,

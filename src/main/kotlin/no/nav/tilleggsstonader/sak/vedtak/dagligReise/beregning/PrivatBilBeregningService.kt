@@ -34,7 +34,7 @@ data class DummyReiseMedBil(
 
 @Service
 class PrivatBilBeregningService {
-    fun beregn(oppfylteVilkår: List<VilkårDagligReise>): BeregningsresultatPrivatBil =
+    fun beregnRamme(oppfylteVilkår: List<VilkårDagligReise>): BeregningsresultatPrivatBil =
         BeregningsresultatPrivatBil(
             reiser =
                 oppfylteVilkår.map {

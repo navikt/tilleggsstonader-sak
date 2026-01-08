@@ -56,11 +56,4 @@ class VedtakService(
     ) {
         stegService.håndterSteg(behandlingId = behandlingId, behandlingSteg = boutgifterBeregnYtelseSteg, data = data)
     }
-
-    fun håndterSteg(
-        behandlingId: BehandlingId,
-        data: VedtakDagligReiseRequest,
-    ) {
-        stegService.håndterSteg(behandlingId = behandlingId, behandlingSteg = dagligReiseBeregnYtelseSteg, data = data)
-    }
 }

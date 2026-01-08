@@ -26,7 +26,7 @@ class DagligReiseBeregningService(
     private val privatBilBeregningService: PrivatBilBeregningService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
 ) {
-    fun beregn(
+    fun beregnOffentligTransportOgRammevedtak(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
@@ -40,6 +40,7 @@ class DagligReiseBeregningService(
 
         val oppfylteVilkårDagligReise =
             vilkårService.hentOppfylteDagligReiseVilkår(behandling.id).map { it.mapTilVilkårDagligReise() }
+
         validerFinnesReiser(oppfylteVilkårDagligReise)
 
         val brukersNavKontor =
@@ -59,7 +60,7 @@ class DagligReiseBeregningService(
                     tidligsteEndring = tidligsteEndring,
                 ),
             privatBil =
-                beregnPrivatBil(
+                beregnRammePrivatBil(
                     oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
                 ),
         )
@@ -95,11 +96,11 @@ class DagligReiseBeregningService(
             tidligsteEndring = tidligsteEndring,
         )
 
-    private fun beregnPrivatBil(oppfylteVilkårDagligReise: List<VilkårDagligReise>): BeregningsresultatPrivatBil? {
+    private fun beregnRammePrivatBil(oppfylteVilkårDagligReise: List<VilkårDagligReise>): BeregningsresultatPrivatBil? {
         val oppfylteVilkårPrivatBil = oppfylteVilkårDagligReise.filter { it.fakta is FaktaPrivatBil }
 
         if (oppfylteVilkårPrivatBil.isEmpty()) return null
-        return privatBilBeregningService.beregn(oppfylteVilkårPrivatBil)
+        return privatBilBeregningService.beregnRamme(oppfylteVilkårPrivatBil)
     }
 }
 
