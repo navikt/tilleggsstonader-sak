@@ -19,11 +19,13 @@ class HelvedDtoTest {
                             fom = 1 januar 2024,
                             tom = 31 januar 2024,
                             beløp = 1000u,
+                            betalendeEnhet = null,
                         ),
                         UtbetalingPeriodeDto(
                             fom = 1 februar 2024,
                             tom = 29 februar 2024,
                             beløp = 1500u,
+                            betalendeEnhet = null,
                         ),
                     ),
                 brukFagområdeTillst = true,
@@ -61,12 +63,14 @@ class HelvedDtoTest {
                     {
                       "fom": "2024-01-01",
                       "tom": "2024-01-31",
-                      "beløp": 1000
+                      "beløp": 1000,
+                      "betalendeEnhet": null
                     },
                     {
                       "fom": "2024-02-01",
                       "tom": "2024-02-29",
-                      "beløp": 1500
+                      "beløp": 1500,
+                      "betalendeEnhet": null
                     }
                   ],
                   "brukFagområdeTillst": true
@@ -116,12 +120,14 @@ class HelvedDtoTest {
                     {
                       "fom": "2024-01-01",
                       "tom": "2024-01-31",
-                      "beløp": 1000
+                      "beløp": 1000,
+                      "betalendeEnhet": null
                     },
                     {
                       "fom": "2024-02-01",
                       "tom": "2024-02-29",
-                      "beløp": 1500
+                      "beløp": 1500,
+                      "betalendeEnhet": null
                     }
                   ],
                   "brukFagområdeTillst": true
