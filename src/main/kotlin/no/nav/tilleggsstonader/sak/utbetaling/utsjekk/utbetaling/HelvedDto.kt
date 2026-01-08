@@ -55,6 +55,7 @@ data class UtbetalingPeriodeDto(
     val fom: LocalDate,
     val tom: LocalDate,
     val beløp: UInt,
+    val betalendeEnhet: String?,
 )
 
 enum class StønadUtbetaling {

@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -110,14 +111,21 @@ class UtbetalingV3Mapper(
     private fun grupperPåDagOgMapTilPerioder(andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>): List<UtbetalingPeriodeDto> =
         andelerTilkjentYtelse
             .filter { it.beløp != 0 }
-            .groupBy { it.utbetalingsdato }
-            .map { (utbetalingsdato, andeler) ->
+            .groupBy { UtbetalingsDatoOgEnhet(it.utbetalingsdato, it.brukersNavKontor) }
+            .map { (utbetalingsdatoOgEnhet, andeler) ->
                 UtbetalingPeriodeDto(
-                    fom = utbetalingsdato,
-                    tom = utbetalingsdato,
+                    fom = utbetalingsdatoOgEnhet.utbetalingsdato,
+                    tom = utbetalingsdatoOgEnhet.utbetalingsdato,
                     beløp = andeler.sumOf { it.beløp }.toUInt(),
+                    betalendeEnhet = utbetalingsdatoOgEnhet.betalendeEnhet,
                 )
             }
+
+    // Hjelpeklasse for å gruppere andeler på utbetalingsdato og betalende enhet
+    private data class UtbetalingsDatoOgEnhet(
+        val utbetalingsdato: LocalDate,
+        val betalendeEnhet: String?,
+    )
 
     private fun mapTilStønadUtbetaling(typeAndel: TypeAndel): StønadUtbetaling =
         when (typeAndel) {
