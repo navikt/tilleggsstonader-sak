@@ -54,36 +54,40 @@ class VedtakDtoMapper(
     ): VedtakResponse {
         val data = vedtak.data
         return when (data) {
-            is VedtakTilsynBarn ->
+            is VedtakTilsynBarn -> {
                 mapVedtakTilsynBarn(
                     vedtak,
                     data,
                     vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId,
                 )
+            }
 
-            is VedtakLæremidler ->
+            is VedtakLæremidler -> {
                 mapVedtakLæremidler(
                     vedtak,
                     data,
                     vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId,
                 )
+            }
 
-            is VedtakBoutgifter ->
+            is VedtakBoutgifter -> {
                 mapVedtakBoutgifter(
                     vedtak,
                     data,
                     vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId,
                 )
+            }
 
-            is VedtakDagligReise ->
+            is VedtakDagligReise -> {
                 mapVedtakDagligReise(
                     data,
                     vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId,
                 )
+            }
         }
     }
 
@@ -105,7 +109,7 @@ class VedtakDtoMapper(
                 )
             }
 
-            is OpphørTilsynBarn ->
+            is OpphørTilsynBarn -> {
                 OpphørTilsynBarnResponse(
                     beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
                     årsakerOpphør = data.årsaker,
@@ -113,12 +117,14 @@ class VedtakDtoMapper(
                     vedtaksperioder = data.vedtaksperioder.tilLagretVedtaksperiodeDto(null),
                     opphørsdato = vedtak.opphørsdato,
                 )
+            }
 
-            is AvslagTilsynBarn ->
+            is AvslagTilsynBarn -> {
                 AvslagTilsynBarnDto(
                     årsakerAvslag = data.årsaker,
                     begrunnelse = data.begrunnelse,
                 )
+            }
         }
 
     private fun mapVedtakLæremidler(
@@ -140,13 +146,14 @@ class VedtakDtoMapper(
                 )
             }
 
-            is AvslagLæremidler ->
+            is AvslagLæremidler -> {
                 AvslagLæremidlerDto(
                     årsakerAvslag = data.årsaker,
                     begrunnelse = data.begrunnelse,
                 )
+            }
 
-            is OpphørLæremidler ->
+            is OpphørLæremidler -> {
                 OpphørLæremidlerResponse(
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
@@ -155,6 +162,7 @@ class VedtakDtoMapper(
                             .tilLagretVedtaksperiodeDto(hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId)),
                     opphørsdato = vedtak.opphørsdato,
                 )
+            }
         }
 
     private fun mapVedtakBoutgifter(
@@ -177,13 +185,14 @@ class VedtakDtoMapper(
                 )
             }
 
-            is AvslagBoutgifter ->
+            is AvslagBoutgifter -> {
                 AvslagBoutgifterDto(
                     årsakerAvslag = data.årsaker,
                     begrunnelse = data.begrunnelse,
                 )
+            }
 
-            is OpphørBoutgifter ->
+            is OpphørBoutgifter -> {
                 OpphørBoutgifterResponse(
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
@@ -193,6 +202,7 @@ class VedtakDtoMapper(
                         ),
                     opphørsdato = vedtak.opphørsdato,
                 )
+            }
         }
 
     private fun mapVedtakDagligReise(
@@ -207,15 +217,20 @@ class VedtakDtoMapper(
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
                         ),
-                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
+                    beregningsresultat = data.beregningsresultat?.tilDto(tidligsteEndring = tidligsteEndring)!!,
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,
                 )
             }
 
-            is AvslagDagligReise -> AvslagDagligReiseDto(årsakerAvslag = data.årsaker, begrunnelse = data.begrunnelse)
-            is OpphørDagligReise -> TODO()
+            is AvslagDagligReise -> {
+                AvslagDagligReiseDto(årsakerAvslag = data.årsaker, begrunnelse = data.begrunnelse)
+            }
+
+            is OpphørDagligReise -> {
+                TODO()
+            }
         }
 
     private fun hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId: BehandlingId?): List<Vedtaksperiode>? =

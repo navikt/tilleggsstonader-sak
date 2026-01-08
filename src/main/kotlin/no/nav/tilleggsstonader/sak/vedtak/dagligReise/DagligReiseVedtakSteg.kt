@@ -1,19 +1,14 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
-import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
@@ -32,12 +27,18 @@ class DagligReiseVedtakSteg(
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val simuleringService: SimuleringService,
 ) : BehandlingSteg<VedtakDagligReiseRequest> {
-    override fun utførSteg(saksbehandling: Saksbehandling, data: VedtakDagligReiseRequest) {
+    override fun utførSteg(
+        saksbehandling: Saksbehandling,
+        data: VedtakDagligReiseRequest,
+    ) {
         nullstillEksisterendeVedtakPåBehandling(saksbehandling)
         lagreVedtaksresultat(saksbehandling, data)
     }
 
-    override fun utførOgReturnerNesteSteg(saksbehandling: Saksbehandling, data: VedtakDagligReiseRequest): StegType {
+    override fun utførOgReturnerNesteSteg(
+        saksbehandling: Saksbehandling,
+        data: VedtakDagligReiseRequest,
+    ): StegType {
         utførSteg(saksbehandling, data)
         return finnNesteSteg(data)
     }
@@ -53,10 +54,13 @@ class DagligReiseVedtakSteg(
         }
     }
 
-    private fun finnNesteSteg(vedtak: VedtakDagligReiseRequest): StegType = when (vedtak) {
-        is InnvilgelseDagligReiseRequest -> StegType.KJORELISTE // TODO: Her kan man hoppe rett til beregning om man har offentlig transport
-        is AvslagDagligReiseDto -> StegType.SEND_TIL_BESLUTTER // TODO: ER dette riktig?
-    }
+    private fun finnNesteSteg(vedtak: VedtakDagligReiseRequest): StegType =
+        when (vedtak) {
+            is InnvilgelseDagligReiseRequest -> StegType.KJØRELISTE
+
+            // TODO: Her kan man hoppe rett til beregning om man har offentlig transport
+            is AvslagDagligReiseDto -> StegType.SEND_TIL_BESLUTTER // TODO: ER dette riktig?
+        }
 
     private fun nullstillEksisterendeVedtakPåBehandling(saksbehandling: Saksbehandling) {
         vedtakRepository.deleteById(saksbehandling.id)
@@ -70,10 +74,11 @@ class DagligReiseVedtakSteg(
     ) {
         val vedtaksperioder = vedtak.vedtaksperioder.tilDomene()
 
-        val tidligsteEndring = utledTidligsteEndringService.utledTidligsteEndringForBeregning(
-            saksbehandling.id,
-            vedtaksperioder,
-        )
+        val tidligsteEndring =
+            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
+                saksbehandling.id,
+                vedtaksperioder,
+            )
 
         lagreInnvilgetVedtak(
             behandling = saksbehandling,
@@ -91,10 +96,11 @@ class DagligReiseVedtakSteg(
             GeneriskVedtak(
                 behandlingId = saksbehandling.id,
                 type = TypeVedtak.AVSLAG,
-                data = AvslagDagligReise(
-                    årsaker = vedtak.årsakerAvslag,
-                    begrunnelse = vedtak.begrunnelse,
-                ),
+                data =
+                    AvslagDagligReise(
+                        årsaker = vedtak.årsakerAvslag,
+                        begrunnelse = vedtak.begrunnelse,
+                    ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
             ),
@@ -111,11 +117,12 @@ class DagligReiseVedtakSteg(
             GeneriskVedtak(
                 behandlingId = behandling.id,
                 type = TypeVedtak.INNVILGELSE,
-                data = InnvilgelseDagligReise(
-                    vedtaksperioder = vedtaksperioder,
-                    begrunnelse = begrunnelse,
-                    beregningsresultat = null,
-                ),
+                data =
+                    InnvilgelseDagligReise(
+                        vedtaksperioder = vedtaksperioder,
+                        begrunnelse = begrunnelse,
+                        beregningsresultat = null,
+                    ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = tidligsteEndring,
             ),

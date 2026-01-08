@@ -20,5 +20,5 @@ class KjorelisteSteg(
         }
     }
 
-    override fun stegType(): StegType = StegType.KJORELISTE
+    override fun stegType(): StegType = StegType.KJØRELISTE
 }

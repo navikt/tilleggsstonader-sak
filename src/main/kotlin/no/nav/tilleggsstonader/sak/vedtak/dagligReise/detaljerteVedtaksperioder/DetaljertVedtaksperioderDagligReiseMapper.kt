@@ -26,7 +26,7 @@ object DetaljertVedtaksperioderDagligReiseMapper {
     }
 
     private fun InnvilgelseEllerOpphørDagligReise.tilReiseperioder() =
-        beregningsresultat.offentligTransport?.reiser?.flatMap { reise ->
+        beregningsresultat?.offentligTransport?.reiser?.flatMap { reise ->
             reise.perioder
         }
 

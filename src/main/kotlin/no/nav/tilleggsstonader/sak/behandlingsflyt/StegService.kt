@@ -81,7 +81,7 @@ class StegService(
             StegType.INNGANGSVILKÅR -> håndterInngangsvilkår(behandlingId)
             StegType.VILKÅR -> håndterVilkår(behandlingId)
             StegType.VEDTAK -> håndterRammeVilkår(behandlingId)
-            StegType.KJORELISTE -> håndterKjøreliste(behandlingId)
+            StegType.KJØRELISTE -> håndterKjøreliste(behandlingId)
             StegType.SIMULERING -> håndterSimulering(behandlingId)
             StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV -> håndterBrev(behandlingId)
             else -> error("Steg $steg kan ikke ferdigstilles her")

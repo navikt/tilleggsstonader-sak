@@ -57,7 +57,7 @@ enum class StegType(
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    KJORELISTE(
+    KJØRELISTE(
         rekkefølge = 4,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
@@ -121,16 +121,21 @@ enum class StegType(
                 }
             }
 
-            VILKÅR -> BEREGNE_YTELSE
-            else -> fellesNesteSteg()
+            VILKÅR -> {
+                BEREGNE_YTELSE
+            }
+
+            else -> {
+                fellesNesteSteg()
+            }
         }
 
     fun hentNesteStegDagligReise(): StegType =
         when (this) {
             INNGANGSVILKÅR -> VILKÅR
             VILKÅR -> VEDTAK
-            VEDTAK -> KJORELISTE
-            KJORELISTE -> BEREGNE_YTELSE
+            VEDTAK -> `KJØRELISTE`
+            `KJØRELISTE` -> BEREGNE_YTELSE
             else -> fellesNesteSteg()
         }
 
@@ -143,8 +148,6 @@ enum class StegType(
             JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV -> FERDIGSTILLE_BEHANDLING
             FERDIGSTILLE_BEHANDLING -> BEHANDLING_FERDIGSTILT
             BEHANDLING_FERDIGSTILT -> BEHANDLING_FERDIGSTILT
-
             else -> error("Finner ikke neste steg etter ${this.visningsnavn()}")
         }
-
 }
