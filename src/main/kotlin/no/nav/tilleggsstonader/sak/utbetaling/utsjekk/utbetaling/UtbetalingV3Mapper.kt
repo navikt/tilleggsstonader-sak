@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdService
@@ -10,8 +11,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
-import kotlin.collections.component1
-import kotlin.collections.component2
 
 @Service
 class UtbetalingV3Mapper(
@@ -64,6 +63,9 @@ class UtbetalingV3Mapper(
                 }
             }
 
+    private fun Stønadstype.skalBrukeGamleFagområder() =
+        Stønadstype.BARNETILSYN == this || Stønadstype.LÆREMIDLER == this || Stønadstype.BOUTGIFTER == this
+
     private fun lagUtbetaling(
         behandling: Saksbehandling,
         type: TypeAndel,
@@ -74,7 +76,7 @@ class UtbetalingV3Mapper(
             id = utbetalingId.utbetalingId,
             stønad = mapTilStønadUtbetaling(type),
             perioder = grupperPåDagOgMapTilPerioder(andeler),
-            brukFagområdeTillst = false, // TODO - må settes til true for saker som har tatt i bruk dette fagområdet
+            brukFagområdeTillst = behandling.stønadstype.skalBrukeGamleFagområder(),
         )
     }
 
@@ -132,8 +134,10 @@ class UtbetalingV3Mapper(
             TypeAndel.DAGLIG_REISE_TILTAK_ENKELTPLASS_AMO -> StønadUtbetaling.DAGLIG_REISE_TILTAK_ENKELTPLASS_AMO
             TypeAndel.DAGLIG_REISE_TILTAK_ENKELTPLASS_FAG_YRKE_HOYERE_UTD ->
                 StønadUtbetaling.DAGLIG_REISE_TILTAK_ENKELTPLASS_FAG_YRKE_HOYERE_UTD
+
             TypeAndel.DAGLIG_REISE_TILTAK_FORSØK_OPPLÆRINGSTILTAK_LENGER_VARIGHET ->
                 StønadUtbetaling.DAGLIG_REISE_TILTAK_FORSØK_OPPLÆRINGSTILTAK_LENGER_VARIGHET
+
             TypeAndel.DAGLIG_REISE_TILTAK_GRUPPE_AMO -> StønadUtbetaling.DAGLIG_REISE_TILTAK_GRUPPE_AMO
             TypeAndel.DAGLIG_REISE_TILTAK_GRUPPE_FAG_YRKE_HOYERE_UTD -> StønadUtbetaling.DAGLIG_REISE_TILTAK_GRUPPE_FAG_YRKE_HOYERE_UTD
             TypeAndel.DAGLIG_REISE_TILTAK_HØYERE_UTDANNING -> StønadUtbetaling.DAGLIG_REISE_TILTAK_HØYERE_UTDANNING

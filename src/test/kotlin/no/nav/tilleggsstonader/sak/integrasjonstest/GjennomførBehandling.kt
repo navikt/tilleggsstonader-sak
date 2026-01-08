@@ -147,7 +147,7 @@ fun IntegrationTest.gjennomførHenleggelse(fraJournalpost: Journalpost = default
     return behandlingId
 }
 
-private fun IntegrationTest.gjennomførBeslutteVedtakSteg(behandlingId: BehandlingId) {
+fun IntegrationTest.gjennomførBeslutteVedtakSteg(behandlingId: BehandlingId) {
     medBrukercontext(bruker = "nissemor", roller = listOf(rolleConfig.beslutterRolle)) {
         tilordneÅpenBehandlingOppgaveForBehandling(behandlingId)
         kall.totrinnskontroll.beslutteVedtak(behandlingId, BeslutteVedtakDto(godkjent = true))
@@ -155,7 +155,7 @@ private fun IntegrationTest.gjennomførBeslutteVedtakSteg(behandlingId: Behandli
     kjørTasksKlareForProsessering()
 }
 
-private fun IntegrationTest.gjennomførSendTilBeslutterSteg(behandlingId: BehandlingId) {
+fun IntegrationTest.gjennomførSendTilBeslutterSteg(behandlingId: BehandlingId) {
     kall.brev.genererPdf(behandlingId, GenererPdfRequest(MINIMALT_BREV))
     kall.totrinnskontroll.sendTilBeslutter(behandlingId)
     kjørTasksKlareForProsessering()

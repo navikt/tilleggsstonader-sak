@@ -25,6 +25,7 @@ fun resetMock(
     clearMocks(mockk)
     every { mockk.isEnabled(any()) } returns isEnabled
     every { mockk.isEnabled(any(), any<Boolean>()) } returns isEnabled
+    every { mockk.isEnabled(Toggle.SKAL_MIGRERE_UTBETALING_TIL_KAFKA) } returns false
     justRun { mockk.destroy() }
 }
 
