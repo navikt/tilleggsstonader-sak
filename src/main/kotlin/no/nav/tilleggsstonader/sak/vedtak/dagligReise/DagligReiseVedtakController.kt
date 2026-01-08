@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -36,6 +37,7 @@ class DagligReiseVedtakController(
     private val tilgangService: TilgangService,
     private val stegService: StegService,
     private val steg: DagligReiseVedtakSteg,
+    private val beregnSteg: DagligReiseBeregnYtelseSteg,
     private val vedtakService: VedtakService,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
@@ -82,6 +84,13 @@ class DagligReiseVedtakController(
 
         return vedtak?.data?.beregningsresultat?.tilDto(vedtak.tidligsteEndring)
     }
+
+    @PutMapping("{behandlingId}/ferdigstill-beregn")
+    fun ferdigstillBeregnSteg(@PathVariable behandlingId: BehandlingId) {
+        stegService.håndterSteg(behandlingId, beregnSteg)
+    }
+
+
 
     @PostMapping("{behandlingId}/beregn")
     fun beregn(
