@@ -1,13 +1,11 @@
 package no.nav.tilleggsstonader.sak.migrering.arena
 
-import no.nav.tilleggsstonader.kontrakter.felles.Skjematype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.felles.tilSkjematype
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
-import no.nav.tilleggsstonader.sak.migrering.routing.SkjemaRoutingService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import org.slf4j.LoggerFactory
@@ -42,7 +40,7 @@ class ArenaStatusService(
 
         val logPrefix = "Sjekker om person finnes i ny løsning stønadstype=${request.stønadstype}"
 
-        if (harBehandling(fagsak)) {
+        if (harBehandlingSomIkkeErHenlagt(fagsak)) {
             logger.info("$logPrefix finnes=true harBehandling")
             return true
         }
@@ -68,7 +66,9 @@ class ArenaStatusService(
             Stønadstype.DAGLIG_REISE_TSR -> false
         }
 
-    private fun harBehandling(fagsak: Fagsak?): Boolean =
-        fagsak
-            ?.let { behandlingService.finnesBehandlingForFagsak(it.id) } == true
+    private fun harBehandlingSomIkkeErHenlagt(fagsak: Fagsak?): Boolean {
+        val behandlinger = fagsak?.let { behandlingService.hentBehandlinger(fagsak.id) }
+
+        return behandlinger?.any { it.resultat != BehandlingResultat.HENLAGT } == true
+    }
 }
