@@ -72,7 +72,9 @@ fun IntegrationTest.gjennomførBehandlingsløp(
         return behandlingId
     }
 
-    gjennomførVilkårSteg(medVilkår, behandling.id, behandling.stønadstype)
+    if (behandling.stønadstype != Stønadstype.LÆREMIDLER) {
+        gjennomførVilkårSteg(medVilkår, behandling.id, behandling.stønadstype)
+    }
 
     if (tilSteg == StegType.BEREGNE_YTELSE) {
         return behandlingId
@@ -159,7 +161,7 @@ private fun IntegrationTest.gjennomførSendTilBeslutterSteg(behandlingId: Behand
     kjørTasksKlareForProsessering()
 }
 
-private fun IntegrationTest.gjennomførSimuleringSteg(behandlingId: BehandlingId) {
+fun IntegrationTest.gjennomførSimuleringSteg(behandlingId: BehandlingId) {
     kall.steg.ferdigstill(
         behandlingId,
         StegController.FerdigstillStegRequest(

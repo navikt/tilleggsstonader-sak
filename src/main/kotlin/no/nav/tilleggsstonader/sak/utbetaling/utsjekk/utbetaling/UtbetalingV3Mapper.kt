@@ -7,8 +7,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseServi
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
-import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
-import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -151,6 +149,11 @@ class UtbetalingV3Mapper(
             TypeAndel.DAGLIG_REISE_TILTAK_UTVIDET_OPPFØLGING_I_NAV -> StønadUtbetaling.DAGLIG_REISE_TILTAK_UTVIDET_OPPFØLGING_I_NAV
             TypeAndel.DAGLIG_REISE_TILTAK_UTVIDET_OPPFØLGING_I_OPPLÆRING ->
                 StønadUtbetaling.DAGLIG_REISE_TILTAK_UTVIDET_OPPFØLGING_I_OPPLÆRING
+
+            TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER -> StønadUtbetaling.LÆREMIDLER_ENSLIG_FORSØRGER
+            TypeAndel.LÆREMIDLER_AAP -> StønadUtbetaling.LÆREMIDLER_AAP
+            TypeAndel.LÆREMIDLER_ETTERLATTE -> StønadUtbetaling.LÆREMIDLER_ETTERLATTE
+
             else -> error("Skal ikke sende andelstype=$typeAndel på kafka")
         }
 

@@ -25,4 +25,5 @@ enum class Toggle(
     OPPRETT_OPPGAVE_TILBAKEKREVING("sak.opprett-oppgave-tilbakekreving"),
 
     TILGANGSSTYRE_PÅ_TILORDNET_OPPGAVE("sak.tilgangsstyring-tildelt-oppgave"),
+    SKAL_MIGRERE_UTBETALING_TIL_KAFKA("sak.skal-betale-utbetaling-til-kafka"),
 }
