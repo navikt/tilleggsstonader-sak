@@ -15,19 +15,15 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTask
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
-import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.journalpost
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -65,7 +61,10 @@ class InnvilgeDaligReiseTsrIntegrationTest : CleanDatabaseIntegrationTest() {
                         typeAktivitet = TypeAktivitet.ENKELAMO,
                         fom = fom,
                         tom = tom,
-                        faktaOgSvar = FaktaOgSvarAktivitetDagligReiseTsrDto,
+                        faktaOgSvar =
+                            FaktaOgSvarAktivitetDagligReiseTsrDto(
+                                svarHarUtgifter = SvarJaNei.JA,
+                            ),
                     )
                 },
                 medMålgruppe = { behandlingId ->

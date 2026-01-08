@@ -22,14 +22,12 @@ class ArenaStatusServiceTest {
     private val personService = mockk<PersonService>()
     private val fagsakService = mockk<FagsakService>()
     private val behandlingService = mockk<BehandlingService>()
-    private val skjemaRoutingService = mockk<SkjemaRoutingService>()
 
     val arenaStatusService =
         ArenaStatusService(
             personService = personService,
             fagsakService = fagsakService,
             behandlingService = behandlingService,
-            skjemaRoutingService = skjemaRoutingService,
         )
 
     val ident = "ident"
@@ -41,7 +39,6 @@ class ArenaStatusServiceTest {
     fun setUp() {
         mockFinnFagsak(fagsak)
         every { personService.hentFolkeregisterIdenter(ident) } returns PdlIdenter(listOf(PdlIdent(ident, false, "FOLKEREGISTERIDENT")))
-        mockSøknadRouting(false)
     }
 
     @Test
@@ -52,7 +49,6 @@ class ArenaStatusServiceTest {
 
         verify(exactly = 1) { fagsakService.finnFagsak(any(), any()) }
         verify(exactly = 0) { behandlingService.finnesBehandlingForFagsak(any()) }
-        verify(exactly = 1) { skjemaRoutingService.harLagretRouting(any(), any()) }
     }
 
     @Test
@@ -63,7 +59,6 @@ class ArenaStatusServiceTest {
 
         verify(exactly = 1) { fagsakService.finnFagsak(any(), any()) }
         verify(exactly = 1) { behandlingService.finnesBehandlingForFagsak(any()) }
-        verify(exactly = 1) { skjemaRoutingService.harLagretRouting(any(), any()) }
     }
 
     @Test
@@ -74,20 +69,6 @@ class ArenaStatusServiceTest {
 
         verify(exactly = 1) { fagsakService.finnFagsak(any(), any()) }
         verify(exactly = 1) { behandlingService.finnesBehandlingForFagsak(any()) }
-        verify(exactly = 0) { skjemaRoutingService.harLagretRouting(any(), any()) }
-    }
-
-    @Test
-    fun `skal returnere true hvis det finnes ikke finnes behandling men det finnes routing`() {
-        mockFinnFagsak(fagsak)
-        mockFinnesBehandlingForFagsak(false)
-        mockSøknadRouting(true)
-
-        assertThat(arenaStatusService.finnStatus(request).finnes).isTrue()
-
-        verify(exactly = 1) { fagsakService.finnFagsak(any(), any()) }
-        verify(exactly = 1) { behandlingService.finnesBehandlingForFagsak(any()) }
-        verify(exactly = 1) { skjemaRoutingService.harLagretRouting(any(), any()) }
     }
 
     private fun mockFinnFagsak(fagsak: Fagsak?) {
@@ -96,9 +77,5 @@ class ArenaStatusServiceTest {
 
     private fun mockFinnesBehandlingForFagsak(svar: Boolean) {
         every { behandlingService.finnesBehandlingForFagsak(fagsak.id) } returns svar
-    }
-
-    private fun mockSøknadRouting(svar: Boolean) {
-        every { skjemaRoutingService.harLagretRouting(any(), any()) } returns svar
     }
 }

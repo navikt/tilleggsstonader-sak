@@ -20,7 +20,7 @@ sealed interface AktivitetDagligReiseTsr :
 }
 
 data class TiltakDagligReiseTsr(
-    override val vurderinger: IngenVurderinger = IngenVurderinger,
+    override val vurderinger: VurderingTiltakDagligReiseTsr,
 ) : AktivitetDagligReiseTsr {
     override val fakta: IngenFakta = IngenFakta
     override val type: AktivitetDagligReiseTsrType = AktivitetDagligReiseTsrType.TILTAK_DAGLIG_REISE_TSR
@@ -59,6 +59,17 @@ data class KvalifiseringsstønadDagligReiseTsr(
     override val fakta: IngenFakta = IngenFakta
 }
 
+data class InnsattIFengselDagligReiseTsr(
+    override val vurderinger: IngenVurderinger = IngenVurderinger,
+) : MålgruppeDagligReiseTsr {
+    override val type: MålgruppeDagligReiseTsrType = MålgruppeDagligReiseTsrType.INNSATT_I_FENGSEL_DAGLIG_REISE_TSR
+    override val fakta: IngenFakta = IngenFakta
+}
+
+data class VurderingTiltakDagligReiseTsr(
+    override val harUtgifter: VurderingHarUtgifter,
+) : HarUtgifterVurdering
+
 sealed interface TypeFaktaOgVurderingDagligReiseTsr : TypeFaktaOgVurdering
 
 enum class AktivitetDagligReiseTsrType(
@@ -77,4 +88,5 @@ enum class MålgruppeDagligReiseTsrType(
     DAGPENGER_DAGLIG_REISE_TSR(MålgruppeType.DAGPENGER),
     TILTAKSPENGER_DAGLIG_REISE_TSR(MålgruppeType.TILTAKSPENGER),
     KVALIFISERINGSSTØNAD_DAGLIG_REISE_TSR(MålgruppeType.KVALIFISERINGSSTØNAD),
+    INNSATT_I_FENGSEL_DAGLIG_REISE_TSR(MålgruppeType.INNSATT_I_FENGSEL),
 }

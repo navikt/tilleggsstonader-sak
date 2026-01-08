@@ -23,7 +23,6 @@ class ArenaStatusService(
     private val personService: PersonService,
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
-    private val skjemaRoutingService: SkjemaRoutingService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -42,22 +41,17 @@ class ArenaStatusService(
         )
 
         val logPrefix = "Sjekker om person finnes i ny løsning stønadstype=${request.stønadstype}"
+
         if (harBehandling(fagsak)) {
-            logger.info("$logPrefix finnes=true harRouting harBehandling")
+            logger.info("$logPrefix finnes=true harBehandling")
             return true
         }
+
         if (skalBehandlesITsSak(request.stønadstype)) {
             logger.info("$logPrefix finnes=true skalAlltidBehandlesITsSak")
             return true
         }
-        // I routingen skiller vi ikke mellom TSO og TSR for daglig reise, men i starten vil alle routinger på daglig reise bare gjelde TSO.
-        // Etter hvert som TSR også slipper gjennom i routingen må vi diskutere hvorvidt vi ønsker å låse en person på både TSO og TSR,
-        // eller skille dem fra hverandre.
-        val requestGjelderDagligReiseTiltaksenheten = request.stønadstype == Stønadstype.DAGLIG_REISE_TSR
-        if (harRouting(identer, request.stønadstype.tilSkjematype()) && !requestGjelderDagligReiseTiltaksenheten) {
-            logger.info("$logPrefix finnes=true harRouting")
-            return true
-        }
+
         return false
     }
 
@@ -77,12 +71,4 @@ class ArenaStatusService(
     private fun harBehandling(fagsak: Fagsak?): Boolean =
         fagsak
             ?.let { behandlingService.finnesBehandlingForFagsak(it.id) } == true
-
-    private fun harRouting(
-        identer: Set<String>,
-        skjematype: Skjematype,
-    ): Boolean =
-        identer.any { ident ->
-            skjemaRoutingService.harLagretRouting(ident, skjematype)
-        }
 }
