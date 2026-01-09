@@ -80,9 +80,9 @@ class FagsakUtbetalingIdMigreringService(
         tilkjentYtelseService
             .hentForBehandling(behandlingId = sisteIverksatteBehandling.id)
             .andelerTilkjentYtelse
-            .filter { it.iverksetting != null }
-            .maxBy { it.iverksetting!!.iverksettingTidspunkt }
-            .iverksetting!!
-            .iverksettingId
-            .toString()
+            .mapNotNull { it.iverksetting }
+            .maxByOrNull { it.iverksettingTidspunkt }
+            ?.iverksettingId
+            ?.toString()
+            ?: error("Fant ingen iverksetting for behandling ${sisteIverksatteBehandling.id}")
 }
