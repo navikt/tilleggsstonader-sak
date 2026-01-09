@@ -45,7 +45,7 @@ fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandlin
                 }
         }
 
-private fun lagAndelForDagligReise(
+fun lagAndelForDagligReise(
     saksbehandling: Saksbehandling,
     fomUkedag: LocalDate,
     beløp: Int,
@@ -58,10 +58,12 @@ private fun lagAndelForDagligReise(
             Stønadstype.DAGLIG_REISE_TSO -> {
                 målgruppe.tilTypeAndel(saksbehandling.stønadstype)
             }
+
             Stønadstype.DAGLIG_REISE_TSR -> {
                 // Validert i funksjon over at den ikke er null for TSR
                 finnTypeAndelFraTypeAktivitet(typeAktivitet!!)
             }
+
             else -> {
                 error("Uforventet stønadstype ${saksbehandling.stønadstype}")
             }
@@ -91,6 +93,7 @@ private fun validerBrukersNavKontorForStønadstype(
                 "Brukers NAV-kontor må være satt for stønadstype $stønadstype"
             }
         }
+
         Stønadstype.DAGLIG_REISE_TSO -> {
             require(brukersNavKontor == null) {
                 "Brukers NAV-kontor skal ikke være satt for stønadstype $stønadstype"
