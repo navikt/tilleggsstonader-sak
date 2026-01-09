@@ -2,7 +2,8 @@ package no.nav.tilleggsstonader.sak.utbetaling.id
 
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
@@ -27,7 +28,10 @@ class FagsakUtbetalingIdMigreringService(
 ) {
     fun migrerForFagsak(fagsakId: FagsakId) {
         if (unleashService.isEnabled(Toggle.SKAL_MIGRERE_UTBETALING_MOT_KAFKA)) {
-            val sisteIverksatteBehandling = behandlingService.finnSisteIverksatteBehandling(fagsakId)
+            val sisteIverksatteBehandling =
+                behandlingService
+                    .finnSisteIverksatteBehandling(fagsakId)
+                    ?.let { behandlingService.hentSaksbehandling(it.id) }
             val andelTilkjentYtelseListe =
                 sisteIverksatteBehandling?.let { iverksettService.hentAndelTilkjentYtelse(it.id) }
             val typeAndelerPåFagsaken =
@@ -35,9 +39,9 @@ class FagsakUtbetalingIdMigreringService(
                     ?: emptyList()
 
             typeAndelerPåFagsaken.forEach { typeAndel ->
-                if (skalMigrereTilKafka(fagsakId, typeAndel)) {
+                if (skalMigrereTilKafka(fagsakId, typeAndel) && sisteIverksatteBehandling !== null) {
                     transactionHandler.runInNewTransaction {
-                        migrerForFagsakOgTypeAndel(fagsakId, typeAndel)
+                        migrerForFagsakOgTypeAndel(sisteIverksatteBehandling, typeAndel)
                     }
                 }
             }
@@ -58,16 +62,16 @@ class FagsakUtbetalingIdMigreringService(
 
     // Returnerer utbetalingId for fagsak og typeAndel
     private fun migrerForFagsakOgTypeAndel(
-        fagsakId: FagsakId,
+        sisteIverksatteBehandling: Saksbehandling,
         typeAndel: TypeAndel,
     ): UUID {
-        val utbetalingId = fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(fagsakId, typeAndel)
-        val sisteIverksatteBehandling = behandlingService.finnSisteIverksatteBehandling(fagsakId)
+        val utbetalingId =
+            fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(sisteIverksatteBehandling.fagsakId, typeAndel)
         iverksettClient.migrer(
             MigrerUtbetalingDto(
-                sakId = fagsakId.toString(),
-                behandlingId = sisteIverksatteBehandling!!.id.toString(),
-                iverksettingId = finnSisteIverksettingId(sisteIverksatteBehandling),
+                sakId = sisteIverksatteBehandling.eksternFagsakId.toString(),
+                behandlingId = sisteIverksatteBehandling.eksternId.toString(),
+                iverksettingId = finnSisteIverksettingId(sisteIverksatteBehandling.id),
                 meldeperiode = null,
                 uidToStønad = utbetalingId.utbetalingId to typeAndel.tilStønadstype(),
             ),
@@ -76,13 +80,13 @@ class FagsakUtbetalingIdMigreringService(
         return utbetalingId.utbetalingId
     }
 
-    private fun finnSisteIverksettingId(sisteIverksatteBehandling: Behandling): String =
+    private fun finnSisteIverksettingId(sisteIverksatteBehandlingId: BehandlingId): String =
         tilkjentYtelseService
-            .hentForBehandling(behandlingId = sisteIverksatteBehandling.id)
+            .hentForBehandling(behandlingId = sisteIverksatteBehandlingId)
             .andelerTilkjentYtelse
             .mapNotNull { it.iverksetting }
             .maxByOrNull { it.iverksettingTidspunkt }
             ?.iverksettingId
             ?.toString()
-            ?: error("Fant ingen iverksetting for behandling ${sisteIverksatteBehandling.id}")
+            ?: error("Fant ingen iverksetting for behandling $sisteIverksatteBehandlingId")
 }
