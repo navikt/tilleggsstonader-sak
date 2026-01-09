@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.behandling
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
-import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingTypeV2
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingUtil.validerKanOppretteNyBehandling
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -52,21 +51,13 @@ class OpprettBehandlingService(
             "Feature toggle for å opprette behandling er slått av"
         }
 
-        val kanHaFlereBehandlingerPåSammeFagsak =
-            unleashService.isEnabled(Toggle.KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK)
-
         val tidligereBehandlinger = behandlingRepository.findByFagsakId(request.fagsakId)
         val forrigeBehandling = behandlingRepository.finnSisteIverksatteBehandling(request.fagsakId)
-        val behandlingType =
-            when (kanHaFlereBehandlingerPåSammeFagsak) {
-                true -> utledBehandlingTypeV2(tidligereBehandlinger)
-                false -> utledBehandlingType(tidligereBehandlinger)
-            }
+        val behandlingType = utledBehandlingTypeV2(tidligereBehandlinger)
 
         validerKanOppretteNyBehandling(
             behandlingType = behandlingType,
             tidligereBehandlinger = tidligereBehandlinger,
-            kanHaFlereBehandlingPåSammeFagsak = kanHaFlereBehandlingerPåSammeFagsak && request.tillatFlereÅpneBehandlinger,
         )
 
         val behandlingStatus = utledBehandlingStatus(tidligereBehandlinger)
@@ -147,7 +138,6 @@ data class OpprettBehandling(
     val behandlingsårsak: BehandlingÅrsak,
     val kravMottatt: LocalDate? = null,
     val nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
-    val tillatFlereÅpneBehandlinger: Boolean = false,
     val oppgaveMetadata: OpprettBehandlingOppgaveMetadata,
 )
 
