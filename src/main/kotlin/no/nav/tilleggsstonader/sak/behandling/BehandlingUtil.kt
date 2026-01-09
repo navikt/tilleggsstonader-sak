@@ -22,13 +22,6 @@ object BehandlingUtil {
         }
     }
 
-    fun utledBehandlingType(tidligereBehandlinger: List<Behandling>): BehandlingType =
-        if (tidligereBehandlinger.any { it.resultat != BehandlingResultat.HENLAGT && it.status != BehandlingStatus.SATT_PÅ_VENT }) {
-            BehandlingType.REVURDERING
-        } else {
-            BehandlingType.FØRSTEGANGSBEHANDLING
-        }
-
     fun validerBehandlingIdErLik(
         behandlingIdParam: BehandlingId,
         behandlingIdRequest: BehandlingId,
@@ -37,8 +30,6 @@ object BehandlingUtil {
     }
 
     fun List<Behandling>.sortertEtterVedtakstidspunkt() = this.sortedWith(compareBy(nullsLast()) { it.vedtakstidspunkt })
-
-    fun List<Behandling>.sortertEtterVedtakstidspunktEllerEndretTid() = this.sortedBy { it.vedtakstidspunkt ?: it.sporbar.endret.endretTid }
 
     fun List<Behandling>.sisteFerdigstilteBehandling() =
         this
