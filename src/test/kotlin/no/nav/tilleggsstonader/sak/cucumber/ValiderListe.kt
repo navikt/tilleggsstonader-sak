@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.cucumber
 
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider
 import org.assertj.core.api.Assertions
 import org.slf4j.LoggerFactory
 
@@ -17,11 +17,11 @@ fun <T> verifiserAtListerErLike(
     faktisk.forEachIndexed { index, verdi ->
         val forventetVerdi = forventet[index]
         val actualPretty =
-            ObjectMapperProvider.jsonMapper
+            JsonMapperProvider.jsonMapper
                 .writerWithDefaultPrettyPrinter()
                 .writeValueAsString(verdi)
         val expectedPretty =
-            ObjectMapperProvider.jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(forventetVerdi)
+            JsonMapperProvider.jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(forventetVerdi)
         try {
             Assertions.assertThat(actualPretty).isEqualTo(expectedPretty)
         } catch (e: Throwable) {

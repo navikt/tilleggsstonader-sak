@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.statistikk.behandling
 
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
 import org.apache.kafka.clients.producer.ProducerRecord

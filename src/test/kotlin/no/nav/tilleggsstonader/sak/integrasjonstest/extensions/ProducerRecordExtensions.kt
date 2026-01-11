@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions
 
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import org.apache.kafka.clients.producer.ProducerRecord
 import tools.jackson.module.kotlin.readValue
 

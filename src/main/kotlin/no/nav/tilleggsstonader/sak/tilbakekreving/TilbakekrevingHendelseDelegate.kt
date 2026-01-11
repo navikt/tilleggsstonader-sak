@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.tilbakekreving
 
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.tilbakekreving.håndter.TilbakekrevingHendelseHåndterer
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory

@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.util.EnumUtil.enumName
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import org.assertj.core.api.Assertions.assertThat

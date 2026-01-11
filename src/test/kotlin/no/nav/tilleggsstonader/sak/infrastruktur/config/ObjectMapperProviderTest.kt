@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.config
 
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -9,7 +9,7 @@ import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-class ObjectMapperProviderTest {
+class JsonMapperProviderTest {
     val expectedJson =
         """
         {

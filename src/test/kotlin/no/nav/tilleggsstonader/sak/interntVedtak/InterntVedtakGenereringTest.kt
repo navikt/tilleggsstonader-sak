@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.interntVedtak
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -174,7 +174,7 @@ class InterntVedtakGenereringTest {
         restTemplate.messageConverters =
             listOf(
                 StringHttpMessageConverter(),
-                JacksonJsonHttpMessageConverter(ObjectMapperProvider.jsonMapper),
+                JacksonJsonHttpMessageConverter(JsonMapperProvider.jsonMapper),
             )
         return HtmlifyClient(URI.create("http://localhost:8001"), restTemplate)
     }

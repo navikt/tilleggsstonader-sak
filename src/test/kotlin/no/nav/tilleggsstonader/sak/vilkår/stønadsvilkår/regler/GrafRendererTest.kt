@@ -1,13 +1,13 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler
 
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 @Disabled
 internal class GrafRendererTest {
-    private val jsonMapper = ObjectMapperProvider.jsonMapper.writerWithDefaultPrettyPrinter()
+    private val jsonMapper = JsonMapperProvider.jsonMapper.writerWithDefaultPrettyPrinter()
 
     @Test
     internal fun `print alle vilkår`() {

@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.oppfølging
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import org.springframework.stereotype.Service
 import tools.jackson.module.kotlin.readValue
