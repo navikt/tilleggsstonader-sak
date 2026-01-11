@@ -11,7 +11,7 @@ class HelvedDtoTest {
     private val testUtbetalinger =
         listOf(
             UtbetalingDto(
-                id = UUID.fromString("7b78b166-9097-4117-b046-5f7e25b91d6b"),
+                id = UtbetalingId(UUID.fromString("7b78b166-9097-4117-b046-5f7e25b91d6b")),
                 stønad = StønadUtbetaling.DAGLIG_REISE_ENSLIG_FORSØRGER,
                 perioder =
                     listOf(

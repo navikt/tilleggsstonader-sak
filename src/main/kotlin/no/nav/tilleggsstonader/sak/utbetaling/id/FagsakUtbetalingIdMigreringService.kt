@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.MigrerUtbetalingDto
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingId
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -64,7 +65,7 @@ class FagsakUtbetalingIdMigreringService(
     private fun migrerForFagsakOgTypeAndel(
         sisteIverksatteBehandling: Saksbehandling,
         typeAndel: TypeAndel,
-    ): UUID {
+    ): UtbetalingId {
         val utbetalingId =
             fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(sisteIverksatteBehandling.fagsakId, typeAndel)
         iverksettClient.migrer(
