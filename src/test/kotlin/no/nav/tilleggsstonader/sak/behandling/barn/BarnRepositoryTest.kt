@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.DuplicateKeyException
 import org.springframework.data.relational.core.conversion.DbActionExecutionException
 
 class BarnRepositoryTest : CleanDatabaseIntegrationTest() {
@@ -38,7 +39,7 @@ class BarnRepositoryTest : CleanDatabaseIntegrationTest() {
 
         assertThatThrownBy {
             barnRepository.insert(behandlingBarn(behandlingId = behandling.id))
-        }.isInstanceOf(DbActionExecutionException::class.java)
+        }.isInstanceOf(DuplicateKeyException::class.java)
             .rootCause()
             .hasMessageContaining(
                 "duplicate key value violates unique constraint \"behandling_barn_behandling_id_person_ident_idx\"",

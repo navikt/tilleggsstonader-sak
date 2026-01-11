@@ -68,7 +68,7 @@ class SøknadsskjemaUtilTest {
                     data = jsonMapper.writeValueAsBytes(json),
                     mottattTidspunkt = LocalDateTime.now(),
                 )
-            }.hasMessageContaining("Unrecognized field \"ukjentFelt\"")
+            }.hasMessageContaining("Unrecognized property \"ukjentFelt\"")
         }
     }
 
@@ -100,7 +100,7 @@ class SøknadsskjemaUtilTest {
                     data = jsonMapper.writeValueAsBytes(json),
                     mottattTidspunkt = LocalDateTime.now(),
                 )
-            }.hasMessageContaining("Unrecognized field \"ukjentFelt\"")
+            }.hasMessageContaining("Unrecognized property \"ukjentFelt\"")
         }
     }
 }
