@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur.database
 import no.nav.familie.prosessering.PropertiesWrapperTilStringConverter
 import no.nav.familie.prosessering.StringTilPropertiesWrapperConverter
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.jsonMapper
+import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.IdConverters.alleValueClassConverters
 import no.nav.tilleggsstonader.sak.oppfølging.OppfølgingData
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagData
@@ -31,7 +32,9 @@ import org.springframework.core.env.Environment
 import org.springframework.data.convert.ReadingConverter
 import org.springframework.data.convert.WritingConverter
 import org.springframework.data.domain.AuditorAware
+import org.springframework.data.jdbc.core.convert.QueryMappingConfiguration
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration
+import org.springframework.data.jdbc.repository.config.DefaultQueryMappingConfiguration
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations
@@ -74,6 +77,12 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
                 throw RuntimeException("Profile=${environment.activeProfiles} men har ignoreIfProd=--")
             }
         }
+    }
+
+    @Bean
+    fun rowMappers(): QueryMappingConfiguration {
+        return DefaultQueryMappingConfiguration()
+            .registerRowMapper<SettPåVent>(SettPåVent::class.java, SettPåVentRowMapper())
     }
 
     override fun userConverters(): List<*> =
@@ -131,12 +140,12 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     @ReadingConverter
     abstract class JsonReader<T : Any>(
         val clazz: KClass<T>,
-    ) : Converter<PGobject, T> {
+    ) : Converter<PGobject, T?> {
         override fun convert(pGobject: PGobject): T? = pGobject.value?.let { jsonMapper.readValue(it, clazz.java) }
     }
 
     @ReadingConverter
-    class PGobjectTilJsonWrapperConverter : Converter<PGobject, JsonWrapper> {
+    class PGobjectTilJsonWrapperConverter : Converter<PGobject, JsonWrapper?> {
         override fun convert(pGobject: PGobject): JsonWrapper? = pGobject.value?.let { JsonWrapper(it) }
     }
 
