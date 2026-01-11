@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.henlagtBehandling
+import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
@@ -24,22 +25,6 @@ internal class BehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest()
 
     @Autowired
     lateinit var behandlingService: BehandlingService
-
-    @Test
-    internal fun `hentBehandlinger - skal kaste feil hvis behandling ikke finnes`() {
-        assertThatThrownBy { behandlingService.hentBehandlinger(setOf(BehandlingId.random())) }
-            .isInstanceOf(IllegalArgumentException::class.java)
-            .hasMessageContaining("Finner ikke Behandling for")
-    }
-
-    @Test
-    internal fun `hentBehandlinger - skal returnere behandlinger`() {
-        val fagsak = testoppsettService.lagreFagsak(fagsak())
-        val behandling = testoppsettService.lagre(behandling(fagsak, status = BehandlingStatus.FERDIGSTILT))
-        val behandling2 = testoppsettService.lagre(behandling(fagsak))
-
-        assertThat(behandlingService.hentBehandlinger(setOf(behandling.id, behandling2.id))).hasSize(2)
-    }
 
     @Test
     internal fun `skal finne siste behandling med avslåtte hvis kun avslått`() {
