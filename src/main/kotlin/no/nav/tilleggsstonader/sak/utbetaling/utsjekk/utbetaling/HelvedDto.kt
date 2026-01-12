@@ -38,14 +38,8 @@ class IverksettingDto(
     override val dryrun: Boolean = false
 }
 
-/**
- * [id] er en UUID som konsumenter av Utsjekk har ansvar for å lage og holde styr
- * på i egen løsning. Denne brukes til å unikt identifisere utbetalingen og kan brukes
- * når man evt. ønsker å gjøre endringer eller opphør på en utbetaling.
- *
- */
 data class UtbetalingDto(
-    val id: UUID, // utbetalingId
+    val id: UtbetalingId,
     val stønad: StønadUtbetaling,
     val perioder: List<UtbetalingPeriodeDto>,
     val brukFagområdeTillst: Boolean,
