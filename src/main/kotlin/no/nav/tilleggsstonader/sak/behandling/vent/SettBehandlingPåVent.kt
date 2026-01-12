@@ -1,13 +1,13 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import java.time.LocalDate
 
 data class SettBehandlingPåVent(
     val årsaker: List<ÅrsakSettPåVent>,
     val frist: LocalDate,
     val kommentar: String?,
+    val opprettHistorikkinnslag: Boolean = true,
     val oppgaveMetadata: SettBehandlingPåVentOppgaveMetadata = SettBehandlingPåVentOppgaveMetadata.OppdaterOppgave(),
 ) {
     init {

@@ -45,13 +45,21 @@ class TaAvVentService(
             }
 
             is KanTaAvVent.Ja -> {
-                val behandlingTattAvVent = behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.UTREDES)
-                opprettHistorikkInnslagTaAvVent(behandling, taAvVentDto?.kommentar)
+                val oppdatertBehandling =
+                    if (behandling.status == BehandlingStatus.OPPRETTET) {
+                        behandling
+                    } else {
+                        behandlingService
+                            .oppdaterStatusPåBehandling(
+                                behandlingId,
+                                BehandlingStatus.UTREDES,
+                            ).also { opprettHistorikkInnslagTaAvVent(it, taAvVentDto?.kommentar) }
+                    }
 
                 when (kanTaAvVent.påkrevdHandling) {
-                    PåkrevdHandling.Ingen -> {}
+                    PåkrevdHandling.Ingen -> Unit
                     PåkrevdHandling.MåHåndtereNyttVedtakPåFagsaken ->
-                        håndterAtNyBehandlingHarBlittFerdigstiltPåFagsaken(behandlingTattAvVent)
+                        håndterAtNyBehandlingHarBlittFerdigstiltPåFagsaken(oppdatertBehandling)
                 }
             }
         }
@@ -59,18 +67,20 @@ class TaAvVentService(
         val påVentMetadata =
             finnAktivSattPåVent(behandlingId).copy(aktiv = false, taAvVentKommentar = taAvVentDto?.kommentar)
         settPåVentRepository.update(påVentMetadata)
-        val fagsak = fagsakService.hentFagsak(behandling.fagsakId)
 
-        taOppgaveAvVent(
-            settPåVent = påVentMetadata,
-            skalTilordnesRessurs = taAvVentDto?.skalTilordnesRessurs ?: true,
-            frist =
-                fristBehandleSakOppgave(
-                    kravMottatt = behandling.kravMottatt,
-                    behandlingOpprettet = behandling.sporbar.opprettetTid,
-                ),
-            endretAvEnhetsnr = fagsak.stønadstype.behandlendeEnhet().enhetsnr,
-        )
+        if (!påVentMetadata.erSattPåVentForSatsjustering()) {
+            val fagsak = fagsakService.hentFagsak(behandling.fagsakId)
+            taOppgaveAvVent(
+                settPåVent = påVentMetadata,
+                skalTilordnesRessurs = taAvVentDto?.skalTilordnesRessurs ?: true,
+                frist =
+                    fristBehandleSakOppgave(
+                        kravMottatt = behandling.kravMottatt,
+                        behandlingOpprettet = behandling.sporbar.opprettetTid,
+                    ),
+                endretAvEnhetsnr = fagsak.stønadstype.behandlendeEnhet().enhetsnr,
+            )
+        }
     }
 
     fun kanTaAvVent(behandlingId: BehandlingId): KanTaAvVentDto {
