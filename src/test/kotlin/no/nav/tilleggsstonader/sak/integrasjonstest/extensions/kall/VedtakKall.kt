@@ -73,6 +73,12 @@ class VedtakKall(
             behandlingId: BehandlingId,
             innvilgelseDto: VedtakRequest,
         ) = lagreVedtak(stønadstype, behandlingId, "innvilgelse", innvilgelseDto)
+
+        fun lagreOpphør(
+            stønadstype: Stønadstype,
+            behandlingId: BehandlingId,
+            opphørDto: VedtakRequest,
+        ) = lagreVedtak(stønadstype, behandlingId, "opphor", opphørDto)
     }
 }
 

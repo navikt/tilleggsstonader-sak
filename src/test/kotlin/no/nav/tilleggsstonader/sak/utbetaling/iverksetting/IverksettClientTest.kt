@@ -8,7 +8,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.okJson
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import no.nav.security.mock.oauth2.http.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettDtoUtil.iverksettDto
 import org.assertj.core.api.Assertions.assertThat
@@ -29,6 +29,7 @@ class IverksettClientTest {
         wiremockServerItem.stubFor(
             post(anyUrl()).willReturn(aResponse().withStatus(HttpStatus.CONFLICT.value())),
         )
+            println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(iverksettDto()))
         assertThatCode {
             client.iverksett(iverksettDto())
         }.doesNotThrowAnyException()

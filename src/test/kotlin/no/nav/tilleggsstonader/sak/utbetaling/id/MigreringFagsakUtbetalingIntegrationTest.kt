@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.integrasjonstest.OpprettOpphør
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørAlleTaskMedSenererTriggertid
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
@@ -129,7 +130,7 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
     }
 
     @Test
-    fun `behandle ny læremidler-sak, feature-toggle for iverksette nytt grensesnitt på, skal sendes gjennom ny iverksetting`() {
+    fun `behandle og opphør revurder ny læremidler-sak, feature-toggle for iverksette nytt grensesnitt på, skal sendes gjennom ny iverksetting`() {
         every { unleashService.isEnabled(Toggle.SKAL_IVERKSETT_NYE_BEHANDLINGER_MOT_KAFKA) } returns true
 
         val fom = 1 september 2025
@@ -149,10 +150,46 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
         KafkaTestConfig
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
+
+        val revurderingId =
+            opprettRevurdering(
+                opprettBehandlingDto =
+                    OpprettBehandlingDto(
+                        fagsakId = førstegangsbehandling.fagsakId,
+                        årsak = BehandlingÅrsak.SØKNAD,
+                        kravMottatt = 15 februar 2025,
+                        nyeOpplysningerMetadata = null,
+                    ),
+            )
+        gjennomførInngangsvilkårSteg(behandlingId = revurderingId)
+
+        // Opphører alt
+        gjennomførBeregningSteg(revurderingId, Stønadstype.LÆREMIDLER, OpprettOpphør(opphørsdato = fom))
+        gjennomførSimuleringSteg(revurderingId)
+        gjennomførSendTilBeslutterSteg(revurderingId)
+        gjennomførBeslutteVedtakSteg(revurderingId)
+        kjørTasksKlareForProsesseringTilIngenTasksIgjen()
+
+        val revurdering = behandlingService.hentBehandling(revurderingId)
+        val finnesUtbetalingIdEtterRevurdering =
+            fagsakUtbetalingIdService.finnesUtbetalingsId(revurdering.fagsakId, TypeAndel.LÆREMIDLER_AAP)
+
+        assertThat(finnesUtbetalingIdEtterRevurdering).isTrue
+        verify(exactly = 0) { iverksettClient.simulerV2(any()) }
+        verify(exactly = 0) { iverksettClient.iverksett(any()) }
+        verify(exactly = 2) { iverksettClient.simulerV3(any()) }
+        val opphørUtbetaling = KafkaTestConfig
+            .sendteMeldinger()
+            .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 2)
+            .map { it.verdiEllerFeil<IverksettingDto>() }
+            .maxBy { it.vedtakstidspunkt }
+
+        assertThat(opphørUtbetaling.utbetalinger.size).isEqualTo(1)
+        assertThat(opphørUtbetaling.utbetalinger.single().perioder).isEmpty()
     }
 
     @Test
-    fun `behandle ny læremidler-sak, feature-toggle for iverksette nytt grensesnitt av, skal sendes gjennom gammelt iverksetting`() {
+    fun `behandle og opphør ny læremidler-sak, feature-toggle for iverksette nytt grensesnitt av, skal sendes gjennom gammelt iverksetting`() {
         every { unleashService.isEnabled(Toggle.SKAL_IVERKSETT_NYE_BEHANDLINGER_MOT_KAFKA) } returns false
 
         val fom = 1 september 2025
@@ -172,6 +209,42 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
         KafkaTestConfig
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
+
+        val revurderingId =
+            opprettRevurdering(
+                opprettBehandlingDto =
+                    OpprettBehandlingDto(
+                        fagsakId = førstegangsbehandling.fagsakId,
+                        årsak = BehandlingÅrsak.SØKNAD,
+                        kravMottatt = 15 februar 2025,
+                        nyeOpplysningerMetadata = null,
+                    ),
+            )
+        gjennomførInngangsvilkårSteg(behandlingId = revurderingId)
+
+        // Opphører alt
+        gjennomførBeregningSteg(revurderingId, Stønadstype.LÆREMIDLER, OpprettOpphør(opphørsdato = fom))
+        gjennomførSimuleringSteg(revurderingId)
+        gjennomførSendTilBeslutterSteg(revurderingId)
+        gjennomførBeslutteVedtakSteg(revurderingId)
+        kjørTasksKlareForProsesseringTilIngenTasksIgjen()
+
+        val revurdering = behandlingService.hentBehandling(revurderingId)
+        val finnesUtbetalingIdEtterRevurdering =
+            fagsakUtbetalingIdService.finnesUtbetalingsId(revurdering.fagsakId, TypeAndel.LÆREMIDLER_AAP)
+
+        assertThat(finnesUtbetalingIdEtterRevurdering).isFalse
+        verify(exactly = 2) { iverksettClient.simulerV2(any()) }
+        verify(exactly = 2) { iverksettClient.iverksett(any()) }
+        verify(exactly = 0) { iverksettClient.simulerV3(any()) }
+        KafkaTestConfig
+            .sendteMeldinger()
+            .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
+            .map { it.verdiEllerFeil<IverksettingDto>() }
+            .forEach { iverksettingDto ->
+                assertThat(iverksettingDto.utbetalinger.all { it.brukFagområdeTillst }).isTrue
+            }
+
     }
 
     private fun opprettFørstegangsbehandling(
