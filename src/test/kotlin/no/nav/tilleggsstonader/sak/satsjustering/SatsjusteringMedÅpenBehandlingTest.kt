@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.satsjustering
 
 import io.mockk.clearMocks
 import io.mockk.every
+import no.nav.familie.prosessering.domene.Status
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
@@ -15,7 +16,10 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVentRepository
+import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakRepository
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettJournalpost
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -53,6 +57,9 @@ class SatsjusteringMedÅpenBehandlingTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var settPåVentRepository: SettPåVentRepository
 
+    @Autowired
+    private lateinit var fagsakRepository: FagsakRepository
+
     private val sisteBekreftedeSatsÅr = bekreftedeSatser.maxOf { it.fom.year }
     private val fom = LocalDate.of(sisteBekreftedeSatsÅr, 8, 1)
     private val tom = LocalDate.of(sisteBekreftedeSatsÅr + 1, 6, 30)
@@ -87,6 +94,7 @@ class SatsjusteringMedÅpenBehandlingTest : CleanDatabaseIntegrationTest() {
         // Verifiser at den åpne behandlingen ikke lenger er på vent og er nullstilt
         val oppdatertÅpenBehandling = behandlingRepository.findById(nyÅpenBehandling.id).get()
         assertThat(oppdatertÅpenBehandling.status).isEqualTo(BehandlingStatus.OPPRETTET)
+        assertThat(oppdatertÅpenBehandling.forrigeIverksatteBehandlingId).isEqualTo(sisteIverksatteBehandling.id)
 
         // Verifiser at settPåVent er inaktiv
         val settPåVent = settPåVentRepository.findByBehandlingIdAndAktivIsTrue(nyÅpenBehandling.id)
@@ -113,12 +121,20 @@ class SatsjusteringMedÅpenBehandlingTest : CleanDatabaseIntegrationTest() {
         mockSatser()
 
         // Satsjustering skal kaste RekjørSenereException fordi oppgaven er fordelt
-        val result =
-            medBrukercontext(roller = listOf(rolleConfig.utvikler)) {
-                runCatching {
-                    kall.satsjustering.satsjustering(Stønadstype.LÆREMIDLER)
-                }
-            }
+        medBrukercontext(roller = listOf(rolleConfig.utvikler)) {
+                kall.satsjustering.satsjustering(Stønadstype.LÆREMIDLER)
+        }
+
+        kjørTasksKlareForProsessering()
+
+        val satsjusteringTask = taskService.findAll()
+            .filter { it.type == SatsjusteringTask.TYPE }
+            .singleOrNull { it.payload == førstegangsbehandling.id.toString() }
+
+        // Satsjusteringstasken skal ha feilet og skal bli kjørt i morgen kl 0700
+        assertThat(satsjusteringTask).isNotNull
+        assertThat(satsjusteringTask!!.status).isEqualTo(Status.KLAR_TIL_PLUKK)
+        assertThat(satsjusteringTask.triggerTid).isEqualTo(LocalDate.now().plusDays(1).atTime(7, 0))
 
         // Verifiser at behandlingen fortsatt er i status OPPRETTET (ikke satt på vent og tatt av igjen)
         val oppdatertÅpenBehandling = behandlingRepository.findById(nyÅpenBehandling.id).get()
@@ -144,9 +160,7 @@ class SatsjusteringMedÅpenBehandlingTest : CleanDatabaseIntegrationTest() {
         mockSatser()
 
         medBrukercontext(roller = listOf(rolleConfig.utvikler)) {
-            runCatching {
-                kall.satsjustering.satsjustering(Stønadstype.LÆREMIDLER)
-            }
+            kall.satsjustering.satsjustering(Stønadstype.LÆREMIDLER)
         }
 
         // Verifiser at behandlingen fortsatt er i UTREDES status
@@ -166,13 +180,15 @@ class SatsjusteringMedÅpenBehandlingTest : CleanDatabaseIntegrationTest() {
         return testoppsettService.ferdigstillBehandling(behandling)
     }
 
-    private fun opprettNyBehandlingIStatusOpprettet(fagsakId: no.nav.tilleggsstonader.sak.felles.domain.FagsakId): Behandling {
+    private fun opprettNyBehandlingIStatusOpprettet(fagsakId: FagsakId): Behandling {
+        val ident = fagsakRepository.finnAktivIdent(fagsakId)
+
         val journalpost =
             journalpost(
                 journalpostId = "2",
                 journalstatus = Journalstatus.MOTTATT,
                 dokumenter = listOf(DokumentInfo("", brevkode = DokumentBrevkode.LÆREMIDLER.verdi)),
-                bruker = Bruker("12345678910", BrukerIdType.FNR),
+                bruker = Bruker(ident, BrukerIdType.FNR),
                 tema = Tema.TSO.name,
             )
         opprettJournalpost(journalpost)
