@@ -91,7 +91,10 @@ class InterntVedtakService(
 
                 is InnvilgelseLæremidler ->
                     BeregningsresultatInterntVedtakDto(
-                        læremidler = data.beregningsresultat.tilDto(vedtak.tidligsteEndring).perioder,
+                        læremidler =
+                            data.beregningsresultat
+                                .tilDto(vedtak.tidligsteEndring)
+                                .perioder,
                     )
 
                 is InnvilgelseBoutgifter ->
@@ -105,9 +108,7 @@ class InterntVedtakService(
                     )
 
                 is Innvilgelse,
-                -> {
-                    error("Mangler mapping av beregningsresultat for ${data.type}")
-                }
+                -> error("Mangler mapping av beregningsresultat for ${data.type}")
 
                 else -> null
             }
@@ -225,73 +226,67 @@ class InterntVedtakService(
         vedtak?.let {
             when (vedtak.data) {
                 is VedtakTilsynBarn -> mapVedtakTilsynBarn(vedtak.data)
+
                 is VedtakLæremidler -> mapVedtakLæremidler(vedtak.data)
+
                 is VedtakBoutgifter -> mapVedtakBoutgifter(vedtak.data)
+
                 is VedtakDagligReise -> mapVedtakDagligReise(vedtak.data)
             }
         }
 
     private fun mapVedtakTilsynBarn(vedtak: VedtakTilsynBarn) =
         when (vedtak) {
-            is InnvilgelseTilsynBarn -> {
+            is InnvilgelseTilsynBarn ->
                 VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
-            }
 
-            is AvslagTilsynBarn -> {
+            is AvslagTilsynBarn ->
                 VedtakAvslagInternt(
                     årsakerAvslag = vedtak.årsaker,
                     avslagBegrunnelse = vedtak.begrunnelse,
                 )
-            }
 
-            is OpphørTilsynBarn -> {
+            is OpphørTilsynBarn ->
                 VedtakOpphørInternt(
                     årsakerOpphør = vedtak.årsaker,
                     opphørBegrunnelse = vedtak.begrunnelse,
                 )
-            }
         }
 
     private fun mapVedtakLæremidler(vedtak: VedtakLæremidler) =
         when (vedtak) {
-            is InnvilgelseLæremidler -> {
+            is InnvilgelseLæremidler ->
                 VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
-            }
 
-            is AvslagLæremidler -> {
+            is AvslagLæremidler ->
                 VedtakAvslagInternt(
                     årsakerAvslag = vedtak.årsaker,
                     avslagBegrunnelse = vedtak.begrunnelse,
                 )
-            }
 
-            is OpphørLæremidler -> {
+            is OpphørLæremidler ->
                 VedtakOpphørInternt(
                     årsakerOpphør = vedtak.årsaker,
                     opphørBegrunnelse = vedtak.begrunnelse,
                 )
-            }
         }
 
     private fun mapVedtakBoutgifter(vedtak: VedtakBoutgifter) =
         when (vedtak) {
-            is InnvilgelseBoutgifter -> {
+            is InnvilgelseBoutgifter ->
                 VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
-            }
 
-            is AvslagBoutgifter -> {
+            is AvslagBoutgifter ->
                 VedtakAvslagInternt(
                     årsakerAvslag = vedtak.årsaker,
                     avslagBegrunnelse = vedtak.begrunnelse,
                 )
-            }
 
-            is OpphørBoutgifter -> {
+            is OpphørBoutgifter ->
                 VedtakOpphørInternt(
                     årsakerOpphør = vedtak.årsaker,
                     opphørBegrunnelse = vedtak.begrunnelse,
                 )
-            }
         }
 
     private fun mapVedtakDagligReise(vedtak: VedtakDagligReise) =
