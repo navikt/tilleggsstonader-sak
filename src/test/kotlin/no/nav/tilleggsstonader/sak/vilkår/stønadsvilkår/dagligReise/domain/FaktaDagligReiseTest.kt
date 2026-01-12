@@ -201,8 +201,8 @@ class FaktaDagligReiseTest {
                         reiseId = ReiseId.random(),
                         reisedagerPerUke = 4,
                         reiseavstandEnVei = BigDecimal(10),
-                        bompengerPerDag = -10,
-                        fergekostandPerDag = 0,
+                        bompengerEnVei = -10,
+                        fergekostandEnVei = 0,
                     )
                 }
             assertThat(feil.message).isEqualTo("Bompenge- og fergeprisen må være større enn 0")
@@ -216,8 +216,8 @@ class FaktaDagligReiseTest {
                         reiseId = ReiseId.random(),
                         reisedagerPerUke = 4,
                         reiseavstandEnVei = BigDecimal("-10"),
-                        bompengerPerDag = 0,
-                        fergekostandPerDag = 0,
+                        bompengerEnVei = 0,
+                        fergekostandEnVei = 0,
                     )
                 }
             assertThat(feil.message).isEqualTo("Reiseavstanden må være større enn 0")
@@ -231,8 +231,8 @@ class FaktaDagligReiseTest {
                         reiseId = ReiseId.random(),
                         reisedagerPerUke = -4,
                         reiseavstandEnVei = BigDecimal(10),
-                        bompengerPerDag = 0,
-                        fergekostandPerDag = 0,
+                        bompengerEnVei = 0,
+                        fergekostandEnVei = 0,
                     )
                 }
             assertThat(feil.message).isEqualTo("Reisedager per uke må være 0 eller mer")
@@ -246,8 +246,8 @@ class FaktaDagligReiseTest {
                         reiseId = ReiseId.random(),
                         reisedagerPerUke = 8,
                         reiseavstandEnVei = BigDecimal(10),
-                        bompengerPerDag = 0,
-                        fergekostandPerDag = 0,
+                        bompengerEnVei = 0,
+                        fergekostandEnVei = 0,
                     )
                 }
             assertThat(feil.message).isEqualTo("Reisedager per uke kan ikke være mer enn 7")
