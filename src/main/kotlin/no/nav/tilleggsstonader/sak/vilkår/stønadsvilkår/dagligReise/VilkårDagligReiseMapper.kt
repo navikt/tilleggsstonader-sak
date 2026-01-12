@@ -59,17 +59,17 @@ object VilkårDagligReiseMapper {
 
     private fun FaktaDagligReisePrivatBil.mapTilFakta() =
         FaktaPrivatBil(
+            reiseId = this.reiseId,
             reisedagerPerUke = this.reisedagerPerUke,
             reiseavstandEnVei = this.reiseavstandEnVei,
-            prisBompengerPerDag = this.prisBompengerPerDag,
-            prisFergekostandPerDag = this.prisFergekostandPerDag,
+            bompengerPerDag = this.bompengerPerDag,
+            fergekostandPerDag = this.fergekostandPerDag,
         )
 
     fun TypeVilkårFakta.tilTypeDagligReise() =
         when (this) {
             TypeVilkårFakta.DAGLIG_REISE_OFFENTLIG_TRANSPORT -> TypeDagligReise.OFFENTLIG_TRANSPORT
             TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL -> TypeDagligReise.PRIVAT_BIL
-
             else -> error("Faktatype $this tilhører ikke daglig reise")
         }
 }

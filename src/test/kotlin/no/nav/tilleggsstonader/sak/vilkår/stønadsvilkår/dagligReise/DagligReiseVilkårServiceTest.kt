@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -25,11 +26,14 @@ class DagligReiseVilkårServiceTest {
     val vilkårRepository = mockk<VilkårRepository>()
     val vilkårService = mockk<VilkårService>()
     val behandlingService = mockk<BehandlingService>()
+    val unleashService = mockk<UnleashService>()
+
     val dagligReiseVilkårService =
         DagligReiseVilkårService(
             vilkårRepository = vilkårRepository,
             behandlingService = behandlingService,
             vilkårService = vilkårService,
+            unleashService = unleashService,
         )
 
     val svarOffentligTransport =

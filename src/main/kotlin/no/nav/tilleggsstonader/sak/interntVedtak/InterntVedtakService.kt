@@ -293,6 +293,7 @@ class InterntVedtakService(
                     årsakerAvslag = vedtak.årsaker,
                     avslagBegrunnelse = vedtak.begrunnelse,
                 )
+
             is OpphørDagligReise -> TODO()
         }
 
@@ -326,8 +327,8 @@ class InterntVedtakService(
                 VilkårFaktaPrivatBil(
                     reisedagerPerUke = fakta.reisedagerPerUke,
                     reiseavstandEnVei = fakta.reiseavstandEnVei,
-                    prisBompengerPerDag = fakta.prisBompengerPerDag,
-                    prisFergekostandPerDag = fakta.prisFergekostandPerDag,
+                    bompengerPerDag = fakta.bompengerPerDag,
+                    fergekostandPerDag = fakta.fergekostandPerDag,
                 )
 
             null -> null
