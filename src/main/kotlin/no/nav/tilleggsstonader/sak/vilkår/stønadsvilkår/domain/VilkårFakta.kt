@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagData
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import java.math.BigDecimal
 
 /**
  * [FaktaGrunnlagDataJson] definierer alle suklasser av [FaktaGrunnlagData]
@@ -32,7 +33,7 @@ data class FaktaDagligReiseOffentligTransport(
 data class FaktaDagligReisePrivatBil(
     val reiseId: ReiseId,
     val reisedagerPerUke: Int,
-    val reiseavstandEnVei: Int,
+    val reiseavstandEnVei: BigDecimal,
     val bompengerPerDag: Int?,
     val fergekostandPerDag: Int?,
 ) : VilkårFakta

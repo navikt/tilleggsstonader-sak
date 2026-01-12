@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.ant
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
+import java.math.BigDecimal
 
 sealed interface FaktaDagligReise {
     val type: TypeDagligReise
@@ -109,7 +110,7 @@ data class FaktaOffentligTransport(
 data class FaktaPrivatBil(
     val reiseId: ReiseId,
     val reisedagerPerUke: Int,
-    val reiseavstandEnVei: Int,
+    val reiseavstandEnVei: BigDecimal,
     val bompengerPerDag: Int?,
     val fergekostandPerDag: Int?,
 ) : FaktaDagligReise {
@@ -131,7 +132,7 @@ data class FaktaPrivatBil(
     }
 
     private fun validerIngenNegativReiseavstand() {
-        brukerfeilHvis(reiseavstandEnVei < 0) {
+        brukerfeilHvis(reiseavstandEnVei < BigDecimal.ZERO) {
             "Reiseavstanden må være større enn 0"
         }
     }

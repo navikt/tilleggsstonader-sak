@@ -6,6 +6,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.math.BigDecimal
 import java.time.LocalDate
 
 class FaktaDagligReiseTest {
@@ -199,7 +200,7 @@ class FaktaDagligReiseTest {
                     FaktaPrivatBil(
                         reiseId = ReiseId.random(),
                         reisedagerPerUke = 4,
-                        reiseavstandEnVei = 10,
+                        reiseavstandEnVei = BigDecimal(10),
                         bompengerPerDag = -10,
                         fergekostandPerDag = 0,
                     )
@@ -214,7 +215,7 @@ class FaktaDagligReiseTest {
                     FaktaPrivatBil(
                         reiseId = ReiseId.random(),
                         reisedagerPerUke = 4,
-                        reiseavstandEnVei = -10,
+                        reiseavstandEnVei = BigDecimal("-10"),
                         bompengerPerDag = 0,
                         fergekostandPerDag = 0,
                     )
@@ -229,7 +230,7 @@ class FaktaDagligReiseTest {
                     FaktaPrivatBil(
                         reiseId = ReiseId.random(),
                         reisedagerPerUke = -4,
-                        reiseavstandEnVei = 10,
+                        reiseavstandEnVei = BigDecimal(10),
                         bompengerPerDag = 0,
                         fergekostandPerDag = 0,
                     )
@@ -244,7 +245,7 @@ class FaktaDagligReiseTest {
                     FaktaPrivatBil(
                         reiseId = ReiseId.random(),
                         reisedagerPerUke = 8,
-                        reiseavstandEnVei = 10,
+                        reiseavstandEnVei = BigDecimal(10),
                         bompengerPerDag = 0,
                         fergekostandPerDag = 0,
                     )
