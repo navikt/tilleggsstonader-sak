@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.libs.log.logger
@@ -9,6 +10,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import org.assertj.core.api.Assertions.assertThat
 import org.springframework.data.domain.Pageable
+import java.time.LocalDateTime
 
 fun IntegrationTest.kjørTasksKlareForProsesseringTilIngenTasksIgjen() {
     do {
@@ -37,6 +39,17 @@ fun IntegrationTest.kjørTask(task: Task) {
     }
 }
 
+fun IntegrationTest.kjørAlleTaskMedSenererTriggertid() {
+    taskService
+        .findAll()
+        .filter {
+            it.status != Status.FERDIG &&
+                it.status != Status.PLUKKET &&
+                it.triggerTid > LocalDateTime.now()
+        }.map { task -> taskService.save(task.copy(triggerTid = LocalDateTime.now())) }
+        .forEach { kjørTask(it) }
+}
+
 private fun taskMsg(it: Task): String =
     when (it.type) {
         OpprettOppgaveTask.TYPE ->
@@ -56,5 +69,7 @@ fun IntegrationTest.assertFinnesTaskMedType(
     type: String,
     antall: Int = 1,
 ) {
-    assertThat(taskService.finnAlleTasksKlareForProsessering(Pageable.unpaged()).filter { it.type == type }).hasSize(antall)
+    assertThat(taskService.finnAlleTasksKlareForProsessering(Pageable.unpaged()).filter { it.type == type }).hasSize(
+        antall,
+    )
 }

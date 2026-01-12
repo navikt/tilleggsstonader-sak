@@ -27,31 +27,6 @@ class VilkårDagligReiseTest {
     }
 
     @Test
-    fun `skal kaste feil hvis fakta ikke er av forventet type`() {
-        val faktaPrivatBil =
-            FaktaPrivatBil(
-                reiseId = ReiseId.random(),
-                reisedagerPerUke = 4,
-                reiseavstandEnVei = 10,
-                bompengerEnVei = 0,
-                fergekostandEnVei = 0,
-            )
-        val feil =
-            assertThrows<Feil> {
-                VilkårDagligReise(
-                    behandlingId = BehandlingId.random(),
-                    fom = 1 januar 2025,
-                    tom = 31 januar 2025,
-                    resultat = Vilkårsresultat.OPPFYLT,
-                    status = VilkårStatus.NY,
-                    delvilkårsett = emptyList(),
-                    fakta = faktaPrivatBil,
-                )
-            }
-        assertThat(feil.message).isEqualTo("Foreløpig støttes kun fakta av typen offentlig transport")
-    }
-
-    @Test
     fun `skal kaste feil hvis fakta ikke er null når resulat er ikke oppfylt`() {
         val faktaOffentligTransport =
             FaktaOffentligTransport(

@@ -5,11 +5,11 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdMigreringService
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.ForrigeIverksettingDto
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettDtoMapper
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
-import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.utbetalingSkalSendesPåKafka
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Simuleringsresultat
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringsresultatRepository
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringRequestDto
@@ -29,6 +29,7 @@ class SimuleringService(
     private val tilgangService: TilgangService,
     private val iverksettService: IverksettService,
     private val utbetalingV3Mapper: UtbetalingV3Mapper,
+    private val fagsakUtbetalingIdMigreringService: FagsakUtbetalingIdMigreringService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -51,6 +52,8 @@ class SimuleringService(
             "Kan ikke hente og lagre simuleringsresultat for behandling=${saksbehandling.id} fordi den har har status ${saksbehandling.status.visningsnavn()}."
         }
 
+        fagsakUtbetalingIdMigreringService.migrerForFagsak(saksbehandling.fagsakId)
+
         val resultat = simulerMedTilkjentYtelse(saksbehandling)
 
         simuleringsresultatRepository.deleteById(saksbehandling.id)
@@ -67,8 +70,18 @@ class SimuleringService(
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(saksbehandling.id)
         val forrigeIverksetting = iverksettService.finnForrigeIverksetting(saksbehandling, tilkjentYtelse)
 
-        return if (utbetalingSkalSendesPåKafka(saksbehandling.stønadstype)) {
-            iverksettClient.simulerV3(utbetalingV3Mapper.lagSimuleringDtoer(saksbehandling, tilkjentYtelse.andelerTilkjentYtelse))
+        return if (iverksettService.utbetalingSkalSendesPåKafka(
+                behandling = saksbehandling,
+                fagsakId = saksbehandling.fagsakId,
+                typeAndel = tilkjentYtelse.andelerTilkjentYtelse.map { it.type }.toSet(),
+            )
+        ) {
+            iverksettClient.simulerV3(
+                utbetalingV3Mapper.lagSimuleringDtoer(
+                    saksbehandling,
+                    tilkjentYtelse.andelerTilkjentYtelse,
+                ),
+            )
         } else {
             iverksettClient.simulerV2(
                 SimuleringRequestDto(
@@ -77,7 +90,13 @@ class SimuleringService(
                     personident = saksbehandling.ident,
                     saksbehandlerId = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
                     utbetalinger = IverksettDtoMapper.mapUtbetalinger(tilkjentYtelse.andelerTilkjentYtelse),
-                    forrigeIverksetting = forrigeIverksetting?.let { ForrigeIverksettingDto(it.behandlingId, it.iverksettingId) },
+                    forrigeIverksetting =
+                        forrigeIverksetting?.let {
+                            ForrigeIverksettingDto(
+                                it.behandlingId,
+                                it.iverksettingId,
+                            )
+                        },
                 ),
             )
         }

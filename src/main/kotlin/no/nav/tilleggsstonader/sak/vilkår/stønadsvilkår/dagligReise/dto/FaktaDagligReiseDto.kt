@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Fa
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import java.math.BigDecimal
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -46,7 +47,7 @@ data class FaktaDagligReiseOffentligTransportDto(
 data class FaktaDagligReisePrivatBilDto(
     val reiseId: ReiseId,
     val reisedagerPerUke: Int,
-    val reiseavstandEnVei: Int,
+    val reiseavstandEnVei: BigDecimal,
     val bompengerEnVei: Int?,
     val fergekostandEnVei: Int?,
 ) : FaktaDagligReiseDto {

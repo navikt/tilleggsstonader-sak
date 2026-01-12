@@ -64,8 +64,6 @@ class SettPåVentService(
             "Kan ikke gjøre endringer på denne behandlingen fordi den er satt på vent."
         }
 
-        behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(behandlingId, behandling.status, behandling.steg)
-
         opprettHistorikkInnslag(behandling, årsaker = request.årsaker, kommentar = request.kommentar)
         behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.SATT_PÅ_VENT)
 

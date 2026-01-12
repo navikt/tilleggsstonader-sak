@@ -137,7 +137,7 @@ class PrivatBilBeregningService {
             tom = this.tom,
             reiseId = this.fakta.reiseId,
             reisedagerPerUke = this.fakta.reisedagerPerUke,
-            reiseavstandEnVei = this.fakta.reiseavstandEnVei.toBigDecimal(), // TODO denne må skrives om til å være BigDecimal
+            reiseavstandEnVei = this.fakta.reiseavstandEnVei,
             bompengerEnVei = this.fakta.bompengerEnVei,
             fergekostandEnVei = this.fakta.fergekostandEnVei,
         )

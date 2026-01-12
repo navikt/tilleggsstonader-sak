@@ -6,30 +6,32 @@ import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.arena.vedtak.Rettighet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
-import no.nav.tilleggsstonader.sak.migrering.routing.SkjemaRoutingService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
+import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.henlagtBehandling
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 
 class ArenaStatusServiceTest {
     private val personService = mockk<PersonService>()
     private val fagsakService = mockk<FagsakService>()
     private val behandlingService = mockk<BehandlingService>()
-    private val skjemaRoutingService = mockk<SkjemaRoutingService>()
 
     val arenaStatusService =
         ArenaStatusService(
             personService = personService,
             fagsakService = fagsakService,
             behandlingService = behandlingService,
-            skjemaRoutingService = skjemaRoutingService,
         )
 
     val ident = "ident"
@@ -40,8 +42,16 @@ class ArenaStatusServiceTest {
     @BeforeEach
     fun setUp() {
         mockFinnFagsak(fagsak)
-        every { personService.hentFolkeregisterIdenter(ident) } returns PdlIdenter(listOf(PdlIdent(ident, false, "FOLKEREGISTERIDENT")))
-        mockSøknadRouting(false)
+        every { personService.hentFolkeregisterIdenter(ident) } returns
+            PdlIdenter(
+                listOf(
+                    PdlIdent(
+                        ident,
+                        false,
+                        "FOLKEREGISTERIDENT",
+                    ),
+                ),
+            )
     }
 
     @Test
@@ -51,54 +61,55 @@ class ArenaStatusServiceTest {
         assertThat(arenaStatusService.finnStatus(request).finnes).isFalse()
 
         verify(exactly = 1) { fagsakService.finnFagsak(any(), any()) }
-        verify(exactly = 0) { behandlingService.finnesBehandlingForFagsak(any()) }
-        verify(exactly = 1) { skjemaRoutingService.harLagretRouting(any(), any()) }
+        verify(exactly = 0) { behandlingService.hentBehandlinger(fagsakId = any()) }
     }
 
     @Test
     fun `skal returnere false når det ikke finnes noen behandlinger`() {
-        mockFinnesBehandlingForFagsak(false)
+        mockBehandling(null)
 
         assertThat(arenaStatusService.finnStatus(request).finnes).isFalse()
 
         verify(exactly = 1) { fagsakService.finnFagsak(any(), any()) }
-        verify(exactly = 1) { behandlingService.finnesBehandlingForFagsak(any()) }
-        verify(exactly = 1) { skjemaRoutingService.harLagretRouting(any(), any()) }
+        verify(exactly = 1) { behandlingService.hentBehandlinger(fagsakId = any()) }
     }
 
-    @Test
-    fun `skal returnere true hvis det finnes behandlinger`() {
-        mockFinnesBehandlingForFagsak(true)
+    @ParameterizedTest
+    @EnumSource(value = BehandlingResultat::class, names = ["HENLAGT"], mode = EnumSource.Mode.EXCLUDE)
+    fun `skal returnere true hvis det finnes behandlinger`(resultat: BehandlingResultat) {
+        mockBehandling(resultat)
 
         assertThat(arenaStatusService.finnStatus(request).finnes).isTrue()
 
         verify(exactly = 1) { fagsakService.finnFagsak(any(), any()) }
-        verify(exactly = 1) { behandlingService.finnesBehandlingForFagsak(any()) }
-        verify(exactly = 0) { skjemaRoutingService.harLagretRouting(any(), any()) }
+        verify(exactly = 1) { behandlingService.hentBehandlinger(fagsakId = any()) }
     }
 
     @Test
-    fun `skal returnere true hvis det finnes ikke finnes behandling men det finnes routing`() {
-        mockFinnFagsak(fagsak)
-        mockFinnesBehandlingForFagsak(false)
-        mockSøknadRouting(true)
+    fun `skal returnere false hvis det kun finnes en henlagt behandling`() {
+        mockBehandling(BehandlingResultat.HENLAGT)
 
-        assertThat(arenaStatusService.finnStatus(request).finnes).isTrue()
+        assertThat(arenaStatusService.finnStatus(request).finnes).isFalse()
 
         verify(exactly = 1) { fagsakService.finnFagsak(any(), any()) }
-        verify(exactly = 1) { behandlingService.finnesBehandlingForFagsak(any()) }
-        verify(exactly = 1) { skjemaRoutingService.harLagretRouting(any(), any()) }
+        verify(exactly = 1) { behandlingService.hentBehandlinger(fagsakId = any()) }
     }
 
     private fun mockFinnFagsak(fagsak: Fagsak?) {
         every { fagsakService.finnFagsak(eq(setOf(ident)), request.stønadstype) } returns fagsak
     }
 
-    private fun mockFinnesBehandlingForFagsak(svar: Boolean) {
-        every { behandlingService.finnesBehandlingForFagsak(fagsak.id) } returns svar
-    }
+    /**
+     * Returnerer ingen behandling dersom resultat settes til null
+     */
+    private fun mockBehandling(resultat: BehandlingResultat?) {
+        val behandlinger =
+            when (resultat) {
+                BehandlingResultat.HENLAGT -> listOf(henlagtBehandling(fagsak))
+                null -> emptyList()
+                else -> listOf(behandling(fagsak, resultat = resultat))
+            }
 
-    private fun mockSøknadRouting(svar: Boolean) {
-        every { skjemaRoutingService.harLagretRouting(any(), any()) } returns svar
+        every { behandlingService.hentBehandlinger(fagsak.id) } returns behandlinger
     }
 }

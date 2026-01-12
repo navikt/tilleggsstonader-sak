@@ -72,7 +72,9 @@ fun IntegrationTest.gjennomførBehandlingsløp(
         return behandlingId
     }
 
-    gjennomførVilkårSteg(medVilkår, behandling.id, behandling.stønadstype)
+    if (behandling.stønadstype != Stønadstype.LÆREMIDLER) {
+        gjennomførVilkårSteg(medVilkår, behandling.id, behandling.stønadstype)
+    }
 
     if (tilSteg == StegType.BEREGNE_YTELSE) {
         return behandlingId
@@ -145,7 +147,7 @@ fun IntegrationTest.gjennomførHenleggelse(fraJournalpost: Journalpost = default
     return behandlingId
 }
 
-private fun IntegrationTest.gjennomførBeslutteVedtakSteg(behandlingId: BehandlingId) {
+fun IntegrationTest.gjennomførBeslutteVedtakSteg(behandlingId: BehandlingId) {
     medBrukercontext(bruker = "nissemor", roller = listOf(rolleConfig.beslutterRolle)) {
         tilordneÅpenBehandlingOppgaveForBehandling(behandlingId)
         kall.totrinnskontroll.beslutteVedtak(behandlingId, BeslutteVedtakDto(godkjent = true))
@@ -153,13 +155,13 @@ private fun IntegrationTest.gjennomførBeslutteVedtakSteg(behandlingId: Behandli
     kjørTasksKlareForProsessering()
 }
 
-private fun IntegrationTest.gjennomførSendTilBeslutterSteg(behandlingId: BehandlingId) {
+fun IntegrationTest.gjennomførSendTilBeslutterSteg(behandlingId: BehandlingId) {
     kall.brev.genererPdf(behandlingId, GenererPdfRequest(MINIMALT_BREV))
     kall.totrinnskontroll.sendTilBeslutter(behandlingId)
     kjørTasksKlareForProsessering()
 }
 
-private fun IntegrationTest.gjennomførSimuleringSteg(behandlingId: BehandlingId) {
+fun IntegrationTest.gjennomførSimuleringSteg(behandlingId: BehandlingId) {
     kall.steg.ferdigstill(
         behandlingId,
         StegController.FerdigstillStegRequest(

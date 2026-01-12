@@ -253,7 +253,6 @@ class JournalføringService(
                     fagsakId = fagsak.id,
                     behandlingsårsak = behandlingÅrsak,
                     kravMottatt = journalpost.datoMottatt?.toLocalDate(),
-                    tillatFlereÅpneBehandlinger = true,
                     oppgaveMetadata =
                         OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                             tilordneSaksbehandler = null, // Behandle sak oppgaven skal være ufordelt

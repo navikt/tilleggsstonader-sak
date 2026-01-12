@@ -123,9 +123,10 @@ class HåndterSøknadService(
         }
 
         val målgrupper =
-            hentMålgrupperFraRegister(journalpost, søknad).takeIf { it.isNotEmpty() }
+            hentMålgrupperFraRegister(journalpost, søknad).takeIf { it.isNotEmpty() }?.toSet()
                 ?: søknad.data.hovedytelse.hovedytelse
                     .map { it.tilMålgruppeType() }
+                    .toSet()
 
         // Sender til TSR hvis flere målgrupper eller TSR sine målgrupper
         return if (målgrupper.size > 1 ||

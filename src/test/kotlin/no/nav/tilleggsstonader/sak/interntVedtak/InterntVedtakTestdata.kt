@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTestdata.Boutgifter.vedtaksperioder
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil
@@ -609,7 +608,8 @@ object InterntVedtakTestdata {
     }
 
     object DagligReise {
-        val fagsak = fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()), stønadstype = Stønadstype.DAGLIG_REISE_TSO)
+        val fagsak =
+            fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()), stønadstype = Stønadstype.DAGLIG_REISE_TSO)
         val behandling =
             saksbehandling(
                 behandling =
@@ -722,23 +722,47 @@ object InterntVedtakTestdata {
                 privatBil = null,
             )
 
-        fun innvilgetVedtakTso() = innvilgetVedtak(beregningsresultatTso())
-
-        fun innvilgetVedtakTsr() = innvilgetVedtak(beregningsresultatTsr())
-
-        private fun innvilgetVedtak(beregningsresultatDagligReise: BeregningsresultatDagligReise) =
-            GeneriskVedtak(
-                behandlingId = behandlingId,
-                type = TypeVedtak.INNVILGELSE,
-                data =
-                    InnvilgelseDagligReise(
-                        vedtaksperioder = vedtaksperioder,
-                        beregningsresultat = beregningsresultatDagligReise,
-                        begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
-                    ),
-                gitVersjon = Applikasjonsversjon.versjon,
-                tidligsteEndring = null,
+        val vedtaksperioderTso =
+            listOf(
+                Vedtaksperiode(
+                    id = UUID.randomUUID(),
+                    fom = LocalDate.of(2024, JANUARY, 1),
+                    tom = LocalDate.of(2024, FEBRUARY, 29),
+                    aktivitet = AktivitetType.TILTAK,
+                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                ),
             )
+
+        val vedtaksperioderTsr =
+            listOf(
+                Vedtaksperiode(
+                    id = UUID.randomUUID(),
+                    fom = LocalDate.of(2024, JANUARY, 1),
+                    tom = LocalDate.of(2024, FEBRUARY, 29),
+                    aktivitet = AktivitetType.TILTAK,
+                    målgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
+                ),
+            )
+
+        fun innvilgetVedtakTso() = innvilgetVedtak(beregningsresultatTso(), vedtaksperioderTso)
+
+        fun innvilgetVedtakTsr() = innvilgetVedtak(beregningsresultatTsr(), vedtaksperioderTsr)
+
+        private fun innvilgetVedtak(
+            beregningsresultatDagligReise: BeregningsresultatDagligReise,
+            vedtaksperioder: List<Vedtaksperiode>,
+        ) = GeneriskVedtak(
+            behandlingId = behandlingId,
+            type = TypeVedtak.INNVILGELSE,
+            data =
+                InnvilgelseDagligReise(
+                    vedtaksperioder = vedtaksperioder,
+                    beregningsresultat = beregningsresultatDagligReise,
+                    begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
+                ),
+            gitVersjon = Applikasjonsversjon.versjon,
+            tidligsteEndring = null,
+        )
 
         val avslåttVedtak =
             GeneriskVedtak(

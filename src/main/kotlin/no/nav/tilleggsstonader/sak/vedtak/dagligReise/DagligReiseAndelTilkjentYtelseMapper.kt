@@ -103,24 +103,27 @@ private fun validerBrukersNavKontorForStønadstype(
     }
 }
 
+val typeAktivitetTilTypeAndelMap =
+    mapOf(
+        TypeAktivitet.ARBFORB to TypeAndel.DAGLIG_REISE_TILTAK_ARBEIDSFORBEREDENDE,
+        TypeAktivitet.ARBRRHDAG to TypeAndel.DAGLIG_REISE_TILTAK_ARBEIDSRETTET_REHAB,
+        TypeAktivitet.ARBTREN to TypeAndel.DAGLIG_REISE_TILTAK_ARBEIDSTRENING,
+        TypeAktivitet.AVKLARAG to TypeAndel.DAGLIG_REISE_TILTAK_AVKLARING,
+        TypeAktivitet.DIGIOPPARB to TypeAndel.DAGLIG_REISE_TILTAK_DIGITAL_JOBBKLUBB,
+        TypeAktivitet.ENKELAMO to TypeAndel.DAGLIG_REISE_TILTAK_ENKELTPLASS_AMO,
+        TypeAktivitet.ENKFAGYRKE to TypeAndel.DAGLIG_REISE_TILTAK_ENKELTPLASS_FAG_YRKE_HOYERE_UTD,
+        TypeAktivitet.FORSOPPLEV to TypeAndel.DAGLIG_REISE_TILTAK_FORSØK_OPPLÆRINGSTILTAK_LENGER_VARIGHET,
+        TypeAktivitet.GRUPPEAMO to TypeAndel.DAGLIG_REISE_TILTAK_GRUPPE_AMO,
+        TypeAktivitet.GRUFAGYRKE to TypeAndel.DAGLIG_REISE_TILTAK_GRUPPE_FAG_YRKE_HOYERE_UTD,
+        TypeAktivitet.HOYEREUTD to TypeAndel.DAGLIG_REISE_TILTAK_HØYERE_UTDANNING,
+        TypeAktivitet.INDJOBSTOT to TypeAndel.DAGLIG_REISE_TILTAK_INDIVIDUELL_JOBBSTØTTE,
+        TypeAktivitet.IPSUNG to TypeAndel.DAGLIG_REISE_TILTAK_INDIVIDUELL_JOBBSTØTTE_UNG,
+        TypeAktivitet.JOBBK to TypeAndel.DAGLIG_REISE_TILTAK_JOBBKLUBB,
+        TypeAktivitet.INDOPPFAG to TypeAndel.DAGLIG_REISE_TILTAK_OPPFØLGING,
+        TypeAktivitet.UTVAOONAV to TypeAndel.DAGLIG_REISE_TILTAK_UTVIDET_OPPFØLGING_I_NAV,
+        TypeAktivitet.UTVOPPFOPL to TypeAndel.DAGLIG_REISE_TILTAK_UTVIDET_OPPFØLGING_I_OPPLÆRING,
+    )
+
 fun finnTypeAndelFraTypeAktivitet(typeAktivitet: TypeAktivitet): TypeAndel =
-    when (typeAktivitet) {
-        TypeAktivitet.ARBFORB -> TypeAndel.DAGLIG_REISE_TILTAK_ARBEIDSFORBEREDENDE
-        TypeAktivitet.ARBRRHDAG -> TypeAndel.DAGLIG_REISE_TILTAK_ARBEIDSRETTET_REHAB
-        TypeAktivitet.ARBTREN -> TypeAndel.DAGLIG_REISE_TILTAK_ARBEIDSTRENING
-        TypeAktivitet.AVKLARAG -> TypeAndel.DAGLIG_REISE_TILTAK_AVKLARING
-        TypeAktivitet.DIGIOPPARB -> TypeAndel.DAGLIG_REISE_TILTAK_DIGITAL_JOBBKLUBB
-        TypeAktivitet.ENKELAMO -> TypeAndel.DAGLIG_REISE_TILTAK_ENKELTPLASS_AMO
-        TypeAktivitet.ENKFAGYRKE -> TypeAndel.DAGLIG_REISE_TILTAK_ENKELTPLASS_FAG_YRKE_HOYERE_UTD
-        TypeAktivitet.FORSOPPLEV -> TypeAndel.DAGLIG_REISE_TILTAK_FORSØK_OPPLÆRINGSTILTAK_LENGER_VARIGHET
-        TypeAktivitet.GRUPPEAMO -> TypeAndel.DAGLIG_REISE_TILTAK_GRUPPE_AMO
-        TypeAktivitet.GRUFAGYRKE -> TypeAndel.DAGLIG_REISE_TILTAK_GRUPPE_FAG_YRKE_HOYERE_UTD
-        TypeAktivitet.HOYEREUTD -> TypeAndel.DAGLIG_REISE_TILTAK_HØYERE_UTDANNING
-        TypeAktivitet.INDJOBSTOT -> TypeAndel.DAGLIG_REISE_TILTAK_INDIVIDUELL_JOBBSTØTTE
-        TypeAktivitet.IPSUNG -> TypeAndel.DAGLIG_REISE_TILTAK_INDIVIDUELL_JOBBSTØTTE_UNG
-        TypeAktivitet.JOBBK -> TypeAndel.DAGLIG_REISE_TILTAK_JOBBKLUBB
-        TypeAktivitet.INDOPPFAG -> TypeAndel.DAGLIG_REISE_TILTAK_OPPFØLGING
-        TypeAktivitet.UTVAOONAV -> TypeAndel.DAGLIG_REISE_TILTAK_UTVIDET_OPPFØLGING_I_NAV
-        TypeAktivitet.UTVOPPFOPL -> TypeAndel.DAGLIG_REISE_TILTAK_UTVIDET_OPPFØLGING_I_OPPLÆRING
-        else -> error("Kan ikke mappe til TypeAndel fra TypeAktivitet $typeAktivitet")
-    }
+    typeAktivitetTilTypeAndelMap[typeAktivitet]
+        ?: error("Kan ikke mappe til TypeAndel fra TypeAktivitet $typeAktivitet")

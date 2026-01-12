@@ -104,14 +104,7 @@ class SettPåVentServiceTest : CleanDatabaseIntegrationTest() {
                 val behandlingshistorikk =
                     behandlingshistorikkRepository.findByBehandlingIdOrderByEndretTidAsc(behandling.id)
 
-                assertThat(behandlingshistorikk).hasSize(2)
-
-                with(behandlingshistorikk[0]) {
-                    assertThat(utfall).isEqualTo(StegUtfall.UTREDNING_PÅBEGYNT)
-                    assertThat(metadata).isNull()
-                }
-
-                with(behandlingshistorikk[1]) {
+                with(behandlingshistorikk.single()) {
                     assertThat(utfall).isEqualTo(StegUtfall.SATT_PÅ_VENT)
                     assertThat(metadata).isNotNull()
                 }

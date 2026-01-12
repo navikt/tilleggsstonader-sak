@@ -60,15 +60,6 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
     @Nested
     inner class OpprettBehandling {
         @Test
-        fun `skal feile hvis forrige behandlingen ikke er ferdigstilt`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(), opprettGrunnlagsdata = false)
-
-            assertThatThrownBy {
-                service.opprettRevurdering(opprettRevurdering(fagsakId = behandling.fagsakId))
-            }.hasMessage("Det finnes en behandling på fagsaken som ikke er ferdigstilt")
-        }
-
-        @Test
         fun `ny behandling skal peke til forrige innvilgede behandling fordi iverksetting skal peke til forrige iverksatte behandling`() {
             val behandling =
                 testoppsettService.opprettBehandlingMedFagsak(

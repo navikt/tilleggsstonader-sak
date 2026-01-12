@@ -244,6 +244,7 @@ class OppfølgingOpprettKontrollerService(
             MålgruppeType.INGEN_MÅLGRUPPE,
             MålgruppeType.TILTAKSPENGER,
             MålgruppeType.KVALIFISERINGSSTØNAD,
+            MålgruppeType.INNSATT_I_FENGSEL,
             -> error("Skal ikke sjekke målgruppe=$this")
         }
 }
