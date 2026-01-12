@@ -54,16 +54,21 @@ fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
                                 ?.harRettTilUtstyrsstipend
                                 ?.svar,
                     )
+
                 is FaktaOgVurderingBoutgifter ->
                     FaktaOgSvarAktivitetBoutgifterDto(
                         svarLønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.svar,
                     )
+
                 is FaktaOgVurderingDagligReiseTso ->
                     FaktaOgSvarAktivitetDagligReiseTsoDto(
                         svarLønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.svar,
                     )
+
                 is FaktaOgVurderingDagligReiseTsr ->
-                    FaktaOgSvarAktivitetDagligReiseTsrDto
+                    FaktaOgSvarAktivitetDagligReiseTsrDto(
+                        svarHarUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.svar,
+                    )
             }
         }
     }

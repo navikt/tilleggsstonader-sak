@@ -19,30 +19,15 @@ object OpprettBehandlingUtil {
     fun validerKanOppretteNyBehandling(
         behandlingType: BehandlingType,
         tidligereBehandlinger: List<Behandling>,
-        kanHaFlereBehandlingPåSammeFagsak: Boolean = false,
     ) {
         val sisteFerdigstilteBehandling =
             tidligereBehandlinger
                 .filter { it.resultat != BehandlingResultat.HENLAGT }
                 .sisteFerdigstilteBehandling()
 
-        if (!kanHaFlereBehandlingPåSammeFagsak) {
-            validerTidligereBehandlingerErFerdigstilte(tidligereBehandlinger)
-        }
-
         when (behandlingType) {
             FØRSTEGANGSBEHANDLING -> validerKanOppretteFørstegangsbehandling(sisteFerdigstilteBehandling)
             REVURDERING -> validerKanOppretteRevurdering(sisteFerdigstilteBehandling)
-        }
-    }
-
-    // TODO: Slett når snike i køen er implementert
-    private fun validerTidligereBehandlingerErFerdigstilte(tidligereBehandlinger: List<Behandling>) {
-        if (tidligereBehandlinger.any { it.status != BehandlingStatus.FERDIGSTILT }) {
-            throw ApiFeil("Det finnes en behandling på fagsaken som ikke er ferdigstilt", HttpStatus.BAD_REQUEST)
-        }
-        feilHvis(tidligereBehandlinger.any { it.type == FØRSTEGANGSBEHANDLING && it.status == BehandlingStatus.SATT_PÅ_VENT }) {
-            "Kan ikke opprette ny behandling når det finnes en førstegangsbehandling på vent"
         }
     }
 

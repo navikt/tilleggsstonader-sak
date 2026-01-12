@@ -12,8 +12,6 @@ enum class Toggle(
 
     HENT_BEHANDLINGER_FOR_OPPFØLGING("sak.hent-behandlinger-for-oppfoelging"),
 
-    KAN_HA_FLERE_BEHANDLINGER_PÅ_SAMME_FAGSAK("sak.kan-ha-flere-behandlinger-pa-samme-fagsak"),
-
     TILLAT_LØPENDE_OG_MIDLERTIDIG_UTGIFT_SAMME_BEHANDLING("sak.tillat-lopende-og-midlertidig-utgift-samme-behandling"),
 
     SKAL_VALIDERE_ÅRSAK_TIL_AVSLAG("sak.skal-validere-arsak-til-avslag"),
@@ -25,6 +23,9 @@ enum class Toggle(
     OPPRETT_OPPGAVE_TILBAKEKREVING("sak.opprett-oppgave-tilbakekreving"),
 
     TILGANGSSTYRE_PÅ_TILORDNET_OPPGAVE("sak.tilgangsstyring-tildelt-oppgave"),
+
+    SKAL_MIGRERE_UTBETALING_MOT_KAFKA("sak.skal-migrere-utbetaling-mot-kafka"),
+    SKAL_IVERKSETT_NYE_BEHANDLINGER_MOT_KAFKA("sak.skal-iverksette-nye-behandlinger-mot-kafka"),
 
     KAN_BEHANDLE_PRIVAT_BIL("sak.daglig-reise-privat-bil"),
 }

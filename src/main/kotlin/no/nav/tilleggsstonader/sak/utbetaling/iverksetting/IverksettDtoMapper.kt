@@ -68,7 +68,7 @@ object IverksettDtoMapper {
             Satstype.UGYLDIG -> error("Ugyldig satstype. Skal ikke iverksettes")
         }
 
-    private fun TypeAndel.tilStønadstype(): StønadstypeIverksetting =
+    fun TypeAndel.tilStønadstype(): StønadstypeIverksetting =
         when (this) {
             TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER -> StønadstypeIverksetting.TILSYN_BARN_ENSLIG_FORSØRGER
             TypeAndel.TILSYN_BARN_AAP -> StønadstypeIverksetting.TILSYN_BARN_AAP

@@ -99,7 +99,7 @@ class UtførSatsjusteringService(
         // Kaller disse direkte for å hoppe over totrinnskontroll
         behandlingService.oppdaterStatusPåBehandling(revurdering.id, BehandlingStatus.FATTER_VEDTAK)
         behandlingService.oppdaterResultatPåBehandling(revurdering.id, BehandlingResultat.INNVILGET)
-        behandlingService.oppdaterStegPåBehandling(revurdering.id, StegType.BESLUTTE_VEDTAK)
+        behandlingService.oppdaterStegPåBehandling(revurdering.id, StegType.FERDIGSTILLE_BEHANDLING)
         iverksettService.iverksettBehandlingFørsteGang(revurdering.id)
 
         // Her lages også internt vedtak og behandling- og vedtaksstatistikk

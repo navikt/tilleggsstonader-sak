@@ -135,7 +135,9 @@ data class AktivitetDagligReiseTsoFaktaOgVurderingerDto(
     val harUtgifter: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
-data object AktivitetDagligReiseTsrFaktaOgVurderingerDto : FaktaOgVurderingerDto()
+data class AktivitetDagligReiseTsrFaktaOgVurderingerDto(
+    val harUtgifter: VurderingDto? = null,
+) : FaktaOgVurderingerDto()
 
 fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
     when (this) {
@@ -204,7 +206,9 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                         harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
                     )
                 is FaktaOgVurderingDagligReiseTsr ->
-                    AktivitetDagligReiseTsrFaktaOgVurderingerDto
+                    AktivitetDagligReiseTsrFaktaOgVurderingerDto(
+                        harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
+                    )
             }
         }
     }
