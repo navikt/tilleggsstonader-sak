@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
@@ -31,7 +31,7 @@ class UtbetalingStatusHåndtererIntegrationTest(
     ) {
         // Gjennomfør behandling til iverksetting er ferdig
         val behandlingId =
-            gjennomførBehandlingsløp(
+            opprettBehandlingOgGjennomførBehandlingsløp(
                 medVilkår = listOf(lagreDagligReiseDto()),
                 tilSteg = StegType.BEHANDLING_FERDIGSTILT,
             )
@@ -69,7 +69,7 @@ class UtbetalingStatusHåndtererIntegrationTest(
 
     @Test
     fun `FEILET status oppdaterer andeler med FEILET status og inkluderer error detaljer`() {
-        val behandlingId = gjennomførBehandlingsløp()
+        val behandlingId = opprettBehandlingOgGjennomførBehandlingsløp()
 
         // Hent iverksettingId fra andel
         val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
@@ -111,7 +111,7 @@ class UtbetalingStatusHåndtererIntegrationTest(
     fun `flere andeler oppdateres alle når status mottas`() {
         // Opprett behandling med flere andeler
         val behandlingId =
-            gjennomførBehandlingsløp(
+            opprettBehandlingOgGjennomførBehandlingsløp(
                 medVilkår =
                     listOf(
                         lagreDagligReiseDto(fom = 2 januar 2025, tom = 2 januar 2025),
@@ -151,7 +151,7 @@ class UtbetalingStatusHåndtererIntegrationTest(
     @Test
     fun `ignorerer status for andre fagsystemer`() {
         val behandlingId =
-            gjennomførBehandlingsløp(
+            opprettBehandlingOgGjennomførBehandlingsløp(
                 medAktivitet = ::lagreVilkårperiodeAktivitet,
                 medMålgruppe = ::lagreVilkårperiodeMålgruppe,
                 medVilkår = listOf(lagreDagligReiseDto()),

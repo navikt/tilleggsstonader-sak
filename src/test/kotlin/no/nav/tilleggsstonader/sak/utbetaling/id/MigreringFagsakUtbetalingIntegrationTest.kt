@@ -24,7 +24,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeld
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørAlleTaskMedSenererTriggertid
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeslutteVedtakSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførInngangsvilkårSteg
@@ -273,7 +273,7 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
         fom: LocalDate,
         tom: LocalDate,
     ): BehandlingId =
-        gjennomførBehandlingsløp(
+        opprettBehandlingOgGjennomførBehandlingsløp(
             fraJournalpost =
                 journalpost(
                     journalpostId = "1",

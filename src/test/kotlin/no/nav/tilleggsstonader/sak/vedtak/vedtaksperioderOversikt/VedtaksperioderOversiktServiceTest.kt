@@ -16,7 +16,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
@@ -81,7 +81,7 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
         val tomTiltaksenheten = 30 september 2025
 
         // Gjennomfører behandling for Tiltaksenheten
-        gjennomførBehandlingsløp(
+        opprettBehandlingOgGjennomførBehandlingsløp(
             fraJournalpost =
                 journalpost(
                     journalpostId = "1",
@@ -117,7 +117,7 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
 
         // Gjennomfører behandling for Nay
         val behandlingId =
-            gjennomførBehandlingsløp(
+            opprettBehandlingOgGjennomførBehandlingsløp(
                 fraJournalpost =
                     journalpost(
                         journalpostId = "1",

@@ -51,7 +51,7 @@ import java.time.LocalDate
  * [tilSteg] I hvilket steg behandlingen skal ende opp. Som default blir den ferdigstilt.
  *
  */
-fun IntegrationTest.gjennomførBehandlingsløp(
+fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
     fraJournalpost: Journalpost = defaultJournalpost,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
     medAktivitet: (BehandlingId) -> LagreVilkårperiode = ::lagreVilkårperiodeAktivitet,

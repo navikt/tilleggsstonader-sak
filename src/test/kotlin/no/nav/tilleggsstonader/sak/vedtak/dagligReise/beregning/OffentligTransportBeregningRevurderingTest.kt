@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførInngangsvilkårSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførVilkårSteg
@@ -40,7 +40,7 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
             )
 
         val førstegangsbehandlingId =
-            gjennomførBehandlingsløp(
+            opprettBehandlingOgGjennomførBehandlingsløp(
                 medAktivitet = ::lagreAktivitet,
                 medMålgruppe = ::lagreMålgruppe,
                 medVilkår = listOf(reiser),
