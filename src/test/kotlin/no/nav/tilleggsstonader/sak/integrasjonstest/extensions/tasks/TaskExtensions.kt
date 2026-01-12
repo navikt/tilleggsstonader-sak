@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
+import no.nav.familie.prosessering.error.RekjørSenereException
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.sak.IntegrationTest
@@ -34,8 +35,12 @@ fun IntegrationTest.kjørTask(task: Task) {
         taskWorker.markerPlukket(task.id)
         logger.info("Kjører task ${task.id} type=${task.type} msg=${taskMsg(task)}")
         taskWorker.doActualWork(task.id)
+    } catch (e: RekjørSenereException) {
+        logger.warn("RekjørSenereException for task ${task.id} type=${task.type} msg=${taskMsg(task)}", e)
+        taskWorker.rekjørSenere(task.id, e)
     } catch (e: Exception) {
         logger.error("Feil ved kjøring av task ${task.id} type=${task.type} msg=${taskMsg(task)}", e)
+        taskWorker.doFeilhåndtering(task.id, e)
     }
 }
 
