@@ -1,13 +1,17 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.SlettetVilkårResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkår
@@ -31,6 +35,7 @@ class DagligReiseVilkårService(
     private val vilkårRepository: VilkårRepository,
     private val behandlingService: BehandlingService,
     private val vilkårService: VilkårService,
+    private val unleashService: UnleashService,
 ) {
     fun hentVilkårForBehandling(behandlingId: BehandlingId): List<VilkårDagligReise> =
         vilkårRepository
@@ -45,6 +50,7 @@ class DagligReiseVilkårService(
     ): VilkårDagligReise {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
+        validerKanBehandleVilkåret(nyttVilkår)
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår)
         val lagretVilkår = vilkårRepository.insert(vilkår.mapTilVilkår())
@@ -60,6 +66,7 @@ class DagligReiseVilkårService(
     ): VilkårDagligReise {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
+        validerKanBehandleVilkåret(nyttVilkår)
 
         val eksisterendeVilkår = vilkårRepository.findByIdOrThrow(vilkårId).mapTilVilkårDagligReise()
 
@@ -145,5 +152,14 @@ class DagligReiseVilkårService(
 
     private fun validerErRedigerbar(behandling: Saksbehandling) {
         behandling.status.validerKanBehandlingRedigeres()
+    }
+
+    private fun validerKanBehandleVilkåret(nyttVilkår: LagreDagligReise) {
+        val gjelderPrivatBil = nyttVilkår.fakta?.type == TypeDagligReise.PRIVAT_BIL
+        val kanBehandlePrivatBil = unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)
+
+        feilHvis(gjelderPrivatBil && !kanBehandlePrivatBil) {
+            "TS-sak støtter foreløpig ikke behandling av saker som gjelder privat bil"
+        }
     }
 }
