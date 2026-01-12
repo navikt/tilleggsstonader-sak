@@ -84,41 +84,32 @@ class InterntVedtakService(
     ): BeregningsresultatInterntVedtakDto? =
         vedtak?.data?.let { data ->
             when (data) {
-                is InnvilgelseTilsynBarn -> {
+                is InnvilgelseTilsynBarn ->
                     BeregningsresultatInterntVedtakDto(
                         tilsynBarn = data.beregningsresultat.tilDto(vedtak.tidligsteEndring).perioder,
                     )
-                }
 
-                is InnvilgelseLæremidler -> {
+                is InnvilgelseLæremidler ->
                     BeregningsresultatInterntVedtakDto(
-                        læremidler =
-                            data.beregningsresultat
-                                .tilDto(vedtak.tidligsteEndring)
-                                .perioder,
+                        læremidler = data.beregningsresultat.tilDto(vedtak.tidligsteEndring).perioder,
                     )
-                }
 
-                is InnvilgelseBoutgifter -> {
+                is InnvilgelseBoutgifter ->
                     BeregningsresultatInterntVedtakDto(
                         boutgifter = data.beregningsresultat.tilDto(vedtak.tidligsteEndring).perioder,
                     )
-                }
 
-                is InnvilgelseDagligReise -> {
+                is InnvilgelseDagligReise ->
                     BeregningsresultatInterntVedtakDto(
                         dagligReiseTso = data.beregningsresultat.tilDto(vedtak.tidligsteEndring),
                     )
-                }
 
                 is Innvilgelse,
                 -> {
                     error("Mangler mapping av beregningsresultat for ${data.type}")
                 }
 
-                else -> {
-                    null
-                }
+                else -> null
             }
         }
 
@@ -176,25 +167,11 @@ class InterntVedtakService(
 
     private fun mapVedtaksperioder(vedtak: Vedtak?): List<VedtaksperiodeInterntVedtak> =
         when (vedtak?.data) {
-            is InnvilgelseTilsynBarn -> {
-                mapVedtaksperioder(vedtak.data.vedtaksperioder)
-            }
-
-            is InnvilgelseLæremidler -> {
-                mapVedtaksperioder(vedtak.data.vedtaksperioder)
-            }
-
-            is InnvilgelseBoutgifter -> {
-                mapVedtaksperioder(vedtak.data.vedtaksperioder)
-            }
-
-            is InnvilgelseDagligReise -> {
-                mapVedtaksperioder(vedtak.data.vedtaksperioder)
-            }
-
-            is Avslag, is Opphør -> {
-                emptyList()
-            }
+            is InnvilgelseTilsynBarn -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
+            is InnvilgelseLæremidler -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
+            is InnvilgelseBoutgifter -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
+            is InnvilgelseDagligReise -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
+            is Avslag, is Opphør -> emptyList()
 
             else -> {
                 error("Kan ikke mappe vedtaksperioder for type ${vedtak?.data?.javaClass?.simpleName}")
@@ -319,16 +296,13 @@ class InterntVedtakService(
 
     private fun mapVedtakDagligReise(vedtak: VedtakDagligReise) =
         when (vedtak) {
-            is InnvilgelseDagligReise -> {
-                VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
-            }
+            is InnvilgelseDagligReise -> VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
 
-            is AvslagDagligReise -> {
+            is AvslagDagligReise ->
                 VedtakAvslagInternt(
                     årsakerAvslag = vedtak.årsaker,
                     avslagBegrunnelse = vedtak.begrunnelse,
                 )
-            }
 
             is OpphørDagligReise -> {
                 TODO()
