@@ -108,7 +108,7 @@ class InterntVedtakService(
                     )
 
                 is Innvilgelse,
-                    -> error("Mangler mapping av beregningsresultat for ${data.type}")
+                -> error("Mangler mapping av beregningsresultat for ${data.type}")
 
                 else -> null
             }

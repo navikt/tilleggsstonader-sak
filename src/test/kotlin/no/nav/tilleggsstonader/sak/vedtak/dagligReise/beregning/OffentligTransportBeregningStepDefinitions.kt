@@ -84,10 +84,10 @@ class OffentligTransportBeregningStepDefinitions {
     @Gitt("følgende beregningsinput for offentlig transport")
     fun `følgende beregnins input offentlig transport`(utgiftData: DataTable) {
         every { behandlingServiceMock.hentSaksbehandling(any<BehandlingId>()) } returns
-                dummyBehandling(
-                    behandlingId = behandlingId,
-                    steg = StegType.VILKÅR,
-                )
+            dummyBehandling(
+                behandlingId = behandlingId,
+                steg = StegType.VILKÅR,
+            )
 
         every { unleashServiceMock.isEnabled(any()) } returns true
 
