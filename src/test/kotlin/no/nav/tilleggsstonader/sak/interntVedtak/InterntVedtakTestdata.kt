@@ -793,6 +793,7 @@ object InterntVedtakTestdata {
                             prisEnkelbillett = 44,
                             prisSyvdagersbillett = null,
                             prisTrettidagersbillett = 750,
+                            adresse = "Tiltaksveien 1",
                         ),
                 ),
             )

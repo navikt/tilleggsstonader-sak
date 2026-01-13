@@ -41,12 +41,15 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 
 @Component
 class VedtakDtoMapper(
     private val vedtakService: VedtakService,
+    private val vilkårService: VilkårService,
 ) {
     fun toDto(
         vedtak: Vedtak,
@@ -80,6 +83,7 @@ class VedtakDtoMapper(
 
             is VedtakDagligReise ->
                 mapVedtakDagligReise(
+                    vedtak.behandlingId,
                     data,
                     vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId,
@@ -196,18 +200,27 @@ class VedtakDtoMapper(
         }
 
     private fun mapVedtakDagligReise(
+        behandlingId: BehandlingId,
         data: VedtakDagligReise,
         tidligsteEndring: LocalDate?,
         forrigeIverksatteBehandlingId: BehandlingId?,
     ): VedtakDagligReiseResponse =
         when (data) {
             is InnvilgelseDagligReise -> {
+                val oppfylteVilkår =
+                    vilkårService
+                        .hentOppfylteDagligReiseVilkår(behandlingId)
+                        .map { it.mapTilVilkårDagligReise() }
                 InnvilgelseDagligReiseResponse(
                     vedtaksperioder =
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
                         ),
-                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
+                    beregningsresultat =
+                        data.beregningsresultat.tilDto(
+                            tidligsteEndring = tidligsteEndring,
+                            vilkår = oppfylteVilkår,
+                        ),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,

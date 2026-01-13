@@ -6,7 +6,10 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatD
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import java.time.LocalDate
 
 data class BeregningsresultatDagligReiseDto(
@@ -20,6 +23,7 @@ data class BeregningsresultatOffentligTransportDto(
 
 data class BeregningsresultatForReiseDto(
     val reiseId: ReiseId,
+    val adresse: String?,
     val perioder: List<BeregningsresultatForPeriodeDto>,
 )
 
@@ -37,20 +41,27 @@ data class BeregningsresultatForPeriodeDto(
     val brukersNavKontor: String?,
 ) : Periode<LocalDate>
 
-fun BeregningsresultatDagligReise.tilDto(tidligsteEndring: LocalDate?): BeregningsresultatDagligReiseDto =
+fun BeregningsresultatDagligReise.tilDto(
+    tidligsteEndring: LocalDate?,
+    vilkår: List<VilkårDagligReise> = emptyList(),
+): BeregningsresultatDagligReiseDto =
     BeregningsresultatDagligReiseDto(
-        offentligTransport = offentligTransport?.tilDto(),
+        offentligTransport = offentligTransport?.tilDto(vilkår),
         tidligsteEndring = tidligsteEndring,
     )
 
-fun BeregningsresultatOffentligTransport.tilDto(): BeregningsresultatOffentligTransportDto =
+fun BeregningsresultatOffentligTransport.tilDto(vilkår: List<VilkårDagligReise>): BeregningsresultatOffentligTransportDto =
     BeregningsresultatOffentligTransportDto(
-        reiser = reiser.map { it.tilDto() },
+        reiser =
+            reiser.map {
+                it.tilDto(adresse = hentTilhørendeAdresseFraFakta(vilkår, it.reiseId))
+            },
     )
 
-fun BeregningsresultatForReise.tilDto(): BeregningsresultatForReiseDto =
+fun BeregningsresultatForReise.tilDto(adresse: String?): BeregningsresultatForReiseDto =
     BeregningsresultatForReiseDto(
         reiseId = reiseId,
+        adresse = adresse,
         perioder = perioder.map { it.tilDto() },
     )
 
@@ -68,3 +79,16 @@ fun BeregningsresultatForPeriode.tilDto(): BeregningsresultatForPeriodeDto =
         fraTidligereVedtak = fraTidligereVedtak,
         brukersNavKontor = grunnlag.brukersNavKontor,
     )
+
+private fun hentTilhørendeAdresseFraFakta(
+    vilkår: List<VilkårDagligReise>,
+    reiseId: ReiseId,
+): String? =
+    vilkår
+        .mapNotNull { it.fakta }
+        .find { fakta ->
+            when (fakta) {
+                is FaktaOffentligTransport -> fakta.reiseId == reiseId
+                is FaktaPrivatBil -> fakta.reiseId == reiseId
+            }
+        }?.adresse

@@ -28,7 +28,7 @@ data class FaktaDagligReiseOffentligTransport(
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int?,
-    val adresse: String? = null,
+    val adresse: String?,
 ) : VilkårFakta
 
 data class FaktaDagligReisePrivatBil(
@@ -37,7 +37,7 @@ data class FaktaDagligReisePrivatBil(
     val reiseavstandEnVei: BigDecimal,
     val bompengerEnVei: Int?,
     val fergekostandEnVei: Int?,
-    val adresse: String? = null,
+    val adresse: String?,
 ) : VilkårFakta
 
 enum class TypeVilkårFakta {

@@ -120,6 +120,6 @@ class DagligReiseVilkårServiceTest {
         prisEnkelbillett = prisEnkelbillett,
         prisSyvdagersbillett = prisSyvdagersbillett,
         prisTrettidagersbillett = prisTrettidagersbillett,
-        adresse = adresse
+        adresse = adresse,
     )
 }

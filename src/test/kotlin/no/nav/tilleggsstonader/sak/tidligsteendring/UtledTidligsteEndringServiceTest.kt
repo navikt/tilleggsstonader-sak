@@ -145,6 +145,7 @@ class UtledTidligsteEndringServiceTest {
                         prisEnkelbillett = 80,
                         prisSyvdagersbillett = 500,
                         prisTrettidagersbillett = 1800,
+                        adresse = null,
                     ),
             )
         val nyttVilkår =
@@ -160,6 +161,7 @@ class UtledTidligsteEndringServiceTest {
                         prisEnkelbillett = 80,
                         prisSyvdagersbillett = 500,
                         prisTrettidagersbillett = 1800,
+                        adresse = null,
                     ),
             )
         vilkårSisteIverksatteBehandling = listOf(gammeltVilkår)

@@ -123,6 +123,7 @@ class DagligReiseVilkårService(
                     prisSyvdagersbillett = this.prisSyvdagersbillett?.takeIf { it > 0 },
                     prisTrettidagersbillett = this.prisTrettidagersbillett?.takeIf { it > 0 },
                     periode = periode,
+                    adresse = this.adresse,
                 )
             }
 

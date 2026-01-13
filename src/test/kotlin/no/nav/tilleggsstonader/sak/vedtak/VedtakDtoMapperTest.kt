@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerResponse
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -19,7 +20,8 @@ import java.time.LocalDate
 
 class VedtakDtoMapperTest {
     val vedtakService: VedtakService = mockk()
-    val vedtakDtoMapper = VedtakDtoMapper(vedtakService)
+    val vilkårService: VilkårService = mockk()
+    val vedtakDtoMapper = VedtakDtoMapper(vedtakService, vilkårService)
 
     @Nested
     inner class TilsynBarn {

@@ -106,6 +106,7 @@ data class FaktaOffentligTransport(
             prisEnkelbillett = prisEnkelbillett,
             prisSyvdagersbillett = prisSyvdagersbillett,
             prisTrettidagersbillett = prisTrettidagersbillett,
+            adresse = adresse,
         )
 }
 
@@ -157,5 +158,6 @@ data class FaktaPrivatBil(
             reiseavstandEnVei = reiseavstandEnVei,
             bompengerEnVei = bompengerEnVei,
             fergekostandEnVei = fergekostandEnVei,
+            adresse = adresse,
         )
 }
