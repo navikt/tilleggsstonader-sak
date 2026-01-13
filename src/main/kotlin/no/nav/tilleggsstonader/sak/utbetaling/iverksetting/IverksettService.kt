@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingId
 import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -164,7 +165,9 @@ class IverksettService(
                 typeAndel = tilkjentYtelse.andelerTilkjentYtelse.map { it.type }.toSet(),
             )
         ) {
-            if (andelerTilUtbetaling.isNotEmpty()) {
+            val utbetalingsIderPåFagsak =
+                fagsakUtbetalingIdService.hentUtbetalingIderForFagsakId(fagsakId = behandling.fagsakId)
+            if (andelerTilUtbetaling.isNotEmpty() || utbetalingsIderPåFagsak.isNotEmpty()) {
                 val utbetalingRecords =
                     utbetalingV3Mapper.lagIverksettingDtoer(
                         behandling = behandling,
@@ -339,6 +342,7 @@ class IverksettService(
         fagsakId: FagsakId,
         typeAndel: Set<TypeAndel>,
     ): Boolean {
+        val utbetalingIderPåFagsak = fagsakUtbetalingIdService.hentUtbetalingIderForFagsakId(fagsakId)
         val finnesUtbetalingListe = typeAndel.map { fagsakUtbetalingIdService.finnesUtbetalingsId(fagsakId, it) }
 
         feilHvis(finnesUtbetalingListe.distinct().size > 1) {
@@ -347,11 +351,25 @@ class IverksettService(
 
         return behandling.stønadstype.gjelderDagligReise() ||
             erFørstegangsbehandlingLæremidlerOgSkalIverksetteMotKafka(behandling) ||
-            finnesUtbetalingListe.all { it }
+            (
+                utbetalingIderPåFagsak.isNotEmpty() &&
+                    finnesUtbetalingIdForAlleTypeAndeler(
+                        typeAndelIBehandling = typeAndel,
+                        utbetalingIderPåFagsak = utbetalingIderPåFagsak,
+                    )
+            )
     }
 
     private fun erFørstegangsbehandlingLæremidlerOgSkalIverksetteMotKafka(behandling: Saksbehandling): Boolean =
         behandling.stønadstype == Stønadstype.LÆREMIDLER &&
             behandling.forrigeIverksatteBehandlingId == null &&
             unleashService.isEnabled(Toggle.SKAL_IVERKSETT_NYE_BEHANDLINGER_MOT_KAFKA)
+
+    private fun finnesUtbetalingIdForAlleTypeAndeler(
+        typeAndelIBehandling: Set<TypeAndel>,
+        utbetalingIderPåFagsak: List<FagsakUtbetalingId>,
+    ): Boolean =
+        typeAndelIBehandling.all { typeAndel ->
+            utbetalingIderPåFagsak.any { utbetalingId -> utbetalingId.typeAndel == typeAndel }
+        }
 }
