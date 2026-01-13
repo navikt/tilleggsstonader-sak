@@ -64,6 +64,7 @@ class UtbetalingV3Mapper(
         erFørsteIverksettingForBehandling: Boolean,
     ): List<UtbetalingDto> =
         andelerTilkjentYtelse
+            .filterNot { it.erNullandel() }
             .groupBy { it.type }
             .map { (type, andelerAvType) -> lagUtbetaling(behandling, type, andelerAvType) }
             .let { utbetalinger ->
