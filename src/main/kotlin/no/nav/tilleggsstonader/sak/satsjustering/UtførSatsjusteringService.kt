@@ -95,17 +95,17 @@ class UtførSatsjusteringService(
      * I så fall kan vi sette den på vent under satsjustering.
      */
     private fun kanSettesPåVentForSatsjustering(åpneBehandlinger: List<Behandling>): Behandling? {
+        logger.info("Sjekker om fagsak har åpne behandlinger som kan settes på vent for satsjustering.")
         if (åpneBehandlinger.size != 1) {
+            logger.info("Fagsak har ${åpneBehandlinger.size} åpne behandlinger, kan ikke sette på vent for satsjustering.")
             return null
         }
 
         val behandling = åpneBehandlinger.single()
         if (behandling.status != BehandlingStatus.OPPRETTET) {
-            return null
-        }
-
-        val oppgave = oppgaveService.hentÅpenBehandlingsoppgave(behandling.id)
-        if (oppgave?.tilordnetSaksbehandler != null) {
+            logger.info(
+                "Behandling=${behandling.id} er allerede påbegynt, kan ikke sette på vent for satsjustering da vi kan risikere at informasjon går tapt ved nullstilling.",
+            )
             return null
         }
 
@@ -117,7 +117,9 @@ class UtførSatsjusteringService(
         fagsakId: FagsakId,
     ) {
         val oppgave = oppgaveService.hentAktivBehandleSakOppgave(behandlingSomSettesPåVent.id)
-        val frist = oppgave.fristFerdigstillelse ?: error("Oppgave mangler frist for behandling=${behandlingSomSettesPåVent.id}")
+        val frist =
+            oppgave.fristFerdigstillelse
+                ?: error("Oppgave mangler frist for behandling=${behandlingSomSettesPåVent.id}")
 
         settPåVentService.settPåVent(
             behandlingId = behandlingSomSettesPåVent.id,
@@ -131,7 +133,10 @@ class UtførSatsjusteringService(
         )
 
         opprettRevurderingOgKjørSatsendring(fagsakId)
-        taAvVentService.taAvVent(behandlingSomSettesPåVent.id, TaAvVentDto(settBehandlingStatusTil = BehandlingStatus.OPPRETTET))
+        taAvVentService.taAvVent(
+            behandlingSomSettesPåVent.id,
+            TaAvVentDto(settBehandlingStatusTil = BehandlingStatus.OPPRETTET),
+        )
     }
 
     private fun opprettRevurderingOgKjørSatsendring(fagsakId: FagsakId) {

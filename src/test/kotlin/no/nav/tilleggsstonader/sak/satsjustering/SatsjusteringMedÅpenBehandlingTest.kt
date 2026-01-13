@@ -126,45 +126,6 @@ class SatsjusteringMedÅpenBehandlingTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `satsjustering setter ikke behandling på vent hvis oppgaven er fordelt`() {
-        val førstegangsbehandling = opprettFørstegangsbehandlingMedAndelerTilSatsjustering()
-        val fagsakId = førstegangsbehandling.fagsakId
-
-        // Opprett en ny behandling i status OPPRETTET med fordelt oppgave
-        val nyÅpenBehandling = opprettNyBehandlingIStatusOpprettet(fagsakId)
-        val oppgave = oppgaveRepository.findByBehandlingId(nyÅpenBehandling.id).single()
-        oppgaveRepository.update(oppgave.copy(tilordnetSaksbehandler = "saksbehandler123"))
-
-        mockSatser()
-
-        // Satsjustering skal kaste RekjørSenereException fordi oppgaven er fordelt
-        medBrukercontext(roller = listOf(rolleConfig.utvikler)) {
-            kall.satsjustering.satsjustering(Stønadstype.LÆREMIDLER)
-        }
-
-        kjørTasksKlareForProsessering()
-
-        val satsjusteringTask =
-            taskService
-                .findAll()
-                .filter { it.type == SatsjusteringTask.TYPE }
-                .singleOrNull { it.payload == førstegangsbehandling.id.toString() }
-
-        // Satsjusteringstasken skal ha feilet og skal bli kjørt i morgen kl 0700
-        assertThat(satsjusteringTask).isNotNull
-        assertThat(satsjusteringTask!!.status).isEqualTo(Status.KLAR_TIL_PLUKK)
-        assertThat(satsjusteringTask.triggerTid).isEqualTo(LocalDate.now().plusDays(1).atTime(7, 0))
-
-        // Verifiser at behandlingen fortsatt er i status OPPRETTET (ikke satt på vent og tatt av igjen)
-        val oppdatertÅpenBehandling = behandlingRepository.findById(nyÅpenBehandling.id).get()
-        assertThat(oppdatertÅpenBehandling.status).isEqualTo(BehandlingStatus.OPPRETTET)
-
-        // Ingen satsjustering er opprettet
-        val sisteIverksatteBehandling = behandlingRepository.finnSisteIverksatteBehandling(fagsakId)!!
-        assertThat(sisteIverksatteBehandling.id).isEqualTo(førstegangsbehandling.id)
-    }
-
-    @Test
     fun `satsjustering setter ikke behandling på vent hvis behandlingen ikke er i status OPPRETTET`() {
         val førstegangsbehandling = opprettFørstegangsbehandlingMedAndelerTilSatsjustering()
         val fagsakId = førstegangsbehandling.fagsakId
