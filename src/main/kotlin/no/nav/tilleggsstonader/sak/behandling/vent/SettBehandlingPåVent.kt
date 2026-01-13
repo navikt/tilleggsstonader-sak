@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import java.time.LocalDate
 
 data class SettBehandlingPåVent(
