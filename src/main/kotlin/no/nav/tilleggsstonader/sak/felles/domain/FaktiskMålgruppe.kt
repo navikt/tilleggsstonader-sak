@@ -70,6 +70,6 @@ enum class FaktiskMålgruppe(
                 }
             }
 
-            Stønadstype.DAGLIG_REISE_TSR -> error("Kan ikke utlede Typeandel for Daglig reise TSR fra FaktiskMålgruppe")
+            Stønadstype.DAGLIG_REISE_TSR -> error("Kan ikke utlede Typeandel for daglige reiser TSR fra FaktiskMålgruppe")
         }
 }

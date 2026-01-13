@@ -255,7 +255,7 @@ enum class VilkårType(
 
     // Daglig reise
     DAGLIG_REISE(
-        "Daglig reise",
+        "Daglige reiser",
         listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
     ),
     ;
