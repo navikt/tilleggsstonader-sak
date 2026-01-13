@@ -3,7 +3,9 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
@@ -22,10 +24,11 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseReque
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -121,55 +124,77 @@ class DagligReiseBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         vedtak: OpphørDagligReiseRequest,
     ) {
-        brukerfeilHvis(saksbehandling.forrigeIverksatteBehandlingId == null) {
+        feilHvis(saksbehandling.forrigeIverksatteBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
         feilHvis(vedtak.opphørsdato == null) {
             "Opphørsdato er ikke satt"
         }
         val opphørsdato = vedtak.opphørsdato
+        val forrigeVedtak = hentVedtak(saksbehandling.forrigeIverksatteBehandlingId)
 
         opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
 
-        val vedtaksperioder = finnNyeVedtaksperioderForOpphør(saksbehandling, opphørsdato)
+        opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
+            forrigeBehandlingsVedtaksperioder = forrigeVedtak.data.vedtaksperioder,
+            opphørsdato = opphørsdato,
+        )
+
+        val avkortetVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, opphørsdato)
 
         val beregningsresultat =
             beregningService.beregn(
-                behandlingId = saksbehandling.id,
-                vedtaksperioder = vedtaksperioder,
+                vedtaksperioder = avkortetVedtaksperioder,
                 behandling = saksbehandling,
-                typeVedtak = TypeVedtak.OPPHØR, // TODO skal vi også ha tidligste endring her?
-                tidligsteEndring = TODO(),
+                typeVedtak = TypeVedtak.OPPHØR,
+                tidligsteEndring = opphørsdato,
             )
         opphørValideringService.validerIngenUtbetalingEtterOpphørsdatoDagligReise(
             beregningsresultat,
             opphørsdato,
-            TODO("denne må tittes på"),
         )
 
+        lagreOpphørsvedtak(saksbehandling, beregningsresultat, avkortetVedtaksperioder, vedtak)
+
+        tilkjentYtelseService.lagreTilkjentYtelse(
+            behandlingId = saksbehandling.id,
+            andeler = beregningsresultat.offentligTransport?.mapTilAndelTilkjentYtelse(saksbehandling) ?: feil("Forventer xxx"),
+        )
+    }
+
+    private fun lagreOpphørsvedtak(
+        saksbehandling: Saksbehandling,
+        beregningsresultat: BeregningsresultatDagligReise,
+        avkortetVedtaksperioder: List<Vedtaksperiode>,
+        vedtak: OpphørDagligReiseRequest,
+    ) {
         vedtakRepository.insert(
-            TODO(),
+            GeneriskVedtak(
+                behandlingId = saksbehandling.id,
+                type = TypeVedtak.OPPHØR,
+                data =
+                    OpphørDagligReise(
+                        beregningsresultat = beregningsresultat,
+                        årsaker = vedtak.årsakerOpphør,
+                        begrunnelse = vedtak.begrunnelse,
+                        vedtaksperioder = avkortetVedtaksperioder,
+                    ),
+                gitVersjon = Applikasjonsversjon.versjon,
+                tidligsteEndring = null,
+                opphørsdato = vedtak.opphørsdato,
+            ),
         )
     }
 
-    private fun finnNyeVedtaksperioderForOpphør(
-        behandling: Saksbehandling,
+    private fun hentVedtak(behandlingId: BehandlingId): GeneriskVedtak<InnvilgelseEllerOpphørDagligReise> =
+        vedtakRepository
+            .findByIdOrThrow(behandlingId)
+            .withTypeOrThrow<InnvilgelseEllerOpphørDagligReise>()
+
+    fun avkortVedtaksperiodeVedOpphør(
+        forrigeVedtak: GeneriskVedtak<out InnvilgelseEllerOpphørDagligReise>,
         opphørsdato: LocalDate,
-    ): List<Vedtaksperiode> {
-        feilHvis(behandling.forrigeIverksatteBehandlingId == null) {
-            "Kan ikke finne nye vedtaksperioder for opphør fordi behandlingen er en førstegangsbehandling"
-        }
-
-        val forrigeVedtaksperioder =
-            vedtakRepository.findByIdOrNull(behandling.forrigeIverksatteBehandlingId)?.vedtaksperioderHvisFinnes()
-
-        feilHvis(forrigeVedtaksperioder == null) {
-            "Kan ikke opphøre fordi data fra forrige vedtak mangler"
-        }
-
-        // .minusDays(1) fordi dagen før opphørsdato blir siste dag i vedtaksperioden
-        return forrigeVedtaksperioder.avkortFraOgMed(opphørsdato.minusDays(1))
-    }
+    ): List<Vedtaksperiode> = forrigeVedtak.data.vedtaksperioder.avkortFraOgMed(opphørsdato.minusDays(1))
 
     private fun lagreInnvilgetVedtak(
         behandling: Saksbehandling,

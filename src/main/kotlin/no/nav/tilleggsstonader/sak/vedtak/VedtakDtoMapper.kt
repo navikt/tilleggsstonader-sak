@@ -81,6 +81,7 @@ class VedtakDtoMapper(
 
             is VedtakDagligReise ->
                 mapVedtakDagligReise(
+                    vedtak,
                     data,
                     vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId,
@@ -197,6 +198,7 @@ class VedtakDtoMapper(
         }
 
     private fun mapVedtakDagligReise(
+        vedtak: Vedtak,
         data: VedtakDagligReise,
         tidligsteEndring: LocalDate?,
         forrigeIverksatteBehandlingId: BehandlingId?,

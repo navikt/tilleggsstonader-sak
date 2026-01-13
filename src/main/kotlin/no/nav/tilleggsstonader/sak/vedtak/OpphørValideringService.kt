@@ -58,13 +58,15 @@ class OpphørValideringService(
         beregningsresultatDagligReise: BeregningsresultatDagligReise,
         opphørsdato: LocalDate,
     ) {
-        val alleReiseperiode =
-            beregningsresultatDagligReise.offentligTransport?.reiser?.flatMap { reise ->
-                reise.perioder
-            }
-
-        alleReiseperiode?.forEach { periode -> }
-        TODO()
+        beregningsresultatDagligReise.offentligTransport?.reiser?.forEach { reise ->
+            reise.perioder
+                .filter { it.beløp > 0 }
+                .forEach {
+                    brukerfeilHvis(
+                        it.grunnlag.fom >= opphørsdato,
+                    ) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter opphørsdato" }
+                }
+        }
     }
 
     fun validerVedtaksperioderAvkortetVedOpphør(
