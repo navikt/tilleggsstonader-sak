@@ -10,6 +10,7 @@ import java.time.LocalDate
 data class LagreDagligReiseDto(
     val fom: LocalDate,
     val tom: LocalDate,
+    val adresse: String?,
     val svar: Map<RegelId, SvarOgBegrunnelseDto>,
     val fakta: FaktaDagligReiseDto? = null,
 ) : LagreVilkår {
@@ -18,7 +19,7 @@ data class LagreDagligReiseDto(
             fom = fom,
             tom = tom,
             svar = svar.mapValues { it.value.tilDomain() },
-            fakta = fakta?.mapTilFakta(),
+            fakta = fakta?.mapTilFakta(adresse),
         )
 }
 

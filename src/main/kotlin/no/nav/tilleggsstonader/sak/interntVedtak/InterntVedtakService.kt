@@ -40,6 +40,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgVurderingDto
@@ -62,6 +64,7 @@ class InterntVedtakService(
         validerStønadstype(behandling.stønadstype)
         val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandling.id)
         val vedtak = vedtakService.hentVedtak(behandling.id)
+        val vilkår = vilkårService.hentVilkår(behandling.id)
 
         val grunnlag = faktaGrunnlagService.hentGrunnlagsdata(behandling.id)
         val behandlingbarn = mapBarnPåBarnId(behandling.id, grunnlag.personopplysninger.barn)
@@ -72,15 +75,15 @@ class InterntVedtakService(
             målgrupper = mapVilkårperioder(vilkårsperioder.målgrupper),
             aktiviteter = mapVilkårperioder(vilkårsperioder.aktiviteter),
             vedtaksperioder = mapVedtaksperioder(vedtak),
-            vilkår = mapVilkår(behandling.id, behandlingbarn),
+            vilkår = mapVilkår(vilkår, behandlingbarn),
             vedtak = mapVedtak(vedtak),
-            beregningsresultat = mapBeregningsresultatForStønadstype(vedtak, behandling),
+            beregningsresultat = mapBeregningsresultatForStønadstype(vedtak, vilkår),
         )
     }
 
     private fun mapBeregningsresultatForStønadstype(
         vedtak: Vedtak?,
-        behandling: Saksbehandling,
+        vilkår: List<Vilkår>,
     ): BeregningsresultatInterntVedtakDto? =
         vedtak?.data?.let { data ->
             when (data) {
@@ -189,11 +192,10 @@ class InterntVedtakService(
         }
 
     private fun mapVilkår(
-        behandlingId: BehandlingId,
+        vilkår: List<Vilkår>,
         behandlingBarn: Map<BarnId, GrunnlagBarn>,
     ): List<VilkårInternt> =
-        vilkårService
-            .hentVilkår(behandlingId)
+        vilkår
             .map { vilkår ->
                 VilkårInternt(
                     type = vilkår.type,
@@ -313,7 +315,7 @@ class InterntVedtakService(
         }
     }
 
-    private fun mapVilkårFakta(fakta: no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta?): VilkårFaktaInternt? =
+    private fun mapVilkårFakta(fakta: VilkårFakta?): VilkårFaktaInternt? =
         when (fakta) {
             is FaktaDagligReiseOffentligTransport ->
                 VilkårFaktaOffentligTransport(

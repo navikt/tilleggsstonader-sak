@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
@@ -44,8 +45,9 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
     fun `skal kunne lagre, endre og slette vilkår for daglig reise - offentlig transport`() {
         val nyttVilkår =
             LagreDagligReiseDto(
-                fom = LocalDate.of(2025, 1, 1),
-                tom = LocalDate.of(2025, 1, 31),
+                fom = 1 januar 2025,
+                tom = 31 januar 2025,
+                adresse = "Tiltakveien 1",
                 svar = svarOffentligTransport,
                 fakta = faktaOffentligTransport(),
             )
@@ -95,8 +97,9 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
 
         val nyttVilkår =
             LagreDagligReiseDto(
-                fom = LocalDate.of(2025, 1, 1),
-                tom = LocalDate.of(2025, 1, 31),
+                fom = 1 januar 2025,
+                tom = 31 januar 2025,
+                adresse = "Tiltakveien 1",
                 svar = svarAvstandIkkeOppfylt,
                 fakta = null,
             )

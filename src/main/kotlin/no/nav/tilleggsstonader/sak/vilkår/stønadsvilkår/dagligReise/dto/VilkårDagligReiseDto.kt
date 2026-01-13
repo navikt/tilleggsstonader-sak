@@ -13,6 +13,7 @@ data class VilkårDagligReiseDto(
     val resultat: Vilkårsresultat,
     val status: VilkårStatus?,
     val delvilkårsett: List<DelvilkårDto>,
+    val adresse: String?,
     val fakta: FaktaDagligReiseDto?,
     val slettetKommentar: String? = null,
 )

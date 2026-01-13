@@ -16,7 +16,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførInngangsvilkårSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførVilkårSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurdering
-import no.nav.tilleggsstonader.sak.util.faktaOffentligTransport
+import no.nav.tilleggsstonader.sak.util.faktaOffentligTransportDto
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
@@ -153,7 +153,7 @@ class OffentligTransportBeregningRevurderingServiceTest : CleanDatabaseIntegrati
                         fom = fom,
                         tom = tom,
                         fakta =
-                            faktaOffentligTransport(
+                            faktaOffentligTransportDto(
                                 reiseId = ReiseId.random(),
                             ),
                     ),

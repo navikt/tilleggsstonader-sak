@@ -22,7 +22,7 @@ import java.math.BigDecimal
 sealed interface FaktaDagligReiseDto {
     val type: TypeDagligReise
 
-    fun mapTilFakta(): FaktaDagligReise
+    fun mapTilFakta(adresse: String?): FaktaDagligReise
 }
 
 data class FaktaDagligReiseOffentligTransportDto(
@@ -34,13 +34,14 @@ data class FaktaDagligReiseOffentligTransportDto(
 ) : FaktaDagligReiseDto {
     override val type = TypeDagligReise.OFFENTLIG_TRANSPORT
 
-    override fun mapTilFakta() =
+    override fun mapTilFakta(adresse: String?) =
         FaktaOffentligTransport(
             reiseId = reiseId,
             reisedagerPerUke = reisedagerPerUke,
             prisEnkelbillett = prisEnkelbillett,
             prisTrettidagersbillett = prisTrettidagersbillett,
             prisSyvdagersbillett = prisSyvdagersbillett,
+            adresse = adresse,
         )
 }
 
@@ -53,12 +54,13 @@ data class FaktaDagligReisePrivatBilDto(
 ) : FaktaDagligReiseDto {
     override val type = TypeDagligReise.PRIVAT_BIL
 
-    override fun mapTilFakta() =
+    override fun mapTilFakta(adresse: String?) =
         FaktaPrivatBil(
             reiseId = reiseId,
             reisedagerPerUke = reisedagerPerUke,
             reiseavstandEnVei = reiseavstandEnVei,
             bompengerEnVei = bompengerEnVei,
             fergekostandEnVei = fergekostandEnVei,
+            adresse = adresse,
         )
 }

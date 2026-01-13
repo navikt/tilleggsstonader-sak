@@ -11,6 +11,7 @@ import java.math.BigDecimal
 
 sealed interface FaktaDagligReise {
     val type: TypeDagligReise
+    val adresse: String?
 
     fun mapTilVilkårFakta(): VilkårFakta
 }
@@ -22,6 +23,7 @@ data class FaktaOffentligTransport(
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int?,
     val periode: Datoperiode? = null,
+    override val adresse: String? = null,
 ) : FaktaDagligReise {
     override val type = TypeDagligReise.OFFENTLIG_TRANSPORT
 
@@ -113,6 +115,7 @@ data class FaktaPrivatBil(
     val reiseavstandEnVei: BigDecimal,
     val bompengerEnVei: Int?,
     val fergekostandEnVei: Int?,
+    override val adresse: String? = null,
 ) : FaktaDagligReise {
     override val type = TypeDagligReise.PRIVAT_BIL
 

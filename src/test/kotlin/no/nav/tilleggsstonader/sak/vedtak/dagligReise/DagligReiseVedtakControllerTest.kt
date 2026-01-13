@@ -60,6 +60,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
         )
     val dummyOffentligTransport =
         FaktaOffentligTransport(
+            adresse = "Tiltaksgata 1",
             reiseId = dummyReiseId,
             reisedagerPerUke = 4,
             prisEnkelbillett = 44,

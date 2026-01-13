@@ -528,7 +528,7 @@ fun totrinnskontroll(
 
 val dummyReiseId = ReiseId.fromString("02c86eca-36e5-451b-a22d-8501a0f7b8dd")
 
-fun faktaOffentligTransport(
+fun faktaOffentligTransportDto(
     reiseId: ReiseId = dummyReiseId,
     reisedagerPerUke: Int = 5,
     prisEnkelbillett: Int? = 40,
@@ -583,16 +583,18 @@ fun lagreVilkårperiodeAktivitet(
 fun lagreDagligReiseDto(
     fom: LocalDate = 1 januar 2025,
     tom: LocalDate = 31 januar 2025,
+    adresse: String = "Tiltaksveien 1",
     svar: Map<RegelId, SvarOgBegrunnelseDto> =
         mapOf(
             RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA),
             RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
         ),
-    fakta: FaktaDagligReiseDto = faktaOffentligTransport(),
+    fakta: FaktaDagligReiseDto = faktaOffentligTransportDto(),
 ) = LagreDagligReiseDto(
     fom = fom,
     tom = tom,
     svar = svar,
+    adresse = adresse,
     fakta = fakta,
 )
 
