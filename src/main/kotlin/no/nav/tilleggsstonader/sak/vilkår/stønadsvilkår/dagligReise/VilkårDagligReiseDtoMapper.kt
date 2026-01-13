@@ -44,7 +44,7 @@ object VilkårDagligReiseDtoMapper {
             reiseId = this.reiseId,
             reisedagerPerUke = reisedagerPerUke,
             reiseavstandEnVei = reiseavstandEnVei,
-            bompengerPerDag = bompengerPerDag,
-            fergekostandPerDag = fergekostandPerDag,
+            bompengerEnVei = bompengerEnVei,
+            fergekostandEnVei = fergekostandEnVei,
         )
 }
