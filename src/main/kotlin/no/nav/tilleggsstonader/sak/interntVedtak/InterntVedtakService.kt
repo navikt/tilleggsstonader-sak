@@ -163,6 +163,7 @@ class InterntVedtakService(
                 resultat = it.resultat,
                 begrunnelse = it.begrunnelse,
                 slettetKommentar = it.slettetKommentar,
+                tilltaksvariant = it.typeAktivitet?.beskrivelse,
             )
         }
 
@@ -183,6 +184,7 @@ class InterntVedtakService(
             VedtaksperiodeInterntVedtak(
                 målgruppe = it.målgruppe,
                 aktivitet = it.aktivitet,
+                tilltaksvariant = it.typeAktivitet?.beskrivelse,
                 fom = it.fom,
                 tom = it.tom,
             )
