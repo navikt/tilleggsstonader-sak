@@ -30,6 +30,5 @@ class FagsakUtbetalingIdService(
         typeAndel: TypeAndel,
     ): Boolean = fagsakUtbetalingIdRepository.findByFagsakIdAndTypeAndel(fagsakId, typeAndel) != null
 
-    fun hentUtbetalingIderForFagsakId(fagsakId: FagsakId): List<FagsakUtbetalingId> =
-        fagsakUtbetalingIdRepository.findByFagsakId(fagsakId)
+    fun hentUtbetalingIderForFagsakId(fagsakId: FagsakId): List<FagsakUtbetalingId> = fagsakUtbetalingIdRepository.findByFagsakId(fagsakId)
 }

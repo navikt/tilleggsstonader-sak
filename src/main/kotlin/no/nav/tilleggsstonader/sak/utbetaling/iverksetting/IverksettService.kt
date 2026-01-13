@@ -165,7 +165,9 @@ class IverksettService(
                 typeAndel = tilkjentYtelse.andelerTilkjentYtelse.map { it.type }.toSet(),
             )
         ) {
-            if (andelerTilUtbetaling.isNotEmpty()) {
+            val utbetalingsIderPåFagsak =
+                fagsakUtbetalingIdService.hentUtbetalingIderForFagsakId(fagsakId = behandling.fagsakId)
+            if (andelerTilUtbetaling.isNotEmpty() || utbetalingsIderPåFagsak.isNotEmpty()) {
                 val utbetalingRecords =
                     utbetalingV3Mapper.lagIverksettingDtoer(
                         behandling = behandling,
@@ -349,7 +351,13 @@ class IverksettService(
 
         return behandling.stønadstype.gjelderDagligReise() ||
             erFørstegangsbehandlingLæremidlerOgSkalIverksetteMotKafka(behandling) ||
-                utbetalingIderPåFagsak.isNotEmpty() && finnesUtbetalingIdForAlleTypeAndeler(typeAndel, utbetalingIderPåFagsak)
+            (
+                utbetalingIderPåFagsak.isNotEmpty() &&
+                    finnesUtbetalingIdForAlleTypeAndeler(
+                        typeAndelIBehandling = typeAndel,
+                        utbetalingIderPåFagsak = utbetalingIderPåFagsak,
+                    )
+            )
     }
 
     private fun erFørstegangsbehandlingLæremidlerOgSkalIverksetteMotKafka(behandling: Saksbehandling): Boolean =
@@ -359,8 +367,9 @@ class IverksettService(
 
     private fun finnesUtbetalingIdForAlleTypeAndeler(
         typeAndelIBehandling: Set<TypeAndel>,
-        utbetalingIderPåFagsak: List<FagsakUtbetalingId>
-    ): Boolean {
-        return typeAndelIBehandling.all { typeAndel -> utbetalingIderPåFagsak.any { utbetalingId -> utbetalingId.typeAndel == typeAndel } }
-    }
+        utbetalingIderPåFagsak: List<FagsakUtbetalingId>,
+    ): Boolean =
+        typeAndelIBehandling.all { typeAndel ->
+            utbetalingIderPåFagsak.any { utbetalingId -> utbetalingId.typeAndel == typeAndel }
+        }
 }

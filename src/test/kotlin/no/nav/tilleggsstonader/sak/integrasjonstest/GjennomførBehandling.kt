@@ -192,62 +192,64 @@ fun IntegrationTest.gjennomførBeregningSteg(
             it.tilVedtaksperiodeDto()
         }
     return when (opprettVedtak) {
-        is OpprettInnvilgelse -> kall.vedtak.apiRespons
-            .lagreInnvilgelse(
-                stønadstype = stønadstype,
-                behandlingId = behandlingId,
-                innvilgelseDto =
-                    when (stønadstype) {
-                        Stønadstype.BARNETILSYN -> InnvilgelseTilsynBarnRequest(vedtaksperioder = vedtaksperioder)
-                        Stønadstype.LÆREMIDLER -> InnvilgelseLæremidlerRequest(vedtaksperioder = vedtaksperioder)
-                        Stønadstype.BOUTGIFTER -> InnvilgelseBoutgifterRequest(vedtaksperioder = vedtaksperioder)
-                        Stønadstype.DAGLIG_REISE_TSO -> InnvilgelseDagligReiseRequest(vedtaksperioder = vedtaksperioder)
-                        Stønadstype.DAGLIG_REISE_TSR -> InnvilgelseDagligReiseRequest(vedtaksperioder = vedtaksperioder)
-                    },
-            )
+        is OpprettInnvilgelse ->
+            kall.vedtak.apiRespons
+                .lagreInnvilgelse(
+                    stønadstype = stønadstype,
+                    behandlingId = behandlingId,
+                    innvilgelseDto =
+                        when (stønadstype) {
+                            Stønadstype.BARNETILSYN -> InnvilgelseTilsynBarnRequest(vedtaksperioder = vedtaksperioder)
+                            Stønadstype.LÆREMIDLER -> InnvilgelseLæremidlerRequest(vedtaksperioder = vedtaksperioder)
+                            Stønadstype.BOUTGIFTER -> InnvilgelseBoutgifterRequest(vedtaksperioder = vedtaksperioder)
+                            Stønadstype.DAGLIG_REISE_TSO -> InnvilgelseDagligReiseRequest(vedtaksperioder = vedtaksperioder)
+                            Stønadstype.DAGLIG_REISE_TSR -> InnvilgelseDagligReiseRequest(vedtaksperioder = vedtaksperioder)
+                        },
+                )
         is OpprettAvslag -> TODO()
-        is OpprettOpphør -> kall.vedtak.apiRespons
-            .lagreOpphør(
-                stønadstype = stønadstype,
-                behandlingId = behandlingId,
-                opphørDto =
-                    when (stønadstype) {
-                        Stønadstype.BARNETILSYN -> OpphørTilsynBarnRequest(
-                            årsakerOpphør = opprettVedtak.årsaker,
-                            begrunnelse = opprettVedtak.begrunnelse,
-                            opphørsdato = opprettVedtak.opphørsdato,
-                        )
-                        Stønadstype.LÆREMIDLER -> OpphørLæremidlerRequest(
-                            årsakerOpphør = opprettVedtak.årsaker,
-                            begrunnelse = opprettVedtak.begrunnelse,
-                            opphørsdato = opprettVedtak.opphørsdato,
-                        )
-                        Stønadstype.BOUTGIFTER -> OpphørBoutgifterRequest(
-                            årsakerOpphør = opprettVedtak.årsaker,
-                            begrunnelse = opprettVedtak.begrunnelse,
-                            opphørsdato = opprettVedtak.opphørsdato,
-                        )
-                        Stønadstype.DAGLIG_REISE_TSO -> TODO()
-                        Stønadstype.DAGLIG_REISE_TSR -> TODO()
-                    },
-            )
+        is OpprettOpphør ->
+            kall.vedtak.apiRespons
+                .lagreOpphør(
+                    stønadstype = stønadstype,
+                    behandlingId = behandlingId,
+                    opphørDto =
+                        when (stønadstype) {
+                            Stønadstype.BARNETILSYN ->
+                                OpphørTilsynBarnRequest(
+                                    årsakerOpphør = opprettVedtak.årsaker,
+                                    begrunnelse = opprettVedtak.begrunnelse,
+                                    opphørsdato = opprettVedtak.opphørsdato,
+                                )
+                            Stønadstype.LÆREMIDLER ->
+                                OpphørLæremidlerRequest(
+                                    årsakerOpphør = opprettVedtak.årsaker,
+                                    begrunnelse = opprettVedtak.begrunnelse,
+                                    opphørsdato = opprettVedtak.opphørsdato,
+                                )
+                            Stønadstype.BOUTGIFTER ->
+                                OpphørBoutgifterRequest(
+                                    årsakerOpphør = opprettVedtak.årsaker,
+                                    begrunnelse = opprettVedtak.begrunnelse,
+                                    opphørsdato = opprettVedtak.opphørsdato,
+                                )
+                            Stønadstype.DAGLIG_REISE_TSO -> TODO()
+                            Stønadstype.DAGLIG_REISE_TSR -> TODO()
+                        },
+                )
     }
-
 }
 
 sealed interface OpprettVedtak
 
-data object OpprettInnvilgelse: OpprettVedtak
-data object OpprettAvslag: OpprettVedtak
+data object OpprettInnvilgelse : OpprettVedtak
+
+data object OpprettAvslag : OpprettVedtak
 
 data class OpprettOpphør(
     val årsaker: List<ÅrsakOpphør> = listOf(ÅrsakOpphør.ANNET),
     val begrunnelse: String = "annet",
-    val opphørsdato: LocalDate
-): OpprettVedtak
-
-
-
+    val opphørsdato: LocalDate,
+) : OpprettVedtak
 
 fun IntegrationTest.gjennomførInngangsvilkårSteg(
     medAktivitet: ((BehandlingId) -> LagreVilkårperiode)? = null,

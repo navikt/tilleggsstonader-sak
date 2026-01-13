@@ -29,7 +29,7 @@ class IverksettClientTest {
         wiremockServerItem.stubFor(
             post(anyUrl()).willReturn(aResponse().withStatus(HttpStatus.CONFLICT.value())),
         )
-            println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(iverksettDto()))
+        println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(iverksettDto()))
         assertThatCode {
             client.iverksett(iverksettDto())
         }.doesNotThrowAnyException()

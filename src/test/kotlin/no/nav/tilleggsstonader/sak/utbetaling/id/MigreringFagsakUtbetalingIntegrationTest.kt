@@ -34,17 +34,17 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurdering
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatus
+import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatusHåndterer
+import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatusRecord
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.IverksettingDto
 import no.nav.tilleggsstonader.sak.util.journalpost
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBoutgifterDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -63,6 +63,9 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
 
     @Autowired
     lateinit var iverksettClient: IverksettClient
+
+    @Autowired
+    lateinit var utbetalingStatusHåndterer: UtbetalingStatusHåndterer
 
     @Test
     fun `behandling blir iverksatt mot gammelt endepunkt, skrur på toggle for migrering, utbetaling for revurdering blir migrert`() {
@@ -130,7 +133,7 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
     }
 
     @Test
-    fun `behandle og opphør revurder ny læremidler-sak, feature-toggle for iverksette nytt grensesnitt på, skal sendes gjennom ny iverksetting`() {
+    fun `behandle og opphør ny læremidler-sak, feature-toggle for iverksette nytt grensesnitt på, skal sendes gjennom ny iverksetting`() {
         every { unleashService.isEnabled(Toggle.SKAL_IVERKSETT_NYE_BEHANDLINGER_MOT_KAFKA) } returns true
 
         val fom = 1 september 2025
@@ -150,6 +153,17 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
         KafkaTestConfig
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
+
+        utbetalingStatusHåndterer.behandleStatusoppdatering(
+            iverksettingId = førstegangsbehandlingId.toString(),
+            melding =
+                UtbetalingStatusRecord(
+                    status = UtbetalingStatus.OK,
+                    detaljer = null,
+                    error = null,
+                ),
+            utbetalingGjelderFagsystem = UtbetalingStatusHåndterer.FAGSYSTEM_TILLEGGSSTØNADER,
+        )
 
         val revurderingId =
             opprettRevurdering(
@@ -178,18 +192,19 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
         verify(exactly = 0) { iverksettClient.simulerV2(any()) }
         verify(exactly = 0) { iverksettClient.iverksett(any()) }
         verify(exactly = 2) { iverksettClient.simulerV3(any()) }
-        val opphørUtbetaling = KafkaTestConfig
-            .sendteMeldinger()
-            .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 2)
-            .map { it.verdiEllerFeil<IverksettingDto>() }
-            .maxBy { it.vedtakstidspunkt }
+        val opphørUtbetaling =
+            KafkaTestConfig
+                .sendteMeldinger()
+                .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 2)
+                .map { it.verdiEllerFeil<IverksettingDto>() }
+                .maxBy { it.vedtakstidspunkt }
 
         assertThat(opphørUtbetaling.utbetalinger.size).isEqualTo(1)
         assertThat(opphørUtbetaling.utbetalinger.single().perioder).isEmpty()
     }
 
     @Test
-    fun `behandle og opphør ny læremidler-sak, feature-toggle for iverksette nytt grensesnitt av, skal sendes gjennom gammelt iverksetting`() {
+    fun `behandle og opphør ny læremidler-sak, toggle for iverksette nytt grensesnitt av, skal sendes gjennom gammelt iverksetting`() {
         every { unleashService.isEnabled(Toggle.SKAL_IVERKSETT_NYE_BEHANDLINGER_MOT_KAFKA) } returns false
 
         val fom = 1 september 2025
@@ -244,7 +259,6 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
             .forEach { iverksettingDto ->
                 assertThat(iverksettingDto.utbetalinger.all { it.brukFagområdeTillst }).isTrue
             }
-
     }
 
     private fun opprettFørstegangsbehandling(
