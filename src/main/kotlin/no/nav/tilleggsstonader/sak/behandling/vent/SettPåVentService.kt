@@ -64,9 +64,6 @@ class SettPåVentService(
             "Kan ikke gjøre endringer på denne behandlingen fordi den er satt på vent."
         }
 
-        if (request.opprettHistorikkinnslag) {
-            opprettHistorikkInnslag(behandling, årsaker = request.årsaker, kommentar = request.kommentar)
-        }
         behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.SATT_PÅ_VENT)
 
         val settPåVent =
@@ -84,7 +81,11 @@ class SettPåVentService(
                 null
             }
 
-        taskService.save(BehandlingsstatistikkTask.opprettVenterTask(behandlingId))
+        if (!settPåVent.erSattPåVentForSatsjustering()) {
+            opprettHistorikkInnslag(behandling, årsaker = request.årsaker, kommentar = request.kommentar)
+            taskService.save(BehandlingsstatistikkTask.opprettVenterTask(behandlingId))
+        }
+
         val endret = utledEndretInformasjon(settPåVent)
 
         return StatusPåVentDto(

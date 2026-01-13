@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.vent.SettBehandlingPåVent
 import no.nav.tilleggsstonader.sak.behandling.vent.SettBehandlingPåVentOppgaveMetadata
 import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVentService
+import no.nav.tilleggsstonader.sak.behandling.vent.TaAvVentDto
 import no.nav.tilleggsstonader.sak.behandling.vent.TaAvVentService
 import no.nav.tilleggsstonader.sak.behandling.vent.ÅrsakSettPåVent
 import no.nav.tilleggsstonader.sak.behandlingsflyt.FerdigstillBehandlingSteg
@@ -125,13 +126,12 @@ class UtførSatsjusteringService(
                     årsaker = listOf(ÅrsakSettPåVent.FOR_SATSJUSTERING),
                     frist = frist,
                     kommentar = null,
-                    opprettHistorikkinnslag = false,
                     oppgaveMetadata = SettBehandlingPåVentOppgaveMetadata.IkkeOppdaterOppgave,
                 ),
         )
 
         opprettRevurderingOgKjørSatsendring(fagsakId)
-        taAvVentService.taAvVent(behandlingSomSettesPåVent.id)
+        taAvVentService.taAvVent(behandlingSomSettesPåVent.id, TaAvVentDto(settBehandlingStatusTil = BehandlingStatus.OPPRETTET))
     }
 
     private fun opprettRevurderingOgKjørSatsendring(fagsakId: FagsakId) {

@@ -7,7 +7,6 @@ data class SettBehandlingPåVent(
     val årsaker: List<ÅrsakSettPåVent>,
     val frist: LocalDate,
     val kommentar: String?,
-    val opprettHistorikkinnslag: Boolean = true,
     val oppgaveMetadata: SettBehandlingPåVentOppgaveMetadata = SettBehandlingPåVentOppgaveMetadata.OppdaterOppgave(),
 ) {
     init {

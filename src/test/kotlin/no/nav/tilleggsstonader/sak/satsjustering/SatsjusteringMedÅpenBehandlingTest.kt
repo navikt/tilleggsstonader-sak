@@ -10,18 +10,24 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
+import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVentRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakRepository
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettJournalpost
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
+import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.journalpost
 import no.nav.tilleggsstonader.sak.util.toYearMonth
@@ -106,6 +112,17 @@ class SatsjusteringMedÅpenBehandlingTest : CleanDatabaseIntegrationTest() {
                 .findByBehandlingId(nyÅpenBehandling.id)
                 .single { it.status == Oppgavestatus.ÅPEN }
         assertThat(oppdatertOppgave.tilordnetSaksbehandler).isNull()
+
+        val behandlingsstatistikkForÅpenBehandling =
+            KafkaTestConfig
+                .sendteMeldinger()
+                .forventAntallMeldingerPåTopic(kafkaTopics.dvhBehandling, 3)
+                .map { it.verdiEllerFeil<BehandlingDVH>() }
+                .filter { it.behandlingId == nyÅpenBehandling.eksternId.toString() }
+
+        // Vil ikke produsere hendelser om at behandlingen har blitt satt på vent, da den også tas av umiddelbart
+        assertThat(behandlingsstatistikkForÅpenBehandling).hasSize(1)
+        assertThat(behandlingsstatistikkForÅpenBehandling.single().behandlingStatus).isEqualTo(Hendelse.MOTTATT.name)
     }
 
     @Test
@@ -122,14 +139,16 @@ class SatsjusteringMedÅpenBehandlingTest : CleanDatabaseIntegrationTest() {
 
         // Satsjustering skal kaste RekjørSenereException fordi oppgaven er fordelt
         medBrukercontext(roller = listOf(rolleConfig.utvikler)) {
-                kall.satsjustering.satsjustering(Stønadstype.LÆREMIDLER)
+            kall.satsjustering.satsjustering(Stønadstype.LÆREMIDLER)
         }
 
         kjørTasksKlareForProsessering()
 
-        val satsjusteringTask = taskService.findAll()
-            .filter { it.type == SatsjusteringTask.TYPE }
-            .singleOrNull { it.payload == førstegangsbehandling.id.toString() }
+        val satsjusteringTask =
+            taskService
+                .findAll()
+                .filter { it.type == SatsjusteringTask.TYPE }
+                .singleOrNull { it.payload == førstegangsbehandling.id.toString() }
 
         // Satsjusteringstasken skal ha feilet og skal bli kjørt i morgen kl 0700
         assertThat(satsjusteringTask).isNotNull
@@ -180,7 +199,7 @@ class SatsjusteringMedÅpenBehandlingTest : CleanDatabaseIntegrationTest() {
         return testoppsettService.ferdigstillBehandling(behandling)
     }
 
-    private fun opprettNyBehandlingIStatusOpprettet(fagsakId: FagsakId): Behandling {
+    private fun opprettNyBehandlingIStatusOpprettet(fagsakId: FagsakId): Saksbehandling {
         val ident = fagsakRepository.finnAktivIdent(fagsakId)
 
         val journalpost =
@@ -196,7 +215,7 @@ class SatsjusteringMedÅpenBehandlingTest : CleanDatabaseIntegrationTest() {
         val behandlingId = håndterSøknadService.håndterSøknad(journalpost)!!.id
         kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 
-        return behandlingRepository.findById(behandlingId).get()
+        return testoppsettService.hentSaksbehandling(behandlingId)
     }
 
     private fun lagreVilkårOgVedtak(
