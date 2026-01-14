@@ -41,7 +41,7 @@
     "resultat" : "OPPFYLT",
     "begrunnelse" : "målgruppe aap",
     "slettetKommentar" : null,
-    "tilltaksvariant" : null
+    "tiltaksvariant" : null
   }, {
     "type" : "OVERGANGSSTØNAD",
     "fom" : "2024-02-05",
@@ -60,7 +60,7 @@
     "resultat" : "OPPFYLT",
     "begrunnelse" : "målgruppe os",
     "slettetKommentar" : null,
-    "tilltaksvariant" : null
+    "tiltaksvariant" : null
   }, {
     "type" : "NEDSATT_ARBEIDSEVNE",
     "fom" : "2024-02-05",
@@ -88,7 +88,7 @@
     "resultat" : "IKKE_VURDERT",
     "begrunnelse" : "målgruppe na",
     "slettetKommentar" : null,
-    "tilltaksvariant" : null
+    "tiltaksvariant" : null
   } ],
   "aktiviteter" : [ {
     "type" : "TILTAK",
@@ -109,7 +109,7 @@
     "resultat" : "OPPFYLT",
     "begrunnelse" : null,
     "slettetKommentar" : null,
-    "tilltaksvariant" : null
+    "tiltaksvariant" : null
   }, {
     "type" : "UTDANNING",
     "fom" : "2024-02-05",
@@ -123,14 +123,14 @@
     "resultat" : "IKKE_OPPFYLT",
     "begrunnelse" : "ikke oppfylt",
     "slettetKommentar" : null,
-    "tilltaksvariant" : null
+    "tiltaksvariant" : null
   } ],
   "vedtaksperioder" : [ {
     "fom" : "2024-01-01",
     "tom" : "2024-02-29",
     "målgruppe" : "NEDSATT_ARBEIDSEVNE",
     "aktivitet" : "TILTAK",
-    "tilltaksvariant" : null
+    "tiltaksvariant" : null
   } ],
   "vilkår" : [ {
     "type" : "DAGLIG_REISE",
