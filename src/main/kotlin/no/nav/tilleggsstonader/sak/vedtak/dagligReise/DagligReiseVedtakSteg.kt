@@ -1,13 +1,12 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
-import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
@@ -27,35 +26,39 @@ import java.time.LocalDate
 class DagligReiseVedtakSteg(
     private val beregningService: DagligReiseBeregningService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
-    vedtakRepository: VedtakRepository,
-    tilkjentYtelseService: TilkjentYtelseService,
-    simuleringService: SimuleringService,
-) : BeregnYtelseSteg<VedtakDagligReiseRequest>(
-        stønadstype = listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
-        vedtakRepository = vedtakRepository,
-        tilkjentYtelseService = tilkjentYtelseService,
-        simuleringService = simuleringService,
-    ) {
-    override fun lagreVedtakForSatsjustering(
+    private val vedtakRepository: VedtakRepository,
+    private val tilkjentYtelseService: TilkjentYtelseService,
+    private val simuleringService: SimuleringService,
+) : BehandlingSteg<VedtakDagligReiseRequest> {
+    override fun utførSteg(
         saksbehandling: Saksbehandling,
-        vedtak: VedtakDagligReiseRequest,
-        satsjusteringFra: LocalDate,
+        data: VedtakDagligReiseRequest,
     ) {
-        TODO("Not yet implemented")
+        nullstillEksisterendeVedtakPåBehandling(saksbehandling)
+        lagreVedtaksresultat(saksbehandling, data)
     }
 
-    override fun lagreVedtak(
+    override fun utførOgReturnerNesteSteg(
+        saksbehandling: Saksbehandling,
+        data: VedtakDagligReiseRequest,
+        kanBehandlePrivatBil: Boolean,
+    ): StegType {
+        utførSteg(saksbehandling, data)
+        return finnNesteSteg(data)
+    }
+
+    fun lagreVedtaksresultat(
         saksbehandling: Saksbehandling,
         vedtak: VedtakDagligReiseRequest,
     ) {
         when (vedtak) {
-            is InnvilgelseDagligReiseRequest -> beregnOgLagreInnvilgelse(saksbehandling, vedtak)
+            is InnvilgelseDagligReiseRequest -> lagreVedtaksperioderOgBeregn(saksbehandling, vedtak)
             is AvslagDagligReiseDto -> lagreAvslag(saksbehandling, vedtak)
             // is OpphørDagligReise -> TODO()
         }
     }
 
-    private fun beregnOgLagreInnvilgelse(
+    private fun lagreVedtaksperioderOgBeregn(
         saksbehandling: Saksbehandling,
         vedtak: InnvilgelseDagligReiseRequest,
     ) {
@@ -66,6 +69,7 @@ class DagligReiseVedtakSteg(
                 saksbehandling.id,
                 vedtaksperioder,
             )
+
         val beregningsresultat =
             beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
@@ -73,21 +77,13 @@ class DagligReiseVedtakSteg(
                 typeVedtak = TypeVedtak.INNVILGELSE,
                 tidligsteEndring = tidligsteEndring,
             )
+
         lagreInnvilgetVedtak(
             behandling = saksbehandling,
             beregningsresultat = beregningsresultat,
             vedtaksperioder = vedtaksperioder,
             begrunnelse = vedtak.begrunnelse,
             tidligsteEndring = tidligsteEndring,
-        )
-
-        feilHvis(beregningsresultat.offentligTransport == null) {
-            "Foreløpig støttes kun beregning av offentlig transport."
-        }
-
-        tilkjentYtelseService.lagreTilkjentYtelse(
-            behandlingId = saksbehandling.id,
-            andeler = beregningsresultat.offentligTransport.mapTilAndelTilkjentYtelse(saksbehandling),
         )
     }
 
@@ -132,4 +128,19 @@ class DagligReiseVedtakSteg(
             ),
         )
     }
+
+    private fun finnNesteSteg(vedtak: VedtakDagligReiseRequest): StegType =
+        when (vedtak) {
+            // TODO: Her kan man hoppe rett til beregning om man kun har registrert offentlig transport
+            is InnvilgelseDagligReiseRequest -> StegType.KJØRELISTE
+            is AvslagDagligReiseDto -> StegType.SEND_TIL_BESLUTTER
+        }
+
+    private fun nullstillEksisterendeVedtakPåBehandling(saksbehandling: Saksbehandling) {
+        vedtakRepository.deleteById(saksbehandling.id)
+        tilkjentYtelseService.slettTilkjentYtelseForBehandling(saksbehandling)
+        simuleringService.slettSimuleringForBehandling(saksbehandling)
+    }
+
+    override fun stegType(): StegType = StegType.VEDTAK
 }

@@ -1,9 +1,12 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -34,11 +37,13 @@ class DagligReiseVedtakController(
     private val beregningService: DagligReiseBeregningService,
     private val tilgangService: TilgangService,
     private val stegService: StegService,
-    private val steg: DagligReiseBeregnYtelseSteg,
+    private val beregnYtelseSteg: DagligReiseBeregnYtelseSteg,
+    private val vedtakSteg: DagligReiseVedtakSteg,
     private val vedtakService: VedtakService,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
+    private val unleashService: UnleashService,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -105,6 +110,15 @@ class DagligReiseVedtakController(
     ) {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
+
+        val steg = finnRiktigSteg()
         stegService.håndterSteg(behandlingId, steg, vedtak)
+    }
+
+    private fun finnRiktigSteg(): BehandlingSteg<VedtakDagligReiseRequest> {
+        if (unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)) {
+            return vedtakSteg
+        }
+        return beregnYtelseSteg
     }
 }
