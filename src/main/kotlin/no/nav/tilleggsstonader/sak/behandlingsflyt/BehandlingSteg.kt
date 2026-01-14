@@ -16,12 +16,16 @@ interface BehandlingSteg<T> {
     fun utførOgReturnerNesteSteg(
         saksbehandling: Saksbehandling,
         data: T,
+        kanBehandlePrivatBil: Boolean = false,
     ): StegType {
         utførSteg(saksbehandling, data)
-        return nesteSteg(stønadstype = saksbehandling.stønadstype)
+        return nesteSteg(stønadstype = saksbehandling.stønadstype, kanBehandlePrivatBil)
     }
 
-    fun nesteSteg(stønadstype: Stønadstype) = stegType().hentNesteSteg(stønadstype)
+    fun nesteSteg(
+        stønadstype: Stønadstype,
+        kanBehandlePrivatBil: Boolean,
+    ) = stegType().hentNesteSteg(stønadstype, kanBehandlePrivatBil)
 
     fun utførSteg(
         saksbehandling: Saksbehandling,
@@ -111,11 +115,17 @@ enum class StegType(
     fun erGyldigIKombinasjonMedStatus(behandlingStatus: BehandlingStatus): Boolean =
         this.gyldigIKombinasjonMedStatus.contains(behandlingStatus)
 
-    fun hentNesteSteg(stønadstype: Stønadstype): StegType =
-        when (stønadstype) {
+    fun hentNesteSteg(
+        stønadstype: Stønadstype,
+        kanBehandlePrivatBil: Boolean = false,
+    ): StegType {
+        if (!kanBehandlePrivatBil) return hentNesteStegStandard(stønadstype)
+
+        return when (stønadstype) {
             Stønadstype.DAGLIG_REISE_TSR, Stønadstype.DAGLIG_REISE_TSO -> hentNesteStegDagligReise()
             else -> hentNesteStegStandard(stønadstype)
         }
+    }
 
     private fun hentNesteStegStandard(stønadstype: Stønadstype): StegType =
         when (this) {

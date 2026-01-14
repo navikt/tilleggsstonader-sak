@@ -26,15 +26,15 @@ class StegTypeTest {
     )
     @ParameterizedTest
     fun `skal finne neste steg for alle relevante steg i standardflyten`(steg: StegType) {
-        assertDoesNotThrow { steg.hentNesteSteg(Stønadstype.BARNETILSYN) }
-        assertDoesNotThrow { steg.hentNesteSteg(Stønadstype.LÆREMIDLER) }
-        assertDoesNotThrow { steg.hentNesteSteg(Stønadstype.BOUTGIFTER) }
+        assertDoesNotThrow { steg.hentNesteSteg(Stønadstype.BARNETILSYN, false) }
+        assertDoesNotThrow { steg.hentNesteSteg(Stønadstype.LÆREMIDLER, false) }
+        assertDoesNotThrow { steg.hentNesteSteg(Stønadstype.BOUTGIFTER, false) }
     }
 
     @EnumSource(value = StegType::class, names = ["BEREGNE_YTELSE"], mode = EnumSource.Mode.EXCLUDE)
     @ParameterizedTest
     fun `skal finne neste for relevante steg for daglig reise`(steg: StegType) {
-        assertDoesNotThrow { steg.hentNesteSteg(Stønadstype.DAGLIG_REISE_TSO) }
-        assertDoesNotThrow { steg.hentNesteSteg(Stønadstype.DAGLIG_REISE_TSR) }
+        assertDoesNotThrow { steg.hentNesteSteg(Stønadstype.DAGLIG_REISE_TSO, true) }
+        assertDoesNotThrow { steg.hentNesteSteg(Stønadstype.DAGLIG_REISE_TSR, true) }
     }
 }

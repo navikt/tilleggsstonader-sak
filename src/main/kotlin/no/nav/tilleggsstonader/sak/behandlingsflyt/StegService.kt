@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandlingsflyt
 
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -14,6 +15,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringSteg
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vilkår.InngangsvilkårSteg
@@ -28,6 +30,7 @@ class StegService(
     private val behandlingshistorikkService: BehandlingshistorikkService,
     private val rolleConfig: RolleConfig,
     private val behandlingSteg: List<BehandlingSteg<*>>,
+    private val unleashService: UnleashService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -148,7 +151,12 @@ class StegService(
         val saksbehandlerIdent = SikkerhetContext.hentSaksbehandlerEllerSystembruker()
         valider(saksbehandling, stegType, saksbehandlerIdent, behandlingSteg)
 
-        val nesteSteg = behandlingSteg.utførOgReturnerNesteSteg(saksbehandling, data)
+        val nesteSteg =
+            behandlingSteg.utførOgReturnerNesteSteg(
+                saksbehandling,
+                data,
+                kanBehandlePrivatBil = unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL),
+            )
 
         oppdaterHistorikk(behandlingSteg, saksbehandling.id, saksbehandlerIdent)
         metrics.success(stegType)
