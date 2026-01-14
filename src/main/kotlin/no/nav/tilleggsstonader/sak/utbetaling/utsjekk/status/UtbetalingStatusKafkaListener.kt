@@ -30,7 +30,7 @@ class UtbetalingStatusKafkaListener(
                     .headers()
                     .firstOrNull { it.key() == "fagsystem" }
                     ?.value()
-                    .toString(),
+                    ?.let { String(it) } ?: "Ukjent",
         )
         acknowledgment.acknowledge()
     }
