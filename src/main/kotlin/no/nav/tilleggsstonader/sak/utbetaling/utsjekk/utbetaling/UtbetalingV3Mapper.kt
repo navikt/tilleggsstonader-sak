@@ -162,9 +162,9 @@ class UtbetalingV3Mapper(
     private fun finnTypeAndelerSomSkalAnnulleres(
         behandling: Saksbehandling,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
-    ): List<TypeAndel> {
+    ): Set<TypeAndel> {
         if (behandling.forrigeIverksatteBehandlingId == null) {
-            return emptyList()
+            return emptySet()
         }
         val andelerForrigeBehandling =
             tilkjentYtelseService
@@ -172,6 +172,8 @@ class UtbetalingV3Mapper(
                 .andelerTilkjentYtelse
 
         val typeAndelerNåværendeBehandling = andelerTilkjentYtelse.map { it.type }
-        return andelerForrigeBehandling.filter { it.type !in typeAndelerNåværendeBehandling }.map { it.type }
+        return andelerForrigeBehandling.filter { it.type !in typeAndelerNåværendeBehandling }
+            .map { it.type }
+            .toSet()
     }
 }
