@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBereg
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
@@ -54,7 +55,7 @@ class DagligReiseVedtakSteg(
         when (vedtak) {
             is InnvilgelseDagligReiseRequest -> lagreVedtaksperioderOgBeregn(saksbehandling, vedtak)
             is AvslagDagligReiseDto -> lagreAvslag(saksbehandling, vedtak)
-            // is OpphørDagligReise -> TODO()
+            is OpphørDagligReiseRequest -> TODO("Tilpass opphør til ny flyt")
         }
     }
 
@@ -134,6 +135,7 @@ class DagligReiseVedtakSteg(
             // TODO: Her kan man hoppe rett til beregning om man kun har registrert offentlig transport
             is InnvilgelseDagligReiseRequest -> StegType.KJØRELISTE
             is AvslagDagligReiseDto -> StegType.SEND_TIL_BESLUTTER
+            is OpphørDagligReiseRequest -> TODO("Tilpass opphør til ny flyt")
         }
 
     private fun nullstillEksisterendeVedtakPåBehandling(saksbehandling: Saksbehandling) {
