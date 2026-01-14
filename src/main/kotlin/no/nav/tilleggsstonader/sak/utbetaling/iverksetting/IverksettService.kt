@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
+import io.micrometer.core.instrument.Metrics
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
@@ -47,6 +48,9 @@ class IverksettService(
     private val fagsakUtbetalingIdService: FagsakUtbetalingIdService,
     private val unleashService: UnleashService,
 ) {
+    private val iverksettingerOverKafkaCounter = Metrics.counter("iverksettinger.til.helved", "type", "kafka")
+    private val iverksettingerOverRestCounter = Metrics.counter("iverksettinger.til.helved", "type", "rest")
+
     /**
      * Iverksetter andeler til og med dagens dato. Utbetalinger frem i tid blir plukket opp av en daglig jobb.
      *
@@ -184,6 +188,7 @@ class IverksettService(
             val utbetalingsIderPåFagsak =
                 fagsakUtbetalingIdService.hentUtbetalingIderForFagsakId(fagsakId = behandling.fagsakId)
             if (andelerTilUtbetaling.isNotEmpty() || utbetalingsIderPåFagsak.isNotEmpty()) {
+                iverksettingerOverKafkaCounter.increment()
                 val utbetalingRecords =
                     utbetalingV3Mapper.lagIverksettingDtoer(
                         behandling = behandling,
@@ -197,6 +202,7 @@ class IverksettService(
                 logger.info("Ingen andeler å iverksette for behandling=${behandling.id} ved iverksettingId=$iverksettingId")
             }
         } else {
+            iverksettingerOverRestCounter.increment()
             val dto =
                 IverksettDtoMapper.map(
                     behandling = behandling,
