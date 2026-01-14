@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -20,7 +21,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
 
 class DagligReiseVilkårServiceTest {
     val vilkårRepository = mockk<VilkårRepository>()
@@ -44,8 +44,9 @@ class DagligReiseVilkårServiceTest {
 
     val nyttVilkår =
         LagreDagligReise(
-            fom = LocalDate.of(2025, 1, 1),
-            tom = LocalDate.of(2025, 1, 31),
+            fom = 1 januar 2025,
+            tom = 31 januar 2025,
+            adresse = "Tiltaksveien 1",
             svar = svarOffentligTransport,
             fakta = faktaOffentligTransport(),
         )

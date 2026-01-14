@@ -10,6 +10,7 @@ data class VilkårDagligReiseDto(
     val id: VilkårId,
     val fom: LocalDate,
     val tom: LocalDate,
+    val adresse: String? = null,
     val resultat: Vilkårsresultat,
     val status: VilkårStatus?,
     val delvilkårsett: List<DelvilkårDto>,

@@ -15,6 +15,7 @@ data class VilkårDagligReise(
     val behandlingId: BehandlingId,
     override val fom: LocalDate,
     override val tom: LocalDate,
+    val adresse: String? = null,
     val resultat: Vilkårsresultat,
     val status: VilkårStatus?,
     val delvilkårsett: List<Delvilkår>,

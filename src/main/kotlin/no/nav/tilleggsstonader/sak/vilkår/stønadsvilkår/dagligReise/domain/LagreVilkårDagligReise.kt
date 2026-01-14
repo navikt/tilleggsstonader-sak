@@ -7,6 +7,7 @@ import java.time.LocalDate
 data class LagreDagligReise(
     val fom: LocalDate,
     val tom: LocalDate,
+    val adresse: String,
     val svar: Map<RegelId, SvarOgBegrunnelse>,
     val fakta: FaktaDagligReise? = null,
 )

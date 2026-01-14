@@ -71,6 +71,7 @@ fun mapTilVilkårDagligReise(rad: Map<String, String>): LagreDagligReise =
     LagreDagligReise(
         fom = parseDato(DomenenøkkelFelles.FOM, rad),
         tom = parseDato(DomenenøkkelFelles.TOM, rad),
+        adresse = "Tiltaksveien 1",
         svar = oppfylteSvarOffentligtransport,
         fakta =
             FaktaOffentligTransport(
