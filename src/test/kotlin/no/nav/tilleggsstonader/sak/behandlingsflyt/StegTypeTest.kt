@@ -21,7 +21,7 @@ class StegTypeTest {
 
     @EnumSource(
         value = StegType::class,
-        names = ["VEDTAK", "KJØRELISTE", "BEREGN"],
+        names = ["VEDTAK", "KJØRELISTE", "BEREGNING"],
         mode = EnumSource.Mode.EXCLUDE,
     )
     @ParameterizedTest

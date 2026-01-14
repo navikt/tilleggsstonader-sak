@@ -71,7 +71,7 @@ enum class StegType(
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    BEREGN(
+    BEREGNING(
         rekkefølge = 6,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
@@ -140,8 +140,8 @@ enum class StegType(
             INNGANGSVILKÅR -> VILKÅR
             VILKÅR -> VEDTAK
             VEDTAK -> KJØRELISTE
-            KJØRELISTE -> BEREGN
-            BEREGN -> SIMULERING
+            KJØRELISTE -> BEREGNING
+            BEREGNING -> SIMULERING
             else -> fellesNesteSteg()
         }
 
