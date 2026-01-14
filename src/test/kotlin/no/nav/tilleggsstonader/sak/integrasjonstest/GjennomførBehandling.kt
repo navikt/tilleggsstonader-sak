@@ -23,17 +23,25 @@ import no.nav.tilleggsstonader.sak.util.journalpost
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import org.springframework.test.web.reactive.server.WebTestClient
+import java.time.LocalDate
 
 /**
  * Gjennomfører en behandling fra journalpost og helt til et gitt steg.
@@ -52,6 +60,7 @@ fun IntegrationTest.gjennomførBehandlingsløp(
     medAktivitet: (BehandlingId) -> LagreVilkårperiode = ::lagreVilkårperiodeAktivitet,
     medMålgruppe: (BehandlingId) -> LagreVilkårperiode = ::lagreVilkårperiodeMålgruppe,
     medVilkår: List<LagreVilkår> = listOf(lagreDagligReiseDto()),
+    opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
 ): BehandlingId {
     val behandlingId = håndterSøknadService.håndterSøknad(fraJournalpost)!!.id
 
@@ -73,7 +82,9 @@ fun IntegrationTest.gjennomførBehandlingsløp(
         return behandlingId
     }
 
-    gjennomførVilkårSteg(medVilkår, behandling.id, behandling.stønadstype)
+    if (behandling.stønadstype != Stønadstype.LÆREMIDLER) {
+        gjennomførVilkårSteg(medVilkår, behandling.id, behandling.stønadstype)
+    }
 
     if (tilSteg == StegType.BEREGNE_YTELSE) {
         return behandlingId
@@ -146,6 +157,101 @@ fun IntegrationTest.gjennomførHenleggelse(fraJournalpost: Journalpost = default
     return behandlingId
 }
 
+fun IntegrationTest.gjennomførBeslutteVedtakSteg(behandlingId: BehandlingId) {
+    medBrukercontext(bruker = "nissemor", roller = listOf(rolleConfig.beslutterRolle)) {
+        tilordneÅpenBehandlingOppgaveForBehandling(behandlingId)
+        kall.totrinnskontroll.beslutteVedtak(behandlingId, BeslutteVedtakDto(godkjent = true))
+    }
+    kjørTasksKlareForProsessering()
+}
+
+fun IntegrationTest.gjennomførSendTilBeslutterSteg(behandlingId: BehandlingId) {
+    kall.brev.genererPdf(behandlingId, GenererPdfRequest(MINIMALT_BREV))
+    kall.totrinnskontroll.sendTilBeslutter(behandlingId)
+    kjørTasksKlareForProsessering()
+}
+
+fun IntegrationTest.gjennomførSimuleringSteg(behandlingId: BehandlingId) {
+    kall.steg.ferdigstill(
+        behandlingId,
+        StegController.FerdigstillStegRequest(
+            steg = StegType.SIMULERING,
+        ),
+    )
+    kjørTasksKlareForProsessering()
+}
+
+fun IntegrationTest.gjennomførBeregningSteg(
+    behandlingId: BehandlingId,
+    stønadstype: Stønadstype,
+    opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
+): WebTestClient.ResponseSpec {
+    val foreslåtteVedtaksperioder = kall.vedtak.foreslåVedtaksperioder(behandlingId)
+
+    val vedtaksperioder =
+        foreslåtteVedtaksperioder.map {
+            it.tilVedtaksperiodeDto()
+        }
+    return when (opprettVedtak) {
+        is OpprettInnvilgelse ->
+            kall.vedtak.apiRespons
+                .lagreInnvilgelse(
+                    stønadstype = stønadstype,
+                    behandlingId = behandlingId,
+                    innvilgelseDto =
+                        when (stønadstype) {
+                            Stønadstype.BARNETILSYN -> InnvilgelseTilsynBarnRequest(vedtaksperioder = vedtaksperioder)
+                            Stønadstype.LÆREMIDLER -> InnvilgelseLæremidlerRequest(vedtaksperioder = vedtaksperioder)
+                            Stønadstype.BOUTGIFTER -> InnvilgelseBoutgifterRequest(vedtaksperioder = vedtaksperioder)
+                            Stønadstype.DAGLIG_REISE_TSO -> InnvilgelseDagligReiseRequest(vedtaksperioder = vedtaksperioder)
+                            Stønadstype.DAGLIG_REISE_TSR -> InnvilgelseDagligReiseRequest(vedtaksperioder = vedtaksperioder)
+                        },
+                )
+        is OpprettAvslag -> TODO()
+        is OpprettOpphør ->
+            kall.vedtak.apiRespons
+                .lagreOpphør(
+                    stønadstype = stønadstype,
+                    behandlingId = behandlingId,
+                    opphørDto =
+                        when (stønadstype) {
+                            Stønadstype.BARNETILSYN ->
+                                OpphørTilsynBarnRequest(
+                                    årsakerOpphør = opprettVedtak.årsaker,
+                                    begrunnelse = opprettVedtak.begrunnelse,
+                                    opphørsdato = opprettVedtak.opphørsdato,
+                                )
+                            Stønadstype.LÆREMIDLER ->
+                                OpphørLæremidlerRequest(
+                                    årsakerOpphør = opprettVedtak.årsaker,
+                                    begrunnelse = opprettVedtak.begrunnelse,
+                                    opphørsdato = opprettVedtak.opphørsdato,
+                                )
+                            Stønadstype.BOUTGIFTER ->
+                                OpphørBoutgifterRequest(
+                                    årsakerOpphør = opprettVedtak.årsaker,
+                                    begrunnelse = opprettVedtak.begrunnelse,
+                                    opphørsdato = opprettVedtak.opphørsdato,
+                                )
+                            Stønadstype.DAGLIG_REISE_TSO -> TODO()
+                            Stønadstype.DAGLIG_REISE_TSR -> TODO()
+                        },
+                )
+    }
+}
+
+sealed interface OpprettVedtak
+
+data object OpprettInnvilgelse : OpprettVedtak
+
+data object OpprettAvslag : OpprettVedtak
+
+data class OpprettOpphør(
+    val årsaker: List<ÅrsakOpphør> = listOf(ÅrsakOpphør.ANNET),
+    val begrunnelse: String = "annet",
+    val opphørsdato: LocalDate,
+) : OpprettVedtak
+
 fun IntegrationTest.gjennomførInngangsvilkårSteg(
     medAktivitet: ((BehandlingId) -> LagreVilkårperiode)? = null,
     medMålgruppe: ((BehandlingId) -> LagreVilkårperiode)? = null,
@@ -184,32 +290,6 @@ fun IntegrationTest.gjennomførVilkårSteg(
     )
     kjørTasksKlareForProsessering()
 }
-
-fun IntegrationTest.gjennomførBeregningSteg(
-    behandlingId: BehandlingId,
-    stønadstype: Stønadstype,
-): WebTestClient.ResponseSpec {
-    val foreslåtteVedtaksperioder = kall.vedtak.foreslåVedtaksperioder(behandlingId)
-
-    val vedtaksperioder =
-        foreslåtteVedtaksperioder.map {
-            it.tilVedtaksperiodeDto()
-        }
-    return kall.vedtak.apiRespons
-        .lagreInnvilgelse(
-            stønadstype = stønadstype,
-            behandlingId = behandlingId,
-            innvilgelseDto =
-                when (stønadstype) {
-                    Stønadstype.BARNETILSYN -> InnvilgelseTilsynBarnRequest(vedtaksperioder = vedtaksperioder)
-                    Stønadstype.LÆREMIDLER -> InnvilgelseLæremidlerRequest(vedtaksperioder = vedtaksperioder)
-                    Stønadstype.BOUTGIFTER -> InnvilgelseBoutgifterRequest(vedtaksperioder = vedtaksperioder)
-                    Stønadstype.DAGLIG_REISE_TSO -> InnvilgelseDagligReiseRequest(vedtaksperioder = vedtaksperioder)
-                    Stønadstype.DAGLIG_REISE_TSR -> InnvilgelseDagligReiseRequest(vedtaksperioder = vedtaksperioder)
-                },
-        )
-}
-
 fun IntegrationTest.gjennomførOpphør(
     stønadstype: Stønadstype,
     behandlingId: BehandlingId,
@@ -221,31 +301,6 @@ fun IntegrationTest.gjennomførOpphør(
         opphørDto = opphørDto,
     )
 
-    kjørTasksKlareForProsessering()
-}
-
-private fun IntegrationTest.gjennomførSimuleringSteg(behandlingId: BehandlingId) {
-    kall.steg.ferdigstill(
-        behandlingId,
-        StegController.FerdigstillStegRequest(
-            steg = StegType.SIMULERING,
-        ),
-    )
-    kjørTasksKlareForProsessering()
-}
-
-private fun IntegrationTest.gjennomførSendTilBeslutterSteg(behandlingId: BehandlingId) {
-    kall.brev.genererPdf(behandlingId, GenererPdfRequest(MINIMALT_BREV))
-    kall.totrinnskontroll.sendTilBeslutter(behandlingId)
-    kjørTasksKlareForProsessering()
-}
-
-private fun IntegrationTest.gjennomførBeslutteVedtakSteg(behandlingId: BehandlingId) {
-    medBrukercontext(bruker = "nissemor", roller = listOf(rolleConfig.beslutterRolle)) {
-        tilordneÅpenBehandlingOppgaveForBehandling(behandlingId)
-
-        kall.totrinnskontroll.beslutteVedtak(behandlingId, BeslutteVedtakDto(godkjent = true))
-    }
     kjørTasksKlareForProsessering()
 }
 

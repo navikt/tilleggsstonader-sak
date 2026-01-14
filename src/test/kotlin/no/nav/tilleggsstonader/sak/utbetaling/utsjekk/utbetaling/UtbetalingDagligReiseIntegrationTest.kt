@@ -27,7 +27,16 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             medVilkår = listOf(reiseFramITid),
         )
 
-        KafkaTestConfig.sendteMeldinger().forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
+        val sendtMelding =
+            KafkaTestConfig
+                .sendteMeldinger()
+                .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
+                .map { it.verdiEllerFeil<IverksettingDto>() }
+                .single()
+
+        assertThat(
+            sendtMelding.utbetalinger.size,
+        ).isEqualTo(0)
     }
 
     @Test
@@ -47,12 +56,14 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 medVilkår = reiser,
             )
 
+        val saksbehandling = testoppsettService.hentSaksbehandling(behandlingId)
         val utbetalinger = KafkaTestConfig.sendteMeldinger().finnPåTopic(kafkaTopics.utbetaling)
         val utbetaling = utbetalinger.single().verdiEllerFeil<IverksettingDto>()
 
-        with(utbetaling.utbetalingsgrunnlag) {
-            assertThat(periodetype).isEqualTo(PeriodetypeUtbetaling.UKEDAG)
-            assertThat(behandlingId).isEqualTo(behandlingId)
+        assertThat(utbetaling.periodetype).isEqualTo(PeriodetypeUtbetaling.UKEDAG)
+        assertThat(utbetaling.behandlingId).isEqualTo(saksbehandling.eksternId.toString())
+        assertThat(utbetaling.utbetalinger).hasSize(1)
+        with(utbetaling.utbetalinger.single()) {
             assertThat(perioder).hasSize(2)
 
             with(perioder.first()) {
@@ -92,7 +103,12 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 .fom
                 .datoEllerNesteMandagHvisLørdagEllerSøndag()
 
-        with(utbetaling.utbetalingsgrunnlag.perioder.single()) {
+        with(
+            utbetaling.utbetalinger
+                .single()
+                .perioder
+                .single(),
+        ) {
             assertThat(fom).isEqualTo(tom).isEqualTo(forventetUtbetalingsdato)
         }
     }
@@ -124,7 +140,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             fom = nå.minusMonths(3),
             tom = nå.plusMonths(3),
         )
-    private val langtvarendeAktivitet = fun (behandlingId: BehandlingId) =
+    private val langtvarendeAktivitet = fun(behandlingId: BehandlingId) =
         lagreVilkårperiodeAktivitet(
             behandlingId,
             fom = nå.minusMonths(3),

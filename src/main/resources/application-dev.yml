@@ -12,3 +12,6 @@ rolle:
 clients:
   kodeverk:
     uri: https://kodeverk-api.nav.no
+
+topics:
+  dvh-behandling: tilleggsstonader.aapen-tilleggsstonader-dvh-behandling-test

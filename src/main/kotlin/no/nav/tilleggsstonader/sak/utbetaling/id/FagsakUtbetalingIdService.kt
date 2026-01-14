@@ -24,4 +24,11 @@ class FagsakUtbetalingIdService(
             ),
         )
     }
+
+    fun finnesUtbetalingsId(
+        fagsakId: FagsakId,
+        typeAndel: TypeAndel,
+    ): Boolean = fagsakUtbetalingIdRepository.findByFagsakIdAndTypeAndel(fagsakId, typeAndel) != null
+
+    fun hentUtbetalingIderForFagsakId(fagsakId: FagsakId): List<FagsakUtbetalingId> = fagsakUtbetalingIdRepository.findByFagsakId(fagsakId)
 }

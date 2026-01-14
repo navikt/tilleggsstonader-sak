@@ -6,6 +6,7 @@ import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
@@ -37,6 +38,7 @@ class OffentligTransportBeregningStepDefinitions {
     val vilkårServiceMock = mockk<VilkårService>()
     val vilkårRepositoryFake = VilkårRepositoryFake()
     val vedtakRepositoryFake = VedtakRepositoryFake()
+    val unleashServiceMock = mockk<UnleashService>()
     val vilkårperiodeRepositoryFake = VilkårperiodeRepositoryFake()
     val behandlingId = BehandlingId.random()
     val utledTidligsteEndringService =
@@ -60,6 +62,7 @@ class OffentligTransportBeregningStepDefinitions {
             vilkårRepository = vilkårRepositoryFake,
             vilkårService = vilkårServiceMock,
             behandlingService = behandlingServiceMock,
+            unleashService = unleashServiceMock,
         )
 
     val vedtaksperiodeValideringService =
@@ -85,6 +88,8 @@ class OffentligTransportBeregningStepDefinitions {
                 behandlingId = behandlingId,
                 steg = StegType.VILKÅR,
             )
+
+        every { unleashServiceMock.isEnabled(any()) } returns true
 
         vilkår =
             utgiftData.mapRad { rad ->

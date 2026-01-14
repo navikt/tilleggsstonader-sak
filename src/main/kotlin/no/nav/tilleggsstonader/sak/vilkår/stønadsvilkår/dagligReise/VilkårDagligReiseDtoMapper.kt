@@ -41,9 +41,10 @@ object VilkårDagligReiseDtoMapper {
 
     private fun FaktaPrivatBil.tilDto() =
         FaktaDagligReisePrivatBilDto(
+            reiseId = this.reiseId,
             reisedagerPerUke = reisedagerPerUke,
             reiseavstandEnVei = reiseavstandEnVei,
-            prisBompengerPerDag = prisBompengerPerDag,
-            prisFergekostandPerDag = prisFergekostandPerDag,
+            bompengerEnVei = bompengerEnVei,
+            fergekostandEnVei = fergekostandEnVei,
         )
 }

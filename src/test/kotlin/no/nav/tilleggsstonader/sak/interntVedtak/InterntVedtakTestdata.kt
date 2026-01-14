@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.interntVedtak
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -8,7 +9,6 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTestdata.Boutgifter.vedtaksperioder
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil
@@ -609,7 +609,8 @@ object InterntVedtakTestdata {
     }
 
     object DagligReise {
-        val fagsak = fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()), stønadstype = Stønadstype.DAGLIG_REISE_TSO)
+        val fagsak =
+            fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()), stønadstype = Stønadstype.DAGLIG_REISE_TSO)
         val behandling =
             saksbehandling(
                 behandling =
@@ -623,7 +624,7 @@ object InterntVedtakTestdata {
                     ),
                 fagsak = fagsak,
             )
-        private val aktivitetererDagligReise =
+        private val aktivitetererDagligReiseTso =
             listOf(
                 VilkårperiodeTestUtil.aktivitet(
                     fom = LocalDate.of(2024, 2, 5),
@@ -639,11 +640,36 @@ object InterntVedtakTestdata {
                 ),
             )
 
-        val vilkårperioder =
+        private val aktivitetererDagligReiseTsr =
+            listOf(
+                VilkårperiodeTestUtil.aktivitet(
+                    fom = LocalDate.of(2024, 2, 5),
+                    tom = LocalDate.of(2024, 2, 10),
+                    faktaOgVurdering = faktaOgVurderingAktivitetDagligReiseTso(),
+                    typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                ),
+                VilkårperiodeTestUtil.aktivitet(
+                    fom = LocalDate.of(2024, 2, 5),
+                    tom = LocalDate.of(2024, 2, 10),
+                    resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
+                    begrunnelse = "ikke oppfylt",
+                    faktaOgVurdering = faktaOgVurderingAktivitetDagligReiseTso(type = AktivitetType.UTDANNING),
+                    typeAktivitet = TypeAktivitet.ENKELAMO,
+                ),
+            )
+
+        val vilkårperioderTso =
             Vilkårperioder(
                 målgrupper = målgrupper,
-                aktiviteter = aktivitetererDagligReise,
+                aktiviteter = aktivitetererDagligReiseTso,
             )
+
+        val vilkårperioderTsr =
+            Vilkårperioder(
+                målgrupper = målgrupper,
+                aktiviteter = aktivitetererDagligReiseTsr,
+            )
+
         val grunnlagsdata =
             lagGrunnlagsdata(personopplysninger = lagFaktaGrunnlagPersonopplysninger(barn = emptyList()))
 
@@ -721,23 +747,48 @@ object InterntVedtakTestdata {
                     ),
             )
 
-        fun innvilgetVedtakTso() = innvilgetVedtak(beregningsresultatTso())
-
-        fun innvilgetVedtakTsr() = innvilgetVedtak(beregningsresultatTsr())
-
-        private fun innvilgetVedtak(beregningsresultatDagligReise: BeregningsresultatDagligReise) =
-            GeneriskVedtak(
-                behandlingId = behandlingId,
-                type = TypeVedtak.INNVILGELSE,
-                data =
-                    InnvilgelseDagligReise(
-                        vedtaksperioder = vedtaksperioder,
-                        beregningsresultat = beregningsresultatDagligReise,
-                        begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
-                    ),
-                gitVersjon = Applikasjonsversjon.versjon,
-                tidligsteEndring = null,
+        val vedtaksperioderTso =
+            listOf(
+                Vedtaksperiode(
+                    id = UUID.randomUUID(),
+                    fom = LocalDate.of(2024, JANUARY, 1),
+                    tom = LocalDate.of(2024, FEBRUARY, 29),
+                    aktivitet = AktivitetType.TILTAK,
+                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                ),
             )
+
+        val vedtaksperioderTsr =
+            listOf(
+                Vedtaksperiode(
+                    id = UUID.randomUUID(),
+                    fom = LocalDate.of(2024, JANUARY, 1),
+                    tom = LocalDate.of(2024, FEBRUARY, 29),
+                    aktivitet = AktivitetType.TILTAK,
+                    målgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
+                    typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                ),
+            )
+
+        fun innvilgetVedtakTso() = innvilgetVedtak(beregningsresultatTso(), vedtaksperioderTso)
+
+        fun innvilgetVedtakTsr() = innvilgetVedtak(beregningsresultatTsr(), vedtaksperioderTsr)
+
+        private fun innvilgetVedtak(
+            beregningsresultatDagligReise: BeregningsresultatDagligReise,
+            vedtaksperioder: List<Vedtaksperiode>,
+        ) = GeneriskVedtak(
+            behandlingId = behandlingId,
+            type = TypeVedtak.INNVILGELSE,
+            data =
+                InnvilgelseDagligReise(
+                    vedtaksperioder = vedtaksperioder,
+                    beregningsresultat = beregningsresultatDagligReise,
+                    begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
+                ),
+            gitVersjon = Applikasjonsversjon.versjon,
+            tidligsteEndring = null,
+        )
 
         val avslåttVedtak =
             GeneriskVedtak(

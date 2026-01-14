@@ -40,7 +40,8 @@
     "kilde" : "MANUELL",
     "resultat" : "OPPFYLT",
     "begrunnelse" : "målgruppe aap",
-    "slettetKommentar" : null
+    "slettetKommentar" : null,
+    "tilltaksvariant" : null
   }, {
     "type" : "OVERGANGSSTØNAD",
     "fom" : "2024-02-05",
@@ -58,7 +59,8 @@
     "kilde" : "MANUELL",
     "resultat" : "OPPFYLT",
     "begrunnelse" : "målgruppe os",
-    "slettetKommentar" : null
+    "slettetKommentar" : null,
+    "tilltaksvariant" : null
   }, {
     "type" : "NEDSATT_ARBEIDSEVNE",
     "fom" : "2024-02-05",
@@ -85,7 +87,8 @@
     "kilde" : "MANUELL",
     "resultat" : "IKKE_VURDERT",
     "begrunnelse" : "målgruppe na",
-    "slettetKommentar" : null
+    "slettetKommentar" : null,
+    "tilltaksvariant" : null
   } ],
   "aktiviteter" : [ {
     "type" : "TILTAK",
@@ -102,7 +105,8 @@
     "kilde" : "MANUELL",
     "resultat" : "IKKE_OPPFYLT",
     "begrunnelse" : "aktivitet abd",
-    "slettetKommentar" : null
+    "slettetKommentar" : null,
+    "tilltaksvariant" : null
   }, {
     "type" : "TILTAK",
     "fom" : "2024-02-05",
@@ -118,13 +122,15 @@
     "kilde" : "MANUELL",
     "resultat" : "SLETTET",
     "begrunnelse" : null,
-    "slettetKommentar" : "kommentar slettet"
+    "slettetKommentar" : "kommentar slettet",
+    "tilltaksvariant" : null
   } ],
   "vedtaksperioder" : [ {
     "fom" : "2024-01-01",
     "tom" : "2024-02-01",
     "målgruppe" : "NEDSATT_ARBEIDSEVNE",
-    "aktivitet" : "TILTAK"
+    "aktivitet" : "TILTAK",
+    "tilltaksvariant" : null
   } ],
   "vilkår" : [ {
     "type" : "PASS_BARN",

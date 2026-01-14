@@ -31,6 +31,7 @@ class UtbetalingStatusKafkaContainerFactoryConfig {
                 this[ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG] = false
                 this[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java
                 this[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = JsonDeserializer::class.java
+                this[JsonDeserializer.USE_TYPE_INFO_HEADERS] = false
                 this[JsonDeserializer.TRUSTED_PACKAGES] = "no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status"
                 this[JsonDeserializer.VALUE_DEFAULT_TYPE] = UtbetalingStatusRecord::class.java.name
             }

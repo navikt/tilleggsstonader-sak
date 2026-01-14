@@ -60,6 +60,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
     JsonSubTypes.Type(KvalifiseringsstønadDagligReiseTsr::class, name = "KVALIFISERINGSSTØNAD_DAGLIG_REISE_TSR"),
     JsonSubTypes.Type(TiltakspengerDagligReiseTsr::class, name = "TILTAKSPENGER_DAGLIG_REISE_TSR"),
     JsonSubTypes.Type(IngenMålgruppeDagligReiseTsr::class, name = "INGEN_MÅLGRUPPE_DAGLIG_REISE_TSR"),
+    JsonSubTypes.Type(InnsattIFengselDagligReiseTsr::class, name = "INNSATT_I_FENGSEL_DAGLIG_REISE_TSR"),
     failOnRepeatedNames = true,
 )
 sealed interface FaktaOgVurderingJson

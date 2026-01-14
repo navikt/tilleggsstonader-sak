@@ -265,11 +265,13 @@ data class TidligsteEndringIBehandlingUtleder(
             faktaNå is FaktaDagligReisePrivatBil && faktaTidligere is FaktaDagligReisePrivatBil -> {
                 faktaNå.reisedagerPerUke != faktaTidligere.reisedagerPerUke ||
                     faktaNå.reiseavstandEnVei != faktaTidligere.reiseavstandEnVei ||
-                    faktaNå.prisBompengerPerDag != faktaTidligere.prisBompengerPerDag ||
-                    faktaNå.prisFergekostandPerDag != faktaTidligere.prisFergekostandPerDag
+                    faktaNå.bompengerEnVei != faktaTidligere.bompengerEnVei ||
+                    faktaNå.fergekostandEnVei != faktaTidligere.fergekostandEnVei
             }
 
-            else -> false
+            else -> {
+                false
+            }
         }
 
     /**
@@ -340,8 +342,10 @@ data class TidligsteEndringIBehandlingUtleder(
             when {
                 // Ny periode i ny behandling
                 perioderNå.size > antallPerioder -> perioderNå[antallPerioder].fom
+
                 // Periode har blitt slettet i ny behandling
                 perioderTidligere.size > antallPerioder -> perioderTidligere[antallPerioder].fom
+
                 // Ingen endringer i perioder
                 else -> null
             }

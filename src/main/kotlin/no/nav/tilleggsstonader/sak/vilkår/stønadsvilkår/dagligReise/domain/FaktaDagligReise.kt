@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.ant
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
+import java.math.BigDecimal
 
 sealed interface FaktaDagligReise {
     val type: TypeDagligReise
@@ -107,10 +108,11 @@ data class FaktaOffentligTransport(
 }
 
 data class FaktaPrivatBil(
+    val reiseId: ReiseId,
     val reisedagerPerUke: Int,
-    val reiseavstandEnVei: Int,
-    val prisBompengerPerDag: Int?,
-    val prisFergekostandPerDag: Int?,
+    val reiseavstandEnVei: BigDecimal,
+    val bompengerEnVei: Int?,
+    val fergekostandEnVei: Int?,
 ) : FaktaDagligReise {
     override val type = TypeDagligReise.PRIVAT_BIL
 
@@ -122,15 +124,15 @@ data class FaktaPrivatBil(
 
     private fun validerIngenNegativeUtgifter() {
         brukerfeilHvis(
-            (prisBompengerPerDag != null && prisBompengerPerDag < 0) ||
-                (prisFergekostandPerDag != null && prisFergekostandPerDag < 0),
+            (bompengerEnVei != null && bompengerEnVei < 0) ||
+                (fergekostandEnVei != null && fergekostandEnVei < 0),
         ) {
             "Bompenge- og fergeprisen må være større enn 0"
         }
     }
 
     private fun validerIngenNegativReiseavstand() {
-        brukerfeilHvis(reiseavstandEnVei < 0) {
+        brukerfeilHvis(reiseavstandEnVei < BigDecimal.ZERO) {
             "Reiseavstanden må være større enn 0"
         }
     }
@@ -147,9 +149,10 @@ data class FaktaPrivatBil(
 
     override fun mapTilVilkårFakta() =
         FaktaDagligReisePrivatBil(
+            reiseId = reiseId,
             reisedagerPerUke = reisedagerPerUke,
             reiseavstandEnVei = reiseavstandEnVei,
-            prisBompengerPerDag = prisBompengerPerDag,
-            prisFergekostandPerDag = prisFergekostandPerDag,
+            bompengerEnVei = bompengerEnVei,
+            fergekostandEnVei = fergekostandEnVei,
         )
 }
