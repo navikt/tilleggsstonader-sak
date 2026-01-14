@@ -60,7 +60,18 @@ fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
     opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
 ): BehandlingId {
     val behandlingId = håndterSøknadService.håndterSøknad(fraJournalpost)!!.id
+    gjennomførBehandlingsløp(behandlingId, tilSteg, medAktivitet, medMålgruppe, medVilkår, opprettVedtak)
+    return behandlingId
+}
 
+fun IntegrationTest.gjennomførBehandlingsløp(
+    behandlingId: BehandlingId,
+    tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
+    medAktivitet: (BehandlingId) -> LagreVilkårperiode = ::lagreVilkårperiodeAktivitet,
+    medMålgruppe: (BehandlingId) -> LagreVilkårperiode = ::lagreVilkårperiodeMålgruppe,
+    medVilkår: List<LagreVilkår> = listOf(lagreDagligReiseDto()),
+    opprettVedtak: OpprettVedtak,
+) {
     // Oppretter grunnlagsdata
     val behandling = kall.behandling.hent(behandlingId)
 
@@ -70,13 +81,13 @@ fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
     tilordneÅpenBehandlingOppgaveForBehandling(behandlingId)
 
     if (tilSteg == StegType.INNGANGSVILKÅR) {
-        return behandlingId
+        return
     }
 
     gjennomførInngangsvilkårSteg(medAktivitet, medMålgruppe, behandlingId)
 
     if (tilSteg == StegType.VILKÅR) {
-        return behandlingId
+        return
     }
 
     if (behandling.stønadstype != Stønadstype.LÆREMIDLER) {
@@ -84,37 +95,35 @@ fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
     }
 
     if (tilSteg == StegType.BEREGNE_YTELSE) {
-        return behandlingId
+        return
     }
 
-    gjennomførBeregningSteg(behandling.id, behandling.stønadstype)
+    gjennomførBeregningSteg(behandling.id, behandling.stønadstype, opprettVedtak)
 
     if (tilSteg == StegType.SIMULERING) {
-        return behandlingId
+        return
     }
 
     gjennomførSimuleringSteg(behandlingId)
 
     if (tilSteg == StegType.SEND_TIL_BESLUTTER) {
-        return behandlingId
+        return
     }
 
     gjennomførSendTilBeslutterSteg(behandlingId)
 
     if (tilSteg == StegType.BESLUTTE_VEDTAK) {
-        return behandlingId
+        return
     }
 
     gjennomførBeslutteVedtakSteg(behandlingId)
 
     if (tilSteg in setOf(StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV, StegType.FERDIGSTILLE_BEHANDLING)) {
-        return behandlingId
+        return
     }
 
     // Ferdigstiller behandling
     kjørTasksKlareForProsesseringTilIngenTasksIgjen()
-
-    return behandlingId
 }
 
 fun IntegrationTest.opprettRevurdering(opprettBehandlingDto: OpprettBehandlingDto): BehandlingId {
