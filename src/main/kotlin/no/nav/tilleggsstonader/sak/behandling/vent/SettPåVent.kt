@@ -27,4 +27,6 @@ data class SettPåVent(
             "SettPåVent må inneholde årsaker for behandling=$behandlingId"
         }
     }
+
+    fun erSattPåVentForSatsjustering(): Boolean = årsaker.singleOrNull() == ÅrsakSettPåVent.FOR_SATSJUSTERING
 }

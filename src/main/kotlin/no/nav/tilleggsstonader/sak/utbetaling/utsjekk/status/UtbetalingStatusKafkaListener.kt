@@ -22,7 +22,16 @@ class UtbetalingStatusKafkaListener(
         consumerRecord: ConsumerRecord<String, UtbetalingStatusRecord>,
         acknowledgment: Acknowledgment,
     ) {
-        utbetalingStatusHåndterer.behandleStatusoppdatering(iverksettingId = consumerRecord.key(), melding = consumerRecord.value())
+        utbetalingStatusHåndterer.behandleStatusoppdatering(
+            iverksettingId = consumerRecord.key(),
+            melding = consumerRecord.value(),
+            utbetalingGjelderFagsystem =
+                consumerRecord
+                    .headers()
+                    .firstOrNull { it.key() == "fagsystem" }
+                    ?.value()
+                    ?.let { String(it) } ?: "Ukjent",
+        )
         acknowledgment.acknowledge()
     }
 }

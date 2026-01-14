@@ -32,9 +32,10 @@ class TaAvVentService(
     @Transactional
     fun taAvVent(
         behandlingId: BehandlingId,
-        taAvVentDto: TaAvVentDto? = null,
+        taAvVentDto: TaAvVentDto,
     ) {
         val behandling = behandlingService.hentBehandling(behandlingId)
+        val aktivSettPåVent = finnAktivSettPåVent(behandlingId)
 
         when (val kanTaAvVent = utledTaAvVentStatus(behandling)) {
             is KanTaAvVent.Nei -> {
@@ -45,32 +46,42 @@ class TaAvVentService(
             }
 
             is KanTaAvVent.Ja -> {
-                val behandlingTattAvVent = behandlingService.oppdaterStatusPåBehandling(behandlingId, BehandlingStatus.UTREDES)
-                opprettHistorikkInnslagTaAvVent(behandling, taAvVentDto?.kommentar)
+                val oppdatertBehandling =
+                    behandlingService
+                        .oppdaterStatusPåBehandling(
+                            behandlingId,
+                            taAvVentDto.settBehandlingStatusTil,
+                        )
+
+                if (!aktivSettPåVent!!.erSattPåVentForSatsjustering()) {
+                    opprettHistorikkInnslagTaAvVent(oppdatertBehandling, taAvVentDto.kommentar)
+                }
 
                 when (kanTaAvVent.påkrevdHandling) {
-                    PåkrevdHandling.Ingen -> {}
+                    PåkrevdHandling.Ingen -> Unit
                     PåkrevdHandling.MåHåndtereNyttVedtakPåFagsaken ->
-                        håndterAtNyBehandlingHarBlittFerdigstiltPåFagsaken(behandlingTattAvVent)
+                        håndterAtNyBehandlingHarBlittFerdigstiltPåFagsaken(oppdatertBehandling)
                 }
             }
         }
 
-        val påVentMetadata =
-            finnAktivSattPåVent(behandlingId).copy(aktiv = false, taAvVentKommentar = taAvVentDto?.kommentar)
-        settPåVentRepository.update(påVentMetadata)
-        val fagsak = fagsakService.hentFagsak(behandling.fagsakId)
+        val oppdatertSettPåVent =
+            aktivSettPåVent.copy(aktiv = false, taAvVentKommentar = taAvVentDto.kommentar)
+        settPåVentRepository.update(oppdatertSettPåVent)
 
-        taOppgaveAvVent(
-            settPåVent = påVentMetadata,
-            skalTilordnesRessurs = taAvVentDto?.skalTilordnesRessurs ?: true,
-            frist =
-                fristBehandleSakOppgave(
-                    kravMottatt = behandling.kravMottatt,
-                    behandlingOpprettet = behandling.sporbar.opprettetTid,
-                ),
-            endretAvEnhetsnr = fagsak.stønadstype.behandlendeEnhet().enhetsnr,
-        )
+        if (!oppdatertSettPåVent.erSattPåVentForSatsjustering()) {
+            val fagsak = fagsakService.hentFagsak(behandling.fagsakId)
+            taOppgaveAvVent(
+                settPåVent = oppdatertSettPåVent,
+                skalTilordnesRessurs = taAvVentDto.skalTilordnesRessurs,
+                frist =
+                    fristBehandleSakOppgave(
+                        kravMottatt = behandling.kravMottatt,
+                        behandlingOpprettet = behandling.sporbar.opprettetTid,
+                    ),
+                endretAvEnhetsnr = fagsak.stønadstype.behandlendeEnhet().enhetsnr,
+            )
+        }
     }
 
     fun kanTaAvVent(behandlingId: BehandlingId): KanTaAvVentDto {
@@ -149,13 +160,14 @@ class TaAvVentService(
         val sisteVedtakstidspunktPåFagsaken =
             behandlingService.finnSisteBehandlingSomHarVedtakPåFagsaken(behandling.fagsakId)?.vedtakstidspunkt
                 ?: return false
-        val tidspunktBehandlingenSistBleSattPåVent = finnAktivSattPåVent(behandling.id).sporbar.opprettetTid
+        val tidspunktBehandlingenSistBleSattPåVent = hentAktivSettPåVent(behandling.id).sporbar.opprettetTid
         return sisteVedtakstidspunktPåFagsaken.isAfter(tidspunktBehandlingenSistBleSattPåVent)
     }
 
-    private fun finnAktivSattPåVent(behandlingId: BehandlingId) =
-        settPåVentRepository.findByBehandlingIdAndAktivIsTrue(behandlingId)
-            ?: error("Finner ikke settPåVent for behandling=$behandlingId")
+    private fun hentAktivSettPåVent(behandlingId: BehandlingId) =
+        finnAktivSettPåVent(behandlingId) ?: error("Finner ikke settPåVent for behandling=$behandlingId")
+
+    private fun finnAktivSettPåVent(behandlingId: BehandlingId) = settPåVentRepository.findByBehandlingIdAndAktivIsTrue(behandlingId)
 }
 
 sealed class KanTaAvVent {

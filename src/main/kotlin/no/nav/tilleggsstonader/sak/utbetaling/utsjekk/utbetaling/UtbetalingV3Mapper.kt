@@ -21,14 +21,16 @@ class UtbetalingV3Mapper(
     fun lagSimuleringDtoer(
         behandling: Saksbehandling,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
-    ): SimuleringDto =
-        SimuleringDto(
+    ): SimuleringDto {
+        validerAndeler(andelerTilkjentYtelse)
+        return SimuleringDto(
             sakId = behandling.eksternFagsakId.toString(),
             behandlingId = behandling.eksternId.toString(),
             personident = behandling.ident,
-            periodetype = mapPeriodetypeFraAndeler(andelerTilkjentYtelse),
+            periodetype = PeriodetypeUtbetaling.UKEDAG,
             utbetalinger = lagUtbetalinger(behandling, andelerTilkjentYtelse, erFørsteIverksettingForBehandling = true),
         )
+    }
 
     fun lagIverksettingDtoer(
         behandling: Saksbehandling,
@@ -36,17 +38,25 @@ class UtbetalingV3Mapper(
         erFørsteIverksettingForBehandling: Boolean,
         totrinnskontroll: Totrinnskontroll?,
         vedtakstidspunkt: LocalDateTime,
-    ): IverksettingDto =
-        IverksettingDto(
+    ): IverksettingDto {
+        validerAndeler(andelerTilkjentYtelse)
+        return IverksettingDto(
             sakId = behandling.eksternFagsakId.toString(),
             behandlingId = behandling.eksternId.toString(),
             personident = behandling.ident,
-            periodetype = mapPeriodetypeFraAndeler(andelerTilkjentYtelse),
+            periodetype = PeriodetypeUtbetaling.UKEDAG,
             utbetalinger = lagUtbetalinger(behandling, andelerTilkjentYtelse, erFørsteIverksettingForBehandling),
             saksbehandler = totrinnskontroll?.saksbehandler ?: error("Saksbehandler mangler"),
             beslutter = totrinnskontroll.beslutter ?: error("Beslutter mangler"),
             vedtakstidspunkt = vedtakstidspunkt,
         )
+    }
+
+    private fun validerAndeler(andeler: Collection<AndelTilkjentYtelse>) {
+        feilHvis(andeler.distinctBy { it.satstype }.size > 1) {
+            "Håndterer ikke andeler med flere ulike satstyper samtidig"
+        }
+    }
 
     private fun lagUtbetalinger(
         behandling: Saksbehandling,
@@ -54,6 +64,7 @@ class UtbetalingV3Mapper(
         erFørsteIverksettingForBehandling: Boolean,
     ): List<UtbetalingDto> =
         andelerTilkjentYtelse
+            .filterNot { it.erNullandel() }
             .groupBy { it.type }
             .map { (type, andelerAvType) -> lagUtbetaling(behandling, type, andelerAvType) }
             .let { utbetalinger ->
@@ -80,22 +91,6 @@ class UtbetalingV3Mapper(
             brukFagområdeTillst = behandling.stønadstype.skalBrukeGamleFagområder(),
         )
     }
-
-    fun mapPeriodetypeFraAndeler(andeler: Collection<AndelTilkjentYtelse>): PeriodetypeUtbetaling {
-        val satstyper = andeler.distinctBy { it.satstype }
-        feilHvis(satstyper.size != 1) {
-            "Håndterer ikke andeler med flere ulike satstyper samtidig"
-        }
-        return satstyper.single().satstype.tilPeriodetypeUtbetaling()
-    }
-
-    fun Satstype.tilPeriodetypeUtbetaling() =
-        when (this) {
-            Satstype.DAG -> PeriodetypeUtbetaling.UKEDAG
-            Satstype.MÅNED -> PeriodetypeUtbetaling.MND
-            Satstype.ENGANGSBELØP -> PeriodetypeUtbetaling.EN_GANG
-            Satstype.UGYLDIG -> error("Andeler med satstype UGYLDIG skal ikke iverksettes")
-        }
 
     private fun lagUtbetalingDtoForAnnulering(
         behandling: Saksbehandling,
@@ -167,9 +162,9 @@ class UtbetalingV3Mapper(
     private fun finnTypeAndelerSomSkalAnnulleres(
         behandling: Saksbehandling,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
-    ): List<TypeAndel> {
+    ): Set<TypeAndel> {
         if (behandling.forrigeIverksatteBehandlingId == null) {
-            return emptyList()
+            return emptySet()
         }
         val andelerForrigeBehandling =
             tilkjentYtelseService
@@ -177,6 +172,9 @@ class UtbetalingV3Mapper(
                 .andelerTilkjentYtelse
 
         val typeAndelerNåværendeBehandling = andelerTilkjentYtelse.map { it.type }
-        return andelerForrigeBehandling.filter { it.type !in typeAndelerNåværendeBehandling }.map { it.type }
+        return andelerForrigeBehandling
+            .filter { it.type !in typeAndelerNåværendeBehandling }
+            .map { it.type }
+            .toSet()
     }
 }

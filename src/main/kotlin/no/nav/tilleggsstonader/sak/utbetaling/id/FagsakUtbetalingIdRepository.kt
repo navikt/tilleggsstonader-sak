@@ -18,6 +18,8 @@ interface FagsakUtbetalingIdRepository :
         fagsakId: FagsakId,
         typeAndel: TypeAndel,
     ): FagsakUtbetalingId?
+
+    fun findByFagsakId(fagsakId: FagsakId): List<FagsakUtbetalingId>
 }
 
 data class FagsakUtbetalingId(

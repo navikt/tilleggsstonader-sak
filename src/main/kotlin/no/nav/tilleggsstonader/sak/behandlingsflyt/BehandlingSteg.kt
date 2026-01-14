@@ -16,12 +16,16 @@ interface BehandlingSteg<T> {
     fun utførOgReturnerNesteSteg(
         saksbehandling: Saksbehandling,
         data: T,
+        kanBehandlePrivatBil: Boolean = false,
     ): StegType {
         utførSteg(saksbehandling, data)
-        return nesteSteg(stønadstype = saksbehandling.stønadstype)
+        return nesteSteg(stønadstype = saksbehandling.stønadstype, kanBehandlePrivatBil)
     }
 
-    fun nesteSteg(stønadstype: Stønadstype) = stegType().hentNesteSteg(stønadstype)
+    fun nesteSteg(
+        stønadstype: Stønadstype,
+        kanBehandlePrivatBil: Boolean,
+    ) = stegType().hentNesteSteg(stønadstype, kanBehandlePrivatBil)
 
     fun utførSteg(
         saksbehandling: Saksbehandling,
@@ -52,48 +56,53 @@ enum class StegType(
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    VEDTAK(
+    BEREGNE_YTELSE(
         rekkefølge = 3,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    KJØRELISTE(
+    VEDTAK(
         rekkefølge = 4,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    BEREGNE_YTELSE(
+    KJØRELISTE(
         rekkefølge = 5,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    SIMULERING(
+    BEREGNING(
         rekkefølge = 6,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    SEND_TIL_BESLUTTER(
+    SIMULERING(
         rekkefølge = 7,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    BESLUTTE_VEDTAK(
+    SEND_TIL_BESLUTTER(
         rekkefølge = 8,
+        tillattFor = BehandlerRolle.SAKSBEHANDLER,
+        gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
+    ),
+    BESLUTTE_VEDTAK(
+        rekkefølge = 9,
         tillattFor = BehandlerRolle.BESLUTTER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.FATTER_VEDTAK),
     ),
     JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV(
-        rekkefølge = 9,
-        tillattFor = BehandlerRolle.SYSTEM,
-        gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
-    ),
-    FERDIGSTILLE_BEHANDLING(
         rekkefølge = 10,
         tillattFor = BehandlerRolle.SYSTEM,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
     ),
-    BEHANDLING_FERDIGSTILT(
+    FERDIGSTILLE_BEHANDLING(
         rekkefølge = 11,
+        tillattFor = BehandlerRolle.SYSTEM,
+        gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
+    ),
+    BEHANDLING_FERDIGSTILT(
+        rekkefølge = 12,
         tillattFor = BehandlerRolle.SYSTEM,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.FERDIGSTILT),
     ),
@@ -106,42 +115,38 @@ enum class StegType(
     fun erGyldigIKombinasjonMedStatus(behandlingStatus: BehandlingStatus): Boolean =
         this.gyldigIKombinasjonMedStatus.contains(behandlingStatus)
 
-    fun hentNesteSteg(stønadstype: Stønadstype): StegType =
-        when (stønadstype) {
+    fun hentNesteSteg(
+        stønadstype: Stønadstype,
+        kanBehandlePrivatBil: Boolean = false,
+    ): StegType {
+        if (!kanBehandlePrivatBil) return hentNesteStegStandard(stønadstype)
+
+        return when (stønadstype) {
             Stønadstype.DAGLIG_REISE_TSR, Stønadstype.DAGLIG_REISE_TSO -> hentNesteStegDagligReise()
             else -> hentNesteStegStandard(stønadstype)
         }
+    }
 
     private fun hentNesteStegStandard(stønadstype: Stønadstype): StegType =
         when (this) {
-            INNGANGSVILKÅR -> {
-                when (stønadstype) {
-                    Stønadstype.LÆREMIDLER -> BEREGNE_YTELSE
-                    else -> VILKÅR
-                }
-            }
-
-            VILKÅR -> {
-                BEREGNE_YTELSE
-            }
-
-            else -> {
-                fellesNesteSteg()
-            }
+            INNGANGSVILKÅR -> finnNesteStegInngangsvilkår(stønadstype)
+            VILKÅR -> BEREGNE_YTELSE
+            BEREGNE_YTELSE -> SIMULERING
+            else -> fellesNesteSteg()
         }
 
-    fun hentNesteStegDagligReise(): StegType =
+    private fun hentNesteStegDagligReise(): StegType =
         when (this) {
             INNGANGSVILKÅR -> VILKÅR
             VILKÅR -> VEDTAK
-            VEDTAK -> `KJØRELISTE`
-            `KJØRELISTE` -> BEREGNE_YTELSE
+            VEDTAK -> KJØRELISTE
+            KJØRELISTE -> BEREGNING
+            BEREGNING -> SIMULERING
             else -> fellesNesteSteg()
         }
 
     private fun fellesNesteSteg(): StegType =
         when (this) {
-            BEREGNE_YTELSE -> SIMULERING
             SIMULERING -> SEND_TIL_BESLUTTER
             SEND_TIL_BESLUTTER -> BESLUTTE_VEDTAK
             BESLUTTE_VEDTAK -> JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV
@@ -149,5 +154,11 @@ enum class StegType(
             FERDIGSTILLE_BEHANDLING -> BEHANDLING_FERDIGSTILT
             BEHANDLING_FERDIGSTILT -> BEHANDLING_FERDIGSTILT
             else -> error("Finner ikke neste steg etter ${this.visningsnavn()}")
+        }
+
+    private fun finnNesteStegInngangsvilkår(stønadstype: Stønadstype): StegType =
+        when (stønadstype) {
+            Stønadstype.LÆREMIDLER -> BEREGNE_YTELSE
+            else -> VILKÅR
         }
 }

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak
 
+import io.mockk.every
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskLogg
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -19,6 +20,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakDomain
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.hendelser.Hendelse
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.migrering.routing.SkjemaRouting
 import no.nav.tilleggsstonader.sak.oppfølging.Oppfølging
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlag
@@ -82,5 +84,10 @@ abstract class CleanDatabaseIntegrationTest : IntegrationTest() {
             FagsakPerson::class,
             IverksettingLogg::class,
         ).forEach { jdbcAggregateOperations.deleteAll(it.java) }
+    }
+
+    @BeforeEach
+    fun togglePrivatBil() {
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns false
     }
 }

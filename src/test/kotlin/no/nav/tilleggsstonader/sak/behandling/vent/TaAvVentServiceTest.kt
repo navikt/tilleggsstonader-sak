@@ -90,7 +90,7 @@ class TaAvVentServiceTest : CleanDatabaseIntegrationTest() {
     @Test
     fun `skal ta av vent og fortsette behandling - uten dto`() {
         testWithBrukerContext(dummySaksbehandler) {
-            taAvVentService.taAvVent(behandling.id)
+            taAvVentService.taAvVent(behandling.id, TaAvVentDto(kommentar = null))
         }
 
         validerTattAvVent(behandling.id)
@@ -163,9 +163,9 @@ class TaAvVentServiceTest : CleanDatabaseIntegrationTest() {
     @Test
     fun `skal feile hvis behandlingen tas av vent to ganger etter hverandre`() {
         testWithBrukerContext(dummySaksbehandler) {
-            taAvVentService.taAvVent(behandling.id)
+            taAvVentService.taAvVent(behandling.id, TaAvVentDto())
             assertThatThrownBy {
-                taAvVentService.taAvVent(behandling.id)
+                taAvVentService.taAvVent(behandling.id, TaAvVentDto())
             }.hasMessageContaining("Behandlingen er ikke på vent")
         }
     }
@@ -175,7 +175,7 @@ class TaAvVentServiceTest : CleanDatabaseIntegrationTest() {
         testWithBrukerContext(dummySaksbehandler) {
             testoppsettService.lagre(behandling(fagsak = fagsak))
             assertThatThrownBy {
-                taAvVentService.taAvVent(behandling.id)
+                taAvVentService.taAvVent(behandling.id, TaAvVentDto())
             }.hasMessageContaining("Det finnes allerede en aktiv behandling på denne fagsaken")
         }
     }
@@ -184,7 +184,7 @@ class TaAvVentServiceTest : CleanDatabaseIntegrationTest() {
     fun `skal nullstille behandling hvis en annen behandling på fagsaken har blitt iverksatt i mellomtiden`() {
         testWithBrukerContext(dummySaksbehandler) {
             // Lagre informasjon på behandlingen som skal nullstilles
-            taAvVentService.taAvVent(behandling.id)
+            taAvVentService.taAvVent(behandling.id, TaAvVentDto())
             vilkårperiodeService.opprettVilkårperiode(dummyVilkårperiodeMålgruppe(behandlingId = behandling.id))
             settPåVentService.settPåVent(
                 behandling.id,
@@ -206,7 +206,7 @@ class TaAvVentServiceTest : CleanDatabaseIntegrationTest() {
             testoppsettService.ferdigstillBehandling(behandlingSomSniker)
 
             // Ta den første behandlingen av vent og sjekk at den blir nullstilt og får ny forrigeIverksatteBehandlingId
-            taAvVentService.taAvVent(behandling.id)
+            taAvVentService.taAvVent(behandling.id, TaAvVentDto())
 
             val nullstilteVilkår = vilkårperiodeService.hentVilkårperioder(behandling.id)
             val nullstiltBehandling = testoppsettService.hentBehandling(behandling.id)
@@ -254,7 +254,7 @@ class TaAvVentServiceTest : CleanDatabaseIntegrationTest() {
             testoppsettService.ferdigstillBehandling(andreIverksatteBehandling)
 
             // Ta av behandlingen på vent og sjekk at den blir nullstilt og får ny forrigeIverksatteBehandlingId
-            taAvVentService.taAvVent(behandlingPåVent.id)
+            taAvVentService.taAvVent(behandlingPåVent.id, TaAvVentDto())
 
             val nullstilteVilkår = vilkårperiodeService.hentVilkårperioder(behandling.id)
             val nullstiltBehandling = testoppsettService.hentBehandling(behandling.id)
@@ -300,7 +300,7 @@ class TaAvVentServiceTest : CleanDatabaseIntegrationTest() {
 
             // Vi forventer at barn1 (fra forrige behandling) nå skal bli lagt til behandlingen som tas av vent
             // siden barn1 ikke finnes i behandling som tas av vent fra før
-            taAvVentService.taAvVent(behandling.id)
+            taAvVentService.taAvVent(behandling.id, TaAvVentDto())
 
             // Verifiser at begge barna nå er på behandlingen som ble tatt av vent
             val barnEtterTaAvVent = barnService.finnBarnPåBehandling(behandling.id)

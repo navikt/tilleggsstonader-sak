@@ -27,7 +27,16 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             medVilkår = listOf(reiseFramITid),
         )
 
-        KafkaTestConfig.sendteMeldinger().forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
+        val sendtMelding =
+            KafkaTestConfig
+                .sendteMeldinger()
+                .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
+                .map { it.verdiEllerFeil<IverksettingDto>() }
+                .single()
+
+        assertThat(
+            sendtMelding.utbetalinger.size,
+        ).isEqualTo(0)
     }
 
     @Test
@@ -131,7 +140,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             fom = nå.minusMonths(3),
             tom = nå.plusMonths(3),
         )
-    private val langtvarendeAktivitet = fun (behandlingId: BehandlingId) =
+    private val langtvarendeAktivitet = fun(behandlingId: BehandlingId) =
         lagreVilkårperiodeAktivitet(
             behandlingId,
             fom = nå.minusMonths(3),

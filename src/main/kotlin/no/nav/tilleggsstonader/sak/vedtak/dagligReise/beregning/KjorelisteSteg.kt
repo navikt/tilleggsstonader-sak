@@ -28,6 +28,7 @@ class KjorelisteSteg(
     override fun utførOgReturnerNesteSteg(
         saksbehandling: Saksbehandling,
         data: Void?,
+        kanBehandlePrivatBil: Boolean,
     ): StegType {
         val beregningsResultatOffentligTransport =
             vedtakRepository
@@ -40,7 +41,7 @@ class KjorelisteSteg(
         if (beregningsResultatOffentligTransport == null) {
             return StegType.SEND_TIL_BESLUTTER
         }
-        return super.utførOgReturnerNesteSteg(saksbehandling, data)
+        return super.utførOgReturnerNesteSteg(saksbehandling, data, kanBehandlePrivatBil)
     }
 
     override fun stegType(): StegType = StegType.KJØRELISTE

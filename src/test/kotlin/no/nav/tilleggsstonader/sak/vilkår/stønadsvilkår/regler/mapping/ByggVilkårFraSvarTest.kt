@@ -44,10 +44,11 @@ class ByggVilkårFraSvarTest {
                     SvarOgBegrunnelse(
                         svar = SvarId.NEI,
                     ),
-                RegelId.UNNTAK_SEKS_KM to SvarOgBegrunnelse(svar = SvarId.JA),
+                RegelId.UNNTAK_SEKS_KM to SvarOgBegrunnelse(svar = SvarId.JA, begrunnelse = "begrunnelse"),
                 RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to
                     SvarOgBegrunnelse(
                         svar = SvarId.NEI,
+                        begrunnelse = "begrunnelse",
                     ),
                 RegelId.KAN_KJØRE_MED_EGEN_BIL to SvarOgBegrunnelse(SvarId.NEI, "Begrunnelse"),
             )

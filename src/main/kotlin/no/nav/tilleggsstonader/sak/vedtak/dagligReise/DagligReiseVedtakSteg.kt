@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBereg
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
@@ -24,6 +25,7 @@ import java.time.LocalDate
 
 @Service
 class DagligReiseVedtakSteg(
+    private val beregningService: DagligReiseBeregningService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
     private val vedtakRepository: VedtakRepository,
     private val tilkjentYtelseService: TilkjentYtelseService,
@@ -41,6 +43,7 @@ class DagligReiseVedtakSteg(
     override fun utførOgReturnerNesteSteg(
         saksbehandling: Saksbehandling,
         data: VedtakDagligReiseRequest,
+        kanBehandlePrivatBil: Boolean,
     ): StegType {
         utførSteg(saksbehandling, data)
         return finnNesteSteg(data)
@@ -51,27 +54,13 @@ class DagligReiseVedtakSteg(
         vedtak: VedtakDagligReiseRequest,
     ) {
         when (vedtak) {
-            is InnvilgelseDagligReiseRequest -> lagreVedtaksperioder(saksbehandling, vedtak)
+            is InnvilgelseDagligReiseRequest -> lagreVedtaksperioderOgBeregn(saksbehandling, vedtak)
             is AvslagDagligReiseDto -> lagreAvslag(saksbehandling, vedtak)
-            // is OpphørDagligReise -> TODO()
+            is OpphørDagligReiseRequest -> TODO("Tilpass opphør til ny flyt")
         }
     }
 
-    private fun finnNesteSteg(vedtak: VedtakDagligReiseRequest): StegType =
-        when (vedtak) {
-            is InnvilgelseDagligReiseRequest -> StegType.KJØRELISTE
-
-            // TODO: Her kan man hoppe rett til beregning om man har offentlig transport
-            is AvslagDagligReiseDto -> StegType.SEND_TIL_BESLUTTER // TODO: ER dette riktig?
-        }
-
-    private fun nullstillEksisterendeVedtakPåBehandling(saksbehandling: Saksbehandling) {
-        vedtakRepository.deleteById(saksbehandling.id)
-        tilkjentYtelseService.slettTilkjentYtelseForBehandling(saksbehandling)
-        simuleringService.slettSimuleringForBehandling(saksbehandling)
-    }
-
-    private fun lagreVedtaksperioder(
+    private fun lagreVedtaksperioderOgBeregn(
         saksbehandling: Saksbehandling,
         vedtak: InnvilgelseDagligReiseRequest,
     ) {
@@ -121,10 +110,10 @@ class DagligReiseVedtakSteg(
 
     private fun lagreInnvilgetVedtak(
         behandling: Saksbehandling,
+        beregningsresultat: BeregningsresultatDagligReise,
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
         tidligsteEndring: LocalDate?,
-        beregningsresultat: BeregningsresultatDagligReise,
     ) {
         vedtakRepository.insert(
             GeneriskVedtak(
@@ -140,6 +129,20 @@ class DagligReiseVedtakSteg(
                 tidligsteEndring = tidligsteEndring,
             ),
         )
+    }
+
+    private fun finnNesteSteg(vedtak: VedtakDagligReiseRequest): StegType =
+        when (vedtak) {
+            // TODO: Her kan man hoppe rett til beregning om man kun har registrert offentlig transport
+            is InnvilgelseDagligReiseRequest -> StegType.KJØRELISTE
+            is AvslagDagligReiseDto -> StegType.SEND_TIL_BESLUTTER
+            is OpphørDagligReiseRequest -> TODO("Tilpass opphør til ny flyt")
+        }
+
+    private fun nullstillEksisterendeVedtakPåBehandling(saksbehandling: Saksbehandling) {
+        vedtakRepository.deleteById(saksbehandling.id)
+        tilkjentYtelseService.slettTilkjentYtelseForBehandling(saksbehandling)
+        simuleringService.slettSimuleringForBehandling(saksbehandling)
     }
 
     override fun stegType(): StegType = StegType.VEDTAK
