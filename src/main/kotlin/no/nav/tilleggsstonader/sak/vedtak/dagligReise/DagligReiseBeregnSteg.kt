@@ -1,135 +1,50 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
+import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
-import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
-import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
-import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
-import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class DagligReiseBeregnSteg(
-    private val beregningService: DagligReiseBeregningService,
-    private val utledTidligsteEndringService: UtledTidligsteEndringService,
-    vedtakRepository: VedtakRepository,
-    tilkjentYtelseService: TilkjentYtelseService,
-    simuleringService: SimuleringService,
-) : BeregnYtelseSteg<VedtakDagligReiseRequest>(
-        stønadstype = listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
-        vedtakRepository = vedtakRepository,
-        tilkjentYtelseService = tilkjentYtelseService,
-        simuleringService = simuleringService,
-    ) {
-    override fun lagreVedtakForSatsjustering(
+    private val vedtakRepository: VedtakRepository,
+    private val tilkjentYtelseService: TilkjentYtelseService,
+    private val simuleringService: SimuleringService,
+) : BehandlingSteg<Void?> {
+    override fun utførSteg(
         saksbehandling: Saksbehandling,
-        vedtak: VedtakDagligReiseRequest,
-        satsjusteringFra: LocalDate,
+        data: Void?
     ) {
-        TODO("Not yet implemented")
+        nullstillEksisterendeAndelerPåBehandling(saksbehandling)
+        opprettAndeler(saksbehandling)
     }
 
-    override fun lagreVedtak(
+    private fun opprettAndeler(
         saksbehandling: Saksbehandling,
-        vedtak: VedtakDagligReiseRequest,
     ) {
-        when (vedtak) {
-            is InnvilgelseDagligReiseRequest -> beregnOgLagreInnvilgelse(saksbehandling, vedtak)
-            is AvslagDagligReiseDto -> lagreAvslag(saksbehandling, vedtak)
-            // is OpphørDagligReise -> TODO()
-        }
-    }
+        // TODO: Vurder å lage en egen vedtakService som henter vedtak på en penere måte
+        // VedtakService kan ikke brukes fordi det fører til circle dependency
+        val vedtak = vedtakRepository.findByIdOrThrow(saksbehandling.id).withTypeOrThrow<InnvilgelseDagligReise>()
+        val beregningsresultatOffentligTransport = vedtak.data.beregningsresultat.offentligTransport
 
-    private fun beregnOgLagreInnvilgelse(
-        saksbehandling: Saksbehandling,
-        vedtak: InnvilgelseDagligReiseRequest,
-    ) {
-        val vedtaksperioder = vedtak.vedtaksperioder.tilDomene()
-
-        val tidligsteEndring =
-            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
-                saksbehandling.id,
-                vedtaksperioder,
-            )
-        val beregningsresultat =
-            beregningService.beregn(
-                vedtaksperioder = vedtaksperioder,
-                behandling = saksbehandling,
-                typeVedtak = TypeVedtak.INNVILGELSE,
-                tidligsteEndring = tidligsteEndring,
-            )
-        lagreInnvilgetVedtak(
-            behandling = saksbehandling,
-            beregningsresultat = beregningsresultat,
-            vedtaksperioder = vedtaksperioder,
-            begrunnelse = vedtak.begrunnelse,
-            tidligsteEndring = tidligsteEndring,
-        )
-
-        feilHvis(beregningsresultat.offentligTransport == null) {
-            "Foreløpig støttes kun beregning av offentlig transport."
-        }
-
-        tilkjentYtelseService.lagreTilkjentYtelse(
-            behandlingId = saksbehandling.id,
-            andeler = beregningsresultat.offentligTransport.mapTilAndelTilkjentYtelse(saksbehandling),
-        )
-    }
-
-    private fun lagreAvslag(
-        saksbehandling: Saksbehandling,
-        vedtak: AvslagDagligReiseDto,
-    ) {
-        vedtakRepository.insert(
-            GeneriskVedtak(
+        if (beregningsresultatOffentligTransport != null) {
+            tilkjentYtelseService.lagreTilkjentYtelse(
                 behandlingId = saksbehandling.id,
-                type = TypeVedtak.AVSLAG,
-                data =
-                    AvslagDagligReise(
-                        årsaker = vedtak.årsakerAvslag,
-                        begrunnelse = vedtak.begrunnelse,
-                    ),
-                gitVersjon = Applikasjonsversjon.versjon,
-                tidligsteEndring = null,
-            ),
-        )
+                andeler = beregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandling),
+            )
+        }
     }
 
-    private fun lagreInnvilgetVedtak(
-        behandling: Saksbehandling,
-        beregningsresultat: BeregningsresultatDagligReise,
-        vedtaksperioder: List<Vedtaksperiode>,
-        begrunnelse: String?,
-        tidligsteEndring: LocalDate?,
-    ) {
-        vedtakRepository.insert(
-            GeneriskVedtak(
-                behandlingId = behandling.id,
-                type = TypeVedtak.INNVILGELSE,
-                data =
-                    InnvilgelseDagligReise(
-                        vedtaksperioder = vedtaksperioder,
-                        begrunnelse = begrunnelse,
-                        beregningsresultat = beregningsresultat,
-                    ),
-                gitVersjon = Applikasjonsversjon.versjon,
-                tidligsteEndring = tidligsteEndring,
-            ),
-        )
+    private fun nullstillEksisterendeAndelerPåBehandling(saksbehandling: Saksbehandling) {
+        tilkjentYtelseService.slettTilkjentYtelseForBehandling(saksbehandling)
+        simuleringService.slettSimuleringForBehandling(saksbehandling)
     }
+
+    override fun stegType(): StegType = StegType.BEREGNING
 }
