@@ -23,15 +23,13 @@ import no.nav.tilleggsstonader.sak.util.journalpost
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
-import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
-import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
@@ -287,6 +285,20 @@ fun IntegrationTest.gjennomførVilkårSteg(
             steg = StegType.VILKÅR,
         ),
     )
+    kjørTasksKlareForProsessering()
+}
+
+fun IntegrationTest.gjennomførOpphør(
+    stønadstype: Stønadstype,
+    behandlingId: BehandlingId,
+    opphørDto: VedtakRequest,
+) {
+    kall.vedtak.lagreOpphør(
+        stønadstype = stønadstype,
+        behandlingId = behandlingId,
+        opphørDto = opphørDto,
+    )
+
     kjørTasksKlareForProsessering()
 }
 
