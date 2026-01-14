@@ -19,15 +19,13 @@ class DagligReiseBeregnSteg(
 ) : BehandlingSteg<Void?> {
     override fun utførSteg(
         saksbehandling: Saksbehandling,
-        data: Void?
+        data: Void?,
     ) {
         nullstillEksisterendeAndelerPåBehandling(saksbehandling)
         opprettAndeler(saksbehandling)
     }
 
-    private fun opprettAndeler(
-        saksbehandling: Saksbehandling,
-    ) {
+    private fun opprettAndeler(saksbehandling: Saksbehandling) {
         // TODO: Vurder å lage en egen vedtakService som henter vedtak på en penere måte
         // VedtakService kan ikke brukes fordi det fører til circle dependency
         val vedtak = vedtakRepository.findByIdOrThrow(saksbehandling.id).withTypeOrThrow<InnvilgelseDagligReise>()
