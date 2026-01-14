@@ -128,15 +128,10 @@ class HåndterSøknadService(
                     .map { it.tilMålgruppeType() }
                     .toSet()
 
-        // Sender til TSR hvis flere målgrupper eller TSR sine målgrupper
-        return if (målgrupper.size > 1 ||
-            målgrupper
-                .single()
-                .kanBrukesForStønad(Stønadstype.DAGLIG_REISE_TSR)
-        ) {
-            Stønadstype.DAGLIG_REISE_TSR
-        } else {
+        return if (målgrupper.all { it.kanBrukesForStønad(Stønadstype.DAGLIG_REISE_TSO) }) {
             Stønadstype.DAGLIG_REISE_TSO
+        } else {
+            Stønadstype.DAGLIG_REISE_TSR
         }
     }
 
