@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRe
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
@@ -284,6 +285,20 @@ fun IntegrationTest.gjennomførVilkårSteg(
             steg = StegType.VILKÅR,
         ),
     )
+    kjørTasksKlareForProsessering()
+}
+
+fun IntegrationTest.gjennomførOpphør(
+    stønadstype: Stønadstype,
+    behandlingId: BehandlingId,
+    opphørDto: VedtakRequest,
+) {
+    kall.vedtak.lagreOpphør(
+        stønadstype = stønadstype,
+        behandlingId = behandlingId,
+        opphørDto = opphørDto,
+    )
+
     kjørTasksKlareForProsessering()
 }
 

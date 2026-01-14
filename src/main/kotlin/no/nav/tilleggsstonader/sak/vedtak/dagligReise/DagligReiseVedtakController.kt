@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBereg
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
@@ -78,6 +79,14 @@ class DagligReiseVedtakController(
         val behandling = behandlingService.hentBehandling(behandlingId)
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: return null
         return vedtakDtoMapper.toDto(vedtak, behandling.forrigeIverksatteBehandlingId)
+    }
+
+    @PostMapping("{behandlingId}/opphor")
+    fun opphor(
+        @PathVariable behandlingId: BehandlingId,
+        @RequestBody vedtak: OpphørDagligReiseRequest,
+    ) {
+        lagreVedtak(behandlingId, vedtak)
     }
 
     @PostMapping("{behandlingId}/beregn")

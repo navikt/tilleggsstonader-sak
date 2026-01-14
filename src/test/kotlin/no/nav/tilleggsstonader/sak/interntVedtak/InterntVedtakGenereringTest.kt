@@ -137,7 +137,7 @@ class InterntVedtakGenereringTest {
 
     private fun mockDagligReiseTso() {
         every { behandlingService.hentSaksbehandling(behandlingId) } returns InterntVedtakTestdata.DagligReise.behandling
-        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.DagligReise.vilkårperioder
+        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.DagligReise.vilkårperioderTso
         every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.DagligReise.grunnlagsdata
         every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
         every { vilkårService.hentVilkår(behandlingId) } returns InterntVedtakTestdata.DagligReise.vilkårOffentligTransport
@@ -146,7 +146,7 @@ class InterntVedtakGenereringTest {
 
     private fun mockDagligReiseTsr() {
         every { behandlingService.hentSaksbehandling(behandlingId) } returns InterntVedtakTestdata.DagligReise.behandling
-        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.DagligReise.vilkårperioder
+        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.DagligReise.vilkårperioderTsr
         every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.DagligReise.grunnlagsdata
         every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
         every { vilkårService.hentVilkår(behandlingId) } returns InterntVedtakTestdata.DagligReise.vilkårOffentligTransport

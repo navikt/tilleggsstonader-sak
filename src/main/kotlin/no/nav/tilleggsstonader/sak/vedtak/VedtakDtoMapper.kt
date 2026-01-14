@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.VedtakBoutgifterRespons
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseResponse
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseResponse
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseResponse
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
@@ -80,6 +81,7 @@ class VedtakDtoMapper(
 
             is VedtakDagligReise ->
                 mapVedtakDagligReise(
+                    vedtak,
                     data,
                     vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId,
@@ -196,6 +198,7 @@ class VedtakDtoMapper(
         }
 
     private fun mapVedtakDagligReise(
+        vedtak: Vedtak,
         data: VedtakDagligReise,
         tidligsteEndring: LocalDate?,
         forrigeIverksatteBehandlingId: BehandlingId?,
@@ -215,7 +218,17 @@ class VedtakDtoMapper(
             }
 
             is AvslagDagligReise -> AvslagDagligReiseDto(årsakerAvslag = data.årsaker, begrunnelse = data.begrunnelse)
-            is OpphørDagligReise -> TODO()
+            is OpphørDagligReise ->
+                OpphørDagligReiseResponse(
+                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring),
+                    årsakerOpphør = data.årsaker,
+                    begrunnelse = data.begrunnelse,
+                    vedtaksperioder =
+                        data.vedtaksperioder.tilLagretVedtaksperiodeDto(
+                            hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
+                        ),
+                    opphørsdato = vedtak.opphørsdato,
+                )
         }
 
     private fun hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId: BehandlingId?): List<Vedtaksperiode>? =

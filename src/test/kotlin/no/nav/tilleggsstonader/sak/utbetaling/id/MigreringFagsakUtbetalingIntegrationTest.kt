@@ -33,6 +33,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførSimuleringSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurdering
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatus
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatusHåndterer
@@ -66,6 +67,9 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
 
     @Autowired
     lateinit var utbetalingStatusHåndterer: UtbetalingStatusHåndterer
+
+    @Autowired
+    lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
 
     @Test
     fun `behandling blir iverksatt mot gammelt endepunkt, skrur på toggle for migrering, utbetaling for revurdering blir migrert`() {
@@ -201,6 +205,10 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
 
         assertThat(opphørUtbetaling.utbetalinger.size).isEqualTo(1)
         assertThat(opphørUtbetaling.utbetalinger.single().perioder).isEmpty()
+
+        val andelerRevurdering = tilkjentYtelseRepository.findByBehandlingId(revurderingId)!!.andelerTilkjentYtelse
+        assertThat(andelerRevurdering).hasSize(1)
+        assertThat(andelerRevurdering.single().erNullandel()).isTrue
     }
 
     @Test

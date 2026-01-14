@@ -122,10 +122,9 @@ class BoutgifterBeregnYtelseSteg(
         }
 
         val opphørsdato = vedtak.opphørsdato
+        val forrigeVedtak = hentVedtak(saksbehandling.forrigeIverksatteBehandlingId)
 
         opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
-
-        val forrigeVedtak = hentVedtak(saksbehandling.forrigeIverksatteBehandlingId)
 
         opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
             forrigeBehandlingsVedtaksperioder = forrigeVedtak.data.vedtaksperioder,
