@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegController
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.integrasjonstest.dsl.BehandlingTestdataDsl
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
@@ -28,8 +29,8 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnReque
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
-import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
@@ -37,8 +38,10 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.Lagre
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.time.LocalDate
+import java.util.UUID
 
 /**
  * Gjennomfører en behandling fra journalpost og helt til et gitt steg.
@@ -60,17 +63,41 @@ fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
     opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
 ): BehandlingId {
     val behandlingId = håndterSøknadService.håndterSøknad(fraJournalpost)!!.id
-    gjennomførBehandlingsløp(behandlingId, tilSteg, medAktivitet, medMålgruppe, medVilkår, opprettVedtak)
+    gjennomførBehandlingsløp(
+        behandlingId = behandlingId,
+        tilSteg = tilSteg,
+        testdataProvider = defaultBehandlingsløpEditor(medAktivitet, medMålgruppe, medVilkår),
+        opprettVedtak = opprettVedtak,
+    )
+    return behandlingId
+}
+
+fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
+    fraJournalpost: Journalpost = defaultJournalpost,
+    tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
+    opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
+    edit: BehandlingTestdataDsl.() -> Unit,
+): BehandlingId {
+    val behandlingId = håndterSøknadService.håndterSøknad(fraJournalpost)!!.id
+    gjennomførBehandlingsløp(
+        behandlingId = behandlingId,
+        tilSteg = tilSteg,
+        testdataProvider = edit,
+        opprettVedtak = opprettVedtak,
+    )
     return behandlingId
 }
 
 fun IntegrationTest.gjennomførBehandlingsløp(
     behandlingId: BehandlingId,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
-    medAktivitet: (BehandlingId) -> LagreVilkårperiode = ::lagreVilkårperiodeAktivitet,
-    medMålgruppe: (BehandlingId) -> LagreVilkårperiode = ::lagreVilkårperiodeMålgruppe,
-    medVilkår: List<LagreVilkår> = listOf(lagreDagligReiseDto()),
-    opprettVedtak: OpprettVedtak,
+    opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
+    testdataProvider: BehandlingTestdataDsl.() -> Unit =
+        defaultBehandlingsløpEditor(
+            medAktivitet = ::lagreVilkårperiodeAktivitet,
+            medMålgruppe = ::lagreVilkårperiodeMålgruppe,
+            medVilkår = listOf(lagreDagligReiseDto()),
+        ),
 ) {
     // Oppretter grunnlagsdata
     val behandling = kall.behandling.hent(behandlingId)
@@ -80,18 +107,20 @@ fun IntegrationTest.gjennomførBehandlingsløp(
 
     tilordneÅpenBehandlingOppgaveForBehandling(behandlingId)
 
+    val testdata = BehandlingTestdataDsl.build(testdataProvider)
+
     if (tilSteg == StegType.INNGANGSVILKÅR) {
         return
     }
 
-    gjennomførInngangsvilkårSteg(medAktivitet, medMålgruppe, behandlingId)
+    gjennomførInngangsvilkårSteg(testdata, behandlingId)
 
     if (tilSteg == StegType.VILKÅR) {
         return
     }
 
     if (behandling.stønadstype != Stønadstype.LÆREMIDLER) {
-        gjennomførVilkårSteg(medVilkår, behandling.id, behandling.stønadstype)
+        gjennomførVilkårSteg(testdata, behandling.id, behandling.stønadstype)
     }
 
     if (tilSteg == StegType.BEREGNE_YTELSE) {
@@ -239,8 +268,12 @@ fun IntegrationTest.gjennomførBeregningSteg(
                                     begrunnelse = opprettVedtak.begrunnelse,
                                     opphørsdato = opprettVedtak.opphørsdato,
                                 )
-                            Stønadstype.DAGLIG_REISE_TSO -> TODO()
-                            Stønadstype.DAGLIG_REISE_TSR -> TODO()
+                            Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR ->
+                                OpphørDagligReiseRequest(
+                                    årsakerOpphør = opprettVedtak.årsaker,
+                                    begrunnelse = opprettVedtak.begrunnelse,
+                                    opphørsdato = opprettVedtak.opphørsdato,
+                                )
                         },
                 )
     }
@@ -258,57 +291,47 @@ data class OpprettOpphør(
     val opphørsdato: LocalDate,
 ) : OpprettVedtak
 
+@Suppress("unused")
+@Deprecated(
+    message = "Use gjennomførBehandlingsløp(edit = { ... }) instead",
+    replaceWith =
+        ReplaceWith(
+            "gjennomførBehandlingsløp(behandlingId = behandlingId, tilSteg = StegType.INNGANGSVILKÅR, opprettVedtak = OpprettInnvilgelse)",
+        ),
+    level = DeprecationLevel.WARNING,
+)
 fun IntegrationTest.gjennomførInngangsvilkårSteg(
     medAktivitet: ((BehandlingId) -> LagreVilkårperiode)? = null,
     medMålgruppe: ((BehandlingId) -> LagreVilkårperiode)? = null,
     behandlingId: BehandlingId,
 ) {
-    medAktivitet?.invoke(behandlingId)?.let { kall.vilkårperiode.opprett(it) }
-    medMålgruppe?.invoke(behandlingId)?.let { kall.vilkårperiode.opprett(it) }
-
-    kall.steg.ferdigstill(
-        behandlingId,
-        StegController.FerdigstillStegRequest(
-            steg = StegType.INNGANGSVILKÅR,
-        ),
-    )
-    kjørTasksKlareForProsessering()
+    val testdataDsl =
+        BehandlingTestdataDsl.build {
+            medAktivitet?.let { a -> aktivitet { opprett(a) } }
+            medMålgruppe?.let { m -> målgruppe { opprett(m) } }
+        }
+    gjennomførInngangsvilkårSteg(testdataDsl, behandlingId)
 }
 
+@Suppress("unused")
+@Deprecated(
+    message = "Use gjennomførBehandlingsløp(edit = { ... }) instead",
+    replaceWith =
+        ReplaceWith(
+            "gjennomførBehandlingsløp(behandlingId = behandlingId, tilSteg = StegType.VILKÅR, opprettVedtak = OpprettInnvilgelse)",
+        ),
+    level = DeprecationLevel.WARNING,
+)
 fun IntegrationTest.gjennomførVilkårSteg(
     medVilkår: List<LagreVilkår>,
     behandlingId: BehandlingId,
     stønadstype: Stønadstype,
 ) {
-    medVilkår.forEach {
-        if (stønadstype.gjelderDagligReise()) {
-            kall.vilkårDagligReise.opprettVilkår(behandlingId, it as LagreDagligReiseDto)
-        } else {
-            kall.vilkår.opprettVilkår(it as OpprettVilkårDto)
+    val editor =
+        BehandlingTestdataDsl.build {
+            vilkår { opprett(*medVilkår.toTypedArray()) }
         }
-    }
-
-    kall.steg.ferdigstill(
-        behandlingId,
-        StegController.FerdigstillStegRequest(
-            steg = StegType.VILKÅR,
-        ),
-    )
-    kjørTasksKlareForProsessering()
-}
-
-fun IntegrationTest.gjennomførOpphør(
-    stønadstype: Stønadstype,
-    behandlingId: BehandlingId,
-    opphørDto: VedtakRequest,
-) {
-    kall.vedtak.lagreOpphør(
-        stønadstype = stønadstype,
-        behandlingId = behandlingId,
-        opphørDto = opphørDto,
-    )
-
-    kjørTasksKlareForProsessering()
+    gjennomførVilkårSteg(editor, behandlingId, stønadstype)
 }
 
 val defaultJournalpost =
@@ -320,3 +343,125 @@ val defaultJournalpost =
     )
 
 private const val MINIMALT_BREV = """SAKSBEHANDLER_SIGNATUR - BREVDATO_PLACEHOLDER - BESLUTTER_SIGNATUR"""
+
+/**
+ * Plan for mutating inngangsvilkår-data (aktivitet/målgruppe) and vilkår in integration tests.
+ *
+ * This is intentionally "test-DSL" level and uses the existing endpoints via `kall.*`.
+ */
+
+private fun defaultBehandlingsløpEditor(
+    medAktivitet: (BehandlingId) -> LagreVilkårperiode,
+    medMålgruppe: (BehandlingId) -> LagreVilkårperiode,
+    medVilkår: List<LagreVilkår>,
+): BehandlingTestdataDsl.() -> Unit =
+    {
+        aktivitet { opprett(medAktivitet) }
+        målgruppe { opprett(medMålgruppe) }
+        vilkår { opprett(*medVilkår.toTypedArray()) }
+    }
+
+private fun IntegrationTest.gjennomførInngangsvilkårSteg(
+    testdataDsl: BehandlingTestdataDsl,
+    behandlingId: BehandlingId,
+) {
+    // Opprett aktiviteter
+    testdataDsl.aktivitet.create
+        .forEach { builder ->
+            kall.vilkårperiode
+                .opprett(builder(behandlingId))
+                .periode!!
+                .id
+        }
+
+    // Oppretter ålgrupper
+    testdataDsl.målgruppe.create
+        .forEach { builder ->
+            kall.vilkårperiode
+                .opprett(builder(behandlingId))
+                .periode!!
+                .id
+        }
+
+    // Oppdater aktiviteter
+    testdataDsl.aktivitet.update.forEach { upd ->
+        val idOgRequest: Pair<UUID, LagreVilkårperiode> = upd(behandlingId)
+        kall.vilkårperiode.oppdater(
+            vilkårperiodeId = idOgRequest.first,
+            lagreVilkårperiode = idOgRequest.second,
+        )
+    }
+
+    // Slett aktiviteter
+    testdataDsl.aktivitet.delete.forEach { del ->
+        val idOgRequest: Pair<UUID, SlettVikårperiode> = del(behandlingId)
+        kall.vilkårperiode.apiRespons.slett(
+            vilkårperiodeId = idOgRequest.first,
+            slettVikårperiode = idOgRequest.second,
+        )
+    }
+
+    // Oppdater målgruppeer
+    testdataDsl.målgruppe.update.forEach { upd ->
+        val idOgRequest: Pair<UUID, LagreVilkårperiode> = upd(behandlingId)
+        kall.vilkårperiode.oppdater(
+            vilkårperiodeId = idOgRequest.first,
+            lagreVilkårperiode = idOgRequest.second,
+        )
+    }
+
+    // Slett målgruppeer
+    testdataDsl.målgruppe.delete.forEach { del ->
+        val idOgRequest: Pair<UUID, SlettVikårperiode> = del(behandlingId)
+        kall.vilkårperiode.apiRespons.slett(
+            vilkårperiodeId = idOgRequest.first,
+            slettVikårperiode = idOgRequest.second,
+        )
+    }
+
+    kall.steg.ferdigstill(
+        behandlingId,
+        StegController.FerdigstillStegRequest(
+            steg = StegType.INNGANGSVILKÅR,
+        ),
+    )
+    kjørTasksKlareForProsessering()
+}
+
+private fun IntegrationTest.gjennomførVilkårSteg(
+    editor: BehandlingTestdataDsl,
+    behandlingId: BehandlingId,
+    stønadstype: Stønadstype,
+) {
+    editor.vilkår.create.forEach {
+        if (stønadstype.gjelderDagligReise()) {
+            kall.vilkårDagligReise.opprettVilkår(behandlingId, it as LagreDagligReiseDto)
+        } else {
+            kall.vilkår.opprettVilkår(it as OpprettVilkårDto)
+        }
+    }
+
+    if (stønadstype.gjelderDagligReise()) {
+        // TODO - implementer for daglig reise
+        // Daglig reise har egne endepunkt med vilkårId i path, så oppdater/slett må gjøres eksplisitt i testen.
+        // DSL-en gir derfor kun "hook"-lambdas som kan implementere riktig kall.
+        editor.vilkår.update.forEach { it(behandlingId) }
+        editor.vilkår.delete.forEach { it(behandlingId) }
+    } else {
+        editor.vilkår.update
+            .map { it(behandlingId) }
+            .forEach { kall.vilkår.oppdaterVilkår(it) }
+
+        editor.vilkår.delete
+            .map { it(behandlingId) }
+            .forEach { kall.vilkår.slettVilkår(it) }
+    }
+
+    kall.steg.ferdigstill(
+        behandlingId,
+        StegController.FerdigstillStegRequest(
+            steg = StegType.VILKÅR,
+        ),
+    )
+    kjørTasksKlareForProsessering()
+}

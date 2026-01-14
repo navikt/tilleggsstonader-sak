@@ -1,16 +1,15 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.juni
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførInngangsvilkårSteg
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførOpphør
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførVilkårSteg
+import no.nav.tilleggsstonader.sak.integrasjonstest.OpprettOpphør
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurdering
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
@@ -18,7 +17,6 @@ import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import org.assertj.core.api.Assertions.assertThat
@@ -51,24 +49,17 @@ class DagligReiseBeregnYtelseStegIntegrationTest(
                         kravMottatt = 15 mars 2025,
                     ),
             )
-        gjennomførInngangsvilkårSteg(behandlingId = revurderingId)
 
-        gjennomførVilkårSteg(
-            medVilkår = emptyList(),
-            behandlingId = revurderingId,
-            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-        )
-        val vedtak =
-            OpphørDagligReiseRequest(
-                årsakerOpphør = listOf(ÅrsakOpphør.ENDRING_AKTIVITET),
-                begrunnelse = "avluttet aktivitet",
-                opphørsdato = 15 mars 2025,
-            )
-
-        gjennomførOpphør(
-            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-            behandlingId = revurderingId,
-            opphørDto = vedtak,
+        gjennomførBehandlingsløp(
+            revurderingId,
+            opprettVedtak =
+                OpprettOpphør(
+                    årsaker = listOf(ÅrsakOpphør.ENDRING_AKTIVITET),
+                    begrunnelse = "avluttet aktivitet",
+                    opphørsdato = 15 mars 2025,
+                ),
+            tilSteg = StegType.SIMULERING,
+            testdataProvider = {},
         )
 
         val beregningsresultat = vedtakService.hentVedtak<OpphørDagligReise>(revurderingId)!!.data.beregningsresultat

@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.utbetaling.id
 import io.mockk.every
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
@@ -24,12 +23,8 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeld
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørAlleTaskMedSenererTriggertid
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningSteg
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeslutteVedtakSteg
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførInngangsvilkårSteg
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførSendTilBeslutterSteg
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførSimuleringSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurdering
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
@@ -102,22 +97,18 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
                         nyeOpplysningerMetadata = null,
                     ),
             )
-        gjennomførInngangsvilkårSteg(
-            behandlingId = revurderingId,
-            medMålgruppe = { behandlingId ->
-                lagreVilkårperiodeMålgruppe(
-                    behandlingId = behandlingId,
-                    målgruppeType = MålgruppeType.AAP,
-                    fom = 1 oktober 2025,
-                    tom = 10 oktober 2025,
-                )
-            },
-        )
-        gjennomførBeregningSteg(revurderingId, Stønadstype.LÆREMIDLER)
-        gjennomførSimuleringSteg(revurderingId)
-        gjennomførSendTilBeslutterSteg(revurderingId)
-        gjennomførBeslutteVedtakSteg(revurderingId)
-        kjørTasksKlareForProsesseringTilIngenTasksIgjen()
+        gjennomførBehandlingsløp(revurderingId) {
+            målgruppe {
+                opprett { behandlingId ->
+                    lagreVilkårperiodeMålgruppe(
+                        behandlingId = behandlingId,
+                        målgruppeType = MålgruppeType.AAP,
+                        fom = 1 oktober 2025,
+                        tom = 10 oktober 2025,
+                    )
+                }
+            }
+        }
 
         val revurdering = behandlingService.hentBehandling(revurderingId)
         val finnesUtbetalingIdEtterRevurdering =
@@ -179,13 +170,9 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
                         nyeOpplysningerMetadata = null,
                     ),
             )
-        gjennomførInngangsvilkårSteg(behandlingId = revurderingId)
 
         // Opphører alt
-        gjennomførBeregningSteg(revurderingId, Stønadstype.LÆREMIDLER, OpprettOpphør(opphørsdato = fom))
-        gjennomførSimuleringSteg(revurderingId)
-        gjennomførSendTilBeslutterSteg(revurderingId)
-        gjennomførBeslutteVedtakSteg(revurderingId)
+        gjennomførBehandlingsløp(revurderingId, opprettVedtak = OpprettOpphør(opphørsdato = fom), testdataProvider = {})
         kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 
         val revurdering = behandlingService.hentBehandling(revurderingId)
@@ -243,14 +230,9 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
                         nyeOpplysningerMetadata = null,
                     ),
             )
-        gjennomførInngangsvilkårSteg(behandlingId = revurderingId)
 
         // Opphører alt
-        gjennomførBeregningSteg(revurderingId, Stønadstype.LÆREMIDLER, OpprettOpphør(opphørsdato = fom))
-        gjennomførSimuleringSteg(revurderingId)
-        gjennomførSendTilBeslutterSteg(revurderingId)
-        gjennomførBeslutteVedtakSteg(revurderingId)
-        kjørTasksKlareForProsesseringTilIngenTasksIgjen()
+        gjennomførBehandlingsløp(revurderingId, opprettVedtak = OpprettOpphør(opphørsdato = fom), testdataProvider = {})
 
         val revurdering = behandlingService.hentBehandling(revurderingId)
         val finnesUtbetalingIdEtterRevurdering =
@@ -282,29 +264,33 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
                     bruker = Bruker("12345678910", BrukerIdType.FNR),
                     tema = Tema.TSO.name,
                 ),
-            medAktivitet = { behandlingId ->
-                lagreVilkårperiodeAktivitet(
-                    behandlingId = behandlingId,
-                    aktivitetType = AktivitetType.UTDANNING,
-                    fom = fom,
-                    tom = tom,
-                    faktaOgSvar =
-                        FaktaOgSvarAktivitetLæremidlerDto(
-                            prosent = 100,
-                            studienivå = Studienivå.HØYERE_UTDANNING,
-                            svarHarUtgifter = SvarJaNei.JA,
-                            svarHarRettTilUtstyrsstipend = SvarJaNei.NEI,
-                        ),
-                )
-            },
-            medMålgruppe = { behandlingId ->
-                lagreVilkårperiodeMålgruppe(
-                    behandlingId = behandlingId,
-                    målgruppeType = MålgruppeType.AAP,
-                    fom = fom,
-                    tom = tom,
-                )
-            },
-            medVilkår = emptyList(),
-        )
+        ) {
+            aktivitet {
+                opprett { behandlingId ->
+                    lagreVilkårperiodeAktivitet(
+                        behandlingId = behandlingId,
+                        aktivitetType = AktivitetType.UTDANNING,
+                        fom = fom,
+                        tom = tom,
+                        faktaOgSvar =
+                            FaktaOgSvarAktivitetLæremidlerDto(
+                                prosent = 100,
+                                studienivå = Studienivå.HØYERE_UTDANNING,
+                                svarHarUtgifter = SvarJaNei.JA,
+                                svarHarRettTilUtstyrsstipend = SvarJaNei.NEI,
+                            ),
+                    )
+                }
+            }
+            målgruppe {
+                opprett { behandlingId ->
+                    lagreVilkårperiodeMålgruppe(
+                        behandlingId = behandlingId,
+                        målgruppeType = MålgruppeType.AAP,
+                        fom = fom,
+                        tom = tom,
+                    )
+                }
+            }
+        }
 }
