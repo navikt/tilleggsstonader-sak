@@ -166,6 +166,7 @@
       "offentligTransport" : {
         "reiser" : [ {
           "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
+          "adresse" : null,
           "perioder" : [ {
             "fom" : "2024-02-05",
             "tom" : "2024-02-10",
@@ -179,8 +180,7 @@
             },
             "antallReisedager" : 5,
             "fraTidligereVedtak" : false,
-            "brukersNavKontor" : "1234",
-            "adresse" : null
+            "brukersNavKontor" : "1234"
           }, {
             "fom" : "2024-02-05",
             "tom" : "2024-02-10",
@@ -194,11 +194,11 @@
             },
             "antallReisedager" : 5,
             "fraTidligereVedtak" : false,
-            "brukersNavKontor" : "1234",
-            "adresse" : null
+            "brukersNavKontor" : "1234"
           } ]
         }, {
           "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
+          "adresse" : null,
           "perioder" : [ {
             "fom" : "2025-02-05",
             "tom" : "2024-02-10",
@@ -212,8 +212,7 @@
             },
             "antallReisedager" : 2,
             "fraTidligereVedtak" : false,
-            "brukersNavKontor" : "1234",
-            "adresse" : null
+            "brukersNavKontor" : "1234"
           } ]
         } ]
       },
