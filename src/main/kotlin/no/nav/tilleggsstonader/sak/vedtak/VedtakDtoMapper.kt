@@ -220,7 +220,7 @@ class VedtakDtoMapper(
             is AvslagDagligReise -> AvslagDagligReiseDto(årsakerAvslag = data.årsaker, begrunnelse = data.begrunnelse)
             is OpphørDagligReise ->
                 OpphørDagligReiseResponse(
-                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring), // TODO skal dette være en annen type
+                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring),
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
                     vedtaksperioder =

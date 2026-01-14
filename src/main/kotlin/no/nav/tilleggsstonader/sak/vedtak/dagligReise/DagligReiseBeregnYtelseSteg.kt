@@ -158,7 +158,9 @@ class DagligReiseBeregnYtelseSteg(
 
         tilkjentYtelseService.lagreTilkjentYtelse(
             behandlingId = saksbehandling.id,
-            andeler = beregningsresultat.offentligTransport?.mapTilAndelTilkjentYtelse(saksbehandling) ?: feil("Forventer xxx"),
+            andeler =
+                beregningsresultat.offentligTransport?.mapTilAndelTilkjentYtelse(saksbehandling)
+                    ?: feil("Mangler beregningsresultat for offentlig transport"),
         )
     }
 
