@@ -172,7 +172,8 @@ class UtbetalingV3Mapper(
                 .andelerTilkjentYtelse
 
         val typeAndelerNåværendeBehandling = andelerTilkjentYtelse.map { it.type }
-        return andelerForrigeBehandling.filter { it.type !in typeAndelerNåværendeBehandling }
+        return andelerForrigeBehandling
+            .filter { it.type !in typeAndelerNåværendeBehandling }
             .map { it.type }
             .toSet()
     }

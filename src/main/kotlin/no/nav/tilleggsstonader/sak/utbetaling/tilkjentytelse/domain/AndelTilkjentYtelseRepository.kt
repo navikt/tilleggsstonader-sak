@@ -23,6 +23,16 @@ interface AndelTilkjentYtelseRepository :
     )
     fun finnBehandlingerForIverksetting(utbetalingsdato: LocalDate): List<BehandlingId>
 
+    @Query(
+        """
+            select distinct b.id from behandling b
+                join tilkjent_ytelse ty on b.id = ty.behandling_id
+                join andel_tilkjent_ytelse aty on aty.tilkjent_ytelse_id = ty.id
+            where aty.iverksetting_id = :iverksettingId
+        """,
+    )
+    fun finnBehandlingIdForIverksettingId(iverksettingId: UUID): BehandlingId
+
     fun findByIverksettingIverksettingId(iverksettingId: UUID): List<AndelTilkjentYtelse>
 
     fun findAndelTilkjentYtelsesByKildeBehandlingId(behandlingId: BehandlingId): List<AndelTilkjentYtelse>

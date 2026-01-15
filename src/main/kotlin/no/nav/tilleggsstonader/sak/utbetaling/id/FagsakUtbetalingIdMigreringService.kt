@@ -27,8 +27,11 @@ class FagsakUtbetalingIdMigreringService(
     private val transactionHandler: TransactionHandler,
     private val unleashService: UnleashService,
 ) {
-    fun migrerForFagsak(fagsakId: FagsakId) {
-        if (unleashService.isEnabled(Toggle.SKAL_MIGRERE_UTBETALING_MOT_KAFKA)) {
+    fun migrerForFagsak(
+        fagsakId: FagsakId,
+        overstyrToggle: Boolean = false,
+    ) {
+        if (unleashService.isEnabled(Toggle.SKAL_MIGRERE_UTBETALING_MOT_KAFKA) || overstyrToggle) {
             val sisteIverksatteBehandling =
                 behandlingService
                     .finnSisteIverksatteBehandling(fagsakId)
