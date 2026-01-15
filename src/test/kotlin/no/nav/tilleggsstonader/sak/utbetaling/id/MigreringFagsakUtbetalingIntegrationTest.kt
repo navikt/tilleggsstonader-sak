@@ -31,8 +31,11 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførInngangsvilkårSt
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførSendTilBeslutterSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførSimuleringSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurdering
+import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.DagligIverksettTask
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatus
@@ -51,6 +54,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.UUID
 
 class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() {
     @Autowired
@@ -267,6 +272,127 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
             .forEach { iverksettingDto ->
                 assertThat(iverksettingDto.utbetalinger.all { it.brukFagområdeTillst }).isTrue
             }
+    }
+
+    @Test
+    fun `førstegangsbehandling med flere andeler hvor første andel har gått over rest skal ikke på kafka om migrering-toggle av`() {
+        val fom = 1 september 2025
+        val tom = 30 september 2025
+
+        val behandlingId = opprettFørstegangsbehandling(fom, tom)
+        // For at sendte andeler skal få OK-status
+
+        kjørAlleTaskMedSenererTriggertid()
+        // Verifiser utbetaling gått over rest
+        verify(exactly = 1) { iverksettClient.simulerV2(any()) }
+        verify(exactly = 1) { iverksettClient.iverksett(any()) }
+
+        KafkaTestConfig
+            .sendteMeldinger()
+            .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
+
+        // Skrur nå på toggle for at nye behandlinger skal iverksettes over kafka
+        every { unleashService.isEnabled(Toggle.SKAL_IVERKSETT_NYE_BEHANDLINGER_MOT_KAFKA) } returns true
+
+        // Legg inn andel manuelt, denne skal også sendes over rest, da første andel har blitt sendt over rest
+        val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingId)!!
+        val nyeAndeler =
+            tilkjentYtelse.andelerTilkjentYtelse +
+                tilkjentYtelse.andelerTilkjentYtelse.first().copy(
+                    id = UUID.randomUUID(),
+                    statusIverksetting = StatusIverksetting.UBEHANDLET,
+                    iverksetting = null,
+                    fom = LocalDate.now(),
+                    tom = LocalDate.now(),
+                    utbetalingsdato = LocalDate.now(),
+                )
+
+        tilkjentYtelseRepository.update(
+            tilkjentYtelse.copy(
+                andelerTilkjentYtelse = nyeAndeler,
+            ),
+        )
+
+        // Kjør DagligIverksettTask som oppretter task for iverksetting av andel manuelt lagt inn over
+        // Tasken feiler på onCompletion, men det går bra
+        taskService.save(DagligIverksettTask.opprettTask(LocalDate.now()))
+        kjørTasksKlareForProsesseringTilIngenTasksIgjen()
+
+        KafkaTestConfig
+            .sendteMeldinger()
+            .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
+        verify(exactly = 2) { iverksettClient.iverksett(any()) }
+
+        kjørAlleTaskMedSenererTriggertid()
+        assertThat(tilkjentYtelseRepository.findByBehandlingId(behandlingId)!!.andelerTilkjentYtelse)
+            .allMatch { it.statusIverksetting == StatusIverksetting.OK }
+    }
+
+    @Test
+    fun `tester endepunkt for feilede utbetalinger pga manglende migrering`() {
+        val fom = 1 september 2025
+        val tom = 30 september 2025
+
+        val behandlingId = opprettFørstegangsbehandling(fom, tom)
+        // For at sendte andeler skal få OK-status
+
+        kjørAlleTaskMedSenererTriggertid()
+        // Verifiser utbetaling gått over rest
+        verify(exactly = 1) { iverksettClient.simulerV2(any()) }
+        verify(exactly = 1) { iverksettClient.iverksett(any()) }
+
+        KafkaTestConfig
+            .sendteMeldinger()
+            .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
+
+        // Skrur nå på toggle for at nye behandlinger skal iverksettes over kafka
+        every { unleashService.isEnabled(Toggle.SKAL_IVERKSETT_NYE_BEHANDLINGER_MOT_KAFKA) } returns true
+
+        // Legg inn andel manuelt, denne skal også sendes over rest, da første andel har blitt sendt over rest
+        val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingId)!!
+        val feilendeIverksettingId = UUID.randomUUID()
+        val nyeAndeler =
+            tilkjentYtelse.andelerTilkjentYtelse +
+                tilkjentYtelse.andelerTilkjentYtelse.first().copy(
+                    id = UUID.randomUUID(),
+                    statusIverksetting = StatusIverksetting.FEILET,
+                    iverksetting = Iverksetting(feilendeIverksettingId, LocalDateTime.now()),
+                    fom = LocalDate.now(),
+                    tom = LocalDate.now(),
+                    utbetalingsdato = LocalDate.now(),
+                )
+
+        tilkjentYtelseRepository.update(
+            tilkjentYtelse.copy(
+                andelerTilkjentYtelse = nyeAndeler,
+            ),
+        )
+
+        medBrukercontext(roller = listOf(rolleConfig.utvikler)) {
+            webTestClient
+                .post()
+                .uri("/api/forvaltning/migrer-saker-helved/$feilendeIverksettingId")
+                .medOnBehalfOfToken()
+                .exchange()
+        }
+
+        kjørTasksKlareForProsesseringTilIngenTasksIgjen()
+
+        verify(exactly = 1) { iverksettClient.migrer(any()) }
+        KafkaTestConfig
+            .sendteMeldinger()
+            .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
+        verify(exactly = 1) { iverksettClient.iverksett(any()) }
+
+        kjørAlleTaskMedSenererTriggertid()
+        assertThat(
+            tilkjentYtelseRepository
+                .findByBehandlingId(behandlingId)!!
+                .andelerTilkjentYtelse
+                .maxBy {
+                    it.iverksetting!!.iverksettingTidspunkt
+                }.statusIverksetting,
+        ).isEqualTo(StatusIverksetting.SENDT)
     }
 
     private fun opprettFørstegangsbehandling(
