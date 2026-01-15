@@ -43,7 +43,7 @@ class FagsakUtbetalingIdMigreringService(
                     ?: emptyList()
 
             typeAndelerPåFagsaken.forEach { typeAndel ->
-                if (skalMigrereTilKafka(fagsakId, typeAndel) && sisteIverksatteBehandling !== null) {
+                if (sisteIverksatteBehandling != null && (skalMigrereTilKafka(fagsakId, typeAndel) || overstyrToggle)) {
                     transactionHandler.runInNewTransaction {
                         migrerForFagsakOgTypeAndel(sisteIverksatteBehandling, typeAndel)
                     }
