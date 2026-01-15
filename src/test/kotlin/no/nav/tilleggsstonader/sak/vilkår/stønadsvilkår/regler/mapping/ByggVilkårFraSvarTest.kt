@@ -16,6 +16,7 @@ class ByggVilkårFraSvarTest {
                 RegelId.AVSTAND_OVER_SEKS_KM to
                     SvarOgBegrunnelse(
                         svar = SvarId.JA,
+                        begrunnelse = "antall km",
                     ),
                 RegelId.UNNTAK_SEKS_KM to null,
                 RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to
@@ -43,6 +44,7 @@ class ByggVilkårFraSvarTest {
                 RegelId.AVSTAND_OVER_SEKS_KM to
                     SvarOgBegrunnelse(
                         svar = SvarId.NEI,
+                        begrunnelse = "antall km",
                     ),
                 RegelId.UNNTAK_SEKS_KM to SvarOgBegrunnelse(svar = SvarId.JA, begrunnelse = "begrunnelse"),
                 RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to
@@ -70,6 +72,7 @@ class ByggVilkårFraSvarTest {
                 RegelId.AVSTAND_OVER_SEKS_KM to
                     SvarOgBegrunnelse(
                         svar = SvarId.JA,
+                        begrunnelse = "antall km",
                     ),
                 // Unntak skal ikke besvares dersom avstand er over 6 km
                 RegelId.UNNTAK_SEKS_KM to SvarOgBegrunnelse(svar = SvarId.JA),
