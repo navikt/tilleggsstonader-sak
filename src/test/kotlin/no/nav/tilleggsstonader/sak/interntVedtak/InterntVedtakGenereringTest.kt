@@ -217,4 +217,5 @@ class InterntVedtakGenereringTest {
 
         private fun Stønadstype.håndteresIkke() = StønadstypeInterntVedtak(stønadstype = this, håndteresAvInterntVedtak = false)
     }
+
 }
