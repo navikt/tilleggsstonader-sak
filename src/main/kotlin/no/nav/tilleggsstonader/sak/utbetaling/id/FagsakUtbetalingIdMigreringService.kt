@@ -39,8 +39,8 @@ class FagsakUtbetalingIdMigreringService(
             val andelTilkjentYtelseListe =
                 sisteIverksatteBehandling?.let { iverksettService.hentAndelTilkjentYtelse(it.id) }
             val typeAndelerPåFagsaken =
-                andelTilkjentYtelseListe?.let { it.map { andelTilkjentYtelse -> andelTilkjentYtelse.type } }
-                    ?: emptyList()
+                andelTilkjentYtelseListe?.let { it.map { andelTilkjentYtelse -> andelTilkjentYtelse.type } }?.toSet()
+                    ?: emptySet()
 
             typeAndelerPåFagsaken.forEach { typeAndel ->
                 if (sisteIverksatteBehandling != null && (skalMigrereTilKafka(fagsakId, typeAndel) || overstyrToggle)) {
