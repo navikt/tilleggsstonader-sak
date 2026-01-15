@@ -30,7 +30,7 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
 
     val svarOffentligTransport =
         mapOf(
-            RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA),
+            RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
             RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
         )
 
@@ -89,7 +89,7 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
     fun `skal kunne lagre ned et vilkår uten fakta om vilkår ikke er oppfylt`() {
         val svarAvstandIkkeOppfylt =
             mapOf(
-                RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.NEI),
+                RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.NEI, "Antall km"),
                 RegelId.UNNTAK_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.NEI, "Begrunnelse"),
             )
 

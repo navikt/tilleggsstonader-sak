@@ -14,6 +14,7 @@ object DagligReiseRegelTestUtil {
                 Vurdering(
                     regelId = RegelId.AVSTAND_OVER_SEKS_KM,
                     svar = SvarId.JA,
+                    begrunnelse = "antall km",
                 ),
                 Vurdering(
                     regelId = RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT,
@@ -34,6 +35,7 @@ object DagligReiseRegelTestUtil {
             RegelId.AVSTAND_OVER_SEKS_KM to
                 SvarOgBegrunnelse(
                     svar = SvarId.JA,
+                    begrunnelse = "antall km",
                 ),
             RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to
                 SvarOgBegrunnelse(

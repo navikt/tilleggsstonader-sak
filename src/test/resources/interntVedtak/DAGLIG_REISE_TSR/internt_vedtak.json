@@ -140,7 +140,7 @@
       "vurderinger" : [ {
         "regel" : "Er reiseavstanden over 6km?",
         "svar" : "Ja",
-        "begrunnelse" : null
+        "begrunnelse" : "antall km"
       }, {
         "regel" : "Kan søker benytte seg av offentlig transport?",
         "svar" : "Ja",
