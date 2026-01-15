@@ -71,7 +71,7 @@ class MigrerFeiledeUtbetalingerController(
 
         // Kjører DagligIverksettBehandlingTask, slik at andelen blir iverksatt
         taskService.save(
-            DagligIverksettBehandlingTask.opprettTask(behandlingId, LocalDate.now()),
+            DagligIverksettBehandlingTask.opprettTask(behandlingId, LocalDate.now(), UUID.randomUUID()),
         )
     }
 }

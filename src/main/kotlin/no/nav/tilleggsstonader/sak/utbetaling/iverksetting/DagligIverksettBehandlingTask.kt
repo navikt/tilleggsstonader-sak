@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -61,6 +62,7 @@ class DagligIverksettBehandlingTask(
         fun opprettTask(
             behandlingId: BehandlingId,
             utbetalingsdato: LocalDate,
+            uuid: UUID? = null,
         ): Task {
             val properties =
                 Properties().apply {
@@ -70,7 +72,7 @@ class DagligIverksettBehandlingTask(
                     setProperty(MDCConstants.MDC_CALL_ID, IdUtils.generateId())
                 }
 
-            val payload = objectMapper.writeValueAsString(TaskData(behandlingId, utbetalingsdato))
+            val payload = objectMapper.writeValueAsString(TaskData(behandlingId, utbetalingsdato, uuid))
 
             return Task(TYPE, payload).copy(metadataWrapper = PropertiesWrapper(properties))
         }
@@ -81,8 +83,11 @@ class DagligIverksettBehandlingTask(
     /**
      * Trenger [utbetalingsdato] for å få unik payload
      */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private data class TaskData(
         val behandlingId: BehandlingId,
         val utbetalingsdato: LocalDate,
+        // Settes for å unngå db-constraint om man trenger å rekjøre iverksetting
+        val uuid: UUID? = null,
     )
 }
