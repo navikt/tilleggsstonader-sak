@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
 import java.util.UUID
+import java.util.concurrent.Executors
 
 @Tag(name = "Forvaltning")
 @RestController
@@ -66,8 +67,15 @@ class MigrerFeiledeUtbetalingerController(
             "Forventet at behandlingId=$behandlingId skal iverksettes, men $behandlingIderTilIverksetting skal iverksettes"
         }
 
-        // Migrerer slik at kan utbetales over kafka
-        fagsakUtbetalingIdMigreringService.migrerForFagsak(fagsakId, overstyrToggle = true)
+        // Hack for at migrering-kallet må kjøres mot helved med client-credentials
+        val migreringAvFagsakFuture =
+            Executors.newVirtualThreadPerTaskExecutor().submit {
+                // Migrerer slik at kan utbetales over kafka
+                fagsakUtbetalingIdMigreringService.migrerForFagsak(fagsakId, overstyrToggle = true)
+            }
+
+        // Venter på at kallet fullføres, propagerer evt exception som blir kastet
+        migreringAvFagsakFuture.get()
 
         // Kjører DagligIverksettBehandlingTask, slik at andelen blir iverksatt
         taskService.save(
