@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -43,6 +44,7 @@ class InterntVedtakGenereringTest {
     private val barnService = mockk<BarnService>()
     private val vilkårService = mockk<VilkårService>()
     private val vedtakService = mockk<VedtakService>()
+    private val dagligReiseVilkårService = mockk<DagligReiseVilkårService>(relaxed = true)
 
     val service =
         InterntVedtakService(
@@ -54,6 +56,7 @@ class InterntVedtakGenereringTest {
             barnService = barnService,
             vilkårService = vilkårService,
             vedtakService = vedtakService,
+            dagligReiseVilkårService = dagligReiseVilkårService,
         )
 
     @BeforeEach

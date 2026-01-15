@@ -21,7 +21,6 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
-import no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt.VedtaksperioderOversiktService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
