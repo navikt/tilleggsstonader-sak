@@ -74,6 +74,7 @@ class SimuleringService(
                 behandling = saksbehandling,
                 fagsakId = saksbehandling.fagsakId,
                 typeAndel = tilkjentYtelse.andelerTilkjentYtelse.map { it.type }.toSet(),
+                erFørsteIverksettingForBehandling = true,
             )
         ) {
             iverksettClient.simulerV3(
