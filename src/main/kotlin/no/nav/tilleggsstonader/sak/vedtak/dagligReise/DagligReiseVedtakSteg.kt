@@ -73,7 +73,7 @@ class DagligReiseVedtakSteg(
             )
 
         val beregningsresultatOffentligTransportOgRammePrivatBil =
-            dagligReiseBeregningService.beregnOffentligTransportOgRammevedtak(
+            dagligReiseBeregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,

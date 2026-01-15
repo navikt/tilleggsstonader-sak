@@ -26,7 +26,7 @@ class DagligReiseBeregningService(
     private val privatBilBeregningService: PrivatBilBeregningService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
 ) {
-    fun beregnOffentligTransportOgRammevedtak(
+    fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,

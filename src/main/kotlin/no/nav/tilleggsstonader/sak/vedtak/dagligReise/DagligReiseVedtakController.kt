@@ -126,7 +126,7 @@ class DagligReiseVedtakController(
             )
         val beregningsresultat =
             beregningService
-                .beregnOffentligTransportOgRammevedtak(
+                .beregn(
                     vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
                     behandling = behandling,
                     typeVedtak = TypeVedtak.INNVILGELSE,

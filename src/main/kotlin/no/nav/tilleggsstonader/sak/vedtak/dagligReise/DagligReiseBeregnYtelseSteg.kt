@@ -77,7 +77,7 @@ class DagligReiseBeregnYtelseSteg(
                 vedtaksperioder,
             )
         val beregningsresultat =
-            beregningService.beregnOffentligTransportOgRammevedtak(
+            beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,
@@ -143,7 +143,7 @@ class DagligReiseBeregnYtelseSteg(
         val avkortetVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, opphørsdato)
 
         val beregningsresultat =
-            beregningService.beregnOffentligTransportOgRammevedtak(
+            beregningService.beregn(
                 vedtaksperioder = avkortetVedtaksperioder,
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.OPPHØR,

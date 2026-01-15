@@ -20,8 +20,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringSteg
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseBeregnSteg
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.KjørelisteSteg
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.KjorelisteSteg
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.RammevedtakSteg
 import no.nav.tilleggsstonader.sak.vilkår.InngangsvilkårSteg
 import no.nav.tilleggsstonader.sak.vilkår.VilkårSteg
 import org.slf4j.LoggerFactory
@@ -112,12 +110,6 @@ class StegService(
     private fun håndterBeregnForDagligReise(behandlingId: BehandlingId): Behandling {
         val beregnSteg: DagligReiseBeregnSteg = behandlingSteg.filterIsInstance<DagligReiseBeregnSteg>().single()
         return håndterSteg(behandlingId, beregnSteg)
-    }
-
-    private fun håndterRammeVilkår(behandlingId: BehandlingId): Behandling {
-        // TODO - implementer rammevedtak steg
-        val rammevedtakSteg: RammevedtakSteg = behandlingSteg.filterIsInstance<RammevedtakSteg>().single()
-        return håndterSteg(behandlingId, rammevedtakSteg)
     }
 
     private fun håndterSimulering(behandlingId: BehandlingId): Behandling {

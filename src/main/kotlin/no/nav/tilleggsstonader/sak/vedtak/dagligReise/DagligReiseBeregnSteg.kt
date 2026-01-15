@@ -29,7 +29,7 @@ class DagligReiseBeregnSteg(
         // TODO: Vurder å lage en egen vedtakService som henter vedtak på en penere måte
         // VedtakService kan ikke brukes fordi det fører til circle dependency
         val vedtak = vedtakRepository.findByIdOrThrow(saksbehandling.id).withTypeOrThrow<InnvilgelseDagligReise>()
-        val beregningsresultatOffentligTransport = vedtak.data.beregningsresultat?.offentligTransport
+        val beregningsresultatOffentligTransport = vedtak.data.beregningsresultat.offentligTransport
 
         if (beregningsresultatOffentligTransport != null) {
             tilkjentYtelseService.lagreTilkjentYtelse(
