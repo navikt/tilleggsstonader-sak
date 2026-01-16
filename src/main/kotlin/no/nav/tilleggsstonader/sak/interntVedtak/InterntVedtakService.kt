@@ -104,7 +104,7 @@ class InterntVedtakService(
 
                 is InnvilgelseDagligReise ->
                     BeregningsresultatInterntVedtakDto(
-                        dagligReiseTso = data.beregningsresultat?.tilDto(vedtak.tidligsteEndring),
+                        dagligReiseTso = data.beregningsresultat.tilDto(vedtak.tidligsteEndring),
                     )
 
                 is Innvilgelse,

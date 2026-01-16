@@ -93,22 +93,31 @@ class DagligReiseVedtakController(
         lagreVedtak(behandlingId, vedtak)
     }
 
+    // TODO: Vurder å slette - Foreløpig hentes dette rett fra vedtaket
     @GetMapping("{behandlingId}/beregningsresultat")
-    fun hentBeregningsresultat(@PathVariable behandlingId: BehandlingId): BeregningsresultatDagligReiseDto? {
+    fun hentBeregningsresultat(
+        @PathVariable behandlingId: BehandlingId,
+    ): BeregningsresultatDagligReiseDto? {
         val vedtak = vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandlingId)
 
         return vedtak?.data?.beregningsresultat?.tilDto(vedtak.tidligsteEndring)
     }
 
+    // TODO: Vurder å slette - Usikker på om den trengs eller om dette skal hentes fra vedtaket
     @GetMapping("{behandlingId}/rammevedtak")
-    fun hentRammevedtak(@PathVariable behandlingId: BehandlingId): BeregningsresultatPrivatBil? {
+    fun hentRammevedtak(
+        @PathVariable behandlingId: BehandlingId,
+    ): BeregningsresultatPrivatBil? {
         val vedtak = vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandlingId)
 
         return vedtak?.data?.beregningsresultat?.privatBil
     }
 
+    // TODO: Slett om ikke tas i bruk før merge - steget ferdigstilles nå via StegService
     @PutMapping("{behandlingId}/ferdigstill-beregn")
-    fun ferdigstillBeregnSteg(@PathVariable behandlingId: BehandlingId) {
+    fun ferdigstillBeregnSteg(
+        @PathVariable behandlingId: BehandlingId,
+    ) {
         stegService.håndterSteg(behandlingId, beregnSteg)
     }
 
