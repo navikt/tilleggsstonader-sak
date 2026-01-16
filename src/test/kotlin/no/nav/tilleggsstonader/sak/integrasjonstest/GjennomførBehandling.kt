@@ -70,7 +70,7 @@ fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
     gjennomførBehandlingsløp(
         behandlingId = behandlingId,
         tilSteg = tilSteg,
-        testdataProvider = defaultBehandlingsløpEditor(medAktivitet, medMålgruppe, medVilkår),
+        testdataProvider = defaultBehandlingTestdataProvider(medAktivitet, medMålgruppe, medVilkår),
         opprettVedtak = opprettVedtak,
     )
     return behandlingId
@@ -80,13 +80,13 @@ fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
     fraJournalpost: Journalpost = defaultJournalpost,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
     opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
-    edit: BehandlingTestdataDsl.() -> Unit,
+    testdataProvider: BehandlingTestdataDsl.() -> Unit,
 ): BehandlingId {
     val behandlingId = håndterSøknadService.håndterSøknad(fraJournalpost)!!.id
     gjennomførBehandlingsløp(
         behandlingId = behandlingId,
         tilSteg = tilSteg,
-        testdataProvider = edit,
+        testdataProvider = testdataProvider,
         opprettVedtak = opprettVedtak,
     )
     return behandlingId
@@ -97,7 +97,7 @@ fun IntegrationTest.gjennomførBehandlingsløp(
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
     opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
     testdataProvider: BehandlingTestdataDsl.() -> Unit =
-        defaultBehandlingsløpEditor(
+        defaultBehandlingTestdataProvider(
             medAktivitet = ::lagreVilkårperiodeAktivitet,
             medMålgruppe = ::lagreVilkårperiodeMålgruppe,
             medVilkår = listOf(lagreDagligReiseDto()),
@@ -177,7 +177,7 @@ fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
     fraBehandlingId: BehandlingId,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
     opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
-    edit: BehandlingTestdataDsl.() -> Unit,
+    testdataProvider: BehandlingTestdataDsl.() -> Unit,
 ): BehandlingId {
     val behandling = kall.behandling.hent(fraBehandlingId)
     return opprettRevurderingOgGjennomførBehandlingsløp(
@@ -190,7 +190,7 @@ fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
             ),
         tilSteg = tilSteg,
         opprettVedtak = opprettVedtak,
-        edit = edit,
+        testdataProvider = testdataProvider,
     )
 }
 
@@ -198,14 +198,14 @@ fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
     opprettBehandlingDto: OpprettBehandlingDto,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
     opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
-    edit: BehandlingTestdataDsl.() -> Unit,
+    testdataProvider: BehandlingTestdataDsl.() -> Unit,
 ): BehandlingId {
     val revurderingId = opprettRevurdering(opprettBehandlingDto)
     gjennomførBehandlingsløp(
         behandlingId = revurderingId,
         tilSteg = tilSteg,
         opprettVedtak = opprettVedtak,
-        testdataProvider = edit,
+        testdataProvider = testdataProvider,
     )
     return revurderingId
 }
@@ -334,7 +334,7 @@ data class OpprettOpphør(
 
 @Suppress("unused")
 @Deprecated(
-    message = "Use gjennomførBehandlingsløp(edit = { ... }) instead",
+    message = "Use gjennomførBehandlingsløp(testdataProvider = { ... }) instead",
     replaceWith =
         ReplaceWith(
             "gjennomførBehandlingsløp(behandlingId = behandlingId, tilSteg = StegType.INNGANGSVILKÅR, opprettVedtak = OpprettInnvilgelse)",
@@ -356,7 +356,7 @@ fun IntegrationTest.gjennomførInngangsvilkårSteg(
 
 @Suppress("unused")
 @Deprecated(
-    message = "Use gjennomførBehandlingsløp(edit = { ... }) instead",
+    message = "Use gjennomførBehandlingsløp(testdataProvider = { ... }) instead",
     replaceWith =
         ReplaceWith(
             "gjennomførBehandlingsløp(behandlingId = behandlingId, tilSteg = StegType.VILKÅR, opprettVedtak = OpprettInnvilgelse)",
@@ -368,7 +368,7 @@ fun IntegrationTest.gjennomførVilkårSteg(
     behandlingId: BehandlingId,
     stønadstype: Stønadstype,
 ) {
-    val editor =
+    val testdataProvider =
         BehandlingTestdataDsl.build {
             vilkår {
                 opprett {
@@ -376,7 +376,7 @@ fun IntegrationTest.gjennomførVilkårSteg(
                 }
             }
         }
-    gjennomførVilkårSteg(editor, behandlingId, stønadstype)
+    gjennomførVilkårSteg(testdataProvider, behandlingId, stønadstype)
 }
 
 val defaultJournalpost =
@@ -389,13 +389,7 @@ val defaultJournalpost =
 
 private const val MINIMALT_BREV = """SAKSBEHANDLER_SIGNATUR - BREVDATO_PLACEHOLDER - BESLUTTER_SIGNATUR"""
 
-/**
- * Plan for mutating inngangsvilkår-data (aktivitet/målgruppe) and vilkår in integration tests.
- *
- * This is intentionally "test-DSL" level and uses the existing endpoints via `kall.*`.
- */
-
-private fun defaultBehandlingsløpEditor(
+private fun defaultBehandlingTestdataProvider(
     medAktivitet: (BehandlingId) -> LagreVilkårperiode,
     medMålgruppe: (BehandlingId) -> LagreVilkårperiode,
     medVilkår: List<LagreVilkår>,
@@ -493,7 +487,7 @@ private fun IntegrationTest.gjennomførInngangsvilkårSteg(
 }
 
 private fun IntegrationTest.gjennomførVilkårSteg(
-    editor: BehandlingTestdataDsl,
+    testdataProvider: BehandlingTestdataDsl,
     behandlingId: BehandlingId,
     stønadstype: Stønadstype,
 ) {
@@ -505,7 +499,7 @@ private fun IntegrationTest.gjennomførVilkårSteg(
         kall.vilkår.hentVilkår(behandlingId)
     }
 
-    editor.vilkår.opprettScope.build().forEach {
+    testdataProvider.vilkår.opprettScope.build().forEach {
         if (stønadstype.gjelderDagligReise()) {
             kall.vilkårDagligReise.opprettVilkår(behandlingId, it as LagreDagligReiseDto)
         } else {
@@ -514,19 +508,19 @@ private fun IntegrationTest.gjennomførVilkårSteg(
     }
 
     if (stønadstype.gjelderDagligReise()) {
-        editor.vilkår.updateDagligReise
+        testdataProvider.vilkår.updateDagligReise
             .map { it(vilkårDagligReise) }
             .forEach { (vilkårId, dto) -> kall.vilkårDagligReise.oppdaterVilkår(dto, vilkårId, behandlingId) }
 
-        editor.vilkår.deleteDagligReise
+        testdataProvider.vilkår.deleteDagligReise
             .map { it(vilkårDagligReise) }
             .forEach { (vilkårId, dto) -> kall.vilkårDagligReise.slettVilkår(behandlingId, vilkårId, dto) }
     } else {
-        editor.vilkår.update
+        testdataProvider.vilkår.update
             .map { it(vilkår) }
             .forEach { kall.vilkår.oppdaterVilkår(it) }
 
-        editor.vilkår.delete
+        testdataProvider.vilkår.delete
             .map { it(vilkår) }
             .forEach { kall.vilkår.slettVilkår(it) }
     }
