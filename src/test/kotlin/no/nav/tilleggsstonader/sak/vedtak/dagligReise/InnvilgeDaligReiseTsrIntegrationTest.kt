@@ -14,7 +14,7 @@ import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTask
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
@@ -50,7 +50,7 @@ class InnvilgeDaligReiseTsrIntegrationTest : CleanDatabaseIntegrationTest() {
         every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoTiltakspengerTpsak()
 
         val behandlingId =
-            gjennomførBehandlingsløp(
+            opprettBehandlingOgGjennomførBehandlingsløp(
                 fraJournalpost =
                     journalpost(
                         journalpostId = "1",

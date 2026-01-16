@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
@@ -31,7 +31,7 @@ class UtbetalingStatusHåndtererIntegrationTest(
     ) {
         // Gjennomfør behandling til iverksetting er ferdig
         val behandlingId =
-            gjennomførBehandlingsløp(
+            opprettBehandlingOgGjennomførBehandlingsløp(
                 medVilkår = listOf(lagreDagligReiseDto()),
                 tilSteg = StegType.BEHANDLING_FERDIGSTILT,
             )
@@ -54,7 +54,11 @@ class UtbetalingStatusHåndtererIntegrationTest(
                     ),
                 error = null,
             )
-        utbetalingStatusHåndterer.behandleStatusoppdatering(iverksettingId.toString(), statusRecord)
+        utbetalingStatusHåndterer.behandleStatusoppdatering(
+            iverksettingId.toString(),
+            statusRecord,
+            UtbetalingStatusHåndterer.FAGSYSTEM_TILLEGGSSTØNADER,
+        )
 
         // Andeler skal være oppdatert med korrekt status
         val tilkjentYtelseEtter = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
@@ -65,7 +69,7 @@ class UtbetalingStatusHåndtererIntegrationTest(
 
     @Test
     fun `FEILET status oppdaterer andeler med FEILET status og inkluderer error detaljer`() {
-        val behandlingId = gjennomførBehandlingsløp()
+        val behandlingId = opprettBehandlingOgGjennomførBehandlingsløp()
 
         // Hent iverksettingId fra andel
         val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
@@ -90,7 +94,11 @@ class UtbetalingStatusHåndtererIntegrationTest(
                         doc = "https://helved-docs.ansatt.dev.nav.no/v3/doc/",
                     ),
             )
-        utbetalingStatusHåndterer.behandleStatusoppdatering(iverksettingId.toString(), statusRecord)
+        utbetalingStatusHåndterer.behandleStatusoppdatering(
+            iverksettingId.toString(),
+            statusRecord,
+            UtbetalingStatusHåndterer.FAGSYSTEM_TILLEGGSSTØNADER,
+        )
 
         // SJekk at andeler er oppdatert med FEILET-status
         val tilkjentYtelseEtter = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
@@ -103,7 +111,7 @@ class UtbetalingStatusHåndtererIntegrationTest(
     fun `flere andeler oppdateres alle når status mottas`() {
         // Opprett behandling med flere andeler
         val behandlingId =
-            gjennomførBehandlingsløp(
+            opprettBehandlingOgGjennomførBehandlingsløp(
                 medVilkår =
                     listOf(
                         lagreDagligReiseDto(fom = 2 januar 2025, tom = 2 januar 2025),
@@ -127,7 +135,11 @@ class UtbetalingStatusHåndtererIntegrationTest(
                     ),
                 error = null,
             )
-        utbetalingStatusHåndterer.behandleStatusoppdatering(iverksettingId.toString(), statusRecord)
+        utbetalingStatusHåndterer.behandleStatusoppdatering(
+            iverksettingId.toString(),
+            statusRecord,
+            UtbetalingStatusHåndterer.FAGSYSTEM_TILLEGGSSTØNADER,
+        )
 
         // Alle andeler skal være oppdatert
         val tilkjentYtelseEtter = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
@@ -137,9 +149,9 @@ class UtbetalingStatusHåndtererIntegrationTest(
     }
 
     @Test
-    fun `ignorerer status for gamle fagområder`() {
+    fun `ignorerer status for andre fagsystemer`() {
         val behandlingId =
-            gjennomførBehandlingsløp(
+            opprettBehandlingOgGjennomførBehandlingsløp(
                 medAktivitet = ::lagreVilkårperiodeAktivitet,
                 medMålgruppe = ::lagreVilkårperiodeMålgruppe,
                 medVilkår = listOf(lagreDagligReiseDto()),
@@ -150,22 +162,21 @@ class UtbetalingStatusHåndtererIntegrationTest(
         val andelerFørStatus = tilkjentYtelse!!.andelerTilkjentYtelse
         val originalStatus = andelerFørStatus.first().statusIverksetting
 
-        // Send status for gammelt fagområde (TILLST)
         val statusGammeltFagomrade =
             UtbetalingStatusRecord(
                 status = UtbetalingStatus.OK,
                 detaljer =
                     UtbetalingStatusDetaljer(
-                        ytelse = "TILLST", // Gammelt fagområde, skal ignoreres
+                        ytelse = "DAGPENGER",
                         linjer = emptyList(),
                     ),
                 error = null,
             )
         val iverksettingId = andelerFørStatus.first().iverksetting?.iverksettingId
         assertThat(iverksettingId).isNotNull
-        utbetalingStatusHåndterer.behandleStatusoppdatering(iverksettingId.toString(), statusGammeltFagomrade)
+        utbetalingStatusHåndterer.behandleStatusoppdatering(iverksettingId.toString(), statusGammeltFagomrade, "DAGPENGER")
 
-        // Status skal IKKE endres fordi det er gammelt fagområde
+        // Status skal IKKE endres fordi det er et annet fagsystem
         val tilkjentYtelseEtter = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
         val andelerEtter = tilkjentYtelseEtter!!.andelerTilkjentYtelse
         assertThat(andelerEtter).allMatch { it.statusIverksetting == originalStatus }

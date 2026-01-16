@@ -54,7 +54,7 @@ class DagligReiseRegel :
                                 begrunnelseType = BegrunnelseType.VALGFRI,
                                 tilhørendeFaktaType = TypeVilkårFakta.DAGLIG_REISE_OFFENTLIG_TRANSPORT,
                             ),
-                        hvisNei = NesteRegel(KAN_KJØRE_MED_EGEN_BIL.regelId),
+                        hvisNei = NesteRegel(KAN_KJØRE_MED_EGEN_BIL.regelId, BegrunnelseType.PÅKREVD),
                     ),
             )
 
@@ -64,7 +64,7 @@ class DagligReiseRegel :
                 erHovedregel = false,
                 svarMapping =
                     jaNeiSvarRegel(
-                        hvisJa = NesteRegel(KAN_REISE_MED_OFFENTLIG_TRANSPORT.regelId),
+                        hvisJa = NesteRegel(KAN_REISE_MED_OFFENTLIG_TRANSPORT.regelId, BegrunnelseType.PÅKREVD),
                         hvisNei = IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
                     ),
             )
@@ -75,8 +75,8 @@ class DagligReiseRegel :
                 erHovedregel = true,
                 svarMapping =
                     jaNeiSvarRegel(
-                        hvisJa = NesteRegel(KAN_REISE_MED_OFFENTLIG_TRANSPORT.regelId),
-                        hvisNei = NesteRegel(UNNTAK_SEKS_KM.regelId),
+                        hvisJa = NesteRegel(KAN_REISE_MED_OFFENTLIG_TRANSPORT.regelId, BegrunnelseType.PÅKREVD),
+                        hvisNei = NesteRegel(UNNTAK_SEKS_KM.regelId, BegrunnelseType.PÅKREVD),
                     ),
             )
     }

@@ -40,7 +40,8 @@
     "kilde" : "MANUELL",
     "resultat" : "OPPFYLT",
     "begrunnelse" : "målgruppe aap",
-    "slettetKommentar" : null
+    "slettetKommentar" : null,
+    "tiltaksvariant" : null
   }, {
     "type" : "OVERGANGSSTØNAD",
     "fom" : "2024-02-05",
@@ -58,7 +59,8 @@
     "kilde" : "MANUELL",
     "resultat" : "OPPFYLT",
     "begrunnelse" : "målgruppe os",
-    "slettetKommentar" : null
+    "slettetKommentar" : null,
+    "tiltaksvariant" : null
   }, {
     "type" : "NEDSATT_ARBEIDSEVNE",
     "fom" : "2024-02-05",
@@ -85,7 +87,8 @@
     "kilde" : "MANUELL",
     "resultat" : "IKKE_VURDERT",
     "begrunnelse" : "målgruppe na",
-    "slettetKommentar" : null
+    "slettetKommentar" : null,
+    "tiltaksvariant" : null
   } ],
   "aktiviteter" : [ {
     "type" : "TILTAK",
@@ -105,7 +108,8 @@
     "kilde" : "MANUELL",
     "resultat" : "OPPFYLT",
     "begrunnelse" : null,
-    "slettetKommentar" : null
+    "slettetKommentar" : null,
+    "tiltaksvariant" : "Gruppe AMO"
   }, {
     "type" : "UTDANNING",
     "fom" : "2024-02-05",
@@ -118,13 +122,15 @@
     "kilde" : "MANUELL",
     "resultat" : "IKKE_OPPFYLT",
     "begrunnelse" : "ikke oppfylt",
-    "slettetKommentar" : null
+    "slettetKommentar" : null,
+    "tiltaksvariant" : "Enkeltplass AMO"
   } ],
   "vedtaksperioder" : [ {
     "fom" : "2024-01-01",
     "tom" : "2024-02-29",
     "målgruppe" : "ARBEIDSSØKER",
-    "aktivitet" : "TILTAK"
+    "aktivitet" : "TILTAK",
+    "tiltaksvariant" : "Gruppe AMO"
   } ],
   "vilkår" : [ {
     "type" : "DAGLIG_REISE",
@@ -134,7 +140,7 @@
       "vurderinger" : [ {
         "regel" : "Er reiseavstanden over 6km?",
         "svar" : "Ja",
-        "begrunnelse" : null
+        "begrunnelse" : "antall km"
       }, {
         "regel" : "Kan søker benytte seg av offentlig transport?",
         "svar" : "Ja",

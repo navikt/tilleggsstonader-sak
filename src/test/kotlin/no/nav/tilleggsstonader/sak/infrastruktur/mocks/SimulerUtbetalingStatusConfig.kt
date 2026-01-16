@@ -50,6 +50,7 @@ class SimulerUtbetalingStatusConfig(
                         ),
                     error = null,
                 ),
+            utbetalingGjelderFagsystem = UtbetalingStatusHåndterer.FAGSYSTEM_TILLEGGSSTØNADER,
         )
     }
 

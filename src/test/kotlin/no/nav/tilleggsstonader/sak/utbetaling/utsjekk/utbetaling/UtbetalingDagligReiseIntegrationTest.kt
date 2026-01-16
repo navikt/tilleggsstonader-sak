@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.finnPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
@@ -21,13 +21,22 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
     fun `utbetalingsdato i fremtiden - ingen andeler skal bli utbetalt`() {
         val reiseFramITid = lagreDagligReiseDto(fom = LocalDate.now().plusDays(1), tom = LocalDate.now().plusWeeks(1))
 
-        gjennomførBehandlingsløp(
+        opprettBehandlingOgGjennomførBehandlingsløp(
             medAktivitet = langtvarendeAktivitet,
             medMålgruppe = langtvarendeMålgruppe,
             medVilkår = listOf(reiseFramITid),
         )
 
-        KafkaTestConfig.sendteMeldinger().forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
+        val sendtMelding =
+            KafkaTestConfig
+                .sendteMeldinger()
+                .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
+                .map { it.verdiEllerFeil<IverksettingDto>() }
+                .single()
+
+        assertThat(
+            sendtMelding.utbetalinger.size,
+        ).isEqualTo(0)
     }
 
     @Test
@@ -41,7 +50,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             )
 
         val behandlingId =
-            gjennomførBehandlingsløp(
+            opprettBehandlingOgGjennomførBehandlingsløp(
                 medAktivitet = langtvarendeAktivitet,
                 medMålgruppe = langtvarendeMålgruppe,
                 medVilkår = reiser,
@@ -75,7 +84,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 lagreDagligReiseDto(fom = nå.plusWeeks(1), tom = nå.plusWeeks(2)),
             )
 
-        gjennomførBehandlingsløp(
+        opprettBehandlingOgGjennomførBehandlingsløp(
             medAktivitet = langtvarendeAktivitet,
             medMålgruppe = langtvarendeMålgruppe,
             medVilkår = reiser,
@@ -131,7 +140,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             fom = nå.minusMonths(3),
             tom = nå.plusMonths(3),
         )
-    private val langtvarendeAktivitet = fun (behandlingId: BehandlingId) =
+    private val langtvarendeAktivitet = fun(behandlingId: BehandlingId) =
         lagreVilkårperiodeAktivitet(
             behandlingId,
             fom = nå.minusMonths(3),
