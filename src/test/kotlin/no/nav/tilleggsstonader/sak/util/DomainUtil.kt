@@ -339,7 +339,7 @@ fun vilkår(
     opphavsvilkår: Opphavsvilkår? = null,
     fom: LocalDate? = YearMonth.now().atDay(1),
     tom: LocalDate? = YearMonth.now().atEndOfMonth(),
-    adresse: String? = "Tiltaksgata 1",
+    adresse: String? = null,
     utgift: Int? = 100,
     erFremtidigUtgift: Boolean = false,
     fakta: VilkårFakta? = null,
