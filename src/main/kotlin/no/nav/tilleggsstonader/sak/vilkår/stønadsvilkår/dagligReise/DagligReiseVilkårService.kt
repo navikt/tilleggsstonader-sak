@@ -110,6 +110,7 @@ class DagligReiseVilkårService(
             delvilkårsett = delvilkårsett,
             resultat = RegelEvaluering.utledVilkårResultat(delvilkårsett),
             fakta = nyttVilkår.fakta?.fjern0Verdier(Datoperiode(fom = nyttVilkår.fom, tom = nyttVilkår.tom)),
+            adresse = nyttVilkår.adresse,
         )
     }
 

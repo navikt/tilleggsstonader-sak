@@ -16,6 +16,7 @@ object VilkårDagligReiseDtoMapper {
             id = this.id,
             fom = this.fom,
             tom = this.tom,
+            adresse = this.adresse,
             resultat = this.resultat,
             status = this.status,
             delvilkårsett = this.delvilkårsett.map { it.tilDto() },

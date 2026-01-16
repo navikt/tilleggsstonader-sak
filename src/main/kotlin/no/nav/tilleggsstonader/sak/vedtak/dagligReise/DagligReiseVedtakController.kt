@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -40,6 +41,7 @@ class DagligReiseVedtakController(
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
+    private val dagligReiseVilkårService: DagligReiseVilkårService,
 ) {
     @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
@@ -105,7 +107,8 @@ class DagligReiseVedtakController(
                     tidligsteEndring = tidligsteEndring,
                 )
 
-        return beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring)
+        val vilkår = dagligReiseVilkårService.hentVilkårForBehandling(behandlingId)
+        return beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring, vilkår)
     }
 
     private fun lagreVedtak(
