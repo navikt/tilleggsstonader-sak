@@ -30,6 +30,7 @@ class DagligReiseVedtakSteg(
     private val vedtakRepository: VedtakRepository,
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val simuleringService: SimuleringService,
+    private val dagligReiseBeregningService: DagligReiseBeregningService,
 ) : BehandlingSteg<VedtakDagligReiseRequest> {
     override fun utførSteg(
         saksbehandling: Saksbehandling,
@@ -71,8 +72,8 @@ class DagligReiseVedtakSteg(
                 vedtaksperioder,
             )
 
-        val beregningsresultat =
-            beregningService.beregn(
+        val beregningsresultatOffentligTransportOgRammePrivatBil =
+            dagligReiseBeregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,
@@ -81,10 +82,10 @@ class DagligReiseVedtakSteg(
 
         lagreInnvilgetVedtak(
             behandling = saksbehandling,
-            beregningsresultat = beregningsresultat,
             vedtaksperioder = vedtaksperioder,
             begrunnelse = vedtak.begrunnelse,
             tidligsteEndring = tidligsteEndring,
+            beregningsresultat = beregningsresultatOffentligTransportOgRammePrivatBil,
         )
     }
 

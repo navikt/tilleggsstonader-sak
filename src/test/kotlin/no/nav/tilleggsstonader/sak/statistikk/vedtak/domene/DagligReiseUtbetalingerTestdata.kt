@@ -88,6 +88,7 @@ fun lagDagligReiseInnvilgelseMedBeløp(
                             ),
                         ),
                 ),
+            privatBil = null,
         )
 
     val vedtaksdata =

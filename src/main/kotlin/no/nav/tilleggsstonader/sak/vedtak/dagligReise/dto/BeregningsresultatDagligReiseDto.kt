@@ -6,11 +6,13 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatD
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import java.time.LocalDate
 
 data class BeregningsresultatDagligReiseDto(
     val offentligTransport: BeregningsresultatOffentligTransportDto?,
+    val privatBil: BeregningsresultatPrivatBil? = null,
     val tidligsteEndring: LocalDate? = null,
 )
 
@@ -40,6 +42,7 @@ data class BeregningsresultatForPeriodeDto(
 fun BeregningsresultatDagligReise.tilDto(tidligsteEndring: LocalDate?): BeregningsresultatDagligReiseDto =
     BeregningsresultatDagligReiseDto(
         offentligTransport = offentligTransport?.tilDto(),
+        privatBil = privatBil,
         tidligsteEndring = tidligsteEndring,
     )
 
