@@ -10,24 +10,25 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import java.time.LocalDate
 import java.util.UUID
 
 @BehandlingTestdataDslMarker
 class VilkårperiodeTestdataDsl {
     internal val opprettScope = OpprettVilkårperiodeDsl()
-    internal val update = mutableListOf<(BehandlingId) -> Pair<UUID, LagreVilkårperiode>>()
-    internal val delete = mutableListOf<(BehandlingId) -> Pair<UUID, SlettVikårperiode>>()
+    internal val update = mutableListOf<(List<VilkårperiodeDto>) -> Pair<UUID, LagreVilkårperiode>>()
+    internal val delete = mutableListOf<(List<VilkårperiodeDto>) -> Pair<UUID, SlettVikårperiode>>()
 
     fun opprett(builder: OpprettVilkårperiodeDsl.() -> Unit) {
         opprettScope.apply(builder)
     }
 
-    fun oppdater(builder: (BehandlingId) -> Pair<UUID, LagreVilkårperiode>) {
+    fun oppdater(builder: (List<VilkårperiodeDto>) -> Pair<UUID, LagreVilkårperiode>) {
         update += builder
     }
 
-    fun slett(builder: (BehandlingId) -> Pair<UUID, SlettVikårperiode>) {
+    fun slett(builder: (List<VilkårperiodeDto>) -> Pair<UUID, SlettVikårperiode>) {
         delete += builder
     }
 }

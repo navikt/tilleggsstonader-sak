@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
@@ -35,10 +36,13 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.time.LocalDate
 import java.util.UUID
@@ -167,6 +171,43 @@ fun IntegrationTest.opprettRevurdering(opprettBehandlingDto: OpprettBehandlingDt
     tilordneÅpenBehandlingOppgaveForBehandling(behandlingId)
 
     return behandlingId
+}
+
+fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
+    fraBehandlingId: BehandlingId,
+    tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
+    opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
+    edit: BehandlingTestdataDsl.() -> Unit,
+): BehandlingId {
+    val behandling = kall.behandling.hent(fraBehandlingId)
+    return opprettRevurderingOgGjennomførBehandlingsløp(
+        opprettBehandlingDto =
+            OpprettBehandlingDto(
+                fagsakId = behandling.fagsakId,
+                årsak = BehandlingÅrsak.SØKNAD,
+                kravMottatt = LocalDate.now(),
+                nyeOpplysningerMetadata = null,
+            ),
+        tilSteg = tilSteg,
+        opprettVedtak = opprettVedtak,
+        edit = edit,
+    )
+}
+
+fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
+    opprettBehandlingDto: OpprettBehandlingDto,
+    tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
+    opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
+    edit: BehandlingTestdataDsl.() -> Unit,
+): BehandlingId {
+    val revurderingId = opprettRevurdering(opprettBehandlingDto)
+    gjennomførBehandlingsløp(
+        behandlingId = revurderingId,
+        tilSteg = tilSteg,
+        opprettVedtak = opprettVedtak,
+        testdataProvider = edit,
+    )
+    return revurderingId
 }
 
 fun IntegrationTest.gjennomførHenleggelse(fraJournalpost: Journalpost = defaultJournalpost): BehandlingId {
@@ -381,6 +422,11 @@ private fun IntegrationTest.gjennomførInngangsvilkårSteg(
     testdataDsl: BehandlingTestdataDsl,
     behandlingId: BehandlingId,
 ) {
+    // Hentes ikke ut om man ikke trenger
+    val vilkårperioder: VilkårperioderDto by lazy {
+        kall.vilkårperiode.hentForBehandling(behandlingId).vilkårperioder
+    }
+
     // Opprett aktiviteter
     testdataDsl.aktivitet.opprettScope
         .build(behandlingId)
@@ -403,16 +449,16 @@ private fun IntegrationTest.gjennomførInngangsvilkårSteg(
 
     // Oppdater aktiviteter
     testdataDsl.aktivitet.update.forEach { upd ->
-        val idOgRequest: Pair<UUID, LagreVilkårperiode> = upd(behandlingId)
+        val (vilkårperiodeId, lagreVilkårperiode) = upd(vilkårperioder.aktiviteter)
         kall.vilkårperiode.oppdater(
-            vilkårperiodeId = idOgRequest.first,
-            lagreVilkårperiode = idOgRequest.second,
+            vilkårperiodeId = vilkårperiodeId,
+            lagreVilkårperiode = lagreVilkårperiode,
         )
     }
 
     // Slett aktiviteter
     testdataDsl.aktivitet.delete.forEach { del ->
-        val idOgRequest: Pair<UUID, SlettVikårperiode> = del(behandlingId)
+        val idOgRequest: Pair<UUID, SlettVikårperiode> = del(vilkårperioder.aktiviteter)
         kall.vilkårperiode.apiRespons.slett(
             vilkårperiodeId = idOgRequest.first,
             slettVikårperiode = idOgRequest.second,
@@ -421,16 +467,16 @@ private fun IntegrationTest.gjennomførInngangsvilkårSteg(
 
     // Oppdater målgruppeer
     testdataDsl.målgruppe.update.forEach { upd ->
-        val idOgRequest: Pair<UUID, LagreVilkårperiode> = upd(behandlingId)
+        val (vilkårperiodeId, lagreVilkårperiode) = upd(vilkårperioder.målgrupper)
         kall.vilkårperiode.oppdater(
-            vilkårperiodeId = idOgRequest.first,
-            lagreVilkårperiode = idOgRequest.second,
+            vilkårperiodeId = vilkårperiodeId,
+            lagreVilkårperiode = lagreVilkårperiode,
         )
     }
 
     // Slett målgruppeer
     testdataDsl.målgruppe.delete.forEach { del ->
-        val idOgRequest: Pair<UUID, SlettVikårperiode> = del(behandlingId)
+        val idOgRequest: Pair<UUID, SlettVikårperiode> = del(vilkårperioder.målgrupper)
         kall.vilkårperiode.apiRespons.slett(
             vilkårperiodeId = idOgRequest.first,
             slettVikårperiode = idOgRequest.second,
@@ -451,6 +497,14 @@ private fun IntegrationTest.gjennomførVilkårSteg(
     behandlingId: BehandlingId,
     stønadstype: Stønadstype,
 ) {
+    val vilkårDagligReise: List<VilkårDagligReiseDto> by lazy {
+        kall.vilkårDagligReise.hentVilkår(behandlingId)
+    }
+
+    val vilkår: VilkårsvurderingDto by lazy {
+        kall.vilkår.hentVilkår(behandlingId)
+    }
+
     editor.vilkår.opprettScope.build().forEach {
         if (stønadstype.gjelderDagligReise()) {
             kall.vilkårDagligReise.opprettVilkår(behandlingId, it as LagreDagligReiseDto)
@@ -460,18 +514,20 @@ private fun IntegrationTest.gjennomførVilkårSteg(
     }
 
     if (stønadstype.gjelderDagligReise()) {
-        // TODO - implementer for daglig reise
-        // Daglig reise har egne endepunkt med vilkårId i path, så oppdater/slett må gjøres eksplisitt i testen.
-        // DSL-en gir derfor kun "hook"-lambdas som kan implementere riktig kall.
-        editor.vilkår.update.forEach { it(behandlingId) }
-        editor.vilkår.delete.forEach { it(behandlingId) }
+        editor.vilkår.updateDagligReise
+            .map { it(vilkårDagligReise) }
+            .forEach { (vilkårId, dto) -> kall.vilkårDagligReise.oppdaterVilkår(dto, vilkårId, behandlingId) }
+
+        editor.vilkår.deleteDagligReise
+            .map { it(vilkårDagligReise) }
+            .forEach { (vilkårId, dto) -> kall.vilkårDagligReise.slettVilkår(behandlingId, vilkårId, dto) }
     } else {
         editor.vilkår.update
-            .map { it(behandlingId) }
+            .map { it(vilkår) }
             .forEach { kall.vilkår.oppdaterVilkår(it) }
 
         editor.vilkår.delete
-            .map { it(behandlingId) }
+            .map { it(vilkår) }
             .forEach { kall.vilkår.slettVilkår(it) }
     }
 
