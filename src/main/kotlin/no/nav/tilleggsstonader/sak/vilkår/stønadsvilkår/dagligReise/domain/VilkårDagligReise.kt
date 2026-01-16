@@ -15,6 +15,7 @@ data class VilkårDagligReise(
     val behandlingId: BehandlingId,
     override val fom: LocalDate,
     override val tom: LocalDate,
+    val adresse: String? = null,
     val resultat: Vilkårsresultat,
     val status: VilkårStatus?,
     val delvilkårsett: List<Delvilkår>,
@@ -40,8 +41,7 @@ data class VilkårDagligReise(
     // Foreløpig støttes kun offentlig transport.
     // Når vi implementerer privat bil og taxi legge til logikk og validering for at innsendt fakta er av forventet type.
     private fun validerFaktaErForventetType() {
-        feilHvis(fakta != null && fakta !is FaktaOffentligTransport) {
-            "Foreløpig støttes kun fakta av typen offentlig transport"
-        }
+        return
+        // TODO() sjekk at fakta stemmer med riktig type
     }
 }

@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerDto
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.BeregningsresultatForPeriodeDto as BeregningsresultatDtoBoutgifter
@@ -92,6 +93,7 @@ data class VilkårperiodeInterntVedtak(
     val resultat: ResultatVilkårperiode,
     val begrunnelse: String?,
     val slettetKommentar: String?,
+    val tiltaksvariant: String?,
 )
 
 data class VurderingVilkårperiode(
@@ -131,9 +133,9 @@ data class VilkårFaktaOffentligTransport(
 
 data class VilkårFaktaPrivatBil(
     val reisedagerPerUke: Int,
-    val reiseavstandEnVei: Int,
-    val prisBompengerPerDag: Int?,
-    val prisFergekostandPerDag: Int?,
+    val reiseavstandEnVei: BigDecimal,
+    val bompengerEnVei: Int?,
+    val fergekostandEnVei: Int?,
 ) : VilkårFaktaInternt {
     override val type = TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL
 }
@@ -149,4 +151,5 @@ data class VedtaksperiodeInterntVedtak(
     val tom: LocalDate,
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
+    val tiltaksvariant: String?,
 )

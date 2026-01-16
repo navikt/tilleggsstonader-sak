@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.behandlingsflyt.task
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
@@ -17,11 +16,9 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.fristBehandleSakOppgave
-import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import tools.jackson.module.kotlin.readValue
-import java.time.LocalDateTime
 import java.util.Properties
 
 @Service
@@ -33,7 +30,6 @@ import java.util.Properties
 class OpprettOppgaveForOpprettetBehandlingTask(
     private val behandlingService: BehandlingService,
     private val oppgaveService: OppgaveService,
-    private val taskService: TaskService,
 ) : AsyncTaskStep {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -41,21 +37,12 @@ class OpprettOppgaveForOpprettetBehandlingTask(
         val behandlingId: BehandlingId,
         val saksbehandler: String? = null,
         val beskrivelse: String? = null,
-        val hendelseTidspunkt: LocalDateTime = LocalDateTime.now(),
         val prioritet: OppgavePrioritet = OppgavePrioritet.NORM,
     )
 
     override fun doTask(task: Task) {
         val data = jsonMapper.readValue<OpprettOppgaveTaskData>(task.payload)
-        val oppgaveId = opprettOppgave(data, task)
-
-        taskService.save(
-            BehandlingsstatistikkTask.opprettMottattTask(
-                behandlingId = data.behandlingId,
-                hendelseTidspunkt = data.hendelseTidspunkt,
-                oppgaveId = oppgaveId,
-            ),
-        )
+        opprettOppgave(data, task)
     }
 
     private fun opprettOppgave(

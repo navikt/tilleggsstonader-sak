@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.VedtakBoutgifterRespons
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseResponse
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseResponse
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseResponse
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
@@ -41,12 +42,15 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 
 @Component
 class VedtakDtoMapper(
     private val vedtakService: VedtakService,
+    private val dagligReiseVilkårService: DagligReiseVilkårService,
 ) {
     fun toDto(
         vedtak: Vedtak,
@@ -80,9 +84,11 @@ class VedtakDtoMapper(
 
             is VedtakDagligReise ->
                 mapVedtakDagligReise(
-                    data,
-                    vedtak.tidligsteEndring,
-                    forrigeIverksatteBehandlingId,
+                    vedtak = vedtak,
+                    data = data,
+                    vilkår = dagligReiseVilkårService.hentVilkårForBehandling(vedtak.behandlingId),
+                    tidligsteEndring = vedtak.tidligsteEndring,
+                    forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
                 )
         }
     }
@@ -196,7 +202,9 @@ class VedtakDtoMapper(
         }
 
     private fun mapVedtakDagligReise(
+        vedtak: Vedtak,
         data: VedtakDagligReise,
+        vilkår: List<VilkårDagligReise>,
         tidligsteEndring: LocalDate?,
         forrigeIverksatteBehandlingId: BehandlingId?,
     ): VedtakDagligReiseResponse =
@@ -207,7 +215,7 @@ class VedtakDtoMapper(
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
                         ),
-                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
+                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring, vilkår),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,
@@ -215,7 +223,17 @@ class VedtakDtoMapper(
             }
 
             is AvslagDagligReise -> AvslagDagligReiseDto(årsakerAvslag = data.årsaker, begrunnelse = data.begrunnelse)
-            is OpphørDagligReise -> TODO()
+            is OpphørDagligReise ->
+                OpphørDagligReiseResponse(
+                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring, vilkår),
+                    årsakerOpphør = data.årsaker,
+                    begrunnelse = data.begrunnelse,
+                    vedtaksperioder =
+                        data.vedtaksperioder.tilLagretVedtaksperiodeDto(
+                            hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
+                        ),
+                    opphørsdato = vedtak.opphørsdato,
+                )
         }
 
     private fun hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId: BehandlingId?): List<Vedtaksperiode>? =

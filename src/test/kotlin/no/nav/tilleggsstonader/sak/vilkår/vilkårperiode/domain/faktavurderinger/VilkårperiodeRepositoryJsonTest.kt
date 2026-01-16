@@ -258,6 +258,7 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
                     MålgruppeDagligReiseTsrType.TILTAKSPENGER_DAGLIG_REISE_TSR -> TiltakspengerDagligReiseTsr::class
                     MålgruppeDagligReiseTsrType.KVALIFISERINGSSTØNAD_DAGLIG_REISE_TSR -> KvalifiseringsstønadDagligReiseTsr::class
                     MålgruppeDagligReiseTsrType.INGEN_MÅLGRUPPE_DAGLIG_REISE_TSR -> IngenMålgruppeDagligReiseTsr::class
+                    MålgruppeDagligReiseTsrType.INNSATT_I_FENGSEL_DAGLIG_REISE_TSR -> InnsattIFengselDagligReiseTsr::class
                 }
             }
 

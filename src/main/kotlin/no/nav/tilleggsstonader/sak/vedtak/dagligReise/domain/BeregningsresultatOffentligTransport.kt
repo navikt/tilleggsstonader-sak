@@ -17,6 +17,7 @@ data class BeregningsresultatOffentligTransport(
     fun sorterReiserOgPerioder(): BeregningsresultatOffentligTransport =
         BeregningsresultatOffentligTransport(
             reiser
+                .filter { it.perioder.isNotEmpty() }
                 .sortedBy { reise -> reise.perioder.minOf { it.grunnlag.fom } }
                 .map { reise ->
                     reise.copy(perioder = reise.perioder.sortedBy { it.grunnlag.fom })
@@ -25,7 +26,7 @@ data class BeregningsresultatOffentligTransport(
 }
 
 data class BeregningsresultatForReise(
-    val reiseId: ReiseId?, // TODO: Fjern nullbarhet
+    val reiseId: ReiseId,
     val perioder: List<BeregningsresultatForPeriode>,
 )
 

@@ -3,11 +3,13 @@ package no.nav.tilleggsstonader.sak.statistikk.task
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
+import no.nav.familie.prosessering.error.RekjørSenereException
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.statistikk.behandling.BehandlingsstatistikkService
-import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.BehandlingMetode
 import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
 import org.springframework.stereotype.Service
 import tools.jackson.module.kotlin.readValue
@@ -21,32 +23,48 @@ import java.util.Properties
 )
 class BehandlingsstatistikkTask(
     private val behandlingsstatistikkService: BehandlingsstatistikkService,
+    private val behandlingService: BehandlingService,
+    private val oppgaveService: OppgaveService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
-        val (behandlingId, hendelse, hendelseTidspunkt, gjeldendeSaksbehandler, oppgaveId, behandlingMetode) =
+        val (behandlingId, hendelse, hendelseTidspunkt, gjeldendeSaksbehandler) =
             jsonMapper.readValue<BehandlingsstatistikkTaskPayload>(task.payload)
 
+        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
+
+        // Vil aldri opprettes oppgave for satsendringer
+        if (!saksbehandling.erSatsendring) {
+            kastFeilOmOppgaveIkkeHarBlittOpprettet(behandlingId)
+        }
+
         behandlingsstatistikkService.sendBehandlingstatistikk(
-            behandlingId,
+            saksbehandling,
             hendelse,
             hendelseTidspunkt,
             gjeldendeSaksbehandler,
-            oppgaveId,
-            behandlingMetode,
         )
+    }
+
+    // Vi sender med ansvarligEnhet til DVH, som hentes ut fra oppgave. Venter på at oppgave skal opprettes
+    private fun kastFeilOmOppgaveIkkeHarBlittOpprettet(behandlingId: BehandlingId) {
+        val oppgaverForBehandling = oppgaveService.finnAlleOppgaveDomainForBehandling(behandlingId)
+        if (oppgaverForBehandling.isEmpty()) {
+            throw RekjørSenereException(
+                "Vent med å sende MOTTATT-status til DVH til oppgave er opprettet for behandling=$behandlingId",
+                triggerTid = LocalDateTime.now().plusSeconds(5),
+            )
+        }
     }
 
     companion object {
         fun opprettMottattTask(
             behandlingId: BehandlingId,
             hendelseTidspunkt: LocalDateTime,
-            oppgaveId: Long?,
         ): Task =
             opprettTask(
                 behandlingId = behandlingId,
                 hendelse = Hendelse.MOTTATT,
                 hendelseTidspunkt = hendelseTidspunkt,
-                oppgaveId = oppgaveId,
             )
 
         fun opprettPåbegyntTask(behandlingId: BehandlingId): Task =
@@ -101,10 +119,8 @@ class BehandlingsstatistikkTask(
         private fun opprettTask(
             behandlingId: BehandlingId,
             hendelse: Hendelse,
-            oppgaveId: Long? = null,
             hendelseTidspunkt: LocalDateTime = LocalDateTime.now(),
             gjeldendeSaksbehandler: String? = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
-            behandlingMetode: BehandlingMetode? = BehandlingMetode.MANUELL,
         ): Task =
             Task(
                 type = TYPE,
@@ -115,8 +131,6 @@ class BehandlingsstatistikkTask(
                             hendelse,
                             hendelseTidspunkt,
                             gjeldendeSaksbehandler,
-                            oppgaveId,
-                            behandlingMetode,
                         ),
                     ),
                 properties =
@@ -125,7 +139,6 @@ class BehandlingsstatistikkTask(
                         this["behandlingId"] = behandlingId.toString()
                         this["hendelse"] = hendelse.name
                         this["hendelseTidspunkt"] = hendelseTidspunkt.toString()
-                        this["oppgaveId"] = oppgaveId?.toString() ?: ""
                     },
             )
 
@@ -137,7 +150,5 @@ class BehandlingsstatistikkTask(
         val hendelse: Hendelse,
         val hendelseTidspunkt: LocalDateTime,
         val gjeldendeSaksbehandler: String?,
-        val oppgaveId: Long?,
-        val behandlingMetode: BehandlingMetode?,
     )
 }

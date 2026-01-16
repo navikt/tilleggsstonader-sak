@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterSøknadService
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.MockClientService
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
+import no.nav.tilleggsstonader.sak.integrasjonstest.KafkaTopics
 import no.nav.tilleggsstonader.sak.integrasjonstest.Kall
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import no.nav.tilleggsstonader.sak.util.DbContainerInitializer
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
@@ -53,6 +55,7 @@ import org.springframework.test.web.servlet.client.RestTestClient
 )
 @EnableMockOAuth2Server
 @AutoConfigureRestTestClient
+@EnableConfigurationProperties(KafkaTopics::class)
 abstract class IntegrationTest {
     @LocalServerPort
     private var port: Int? = 0
@@ -92,6 +95,9 @@ abstract class IntegrationTest {
 
     @Autowired
     lateinit var oppgaveRepository: OppgaveRepository
+
+    @Autowired
+    lateinit var kafkaTopics: KafkaTopics
 
     lateinit var testBrukerkontekst: TestBrukerKontekst
 

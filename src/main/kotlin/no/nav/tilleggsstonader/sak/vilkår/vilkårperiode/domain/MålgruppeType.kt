@@ -51,6 +51,10 @@ enum class MålgruppeType(
         gyldigeAktiviter = setOf(AktivitetType.TILTAK),
         faktiskMålgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
     ),
+    INNSATT_I_FENGSEL(
+        gyldigeAktiviter = setOf(AktivitetType.TILTAK),
+        faktiskMålgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
+    ),
     ;
 
     override fun tilDbType(): String = this.name
@@ -65,8 +69,20 @@ enum class MålgruppeType(
 
     fun skalVurdereAldersvilkår() =
         when (this) {
-            AAP, UFØRETRYGD, NEDSATT_ARBEIDSEVNE, OMSTILLINGSSTØNAD -> true
-            OVERGANGSSTØNAD, INGEN_MÅLGRUPPE, SYKEPENGER_100_PROSENT, DAGPENGER, TILTAKSPENGER, KVALIFISERINGSSTØNAD -> false
+            AAP,
+            UFØRETRYGD,
+            NEDSATT_ARBEIDSEVNE,
+            OMSTILLINGSSTØNAD,
+            -> true
+
+            OVERGANGSSTØNAD,
+            INGEN_MÅLGRUPPE,
+            SYKEPENGER_100_PROSENT,
+            DAGPENGER,
+            TILTAKSPENGER,
+            KVALIFISERINGSSTØNAD,
+            INNSATT_I_FENGSEL,
+            -> false
         }
 
     fun kanBrukesForStønad(stønadstype: Stønadstype): Boolean =
@@ -101,6 +117,7 @@ enum class MålgruppeType(
                         TILTAKSPENGER,
                         KVALIFISERINGSSTØNAD,
                         DAGPENGER,
+                        INNSATT_I_FENGSEL,
                     )
         }
 }

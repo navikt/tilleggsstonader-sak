@@ -27,8 +27,10 @@ class UtbetalingStatusHåndterer(
     fun behandleStatusoppdatering(
         iverksettingId: String,
         melding: UtbetalingStatusRecord,
+        utbetalingGjelderFagsystem: String,
     ) {
-        if (melding.detaljer?.ytelse !in nyeFagområderTilleggsstønader) {
+        logger.info("Mottokk melding fra fagsystem: $utbetalingGjelderFagsystem")
+        if (utbetalingGjelderFagsystem != FAGSYSTEM_TILLEGGSSTØNADER) {
             return
         }
 
@@ -49,6 +51,10 @@ class UtbetalingStatusHåndterer(
             }
             andelTilkjentYtelseRepository.updateAll(andeler.map { it.copy(statusIverksetting = utbetalingsstatus.tilStatusIverksetting()) })
         }
+    }
+
+    companion object {
+        const val FAGSYSTEM_TILLEGGSSTØNADER = "TILLEGGSSTØNADER"
     }
 }
 

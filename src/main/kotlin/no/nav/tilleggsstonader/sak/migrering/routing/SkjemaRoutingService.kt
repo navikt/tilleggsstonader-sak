@@ -28,7 +28,7 @@ class SkjemaRoutingService(
     private val ytelseService: YtelseService,
     private val personService: PersonService,
 ) {
-    fun harLagretRouting(
+    private fun harLagretRouting(
         ident: String,
         skjematype: Skjematype,
     ) = routingRepository.findByIdentAndType(ident, skjematype) != null

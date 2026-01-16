@@ -29,6 +29,7 @@ object SøknadDagligReiseUtil {
     fun søknadDagligReise(hovedytelse: Map<HovedytelseType, Boolean> = defaultHovedytelse): SøknadsskjemaDagligReiseFyllUtSendInn {
         val skjemaDagligReise =
             SkjemaDagligReise(
+                jegSokerPaVegneAvMegSelv = true,
                 dineOpplysninger = dineOpplysninger(),
                 hovedytelse = hovedytelse,
                 aktiviteter = aktiviteter(),

@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktaGrunnlagId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingId
 import org.springframework.core.convert.converter.Converter
 import org.springframework.data.convert.ReadingConverter
 import org.springframework.data.convert.WritingConverter
@@ -53,6 +54,10 @@ object IdConverters {
 
     class FaktaGrunnlagIdReaderConverter : ValueClassReader<FaktaGrunnlagId>({ FaktaGrunnlagId(it) })
 
+    class UtbetalingIdWritingConverter : ValueClassWriter<UtbetalingId>({ it.id })
+
+    class UtbetalingIdReaderConverter : ValueClassReader<UtbetalingId>({ UtbetalingId(it) })
+
     val alleValueClassConverters =
         listOf(
             FagsakPersonIdWritingConverter(),
@@ -67,5 +72,7 @@ object IdConverters {
             VilkårIdReaderConverter(),
             FaktaGrunnlagIdWritingConverter(),
             FaktaGrunnlagIdReaderConverter(),
+            UtbetalingIdWritingConverter(),
+            UtbetalingIdReaderConverter(),
         )
 }

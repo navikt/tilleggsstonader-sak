@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -38,8 +39,9 @@ data class StatusPåVentDto(
 )
 
 data class TaAvVentDto(
-    val skalTilordnesRessurs: Boolean,
-    val kommentar: String?,
+    val skalTilordnesRessurs: Boolean = true,
+    val kommentar: String? = null,
+    val settBehandlingStatusTil: BehandlingStatus = BehandlingStatus.UTREDES,
 )
 
 enum class ÅrsakSettPåVent {
@@ -50,5 +52,6 @@ enum class ÅrsakSettPåVent {
     ANTALL_DAGER_PÅ_TILTAK,
     RETTIGHET_TIL_OVERGANGSSTØNAD,
     REGISTRERING_AV_UTDANNING,
+    FOR_SATSJUSTERING,
     ANNET,
 }

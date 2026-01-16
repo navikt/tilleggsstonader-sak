@@ -1,36 +1,53 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.finnPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
-import no.nav.tilleggsstonader.sak.util.toYearMonth
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.YearMonth
 
 class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
-    val utbetalingTopic = "tilleggsstonader.utbetaling.v1"
+    private val nå = LocalDate.now()
+    private val fom = nå.minusMonths(3)
+    private val tom = nå.plusMonths(3)
 
     @Test
     fun `utbetalingsdato i fremtiden - ingen andeler skal bli utbetalt`() {
-        val reiseFramITid = lagreDagligReiseDto(fom = LocalDate.now().plusDays(1), tom = LocalDate.now().plusWeeks(1))
+        opprettBehandlingOgGjennomførBehandlingsløp {
+            aktivitet {
+                opprett {
+                    aktivitetTiltak(fom = fom, tom = tom)
+                }
+            }
+            målgruppe {
+                opprett {
+                    målgruppeAAP(fom = fom, tom = tom)
+                }
+            }
+            vilkår {
+                opprett {
+                    offentligTransport(fom = LocalDate.now().plusDays(1), tom = LocalDate.now().plusWeeks(1))
+                }
+            }
+        }
 
-        gjennomførBehandlingsløp(
-            medAktivitet = langtvarendeAktivitet,
-            medMålgruppe = langtvarendeMålgruppe,
-            medVilkår = listOf(reiseFramITid),
-        )
+        val sendtMelding =
+            KafkaTestConfig
+                .sendteMeldinger()
+                .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
+                .map { it.verdiEllerFeil<IverksettingDto>() }
+                .single()
 
-        KafkaTestConfig.sendteMeldinger().forventAntallMeldingerPåTopic(utbetalingTopic, 0)
+        assertThat(
+            sendtMelding.utbetalinger.size,
+        ).isEqualTo(0)
     }
 
     @Test
@@ -44,18 +61,32 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             )
 
         val behandlingId =
-            gjennomførBehandlingsløp(
-                medAktivitet = langtvarendeAktivitet,
-                medMålgruppe = langtvarendeMålgruppe,
-                medVilkår = reiser,
-            )
+            opprettBehandlingOgGjennomførBehandlingsløp {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltak(fom = fom, tom = tom)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(fom = fom, tom = tom)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        add(reiser)
+                    }
+                }
+            }
 
-        val utbetalinger = KafkaTestConfig.sendteMeldinger().finnPåTopic(utbetalingTopic)
+        val saksbehandling = testoppsettService.hentSaksbehandling(behandlingId)
+        val utbetalinger = KafkaTestConfig.sendteMeldinger().finnPåTopic(kafkaTopics.utbetaling)
         val utbetaling = utbetalinger.single().verdiEllerFeil<IverksettingDto>()
 
-        with(utbetaling.utbetalingsgrunnlag) {
-            assertThat(periodetype).isEqualTo(PeriodetypeUtbetaling.UKEDAG)
-            assertThat(behandlingId).isEqualTo(behandlingId)
+        assertThat(utbetaling.periodetype).isEqualTo(PeriodetypeUtbetaling.UKEDAG)
+        assertThat(utbetaling.behandlingId).isEqualTo(saksbehandling.eksternId.toString())
+        assertThat(utbetaling.utbetalinger).hasSize(1)
+        with(utbetaling.utbetalinger.single()) {
             assertThat(perioder).hasSize(2)
 
             with(perioder.first()) {
@@ -76,16 +107,28 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 lagreDagligReiseDto(fom = nå.plusWeeks(1), tom = nå.plusWeeks(2)),
             )
 
-        gjennomførBehandlingsløp(
-            medAktivitet = langtvarendeAktivitet,
-            medMålgruppe = langtvarendeMålgruppe,
-            medVilkår = reiser,
-        )
+        opprettBehandlingOgGjennomførBehandlingsløp {
+            aktivitet {
+                opprett {
+                    aktivitetTiltak(fom = fom, tom = tom)
+                }
+            }
+            målgruppe {
+                opprett {
+                    målgruppeAAP(fom = fom, tom = tom)
+                }
+            }
+            vilkår {
+                opprett {
+                    add(reiser)
+                }
+            }
+        }
 
         val utbetaling =
             KafkaTestConfig
                 .sendteMeldinger()
-                .finnPåTopic(utbetalingTopic)
+                .finnPåTopic(kafkaTopics.utbetaling)
                 .single()
                 .verdiEllerFeil<IverksettingDto>()
 
@@ -95,7 +138,12 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 .fom
                 .datoEllerNesteMandagHvisLørdagEllerSøndag()
 
-        with(utbetaling.utbetalingsgrunnlag.perioder.single()) {
+        with(
+            utbetaling.utbetalinger
+                .single()
+                .perioder
+                .single(),
+        ) {
             assertThat(fom).isEqualTo(tom).isEqualTo(forventetUtbetalingsdato)
         }
     }
@@ -119,18 +167,4 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
     @Test
     fun `Håndtering av error-status på topic`() {
     }
-
-    private val nå: LocalDate = LocalDate.now()
-    private val langtvarendeMålgruppe = fun(behandlingId: BehandlingId) =
-        lagreVilkårperiodeMålgruppe(
-            behandlingId,
-            fom = nå.minusMonths(3),
-            tom = nå.plusMonths(3),
-        )
-    private val langtvarendeAktivitet = fun (behandlingId: BehandlingId) =
-        lagreVilkårperiodeAktivitet(
-            behandlingId,
-            fom = nå.minusMonths(3),
-            tom = nå.plusMonths(3),
-        )
 }

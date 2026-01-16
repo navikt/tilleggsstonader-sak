@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdMigreringService
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringJson
@@ -42,6 +43,7 @@ internal class SimuleringServiceTest {
     private val tilgangService = mockk<TilgangService>()
     private val iverksettService = mockk<IverksettService>()
     private val utbetalingV3Mapper = mockk<UtbetalingV3Mapper>()
+    private val fagsakUtbetalingIdMigreringService = mockk<FagsakUtbetalingIdMigreringService>()
 
     private val simuleringService =
         SimuleringService(
@@ -51,6 +53,7 @@ internal class SimuleringServiceTest {
             tilgangService = tilgangService,
             iverksettService = iverksettService,
             utbetalingV3Mapper = utbetalingV3Mapper,
+            fagsakUtbetalingIdMigreringService = fagsakUtbetalingIdMigreringService,
         )
 
     private val personIdent = "12345678901"
@@ -63,6 +66,8 @@ internal class SimuleringServiceTest {
         every { tilgangService.validerHarSaksbehandlerrolle() } just Runs
         every { tilgangService.harTilgangTilRolle(any()) } returns true
         every { iverksettService.finnForrigeIverksetting(any(), any()) } returns null
+        every { iverksettService.utbetalingSkalSendesPåKafka(any(), any(), any(), any()) } returns false
+        every { fagsakUtbetalingIdMigreringService.migrerForFagsak(any()) } just Runs
     }
 
     @Test

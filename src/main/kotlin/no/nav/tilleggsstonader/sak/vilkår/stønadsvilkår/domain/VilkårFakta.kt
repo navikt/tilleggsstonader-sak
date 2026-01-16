@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagData
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import java.math.BigDecimal
 
 /**
  * [FaktaGrunnlagDataJson] definierer alle suklasser av [FaktaGrunnlagData]
@@ -22,7 +23,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Re
 sealed interface VilkårFakta
 
 data class FaktaDagligReiseOffentligTransport(
-    val reiseId: ReiseId? = ReiseId.random(), // TODO: Fjern nullbarhet
+    val reiseId: ReiseId,
     val reisedagerPerUke: Int,
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
@@ -30,10 +31,11 @@ data class FaktaDagligReiseOffentligTransport(
 ) : VilkårFakta
 
 data class FaktaDagligReisePrivatBil(
+    val reiseId: ReiseId,
     val reisedagerPerUke: Int,
-    val reiseavstandEnVei: Int,
-    val prisBompengerPerDag: Int?,
-    val prisFergekostandPerDag: Int?,
+    val reiseavstandEnVei: BigDecimal,
+    val bompengerEnVei: Int?,
+    val fergekostandEnVei: Int?,
 ) : VilkårFakta
 
 enum class TypeVilkårFakta {

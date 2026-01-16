@@ -80,10 +80,9 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     }
 
     @Bean
-    fun rowMappers(): QueryMappingConfiguration {
-        return DefaultQueryMappingConfiguration()
+    fun rowMappers(): QueryMappingConfiguration =
+        DefaultQueryMappingConfiguration()
             .registerRowMapper<SettPåVent>(SettPåVent::class.java, SettPåVentRowMapper())
-    }
 
     override fun userConverters(): List<*> =
         listOf(

@@ -30,6 +30,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.InnsattIFengselDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.KvalifiseringsstønadDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeDagligReiseTso
@@ -80,6 +81,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingOmstillingsstønad
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakDagligReiseTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
@@ -137,7 +139,7 @@ private fun mapAktiviteter(
         }
         Stønadstype.DAGLIG_REISE_TSR -> {
             require(faktaOgSvar is FaktaOgSvarAktivitetDagligReiseTsrDto)
-            return mapAktiviteterDagligReiseTsr(type)
+            return mapAktiviteterDagligReiseTsr(type, faktaOgSvar)
         }
     }
 }
@@ -278,18 +280,29 @@ private fun mapAktiviteterDagligReiseTso(
         AktivitetType.UTDANNING -> UtdanningDagligReiseTso
 
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetDagligReiseTso
-        AktivitetType.REELL_ARBEIDSSØKER -> feil("Reell arbeidssøker er ikke en gyldig aktivitet for daglig reise TSO")
+        AktivitetType.REELL_ARBEIDSSØKER -> feil("Reell arbeidssøker er ikke en gyldig aktivitet for daglige reiser TSO")
     }
 
-private fun mapAktiviteterDagligReiseTsr(aktivitetType: AktivitetType): AktivitetDagligReiseTsr =
+private fun mapAktiviteterDagligReiseTsr(
+    aktivitetType: AktivitetType,
+    faktaOgSvar: FaktaOgSvarAktivitetDagligReiseTsrDto,
+): AktivitetDagligReiseTsr =
     when (aktivitetType) {
         AktivitetType.TILTAK -> {
-            TiltakDagligReiseTsr()
+            TiltakDagligReiseTsr(
+                vurderinger =
+                    VurderingTiltakDagligReiseTsr(
+                        harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
+                    ),
+            )
         }
-        AktivitetType.UTDANNING -> feil("Utdanning er ikke en gyldig aktivitet for daglig reise TSR")
+
+        AktivitetType.UTDANNING -> {
+            feil("Utdanning er ikke en gyldig aktivitet for daglige reiser TSR")
+        }
 
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetDagligReiseTsr
-        AktivitetType.REELL_ARBEIDSSØKER -> feil("Reell arbeidssøker er ikke en gyldig aktivitet for daglig reise TSR")
+        AktivitetType.REELL_ARBEIDSSØKER -> feil("Reell arbeidssøker er ikke en gyldig aktivitet for daglige reiser TSR")
     }
 
 private fun lagVurderingAldersvilkår(
@@ -367,6 +380,7 @@ private fun mapMålgruppeBarnetilsyn(
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
         MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram")
+        MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel")
     }
 
 private fun mapMålgruppeLæremidler(
@@ -427,6 +441,7 @@ private fun mapMålgruppeLæremidler(
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
         MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram")
+        MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel")
     }
 
 private fun mapMålgruppeBoutgfiter(
@@ -491,6 +506,7 @@ private fun mapMålgruppeBoutgfiter(
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
         MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram")
+        MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel")
     }
 
 private fun mapMålgruppeDagligReiseTso(
@@ -555,23 +571,20 @@ private fun mapMålgruppeDagligReiseTso(
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
         MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram")
+        MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel")
     }
 
 private fun mapMålgruppeDagligReiseTsr(type: MålgruppeType): MålgruppeDagligReiseTsr =
     when (type) {
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeDagligReiseTsr
         MålgruppeType.OMSTILLINGSSTØNAD -> error("Håndterer ikke omstillingstønad")
-
         MålgruppeType.OVERGANGSSTØNAD -> error("Håndterer ikke overgangsstønad")
-
         MålgruppeType.AAP -> error("Håndterer ikke aap")
-
         MålgruppeType.UFØRETRYGD -> error("Håndterer ikke uføretrygd")
-
         MålgruppeType.NEDSATT_ARBEIDSEVNE -> error("Håndterer ikke nedsattArbeidsevne")
-
         MålgruppeType.SYKEPENGER_100_PROSENT -> error("Støtter ikke sykepenger for boutgifter")
         MålgruppeType.DAGPENGER -> DagpengerDagligReiseTsr()
         MålgruppeType.TILTAKSPENGER -> TiltakspengerDagligReiseTsr()
         MålgruppeType.KVALIFISERINGSSTØNAD -> KvalifiseringsstønadDagligReiseTsr()
+        MålgruppeType.INNSATT_I_FENGSEL -> InnsattIFengselDagligReiseTsr()
     }

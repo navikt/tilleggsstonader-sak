@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
@@ -30,7 +31,7 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
 
     val svarOffentligTransport =
         mapOf(
-            RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA),
+            RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
             RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
         )
 
@@ -44,8 +45,9 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
     fun `skal kunne lagre, endre og slette vilkår for daglig reise - offentlig transport`() {
         val nyttVilkår =
             LagreDagligReiseDto(
-                fom = LocalDate.of(2025, 1, 1),
-                tom = LocalDate.of(2025, 1, 31),
+                fom = 1 januar 2025,
+                tom = 31 januar 2025,
+                adresse = "Tiltaksveien 1",
                 svar = svarOffentligTransport,
                 fakta = faktaOffentligTransport(),
             )
@@ -89,14 +91,15 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
     fun `skal kunne lagre ned et vilkår uten fakta om vilkår ikke er oppfylt`() {
         val svarAvstandIkkeOppfylt =
             mapOf(
-                RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.NEI),
+                RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.NEI, "Antall km"),
                 RegelId.UNNTAK_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.NEI, "Begrunnelse"),
             )
 
         val nyttVilkår =
             LagreDagligReiseDto(
-                fom = LocalDate.of(2025, 1, 1),
-                tom = LocalDate.of(2025, 1, 31),
+                fom = 1 januar 2025,
+                tom = 31 januar 2025,
+                adresse = "Tiltaksveien 1",
                 svar = svarAvstandIkkeOppfylt,
                 fakta = null,
             )
@@ -104,6 +107,7 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
         val resultat = kall.vilkårDagligReise.opprettVilkår(behandling.id, nyttVilkår)
 
         assertThat(resultat.resultat).isEqualTo(Vilkårsresultat.IKKE_OPPFYLT)
+        assertThat(resultat.adresse).isEqualTo("Tiltaksveien 1")
         assertThat(resultat.fakta).isNull()
     }
 

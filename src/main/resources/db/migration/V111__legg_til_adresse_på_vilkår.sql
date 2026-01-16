@@ -1,0 +1,2 @@
+ALTER TABLE vilkar
+    ADD COLUMN IF NOT EXISTS adresse VARCHAR;

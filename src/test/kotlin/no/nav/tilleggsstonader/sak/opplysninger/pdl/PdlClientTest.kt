@@ -26,8 +26,7 @@ class PdlClientTest {
             RestTemplateBuilder()
                 .messageConverters(
                     JacksonJsonHttpMessageConverter(jsonMapper),
-                )
-                .build()
+                ).build()
         lateinit var pdlClient: PdlClient
         lateinit var wiremockServerItem: WireMockServer
 

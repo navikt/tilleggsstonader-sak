@@ -29,6 +29,11 @@ private val MAX = LocalDate.of(2099, 12, 31)
 val bekreftedeSatser =
     listOf(
         SatsLæremidler(
+            fom = LocalDate.of(2026, 1, 1),
+            tom = LocalDate.of(2026, 12, 31),
+            beløp = mapOf(Studienivå.VIDEREGÅENDE to 461, Studienivå.HØYERE_UTDANNING to 921),
+        ),
+        SatsLæremidler(
             fom = LocalDate.of(2025, 1, 1),
             tom = LocalDate.of(2025, 12, 31),
             beløp = mapOf(Studienivå.VIDEREGÅENDE to 451, Studienivå.HØYERE_UTDANNING to 901),

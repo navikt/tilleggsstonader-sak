@@ -16,29 +16,25 @@ class UtbetalingMessageProducer(
 ) {
     fun sendUtbetalinger(
         iverksettingId: UUID,
-        utbetaling: Collection<IverksettingDto>,
+        utbetaling: IverksettingDto,
     ) {
-        val producerRecords =
-            utbetaling.map { utbetalingRecord ->
-                val utbetalingJson = jsonMapper.writeValueAsString(utbetalingRecord)
-                iverksettingLoggRepository.insert(
-                    IverksettingLogg(
-                        iverksettingId = iverksettingId,
-                        utbetalingJson = JsonWrapper(utbetalingJson),
-                    ),
-                )
-                ProducerRecord(
-                    topic,
-                    iverksettingId.toString(),
-                    utbetalingJson,
-                )
-            }
+        val utbetalingJson = jsonMapper.writeValueAsString(utbetaling)
+        iverksettingLoggRepository.insert(
+            IverksettingLogg(
+                iverksettingId = iverksettingId,
+                utbetalingJson = JsonWrapper(utbetalingJson),
+            ),
+        )
+        val producerRecord =
+            ProducerRecord(
+                topic,
+                iverksettingId.toString(),
+                utbetalingJson,
+            )
 
         // Bruker iverksettingId som key for å si at helved skal se på utbetalingene samlet (transaksjonsid hos helved).
         // Vi mottar status på transaksjonsId
         // .get() til slutt for å vente på at alle er sendt
-        producerRecords
-            .map { kafkaTemplate.send(it) }
-            .forEach { it.get() }
+        kafkaTemplate.send(producerRecord).get()
     }
 }

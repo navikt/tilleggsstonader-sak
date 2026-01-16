@@ -92,6 +92,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                                 listOf(
                                     BeregningsresultatForReiseDto(
                                         reiseId = dummyReiseId,
+                                        adresse = null,
                                         perioder =
                                             listOf(
                                                 BeregningsresultatForPeriodeDto(

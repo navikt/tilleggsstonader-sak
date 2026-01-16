@@ -583,15 +583,17 @@ fun lagreVilkårperiodeAktivitet(
 fun lagreDagligReiseDto(
     fom: LocalDate = 1 januar 2025,
     tom: LocalDate = 31 januar 2025,
+    adresse: String = "Tiltaksveien 1",
     svar: Map<RegelId, SvarOgBegrunnelseDto> =
         mapOf(
-            RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA),
+            RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
             RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
         ),
     fakta: FaktaDagligReiseDto = faktaOffentligTransport(),
 ) = LagreDagligReiseDto(
     fom = fom,
     tom = tom,
+    adresse = adresse,
     svar = svar,
     fakta = fakta,
 )

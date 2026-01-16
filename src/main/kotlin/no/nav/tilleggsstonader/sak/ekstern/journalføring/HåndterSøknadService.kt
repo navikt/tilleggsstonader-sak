@@ -114,18 +114,19 @@ class HåndterSøknadService(
             }
         }
 
-        // Alle daglig reise støknader legges på TSO fra fyll ut send inn
+        // Alle daglige reiser støknader legges på TSO fra fyll ut send inn
         val søknadsskjema = journalpostService.hentSøknadFraJournalpost(journalpost, Stønadstype.DAGLIG_REISE_TSO)
         val søknad = søknadService.mapSøknad(søknadsskjema, journalpost)
 
         if (søknad !is SøknadDagligReise) {
-            error("Søknaden fra journalposten er ikke en daglig reise søknad")
+            error("Søknaden fra journalposten er ikke en daglige reiser søknad")
         }
 
         val målgrupper =
-            hentMålgrupperFraRegister(journalpost, søknad).takeIf { it.isNotEmpty() }
+            hentMålgrupperFraRegister(journalpost, søknad).takeIf { it.isNotEmpty() }?.toSet()
                 ?: søknad.data.hovedytelse.hovedytelse
                     .map { it.tilMålgruppeType() }
+                    .toSet()
 
         // Sender til TSR hvis flere målgrupper eller TSR sine målgrupper
         return if (målgrupper.size > 1 ||
@@ -186,8 +187,8 @@ class HåndterSøknadService(
     ) {
         val opprettOppgave =
             if (stønadstype.gjelderDagligReise() && !journalpost.harStrukturertSøknad()) {
-                // Kommer journalposter på daglig reise inn fra skanning før vi har tatt i bruk i prod, ønsker ikke å legge de i vår mappe
-                // Kan fjernes etter daglig reise er i prod. Se https://nav-it.slack.com/archives/C049HPU424F/p1758780000577149
+                // Kommer journalposter på daglige reiser inn fra skanning før vi har tatt i bruk i prod, ønsker ikke å legge de i vår mappe
+                // Kan fjernes etter daglige reiser er i prod. Se https://nav-it.slack.com/archives/C049HPU424F/p1758780000577149
                 OpprettOppgave(
                     oppgavetype = Oppgavetype.Journalføring,
                     beskrivelse =

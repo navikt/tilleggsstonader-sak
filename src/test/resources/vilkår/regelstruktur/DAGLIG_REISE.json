@@ -10,13 +10,13 @@
       {
         "svarId" : "JA",
         "nesteRegelId" : "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
-        "begrunnelseType" : "UTEN",
+        "begrunnelseType" : "PÅKREVD",
         "tilhørendeFaktaType" : null
       },
       {
         "svarId" : "NEI",
         "nesteRegelId" : "UNNTAK_SEKS_KM",
-        "begrunnelseType" : "UTEN",
+        "begrunnelseType" : "PÅKREVD",
         "tilhørendeFaktaType" : null
       }
     ]
@@ -31,7 +31,7 @@
       {
         "svarId" : "JA",
         "nesteRegelId" : "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
-        "begrunnelseType" : "UTEN",
+        "begrunnelseType" : "PÅKREVD",
         "tilhørendeFaktaType" : null
       },
       {
@@ -57,7 +57,7 @@
       {
         "svarId" : "NEI",
         "nesteRegelId" : "KAN_KJØRE_MED_EGEN_BIL",
-        "begrunnelseType" : "UTEN",
+        "begrunnelseType" : "PÅKREVD",
         "tilhørendeFaktaType" : null
       }
     ]

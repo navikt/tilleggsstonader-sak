@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
@@ -19,7 +18,7 @@ import java.time.LocalDate
 @Service
 class DagligReiseBeregningService(
     private val vilkårService: VilkårService,
-    private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
+    private val dagligReiseVedtaksperioderValideringService: DagligReiseVedtaksperioderValideringService,
     private val offentligTransportBeregningService: OffentligTransportBeregningService,
     private val offentligTransportBeregningRevurderingService: OffentligTransportBeregningRevurderingService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
@@ -30,7 +29,7 @@ class DagligReiseBeregningService(
         typeVedtak: TypeVedtak,
         tidligsteEndring: LocalDate?,
     ): BeregningsresultatDagligReise {
-        vedtaksperiodeValideringService.validerVedtaksperioder(
+        dagligReiseVedtaksperioderValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
             typeVedtak = typeVedtak,
@@ -69,20 +68,24 @@ class DagligReiseBeregningService(
 
         if (oppfylteVilkårOffentligTransport.isEmpty()) return null
 
-        val nyttBeregningsresultat =
-            offentligTransportBeregningService.beregn(
+        return offentligTransportBeregningService
+            .beregn(
                 vedtaksperioder = vedtaksperioder,
                 oppfylteVilkår = oppfylteVilkårOffentligTransport,
                 brukersNavKontor = brukersNavKontor,
-            )
-
-        return offentligTransportBeregningRevurderingService
-            .flettMedForrigeVedtakHvisRevurdering(
-                nyttBeregningsresultat = nyttBeregningsresultat,
-                behandling = behandling,
-                tidligsteEndring = tidligsteEndring,
-            ).sorterReiserOgPerioder()
+            ).flettMedForrigeVedtakHvisRevurdering(behandling, tidligsteEndring)
+            .sorterReiserOgPerioder()
     }
+
+    private fun BeregningsresultatOffentligTransport.flettMedForrigeVedtakHvisRevurdering(
+        behandling: Saksbehandling,
+        tidligsteEndring: LocalDate?,
+    ) = offentligTransportBeregningRevurderingService
+        .flettMedForrigeVedtakHvisRevurdering(
+            nyttBeregningsresultat = this,
+            behandling = behandling,
+            tidligsteEndring = tidligsteEndring,
+        )
 }
 
 private fun validerFinnesReiser(vilkår: List<VilkårDagligReise>) {

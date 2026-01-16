@@ -37,6 +37,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
@@ -56,6 +57,7 @@ class InterntVedtakService(
     private val søknadService: SøknadService,
     private val vilkårService: VilkårService,
     private val vedtakService: VedtakService,
+    private val dagligReiseVilkårService: DagligReiseVilkårService,
 ) {
     fun lagInterntVedtak(behandlingId: BehandlingId): InterntVedtak {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
@@ -102,10 +104,12 @@ class InterntVedtakService(
                         boutgifter = data.beregningsresultat.tilDto(vedtak.tidligsteEndring).perioder,
                     )
 
-                is InnvilgelseDagligReise ->
+                is InnvilgelseDagligReise -> {
+                    val vilkår = dagligReiseVilkårService.hentVilkårForBehandling(behandling.id)
                     BeregningsresultatInterntVedtakDto(
-                        dagligReiseTso = data.beregningsresultat.tilDto(vedtak.tidligsteEndring),
+                        dagligReiseTso = data.beregningsresultat.tilDto(vedtak.tidligsteEndring, vilkår),
                     )
+                }
 
                 is Innvilgelse,
                 -> error("Mangler mapping av beregningsresultat for ${data.type}")
@@ -163,6 +167,7 @@ class InterntVedtakService(
                 resultat = it.resultat,
                 begrunnelse = it.begrunnelse,
                 slettetKommentar = it.slettetKommentar,
+                tiltaksvariant = it.typeAktivitet?.beskrivelse,
             )
         }
 
@@ -183,6 +188,7 @@ class InterntVedtakService(
             VedtaksperiodeInterntVedtak(
                 målgruppe = it.målgruppe,
                 aktivitet = it.aktivitet,
+                tiltaksvariant = it.typeAktivitet?.beskrivelse,
                 fom = it.fom,
                 tom = it.tom,
             )
@@ -293,7 +299,11 @@ class InterntVedtakService(
                     årsakerAvslag = vedtak.årsaker,
                     avslagBegrunnelse = vedtak.begrunnelse,
                 )
-            is OpphørDagligReise -> TODO()
+            is OpphørDagligReise ->
+                VedtakOpphørInternt(
+                    årsakerOpphør = vedtak.årsaker,
+                    opphørBegrunnelse = vedtak.begrunnelse,
+                )
         }
 
     private fun Map<BarnId, GrunnlagBarn>.finnFødselsdato(barnId: BarnId): LocalDate {
@@ -326,8 +336,8 @@ class InterntVedtakService(
                 VilkårFaktaPrivatBil(
                     reisedagerPerUke = fakta.reisedagerPerUke,
                     reiseavstandEnVei = fakta.reiseavstandEnVei,
-                    prisBompengerPerDag = fakta.prisBompengerPerDag,
-                    prisFergekostandPerDag = fakta.prisFergekostandPerDag,
+                    bompengerEnVei = fakta.bompengerEnVei,
+                    fergekostandEnVei = fakta.fergekostandEnVei,
                 )
 
             null -> null

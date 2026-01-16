@@ -13,8 +13,13 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernatting
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
@@ -124,6 +129,53 @@ class UtledTidligsteEndringServiceTest {
     }
 
     @Test
+    fun `utled tidligste endring når fakta for daglig reise endres`() {
+        val fom = originalFom
+        val tom = originalTom
+        val gammeltVilkår =
+            vilkår(
+                sisteIverksatteBehandling.id,
+                VilkårType.DAGLIG_REISE,
+                fom = fom,
+                tom = tom,
+                fakta =
+                    FaktaDagligReiseOffentligTransport(
+                        reiseId = ReiseId.random(),
+                        reisedagerPerUke = 5,
+                        prisEnkelbillett = 80,
+                        prisSyvdagersbillett = 500,
+                        prisTrettidagersbillett = 1800,
+                    ),
+            )
+        val nyttVilkår =
+            vilkår(
+                sisteIverksatteBehandling.id,
+                VilkårType.DAGLIG_REISE,
+                fom = originalFom,
+                tom = originalTom,
+                fakta =
+                    FaktaDagligReiseOffentligTransport(
+                        reiseId = ReiseId.random(),
+                        reisedagerPerUke = 4,
+                        prisEnkelbillett = 80,
+                        prisSyvdagersbillett = 500,
+                        prisTrettidagersbillett = 1800,
+                    ),
+            )
+        vilkårSisteIverksatteBehandling = listOf(gammeltVilkår)
+        vilkår = listOf(nyttVilkår)
+        vilkårperioder = vilkårperioderSisteIverksattBehandling
+        vedtaksperioder = vedtaksperioderSisteIverksatteBehandling
+        val result =
+            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
+                behandling.id,
+                vedtaksperioder,
+            )
+
+        assertThat(result).isEqualTo(fom)
+    }
+
+    @Test
     fun `utled tidligste endring ignorer vedtaksperiode, ingen endring utenom vedtaksperioder, forvent ingen endring`() {
         vilkår = vilkårSisteIverksatteBehandling
         vilkårperioder = vilkårperioderSisteIverksattBehandling
@@ -132,6 +184,36 @@ class UtledTidligsteEndringServiceTest {
         val result = utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(behandling.id)
 
         assertThat(result).isNull()
+    }
+
+    @Test
+    fun `utled tidligste endring når bruker skal ha dekt faktiske utgifter`() {
+        val eksisterendeVilkår =
+            vilkår(
+                sisteIverksatteBehandling.id,
+                VilkårType.UTGIFTER_OVERNATTING,
+                fom = originalFom,
+                tom = originalTom,
+                delvilkår = oppfylteDelvilkårUtgifterOvernatting(høyereUtgifter = SvarId.NEI),
+            )
+
+        val nyttVilkår =
+            eksisterendeVilkår.copy(
+                delvilkårwrapper = DelvilkårWrapper(oppfylteDelvilkårUtgifterOvernatting(høyereUtgifter = SvarId.JA)),
+            )
+
+        vilkårSisteIverksatteBehandling = listOf(eksisterendeVilkår)
+        vilkår = listOf(nyttVilkår)
+        vilkårperioder = vilkårperioderSisteIverksattBehandling
+        vedtaksperioder = vedtaksperioderSisteIverksatteBehandling
+
+        val result =
+            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
+                behandling.id,
+                vedtaksperioder,
+            )
+
+        assertThat(result).isEqualTo(originalFom)
     }
 }
 

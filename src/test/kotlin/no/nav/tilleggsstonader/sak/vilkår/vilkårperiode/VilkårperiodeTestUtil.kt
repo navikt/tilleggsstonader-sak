@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.InnsattIFengselDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.KvalifiseringsstønadDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneLæremidler
@@ -158,6 +159,7 @@ object VilkårperiodeTestUtil {
             MålgruppeType.DAGPENGER -> DagpengerDagligReiseTsr()
             MålgruppeType.TILTAKSPENGER -> TiltakspengerDagligReiseTsr()
             MålgruppeType.KVALIFISERINGSSTØNAD -> KvalifiseringsstønadDagligReiseTsr()
+            MålgruppeType.INNSATT_I_FENGSEL -> InnsattIFengselDagligReiseTsr()
         }
 
     fun faktaOgVurderingMålgruppeLæremidler(
@@ -211,6 +213,7 @@ object VilkårperiodeTestUtil {
             MålgruppeType.DAGPENGER -> DagpengerDagligReiseTsr()
             MålgruppeType.TILTAKSPENGER -> TiltakspengerDagligReiseTsr()
             MålgruppeType.KVALIFISERINGSSTØNAD -> KvalifiseringsstønadDagligReiseTsr()
+            MålgruppeType.INNSATT_I_FENGSEL -> InnsattIFengselDagligReiseTsr()
         }
 
     fun faktaOgVurderingerMålgruppeDto() =
