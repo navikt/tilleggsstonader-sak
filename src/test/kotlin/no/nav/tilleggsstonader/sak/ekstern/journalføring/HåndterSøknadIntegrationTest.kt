@@ -40,7 +40,9 @@ class HåndterSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
 
     @Test
     internal fun `oppretter behandling hvis alle eksisterende behandlinger er ferdigstilt`() {
-        opprettBehandlingOgGjennomførBehandlingsløp()
+        opprettBehandlingOgGjennomførBehandlingsløp {
+            defaultDagligReiseTsoTestdata()
+        }
 
         val nyBehandling = håndterSøknadService.håndterSøknad(defaultJournalpost)
         assertThat(nyBehandling).isNotNull()

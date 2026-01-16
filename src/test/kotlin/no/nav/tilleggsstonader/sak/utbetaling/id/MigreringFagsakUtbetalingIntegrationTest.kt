@@ -104,13 +104,8 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
             )
         gjennomførBehandlingsløp(revurderingId) {
             målgruppe {
-                opprett { behandlingId ->
-                    lagreVilkårperiodeMålgruppe(
-                        behandlingId = behandlingId,
-                        målgruppeType = MålgruppeType.AAP,
-                        fom = 1 oktober 2025,
-                        tom = 10 oktober 2025,
-                    )
+                opprett {
+                    målgruppeAAP(fom = 1 oktober 2025, tom = 10 oktober 2025)
                 }
             }
         }
@@ -325,30 +320,13 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
                 ),
         ) {
             aktivitet {
-                opprett { behandlingId ->
-                    lagreVilkårperiodeAktivitet(
-                        behandlingId = behandlingId,
-                        aktivitetType = AktivitetType.UTDANNING,
-                        fom = fom,
-                        tom = tom,
-                        faktaOgSvar =
-                            FaktaOgSvarAktivitetLæremidlerDto(
-                                prosent = 100,
-                                studienivå = Studienivå.HØYERE_UTDANNING,
-                                svarHarUtgifter = SvarJaNei.JA,
-                                svarHarRettTilUtstyrsstipend = SvarJaNei.NEI,
-                            ),
-                    )
+                opprett {
+                    aktivitetUtdanning(fom, tom)
                 }
             }
             målgruppe {
-                opprett { behandlingId ->
-                    lagreVilkårperiodeMålgruppe(
-                        behandlingId = behandlingId,
-                        målgruppeType = MålgruppeType.AAP,
-                        fom = fom,
-                        tom = tom,
-                    )
+                opprett {
+                    målgruppeAAP(fom, tom)
                 }
             }
         }

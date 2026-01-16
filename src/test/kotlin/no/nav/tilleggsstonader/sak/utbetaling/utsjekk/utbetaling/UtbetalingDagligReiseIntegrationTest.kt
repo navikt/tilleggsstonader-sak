@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.finnPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
@@ -9,23 +8,35 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.YearMonth
 
 class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
+    private val nå = LocalDate.now()
+    private val fom = nå.minusMonths(3)
+    private val tom = nå.plusMonths(3)
+
     @Test
     fun `utbetalingsdato i fremtiden - ingen andeler skal bli utbetalt`() {
-        val reiseFramITid = lagreDagligReiseDto(fom = LocalDate.now().plusDays(1), tom = LocalDate.now().plusWeeks(1))
-
-        opprettBehandlingOgGjennomførBehandlingsløp(
-            medAktivitet = langtvarendeAktivitet,
-            medMålgruppe = langtvarendeMålgruppe,
-            medVilkår = listOf(reiseFramITid),
-        )
+        opprettBehandlingOgGjennomførBehandlingsløp {
+            aktivitet {
+                opprett {
+                    aktivitetTiltak(fom = fom, tom = tom)
+                }
+            }
+            målgruppe {
+                opprett {
+                    målgruppeAAP(fom = fom, tom = tom)
+                }
+            }
+            vilkår {
+                opprett {
+                    offentligTransport(fom = LocalDate.now().plusDays(1), tom = LocalDate.now().plusWeeks(1))
+                }
+            }
+        }
 
         val sendtMelding =
             KafkaTestConfig
@@ -50,11 +61,23 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             )
 
         val behandlingId =
-            opprettBehandlingOgGjennomførBehandlingsløp(
-                medAktivitet = langtvarendeAktivitet,
-                medMålgruppe = langtvarendeMålgruppe,
-                medVilkår = reiser,
-            )
+            opprettBehandlingOgGjennomførBehandlingsløp {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltak(fom = fom, tom = tom)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(fom = fom, tom = tom)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        add(reiser)
+                    }
+                }
+            }
 
         val saksbehandling = testoppsettService.hentSaksbehandling(behandlingId)
         val utbetalinger = KafkaTestConfig.sendteMeldinger().finnPåTopic(kafkaTopics.utbetaling)
@@ -84,11 +107,23 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 lagreDagligReiseDto(fom = nå.plusWeeks(1), tom = nå.plusWeeks(2)),
             )
 
-        opprettBehandlingOgGjennomførBehandlingsløp(
-            medAktivitet = langtvarendeAktivitet,
-            medMålgruppe = langtvarendeMålgruppe,
-            medVilkår = reiser,
-        )
+        opprettBehandlingOgGjennomførBehandlingsløp {
+            aktivitet {
+                opprett {
+                    aktivitetTiltak(fom = fom, tom = tom)
+                }
+            }
+            målgruppe {
+                opprett {
+                    målgruppeAAP(fom = fom, tom = tom)
+                }
+            }
+            vilkår {
+                opprett {
+                    add(reiser)
+                }
+            }
+        }
 
         val utbetaling =
             KafkaTestConfig
@@ -132,18 +167,4 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
     @Test
     fun `Håndtering av error-status på topic`() {
     }
-
-    private val nå: LocalDate = LocalDate.now()
-    private val langtvarendeMålgruppe = fun(behandlingId: BehandlingId) =
-        lagreVilkårperiodeMålgruppe(
-            behandlingId,
-            fom = nå.minusMonths(3),
-            tom = nå.plusMonths(3),
-        )
-    private val langtvarendeAktivitet = fun(behandlingId: BehandlingId) =
-        lagreVilkårperiodeAktivitet(
-            behandlingId,
-            fom = nå.minusMonths(3),
-            tom = nå.plusMonths(3),
-        )
 }

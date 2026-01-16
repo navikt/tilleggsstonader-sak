@@ -31,10 +31,9 @@ class UtbetalingStatusHåndtererIntegrationTest(
     ) {
         // Gjennomfør behandling til iverksetting er ferdig
         val behandlingId =
-            opprettBehandlingOgGjennomførBehandlingsløp(
-                medVilkår = listOf(lagreDagligReiseDto()),
-                tilSteg = StegType.BEHANDLING_FERDIGSTILT,
-            )
+            opprettBehandlingOgGjennomførBehandlingsløp(tilSteg = StegType.BEHANDLING_FERDIGSTILT) {
+                defaultDagligReiseTsoTestdata()
+            }
 
         // Hent iverksettingId fra andel
         val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
@@ -69,7 +68,10 @@ class UtbetalingStatusHåndtererIntegrationTest(
 
     @Test
     fun `FEILET status oppdaterer andeler med FEILET status og inkluderer error detaljer`() {
-        val behandlingId = opprettBehandlingOgGjennomførBehandlingsløp()
+        val behandlingId =
+            opprettBehandlingOgGjennomførBehandlingsløp {
+                defaultDagligReiseTsoTestdata()
+            }
 
         // Hent iverksettingId fra andel
         val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
@@ -109,15 +111,29 @@ class UtbetalingStatusHåndtererIntegrationTest(
 
     @Test
     fun `flere andeler oppdateres alle når status mottas`() {
+        val fom = 1 januar 2025
+        val tom = 31 januar 2025
+
         // Opprett behandling med flere andeler
         val behandlingId =
-            opprettBehandlingOgGjennomførBehandlingsløp(
-                medVilkår =
-                    listOf(
-                        lagreDagligReiseDto(fom = 2 januar 2025, tom = 2 januar 2025),
-                        lagreDagligReiseDto(fom = 6 januar 2025, tom = 6 januar 2025),
-                    ),
-            )
+            opprettBehandlingOgGjennomførBehandlingsløp {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltak(fom, tom)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(fom, tom)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        offentligTransport(fom = 2 januar 2025, tom = 2 januar 2025)
+                        offentligTransport(fom = 6 januar 2025, tom = 6 januar 2025)
+                    }
+                }
+            }
 
         val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
         val andelerFørStatus = tilkjentYtelse!!.andelerTilkjentYtelse
@@ -151,12 +167,9 @@ class UtbetalingStatusHåndtererIntegrationTest(
     @Test
     fun `ignorerer status for andre fagsystemer`() {
         val behandlingId =
-            opprettBehandlingOgGjennomførBehandlingsløp(
-                medAktivitet = ::lagreVilkårperiodeAktivitet,
-                medMålgruppe = ::lagreVilkårperiodeMålgruppe,
-                medVilkår = listOf(lagreDagligReiseDto()),
-                tilSteg = StegType.BEHANDLING_FERDIGSTILT,
-            )
+            opprettBehandlingOgGjennomførBehandlingsløp {
+                defaultDagligReiseTsoTestdata()
+            }
 
         val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
         val andelerFørStatus = tilkjentYtelse!!.andelerTilkjentYtelse

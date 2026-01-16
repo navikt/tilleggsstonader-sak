@@ -1,23 +1,9 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.dsl
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
-import java.util.UUID
+import no.nav.tilleggsstonader.libs.utils.dato.januar
+import java.time.LocalDate
 
-/**
- * Builder-style DSL used by `gjennomførBehandlingsløp(...){ ... }` in integration tests.
- *
- * Supports create/update/delete for:
- *  - aktivitet (vilkårperiode)
- *  - målgruppe (vilkårperiode)
- *  - vilkår (stønadsvilkår)
- */
+@BehandlingTestdataDslMarker
 class BehandlingTestdataDsl internal constructor() {
     internal val aktivitet: VilkårperiodeTestdataDsl = VilkårperiodeTestdataDsl()
     internal val målgruppe: VilkårperiodeTestdataDsl = VilkårperiodeTestdataDsl()
@@ -38,44 +24,26 @@ class BehandlingTestdataDsl internal constructor() {
     companion object {
         fun build(block: BehandlingTestdataDsl.() -> Unit): BehandlingTestdataDsl = BehandlingTestdataDsl().apply(block)
     }
-}
 
-class VilkårperiodeTestdataDsl {
-    internal val create = mutableListOf<(BehandlingId) -> LagreVilkårperiode>()
-    internal val update = mutableListOf<(BehandlingId) -> Pair<UUID, LagreVilkårperiode>>()
-    internal val delete = mutableListOf<(BehandlingId) -> Pair<UUID, SlettVikårperiode>>()
-
-    fun opprett(builder: (BehandlingId) -> LagreVilkårperiode) {
-        create += builder
-    }
-
-    fun oppdater(builder: (BehandlingId) -> Pair<UUID, LagreVilkårperiode>) {
-        update += builder
-    }
-
-    fun slett(builder: (BehandlingId) -> Pair<UUID, SlettVikårperiode>) {
-        delete += builder
-    }
-}
-
-class StønadsvilkårTestdataDsl {
-    internal val create = mutableListOf<LagreVilkår>()
-    internal val update = mutableListOf<(BehandlingId) -> SvarPåVilkårDto>()
-    internal val delete = mutableListOf<(BehandlingId) -> SlettVilkårRequest>()
-
-    fun opprettVilkår(builder: () -> LagreVilkår) {
-        create += builder()
-    }
-
-    fun opprett(vararg vilkår: LagreVilkår) {
-        create += vilkår
-    }
-
-    fun oppdater(block: (behandlingId: BehandlingId) -> SvarPåVilkårDto) {
-        update += block
-    }
-
-    fun slett(block: (behandlingId: BehandlingId) -> SlettVilkårRequest) {
-        delete += block
+    // Hjelpefunksjoner for å sette opp testdata f.eks. for en gitt stønadstype
+    fun defaultDagligReiseTsoTestdata(
+        fom: LocalDate = 1 januar 2026,
+        tom: LocalDate = 31 januar 2026,
+    ) {
+        aktivitet {
+            opprett {
+                aktivitetTiltak(fom, tom)
+            }
+        }
+        målgruppe {
+            opprett {
+                målgruppeAAP(fom, tom)
+            }
+        }
+        vilkår {
+            opprett {
+                offentligTransport(fom = fom, tom = tom)
+            }
+        }
     }
 }

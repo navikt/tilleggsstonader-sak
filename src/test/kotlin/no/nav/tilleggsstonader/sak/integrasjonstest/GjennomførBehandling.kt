@@ -307,8 +307,8 @@ fun IntegrationTest.gjennomførInngangsvilkårSteg(
 ) {
     val testdataDsl =
         BehandlingTestdataDsl.build {
-            medAktivitet?.let { a -> aktivitet { opprett(a) } }
-            medMålgruppe?.let { m -> målgruppe { opprett(m) } }
+            medAktivitet?.let { a -> aktivitet { opprett { add(a) } } }
+            medMålgruppe?.let { m -> målgruppe { opprett { add(m) } } }
         }
     gjennomførInngangsvilkårSteg(testdataDsl, behandlingId)
 }
@@ -329,7 +329,11 @@ fun IntegrationTest.gjennomførVilkårSteg(
 ) {
     val editor =
         BehandlingTestdataDsl.build {
-            vilkår { opprett(*medVilkår.toTypedArray()) }
+            vilkår {
+                opprett {
+                    medVilkår.forEach { add(it) }
+                }
+            }
         }
     gjennomførVilkårSteg(editor, behandlingId, stønadstype)
 }
@@ -356,9 +360,21 @@ private fun defaultBehandlingsløpEditor(
     medVilkår: List<LagreVilkår>,
 ): BehandlingTestdataDsl.() -> Unit =
     {
-        aktivitet { opprett(medAktivitet) }
-        målgruppe { opprett(medMålgruppe) }
-        vilkår { opprett(*medVilkår.toTypedArray()) }
+        aktivitet {
+            opprett {
+                add(medAktivitet)
+            }
+        }
+        målgruppe {
+            opprett {
+                add(medMålgruppe)
+            }
+        }
+        vilkår {
+            opprett {
+                medVilkår.forEach { add(it) }
+            }
+        }
     }
 
 private fun IntegrationTest.gjennomførInngangsvilkårSteg(
@@ -366,19 +382,21 @@ private fun IntegrationTest.gjennomførInngangsvilkårSteg(
     behandlingId: BehandlingId,
 ) {
     // Opprett aktiviteter
-    testdataDsl.aktivitet.create
-        .forEach { builder ->
+    testdataDsl.aktivitet.opprettScope
+        .build(behandlingId)
+        .forEach { lagreVilkårperiode ->
             kall.vilkårperiode
-                .opprett(builder(behandlingId))
+                .opprett(lagreVilkårperiode)
                 .periode!!
                 .id
         }
 
     // Oppretter ålgrupper
-    testdataDsl.målgruppe.create
-        .forEach { builder ->
+    testdataDsl.målgruppe.opprettScope
+        .build(behandlingId)
+        .forEach { lagreVilkårperiode ->
             kall.vilkårperiode
-                .opprett(builder(behandlingId))
+                .opprett(lagreVilkårperiode)
                 .periode!!
                 .id
         }
@@ -433,7 +451,7 @@ private fun IntegrationTest.gjennomførVilkårSteg(
     behandlingId: BehandlingId,
     stønadstype: Stønadstype,
 ) {
-    editor.vilkår.create.forEach {
+    editor.vilkår.opprettScope.build().forEach {
         if (stønadstype.gjelderDagligReise()) {
             kall.vilkårDagligReise.opprettVilkår(behandlingId, it as LagreDagligReiseDto)
         } else {
