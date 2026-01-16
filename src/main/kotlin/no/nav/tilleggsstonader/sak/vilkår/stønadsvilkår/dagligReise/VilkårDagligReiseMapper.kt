@@ -70,6 +70,6 @@ object VilkårDagligReiseMapper {
         when (this) {
             TypeVilkårFakta.DAGLIG_REISE_OFFENTLIG_TRANSPORT -> TypeDagligReise.OFFENTLIG_TRANSPORT
             TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL -> TypeDagligReise.PRIVAT_BIL
-            else -> error("Faktatype $this tilhører ikke daglig reise")
+            else -> error("Faktatype $this tilhører ikke daglige reiser")
         }
 }

@@ -46,7 +46,7 @@ class DagligReiseVedtaksperioderValideringService(
             when (behandling.stønadstype) {
                 Stønadstype.DAGLIG_REISE_TSR -> fagsakService.finnFagsakerForFagsakPersonId(behandling.fagsakPersonId).dagligReiseTso?.id
                 Stønadstype.DAGLIG_REISE_TSO -> fagsakService.finnFagsakerForFagsakPersonId(behandling.fagsakPersonId).dagligReiseTsr?.id
-                else -> error("Kan ikke finne fagsakId for annen enhet for daglig reise når stønadstype er: ${behandling.stønadstype}")
+                else -> error("Kan ikke finne fagsakId for annen enhet for daglige reiser når stønadstype er: ${behandling.stønadstype}")
             }
 
         val vedtaksperioderAnnenEnhet =
