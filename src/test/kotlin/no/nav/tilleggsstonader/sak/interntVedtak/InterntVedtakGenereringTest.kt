@@ -83,6 +83,7 @@ class InterntVedtakGenereringTest {
      * Kommenter ut Disabled for å oppdatere html og pdf ved endringer i htmlify.
      * Endre SKAL_SKRIVE_TIL_FIL i fileUtil til true
      * Formatter htmlfil etter generering for å unngå stor diff
+     * Legger til denne for å trigge et bygg
      */
     @Disabled
     @ParameterizedTest
