@@ -44,6 +44,28 @@ class YtelseService(
             ).tilDto()
     }
 
+    fun harAktivTsrMålgruppe(ident: String): Boolean {
+        val typer =
+            listOf(
+                TypeYtelsePeriode.DAGPENGER,
+                TypeYtelsePeriode.TILTAKSPENGER_TPSAK,
+                TypeYtelsePeriode.TILTAKSPENGER_ARENA,
+            )
+
+        val aktiveTsrVedtak =
+            ytelseClient
+                .hentYtelser(
+                    YtelsePerioderRequest(
+                        ident = ident,
+                        fom = LocalDate.now(),
+                        tom = LocalDate.now(),
+                        typer = typer,
+                    ),
+                )
+
+        return aktiveTsrVedtak.perioder.isNotEmpty()
+    }
+
     fun harAktivtAapVedtak(ident: String): HarAktivtVedtakDto {
         val aktiveAapVedtak =
             ytelseClient

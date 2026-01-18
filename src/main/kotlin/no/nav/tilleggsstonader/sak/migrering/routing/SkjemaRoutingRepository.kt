@@ -6,6 +6,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
 import org.springframework.data.annotation.Id
+import org.springframework.data.jdbc.repository.query.Query
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 import java.util.UUID
@@ -20,6 +22,14 @@ interface SkjemaRoutingRepository :
     ): SkjemaRouting?
 
     fun countByType(type: Skjematype): Int
+
+    @Query(
+        "SELECT COUNT(*) FROM skjema_routing WHERE type = :type AND detaljer::jsonb = :detaljer::jsonb",
+    )
+    fun countByTypeAndDetaljerContains(
+        @Param("type") type: Skjematype,
+        @Param("detaljer") detaljer: String,
+    ): Int
 }
 
 data class SkjemaRouting(
