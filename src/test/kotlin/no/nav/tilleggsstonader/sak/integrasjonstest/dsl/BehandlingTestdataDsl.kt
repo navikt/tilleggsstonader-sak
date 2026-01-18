@@ -8,6 +8,7 @@ class BehandlingTestdataDsl internal constructor() {
     internal val aktivitet: VilkårperiodeTestdataDsl = VilkårperiodeTestdataDsl()
     internal val målgruppe: VilkårperiodeTestdataDsl = VilkårperiodeTestdataDsl()
     internal val vilkår: StønadsvilkårTestdataDsl = StønadsvilkårTestdataDsl()
+    internal var vedtak: OpprettVedtakTestdataDsl = OpprettVedtakTestdataDsl()
 
     fun aktivitet(block: VilkårperiodeTestdataDsl.() -> Unit) {
         aktivitet.apply(block)
@@ -19,6 +20,10 @@ class BehandlingTestdataDsl internal constructor() {
 
     fun vilkår(block: StønadsvilkårTestdataDsl.() -> Unit) {
         vilkår.apply(block)
+    }
+
+    fun vedtak(block: OpprettVedtakTestdataDsl.() -> Unit) {
+        vedtak.apply(block)
     }
 
     companion object {
