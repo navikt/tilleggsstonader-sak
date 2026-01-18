@@ -37,6 +37,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatus
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatusHåndterer
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatusRecord
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.IverksettingDto
+import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.journalpost
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
@@ -279,9 +280,9 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
                     id = UUID.randomUUID(),
                     statusIverksetting = StatusIverksetting.UBEHANDLET,
                     iverksetting = null,
-                    fom = LocalDate.now(),
-                    tom = LocalDate.now(),
-                    utbetalingsdato = LocalDate.now(),
+                    fom = tom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                    tom = tom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                    utbetalingsdato = tom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
                 )
 
         tilkjentYtelseRepository.update(
