@@ -27,6 +27,7 @@ class DagligReisePrivatBilController(
     fun hentRammevedtaksinformasjon(
         @RequestBody request: IdentStønadstype,
     ): List<RammevedtakDto> {
+        // Fjerne lokal når man går i prod
         feilHvisIkke(SikkerhetContext.kallKommerFra(EksternApplikasjon.SOKNAD_API), HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
         }

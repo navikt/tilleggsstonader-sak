@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakUkeDto
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -17,13 +16,6 @@ class DagligReisePrivatBilService(
     private val behandlingService: BehandlingService,
 ) {
     fun hentRammevedtaksPrivatBil(ident: IdentStønadstype): List<RammevedtakDto> {
-        val fagsaker = fagsakService.finnFagsak(setOf(ident.ident), ident.stønadstype)
-        val behandling = behandlingService.hentBehandlinger(fagsaker?.id!!)
-
-        val vedtak =
-            vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandling.first().id)?.data
-                ?: return emptyList()
-
         return hentRammevedtakMock()
     }
 
