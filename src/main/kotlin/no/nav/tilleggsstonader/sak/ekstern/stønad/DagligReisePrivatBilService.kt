@@ -15,9 +15,7 @@ class DagligReisePrivatBilService(
     private val vedtakService: VedtakService,
     private val behandlingService: BehandlingService,
 ) {
-    fun hentRammevedtaksPrivatBil(ident: IdentStønadstype): List<RammevedtakDto> {
-        return hentRammevedtakMock()
-    }
+    fun hentRammevedtaksPrivatBil(ident: IdentStønadstype): List<RammevedtakDto> = hentRammevedtakMock()
 
     private fun hentRammevedtakMock(): List<RammevedtakDto> =
         listOf(
