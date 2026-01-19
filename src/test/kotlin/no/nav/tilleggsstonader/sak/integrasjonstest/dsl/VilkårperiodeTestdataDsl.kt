@@ -93,7 +93,7 @@ class OpprettVilkårperiodeDsl {
     fun aktivitetTiltakTsr(
         fom: LocalDate,
         tom: LocalDate,
-        typeAktivitet: TypeAktivitet? = null,
+        typeAktivitet: TypeAktivitet,
     ) {
         add { behandlingId ->
             lagreVilkårperiodeAktivitet(

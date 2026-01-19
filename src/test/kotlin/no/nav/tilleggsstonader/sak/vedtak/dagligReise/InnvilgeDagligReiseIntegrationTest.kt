@@ -19,14 +19,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
 import no.nav.tilleggsstonader.sak.util.journalpost
-import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -53,30 +45,24 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                     dokumenter = listOf(DokumentInfo("", brevkode = DokumentBrevkode.DAGLIG_REISE.verdi)),
                     bruker = Bruker("12345678910", BrukerIdType.FNR),
                     tema = Tema.TSR.name,
-                ),
-            medAktivitet = { behandlingId ->
-                lagreVilkårperiodeAktivitet(
-                    behandlingId = behandlingId,
-                    aktivitetType = AktivitetType.TILTAK,
-                    typeAktivitet = TypeAktivitet.ENKELAMO,
-                    fom = fomTiltaksenheten,
-                    tom = tomTiltaksenheten,
-                    faktaOgSvar =
-                        FaktaOgSvarAktivitetDagligReiseTsrDto(
-                            svarHarUtgifter = SvarJaNei.JA,
-                        ),
                 )
-            },
-            medMålgruppe = { behandlingId ->
-                lagreVilkårperiodeMålgruppe(
-                    behandlingId = behandlingId,
-                    målgruppeType = MålgruppeType.TILTAKSPENGER,
-                    fom = fomTiltaksenheten,
-                    tom = tomTiltaksenheten,
-                )
-            },
-            medVilkår = listOf(lagreDagligReiseDto(fom = fomTiltaksenheten, tom = tomTiltaksenheten)),
-        )
+        ) {
+            aktivitet {
+                opprett {
+                    aktivitetTiltakTsr(fomTiltaksenheten, tomTiltaksenheten, typeAktivitet = TypeAktivitet.GRUPPEAMO)
+                }
+            }
+            målgruppe {
+                opprett {
+                    målgruppeTiltakspenger(fomTiltaksenheten, tomTiltaksenheten)
+                }
+            }
+            vilkår {
+                opprett {
+                    offentligTransport(fomTiltaksenheten, tomTiltaksenheten)
+                }
+            }
+        }
 
         every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoAAP()
 
@@ -91,27 +77,24 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                         bruker = Bruker("12345678910", BrukerIdType.FNR),
                         tema = Tema.TSO.name,
                     ),
-                medAktivitet = { behandlingId ->
-                    lagreVilkårperiodeAktivitet(
-                        behandlingId = behandlingId,
-                        aktivitetType = AktivitetType.UTDANNING,
-                        typeAktivitet = null,
-                        fom = fomNay,
-                        tom = tomNay,
-                        faktaOgSvar = FaktaOgSvarAktivitetDagligReiseTsoDto(),
-                    )
-                },
-                medMålgruppe = { behandlingId ->
-                    lagreVilkårperiodeMålgruppe(
-                        behandlingId = behandlingId,
-                        målgruppeType = MålgruppeType.AAP,
-                        fom = fomNay,
-                        tom = tomNay,
-                    )
-                },
-                medVilkår = listOf(lagreDagligReiseDto(fom = fomNay, tom = tomNay)),
-                tilSteg = StegType.BEREGNE_YTELSE,
-            )
+                tilSteg = StegType.BEREGNE_YTELSE
+            ) {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTso(fomNay, tomNay)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(fomNay, tomNay)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        offentligTransport(fomNay, tomNay)
+                    }
+                }
+            }
 
         gjennomførBeregningSteg(behandlingId, Stønadstype.DAGLIG_REISE_TSO)
             .expectStatus()
