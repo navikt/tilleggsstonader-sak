@@ -29,7 +29,9 @@ class UtbetalingStatusHåndterer(
         melding: UtbetalingStatusRecord,
         utbetalingGjelderFagsystem: String,
     ) {
-        logger.info("Mottokk melding fra fagsystem: $utbetalingGjelderFagsystem")
+        logger.info(
+            "Mottok melding fra fagsystem: $utbetalingGjelderFagsystem, iverksettingId: $iverksettingId og ytelse: ${melding.detaljer?.ytelse}",
+        )
         if (utbetalingGjelderFagsystem != FAGSYSTEM_TILLEGGSSTØNADER) {
             return
         }
