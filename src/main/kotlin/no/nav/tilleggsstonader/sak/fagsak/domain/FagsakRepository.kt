@@ -100,7 +100,4 @@ interface FagsakRepository :
     """,
     )
     fun hentFagsakMetadata(fagsakIder: Set<FagsakId>): List<FagsakMetadata>
-
-    @Query("SELECT id FROM fagsak")
-    fun findAllIds(): List<FagsakId>
 }

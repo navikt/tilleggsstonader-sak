@@ -63,7 +63,12 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
             ) {
                 vilkår {
                     oppdaterDagligReise { vilkårDagligReise ->
-                        vilkårDagligReise.single().id to reiser.copy(tom = tom)
+                        // Utvider tom og antall reisedager
+                        vilkårDagligReise.single().id to
+                            reiser.copy(
+                                tom = tom,
+                                fakta = (reiser.fakta as FaktaDagligReiseOffentligTransportDto).copy(reisedagerPerUke = 5),
+                            )
                     }
                 }
             }
