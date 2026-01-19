@@ -342,7 +342,7 @@ fun IntegrationTest.gjennomførVilkårSteg(
         BehandlingTestdataDsl.build {
             vilkår {
                 opprett {
-                    medVilkår.forEach { add(it) }
+                    medVilkår.forEach { lagreVilkår -> add { _ -> lagreVilkår }  }
                 }
             }
         }
@@ -370,7 +370,7 @@ private fun defaultBehandlingTestdataProvider(
         }
         vilkår {
             opprett {
-                medVilkår.forEach { add(it) }
+                medVilkår.forEach { lagreVilkår -> add { _ -> lagreVilkår } }
             }
         }
         vedtak {
@@ -465,7 +465,7 @@ private fun IntegrationTest.gjennomførVilkårSteg(
         kall.vilkår.hentVilkår(behandlingId)
     }
 
-    testdataProvider.vilkår.opprettScope.build().forEach {
+    testdataProvider.vilkår.opprettScope.build(behandlingId).forEach {
         if (stønadstype.gjelderDagligReise()) {
             kall.vilkårDagligReise.opprettVilkår(behandlingId, it as LagreDagligReiseDto)
         } else {
