@@ -65,8 +65,7 @@ fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
     gjennomførBehandlingsløp(
         behandlingId = behandlingId,
         tilSteg = tilSteg,
-        testdataProvider = defaultBehandlingTestdataProvider(medAktivitet, medMålgruppe, medVilkår),
-        opprettVedtak = opprettVedtak,
+        testdataProvider = defaultBehandlingTestdataProvider(medAktivitet, medMålgruppe, medVilkår, opprettVedtak),
     )
     return behandlingId
 }
@@ -74,7 +73,6 @@ fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
 fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
     fraJournalpost: Journalpost = defaultJournalpost,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
-    opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
     testdataProvider: BehandlingTestdataDsl.() -> Unit,
 ): BehandlingId {
     val behandlingId = håndterSøknadService.håndterSøknad(fraJournalpost)!!.id
@@ -82,7 +80,6 @@ fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
         behandlingId = behandlingId,
         tilSteg = tilSteg,
         testdataProvider = testdataProvider,
-        opprettVedtak = opprettVedtak,
     )
     return behandlingId
 }
@@ -90,12 +87,12 @@ fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
 fun IntegrationTest.gjennomførBehandlingsløp(
     behandlingId: BehandlingId,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
-    opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
     testdataProvider: BehandlingTestdataDsl.() -> Unit =
         defaultBehandlingTestdataProvider(
             medAktivitet = ::lagreVilkårperiodeAktivitet,
             medMålgruppe = ::lagreVilkårperiodeMålgruppe,
             medVilkår = listOf(lagreDagligReiseDto()),
+            opprettVedtak = OpprettInnvilgelse,
         ),
 ) {
     // Oppretter grunnlagsdata
@@ -126,7 +123,7 @@ fun IntegrationTest.gjennomførBehandlingsløp(
         return
     }
 
-    gjennomførBeregningSteg(behandling.id, behandling.stønadstype, opprettVedtak)
+    gjennomførBeregningSteg(behandling.id, behandling.stønadstype, testdata.vedtak.vedtak)
 
     if (tilSteg == StegType.SIMULERING) {
         return
@@ -171,7 +168,6 @@ fun IntegrationTest.opprettRevurdering(opprettBehandlingDto: OpprettBehandlingDt
 fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
     fraBehandlingId: BehandlingId,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
-    opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
     testdataProvider: BehandlingTestdataDsl.() -> Unit,
 ): BehandlingId {
     val behandling = kall.behandling.hent(fraBehandlingId)
@@ -184,7 +180,6 @@ fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
                 nyeOpplysningerMetadata = null,
             ),
         tilSteg = tilSteg,
-        opprettVedtak = opprettVedtak,
         testdataProvider = testdataProvider,
     )
 }
@@ -192,14 +187,12 @@ fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
 fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
     opprettBehandlingDto: OpprettBehandlingDto,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
-    opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
     testdataProvider: BehandlingTestdataDsl.() -> Unit,
 ): BehandlingId {
     val revurderingId = opprettRevurdering(opprettBehandlingDto)
     gjennomførBehandlingsløp(
         behandlingId = revurderingId,
         tilSteg = tilSteg,
-        opprettVedtak = opprettVedtak,
         testdataProvider = testdataProvider,
     )
     return revurderingId
@@ -380,6 +373,7 @@ private fun defaultBehandlingTestdataProvider(
     medAktivitet: (BehandlingId) -> LagreVilkårperiode,
     medMålgruppe: (BehandlingId) -> LagreVilkårperiode,
     medVilkår: List<LagreVilkår>,
+    opprettVedtak: OpprettVedtak,
 ): BehandlingTestdataDsl.() -> Unit =
     {
         aktivitet {
@@ -396,6 +390,9 @@ private fun defaultBehandlingTestdataProvider(
             opprett {
                 medVilkår.forEach { add(it) }
             }
+        }
+        vedtak {
+            vedtak = opprettVedtak
         }
     }
 

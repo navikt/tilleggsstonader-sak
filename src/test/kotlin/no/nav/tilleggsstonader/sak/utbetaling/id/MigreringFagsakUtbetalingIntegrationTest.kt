@@ -18,7 +18,6 @@ import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.integrasjonstest.OpprettOpphør
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørAlleTaskMedSenererTriggertid
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
@@ -26,10 +25,10 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurdering
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.DagligIverksettTask
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
@@ -39,18 +38,10 @@ import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatusRec
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.IverksettingDto
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.journalpost
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.UUID
 
 class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() {
@@ -173,7 +164,11 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
             )
 
         // Opphører alt
-        gjennomførBehandlingsløp(revurderingId, opprettVedtak = OpprettOpphør(opphørsdato = fom), testdataProvider = {})
+        gjennomførBehandlingsløp(revurderingId) {
+            vedtak {
+                opphør(opphørsdato = fom)
+            }
+        }
         kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 
         val revurdering = behandlingService.hentBehandling(revurderingId)
@@ -221,19 +216,15 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
 
+        // Revurdering opphører alt
         val revurderingId =
-            opprettRevurdering(
-                opprettBehandlingDto =
-                    OpprettBehandlingDto(
-                        fagsakId = førstegangsbehandling.fagsakId,
-                        årsak = BehandlingÅrsak.SØKNAD,
-                        kravMottatt = 15 februar 2025,
-                        nyeOpplysningerMetadata = null,
-                    ),
-            )
-
-        // Opphører alt
-        gjennomførBehandlingsløp(revurderingId, opprettVedtak = OpprettOpphør(opphørsdato = fom), testdataProvider = {})
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = førstegangsbehandlingId,
+            ) {
+                vedtak {
+                    opphør(opphørsdato = fom)
+                }
+            }
 
         val revurdering = behandlingService.hentBehandling(revurderingId)
         val finnesUtbetalingIdEtterRevurdering =

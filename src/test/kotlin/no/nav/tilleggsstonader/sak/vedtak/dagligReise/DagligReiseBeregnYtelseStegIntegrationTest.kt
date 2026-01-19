@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.integrasjonstest.OpprettOpphør
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurdering
@@ -52,15 +51,16 @@ class DagligReiseBeregnYtelseStegIntegrationTest(
 
         gjennomførBehandlingsløp(
             revurderingId,
-            opprettVedtak =
-                OpprettOpphør(
+            tilSteg = StegType.SIMULERING,
+        ) {
+            vedtak {
+                opphør(
                     årsaker = listOf(ÅrsakOpphør.ENDRING_AKTIVITET),
                     begrunnelse = "avluttet aktivitet",
                     opphørsdato = 15 mars 2025,
-                ),
-            tilSteg = StegType.SIMULERING,
-            testdataProvider = {},
-        )
+                )
+            }
+        }
 
         val beregningsresultat = vedtakService.hentVedtak<OpphørDagligReise>(revurderingId)!!.data.beregningsresultat
         assertThat(
