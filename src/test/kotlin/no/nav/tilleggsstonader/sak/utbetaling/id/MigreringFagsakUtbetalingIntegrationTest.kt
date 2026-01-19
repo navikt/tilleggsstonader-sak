@@ -33,6 +33,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatusRec
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.IverksettingDto
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.StønadUtbetaling
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
+import no.nav.tilleggsstonader.sak.util.toYearMonth
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -236,6 +237,66 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
 
         assertThat(sendtUtbetaling.utbetalinger).hasSize(1)
         assertThat(sendtUtbetaling.utbetalinger.single().stønad).isEqualTo(StønadUtbetaling.BOUTGIFTER_AAP)
+
+        utbetalingStatusHåndterer.behandleStatusoppdatering(
+            iverksettingId = førstegangsbehandlingId.toString(),
+            melding =
+                UtbetalingStatusRecord(
+                    status = UtbetalingStatus.OK,
+                    detaljer = null,
+                    error = null,
+                ),
+            utbetalingGjelderFagsystem = UtbetalingStatusHåndterer.FAGSYSTEM_TILLEGGSSTØNADER,
+        )
+    }
+
+    @Test
+    fun `nye tilsyn-barn-saker skal iverksettes gjennom kafka`() {
+        every { unleashService.isEnabled(Toggle.SKAL_IVERKSETT_NYE_BEHANDLINGER_MOT_KAFKA) } returns true
+
+        val fom = 1 september 2025
+        val tom = 30 september 2025
+
+        val førstegangsbehandlingId =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.BARNETILSYN,
+            ) {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTilsynBarn(fom, tom, aktivitetsdager = 5)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(fom, tom)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        passBarn(fom.toYearMonth(), tom.toYearMonth(), utgift = 1000)
+                    }
+                }
+            }
+        kjørAlleTaskMedSenererTriggertid()
+
+        val førstegangsbehandling = behandlingService.hentBehandling(førstegangsbehandlingId)
+        val finnesUtbetalingIdEtterFørstegangsbehandling =
+            fagsakUtbetalingIdService.finnesUtbetalingsId(førstegangsbehandling.fagsakId, TypeAndel.TILSYN_BARN_AAP)
+
+        assertThat(finnesUtbetalingIdEtterFørstegangsbehandling).isTrue
+        verify(exactly = 0) { iverksettClient.simulerV2(any()) }
+        verify(exactly = 0) { iverksettClient.iverksett(any()) }
+        verify(exactly = 1) { iverksettClient.simulerV3(any()) }
+
+        val sendtUtbetaling =
+            KafkaTestConfig
+                .sendteMeldinger()
+                .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
+                .map { it.verdiEllerFeil<IverksettingDto>() }
+                .single()
+
+        assertThat(sendtUtbetaling.utbetalinger).hasSize(1)
+        assertThat(sendtUtbetaling.utbetalinger.single().stønad).isEqualTo(StønadUtbetaling.TILSYN_BARN_AAP)
 
         utbetalingStatusHåndterer.behandleStatusoppdatering(
             iverksettingId = førstegangsbehandlingId.toString(),
