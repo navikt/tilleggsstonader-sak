@@ -12,7 +12,12 @@ import org.junit.jupiter.api.Test
 class ReiseIdTest : CleanDatabaseIntegrationTest() {
     @Test
     fun `reiseId blir overført fra vilkår til beregningsresultat`() {
-        val behandlingId = opprettBehandlingOgGjennomførBehandlingsløp()
+        val behandlingId =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                defaultDagligReiseTsoTestdata()
+            }
 
         val vilkår =
             kall.vilkårDagligReise

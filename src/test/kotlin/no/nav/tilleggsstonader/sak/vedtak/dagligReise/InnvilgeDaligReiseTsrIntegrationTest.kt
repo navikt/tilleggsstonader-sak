@@ -3,13 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 import io.mockk.every
 import no.nav.familie.prosessering.domene.Status
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
-import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.felles.Tema
-import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
-import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
-import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
-import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
@@ -35,18 +29,10 @@ import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatus
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatusHåndterer
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatusRecord
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.IverksettingDto
-import no.nav.tilleggsstonader.sak.util.journalpost
-import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -80,37 +66,24 @@ class InnvilgeDaligReiseTsrIntegrationTest : CleanDatabaseIntegrationTest() {
 
         val behandlingId =
             opprettBehandlingOgGjennomførBehandlingsløp(
-                fraJournalpost =
-                    journalpost(
-                        journalpostId = "1",
-                        journalstatus = Journalstatus.MOTTATT,
-                        dokumenter = listOf(DokumentInfo("", brevkode = DokumentBrevkode.DAGLIG_REISE.verdi)),
-                        bruker = Bruker("12345678910", BrukerIdType.FNR),
-                        tema = Tema.TSR.name,
-                    ),
-                medAktivitet = { behandlingId ->
-                    lagreVilkårperiodeAktivitet(
-                        behandlingId = behandlingId,
-                        aktivitetType = AktivitetType.TILTAK,
-                        typeAktivitet = TypeAktivitet.GRUPPEAMO,
-                        fom = fom,
-                        tom = tom,
-                        faktaOgSvar =
-                            FaktaOgSvarAktivitetDagligReiseTsrDto(
-                                svarHarUtgifter = SvarJaNei.JA,
-                            ),
-                    )
-                },
-                medMålgruppe = { behandlingId ->
-                    lagreVilkårperiodeMålgruppe(
-                        behandlingId = behandlingId,
-                        målgruppeType = MålgruppeType.TILTAKSPENGER,
-                        fom = fom,
-                        tom = tom,
-                    )
-                },
-                medVilkår = listOf(lagreDagligReiseDto(fom = fom, tom = tom)),
-            )
+                stønadstype = Stønadstype.DAGLIG_REISE_TSR,
+            ) {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTsr(fom, tom, TypeAktivitet.GRUPPEAMO)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeTiltakspenger(fom, tom)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        offentligTransport(fom, tom)
+                    }
+                }
+            }
 
         validerAndeler(behandlingId)
         assertThat(taskService.finnAlleTaskerMedType(InterntVedtakTask.TYPE)).allMatch { it.status == Status.FERDIG }

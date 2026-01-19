@@ -46,32 +46,12 @@ import java.util.UUID
 /**
  * Gjennomfører en behandling fra journalpost og helt til et gitt steg.
  *
- * Foreløpig funker bare innvilgelse.
+ * Kan bruke [testdataProvider] til å modifisere aktiviteter, målgruppe, vilkår og vedtaksresultatet
  *
- * Du kan sende inn ønsket aktivitet, målgruppe og vilkår. Som default er disse satt til et happy-case for daglig reise TSO.
- *
- * [fraJournalpost] Journalposten som behandlingen skal opprettes på bakgrunn av. Bestemmer hvilken stønadstype det blir.
+ * [stønadstype] Oppretter journalpost med brevkode tilhørende stønadstype som brukes til å opprette fagsak
  * [tilSteg] I hvilket steg behandlingen skal ende opp. Som default blir den ferdigstilt.
  *
  */
-@Deprecated("Bruk opprettBehandlingOgGjennomførBehandlingsløp {..}")
-fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
-    fraJournalpost: Journalpost = defaultJournalpost,
-    tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
-    medAktivitet: (BehandlingId) -> LagreVilkårperiode = ::lagreVilkårperiodeAktivitet,
-    medMålgruppe: (BehandlingId) -> LagreVilkårperiode = ::lagreVilkårperiodeMålgruppe,
-    medVilkår: List<LagreVilkår> = listOf(lagreDagligReiseDto()),
-    opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
-): BehandlingId {
-    val behandlingId = håndterSøknadService.håndterSøknad(fraJournalpost)!!.id
-    gjennomførBehandlingsløp(
-        behandlingId = behandlingId,
-        tilSteg = tilSteg,
-        testdataProvider = defaultBehandlingTestdataProvider(medAktivitet, medMålgruppe, medVilkår, opprettVedtak),
-    )
-    return behandlingId
-}
-
 fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
     stønadstype: Stønadstype,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,

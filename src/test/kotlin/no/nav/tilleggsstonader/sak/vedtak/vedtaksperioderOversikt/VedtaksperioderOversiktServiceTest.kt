@@ -2,13 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt
 
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
-import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.felles.Tema
-import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
-import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
-import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
-import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -21,10 +15,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
 import no.nav.tilleggsstonader.sak.util.behandling
-import no.nav.tilleggsstonader.sak.util.journalpost
-import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil
@@ -36,9 +26,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -82,52 +69,19 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
 
         // Gjennomfører behandling for Tiltaksenheten
         opprettBehandlingOgGjennomførBehandlingsløp(
-            fraJournalpost =
-                journalpost(
-                    journalpostId = "1",
-                    journalstatus = Journalstatus.MOTTATT,
-                    dokumenter = listOf(DokumentInfo("", brevkode = DokumentBrevkode.DAGLIG_REISE.verdi)),
-                    bruker = Bruker("12345678910", BrukerIdType.FNR),
-                    tema = Tema.TSR.name,
-                ),
-            medAktivitet = { behandlingId ->
-                lagreVilkårperiodeAktivitet(
-                    behandlingId = behandlingId,
-                    aktivitetType = AktivitetType.TILTAK,
-                    typeAktivitet = TypeAktivitet.ENKELAMO,
-                    fom = fomTiltaksenheten,
-                    tom = tomTiltaksenheten,
-                    faktaOgSvar =
-                        FaktaOgSvarAktivitetDagligReiseTsrDto(
-                            svarHarUtgifter = SvarJaNei.JA,
-                        ),
-                )
-            },
-            medMålgruppe = { behandlingId ->
-                lagreVilkårperiodeMålgruppe(
-                    behandlingId = behandlingId,
-                    målgruppeType = MålgruppeType.TILTAKSPENGER,
-                    fom = fomTiltaksenheten,
-                    tom = tomTiltaksenheten,
-                )
-            },
-            medVilkår = listOf(lagreDagligReiseDto(fom = fomTiltaksenheten, tom = tomTiltaksenheten)),
-        )
+            stønadstype = Stønadstype.DAGLIG_REISE_TSR,
+        ) {
+            defaultDagligReiseTsrTestdata(fomTiltaksenheten, tomTiltaksenheten)
+        }
+
         every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoAAP()
 
         // Gjennomfører behandling for Nay
         val behandlingId =
             opprettBehandlingOgGjennomførBehandlingsløp(
-                fraJournalpost =
-                    journalpost(
-                        journalpostId = "1",
-                        journalstatus = Journalstatus.MOTTATT,
-                        dokumenter = listOf(DokumentInfo("", brevkode = DokumentBrevkode.DAGLIG_REISE.verdi)),
-                        bruker = Bruker("12345678910", BrukerIdType.FNR),
-                        tema = Tema.TSO.name,
-                    ),
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
                 tilSteg = StegType.INNGANGSVILKÅR,
-            )
+            ) {}
 
         val forventetDetaljertVedtaksperiodeTsr =
             listOf(
@@ -135,7 +89,7 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
                     fom = fomTiltaksenheten,
                     tom = tomTiltaksenheten,
                     aktivitet = AktivitetType.TILTAK,
-                    typeAktivtet = TypeAktivitet.ENKELAMO,
+                    typeAktivtet = TypeAktivitet.GRUPPEAMO,
                     målgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
                     typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
                     stønadstype = Stønadstype.DAGLIG_REISE_TSR,

@@ -178,10 +178,24 @@ class OffentligTransportBeregningRevurderingServiceTest : CleanDatabaseIntegrati
     ): FagsakId {
         val førstegangsbehandlingId =
             opprettBehandlingOgGjennomførBehandlingsløp(
-                medAktivitet = ::lagreAktivitet,
-                medMålgruppe = ::lagreMålgruppe,
-                medVilkår = listOf(lagreDagligReiseDto(fom = reiseFom, tom = reiseTom)),
-            )
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                aktivitet {
+                    opprett {
+                        add(::lagreAktivitet)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        add(::lagreMålgruppe)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        offentligTransport(reiseFom, reiseTom)
+                    }
+                }
+            }
 
         val førstegangsbehandling = kall.behandling.hent(førstegangsbehandlingId)
         return førstegangsbehandling.fagsakId
