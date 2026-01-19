@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.fagsak
 
+import io.micrometer.core.instrument.Metrics
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingTilJournalføringDto
@@ -34,6 +35,11 @@ class FagsakService(
     private val personService: PersonService,
     private val behandlingService: BehandlingService,
 ) {
+    init {
+        // Initialiserer counters ved oppstart, slik at de starter på verdi 0
+        Stønadstype.entries.forEach { stønadstypeOpprettetCounter(it) }
+    }
+
     @Transactional
     fun hentEllerOpprettFagsak(
         personIdent: String,
@@ -59,8 +65,6 @@ class FagsakService(
                 it.tilBehandlingJournalDto()
             }
         } ?: emptyList()
-
-    fun harFagsak(personIdenter: Set<String>) = fagsakRepository.findBySøkerIdent(personIdenter).isNotEmpty()
 
     fun finnFagsak(
         personIdenter: Set<String>,
@@ -143,6 +147,7 @@ class FagsakService(
                 ),
             )
         eksternFagsakIdRepository.insert(EksternFagsakId(fagsakId = fagsak.id))
+        inkrementerStønadstypeOpprettetCounter(stønadstype)
         return fagsak
     }
 
@@ -156,5 +161,10 @@ class FagsakService(
         return this.tilFagsakMedPerson(personIdenter, eksternId)
     }
 
-    fun hentAlleFagsakIder() = fagsakRepository.findAllIds()
+    private fun inkrementerStønadstypeOpprettetCounter(stønadstype: Stønadstype) {
+        stønadstypeOpprettetCounter(stønadstype).increment()
+    }
+
+    private fun stønadstypeOpprettetCounter(stønadstype: Stønadstype) =
+        Metrics.counter("fagsak.stonadstype.opprettet", "type", stønadstype.name)
 }
