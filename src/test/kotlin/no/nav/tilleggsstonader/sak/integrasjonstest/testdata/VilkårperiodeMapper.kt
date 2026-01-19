@@ -2,13 +2,15 @@ package no.nav.tilleggsstonader.sak.integrasjonstest.testdata
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetDagligReiseTsrFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.MålgruppeFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 
 fun VilkårperiodeDto.tilLagreVilkårperiodeAktivitet(behandlingId: BehandlingId) =
@@ -18,7 +20,7 @@ fun VilkårperiodeDto.tilLagreVilkårperiodeAktivitet(behandlingId: BehandlingId
         typeAktivitet = typeAktivitet?.kode?.let { TypeAktivitet.valueOf(it) },
         fom = fom,
         tom = tom,
-        faktaOgSvar = faktaOgVurderinger.tilFaktaOgSvar(),
+        faktaOgSvar = faktaOgVurderinger.tilFaktaOgSvarDto(),
         begrunnelse = begrunnelse,
     )
 
@@ -29,12 +31,23 @@ fun VilkårperiodeDto.tilLagreVilkårperiodeMålgruppe(behandlingId: BehandlingI
         typeAktivitet = null,
         fom = fom,
         tom = tom,
-        faktaOgSvar = VilkårperiodeTestUtil.faktaOgVurderingerMålgruppeDto(), // TODO
+        faktaOgSvar = faktaOgVurderinger.tilFaktaOgSvarDto(),
         begrunnelse = begrunnelse,
     )
 
-// TODO gjør denne generisk
-private fun FaktaOgVurderingerDto.tilFaktaOgSvar() =
-    FaktaOgSvarAktivitetDagligReiseTsrDto(
-        svarHarUtgifter = SvarJaNei.JA,
-    )
+private fun FaktaOgVurderingerDto.tilFaktaOgSvarDto(): FaktaOgSvarDto =
+    when (this) {
+        is AktivitetDagligReiseTsrFaktaOgVurderingerDto -> {
+            FaktaOgSvarAktivitetDagligReiseTsrDto(
+                svarHarUtgifter = this.harUtgifter?.svar,
+            )
+        }
+        is MålgruppeFaktaOgVurderingerDto -> {
+            FaktaOgSvarMålgruppeDto(
+                svarMedlemskap = this.medlemskap?.svar,
+                svarUtgifterDekketAvAnnetRegelverk = this.utgifterDekketAvAnnetRegelverk?.svar,
+                svarMottarSykepengerForFulltidsstilling = this.mottarSykepengerForFulltidsstilling?.svar,
+            )
+        }
+        else -> TODO()
+    }
