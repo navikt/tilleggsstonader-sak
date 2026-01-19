@@ -53,7 +53,7 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
                 }
                 vilkår {
                     opprett {
-                        add { _ -> reiser }
+                        add { _, _ -> reiser }
                     }
                 }
             }

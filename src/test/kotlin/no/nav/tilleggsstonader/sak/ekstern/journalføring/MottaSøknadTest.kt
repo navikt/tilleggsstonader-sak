@@ -61,9 +61,6 @@ class MottaSøknadTest : CleanDatabaseIntegrationTest() {
     private lateinit var fagsakRepository: FagsakRepository
 
     @Autowired
-    private lateinit var journalpostClient: JournalpostClient
-
-    @Autowired
     lateinit var journalhendelseKafkaListener: JournalhendelseKafkaListener
 
     @Autowired

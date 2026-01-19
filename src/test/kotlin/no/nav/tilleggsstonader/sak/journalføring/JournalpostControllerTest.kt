@@ -46,7 +46,6 @@ class JournalpostControllerTest(
     @Autowired val fagsakService: FagsakService,
     @Autowired val behandlingService: BehandlingService,
     @Autowired val klageClient: KlageClient,
-    @Autowired val journalpostClient: JournalpostClient,
     @Autowired val oppgaveClient: OppgaveClient,
     @Autowired val ytelseClient: YtelseClient,
 ) : CleanDatabaseIntegrationTest() {

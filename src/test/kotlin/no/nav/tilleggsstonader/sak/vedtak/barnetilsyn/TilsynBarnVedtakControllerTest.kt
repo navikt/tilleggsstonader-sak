@@ -42,9 +42,6 @@ import java.util.UUID
 
 class TilsynBarnVedtakControllerTest : CleanDatabaseIntegrationTest() {
     @Autowired
-    lateinit var barnRepository: BarnRepository
-
-    @Autowired
     lateinit var vilkårperiodeRepository: VilkårperiodeRepository
 
     @Autowired

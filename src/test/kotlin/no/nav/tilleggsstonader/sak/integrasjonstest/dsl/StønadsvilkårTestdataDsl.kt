@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.dsl
 
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
@@ -14,7 +15,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBolig
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
 import java.time.LocalDate
+import java.time.YearMonth
 
 @BehandlingTestdataDslMarker
 class StønadsvilkårTestdataDsl {
@@ -47,13 +50,13 @@ class StønadsvilkårTestdataDsl {
 
 @BehandlingTestdataDslMarker
 class OpprettStønadsvilkårDsl {
-    private val dtoer = mutableListOf<(BehandlingId) -> LagreVilkår>()
+    private val dtoer = mutableListOf<(BehandlingId, Collection<BarnId>) -> LagreVilkår>()
 
     fun offentligTransport(
         fom: LocalDate,
         tom: LocalDate,
     ) {
-        dtoer += { _ ->
+        dtoer += { _, _ ->
             lagreDagligReiseDto(fom = fom, tom = tom)
         }
     }
@@ -62,7 +65,7 @@ class OpprettStønadsvilkårDsl {
         fom: LocalDate,
         tom: LocalDate,
     ) {
-        add { behandlingId ->
+        add { behandlingId, _ ->
             OpprettVilkårDto(
                 fom = fom,
                 tom = tom,
@@ -77,13 +80,36 @@ class OpprettStønadsvilkårDsl {
         }
     }
 
-    fun add(block: (BehandlingId) -> LagreVilkår) {
+    fun passBarn(
+        fom: YearMonth,
+        tom: YearMonth,
+        utgift: Int,
+    ) {
+        add { behandlingId, barnIder ->
+            OpprettVilkårDto(
+                vilkårType = VilkårType.PASS_BARN,
+                barnId = barnIder.first(),
+                behandlingId = behandlingId,
+                delvilkårsett = oppfylteDelvilkårPassBarnDto(),
+                fom = fom.atDay(1),
+                tom = tom.atEndOfMonth(),
+                utgift = utgift,
+                erFremtidigUtgift = false,
+                offentligTransport = null,
+            )
+        }
+    }
+
+    fun add(block: (BehandlingId, Collection<BarnId>) -> LagreVilkår) {
         dtoer += block
     }
 
-    fun add(lagreVilkår: Collection<(BehandlingId) -> LagreVilkår>) {
+    fun add(lagreVilkår: Collection<(BehandlingId, Collection<BarnId>) -> LagreVilkår>) {
         lagreVilkår.forEach { add(it) }
     }
 
-    fun build(behandlingId: BehandlingId) = dtoer.map { it(behandlingId) }
+    fun build(
+        behandlingId: BehandlingId,
+        barnIder: Collection<BarnId>,
+    ) = dtoer.map { it(behandlingId, barnIder) }
 }
