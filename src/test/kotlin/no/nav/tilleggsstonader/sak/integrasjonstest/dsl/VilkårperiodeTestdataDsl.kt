@@ -86,9 +86,10 @@ class OpprettVilkårperiodeDsl {
                 behandlingId = behandlingId,
                 fom = fom,
                 tom = tom,
-                faktaOgSvar = FaktaOgSvarAktivitetBoutgifterDto(
-                    svarLønnet = SvarJaNei.NEI,
-                )
+                faktaOgSvar =
+                    FaktaOgSvarAktivitetBoutgifterDto(
+                        svarLønnet = SvarJaNei.NEI,
+                    ),
             )
         }
     }

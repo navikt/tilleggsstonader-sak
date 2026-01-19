@@ -342,7 +342,7 @@ fun IntegrationTest.gjennomførVilkårSteg(
         BehandlingTestdataDsl.build {
             vilkår {
                 opprett {
-                    medVilkår.forEach { lagreVilkår -> add { _ -> lagreVilkår }  }
+                    medVilkår.forEach { lagreVilkår -> add { _ -> lagreVilkår } }
                 }
             }
         }

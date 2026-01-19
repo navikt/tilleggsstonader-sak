@@ -156,6 +156,10 @@ class UtbetalingV3Mapper(
             TypeAndel.LÆREMIDLER_AAP -> StønadUtbetaling.LÆREMIDLER_AAP
             TypeAndel.LÆREMIDLER_ETTERLATTE -> StønadUtbetaling.LÆREMIDLER_ETTERLATTE
 
+            TypeAndel.BOUTGIFTER_AAP -> StønadUtbetaling.BOUTGIFTER_AAP
+            TypeAndel.BOUTGIFTER_ETTERLATTE -> StønadUtbetaling.BOUTGIFTER_ETTERLATTE
+            TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER -> StønadUtbetaling.BOUTGIFTER_ENSLIG_FORSØRGER
+
             else -> error("Skal ikke sende andelstype=$typeAndel på kafka")
         }
 

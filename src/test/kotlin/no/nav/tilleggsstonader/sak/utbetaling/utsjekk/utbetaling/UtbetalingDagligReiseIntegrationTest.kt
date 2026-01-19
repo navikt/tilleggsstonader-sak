@@ -86,7 +86,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 }
                 vilkår {
                     opprett {
-                        reiser.forEach { reise ->  add { _ -> reise } }
+                        reiser.forEach { reise -> add { _ -> reise } }
                     }
                 }
             }

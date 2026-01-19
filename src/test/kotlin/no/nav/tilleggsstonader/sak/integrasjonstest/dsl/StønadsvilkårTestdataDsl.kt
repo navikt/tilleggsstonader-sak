@@ -60,7 +60,7 @@ class OpprettStønadsvilkårDsl {
 
     fun løpendeutgifterEnBolig(
         fom: LocalDate,
-        tom: LocalDate
+        tom: LocalDate,
     ) {
         add { behandlingId ->
             OpprettVilkårDto(
