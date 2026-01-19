@@ -16,7 +16,7 @@ class OpprettVedtakTestdataDsl {
     }
 
     fun opphør(
-        årsaker: List<ÅrsakOpphør> = listOf(`ÅrsakOpphør`.ANNET),
+        årsaker: List<ÅrsakOpphør> = listOf(ÅrsakOpphør.ANNET),
         begrunnelse: String = "annet",
         opphørsdato: LocalDate,
     ) {
