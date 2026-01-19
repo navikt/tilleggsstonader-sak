@@ -6,9 +6,6 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
-import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -119,7 +116,7 @@ class UtbetalingStatusHåndtererIntegrationTest(
             opprettBehandlingOgGjennomførBehandlingsløp {
                 aktivitet {
                     opprett {
-                        aktivitetTiltak(fom, tom)
+                        aktivitetTiltakTso(fom, tom)
                     }
                 }
                 målgruppe {

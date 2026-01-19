@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.dsl
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import java.time.LocalDate
 
@@ -32,12 +33,37 @@ class BehandlingTestdataDsl internal constructor() {
     ) {
         aktivitet {
             opprett {
-                aktivitetTiltak(fom, tom)
+                aktivitetTiltakTso(fom, tom)
             }
         }
         målgruppe {
             opprett {
                 målgruppeAAP(fom, tom)
+            }
+        }
+        vilkår {
+            opprett {
+                offentligTransport(fom = fom, tom = tom)
+            }
+        }
+    }
+
+    fun defaultDagligReiseTsrTestdata(
+        fom: LocalDate = 1 januar 2026,
+        tom: LocalDate = 31 januar 2026,
+    ) {
+        aktivitet {
+            opprett {
+                aktivitetTiltakTsr(
+                    fom = fom,
+                    tom = tom,
+                    typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                )
+            }
+        }
+        målgruppe {
+            opprett {
+                målgruppeTiltakspenger(fom, tom)
             }
         }
         vilkår {

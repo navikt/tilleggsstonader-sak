@@ -23,7 +23,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
         opprettBehandlingOgGjennomførBehandlingsløp {
             aktivitet {
                 opprett {
-                    aktivitetTiltak(fom = fom, tom = tom)
+                    aktivitetTiltakTso(fom = fom, tom = tom)
                 }
             }
             målgruppe {
@@ -64,7 +64,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             opprettBehandlingOgGjennomførBehandlingsløp {
                 aktivitet {
                     opprett {
-                        aktivitetTiltak(fom = fom, tom = tom)
+                        aktivitetTiltakTso(fom = fom, tom = tom)
                     }
                 }
                 målgruppe {
@@ -110,7 +110,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
         opprettBehandlingOgGjennomførBehandlingsløp {
             aktivitet {
                 opprett {
-                    aktivitetTiltak(fom = fom, tom = tom)
+                    aktivitetTiltakTso(fom = fom, tom = tom)
                 }
             }
             målgruppe {
