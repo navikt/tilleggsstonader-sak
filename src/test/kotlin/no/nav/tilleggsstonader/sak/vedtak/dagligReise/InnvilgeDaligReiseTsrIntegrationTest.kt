@@ -39,6 +39,8 @@ import no.nav.tilleggsstonader.sak.util.journalpost
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -64,6 +66,9 @@ class InnvilgeDaligReiseTsrIntegrationTest : CleanDatabaseIntegrationTest() {
 
     @Autowired
     lateinit var vilkårperiodeService: VilkårperiodeService
+
+    @Autowired
+    lateinit var vilkårService: VilkårService
 
     @Autowired
     lateinit var utbetalingStatusHåndterer: UtbetalingStatusHåndterer
@@ -145,10 +150,16 @@ class InnvilgeDaligReiseTsrIntegrationTest : CleanDatabaseIntegrationTest() {
 
         val vilkårsperioderFørstegangsbehandling = vilkårperiodeService.hentVilkårperioder(førstegangsbehandlingId)
         val vilkårsperioderRevurdering = vilkårperiodeService.hentVilkårperioder(revurderingId)
-        // TODO valider vilkår
-        validerErInngangsvilkårErLike(
+        validerErInngangsvilkårLike(
             vilkårsperioderFørstegangsbehandling = vilkårsperioderFørstegangsbehandling,
             vilkårsperioderRevurdering = vilkårsperioderRevurdering,
+        )
+
+        val vilkårFørstegangsbehandling = vilkårService.hentVilkår(førstegangsbehandlingId)
+        val vilkårRevurdering = vilkårService.hentVilkår(revurderingId)
+        validerErVilkårLike(
+            vilkårListeFørstegangsbehanlding = vilkårFørstegangsbehandling,
+            vilkårListeRevurdering = vilkårRevurdering,
         )
 
         gjennomførBehandlingsløp(revurderingId) {
@@ -215,7 +226,7 @@ class InnvilgeDaligReiseTsrIntegrationTest : CleanDatabaseIntegrationTest() {
         ).allMatch { it.betalendeEnhet != null }
     }
 
-    private fun validerErInngangsvilkårErLike(
+    private fun validerErInngangsvilkårLike(
         vilkårsperioderFørstegangsbehandling: Vilkårperioder,
         vilkårsperioderRevurdering: Vilkårperioder,
     ) {
@@ -242,5 +253,25 @@ class InnvilgeDaligReiseTsrIntegrationTest : CleanDatabaseIntegrationTest() {
         assertThat(aktivitetFørstegangsbehandling.begrunnelse).isEqualTo(aktivitetRevurdering.begrunnelse)
         assertThat(aktivitetFørstegangsbehandling.resultat).isEqualTo(aktivitetRevurdering.resultat)
         assertThat(aktivitetFørstegangsbehandling.kilde).isEqualTo(aktivitetRevurdering.kilde)
+    }
+
+    private fun validerErVilkårLike(
+        vilkårListeFørstegangsbehanlding: List<Vilkår>,
+        vilkårListeRevurdering: List<Vilkår>,
+    ) {
+        val vilkårFørstegangsbehandling = vilkårListeFørstegangsbehanlding.single()
+        val vilkårRevurdering = vilkårListeRevurdering.single()
+
+        assertThat(vilkårFørstegangsbehandling.resultat).isEqualTo(vilkårRevurdering.resultat)
+        assertThat(vilkårFørstegangsbehandling.type).isEqualTo(vilkårRevurdering.type)
+        assertThat(vilkårFørstegangsbehandling.fom).isEqualTo(vilkårRevurdering.fom)
+        assertThat(vilkårFørstegangsbehandling.tom).isEqualTo(vilkårRevurdering.tom)
+        assertThat(vilkårFørstegangsbehandling.utgift).isEqualTo(vilkårRevurdering.utgift)
+        assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(vilkårRevurdering.barnId)
+        assertThat(vilkårFørstegangsbehandling.erFremtidigUtgift).isEqualTo(vilkårRevurdering.erFremtidigUtgift)
+        assertThat(vilkårFørstegangsbehandling.adresse).isEqualTo(vilkårRevurdering.adresse)
+        assertThat(vilkårFørstegangsbehandling.delvilkårwrapper).isEqualTo(vilkårRevurdering.delvilkårwrapper)
+        assertThat(vilkårFørstegangsbehandling.slettetKommentar).isEqualTo(vilkårRevurdering.slettetKommentar)
+        assertThat(vilkårFørstegangsbehandling.fakta).isEqualTo(vilkårRevurdering.fakta)
     }
 }
