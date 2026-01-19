@@ -4,11 +4,11 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
-import no.nav.tilleggsstonader.sak.integrasjonstest.defaultJournalpost
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.finnAlleTaskerMedType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførHenleggelse
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.defaultJournalpost
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

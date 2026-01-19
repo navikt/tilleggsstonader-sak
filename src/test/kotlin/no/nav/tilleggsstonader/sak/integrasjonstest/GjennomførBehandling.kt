@@ -1,13 +1,8 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest
 
-import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
-import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
-import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
-import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
-import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
@@ -21,7 +16,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.dsl.BehandlingTestdataDsl
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
-import no.nav.tilleggsstonader.sak.util.journalpost
+import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.defaultJournalpost
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
@@ -379,14 +374,6 @@ fun IntegrationTest.gjennomførVilkårSteg(
     gjennomførVilkårSteg(testdataProvider, behandlingId, stønadstype)
 }
 
-val defaultJournalpost =
-    journalpost(
-        journalpostId = "1",
-        journalstatus = Journalstatus.MOTTATT,
-        dokumenter = listOf(DokumentInfo("", brevkode = DokumentBrevkode.DAGLIG_REISE.verdi)),
-        bruker = Bruker("12345678910", BrukerIdType.FNR),
-    )
-
 private const val MINIMALT_BREV = """SAKSBEHANDLER_SIGNATUR - BREVDATO_PLACEHOLDER - BESLUTTER_SIGNATUR"""
 
 private fun defaultBehandlingTestdataProvider(
@@ -443,7 +430,7 @@ private fun IntegrationTest.gjennomførInngangsvilkårSteg(
 
     // Oppdater aktiviteter
     testdataDsl.aktivitet.update.forEach { upd ->
-        val (vilkårperiodeId, lagreVilkårperiode) = upd(vilkårperioder.aktiviteter)
+        val (vilkårperiodeId, lagreVilkårperiode) = upd(vilkårperioder.aktiviteter, behandlingId)
         kall.vilkårperiode.oppdater(
             vilkårperiodeId = vilkårperiodeId,
             lagreVilkårperiode = lagreVilkårperiode,
@@ -461,7 +448,7 @@ private fun IntegrationTest.gjennomførInngangsvilkårSteg(
 
     // Oppdater målgruppeer
     testdataDsl.målgruppe.update.forEach { upd ->
-        val (vilkårperiodeId, lagreVilkårperiode) = upd(vilkårperioder.målgrupper)
+        val (vilkårperiodeId, lagreVilkårperiode) = upd(vilkårperioder.målgrupper, behandlingId)
         kall.vilkårperiode.oppdater(
             vilkårperiodeId = vilkårperiodeId,
             lagreVilkårperiode = lagreVilkårperiode,

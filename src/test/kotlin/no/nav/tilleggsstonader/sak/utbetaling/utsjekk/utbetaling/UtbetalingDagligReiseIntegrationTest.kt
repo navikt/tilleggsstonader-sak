@@ -30,7 +30,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
         opprettBehandlingOgGjennomførBehandlingsløp {
             aktivitet {
                 opprett {
-                    aktivitetTiltak(fom = fom, tom = tom)
+                    aktivitetTiltakTso(fom = fom, tom = tom)
                 }
             }
             målgruppe {
@@ -71,7 +71,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             opprettBehandlingOgGjennomførBehandlingsløp {
                 aktivitet {
                     opprett {
-                        aktivitetTiltak(fom = fom, tom = tom)
+                        aktivitetTiltakTso(fom = fom, tom = tom)
                     }
                 }
                 målgruppe {
@@ -117,7 +117,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
         opprettBehandlingOgGjennomførBehandlingsløp {
             aktivitet {
                 opprett {
-                    aktivitetTiltak(fom = fom, tom = tom)
+                    aktivitetTiltakTso(fom = fom, tom = tom)
                 }
             }
             målgruppe {
@@ -164,7 +164,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             opprettBehandlingOgGjennomførBehandlingsløp {
                 aktivitet {
                     opprett {
-                        aktivitetTiltak(førstePeriode.fom, førstePeriode.tom)
+                        aktivitetTiltakTso(førstePeriode.fom, førstePeriode.tom)
                         add { behandlingId ->
                             lagreVilkårperiodeAktivitet(
                                 behandlingId = behandlingId,

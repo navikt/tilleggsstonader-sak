@@ -41,7 +41,7 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
             opprettBehandlingOgGjennomførBehandlingsløp {
                 aktivitet {
                     opprett {
-                        aktivitetTiltak(fom, tom)
+                        aktivitetTiltakTso(fom, tom)
                     }
                 }
                 målgruppe {
