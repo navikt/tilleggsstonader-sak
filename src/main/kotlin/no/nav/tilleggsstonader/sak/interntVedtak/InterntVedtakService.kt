@@ -200,10 +200,10 @@ class InterntVedtakService(
     private fun mapVilkår(
         vilkår: List<Vilkår>,
         behandlingBarn: Map<BarnId, GrunnlagBarn>,
-    ): List<VilkårInternt> =
+    ): List<VilkårInterntVedtak> =
         vilkår
             .map { vilkår ->
-                VilkårInternt(
+                VilkårInterntVedtak(
                     type = vilkår.type,
                     resultat = vilkår.resultat,
                     fødselsdatoBarn = vilkår.barnId?.let { behandlingBarn.finnFødselsdato(it) },
@@ -218,11 +218,11 @@ class InterntVedtakService(
             }.sortedWith(compareBy<VilkårInternt> { it.type }.thenBy { it.fødselsdatoBarn }.thenBy { it.fom })
 
     private fun mapDelvilkår(delvilkår: Delvilkår) =
-        DelvilkårInternt(
+        DelvilkårInterntVedtak(
             resultat = delvilkår.resultat,
             vurderinger =
                 delvilkår.vurderinger.map { vurdering ->
-                    VurderingInternt(
+                    VurderingInterntVedtak(
                         regel = vurdering.regelId.beskrivelse,
                         svar = vurdering.svar?.beskrivelse,
                         begrunnelse = vurdering.begrunnelse,
@@ -326,10 +326,10 @@ class InterntVedtakService(
         }
     }
 
-    private fun mapVilkårFakta(fakta: no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta?): VilkårFaktaInternt? =
+    private fun mapVilkårFakta(fakta: VilkårFakta?): VilkårFaktaInterntVedtak? =
         when (fakta) {
             is FaktaDagligReiseOffentligTransport ->
-                VilkårFaktaOffentligTransport(
+                VilkårFaktaOffentligTransportInterntVedtak(
                     reisedagerPerUke = fakta.reisedagerPerUke,
                     prisEnkelbillett = fakta.prisEnkelbillett,
                     prisSyvdagersbillett = fakta.prisSyvdagersbillett,
@@ -337,7 +337,7 @@ class InterntVedtakService(
                 )
 
             is FaktaDagligReisePrivatBil ->
-                VilkårFaktaPrivatBil(
+                VilkårFaktaPrivatBilInterntVedtak(
                     reisedagerPerUke = fakta.reisedagerPerUke,
                     reiseavstandEnVei = fakta.reiseavstandEnVei,
                     bompengerEnVei = fakta.bompengerEnVei,
