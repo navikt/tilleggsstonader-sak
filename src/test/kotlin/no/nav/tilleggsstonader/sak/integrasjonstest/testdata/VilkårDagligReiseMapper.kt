@@ -5,20 +5,23 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SvarO
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 
 fun VilkårDagligReiseDto.tilLagreDagligReiseDto() =
     LagreDagligReiseDto(
         fom = fom,
         tom = tom,
-        adresse = adresse!!,
+        adresse = adresse ?: error("Forventer adresse i test dataen"),
         svar = delvilkårsett.tilSvar(),
         fakta = fakta,
     )
 
-// TODO
-private fun List<DelvilkårDto>.tilSvar() =
-    mapOf(
-        RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
-        RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
-    )
+private fun List<DelvilkårDto>.tilSvar(): Map<RegelId, SvarOgBegrunnelseDto> =
+    this
+        .flatMap { it.vurderinger }
+        .associate { vurderingDto ->
+            vurderingDto.regelId to
+                SvarOgBegrunnelseDto(
+                    svar = vurderingDto.svar ?: error("Forventer svar i test dataen"),
+                    begrunnelse = vurderingDto.begrunnelse,
+                )
+        }
