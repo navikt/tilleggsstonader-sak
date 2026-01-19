@@ -38,7 +38,9 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
             )
 
         val førstegangsbehandlingId =
-            opprettBehandlingOgGjennomførBehandlingsløp {
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
                 aktivitet {
                     opprett {
                         aktivitetTiltakTso(fom, tom)

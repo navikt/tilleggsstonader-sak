@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.ekstern.journalføring
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.finnAlleTaskerMedType
@@ -40,7 +41,9 @@ class HåndterSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
 
     @Test
     internal fun `oppretter behandling hvis alle eksisterende behandlinger er ferdigstilt`() {
-        opprettBehandlingOgGjennomførBehandlingsløp {
+        opprettBehandlingOgGjennomførBehandlingsløp(
+            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+        ) {
             defaultDagligReiseTsoTestdata()
         }
 

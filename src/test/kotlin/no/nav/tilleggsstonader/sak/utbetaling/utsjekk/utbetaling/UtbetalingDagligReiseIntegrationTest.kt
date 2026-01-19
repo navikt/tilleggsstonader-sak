@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.august
 import no.nav.tilleggsstonader.libs.utils.dato.oktober
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
@@ -27,7 +28,9 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
 
     @Test
     fun `utbetalingsdato i fremtiden - ingen andeler skal bli utbetalt`() {
-        opprettBehandlingOgGjennomførBehandlingsløp {
+        opprettBehandlingOgGjennomførBehandlingsløp(
+            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+        ) {
             aktivitet {
                 opprett {
                     aktivitetTiltakTso(fom = fom, tom = tom)
@@ -68,7 +71,9 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             )
 
         val behandlingId =
-            opprettBehandlingOgGjennomførBehandlingsløp {
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
                 aktivitet {
                     opprett {
                         aktivitetTiltakTso(fom = fom, tom = tom)
@@ -114,7 +119,9 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 lagreDagligReiseDto(fom = nå.plusWeeks(1), tom = nå.plusWeeks(2)),
             )
 
-        opprettBehandlingOgGjennomførBehandlingsløp {
+        opprettBehandlingOgGjennomførBehandlingsløp(
+            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+        ) {
             aktivitet {
                 opprett {
                     aktivitetTiltakTso(fom = fom, tom = tom)
@@ -161,7 +168,9 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
         val andrePeriode = Datoperiode(1 oktober 2025, 20 oktober 2025)
 
         val behandlingId =
-            opprettBehandlingOgGjennomførBehandlingsløp {
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
                 aktivitet {
                     opprett {
                         aktivitetTiltakTso(førstePeriode.fom, førstePeriode.tom)

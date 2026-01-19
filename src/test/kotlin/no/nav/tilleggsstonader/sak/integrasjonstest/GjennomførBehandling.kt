@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksK
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.defaultJournalpost
+import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.journalpostSøknadForStønadstype
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
@@ -53,6 +54,7 @@ import java.util.UUID
  * [tilSteg] I hvilket steg behandlingen skal ende opp. Som default blir den ferdigstilt.
  *
  */
+@Deprecated("Bruk opprettBehandlingOgGjennomførBehandlingsløp {..}")
 fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
     fraJournalpost: Journalpost = defaultJournalpost,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
@@ -71,11 +73,11 @@ fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
 }
 
 fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
-    fraJournalpost: Journalpost = defaultJournalpost,
+    stønadstype: Stønadstype,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
     testdataProvider: BehandlingTestdataDsl.() -> Unit,
 ): BehandlingId {
-    val behandlingId = håndterSøknadService.håndterSøknad(fraJournalpost)!!.id
+    val behandlingId = håndterSøknadService.håndterSøknad(journalpostSøknadForStønadstype(stønadstype))!!.id
     gjennomførBehandlingsløp(
         behandlingId = behandlingId,
         tilSteg = tilSteg,

@@ -2,13 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
-import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.felles.Tema
-import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
-import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
-import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
-import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.libs.utils.dato.oktober
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
@@ -18,7 +12,6 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomf�
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
-import no.nav.tilleggsstonader.sak.util.journalpost
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -38,14 +31,7 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
 
         // Gjennomfører behandling for Tiltaksenheten
         opprettBehandlingOgGjennomførBehandlingsløp(
-            fraJournalpost =
-                journalpost(
-                    journalpostId = "1",
-                    journalstatus = Journalstatus.MOTTATT,
-                    dokumenter = listOf(DokumentInfo("", brevkode = DokumentBrevkode.DAGLIG_REISE.verdi)),
-                    bruker = Bruker("12345678910", BrukerIdType.FNR),
-                    tema = Tema.TSR.name,
-                )
+            stønadstype = Stønadstype.DAGLIG_REISE_TSR,
         ) {
             aktivitet {
                 opprett {
@@ -69,15 +55,8 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
         // Gjennomfører behandling for Nay
         val behandlingId =
             opprettBehandlingOgGjennomførBehandlingsløp(
-                fraJournalpost =
-                    journalpost(
-                        journalpostId = "1",
-                        journalstatus = Journalstatus.MOTTATT,
-                        dokumenter = listOf(DokumentInfo("", brevkode = DokumentBrevkode.DAGLIG_REISE.verdi)),
-                        bruker = Bruker("12345678910", BrukerIdType.FNR),
-                        tema = Tema.TSO.name,
-                    ),
-                tilSteg = StegType.BEREGNE_YTELSE
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+                tilSteg = StegType.BEREGNE_YTELSE,
             ) {
                 aktivitet {
                     opprett {

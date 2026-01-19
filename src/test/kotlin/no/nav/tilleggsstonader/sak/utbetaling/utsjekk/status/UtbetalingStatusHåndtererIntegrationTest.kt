@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -28,7 +29,10 @@ class UtbetalingStatusHåndtererIntegrationTest(
     ) {
         // Gjennomfør behandling til iverksetting er ferdig
         val behandlingId =
-            opprettBehandlingOgGjennomførBehandlingsløp(tilSteg = StegType.BEHANDLING_FERDIGSTILT) {
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+                tilSteg = StegType.BEHANDLING_FERDIGSTILT,
+            ) {
                 defaultDagligReiseTsoTestdata()
             }
 
@@ -66,7 +70,9 @@ class UtbetalingStatusHåndtererIntegrationTest(
     @Test
     fun `FEILET status oppdaterer andeler med FEILET status og inkluderer error detaljer`() {
         val behandlingId =
-            opprettBehandlingOgGjennomførBehandlingsløp {
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
                 defaultDagligReiseTsoTestdata()
             }
 
@@ -113,7 +119,9 @@ class UtbetalingStatusHåndtererIntegrationTest(
 
         // Opprett behandling med flere andeler
         val behandlingId =
-            opprettBehandlingOgGjennomførBehandlingsløp {
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
                 aktivitet {
                     opprett {
                         aktivitetTiltakTso(fom, tom)
@@ -164,7 +172,9 @@ class UtbetalingStatusHåndtererIntegrationTest(
     @Test
     fun `ignorerer status for andre fagsystemer`() {
         val behandlingId =
-            opprettBehandlingOgGjennomførBehandlingsløp {
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
                 defaultDagligReiseTsoTestdata()
             }
 

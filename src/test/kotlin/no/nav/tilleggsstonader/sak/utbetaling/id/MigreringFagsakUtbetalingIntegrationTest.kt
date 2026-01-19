@@ -2,12 +2,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.id
 
 import io.mockk.every
 import io.mockk.verify
-import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
-import no.nav.tilleggsstonader.kontrakter.felles.Tema
-import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
-import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
-import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
-import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.oktober
 import no.nav.tilleggsstonader.libs.utils.dato.september
@@ -37,7 +32,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatusHå
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatusRecord
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.IverksettingDto
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
-import no.nav.tilleggsstonader.sak.util.journalpost
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -302,14 +296,7 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
         tom: LocalDate,
     ): BehandlingId =
         opprettBehandlingOgGjennomførBehandlingsløp(
-            fraJournalpost =
-                journalpost(
-                    journalpostId = "1",
-                    journalstatus = Journalstatus.MOTTATT,
-                    dokumenter = listOf(DokumentInfo("", brevkode = DokumentBrevkode.LÆREMIDLER.verdi)),
-                    bruker = Bruker("12345678910", BrukerIdType.FNR),
-                    tema = Tema.TSO.name,
-                ),
+            stønadstype = Stønadstype.LÆREMIDLER,
         ) {
             aktivitet {
                 opprett {
