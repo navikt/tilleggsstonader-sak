@@ -92,7 +92,7 @@ class InnvilgeDaligReiseTsrIntegrationTest : CleanDatabaseIntegrationTest() {
                     lagreVilkårperiodeAktivitet(
                         behandlingId = behandlingId,
                         aktivitetType = AktivitetType.TILTAK,
-                        typeAktivitet = TypeAktivitet.ENKELAMO,
+                        typeAktivitet = TypeAktivitet.GRUPPEAMO,
                         fom = fom,
                         tom = tom,
                         faktaOgSvar =
