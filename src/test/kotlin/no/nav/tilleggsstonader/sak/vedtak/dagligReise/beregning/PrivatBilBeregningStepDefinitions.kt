@@ -4,48 +4,81 @@ import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
 import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
+import io.mockk.every
+import io.mockk.mockk
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
-import no.nav.tilleggsstonader.sak.cucumber.parseBigDecimal
+import no.nav.tilleggsstonader.sak.cucumber.parseBoolean
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
-import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
+import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForUke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import org.assertj.core.api.Assertions.assertThat
 
 @Suppress("unused", "ktlint:standard:function-naming")
 class PrivatBilBeregningStepDefinitions {
-    /*val beregningService =
+    val behandlingServiceMock = mockk<BehandlingService>()
+    val vilkårServiceMock = mockk<VilkårService>()
+    val vilkårRepositoryFake = VilkårRepositoryFake()
+    val unleashServiceMock = mockk<UnleashService>()
+
+    val dagligReiseVilkårService =
+        DagligReiseVilkårService(
+            vilkårRepository = vilkårRepositoryFake,
+            vilkårService = vilkårServiceMock,
+            behandlingService = behandlingServiceMock,
+            unleashService = unleashServiceMock,
+        )
+
+    val behandlingId = BehandlingId.random()
+
+    val beregningService =
         PrivatBilBeregningService()
 
-    var reiser: List<`VilkårDagligReise`> = emptyList()
+    var reiser: List<VilkårDagligReise> = emptyList()
+
+    var vedtaksperioder: List<Vedtaksperiode> = emptyList()
 
     var beregningsResultat: BeregningsresultatPrivatBil? = null
     var forventetBeregningsresultat: List<BeregningsresultatUkeCucumber> = emptyList()
 
-    @Gitt("følgende dummyperioder for daglig reise privat bil")
+    @Gitt("følgende vedtaksperioder for daglig reise privat bil")
+    fun `følgende vedtaksperioder`(dataTable: DataTable) {
+        vedtaksperioder = mapVedtaksperioder(dataTable)
+    }
+
+    @Gitt("følgende vilkår for daglig reise med privat bil")
     fun `følgende dummyperioder`(dataTable: DataTable) {
+        every { behandlingServiceMock.hentSaksbehandling(any<BehandlingId>()) } returns
+            dummyBehandling(
+                behandlingId = behandlingId,
+                steg = StegType.VILKÅR,
+            )
+
+        every { unleashServiceMock.isEnabled(any()) } returns true
+
         reiser =
             dataTable.mapRad { rad ->
-                DummyReiseMedBil(
-                    fom = parseDato(`DomenenøkkelFelles`.FOM, rad),
-                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                    reiseId = ReiseId.random(),
-                    reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, rad),
-                    reiseavstandEnVei = parseBigDecimal(DomenenøkkelPrivatBil.REISEAVSTAND_EN_VEI, rad),
-                    bompengerEnVei = parseValgfriInt(DomenenøkkelPrivatBil.BOMPENGER, rad),
-                    fergekostandEnVei = parseValgfriInt(DomenenøkkelPrivatBil.FERGEKOSTNAD, rad),
-                )
+                val nyttVilkår = mapTilVilkårDagligReise(TypeDagligReise.PRIVAT_BIL, rad)
+                dagligReiseVilkårService.opprettNyttVilkår(behandlingId = behandlingId, nyttVilkår = nyttVilkår)
             }
     }
 
     @Når("beregner for daglig reise privat bil")
     fun `beregner for daglig reise privat bil`() {
-        beregningsResultat = beregningService.beregn(reiser)
+        beregningsResultat = beregningService.beregn(vedtaksperioder, reiser)
     }
 
     @Så("forventer vi følgende beregningsrsultat for daglig reise privatBil")
@@ -78,7 +111,7 @@ class PrivatBilBeregningStepDefinitions {
                         antallDagerInkludererHelg = parseBoolean(DomenenøkkelPrivatBil.INKLUDERER_HELG, rad),
                     ),
             )
-        }*/
+        }
 }
 
 enum class DomenenøkkelPrivatBil(

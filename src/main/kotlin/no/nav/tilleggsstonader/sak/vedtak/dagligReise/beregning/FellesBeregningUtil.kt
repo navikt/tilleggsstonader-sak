@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
+import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -21,8 +22,8 @@ fun antallHelgedagerIPeriodeInklusiv(
         .takeWhile { !it.isAfter(tom) }
         .count { it.dayOfWeek.value in 6..7 }
 
-fun <P : Periode<LocalDate>> P.splitPerUkeMedHelg(): List<UkeMedAntallDager> {
-    val uker = mutableListOf<UkeMedAntallDager>()
+fun <P : Periode<LocalDate>> P.splitPerUkeMedHelg(): List<PeriodeMedAntallDager> {
+    val uker = mutableListOf<PeriodeMedAntallDager>()
 
     var startOfWeek = this.fom
 
@@ -31,7 +32,7 @@ fun <P : Periode<LocalDate>> P.splitPerUkeMedHelg(): List<UkeMedAntallDager> {
         val endOfWeek: LocalDate = minOf(nærmesteSøndagFremITid, this.tom)
 
         uker.add(
-            UkeMedAntallDager(
+            PeriodeMedAntallDager(
                 fom = startOfWeek,
                 tom = endOfWeek,
                 antallHverdager = antallHverdagerIPeriodeInklusiv(fom = startOfWeek, tom = endOfWeek),
@@ -45,13 +46,19 @@ fun <P : Periode<LocalDate>> P.splitPerUkeMedHelg(): List<UkeMedAntallDager> {
     return uker
 }
 
-data class UkeMedAntallDager(
+data class PeriodeMedAntallDager(
     override val fom: LocalDate,
     override val tom: LocalDate,
     var antallHverdager: Int,
     var antallHelgedager: Int,
-) : Periode<LocalDate> {
+) : Periode<LocalDate>,
+    KopierPeriode<PeriodeMedAntallDager> {
     init {
         validatePeriode()
     }
+
+    override fun medPeriode(
+        fom: LocalDate,
+        tom: LocalDate,
+    ): PeriodeMedAntallDager = this.copy(fom = fom, tom = tom)
 }

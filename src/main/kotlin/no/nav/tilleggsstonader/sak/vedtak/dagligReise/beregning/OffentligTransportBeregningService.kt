@@ -59,8 +59,7 @@ class OffentligTransportBeregningService {
         brukersNavKontor: String?,
     ): BeregningsresultatForPeriode {
         val vedtaksperiodeGrunnlag =
-            finnSnittMellomReiseOgVedtaksperioder(trettidagerReisePeriode, vedtaksperioder)
-                .justerteVedtaksperioder
+            finnSnittVedtaksperioder(trettidagerReisePeriode, vedtaksperioder)
                 .map { vedtaksperiode ->
                     VedtaksperiodeGrunnlag(
                         vedtaksperiode = vedtaksperiode,

@@ -59,10 +59,10 @@ class DagligReiseBeregningService(
                     brukersNavKontor = brukersNavKontor,
                     tidligsteEndring = tidligsteEndring,
                 ),
-            privatBil =
-                beregnRammePrivatBil(
-                    oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
-                ),
+            privatBil = null,
+//                beregnRammePrivatBil(
+//                    oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
+//                ),
         )
     }
 
@@ -96,12 +96,12 @@ class DagligReiseBeregningService(
             tidligsteEndring = tidligsteEndring,
         )
 
-    private fun beregnRammePrivatBil(oppfylteVilkårDagligReise: List<VilkårDagligReise>): BeregningsresultatPrivatBil? {
-        val oppfylteVilkårPrivatBil = oppfylteVilkårDagligReise.filter { it.fakta is FaktaPrivatBil }
-
-        if (oppfylteVilkårPrivatBil.isEmpty()) return null
-        return privatBilBeregningService.beregnRamme(oppfylteVilkårPrivatBil)
-    }
+//    private fun beregnRammePrivatBil(oppfylteVilkårDagligReise: List<VilkårDagligReise>): BeregningsresultatPrivatBil? {
+//        val oppfylteVilkårPrivatBil = oppfylteVilkårDagligReise.filter { it.fakta is FaktaPrivatBil }
+//
+//        if (oppfylteVilkårPrivatBil.isEmpty()) return null
+//        return privatBilBeregningService.beregnRamme(oppfylteVilkårPrivatBil)
+//    }
 }
 
 private fun validerFinnesReiser(vilkår: List<VilkårDagligReise>) {

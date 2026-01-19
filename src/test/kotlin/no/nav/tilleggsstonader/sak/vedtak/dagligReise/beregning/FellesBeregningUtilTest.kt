@@ -75,31 +75,31 @@ class FellesBeregningUtilTest {
 
             val forventedeUker =
                 listOf(
-                    UkeMedAntallDager(
+                    PeriodeMedAntallDager(
                         fom = førsteJanuar,
                         tom = førsteJanuar.plusDays(4),
                         antallHverdager = 3,
                         antallHelgedager = 2,
                     ),
-                    UkeMedAntallDager(
+                    PeriodeMedAntallDager(
                         fom = sjetteJanuar,
                         tom = sjetteJanuar.plusDays(6),
                         antallHverdager = 5,
                         antallHelgedager = 2,
                     ),
-                    UkeMedAntallDager(
+                    PeriodeMedAntallDager(
                         fom = trettendeJanuar,
                         tom = trettendeJanuar.plusDays(6),
                         antallHverdager = 5,
                         antallHelgedager = 2,
                     ),
-                    UkeMedAntallDager(
+                    PeriodeMedAntallDager(
                         fom = tjuendeJanuar,
                         tom = tjuendeJanuar.plusDays(6),
                         antallHverdager = 5,
                         antallHelgedager = 2,
                     ),
-                    UkeMedAntallDager(
+                    PeriodeMedAntallDager(
                         fom = tjuesyvendeJanuar,
                         tom = LocalDate.of(2025, 1, 31),
                         antallHverdager = 5,
