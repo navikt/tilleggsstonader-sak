@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseResponse
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -18,7 +17,6 @@ class ReiseIdTest : CleanDatabaseIntegrationTest() {
             kall.vilkårDagligReise
                 .hentVilkår(behandlingId)
                 .single()
-                .fakta as FaktaDagligReiseOffentligTransportDto
 
         val reiseIdBeregningsresultat =
             kall.vedtak

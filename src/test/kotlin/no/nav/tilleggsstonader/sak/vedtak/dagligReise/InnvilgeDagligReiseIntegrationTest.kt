@@ -45,7 +45,7 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                     dokumenter = listOf(DokumentInfo("", brevkode = DokumentBrevkode.DAGLIG_REISE.verdi)),
                     bruker = Bruker("12345678910", BrukerIdType.FNR),
                     tema = Tema.TSR.name,
-                )
+                ),
         ) {
             aktivitet {
                 opprett {
@@ -77,7 +77,7 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                         bruker = Bruker("12345678910", BrukerIdType.FNR),
                         tema = Tema.TSO.name,
                     ),
-                tilSteg = StegType.BEREGNE_YTELSE
+                tilSteg = StegType.BEREGNE_YTELSE,
             ) {
                 aktivitet {
                     opprett {

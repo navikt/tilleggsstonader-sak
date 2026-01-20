@@ -38,11 +38,12 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgVurderingDto
@@ -70,7 +71,6 @@ class InterntVedtakService(
         val behandlingbarn = mapBarnPåBarnId(behandling.id, grunnlag.personopplysninger.barn)
 
         val vilkår = vilkårService.hentVilkår(behandling.id)
-        val vilkårDagligReise = vilkår.map { it.mapTilVilkårDagligReise() }
 
         return InterntVedtak(
             behandling = mapBehandlingsinformasjon(behandling),
@@ -80,13 +80,13 @@ class InterntVedtakService(
             vedtaksperioder = mapVedtaksperioder(vedtak),
             vilkår = mapVilkår(vilkår, behandlingbarn),
             vedtak = mapVedtak(vedtak),
-            beregningsresultat = mapBeregningsresultatForStønadstype(vedtak, vilkårDagligReise),
+            beregningsresultat = mapBeregningsresultatForStønadstype(vedtak, vilkår),
         )
     }
 
     private fun mapBeregningsresultatForStønadstype(
         vedtak: Vedtak?,
-        vilkårDagligReise: List<VilkårDagligReise>,
+        vilkår: List<Vilkår>,
     ): BeregningsresultatInterntVedtakDto? =
         vedtak?.data?.let { data ->
             when (data) {
@@ -109,6 +109,7 @@ class InterntVedtakService(
                     )
 
                 is InnvilgelseDagligReise -> {
+                    val vilkårDagligReise = vilkår.map { it.mapTilVilkårDagligReise() }
                     BeregningsresultatInterntVedtakDto(
                         dagligReiseTso = data.beregningsresultat.tilDto(vedtak.tidligsteEndring, vilkårDagligReise),
                     )
@@ -210,12 +211,11 @@ class InterntVedtakService(
                     delvilkår = vilkår.delvilkårsett.map { mapDelvilkår(it) },
                     fom = vilkår.fom,
                     tom = vilkår.tom,
-                    adresse = vilkår.adresse,
                     utgift = vilkår.utgift,
                     slettetKommentar = vilkår.slettetKommentar,
                     fakta = mapVilkårFakta(vilkår.fakta),
                 )
-            }.sortedWith(compareBy<VilkårInternt> { it.type }.thenBy { it.fødselsdatoBarn }.thenBy { it.fom })
+            }.sortedWith(compareBy<VilkårInterntVedtak> { it.type }.thenBy { it.fødselsdatoBarn }.thenBy { it.fom })
 
     private fun mapDelvilkår(delvilkår: Delvilkår) =
         DelvilkårInterntVedtak(
@@ -334,6 +334,8 @@ class InterntVedtakService(
                     prisEnkelbillett = fakta.prisEnkelbillett,
                     prisSyvdagersbillett = fakta.prisSyvdagersbillett,
                     prisTrettidagersbillett = fakta.prisTrettidagersbillett,
+                    reiseId = fakta.reiseId,
+                    adresse = fakta.adresse,
                 )
 
             is FaktaDagligReisePrivatBil ->
@@ -342,6 +344,14 @@ class InterntVedtakService(
                     reiseavstandEnVei = fakta.reiseavstandEnVei,
                     bompengerEnVei = fakta.bompengerEnVei,
                     fergekostandEnVei = fakta.fergekostandEnVei,
+                    reiseId = fakta.reiseId,
+                    adresse = fakta.adresse,
+                )
+
+            is FaktaDagligReiseUbestemt ->
+                VilkårFaktaUbestemtInterntVedtak(
+                    reiseId = fakta.reiseId,
+                    adresse = fakta.adresse,
                 )
 
             null -> null

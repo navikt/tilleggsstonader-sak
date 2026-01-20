@@ -10,7 +10,8 @@ fun VilkårDagligReiseDto.tilLagreDagligReiseDto() =
     LagreDagligReiseDto(
         fom = fom,
         tom = tom,
-        adresse = adresse ?: error("Forventer adresse i test dataen"),
+        adresse = adresse ?: "Forventer adresse på vilkår daglig reise",
+        reiseId = reiseId,
         svar = delvilkårsett.tilSvar(),
         fakta = fakta,
     )
