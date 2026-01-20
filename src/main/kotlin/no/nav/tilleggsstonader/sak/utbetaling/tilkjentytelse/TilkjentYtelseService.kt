@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse
 
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -10,6 +11,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtel
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.toYearMonth
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.YearMonth
@@ -87,9 +89,28 @@ class TilkjentYtelseService(
         return nullAndel
     }
 
+    fun settAndelerForBehandlingTilUaktuellHvisFinnes(behandlingId: BehandlingId) {
+        val tilkjentYtelse = hentForBehandlingEllerNull(behandlingId)
+        if (tilkjentYtelse != null && tilkjentYtelse.andelerTilkjentYtelse.isNotEmpty()) {
+            logger.info("Setter andeler for behandling $behandlingId til ugyldig")
+            tilkjentYtelseRepository.update(
+                tilkjentYtelse.copy(
+                    andelerTilkjentYtelse =
+                        tilkjentYtelse.andelerTilkjentYtelse
+                            .map { it.copy(statusIverksetting = StatusIverksetting.UAKTUELL) }
+                            .toSet(),
+                ),
+            )
+        }
+    }
+
     private fun finnMånedFørFørsteAndel(tilkjentYtelse: TilkjentYtelse): YearMonth? =
         tilkjentYtelse.andelerTilkjentYtelse
             .minOfOrNull { it.fom }
             ?.toYearMonth()
             ?.minusMonths(1)
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(TilkjentYtelseService::class.java)
+    }
 }

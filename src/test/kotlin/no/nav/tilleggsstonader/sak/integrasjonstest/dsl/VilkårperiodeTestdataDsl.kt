@@ -148,7 +148,7 @@ class OpprettVilkårperiodeDsl {
         }
     }
 
-    fun aktivitetUtdanning(
+    fun aktivitetUtdanningLæremidler(
         fom: LocalDate,
         tom: LocalDate,
     ) {
