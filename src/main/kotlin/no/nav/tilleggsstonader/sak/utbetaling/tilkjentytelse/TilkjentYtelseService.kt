@@ -92,7 +92,7 @@ class TilkjentYtelseService(
     fun settAndelerForBehandlingTilUaktuellHvisFinnes(behandlingId: BehandlingId) {
         val tilkjentYtelse = hentForBehandlingEllerNull(behandlingId)
         if (tilkjentYtelse != null && tilkjentYtelse.andelerTilkjentYtelse.isNotEmpty()) {
-            logger.info("Setter andeler for behandling $behandlingId til ugyldig")
+            logger.info("Setter andeler for behandling $behandlingId til uaktuell")
             tilkjentYtelseRepository.update(
                 tilkjentYtelse.copy(
                     andelerTilkjentYtelse =
