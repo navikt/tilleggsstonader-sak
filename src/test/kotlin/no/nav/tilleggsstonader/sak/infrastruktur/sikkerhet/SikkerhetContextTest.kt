@@ -24,17 +24,32 @@ class SikkerhetContextTest {
     }
 
     @Test
-    internal fun `skal gjenkjenne kall fra soknad-api`() {
+    internal fun `skal gjenkjenne kall fra soknad-api-lokal`() {
+        EksternApplikasjonConfig.namespaceAppNavn = mapOf(
+            EksternApplikasjon.SOKNAD_API to "tilleggsstonader-soknad-api-lokal"
+        )
+
         mockBrukerContext("", azp_name = "prod-gcp:tilleggsstonader:tilleggsstonader-soknad-api-lokal")
         assertThat(kallKommerFra(EksternApplikasjon.SOKNAD_API)).isTrue
         clearBrukerContext()
+
         mockBrukerContext("", azp_name = "dev-gcp:tilleggsstonader:tilleggsstonader-soknad-api-lokal")
+        assertThat(kallKommerFra(EksternApplikasjon.SOKNAD_API)).isTrue
+    }
+
+
+    @Test
+    internal fun `skal gjenkjenne kall fra soknad-api`() {
+        mockBrukerContext("", azp_name = "prod-gcp:tilleggsstonader:tilleggsstonader-soknad-api")
+        assertThat(kallKommerFra(EksternApplikasjon.SOKNAD_API)).isTrue
+        clearBrukerContext()
+        mockBrukerContext("", azp_name = "dev-gcp:tilleggsstonader:tilleggsstonader-soknad-api")
         assertThat(kallKommerFra(EksternApplikasjon.SOKNAD_API)).isTrue
     }
 
     @Test
     internal fun `skal gjenkjenne kall fra en av appene som har tilgang`() {
-        mockBrukerContext("", azp_name = "prod-gcp:tilleggsstonader:tilleggsstonader-soknad-api-lokal")
+        mockBrukerContext("", azp_name = "prod-gcp:tilleggsstonader:tilleggsstonader-soknad-api")
         assertThat(kallKommerFra(EksternApplikasjon.BIDRAG_GRUNNLAG, EksternApplikasjon.SOKNAD_API)).isTrue
         assertThat(kallKommerFra(EksternApplikasjon.BIDRAG_GRUNNLAG)).isFalse()
     }

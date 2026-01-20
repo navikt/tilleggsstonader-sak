@@ -21,7 +21,7 @@ class SkjemaRoutingKall(
                     .uri("/api/ekstern/skjema-routing")
                     .bodyValue(identSkjematype)
                     .medClientCredentials(
-                        clientId = EksternApplikasjon.SOKNAD_API.namespaceAppNavn,
+                        clientId = EksternApplikasjon.SOKNAD_API.name,
                         accessAsApplication = true,
                     ).exchange()
             }

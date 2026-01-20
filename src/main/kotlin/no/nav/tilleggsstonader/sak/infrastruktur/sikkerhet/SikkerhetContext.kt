@@ -22,15 +22,20 @@ object SikkerhetContext {
     fun erMaskinTilMaskinToken(): Boolean {
         val claims = SpringTokenValidationContextHolder().getTokenValidationContext().getClaims("azuread")
         return claims.get("oid") != null &&
-            claims.get("oid") == claims.get("sub") &&
-            claims.getAsList("roles").contains("access_as_application")
+                claims.get("oid") == claims.get("sub") &&
+                claims.getAsList("roles").contains("access_as_application")
     }
 
     fun kallKommerFra(vararg eksternApplikasjon: EksternApplikasjon): Boolean {
         val claims = SpringTokenValidationContextHolder().getTokenValidationContext().getClaims("azuread")
         val applikasjonsnavn = claims.get("azp_name")?.toString() ?: "" // e.g. dev-gcp:some-team:application-name
         secureLogger.info("Applikasjonsnavn: $applikasjonsnavn")
-        return eksternApplikasjon.any { applikasjonsnavn.endsWith(it.namespaceAppNavn) }
+        return eksternApplikasjon.any {
+            applikasjonsnavn.endsWith(
+                EksternApplikasjonConfig.namespaceAppNavn
+                    .getValue(it),
+            )
+        }
     }
 
     fun hentSaksbehandler(): String {

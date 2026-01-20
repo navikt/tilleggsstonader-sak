@@ -20,7 +20,7 @@ class ArenaKall(
                     .post()
                     .uri("/api/ekstern/arena/status")
                     .bodyValue(dto)
-                    .medClientCredentials(EksternApplikasjon.ARENA.namespaceAppNavn, true)
+                    .medClientCredentials(EksternApplikasjon.ARENA.name, true)
                     .exchange()
             }
     }
