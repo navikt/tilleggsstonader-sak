@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.KafkaTopics
 import no.nav.tilleggsstonader.sak.integrasjonstest.Kall
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.util.DbContainerInitializer
 import no.nav.tilleggsstonader.sak.util.TestoppsettService
 import no.nav.tilleggsstonader.sak.util.TokenUtil
@@ -103,6 +104,9 @@ abstract class IntegrationTest {
 
     @Autowired
     lateinit var journalpostClient: JournalpostClient
+
+    @Autowired
+    lateinit var ytelseClient: YtelseClient
 
     @Autowired
     lateinit var kafkaTopics: KafkaTopics

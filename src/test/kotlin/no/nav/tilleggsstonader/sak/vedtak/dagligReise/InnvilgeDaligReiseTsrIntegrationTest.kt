@@ -42,9 +42,6 @@ class InnvilgeDaligReiseTsrIntegrationTest : CleanDatabaseIntegrationTest() {
     val tom = 30 september 2025
 
     @Autowired
-    lateinit var ytelseClient: YtelseClient
-
-    @Autowired
     lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
 
     @Autowired

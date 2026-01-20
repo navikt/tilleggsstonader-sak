@@ -47,7 +47,6 @@ class JournalpostControllerTest(
     @Autowired val behandlingService: BehandlingService,
     @Autowired val klageClient: KlageClient,
     @Autowired val oppgaveClient: OppgaveClient,
-    @Autowired val ytelseClient: YtelseClient,
 ) : CleanDatabaseIntegrationTest() {
     val ident = "12345678910"
     val saksbehandler = "ole"

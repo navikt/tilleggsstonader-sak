@@ -38,9 +38,6 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var vedtakRepository: VedtakRepository
 
-    @Autowired
-    lateinit var ytelseClient: YtelseClient
-
     @Test
     fun `skal returnere vedtaksperiodeoversikt for alle stønadstyper`() {
         val fagsakPerson = testoppsettService.opprettPerson("123")

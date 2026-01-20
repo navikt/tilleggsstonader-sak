@@ -37,7 +37,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 
 class SkjemaRoutingIntegrationTest(
-    @Autowired private val ytelseClient: YtelseClient,
     @Autowired private val arenaClient: ArenaClient,
     @Autowired private val pdlClient: PdlClient,
 ) : CleanDatabaseIntegrationTest() {

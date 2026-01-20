@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksK
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.defaultJournalpost
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.journalpostSøknadForStønadstype
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil.søknadBoutgifter
 import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil.søknadDagligReise
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.barnMedBarnepass
@@ -82,6 +83,10 @@ private fun IntegrationTest.mockStrukturertSøknadForJournalpost(
     journalpost: Journalpost,
     stønadstype: Stønadstype,
 ) {
+    if (stønadstype == Stønadstype.DAGLIG_REISE_TSO) {
+        // Samme søknad for TSO og TSR, rutes ved sjekk på ytelser i HåndterSøknadService
+        every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoAAP()
+    }
     every {
         journalpostClient.hentDokument(
             journalpost.journalpostId,

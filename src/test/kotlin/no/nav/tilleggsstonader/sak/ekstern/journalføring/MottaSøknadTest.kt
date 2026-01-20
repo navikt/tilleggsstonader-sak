@@ -72,9 +72,6 @@ class MottaSøknadTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var behandlingsjournalpostRepository: BehandlingsjournalpostRepository
 
-    @Autowired
-    lateinit var ytelseClient: YtelseClient
-
     val journalpostId = 123321L
     val ident = "12345678901"
 
