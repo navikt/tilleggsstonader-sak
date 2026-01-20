@@ -61,6 +61,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
     val dummyOffentligTransport =
         FaktaOffentligTransport(
             reiseId = dummyReiseId,
+            adresse = "Tiltaksveien 1",
             reisedagerPerUke = 4,
             prisEnkelbillett = 44,
             prisSyvdagersbillett = null,
@@ -92,7 +93,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                                 listOf(
                                     BeregningsresultatForReiseDto(
                                         reiseId = dummyReiseId,
-                                        adresse = null,
+                                        adresse = "Tiltaksveien 1",
                                         perioder =
                                             listOf(
                                                 BeregningsresultatForPeriodeDto(

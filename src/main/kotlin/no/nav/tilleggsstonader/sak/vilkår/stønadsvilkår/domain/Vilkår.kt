@@ -38,7 +38,6 @@ data class Vilkår(
     val utgift: Int? = null,
     val barnId: BarnId? = null,
     val erFremtidigUtgift: Boolean,
-    val adresse: String? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
     @Column("delvilkar")

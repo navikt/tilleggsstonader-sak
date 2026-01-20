@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto
 
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
@@ -11,16 +12,16 @@ data class LagreDagligReiseDto(
     val fom: LocalDate,
     val tom: LocalDate,
     val adresse: String,
+    val reiseId: ReiseId,
     val svar: Map<RegelId, SvarOgBegrunnelseDto>,
-    val fakta: FaktaDagligReiseDto? = null,
+    val fakta: FaktaDagligReiseDto,
 ) : LagreVilkår {
     fun tilDomain() =
         LagreDagligReise(
             fom = fom,
             tom = tom,
-            adresse = adresse,
             svar = svar.mapValues { it.value.tilDomain() },
-            fakta = fakta?.mapTilFakta(),
+            fakta = fakta.mapTilFakta(reiseId = reiseId, adresse = adresse),
         )
 }
 

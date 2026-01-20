@@ -150,10 +150,11 @@
     "fødselsdatoBarn" : null,
     "fom" : "2024-02-01",
     "tom" : "2024-02-02",
-    "adresse" : "Tiltaksgata 1",
     "utgift" : null,
     "slettetKommentar" : null,
     "fakta" : {
+      "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
+      "adresse" : "Tiltaksgata 1",
       "reisedagerPerUke" : 5,
       "prisEnkelbillett" : 44,
       "prisSyvdagersbillett" : null,

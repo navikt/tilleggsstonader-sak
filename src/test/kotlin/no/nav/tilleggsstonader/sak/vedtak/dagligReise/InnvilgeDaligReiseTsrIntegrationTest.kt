@@ -241,7 +241,6 @@ class InnvilgeDaligReiseTsrIntegrationTest : CleanDatabaseIntegrationTest() {
         assertThat(vilkårFørstegangsbehandling.utgift).isEqualTo(vilkårRevurdering.utgift)
         assertThat(vilkårFørstegangsbehandling.barnId).isEqualTo(vilkårRevurdering.barnId)
         assertThat(vilkårFørstegangsbehandling.erFremtidigUtgift).isEqualTo(vilkårRevurdering.erFremtidigUtgift)
-        assertThat(vilkårFørstegangsbehandling.adresse).isEqualTo(vilkårRevurdering.adresse)
         assertThat(vilkårFørstegangsbehandling.delvilkårwrapper).isEqualTo(vilkårRevurdering.delvilkårwrapper)
         assertThat(vilkårFørstegangsbehandling.slettetKommentar).isEqualTo(vilkårRevurdering.slettetKommentar)
         assertThat(vilkårFørstegangsbehandling.fakta).isEqualTo(vilkårRevurdering.fakta)

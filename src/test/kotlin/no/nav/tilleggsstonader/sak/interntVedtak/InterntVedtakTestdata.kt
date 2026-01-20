@@ -813,10 +813,10 @@ object InterntVedtakTestdata {
                     fom = LocalDate.of(2024, FEBRUARY, 1),
                     tom = LocalDate.of(2024, FEBRUARY, 2),
                     utgift = null,
-                    adresse = "Tiltaksgata 1",
                     fakta =
                         FaktaDagligReiseOffentligTransport(
                             reiseId = dummyReiseId,
+                            adresse = "Tiltaksgata 1",
                             reisedagerPerUke = 5,
                             prisEnkelbillett = 44,
                             prisSyvdagersbillett = null,

@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
-import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
@@ -29,7 +28,6 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
                 tom = dagensDato.plusDays(7),
                 fakta =
                     FaktaDagligReiseOffentligTransportDto(
-                        reiseId = dummyReiseId,
                         reisedagerPerUke = 2,
                         prisEnkelbillett = 44,
                         prisSyvdagersbillett = null,
