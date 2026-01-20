@@ -39,12 +39,21 @@ class YtelseClientMockConfig {
                                 } else {
                                     null
                                 }
-                            YtelsePeriode(
-                                type = type,
-                                fom = LocalDate.now(),
-                                tom = LocalDate.now(),
-                                ensligForsørgerStønadstype = ensligForsørgerStønadstype,
-                            )
+                            if (type == TypeYtelsePeriode.DAGPENGER) {
+                                YtelsePeriode(
+                                    type = type,
+                                    fom = LocalDate.now(),
+                                    tom = null,
+                                    ensligForsørgerStønadstype = ensligForsørgerStønadstype,
+                                )
+                            } else {
+                                YtelsePeriode(
+                                    type = type,
+                                    fom = LocalDate.now(),
+                                    tom = LocalDate.now(),
+                                    ensligForsørgerStønadstype = ensligForsørgerStønadstype,
+                                )
+                            }
                         }.toMutableList()
                 if (request.typer.contains(TypeYtelsePeriode.AAP)) {
                     perioder +=
