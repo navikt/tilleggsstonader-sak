@@ -22,9 +22,6 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
     val fomNay = 15 september 2025
     val tomNay = 14 oktober 2025
 
-    @Autowired
-    lateinit var ytelseClient: YtelseClient
-
     @Test
     fun `Skal ikke kunne innvilge daglig reise for både Nay og Tiltaksenheten samtidig`() {
         every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoTiltakspengerTpsak()

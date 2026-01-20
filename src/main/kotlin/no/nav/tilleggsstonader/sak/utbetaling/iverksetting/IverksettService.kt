@@ -375,7 +375,7 @@ class IverksettService(
         }
 
         return behandling.stønadstype.gjelderDagligReise() ||
-            erFørstegangsbehandlingLæremidlerOgSkalIverksetteMotKafka(behandling, erFørsteIverksettingForBehandling) ||
+            erFørstegangsbehandlingOgSkalIverksetteMotKafka(behandling, erFørsteIverksettingForBehandling) ||
             (
                 utbetalingIderPåFagsak.isNotEmpty() &&
                     finnesUtbetalingIdForAlleTypeAndeler(
@@ -385,12 +385,11 @@ class IverksettService(
             )
     }
 
-    private fun erFørstegangsbehandlingLæremidlerOgSkalIverksetteMotKafka(
+    private fun erFørstegangsbehandlingOgSkalIverksetteMotKafka(
         behandling: Saksbehandling,
         erFørsteIverksettingForBehandling: Boolean,
     ): Boolean =
-        behandling.stønadstype == Stønadstype.LÆREMIDLER &&
-            behandling.forrigeIverksatteBehandlingId == null &&
+        behandling.forrigeIverksatteBehandlingId == null &&
             erFørsteIverksettingForBehandling &&
             unleashService.isEnabled(Toggle.SKAL_IVERKSETT_NYE_BEHANDLINGER_MOT_KAFKA)
 

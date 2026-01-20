@@ -5,10 +5,13 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
+import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariant
+import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.sak.util.journalpost
+import java.util.UUID
 
 val defaultJournalpost =
     journalpost(
@@ -25,7 +28,21 @@ fun journalpostSøknadForStønadstype(stønadstype: Stønadstype): Journalpost {
     return journalpost(
         journalpostId = "1",
         journalstatus = Journalstatus.MOTTATT,
-        dokumenter = listOf(DokumentInfo("", brevkode = dokumentBrevkode.verdi)),
+        dokumenter =
+            listOf(
+                DokumentInfo(
+                    UUID.randomUUID().toString(),
+                    brevkode = dokumentBrevkode.verdi,
+                    dokumentvarianter =
+                        listOf(
+                            Dokumentvariant(
+                                variantformat = Dokumentvariantformat.ORIGINAL,
+                                filnavn = "f",
+                                saksbehandlerHarTilgang = true,
+                            ),
+                        ),
+                ),
+            ),
         bruker = Bruker("12345678910", BrukerIdType.FNR),
         tema = tema.name,
     )

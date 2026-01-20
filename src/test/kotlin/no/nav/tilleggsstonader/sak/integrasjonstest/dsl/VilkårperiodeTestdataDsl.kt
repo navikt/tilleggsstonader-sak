@@ -8,6 +8,8 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBoutgifterDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
@@ -73,6 +75,42 @@ class OpprettVilkårperiodeDsl {
     ) {
         add { behandlingId ->
             lagreVilkårperiodeMålgruppe(behandlingId = behandlingId, fom = fom, tom = tom, målgruppeType = MålgruppeType.OVERGANGSSTØNAD)
+        }
+    }
+
+    fun aktivitetTiltakTilsynBarn(
+        fom: LocalDate,
+        tom: LocalDate,
+        aktivitetsdager: Int,
+    ) {
+        add { behandlingId ->
+            lagreVilkårperiodeAktivitet(
+                behandlingId = behandlingId,
+                fom = fom,
+                tom = tom,
+                faktaOgSvar =
+                    FaktaOgSvarAktivitetBarnetilsynDto(
+                        svarLønnet = SvarJaNei.NEI,
+                        aktivitetsdager = aktivitetsdager,
+                    ),
+            )
+        }
+    }
+
+    fun aktivitetTiltakBoutgifter(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) {
+        add { behandlingId ->
+            lagreVilkårperiodeAktivitet(
+                behandlingId = behandlingId,
+                fom = fom,
+                tom = tom,
+                faktaOgSvar =
+                    FaktaOgSvarAktivitetBoutgifterDto(
+                        svarLønnet = SvarJaNei.NEI,
+                    ),
+            )
         }
     }
 

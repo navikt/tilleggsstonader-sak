@@ -1,7 +1,10 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest
 
+import io.mockk.every
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
+import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
@@ -11,13 +14,21 @@ import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegController
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientMockConfig
 import no.nav.tilleggsstonader.sak.integrasjonstest.dsl.BehandlingTestdataDsl
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.defaultJournalpost
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.journalpostSøknadForStønadstype
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
+import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil.søknadBoutgifter
+import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil.søknadDagligReise
+import no.nav.tilleggsstonader.sak.util.SøknadUtil.barnMedBarnepass
+import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaBarnetilsyn
+import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaLæremidler
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
@@ -57,7 +68,9 @@ fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
     testdataProvider: BehandlingTestdataDsl.() -> Unit,
 ): BehandlingId {
-    val behandlingId = håndterSøknadService.håndterSøknad(journalpostSøknadForStønadstype(stønadstype))!!.id
+    val journalpostSøknadForStønadstype = journalpostSøknadForStønadstype(stønadstype)
+    mockStrukturertSøknadForJournalpost(journalpostSøknadForStønadstype, stønadstype)
+    val behandlingId = håndterSøknadService.håndterSøknad(journalpostSøknadForStønadstype)!!.id
     gjennomførBehandlingsløp(
         behandlingId = behandlingId,
         tilSteg = tilSteg,
@@ -65,6 +78,36 @@ fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
     )
     return behandlingId
 }
+
+private fun IntegrationTest.mockStrukturertSøknadForJournalpost(
+    journalpost: Journalpost,
+    stønadstype: Stønadstype,
+) {
+    if (stønadstype == Stønadstype.DAGLIG_REISE_TSO) {
+        // Samme søknad for TSO og TSR, rutes ved sjekk på ytelser i HåndterSøknadService
+        every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoAAP()
+    }
+    every {
+        journalpostClient.hentDokument(
+            journalpost.journalpostId,
+            journalpost.dokumenter?.single()!!.dokumentInfoId,
+            Dokumentvariantformat.ORIGINAL,
+        )
+    } returns objectMapper.writeValueAsBytes(søknadForStønadstype(stønadstype))
+}
+
+private fun søknadForStønadstype(stønadstype: Stønadstype) =
+    when (stønadstype) {
+        Stønadstype.BARNETILSYN ->
+            søknadskjemaBarnetilsyn(
+                barnMedBarnepass = listOf(barnMedBarnepass(ident = PdlClientMockConfig.BARN_FNR)),
+            )
+        Stønadstype.LÆREMIDLER -> søknadskjemaLæremidler()
+        Stønadstype.BOUTGIFTER -> søknadBoutgifter()
+        Stønadstype.DAGLIG_REISE_TSO,
+        Stønadstype.DAGLIG_REISE_TSR,
+        -> søknadDagligReise()
+    }
 
 fun IntegrationTest.gjennomførBehandlingsløp(
     behandlingId: BehandlingId,
@@ -342,7 +385,7 @@ fun IntegrationTest.gjennomførVilkårSteg(
         BehandlingTestdataDsl.build {
             vilkår {
                 opprett {
-                    medVilkår.forEach { add(it) }
+                    medVilkår.forEach { lagreVilkår -> add { _, _ -> lagreVilkår } }
                 }
             }
         }
@@ -370,7 +413,7 @@ private fun defaultBehandlingTestdataProvider(
         }
         vilkår {
             opprett {
-                medVilkår.forEach { add(it) }
+                medVilkår.forEach { lagreVilkår -> add { _, _ -> lagreVilkår } }
             }
         }
         vedtak {
@@ -465,7 +508,14 @@ private fun IntegrationTest.gjennomførVilkårSteg(
         kall.vilkår.hentVilkår(behandlingId)
     }
 
-    testdataProvider.vilkår.opprettScope.build().forEach {
+    // Trenger kun hente ut om tilsyn-barn
+    val barnIder: List<BarnId> =
+        stønadstype
+            .takeIf { it == Stønadstype.BARNETILSYN }
+            ?.let { _ -> barnRepository.findByBehandlingId(behandlingId).map { it.id } }
+            ?: emptyList()
+
+    testdataProvider.vilkår.opprettScope.build(behandlingId, barnIder).forEach {
         if (stønadstype.gjelderDagligReise()) {
             kall.vilkårDagligReise.opprettVilkår(behandlingId, it as LagreDagligReiseDto)
         } else {
