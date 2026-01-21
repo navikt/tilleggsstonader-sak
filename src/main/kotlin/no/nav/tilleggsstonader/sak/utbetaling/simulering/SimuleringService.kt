@@ -61,7 +61,7 @@ class SimuleringService(
             Simuleringsresultat(
                 behandlingId = saksbehandling.id,
                 data = resultat?.let { SimuleringKontraktTilDomeneMapper.map(it) },
-                ingenEndringIUtbetaling = resultat == null,
+                ingenEndringIUtbetaling = resultat == null || resultat.oppsummeringer.isEmpty(),
             ),
         )
     }
@@ -74,6 +74,7 @@ class SimuleringService(
                 behandling = saksbehandling,
                 fagsakId = saksbehandling.fagsakId,
                 typeAndel = tilkjentYtelse.andelerTilkjentYtelse.map { it.type }.toSet(),
+                erFørsteIverksettingForBehandling = true,
             )
         ) {
             iverksettClient.simulerV3(

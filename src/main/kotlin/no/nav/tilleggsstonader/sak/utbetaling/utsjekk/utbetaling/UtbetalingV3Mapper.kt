@@ -64,6 +64,7 @@ class UtbetalingV3Mapper(
         erFørsteIverksettingForBehandling: Boolean,
     ): List<UtbetalingDto> =
         andelerTilkjentYtelse
+            .filterNot { it.erNullandel() }
             .groupBy { it.type }
             .map { (type, andelerAvType) -> lagUtbetaling(behandling, type, andelerAvType) }
             .let { utbetalinger ->
@@ -155,15 +156,23 @@ class UtbetalingV3Mapper(
             TypeAndel.LÆREMIDLER_AAP -> StønadUtbetaling.LÆREMIDLER_AAP
             TypeAndel.LÆREMIDLER_ETTERLATTE -> StønadUtbetaling.LÆREMIDLER_ETTERLATTE
 
+            TypeAndel.BOUTGIFTER_AAP -> StønadUtbetaling.BOUTGIFTER_AAP
+            TypeAndel.BOUTGIFTER_ETTERLATTE -> StønadUtbetaling.BOUTGIFTER_ETTERLATTE
+            TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER -> StønadUtbetaling.BOUTGIFTER_ENSLIG_FORSØRGER
+
+            TypeAndel.TILSYN_BARN_AAP -> StønadUtbetaling.TILSYN_BARN_AAP
+            TypeAndel.TILSYN_BARN_ETTERLATTE -> StønadUtbetaling.TILSYN_BARN_ETTERLATTE
+            TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER -> StønadUtbetaling.TILSYN_BARN_ENSLIG_FORSØRGER
+
             else -> error("Skal ikke sende andelstype=$typeAndel på kafka")
         }
 
     private fun finnTypeAndelerSomSkalAnnulleres(
         behandling: Saksbehandling,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
-    ): List<TypeAndel> {
+    ): Set<TypeAndel> {
         if (behandling.forrigeIverksatteBehandlingId == null) {
-            return emptyList()
+            return emptySet()
         }
         val andelerForrigeBehandling =
             tilkjentYtelseService
@@ -171,6 +180,9 @@ class UtbetalingV3Mapper(
                 .andelerTilkjentYtelse
 
         val typeAndelerNåværendeBehandling = andelerTilkjentYtelse.map { it.type }
-        return andelerForrigeBehandling.filter { it.type !in typeAndelerNåværendeBehandling }.map { it.type }
+        return andelerForrigeBehandling
+            .filter { it.type !in typeAndelerNåværendeBehandling }
+            .map { it.type }
+            .toSet()
     }
 }

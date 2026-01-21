@@ -61,9 +61,6 @@ class MottaSøknadTest : CleanDatabaseIntegrationTest() {
     private lateinit var fagsakRepository: FagsakRepository
 
     @Autowired
-    private lateinit var journalpostClient: JournalpostClient
-
-    @Autowired
     lateinit var journalhendelseKafkaListener: JournalhendelseKafkaListener
 
     @Autowired
@@ -74,9 +71,6 @@ class MottaSøknadTest : CleanDatabaseIntegrationTest() {
 
     @Autowired
     lateinit var behandlingsjournalpostRepository: BehandlingsjournalpostRepository
-
-    @Autowired
-    lateinit var ytelseClient: YtelseClient
 
     val journalpostId = 123321L
     val ident = "12345678901"

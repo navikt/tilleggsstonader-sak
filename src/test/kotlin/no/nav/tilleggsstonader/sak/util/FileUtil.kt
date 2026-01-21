@@ -42,8 +42,10 @@ object FileUtil {
      * 2. Setter denne til true
      * 3. Kjører tester på nytt, 2 ganger, 1 gang for å skrive filen, en andre gång for å verifisere
      * 4. set denne til false på nytt, hvis ikke feiler [FileUtilTest]
+     *
+     * Kan også settes via environment variable: SKRIV_TIL_FIL=true
      */
-    const val SKAL_SKRIVE_TIL_FIL = false
+    val SKRIV_TIL_FIL = System.getenv("SKRIV_TIL_FIL")?.toBoolean() ?: false
 
     fun assertFileJsonIsEqual(
         filnavn: String,
@@ -83,7 +85,7 @@ object FileUtil {
         filnavn: String,
         data: ByteArray,
     ) {
-        if (!SKAL_SKRIVE_TIL_FIL) {
+        if (!SKRIV_TIL_FIL) {
             return
         }
         val file = File("src/test/resources/$filnavn")

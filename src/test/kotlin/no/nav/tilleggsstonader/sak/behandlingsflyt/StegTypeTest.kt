@@ -1,7 +1,11 @@
 package no.nav.tilleggsstonader.sak.behandlingsflyt
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 
 class StegTypeTest {
     @Test
@@ -13,5 +17,24 @@ class StegTypeTest {
                         "testes mot ${it[1]} med rekkefølge=${it[1].rekkefølge}"
                 }.isEqualTo(it[1].rekkefølge)
         }
+    }
+
+    @EnumSource(
+        value = StegType::class,
+        names = ["VEDTAK", "KJØRELISTE", "BEREGNING"],
+        mode = EnumSource.Mode.EXCLUDE,
+    )
+    @ParameterizedTest
+    fun `skal finne neste steg for alle relevante steg i standardflyten`(steg: StegType) {
+        assertDoesNotThrow { steg.hentNesteSteg(Stønadstype.BARNETILSYN, false) }
+        assertDoesNotThrow { steg.hentNesteSteg(Stønadstype.LÆREMIDLER, false) }
+        assertDoesNotThrow { steg.hentNesteSteg(Stønadstype.BOUTGIFTER, false) }
+    }
+
+    @EnumSource(value = StegType::class, names = ["BEREGNE_YTELSE"], mode = EnumSource.Mode.EXCLUDE)
+    @ParameterizedTest
+    fun `skal finne neste for relevante steg for daglig reise`(steg: StegType) {
+        assertDoesNotThrow { steg.hentNesteSteg(Stønadstype.DAGLIG_REISE_TSO, true) }
+        assertDoesNotThrow { steg.hentNesteSteg(Stønadstype.DAGLIG_REISE_TSR, true) }
     }
 }

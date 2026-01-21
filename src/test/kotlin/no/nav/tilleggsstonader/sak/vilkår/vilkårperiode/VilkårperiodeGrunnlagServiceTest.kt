@@ -52,9 +52,6 @@ class VilkårperiodeGrunnlagServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var registerAktivitetClient: RegisterAktivitetClient
 
-    @Autowired
-    lateinit var ytelseClient: YtelseClient
-
     val ingenVilkårperioder = Vilkårperioder(emptyList(), emptyList())
 
     @Test

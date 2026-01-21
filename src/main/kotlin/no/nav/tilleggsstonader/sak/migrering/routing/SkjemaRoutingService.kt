@@ -62,7 +62,7 @@ class SkjemaRoutingService(
             lagreRouting(ident, skjematype, mapOf("harBehandling" to true))
             return true
         }
-        if (maksAntallErNådd(skjematype, toggleId = kontekst.featureToggleMaksAntall)) {
+        if (maksAntallErNådd(skjematype, toggleId = kontekst.featureToggleMaksAntallForStønad)) {
             return false
         }
         if (kontekst.kreverAtSøkerErUtenAktivtVedtakIArena && harAktivtVedtakIArena(skjematype, ident)) {
@@ -70,6 +70,16 @@ class SkjemaRoutingService(
         }
         if (kontekst.kreverAktivtAapVedtak && harAktivtAapVedtak(ident)) {
             lagreRouting(ident, skjematype, mapOf("harAktivAAP" to true))
+            return true
+        }
+        if (kontekst.skalBegrenseAntallTilTsr &&
+            harAktivtTsrMålgruppe(ident) &&
+            !erMaksAntallNåddForTsr(
+                skjematype,
+                toggleId = kontekst.featureToggleMaksAntallForTsr,
+            )
+        ) {
+            lagreRouting(ident, skjematype, mapOf("harAktivTsrMålgruppe" to true))
             return true
         }
 
@@ -89,6 +99,20 @@ class SkjemaRoutingService(
         val maksAntall = unleashService.getVariantWithNameOrDefault(toggleId, "antall", 0)
         val antall = routingRepository.countByType(skjematype)
         logger.info("routing - stønadstype=$skjematype antallIDatabase=$antall toggleMaksAntall=$maksAntall")
+        return antall >= maksAntall
+    }
+
+    private fun erMaksAntallNåddForTsr(
+        skjematype: Skjematype,
+        toggleId: ToggleId,
+    ): Boolean {
+        val maksAntall = unleashService.getVariantWithNameOrDefault(toggleId, "antall", 0)
+        val antall =
+            routingRepository.countByTypeAndDetaljerContains(
+                skjematype,
+                detaljer = objectMapper.writeValueAsString(mapOf("harAktivTsrMålgruppe" to true)),
+            )
+        logger.info("routing - stønadstype=$skjematype antallIDatabase=$antall toggleMaksAntall=$maksAntall (kun harAktivTsrMålgruppe)")
         return antall >= maksAntall
     }
 
@@ -163,4 +187,6 @@ class SkjemaRoutingService(
         with(ytelseService.harAktivtAapVedtak(ident)) {
             return type == TypeYtelsePeriode.AAP && harAktivtVedtak
         }
+
+    private fun harAktivtTsrMålgruppe(ident: String): Boolean = ytelseService.harAktivTsrMålgruppe(ident)
 }

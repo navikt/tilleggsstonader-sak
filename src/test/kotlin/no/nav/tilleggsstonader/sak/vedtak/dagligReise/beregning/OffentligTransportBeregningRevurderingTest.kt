@@ -2,15 +2,11 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningSteg
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførInngangsvilkårSteg
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførVilkårSteg
-import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurdering
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
@@ -24,10 +20,12 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
     @Test
     fun `forlengelse av reise der perioden allerede har blitt utbetalt skal validere feil`() {
         val dagensDato = LocalDate.now()
+        val fom = dagensDato.minusDays(46)
+        val tom = dagensDato.plusDays(42)
 
         val reiser =
             lagreDagligReiseDto(
-                fom = dagensDato.minusDays(46),
+                fom = fom,
                 tom = dagensDato.plusDays(7),
                 fakta =
                     FaktaDagligReiseOffentligTransportDto(
@@ -40,48 +38,42 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
             )
 
         val førstegangsbehandlingId =
-            gjennomførBehandlingsløp(
-                medAktivitet = ::lagreAktivitet,
-                medMålgruppe = ::lagreMålgruppe,
-                medVilkår = listOf(reiser),
-            )
-
-        val førstegangsbehandling = kall.behandling.hent(førstegangsbehandlingId)
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTso(fom, tom)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(fom, tom)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        add { _, _ -> reiser }
+                    }
+                }
+            }
 
         val revurderingId =
-            opprettRevurdering(
-                opprettBehandlingDto =
-                    OpprettBehandlingDto(
-                        fagsakId = førstegangsbehandling.fagsakId,
-                        årsak = BehandlingÅrsak.SØKNAD,
-                        kravMottatt = dagensDato,
-                        nyeOpplysningerMetadata = null,
-                    ),
-            )
-        gjennomførInngangsvilkårSteg(behandlingId = revurderingId)
-
-        kjørTasksKlareForProsessering()
-        val vilkårId =
-            kall.vilkårDagligReise
-                .hentVilkår(revurderingId)
-                .first()
-                .id
-
-        kall.vilkårDagligReise.oppdaterVilkår(
-            lagreVilkår =
-                lagreDagligReiseDto(
-                    fom = dagensDato.minusDays(46),
-                    tom = dagensDato.plusDays(42),
-                ),
-            vilkårId = vilkårId,
-            behandlingId = revurderingId,
-        )
-
-        gjennomførVilkårSteg(
-            medVilkår = emptyList(),
-            behandlingId = revurderingId,
-            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-        )
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = førstegangsbehandlingId,
+                tilSteg = StegType.BEREGNE_YTELSE,
+            ) {
+                vilkår {
+                    oppdaterDagligReise { vilkårDagligReise ->
+                        // Utvider tom og antall reisedager
+                        vilkårDagligReise.single().id to
+                            reiser.copy(
+                                tom = tom,
+                                fakta = (reiser.fakta as FaktaDagligReiseOffentligTransportDto).copy(reisedagerPerUke = 5),
+                            )
+                    }
+                }
+            }
 
         gjennomførBeregningSteg(
             behandlingId = revurderingId,

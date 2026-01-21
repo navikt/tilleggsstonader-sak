@@ -93,7 +93,7 @@ data class VilkårperiodeInterntVedtak(
     val resultat: ResultatVilkårperiode,
     val begrunnelse: String?,
     val slettetKommentar: String?,
-    val tilltaksvariant: String?,
+    val tiltaksvariant: String?,
 )
 
 data class VurderingVilkårperiode(
@@ -108,6 +108,7 @@ data class VilkårInternt(
     val fødselsdatoBarn: LocalDate?,
     val fom: LocalDate?,
     val tom: LocalDate?,
+    val adresse: String?,
     val utgift: Int?,
     val slettetKommentar: String?,
     val fakta: VilkårFaktaInternt?,
@@ -151,5 +152,5 @@ data class VedtaksperiodeInterntVedtak(
     val tom: LocalDate,
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
-    val tilltaksvariant: String?,
+    val tiltaksvariant: String?,
 )

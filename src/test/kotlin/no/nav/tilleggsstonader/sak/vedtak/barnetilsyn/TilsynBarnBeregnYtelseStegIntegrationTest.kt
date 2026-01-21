@@ -67,9 +67,6 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
     lateinit var repository: VedtakRepository
 
     @Autowired
-    lateinit var barnRepository: BarnRepository
-
-    @Autowired
     lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
 
     @Autowired

@@ -38,6 +38,7 @@ data class Vilkår(
     val utgift: Int? = null,
     val barnId: BarnId? = null,
     val erFremtidigUtgift: Boolean,
+    val adresse: String? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
     @Column("delvilkar")
@@ -255,7 +256,7 @@ enum class VilkårType(
 
     // Daglig reise
     DAGLIG_REISE(
-        "Daglig reise",
+        "Daglige reiser",
         listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
     ),
     ;

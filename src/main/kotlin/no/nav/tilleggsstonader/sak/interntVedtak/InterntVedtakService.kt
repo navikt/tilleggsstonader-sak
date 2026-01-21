@@ -37,9 +37,12 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgVurderingDto
@@ -66,21 +69,24 @@ class InterntVedtakService(
         val grunnlag = faktaGrunnlagService.hentGrunnlagsdata(behandling.id)
         val behandlingbarn = mapBarnPåBarnId(behandling.id, grunnlag.personopplysninger.barn)
 
+        val vilkår = vilkårService.hentVilkår(behandling.id)
+        val vilkårDagligReise = vilkår.map { it.mapTilVilkårDagligReise() }
+
         return InterntVedtak(
             behandling = mapBehandlingsinformasjon(behandling),
             søknad = mapSøknadsinformasjon(behandling),
             målgrupper = mapVilkårperioder(vilkårsperioder.målgrupper),
             aktiviteter = mapVilkårperioder(vilkårsperioder.aktiviteter),
             vedtaksperioder = mapVedtaksperioder(vedtak),
-            vilkår = mapVilkår(behandling.id, behandlingbarn),
+            vilkår = mapVilkår(vilkår, behandlingbarn),
             vedtak = mapVedtak(vedtak),
-            beregningsresultat = mapBeregningsresultatForStønadstype(vedtak, behandling),
+            beregningsresultat = mapBeregningsresultatForStønadstype(vedtak, vilkårDagligReise),
         )
     }
 
     private fun mapBeregningsresultatForStønadstype(
         vedtak: Vedtak?,
-        behandling: Saksbehandling,
+        vilkårDagligReise: List<VilkårDagligReise>,
     ): BeregningsresultatInterntVedtakDto? =
         vedtak?.data?.let { data ->
             when (data) {
@@ -102,10 +108,11 @@ class InterntVedtakService(
                         boutgifter = data.beregningsresultat.tilDto(vedtak.tidligsteEndring).perioder,
                     )
 
-                is InnvilgelseDagligReise ->
+                is InnvilgelseDagligReise -> {
                     BeregningsresultatInterntVedtakDto(
-                        dagligReiseTso = data.beregningsresultat.tilDto(vedtak.tidligsteEndring),
+                        dagligReiseTso = data.beregningsresultat.tilDto(vedtak.tidligsteEndring, vilkårDagligReise),
                     )
+                }
 
                 is Innvilgelse,
                 -> error("Mangler mapping av beregningsresultat for ${data.type}")
@@ -163,7 +170,7 @@ class InterntVedtakService(
                 resultat = it.resultat,
                 begrunnelse = it.begrunnelse,
                 slettetKommentar = it.slettetKommentar,
-                tilltaksvariant = it.typeAktivitet?.beskrivelse,
+                tiltaksvariant = it.typeAktivitet?.beskrivelse,
             )
         }
 
@@ -184,18 +191,17 @@ class InterntVedtakService(
             VedtaksperiodeInterntVedtak(
                 målgruppe = it.målgruppe,
                 aktivitet = it.aktivitet,
-                tilltaksvariant = it.typeAktivitet?.beskrivelse,
+                tiltaksvariant = it.typeAktivitet?.beskrivelse,
                 fom = it.fom,
                 tom = it.tom,
             )
         }
 
     private fun mapVilkår(
-        behandlingId: BehandlingId,
+        vilkår: List<Vilkår>,
         behandlingBarn: Map<BarnId, GrunnlagBarn>,
     ): List<VilkårInternt> =
-        vilkårService
-            .hentVilkår(behandlingId)
+        vilkår
             .map { vilkår ->
                 VilkårInternt(
                     type = vilkår.type,
@@ -204,6 +210,7 @@ class InterntVedtakService(
                     delvilkår = vilkår.delvilkårsett.map { mapDelvilkår(it) },
                     fom = vilkår.fom,
                     tom = vilkår.tom,
+                    adresse = vilkår.adresse,
                     utgift = vilkår.utgift,
                     slettetKommentar = vilkår.slettetKommentar,
                     fakta = mapVilkårFakta(vilkår.fakta),
@@ -296,7 +303,11 @@ class InterntVedtakService(
                     avslagBegrunnelse = vedtak.begrunnelse,
                 )
 
-            is OpphørDagligReise -> TODO()
+            is OpphørDagligReise ->
+                VedtakOpphørInternt(
+                    årsakerOpphør = vedtak.årsaker,
+                    opphørBegrunnelse = vedtak.begrunnelse,
+                )
         }
 
     private fun Map<BarnId, GrunnlagBarn>.finnFødselsdato(barnId: BarnId): LocalDate {

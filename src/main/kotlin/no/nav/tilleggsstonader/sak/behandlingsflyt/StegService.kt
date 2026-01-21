@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandlingsflyt
 
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -14,8 +15,11 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringSteg
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseBeregnSteg
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.KjørelisteSteg
 import no.nav.tilleggsstonader.sak.vilkår.InngangsvilkårSteg
 import no.nav.tilleggsstonader.sak.vilkår.VilkårSteg
 import org.slf4j.LoggerFactory
@@ -28,6 +32,7 @@ class StegService(
     private val behandlingshistorikkService: BehandlingshistorikkService,
     private val rolleConfig: RolleConfig,
     private val behandlingSteg: List<BehandlingSteg<*>>,
+    private val unleashService: UnleashService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -78,6 +83,8 @@ class StegService(
         return when (steg) {
             StegType.INNGANGSVILKÅR -> håndterInngangsvilkår(behandlingId)
             StegType.VILKÅR -> håndterVilkår(behandlingId)
+            StegType.KJØRELISTE -> håndterKjøreliste(behandlingId)
+            StegType.BEREGNING -> håndterBeregnForDagligReise(behandlingId)
             StegType.SIMULERING -> håndterSimulering(behandlingId)
             StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV -> håndterBrev(behandlingId)
             else -> error("Steg $steg kan ikke ferdigstilles her")
@@ -93,6 +100,16 @@ class StegService(
     private fun håndterVilkår(behandlingId: BehandlingId): Behandling {
         val vilkårSteg: VilkårSteg = behandlingSteg.filterIsInstance<VilkårSteg>().single()
         return håndterSteg(behandlingId, vilkårSteg)
+    }
+
+    private fun håndterKjøreliste(behandlingId: BehandlingId): Behandling {
+        val kjørelisteSteg: KjørelisteSteg = behandlingSteg.filterIsInstance<KjørelisteSteg>().single()
+        return håndterSteg(behandlingId, kjørelisteSteg)
+    }
+
+    private fun håndterBeregnForDagligReise(behandlingId: BehandlingId): Behandling {
+        val beregnSteg: DagligReiseBeregnSteg = behandlingSteg.filterIsInstance<DagligReiseBeregnSteg>().single()
+        return håndterSteg(behandlingId, beregnSteg)
     }
 
     private fun håndterSimulering(behandlingId: BehandlingId): Behandling {
@@ -148,7 +165,12 @@ class StegService(
         val saksbehandlerIdent = SikkerhetContext.hentSaksbehandlerEllerSystembruker()
         valider(saksbehandling, stegType, saksbehandlerIdent, behandlingSteg)
 
-        val nesteSteg = behandlingSteg.utførOgReturnerNesteSteg(saksbehandling, data)
+        val nesteSteg =
+            behandlingSteg.utførOgReturnerNesteSteg(
+                saksbehandling,
+                data,
+                kanBehandlePrivatBil = unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL),
+            )
 
         oppdaterHistorikk(behandlingSteg, saksbehandling.id, saksbehandlerIdent)
         metrics.success(stegType)
