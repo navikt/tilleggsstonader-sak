@@ -21,8 +21,8 @@ private fun List<DelvilkårDto>.tilSvar(): Map<RegelId, SvarOgBegrunnelseDto> =
         .flatMap { it.vurderinger }
         .associate { vurderingDto ->
             vurderingDto.regelId to
-                    SvarOgBegrunnelseDto(
-                        svar = vurderingDto.svar ?: error("Forventer svar i test dataen"),
-                        begrunnelse = vurderingDto.begrunnelse,
-                    )
+                SvarOgBegrunnelseDto(
+                    svar = vurderingDto.svar ?: error("Forventer svar i test dataen"),
+                    begrunnelse = vurderingDto.begrunnelse,
+                )
         }
