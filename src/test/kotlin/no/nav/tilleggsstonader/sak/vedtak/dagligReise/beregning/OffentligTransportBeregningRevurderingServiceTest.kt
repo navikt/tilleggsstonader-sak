@@ -16,13 +16,11 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførInngangsvilkårSt
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførVilkårSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurdering
-import no.nav.tilleggsstonader.sak.util.faktaOffentligTransport
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatForReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseResponse
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -147,17 +145,7 @@ class OffentligTransportBeregningRevurderingServiceTest : CleanDatabaseIntegrati
         revurderingId: BehandlingId,
     ) {
         gjennomførVilkårSteg(
-            medVilkår =
-                listOf(
-                    lagreDagligReiseDto(
-                        fom = fom,
-                        tom = tom,
-                        fakta =
-                            faktaOffentligTransport(
-                                reiseId = ReiseId.random(),
-                            ),
-                    ),
-                ),
+            medVilkår = listOf(lagreDagligReiseDto(fom = fom, tom = tom)),
             behandlingId = revurderingId,
             stønadstype = Stønadstype.DAGLIG_REISE_TSO,
         )

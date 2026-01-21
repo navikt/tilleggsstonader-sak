@@ -160,7 +160,6 @@
     "fødselsdatoBarn" : "2024-05-15",
     "fom" : "2024-02-01",
     "tom" : "2024-02-29",
-    "adresse" : null,
     "utgift" : 100,
     "slettetKommentar" : null,
     "fakta" : null
@@ -192,7 +191,6 @@
     "fødselsdatoBarn" : "2024-05-15",
     "fom" : "2024-02-01",
     "tom" : "2024-02-29",
-    "adresse" : null,
     "utgift" : 200,
     "slettetKommentar" : null,
     "fakta" : null
@@ -224,7 +222,6 @@
     "fødselsdatoBarn" : "2024-10-15",
     "fom" : "2024-02-01",
     "tom" : "2024-02-29",
-    "adresse" : null,
     "utgift" : 200,
     "slettetKommentar" : "slettet dette vilkår",
     "fakta" : null

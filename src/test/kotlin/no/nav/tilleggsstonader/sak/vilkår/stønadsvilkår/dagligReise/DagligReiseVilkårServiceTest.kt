@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
@@ -46,7 +47,6 @@ class DagligReiseVilkårServiceTest {
         LagreDagligReise(
             fom = 1 januar 2025,
             tom = 31 januar 2025,
-            adresse = "Tiltaksveien 1",
             svar = svarOffentligTransport,
             fakta = faktaOffentligTransport(),
         )
@@ -110,12 +110,15 @@ class DagligReiseVilkårServiceTest {
     }
 
     fun faktaOffentligTransport(
+        reiseId: ReiseId = dummyReiseId,
+        adresse: String? = "Tiltaksveien 1",
         reisedagerPerUke: Int = 5,
         prisEnkelbillett: Int? = 40,
         prisSyvdagersbillett: Int? = null,
         prisTrettidagersbillett: Int? = 800,
     ) = FaktaOffentligTransport(
-        reiseId = dummyReiseId,
+        reiseId = reiseId,
+        adresse = adresse,
         reisedagerPerUke = reisedagerPerUke,
         prisEnkelbillett = prisEnkelbillett,
         prisSyvdagersbillett = prisSyvdagersbillett,

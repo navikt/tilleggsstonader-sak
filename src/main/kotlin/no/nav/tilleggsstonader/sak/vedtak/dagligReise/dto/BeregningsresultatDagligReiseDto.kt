@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatD
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import java.time.LocalDate
@@ -57,7 +56,7 @@ fun BeregningsresultatOffentligTransport.tilDto(vilkår: List<VilkårDagligReise
 fun BeregningsresultatForReise.tilDto(vilkår: List<VilkårDagligReise>): BeregningsresultatForReiseDto =
     BeregningsresultatForReiseDto(
         reiseId = reiseId,
-        adresse = vilkår.firstOrNull { (it.fakta as? FaktaOffentligTransport)?.reiseId == reiseId }?.adresse,
+        adresse = vilkår.firstOrNull { it.fakta.reiseId == reiseId }?.fakta?.adresse,
         perioder = perioder.map { it.tilDto() },
     )
 

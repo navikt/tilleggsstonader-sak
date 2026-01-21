@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.AvsenderMottaker
@@ -54,6 +55,7 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontro
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseDto
@@ -339,7 +341,6 @@ fun vilkår(
     opphavsvilkår: Opphavsvilkår? = null,
     fom: LocalDate? = YearMonth.now().atDay(1),
     tom: LocalDate? = YearMonth.now().atEndOfMonth(),
-    adresse: String? = null,
     utgift: Int? = 100,
     erFremtidigUtgift: Boolean = false,
     fakta: VilkårFakta? = null,
@@ -354,7 +355,6 @@ fun vilkår(
         opphavsvilkår = opphavsvilkår,
         fom = fom,
         tom = tom,
-        adresse = adresse,
         utgift = utgift,
         erFremtidigUtgift = erFremtidigUtgift,
         gitVersjon = Applikasjonsversjon.versjon,
@@ -368,7 +368,7 @@ fun vilkårDagligReise(
     delvilkår: List<Delvilkår> = emptyList(),
     fom: LocalDate = YearMonth.now().atDay(1),
     tom: LocalDate = YearMonth.now().atEndOfMonth(),
-    fakta: FaktaDagligReise? = null,
+    fakta: FaktaDagligReise = faktaOffentligTransport(),
 ): VilkårDagligReise =
     VilkårDagligReise(
         behandlingId = behandlingId,
@@ -532,16 +532,20 @@ val dummyReiseId = ReiseId.fromString("02c86eca-36e5-451b-a22d-8501a0f7b8dd")
 
 fun faktaOffentligTransport(
     reiseId: ReiseId = dummyReiseId,
+    adresse: String = "Tiltaksveien 1",
     reisedagerPerUke: Int = 5,
     prisEnkelbillett: Int? = 40,
     prisSyvdagersbillett: Int? = null,
     prisTrettidagersbillett: Int? = 800,
-) = FaktaDagligReiseOffentligTransportDto(
+    periode: Datoperiode? = null,
+) = FaktaOffentligTransport(
     reiseId = reiseId,
+    adresse = adresse,
     reisedagerPerUke = reisedagerPerUke,
     prisEnkelbillett = prisEnkelbillett,
     prisSyvdagersbillett = prisSyvdagersbillett,
     prisTrettidagersbillett = prisTrettidagersbillett,
+    periode = periode,
 )
 
 fun lagreVilkårperiodeMålgruppe(
@@ -586,15 +590,25 @@ fun lagreDagligReiseDto(
     fom: LocalDate = 1 januar 2025,
     tom: LocalDate = 31 januar 2025,
     adresse: String = "Tiltaksveien 1",
+    reiseId: ReiseId = dummyReiseId,
     svar: Map<RegelId, SvarOgBegrunnelseDto> =
         mapOf(
             RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
             RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
         ),
-    fakta: FaktaDagligReiseDto = faktaOffentligTransport(),
+    fakta: FaktaDagligReiseDto =
+        faktaOffentligTransport(adresse = adresse, reiseId = reiseId).run {
+            FaktaDagligReiseOffentligTransportDto(
+                prisEnkelbillett = prisEnkelbillett,
+                prisSyvdagersbillett = prisSyvdagersbillett,
+                prisTrettidagersbillett = prisTrettidagersbillett,
+                reisedagerPerUke = reisedagerPerUke,
+            )
+        },
 ) = LagreDagligReiseDto(
     fom = fom,
     tom = tom,
+    reiseId = reiseId,
     adresse = adresse,
     svar = svar,
     fakta = fakta,
