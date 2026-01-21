@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.migrering.arena.ArenaFinnesPersonResponse
 
 class ArenaKall(
     private val testklient: Testklient,
+    private val eksternApplikasjon: EksternApplikasjon,
 ) {
     fun status(dto: ArenaFinnesPersonRequest) = apiRespons.status(dto).expectOkWithBody<ArenaFinnesPersonResponse>()
 
@@ -20,7 +21,7 @@ class ArenaKall(
                     .post()
                     .uri("/api/ekstern/arena/status")
                     .bodyValue(dto)
-                    .medClientCredentials(EksternApplikasjon.ARENA.name, true)
+                    .medClientCredentials(eksternApplikasjon.arena, true)
                     .exchange()
             }
     }

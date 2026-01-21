@@ -21,14 +21,14 @@ import org.springframework.web.bind.annotation.RestController
 )
 class DagligReisePrivatBilController(
     private val dagligReisePrivatBilService: DagligReisePrivatBilService,
+    private val eksternApplikasjon: EksternApplikasjon,
 ) {
     @PostMapping("/rammevedtak")
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
     fun hentRammevedtaksinformasjon(
         @RequestBody request: IdentStønadstype,
     ): List<RammevedtakDto> {
-        // Fjerne lokal når man går i prod
-        feilHvisIkke(SikkerhetContext.kallKommerFra(EksternApplikasjon.SOKNAD_API), HttpStatus.UNAUTHORIZED) {
+        feilHvisIkke(SikkerhetContext.kallKommerFra(eksternApplikasjon.soknadApi), HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
         }
         return dagligReisePrivatBilService.hentRammevedtaksPrivatBil(request)

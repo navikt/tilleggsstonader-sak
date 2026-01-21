@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRoutingResponse
 
 class SkjemaRoutingKall(
     private val testklient: Testklient,
+    private val eksternApplikasjon: EksternApplikasjon,
 ) {
     fun sjekk(identSkjematype: IdentSkjematype): SøknadRoutingResponse = apiRespons.sjekk(identSkjematype).expectOkWithBody()
 
@@ -21,7 +22,7 @@ class SkjemaRoutingKall(
                     .uri("/api/ekstern/skjema-routing")
                     .bodyValue(identSkjematype)
                     .medClientCredentials(
-                        clientId = EksternApplikasjon.SOKNAD_API.name,
+                        clientId = eksternApplikasjon.soknadApi,
                         accessAsApplication = true,
                     ).exchange()
             }
