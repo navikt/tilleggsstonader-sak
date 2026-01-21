@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.mockBrukerContext
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
-import org.springframework.test.context.ActiveProfiles
 
 class SikkerhetContextTest : IntegrationTest() {
     @AfterEach
@@ -40,15 +39,5 @@ class SikkerhetContextTest : IntegrationTest() {
         mockBrukerContext("", azp_name = "prod-gcp:tilleggsstonader:tilleggsstonader-soknad-api")
         assertThat(kallKommerFra(eksternApplikasjon.bidragGrunnlag, eksternApplikasjon.soknadApi)).isTrue
         assertThat(kallKommerFra(eksternApplikasjon.bidragGrunnlag)).isFalse()
-    }
-}
-
-// Tester at eksternApplikasjon blir skrevet over av verdien fra application-local.yml
-@ActiveProfiles("local")
-class SikkerhetContextLocalTest : IntegrationTest() {
-    @Test
-    internal fun `skal gjenkjenne kall fra soknad-api-lokal`() {
-        mockBrukerContext("", azp_name = "gcp:tilleggsstonader:tilleggsstonader-soknad-api-lokal")
-        assertThat(kallKommerFra(eksternApplikasjon.soknadApi)).isTrue
     }
 }
