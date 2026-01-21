@@ -597,7 +597,7 @@ fun lagreDagligReiseDto(
             RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
         ),
     fakta: FaktaDagligReiseDto =
-        faktaOffentligTransport().run {
+        faktaOffentligTransport(adresse = adresse, reiseId = reiseId).run {
             FaktaDagligReiseOffentligTransportDto(
                 prisEnkelbillett = prisEnkelbillett,
                 prisSyvdagersbillett = prisSyvdagersbillett,

@@ -10,7 +10,7 @@ fun VilkårDagligReiseDto.tilLagreDagligReiseDto() =
     LagreDagligReiseDto(
         fom = fom,
         tom = tom,
-        adresse = adresse ?: "Forventer adresse på vilkår daglig reise",
+        adresse = adresse ?: "Det er påkrevd å sende inn adresse når reisevilkår opprettes",
         reiseId = reiseId,
         svar = delvilkårsett.tilSvar(),
         fakta = fakta,

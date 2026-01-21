@@ -15,49 +15,19 @@ class FaktaDagligReiseTest {
     inner class OffentligTransport {
         @Test
         fun `skal kaste feil hvis negative utgifter`() {
-            val feil =
-                assertThrows<ApiFeil> {
-                    faktaOffentligTransport(
-                        reiseId = ReiseId.random(),
-                        adresse = "Tiltaksveien 1",
-                        reisedagerPerUke = 4,
-                        prisEnkelbillett = -44,
-                        prisSyvdagersbillett = 200,
-                        prisTrettidagersbillett = 780,
-                    )
-                }
+            val feil = assertThrows<ApiFeil> { faktaOffentligTransport(prisEnkelbillett = -44) }
             assertThat(feil.message).isEqualTo("Billettprisen må være større enn 0")
         }
 
         @Test
         fun `skal kaste feil hvis negative reisedager`() {
-            val feil =
-                assertThrows<ApiFeil> {
-                    faktaOffentligTransport(
-                        reiseId = ReiseId.random(),
-                        adresse = "Tiltaksveien 1",
-                        reisedagerPerUke = -4,
-                        prisEnkelbillett = 44,
-                        prisSyvdagersbillett = 200,
-                        prisTrettidagersbillett = 780,
-                    )
-                }
+            val feil = assertThrows<ApiFeil> { faktaOffentligTransport(reisedagerPerUke = -4) }
             assertThat(feil.message).isEqualTo("Reisedager per uke må være 0 eller mer")
         }
 
         @Test
         fun `skal kaste feil hvis reisedager er større enn 5`() {
-            val feil =
-                assertThrows<ApiFeil> {
-                    faktaOffentligTransport(
-                        reiseId = ReiseId.random(),
-                        adresse = "Tiltaksveien 1",
-                        reisedagerPerUke = 6,
-                        prisEnkelbillett = 44,
-                        prisSyvdagersbillett = 200,
-                        prisTrettidagersbillett = 780,
-                    )
-                }
+            val feil = assertThrows<ApiFeil> { faktaOffentligTransport(reisedagerPerUke = 6) }
             assertThat(feil.message).isEqualTo("Reisedager per uke kan ikke være mer enn 5")
         }
 
@@ -66,9 +36,6 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     faktaOffentligTransport(
-                        reiseId = ReiseId.random(),
-                        adresse = "Tiltaksveien 1",
-                        reisedagerPerUke = 4,
                         prisEnkelbillett = null,
                         prisSyvdagersbillett = null,
                         prisTrettidagersbillett = null,
@@ -82,12 +49,8 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     faktaOffentligTransport(
-                        reiseId = ReiseId.random(),
-                        adresse = "Tiltaksveien 1",
                         reisedagerPerUke = 1,
                         prisEnkelbillett = null,
-                        prisSyvdagersbillett = null,
-                        prisTrettidagersbillett = 750,
                         periode = Datoperiode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(20)),
                     )
                 }
@@ -99,12 +62,7 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     faktaOffentligTransport(
-                        reiseId = ReiseId.random(),
-                        adresse = "Tiltaksveien 1",
-                        reisedagerPerUke = 3,
                         prisEnkelbillett = null,
-                        prisSyvdagersbillett = null,
-                        prisTrettidagersbillett = 750,
                         periode = Datoperiode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(12)),
                     )
                 }
@@ -116,11 +74,6 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     faktaOffentligTransport(
-                        reiseId = ReiseId.random(),
-                        adresse = "Tiltaksveien 1",
-                        reisedagerPerUke = 3,
-                        prisEnkelbillett = 44,
-                        prisSyvdagersbillett = null,
                         prisTrettidagersbillett = null,
                         periode = Datoperiode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(28)),
                     )
@@ -135,11 +88,6 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     faktaOffentligTransport(
-                        reiseId = ReiseId.random(),
-                        adresse = "Tiltaksveien 1",
-                        reisedagerPerUke = 3,
-                        prisEnkelbillett = 44,
-                        prisSyvdagersbillett = null,
                         prisTrettidagersbillett = null,
                         periode = Datoperiode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(31)),
                     )
@@ -152,11 +100,6 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     faktaOffentligTransport(
-                        reiseId = ReiseId.random(),
-                        adresse = "Tiltaksveien 1",
-                        reisedagerPerUke = 4,
-                        prisEnkelbillett = 44,
-                        prisSyvdagersbillett = null,
                         prisTrettidagersbillett = null,
                         periode = Datoperiode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(29)),
                     )
@@ -169,11 +112,6 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     faktaOffentligTransport(
-                        reiseId = ReiseId.random(),
-                        adresse = "Tiltaksveien 1",
-                        reisedagerPerUke = 3,
-                        prisEnkelbillett = 44,
-                        prisSyvdagersbillett = null,
                         prisTrettidagersbillett = null,
                         periode = Datoperiode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(47)),
                     )
@@ -188,12 +126,7 @@ class FaktaDagligReiseTest {
             val feil =
                 assertThrows<ApiFeil> {
                     faktaOffentligTransport(
-                        reiseId = ReiseId.random(),
-                        adresse = "Tiltaksveien 1",
-                        reisedagerPerUke = 3,
                         prisEnkelbillett = null,
-                        prisSyvdagersbillett = null,
-                        prisTrettidagersbillett = 750,
                         periode = Datoperiode(fom = LocalDate.now(), tom = LocalDate.now().plusDays(47)),
                     )
                 }
