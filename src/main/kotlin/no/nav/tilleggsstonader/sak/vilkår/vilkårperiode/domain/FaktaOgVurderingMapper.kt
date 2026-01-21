@@ -280,7 +280,7 @@ private fun mapAktiviteterDagligReiseTso(
         AktivitetType.UTDANNING -> UtdanningDagligReiseTso
 
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetDagligReiseTso
-        AktivitetType.REELL_ARBEIDSSØKER -> feil("Reell arbeidssøker er ikke en gyldig aktivitet for daglig reise TSO")
+        AktivitetType.REELL_ARBEIDSSØKER -> feil("Reell arbeidssøker er ikke en gyldig aktivitet for daglige reiser TSO")
     }
 
 private fun mapAktiviteterDagligReiseTsr(
@@ -298,11 +298,11 @@ private fun mapAktiviteterDagligReiseTsr(
         }
 
         AktivitetType.UTDANNING -> {
-            feil("Utdanning er ikke en gyldig aktivitet for daglig reise TSR")
+            feil("Utdanning er ikke en gyldig aktivitet for daglige reiser TSR")
         }
 
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetDagligReiseTsr
-        AktivitetType.REELL_ARBEIDSSØKER -> feil("Reell arbeidssøker er ikke en gyldig aktivitet for daglig reise TSR")
+        AktivitetType.REELL_ARBEIDSSØKER -> feil("Reell arbeidssøker er ikke en gyldig aktivitet for daglige reiser TSR")
     }
 
 private fun lagVurderingAldersvilkår(

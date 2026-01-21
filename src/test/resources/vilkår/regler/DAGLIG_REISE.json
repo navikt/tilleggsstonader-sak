@@ -7,11 +7,11 @@
       "svarMapping" : {
         "JA" : {
           "regelId" : "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
-          "begrunnelseType" : "VALGFRI"
+          "begrunnelseType" : "PÅKREVD"
         },
         "NEI" : {
           "regelId" : "UNNTAK_SEKS_KM",
-          "begrunnelseType" : "UTEN"
+          "begrunnelseType" : "PÅKREVD"
         }
       }
     },

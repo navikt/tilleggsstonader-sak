@@ -108,6 +108,7 @@ data class VilkårInternt(
     val fødselsdatoBarn: LocalDate?,
     val fom: LocalDate?,
     val tom: LocalDate?,
+    val adresse: String?,
     val utgift: Int?,
     val slettetKommentar: String?,
     val fakta: VilkårFaktaInternt?,

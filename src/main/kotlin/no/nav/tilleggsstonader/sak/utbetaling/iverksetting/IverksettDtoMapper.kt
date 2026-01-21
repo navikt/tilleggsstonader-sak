@@ -102,7 +102,7 @@ object IverksettDtoMapper {
             TypeAndel.DAGLIG_REISE_TILTAK_OPPFØLGING,
             TypeAndel.DAGLIG_REISE_TILTAK_UTVIDET_OPPFØLGING_I_NAV,
             TypeAndel.DAGLIG_REISE_TILTAK_UTVIDET_OPPFØLGING_I_OPPLÆRING,
-            -> error("Andeler for daglig reise skal sendes på Kafka")
+            -> error("Andeler for daglige reiser skal sendes på Kafka")
 
             TypeAndel.UGYLDIG -> error("Ugyldig type andel. Skal ikke iverksettes")
         }

@@ -10,13 +10,13 @@
       {
         "svarId" : "JA",
         "nesteRegelId" : "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
-        "begrunnelseType" : "VALGFRI",
+        "begrunnelseType" : "PÅKREVD",
         "tilhørendeFaktaType" : null
       },
       {
         "svarId" : "NEI",
         "nesteRegelId" : "UNNTAK_SEKS_KM",
-        "begrunnelseType" : "UTEN",
+        "begrunnelseType" : "PÅKREVD",
         "tilhørendeFaktaType" : null
       }
     ]

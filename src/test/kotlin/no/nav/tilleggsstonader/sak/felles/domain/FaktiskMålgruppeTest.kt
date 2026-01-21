@@ -148,7 +148,7 @@ class FaktiskMålgruppeTest {
                 assertThatException()
                     .isThrownBy {
                         FaktiskMålgruppe.GJENLEVENDE.tilTypeAndel(Stønadstype.DAGLIG_REISE_TSR)
-                    }.withMessage("Kan ikke utlede Typeandel for Daglig reise TSR fra FaktiskMålgruppe")
+                    }.withMessage("Kan ikke utlede Typeandel for Daglige reiser TSR fra FaktiskMålgruppe")
             }
         }
     }

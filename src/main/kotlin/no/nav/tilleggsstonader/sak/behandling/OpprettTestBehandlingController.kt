@@ -540,12 +540,12 @@ class OpprettTestBehandlingController(
         val (tittel, brevkode) =
             when (fagsak.stønadstype) {
                 Stønadstype.DAGLIG_REISE_TSO ->
-                    "Søknad om Daglig reise tso" to "DAGLIG_REISE_TSO"
+                    "Søknad om daglige reiser tso" to "DAGLIG_REISE_TSO"
 
                 Stønadstype.DAGLIG_REISE_TSR ->
-                    "Søknad om Daglig reise tsr" to "DAGLIG_REISE_TSR"
+                    "Søknad om daglige reiser tsr" to "DAGLIG_REISE_TSR"
 
-                else -> error("Ugyldig stønadstype for daglig reise: ${fagsak.stønadstype}")
+                else -> error("Ugyldig stønadstype for daglige reiser: ${fagsak.stønadstype}")
             }
 
         val journalpost =

@@ -1,25 +1,34 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest
 
-import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
+import io.mockk.every
+import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
-import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
-import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
+import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
-import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
-import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegController
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientMockConfig
+import no.nav.tilleggsstonader.sak.integrasjonstest.dsl.BehandlingTestdataDsl
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
-import no.nav.tilleggsstonader.sak.util.journalpost
+import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.defaultJournalpost
+import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.journalpostSøknadForStønadstype
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
+import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil.søknadBoutgifter
+import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil.søknadDagligReise
+import no.nav.tilleggsstonader.sak.util.SøknadUtil.barnMedBarnepass
+import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaBarnetilsyn
+import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaLæremidler
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
@@ -28,39 +37,89 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnReque
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
-import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.time.LocalDate
+import java.util.UUID
 
 /**
  * Gjennomfører en behandling fra journalpost og helt til et gitt steg.
  *
- * Foreløpig funker bare innvilgelse.
+ * Kan bruke [testdataProvider] til å modifisere aktiviteter, målgruppe, vilkår og vedtaksresultatet
  *
- * Du kan sende inn ønsket aktivitet, målgruppe og vilkår. Som default er disse satt til et happy-case for daglig reise TSO.
- *
- * [fraJournalpost] Journalposten som behandlingen skal opprettes på bakgrunn av. Bestemmer hvilken stønadstype det blir.
+ * [stønadstype] Oppretter journalpost med brevkode tilhørende stønadstype som brukes til å opprette fagsak
  * [tilSteg] I hvilket steg behandlingen skal ende opp. Som default blir den ferdigstilt.
  *
  */
-fun IntegrationTest.gjennomførBehandlingsløp(
-    fraJournalpost: Journalpost = defaultJournalpost,
+fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
+    stønadstype: Stønadstype,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
-    medAktivitet: (BehandlingId) -> LagreVilkårperiode = ::lagreVilkårperiodeAktivitet,
-    medMålgruppe: (BehandlingId) -> LagreVilkårperiode = ::lagreVilkårperiodeMålgruppe,
-    medVilkår: List<LagreVilkår> = listOf(lagreDagligReiseDto()),
-    opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
+    testdataProvider: BehandlingTestdataDsl.() -> Unit,
 ): BehandlingId {
-    val behandlingId = håndterSøknadService.håndterSøknad(fraJournalpost)!!.id
+    val journalpostSøknadForStønadstype = journalpostSøknadForStønadstype(stønadstype)
+    mockStrukturertSøknadForJournalpost(journalpostSøknadForStønadstype, stønadstype)
+    val behandlingId = håndterSøknadService.håndterSøknad(journalpostSøknadForStønadstype)!!.id
+    gjennomførBehandlingsløp(
+        behandlingId = behandlingId,
+        tilSteg = tilSteg,
+        testdataProvider = testdataProvider,
+    )
+    return behandlingId
+}
 
+private fun IntegrationTest.mockStrukturertSøknadForJournalpost(
+    journalpost: Journalpost,
+    stønadstype: Stønadstype,
+) {
+    if (stønadstype == Stønadstype.DAGLIG_REISE_TSO) {
+        // Samme søknad for TSO og TSR, rutes ved sjekk på ytelser i HåndterSøknadService
+        every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoAAP()
+    }
+    every {
+        journalpostClient.hentDokument(
+            journalpost.journalpostId,
+            journalpost.dokumenter?.single()!!.dokumentInfoId,
+            Dokumentvariantformat.ORIGINAL,
+        )
+    } returns objectMapper.writeValueAsBytes(søknadForStønadstype(stønadstype))
+}
+
+private fun søknadForStønadstype(stønadstype: Stønadstype) =
+    when (stønadstype) {
+        Stønadstype.BARNETILSYN ->
+            søknadskjemaBarnetilsyn(
+                barnMedBarnepass = listOf(barnMedBarnepass(ident = PdlClientMockConfig.BARN_FNR)),
+            )
+        Stønadstype.LÆREMIDLER -> søknadskjemaLæremidler()
+        Stønadstype.BOUTGIFTER -> søknadBoutgifter()
+        Stønadstype.DAGLIG_REISE_TSO,
+        Stønadstype.DAGLIG_REISE_TSR,
+        -> søknadDagligReise()
+    }
+
+fun IntegrationTest.gjennomførBehandlingsløp(
+    behandlingId: BehandlingId,
+    tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
+    testdataProvider: BehandlingTestdataDsl.() -> Unit =
+        defaultBehandlingTestdataProvider(
+            medAktivitet = ::lagreVilkårperiodeAktivitet,
+            medMålgruppe = ::lagreVilkårperiodeMålgruppe,
+            medVilkår = listOf(lagreDagligReiseDto()),
+            opprettVedtak = OpprettInnvilgelse,
+        ),
+) {
     // Oppretter grunnlagsdata
     val behandling = kall.behandling.hent(behandlingId)
 
@@ -69,52 +128,52 @@ fun IntegrationTest.gjennomførBehandlingsløp(
 
     tilordneÅpenBehandlingOppgaveForBehandling(behandlingId)
 
+    val testdata = BehandlingTestdataDsl.build(testdataProvider)
+
     if (tilSteg == StegType.INNGANGSVILKÅR) {
-        return behandlingId
+        return
     }
 
-    gjennomførInngangsvilkårSteg(medAktivitet, medMålgruppe, behandlingId)
+    gjennomførInngangsvilkårSteg(testdata, behandlingId)
 
     if (tilSteg == StegType.VILKÅR) {
-        return behandlingId
+        return
     }
 
     if (behandling.stønadstype != Stønadstype.LÆREMIDLER) {
-        gjennomførVilkårSteg(medVilkår, behandling.id, behandling.stønadstype)
+        gjennomførVilkårSteg(testdata, behandling.id, behandling.stønadstype)
     }
 
     if (tilSteg == StegType.BEREGNE_YTELSE) {
-        return behandlingId
+        return
     }
 
-    gjennomførBeregningSteg(behandling.id, behandling.stønadstype)
+    gjennomførBeregningSteg(behandling.id, behandling.stønadstype, testdata.vedtak.vedtak)
 
     if (tilSteg == StegType.SIMULERING) {
-        return behandlingId
+        return
     }
 
     gjennomførSimuleringSteg(behandlingId)
 
     if (tilSteg == StegType.SEND_TIL_BESLUTTER) {
-        return behandlingId
+        return
     }
 
     gjennomførSendTilBeslutterSteg(behandlingId)
 
     if (tilSteg == StegType.BESLUTTE_VEDTAK) {
-        return behandlingId
+        return
     }
 
     gjennomførBeslutteVedtakSteg(behandlingId)
 
     if (tilSteg in setOf(StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV, StegType.FERDIGSTILLE_BEHANDLING)) {
-        return behandlingId
+        return
     }
 
     // Ferdigstiller behandling
     kjørTasksKlareForProsesseringTilIngenTasksIgjen()
-
-    return behandlingId
 }
 
 fun IntegrationTest.opprettRevurdering(opprettBehandlingDto: OpprettBehandlingDto): BehandlingId {
@@ -129,6 +188,39 @@ fun IntegrationTest.opprettRevurdering(opprettBehandlingDto: OpprettBehandlingDt
     tilordneÅpenBehandlingOppgaveForBehandling(behandlingId)
 
     return behandlingId
+}
+
+fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
+    fraBehandlingId: BehandlingId,
+    tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
+    testdataProvider: BehandlingTestdataDsl.() -> Unit,
+): BehandlingId {
+    val behandling = kall.behandling.hent(fraBehandlingId)
+    return opprettRevurderingOgGjennomførBehandlingsløp(
+        opprettBehandlingDto =
+            OpprettBehandlingDto(
+                fagsakId = behandling.fagsakId,
+                årsak = BehandlingÅrsak.SØKNAD,
+                kravMottatt = LocalDate.now(),
+                nyeOpplysningerMetadata = null,
+            ),
+        tilSteg = tilSteg,
+        testdataProvider = testdataProvider,
+    )
+}
+
+fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
+    opprettBehandlingDto: OpprettBehandlingDto,
+    tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
+    testdataProvider: BehandlingTestdataDsl.() -> Unit,
+): BehandlingId {
+    val revurderingId = opprettRevurdering(opprettBehandlingDto)
+    gjennomførBehandlingsløp(
+        behandlingId = revurderingId,
+        tilSteg = tilSteg,
+        testdataProvider = testdataProvider,
+    )
+    return revurderingId
 }
 
 fun IntegrationTest.gjennomførHenleggelse(fraJournalpost: Journalpost = defaultJournalpost): BehandlingId {
@@ -230,8 +322,12 @@ fun IntegrationTest.gjennomførBeregningSteg(
                                     begrunnelse = opprettVedtak.begrunnelse,
                                     opphørsdato = opprettVedtak.opphørsdato,
                                 )
-                            Stønadstype.DAGLIG_REISE_TSO -> TODO()
-                            Stønadstype.DAGLIG_REISE_TSR -> TODO()
+                            Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR ->
+                                OpphørDagligReiseRequest(
+                                    årsakerOpphør = opprettVedtak.årsaker,
+                                    begrunnelse = opprettVedtak.begrunnelse,
+                                    opphørsdato = opprettVedtak.opphørsdato,
+                                )
                         },
                 )
     }
@@ -249,13 +345,146 @@ data class OpprettOpphør(
     val opphørsdato: LocalDate,
 ) : OpprettVedtak
 
+@Suppress("unused")
+@Deprecated(
+    message = "Use gjennomførBehandlingsløp(testdataProvider = { ... }) instead",
+    replaceWith =
+        ReplaceWith(
+            "gjennomførBehandlingsløp(behandlingId = behandlingId, tilSteg = StegType.INNGANGSVILKÅR, opprettVedtak = OpprettInnvilgelse)",
+        ),
+    level = DeprecationLevel.WARNING,
+)
 fun IntegrationTest.gjennomførInngangsvilkårSteg(
     medAktivitet: ((BehandlingId) -> LagreVilkårperiode)? = null,
     medMålgruppe: ((BehandlingId) -> LagreVilkårperiode)? = null,
     behandlingId: BehandlingId,
 ) {
-    medAktivitet?.invoke(behandlingId)?.let { kall.vilkårperiode.opprett(it) }
-    medMålgruppe?.invoke(behandlingId)?.let { kall.vilkårperiode.opprett(it) }
+    val testdataDsl =
+        BehandlingTestdataDsl.build {
+            medAktivitet?.let { a -> aktivitet { opprett { add(a) } } }
+            medMålgruppe?.let { m -> målgruppe { opprett { add(m) } } }
+        }
+    gjennomførInngangsvilkårSteg(testdataDsl, behandlingId)
+}
+
+@Suppress("unused")
+@Deprecated(
+    message = "Use gjennomførBehandlingsløp(testdataProvider = { ... }) instead",
+    replaceWith =
+        ReplaceWith(
+            "gjennomførBehandlingsløp(behandlingId = behandlingId, tilSteg = StegType.VILKÅR, opprettVedtak = OpprettInnvilgelse)",
+        ),
+    level = DeprecationLevel.WARNING,
+)
+fun IntegrationTest.gjennomførVilkårSteg(
+    medVilkår: List<LagreVilkår>,
+    behandlingId: BehandlingId,
+    stønadstype: Stønadstype,
+) {
+    val testdataProvider =
+        BehandlingTestdataDsl.build {
+            vilkår {
+                opprett {
+                    medVilkår.forEach { lagreVilkår -> add { _, _ -> lagreVilkår } }
+                }
+            }
+        }
+    gjennomførVilkårSteg(testdataProvider, behandlingId, stønadstype)
+}
+
+private const val MINIMALT_BREV = """SAKSBEHANDLER_SIGNATUR - BREVDATO_PLACEHOLDER - BESLUTTER_SIGNATUR"""
+
+private fun defaultBehandlingTestdataProvider(
+    medAktivitet: (BehandlingId) -> LagreVilkårperiode,
+    medMålgruppe: (BehandlingId) -> LagreVilkårperiode,
+    medVilkår: List<LagreVilkår>,
+    opprettVedtak: OpprettVedtak,
+): BehandlingTestdataDsl.() -> Unit =
+    {
+        aktivitet {
+            opprett {
+                add(medAktivitet)
+            }
+        }
+        målgruppe {
+            opprett {
+                add(medMålgruppe)
+            }
+        }
+        vilkår {
+            opprett {
+                medVilkår.forEach { lagreVilkår -> add { _, _ -> lagreVilkår } }
+            }
+        }
+        vedtak {
+            vedtak = opprettVedtak
+        }
+    }
+
+private fun IntegrationTest.gjennomførInngangsvilkårSteg(
+    testdataDsl: BehandlingTestdataDsl,
+    behandlingId: BehandlingId,
+) {
+    // Hentes ikke ut om man ikke trenger
+    val vilkårperioder: VilkårperioderDto by lazy {
+        kall.vilkårperiode.hentForBehandling(behandlingId).vilkårperioder
+    }
+
+    // Opprett aktiviteter
+    testdataDsl.aktivitet.opprettScope
+        .build(behandlingId)
+        .forEach { lagreVilkårperiode ->
+            kall.vilkårperiode
+                .opprett(lagreVilkårperiode)
+                .periode!!
+                .id
+        }
+
+    // Oppretter ålgrupper
+    testdataDsl.målgruppe.opprettScope
+        .build(behandlingId)
+        .forEach { lagreVilkårperiode ->
+            kall.vilkårperiode
+                .opprett(lagreVilkårperiode)
+                .periode!!
+                .id
+        }
+
+    // Oppdater aktiviteter
+    testdataDsl.aktivitet.update.forEach { upd ->
+        val (vilkårperiodeId, lagreVilkårperiode) = upd(vilkårperioder.aktiviteter, behandlingId)
+        kall.vilkårperiode.oppdater(
+            vilkårperiodeId = vilkårperiodeId,
+            lagreVilkårperiode = lagreVilkårperiode,
+        )
+    }
+
+    // Slett aktiviteter
+    testdataDsl.aktivitet.delete.forEach { del ->
+        val idOgRequest: Pair<UUID, SlettVikårperiode> = del(vilkårperioder.aktiviteter)
+        kall.vilkårperiode.apiRespons.slett(
+            vilkårperiodeId = idOgRequest.first,
+            slettVikårperiode = idOgRequest.second,
+        )
+    }
+
+    // Oppdater målgruppeer
+    testdataDsl.målgruppe.update.forEach { upd ->
+        val (vilkårperiodeId, lagreVilkårperiode) = upd(vilkårperioder.målgrupper, behandlingId)
+        kall.vilkårperiode.oppdater(
+            vilkårperiodeId = vilkårperiodeId,
+            lagreVilkårperiode = lagreVilkårperiode,
+        )
+    }
+
+    // Slett målgruppeer
+    testdataDsl.målgruppe.delete.forEach { del ->
+        val idOgRequest: Pair<UUID, SlettVikårperiode> = del(vilkårperioder.målgrupper)
+        kall.vilkårperiode.apiRespons.slett(
+            vilkårperiodeId = idOgRequest.first,
+            slettVikårperiode = idOgRequest.second,
+        )
+    }
 
     kall.steg.ferdigstill(
         behandlingId,
@@ -266,17 +495,50 @@ fun IntegrationTest.gjennomførInngangsvilkårSteg(
     kjørTasksKlareForProsessering()
 }
 
-fun IntegrationTest.gjennomførVilkårSteg(
-    medVilkår: List<LagreVilkår>,
+private fun IntegrationTest.gjennomførVilkårSteg(
+    testdataProvider: BehandlingTestdataDsl,
     behandlingId: BehandlingId,
     stønadstype: Stønadstype,
 ) {
-    medVilkår.forEach {
+    val vilkårDagligReise: List<VilkårDagligReiseDto> by lazy {
+        kall.vilkårDagligReise.hentVilkår(behandlingId)
+    }
+
+    val vilkår: VilkårsvurderingDto by lazy {
+        kall.vilkår.hentVilkår(behandlingId)
+    }
+
+    // Trenger kun hente ut om tilsyn-barn
+    val barnIder: List<BarnId> =
+        stønadstype
+            .takeIf { it == Stønadstype.BARNETILSYN }
+            ?.let { _ -> barnRepository.findByBehandlingId(behandlingId).map { it.id } }
+            ?: emptyList()
+
+    testdataProvider.vilkår.opprettScope.build(behandlingId, barnIder).forEach {
         if (stønadstype.gjelderDagligReise()) {
             kall.vilkårDagligReise.opprettVilkår(behandlingId, it as LagreDagligReiseDto)
         } else {
             kall.vilkår.opprettVilkår(it as OpprettVilkårDto)
         }
+    }
+
+    if (stønadstype.gjelderDagligReise()) {
+        testdataProvider.vilkår.updateDagligReise
+            .map { it(vilkårDagligReise) }
+            .forEach { (vilkårId, dto) -> kall.vilkårDagligReise.oppdaterVilkår(dto, vilkårId, behandlingId) }
+
+        testdataProvider.vilkår.deleteDagligReise
+            .map { it(vilkårDagligReise) }
+            .forEach { (vilkårId, dto) -> kall.vilkårDagligReise.slettVilkår(behandlingId, vilkårId, dto) }
+    } else {
+        testdataProvider.vilkår.update
+            .map { it(vilkår) }
+            .forEach { kall.vilkår.oppdaterVilkår(it) }
+
+        testdataProvider.vilkår.delete
+            .map { it(vilkår) }
+            .forEach { kall.vilkår.slettVilkår(it) }
     }
 
     kall.steg.ferdigstill(
@@ -287,27 +549,3 @@ fun IntegrationTest.gjennomførVilkårSteg(
     )
     kjørTasksKlareForProsessering()
 }
-
-fun IntegrationTest.gjennomførOpphør(
-    stønadstype: Stønadstype,
-    behandlingId: BehandlingId,
-    opphørDto: VedtakRequest,
-) {
-    kall.vedtak.lagreOpphør(
-        stønadstype = stønadstype,
-        behandlingId = behandlingId,
-        opphørDto = opphørDto,
-    )
-
-    kjørTasksKlareForProsessering()
-}
-
-val defaultJournalpost =
-    journalpost(
-        journalpostId = "1",
-        journalstatus = Journalstatus.MOTTATT,
-        dokumenter = listOf(DokumentInfo("", brevkode = DokumentBrevkode.DAGLIG_REISE.verdi)),
-        bruker = Bruker("12345678910", BrukerIdType.FNR),
-    )
-
-private const val MINIMALT_BREV = """SAKSBEHANDLER_SIGNATUR - BREVDATO_PLACEHOLDER - BESLUTTER_SIGNATUR"""

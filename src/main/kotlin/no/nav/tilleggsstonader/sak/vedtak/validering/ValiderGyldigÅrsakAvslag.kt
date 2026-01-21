@@ -99,7 +99,7 @@ fun Stønadstype.visningsnavnStønadsvilkår() =
     when (this) {
         Stønadstype.BARNETILSYN -> "pass barn"
         Stønadstype.BOUTGIFTER -> "bolig/overnatting"
-        Stønadstype.DAGLIG_REISE_TSO -> "daglig reise"
-        Stønadstype.DAGLIG_REISE_TSR -> "daglig reise"
+        Stønadstype.DAGLIG_REISE_TSO -> "daglige reiser"
+        Stønadstype.DAGLIG_REISE_TSR -> "daglige reiser"
         Stønadstype.LÆREMIDLER -> error("læremidler har ikke stønadsvilkår")
     }

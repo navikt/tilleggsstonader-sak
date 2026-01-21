@@ -11,10 +11,10 @@ import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførInngangsvilkårSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførVilkårSteg
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurdering
 import no.nav.tilleggsstonader.sak.util.faktaOffentligTransport
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
@@ -177,11 +177,25 @@ class OffentligTransportBeregningRevurderingServiceTest : CleanDatabaseIntegrati
         reiseTom: LocalDate,
     ): FagsakId {
         val førstegangsbehandlingId =
-            gjennomførBehandlingsløp(
-                medAktivitet = ::lagreAktivitet,
-                medMålgruppe = ::lagreMålgruppe,
-                medVilkår = listOf(lagreDagligReiseDto(fom = reiseFom, tom = reiseTom)),
-            )
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                aktivitet {
+                    opprett {
+                        add(::lagreAktivitet)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        add(::lagreMålgruppe)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        offentligTransport(reiseFom, reiseTom)
+                    }
+                }
+            }
 
         val førstegangsbehandling = kall.behandling.hent(førstegangsbehandlingId)
         return førstegangsbehandling.fagsakId

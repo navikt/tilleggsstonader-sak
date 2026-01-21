@@ -20,6 +20,7 @@ object VilkårDagligReiseMapper {
             behandlingId = behandlingId,
             fom = this.fom ?: error("Forventer at fom er satt"),
             tom = this.tom ?: error("Forventer at tom er satt"),
+            adresse = this.adresse,
             resultat = this.resultat,
             status = this.status,
             delvilkårsett = this.delvilkårsett,
@@ -32,6 +33,7 @@ object VilkårDagligReiseMapper {
             behandlingId = this.behandlingId,
             fom = this.fom,
             tom = this.tom,
+            adresse = this.adresse,
             resultat = this.resultat,
             status = this.status,
             type = VilkårType.DAGLIG_REISE,
@@ -70,6 +72,6 @@ object VilkårDagligReiseMapper {
         when (this) {
             TypeVilkårFakta.DAGLIG_REISE_OFFENTLIG_TRANSPORT -> TypeDagligReise.OFFENTLIG_TRANSPORT
             TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL -> TypeDagligReise.PRIVAT_BIL
-            else -> error("Faktatype $this tilhører ikke daglig reise")
+            else -> error("Faktatype $this tilhører ikke daglige reiser")
         }
 }
