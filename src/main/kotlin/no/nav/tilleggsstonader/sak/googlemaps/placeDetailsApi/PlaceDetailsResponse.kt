@@ -1,6 +1,6 @@
-package no.nav.tilleggsstonader.sak.googlemaps
+package no.nav.tilleggsstonader.sak.googlemaps.placeDetailsApi
 
-data class StedDetaljerResponse(
+data class PlaceDetailsResponse(
     val id: String,
     val formattedAddress: String,
     val displayName: DisplayName?,

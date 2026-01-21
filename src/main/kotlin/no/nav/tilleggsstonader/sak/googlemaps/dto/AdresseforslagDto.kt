@@ -1,4 +1,6 @@
-package no.nav.tilleggsstonader.sak.googlemaps
+package no.nav.tilleggsstonader.sak.googlemaps.dto
+
+import no.nav.tilleggsstonader.sak.googlemaps.autocompleteApi.AutocompleteResponse
 
 data class AdresseforslagDto(
     val forslag: List<String>?,

@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.googlemaps
+package no.nav.tilleggsstonader.sak.googlemaps.routesApi
 
 data class RuteRequest(
     val origin: Address,
@@ -6,7 +6,6 @@ data class RuteRequest(
     val travelMode: String,
     val departureTime: String?,
     val transitPreferences: TransitPreferences?,
-    val polylineQuality: String?,
     val computeAlternativeRoutes: Boolean?,
 )
 

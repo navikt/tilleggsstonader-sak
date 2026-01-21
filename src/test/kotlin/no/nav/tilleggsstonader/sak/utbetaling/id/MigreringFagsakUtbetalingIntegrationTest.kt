@@ -422,7 +422,7 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
         ) {
             aktivitet {
                 opprett {
-                    aktivitetUtdanning(fom, tom)
+                    aktivitetUtdanningLæremidler(fom, tom)
                 }
             }
             målgruppe {

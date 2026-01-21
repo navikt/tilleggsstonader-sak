@@ -1,4 +1,14 @@
-package no.nav.tilleggsstonader.sak.googlemaps
+package no.nav.tilleggsstonader.sak.googlemaps.dto
+
+import no.nav.tilleggsstonader.sak.googlemaps.KollektivDetaljer
+import no.nav.tilleggsstonader.sak.googlemaps.Lokasjon
+import no.nav.tilleggsstonader.sak.googlemaps.Operatør
+import no.nav.tilleggsstonader.sak.googlemaps.Rute
+import no.nav.tilleggsstonader.sak.googlemaps.StartOgSluttAdresse
+import no.nav.tilleggsstonader.sak.googlemaps.Strekning
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.LinjeType
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Polyline
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Reisetype
 
 data class ReisedataDto(
     val reiserute: RuteDto?,
@@ -77,7 +87,7 @@ fun KollektivDetaljer.tilDto() =
         operatør = operatør.map { it.tilDto() },
     )
 
-fun Operatør.tilDto() =
+fun `Operatør`.tilDto() =
     OperatørDto(
         navn = navn,
         url = url,
