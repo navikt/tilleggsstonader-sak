@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingClient
-import no.nav.tilleggsstonader.sak.googlemaps.GoogleRoutesClient
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.GoogleRoutesClient
 import no.nav.tilleggsstonader.sak.interntVedtak.HtmlifyClient
 import no.nav.tilleggsstonader.sak.journalføring.FamilieDokumentClient
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient

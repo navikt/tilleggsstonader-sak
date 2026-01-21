@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 
 import io.mockk.clearMocks
 import io.mockk.mockk
-import no.nav.tilleggsstonader.sak.googlemaps.GoogleRoutesClient
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.GoogleRoutesClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary

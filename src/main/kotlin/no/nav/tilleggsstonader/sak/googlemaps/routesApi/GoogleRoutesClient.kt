@@ -1,6 +1,6 @@
-package no.nav.tilleggsstonader.sak.googlemaps
+package no.nav.tilleggsstonader.sak.googlemaps.routesApi
 
-import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
+import no.nav.tilleggsstonader.libs.log.SecureLogger
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.logger
@@ -25,7 +25,7 @@ class GoogleRoutesClient(
     private val uri = UriComponentsBuilder.fromUri(baseUrl).encode().toUriString()
 
     fun hentRuter(request: RuteRequest): RuteResponse? {
-        secureLogger.info("Reise fra ${request.origin} til ${request.destination}")
+        SecureLogger.secureLogger.info("Reise fra ${request.origin} til ${request.destination}")
         return restClient
             .post()
             .uri(uri)

@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.googlemaps
+package no.nav.tilleggsstonader.sak.googlemaps.dto
 
 data class FinnReiseavstandDto(
     val fraAdresse: String,
