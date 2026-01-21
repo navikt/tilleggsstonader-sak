@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.ekstern.stønad
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
+import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
@@ -26,7 +26,7 @@ class DagligReisePrivatBilController(
     @PostMapping("/rammevedtak")
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
     fun hentRammevedtaksinformasjon(
-        @RequestBody request: IdentStønadstype,
+        @RequestBody request: IdentRequest,
     ): List<RammevedtakDto> {
         feilHvisIkke(SikkerhetContext.kallKommerFra(eksternApplikasjon.soknadApi), HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"

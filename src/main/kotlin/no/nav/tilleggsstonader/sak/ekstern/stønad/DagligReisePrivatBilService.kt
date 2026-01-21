@@ -1,21 +1,14 @@
 package no.nav.tilleggsstonader.sak.ekstern.stønad
 
-import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
-import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakUkeDto
-import no.nav.tilleggsstonader.sak.fagsak.FagsakService
-import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-class DagligReisePrivatBilService(
-    private val fagsakService: FagsakService,
-    private val vedtakService: VedtakService,
-    private val behandlingService: BehandlingService,
-) {
-    fun hentRammevedtaksPrivatBil(ident: IdentStønadstype): List<RammevedtakDto> = hentRammevedtakMock()
+class DagligReisePrivatBilService {
+    fun hentRammevedtaksPrivatBil(ident: IdentRequest): List<RammevedtakDto> = hentRammevedtakMock()
 
     private fun hentRammevedtakMock(): List<RammevedtakDto> =
         listOf(
