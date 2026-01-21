@@ -42,17 +42,6 @@ class GooglemapsController(
         @RequestBody statiskKartRequest: StatiskKartRequest,
     ): ByteArray? = staticMapClient.hentStaticMap(statiskKartRequest)
 
-    @GetMapping("/embedded-map")
-    fun embeddedMap(
-        @RequestParam destination: String,
-        @RequestParam origin: String,
-        @RequestParam mode: String,
-    ): RedirectView =
-        googleEmbeddedMapClient.embeddedMapRedirect(
-            origin = origin,
-            destination = destination,
-            mode = mode,
-        )
 
     @PostMapping("/autocomplete")
     fun hentForslag(
