@@ -24,7 +24,6 @@ class GooglemapsService(
                         travelMode = "DRIVE",
                         departureTime = null,
                         transitPreferences = null,
-                        polylineQuality = "OVERVIEW",
                         computeAlternativeRoutes = true,
                     ),
                 )?.tilDomene()
@@ -71,7 +70,6 @@ class GooglemapsService(
                                         TransitOption.RAIL.value,
                                     ),
                             ),
-                        polylineQuality = "OVERVIEW",
                         computeAlternativeRoutes = false,
                     ),
                 )?.tilDomene()

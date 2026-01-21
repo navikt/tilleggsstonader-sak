@@ -6,7 +6,6 @@ data class RuteRequest(
     val travelMode: String,
     val departureTime: String?,
     val transitPreferences: TransitPreferences?,
-    val polylineQuality: String?,
     val computeAlternativeRoutes: Boolean?,
 )
 
