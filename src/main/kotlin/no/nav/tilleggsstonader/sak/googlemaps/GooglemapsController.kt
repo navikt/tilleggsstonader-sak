@@ -1,13 +1,19 @@
 package no.nav.tilleggsstonader.sak.googlemaps
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import org.springframework.web.bind.annotation.GetMapping
+import no.nav.tilleggsstonader.sak.googlemaps.autocompleteApi.AutocompleteRequest
+import no.nav.tilleggsstonader.sak.googlemaps.autocompleteApi.GoogleAutocompleteClient
+import no.nav.tilleggsstonader.sak.googlemaps.dto.FinnReiseavstandDto
+import no.nav.tilleggsstonader.sak.googlemaps.dto.HentForslagDto
+import no.nav.tilleggsstonader.sak.googlemaps.dto.ReisedataDto
+import no.nav.tilleggsstonader.sak.googlemaps.dto.tilDto
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Address
+import no.nav.tilleggsstonader.sak.googlemaps.staticMapApi.GoogleStaticMapClient
+import no.nav.tilleggsstonader.sak.googlemaps.staticMapApi.StatiskKartRequest
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.servlet.view.RedirectView
 
 @RestController
 @RequestMapping(path = ["/api/kart"])
@@ -16,7 +22,6 @@ class GooglemapsController(
     private val googleAutocompleteClient: GoogleAutocompleteClient,
     private val staticMapClient: GoogleStaticMapClient,
     private val googlemapsService: GooglemapsService,
-    private val googleEmbeddedMapClient: GoogleEmbeddedMapClient,
 ) {
     @PostMapping("/kjoreavstand")
     fun hentKjoreavstand(
@@ -41,7 +46,6 @@ class GooglemapsController(
     fun hentStatiskKart(
         @RequestBody statiskKartRequest: StatiskKartRequest,
     ): ByteArray? = staticMapClient.hentStaticMap(statiskKartRequest)
-
 
     @PostMapping("/autocomplete")
     fun hentForslag(

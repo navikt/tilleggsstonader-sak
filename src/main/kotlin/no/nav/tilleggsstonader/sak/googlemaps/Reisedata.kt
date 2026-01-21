@@ -1,5 +1,18 @@
 package no.nav.tilleggsstonader.sak.googlemaps
 
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Leg
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.LinjeType
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Location
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Maneuver
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Polyline
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Reisetype
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Route
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.RouteLabel
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.RuteResponse
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Step
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.TransitAgency
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.TransitDetails
+
 data class Rute(
     val erDefualtRute: Boolean,
     val polyline: Polyline,

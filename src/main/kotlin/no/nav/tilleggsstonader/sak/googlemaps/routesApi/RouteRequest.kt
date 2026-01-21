@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.googlemaps
+package no.nav.tilleggsstonader.sak.googlemaps.routesApi
 
 data class RuteRequest(
     val origin: Address,

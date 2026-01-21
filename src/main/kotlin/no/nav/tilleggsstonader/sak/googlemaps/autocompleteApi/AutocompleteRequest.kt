@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.googlemaps
+package no.nav.tilleggsstonader.sak.googlemaps.autocompleteApi
 
 data class AutocompleteRequest(
     val input: String,
