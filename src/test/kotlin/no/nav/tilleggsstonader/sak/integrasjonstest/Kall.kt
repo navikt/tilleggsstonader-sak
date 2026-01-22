@@ -34,7 +34,7 @@ class Kall(
     val settPaVent = SettPåVentKall(testklient)
     val simulering = SimuleringKall(testklient)
     val steg = StegKall(testklient)
-    val skjemaRouting = SkjemaRoutingKall(testklient, eksternApplikasjon)
+    val skjemaRouting = SkjemaRoutingKall(testklient)
     val totrinnskontroll = TotrinnskontrollKall(testklient)
     val vedtak = VedtakKall(testklient)
     val vilkår = VilkårKall(testklient)

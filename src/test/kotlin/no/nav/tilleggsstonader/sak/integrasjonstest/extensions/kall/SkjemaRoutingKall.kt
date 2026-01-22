@@ -1,13 +1,11 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
 import no.nav.tilleggsstonader.kontrakter.felles.IdentSkjematype
-import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRoutingResponse
 
 class SkjemaRoutingKall(
     private val testklient: Testklient,
-    private val eksternApplikasjon: EksternApplikasjon,
 ) {
     fun sjekk(identSkjematype: IdentSkjematype): SøknadRoutingResponse = apiRespons.sjekk(identSkjematype).expectOkWithBody()
 
