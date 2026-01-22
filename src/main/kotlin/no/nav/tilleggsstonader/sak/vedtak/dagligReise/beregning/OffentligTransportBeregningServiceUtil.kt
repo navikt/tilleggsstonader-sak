@@ -1,8 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
-import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
-import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
@@ -16,20 +14,6 @@ import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import kotlin.math.max
 import kotlin.math.min
-
-fun <P : Periode<LocalDate>> finnSnittVedtaksperioder(
-    reise: P,
-    vedtaksperioder: List<Vedtaksperiode>,
-): List<Vedtaksperiode> = vedtaksperioder.mapNotNull { it.beregnSnitt(reise) }
-
-fun <P> finnSnittReise(
-    reise: P,
-    vedtaksperioder: List<Vedtaksperiode>,
-): P where P : Periode<LocalDate>, P : KopierPeriode<P> =
-    reise.medPeriode(
-        fom = maxOf(vedtaksperioder.first().fom, reise.fom),
-        tom = minOf(vedtaksperioder.last().tom, reise.tom),
-    )
 
 fun finnReisedagerIPeriode(
     vedtaksperiode: Vedtaksperiode,
