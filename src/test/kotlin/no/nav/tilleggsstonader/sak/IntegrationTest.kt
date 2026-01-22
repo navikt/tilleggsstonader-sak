@@ -117,7 +117,7 @@ abstract class IntegrationTest {
 
     lateinit var testBrukerkontekst: TestBrukerKontekst
 
-    val kall: Kall by lazy { Kall(this) }
+    val kall = Kall(this)
 
     @BeforeEach
     fun setup() {

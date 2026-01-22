@@ -22,9 +22,7 @@ class Kall(
     kontekst: IntegrationTest,
 ) {
     val testklient = Testklient(kontekst)
-    val eksternApplikasjon = kontekst.eksternApplikasjon
-
-    val arena = ArenaKall(testklient, eksternApplikasjon)
+    val arena = ArenaKall(testklient)
     val behandling = BehandlingKall(testklient)
     val brev = BrevKall(testklient)
     val gjenopprettOppgave = GjenopprettOppgaveKall(testklient)

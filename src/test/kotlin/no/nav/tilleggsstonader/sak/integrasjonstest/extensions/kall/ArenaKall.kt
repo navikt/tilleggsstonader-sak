@@ -1,13 +1,11 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
-import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.migrering.arena.ArenaFinnesPersonRequest
 import no.nav.tilleggsstonader.sak.migrering.arena.ArenaFinnesPersonResponse
 
 class ArenaKall(
     private val testklient: Testklient,
-    private val eksternApplikasjon: EksternApplikasjon,
 ) {
     fun status(dto: ArenaFinnesPersonRequest) = apiRespons.status(dto).expectOkWithBody<ArenaFinnesPersonResponse>()
 
