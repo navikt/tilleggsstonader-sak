@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForUke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
@@ -53,6 +54,7 @@ class PrivatBilBeregningStepDefinitions {
 
     var beregningsResultat: BeregningsresultatPrivatBil? = null
     var forventetBeregningsresultat: List<BeregningsresultatUkeCucumber> = emptyList()
+    var feil: Exception? = null
 
     @Gitt("følgende vedtaksperioder for daglig reise privat bil")
     fun `følgende vedtaksperioder`(dataTable: DataTable) {
@@ -60,7 +62,7 @@ class PrivatBilBeregningStepDefinitions {
     }
 
     @Gitt("følgende vilkår for daglig reise med privat bil")
-    fun `følgende dummyperioder`(dataTable: DataTable) {
+    fun `følgende vilkår for daglig reise med privat bil`(dataTable: DataTable) {
         every { behandlingServiceMock.hentSaksbehandling(any<BehandlingId>()) } returns
             dummyBehandling(
                 behandlingId = behandlingId,
@@ -78,11 +80,17 @@ class PrivatBilBeregningStepDefinitions {
 
     @Når("beregner for daglig reise privat bil")
     fun `beregner for daglig reise privat bil`() {
-        beregningsResultat = beregningService.beregn(vedtaksperioder, reiser)
+        try {
+            beregningsResultat = beregningService.beregn(vedtaksperioder, reiser)
+        } catch (e: Exception) {
+            feil = e
+        }
     }
 
     @Så("forventer vi følgende beregningsrsultat for daglig reise privatBil")
     fun `forventer vi følgende beregningsrsultat for daglig reise privat bil`(dataTable: DataTable) {
+        assertThat(feil).isNull()
+
         val forventetBeregningsresultatForReise = mapUker(dataTable)
 
         forventetBeregningsresultatForReise.forEachIndexed { index, uke ->
@@ -98,6 +106,16 @@ class PrivatBilBeregningStepDefinitions {
         }
     }
 
+    @Så("forvent følgende feilmelding for beregning privat bil: {}")
+    fun `forvent følgelde feilmelding for beregning privat bil`(feilmelding: String) {
+        assertThat(feil?.message).contains(feilmelding)
+    }
+
+    @Så("forvent at det ikke finnes et beregninsresultat for privat bil")
+    fun `forvent at det ikke finnes et beregninsresultat`() {
+        assertThat(beregningsResultat).isNull()
+    }
+
     private fun mapUker(dataTable: DataTable) =
         dataTable.mapRad { rad ->
             BeregningsresultatUkeCucumber(
@@ -109,9 +127,19 @@ class PrivatBilBeregningStepDefinitions {
                         tom = parseDato(DomenenøkkelFelles.TOM, rad),
                         antallDagerDenneUkaSomKanDekkes = parseInt(DomenenøkkelPrivatBil.ANTALL_DAGER_DEKT_UKE, rad),
                         antallDagerInkludererHelg = parseBoolean(DomenenøkkelPrivatBil.INKLUDERER_HELG, rad),
+                        vedtaksperioder = emptyList(),
                     ),
             )
         }
+
+    private fun kjørMedFeilkontekst(block: () -> Unit) {
+        try {
+            block()
+        } catch (e: Exception) {
+            // logger.error(e.message, e)
+            feil = e
+        }
+    }
 }
 
 enum class DomenenøkkelPrivatBil(

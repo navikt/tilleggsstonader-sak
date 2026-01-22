@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -11,6 +12,11 @@ data class BeregningsresultatPrivatBil(
     val reiser: List<BeregningsresultatForReiseMedPrivatBil>,
 )
 
+// Vil oppnå:
+// Enkelt å sjekke om kun ramme er beregnet
+// Unngå duplikat lagring av data
+// Smud å dytte inn kjøreliste og ekte resultat når rammevedtak alt er beregnet
+
 // TODO: Vurder om det er nødvendig å ha med fom og tom her
 data class BeregningsresultatForReiseMedPrivatBil(
     val uker: List<BeregningsresultatForUke>,
@@ -20,7 +26,9 @@ data class BeregningsresultatForReiseMedPrivatBil(
 // Vedtaksperiode inn her?
 data class BeregningsresultatForUke(
     val grunnlag: BeregningsgrunnlagForUke,
-    val stønadsbeløp: Int, // TODO: Vurder navn - Gir dette navnet mening når det er etterbetaling?
+    // TODO: Vurder navn - Gir dette navnet mening når det er etterbetaling?
+    val stønadsbeløp: Int,
+//    val maksBeløpSomKanDekkes: Int?,
 )
 
 // TODO: Finn ut om tall generelt skal være heltall eller desimaltall
@@ -30,19 +38,23 @@ data class BeregningsgrunnlagForReiseMedPrivatBil(
     override val tom: LocalDate,
     val reisedagerPerUke: Int,
     val reiseavstandEnVei: BigDecimal,
-    val kilometersats: BigDecimal, // TODO: Vurder om denne burde ligge på uke. Avhenger av hvor vi vil splitte en reise
+    // TODO: Vurder om denne burde ligge på uke. Avhenger av hvor vi vil splitte en reise
+    val kilometersats: BigDecimal,
     val ekstrakostnader: Ekstrakostnader,
 ) : Periode<LocalDate>
 
 data class BeregningsgrunnlagForUke(
     override val fom: LocalDate, // mandag eller begrenset av reiseperioden
-    override val tom: LocalDate, // søndag eller fredag?
+    override val tom: LocalDate, // søndag eller begrenset av reiseperioden
     val kjøreliste: GrunnlagKjøreliste? = null,
     // TODO: Bytt til et bedre navn: antallReisedager? maksAntallReisedager?
     // reisedager per uke, begrenset av antall dager som er i uka (første og siste uke er ikke nødvendigvis fulle uker)
     val antallDagerDenneUkaSomKanDekkes: Int,
     // Ikke så bra navn, men betyr at utregningen av den over inkluderer en eller to helgedager
     val antallDagerInkludererHelg: Boolean,
+    // TODO: Vi håndterer ikke at denne er mer enn 1, men kjipt å ikke ha den som en liste dersom vi vil det senere
+    val vedtaksperioder: List<Vedtaksperiode>,
+    // val dagsats: BigDecimal, //TODO: Lag
 ) : Periode<LocalDate>
 
 data class Ekstrakostnader(
@@ -56,15 +68,6 @@ data class Ekstrakostnader(
 
         return bompengerEnDag + fergekostnadEnDag
     }
-
-// Er dette feks bedre?
-//    fun beregnTotalEkstrakostnadForEnDag3(): Int {
-//        return listOfNotNull(
-//            bompengerEnVei?.takeIf { it > 0 }?.times(2),
-//            fergekostnadEnVei?.takeIf { it > 0 }?.times(2),
-//            dagligPiggdekkavgift?.takeIf { it > 0 }
-//        ).sum()
-//    }
 }
 
 data class GrunnlagKjøreliste(

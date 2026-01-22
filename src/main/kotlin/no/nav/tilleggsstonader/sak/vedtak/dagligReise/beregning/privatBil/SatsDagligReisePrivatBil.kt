@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
+package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import java.math.BigDecimal

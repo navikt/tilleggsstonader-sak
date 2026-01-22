@@ -17,24 +17,6 @@ import java.time.temporal.TemporalAdjusters
 import kotlin.math.max
 import kotlin.math.min
 
-data class ReiseOgVedtaksperioderSnitt<P>(
-    val justerteVedtaksperioder: List<Vedtaksperiode>,
-    val justertReiseperiode: P,
-) where P : Periode<LocalDate>, P : KopierPeriode<P>
-
-fun <P> finnSnittMellomReiseOgVedtaksperioder(
-    reise: P,
-    vedtaksperioder: List<Vedtaksperiode>,
-): ReiseOgVedtaksperioderSnitt<P> where P : Periode<LocalDate>, P : KopierPeriode<P> =
-    ReiseOgVedtaksperioderSnitt(
-        justerteVedtaksperioder = vedtaksperioder.mapNotNull { it.beregnSnitt(reise) },
-        justertReiseperiode =
-            reise.medPeriode(
-                fom = maxOf(vedtaksperioder.first().fom, reise.fom),
-                tom = minOf(vedtaksperioder.last().tom, reise.tom),
-            ),
-    )
-
 fun <P : Periode<LocalDate>> finnSnittVedtaksperioder(
     reise: P,
     vedtaksperioder: List<Vedtaksperiode>,

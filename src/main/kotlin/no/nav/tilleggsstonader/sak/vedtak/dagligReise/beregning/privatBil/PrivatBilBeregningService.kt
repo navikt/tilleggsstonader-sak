@@ -1,8 +1,19 @@
-package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
+package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.PeriodeMedAntallDager
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.antallHelgedagerIPeriodeInklusiv
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.antallHverdagerIPeriodeInklusiv
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.splitPerUkeMedHelg
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForUke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReiseMedPrivatBil
@@ -35,12 +46,6 @@ data class UtgiftPrivatBil(
     ): UtgiftPrivatBil = this.copy(fom = fom, tom = tom)
 }
 
-// Gjenstår:
-// Ta hensyn til vedtaksperioder
-// Ta det i bruk
-// Skrive tester - dukker nok opp flere caser som ikke fungerer om man gjør det
-// Tilpasse slik at beregningen kan brukes basert på kjørelister
-
 @Service
 class PrivatBilBeregningService {
     fun beregn(
@@ -51,7 +56,7 @@ class PrivatBilBeregningService {
 
         return BeregningsresultatPrivatBil(
             reiser =
-                reiseInformasjon.map {
+                reiseInformasjon.mapNotNull {
                     beregnForReise(it, vedtaksperioder)
                 },
         )
@@ -60,17 +65,14 @@ class PrivatBilBeregningService {
     private fun beregnForReise(
         reise: UtgiftPrivatBil,
         vedtaksperioder: List<Vedtaksperiode>,
-    ): BeregningsresultatForReiseMedPrivatBil {
-        // TODO: Er det nødvendig å justere vedtaksperiodene her? Annet enn at de brukes for å begrense reisen
-        val (justerteVedtaksperioder, justertReiseperiode) =
-            finnSnittMellomReiseOgVedtaksperioder(
-                reise,
-                vedtaksperioder,
-            )
+    ): BeregningsresultatForReiseMedPrivatBil? {
+        val (_, justertReise) = finnSnittMellomReiseOgVedtaksperioder(reise, vedtaksperioder)
 
-        val grunnlagForReise = lagBeregningsgrunnlagForReise(justertReiseperiode)
+        if (justertReise == null) return null
 
-        val periodeSplittetPåUker = justertReiseperiode.splitPerUkeMedHelg()
+        val grunnlagForReise = lagBeregningsgrunnlagForReise(justertReise)
+
+        val periodeSplittetPåUker = justertReise.splitPerUkeMedHelg()
 
         return BeregningsresultatForReiseMedPrivatBil(
             uker =
@@ -78,7 +80,7 @@ class PrivatBilBeregningService {
                     beregnForUke(
                         uke = it,
                         grunnlagForReise = grunnlagForReise,
-                        justerteVedtaksperioder,
+                        vedtaksperioder = vedtaksperioder,
                     )
                 },
             grunnlag = grunnlagForReise,
@@ -86,79 +88,22 @@ class PrivatBilBeregningService {
     }
 
     private fun beregnForUke(
-        uke: PeriodeMedAntallDager,
+        uke: Datoperiode,
         grunnlagForReise: BeregningsgrunnlagForReiseMedPrivatBil,
         vedtaksperioder: List<Vedtaksperiode>,
     ): BeregningsresultatForUke? {
-        val justertUke = justerUkeTilVedtaksperioder(uke, vedtaksperioder)
-
         val grunnlagForUke =
             lagBeregningsgrunnlagForUke(
-                uke = justertUke,
+                uke = uke,
                 reisedagerPerUke = grunnlagForReise.reisedagerPerUke,
-            )
-
-        // Beregner ikke noe for uka dersom det ikke gjenstår noen dager i uka som er innafor en vedtaksperiode
-        if (grunnlagForUke.antallDagerDenneUkaSomKanDekkes == 0) return null
+                vedtaksperioder = vedtaksperioder,
+            ) ?: return null
 
         return BeregningsresultatForUke(
             grunnlag = grunnlagForUke,
             stønadsbeløp = beregnStønadsbeløp(grunnlagForReise = grunnlagForReise, grunnlagForUke = grunnlagForUke),
         )
     }
-
-    private fun justerUkeTilVedtaksperioder(
-        uke: PeriodeMedAntallDager,
-        vedtaksperioder: List<Vedtaksperiode>,
-    ): PeriodeMedAntallDager {
-        val (relevanteVedtaksperioder, ukeMedJustertFomOgTom) =
-            finnSnittMellomReiseOgVedtaksperioder(
-                uke,
-                vedtaksperioder,
-            )
-        val vedtaksperioderMedAntallDager = relevanteVedtaksperioder.map { it.finnAntallDager() }
-
-        val ukeMedDagerBegrensetAvVedtaksperioder =
-            PeriodeMedAntallDager(
-                fom = ukeMedJustertFomOgTom.fom,
-                tom = ukeMedJustertFomOgTom.tom,
-                antallHverdager = vedtaksperioderMedAntallDager.sumOf { it.antallHverdager },
-                antallHelgedager = vedtaksperioderMedAntallDager.sumOf { it.antallHelgedager },
-            )
-
-        validerJustertUke(ukeMedDagerBegrensetAvVedtaksperioder, uke)
-
-        return ukeMedDagerBegrensetAvVedtaksperioder
-    }
-
-    private fun validerJustertUke(
-        justertUke: PeriodeMedAntallDager,
-        originalUke: PeriodeMedAntallDager,
-    ) {
-        feilHvis(justertUke.antallHverdager > originalUke.antallHverdager) {
-            "Kan ikke ha flere hverdager i en uke etter justering enn originaluke"
-        }
-
-        feilHvis(justertUke.antallHelgedager > originalUke.antallHverdager) {
-            "Kan ikke ha flere helgedager i en uke etter justering enn originaluke"
-        }
-
-        feilHvis(justertUke.antallHverdager > 5) {
-            "Kan ikke ha mer enn 5 hverdager i en uke"
-        }
-
-        feilHvis(justertUke.antallHelgedager > 2) {
-            "Kan ikke ha flere helgedager enn 2 i en uke"
-        }
-    }
-
-    private fun Vedtaksperiode.finnAntallDager(): PeriodeMedAntallDager =
-        PeriodeMedAntallDager(
-            fom = this.fom,
-            tom = this.tom,
-            antallHverdager = antallHverdagerIPeriodeInklusiv(fom = fom, tom = tom),
-            antallHelgedager = antallHelgedagerIPeriodeInklusiv(fom = fom, tom = tom),
-        )
 
     private fun beregnStønadsbeløp(
         grunnlagForReise: BeregningsgrunnlagForReiseMedPrivatBil,
@@ -192,30 +137,22 @@ class PrivatBilBeregningService {
         )
 
     private fun lagBeregningsgrunnlagForUke(
-        uke: PeriodeMedAntallDager,
+        uke: Datoperiode,
         reisedagerPerUke: Int,
-    ): BeregningsgrunnlagForUke {
-        var antallDager: Int
-        var antallDagerInkludererHelg: Boolean
+        vedtaksperioder: List<Vedtaksperiode>,
+    ): BeregningsgrunnlagForUke? {
+        val relevantVedtaksperiode = finnRelevantVedtaksperiodeForUke(uke, vedtaksperioder) ?: return null
 
-        val totaltAntallDagerIUke = uke.antallHverdager + uke.antallHelgedager
+        val justertUkeMedAntallDager = uke.tilpassUkeTilVedtaksperiode(relevantVedtaksperiode) ?: return null
 
-        if (reisedagerPerUke <= uke.antallHverdager) {
-            antallDager = reisedagerPerUke
-            antallDagerInkludererHelg = false
-        } else if (reisedagerPerUke <= totaltAntallDagerIUke) {
-            antallDager = reisedagerPerUke
-            antallDagerInkludererHelg = true
-        } else {
-            antallDager = totaltAntallDagerIUke
-            antallDagerInkludererHelg = uke.antallHelgedager > 0
-        }
+        val (antallDager, antallDagerInkludererHelg) = finnAntallDagerSomDekkes(justertUkeMedAntallDager, reisedagerPerUke)
 
         return BeregningsgrunnlagForUke(
-            fom = uke.fom,
-            tom = uke.tom,
+            fom = justertUkeMedAntallDager.fom,
+            tom = justertUkeMedAntallDager.tom,
             antallDagerDenneUkaSomKanDekkes = antallDager,
             antallDagerInkludererHelg = antallDagerInkludererHelg,
+            vedtaksperioder = listOf(relevantVedtaksperiode),
         )
     }
 
