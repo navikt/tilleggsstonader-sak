@@ -35,31 +35,6 @@ fun Datoperiode.tilpassUkeTilVedtaksperiode(vedtaksperiode: Vedtaksperiode): Per
     )
 }
 
-// fun justerUkeTilVedtaksperiode(
-//    uke: PeriodeMedAntallDager,
-//    vedtaksperioder: List<Vedtaksperiode>
-// ): PeriodeMedAntallDager? {
-//    val sammenslåtteVedtaksperioder = vedtaksperioder.sorted()
-//        .mergeSammenhengende { v1, v2 -> v1.erSammenhengendeMedLikMålgruppeOgTypeAktivitet(v2) }
-//    val vedtaksperioderSomOverlapperUke = sammenslåtteVedtaksperioder.map { it.beregnSnitt(uke) }
-//
-//    if (vedtaksperioderSomOverlapperUke.size > 1) {
-//        håndterFlereVedtaksperioderInnenforEnUke(uke, sammenslåtteVedtaksperioder)
-//    }
-//
-//    // Skal ikke beregne for uke dersom ingen vedtaksperioder overlapper uken
-//    if (vedtaksperioderSomOverlapperUke.isEmpty()) {
-//        return null
-//    }
-//
-//    val enVedtaksperiodeDekkerHeleUka = vedtaksperioderSomOverlapperUke.any { it.inneholder(uke) }
-//
-//    // TODO: Kan håndteres ved å redusere start eller sluttdato på uka
-//    brukerfeilHvisIkke(enVedtaksperiodeDekkerHeleUka) { "Kun deler av uke ${uke.formatertPeriodeNorskFormat()} er dekt av en vedtaksperiode" }
-//
-//    return uke
-// }
-
 private fun håndterFlereVedtaksperioderInnenforEnUke(
     uke: Datoperiode,
     vedtaksperioder: List<Vedtaksperiode>,

@@ -1,17 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
-import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
-import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.PeriodeMedAntallDager
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.antallHelgedagerIPeriodeInklusiv
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.antallHverdagerIPeriodeInklusiv
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.splitPerUkeMedHelg
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForReiseMedPrivatBil
@@ -21,30 +10,10 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Ekstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.time.LocalDate
-
-// TODO: Legg denne i egen fil - og finn nytt navn
-data class UtgiftPrivatBil(
-    override val fom: LocalDate,
-    override val tom: LocalDate,
-    val reiseId: ReiseId,
-    val reisedagerPerUke: Int,
-    val reiseavstandEnVei: BigDecimal,
-    val bompengerEnVei: Int?,
-    val fergekostandEnVei: Int?,
-) : Periode<LocalDate>,
-    KopierPeriode<UtgiftPrivatBil> {
-    override fun medPeriode(
-        fom: LocalDate,
-        tom: LocalDate,
-    ): UtgiftPrivatBil = this.copy(fom = fom, tom = tom)
-}
 
 @Service
 class PrivatBilBeregningService {
@@ -52,7 +21,7 @@ class PrivatBilBeregningService {
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkår: List<VilkårDagligReise>,
     ): BeregningsresultatPrivatBil {
-        val reiseInformasjon = oppfylteVilkår.map { it.tilUtgiftPrivatbil() }
+        val reiseInformasjon = oppfylteVilkår.map { it.tilReiseMedPrivatBil() }
 
         return BeregningsresultatPrivatBil(
             reiser =
@@ -63,7 +32,7 @@ class PrivatBilBeregningService {
     }
 
     private fun beregnForReise(
-        reise: UtgiftPrivatBil,
+        reise: ReiseMedPrivatBil,
         vedtaksperioder: List<Vedtaksperiode>,
     ): BeregningsresultatForReiseMedPrivatBil? {
         val (_, justertReise) = finnSnittMellomReiseOgVedtaksperioder(reise, vedtaksperioder)
@@ -122,7 +91,7 @@ class PrivatBilBeregningService {
         return totaltBeløp.setScale(0, RoundingMode.HALF_UP).toInt()
     }
 
-    private fun lagBeregningsgrunnlagForReise(reise: UtgiftPrivatBil): BeregningsgrunnlagForReiseMedPrivatBil =
+    private fun lagBeregningsgrunnlagForReise(reise: ReiseMedPrivatBil): BeregningsgrunnlagForReiseMedPrivatBil =
         BeregningsgrunnlagForReiseMedPrivatBil(
             fom = reise.fom,
             tom = reise.tom,
@@ -153,22 +122,6 @@ class PrivatBilBeregningService {
             antallDagerDenneUkaSomKanDekkes = antallDager,
             antallDagerInkludererHelg = antallDagerInkludererHelg,
             vedtaksperioder = listOf(relevantVedtaksperiode),
-        )
-    }
-
-    private fun VilkårDagligReise.tilUtgiftPrivatbil(): UtgiftPrivatBil {
-        feilHvis(this.fakta !is FaktaPrivatBil) {
-            "Forventer kun å få inn vilkår med fakta som er av type privat bil ved beregning av privat bil"
-        }
-
-        return UtgiftPrivatBil(
-            fom = this.fom,
-            tom = this.tom,
-            reiseId = this.fakta.reiseId,
-            reisedagerPerUke = this.fakta.reisedagerPerUke,
-            reiseavstandEnVei = this.fakta.reiseavstandEnVei,
-            bompengerEnVei = this.fakta.bompengerEnVei,
-            fergekostandEnVei = this.fakta.fergekostandEnVei,
         )
     }
 }
