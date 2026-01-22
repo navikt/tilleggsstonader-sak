@@ -16,12 +16,14 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.oppfylteSvarOffentligtransport
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -85,16 +87,17 @@ fun mapTilVilkårDagligReise(
 private fun mapFakta(
     type: TypeDagligReise,
     rad: Map<String, String>,
-): FaktaDagligReise? =
+): FaktaDagligReise =
     when (type) {
         TypeDagligReise.OFFENTLIG_TRANSPORT -> mapFaktaOffentligTransport(rad)
         TypeDagligReise.PRIVAT_BIL -> mapFaktaPrivatBil(rad)
-        else -> null
+        else -> FaktaUbestemtType(reiseId = dummyReiseId, adresse = "Tiltaksveien 1",)
     }
 
 fun mapFaktaOffentligTransport(rad: Map<String, String>): FaktaOffentligTransport =
     FaktaOffentligTransport(
         reiseId = dummyReiseId,
+        adresse = "Tiltaksveien 1",
         reisedagerPerUke =
             parseInt(
                 DomenenøkkelOffentligtransport.ANTALL_REISEDAGER_PER_UKE,
@@ -112,6 +115,7 @@ fun mapFaktaOffentligTransport(rad: Map<String, String>): FaktaOffentligTranspor
 fun mapFaktaPrivatBil(rad: Map<String, String>): FaktaPrivatBil =
     FaktaPrivatBil(
         reiseId = dummyReiseId,
+        adresse = "Tiltaksveien 1",
         reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, rad),
         reiseavstandEnVei = parseBigDecimal(DomenenøkkelPrivatBil.REISEAVSTAND_EN_VEI, rad),
         bompengerEnVei = parseValgfriInt(DomenenøkkelPrivatBil.BOMPENGER, rad),

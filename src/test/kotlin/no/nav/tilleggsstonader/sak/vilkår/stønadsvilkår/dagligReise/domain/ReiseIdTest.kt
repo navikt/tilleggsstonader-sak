@@ -28,7 +28,7 @@ class ReiseIdTest : CleanDatabaseIntegrationTest() {
                 .hentVedtak(Stønadstype.DAGLIG_REISE_TSO, behandlingId)
                 .expectOkWithBody<InnvilgelseDagligReiseResponse>()
                 .beregningsresultat
-                ?.offentligTransport!!
+                .offentligTransport!!
                 .reiser
                 .single()
                 .reiseId

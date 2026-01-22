@@ -14,14 +14,12 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
@@ -29,7 +27,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligRei
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -43,7 +40,6 @@ class DagligReiseVedtakController(
     private val tilgangService: TilgangService,
     private val stegService: StegService,
     private val beregnYtelseSteg: DagligReiseBeregnYtelseSteg,
-    private val beregnSteg: DagligReiseBeregnSteg,
     private val vedtakSteg: DagligReiseVedtakSteg,
     private val vedtakService: VedtakService,
     private val vedtakDtoMapper: VedtakDtoMapper,
@@ -93,34 +89,6 @@ class DagligReiseVedtakController(
         @RequestBody vedtak: OpphørDagligReiseRequest,
     ) {
         lagreVedtak(behandlingId, vedtak)
-    }
-
-    // TODO: Vurder å slette - Foreløpig hentes dette rett fra vedtaket
-    @GetMapping("{behandlingId}/beregningsresultat")
-    fun hentBeregningsresultat(
-        @PathVariable behandlingId: BehandlingId,
-    ): BeregningsresultatDagligReiseDto? {
-        val vedtak = vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandlingId)
-
-        return vedtak?.data?.beregningsresultat?.tilDto(vedtak.tidligsteEndring)
-    }
-
-    // TODO: Vurder å slette - Usikker på om den trengs eller om dette skal hentes fra vedtaket
-    @GetMapping("{behandlingId}/rammevedtak")
-    fun hentRammevedtak(
-        @PathVariable behandlingId: BehandlingId,
-    ): BeregningsresultatPrivatBil? {
-        val vedtak = vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandlingId)
-
-        return vedtak?.data?.beregningsresultat?.privatBil
-    }
-
-    // TODO: Slett om ikke tas i bruk før merge - steget ferdigstilles nå via StegService
-    @PutMapping("{behandlingId}/ferdigstill-beregn")
-    fun ferdigstillBeregnSteg(
-        @PathVariable behandlingId: BehandlingId,
-    ) {
-        stegService.håndterSteg(behandlingId, beregnSteg)
     }
 
     @PostMapping("{behandlingId}/beregn")
