@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDa
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -109,7 +110,7 @@ class DagligReiseVilkårService(
             status = utledStatus(eksisterendeVilkår),
             delvilkårsett = delvilkårsett,
             resultat = RegelEvaluering.utledVilkårResultat(delvilkårsett),
-            fakta = nyttVilkår.fakta?.fjern0Verdier(Datoperiode(fom = nyttVilkår.fom, tom = nyttVilkår.tom)),
+            fakta = nyttVilkår.fakta.fjern0Verdier(Datoperiode(fom = nyttVilkår.fom, tom = nyttVilkår.tom)),
         )
     }
 
@@ -122,11 +123,16 @@ class DagligReiseVilkårService(
                     prisEnkelbillett = this.prisEnkelbillett?.takeIf { it > 0 },
                     prisSyvdagersbillett = this.prisSyvdagersbillett?.takeIf { it > 0 },
                     prisTrettidagersbillett = this.prisTrettidagersbillett?.takeIf { it > 0 },
+                    adresse = this.adresse,
                     periode = periode,
                 )
             }
 
             is FaktaPrivatBil -> {
+                return this
+            }
+
+            is FaktaUbestemtType -> {
                 return this
             }
         }
@@ -155,7 +161,7 @@ class DagligReiseVilkårService(
     }
 
     private fun validerKanBehandleVilkåret(nyttVilkår: LagreDagligReise) {
-        val gjelderPrivatBil = nyttVilkår.fakta?.type == TypeDagligReise.PRIVAT_BIL
+        val gjelderPrivatBil = nyttVilkår.fakta.type == TypeDagligReise.PRIVAT_BIL
         val kanBehandlePrivatBil = unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)
 
         feilHvis(gjelderPrivatBil && !kanBehandlePrivatBil) {

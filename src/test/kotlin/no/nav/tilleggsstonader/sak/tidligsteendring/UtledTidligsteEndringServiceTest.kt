@@ -141,6 +141,7 @@ class UtledTidligsteEndringServiceTest {
                 fakta =
                     FaktaDagligReiseOffentligTransport(
                         reiseId = ReiseId.random(),
+                        adresse = "Tiltaksgata 1",
                         reisedagerPerUke = 5,
                         prisEnkelbillett = 80,
                         prisSyvdagersbillett = 500,
@@ -156,6 +157,7 @@ class UtledTidligsteEndringServiceTest {
                 fakta =
                     FaktaDagligReiseOffentligTransport(
                         reiseId = ReiseId.random(),
+                        adresse = "Tiltaksgata 1",
                         reisedagerPerUke = 4,
                         prisEnkelbillett = 80,
                         prisSyvdagersbillett = 500,

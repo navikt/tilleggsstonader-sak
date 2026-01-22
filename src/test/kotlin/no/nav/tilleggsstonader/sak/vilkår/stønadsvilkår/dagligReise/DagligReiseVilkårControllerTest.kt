@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
@@ -8,8 +9,8 @@ import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseUbestemtDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SvarOgBegrunnelseDto
@@ -30,7 +31,7 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
 
     val svarOffentligTransport =
         mapOf(
-            RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA),
+            RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
             RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
         )
 
@@ -44,8 +45,10 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
     fun `skal kunne lagre, endre og slette vilkår for daglig reise - offentlig transport`() {
         val nyttVilkår =
             LagreDagligReiseDto(
-                fom = LocalDate.of(2025, 1, 1),
-                tom = LocalDate.of(2025, 1, 31),
+                fom = 1 januar 2025,
+                tom = 31 januar 2025,
+                adresse = "Tiltaksveien 1",
+                reiseId = dummyReiseId,
                 svar = svarOffentligTransport,
                 fakta = faktaOffentligTransport(),
             )
@@ -86,25 +89,29 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `skal kunne lagre ned et vilkår uten fakta om vilkår ikke er oppfylt`() {
+    fun `skal kunne lagre ned et vilkår med fakta UBESTEMT med adresse og reiseId om vilkår ikke er oppfylt`() {
         val svarAvstandIkkeOppfylt =
             mapOf(
-                RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.NEI),
+                RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.NEI, "Antall km"),
                 RegelId.UNNTAK_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.NEI, "Begrunnelse"),
             )
 
         val nyttVilkår =
             LagreDagligReiseDto(
-                fom = LocalDate.of(2025, 1, 1),
-                tom = LocalDate.of(2025, 1, 31),
+                fom = 1 januar 2025,
+                tom = 31 januar 2025,
+                adresse = "Tiltaksveien 1",
+                reiseId = dummyReiseId,
                 svar = svarAvstandIkkeOppfylt,
-                fakta = null,
+                fakta = FaktaDagligReiseUbestemtDto,
             )
 
         val resultat = kall.vilkårDagligReise.opprettVilkår(behandling.id, nyttVilkår)
 
         assertThat(resultat.resultat).isEqualTo(Vilkårsresultat.IKKE_OPPFYLT)
-        assertThat(resultat.fakta).isNull()
+        assertThat(resultat.reiseId).isEqualTo(dummyReiseId)
+        assertThat(resultat.adresse).isEqualTo("Tiltaksveien 1")
+        assertThat(resultat.fakta).isNotNull
     }
 
     @Test
@@ -115,13 +122,11 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
     }
 
     private fun faktaOffentligTransport(
-        reiseId: ReiseId = dummyReiseId,
         reisedagerPerUke: Int = 5,
         prisEnkelbillett: Int? = 40,
         prisSyvdagersbillett: Int? = null,
         prisTrettidagersbillett: Int? = 800,
     ) = FaktaDagligReiseOffentligTransportDto(
-        reiseId = reiseId,
         reisedagerPerUke = reisedagerPerUke,
         prisEnkelbillett = prisEnkelbillett,
         prisSyvdagersbillett = prisSyvdagersbillett,

@@ -75,8 +75,8 @@ class DagligReiseRegel :
                 erHovedregel = true,
                 svarMapping =
                     jaNeiSvarRegel(
-                        hvisJa = NesteRegel(KAN_REISE_MED_OFFENTLIG_TRANSPORT.regelId, BegrunnelseType.VALGFRI),
-                        hvisNei = NesteRegel(UNNTAK_SEKS_KM.regelId),
+                        hvisJa = NesteRegel(KAN_REISE_MED_OFFENTLIG_TRANSPORT.regelId, BegrunnelseType.PÅKREVD),
+                        hvisNei = NesteRegel(UNNTAK_SEKS_KM.regelId, BegrunnelseType.PÅKREVD),
                     ),
             )
     }

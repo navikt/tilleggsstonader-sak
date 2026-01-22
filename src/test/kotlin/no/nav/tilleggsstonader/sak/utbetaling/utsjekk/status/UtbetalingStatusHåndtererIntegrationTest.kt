@@ -1,14 +1,12 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
-import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -31,10 +29,12 @@ class UtbetalingStatusHåndtererIntegrationTest(
     ) {
         // Gjennomfør behandling til iverksetting er ferdig
         val behandlingId =
-            gjennomførBehandlingsløp(
-                medVilkår = listOf(lagreDagligReiseDto()),
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
                 tilSteg = StegType.BEHANDLING_FERDIGSTILT,
-            )
+            ) {
+                defaultDagligReiseTsoTestdata()
+            }
 
         // Hent iverksettingId fra andel
         val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
@@ -69,7 +69,12 @@ class UtbetalingStatusHåndtererIntegrationTest(
 
     @Test
     fun `FEILET status oppdaterer andeler med FEILET status og inkluderer error detaljer`() {
-        val behandlingId = gjennomførBehandlingsløp()
+        val behandlingId =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                defaultDagligReiseTsoTestdata()
+            }
 
         // Hent iverksettingId fra andel
         val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
@@ -109,15 +114,31 @@ class UtbetalingStatusHåndtererIntegrationTest(
 
     @Test
     fun `flere andeler oppdateres alle når status mottas`() {
+        val fom = 1 januar 2025
+        val tom = 31 januar 2025
+
         // Opprett behandling med flere andeler
         val behandlingId =
-            gjennomførBehandlingsløp(
-                medVilkår =
-                    listOf(
-                        lagreDagligReiseDto(fom = 2 januar 2025, tom = 2 januar 2025),
-                        lagreDagligReiseDto(fom = 6 januar 2025, tom = 6 januar 2025),
-                    ),
-            )
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTso(fom, tom)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(fom, tom)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        offentligTransport(fom = 2 januar 2025, tom = 2 januar 2025)
+                        offentligTransport(fom = 6 januar 2025, tom = 6 januar 2025)
+                    }
+                }
+            }
 
         val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
         val andelerFørStatus = tilkjentYtelse!!.andelerTilkjentYtelse
@@ -151,12 +172,11 @@ class UtbetalingStatusHåndtererIntegrationTest(
     @Test
     fun `ignorerer status for andre fagsystemer`() {
         val behandlingId =
-            gjennomførBehandlingsløp(
-                medAktivitet = ::lagreVilkårperiodeAktivitet,
-                medMålgruppe = ::lagreVilkårperiodeMålgruppe,
-                medVilkår = listOf(lagreDagligReiseDto()),
-                tilSteg = StegType.BEHANDLING_FERDIGSTILT,
-            )
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                defaultDagligReiseTsoTestdata()
+            }
 
         val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
         val andelerFørStatus = tilkjentYtelse!!.andelerTilkjentYtelse

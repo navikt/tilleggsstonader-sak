@@ -7,12 +7,12 @@ import org.junit.jupiter.api.Test
 
 class ByggRegelstrukturFraVilkårregelTest {
     /**
-     * Sett FileUtil.SKAL_SKRIVE_TIL_FIL = true for å oppdatere filene ved endring som er ment å påvirke logikken.
-     * Kan også gjøres for å lage nye filer dersom det legges til nye vilkårsregler.
+     * Feiler hvis regeltreeet har endret seg. Var det meningen, kjør
+     *      SKRIV_TIL_FIL=true ./gradlew :test --tests "no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggRegelstrukturFraVilkårregelTest.regelstrukturSnapshotTest"
      * OBS: Ved oppdatering av filene må testen kjøres flere ganger fordi den feiler per fil som endres.
      */
     @Test
-    internal fun `sjekker at output fortsatt er det samme på json`() {
+    fun regelstrukturSnapshotTest() {
         val vilkårsregler = Vilkårsregler.ALLE_VILKÅRSREGLER.vilkårsregler.map { it.value }
 
         vilkårsregler.forEach {

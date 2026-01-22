@@ -36,9 +36,6 @@ import java.time.LocalDate
 
 class FaktaGrunnlagServiceIntegrationTest : CleanDatabaseIntegrationTest() {
     @Autowired
-    private lateinit var barnRepository: BarnRepository
-
-    @Autowired
     lateinit var faktaGrunnlagService: FaktaGrunnlagService
 
     @Autowired

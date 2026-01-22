@@ -52,9 +52,6 @@ class StegServiceTest : CleanDatabaseIntegrationTest() {
     lateinit var behandlingRepository: BehandlingRepository
 
     @Autowired
-    lateinit var barnRepository: BarnRepository
-
-    @Autowired
     lateinit var tilsynBarnBeregnYtelseSteg: TilsynBarnBeregnYtelseSteg
 
     @Autowired

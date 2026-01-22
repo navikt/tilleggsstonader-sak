@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatForM
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.TypeVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -17,7 +18,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerDto
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -31,7 +31,7 @@ data class InterntVedtak(
     val målgrupper: List<VilkårperiodeInterntVedtak>,
     val aktiviteter: List<VilkårperiodeInterntVedtak>,
     val vedtaksperioder: List<VedtaksperiodeInterntVedtak>,
-    val vilkår: List<VilkårInternt>,
+    val vilkår: List<VilkårInterntVedtak>,
     val vedtak: VedtakInternt?,
     val beregningsresultat: BeregningsresultatInterntVedtakDto?,
 )
@@ -96,51 +96,59 @@ data class VilkårperiodeInterntVedtak(
     val tiltaksvariant: String?,
 )
 
-data class VurderingVilkårperiode(
-    val svar: String?,
-    val resultat: ResultatDelvilkårperiode,
-)
-
-data class VilkårInternt(
+data class VilkårInterntVedtak(
     val type: VilkårType,
     val resultat: Vilkårsresultat,
-    val delvilkår: List<DelvilkårInternt>,
+    val delvilkår: List<DelvilkårInterntVedtak>,
     val fødselsdatoBarn: LocalDate?,
     val fom: LocalDate?,
     val tom: LocalDate?,
     val utgift: Int?,
     val slettetKommentar: String?,
-    val fakta: VilkårFaktaInternt?,
+    val fakta: VilkårFaktaInterntVedtak?,
 )
 
-data class DelvilkårInternt(
+data class DelvilkårInterntVedtak(
     val resultat: Vilkårsresultat,
-    val vurderinger: List<VurderingInternt>,
+    val vurderinger: List<VurderingInterntVedtak>,
 )
 
-sealed interface VilkårFaktaInternt {
+sealed interface VilkårFaktaInterntVedtak {
+    val reiseId: ReiseId
+    val adresse: String?
     val type: TypeVilkårFakta
 }
 
-data class VilkårFaktaOffentligTransport(
+data class VilkårFaktaUbestemtInterntVedtak(
+    override val reiseId: ReiseId,
+    override val adresse: String?,
+) : VilkårFaktaInterntVedtak {
+    override val type = TypeVilkårFakta.DAGLIG_REISE_UBESTEMT
+}
+
+data class VilkårFaktaOffentligTransportInterntVedtak(
+    override val reiseId: ReiseId,
+    override val adresse: String?,
     val reisedagerPerUke: Int,
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int?,
-) : VilkårFaktaInternt {
+) : VilkårFaktaInterntVedtak {
     override val type = TypeVilkårFakta.DAGLIG_REISE_OFFENTLIG_TRANSPORT
 }
 
-data class VilkårFaktaPrivatBil(
+data class VilkårFaktaPrivatBilInterntVedtak(
+    override val reiseId: ReiseId,
+    override val adresse: String?,
     val reisedagerPerUke: Int,
     val reiseavstandEnVei: BigDecimal,
     val bompengerEnVei: Int?,
     val fergekostandEnVei: Int?,
-) : VilkårFaktaInternt {
+) : VilkårFaktaInterntVedtak {
     override val type = TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL
 }
 
-data class VurderingInternt(
+data class VurderingInterntVedtak(
     val regel: String,
     val svar: String?,
     val begrunnelse: String?,

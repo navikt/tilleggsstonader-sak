@@ -15,7 +15,7 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkårDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.Billettype
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatForPeriodeDto
@@ -61,6 +61,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
     val dummyOffentligTransport =
         FaktaOffentligTransport(
             reiseId = dummyReiseId,
+            adresse = "Tiltaksveien 1",
             reisedagerPerUke = 4,
             prisEnkelbillett = 44,
             prisSyvdagersbillett = null,
@@ -92,6 +93,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                                 listOf(
                                     BeregningsresultatForReiseDto(
                                         reiseId = dummyReiseId,
+                                        adresse = "Tiltaksveien 1",
                                         perioder =
                                             listOf(
                                                 BeregningsresultatForPeriodeDto(

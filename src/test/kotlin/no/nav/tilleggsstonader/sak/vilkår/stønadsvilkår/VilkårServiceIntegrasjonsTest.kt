@@ -49,9 +49,6 @@ internal class VilkårServiceIntegrasjonsTest : CleanDatabaseIntegrationTest() {
     lateinit var vilkårService: VilkårService
 
     @Autowired
-    lateinit var barnRepository: BarnRepository
-
-    @Autowired
     lateinit var barnService: BarnService
 
     @Nested

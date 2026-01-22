@@ -78,6 +78,7 @@ class IverksettService(
                     behandling,
                     fagsakId = behandling.fagsakId,
                     typeAndel = tilkjentYtelse.andelerTilkjentYtelse.map { it.type }.toSet(),
+                    erFørsteIverksettingForBehandling = true,
                 ),
             )
 
@@ -183,6 +184,7 @@ class IverksettService(
                 behandling = behandling,
                 fagsakId = behandling.fagsakId,
                 typeAndel = tilkjentYtelse.andelerTilkjentYtelse.map { it.type }.toSet(),
+                erFørsteIverksettingForBehandling = erFørsteIverksettingForBehandling,
             )
         ) {
             val utbetalingsIderPåFagsak =
@@ -363,6 +365,7 @@ class IverksettService(
         behandling: Saksbehandling,
         fagsakId: FagsakId,
         typeAndel: Set<TypeAndel>,
+        erFørsteIverksettingForBehandling: Boolean,
     ): Boolean {
         val utbetalingIderPåFagsak = fagsakUtbetalingIdService.hentUtbetalingIderForFagsakId(fagsakId)
         val finnesUtbetalingListe = typeAndel.map { fagsakUtbetalingIdService.finnesUtbetalingsId(fagsakId, it) }
@@ -372,7 +375,7 @@ class IverksettService(
         }
 
         return behandling.stønadstype.gjelderDagligReise() ||
-            erFørstegangsbehandlingLæremidlerOgSkalIverksetteMotKafka(behandling) ||
+            erFørstegangsbehandlingOgSkalIverksetteMotKafka(behandling, erFørsteIverksettingForBehandling) ||
             (
                 utbetalingIderPåFagsak.isNotEmpty() &&
                     finnesUtbetalingIdForAlleTypeAndeler(
@@ -382,9 +385,12 @@ class IverksettService(
             )
     }
 
-    private fun erFørstegangsbehandlingLæremidlerOgSkalIverksetteMotKafka(behandling: Saksbehandling): Boolean =
-        behandling.stønadstype == Stønadstype.LÆREMIDLER &&
-            behandling.forrigeIverksatteBehandlingId == null &&
+    private fun erFørstegangsbehandlingOgSkalIverksetteMotKafka(
+        behandling: Saksbehandling,
+        erFørsteIverksettingForBehandling: Boolean,
+    ): Boolean =
+        behandling.forrigeIverksatteBehandlingId == null &&
+            erFørsteIverksettingForBehandling &&
             unleashService.isEnabled(Toggle.SKAL_IVERKSETT_NYE_BEHANDLINGER_MOT_KAFKA)
 
     private fun finnesUtbetalingIdForAlleTypeAndeler(

@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -14,13 +15,13 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
 
 class DagligReiseVilkårServiceTest {
     val vilkårRepository = mockk<VilkårRepository>()
@@ -44,8 +45,8 @@ class DagligReiseVilkårServiceTest {
 
     val nyttVilkår =
         LagreDagligReise(
-            fom = LocalDate.of(2025, 1, 1),
-            tom = LocalDate.of(2025, 1, 31),
+            fom = 1 januar 2025,
+            tom = 31 januar 2025,
             svar = svarOffentligTransport,
             fakta = faktaOffentligTransport(),
         )
@@ -109,12 +110,15 @@ class DagligReiseVilkårServiceTest {
     }
 
     fun faktaOffentligTransport(
+        reiseId: ReiseId = dummyReiseId,
+        adresse: String? = "Tiltaksveien 1",
         reisedagerPerUke: Int = 5,
         prisEnkelbillett: Int? = 40,
         prisSyvdagersbillett: Int? = null,
         prisTrettidagersbillett: Int? = 800,
     ) = FaktaOffentligTransport(
-        reiseId = dummyReiseId,
+        reiseId = reiseId,
+        adresse = adresse,
         reisedagerPerUke = reisedagerPerUke,
         prisEnkelbillett = prisEnkelbillett,
         prisSyvdagersbillett = prisSyvdagersbillett,

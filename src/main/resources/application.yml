@@ -248,3 +248,9 @@ topics:
   utbetaling: tilleggsstonader.utbetaling.v1
   utbetaling-status: helved.status.v1
   dvh-behandling: tilleggsstonader.aapen-tilleggsstonader-dvh-behandling
+
+eksterne-applikasjoner:
+  soknad-api: "gcp:tilleggsstonader:tilleggsstonader-soknad-api"
+  arena: "fss:teamarenanais:arena"
+  bidrag-grunnlag: "gcp:bidrag:bidrag-grunnlag"
+  bidrag-grunnlag-feature: "gcp:bidrag:bidrag-grunnlag-feature"
