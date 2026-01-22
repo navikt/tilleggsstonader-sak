@@ -14,7 +14,8 @@ data class UtgiftOffentligTransport(
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
     val pris30dagersbillett: Int?,
-) : Periode<LocalDate>, KopierPeriode<UtgiftOffentligTransport> {
+) : Periode<LocalDate>,
+    KopierPeriode<UtgiftOffentligTransport> {
     fun delTil30Dagersperioder(): List<UtgiftOffentligTransport> =
         this.splitPer30DagersPerioder { fom, tom ->
             UtgiftOffentligTransport(
