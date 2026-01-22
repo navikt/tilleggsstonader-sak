@@ -36,6 +36,7 @@ object DagligReiseTestUtil {
         BeregningsresultatDagligReise(
             offentligTransport =
                 beregningsresultatOffentligTransport(),
+            privatBil = null,
         )
     val defaultInnvilgelseDagligReise =
         InnvilgelseDagligReise(
