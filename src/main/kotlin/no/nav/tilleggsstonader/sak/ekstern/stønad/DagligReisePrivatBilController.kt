@@ -1,7 +1,8 @@
 package no.nav.tilleggsstonader.sak.ekstern.stønad
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
+import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
+import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
@@ -14,22 +15,22 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping(
-    path = ["/api/ekstern/har-behandling"],
+    path = ["/api/ekstern/privat-bil"],
     consumes = [MediaType.APPLICATION_JSON_VALUE],
     produces = [MediaType.APPLICATION_JSON_VALUE],
 )
-class HarBehandlingUnderArbeidController(
-    private val harBehandlingUnderArbeidService: HarBehandlingUnderArbeidService,
+class DagligReisePrivatBilController(
+    private val dagligReisePrivatBilService: DagligReisePrivatBilService,
     private val eksternApplikasjon: EksternApplikasjon,
 ) {
-    @PostMapping()
+    @PostMapping("/rammevedtak")
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
-    fun harBehandlingUnderArbeid(
-        @RequestBody identStønadstype: IdentStønadstype,
-    ): Boolean {
+    fun hentRammevedtaksinformasjon(
+        @RequestBody request: IdentRequest,
+    ): List<RammevedtakDto> {
         feilHvisIkke(SikkerhetContext.kallKommerFra(eksternApplikasjon.soknadApi), HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
         }
-        return harBehandlingUnderArbeidService.harSøknadUnderBehandling(identStønadstype)
+        return dagligReisePrivatBilService.hentRammevedtaksPrivatBil(request)
     }
 }

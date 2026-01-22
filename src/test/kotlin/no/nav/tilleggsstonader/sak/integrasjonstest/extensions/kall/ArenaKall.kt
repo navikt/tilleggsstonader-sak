@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
-import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.migrering.arena.ArenaFinnesPersonRequest
 import no.nav.tilleggsstonader.sak.migrering.arena.ArenaFinnesPersonResponse
@@ -20,7 +19,7 @@ class ArenaKall(
                     .post()
                     .uri("/api/ekstern/arena/status")
                     .bodyValue(dto)
-                    .medClientCredentials(EksternApplikasjon.ARENA.namespaceAppNavn, true)
+                    .medClientCredentials(eksternApplikasjon.arena, true)
                     .exchange()
             }
     }

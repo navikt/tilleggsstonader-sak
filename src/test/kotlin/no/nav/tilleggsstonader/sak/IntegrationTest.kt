@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterSøknadService
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.MockClientService
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
 import no.nav.tilleggsstonader.sak.integrasjonstest.KafkaTopics
@@ -58,7 +59,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 )
 @EnableMockOAuth2Server
 @AutoConfigureWebTestClient
-@EnableConfigurationProperties(KafkaTopics::class)
+@EnableConfigurationProperties(KafkaTopics::class, EksternApplikasjon::class)
 abstract class IntegrationTest {
     @LocalServerPort
     private var port: Int? = 0
@@ -110,6 +111,9 @@ abstract class IntegrationTest {
 
     @Autowired
     lateinit var kafkaTopics: KafkaTopics
+
+    @Autowired
+    lateinit var eksternApplikasjon: EksternApplikasjon
 
     lateinit var testBrukerkontekst: TestBrukerKontekst
 
