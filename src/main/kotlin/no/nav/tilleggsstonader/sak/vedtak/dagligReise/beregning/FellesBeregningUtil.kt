@@ -16,7 +16,7 @@ fun antallHverdagerIPeriodeInklusiv(
 
 data class ReiseOgVedtaksperioderSnitt<P>(
     val justerteVedtaksperioder: List<Vedtaksperiode>,
-    val justertReiseperiode: P,
+    val justertReiseperiode: P?,
 ) where P : Periode<LocalDate>, P : KopierPeriode<P>
 
 fun <P> finnSnittMellomReiseOgVedtaksperioder(
@@ -24,6 +24,14 @@ fun <P> finnSnittMellomReiseOgVedtaksperioder(
     vedtaksperioder: List<Vedtaksperiode>,
 ): ReiseOgVedtaksperioderSnitt<P> where P : Periode<LocalDate>, P : KopierPeriode<P> {
     val justerteVedtaksperioder = vedtaksperioder.mapNotNull { it.beregnSnitt(reise) }.sorted()
+
+    if (justerteVedtaksperioder.isEmpty()) {
+        return ReiseOgVedtaksperioderSnitt(
+            justerteVedtaksperioder = emptyList(),
+            justertReiseperiode = null,
+        )
+    }
+
     return ReiseOgVedtaksperioderSnitt(
         justerteVedtaksperioder = justerteVedtaksperioder,
         justertReiseperiode =

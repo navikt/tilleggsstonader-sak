@@ -26,7 +26,7 @@ class OffentligTransportBeregningService {
 
         return BeregningsresultatOffentligTransport(
             reiser =
-                utgifter.map { reise ->
+                utgifter.mapNotNull { reise ->
                     beregnForReise(reise, vedtaksperioder, brukersNavKontor)
                 },
         )
@@ -36,12 +36,14 @@ class OffentligTransportBeregningService {
         reise: UtgiftOffentligTransport,
         vedtaksperioder: List<Vedtaksperiode>,
         brukersNavKontor: String?,
-    ): BeregningsresultatForReise {
+    ): BeregningsresultatForReise? {
         val (justerteVedtaksperioder, justertReiseperiode) =
             finnSnittMellomReiseOgVedtaksperioder(
                 reise,
                 vedtaksperioder,
             )
+
+        if (justertReiseperiode == null) return null
 
         val trettidagerReisePerioder = justertReiseperiode.delTil30Dagersperioder()
 
