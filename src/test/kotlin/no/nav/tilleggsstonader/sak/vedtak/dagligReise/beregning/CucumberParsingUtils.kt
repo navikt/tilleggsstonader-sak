@@ -15,6 +15,8 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.DomenenøkkelOffentligtransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
@@ -78,14 +80,14 @@ fun mapTilVilkårDagligReise(rad: Map<String, String>): LagreDagligReise =
                 adresse = "Tiltaksveien 1",
                 reisedagerPerUke =
                     parseInt(
-                        DomenenøkkelOffentligtransport.ANTALL_REISEDAGER_PER_UKE,
+                        `DomenenøkkelOffentligtransport`.ANTALL_REISEDAGER_PER_UKE,
                         rad,
                     ),
-                prisEnkelbillett = parseValgfriInt(DomenenøkkelOffentligtransport.PRIS_ENKELTBILLETT, rad),
-                prisSyvdagersbillett = parseValgfriInt(DomenenøkkelOffentligtransport.PRIS_SYV_DAGERS_BILLETT, rad),
+                prisEnkelbillett = parseValgfriInt(`DomenenøkkelOffentligtransport`.PRIS_ENKELTBILLETT, rad),
+                prisSyvdagersbillett = parseValgfriInt(`DomenenøkkelOffentligtransport`.PRIS_SYV_DAGERS_BILLETT, rad),
                 prisTrettidagersbillett =
                     parseValgfriInt(
-                        DomenenøkkelOffentligtransport.PRIS_TRETTI_DAGERS_BILLETT,
+                        `DomenenøkkelOffentligtransport`.PRIS_TRETTI_DAGERS_BILLETT,
                         rad,
                     ),
             ),
