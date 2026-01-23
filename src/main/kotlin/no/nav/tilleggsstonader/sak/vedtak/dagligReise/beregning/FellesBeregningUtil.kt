@@ -25,52 +25,6 @@ fun antallHelgedagerIPeriodeInklusiv(
         .takeWhile { !it.isAfter(tom) }
         .count { it.dayOfWeek.value in 6..7 }
 
-fun <P : Periode<LocalDate>> P.splitPerUkeMedHelg(): List<Datoperiode> {
-    val uker = mutableListOf<Datoperiode>()
-
-    var startOfWeek = this.fom
-
-    while (startOfWeek <= this.tom) {
-        val nærmesteSøndagFremITid = startOfWeek.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
-        val endOfWeek: LocalDate = minOf(nærmesteSøndagFremITid, this.tom)
-
-        uker.add(
-            Datoperiode(
-                fom = startOfWeek,
-                tom = endOfWeek,
-            ),
-        )
-
-        startOfWeek = endOfWeek.with(TemporalAdjusters.next(DayOfWeek.MONDAY))
-    }
-
-    return uker
-}
-
-data class PeriodeMedAntallDager(
-    override val fom: LocalDate,
-    override val tom: LocalDate,
-    var antallHverdager: Int,
-    var antallHelgedager: Int,
-) : Periode<LocalDate>,
-    KopierPeriode<PeriodeMedAntallDager> {
-    init {
-        validatePeriode()
-    }
-
-    constructor(fom: LocalDate, tom: LocalDate) : this(
-        fom = fom,
-        tom = tom,
-        antallHverdager = antallHverdagerIPeriodeInklusiv(fom = fom, tom = tom),
-        antallHelgedager = antallHelgedagerIPeriodeInklusiv(fom = fom, tom = tom),
-    )
-
-    override fun medPeriode(
-        fom: LocalDate,
-        tom: LocalDate,
-    ): PeriodeMedAntallDager = this.copy(fom = fom, tom = tom)
-}
-
 data class ReiseOgVedtaksperioderSnitt<P>(
     val justerteVedtaksperioder: List<Vedtaksperiode>,
     val justertReiseperiode: P?,

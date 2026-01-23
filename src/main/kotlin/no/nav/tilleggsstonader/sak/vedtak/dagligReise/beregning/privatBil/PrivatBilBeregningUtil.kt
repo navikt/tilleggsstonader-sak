@@ -1,13 +1,19 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.PeriodeMedAntallDager
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.antallHelgedagerIPeriodeInklusiv
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.antallHverdagerIPeriodeInklusiv
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.temporal.TemporalAdjusters
 
 fun finnRelevantVedtaksperiodeForUke(
     uke: Datoperiode,
@@ -83,4 +89,50 @@ fun finnAntallDagerSomDekkes(
         antallDager = antallDager,
         inkludererHelg = antallDagerInkludererHelg,
     )
+}
+
+fun <P : Periode<LocalDate>> P.splitPerUkeMedHelg(): List<Datoperiode> {
+    val uker = mutableListOf<Datoperiode>()
+
+    var startOfWeek = this.fom
+
+    while (startOfWeek <= this.tom) {
+        val nærmesteSøndagFremITid = startOfWeek.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+        val endOfWeek: LocalDate = minOf(nærmesteSøndagFremITid, this.tom)
+
+        uker.add(
+            Datoperiode(
+                fom = startOfWeek,
+                tom = endOfWeek,
+            ),
+        )
+
+        startOfWeek = endOfWeek.with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+    }
+
+    return uker
+}
+
+data class PeriodeMedAntallDager(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    var antallHverdager: Int,
+    var antallHelgedager: Int,
+) : Periode<LocalDate>,
+    KopierPeriode<PeriodeMedAntallDager> {
+    init {
+        validatePeriode()
+    }
+
+    constructor(fom: LocalDate, tom: LocalDate) : this(
+        fom = fom,
+        tom = tom,
+        antallHverdager = antallHverdagerIPeriodeInklusiv(fom = fom, tom = tom),
+        antallHelgedager = antallHelgedagerIPeriodeInklusiv(fom = fom, tom = tom),
+    )
+
+    override fun medPeriode(
+        fom: LocalDate,
+        tom: LocalDate,
+    ): PeriodeMedAntallDager = this.copy(fom = fom, tom = tom)
 }
