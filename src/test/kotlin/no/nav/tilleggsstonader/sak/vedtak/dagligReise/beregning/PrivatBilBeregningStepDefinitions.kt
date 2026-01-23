@@ -6,6 +6,7 @@ import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -19,6 +20,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.finnRelevantKilometerSats
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForUke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
@@ -118,16 +120,19 @@ class PrivatBilBeregningStepDefinitions {
 
     private fun mapUker(dataTable: DataTable) =
         dataTable.mapRad { rad ->
+            val fom = parseDato(DomenenøkkelFelles.FOM, rad)
+            val tom = parseDato(DomenenøkkelFelles.TOM, rad)
             BeregningsresultatUkeCucumber(
                 reiseNr = parseInt(DomenenøkkelPrivatBil.REISENR, rad),
                 stønadsbeløp = parseInt(DomenenøkkelFelles.BELØP, rad),
                 grunnlag =
                     BeregningsgrunnlagForUke(
-                        fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                        tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                        fom = fom,
+                        tom = tom,
                         antallDagerDenneUkaSomKanDekkes = parseInt(DomenenøkkelPrivatBil.ANTALL_DAGER_DEKT_UKE, rad),
                         antallDagerInkludererHelg = parseBoolean(DomenenøkkelPrivatBil.INKLUDERER_HELG, rad),
                         vedtaksperioder = emptyList(),
+                        kilometersats = finnRelevantKilometerSats(Datoperiode(fom, tom)),
                     ),
             )
         }

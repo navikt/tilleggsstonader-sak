@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
 
+// Begrensninger:
+// Håndterer ikke ulik kilometersats i årskifte dersom en uke går på tvers av to år.
+
 @Service
 class PrivatBilBeregningService {
     fun beregn(
@@ -22,11 +25,12 @@ class PrivatBilBeregningService {
     ): BeregningsresultatPrivatBil {
         val reiseInformasjon = oppfylteVilkår.map { it.tilReiseMedPrivatBil() }
 
+        val resultatForReiser = reiseInformasjon.mapNotNull {
+            beregnForReise(it, vedtaksperioder)
+        }
+
         return BeregningsresultatPrivatBil(
-            reiser =
-                reiseInformasjon.mapNotNull {
-                    beregnForReise(it, vedtaksperioder)
-                },
+            reiser = resultatForReiser,
         )
     }
 
@@ -80,7 +84,7 @@ class PrivatBilBeregningService {
         val kostnadKjøring =
             grunnlagForReise.reiseavstandEnVei
                 .multiply(BigDecimal.valueOf(2))
-                .multiply(grunnlagForReise.kilometersats)
+                .multiply(grunnlagForUke.kilometersats)
                 .multiply(grunnlagForUke.antallDagerDenneUkaSomKanDekkes.toBigDecimal())
 
         val sumEkstrakostnader = grunnlagForReise.ekstrakostnader.beregnTotalEkstrakostnadForEnDag().toBigDecimal()
@@ -96,7 +100,6 @@ class PrivatBilBeregningService {
             tom = reise.tom,
             reisedagerPerUke = reise.reisedagerPerUke,
             reiseavstandEnVei = reise.reiseavstandEnVei,
-            kilometersats = finnRelevantKilometerSats(periode = reise),
             ekstrakostnader =
                 Ekstrakostnader(
                     fergekostnadEnVei = reise.fergekostandEnVei,
@@ -121,6 +124,7 @@ class PrivatBilBeregningService {
             antallDagerDenneUkaSomKanDekkes = antallDager,
             antallDagerInkludererHelg = antallDagerInkludererHelg,
             vedtaksperioder = listOf(relevantVedtaksperiode),
+            kilometersats = finnRelevantKilometerSats(periode = justertUkeMedAntallDager),
         )
     }
 }

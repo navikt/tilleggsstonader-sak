@@ -6,18 +6,11 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 // Generelle tanker:
-// Mangler informasjon om vedtaksperiode
 // Burde vi splitte opp reisene slik at det blir 1 ny ved nytt år?
 data class BeregningsresultatPrivatBil(
     val reiser: List<BeregningsresultatForReiseMedPrivatBil>,
 )
 
-// Vil oppnå:
-// Enkelt å sjekke om kun ramme er beregnet
-// Unngå duplikat lagring av data
-// Smud å dytte inn kjøreliste og ekte resultat når rammevedtak alt er beregnet
-
-// TODO: Vurder om det er nødvendig å ha med fom og tom her
 data class BeregningsresultatForReiseMedPrivatBil(
     val uker: List<BeregningsresultatForUke>,
     val grunnlag: BeregningsgrunnlagForReiseMedPrivatBil,
@@ -31,15 +24,11 @@ data class BeregningsresultatForUke(
 //    val maksBeløpSomKanDekkes: Int?,
 )
 
-// TODO: Finn ut om tall generelt skal være heltall eller desimaltall
-// Antar heltall på alt utenom kilometersats foreløpig
 data class BeregningsgrunnlagForReiseMedPrivatBil(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val reisedagerPerUke: Int,
     val reiseavstandEnVei: BigDecimal,
-    // TODO: Vurder om denne burde ligge på uke. Avhenger av hvor vi vil splitte en reise
-    val kilometersats: BigDecimal,
     val ekstrakostnader: Ekstrakostnader,
 ) : Periode<LocalDate>
 
@@ -54,7 +43,7 @@ data class BeregningsgrunnlagForUke(
     val antallDagerInkludererHelg: Boolean,
     // TODO: Vi håndterer ikke at denne er mer enn 1, men kjipt å ikke ha den som en liste dersom vi vil det senere
     val vedtaksperioder: List<Vedtaksperiode>,
-    // val dagsats: BigDecimal, //TODO: Lag
+    val kilometersats: BigDecimal,
 ) : Periode<LocalDate>
 
 data class Ekstrakostnader(
