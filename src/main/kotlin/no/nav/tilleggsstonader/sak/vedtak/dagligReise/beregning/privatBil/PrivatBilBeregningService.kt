@@ -73,7 +73,7 @@ class PrivatBilBeregningService {
 
         return BeregningsresultatForUke(
             grunnlag = grunnlagForUke,
-            stønadsbeløp = beregnStønadsbeløp(grunnlagForReise = grunnlagForReise, grunnlagForUke = grunnlagForUke),
+            maksBeløpSomKanDekkesFørParkering = beregnStønadsbeløp(grunnlagForReise = grunnlagForReise, grunnlagForUke = grunnlagForUke),
         )
     }
 
@@ -85,7 +85,7 @@ class PrivatBilBeregningService {
             grunnlagForReise.reiseavstandEnVei
                 .multiply(BigDecimal.valueOf(2))
                 .multiply(grunnlagForUke.kilometersats)
-                .multiply(grunnlagForUke.antallDagerDenneUkaSomKanDekkes.toBigDecimal())
+                .multiply(grunnlagForUke.maksAntallDagerSomKanDekkes.toBigDecimal())
 
         val sumEkstrakostnader = grunnlagForReise.ekstrakostnader.beregnTotalEkstrakostnadForEnDag().toBigDecimal()
 
@@ -121,7 +121,7 @@ class PrivatBilBeregningService {
         return BeregningsgrunnlagForUke(
             fom = justertUkeMedAntallDager.fom,
             tom = justertUkeMedAntallDager.tom,
-            antallDagerDenneUkaSomKanDekkes = antallDager,
+            maksAntallDagerSomKanDekkes = antallDager,
             antallDagerInkludererHelg = antallDagerInkludererHelg,
             vedtaksperioder = listOf(relevantVedtaksperiode),
             kilometersats = finnRelevantKilometerSats(periode = justertUkeMedAntallDager),

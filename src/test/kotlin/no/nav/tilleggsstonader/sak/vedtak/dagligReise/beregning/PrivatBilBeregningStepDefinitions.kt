@@ -101,10 +101,10 @@ class PrivatBilBeregningStepDefinitions {
             assertThat(gjeldendeReise.uker[index].grunnlag.fom).isEqualTo(uke.grunnlag.fom)
             assertThat(gjeldendeReise.uker[index].grunnlag.tom).isEqualTo(uke.grunnlag.tom)
             assertThat(
-                gjeldendeReise.uker[index].grunnlag.antallDagerDenneUkaSomKanDekkes,
-            ).isEqualTo(uke.grunnlag.antallDagerDenneUkaSomKanDekkes)
+                gjeldendeReise.uker[index].grunnlag.maksAntallDagerSomKanDekkes,
+            ).isEqualTo(uke.grunnlag.maksAntallDagerSomKanDekkes)
             assertThat(gjeldendeReise.uker[index].grunnlag.antallDagerInkludererHelg).isEqualTo(uke.grunnlag.antallDagerInkludererHelg)
-            assertThat(gjeldendeReise.uker[index].stønadsbeløp).isEqualTo(uke.stønadsbeløp)
+            assertThat(gjeldendeReise.uker[index].maksBeløpSomKanDekkesFørParkering).isEqualTo(uke.`maksBeløpSomKanDekkesFørParkering`)
         }
     }
 
@@ -124,12 +124,12 @@ class PrivatBilBeregningStepDefinitions {
             val tom = parseDato(DomenenøkkelFelles.TOM, rad)
             BeregningsresultatUkeCucumber(
                 reiseNr = parseInt(DomenenøkkelPrivatBil.REISENR, rad),
-                stønadsbeløp = parseInt(DomenenøkkelFelles.BELØP, rad),
+                maksBeløpSomKanDekkesFørParkering = parseInt(DomenenøkkelFelles.BELØP, rad),
                 grunnlag =
                     BeregningsgrunnlagForUke(
                         fom = fom,
                         tom = tom,
-                        antallDagerDenneUkaSomKanDekkes = parseInt(DomenenøkkelPrivatBil.ANTALL_DAGER_DEKT_UKE, rad),
+                        maksAntallDagerSomKanDekkes = parseInt(DomenenøkkelPrivatBil.ANTALL_DAGER_DEKT_UKE, rad),
                         antallDagerInkludererHelg = parseBoolean(DomenenøkkelPrivatBil.INKLUDERER_HELG, rad),
                         vedtaksperioder = emptyList(),
                         kilometersats = finnRelevantKilometerSats(Datoperiode(fom, tom)),
@@ -162,5 +162,5 @@ enum class DomenenøkkelPrivatBil(
 data class BeregningsresultatUkeCucumber(
     val reiseNr: Int,
     val grunnlag: BeregningsgrunnlagForUke,
-    val stønadsbeløp: Int,
+    val maksBeløpSomKanDekkesFørParkering: Int,
 )

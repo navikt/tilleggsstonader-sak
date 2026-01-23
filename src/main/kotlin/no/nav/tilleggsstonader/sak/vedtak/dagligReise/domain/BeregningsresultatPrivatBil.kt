@@ -16,12 +16,9 @@ data class BeregningsresultatForReiseMedPrivatBil(
     val grunnlag: BeregningsgrunnlagForReiseMedPrivatBil,
 )
 
-// Vedtaksperiode inn her?
 data class BeregningsresultatForUke(
     val grunnlag: BeregningsgrunnlagForUke,
-    // TODO: Vurder navn - Gir dette navnet mening når det er etterbetaling?
-    val stønadsbeløp: Int,
-//    val maksBeløpSomKanDekkes: Int?,
+    val maksBeløpSomKanDekkesFørParkering: Int,
 )
 
 data class BeregningsgrunnlagForReiseMedPrivatBil(
@@ -32,25 +29,27 @@ data class BeregningsgrunnlagForReiseMedPrivatBil(
     val ekstrakostnader: Ekstrakostnader,
 ) : Periode<LocalDate>
 
+/**
+ * fom: Mandag eller begrenset av reiseperioden
+ * tom: Søndag eller begrenset av reiseperioden
+ * maksAntallDagerSomKanDekkes: Begrenses av antall reisedager og fom/tom
+ * antallDagerInkludererHelg: Flagg for å vise om beregning har tatt med helg i maksAntall dager
+ * vedtaksperioder: Er en liste, men beregning håndterer foreløpig ikke mer enn 1
+ */
 data class BeregningsgrunnlagForUke(
-    override val fom: LocalDate, // mandag eller begrenset av reiseperioden
-    override val tom: LocalDate, // søndag eller begrenset av reiseperioden
-    val kjøreliste: GrunnlagKjøreliste? = null,
-    // TODO: Bytt til et bedre navn: antallReisedager? maksAntallReisedager?
-    // reisedager per uke, begrenset av antall dager som er i uka (første og siste uke er ikke nødvendigvis fulle uker)
-    val antallDagerDenneUkaSomKanDekkes: Int,
-    // Ikke så bra navn, men betyr at utregningen av den over inkluderer en eller to helgedager
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val maksAntallDagerSomKanDekkes: Int,
     val antallDagerInkludererHelg: Boolean,
-    // TODO: Vi håndterer ikke at denne er mer enn 1, men kjipt å ikke ha den som en liste dersom vi vil det senere
     val vedtaksperioder: List<Vedtaksperiode>,
     val kilometersats: BigDecimal,
 ) : Periode<LocalDate>
 
+// TODO: Finn ut om det finnes abbonnement på disse prisene og om det påvirker hvordan vi vil løse dette
 data class Ekstrakostnader(
-    val bompengerEnVei: Int?, // TODO: Kan man ha noe abonnement/månedskort her? Tar vi hensyn til det?
-    val fergekostnadEnVei: Int?, // Månedskort?
+    val bompengerEnVei: Int?,
+    val fergekostnadEnVei: Int?,
 ) {
-    // TODO: Spør om hjelp til å skrive denne penere
     fun beregnTotalEkstrakostnadForEnDag(): Int {
         val bompengerEnDag = bompengerEnVei?.times(2) ?: 0
         val fergekostnadEnDag = fergekostnadEnVei?.times(2) ?: 0
@@ -58,8 +57,3 @@ data class Ekstrakostnader(
         return bompengerEnDag + fergekostnadEnDag
     }
 }
-
-data class GrunnlagKjøreliste(
-    val antallDagerKjørt: Int,
-    val totaleParkeringsutgifter: Int?,
-)
