@@ -81,10 +81,10 @@ class DagligReiseVedtakSteg(
 
         lagreInnvilgetVedtak(
             behandling = saksbehandling,
+            beregningsresultat = beregningsresultat,
             vedtaksperioder = vedtaksperioder,
             begrunnelse = vedtak.begrunnelse,
             tidligsteEndring = tidligsteEndring,
-            beregningsresultat = beregningsresultat,
         )
     }
 

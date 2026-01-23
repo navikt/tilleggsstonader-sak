@@ -19,7 +19,6 @@ data class ReiseMedPrivatBil(
     val fergekostandEnVei: Int?,
 ) : Periode<LocalDate>,
     KopierPeriode<ReiseMedPrivatBil> {
-
     override fun medPeriode(
         fom: LocalDate,
         tom: LocalDate,

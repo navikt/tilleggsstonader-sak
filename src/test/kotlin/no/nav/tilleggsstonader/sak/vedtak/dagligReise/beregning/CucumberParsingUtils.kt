@@ -91,7 +91,7 @@ private fun mapFakta(
     when (type) {
         TypeDagligReise.OFFENTLIG_TRANSPORT -> mapFaktaOffentligTransport(rad)
         TypeDagligReise.PRIVAT_BIL -> mapFaktaPrivatBil(rad)
-        else -> FaktaUbestemtType(reiseId = dummyReiseId, adresse = "Tiltaksveien 1",)
+        else -> FaktaUbestemtType(reiseId = dummyReiseId, adresse = "Tiltaksveien 1")
     }
 
 fun mapFaktaOffentligTransport(rad: Map<String, String>): FaktaOffentligTransport =
