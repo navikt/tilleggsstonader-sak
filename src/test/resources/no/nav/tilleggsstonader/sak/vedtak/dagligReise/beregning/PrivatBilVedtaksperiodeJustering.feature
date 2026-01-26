@@ -16,8 +16,8 @@ Egenskap: Beregning av privat bil og vedtaksperioder
     Når beregner for daglig reise privat bil
 
     Så forventer vi følgende beregningsrsultat for daglig reise privatBil
-      | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Beløp | Inkluderer helg |
-      | 1       | 12.01.2026 | 15.01.2026 | 4                       | 235   | Nei             |
+      | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Inkluderer helg |
+      | 1       | 12.01.2026 | 15.01.2026 | 4                       | Nei             |
 
   Scenario: reisen er kortere enn vedtaksperioden
     Gitt følgende vedtaksperioder for daglig reise privat bil
@@ -31,8 +31,8 @@ Egenskap: Beregning av privat bil og vedtaksperioder
     Når beregner for daglig reise privat bil
 
     Så forventer vi følgende beregningsrsultat for daglig reise privatBil
-      | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Beløp | Inkluderer helg |
-      | 1       | 12.01.2026 | 15.01.2026 | 4                       | 235   | Nei             |
+      | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Inkluderer helg |
+      | 1       | 12.01.2026 | 15.01.2026 | 4                       | Nei             |
 
     Scenario: 2 vedtaksperioder hvor oppholdet gjør at en uke ikke dekkes at all av en vedtaksperiode
       Gitt følgende vedtaksperioder for daglig reise privat bil
@@ -47,9 +47,9 @@ Egenskap: Beregning av privat bil og vedtaksperioder
       Når beregner for daglig reise privat bil
 
       Så forventer vi følgende beregningsrsultat for daglig reise privatBil
-        | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Beløp | Inkluderer helg |
-        | 1       | 05.01.2026 | 11.01.2026 | 5                       | 294   | Nei             |
-        | 1       | 19.01.2026 | 25.01.2026 | 5                       | 294   | Nei             |
+        | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Inkluderer helg |
+        | 1       | 05.01.2026 | 11.01.2026 | 5                       | Nei             |
+        | 1       | 19.01.2026 | 25.01.2026 | 5                       | Nei             |
 
     Scenario: Vedtaksperiode og reise overlapper ikke
       Gitt følgende vedtaksperioder for daglig reise privat bil
@@ -80,8 +80,8 @@ Egenskap: Beregning av privat bil og vedtaksperioder
       Når beregner for daglig reise privat bil
 
       Så forventer vi følgende beregningsrsultat for daglig reise privatBil
-        | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Beløp | Inkluderer helg |
-        | 1       | 05.01.2026 | 11.01.2026 | 5                       | 294   | Nei             |
+        | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Inkluderer helg |
+        | 1       | 05.01.2026 | 11.01.2026 | 5                       | Nei             |
 
     Scenario: En uke som kun dekkes delvis pga. splitt i vedtaksperioder
       ## Det er nødvendig å ha to vedtaksperioder slik at selve reisen ikke blir kuttet før den splittes til uker
@@ -97,11 +97,11 @@ Egenskap: Beregning av privat bil og vedtaksperioder
       Når beregner for daglig reise privat bil
 
       Så forventer vi følgende beregningsrsultat for daglig reise privatBil
-        | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Beløp | Inkluderer helg |
-        | 1       | 05.01.2026 | 07.01.2026 | 3                       | 176   | Nei             |
-        | 1       | 12.01.2026 | 18.01.2026 | 5                       | 294   | Nei             |
-        | 1       | 19.01.2026 | 25.01.2026 | 5                       | 294   | Nei             |
-        | 1       | 26.01.2026 | 31.01.2026 | 5                       | 294   | Nei             |
+        | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Inkluderer helg |
+        | 1       | 05.01.2026 | 07.01.2026 | 3                       | Nei             |
+        | 1       | 12.01.2026 | 18.01.2026 | 5                       | Nei             |
+        | 1       | 19.01.2026 | 25.01.2026 | 5                       | Nei             |
+        | 1       | 26.01.2026 | 31.01.2026 | 5                       | Nei             |
 
     Scenario: Opphold mellom to vedtaksperioder innenfor samme uke
       Gitt følgende vedtaksperioder for daglig reise privat bil

@@ -22,12 +22,15 @@ class PrivatBilBeregningService {
     fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkår: List<VilkårDagligReise>,
-    ): BeregningsresultatPrivatBil {
+    ): BeregningsresultatPrivatBil? {
         val reiseInformasjon = oppfylteVilkår.map { it.tilReiseMedPrivatBil() }
 
-        val resultatForReiser = reiseInformasjon.mapNotNull {
-            beregnForReise(it, vedtaksperioder)
-        }
+        val resultatForReiser =
+            reiseInformasjon.mapNotNull {
+                beregnForReise(it, vedtaksperioder)
+            }
+
+        if (resultatForReiser.isEmpty()) return null
 
         return BeregningsresultatPrivatBil(
             reiser = resultatForReiser,
@@ -69,30 +72,20 @@ class PrivatBilBeregningService {
                 uke = uke,
                 reisedagerPerUke = grunnlagForReise.reisedagerPerUke,
                 vedtaksperioder = vedtaksperioder,
+                grunnlagForReise = grunnlagForReise,
             ) ?: return null
 
         return BeregningsresultatForUke(
             grunnlag = grunnlagForUke,
-            maksBeløpSomKanDekkesFørParkering = beregnStønadsbeløp(grunnlagForReise = grunnlagForReise, grunnlagForUke = grunnlagForUke),
+            maksBeløpSomKanDekkesFørParkering = beregnMaksbeløp(grunnlagForUke = grunnlagForUke),
         )
     }
 
-    private fun beregnStønadsbeløp(
-        grunnlagForReise: BeregningsgrunnlagForReiseMedPrivatBil,
-        grunnlagForUke: BeregningsgrunnlagForUke,
-    ): Int {
-        val kostnadKjøring =
-            grunnlagForReise.reiseavstandEnVei
-                .multiply(BigDecimal.valueOf(2))
-                .multiply(grunnlagForUke.kilometersats)
-                .multiply(grunnlagForUke.maksAntallDagerSomKanDekkes.toBigDecimal())
-
-        val sumEkstrakostnader = grunnlagForReise.ekstrakostnader.beregnTotalEkstrakostnadForEnDag().toBigDecimal()
-
-        val totaltBeløp = listOfNotNull(kostnadKjøring, sumEkstrakostnader).sumOf { it }
-
-        return totaltBeløp.setScale(0, RoundingMode.HALF_UP).toInt()
-    }
+    private fun beregnMaksbeløp(grunnlagForUke: BeregningsgrunnlagForUke) =
+        grunnlagForUke.dagsatsUtenParkering
+            .multiply(grunnlagForUke.maksAntallDagerSomKanDekkes.toBigDecimal())
+            .setScale(0, RoundingMode.HALF_UP)
+            .toInt()
 
     private fun lagBeregningsgrunnlagForReise(reise: ReiseMedPrivatBil): BeregningsgrunnlagForReiseMedPrivatBil =
         BeregningsgrunnlagForReiseMedPrivatBil(
@@ -111,6 +104,7 @@ class PrivatBilBeregningService {
         uke: Datoperiode,
         reisedagerPerUke: Int,
         vedtaksperioder: List<Vedtaksperiode>,
+        grunnlagForReise: BeregningsgrunnlagForReiseMedPrivatBil,
     ): BeregningsgrunnlagForUke? {
         val relevantVedtaksperiode = finnRelevantVedtaksperiodeForUke(uke, vedtaksperioder) ?: return null
 
@@ -118,13 +112,34 @@ class PrivatBilBeregningService {
 
         val (antallDager, antallDagerInkludererHelg) = finnAntallDagerSomDekkes(justertUkeMedAntallDager, reisedagerPerUke)
 
+        val kilometersats = finnRelevantKilometerSats(periode = justertUkeMedAntallDager)
+
         return BeregningsgrunnlagForUke(
             fom = justertUkeMedAntallDager.fom,
             tom = justertUkeMedAntallDager.tom,
             maksAntallDagerSomKanDekkes = antallDager,
             antallDagerInkludererHelg = antallDagerInkludererHelg,
             vedtaksperioder = listOf(relevantVedtaksperiode),
-            kilometersats = finnRelevantKilometerSats(periode = justertUkeMedAntallDager),
+            kilometersats = kilometersats,
+            dagsatsUtenParkering =
+                beregnDagsatsUtenParkering(
+                    kilometersats = kilometersats,
+                    grunnlagForReise = grunnlagForReise,
+                ),
         )
+    }
+
+    private fun beregnDagsatsUtenParkering(
+        grunnlagForReise: BeregningsgrunnlagForReiseMedPrivatBil,
+        kilometersats: BigDecimal,
+    ): BigDecimal {
+        val kostnadKjøring =
+            grunnlagForReise.reiseavstandEnVei
+                .multiply(BigDecimal.valueOf(2))
+                .multiply(kilometersats)
+
+        val sumEkstrakostnader = grunnlagForReise.ekstrakostnader.beregnTotalEkstrakostnadForEnDag()
+
+        return kostnadKjøring + sumEkstrakostnader
     }
 }

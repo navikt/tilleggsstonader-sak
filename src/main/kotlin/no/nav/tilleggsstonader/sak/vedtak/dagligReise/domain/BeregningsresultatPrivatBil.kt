@@ -43,6 +43,7 @@ data class BeregningsgrunnlagForUke(
     val antallDagerInkludererHelg: Boolean,
     val vedtaksperioder: List<Vedtaksperiode>,
     val kilometersats: BigDecimal,
+    val dagsatsUtenParkering: BigDecimal,
 ) : Periode<LocalDate>
 
 // TODO: Finn ut om det finnes abbonnement på disse prisene og om det påvirker hvordan vi vil løse dette
@@ -50,10 +51,12 @@ data class Ekstrakostnader(
     val bompengerEnVei: Int?,
     val fergekostnadEnVei: Int?,
 ) {
-    fun beregnTotalEkstrakostnadForEnDag(): Int {
+    fun beregnTotalEkstrakostnadForEnDag(): BigDecimal {
         val bompengerEnDag = bompengerEnVei?.times(2) ?: 0
         val fergekostnadEnDag = fergekostnadEnVei?.times(2) ?: 0
 
-        return bompengerEnDag + fergekostnadEnDag
+        val sum = bompengerEnDag + fergekostnadEnDag
+
+        return sum.toBigDecimal()
     }
 }

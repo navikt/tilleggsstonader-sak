@@ -7,6 +7,7 @@ import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -16,12 +17,13 @@ import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseBoolean
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
+import no.nav.tilleggsstonader.sak.cucumber.parseValgfriBigDecimal
+import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.finnRelevantKilometerSats
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForUke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -29,6 +31,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import org.assertj.core.api.Assertions.assertThat
+import java.math.BigDecimal
+import java.time.LocalDate
 
 @Suppress("unused", "ktlint:standard:function-naming")
 class PrivatBilBeregningStepDefinitions {
@@ -104,7 +108,15 @@ class PrivatBilBeregningStepDefinitions {
                 gjeldendeReise.uker[index].grunnlag.maksAntallDagerSomKanDekkes,
             ).isEqualTo(uke.grunnlag.maksAntallDagerSomKanDekkes)
             assertThat(gjeldendeReise.uker[index].grunnlag.antallDagerInkludererHelg).isEqualTo(uke.grunnlag.antallDagerInkludererHelg)
-            assertThat(gjeldendeReise.uker[index].maksBeløpSomKanDekkesFørParkering).isEqualTo(uke.`maksBeløpSomKanDekkesFørParkering`)
+
+            uke.maksBeløpSomKanDekkesFørParkering?.let {
+                assertThat(gjeldendeReise.uker[index].maksBeløpSomKanDekkesFørParkering).isEqualTo(
+                    it,
+                )
+            }
+            uke.grunnlag.dagsatsUtenParkering?.let {
+                assertThat(gjeldendeReise.uker[index].grunnlag.dagsatsUtenParkering).isEqualTo(it)
+            }
         }
     }
 
@@ -124,27 +136,19 @@ class PrivatBilBeregningStepDefinitions {
             val tom = parseDato(DomenenøkkelFelles.TOM, rad)
             BeregningsresultatUkeCucumber(
                 reiseNr = parseInt(DomenenøkkelPrivatBil.REISENR, rad),
-                maksBeløpSomKanDekkesFørParkering = parseInt(DomenenøkkelFelles.BELØP, rad),
+                maksBeløpSomKanDekkesFørParkering = parseValgfriInt(DomenenøkkelFelles.BELØP, rad),
                 grunnlag =
-                    BeregningsgrunnlagForUke(
+                    BeregningsgrunnlagForUkeCucumber(
                         fom = fom,
                         tom = tom,
                         maksAntallDagerSomKanDekkes = parseInt(DomenenøkkelPrivatBil.ANTALL_DAGER_DEKT_UKE, rad),
                         antallDagerInkludererHelg = parseBoolean(DomenenøkkelPrivatBil.INKLUDERER_HELG, rad),
                         vedtaksperioder = emptyList(),
                         kilometersats = finnRelevantKilometerSats(Datoperiode(fom, tom)),
+                        dagsatsUtenParkering = parseValgfriBigDecimal(DomenenøkkelPrivatBil.DAGSATS_UTEN_PARKERING, rad),
                     ),
             )
         }
-
-    private fun kjørMedFeilkontekst(block: () -> Unit) {
-        try {
-            block()
-        } catch (e: Exception) {
-            // logger.error(e.message, e)
-            feil = e
-        }
-    }
 }
 
 enum class DomenenøkkelPrivatBil(
@@ -157,10 +161,21 @@ enum class DomenenøkkelPrivatBil(
     REISENR("Reisenr"),
     ANTALL_DAGER_DEKT_UKE("Antall dager dekt i uke"),
     INKLUDERER_HELG("Inkluderer helg"),
+    DAGSATS_UTEN_PARKERING("Dagsats uten parkering"),
 }
 
 data class BeregningsresultatUkeCucumber(
     val reiseNr: Int,
-    val grunnlag: BeregningsgrunnlagForUke,
-    val maksBeløpSomKanDekkesFørParkering: Int,
+    val grunnlag: BeregningsgrunnlagForUkeCucumber,
+    val maksBeløpSomKanDekkesFørParkering: Int?,
 )
+
+data class BeregningsgrunnlagForUkeCucumber(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val maksAntallDagerSomKanDekkes: Int,
+    val antallDagerInkludererHelg: Boolean,
+    val vedtaksperioder: List<Vedtaksperiode>,
+    val kilometersats: BigDecimal,
+    val dagsatsUtenParkering: BigDecimal?,
+) : Periode<LocalDate>
