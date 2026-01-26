@@ -41,9 +41,7 @@ class PrivatBilBeregningService {
         reise: ReiseMedPrivatBil,
         vedtaksperioder: List<Vedtaksperiode>,
     ): BeregningsresultatForReiseMedPrivatBil? {
-        val (_, justertReise) = finnSnittMellomReiseOgVedtaksperioder(reise, vedtaksperioder)
-
-        if (justertReise == null) return null
+        val justertReise = finnSnittMellomReiseOgVedtaksperioder(reise, vedtaksperioder).justertReiseperiode ?: return null
 
         val grunnlagForReise = lagBeregningsgrunnlagForReise(justertReise)
 
