@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
@@ -158,10 +159,30 @@ class DagligReiseBeregnYtelseSteg(
 
         tilkjentYtelseService.lagreTilkjentYtelse(
             behandlingId = saksbehandling.id,
-            andeler =
-                beregningsresultat.offentligTransport?.mapTilAndelTilkjentYtelse(saksbehandling)
-                    ?: feil("Mangler beregningsresultat for offentlig transport"),
+            andeler = lagAndeler(beregningsresultat, saksbehandling),
         )
+    }
+
+    private fun lagAndeler(
+        beregningsresultatDagligReise: BeregningsresultatDagligReise,
+        saksbehandling: Saksbehandling,
+    ): List<AndelTilkjentYtelse> {
+        val andeler = mutableListOf<AndelTilkjentYtelse>()
+
+        beregningsresultatDagligReise.offentligTransport
+            ?.mapTilAndelTilkjentYtelse(saksbehandling)
+            ?.let { andeler += it }
+
+        // TODO legg til når privatbil er merget inn
+//        beregningsresultatDagligReise.privatBil
+//            ?.mapTilAndelTilkjentYtelse(saksbehandling)
+//            ?.let { andeler += it }
+
+        if (andeler.isEmpty()) {
+            feil("Mangler beregningsresultat for daglig reise")
+        }
+
+        return andeler
     }
 
     private fun lagreOpphørsvedtak(
