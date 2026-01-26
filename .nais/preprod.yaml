@@ -60,8 +60,6 @@ spec:
               - name: datastream # ekstra databasebruker
   kafka:
     pool: nav-dev
-  secureLogs:
-    enabled: true
   azure:
     sidecar:
       enabled: true

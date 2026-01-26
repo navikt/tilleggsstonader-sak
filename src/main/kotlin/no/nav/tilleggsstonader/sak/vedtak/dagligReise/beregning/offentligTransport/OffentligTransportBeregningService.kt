@@ -19,16 +19,20 @@ class OffentligTransportBeregningService {
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkår: List<VilkårDagligReise>,
         brukersNavKontor: String?,
-    ): BeregningsresultatOffentligTransport {
+    ): BeregningsresultatOffentligTransport? {
         val utgifter =
             oppfylteVilkår
                 .map { it.tilUtgiftOffentligTransport() }
 
+        val resultatForReiser =
+            utgifter.mapNotNull { reise ->
+                beregnForReise(reise, vedtaksperioder, brukersNavKontor)
+            }
+
+        if (resultatForReiser.isEmpty()) return null
+
         return BeregningsresultatOffentligTransport(
-            reiser =
-                utgifter.mapNotNull { reise ->
-                    beregnForReise(reise, vedtaksperioder, brukersNavKontor)
-                },
+            reiser = resultatForReiser,
         )
     }
 
