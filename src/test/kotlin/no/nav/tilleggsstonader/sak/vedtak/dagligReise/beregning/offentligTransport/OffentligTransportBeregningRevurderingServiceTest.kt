@@ -157,7 +157,8 @@ class OffentligTransportBeregningRevurderingServiceTest : CleanDatabaseIntegrati
                 Stønadstype.DAGLIG_REISE_TSO,
                 revurderingId,
             ).expectOkWithBody<InnvilgelseDagligReiseResponse>()
-            .beregningsresultat.offentligTransport!!
+            .beregningsresultat
+            ?.offentligTransport!!
             .reiser
 
     private fun gjennomførEnFørstegangsbehandling(
