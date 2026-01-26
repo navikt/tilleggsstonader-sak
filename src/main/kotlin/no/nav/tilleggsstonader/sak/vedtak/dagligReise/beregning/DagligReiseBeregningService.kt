@@ -76,8 +76,8 @@ class DagligReiseBeregningService(
                 vedtaksperioder = vedtaksperioder,
                 oppfylteVilkår = oppfylteVilkårOffentligTransport,
                 brukersNavKontor = brukersNavKontor,
-            ).flettMedForrigeVedtakHvisRevurdering(behandling, tidligsteEndring)
-            .sorterReiserOgPerioder()
+            )?.flettMedForrigeVedtakHvisRevurdering(behandling, tidligsteEndring)
+            ?.sorterReiserOgPerioder()
     }
 
     private fun BeregningsresultatOffentligTransport.flettMedForrigeVedtakHvisRevurdering(
