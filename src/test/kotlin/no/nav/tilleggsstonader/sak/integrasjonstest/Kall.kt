@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.BehandlingKa
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.BrevKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.GjenopprettOppgaveKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.JournalpostKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.KartKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.PersonKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.SatsjusteringKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.SettPåVentKall
@@ -27,6 +28,7 @@ class Kall(
     val brev = BrevKall(testklient)
     val gjenopprettOppgave = GjenopprettOppgaveKall(testklient)
     val journalpost = JournalpostKall(testklient)
+    val kart = KartKall(testklient)
     val person = PersonKall(testklient)
     val satsjustering = SatsjusteringKall(testklient)
     val settPaVent = SettPåVentKall(testklient)
