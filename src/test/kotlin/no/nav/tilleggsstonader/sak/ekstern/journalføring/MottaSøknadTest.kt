@@ -242,6 +242,32 @@ class MottaSøknadTest : CleanDatabaseIntegrationTest() {
         assertThat(oppgave.mappeId).isNull()
     }
 
+    @Test
+    fun `mottar journalpost som er ferdigstilt, lager task men behandler ikke`() {
+        val hendelse = journalfoeringHendelseRecord()
+
+        journalhendelseKafkaListener.listen(
+            ConsumerRecordUtil.lagConsumerRecord("key", hendelse),
+            mockk<Acknowledgment>(relaxed = true),
+        )
+
+        assertThat(hendelseRepository.findByTypeAndId(TypeHendelse.JOURNALPOST, hendelse.hendelsesId)).isNotNull
+
+        val journalpost =
+            journalpost(
+                journalpostId = journalpostId.toString(),
+                journalposttype = Journalposttype.I,
+                dokumenter = emptyList(),
+                kanal = hendelse.mottaksKanal,
+                bruker = Bruker(ident, BrukerIdType.FNR),
+                journalstatus = Journalstatus.FERDIGSTILT,
+            )
+        opprettJournalpost(journalpost)
+        kjørTasksKlareForProsesseringTilIngenTasksIgjen()
+
+        verify(exactly = 0) { oppgaveClient.opprettOppgave(any()) }
+    }
+
     private fun journalfoeringHendelseRecord(
         journalpostId: Long = this.journalpostId,
         mottaksKanal: String = "NAV_NO",

@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.hendelser.journalføring
 
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
+import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.BARNETILSYN
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.BOUTGIFTER
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.DAGLIG_REISE
@@ -38,15 +39,26 @@ class JournalhendelseKafkaHåndtererService(
         }
         // Trenger ikke å logge andre journalposter av typen utgående eller notat
 
-        // Teller antall mottatte journalposter per brevkode
-        journalpostMottattMetrikker.journalpostMottatt(journalpost)
+        // Teller antall mottatte journalposter per brevkode. Ignorerer evt ferdigstilte
+        if (!journalpost.erFerdigstilt()) {
+            journalpostMottattMetrikker.journalpostMottatt(journalpost)
+        }
     }
 
     private fun Journalpost.kanBehandles() =
         Tema.gjelderTemaTilleggsstønader(this.tema) &&
             this.erInnkommende() &&
             this.gjelderKanalSkanningEllerNavNo() &&
-            this.dokumentBrevkode() in listOf(BARNETILSYN, LÆREMIDLER, BOUTGIFTER, DAGLIG_REISE)
+            this.dokumentBrevkode() in listOf(BARNETILSYN, LÆREMIDLER, BOUTGIFTER, DAGLIG_REISE) &&
+            !this.erFerdigstilt()
+
+    /*
+     Kan komme inn ferdigstilte journalposter om man har endret sakstilknytning på et allerede journalført dokument.
+     Kommer i så fall to hendelser "JournalpostMottatt" og deretter "EndeligJournalført" rett etter hverandre,
+     dette fordi man ikke kan endre en ferdigstilt journalpost og man da kopierer den originale som en ny en
+     */
+    private fun Journalpost.erFerdigstilt() =
+        this.journalstatus == Journalstatus.FERDIGSTILT || this.journalstatus == Journalstatus.JOURNALFOERT
 
     private fun logSkalBehandles(
         journalpost: Journalpost,
