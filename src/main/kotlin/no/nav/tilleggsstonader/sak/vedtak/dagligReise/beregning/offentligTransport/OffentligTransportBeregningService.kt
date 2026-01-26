@@ -24,9 +24,10 @@ class OffentligTransportBeregningService {
             oppfylteVilkår
                 .map { it.tilUtgiftOffentligTransport() }
 
-        val resultatForReiser = utgifter.mapNotNull { reise ->
-            beregnForReise(reise, vedtaksperioder, brukersNavKontor)
-        }
+        val resultatForReiser =
+            utgifter.mapNotNull { reise ->
+                beregnForReise(reise, vedtaksperioder, brukersNavKontor)
+            }
 
         if (resultatForReiser.isEmpty()) return null
 
