@@ -1,12 +1,8 @@
 package no.nav.tilleggsstonader.sak.googlemaps
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.sak.googlemaps.autocompleteApi.AutocompleteRequest
-import no.nav.tilleggsstonader.sak.googlemaps.autocompleteApi.GoogleAutocompleteClient
 import no.nav.tilleggsstonader.sak.googlemaps.dto.FinnReiseavstandDto
-import no.nav.tilleggsstonader.sak.googlemaps.dto.HentForslagDto
 import no.nav.tilleggsstonader.sak.googlemaps.dto.ReisedataDto
-import no.nav.tilleggsstonader.sak.googlemaps.dto.tilDto
 import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Address
 import no.nav.tilleggsstonader.sak.googlemaps.staticMapApi.GoogleStaticMapClient
 import no.nav.tilleggsstonader.sak.googlemaps.staticMapApi.StatiskKartRequest
@@ -19,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping(path = ["/api/kart"])
 @ProtectedWithClaims(issuer = "azuread")
 class GooglemapsController(
-    private val googleAutocompleteClient: GoogleAutocompleteClient,
     private val staticMapClient: GoogleStaticMapClient,
     private val googlemapsService: GooglemapsService,
 ) {
@@ -46,17 +41,4 @@ class GooglemapsController(
     fun hentStatiskKart(
         @RequestBody statiskKartRequest: StatiskKartRequest,
     ): ByteArray? = staticMapClient.hentStaticMap(statiskKartRequest)
-
-    @PostMapping("/autocomplete")
-    fun hentForslag(
-        @RequestBody hentForslagDto: HentForslagDto,
-    ) = googleAutocompleteClient
-        .hentForslag(
-            AutocompleteRequest(
-                input = hentForslagDto.input,
-                includedRegionCodes = listOf("no"),
-                languageCode = "no",
-                regionCode = "no",
-            ),
-        )?.tilDto()
 }

@@ -202,8 +202,6 @@ google:
     uri: https://routes.googleapis.com/directions/v2:computeRoutes
   static-map:
     uri: https://maps.googleapis.com/maps/api/staticmap
-  autocomplete:
-    uri: https://places.googleapis.com/v1/places:autocomplete
   place-details:
     uri: https://places.googleapis.com/v1
   embedded-map:
