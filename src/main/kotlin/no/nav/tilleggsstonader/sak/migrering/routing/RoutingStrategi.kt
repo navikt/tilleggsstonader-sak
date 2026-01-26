@@ -23,7 +23,7 @@ fun bestemRoutingStrategi(skjematype: Skjematype): RoutingStrategi =
         Skjematype.SØKNAD_DAGLIG_REISE ->
             RoutingStrategi.SendEnkelteBrukereTilNyLøsning(
                 featureToggleMaksAntallForStønad = Toggle.SØKNAD_ROUTING_DAGLIG_REISE,
-                kreverAtSøkerErUtenAktivtVedtakIArena = false,
+                kreverAtSøkerErUtenAktivtVedtakIArena = true,
                 kreverAktivtAapVedtak = false,
                 kreverUgradertAdresse = true,
             )

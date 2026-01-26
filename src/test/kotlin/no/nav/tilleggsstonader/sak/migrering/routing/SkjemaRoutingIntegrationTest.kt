@@ -94,6 +94,17 @@ class SkjemaRoutingIntegrationTest(
         }
 
         @Test
+        fun `skal route til gammel løsning hvis person har aktivt vedtak i Arena`() {
+            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
+            mockDagligReiseVedtakIArena(erAktivt = true)
+
+            val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
+
+            assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
+            assertThat(routingHarBlittLagret()).isFalse()
+        }
+
+        @Test
         fun `skal route til gammel løsning hvis person har AAP men fortrolig adresse`() {
             mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
             mockAapVedtak(erAktivt = true)
