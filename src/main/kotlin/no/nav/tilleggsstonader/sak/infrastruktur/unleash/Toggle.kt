@@ -19,7 +19,6 @@ enum class Toggle(
     KAN_SAKSBEHANDLE_DAGLIG_REISE_TSR("sak.frontend.kan-saksbehandle.daglig-reise-tsr"),
 
     SØKNAD_ROUTING_DAGLIG_REISE("sak.soknad-routing.daglig-reise"),
-    SØKNAD_ROUTING_DAGLIG_REISE_TSR("sak.soknad-routing.daglig-reise-tsr"),
 
     OPPRETT_OPPGAVE_TILBAKEKREVING("sak.opprett-oppgave-tilbakekreving"),
 

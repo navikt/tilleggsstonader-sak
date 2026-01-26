@@ -72,18 +72,9 @@ class SkjemaRoutingService(
             lagreRouting(ident, skjematype, mapOf("harAktivAAP" to true))
             return true
         }
-        if (kontekst.skalBegrenseAntallTilTsr &&
-            harAktivtTsrMålgruppe(ident) &&
-            !erMaksAntallNåddForTsr(
-                skjematype,
-                toggleId = kontekst.featureToggleMaksAntallForTsr,
-            )
-        ) {
-            lagreRouting(ident, skjematype, mapOf("harAktivTsrMålgruppe" to true))
-            return true
-        }
 
-        return false
+        lagreRouting(ident, skjematype, mapOf("skalTilNyLøsning" to true))
+        return true
     }
 
     private fun harFortroligEllerStrengtFortroligAdresse(ident: String): Boolean =
