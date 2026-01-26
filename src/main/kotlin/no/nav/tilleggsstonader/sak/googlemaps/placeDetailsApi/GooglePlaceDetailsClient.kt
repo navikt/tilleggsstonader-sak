@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
-import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
 
 @Service
@@ -15,16 +14,10 @@ class GooglePlaceDetailsClient(
 ) {
     private val restClient = builder.baseUrl(baseUrl.toString()).build()
 
-    fun finnStedDetaljer(stedId: String): PlaceDetailsResponse? {
-        val uri =
-            UriComponentsBuilder
-                .fromUri(baseUrl)
-                .pathSegment(stedId)
-                .encode()
-                .toUriString()
-        return restClient
+    fun finnStedDetaljer(stedId: String): PlaceDetailsResponse? =
+        restClient
             .get()
-            .uri(uri)
+            .uri("/places/{placesId}", stedId)
             .headers { headers ->
                 headers.apply {
                     add("X-Goog-Api-Key", apiKey)
@@ -33,5 +26,4 @@ class GooglePlaceDetailsClient(
                 }
             }.retrieve()
             .body<PlaceDetailsResponse>()
-    }
 }

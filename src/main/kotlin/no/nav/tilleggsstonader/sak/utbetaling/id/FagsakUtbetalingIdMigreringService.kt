@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.MigrerUtbetalingDto
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingId
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -38,6 +39,8 @@ class FagsakUtbetalingIdMigreringService(
             val typeAndelerPåFagsaken =
                 andelTilkjentYtelseListe?.let { it.map { andelTilkjentYtelse -> andelTilkjentYtelse.type } }?.toSet()
                     ?: emptySet()
+
+            logger.info("Migrerer typeAndeler: {} for fagsak {}", typeAndelerPåFagsaken, fagsakId)
 
             typeAndelerPåFagsaken.forEach { typeAndel ->
                 if (sisteIverksatteBehandling != null && skalMigrereTilKafka(fagsakId, typeAndel)) {
@@ -90,4 +93,8 @@ class FagsakUtbetalingIdMigreringService(
             ?.iverksettingId
             ?.toString()
             ?: error("Fant ingen iverksetting for behandling $sisteIverksatteBehandlingId")
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(FagsakUtbetalingIdMigreringService::class.java)
+    }
 }

@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfVurderinger
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.HarUtgifterVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.LønnetVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MedlemskapVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
@@ -109,6 +110,11 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
         faktaOgVurdering.vurderinger.takeIfVurderinger<MedlemskapVurdering>()?.let {
             brukerfeilHvis(it.medlemskap.svar?.harVurdert() == true) {
                 "Mangler begrunnelse for vurdering av medlemskap"
+            }
+        }
+        faktaOgVurdering.vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.let {
+            brukerfeilHvis(it.harUtgifter.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT) {
+                "Mangler begrunnelse for vurdering av om bruker har utgifter"
             }
         }
     }
