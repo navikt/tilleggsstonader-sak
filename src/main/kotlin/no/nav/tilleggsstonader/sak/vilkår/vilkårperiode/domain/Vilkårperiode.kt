@@ -114,7 +114,7 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
         }
         faktaOgVurdering.vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.let {
             brukerfeilHvis(it.harUtgifter.resultat == ResultatDelvilkårperiode.IKKE_OPPFYLT) {
-                "Mangler begrunnelse for vurdering av har utgifter"
+                "Mangler begrunnelse for vurdering av om bruker har utgifter"
             }
         }
     }

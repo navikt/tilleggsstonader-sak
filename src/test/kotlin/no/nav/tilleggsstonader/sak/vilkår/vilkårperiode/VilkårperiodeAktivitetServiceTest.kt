@@ -168,7 +168,7 @@ class VilkårperiodeAktivitetServiceTest : CleanDatabaseIntegrationTest() {
                         faktaOgSvar = faktaOgSvar,
                     ),
                 )
-            }.hasMessageContaining("Mangler begrunnelse for vurdering av har utgifter")
+            }.hasMessageContaining("Mangler begrunnelse for vurdering av om bruker har utgifter")
         }
 
         @Test
