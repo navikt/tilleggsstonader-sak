@@ -205,7 +205,7 @@ google:
   autocomplete:
     uri: https://places.googleapis.com/v1/places:autocomplete
   place-details:
-    uri: https://places.googleapis.com/v1/places/
+    uri: https://places.googleapis.com/v1
   embedded-map:
     uri: https://www.google.com/maps/embed/v1/directions
 
