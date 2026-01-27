@@ -10,7 +10,7 @@ import org.jboss.logging.MDC
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
-const val journalpostId = "journalpostId"
+const val JOURNALPOST_ID = "journalpostId"
 
 @Service
 @TaskStepBeskrivelse(
@@ -28,11 +28,11 @@ class JournalhendelseKafkaHåndtererTask(
     override fun doTask(task: Task) {
         val hendelse = objectMapper.readValue<JournalhendelseTaskData>(task.payload)
         try {
-            MDC.put(journalpostId, hendelse.journalpostId)
+            MDC.put(JOURNALPOST_ID, hendelse.journalpostId)
             logger.info("Behandler mottatt journalpost {}", hendelse.journalpostId)
             journalhendelseKafkaHåndtererService.behandleJournalhendelse(journalpostId = hendelse.journalpostId)
         } finally {
-            MDC.remove(journalpostId)
+            MDC.remove(JOURNALPOST_ID)
         }
     }
 
