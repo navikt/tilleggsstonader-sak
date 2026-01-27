@@ -35,7 +35,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.StønadUtbetali
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
@@ -417,7 +416,7 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
             .allMatch { it.statusIverksetting == StatusIverksetting.OK }
     }
 
-    @Disabled
+    //    @Disabled
     @Test
     fun `fagsaker iverksatt gjennom rest, kjører migrering, opprettes utbetalingId på alle saker`() {
         val tilsynBarn =
@@ -447,6 +446,8 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
             assertThat(fagsakUtbetalingIdService.hentUtbetalingIderForFagsakId(it)).isEmpty()
         }
 
+        every { unleashService.isEnabled(Toggle.SKAL_MIGRERE_UTBETALING_MOT_KAFKA) } returns true
+
         medBrukercontext(
             roller = listOf(rolleConfig.utvikler),
         ) {
@@ -458,6 +459,8 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
                 .expectStatus()
                 .isOk
         }
+
+        kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 
         fagsakIder.forEach {
             assertThat(fagsakUtbetalingIdService.hentUtbetalingIderForFagsakId(it)).isNotEmpty()

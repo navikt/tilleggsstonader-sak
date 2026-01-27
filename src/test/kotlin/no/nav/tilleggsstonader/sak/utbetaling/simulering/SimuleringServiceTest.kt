@@ -67,7 +67,7 @@ internal class SimuleringServiceTest {
         every { tilgangService.harTilgangTilRolle(any()) } returns true
         every { iverksettService.finnForrigeIverksetting(any(), any()) } returns null
         every { iverksettService.utbetalingSkalSendesPåKafka(any(), any(), any(), any()) } returns false
-        every { fagsakUtbetalingIdMigreringService.migrerForFagsak(any()) } just Runs
+        every { fagsakUtbetalingIdMigreringService.migrerForFagsak(any()) } returns true
     }
 
     @Test
