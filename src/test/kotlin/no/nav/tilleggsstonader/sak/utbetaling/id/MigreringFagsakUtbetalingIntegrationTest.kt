@@ -35,6 +35,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.StønadUtbetali
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
@@ -411,6 +412,30 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
         kjørAlleTaskMedSenererTriggertid()
         assertThat(tilkjentYtelseRepository.findByBehandlingId(behandlingId)!!.andelerTilkjentYtelse)
             .allMatch { it.statusIverksetting == StatusIverksetting.OK }
+    }
+
+    @Disabled
+    @Test
+    fun `fagsaker iverksatt gjennom rest, kjører migrering, opprettes utbetalingId på alle saker`() {
+        val tilsynBarn =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.BARNETILSYN,
+            ) {
+                defaultTilsynBarnTestdata()
+            }
+
+        val læremidler =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.LÆREMIDLER,
+            ) {
+                defaultLæremidlerTestdata()
+            }
+        val boutgifter =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.BOUTGIFTER,
+            ) {
+                defaultBoutgifterTestdata()
+            }
     }
 
     private fun opprettFørstegangsbehandling(

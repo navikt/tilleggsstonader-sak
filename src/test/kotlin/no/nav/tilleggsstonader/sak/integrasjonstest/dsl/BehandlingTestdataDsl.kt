@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.integrasjonstest.dsl
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.sak.util.toYearMonth
 import java.time.LocalDate
 
 @BehandlingTestdataDslMarker
@@ -31,10 +32,13 @@ class BehandlingTestdataDsl internal constructor() {
         fun build(block: BehandlingTestdataDsl.() -> Unit): BehandlingTestdataDsl = BehandlingTestdataDsl().apply(block)
     }
 
+    private val defaultFom = 1 januar 2026
+    private val defaultTom = 31 januar 2026
+
     // Hjelpefunksjoner for å sette opp testdata f.eks. for en gitt stønadstype
     fun defaultDagligReiseTsoTestdata(
-        fom: LocalDate = 1 januar 2026,
-        tom: LocalDate = 31 januar 2026,
+        fom: LocalDate = defaultFom,
+        tom: LocalDate = defaultTom,
     ) {
         aktivitet {
             opprett {
@@ -54,8 +58,8 @@ class BehandlingTestdataDsl internal constructor() {
     }
 
     fun defaultDagligReiseTsrTestdata(
-        fom: LocalDate = 1 januar 2026,
-        tom: LocalDate = 31 januar 2026,
+        fom: LocalDate = defaultFom,
+        tom: LocalDate = defaultTom,
     ) {
         aktivitet {
             opprett {
@@ -74,6 +78,72 @@ class BehandlingTestdataDsl internal constructor() {
         vilkår {
             opprett {
                 offentligTransport(fom = fom, tom = tom)
+            }
+        }
+    }
+
+    fun defaultTilsynBarnTestdata(
+        fom: LocalDate = defaultFom,
+        tom: LocalDate = defaultTom,
+    ) {
+        aktivitet {
+            opprett {
+                aktivitetTiltakTilsynBarn(
+                    fom = fom,
+                    tom = tom,
+                    aktivitetsdager = 4,
+                )
+            }
+        }
+        målgruppe {
+            opprett {
+                målgruppeAAP(fom, tom)
+            }
+        }
+        vilkår {
+            opprett {
+                passBarn(
+                    fom = fom.toYearMonth(),
+                    tom = tom.toYearMonth(),
+                    utgift = 1000,
+                )
+            }
+        }
+    }
+
+    fun defaultLæremidlerTestdata(
+        fom: LocalDate = defaultFom,
+        tom: LocalDate = defaultTom,
+    ) {
+        aktivitet {
+            opprett {
+                aktivitetUtdanningLæremidler(fom, tom)
+            }
+        }
+        målgruppe {
+            opprett {
+                målgruppeAAP(fom, tom)
+            }
+        }
+    }
+
+    fun defaultBoutgifterTestdata(
+        fom: LocalDate = defaultFom,
+        tom: LocalDate = defaultTom,
+    ) {
+        aktivitet {
+            opprett {
+                aktivitetTiltakBoutgifter(fom, tom)
+            }
+        }
+        målgruppe {
+            opprett {
+                målgruppeAAP(fom, tom)
+            }
+        }
+        vilkår {
+            opprett {
+                løpendeutgifterEnBolig(fom, tom)
             }
         }
     }
