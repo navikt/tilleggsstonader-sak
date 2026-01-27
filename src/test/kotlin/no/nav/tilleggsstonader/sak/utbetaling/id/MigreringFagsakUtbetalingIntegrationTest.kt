@@ -46,6 +46,9 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
     lateinit var fagsakUtbetalingIdService: FagsakUtbetalingIdService
 
     @Autowired
+    lateinit var fagsakUtbetalingIdMigreringController: FagsakUtbetalingIdMigreringController
+
+    @Autowired
     lateinit var behandlingService: BehandlingService
 
     @Autowired
@@ -436,6 +439,29 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
             ) {
                 defaultBoutgifterTestdata()
             }
+
+        val behandlingIder = listOf(tilsynBarn, læremidler, boutgifter)
+        val fagsakIder = behandlingIder.map { testoppsettService.hentSaksbehandling(it).fagsakId }
+
+        fagsakIder.forEach {
+            assertThat(fagsakUtbetalingIdService.hentUtbetalingIderForFagsakId(it)).isEmpty()
+        }
+
+        medBrukercontext(
+            roller = listOf(rolleConfig.utvikler),
+        ) {
+            webTestClient
+                .post()
+                .uri("/api/forvaltning/migrer-utbetalinger")
+                .medOnBehalfOfToken()
+                .exchange()
+                .expectStatus()
+                .isOk
+        }
+
+        fagsakIder.forEach {
+            assertThat(fagsakUtbetalingIdService.hentUtbetalingIderForFagsakId(it)).isNotEmpty()
+        }
     }
 
     private fun opprettFørstegangsbehandling(
