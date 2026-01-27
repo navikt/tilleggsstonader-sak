@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingId
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class FagsakUtbetalingIdMigreringService(
@@ -55,14 +54,7 @@ class FagsakUtbetalingIdMigreringService(
     private fun skalMigrereTilKafka(
         fagsakId: FagsakId,
         typeAndel: TypeAndel,
-    ): Boolean =
-        !fagsakUtbetalingIdService.finnesUtbetalingsId(fagsakId, typeAndel) &&
-            typeAndel in
-            listOf(
-                TypeAndel.LÆREMIDLER_AAP,
-                TypeAndel.LÆREMIDLER_ETTERLATTE,
-                TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER,
-            )
+    ): Boolean = !fagsakUtbetalingIdService.finnesUtbetalingsId(fagsakId, typeAndel)
 
     // Returnerer utbetalingId for fagsak og typeAndel
     private fun migrerForFagsakOgTypeAndel(
