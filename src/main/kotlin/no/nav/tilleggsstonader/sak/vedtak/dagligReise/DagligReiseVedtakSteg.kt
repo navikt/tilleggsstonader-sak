@@ -3,39 +3,34 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
-import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
-import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
-import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class DagligReiseVedtakSteg(
     private val beregningService: DagligReiseBeregningService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
-    private val vedtakRepository: VedtakRepository,
     private val tilkjentYtelseService: TilkjentYtelseService,
-    private val simuleringService: SimuleringService,
+    private val opphørValideringService: OpphørValideringService,
+    private val dagligReiseVedtakService: DagligReiseVedtakService,
 ) : BehandlingSteg<VedtakDagligReiseRequest> {
     override fun utførSteg(
         saksbehandling: Saksbehandling,
         data: VedtakDagligReiseRequest,
     ) {
-        nullstillEksisterendeVedtakPåBehandling(saksbehandling)
+        dagligReiseVedtakService.nullstillEksisterendeVedtakPåBehandling(saksbehandling)
         lagreVedtaksresultat(saksbehandling, data)
     }
 
@@ -54,8 +49,8 @@ class DagligReiseVedtakSteg(
     ) {
         when (vedtak) {
             is InnvilgelseDagligReiseRequest -> lagreVedtaksperioderOgBeregn(saksbehandling, vedtak)
-            is AvslagDagligReiseDto -> lagreAvslag(saksbehandling, vedtak)
-            is OpphørDagligReiseRequest -> TODO("Tilpass opphør til ny flyt")
+            is AvslagDagligReiseDto -> dagligReiseVedtakService.lagreAvslag(saksbehandling, vedtak)
+            is OpphørDagligReiseRequest -> beregnOgLagreOpphør(saksbehandling, vedtak)
         }
     }
 
@@ -79,7 +74,7 @@ class DagligReiseVedtakSteg(
                 tidligsteEndring = tidligsteEndring,
             )
 
-        lagreInnvilgetVedtak(
+        dagligReiseVedtakService.lagreInnvilgetVedtak(
             behandling = saksbehandling,
             beregningsresultat = beregningsresultat,
             vedtaksperioder = vedtaksperioder,
@@ -88,45 +83,47 @@ class DagligReiseVedtakSteg(
         )
     }
 
-    private fun lagreAvslag(
+    private fun beregnOgLagreOpphør(
         saksbehandling: Saksbehandling,
-        vedtak: AvslagDagligReiseDto,
+        vedtak: OpphørDagligReiseRequest,
     ) {
-        vedtakRepository.insert(
-            GeneriskVedtak(
-                behandlingId = saksbehandling.id,
-                type = TypeVedtak.AVSLAG,
-                data =
-                    AvslagDagligReise(
-                        årsaker = vedtak.årsakerAvslag,
-                        begrunnelse = vedtak.begrunnelse,
-                    ),
-                gitVersjon = Applikasjonsversjon.versjon,
-                tidligsteEndring = null,
-            ),
-        )
-    }
+        feilHvis(saksbehandling.forrigeIverksatteBehandlingId == null) {
+            "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
+        }
+        feilHvis(vedtak.opphørsdato == null) {
+            "Opphørsdato er ikke satt"
+        }
+        val opphørsdato = vedtak.opphørsdato
+        val forrigeVedtak = dagligReiseVedtakService.hentVedtak(saksbehandling.forrigeIverksatteBehandlingId)
 
-    private fun lagreInnvilgetVedtak(
-        behandling: Saksbehandling,
-        beregningsresultat: BeregningsresultatDagligReise,
-        vedtaksperioder: List<Vedtaksperiode>,
-        begrunnelse: String?,
-        tidligsteEndring: LocalDate?,
-    ) {
-        vedtakRepository.insert(
-            GeneriskVedtak(
-                behandlingId = behandling.id,
-                type = TypeVedtak.INNVILGELSE,
-                data =
-                    InnvilgelseDagligReise(
-                        vedtaksperioder = vedtaksperioder,
-                        begrunnelse = begrunnelse,
-                        beregningsresultat = beregningsresultat,
-                    ),
-                gitVersjon = Applikasjonsversjon.versjon,
-                tidligsteEndring = tidligsteEndring,
-            ),
+        opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
+
+        opphørValideringService.validerVedtaksperioderAvkortetVedOpphør(
+            forrigeBehandlingsVedtaksperioder = forrigeVedtak.data.vedtaksperioder,
+            opphørsdato = opphørsdato,
+        )
+
+        val avkortetVedtaksperioder = dagligReiseVedtakService.avkortVedtaksperiodeVedOpphør(forrigeVedtak, opphørsdato)
+
+        val beregningsresultat =
+            beregningService.beregn(
+                vedtaksperioder = avkortetVedtaksperioder,
+                behandling = saksbehandling,
+                typeVedtak = TypeVedtak.OPPHØR,
+                tidligsteEndring = opphørsdato,
+            )
+        opphørValideringService.validerIngenUtbetalingEtterOpphørsdatoDagligReise(
+            beregningsresultat,
+            opphørsdato,
+        )
+
+        dagligReiseVedtakService.lagreOpphørsvedtak(saksbehandling, beregningsresultat, avkortetVedtaksperioder, vedtak)
+
+        tilkjentYtelseService.lagreTilkjentYtelse(
+            behandlingId = saksbehandling.id,
+            andeler =
+                beregningsresultat.offentligTransport?.mapTilAndelTilkjentYtelse(saksbehandling)
+                    ?: feil("Mangler beregningsresultat for offentlig transport"),
         )
     }
 
@@ -135,14 +132,8 @@ class DagligReiseVedtakSteg(
             // TODO: Her kan man hoppe rett til beregning om man kun har registrert offentlig transport
             is InnvilgelseDagligReiseRequest -> StegType.KJØRELISTE
             is AvslagDagligReiseDto -> StegType.SEND_TIL_BESLUTTER
-            is OpphørDagligReiseRequest -> TODO("Tilpass opphør til ny flyt")
+            is OpphørDagligReiseRequest -> StegType.SIMULERING
         }
-
-    private fun nullstillEksisterendeVedtakPåBehandling(saksbehandling: Saksbehandling) {
-        vedtakRepository.deleteById(saksbehandling.id)
-        tilkjentYtelseService.slettTilkjentYtelseForBehandling(saksbehandling)
-        simuleringService.slettSimuleringForBehandling(saksbehandling)
-    }
 
     override fun stegType(): StegType = StegType.VEDTAK
 }
