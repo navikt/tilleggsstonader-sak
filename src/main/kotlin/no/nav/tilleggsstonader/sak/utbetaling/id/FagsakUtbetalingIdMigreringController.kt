@@ -27,7 +27,7 @@ class FagsakUtbetalingIdMigreringController(
                 .filter {
                     taskService
                         .finnAlleTaskerMedPayloadOgType(
-                            payload = it.toString(),
+                            payload = it.payload,
                             type = FagsakUtbetalingIdMigrieringTask.TYPE,
                         ).isEmpty()
                 },
