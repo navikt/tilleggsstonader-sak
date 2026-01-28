@@ -31,6 +31,6 @@ class FagsakUtbetalingIdMigrieringTask(
                 payload = fagsakId.toString(),
             )
 
-        const val TYPE = "fagsakUtbetalingIdMigrieringTask "
+        const val TYPE = "fagsakUtbetalingIdMigrieringTask"
     }
 }
