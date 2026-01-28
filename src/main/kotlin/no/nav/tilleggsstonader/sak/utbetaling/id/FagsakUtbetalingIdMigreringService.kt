@@ -36,7 +36,10 @@ class FagsakUtbetalingIdMigreringService(
             val andelTilkjentYtelseListe =
                 sisteIverksatteBehandling?.let { iverksettService.hentAndelTilkjentYtelse(it.id) }
             val typeAndelerPåFagsaken =
-                andelTilkjentYtelseListe?.let { it.map { andelTilkjentYtelse -> andelTilkjentYtelse.type } }?.toSet()
+                andelTilkjentYtelseListe
+                    ?.let { it.map { andelTilkjentYtelse -> andelTilkjentYtelse.type } }
+                    ?.toSet()
+                    ?.filter { it != TypeAndel.UGYLDIG }
                     ?: emptySet()
 
             logger.info("Migrerer typeAndeler: {} for fagsak {}", typeAndelerPåFagsaken, fagsakId)
