@@ -1,6 +1,7 @@
-package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
+package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport
 
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
@@ -18,16 +19,20 @@ class OffentligTransportBeregningService {
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkår: List<VilkårDagligReise>,
         brukersNavKontor: String?,
-    ): BeregningsresultatOffentligTransport {
+    ): BeregningsresultatOffentligTransport? {
         val utgifter =
             oppfylteVilkår
                 .map { it.tilUtgiftOffentligTransport() }
 
+        val resultatForReiser =
+            utgifter.mapNotNull { reise ->
+                beregnForReise(reise, vedtaksperioder, brukersNavKontor)
+            }
+
+        if (resultatForReiser.isEmpty()) return null
+
         return BeregningsresultatOffentligTransport(
-            reiser =
-                utgifter.map { reise ->
-                    beregnForReise(reise, vedtaksperioder, brukersNavKontor)
-                },
+            reiser = resultatForReiser,
         )
     }
 
@@ -35,12 +40,14 @@ class OffentligTransportBeregningService {
         reise: UtgiftOffentligTransport,
         vedtaksperioder: List<Vedtaksperiode>,
         brukersNavKontor: String?,
-    ): BeregningsresultatForReise {
+    ): BeregningsresultatForReise? {
         val (justerteVedtaksperioder, justertReiseperiode) =
             finnSnittMellomReiseOgVedtaksperioder(
                 reise,
                 vedtaksperioder,
             )
+
+        if (justertReiseperiode == null) return null
 
         val trettidagerReisePerioder = justertReiseperiode.delTil30Dagersperioder()
 

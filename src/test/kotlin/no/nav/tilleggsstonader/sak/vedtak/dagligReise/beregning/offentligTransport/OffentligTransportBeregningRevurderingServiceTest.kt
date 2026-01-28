@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
+package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.desember

@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
+package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId

@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.Billettype
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise

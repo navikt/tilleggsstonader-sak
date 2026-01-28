@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
+package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport
 
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
@@ -18,6 +18,9 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.Vilkårperi
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.dummyBehandling
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.mapBeregningsresultatForPeriode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.mapTilVilkårDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -93,7 +96,7 @@ class OffentligTransportBeregningStepDefinitions {
 
         vilkår =
             utgiftData.mapRad { rad ->
-                val nyttVilkår = mapTilVilkårDagligReise(rad)
+                val nyttVilkår = `mapTilVilkårDagligReise`(rad)
                 dagligReiseVilkårService.opprettNyttVilkår(behandlingId = behandlingId, nyttVilkår = nyttVilkår)
             }
     }

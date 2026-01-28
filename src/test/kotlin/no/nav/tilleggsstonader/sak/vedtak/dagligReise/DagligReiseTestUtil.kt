@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.Billettype
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
@@ -36,6 +36,7 @@ object DagligReiseTestUtil {
         BeregningsresultatDagligReise(
             offentligTransport =
                 beregningsresultatOffentligTransport(),
+            privatBil = null,
         )
     val defaultInnvilgelseDagligReise =
         InnvilgelseDagligReise(
