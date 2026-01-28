@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.februar
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.oktober
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
@@ -416,7 +417,6 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
             .allMatch { it.statusIverksetting == StatusIverksetting.OK }
     }
 
-    //    @Disabled
     @Test
     fun `fagsaker iverksatt gjennom rest, kjører migrering, opprettes utbetalingId på alle saker`() {
         val tilsynBarn =
@@ -465,6 +465,55 @@ class MigreringFagsakUtbetalingIntegrationTest : CleanDatabaseIntegrationTest() 
         fagsakIder.forEach {
             assertThat(fagsakUtbetalingIdService.hentUtbetalingIderForFagsakId(it)).isNotEmpty()
         }
+    }
+
+    @Test
+    fun `innvilgelse og opphør over rest, migreres, neste innvilgelse går over kafka`() {
+        val fom = 1 januar 2026
+        val tom = 31 januar 2026
+
+        val førstegangsBehandlingId =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.LÆREMIDLER,
+            ) {
+                defaultLæremidlerTestdata(fom, tom)
+            }
+
+        kjørAlleTaskMedSenererTriggertid()
+
+        val revurderingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(fraBehandlingId = førstegangsBehandlingId) {
+                vedtak {
+                    opphør(opphørsdato = fom)
+                }
+            }
+
+        kjørAlleTaskMedSenererTriggertid()
+
+        val fagsakId = testoppsettService.hentSaksbehandling(førstegangsBehandlingId).fagsakId
+        assertThat(fagsakUtbetalingIdService.hentUtbetalingIderForFagsakId(fagsakId)).isEmpty()
+
+        every { unleashService.isEnabled(Toggle.SKAL_MIGRERE_UTBETALING_MOT_KAFKA) } returns true
+
+        medBrukercontext(
+            roller = listOf(rolleConfig.utvikler),
+        ) {
+            webTestClient
+                .post()
+                .uri("/api/forvaltning/migrer-utbetalinger")
+                .medOnBehalfOfToken()
+                .exchange()
+                .expectStatus()
+                .isOk
+        }
+
+        kjørTasksKlareForProsesseringTilIngenTasksIgjen()
+
+        opprettRevurderingOgGjennomførBehandlingsløp(
+            fraBehandlingId = revurderingId,
+        ) {}
+
+        assertThat(fagsakUtbetalingIdService.hentUtbetalingIderForFagsakId(fagsakId)).isNotEmpty
     }
 
     private fun opprettFørstegangsbehandling(
