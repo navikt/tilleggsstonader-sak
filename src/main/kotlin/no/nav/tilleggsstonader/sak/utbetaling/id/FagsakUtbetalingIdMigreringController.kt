@@ -22,7 +22,15 @@ class FagsakUtbetalingIdMigreringController(
         tilgangService.validerHarUtviklerrolle()
         val fagsakerUtenUtbetalingId = fagsakUtbetalingIdRepository.finnAlleFagsakerUtenUtbetalingId().take(10)
         taskService.saveAll(
-            fagsakerUtenUtbetalingId.map { FagsakUtbetalingIdMigrieringTask.opprettTask(it) },
+            fagsakerUtenUtbetalingId
+                .map { FagsakUtbetalingIdMigrieringTask.opprettTask(it) }
+                .filter {
+                    taskService
+                        .finnAlleTaskerMedPayloadOgType(
+                            payload = it.toString(),
+                            type = FagsakUtbetalingIdMigrieringTask.TYPE,
+                        ).isEmpty()
+                },
         )
     }
 }
