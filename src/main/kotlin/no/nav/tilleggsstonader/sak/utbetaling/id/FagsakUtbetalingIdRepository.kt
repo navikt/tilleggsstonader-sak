@@ -20,7 +20,7 @@ interface FagsakUtbetalingIdRepository :
 
     fun findByFagsakId(fagsakId: FagsakId): List<FagsakUtbetalingId>
 
-    @Query("select id from fagsak where id not in (select fagsak_id from fagsak_utbetaling_id)")
+    @Query("select fagsak_id from gjeldende_iverksatte_behandlinger where fagsak_id not in(select fagsak_id from fagsak_utbetaling_id)")
     fun finnAlleFagsakerUtenUtbetalingId(): List<FagsakId>
 }
 
