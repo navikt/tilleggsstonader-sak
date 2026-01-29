@@ -1,9 +1,5 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
-import io.mockk.CapturingSlot
-import io.mockk.justRun
-import io.mockk.slot
-import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -46,9 +42,6 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
     lateinit var iverksettService: IverksettService
 
     @Autowired
-    lateinit var iverksettClient: IverksettClient
-
-    @Autowired
     lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
 
     @Autowired
@@ -65,13 +58,6 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
     val nesteMåned = YearMonth.now().plusMonths(1)
     val nestNesteMåned = YearMonth.now().plusMonths(2)
 
-    val iverksettDto = slot<IverksettDto>()
-
-    @BeforeEach
-    fun setUp() {
-        justRun { iverksettClient.iverksett(capture(iverksettDto)) }
-    }
-
     private fun IverksettService.iverksett(
         behandlingId: BehandlingId,
         iverksettingId: BehandlingId,
@@ -87,7 +73,9 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
 
         iverksettService.iverksett(behandling.id, behandling.id, nesteMåned.atEndOfMonth())
 
-        verify(exactly = 0) { iverksettClient.iverksett(any()) }
+        KafkaTestConfig
+            .sendteMeldinger()
+            .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
     }
 
     @Test
@@ -568,14 +556,6 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
         assertThat(this.iverksetting?.iverksettingId).isEqualTo(iverksettingId)
     }
 
-    private fun Set<AndelTilkjentYtelse>.verifiserHarLagtTilNullPeriode(yearMonth: YearMonth) {
-        with(forMåned(yearMonth)) {
-            assertThat(beløp).isEqualTo(0)
-            assertThat(statusIverksetting).isEqualTo(StatusIverksetting.SENDT)
-            assertThat(type).isEqualTo(TypeAndel.UGYLDIG)
-        }
-    }
-
     private fun oppdaterAndelerTilOk(
         behandling: Behandling,
         statusIverksetting: StatusIverksetting = StatusIverksetting.OK,
@@ -612,11 +592,6 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             statusIverksetting = statusIverksetting,
             type = type,
         )
-    }
-
-    private fun CapturingSlot<IverksettDto>.assertUtbetalingerInneholder(vararg måned: YearMonth) {
-        assertThat(captured.vedtak.utbetalinger.map { YearMonth.from(it.fraOgMedDato) })
-            .containsExactly(*måned)
     }
 
     private fun IverksettingDto.assertUtbetalingerInneholder(vararg måned: YearMonth) {

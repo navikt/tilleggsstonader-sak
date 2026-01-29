@@ -1,20 +1,13 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.libs.log.logger
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingId
 import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -22,7 +15,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingMessageProducer
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingV3Mapper
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
@@ -41,7 +33,6 @@ class IverksettService(
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val totrinnskontrollService: TotrinnskontrollService,
     private val andelTilkjentYtelseRepository: AndelTilkjentYtelseRepository,
-    private val taskService: TaskService,
     private val utbetalingMessageProducer: UtbetalingMessageProducer,
     private val utbetalingV3Mapper: UtbetalingV3Mapper,
     private val fagsakUtbetalingIdService: FagsakUtbetalingIdService,
@@ -273,54 +264,4 @@ class IverksettService(
         }
         return totrinnskontroll
     }
-
-    private fun opprettHentStatusFraIverksettingTask(
-        behandling: Saksbehandling,
-        iverksettingId: UUID,
-    ) {
-        taskService.save(
-            HentStatusFraIverksettingTask.opprettTask(
-                eksternFagsakId = behandling.eksternFagsakId,
-                behandlingId = behandling.id,
-                eksternBehandlingId = behandling.eksternId,
-                iverksettingId = iverksettingId,
-            ),
-        )
-    }
-
-    /**
-     * Finner forrigeIverksetting fra denne eller forrige behandling
-     * Når man iverksetter behandling 1 første gang: null
-     * Når man iverksetter behandling 1 andre gang: (behandling1, forrige iverksettingId for behandling 1)
-     * Når man iverksetter behandling 2 første gang: (behandling1, siste iverksetting for behandling 1)
-     * Når man iverksetter behandling 2 andre gang: (behandling2, forrigeIverksettingId for behandling 2)
-     */
-    fun finnForrigeIverksetting(
-        behandling: Saksbehandling,
-        tilkjentYtelse: TilkjentYtelse,
-    ): ForrigeIverksettingDto? =
-        tilkjentYtelse.finnForrigeIverksetting(behandling.id)
-            ?: forrigeIverksettingForrigeBehandling(behandling)
-
-    private fun forrigeIverksettingForrigeBehandling(behandling: Saksbehandling): ForrigeIverksettingDto? {
-        val forrigeIverksatteBehandlingId = behandling.forrigeIverksatteBehandlingId
-        return forrigeIverksatteBehandlingId?.let {
-            tilkjentYtelseService
-                .hentForBehandling(forrigeIverksatteBehandlingId)
-                .finnForrigeIverksetting(forrigeIverksatteBehandlingId)
-        }
-    }
-
-    /**
-     * Utleder [ForrigeIverksettingDto] ut fra andel med siste tidspunkt for iverksetting
-     */
-    private fun TilkjentYtelse.finnForrigeIverksetting(behandlingId: BehandlingId): ForrigeIverksettingDto? =
-        andelerTilkjentYtelse
-            .mapNotNull { it.iverksetting }
-            .maxByOrNull { it.iverksettingTidspunkt }
-            ?.iverksettingId
-            ?.let {
-                val eksternBehandlingId = behandlingService.hentEksternBehandlingId(behandlingId).id
-                ForrigeIverksettingDto(behandlingId = eksternBehandlingId.toString(), iverksettingId = it)
-            }
 }

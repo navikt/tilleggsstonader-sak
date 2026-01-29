@@ -72,10 +72,8 @@ class UtbetalingIntegrationTest : CleanDatabaseIntegrationTest() {
             fagsakUtbetalingIdService.finnesUtbetalingsId(førstegangsbehandling.fagsakId, TypeAndel.LÆREMIDLER_AAP)
 
         Assertions.assertThat(finnesUtbetalingIdEtterFørstegangsbehandling).isTrue
-        verify(exactly = 0) { iverksettClient.simulerV2(any()) }
-        verify(exactly = 0) { iverksettClient.iverksett(any()) }
         verify(exactly = 1) { iverksettClient.simulerV3(any()) }
-        KafkaTestConfig.Companion
+        KafkaTestConfig
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
 
@@ -114,11 +112,9 @@ class UtbetalingIntegrationTest : CleanDatabaseIntegrationTest() {
             fagsakUtbetalingIdService.finnesUtbetalingsId(revurdering.fagsakId, TypeAndel.LÆREMIDLER_AAP)
 
         Assertions.assertThat(finnesUtbetalingIdEtterRevurdering).isTrue
-        verify(exactly = 0) { iverksettClient.simulerV2(any()) }
-        verify(exactly = 0) { iverksettClient.iverksett(any()) }
         verify(exactly = 2) { iverksettClient.simulerV3(any()) }
         val opphørUtbetaling =
-            KafkaTestConfig.Companion
+            KafkaTestConfig
                 .sendteMeldinger()
                 .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 2)
                 .map { it.verdiEllerFeil<IverksettingDto>() }

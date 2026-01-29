@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingId
 import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdService
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
-import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringJson
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Simuleringsresultat
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringsresultatRepository
@@ -43,7 +42,6 @@ internal class SimuleringServiceTest {
     private val simuleringsresultatRepository = mockk<SimuleringsresultatRepository>()
     private val tilkjentYtelseService = mockk<TilkjentYtelseService>()
     private val tilgangService = mockk<TilgangService>()
-    private val iverksettService = mockk<IverksettService>()
     private val fagsakUtbetalingIdService = mockk<FagsakUtbetalingIdService>()
 
     private val utbetalingV3Mapper = UtbetalingV3Mapper(fagsakUtbetalingIdService, tilkjentYtelseService)
@@ -66,7 +64,6 @@ internal class SimuleringServiceTest {
         every { fagsakService.fagsakMedOppdatertPersonIdent(any()) } returns fagsak
         every { tilgangService.validerHarSaksbehandlerrolle() } just Runs
         every { tilgangService.harTilgangTilRolle(any()) } returns true
-        every { iverksettService.finnForrigeIverksetting(any(), any()) } returns null
         every { fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(any(), any()) } answers {
             FagsakUtbetalingId(fagsakId = FagsakId(firstArg()), typeAndel = secondArg())
         }
