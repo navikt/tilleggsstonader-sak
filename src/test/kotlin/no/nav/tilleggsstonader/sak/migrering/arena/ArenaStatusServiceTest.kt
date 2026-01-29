@@ -8,8 +8,10 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
@@ -66,7 +68,7 @@ class ArenaStatusServiceTest {
 
     @Test
     fun `skal returnere false når det ikke finnes noen behandlinger`() {
-        mockBehandling(null)
+        mockBehandling(null, fagsak)
 
         assertThat(arenaStatusService.finnStatus(request).finnes).isFalse()
 
@@ -77,7 +79,7 @@ class ArenaStatusServiceTest {
     @ParameterizedTest
     @EnumSource(value = BehandlingResultat::class, names = ["HENLAGT"], mode = EnumSource.Mode.EXCLUDE)
     fun `skal returnere true hvis det finnes behandlinger`(resultat: BehandlingResultat) {
-        mockBehandling(resultat)
+        mockBehandling(resultat, fagsak)
 
         assertThat(arenaStatusService.finnStatus(request).finnes).isTrue()
 
@@ -87,7 +89,21 @@ class ArenaStatusServiceTest {
 
     @Test
     fun `skal returnere false hvis det kun finnes en henlagt behandling`() {
-        mockBehandling(BehandlingResultat.HENLAGT)
+        mockBehandling(BehandlingResultat.HENLAGT, fagsak)
+
+        assertThat(arenaStatusService.finnStatus(request).finnes).isFalse()
+
+        verify(exactly = 1) { fagsakService.finnFagsak(any(), any()) }
+        verify(exactly = 1) { behandlingService.hentBehandlinger(fagsakId = any()) }
+    }
+
+    @Test
+    fun `skal returnere false hvis behandlingen har unntak og kan behandles i arena`() {
+        val fagsakId = FagsakId.random()
+        val fagsakMedUnntak = fagsak(id = fagsakId, eksternId = EksternFagsakId(fagsakId = fagsakId, id = 9807))
+
+        mockBehandling(BehandlingResultat.INNVILGET, fagsakMedUnntak)
+        mockFinnFagsak(fagsakMedUnntak)
 
         assertThat(arenaStatusService.finnStatus(request).finnes).isFalse()
 
@@ -102,7 +118,10 @@ class ArenaStatusServiceTest {
     /**
      * Returnerer ingen behandling dersom resultat settes til null
      */
-    private fun mockBehandling(resultat: BehandlingResultat?) {
+    private fun mockBehandling(
+        resultat: BehandlingResultat?,
+        fagsak: Fagsak,
+    ) {
         val behandlinger =
             when (resultat) {
                 BehandlingResultat.HENLAGT -> listOf(henlagtBehandling(fagsak))
