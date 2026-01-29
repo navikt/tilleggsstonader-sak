@@ -42,10 +42,7 @@ class IverksettService(
     /**
      * Iverksetter andeler til og med dagens dato. Utbetalinger frem i tid blir plukket opp av en daglig jobb.
      *
-     * Notat om synkron iverksetting (aka v2 av utsjekk):
-     * Ved første iverksetting av en behandling er det krav på at det gjøres med jwt, dvs med saksbehandler-token
-     * Neste iverksettinger kan gjøres med client_credentials. Dersom det ikke finnes utbetalinger som skal iverksettes for forrige måned,
-     * så legges det til en nullandel for å kunne sjekke status på iverksetting og for å kunne opphøre andeler fra forrige behandling.
+     * Ved fullstendig opphør legges det til en nullandel for å få tilbake status fra økonomi om opphøret
      */
     @Transactional
     fun iverksettBehandlingFørsteGang(behandlingId: BehandlingId) {
@@ -110,12 +107,6 @@ class IverksettService(
 
     /**
      * Kalles på av daglig jobb som plukker opp alle andeler som har utbetalingsdato <= dagens dato.
-     *
-     * Notat om synkron iverksetting (aka v2 av utsjekk):
-     * Hvis kallet feiler er det viktig at den samme iverksettingId brukes for å kunne ignorere conflict
-     * Ved første iverksetting som gjøres brukes behandlingId for å iverksette
-     * for å enkelt kunne gjenbruke samme id vid neste iverksetting.
-     *
      */
     @Transactional
     fun iverksett(
@@ -207,8 +198,6 @@ class IverksettService(
     /**
      * Henter aktuelle andeler
      * Oppdaterer aktuelle perioder med status og iverksettingId
-     * Returnerer andeler som har beløp=0 då vi fortsatt ønsker å iverksette,
-     * men filtrer vekk disse i IverksettDtoMapper, for å eventuell opphøre tidligere perioder
      */
     private fun finnAndelerTilIverksetting(
         tilkjentYtelse: TilkjentYtelse,
