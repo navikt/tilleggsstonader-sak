@@ -6,6 +6,10 @@ sealed interface FaktaAktivitetsdager : Fakta {
     val aktivitetsdager: Int
 }
 
+sealed interface FaktaAktivitetsdagerNullable : Fakta {
+    val aktivitetsdager: Int?
+}
+
 sealed interface FaktaProsent : Fakta {
     val prosent: Int
 }

@@ -143,6 +143,7 @@ class OpprettVilkårperiodeDsl {
                 faktaOgSvar =
                     FaktaOgSvarAktivitetDagligReiseTsrDto(
                         svarHarUtgifter = SvarJaNei.JA,
+                        aktivitetsdager = 3,
                     ),
             )
         }

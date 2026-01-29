@@ -117,7 +117,36 @@ class VilkårperiodeControllerTest : CleanDatabaseIntegrationTest() {
                 typeAktivitet = TypeAktivitet.GRUPPEAMO,
                 fom = LocalDate.now(),
                 tom = LocalDate.now(),
-                faktaOgSvar = FaktaOgSvarAktivitetDagligReiseTsrDto(svarHarUtgifter = SvarJaNei.JA),
+                faktaOgSvar =
+                    FaktaOgSvarAktivitetDagligReiseTsrDto(
+                        svarHarUtgifter = SvarJaNei.JA,
+                        aktivitetsdager = 3,
+                    ),
+                behandlingId = behandling.id,
+            )
+
+        kall.vilkårperiode.opprett(originalLagreRequest)
+    }
+
+    @Test
+    fun `skal kunne lagre aktivitet uten aktivitetsdager når stønadstype daglig reise tsr`() {
+        val behandling =
+            testoppsettService.opprettBehandlingMedFagsak(
+                behandling(),
+                stønadstype = Stønadstype.DAGLIG_REISE_TSR,
+            )
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
+
+        val originalLagreRequest =
+            LagreVilkårperiode(
+                type = AktivitetType.TILTAK,
+                typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                fom = LocalDate.now(),
+                tom = LocalDate.now(),
+                faktaOgSvar =
+                    FaktaOgSvarAktivitetDagligReiseTsrDto(
+                        svarHarUtgifter = SvarJaNei.JA,
+                    ),
                 behandlingId = behandling.id,
             )
 
@@ -139,7 +168,11 @@ class VilkårperiodeControllerTest : CleanDatabaseIntegrationTest() {
                 typeAktivitet = null,
                 fom = LocalDate.now(),
                 tom = LocalDate.now(),
-                faktaOgSvar = FaktaOgSvarAktivitetDagligReiseTsrDto(svarHarUtgifter = SvarJaNei.JA),
+                faktaOgSvar =
+                    FaktaOgSvarAktivitetDagligReiseTsrDto(
+                        svarHarUtgifter = SvarJaNei.JA,
+                        aktivitetsdager = 3,
+                    ),
                 behandlingId = behandling.id,
             )
 
