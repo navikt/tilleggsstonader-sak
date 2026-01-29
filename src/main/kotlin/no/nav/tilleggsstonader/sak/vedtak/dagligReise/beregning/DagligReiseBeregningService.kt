@@ -107,7 +107,7 @@ class DagligReiseBeregningService(
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkårDagligReise: List<VilkårDagligReise>,
     ): BeregningsresultatPrivatBil? {
-        if(!unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)) return null
+        if (!unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)) return null
 
         val oppfylteVilkårPrivatBil = oppfylteVilkårDagligReise.filter { it.fakta is FaktaPrivatBil }
 

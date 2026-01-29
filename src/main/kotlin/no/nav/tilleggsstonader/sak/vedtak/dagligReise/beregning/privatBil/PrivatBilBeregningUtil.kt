@@ -49,19 +49,19 @@ private fun kastFeilVedFlereVedtaksperioderInnenforEnUke(
     val antallMålgrupper = vedtaksperioder.map { it.målgruppe }.distinct().size
     brukerfeilHvis(antallMålgrupper > 1) {
         "Beregningen klarer ikke å håndtere flere ulike målgrupper innenfor samme uke. " +
-                "Gjelder uke ${uke.formatertPeriodeNorskFormat()}"
+            "Gjelder uke ${uke.formatertPeriodeNorskFormat()}"
     }
 
     val antallTypeAktiviteter = vedtaksperioder.map { it.typeAktivitet }.distinct().size
     brukerfeilHvis(antallTypeAktiviteter > 1) {
         "Beregningen klarer ikke å håndtere flere ulike aktivitetsvarianter innenfor samme uke. " +
-                "Gjelder uke ${uke.formatertPeriodeNorskFormat()}"
+            "Gjelder uke ${uke.formatertPeriodeNorskFormat()}"
     }
 
     brukerfeil(
         "Beregning klarer ikke å håndtere opphold mellom to vedtaksperioder innenfor en uke. " +
-                "Gjelder uke ${uke.formatertPeriodeNorskFormat()}. " +
-                "Splitt reiseperioden slik at den matcher vedtaksperiodene",
+            "Gjelder uke ${uke.formatertPeriodeNorskFormat()}. " +
+            "Splitt reiseperioden slik at den matcher vedtaksperiodene",
     )
 }
 

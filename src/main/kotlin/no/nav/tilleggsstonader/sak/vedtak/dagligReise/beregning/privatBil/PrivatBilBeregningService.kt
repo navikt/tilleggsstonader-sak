@@ -47,13 +47,14 @@ class PrivatBilBeregningService {
 
         val periodeSplittetPåUker = justertReise.splitPerUkeMedHelg()
 
-        val uker = periodeSplittetPåUker.mapNotNull {
-            beregnForUke(
-                uke = it,
-                grunnlagForReise = grunnlagForReise,
-                vedtaksperioder = vedtaksperioder,
-            )
-        }
+        val uker =
+            periodeSplittetPåUker.mapNotNull {
+                beregnForUke(
+                    uke = it,
+                    grunnlagForReise = grunnlagForReise,
+                    vedtaksperioder = vedtaksperioder,
+                )
+            }
 
         if (uker.isEmpty()) return null
 
