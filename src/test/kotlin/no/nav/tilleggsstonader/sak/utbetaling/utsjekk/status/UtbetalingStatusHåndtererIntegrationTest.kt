@@ -201,4 +201,73 @@ class UtbetalingStatusHåndtererIntegrationTest(
         val andelerEtter = tilkjentYtelseEtter!!.andelerTilkjentYtelse
         assertThat(andelerEtter).allMatch { it.statusIverksetting == originalStatus }
     }
+
+    @Test
+    fun `mottar først status OK og deretter TIL_OPPDRAG, ignorerer da TIL_OPPDRAG-status`() {
+        val behandlingId =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                defaultDagligReiseTsoTestdata()
+            }
+
+        assertThat(
+            tilkjentYtelseRepository
+                .findByBehandlingId(behandlingId)
+                ?.andelerTilkjentYtelse
+                ?.filter { it.iverksetting != null },
+        ).isNotEmpty
+
+        // Sender OK-status
+        val okStatus =
+            UtbetalingStatusRecord(
+                status = UtbetalingStatus.OK,
+                detaljer =
+                    UtbetalingStatusDetaljer(
+                        ytelse = "TILLSTDR",
+                        linjer = emptyList(),
+                    ),
+                error = null,
+            )
+
+        // Første iverksettingid er alltid behandlingId
+        utbetalingStatusHåndterer.behandleStatusoppdatering(
+            iverksettingId = behandlingId.id.toString(),
+            melding = okStatus,
+            utbetalingGjelderFagsystem = UtbetalingStatusHåndterer.FAGSYSTEM_TILLEGGSSTØNADER,
+        )
+
+        assertThat(
+            tilkjentYtelseRepository
+                .findByBehandlingId(behandlingId)!!
+                .andelerTilkjentYtelse
+                .filter { it.iverksetting != null && it.iverksetting.iverksettingId == behandlingId.id },
+        ).isNotEmpty.allMatch { it.statusIverksetting == StatusIverksetting.OK }
+
+        // Sender HOS_OPPDRAG-status
+        val hosOppdragStatus =
+            UtbetalingStatusRecord(
+                status = UtbetalingStatus.HOS_OPPDRAG,
+                detaljer =
+                    UtbetalingStatusDetaljer(
+                        ytelse = "TILLSTDR",
+                        linjer = emptyList(),
+                    ),
+                error = null,
+            )
+
+        // Første iverksettingid er alltid behandlingId
+        utbetalingStatusHåndterer.behandleStatusoppdatering(
+            iverksettingId = behandlingId.id.toString(),
+            melding = hosOppdragStatus,
+            utbetalingGjelderFagsystem = UtbetalingStatusHåndterer.FAGSYSTEM_TILLEGGSSTØNADER,
+        )
+
+        assertThat(
+            tilkjentYtelseRepository
+                .findByBehandlingId(behandlingId)!!
+                .andelerTilkjentYtelse
+                .filter { it.iverksetting != null && it.iverksetting.iverksettingId == behandlingId.id },
+        ).isNotEmpty.allMatch { it.statusIverksetting == StatusIverksetting.OK }
+    }
 }
