@@ -20,7 +20,7 @@ class FagsakUtbetalingIdMigreringController(
     @PostMapping
     fun migrerUtbetalinger() {
         tilgangService.validerHarUtviklerrolle()
-        val fagsakerUtenUtbetalingId = fagsakUtbetalingIdRepository.finnAlleFagsakerUtenUtbetalingId().take(10)
+        val fagsakerUtenUtbetalingId = fagsakUtbetalingIdRepository.finnAlleFagsakerUtenUtbetalingId()
         taskService.saveAll(
             fagsakerUtenUtbetalingId
                 .map { FagsakUtbetalingIdMigrieringTask.opprettTask(it) }
