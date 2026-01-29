@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
+import no.nav.tilleggsstonader.sak.cucumber.parseBigDecimal
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
@@ -16,10 +17,13 @@ import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.DomenenøkkelOffentligtransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.oppfylteSvarOffentligtransport
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -69,28 +73,53 @@ fun dummyBehandling(
         type = BehandlingType.FØRSTEGANGSBEHANDLING,
     )
 
-fun mapTilVilkårDagligReise(rad: Map<String, String>): LagreDagligReise =
+fun mapTilVilkårDagligReise(
+    typeVilkår: TypeDagligReise,
+    rad: Map<String, String>,
+): LagreDagligReise =
     LagreDagligReise(
         fom = parseDato(DomenenøkkelFelles.FOM, rad),
         tom = parseDato(DomenenøkkelFelles.TOM, rad),
         svar = oppfylteSvarOffentligtransport,
-        fakta =
-            FaktaOffentligTransport(
-                reiseId = dummyReiseId,
-                adresse = "Tiltaksveien 1",
-                reisedagerPerUke =
-                    parseInt(
-                        `DomenenøkkelOffentligtransport`.ANTALL_REISEDAGER_PER_UKE,
-                        rad,
-                    ),
-                prisEnkelbillett = parseValgfriInt(`DomenenøkkelOffentligtransport`.PRIS_ENKELTBILLETT, rad),
-                prisSyvdagersbillett = parseValgfriInt(`DomenenøkkelOffentligtransport`.PRIS_SYV_DAGERS_BILLETT, rad),
-                prisTrettidagersbillett =
-                    parseValgfriInt(
-                        `DomenenøkkelOffentligtransport`.PRIS_TRETTI_DAGERS_BILLETT,
-                        rad,
-                    ),
+        fakta = mapFakta(typeVilkår, rad),
+    )
+
+private fun mapFakta(
+    type: TypeDagligReise,
+    rad: Map<String, String>,
+): FaktaDagligReise =
+    when (type) {
+        TypeDagligReise.OFFENTLIG_TRANSPORT -> mapFaktaOffentligTransport(rad)
+        TypeDagligReise.PRIVAT_BIL -> mapFaktaPrivatBil(rad)
+        else -> FaktaUbestemtType(reiseId = dummyReiseId, adresse = "Tiltaksveien 1")
+    }
+
+fun mapFaktaOffentligTransport(rad: Map<String, String>): FaktaOffentligTransport =
+    FaktaOffentligTransport(
+        reiseId = dummyReiseId,
+        adresse = "Tiltaksveien 1",
+        reisedagerPerUke =
+            parseInt(
+                DomenenøkkelOffentligtransport.ANTALL_REISEDAGER_PER_UKE,
+                rad,
             ),
+        prisEnkelbillett = parseValgfriInt(DomenenøkkelOffentligtransport.PRIS_ENKELTBILLETT, rad),
+        prisSyvdagersbillett = parseValgfriInt(DomenenøkkelOffentligtransport.PRIS_SYV_DAGERS_BILLETT, rad),
+        prisTrettidagersbillett =
+            parseValgfriInt(
+                DomenenøkkelOffentligtransport.PRIS_TRETTI_DAGERS_BILLETT,
+                rad,
+            ),
+    )
+
+fun mapFaktaPrivatBil(rad: Map<String, String>): FaktaPrivatBil =
+    FaktaPrivatBil(
+        reiseId = dummyReiseId,
+        adresse = "Tiltaksveien 1",
+        reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, rad),
+        reiseavstandEnVei = parseBigDecimal(DomenenøkkelPrivatBil.REISEAVSTAND_EN_VEI, rad),
+        bompengerEnVei = parseValgfriInt(DomenenøkkelPrivatBil.BOMPENGER, rad),
+        fergekostandEnVei = parseValgfriInt(DomenenøkkelPrivatBil.FERGEKOSTNAD, rad),
     )
 
 fun mapAktiviteter(

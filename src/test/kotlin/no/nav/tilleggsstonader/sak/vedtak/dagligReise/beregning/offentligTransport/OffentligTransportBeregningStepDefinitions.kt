@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport
+package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
@@ -18,11 +18,10 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.Vilkårperi
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.dummyBehandling
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.mapBeregningsresultatForPeriode
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.mapTilVilkårDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.OffentligTransportBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -96,7 +95,7 @@ class OffentligTransportBeregningStepDefinitions {
 
         vilkår =
             utgiftData.mapRad { rad ->
-                val nyttVilkår = `mapTilVilkårDagligReise`(rad)
+                val nyttVilkår = mapTilVilkårDagligReise(TypeDagligReise.OFFENTLIG_TRANSPORT, rad)
                 dagligReiseVilkårService.opprettNyttVilkår(behandlingId = behandlingId, nyttVilkår = nyttVilkår)
             }
     }

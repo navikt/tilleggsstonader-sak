@@ -35,4 +35,31 @@ class FellesBeregningUtilTest {
             assertThat(antallHverdagerIPeriodeInklusiv(fom, tom)).isEqualTo(13)
         }
     }
+
+    @Nested
+    inner class AntallHelgedagerIPeriode {
+        @Test
+        fun `skal finne 2 helgedager i èn full uke`() {
+            val fom = sjetteJanuar
+            val tom = LocalDate.of(2025, 1, 12)
+
+            assertThat(antallHelgedagerIPeriodeInklusiv(fom, tom)).isEqualTo(2)
+        }
+
+        @Test
+        fun `skal finne 1 helgedag om halve helgen er inkludert i perioden`() {
+            val fom = førsteJanuar
+            val tom = LocalDate.of(2025, 1, 4)
+
+            assertThat(antallHelgedagerIPeriodeInklusiv(fom, tom)).isEqualTo(1)
+        }
+
+        @Test
+        fun `skal finne antall helgedager over flere uker`() {
+            val fom = førsteJanuar
+            val tom = LocalDate.of(2025, 1, 18)
+
+            assertThat(antallHelgedagerIPeriodeInklusiv(fom, tom)).isEqualTo(5)
+        }
+    }
 }
