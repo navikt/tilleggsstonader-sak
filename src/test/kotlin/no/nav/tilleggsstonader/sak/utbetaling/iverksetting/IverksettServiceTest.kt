@@ -1,20 +1,20 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.CapturingSlot
 import io.mockk.justRun
 import io.mockk.slot
 import io.mockk.verify
-import no.nav.familie.prosessering.domene.Status
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
-import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.finnPåTopic
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.IverksettingDto
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -64,11 +65,11 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
     val nesteMåned = YearMonth.now().plusMonths(1)
     val nestNesteMåned = YearMonth.now().plusMonths(2)
 
-    val iverksettingDto = slot<IverksettDto>()
+    val iverksettDto = slot<IverksettDto>()
 
     @BeforeEach
     fun setUp() {
-        justRun { iverksettClient.iverksett(capture(iverksettingDto)) }
+        justRun { iverksettClient.iverksett(capture(iverksettDto)) }
     }
 
     private fun IverksettService.iverksett(
@@ -98,29 +99,14 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
 
         iverksettService.iverksett(behandling.id, behandling.id, nesteMåned.atEndOfMonth())
 
-        verify(exactly = 1) { iverksettClient.iverksett(any()) }
+        KafkaTestConfig
+            .sendteMeldinger()
+            .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
 
         val oppdatertTilkjentYtelse = tilkjentYtelseRepository.findByIdOrThrow(tilkjentYtelse.id)
         val andel = oppdatertTilkjentYtelse.andelerTilkjentYtelse.single()
         assertThat(andel.iverksetting?.iverksettingId).isEqualTo(behandling.id.id)
         assertThat(andel.statusIverksetting).isEqualTo(StatusIverksetting.SENDT)
-        assertHarOpprettetTaskForÅSjekkeStatus(fagsak, behandling)
-    }
-
-    private fun assertHarOpprettetTaskForÅSjekkeStatus(
-        fagsak: Fagsak,
-        behandling: Behandling,
-    ) {
-        val task = taskService.finnTasksMedStatus(Status.entries, HentStatusFraIverksettingTask.TYPE).single()
-        val eksternBehandlingId = testoppsettService.hentSaksbehandling(behandling.id).eksternId
-        assertThat(objectMapper.readValue<Map<String, Any>>(task.payload)).isEqualTo(
-            mapOf(
-                "eksternFagsakId" to fagsak.eksternId.id.toInt(),
-                "behandlingId" to behandling.id.toString(),
-                "eksternBehandlingId" to eksternBehandlingId.toInt(),
-                "iverksettingId" to behandling.id.toString(),
-            ),
-        )
     }
 
     @Nested
@@ -153,6 +139,14 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             val andeler = hentAndeler(behandling)
 
             andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling.id)
+
+            val iverksettingDto =
+                KafkaTestConfig
+                    .sendteMeldinger()
+                    .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
+                    .single()
+                    .verdiEllerFeil<IverksettingDto>()
+
             if (!erHelgOgFørsteEllerAndreDagIMåned()) {
                 andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling.id)
                 iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned)
@@ -163,7 +157,6 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
 
             andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
             andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
-            assertThat(iverksettingDto.captured.forrigeIverksetting).isNull()
         }
 
         @Test
@@ -184,11 +177,14 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.SENDT, iverksettingId)
             andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
 
-            iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned, nesteMåned)
+            val iverksettingDto =
+                KafkaTestConfig
+                    .sendteMeldinger()
+                    .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 2)
+                    .single { it.key() == iverksettingId.toString() }
+                    .verdiEllerFeil<IverksettingDto>()
 
-            assertThat(iverksettingDto.captured.forrigeIverksetting?.behandlingId)
-                .isEqualTo(hentEksternBehandlingId(behandling))
-            assertThat(iverksettingDto.captured.forrigeIverksetting?.iverksettingId).isEqualTo(behandling.id.id)
+            iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned, nesteMåned)
         }
 
         @Test
@@ -205,6 +201,13 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
             andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
 
+            val iverksettingDto =
+                KafkaTestConfig
+                    .sendteMeldinger()
+                    .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 2)
+                    .single { it.key() == behandling2.id.toString() }
+                    .verdiEllerFeil<IverksettingDto>()
+
             if (!erHelgOgFørsteEllerAndreDagIMåned()) {
                 andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling2.id)
                 iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned)
@@ -212,10 +215,6 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
                 andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
                 iverksettingDto.assertUtbetalingerInneholder(forrigeMåned)
             }
-
-            assertThat(iverksettingDto.captured.forrigeIverksetting?.behandlingId)
-                .isEqualTo(hentEksternBehandlingId(behandling))
-            assertThat(iverksettingDto.captured.forrigeIverksetting?.iverksettingId).isEqualTo(behandling.id.id)
         }
 
         @Test
@@ -236,6 +235,13 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
             andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
 
+            val iverksettingDto =
+                KafkaTestConfig
+                    .sendteMeldinger()
+                    .finnPåTopic(kafkaTopics.utbetaling)
+                    .single { it.key() == behandling2.id.toString() }
+                    .verdiEllerFeil<IverksettingDto>()
+
             if (!erHelgOgFørsteEllerAndreDagIMåned()) {
                 andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling2.id)
                 iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned)
@@ -243,10 +249,6 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
                 andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
                 iverksettingDto.assertUtbetalingerInneholder(forrigeMåned)
             }
-
-            assertThat(iverksettingDto.captured.forrigeIverksetting?.behandlingId)
-                .isEqualTo(hentEksternBehandlingId(behandling))
-            assertThat(iverksettingDto.captured.forrigeIverksetting?.iverksettingId).isEqualTo(iverksettingIdBehandling1)
         }
 
         @Test
@@ -275,11 +277,16 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
                 andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, iverksettingId)
             }
 
+            val iverksettingDto =
+                KafkaTestConfig
+                    .sendteMeldinger()
+                    .finnPåTopic(kafkaTopics.utbetaling)
+                    .single { it.key() == iverksettingId.toString() }
+                    .verdiEllerFeil<IverksettingDto>()
+
             iverksettingDto.assertUtbetalingerInneholder(forrigeMåned, nåværendeMåned, nesteMåned)
 
-            assertThat(iverksettingDto.captured.forrigeIverksetting?.behandlingId)
-                .isEqualTo(hentEksternBehandlingId(behandling2))
-            assertThat(iverksettingDto.captured.forrigeIverksetting?.iverksettingId).isEqualTo(behandling2.id.id)
+            assertThat(iverksettingDto.behandlingId).isEqualTo(hentEksternBehandlingId(behandling2))
         }
 
         @Test
@@ -299,7 +306,14 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
 
             andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling2.id)
 
-            assertThat(iverksettingDto.captured.vedtak.utbetalinger).isEmpty()
+            val iverksettingDto =
+                KafkaTestConfig
+                    .sendteMeldinger()
+                    .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 2)
+                    .single { it.key() == behandling2.id.toString() }
+                    .verdiEllerFeil<IverksettingDto>()
+
+            assertThat(iverksettingDto.utbetalinger.single().perioder).isEmpty()
         }
 
         @Test
@@ -514,66 +528,14 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             tilkjentYtelseRepository.insert(tilkjentYtelse)
             iverksettService.iverksettBehandlingFørsteGang(behandling.id)
 
+            KafkaTestConfig
+                .sendteMeldinger()
+                .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
+
             with(hentAndeler(behandling)) {
-                verifiserHarLagtTilNullPeriode(forrigeMåned.minusMonths(1))
                 forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.VENTER_PÅ_SATS_ENDRING)
-                assertThat(this).hasSize(2)
+                assertThat(this).hasSize(1)
             }
-        }
-    }
-
-    @Nested
-    inner class IverksettingNullperioder {
-        val fagsak = fagsak()
-
-        val behandling =
-            behandling(fagsak, resultat = BehandlingResultat.INNVILGET, status = BehandlingStatus.FERDIGSTILT)
-
-        @BeforeEach
-        fun setUp() {
-            testoppsettService.opprettBehandlingMedFagsak(behandling)
-            testoppsettService.lagreTotrinnskontroll(totrinnskontroll(behandling.id))
-        }
-
-        @Test
-        fun `skal iverksette uten utbetalinger når første periode er fremover i tid`() {
-            tilkjentYtelseRepository.insert(
-                tilkjentYtelse(
-                    behandlingId = behandling.id,
-                    andeler = arrayOf(lagAndel(behandling, nesteMåned)),
-                ),
-            )
-
-            iverksettService.iverksettBehandlingFørsteGang(behandling.id)
-
-            val andeler = hentAndeler(behandling)
-
-            assertThat(andeler).hasSize(2)
-            val andelForrigeMåned = andeler.forMåned(nåværendeMåned)
-            andelForrigeMåned.assertHarStatusOgId(StatusIverksetting.SENDT, behandling.id)
-            assertThat(andelForrigeMåned.beløp).isEqualTo(0)
-            andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
-        }
-
-        @Test
-        fun `skal iverksette måned 2 når status er OK_UTEN_UTBETALING for første måned`() {
-            tilkjentYtelseRepository.insert(
-                tilkjentYtelse(
-                    behandlingId = behandling.id,
-                    andeler = arrayOf(lagAndel(behandling, nesteMåned)),
-                ),
-            )
-            iverksettService.iverksettBehandlingFørsteGang(behandling.id)
-            oppdaterAndelerTilOk(behandling, StatusIverksetting.OK_UTEN_UTBETALING)
-
-            val iverksettingId = UUID.randomUUID()
-            iverksettService.iverksett(behandling.id, iverksettingId, nesteMåned.atEndOfMonth())
-
-            val andeler = hentAndeler(behandling)
-            val andelForrigeMåned = andeler.forMåned(nåværendeMåned)
-            andelForrigeMåned.assertHarStatusOgId(StatusIverksetting.OK_UTEN_UTBETALING, behandling.id)
-            assertThat(andelForrigeMåned.beløp).isEqualTo(0)
-            andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.SENDT, iverksettingId)
         }
     }
 
@@ -655,6 +617,11 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
     private fun CapturingSlot<IverksettDto>.assertUtbetalingerInneholder(vararg måned: YearMonth) {
         assertThat(captured.vedtak.utbetalinger.map { YearMonth.from(it.fraOgMedDato) })
             .containsExactly(*måned)
+    }
+
+    private fun IverksettingDto.assertUtbetalingerInneholder(vararg måned: YearMonth) {
+        assertThat(utbetalinger.single().perioder.map { YearMonth.from(it.fom) })
+            .containsExactlyInAnyOrder(*måned)
     }
 
     private fun erHelgOgFørsteEllerAndreDagIMåned(): Boolean {

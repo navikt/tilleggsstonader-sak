@@ -27,7 +27,6 @@ class IverksettClientMockConfig {
             clearMocks(iverksettClient)
             justRun { iverksettClient.iverksett(any()) }
             every { iverksettClient.hentStatus(any(), any(), any()) } returns IverksettStatus.OK
-            every { iverksettClient.simulerV2(any()) } returns simuleringsresultat
             every { iverksettClient.simulerV3(any()) } returns simuleringsresultat
         }
 

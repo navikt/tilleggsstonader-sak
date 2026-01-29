@@ -3,16 +3,10 @@ package no.nav.tilleggsstonader.sak.utbetaling.simulering
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
-import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdMigreringService
-import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.ForrigeIverksettingDto
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
-import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettDtoMapper
-import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Simuleringsresultat
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringsresultatRepository
-import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringRequestDto
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingV3Mapper
@@ -27,9 +21,7 @@ class SimuleringService(
     private val simuleringsresultatRepository: SimuleringsresultatRepository,
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val tilgangService: TilgangService,
-    private val iverksettService: IverksettService,
     private val utbetalingV3Mapper: UtbetalingV3Mapper,
-    private val fagsakUtbetalingIdMigreringService: FagsakUtbetalingIdMigreringService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -52,8 +44,6 @@ class SimuleringService(
             "Kan ikke hente og lagre simuleringsresultat for behandling=${saksbehandling.id} fordi den har har status ${saksbehandling.status.visningsnavn()}."
         }
 
-        fagsakUtbetalingIdMigreringService.migrerForFagsak(saksbehandling.fagsakId)
-
         val resultat = simulerMedTilkjentYtelse(saksbehandling)
 
         simuleringsresultatRepository.deleteById(saksbehandling.id)
@@ -68,38 +58,12 @@ class SimuleringService(
 
     private fun simulerMedTilkjentYtelse(saksbehandling: Saksbehandling): SimuleringResponseDto? {
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(saksbehandling.id)
-        val forrigeIverksetting = iverksettService.finnForrigeIverksetting(saksbehandling, tilkjentYtelse)
 
-        return if (iverksettService.utbetalingSkalSendesPåKafka(
-                behandling = saksbehandling,
-                fagsakId = saksbehandling.fagsakId,
-                typeAndel = tilkjentYtelse.andelerTilkjentYtelse.map { it.type }.toSet(),
-                erFørsteIverksettingForBehandling = true,
-            )
-        ) {
-            iverksettClient.simulerV3(
-                utbetalingV3Mapper.lagSimuleringDtoer(
-                    saksbehandling,
-                    tilkjentYtelse.andelerTilkjentYtelse,
-                ),
-            )
-        } else {
-            iverksettClient.simulerV2(
-                SimuleringRequestDto(
-                    sakId = saksbehandling.eksternFagsakId.toString(),
-                    behandlingId = saksbehandling.eksternId.toString(),
-                    personident = saksbehandling.ident,
-                    saksbehandlerId = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
-                    utbetalinger = IverksettDtoMapper.mapUtbetalinger(tilkjentYtelse.andelerTilkjentYtelse),
-                    forrigeIverksetting =
-                        forrigeIverksetting?.let {
-                            ForrigeIverksettingDto(
-                                it.behandlingId,
-                                it.iverksettingId,
-                            )
-                        },
-                ),
-            )
-        }
+        return iverksettClient.simulerV3(
+            utbetalingV3Mapper.lagSimuleringDtoer(
+                saksbehandling,
+                tilkjentYtelse.andelerTilkjentYtelse,
+            ),
+        )
     }
 }
