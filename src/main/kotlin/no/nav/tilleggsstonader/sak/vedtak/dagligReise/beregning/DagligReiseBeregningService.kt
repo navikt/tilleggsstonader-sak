@@ -5,6 +5,8 @@ import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.OffentligTransportBeregningRevurderingService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.OffentligTransportBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -54,6 +56,7 @@ class DagligReiseBeregningService(
                     brukersNavKontor = brukersNavKontor,
                     tidligsteEndring = tidligsteEndring,
                 ),
+            privatBil = null,
         )
     }
 
@@ -73,8 +76,8 @@ class DagligReiseBeregningService(
                 vedtaksperioder = vedtaksperioder,
                 oppfylteVilkår = oppfylteVilkårOffentligTransport,
                 brukersNavKontor = brukersNavKontor,
-            ).flettMedForrigeVedtakHvisRevurdering(behandling, tidligsteEndring)
-            .sorterReiserOgPerioder()
+            )?.flettMedForrigeVedtakHvisRevurdering(behandling, tidligsteEndring)
+            ?.sorterReiserOgPerioder()
     }
 
     private fun BeregningsresultatOffentligTransport.flettMedForrigeVedtakHvisRevurdering(
