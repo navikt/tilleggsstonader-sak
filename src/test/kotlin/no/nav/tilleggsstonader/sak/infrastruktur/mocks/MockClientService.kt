@@ -17,7 +17,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PdlClient
 import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.TilordnetSaksbehandlerClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
-import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
+import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.SimuleringClient
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
 
@@ -32,7 +32,7 @@ class MockClientService(
     val familieDokumentClient: FamilieDokumentClient,
     val fullmaktClient: FullmaktClient,
     val htmlifyClient: HtmlifyClient,
-    val iverksettClient: IverksettClient,
+    val simuleringClient: SimuleringClient,
     val journalpostClient: JournalpostClient,
     val klageClient: KlageClient,
     val kodeverkClient: KodeverkClient,
@@ -53,7 +53,7 @@ class MockClientService(
         FamilieDokumentClientMockConfig.resetTilDefault(familieDokumentClient)
         FullmaktClientMockConfig.resetTilDefault(fullmaktClient)
         HtmlifyClientMockConfig.resetTilDefault(htmlifyClient)
-        IverksettClientMockConfig.resetTilDefault(iverksettClient)
+        IverksettClientMockConfig.resetTilDefault(simuleringClient)
         JournalpostClientMockConfig.resetTilDefault(journalpostClient)
         KlageClientMockConfig.resetTilDefault(klageClient)
         KodeverkClientMockConfig.resetTilDefault(kodeverkClient)

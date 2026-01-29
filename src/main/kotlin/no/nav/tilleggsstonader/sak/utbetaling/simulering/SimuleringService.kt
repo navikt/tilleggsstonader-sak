@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
-import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
+import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.SimuleringClient
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Simuleringsresultat
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringsresultatRepository
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class SimuleringService(
-    private val iverksettClient: IverksettClient,
+    private val simuleringClient: SimuleringClient,
     private val simuleringsresultatRepository: SimuleringsresultatRepository,
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val tilgangService: TilgangService,
@@ -59,7 +59,7 @@ class SimuleringService(
     private fun simulerMedTilkjentYtelse(saksbehandling: Saksbehandling): SimuleringResponseDto? {
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandling(saksbehandling.id)
 
-        return iverksettClient.simulerV3(
+        return simuleringClient.simuler(
             utbetalingV3Mapper.lagSimuleringDtoer(
                 saksbehandling,
                 tilkjentYtelse.andelerTilkjentYtelse,

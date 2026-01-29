@@ -5,7 +5,7 @@ import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
-import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
+import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.SimuleringClient
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
 import no.nav.tilleggsstonader.sak.util.FileUtil.readFile
 import org.springframework.context.annotation.Bean
@@ -18,12 +18,12 @@ import org.springframework.context.annotation.Profile
 class IverksettClientMockConfig {
     @Bean
     @Primary
-    fun iverksettClient() = mockk<IverksettClient>(relaxed = true).apply { resetTilDefault(this) }
+    fun iverksettClient() = mockk<SimuleringClient>(relaxed = true).apply { resetTilDefault(this) }
 
     companion object {
-        fun resetTilDefault(iverksettClient: IverksettClient) {
-            clearMocks(iverksettClient)
-            every { iverksettClient.simulerV3(any()) } returns simuleringsresultat
+        fun resetTilDefault(simuleringClient: SimuleringClient) {
+            clearMocks(simuleringClient)
+            every { simuleringClient.simuler(any()) } returns simuleringsresultat
         }
 
         private val simuleringsresultat =

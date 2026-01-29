@@ -16,8 +16,8 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurdering
 import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdService
-import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
+import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.SimuleringClient
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatus
@@ -38,7 +38,7 @@ class UtbetalingIntegrationTest : CleanDatabaseIntegrationTest() {
     lateinit var iverksettService: IverksettService
 
     @Autowired
-    lateinit var iverksettClient: IverksettClient
+    lateinit var simuleringClient: SimuleringClient
 
     @Autowired
     lateinit var utbetalingStatusHåndterer: UtbetalingStatusHåndterer
@@ -72,7 +72,7 @@ class UtbetalingIntegrationTest : CleanDatabaseIntegrationTest() {
             fagsakUtbetalingIdService.finnesUtbetalingsId(førstegangsbehandling.fagsakId, TypeAndel.LÆREMIDLER_AAP)
 
         Assertions.assertThat(finnesUtbetalingIdEtterFørstegangsbehandling).isTrue
-        verify(exactly = 1) { iverksettClient.simulerV3(any()) }
+        verify(exactly = 1) { simuleringClient.simuler(any()) }
         KafkaTestConfig
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
@@ -112,7 +112,7 @@ class UtbetalingIntegrationTest : CleanDatabaseIntegrationTest() {
             fagsakUtbetalingIdService.finnesUtbetalingsId(revurdering.fagsakId, TypeAndel.LÆREMIDLER_AAP)
 
         Assertions.assertThat(finnesUtbetalingIdEtterRevurdering).isTrue
-        verify(exactly = 2) { iverksettClient.simulerV3(any()) }
+        verify(exactly = 2) { simuleringClient.simuler(any()) }
         val opphørUtbetaling =
             KafkaTestConfig
                 .sendteMeldinger()

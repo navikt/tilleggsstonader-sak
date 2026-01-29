@@ -14,11 +14,11 @@ import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
 
 @Service
-class IverksettClient(
-    @Value("\${clients.iverksetting.uri}") private val uri: URI,
+class SimuleringClient(
+    @Value("\${clients.simulering.uri}") private val uri: URI,
     @Qualifier("azure") restTemplate: RestTemplate,
 ) : AbstractRestClient(restTemplate) {
-    fun simulerV3(simuleringRequest: SimuleringDto): SimuleringResponseDto? {
+    fun simuler(simuleringRequest: SimuleringDto): SimuleringResponseDto? {
         val url =
             UriComponentsBuilder
                 .fromUri(uri)
