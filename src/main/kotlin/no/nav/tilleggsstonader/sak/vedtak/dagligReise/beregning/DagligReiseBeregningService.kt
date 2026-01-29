@@ -1,9 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.OffentligTransportBeregningRevurderingService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.OffentligTransportBeregningService
@@ -28,6 +30,7 @@ class DagligReiseBeregningService(
     private val offentligTransportBeregningRevurderingService: OffentligTransportBeregningRevurderingService,
     private val privatBilBeregningService: PrivatBilBeregningService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
+    private val unleashService: UnleashService,
 ) {
     fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
@@ -104,6 +107,8 @@ class DagligReiseBeregningService(
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkårDagligReise: List<VilkårDagligReise>,
     ): BeregningsresultatPrivatBil? {
+        if(!unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)) return null
+
         val oppfylteVilkårPrivatBil = oppfylteVilkårDagligReise.filter { it.fakta is FaktaPrivatBil }
 
         if (oppfylteVilkårPrivatBil.isEmpty()) return null
