@@ -47,15 +47,18 @@ class PrivatBilBeregningService {
 
         val periodeSplittetPåUker = justertReise.splitPerUkeMedHelg()
 
+        val uker = periodeSplittetPåUker.mapNotNull {
+            beregnForUke(
+                uke = it,
+                grunnlagForReise = grunnlagForReise,
+                vedtaksperioder = vedtaksperioder,
+            )
+        }
+
+        if (uker.isEmpty()) return null
+
         return BeregningsresultatForReiseMedPrivatBil(
-            uker =
-                periodeSplittetPåUker.mapNotNull {
-                    beregnForUke(
-                        uke = it,
-                        grunnlagForReise = grunnlagForReise,
-                        vedtaksperioder = vedtaksperioder,
-                    )
-                },
+            uker = uker,
             grunnlag = grunnlagForReise,
         )
     }
@@ -70,20 +73,32 @@ class PrivatBilBeregningService {
                 uke = uke,
                 reisedagerPerUke = grunnlagForReise.reisedagerPerUke,
                 vedtaksperioder = vedtaksperioder,
-                grunnlagForReise = grunnlagForReise,
             ) ?: return null
+
+        val dagsatsUtenParkering =
+            beregnDagsatsUtenParkering(
+                kilometersats = grunnlagForUke.kilometersats,
+                grunnlagForReise = grunnlagForReise,
+            )
 
         return BeregningsresultatForUke(
             grunnlag = grunnlagForUke,
-            maksBeløpSomKanDekkesFørParkering = beregnMaksbeløp(grunnlagForUke = grunnlagForUke),
+            dagsatsUtenParkering = dagsatsUtenParkering,
+            maksBeløpSomKanDekkesFørParkering =
+                beregnMaksbeløp(
+                    grunnlagForUke = grunnlagForUke,
+                    dagsatsUtenParkering = dagsatsUtenParkering,
+                ),
         )
     }
 
-    private fun beregnMaksbeløp(grunnlagForUke: BeregningsgrunnlagForUke) =
-        grunnlagForUke.dagsatsUtenParkering
-            .multiply(grunnlagForUke.maksAntallDagerSomKanDekkes.toBigDecimal())
-            .setScale(0, RoundingMode.HALF_UP)
-            .toInt()
+    private fun beregnMaksbeløp(
+        grunnlagForUke: BeregningsgrunnlagForUke,
+        dagsatsUtenParkering: BigDecimal,
+    ) = dagsatsUtenParkering
+        .multiply(grunnlagForUke.maksAntallDagerSomKanDekkes.toBigDecimal())
+        .setScale(0, RoundingMode.HALF_UP)
+        .toBigInteger()
 
     private fun lagBeregningsgrunnlagForReise(reise: ReiseMedPrivatBil): BeregningsgrunnlagForReiseMedPrivatBil =
         BeregningsgrunnlagForReiseMedPrivatBil(
@@ -102,15 +117,12 @@ class PrivatBilBeregningService {
         uke: Datoperiode,
         reisedagerPerUke: Int,
         vedtaksperioder: List<Vedtaksperiode>,
-        grunnlagForReise: BeregningsgrunnlagForReiseMedPrivatBil,
     ): BeregningsgrunnlagForUke? {
         val relevantVedtaksperiode = finnRelevantVedtaksperiodeForUke(uke, vedtaksperioder) ?: return null
 
-        val justertUkeMedAntallDager = uke.tilpassUkeTilVedtaksperiode(relevantVedtaksperiode) ?: return null
+        val justertUkeMedAntallDager = uke.finnAntallDagerIUkeInnenforVedtaksperiode(relevantVedtaksperiode) ?: return null
 
         val (antallDager, antallDagerInkludererHelg) = finnAntallDagerSomDekkes(justertUkeMedAntallDager, reisedagerPerUke)
-
-        val kilometersats = finnRelevantKilometerSats(periode = justertUkeMedAntallDager)
 
         return BeregningsgrunnlagForUke(
             fom = justertUkeMedAntallDager.fom,
@@ -118,12 +130,7 @@ class PrivatBilBeregningService {
             maksAntallDagerSomKanDekkes = antallDager,
             antallDagerInkludererHelg = antallDagerInkludererHelg,
             vedtaksperioder = listOf(relevantVedtaksperiode),
-            kilometersats = kilometersats,
-            dagsatsUtenParkering =
-                beregnDagsatsUtenParkering(
-                    kilometersats = kilometersats,
-                    grunnlagForReise = grunnlagForReise,
-                ),
+            kilometersats = finnRelevantKilometerSats(periode = justertUkeMedAntallDager),
         )
     }
 

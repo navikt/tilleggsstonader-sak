@@ -34,7 +34,7 @@ Egenskap: Beregning av privat bil og vedtaksperioder
       | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Inkluderer helg |
       | 1       | 12.01.2026 | 15.01.2026 | 4                       | Nei             |
 
-    Scenario: 2 vedtaksperioder hvor oppholdet gjør at en uke ikke dekkes at all av en vedtaksperiode
+    Scenario: 2 vedtaksperioder hvor oppholdet gjør at hele uker ikke dekkes av minst én vedtaksperiode
       Gitt følgende vedtaksperioder for daglig reise privat bil
         | Fom        | Tom        | Målgruppe           | Aktivitet |
         | 05.01.2026 | 11.01.2026 | NEDSATT_ARBEIDSEVNE | TILTAK    |
@@ -144,4 +144,4 @@ Egenskap: Beregning av privat bil og vedtaksperioder
 
       Når beregner for daglig reise privat bil
 
-      Så forvent følgende feilmelding for beregning privat bil: flere ulike aktivitetstyper innenfor samme uke
+      Så forvent følgende feilmelding for beregning privat bil: flere ulike aktivitetsvarianter innenfor samme uke

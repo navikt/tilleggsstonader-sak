@@ -23,16 +23,17 @@ fun finnRelevantVedtaksperiodeForUke(
         vedtaksperioder
             .sorted()
             .mergeSammenhengende { v1, v2 -> v1.erSammenhengendeMedLikMålgruppeOgTypeAktivitet(v2) }
+
     val vedtaksperioderSomOverlapperUke = sammenslåtteVedtaksperioder.mapNotNull { it.beregnSnitt(uke) }
 
     if (vedtaksperioderSomOverlapperUke.size > 1) {
-        håndterFlereVedtaksperioderInnenforEnUke(uke, sammenslåtteVedtaksperioder)
+        kastFeilVedFlereVedtaksperioderInnenforEnUke(uke, sammenslåtteVedtaksperioder)
     }
 
     return vedtaksperioderSomOverlapperUke.firstOrNull()
 }
 
-fun Datoperiode.tilpassUkeTilVedtaksperiode(vedtaksperiode: Vedtaksperiode): PeriodeMedAntallDager? {
+fun Datoperiode.finnAntallDagerIUkeInnenforVedtaksperiode(vedtaksperiode: Vedtaksperiode): PeriodeMedAntallDager? {
     val snitt = this.beregnSnitt(vedtaksperiode) ?: return null
 
     return PeriodeMedAntallDager(
@@ -41,22 +42,26 @@ fun Datoperiode.tilpassUkeTilVedtaksperiode(vedtaksperiode: Vedtaksperiode): Per
     )
 }
 
-private fun håndterFlereVedtaksperioderInnenforEnUke(
+private fun kastFeilVedFlereVedtaksperioderInnenforEnUke(
     uke: Datoperiode,
     vedtaksperioder: List<Vedtaksperiode>,
-) {
+): Nothing {
     val antallMålgrupper = vedtaksperioder.map { it.målgruppe }.distinct().size
     brukerfeilHvis(antallMålgrupper > 1) {
-        "Beregningen klarer ikke å håndtere flere ulike målgrupper innenfor samme uke. Gjelder uke ${uke.formatertPeriodeNorskFormat()}"
+        "Beregningen klarer ikke å håndtere flere ulike målgrupper innenfor samme uke. " +
+                "Gjelder uke ${uke.formatertPeriodeNorskFormat()}"
     }
 
     val antallTypeAktiviteter = vedtaksperioder.map { it.typeAktivitet }.distinct().size
     brukerfeilHvis(antallTypeAktiviteter > 1) {
-        "Beregningen klarer ikke å håndtere flere ulike aktivitetstyper innenfor samme uke. Gjelder uke ${uke.formatertPeriodeNorskFormat()}"
+        "Beregningen klarer ikke å håndtere flere ulike aktivitetsvarianter innenfor samme uke. " +
+                "Gjelder uke ${uke.formatertPeriodeNorskFormat()}"
     }
 
     brukerfeil(
-        "Beregning klarer ikke å håndtere opphold mellom to vedtaksperioder innenfor en uke. Gjelder uke ${uke.formatertPeriodeNorskFormat()}",
+        "Beregning klarer ikke å håndtere opphold mellom to vedtaksperioder innenfor en uke. " +
+                "Gjelder uke ${uke.formatertPeriodeNorskFormat()}. " +
+                "Splitt reiseperioden slik at den matcher vedtaksperiodene",
     )
 }
 
@@ -69,25 +74,25 @@ fun finnAntallDagerSomDekkes(
     uke: PeriodeMedAntallDager,
     reisedagerPerUke: Int,
 ): AntallDagerSomDekkes {
-    var antallDager: Int
-    var antallDagerInkludererHelg: Boolean
-
     val totaltAntallDagerIUke = uke.antallHverdager + uke.antallHelgedager
 
     if (reisedagerPerUke <= uke.antallHverdager) {
-        antallDager = reisedagerPerUke
-        antallDagerInkludererHelg = false
-    } else if (reisedagerPerUke <= totaltAntallDagerIUke) {
-        antallDager = reisedagerPerUke
-        antallDagerInkludererHelg = true
-    } else {
-        antallDager = totaltAntallDagerIUke
-        antallDagerInkludererHelg = uke.antallHelgedager > 0
+        return AntallDagerSomDekkes(
+            antallDager = reisedagerPerUke,
+            inkludererHelg = false,
+        )
+    }
+
+    if (reisedagerPerUke <= totaltAntallDagerIUke) {
+        return AntallDagerSomDekkes(
+            antallDager = reisedagerPerUke,
+            inkludererHelg = true,
+        )
     }
 
     return AntallDagerSomDekkes(
-        antallDager = antallDager,
-        inkludererHelg = antallDagerInkludererHelg,
+        antallDager = totaltAntallDagerIUke,
+        inkludererHelg = uke.antallHelgedager > 0,
     )
 }
 

@@ -115,7 +115,7 @@ class PrivatBilBeregningStepDefinitions {
                 )
             }
             uke.grunnlag.dagsatsUtenParkering?.let {
-                assertThat(gjeldendeReise.uker[index].grunnlag.dagsatsUtenParkering).isEqualTo(it)
+                assertThat(gjeldendeReise.uker[index].dagsatsUtenParkering).isEqualTo(it)
             }
         }
     }

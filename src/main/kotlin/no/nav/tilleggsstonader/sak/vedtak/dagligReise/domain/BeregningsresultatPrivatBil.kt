@@ -3,10 +3,9 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import java.math.BigDecimal
+import java.math.BigInteger
 import java.time.LocalDate
 
-// Generelle tanker:
-// Burde vi splitte opp reisene slik at det blir 1 ny ved nytt år?
 data class BeregningsresultatPrivatBil(
     val reiser: List<BeregningsresultatForReiseMedPrivatBil>,
 )
@@ -16,9 +15,14 @@ data class BeregningsresultatForReiseMedPrivatBil(
     val grunnlag: BeregningsgrunnlagForReiseMedPrivatBil,
 )
 
+/**
+ * dagsatsUtenParkering: hva brukeren kan få dekt per dag. Inkluderer bompenger og ferge, men ikke parkering.
+ * maksBeløpSomKanDekkesFørParkering: maksimalt beløp bruker kan få dekt dersom hen kjører hver dag.
+ */
 data class BeregningsresultatForUke(
     val grunnlag: BeregningsgrunnlagForUke,
-    val maksBeløpSomKanDekkesFørParkering: Int,
+    val dagsatsUtenParkering: BigDecimal,
+    val maksBeløpSomKanDekkesFørParkering: BigInteger,
 )
 
 data class BeregningsgrunnlagForReiseMedPrivatBil(
@@ -35,6 +39,7 @@ data class BeregningsgrunnlagForReiseMedPrivatBil(
  * maksAntallDagerSomKanDekkes: Begrenses av antall reisedager og fom/tom
  * antallDagerInkludererHelg: Flagg for å vise om beregning har tatt med helg i maksAntall dager
  * vedtaksperioder: Er en liste, men beregning håndterer foreløpig ikke mer enn 1
+ * kilometersats: Hvor mye som dekkes per kilometer, fastsatt i forskriften og endres årlig.
  */
 data class BeregningsgrunnlagForUke(
     override val fom: LocalDate,
@@ -43,7 +48,6 @@ data class BeregningsgrunnlagForUke(
     val antallDagerInkludererHelg: Boolean,
     val vedtaksperioder: List<Vedtaksperiode>,
     val kilometersats: BigDecimal,
-    val dagsatsUtenParkering: BigDecimal,
 ) : Periode<LocalDate>
 
 // TODO: Finn ut om det finnes abbonnement på disse prisene og om det påvirker hvordan vi vil løse dette
