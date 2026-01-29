@@ -1,0 +1,161 @@
+{
+  "ident": "22079708902",
+  "mottattTidspunkt": "2026-01-28T12:22:18.187838",
+  "språk": "NB",
+  "skjema": {
+    "reisedagerPerUkeAvsnitt": [
+      {
+        "ukeLabel": "Uke 1 (2. februar 2025 - 8. februar 2025)",
+        "spørsmål": "Hvilke dager kjørte du?",
+        "reisedager": [
+          {
+            "dato": {
+              "label": "Søndag 2. februar 2025",
+              "verdi": "2025-02-02"
+            },
+            "harKjørt": false,
+            "parkeringsutgift": {
+              "verdi": null,
+              "label": "Parkeringsutgifter (kr)"
+            }
+          },
+          {
+            "dato": {
+              "label": "Mandag 3. februar 2025",
+              "verdi": "2025-02-03"
+            },
+            "harKjørt": false,
+            "parkeringsutgift": {
+              "verdi": null,
+              "label": "Parkeringsutgifter (kr)"
+            }
+          },
+          {
+            "dato": {
+              "label": "Tirsdag 4. februar 2025",
+              "verdi": "2025-02-04"
+            },
+            "harKjørt": true,
+            "parkeringsutgift": {
+              "verdi": 12,
+              "label": "Parkeringsutgifter (kr)"
+            }
+          },
+          {
+            "dato": {
+              "label": "Onsdag 5. februar 2025",
+              "verdi": "2025-02-05"
+            },
+            "harKjørt": true,
+            "parkeringsutgift": {
+              "verdi": 22,
+              "label": "Parkeringsutgifter (kr)"
+            }
+          },
+          {
+            "dato": {
+              "label": "Torsdag 6. februar 2025",
+              "verdi": "2025-02-06"
+            },
+            "harKjørt": true,
+            "parkeringsutgift": {
+              "verdi": 33,
+              "label": "Parkeringsutgifter (kr)"
+            }
+          },
+          {
+            "dato": {
+              "label": "Fredag 7. februar 2025",
+              "verdi": "2025-02-07"
+            },
+            "harKjørt": false,
+            "parkeringsutgift": {
+              "verdi": null,
+              "label": "Parkeringsutgifter (kr)"
+            }
+          },
+          {
+            "dato": {
+              "label": "Lørdag 8. februar 2025",
+              "verdi": "2025-02-08"
+            },
+            "harKjørt": false,
+            "parkeringsutgift": {
+              "verdi": null,
+              "label": "Parkeringsutgifter (kr)"
+            }
+          }
+        ]
+      },
+      {
+        "ukeLabel": "Uke 2 (9. februar 2025 - 13. februar 2025)",
+        "spørsmål": "Hvilke dager kjørte du?",
+        "reisedager": [
+          {
+            "dato": {
+              "label": "Søndag 9. februar 2025",
+              "verdi": "2025-02-09"
+            },
+            "harKjørt": false,
+            "parkeringsutgift": {
+              "verdi": null,
+              "label": "Parkeringsutgifter (kr)"
+            }
+          },
+          {
+            "dato": {
+              "label": "Mandag 10. februar 2025",
+              "verdi": "2025-02-10"
+            },
+            "harKjørt": false,
+            "parkeringsutgift": {
+              "verdi": null,
+              "label": "Parkeringsutgifter (kr)"
+            }
+          },
+          {
+            "dato": {
+              "label": "Tirsdag 11. februar 2025",
+              "verdi": "2025-02-11"
+            },
+            "harKjørt": true,
+            "parkeringsutgift": {
+              "verdi": 33,
+              "label": "Parkeringsutgifter (kr)"
+            }
+          },
+          {
+            "dato": {
+              "label": "Onsdag 12. februar 2025",
+              "verdi": "2025-02-12"
+            },
+            "harKjørt": true,
+            "parkeringsutgift": {
+              "verdi": 38,
+              "label": "Parkeringsutgifter (kr)"
+            }
+          },
+          {
+            "dato": {
+              "label": "Torsdag 13. februar 2025",
+              "verdi": "2025-02-13"
+            },
+            "harKjørt": false,
+            "parkeringsutgift": {
+              "verdi": null,
+              "label": "Parkeringsutgifter (kr)"
+            }
+          }
+        ]
+      }
+    ],
+    "dokumentasjon": [
+      {
+        "type": "PARKERINGSUTGIFT",
+        "label": "Vedlegg parkeringsutgift",
+        "opplastedeVedlegg": [],
+        "barnId": null
+      }
+    ]
+  }
+}

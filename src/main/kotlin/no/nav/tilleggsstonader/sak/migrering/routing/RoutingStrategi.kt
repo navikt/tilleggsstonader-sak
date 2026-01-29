@@ -28,5 +28,11 @@ fun bestemRoutingStrategi(skjematype: Skjematype): RoutingStrategi =
                 kreverUgradertAdresse = true,
             )
 
-        Skjematype.DAGLIG_REISE_KJØRELISTE -> TODO()
+        Skjematype.DAGLIG_REISE_KJØRELISTE ->
+            RoutingStrategi.SendEnkelteBrukereTilNyLøsning(
+                featureToggleMaksAntallForStønad = Toggle.SØKNAD_ROUTING_DAGLIG_REISE_KJORELISTE,
+                kreverAtSøkerErUtenAktivtVedtakIArena = true,
+                kreverAktivtAapVedtak = false,
+                kreverUgradertAdresse = true,
+            )
     }

@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadKjøreliste
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.tilMålgruppeType
@@ -101,7 +102,12 @@ class HåndterSøknadService(
                     finnStønadstypeForDagligReise(journalpost),
                     Stønadstype.entries.filter { it.gjelderDagligReise() },
                 )
-            Skjematype.DAGLIG_REISE_KJØRELISTE -> TODO()
+
+            Skjematype.DAGLIG_REISE_KJØRELISTE ->
+                ValgbareStønadstyperForJournalpost(
+                    finnStønadstypeForKjøreliste(journalpost),
+                    Stønadstype.entries.filter { it.gjelderDagligReise() },
+                )
         }
     }
 
@@ -114,8 +120,9 @@ class HåndterSøknadService(
             }
         }
 
-        // Alle daglige reiser støknader legges på TSO fra fyll ut send inn
-        val søknadsskjema = journalpostService.hentSøknadFraJournalpost(journalpost, Stønadstype.DAGLIG_REISE_TSO)
+        // Alle daglige reiser stønader legges på TSO fra fyll ut send inn
+        val søknadsskjema =
+            journalpostService.hentSøknadFraJournalpost(journalpost, Stønadstype.DAGLIG_REISE_TSO)
         val søknad = søknadService.mapSøknad(søknadsskjema, journalpost)
 
         if (søknad !is SøknadDagligReise) {
@@ -133,6 +140,27 @@ class HåndterSøknadService(
         } else {
             Stønadstype.DAGLIG_REISE_TSR
         }
+    }
+
+    private fun finnStønadstypeForKjøreliste(journalpost: Journalpost): Stønadstype {
+        if (!journalpost.harStrukturertSøknad()) {
+            return if (journalpost.tema == Tema.TSO.name) {
+                Stønadstype.DAGLIG_REISE_TSO
+            } else {
+                Stønadstype.DAGLIG_REISE_TSR
+            }
+        }
+
+        val søknadsskjema =
+            journalpostService.hentSøknadFraJournalpost(journalpost, Stønadstype.DAGLIG_REISE_TSO)
+        val søknad = søknadService.mapSøknad(søknadsskjema, journalpost)
+
+        if (søknad !is SøknadKjøreliste) {
+            error("Søknaden fra journalposten er ikke en kjøreliste søknad")
+        }
+
+        // TODO her må jeg sjekke på målgruppe eller annet for å kunne skille på TSO og TSR for kjøreliste
+        return Stønadstype.DAGLIG_REISE_TSO
     }
 
     private fun hentMålgrupperFraRegister(
@@ -165,6 +193,7 @@ class HåndterSøknadService(
         val allePersonIdenter = personService.hentFolkeregisterIdenter(personIdent).identer()
         val fagsak = fagsakService.finnFagsak(allePersonIdenter, stønadstype)
 
+        // todo sjekke for parkeringsutgifter
         return if (fagsak == null) {
             true
         } else {

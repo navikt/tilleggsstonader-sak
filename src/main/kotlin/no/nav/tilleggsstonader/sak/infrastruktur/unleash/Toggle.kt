@@ -28,4 +28,5 @@ enum class Toggle(
     SKAL_IVERKSETT_NYE_BEHANDLINGER_MOT_KAFKA("sak.skal-iverksette-nye-behandlinger-mot-kafka"),
 
     KAN_BEHANDLE_PRIVAT_BIL("sak.daglig-reise-privat-bil"),
+    SØKNAD_ROUTING_DAGLIG_REISE_KJORELISTE("sak.soknad-routing.daglig-reise-kjoreliste"),
 }

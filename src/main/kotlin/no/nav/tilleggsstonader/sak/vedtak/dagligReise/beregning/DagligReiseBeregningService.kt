@@ -54,6 +54,7 @@ class DagligReiseBeregningService(
                     brukersNavKontor = brukersNavKontor,
                     tidligsteEndring = tidligsteEndring,
                 ),
+            privatBil = null,
         )
     }
 

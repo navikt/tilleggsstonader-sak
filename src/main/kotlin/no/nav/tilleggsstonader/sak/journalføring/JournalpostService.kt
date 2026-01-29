@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.AvsenderMottaker
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.BulkOppdaterLogiskVedleggRequest
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
+import no.nav.tilleggsstonader.kontrakter.felles.Skjematype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
@@ -130,8 +131,14 @@ class JournalpostService(
         søknadJournalpost: Journalpost,
         stønadstype: Stønadstype,
     ): InnsendtSkjema<out Skjemadata> {
+        val skjematype = søknadJournalpost.dokumentBrevkode()?.tilSkjematype()
+        val erKjøreliste = skjematype != null && skjematype == Skjematype.DAGLIG_REISE_KJØRELISTE
+
         val dokumentinfo =
-            JournalføringHelper.plukkUtOriginaldokument(søknadJournalpost, stønadstype.tilDokumentBrevkode())
+            JournalføringHelper.plukkUtOriginaldokument(
+                søknadJournalpost,
+                stønadstype.tilDokumentBrevkode(erKjøreliste),
+            )
         val data =
             journalpostClient.hentDokument(
                 journalpostId = søknadJournalpost.journalpostId,
@@ -139,7 +146,12 @@ class JournalpostService(
                 Dokumentvariantformat.ORIGINAL,
             )
         val mottattTidspunkt = mestRelevanteDato(søknadJournalpost) ?: LocalDateTime.now()
-        return SøknadsskjemaUtil.parseSøknadsskjema(stønadstype, data, mottattTidspunkt = mottattTidspunkt)
+
+        if (erKjøreliste) {
+            return SøknadsskjemaUtil.parseKjøreliste(data)
+        } else {
+            return SøknadsskjemaUtil.parseSøknadsskjema(stønadstype, data, mottattTidspunkt = mottattTidspunkt)
+        }
     }
 
     fun finnJournalpostOgPersonIdent(journalpostId: String): Pair<Journalpost, String> {
@@ -200,12 +212,12 @@ class JournalpostService(
     }
 }
 
-private fun Stønadstype.tilDokumentBrevkode(): DokumentBrevkode =
+private fun Stønadstype.tilDokumentBrevkode(erKjøreliste: Boolean): DokumentBrevkode =
     when (this) {
         Stønadstype.BARNETILSYN -> DokumentBrevkode.BARNETILSYN
         Stønadstype.LÆREMIDLER -> DokumentBrevkode.LÆREMIDLER
         Stønadstype.BOUTGIFTER -> DokumentBrevkode.BOUTGIFTER
         Stønadstype.DAGLIG_REISE_TSO,
         Stønadstype.DAGLIG_REISE_TSR,
-        -> DokumentBrevkode.DAGLIG_REISE
+        -> if (erKjøreliste) DokumentBrevkode.DAGLIG_REISE_KJØRELISTE else DokumentBrevkode.DAGLIG_REISE
     }

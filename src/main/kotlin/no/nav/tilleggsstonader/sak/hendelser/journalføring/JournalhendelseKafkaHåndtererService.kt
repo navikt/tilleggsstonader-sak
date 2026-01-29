@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.BARNETILSYN
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.BOUTGIFTER
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.DAGLIG_REISE
+import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.DAGLIG_REISE_KJØRELISTE
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.LÆREMIDLER
 import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterSøknadService
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
@@ -49,7 +50,14 @@ class JournalhendelseKafkaHåndtererService(
         Tema.gjelderTemaTilleggsstønader(this.tema) &&
             this.erInnkommende() &&
             this.gjelderKanalSkanningEllerNavNo() &&
-            this.dokumentBrevkode() in listOf(BARNETILSYN, LÆREMIDLER, BOUTGIFTER, DAGLIG_REISE) &&
+            this.dokumentBrevkode() in
+            listOf(
+                BARNETILSYN,
+                LÆREMIDLER,
+                BOUTGIFTER,
+                DAGLIG_REISE,
+                DAGLIG_REISE_KJØRELISTE,
+            ) &&
             !this.erFerdigstilt()
 
     /*
