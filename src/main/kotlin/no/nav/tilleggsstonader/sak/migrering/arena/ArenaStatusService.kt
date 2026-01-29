@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
@@ -40,8 +41,14 @@ class ArenaStatusService(
 
         val logPrefix = "Sjekker om person finnes i ny løsning stønadstype=${request.stønadstype}"
 
-        if (harBehandlingSomIkkeErHenlagt(fagsak)) {
+        if (fagsak != null && harBehandlingSomIkkeErHenlagt(fagsak)) {
             logger.info("$logPrefix finnes=true harBehandling")
+
+            if (fagsakHarUnntakOgKanBehandlesIArena(fagsak.eksternId)) {
+                logger.info("$logPrefix finnes=true harUnntak")
+                return false
+            }
+
             return true
         }
 
@@ -66,9 +73,20 @@ class ArenaStatusService(
             Stønadstype.DAGLIG_REISE_TSR -> false
         }
 
-    private fun harBehandlingSomIkkeErHenlagt(fagsak: Fagsak?): Boolean {
-        val behandlinger = fagsak?.let { behandlingService.hentBehandlinger(fagsak.id) }
+    private fun harBehandlingSomIkkeErHenlagt(fagsak: Fagsak): Boolean {
+        val behandlinger = behandlingService.hentBehandlinger(fagsak.id)
 
-        return behandlinger?.any { it.resultat != BehandlingResultat.HENLAGT } == true
+        return behandlinger.any { it.resultat != BehandlingResultat.HENLAGT }
     }
+
+    private fun fagsakHarUnntakOgKanBehandlesIArena(eksternFagsakId: EksternFagsakId): Boolean =
+        saksnummerSomKanBehandlesIArena.contains(eksternFagsakId.id)
+
+    /**
+     * Liste med saksnummere som har fått unntak slik at de kan behandles i arena
+     */
+    private val saksnummerSomKanBehandlesIArena: List<Long> =
+        listOf(
+            9807,
+        )
 }
