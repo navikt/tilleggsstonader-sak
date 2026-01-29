@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DagpengerDagligReiseTsr
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
@@ -133,10 +134,12 @@ private fun mapAktiviteter(
             require(faktaOgSvar is FaktaOgSvarAktivitetBoutgifterDto)
             return mapAktiviteterBoutgifter(type, faktaOgSvar)
         }
+
         Stønadstype.DAGLIG_REISE_TSO -> {
             require(faktaOgSvar is FaktaOgSvarAktivitetDagligReiseTsoDto)
             return mapAktiviteterDagligReiseTso(type, faktaOgSvar)
         }
+
         Stønadstype.DAGLIG_REISE_TSR -> {
             require(faktaOgSvar is FaktaOgSvarAktivitetDagligReiseTsrDto)
             return mapAktiviteterDagligReiseTsr(type, faktaOgSvar)
@@ -167,9 +170,11 @@ private fun mapMålgruppe(
         Stønadstype.BOUTGIFTER -> {
             mapMålgruppeBoutgfiter(type, faktaOgSvar, målgruppe, fødselFaktaGrunnlag)
         }
+
         Stønadstype.DAGLIG_REISE_TSO -> {
             mapMålgruppeDagligReiseTso(type, faktaOgSvar, målgruppe, fødselFaktaGrunnlag)
         }
+
         Stønadstype.DAGLIG_REISE_TSR -> {
             mapMålgruppeDagligReiseTsr(type)
         }
@@ -294,6 +299,7 @@ private fun mapAktiviteterDagligReiseTsr(
                     VurderingTiltakDagligReiseTsr(
                         harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
                     ),
+                fakta = FaktaAktivitetDagligReiseTsr(faktaOgSvar.aktivitetsdager),
             )
         }
 
