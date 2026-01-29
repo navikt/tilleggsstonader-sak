@@ -2,11 +2,11 @@ package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -376,6 +376,7 @@ class IverksettService(
 
         return behandling.stønadstype.gjelderDagligReise() ||
             erFørstegangsbehandlingOgSkalIverksetteMotKafka(behandling, erFørsteIverksettingForBehandling) ||
+            forrigeBehandlingHarOpphørtAlt(behandling) ||
             (
                 utbetalingIderPåFagsak.isNotEmpty() &&
                     finnesUtbetalingIdForAlleTypeAndeler(
@@ -383,6 +384,22 @@ class IverksettService(
                         utbetalingIderPåFagsak = utbetalingIderPåFagsak,
                     )
             )
+    }
+
+    private fun forrigeBehandlingHarOpphørtAlt(behandling: Saksbehandling): Boolean {
+        if (behandling.forrigeIverksatteBehandlingId == null) {
+            return false
+        }
+        val forrigeIverksatteBehandling = behandlingService.hentBehandling(behandling.forrigeIverksatteBehandlingId)
+        if (forrigeIverksatteBehandling.resultat != BehandlingResultat.OPPHØRT) {
+            return false
+        }
+
+        val andeler = tilkjentYtelseService.hentForBehandling(forrigeIverksatteBehandling.id).andelerTilkjentYtelse
+        if (andeler.all { it.type == TypeAndel.UGYLDIG }) {
+            return true
+        }
+        return false
     }
 
     private fun erFørstegangsbehandlingOgSkalIverksetteMotKafka(

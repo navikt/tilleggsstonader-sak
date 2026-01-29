@@ -10,8 +10,6 @@ sealed interface RoutingStrategi {
     data class SendEnkelteBrukereTilNyLøsning(
         val featureToggleMaksAntallForStønad: ToggleId,
         val kreverAtSøkerErUtenAktivtVedtakIArena: Boolean,
-        val skalBegrenseAntallTilTsr: Boolean,
-        val featureToggleMaksAntallForTsr: Toggle,
         val kreverAktivtAapVedtak: Boolean,
         val kreverUgradertAdresse: Boolean,
     ) : RoutingStrategi
@@ -26,9 +24,7 @@ fun bestemRoutingStrategi(skjematype: Skjematype): RoutingStrategi =
             RoutingStrategi.SendEnkelteBrukereTilNyLøsning(
                 featureToggleMaksAntallForStønad = Toggle.SØKNAD_ROUTING_DAGLIG_REISE,
                 kreverAtSøkerErUtenAktivtVedtakIArena = true,
-                featureToggleMaksAntallForTsr = Toggle.SØKNAD_ROUTING_DAGLIG_REISE_TSR,
-                skalBegrenseAntallTilTsr = true,
-                kreverAktivtAapVedtak = true,
+                kreverAktivtAapVedtak = false,
                 kreverUgradertAdresse = true,
             )
 

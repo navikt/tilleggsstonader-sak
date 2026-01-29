@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingId
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class FagsakUtbetalingIdMigreringService(
@@ -28,7 +27,7 @@ class FagsakUtbetalingIdMigreringService(
     private val transactionHandler: TransactionHandler,
     private val unleashService: UnleashService,
 ) {
-    fun migrerForFagsak(fagsakId: FagsakId) {
+    fun migrerForFagsak(fagsakId: FagsakId): Boolean {
         if (unleashService.isEnabled(Toggle.SKAL_MIGRERE_UTBETALING_MOT_KAFKA)) {
             val sisteIverksatteBehandling =
                 behandlingService
@@ -37,7 +36,10 @@ class FagsakUtbetalingIdMigreringService(
             val andelTilkjentYtelseListe =
                 sisteIverksatteBehandling?.let { iverksettService.hentAndelTilkjentYtelse(it.id) }
             val typeAndelerPåFagsaken =
-                andelTilkjentYtelseListe?.let { it.map { andelTilkjentYtelse -> andelTilkjentYtelse.type } }?.toSet()
+                andelTilkjentYtelseListe
+                    ?.let { it.map { andelTilkjentYtelse -> andelTilkjentYtelse.type } }
+                    ?.toSet()
+                    ?.filter { it != TypeAndel.UGYLDIG }
                     ?: emptySet()
 
             logger.info("Migrerer typeAndeler: {} for fagsak {}", typeAndelerPåFagsaken, fagsakId)
@@ -49,20 +51,15 @@ class FagsakUtbetalingIdMigreringService(
                     }
                 }
             }
+            return true
         }
+        return false
     }
 
     private fun skalMigrereTilKafka(
         fagsakId: FagsakId,
         typeAndel: TypeAndel,
-    ): Boolean =
-        !fagsakUtbetalingIdService.finnesUtbetalingsId(fagsakId, typeAndel) &&
-            typeAndel in
-            listOf(
-                TypeAndel.LÆREMIDLER_AAP,
-                TypeAndel.LÆREMIDLER_ETTERLATTE,
-                TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER,
-            )
+    ): Boolean = !fagsakUtbetalingIdService.finnesUtbetalingsId(fagsakId, typeAndel)
 
     // Returnerer utbetalingId for fagsak og typeAndel
     private fun migrerForFagsakOgTypeAndel(

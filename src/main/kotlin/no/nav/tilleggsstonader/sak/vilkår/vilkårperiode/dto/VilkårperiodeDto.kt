@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AldersvilkårVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdagerNullable
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingDagligReiseTso
@@ -137,6 +138,7 @@ data class AktivitetDagligReiseTsoFaktaOgVurderingerDto(
 
 data class AktivitetDagligReiseTsrFaktaOgVurderingerDto(
     val harUtgifter: VurderingDto? = null,
+    val aktivitetsdager: Int? = null,
 ) : FaktaOgVurderingerDto()
 
 fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
@@ -200,14 +202,17 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                     AktivitetBoutgifterFaktaOgVurderingerDto(
                         lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
                     )
+
                 is FaktaOgVurderingDagligReiseTso ->
                     AktivitetDagligReiseTsoFaktaOgVurderingerDto(
                         lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
                         harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
                     )
+
                 is FaktaOgVurderingDagligReiseTsr ->
                     AktivitetDagligReiseTsrFaktaOgVurderingerDto(
                         harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
+                        aktivitetsdager = fakta.takeIfFakta<FaktaAktivitetsdagerNullable>()?.aktivitetsdager,
                     )
             }
         }

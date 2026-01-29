@@ -20,11 +20,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PdlClient
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
-import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.kildeResultatAAP
-import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.kildeResultatTiltakspengerTpsak
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.periodeAAP
-import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.periodeTiltakspengerTpsak
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDto
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -153,18 +150,6 @@ class SkjemaRoutingIntegrationTest(
         }
 
         @Test
-        fun `brukere uten aktiv AAP og uten aktiv tsr målgruppe skal bli routet til gammel løsning`() {
-            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
-            mockDagligReiseVedtakIArena(erAktivt = false)
-            mockAapVedtak(erAktivt = false)
-            mockTiltakspengerVedtak(erAktivt = false)
-
-            val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
-            assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
-            assertThat(routingHarBlittLagret()).isFalse()
-        }
-
-        @Test
         fun `skal slippe gjennom personer til ny løsning, men bare til maks antall er nådd`() {
             mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 1)
             mockDagligReiseVedtakIArena(erAktivt = false)
@@ -181,35 +166,9 @@ class SkjemaRoutingIntegrationTest(
             assertThat(routingHarBlittLagret(ident = ernaIdent)).isFalse()
         }
 
-        @Test
-        fun `skal slippe gjennom personer med tsr målgruppe til ny løsning, men bare til maks antall for tsr er nådd`() {
-            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 5)
-            mockMaksAntallSomKanRoutesPåDagligReiseTsr(maksAntall = 1)
-            mockDagligReiseVedtakIArena(erAktivt = false)
-            mockTiltakspengerVedtak(erAktivt = true)
-            mockAapVedtak(erAktivt = false)
-
-            val routingSjekkFørsteRouting =
-                kall.skjemaRouting.sjekk(IdentSkjematype(jonasIdent, Skjematype.SØKNAD_DAGLIG_REISE))
-            val routingSjekkAndreRouting =
-                kall.skjemaRouting.sjekk(IdentSkjematype(ernaIdent, Skjematype.SØKNAD_DAGLIG_REISE))
-
-            assertThat(routingSjekkFørsteRouting.skalBehandlesINyLøsning).isTrue()
-            assertThat(routingHarBlittLagret(ident = jonasIdent)).isTrue()
-            assertThat(routingSjekkAndreRouting.skalBehandlesINyLøsning).isFalse()
-            assertThat(routingHarBlittLagret(ident = ernaIdent)).isFalse()
-        }
-
         private fun mockMaksAntallSomKanRoutesPåDagligReise(maksAntall: Int) {
             unleashService.mockGetVariant(
                 Toggle.SØKNAD_ROUTING_DAGLIG_REISE,
-                Variant("antall", maksAntall.toString(), true),
-            )
-        }
-
-        private fun mockMaksAntallSomKanRoutesPåDagligReiseTsr(maksAntall: Int) {
-            unleashService.mockGetVariant(
-                Toggle.SØKNAD_ROUTING_DAGLIG_REISE_TSR,
                 Variant("antall", maksAntall.toString(), true),
             )
         }
@@ -249,30 +208,6 @@ class SkjemaRoutingIntegrationTest(
                 )
         }
 
-        private fun mockTiltakspengerVedtak(erAktivt: Boolean) {
-            val pågåendePeriode =
-                periodeTiltakspengerTpsak(
-                    fom = LocalDate.now().minusDays(1),
-                    tom = LocalDate.now().plusDays(1),
-                )
-            every {
-                ytelseClient.hentYtelser(
-                    match {
-                        it.typer ==
-                            listOf(
-                                TypeYtelsePeriode.DAGPENGER,
-                                TypeYtelsePeriode.TILTAKSPENGER_TPSAK,
-                                TypeYtelsePeriode.TILTAKSPENGER_ARENA,
-                            )
-                    },
-                )
-            } returns
-                ytelsePerioderDto(
-                    perioder = if (erAktivt) listOf(pågåendePeriode) else emptyList(),
-                    kildeResultat = listOf(kildeResultatTiltakspengerTpsak()),
-                )
-        }
-
         private fun mockPersonMedAdressebeskyttelse(adressebeskyttelseGradering: AdressebeskyttelseGradering) {
             every { pdlClient.hentPersonKortBolk(any()) } answers {
                 firstArg<List<String>>().associateWith {
@@ -286,7 +221,17 @@ class SkjemaRoutingIntegrationTest(
 
         private fun mockHentIdenterFraPdl() {
             every { pdlClient.hentPersonidenter(any()) } answers
-                { PdlIdenter(listOf(PdlIdent(ident = firstArg(), historisk = false, gruppe = "FOLKEREGISTERIDENT"))) }
+                {
+                    PdlIdenter(
+                        listOf(
+                            PdlIdent(
+                                ident = firstArg(),
+                                historisk = false,
+                                gruppe = "FOLKEREGISTERIDENT",
+                            ),
+                        ),
+                    )
+                }
         }
     }
 

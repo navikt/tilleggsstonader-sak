@@ -40,6 +40,7 @@ private fun FaktaOgVurderingerDto.tilFaktaOgSvarDto(): FaktaOgSvarDto =
         is AktivitetDagligReiseTsrFaktaOgVurderingerDto -> {
             FaktaOgSvarAktivitetDagligReiseTsrDto(
                 svarHarUtgifter = this.harUtgifter?.svar,
+                aktivitetsdager = this.aktivitetsdager,
             )
         }
         is MålgruppeFaktaOgVurderingerDto -> {

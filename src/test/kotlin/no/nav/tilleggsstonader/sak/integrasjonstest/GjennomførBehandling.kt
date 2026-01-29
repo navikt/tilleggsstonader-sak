@@ -29,9 +29,6 @@ import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil.søknadDagligReis
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.barnMedBarnepass
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaLæremidler
-import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
@@ -44,10 +41,8 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequ
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -112,13 +107,7 @@ private fun søknadForStønadstype(stønadstype: Stønadstype) =
 fun IntegrationTest.gjennomførBehandlingsløp(
     behandlingId: BehandlingId,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
-    testdataProvider: BehandlingTestdataDsl.() -> Unit =
-        defaultBehandlingTestdataProvider(
-            medAktivitet = ::lagreVilkårperiodeAktivitet,
-            medMålgruppe = ::lagreVilkårperiodeMålgruppe,
-            medVilkår = listOf(lagreDagligReiseDto()),
-            opprettVedtak = OpprettInnvilgelse,
-        ),
+    testdataProvider: BehandlingTestdataDsl.() -> Unit,
 ) {
     // Oppretter grunnlagsdata
     val behandling = kall.behandling.hent(behandlingId)
@@ -345,81 +334,7 @@ data class OpprettOpphør(
     val opphørsdato: LocalDate,
 ) : OpprettVedtak
 
-@Suppress("unused")
-@Deprecated(
-    message = "Use gjennomførBehandlingsløp(testdataProvider = { ... }) instead",
-    replaceWith =
-        ReplaceWith(
-            "gjennomførBehandlingsløp(behandlingId = behandlingId, tilSteg = StegType.INNGANGSVILKÅR, opprettVedtak = OpprettInnvilgelse)",
-        ),
-    level = DeprecationLevel.WARNING,
-)
-fun IntegrationTest.gjennomførInngangsvilkårSteg(
-    medAktivitet: ((BehandlingId) -> LagreVilkårperiode)? = null,
-    medMålgruppe: ((BehandlingId) -> LagreVilkårperiode)? = null,
-    behandlingId: BehandlingId,
-) {
-    val testdataDsl =
-        BehandlingTestdataDsl.build {
-            medAktivitet?.let { a -> aktivitet { opprett { add(a) } } }
-            medMålgruppe?.let { m -> målgruppe { opprett { add(m) } } }
-        }
-    gjennomførInngangsvilkårSteg(testdataDsl, behandlingId)
-}
-
-@Suppress("unused")
-@Deprecated(
-    message = "Use gjennomførBehandlingsløp(testdataProvider = { ... }) instead",
-    replaceWith =
-        ReplaceWith(
-            "gjennomførBehandlingsløp(behandlingId = behandlingId, tilSteg = StegType.VILKÅR, opprettVedtak = OpprettInnvilgelse)",
-        ),
-    level = DeprecationLevel.WARNING,
-)
-fun IntegrationTest.gjennomførVilkårSteg(
-    medVilkår: List<LagreVilkår>,
-    behandlingId: BehandlingId,
-    stønadstype: Stønadstype,
-) {
-    val testdataProvider =
-        BehandlingTestdataDsl.build {
-            vilkår {
-                opprett {
-                    medVilkår.forEach { lagreVilkår -> add { _, _ -> lagreVilkår } }
-                }
-            }
-        }
-    gjennomførVilkårSteg(testdataProvider, behandlingId, stønadstype)
-}
-
 private const val MINIMALT_BREV = """SAKSBEHANDLER_SIGNATUR - BREVDATO_PLACEHOLDER - BESLUTTER_SIGNATUR"""
-
-private fun defaultBehandlingTestdataProvider(
-    medAktivitet: (BehandlingId) -> LagreVilkårperiode,
-    medMålgruppe: (BehandlingId) -> LagreVilkårperiode,
-    medVilkår: List<LagreVilkår>,
-    opprettVedtak: OpprettVedtak,
-): BehandlingTestdataDsl.() -> Unit =
-    {
-        aktivitet {
-            opprett {
-                add(medAktivitet)
-            }
-        }
-        målgruppe {
-            opprett {
-                add(medMålgruppe)
-            }
-        }
-        vilkår {
-            opprett {
-                medVilkår.forEach { lagreVilkår -> add { _, _ -> lagreVilkår } }
-            }
-        }
-        vedtak {
-            vedtak = opprettVedtak
-        }
-    }
 
 private fun IntegrationTest.gjennomførInngangsvilkårSteg(
     testdataDsl: BehandlingTestdataDsl,
