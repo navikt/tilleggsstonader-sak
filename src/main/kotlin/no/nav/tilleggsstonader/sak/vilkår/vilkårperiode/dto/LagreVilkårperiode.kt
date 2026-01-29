@@ -75,6 +75,7 @@ data class FaktaOgSvarAktivitetBoutgifterDto(
 data class FaktaOgSvarAktivitetDagligReiseTsoDto(
     val svarLønnet: SvarJaNei? = null,
     val svarHarUtgifter: SvarJaNei? = null,
+    val aktivitetsdager: Int? = null,
 ) : FaktaOgSvarDto()
 
 data class FaktaOgSvarAktivitetDagligReiseTsrDto(
@@ -145,6 +146,7 @@ fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
                         .takeIfVurderinger<LønnetVurdering>()
                         ?.lønnet
                         ?.svar,
+                aktivitetsdager = this.fakta.takeIfFakta<FaktaAktivitetsdagerNullable>()?.aktivitetsdager,
             )
 
         is AktivitetDagligReiseTsr ->
