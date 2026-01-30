@@ -24,9 +24,6 @@ enum class Toggle(
 
     TILGANGSSTYRE_PÅ_TILORDNET_OPPGAVE("sak.tilgangsstyring-tildelt-oppgave"),
 
-    SKAL_MIGRERE_UTBETALING_MOT_KAFKA("sak.skal-migrere-utbetaling-mot-kafka"),
-    SKAL_IVERKSETT_NYE_BEHANDLINGER_MOT_KAFKA("sak.skal-iverksette-nye-behandlinger-mot-kafka"),
-
     KAN_BEHANDLE_PRIVAT_BIL("sak.daglig-reise-privat-bil"),
     SØKNAD_ROUTING_DAGLIG_REISE_KJORELISTE("sak.soknad-routing.daglig-reise-kjoreliste"),
 }

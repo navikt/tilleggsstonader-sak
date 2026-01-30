@@ -207,6 +207,18 @@ fun parseBigDecimal(
     return verdi.toBigDecimal()
 }
 
+fun parseValgfriBigDecimal(
+    domenebegrep: Domenenøkkel,
+    rad: Map<String, String?>,
+): BigDecimal? {
+    val verdi = rad[domenebegrep.nøkkel]
+    if (verdi == null || verdi == "") {
+        return null
+    }
+
+    return verdi.toBigDecimal()
+}
+
 fun parseDouble(
     domenebegrep: Domenenøkkel,
     rad: Map<String, String>,

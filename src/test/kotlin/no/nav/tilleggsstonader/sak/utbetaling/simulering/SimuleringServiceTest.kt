@@ -11,17 +11,18 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
-import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdMigreringService
-import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
-import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
+import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingId
+import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdService
+import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.SimuleringClient
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringJson
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Simuleringsresultat
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringsresultatRepository
-import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringRequestDto
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.SimuleringDto
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingV3Mapper
 import no.nav.tilleggsstonader.sak.util.FileUtil.readFile
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -35,25 +36,23 @@ import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringDetaljer as SimuleringDetaljerKontrakt
 
 internal class SimuleringServiceTest {
-    private val iverksettClient = mockk<IverksettClient>()
+    private val simuleringClient = mockk<SimuleringClient>()
     private val behandlingService = mockk<BehandlingService>()
     private val fagsakService = mockk<FagsakService>()
     private val simuleringsresultatRepository = mockk<SimuleringsresultatRepository>()
     private val tilkjentYtelseService = mockk<TilkjentYtelseService>()
     private val tilgangService = mockk<TilgangService>()
-    private val iverksettService = mockk<IverksettService>()
-    private val utbetalingV3Mapper = mockk<UtbetalingV3Mapper>()
-    private val fagsakUtbetalingIdMigreringService = mockk<FagsakUtbetalingIdMigreringService>()
+    private val fagsakUtbetalingIdService = mockk<FagsakUtbetalingIdService>()
+
+    private val utbetalingV3Mapper = UtbetalingV3Mapper(fagsakUtbetalingIdService, tilkjentYtelseService)
 
     private val simuleringService =
         SimuleringService(
-            iverksettClient = iverksettClient,
+            simuleringClient = simuleringClient,
             simuleringsresultatRepository = simuleringsresultatRepository,
             tilkjentYtelseService = tilkjentYtelseService,
             tilgangService = tilgangService,
-            iverksettService = iverksettService,
             utbetalingV3Mapper = utbetalingV3Mapper,
-            fagsakUtbetalingIdMigreringService = fagsakUtbetalingIdMigreringService,
         )
 
     private val personIdent = "12345678901"
@@ -65,9 +64,9 @@ internal class SimuleringServiceTest {
         every { fagsakService.fagsakMedOppdatertPersonIdent(any()) } returns fagsak
         every { tilgangService.validerHarSaksbehandlerrolle() } just Runs
         every { tilgangService.harTilgangTilRolle(any()) } returns true
-        every { iverksettService.finnForrigeIverksetting(any(), any()) } returns null
-        every { iverksettService.utbetalingSkalSendesPåKafka(any(), any(), any(), any()) } returns false
-        every { fagsakUtbetalingIdMigreringService.migrerForFagsak(any()) } just Runs
+        every { fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(any(), any()) } answers {
+            FagsakUtbetalingId(fagsakId = FagsakId(firstArg()), typeAndel = secondArg())
+        }
     }
 
     @Test
@@ -91,10 +90,10 @@ internal class SimuleringServiceTest {
         every { simuleringsresultatRepository.deleteById(any()) } just Runs
         every { simuleringsresultatRepository.insert(any()) } returns simuleringsresultat
 
-        val simulerSlot = slot<SimuleringRequestDto>()
+        val simulerSlot = slot<SimuleringDto>()
         val detaljer = SimuleringDetaljerKontrakt("", LocalDate.now(), 0, emptyList())
         every {
-            iverksettClient.simulerV2(capture(simulerSlot))
+            simuleringClient.simuler(capture(simulerSlot))
         } returns SimuleringResponseDto(emptyList(), detaljer)
 
         simuleringService.hentOgLagreSimuleringsresultat(saksbehandling)
@@ -103,20 +102,31 @@ internal class SimuleringServiceTest {
         assertThat(simulerSlot.captured.utbetalinger).hasSize(1)
         assertThat(
             simulerSlot.captured.utbetalinger
-                .first()
-                .beløp,
+                .single()
+                .perioder,
+        ).hasSize(1)
+        assertThat(
+            simulerSlot.captured.utbetalinger
+                .single()
+                .perioder
+                .single()
+                .beløp
+                .toInt(),
         ).isEqualTo(tilkjentYtelse.andelerTilkjentYtelse.first().beløp)
         assertThat(
             simulerSlot.captured.utbetalinger
-                .first()
-                .fraOgMedDato,
+                .single()
+                .perioder
+                .single()
+                .fom,
         ).isEqualTo(tilkjentYtelse.andelerTilkjentYtelse.first().fom)
         assertThat(
             simulerSlot.captured.utbetalinger
-                .first()
-                .tilOgMedDato,
+                .single()
+                .perioder
+                .single()
+                .tom,
         ).isEqualTo(tilkjentYtelse.andelerTilkjentYtelse.first().tom)
-        assertThat(simulerSlot.captured.forrigeIverksetting).isEqualTo(null)
     }
 
     @Test
@@ -131,7 +141,7 @@ internal class SimuleringServiceTest {
 
         val tilkjentYtelse = tilkjentYtelse(behandlingId = behandling.id)
 
-        every { iverksettClient.simulerV2(any()) } returns
+        every { simuleringClient.simuler(any()) } returns
             objectMapper.readValue(readFile("mock/iverksett/simuleringsresultat.json"))
 
         every { behandlingService.hentBehandling(any()) } returns behandling

@@ -1,9 +1,9 @@
-package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
+package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.antallHverdagerIPeriodeInklusiv
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.UtgiftOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.PeriodeMedDager
 import no.nav.tilleggsstonader.sak.vedtak.domain.Uke
@@ -15,24 +15,6 @@ import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import kotlin.math.max
 import kotlin.math.min
-
-data class ReiseOgVedtaksperioderSnitt(
-    val justerteVedtaksperioder: List<Vedtaksperiode>,
-    val justertReiseperiode: UtgiftOffentligTransport,
-)
-
-fun finnSnittMellomReiseOgVedtaksperioder(
-    reise: UtgiftOffentligTransport,
-    vedtaksperioder: List<Vedtaksperiode>,
-): ReiseOgVedtaksperioderSnitt =
-    ReiseOgVedtaksperioderSnitt(
-        justerteVedtaksperioder = vedtaksperioder.mapNotNull { it.beregnSnitt(reise) },
-        justertReiseperiode =
-            reise.copy(
-                fom = maxOf(vedtaksperioder.first().fom, reise.fom),
-                tom = minOf(vedtaksperioder.last().tom, reise.tom),
-            ),
-    )
 
 fun finnReisedagerIPeriode(
     vedtaksperiode: Vedtaksperiode,
@@ -188,14 +170,6 @@ private fun Int.skalIkkeReise(
     reisedagerListe: List<Int>,
     reisedagIndeks: Int,
 ): Boolean = this < reisedagerListe[reisedagIndeks]
-
-private fun antallHverdagerIPeriodeInklusiv(
-    fom: LocalDate,
-    tom: LocalDate,
-): Int =
-    generateSequence(fom) { it.plusDays(1) }
-        .takeWhile { !it.isAfter(tom) }
-        .count { it.dayOfWeek.value in 1..5 }
 
 private fun finnAntallDagerISnittetMellomUkeOgVedtaksperioder(
     uke: Datoperiode,

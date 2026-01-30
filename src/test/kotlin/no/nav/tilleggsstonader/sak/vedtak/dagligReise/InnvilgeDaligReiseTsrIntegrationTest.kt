@@ -21,7 +21,6 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreDagligReise
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTask
-import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel

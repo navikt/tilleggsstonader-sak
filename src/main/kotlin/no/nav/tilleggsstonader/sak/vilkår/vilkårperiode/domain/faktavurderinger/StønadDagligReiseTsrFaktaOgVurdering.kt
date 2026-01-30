@@ -21,8 +21,8 @@ sealed interface AktivitetDagligReiseTsr :
 
 data class TiltakDagligReiseTsr(
     override val vurderinger: VurderingTiltakDagligReiseTsr,
+    override val fakta: FaktaAktivitetDagligReiseTsr,
 ) : AktivitetDagligReiseTsr {
-    override val fakta: IngenFakta = IngenFakta
     override val type: AktivitetDagligReiseTsrType = AktivitetDagligReiseTsrType.TILTAK_DAGLIG_REISE_TSR
 }
 
@@ -69,6 +69,11 @@ data class InnsattIFengselDagligReiseTsr(
 data class VurderingTiltakDagligReiseTsr(
     override val harUtgifter: VurderingHarUtgifter,
 ) : HarUtgifterVurdering
+
+data class FaktaAktivitetDagligReiseTsr(
+    override val aktivitetsdager: Int? = null,
+) : Fakta,
+    FaktaAktivitetsdagerNullable
 
 sealed interface TypeFaktaOgVurderingDagligReiseTsr : TypeFaktaOgVurdering
 

@@ -67,7 +67,7 @@ class AndelTilkjentYtelseIverksettingStatusGauge(
                 .map { it.iverksetting }
 
         if (iverksettingerUtenOKStatus.isNotEmpty()) {
-            logger.warn(
+            logger.info(
                 "Iverksettinger uten OK-status: {}",
                 iverksettingerUtenOKStatus,
             )

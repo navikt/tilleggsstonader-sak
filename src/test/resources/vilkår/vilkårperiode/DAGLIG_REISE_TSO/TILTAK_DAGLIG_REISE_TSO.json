@@ -1,6 +1,8 @@
 {
   "type": "TILTAK_DAGLIG_REISE_TSO",
-  "fakta": {},
+  "fakta": {
+    "aktivitetsdager": 3
+  },
   "vurderinger": {
     "lønnet": {
       "svar": "NEI",

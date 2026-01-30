@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBoutgifterDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
@@ -124,6 +125,12 @@ class OpprettVilkårperiodeDsl {
                 fom = fom,
                 tom = tom,
                 aktivitetType = AktivitetType.TILTAK,
+                faktaOgSvar =
+                    FaktaOgSvarAktivitetDagligReiseTsoDto(
+                        svarLønnet = SvarJaNei.NEI,
+                        svarHarUtgifter = SvarJaNei.JA,
+                        aktivitetsdager = 3,
+                    ),
             )
         }
     }
@@ -143,6 +150,7 @@ class OpprettVilkårperiodeDsl {
                 faktaOgSvar =
                     FaktaOgSvarAktivitetDagligReiseTsrDto(
                         svarHarUtgifter = SvarJaNei.JA,
+                        aktivitetsdager = 3,
                     ),
             )
         }

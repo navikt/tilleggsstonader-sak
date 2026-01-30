@@ -48,6 +48,11 @@ data class Vedtaksperiode(
             this.aktivitet == other.aktivitet &&
             this.overlapperEllerPåfølgesAv(other)
 
+    fun erSammenhengendeMedLikMålgruppeOgTypeAktivitet(other: Vedtaksperiode): Boolean =
+        this.målgruppe == other.målgruppe &&
+            this.typeAktivitet == other.typeAktivitet &&
+            this.overlapperEllerPåfølgesAv(other)
+
     override fun merge(other: Vedtaksperiode): Vedtaksperiode {
         require(this.målgruppe == other.målgruppe) {
             "Kan ikke slå sammen vedtaksperioder med ulike målgrupper: $this og $other"
