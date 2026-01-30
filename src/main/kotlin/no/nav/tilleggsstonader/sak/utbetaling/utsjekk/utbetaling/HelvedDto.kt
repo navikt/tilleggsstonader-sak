@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
 
 private sealed interface HelvedDto {
     val sakId: String

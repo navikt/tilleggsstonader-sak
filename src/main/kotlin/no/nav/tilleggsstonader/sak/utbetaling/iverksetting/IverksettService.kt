@@ -1,20 +1,13 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.libs.log.logger
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingId
 import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -22,7 +15,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingMessageProducer
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingV3Mapper
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
@@ -37,27 +29,20 @@ import java.util.UUID
 
 @Service
 class IverksettService(
-    private val iverksettClient: IverksettClient,
     private val behandlingService: BehandlingService,
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val totrinnskontrollService: TotrinnskontrollService,
     private val andelTilkjentYtelseRepository: AndelTilkjentYtelseRepository,
-    private val taskService: TaskService,
     private val utbetalingMessageProducer: UtbetalingMessageProducer,
     private val utbetalingV3Mapper: UtbetalingV3Mapper,
     private val fagsakUtbetalingIdService: FagsakUtbetalingIdService,
-    private val unleashService: UnleashService,
 ) {
     private val iverksettingerOverKafkaCounter = Metrics.counter("iverksettinger.til.helved", "type", "kafka")
-    private val iverksettingerOverRestCounter = Metrics.counter("iverksettinger.til.helved", "type", "rest")
 
     /**
      * Iverksetter andeler til og med dagens dato. Utbetalinger frem i tid blir plukket opp av en daglig jobb.
      *
-     * Notat om synkron iverksetting (aka v2 av utsjekk):
-     * Ved første iverksetting av en behandling er det krav på at det gjøres med jwt, dvs med saksbehandler-token
-     * Neste iverksettinger kan gjøres med client_credentials. Dersom det ikke finnes utbetalinger som skal iverksettes for forrige måned,
-     * så legges det til en nullandel for å kunne sjekke status på iverksetting og for å kunne opphøre andeler fra forrige behandling.
+     * Ved fullstendig opphør legges det til en nullandel for å få tilbake status fra økonomi om opphøret
      */
     @Transactional
     fun iverksettBehandlingFørsteGang(behandlingId: BehandlingId) {
@@ -74,19 +59,12 @@ class IverksettService(
             andelerForFørsteIverksettingAvBehandling(
                 behandling,
                 tilkjentYtelse,
-                utbetalingSkalSendesPåKafka(
-                    behandling,
-                    fagsakId = behandling.fagsakId,
-                    typeAndel = tilkjentYtelse.andelerTilkjentYtelse.map { it.type }.toSet(),
-                    erFørsteIverksettingForBehandling = true,
-                ),
             )
 
         val totrinnskontroll = hentTotrinnskontroll(behandling)
 
         val iverksettingId = behandlingId.id
         sendAndelerTilUtsjekk(
-            tilkjentYtelse = tilkjentYtelse,
             andelerTilUtbetaling = andelerSomSkalIverksettesNå,
             behandling = behandling,
             iverksettingId = iverksettingId,
@@ -101,14 +79,17 @@ class IverksettService(
     private fun andelerForFørsteIverksettingAvBehandling(
         behandling: Saksbehandling,
         tilkjentYtelse: TilkjentYtelse,
-        skalSendesPåKafka: Boolean,
     ): Collection<AndelTilkjentYtelse> {
         val måned = YearMonth.now()
         val iverksettingId = tilkjentYtelse.behandlingId.id
         val andelerTilIverksetting =
             finnAndelerTilIverksetting(tilkjentYtelse, iverksettingId, utbetalingsdato = LocalDate.now())
 
-        return if (skalOppretteNullandelForFørsteIverksettingAvBehandling(behandling, skalSendesPåKafka, andelerTilIverksetting)) {
+        return if (skalOppretteNullandelForFørsteIverksettingAvBehandling(
+                behandling,
+                andelerTilIverksetting,
+            )
+        ) {
             val iverksetting = Iverksetting(iverksettingId, LocalDateTime.now())
             listOf(tilkjentYtelseService.leggTilNullAndel(tilkjentYtelse, iverksetting, måned))
         } else {
@@ -117,29 +98,15 @@ class IverksettService(
     }
 
     /**
-     * Trenger ikke nullandel ved første iverksetting av førstegangsbehandling om det sendes på kafka,
-     * men trenger nullandel over kafka ved opphør av en hel sak for å kunne tracke at økonomi behandler feilutbetalingen
+     * Trenger bare nullandel ved opphør av en hel sak for å kunne tracke at økonomi behandler feilutbetalingen
      */
     private fun skalOppretteNullandelForFørsteIverksettingAvBehandling(
         behandling: Saksbehandling,
-        skalSendesPåKafka: Boolean,
         andelerTilIverksetting: Collection<AndelTilkjentYtelse>,
-    ): Boolean =
-        when {
-            andelerTilIverksetting.isNotEmpty() -> false
-            !skalSendesPåKafka -> true
-            behandling.forrigeIverksatteBehandlingId == null -> false
-            else -> true
-        }
+    ): Boolean = andelerTilIverksetting.isEmpty() && behandling.forrigeIverksatteBehandlingId != null
 
     /**
      * Kalles på av daglig jobb som plukker opp alle andeler som har utbetalingsdato <= dagens dato.
-     *
-     * Notat om synkron iverksetting (aka v2 av utsjekk):
-     * Hvis kallet feiler er det viktig at den samme iverksettingId brukes for å kunne ignorere conflict
-     * Ved første iverksetting som gjøres brukes behandlingId for å iverksette
-     * for å enkelt kunne gjenbruke samme id vid neste iverksetting.
-     *
      */
     @Transactional
     fun iverksett(
@@ -167,7 +134,6 @@ class IverksettService(
             iverksettingId = iverksettingId,
             andelerTilUtbetaling = andelerTilkjentYtelse,
             totrinnskontroll = totrinnskontroll,
-            tilkjentYtelse = tilkjentYtelse,
             erFørsteIverksettingForBehandling = false,
         )
     }
@@ -177,44 +143,23 @@ class IverksettService(
         iverksettingId: UUID,
         andelerTilUtbetaling: Collection<AndelTilkjentYtelse>,
         totrinnskontroll: Totrinnskontroll,
-        tilkjentYtelse: TilkjentYtelse,
         erFørsteIverksettingForBehandling: Boolean,
     ) {
-        if (utbetalingSkalSendesPåKafka(
-                behandling = behandling,
-                fagsakId = behandling.fagsakId,
-                typeAndel = tilkjentYtelse.andelerTilkjentYtelse.map { it.type }.toSet(),
-                erFørsteIverksettingForBehandling = erFørsteIverksettingForBehandling,
-            )
-        ) {
-            val utbetalingsIderPåFagsak =
-                fagsakUtbetalingIdService.hentUtbetalingIderForFagsakId(fagsakId = behandling.fagsakId)
-            if (andelerTilUtbetaling.isNotEmpty() || utbetalingsIderPåFagsak.isNotEmpty()) {
-                iverksettingerOverKafkaCounter.increment()
-                val utbetalingRecords =
-                    utbetalingV3Mapper.lagIverksettingDtoer(
-                        behandling = behandling,
-                        andelerTilkjentYtelse = andelerTilUtbetaling.filterNot { it.erNullandel() },
-                        totrinnskontroll = totrinnskontroll,
-                        erFørsteIverksettingForBehandling = erFørsteIverksettingForBehandling,
-                        vedtakstidspunkt = behandling.vedtakstidspunkt ?: feil("Vedtakstidspunkt er påkrevd"),
-                    )
-                utbetalingMessageProducer.sendUtbetalinger(iverksettingId, utbetalingRecords)
-            } else {
-                logger.info("Ingen andeler å iverksette for behandling=${behandling.id} ved iverksettingId=$iverksettingId")
-            }
-        } else {
-            iverksettingerOverRestCounter.increment()
-            val dto =
-                IverksettDtoMapper.map(
+        val utbetalingsIderPåFagsak =
+            fagsakUtbetalingIdService.hentUtbetalingIderForFagsakId(fagsakId = behandling.fagsakId)
+        if (andelerTilUtbetaling.isNotEmpty() || utbetalingsIderPåFagsak.isNotEmpty()) {
+            iverksettingerOverKafkaCounter.increment()
+            val utbetalingRecords =
+                utbetalingV3Mapper.lagIverksettingDtoer(
                     behandling = behandling,
-                    andelerTilkjentYtelse = andelerTilUtbetaling,
+                    andelerTilkjentYtelse = andelerTilUtbetaling.filterNot { it.erNullandel() },
                     totrinnskontroll = totrinnskontroll,
-                    iverksettingId = iverksettingId,
-                    forrigeIverksetting = finnForrigeIverksetting(behandling, tilkjentYtelse),
+                    erFørsteIverksettingForBehandling = erFørsteIverksettingForBehandling,
+                    vedtakstidspunkt = behandling.vedtakstidspunkt ?: feil("Vedtakstidspunkt er påkrevd"),
                 )
-            opprettHentStatusFraIverksettingTask(behandling, iverksettingId)
-            iverksettClient.iverksett(dto)
+            utbetalingMessageProducer.sendUtbetalinger(iverksettingId, utbetalingRecords)
+        } else {
+            logger.info("Ingen andeler å iverksette for behandling=${behandling.id} ved iverksettingId=$iverksettingId")
         }
     }
 
@@ -253,8 +198,6 @@ class IverksettService(
     /**
      * Henter aktuelle andeler
      * Oppdaterer aktuelle perioder med status og iverksettingId
-     * Returnerer andeler som har beløp=0 då vi fortsatt ønsker å iverksette,
-     * men filtrer vekk disse i IverksettDtoMapper, for å eventuell opphøre tidligere perioder
      */
     private fun finnAndelerTilIverksetting(
         tilkjentYtelse: TilkjentYtelse,
@@ -310,111 +253,4 @@ class IverksettService(
         }
         return totrinnskontroll
     }
-
-    private fun opprettHentStatusFraIverksettingTask(
-        behandling: Saksbehandling,
-        iverksettingId: UUID,
-    ) {
-        taskService.save(
-            HentStatusFraIverksettingTask.opprettTask(
-                eksternFagsakId = behandling.eksternFagsakId,
-                behandlingId = behandling.id,
-                eksternBehandlingId = behandling.eksternId,
-                iverksettingId = iverksettingId,
-            ),
-        )
-    }
-
-    /**
-     * Finner forrigeIverksetting fra denne eller forrige behandling
-     * Når man iverksetter behandling 1 første gang: null
-     * Når man iverksetter behandling 1 andre gang: (behandling1, forrige iverksettingId for behandling 1)
-     * Når man iverksetter behandling 2 første gang: (behandling1, siste iverksetting for behandling 1)
-     * Når man iverksetter behandling 2 andre gang: (behandling2, forrigeIverksettingId for behandling 2)
-     */
-    fun finnForrigeIverksetting(
-        behandling: Saksbehandling,
-        tilkjentYtelse: TilkjentYtelse,
-    ): ForrigeIverksettingDto? =
-        tilkjentYtelse.finnForrigeIverksetting(behandling.id)
-            ?: forrigeIverksettingForrigeBehandling(behandling)
-
-    private fun forrigeIverksettingForrigeBehandling(behandling: Saksbehandling): ForrigeIverksettingDto? {
-        val forrigeIverksatteBehandlingId = behandling.forrigeIverksatteBehandlingId
-        return forrigeIverksatteBehandlingId?.let {
-            tilkjentYtelseService
-                .hentForBehandling(forrigeIverksatteBehandlingId)
-                .finnForrigeIverksetting(forrigeIverksatteBehandlingId)
-        }
-    }
-
-    /**
-     * Utleder [ForrigeIverksettingDto] ut fra andel med siste tidspunkt for iverksetting
-     */
-    private fun TilkjentYtelse.finnForrigeIverksetting(behandlingId: BehandlingId): ForrigeIverksettingDto? =
-        andelerTilkjentYtelse
-            .mapNotNull { it.iverksetting }
-            .maxByOrNull { it.iverksettingTidspunkt }
-            ?.iverksettingId
-            ?.let {
-                val eksternBehandlingId = behandlingService.hentEksternBehandlingId(behandlingId).id
-                ForrigeIverksettingDto(behandlingId = eksternBehandlingId.toString(), iverksettingId = it)
-            }
-
-    fun utbetalingSkalSendesPåKafka(
-        behandling: Saksbehandling,
-        fagsakId: FagsakId,
-        typeAndel: Set<TypeAndel>,
-        erFørsteIverksettingForBehandling: Boolean,
-    ): Boolean {
-        val utbetalingIderPåFagsak = fagsakUtbetalingIdService.hentUtbetalingIderForFagsakId(fagsakId)
-        val finnesUtbetalingListe = typeAndel.map { fagsakUtbetalingIdService.finnesUtbetalingsId(fagsakId, it) }
-
-        feilHvis(finnesUtbetalingListe.distinct().size > 1) {
-            "Kun noen av andelene på behandlingen er migrert fra REST til Kafka"
-        }
-
-        return behandling.stønadstype.gjelderDagligReise() ||
-            erFørstegangsbehandlingOgSkalIverksetteMotKafka(behandling, erFørsteIverksettingForBehandling) ||
-            forrigeBehandlingHarOpphørtAlt(behandling) ||
-            (
-                utbetalingIderPåFagsak.isNotEmpty() &&
-                    finnesUtbetalingIdForAlleTypeAndeler(
-                        typeAndelIBehandling = typeAndel,
-                        utbetalingIderPåFagsak = utbetalingIderPåFagsak,
-                    )
-            )
-    }
-
-    private fun forrigeBehandlingHarOpphørtAlt(behandling: Saksbehandling): Boolean {
-        if (behandling.forrigeIverksatteBehandlingId == null) {
-            return false
-        }
-        val forrigeIverksatteBehandling = behandlingService.hentBehandling(behandling.forrigeIverksatteBehandlingId)
-        if (forrigeIverksatteBehandling.resultat != BehandlingResultat.OPPHØRT) {
-            return false
-        }
-
-        val andeler = tilkjentYtelseService.hentForBehandling(forrigeIverksatteBehandling.id).andelerTilkjentYtelse
-        if (andeler.all { it.type == TypeAndel.UGYLDIG }) {
-            return true
-        }
-        return false
-    }
-
-    private fun erFørstegangsbehandlingOgSkalIverksetteMotKafka(
-        behandling: Saksbehandling,
-        erFørsteIverksettingForBehandling: Boolean,
-    ): Boolean =
-        behandling.forrigeIverksatteBehandlingId == null &&
-            erFørsteIverksettingForBehandling &&
-            unleashService.isEnabled(Toggle.SKAL_IVERKSETT_NYE_BEHANDLINGER_MOT_KAFKA)
-
-    private fun finnesUtbetalingIdForAlleTypeAndeler(
-        typeAndelIBehandling: Set<TypeAndel>,
-        utbetalingIderPåFagsak: List<FagsakUtbetalingId>,
-    ): Boolean =
-        typeAndelIBehandling.all { typeAndel ->
-            utbetalingIderPåFagsak.any { utbetalingId -> utbetalingId.typeAndel == typeAndel }
-        }
 }
