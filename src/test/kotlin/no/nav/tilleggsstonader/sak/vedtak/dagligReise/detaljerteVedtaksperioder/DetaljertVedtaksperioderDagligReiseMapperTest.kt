@@ -144,7 +144,6 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
             behandlingId = BehandlingId.random(),
             type = TypeVedtak.INNVILGELSE,
             data = data,
-            gitVersjon = Applikasjonsversjon.versjon,
             tidligsteEndring = null,
             opphørsdato = null,
         )

@@ -51,7 +51,6 @@ object LæremidlerTestUtil {
             behandlingId = BehandlingId.random(),
             type = TypeVedtak.INNVILGELSE,
             data = data,
-            gitVersjon = Applikasjonsversjon.versjon,
             tidligsteEndring = null,
             opphørsdato = null,
         )
@@ -68,7 +67,6 @@ object LæremidlerTestUtil {
                 vedtaksperioder = vedtaksperioder,
                 beregningsresultat = beregningsresultat,
             ),
-        gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = null,
         opphørsdato = null,
     )
@@ -85,7 +83,6 @@ object LæremidlerTestUtil {
                 årsaker = årsaker,
                 begrunnelse = begrunnelse,
             ),
-        gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = null,
         opphørsdato = null,
     )
@@ -107,7 +104,6 @@ object LæremidlerTestUtil {
                 årsaker = årsaker,
                 begrunnelse = begrunnelse,
             ),
-        gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = null,
         opphørsdato = opphørsdato,
     )

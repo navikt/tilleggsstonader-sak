@@ -13,5 +13,10 @@ class VedtaksresultatService(
         vedtakRepository.findByIdOrNull(saksbehandling.id)?.type
             ?: error("Finner ikke vedtaksresultat for behandling=$saksbehandling")
 
+    fun førerVedtakTilUtbetaling(saksbehandling: Saksbehandling): Boolean =
+        vedtakRepository.findByIdOrNull(saksbehandling.id)?.medUtbetaling
+            ?: error("Finner ikke vedtaksresultat for behandling=$saksbehandling")
+
+
     fun hentVedtaksresultatHvisFinnes(behandlingId: BehandlingId): TypeVedtak? = vedtakRepository.findByIdOrNull(behandlingId)?.type
 }

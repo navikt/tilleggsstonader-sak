@@ -252,7 +252,6 @@ object InterntVedtakTestdata {
                                 vedtaksperiode,
                             ),
                     ),
-                gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = LocalDate.of(2024, 1, 1),
                 opphørsdato = null,
             )
@@ -359,7 +358,6 @@ object InterntVedtakTestdata {
                         beregningsresultat = beregningsresultat,
                         begrunnelse = "Sånn her vil en begrunnelse se ut",
                     ),
-                gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = LocalDate.of(2024, 1, 1),
                 opphørsdato = null,
             )
@@ -373,7 +371,6 @@ object InterntVedtakTestdata {
                         årsaker = listOf(ÅrsakAvslag.MANGELFULL_DOKUMENTASJON, ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND),
                         begrunnelse = "Begrunelse for avslag",
                     ),
-                gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
                 opphørsdato = null,
             )
@@ -552,7 +549,6 @@ object InterntVedtakTestdata {
                         beregningsresultat = beregningsresultat,
                         begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
                     ),
-                gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
                 opphørsdato = null,
             )
@@ -565,7 +561,6 @@ object InterntVedtakTestdata {
                         årsaker = listOf(ÅrsakAvslag.MANGELFULL_DOKUMENTASJON, ÅrsakAvslag.RETT_TIL_BOSTØTTE),
                         begrunnelse = "Begrunelse for avslag",
                     ),
-                gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
                 opphørsdato = null,
             )
@@ -580,7 +575,6 @@ object InterntVedtakTestdata {
                         vedtaksperioder = vedtaksperioder,
                         beregningsresultat = beregningsresultat,
                     ),
-                gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
                 opphørsdato = null,
             )
@@ -787,7 +781,6 @@ object InterntVedtakTestdata {
                     beregningsresultat = beregningsresultatDagligReise,
                     begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
                 ),
-            gitVersjon = Applikasjonsversjon.versjon,
             tidligsteEndring = null,
         )
 
@@ -800,7 +793,6 @@ object InterntVedtakTestdata {
                         begrunnelse = "Årsaken til avslaget",
                     ),
                 type = TypeVedtak.AVSLAG,
-                gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
             )
 

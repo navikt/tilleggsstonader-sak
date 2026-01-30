@@ -68,10 +68,11 @@ class BeslutteVedtakSteg(
 
         return if (data.godkjent) {
             val typeVedtak = vedtaksresultatService.hentVedtaksresultat(saksbehandling)
+            val vedtakFørerTilUtbetaling = vedtaksresultatService.førerVedtakTilUtbetaling(saksbehandling)
             oppdaterResultatPåBehandling(saksbehandling, typeVedtak)
             vedtakCounter(saksbehandling.stønadstype, typeVedtak).increment()
 
-            iverksettService.iverksettBehandlingFørsteGang(saksbehandling.id)
+            iverksettService.iverksettBehandlingFørsteGang(saksbehandling.id, vedtakFørerTilUtbetaling)
             if (!saksbehandling.skalIkkeSendeBrev) {
                 brevService.lagEndeligBeslutterbrev(saksbehandling)
                 opprettJournalførVedtaksbrevTask(saksbehandling)

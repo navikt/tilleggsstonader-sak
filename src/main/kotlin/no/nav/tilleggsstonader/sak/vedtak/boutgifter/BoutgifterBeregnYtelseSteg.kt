@@ -168,7 +168,6 @@ class BoutgifterBeregnYtelseSteg(
                         årsaker = vedtak.årsakerAvslag,
                         begrunnelse = vedtak.begrunnelse,
                     ),
-                gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
             ),
         )
@@ -191,7 +190,6 @@ class BoutgifterBeregnYtelseSteg(
                         begrunnelse = begrunnelse,
                         beregningsresultat = BeregningsresultatBoutgifter(beregningsresultat.perioder),
                     ),
-                gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = tidligsteEndring,
             ),
         )
@@ -214,7 +212,6 @@ class BoutgifterBeregnYtelseSteg(
                         årsaker = vedtak.årsakerOpphør,
                         begrunnelse = vedtak.begrunnelse,
                     ),
-                gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
                 opphørsdato = vedtak.opphørsdato,
             ),

@@ -144,7 +144,6 @@ object TilsynBarnTestUtil {
             behandlingId = defaultBehandling.id,
             type = TypeVedtak.INNVILGELSE,
             data = data,
-            gitVersjon = Applikasjonsversjon.versjon,
             tidligsteEndring = null,
             opphørsdato = null,
         )
@@ -169,7 +168,6 @@ object TilsynBarnTestUtil {
                 beregningsresultat = beregningsresultat,
                 vedtaksperioder = vedtaksperioder,
             ),
-        gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = tidligsteEndring,
         opphørsdato = null,
     )
@@ -181,7 +179,6 @@ object TilsynBarnTestUtil {
         behandlingId = behandlingId,
         type = TypeVedtak.INNVILGELSE,
         data = vedtak,
-        gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = null,
         opphørsdato = null,
     )
@@ -198,7 +195,6 @@ object TilsynBarnTestUtil {
                 årsaker = årsaker,
                 begrunnelse = begrunnelse,
             ),
-        gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = null,
         opphørsdato = null,
     )
@@ -219,7 +215,6 @@ object TilsynBarnTestUtil {
                 beregningsresultat = beregningsresultat,
                 vedtaksperioder = emptyList(),
             ),
-        gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = null,
         opphørsdato = opphørsdato,
     )

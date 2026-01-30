@@ -59,11 +59,12 @@ class IverksettService(
      * Neste iverksettinger kan gjøres med client_credentials. Dersom det ikke finnes utbetalinger som skal iverksettes for forrige måned,
      * så legges det til en nullandel for å kunne sjekke status på iverksetting og for å kunne opphøre andeler fra forrige behandling.
      */
+    // TODO: Fjern = true
     @Transactional
-    fun iverksettBehandlingFørsteGang(behandlingId: BehandlingId) {
+    fun iverksettBehandlingFørsteGang(behandlingId: BehandlingId, vedtakFørerTilUtbetaling: Boolean) {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
 
-        if (!behandling.resultat.skalIverksettes) {
+        if (!behandling.resultat.skalIverksettes || !vedtakFørerTilUtbetaling) {
             logger.info("Iverksetter ikke behandling=$behandlingId med status=${behandling.status}")
             return
         }

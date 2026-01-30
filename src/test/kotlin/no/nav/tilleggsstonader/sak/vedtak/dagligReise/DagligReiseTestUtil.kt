@@ -49,7 +49,6 @@ object DagligReiseTestUtil {
             behandlingId = BehandlingId.random(),
             type = TypeVedtak.INNVILGELSE,
             data = data,
-            gitVersjon = Applikasjonsversjon.versjon,
             tidligsteEndring = null,
             opphørsdato = null,
         )
@@ -66,7 +65,6 @@ object DagligReiseTestUtil {
                 vedtaksperioder = vedtaksperioder,
                 beregningsresultat = beregningsresultat,
             ),
-        gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = null,
         opphørsdato = null,
     )
@@ -83,7 +81,6 @@ object DagligReiseTestUtil {
                 årsaker = årsaker,
                 begrunnelse = begrunnelse,
             ),
-        gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = null,
         opphørsdato = null,
     )

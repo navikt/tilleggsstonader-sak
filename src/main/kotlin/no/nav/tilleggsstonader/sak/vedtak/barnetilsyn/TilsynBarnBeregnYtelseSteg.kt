@@ -131,7 +131,6 @@ class TilsynBarnBeregnYtelseSteg(
                         begrunnelse = vedtak.begrunnelse,
                         vedtaksperioder = vedtaksperioder,
                     ),
-                gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
                 opphørsdato = vedtak.opphørsdato,
             ),
@@ -172,7 +171,6 @@ class TilsynBarnBeregnYtelseSteg(
                         årsaker = vedtak.årsakerAvslag,
                         begrunnelse = vedtak.begrunnelse,
                     ),
-                gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
             ),
         )
@@ -202,7 +200,6 @@ class TilsynBarnBeregnYtelseSteg(
                     begrunnelse = begrunnelse,
                     beregningsresultat = BeregningsresultatTilsynBarn(beregningsresultat.perioder),
                 ),
-            gitVersjon = Applikasjonsversjon.versjon,
             tidligsteEndring = tidligsteEndring,
         )
 }

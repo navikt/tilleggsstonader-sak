@@ -24,12 +24,7 @@ class SimuleringSteg(
     }
 
     private fun skalUtføreSimulering(saksbehandling: Saksbehandling): Boolean {
-        val typeVedtak = vedtaksresultatService.hentVedtaksresultat(saksbehandling)
-        return when (typeVedtak) {
-            TypeVedtak.INNVILGELSE -> true
-            TypeVedtak.AVSLAG -> false
-            TypeVedtak.OPPHØR -> true
-        }
+        return vedtaksresultatService.førerVedtakTilUtbetaling(saksbehandling)
     }
 
     override fun stegType(): StegType = StegType.SIMULERING

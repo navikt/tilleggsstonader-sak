@@ -14,3 +14,10 @@ fun TypeVedtak.tilBehandlingResult(): BehandlingResultat =
         TypeVedtak.AVSLAG -> BehandlingResultat.AVSLÅTT
         TypeVedtak.OPPHØR -> BehandlingResultat.OPPHØRT
     }
+
+fun TypeVedtak.girUtbetaling(): Boolean =
+    when (this) {
+        TypeVedtak.INNVILGELSE -> true
+        TypeVedtak.AVSLAG -> false
+        TypeVedtak.OPPHØR -> true
+    }

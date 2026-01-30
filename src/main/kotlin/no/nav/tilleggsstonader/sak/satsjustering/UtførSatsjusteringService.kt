@@ -170,7 +170,7 @@ class UtførSatsjusteringService(
         behandlingService.oppdaterStatusPåBehandling(revurdering.id, BehandlingStatus.FATTER_VEDTAK)
         behandlingService.oppdaterResultatPåBehandling(revurdering.id, BehandlingResultat.INNVILGET)
         behandlingService.oppdaterStegPåBehandling(revurdering.id, StegType.FERDIGSTILLE_BEHANDLING)
-        iverksettService.iverksettBehandlingFørsteGang(revurdering.id)
+        iverksettService.iverksettBehandlingFørsteGang(revurdering.id, vedtakFørerTilUtbetaling = true)
 
         // Her lages også internt vedtak og behandling- og vedtaksstatistikk
         ferdigstillBehandlingSteg.utførSteg(revurdering, null)

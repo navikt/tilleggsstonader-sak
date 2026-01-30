@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
-import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
@@ -45,8 +44,8 @@ class DagligReiseVedtakService(
                         begrunnelse = begrunnelse,
                         beregningsresultat = beregningsresultat,
                     ),
-                gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = tidligsteEndring,
+                medUtbetaling = beregningsresultat.førerTilUtbetaling()
             ),
         )
     }
@@ -64,7 +63,6 @@ class DagligReiseVedtakService(
                         årsaker = vedtak.årsakerAvslag,
                         begrunnelse = vedtak.begrunnelse,
                     ),
-                gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
             ),
         )
@@ -87,9 +85,9 @@ class DagligReiseVedtakService(
                         begrunnelse = vedtak.begrunnelse,
                         vedtaksperioder = avkortetVedtaksperioder,
                     ),
-                gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
                 opphørsdato = vedtak.opphørsdato,
+                medUtbetaling = beregningsresultat.førerTilUtbetaling()
             ),
         )
     }

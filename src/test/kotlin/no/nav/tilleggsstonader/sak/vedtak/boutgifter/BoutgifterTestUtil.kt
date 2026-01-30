@@ -59,7 +59,6 @@ object BoutgifterTestUtil {
                 begrunnelse = null,
             ),
         type = TypeVedtak.INNVILGELSE,
-        gitVersjon = "versjon-test",
         tidligsteEndring = null,
         opphørsdato = null,
     )

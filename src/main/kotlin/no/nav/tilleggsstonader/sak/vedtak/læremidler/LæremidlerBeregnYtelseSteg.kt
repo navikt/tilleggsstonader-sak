@@ -162,7 +162,6 @@ class LæremidlerBeregnYtelseSteg(
                         årsaker = vedtak.årsakerOpphør,
                         begrunnelse = vedtak.begrunnelse,
                     ),
-                gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
                 opphørsdato = vedtak.opphørsdato,
             ),
@@ -189,7 +188,6 @@ class LæremidlerBeregnYtelseSteg(
                         årsaker = vedtak.årsakerAvslag,
                         begrunnelse = vedtak.begrunnelse,
                     ),
-                gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
             ),
         )
@@ -219,7 +217,6 @@ class LæremidlerBeregnYtelseSteg(
                     beregningsresultat = BeregningsresultatLæremidler(beregningsresultat.perioder),
                     begrunnelse = begrunnelse,
                 ),
-            gitVersjon = Applikasjonsversjon.versjon,
             tidligsteEndring = tidligsteEndring,
         )
 }

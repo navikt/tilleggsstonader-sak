@@ -94,7 +94,6 @@ class UtbetalingerDvhTest {
                 behandlingId = defaultBehandling.id,
                 type = TypeVedtak.INNVILGELSE,
                 data = vedtaksdata,
-                gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
                 opphørsdato = null,
             )
@@ -139,7 +138,6 @@ class UtbetalingerDvhTest {
                 behandlingId = defaultBehandling.id,
                 type = TypeVedtak.INNVILGELSE,
                 data = vedtaksdata,
-                gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
                 opphørsdato = null,
             )
