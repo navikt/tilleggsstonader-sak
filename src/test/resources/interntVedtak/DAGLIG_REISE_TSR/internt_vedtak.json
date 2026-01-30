@@ -103,7 +103,8 @@
       "harUtgifter" : {
         "svar" : "JA",
         "resultat" : "OPPFYLT"
-      }
+      },
+      "aktivitetsdager" : 3
     },
     "kilde" : "MANUELL",
     "resultat" : "OPPFYLT",
@@ -117,7 +118,8 @@
     "faktaOgVurderinger" : {
       "@type" : "AktivitetDagligReiseTsoFaktaOgVurderingerDto",
       "lønnet" : null,
-      "harUtgifter" : null
+      "harUtgifter" : null,
+      "aktivitetsdager" : 3
     },
     "kilde" : "MANUELL",
     "resultat" : "IKKE_OPPFYLT",
