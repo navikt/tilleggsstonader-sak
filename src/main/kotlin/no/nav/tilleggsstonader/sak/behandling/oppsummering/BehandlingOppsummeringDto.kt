@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
@@ -17,6 +18,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdagerNullable
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaStudienivå
 import java.time.LocalDate
 import java.util.UUID
 
@@ -41,6 +43,7 @@ data class OppsummertVilkårperiode(
     val type: VilkårperiodeType,
     val resultat: ResultatVilkårperiode,
     val aktivitetsdager: Int?,
+    val studienivå: Studienivå?,
 ) : Periode<LocalDate>,
     KopierPeriode<OppsummertVilkårperiode> {
     override fun medPeriode(
@@ -60,6 +63,10 @@ fun Vilkårperiode.tilOppsummertVilkårperiode(): OppsummertVilkårperiode =
             this.faktaOgVurdering.fakta
                 .takeIfFakta<FaktaAktivitetsdagerNullable>()
                 ?.aktivitetsdager,
+        studienivå =
+            this.faktaOgVurdering.fakta
+                .takeIfFakta<FaktaStudienivå>()
+                ?.studienivå,
     )
 
 data class Stønadsvilkår(
