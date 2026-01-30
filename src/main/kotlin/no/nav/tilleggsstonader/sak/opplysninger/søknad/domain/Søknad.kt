@@ -3,7 +3,9 @@ package no.nav.tilleggsstonader.sak.opplysninger.søknad.domain
 import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
+import no.nav.tilleggsstonader.kontrakter.søknad.DokumentasjonFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
+import no.nav.tilleggsstonader.kontrakter.søknad.UkeMedReisedager
 import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
@@ -90,6 +92,12 @@ data class SøknadLæremidler(
     override val data: SkjemaLæremidler,
 ) : Søknad<SkjemaLæremidler>
 
+data class SkjemaLæremidler(
+    val hovedytelse: HovedytelseAvsnitt,
+    val utdanning: UtdanningAvsnitt,
+    val dokumentasjon: List<Dokumentasjon>,
+)
+
 @Table("soknad")
 data class SøknadBoutgifter(
     @Id
@@ -116,10 +124,22 @@ data class SøknadDagligReise(
     override val data: SkjemaDagligReise,
 ) : Søknad<SkjemaDagligReise>
 
-data class SkjemaLæremidler(
-    val hovedytelse: HovedytelseAvsnitt,
-    val utdanning: UtdanningAvsnitt,
-    val dokumentasjon: List<Dokumentasjon>,
+@Table("soknad")
+data class SøknadKjøreliste(
+    @Id
+    override val id: UUID = UUID.randomUUID(),
+    override val journalpostId: String,
+    override val mottattTidspunkt: LocalDateTime,
+    @Column("sprak")
+    override val språk: Språkkode,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
+    override val sporbar: Sporbar = Sporbar(),
+    override val data: SkjemaKjøreliste,
+) : Søknad<SkjemaKjøreliste>
+
+data class SkjemaKjøreliste(
+    val reiser: List<UkeMedReisedager>,
+    val dokumentasjon: List<DokumentasjonFelt>,
 )
 
 data class UtdanningAvsnitt(

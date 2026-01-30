@@ -31,14 +31,13 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.Oppgavelager
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettJournalpost
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
-import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
-import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.tomYtelsePerioderDto
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
 import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil.søknadBoutgifter
 import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil.søknadDagligReise
+import no.nav.tilleggsstonader.sak.util.SøknadKjørelisteUtil.søknadKjøreliste
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaLæremidler
 import no.nav.tilleggsstonader.sak.util.dokumentInfo
@@ -89,7 +88,11 @@ class MottaSøknadTest : CleanDatabaseIntegrationTest() {
         mockJournalpost(brevkode = DokumentBrevkode.BOUTGIFTER, søknad = søknadBoutgifter(ident = ident))
         kjørTasksKlareForProsessering()
 
-        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(ident, Stønadstype.BOUTGIFTER, journalpostId.toString())
+        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(
+            ident,
+            Stønadstype.BOUTGIFTER,
+            journalpostId.toString(),
+        )
     }
 
     @Test
@@ -106,7 +109,11 @@ class MottaSøknadTest : CleanDatabaseIntegrationTest() {
         mockJournalpost(brevkode = DokumentBrevkode.BARNETILSYN, søknad = søknadskjemaBarnetilsyn())
         kjørTasksKlareForProsessering()
 
-        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(ident, Stønadstype.BARNETILSYN, journalpostId.toString())
+        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(
+            ident,
+            Stønadstype.BARNETILSYN,
+            journalpostId.toString(),
+        )
     }
 
     @Test
@@ -123,7 +130,11 @@ class MottaSøknadTest : CleanDatabaseIntegrationTest() {
         mockJournalpost(brevkode = DokumentBrevkode.LÆREMIDLER, søknad = søknadskjemaLæremidler())
         kjørTasksKlareForProsessering()
 
-        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(ident, Stønadstype.LÆREMIDLER, journalpostId.toString())
+        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(
+            ident,
+            Stønadstype.LÆREMIDLER,
+            journalpostId.toString(),
+        )
     }
 
     @Test
@@ -143,11 +154,23 @@ class MottaSøknadTest : CleanDatabaseIntegrationTest() {
         assertThat(hendelseRepository.findByTypeAndId(TypeHendelse.JOURNALPOST, hendelse1.hendelsesId)).isNotNull
         assertThat(hendelseRepository.findByTypeAndId(TypeHendelse.JOURNALPOST, hendelse2.hendelsesId)).isNotNull
 
-        mockJournalpost(brevkode = DokumentBrevkode.LÆREMIDLER, søknad = søknadskjemaLæremidler(), journalpostId = hendelse1.journalpostId)
-        mockJournalpost(brevkode = DokumentBrevkode.LÆREMIDLER, søknad = søknadskjemaLæremidler(), journalpostId = hendelse2.journalpostId)
+        mockJournalpost(
+            brevkode = DokumentBrevkode.LÆREMIDLER,
+            søknad = søknadskjemaLæremidler(),
+            journalpostId = hendelse1.journalpostId,
+        )
+        mockJournalpost(
+            brevkode = DokumentBrevkode.LÆREMIDLER,
+            søknad = søknadskjemaLæremidler(),
+            journalpostId = hendelse2.journalpostId,
+        )
         kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 
-        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(ident, Stønadstype.LÆREMIDLER, hendelse1.journalpostId.toString())
+        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(
+            ident,
+            Stønadstype.LÆREMIDLER,
+            hendelse1.journalpostId.toString(),
+        )
 
         // Verifiserer at det har blitt opprettet jfr-oppgave for den andre søknaden
         assertThat(
@@ -174,7 +197,11 @@ class MottaSøknadTest : CleanDatabaseIntegrationTest() {
         mockJournalpost(brevkode = DokumentBrevkode.DAGLIG_REISE, søknad = søknadDagligReise())
         kjørTasksKlareForProsessering()
 
-        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(ident, Stønadstype.DAGLIG_REISE_TSR, journalpostId.toString())
+        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(
+            ident,
+            Stønadstype.DAGLIG_REISE_TSR,
+            journalpostId.toString(),
+        )
     }
 
     @Test
@@ -192,7 +219,11 @@ class MottaSøknadTest : CleanDatabaseIntegrationTest() {
         mockJournalpost(brevkode = DokumentBrevkode.DAGLIG_REISE, søknad = søknadDagligReise())
         kjørTasksKlareForProsessering()
 
-        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(ident, Stønadstype.DAGLIG_REISE_TSO, journalpostId.toString())
+        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(
+            ident,
+            Stønadstype.DAGLIG_REISE_TSO,
+            journalpostId.toString(),
+        )
     }
 
     @Test
@@ -214,7 +245,11 @@ class MottaSøknadTest : CleanDatabaseIntegrationTest() {
         )
         kjørTasksKlareForProsessering()
 
-        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(ident, Stønadstype.DAGLIG_REISE_TSO, journalpostId.toString())
+        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(
+            ident,
+            Stønadstype.DAGLIG_REISE_TSO,
+            journalpostId.toString(),
+        )
     }
 
     @Test
@@ -228,18 +263,44 @@ class MottaSøknadTest : CleanDatabaseIntegrationTest() {
 
         assertThat(hendelseRepository.findByTypeAndId(TypeHendelse.JOURNALPOST, hendelse.hendelsesId)).isNotNull
 
-        val journalpost = mockJournalpost(brevkode = DokumentBrevkode.DAGLIG_REISE, søknad = null, journalpostKanal = "SKAN_IM")
+        val journalpost =
+            mockJournalpost(brevkode = DokumentBrevkode.DAGLIG_REISE, søknad = null, journalpostKanal = "SKAN_IM")
         kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 
         val oppgaveSlot = mutableListOf<OpprettOppgaveRequest>()
         verify { oppgaveClient.opprettOppgave(capture(oppgaveSlot)) }
 
-        val oppgave = oppgaveSlot.first { it.journalpostId == journalpostId.toString() && it.oppgavetype == Oppgavetype.Journalføring }
+        val oppgave =
+            oppgaveSlot.first { it.journalpostId == journalpostId.toString() && it.oppgavetype == Oppgavetype.Journalføring }
 
         assertThat(oppgave.journalpostId).isEqualTo(journalpostId.toString())
         assertThat(oppgave.tema.name).isEqualTo(journalpost.tema)
         assertThat(oppgave.beskrivelse).contains(journalpost.dokumenter?.first()?.tittel)
         assertThat(oppgave.mappeId).isNull()
+    }
+
+    @Test
+    fun `mottar daglig-resise-kjøreliste-søknad fra kafka, bruker mottar AAP, journalføres og oppretter sak på TSO`() {
+        val hendelse = journalfoeringHendelseRecord()
+
+        journalhendelseKafkaListener.listen(
+            ConsumerRecordUtil.lagConsumerRecord("key", hendelse),
+            mockk<Acknowledgment>(relaxed = true),
+        )
+
+        assertThat(hendelseRepository.findByTypeAndId(TypeHendelse.JOURNALPOST, hendelse.hendelsesId)).isNotNull
+
+        every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoAAP()
+
+        mockJournalpost(brevkode = DokumentBrevkode.DAGLIG_REISE_KJØRELISTE, søknad = søknadKjøreliste())
+
+        kjørTasksKlareForProsessering()
+
+        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(
+            ident,
+            Stønadstype.DAGLIG_REISE_TSO,
+            journalpostId.toString(),
+        )
     }
 
     @Test

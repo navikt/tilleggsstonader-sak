@@ -18,8 +18,10 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsy
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadKjøreliste
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadLæremidler
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadskjemaKjørelisteMapper
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadskjemaLæremidlerMapper
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaBarnetilsynMapper
 import org.slf4j.LoggerFactory
@@ -36,6 +38,7 @@ class SøknadService(
     private val søknadskjemaBoutgifterMapper: SøknadskjemaBoutgifterMapper,
     private val søknadsskjemaDagligReiseMapper: SøknadskjemaDagligReiseMapper,
     private val søknadDagligReiseRepository: SøknadDagligReiseRepository,
+    private val søknadKjørelisteRepository: SøknadKjørelisteRepository,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -73,6 +76,7 @@ class SøknadService(
                 is SøknadLæremidler -> søknadLæremidlerRepository.insert(søknad)
                 is SøknadBoutgifter -> søknadBoutgifterRepository.insert(søknad)
                 is SøknadDagligReise -> søknadDagligReiseRepository.insert(søknad)
+                is SøknadKjøreliste -> søknadKjørelisteRepository.insert(søknad)
             }
         søknadBehandlingRepository.insert(SøknadBehandling(behandlingId, søknad.id))
         return lagretSøknad
@@ -115,7 +119,13 @@ class SøknadService(
                     søknadsskjema,
                 )
 
-            is KjørelisteSkjema -> TODO()
+            is KjørelisteSkjema ->
+                SøknadskjemaKjørelisteMapper.map(
+                    skjema.mottattTidspunkt,
+                    skjema.språk,
+                    journalpost,
+                    søknadsskjema,
+                )
         }
 
     fun kopierSøknad(

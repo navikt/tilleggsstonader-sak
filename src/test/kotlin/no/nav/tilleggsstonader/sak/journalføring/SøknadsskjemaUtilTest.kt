@@ -3,8 +3,10 @@ package no.nav.tilleggsstonader.sak.journalføring
 import com.fasterxml.jackson.databind.node.ObjectNode
 import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadskjemaKjørelisteMapper
 import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil
 import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil
+import no.nav.tilleggsstonader.sak.util.SøknadKjørelisteUtil
 import no.nav.tilleggsstonader.sak.util.SøknadUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -100,6 +102,30 @@ class SøknadsskjemaUtilTest {
                     data = objectMapper.writeValueAsBytes(json),
                     mottattTidspunkt = LocalDateTime.now(),
                 )
+            }.hasMessageContaining("Unrecognized field \"ukjentFelt\"")
+        }
+    }
+
+    @Nested
+    inner class ParsingKjøreliste {
+        // TODO - her må jeg fikse opp i parsing og mapping - går litt i surr på navngivningen
+        @Test
+        fun `Skal kunne parse søknad av type daglig reise kjøreliste`() {
+            val skjema = SøknadKjørelisteUtil.søknadKjøreliste()
+            val parsetSkjema = SøknadsskjemaUtil.parseKjøreliste(data = objectMapper.writeValueAsBytes(skjema))
+            val parsetOgMappetSkjema = SøknadskjemaKjørelisteMapper.mapSkjemaKjøreliste(parsetSkjema.skjema)
+            assertThat(parsetOgMappetSkjema).isEqualTo(skjema.data)
+        }
+
+        @Test
+        fun `Skal feile hvis et ukjent felt finnes i skjemaet`() {
+            val skjema = SøknadKjørelisteUtil.søknadKjøreliste()
+            val json =
+                objectMapper.readTree(objectMapper.writeValueAsBytes(skjema)).apply {
+                    (this as ObjectNode).put("ukjentFelt", "test")
+                }
+            assertThatThrownBy {
+                SøknadsskjemaUtil.parseKjøreliste(data = objectMapper.writeValueAsBytes(json))
             }.hasMessageContaining("Unrecognized field \"ukjentFelt\"")
         }
     }
