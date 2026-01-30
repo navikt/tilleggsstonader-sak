@@ -3,71 +3,133 @@ package no.nav.tilleggsstonader.sak.ekstern.stønad
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakUkeDto
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForUke
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForUke
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Ekstrakostnader
 import org.springframework.stereotype.Service
+import java.math.BigDecimal
 import java.time.LocalDate
 
 @Service
 class DagligReisePrivatBilService {
-    fun hentRammevedtaksPrivatBil(ident: IdentRequest): List<RammevedtakDto> = hentRammevedtakMock()
+    fun hentRammevedtaksPrivatBil(ident: IdentRequest): List<RammevedtakDto> {
+        val beregningsresultat = hentBeregningsresultatMock()
+        return mapBeregningsresultatTilRammevedtak(beregningsresultat)
+    }
 
-    private fun hentRammevedtakMock(): List<RammevedtakDto> =
-        listOf(
+    private fun mapBeregningsresultatTilRammevedtak(beregningsresultat: BeregningsresultatPrivatBil): List<RammevedtakDto> =
+        beregningsresultat.reiser.mapIndexed { index, reise ->
             RammevedtakDto(
-                id = "1",
-                fom = LocalDate.of(2025, 1, 1),
-                tom = LocalDate.of(2025, 2, 6),
-                reisedagerPerUke = 3,
-                aktivitetsadresse = "Tiurveien 34, 0356 Oslo",
-                aktivitetsnavn = "Arbeidstrening",
+                id = index.toString(),
+                fom = reise.grunnlag.fom,
+                tom = reise.grunnlag.tom,
+                reisedagerPerUke = reise.grunnlag.reisedagerPerUke,
+                aktivitetsadresse = "Ukjent adresse",
+                aktivitetsnavn = "Ukjent aktivitet",
                 uker =
-                    listOf(
+                    reise.uker.mapIndexed { idx, uke ->
                         RammevedtakUkeDto(
-                            fom = LocalDate.of(2025, 1, 1),
-                            tom = LocalDate.of(2025, 1, 5),
-                            ukeNummer = 1,
-                        ),
-                        RammevedtakUkeDto(
-                            fom = LocalDate.of(2025, 1, 6),
-                            tom = LocalDate.of(2025, 1, 12),
-                            ukeNummer = 2,
-                        ),
-                        RammevedtakUkeDto(
-                            fom = LocalDate.of(2025, 1, 13),
-                            tom = LocalDate.of(2025, 1, 19),
-                            ukeNummer = 3,
-                        ),
-                        RammevedtakUkeDto(
-                            fom = LocalDate.of(2025, 1, 20),
-                            tom = LocalDate.of(2025, 1, 26),
-                            ukeNummer = 4,
-                        ),
-                        RammevedtakUkeDto(
-                            fom = LocalDate.of(2025, 1, 27),
-                            tom = LocalDate.of(2025, 2, 2),
-                            ukeNummer = 5,
-                        ),
-                        RammevedtakUkeDto(
-                            fom = LocalDate.of(2025, 2, 3),
-                            tom = LocalDate.of(2025, 2, 6),
-                            ukeNummer = 6,
-                        ),
+                            fom = uke.grunnlag.fom,
+                            tom = uke.grunnlag.tom,
+                            ukeNummer = idx + 1,
+                        )
+                    },
+            )
+        }
+
+    private fun hentBeregningsresultatMock(): BeregningsresultatPrivatBil =
+        BeregningsresultatPrivatBil(
+            reiser =
+                listOf(
+                    BeregningsresultatForReiseMedPrivatBil(
+                        uker =
+                            listOf(
+                                BeregningsresultatForUke(
+                                    grunnlag =
+                                        BeregningsgrunnlagForUke(
+                                            fom = LocalDate.of(2025, 1, 1),
+                                            tom = LocalDate.of(2025, 1, 4),
+                                            maksAntallDagerSomKanDekkes = 3,
+                                            antallDagerInkludererHelg = true,
+                                            vedtaksperioder = emptyList(),
+                                            kilometersats = BigDecimal(4.03),
+                                        ),
+                                    dagsatsUtenParkering = BigDecimal(500),
+                                    maksBeløpSomKanDekkesFørParkering = BigDecimal(100).toBigInteger(),
+                                ),
+                                BeregningsresultatForUke(
+                                    grunnlag =
+                                        BeregningsgrunnlagForUke(
+                                            fom = LocalDate.of(2025, 1, 5),
+                                            tom = LocalDate.of(2025, 1, 11),
+                                            maksAntallDagerSomKanDekkes = 3,
+                                            antallDagerInkludererHelg = true,
+                                            vedtaksperioder = emptyList(),
+                                            kilometersats = BigDecimal(4.03),
+                                        ),
+                                    dagsatsUtenParkering = BigDecimal(500),
+                                    maksBeløpSomKanDekkesFørParkering = BigDecimal(100).toBigInteger(),
+                                ),
+                            ),
+                        grunnlag =
+                            BeregningsgrunnlagForReiseMedPrivatBil(
+                                fom = LocalDate.of(2025, 1, 1),
+                                tom = LocalDate.of(2025, 1, 11),
+                                reisedagerPerUke = 3,
+                                reiseavstandEnVei = BigDecimal(15),
+                                ekstrakostnader =
+                                    Ekstrakostnader(
+                                        bompengerEnVei = 20,
+                                        fergekostnadEnVei = 50,
+                                    ),
+                            ),
                     ),
-            ),
-            RammevedtakDto(
-                id = "2",
-                fom = LocalDate.of(2025, 2, 10),
-                tom = LocalDate.of(2025, 2, 16),
-                reisedagerPerUke = 3,
-                aktivitetsadresse = "Drammensveien 1, 0356 Oslo",
-                aktivitetsnavn = "Tiltak",
-                uker =
-                    listOf(
-                        RammevedtakUkeDto(
-                            fom = LocalDate.of(2025, 2, 10),
-                            tom = LocalDate.of(2025, 2, 16),
-                            ukeNummer = 7,
-                        ),
+                    BeregningsresultatForReiseMedPrivatBil(
+                        uker =
+                            listOf(
+                                BeregningsresultatForUke(
+                                    grunnlag =
+                                        BeregningsgrunnlagForUke(
+                                            fom = LocalDate.of(2025, 2, 2),
+                                            tom = LocalDate.of(2025, 2, 8),
+                                            maksAntallDagerSomKanDekkes = 4,
+                                            antallDagerInkludererHelg = true,
+                                            vedtaksperioder = emptyList(),
+                                            kilometersats = BigDecimal(4.03),
+                                        ),
+                                    dagsatsUtenParkering = BigDecimal(500),
+                                    maksBeløpSomKanDekkesFørParkering = BigDecimal(100).toBigInteger(),
+                                ),
+                                BeregningsresultatForUke(
+                                    grunnlag =
+                                        BeregningsgrunnlagForUke(
+                                            fom = LocalDate.of(2025, 2, 9),
+                                            tom = LocalDate.of(2025, 2, 13),
+                                            maksAntallDagerSomKanDekkes = 4,
+                                            antallDagerInkludererHelg = false,
+                                            vedtaksperioder = emptyList(),
+                                            kilometersats = BigDecimal(4.03),
+                                        ),
+                                    dagsatsUtenParkering = BigDecimal(500),
+                                    maksBeløpSomKanDekkesFørParkering = BigDecimal(100).toBigInteger(),
+                                ),
+                            ),
+                        grunnlag =
+                            BeregningsgrunnlagForReiseMedPrivatBil(
+                                fom = LocalDate.of(2025, 2, 2),
+                                tom = LocalDate.of(2025, 2, 13),
+                                reisedagerPerUke = 4,
+                                reiseavstandEnVei = BigDecimal(15),
+                                ekstrakostnader =
+                                    Ekstrakostnader(
+                                        bompengerEnVei = 200,
+                                        fergekostnadEnVei = null,
+                                    ),
+                            ),
                     ),
-            ),
+                ),
         )
 }
