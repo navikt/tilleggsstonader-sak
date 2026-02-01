@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 
 class FileUtilTest {
     @Test
-    fun `skal ikke sjekke inn SKAL_SKRIVE_TIL_FIL=true`() {
-        assertThat(FileUtil.SKAL_SKRIVE_TIL_FIL).isFalse()
+    fun `skal ikke sjekke inn SKRIV_TIL_FIL=true`() {
+        assertThat(FileUtil.SKRIV_TIL_FIL).isFalse()
     }
 }

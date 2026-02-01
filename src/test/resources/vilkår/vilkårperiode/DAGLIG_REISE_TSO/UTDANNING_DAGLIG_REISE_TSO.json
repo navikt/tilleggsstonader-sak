@@ -1,5 +1,7 @@
 {
   "type": "UTDANNING_DAGLIG_REISE_TSO",
-  "fakta": {},
+  "fakta": {
+    "aktivitetsdager": 3
+  },
   "vurderinger": {}
 }

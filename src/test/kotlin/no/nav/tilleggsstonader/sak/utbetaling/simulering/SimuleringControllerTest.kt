@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering
 
+import io.mockk.every
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -11,6 +12,8 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringsresultatRepository
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringDetaljer
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -20,6 +23,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilg
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDate
 
 internal class SimuleringControllerTest : CleanDatabaseIntegrationTest() {
     @Autowired
@@ -54,6 +58,9 @@ internal class SimuleringControllerTest : CleanDatabaseIntegrationTest() {
     @Test
     internal fun `Skal håndtere 204 No Content for behandling uten endring i utbetalinger, og lagre ned dette`() {
         val personIdent = "identIngenEndring"
+
+        every { mockClientService.simuleringClient.simuler(match { it.personident == personIdent }) } returns null
+
         val fagsak = opprettFagsak(personIdent)
         val behandling = opprettBehandling(fagsak)
         opprettOgTilordneOppgaveForBehandling(behandling.id)
@@ -68,6 +75,41 @@ internal class SimuleringControllerTest : CleanDatabaseIntegrationTest() {
         val simuleringsresultat = simuleringsresultatRepository.findByIdOrThrow(behandling.id)
 
         assertThat(simuleringsresultat.data).isNull()
+        assertThat(simuleringsresultat.ingenEndringIUtbetaling).isTrue()
+    }
+
+    @Test
+    internal fun `Skal håndtere simulering med tom oppsumeringer-liste, og lagre ned og hente dette`() {
+        val personIdent = "utbetalingFraGårsdagenErSattPåPause"
+
+        every {
+            mockClientService.simuleringClient.simuler(match { it.personident == personIdent })
+        } returns
+            SimuleringResponseDto(
+                oppsummeringer = emptyList(),
+                detaljer =
+                    SimuleringDetaljer(
+                        gjelderId = personIdent,
+                        datoBeregnet = LocalDate.now(),
+                        totalBeløp = 0,
+                        perioder = emptyList(),
+                    ),
+            )
+
+        val fagsak = opprettFagsak(personIdent)
+        val behandling = opprettBehandling(fagsak)
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
+        opprettVedtak(behandling.id)
+
+        tilkjentYtelseRepository.insert(tilkjentYtelse(behandlingId = behandling.id))
+
+        val response = kall.simulering.simulering(behandling.id)
+        assertThat(response.oppsummering).isNull()
+        assertThat(response.ingenEndringIUtbetaling).isTrue()
+
+        val simuleringsresultat = simuleringsresultatRepository.findByIdOrThrow(behandling.id)
+
+        assertThat(simuleringsresultat.data).isNotNull()
         assertThat(simuleringsresultat.ingenEndringIUtbetaling).isTrue()
     }
 

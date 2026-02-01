@@ -61,9 +61,6 @@ class MottaSøknadTest : CleanDatabaseIntegrationTest() {
     private lateinit var fagsakRepository: FagsakRepository
 
     @Autowired
-    private lateinit var journalpostClient: JournalpostClient
-
-    @Autowired
     lateinit var journalhendelseKafkaListener: JournalhendelseKafkaListener
 
     @Autowired
@@ -74,9 +71,6 @@ class MottaSøknadTest : CleanDatabaseIntegrationTest() {
 
     @Autowired
     lateinit var behandlingsjournalpostRepository: BehandlingsjournalpostRepository
-
-    @Autowired
-    lateinit var ytelseClient: YtelseClient
 
     val journalpostId = 123321L
     val ident = "12345678901"
@@ -246,6 +240,32 @@ class MottaSøknadTest : CleanDatabaseIntegrationTest() {
         assertThat(oppgave.tema.name).isEqualTo(journalpost.tema)
         assertThat(oppgave.beskrivelse).contains(journalpost.dokumenter?.first()?.tittel)
         assertThat(oppgave.mappeId).isNull()
+    }
+
+    @Test
+    fun `mottar journalpost som er ferdigstilt, lager task men behandler ikke`() {
+        val hendelse = journalfoeringHendelseRecord()
+
+        journalhendelseKafkaListener.listen(
+            ConsumerRecordUtil.lagConsumerRecord("key", hendelse),
+            mockk<Acknowledgment>(relaxed = true),
+        )
+
+        assertThat(hendelseRepository.findByTypeAndId(TypeHendelse.JOURNALPOST, hendelse.hendelsesId)).isNotNull
+
+        val journalpost =
+            journalpost(
+                journalpostId = journalpostId.toString(),
+                journalposttype = Journalposttype.I,
+                dokumenter = emptyList(),
+                kanal = hendelse.mottaksKanal,
+                bruker = Bruker(ident, BrukerIdType.FNR),
+                journalstatus = Journalstatus.FERDIGSTILT,
+            )
+        opprettJournalpost(journalpost)
+        kjørTasksKlareForProsesseringTilIngenTasksIgjen()
+
+        verify(exactly = 0) { oppgaveClient.opprettOppgave(any()) }
     }
 
     private fun journalfoeringHendelseRecord(

@@ -25,7 +25,16 @@ class KlageService(
 ) {
     fun hentBehandlinger(fagsakPersonId: FagsakPersonId): KlagebehandlingerDto {
         val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(fagsakPersonId)
-        val eksterneFagsakIder = listOfNotNull(fagsaker.barnetilsyn, fagsaker.læremidler, fagsaker.boutgifter).map { it.eksternId.id }
+        val eksterneFagsakIder =
+            listOfNotNull(
+                fagsaker.barnetilsyn,
+                fagsaker.læremidler,
+                fagsaker.boutgifter,
+                fagsaker.dagligReiseTso,
+                fagsaker.dagligReiseTsr,
+            ).map {
+                it.eksternId.id
+            }
 
         if (eksterneFagsakIder.isEmpty()) {
             return KlagebehandlingerDto.empty()

@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.domain
 
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.TypeVilkårFakta
 
 enum class TypeVedtakDagligReise(
     override val typeVedtak: TypeVedtak,
@@ -16,14 +15,7 @@ enum class TypeDagligReise {
     OFFENTLIG_TRANSPORT,
     PRIVAT_BIL,
     TAXI,
-    ;
-
-    fun tilTypeVilkårFakta(): TypeVilkårFakta =
-        when (this) {
-            OFFENTLIG_TRANSPORT -> TypeVilkårFakta.DAGLIG_REISE_OFFENTLIG_TRANSPORT
-            PRIVAT_BIL -> TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL
-            else -> TODO("Ikke implementert")
-        }
+    UBESTEMT,
 }
 
 sealed interface VedtakDagligReise : Vedtaksdata

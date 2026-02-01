@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
 
 private sealed interface HelvedDto {
     val sakId: String
@@ -61,6 +60,14 @@ enum class StønadUtbetaling {
     LÆREMIDLER_ENSLIG_FORSØRGER,
     LÆREMIDLER_AAP,
     LÆREMIDLER_ETTERLATTE,
+
+    BOUTGIFTER_ENSLIG_FORSØRGER,
+    BOUTGIFTER_AAP,
+    BOUTGIFTER_ETTERLATTE,
+
+    TILSYN_BARN_ENSLIG_FORSØRGER,
+    TILSYN_BARN_AAP,
+    TILSYN_BARN_ETTERLATTE,
 
     DAGLIG_REISE_TILTAK_ARBEIDSFORBEREDENDE,
     DAGLIG_REISE_TILTAK_ARBEIDSRETTET_REHAB,

@@ -16,13 +16,14 @@ import org.springframework.web.bind.annotation.RestController
 @ProtectedWithClaims(issuer = "azuread")
 class SkjemaRoutingController(
     private val skjemaRoutingService: SkjemaRoutingService,
+    private val eksternApplikasjon: EksternApplikasjon,
 ) {
     @PostMapping
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
     fun sjekkRoutingForPerson(
         @RequestBody request: IdentSkjematype,
     ): SøknadRoutingResponse {
-        feilHvisIkke(kallKommerFra(EksternApplikasjon.SOKNAD_API), HttpStatus.UNAUTHORIZED) {
+        feilHvisIkke(kallKommerFra(eksternApplikasjon.soknadApi), HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
         }
         return with(request) { SøknadRoutingResponse(skjemaRoutingService.skalRoutesTilNyLøsning(ident, skjematype)) }

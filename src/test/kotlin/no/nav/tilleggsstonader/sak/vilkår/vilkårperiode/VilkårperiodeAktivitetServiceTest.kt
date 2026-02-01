@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBoutgifterDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
@@ -147,6 +148,27 @@ class VilkårperiodeAktivitetServiceTest : CleanDatabaseIntegrationTest() {
                     ),
                 )
             }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
+        }
+
+        @Test
+        fun `skal kaste feil ved opprettelse av tiltak med vurdering at bruker ikke har utgifter uten begrunnelse`() {
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSR)
+            val faktaOgSvar =
+                FaktaOgSvarAktivitetDagligReiseTsrDto(
+                    svarHarUtgifter = SvarJaNei.NEI,
+                )
+
+            assertThatThrownBy {
+                aktivitetService.opprettVilkårperiode(
+                    dummyVilkårperiodeAktivitet(
+                        type = AktivitetType.TILTAK,
+                        behandlingId = behandling.id,
+                        begrunnelse = null,
+                        faktaOgSvar = faktaOgSvar,
+                    ),
+                )
+            }.hasMessageContaining("Mangler begrunnelse for vurdering av om bruker har utgifter")
         }
 
         @Test

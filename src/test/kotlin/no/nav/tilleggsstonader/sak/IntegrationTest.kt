@@ -5,13 +5,17 @@ import no.nav.familie.prosessering.internal.TaskWorker
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
+import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterSøknadService
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.MockClientService
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
 import no.nav.tilleggsstonader.sak.integrasjonstest.KafkaTopics
 import no.nav.tilleggsstonader.sak.integrasjonstest.Kall
+import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.util.DbContainerInitializer
 import no.nav.tilleggsstonader.sak.util.TestoppsettService
 import no.nav.tilleggsstonader.sak.util.TokenUtil
@@ -52,10 +56,11 @@ import org.springframework.test.web.servlet.client.RestTestClient
     "mock-register-aktivitet",
     "mock-ytelse-client",
     "mock-google-routes",
+    "mock-google-place-details",
 )
 @EnableMockOAuth2Server
 @AutoConfigureRestTestClient
-@EnableConfigurationProperties(KafkaTopics::class)
+@EnableConfigurationProperties(KafkaTopics::class, EksternApplikasjon::class)
 abstract class IntegrationTest {
     @LocalServerPort
     private var port: Int? = 0
@@ -97,7 +102,19 @@ abstract class IntegrationTest {
     lateinit var oppgaveRepository: OppgaveRepository
 
     @Autowired
+    lateinit var barnRepository: BarnRepository
+
+    @Autowired
+    lateinit var journalpostClient: JournalpostClient
+
+    @Autowired
+    lateinit var ytelseClient: YtelseClient
+
+    @Autowired
     lateinit var kafkaTopics: KafkaTopics
+
+    @Autowired
+    lateinit var eksternApplikasjon: EksternApplikasjon
 
     lateinit var testBrukerkontekst: TestBrukerKontekst
 

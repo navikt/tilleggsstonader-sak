@@ -20,13 +20,14 @@ import org.springframework.web.bind.annotation.RestController
 )
 class HarBehandlingUnderArbeidController(
     private val harBehandlingUnderArbeidService: HarBehandlingUnderArbeidService,
+    private val eksternApplikasjon: EksternApplikasjon,
 ) {
     @PostMapping()
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
     fun harBehandlingUnderArbeid(
         @RequestBody identStønadstype: IdentStønadstype,
     ): Boolean {
-        feilHvisIkke(SikkerhetContext.kallKommerFra(EksternApplikasjon.SOKNAD_API), HttpStatus.UNAUTHORIZED) {
+        feilHvisIkke(SikkerhetContext.kallKommerFra(eksternApplikasjon.soknadApi), HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
         }
         return harBehandlingUnderArbeidService.harSøknadUnderBehandling(identStønadstype)

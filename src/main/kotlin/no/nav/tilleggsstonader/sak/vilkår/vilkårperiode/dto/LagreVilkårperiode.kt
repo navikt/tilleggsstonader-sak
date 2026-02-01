@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdagerNullable
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfVurderinger
@@ -74,10 +75,12 @@ data class FaktaOgSvarAktivitetBoutgifterDto(
 data class FaktaOgSvarAktivitetDagligReiseTsoDto(
     val svarLønnet: SvarJaNei? = null,
     val svarHarUtgifter: SvarJaNei? = null,
+    val aktivitetsdager: Int? = null,
 ) : FaktaOgSvarDto()
 
 data class FaktaOgSvarAktivitetDagligReiseTsrDto(
     val svarHarUtgifter: SvarJaNei? = null,
+    val aktivitetsdager: Int? = null,
 ) : FaktaOgSvarDto()
 
 fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
@@ -143,6 +146,7 @@ fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
                         .takeIfVurderinger<LønnetVurdering>()
                         ?.lønnet
                         ?.svar,
+                aktivitetsdager = this.fakta.takeIfFakta<FaktaAktivitetsdagerNullable>()?.aktivitetsdager,
             )
 
         is AktivitetDagligReiseTsr ->
@@ -152,5 +156,6 @@ fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
                         .takeIfVurderinger<HarUtgifterVurdering>()
                         ?.harUtgifter
                         ?.svar,
+                aktivitetsdager = this.fakta.takeIfFakta<FaktaAktivitetsdagerNullable>()?.aktivitetsdager,
             )
     }

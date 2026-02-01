@@ -68,7 +68,7 @@ private fun List<OppsummeringForPeriodeDto>.summerPerMåned() =
         .toList()
 
 private fun lagSimuleringOppsummering(simulering: Simuleringsresultat): SimuleringOppsummering? {
-    if (simulering.data == null) {
+    if (simulering.data == null || simulering.data.oppsummeringer.isEmpty()) {
         return null
     }
 

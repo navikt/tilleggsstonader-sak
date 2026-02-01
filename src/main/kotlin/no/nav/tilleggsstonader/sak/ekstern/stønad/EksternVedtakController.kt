@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController
 )
 class EksternVedtakController(
     private val eksternVedtakService: EksternVedtakService,
+    private val eksternApplikasjon: EksternApplikasjon,
 ) {
     @PostMapping("tilsyn-barn")
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
@@ -29,8 +30,8 @@ class EksternVedtakController(
     ): VedtaksinformasjonTilsynBarnDto {
         val gyldigKlient =
             SikkerhetContext.kallKommerFra(
-                EksternApplikasjon.BIDRAG_GRUNNLAG,
-                EksternApplikasjon.BIDRAG_GRUNNLAG_FEATURE,
+                eksternApplikasjon.bidragGrunnlag,
+                eksternApplikasjon.bidragGrunnlagFeature,
             )
         feilHvisIkke(gyldigKlient, HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"

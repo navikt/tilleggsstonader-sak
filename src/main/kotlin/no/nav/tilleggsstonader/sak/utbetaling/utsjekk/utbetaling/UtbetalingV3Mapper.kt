@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import org.springframework.stereotype.Service
@@ -156,6 +155,14 @@ class UtbetalingV3Mapper(
             TypeAndel.LÆREMIDLER_AAP -> StønadUtbetaling.LÆREMIDLER_AAP
             TypeAndel.LÆREMIDLER_ETTERLATTE -> StønadUtbetaling.LÆREMIDLER_ETTERLATTE
 
+            TypeAndel.BOUTGIFTER_AAP -> StønadUtbetaling.BOUTGIFTER_AAP
+            TypeAndel.BOUTGIFTER_ETTERLATTE -> StønadUtbetaling.BOUTGIFTER_ETTERLATTE
+            TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER -> StønadUtbetaling.BOUTGIFTER_ENSLIG_FORSØRGER
+
+            TypeAndel.TILSYN_BARN_AAP -> StønadUtbetaling.TILSYN_BARN_AAP
+            TypeAndel.TILSYN_BARN_ETTERLATTE -> StønadUtbetaling.TILSYN_BARN_ETTERLATTE
+            TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER -> StønadUtbetaling.TILSYN_BARN_ENSLIG_FORSØRGER
+
             else -> error("Skal ikke sende andelstype=$typeAndel på kafka")
         }
 
@@ -175,6 +182,7 @@ class UtbetalingV3Mapper(
         return andelerForrigeBehandling
             .filter { it.type !in typeAndelerNåværendeBehandling }
             .map { it.type }
+            .filter { it != TypeAndel.UGYLDIG }
             .toSet()
     }
 }

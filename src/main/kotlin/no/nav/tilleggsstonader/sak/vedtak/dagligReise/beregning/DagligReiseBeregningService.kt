@@ -1,16 +1,23 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.OffentligTransportBeregningRevurderingService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.OffentligTransportBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -21,7 +28,9 @@ class DagligReiseBeregningService(
     private val dagligReiseVedtaksperioderValideringService: DagligReiseVedtaksperioderValideringService,
     private val offentligTransportBeregningService: OffentligTransportBeregningService,
     private val offentligTransportBeregningRevurderingService: OffentligTransportBeregningRevurderingService,
+    private val privatBilBeregningService: PrivatBilBeregningService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
+    private val unleashService: UnleashService,
 ) {
     fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
@@ -35,7 +44,9 @@ class DagligReiseBeregningService(
             typeVedtak = typeVedtak,
         )
 
-        val oppfylteVilkårDagligReise = vilkårService.hentOppfylteDagligReiseVilkår(behandling.id).map { it.mapTilVilkårDagligReise() }
+        val oppfylteVilkårDagligReise =
+            vilkårService.hentOppfylteDagligReiseVilkår(behandling.id).map { it.mapTilVilkårDagligReise() }
+
         validerFinnesReiser(oppfylteVilkårDagligReise)
 
         val brukersNavKontor =
@@ -53,6 +64,11 @@ class DagligReiseBeregningService(
                     behandling = behandling,
                     brukersNavKontor = brukersNavKontor,
                     tidligsteEndring = tidligsteEndring,
+                ),
+            privatBil =
+                beregnRammePrivatBil(
+                    oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
+                    vedtaksperioder = vedtaksperioder,
                 ),
         )
     }
@@ -73,8 +89,8 @@ class DagligReiseBeregningService(
                 vedtaksperioder = vedtaksperioder,
                 oppfylteVilkår = oppfylteVilkårOffentligTransport,
                 brukersNavKontor = brukersNavKontor,
-            ).flettMedForrigeVedtakHvisRevurdering(behandling, tidligsteEndring)
-            .sorterReiserOgPerioder()
+            )?.flettMedForrigeVedtakHvisRevurdering(behandling, tidligsteEndring)
+            ?.sorterReiserOgPerioder()
     }
 
     private fun BeregningsresultatOffentligTransport.flettMedForrigeVedtakHvisRevurdering(
@@ -86,6 +102,18 @@ class DagligReiseBeregningService(
             behandling = behandling,
             tidligsteEndring = tidligsteEndring,
         )
+
+    private fun beregnRammePrivatBil(
+        vedtaksperioder: List<Vedtaksperiode>,
+        oppfylteVilkårDagligReise: List<VilkårDagligReise>,
+    ): BeregningsresultatPrivatBil? {
+        if (!unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)) return null
+
+        val oppfylteVilkårPrivatBil = oppfylteVilkårDagligReise.filter { it.fakta is FaktaPrivatBil }
+
+        if (oppfylteVilkårPrivatBil.isEmpty()) return null
+        return privatBilBeregningService.beregn(vedtaksperioder = vedtaksperioder, oppfylteVilkårPrivatBil)
+    }
 }
 
 private fun validerFinnesReiser(vilkår: List<VilkårDagligReise>) {

@@ -5,9 +5,12 @@ import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
+import org.jboss.logging.MDC
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import tools.jackson.module.kotlin.readValue
+
+const val JOURNALPOST_ID = "journalpostId"
 
 @Service
 @TaskStepBeskrivelse(
@@ -24,7 +27,13 @@ class JournalhendelseKafkaHåndtererTask(
 
     override fun doTask(task: Task) {
         val hendelse = jsonMapper.readValue<JournalhendelseTaskData>(task.payload)
-        journalhendelseKafkaHåndtererService.behandleJournalhendelse(journalpostId = hendelse.journalpostId)
+        try {
+            MDC.put(JOURNALPOST_ID, hendelse.journalpostId)
+            logger.info("Behandler mottatt journalpost {}", hendelse.journalpostId)
+            journalhendelseKafkaHåndtererService.behandleJournalhendelse(journalpostId = hendelse.journalpostId)
+        } finally {
+            MDC.remove(JOURNALPOST_ID)
+        }
     }
 
     private data class JournalhendelseTaskData(

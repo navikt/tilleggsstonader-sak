@@ -66,7 +66,7 @@ class SkjemaRoutingService(
             lagreRouting(ident, skjematype, mapOf("harBehandling" to true))
             return true
         }
-        if (maksAntallErNådd(skjematype, toggleId = kontekst.featureToggleMaksAntall)) {
+        if (maksAntallErNådd(skjematype, toggleId = kontekst.featureToggleMaksAntallForStønad)) {
             return false
         }
         if (kontekst.kreverAtSøkerErUtenAktivtVedtakIArena && harAktivtVedtakIArena(skjematype, ident)) {
@@ -77,7 +77,8 @@ class SkjemaRoutingService(
             return true
         }
 
-        return false
+        lagreRouting(ident, skjematype, mapOf("skalTilNyLøsning" to true))
+        return true
     }
 
     private fun harFortroligEllerStrengtFortroligAdresse(ident: String): Boolean =
@@ -93,6 +94,20 @@ class SkjemaRoutingService(
         val maksAntall = unleashService.getVariantWithNameOrDefault(toggleId, "antall", 0)
         val antall = routingRepository.countByType(skjematype)
         logger.info("routing - stønadstype=$skjematype antallIDatabase=$antall toggleMaksAntall=$maksAntall")
+        return antall >= maksAntall
+    }
+
+    private fun erMaksAntallNåddForTsr(
+        skjematype: Skjematype,
+        toggleId: ToggleId,
+    ): Boolean {
+        val maksAntall = unleashService.getVariantWithNameOrDefault(toggleId, "antall", 0)
+        val antall =
+            routingRepository.countByTypeAndDetaljerContains(
+                skjematype,
+                detaljer = jsonMapper.writeValueAsString(mapOf("harAktivTsrMålgruppe" to true)),
+            )
+        logger.info("routing - stønadstype=$skjematype antallIDatabase=$antall toggleMaksAntall=$maksAntall (kun harAktivTsrMålgruppe)")
         return antall >= maksAntall
     }
 
@@ -167,4 +182,6 @@ class SkjemaRoutingService(
         with(ytelseService.harAktivtAapVedtak(ident)) {
             return type == TypeYtelsePeriode.AAP && harAktivtVedtak
         }
+
+    private fun harAktivtTsrMålgruppe(ident: String): Boolean = ytelseService.harAktivTsrMålgruppe(ident)
 }

@@ -1,5 +1,12 @@
 package no.nav.tilleggsstonader.sak.googlemaps
 
+import no.nav.tilleggsstonader.sak.googlemaps.dto.ReisedataDto
+import no.nav.tilleggsstonader.sak.googlemaps.placeDetailsApi.GooglePlaceDetailsClient
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Address
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.GoogleRoutesClient
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.RuteRequest
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.TransitOption
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.TransitPreferences
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import org.springframework.stereotype.Service
@@ -24,7 +31,6 @@ class GooglemapsService(
                         travelMode = "DRIVE",
                         departureTime = null,
                         transitPreferences = null,
-                        polylineQuality = "OVERVIEW",
                         computeAlternativeRoutes = true,
                     ),
                 )?.tilDomene()
@@ -71,7 +77,6 @@ class GooglemapsService(
                                         TransitOption.RAIL.value,
                                     ),
                             ),
-                        polylineQuality = "OVERVIEW",
                         computeAlternativeRoutes = false,
                     ),
                 )?.tilDomene()

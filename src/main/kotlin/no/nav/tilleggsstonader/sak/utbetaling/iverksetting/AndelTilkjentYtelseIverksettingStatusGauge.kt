@@ -67,7 +67,7 @@ class AndelTilkjentYtelseIverksettingStatusGauge(
                 .map { it.iverksetting }
 
         if (iverksettingerUtenOKStatus.isNotEmpty()) {
-            logger.warn(
+            logger.info(
                 "Iverksettinger uten OK-status: {}",
                 iverksettingerUtenOKStatus,
             )
@@ -106,7 +106,9 @@ class AndelTilkjentYtelseIverksettingStatusGauge(
         return nå.dayOfWeek == DayOfWeek.MONDAY && nå.hour < 6
     }
 
-    private fun erHelg(): Boolean = LocalDate.now().dayOfWeek !in DayOfWeek.SATURDAY..DayOfWeek.SUNDAY
+    private fun erHelg(): Boolean =
+        LocalDate.now().dayOfWeek == DayOfWeek.SATURDAY ||
+            LocalDate.now().dayOfWeek == DayOfWeek.SUNDAY
 
     private data class StatusMedIverksetting(
         val status: StatusIverksetting,

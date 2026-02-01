@@ -28,7 +28,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatT
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.Billettype
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
@@ -745,6 +745,7 @@ object InterntVedtakTestdata {
                                 ),
                             ),
                     ),
+                privatBil = null,
             )
 
         val vedtaksperioderTso =
@@ -816,6 +817,7 @@ object InterntVedtakTestdata {
                     fakta =
                         FaktaDagligReiseOffentligTransport(
                             reiseId = dummyReiseId,
+                            adresse = "Tiltaksgata 1",
                             reisedagerPerUke = 5,
                             prisEnkelbillett = 44,
                             prisSyvdagersbillett = null,

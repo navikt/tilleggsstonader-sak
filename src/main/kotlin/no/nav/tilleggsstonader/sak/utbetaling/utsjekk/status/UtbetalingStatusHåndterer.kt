@@ -29,7 +29,9 @@ class UtbetalingStatusHåndterer(
         melding: UtbetalingStatusRecord,
         utbetalingGjelderFagsystem: String,
     ) {
-        logger.info("Mottokk melding fra fagsystem: $utbetalingGjelderFagsystem")
+        logger.info(
+            "Mottok melding fra fagsystem: $utbetalingGjelderFagsystem, iverksettingId: $iverksettingId og ytelse: ${melding.detaljer?.ytelse} med status: ${melding.status}",
+        )
         if (utbetalingGjelderFagsystem != FAGSYSTEM_TILLEGGSSTØNADER) {
             return
         }
@@ -49,9 +51,21 @@ class UtbetalingStatusHåndterer(
             feilHvis(andelerHarUforventetStatus(andeler)) {
                 "Det finnes andeler på iverksetting=$iverksettingId som har en uforventet status"
             }
-            andelTilkjentYtelseRepository.updateAll(andeler.map { it.copy(statusIverksetting = utbetalingsstatus.tilStatusIverksetting()) })
+            if (skalOppdatereStatus(andeler, utbetalingsstatus.tilStatusIverksetting())) {
+                andelTilkjentYtelseRepository.updateAll(
+                    andeler.map {
+                        it.copy(statusIverksetting = utbetalingsstatus.tilStatusIverksetting())
+                    },
+                )
+            }
         }
     }
+
+    // HOS_OPPDRAG kommer noen ganger etter vi har mottatt OK, unngår da å endre tilbake til HOS_OPPDRAG, da det ikke vil komme enda en OK-status etter
+    private fun skalOppdatereStatus(
+        andeler: List<AndelTilkjentYtelse>,
+        nyStatusIverksetting: StatusIverksetting,
+    ): Boolean = !(andeler.all { it.statusIverksetting == StatusIverksetting.OK } && nyStatusIverksetting == StatusIverksetting.HOS_OPPDRAG)
 
     companion object {
         const val FAGSYSTEM_TILLEGGSSTØNADER = "TILLEGGSSTØNADER"

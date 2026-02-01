@@ -10,22 +10,18 @@ import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTestdata.behandlin
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.util.FileUtil
+import no.nav.tilleggsstonader.sak.util.FileUtil.SKRIV_TIL_FIL
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
 import no.nav.tilleggsstonader.sak.util.FileUtil.skrivTilFil
-import no.nav.tilleggsstonader.sak.util.fagsak
-import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.boot.resttestclient.TestRestTemplate
 import org.springframework.boot.resttestclient.postForEntity
 import org.springframework.http.HttpEntity
@@ -33,7 +29,6 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.converter.StringHttpMessageConverter
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
 import java.net.URI
 
 class InterntVedtakGenereringTest {
@@ -45,7 +40,6 @@ class InterntVedtakGenereringTest {
     private val barnService = mockk<BarnService>()
     private val vilkårService = mockk<VilkårService>()
     private val vedtakService = mockk<VedtakService>()
-    private val dagligReiseVilkårService = mockk<DagligReiseVilkårService>(relaxed = true)
 
     val service =
         InterntVedtakService(
@@ -57,7 +51,6 @@ class InterntVedtakGenereringTest {
             barnService = barnService,
             vilkårService = vilkårService,
             vedtakService = vedtakService,
-            dagligReiseVilkårService = dagligReiseVilkårService,
         )
 
     @BeforeEach
@@ -67,43 +60,53 @@ class InterntVedtakGenereringTest {
     }
 
     @ParameterizedTest
-    @MethodSource("stønadstyperInterntVedtak")
-    fun `json til htmlify er riktig`(type: StønadstypeInterntVedtak) {
-        val stønadstype = type.stønadstype
-        if (type.håndteresAvInterntVedtak) {
-            mock(type)
-            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
-            assertFileIsEqual("interntVedtak/$stønadstype/internt_vedtak.json", interntVedtak)
-        } else {
-            val saksbehandling = saksbehandling(fagsak(stønadstype = stønadstype))
-            every { behandlingService.hentSaksbehandling(behandlingId) } returns saksbehandling
-            assertThatThrownBy {
-                service.lagInterntVedtak(behandlingId = behandlingId)
-            }.hasMessageContaining("Internt vedtak håndterer ikke stønadstype=$stønadstype")
-        }
+    @EnumSource(
+        value = Stønadstype::class,
+        names = [
+            "BARNETILSYN",
+            "LÆREMIDLER",
+            "BOUTGIFTER",
+            "DAGLIG_REISE_TSO",
+            "DAGLIG_REISE_TSR",
+        ],
+    )
+    fun `json til htmlify er riktig`(stønadstype: Stønadstype) {
+        mock(stønadstype)
+        val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+        assertFileIsEqual("interntVedtak/$stønadstype/internt_vedtak.json", interntVedtak)
     }
 
     /**
-     * Kommenter ut Disabled for å oppdatere html og pdf ved endringer i htmlify.
-     * Endre SKAL_SKRIVE_TIL_FIL i fileUtil til true
-     * Formatter htmlfil etter generering for å unngå stor diff
+     * For å oppdatere html og pdf ved endringer i htmlify,
+     * 1. Fyr opp htmlify lokalt
+     * 2. Kjør:
+     *     SKAL_SKRIVE_TIL_FIL=true ./gradlew test --tests "no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakGenereringTest.lag html og pdf"
+     * 3. Formatter htmlfil etter generering for å unngå stor diff
      */
-    @Disabled
     @ParameterizedTest
-    @MethodSource("stønadstyperInterntVedtak")
-    fun `lager html og pdf`(type: StønadstypeInterntVedtak) {
-        if (!type.håndteresAvInterntVedtak) {
-            return
+    @EnumSource(
+        value = Stønadstype::class,
+        names = [ // Kommenter ut stønadstypene du ikke ønsker å generere internt vedtak for
+            "BARNETILSYN",
+            "LÆREMIDLER",
+            "BOUTGIFTER",
+            "DAGLIG_REISE_TSO",
+            "DAGLIG_REISE_TSR",
+        ],
+    )
+    fun `lag html og pdf`(stønadstype: Stønadstype) {
+        if (!SKRIV_TIL_FIL) {
+            return // Skal ikke generere opp interne vedtak hvis SKRIV_TIL_FIL er false
         }
-        mock(type)
+        mock(stønadstype)
         val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
         val html = lagHtmlifyClient().generateHtml(interntVedtak)
-        skrivTilFil("interntVedtak/${type.stønadstype}/internt_vedtak.html", html)
-        generatePdf(html, "interntVedtak/${type.stønadstype}/internt_vedtak.pdf")
+        skrivTilFil("interntVedtak/$stønadstype/internt_vedtak.html", html)
+        generatePdf(html, "interntVedtak/$stønadstype/internt_vedtak.pdf")
     }
 
-    private fun mock(type: StønadstypeInterntVedtak) {
-        when (type.stønadstype) {
+    private fun mock(type: Stønadstype) {
+        when (type) {
             Stønadstype.BARNETILSYN -> mockTilsynBarn()
             Stønadstype.LÆREMIDLER -> mockLæremidler()
             Stønadstype.BOUTGIFTER -> mockBoutgifter()
@@ -196,29 +199,5 @@ class InterntVedtakGenereringTest {
             )
         val pdf = TestRestTemplate().postForEntity<ByteArray>(url, request).body!!
         skrivTilFil(name, pdf)
-    }
-
-    companion object {
-        @JvmStatic
-        fun stønadstyperInterntVedtak(): List<StønadstypeInterntVedtak> =
-            Stønadstype.entries.map {
-                when (it) {
-                    Stønadstype.BARNETILSYN,
-                    Stønadstype.LÆREMIDLER,
-                    Stønadstype.BOUTGIFTER,
-                    Stønadstype.DAGLIG_REISE_TSO,
-                    Stønadstype.DAGLIG_REISE_TSR,
-                    -> it.håndteres()
-                }
-            }
-
-        data class StønadstypeInterntVedtak(
-            val stønadstype: Stønadstype,
-            val håndteresAvInterntVedtak: Boolean,
-        )
-
-        private fun Stønadstype.håndteres() = StønadstypeInterntVedtak(stønadstype = this, håndteresAvInterntVedtak = true)
-
-        private fun Stønadstype.håndteresIkke() = StønadstypeInterntVedtak(stønadstype = this, håndteresAvInterntVedtak = false)
     }
 }

@@ -103,7 +103,8 @@
       "harUtgifter" : {
         "svar" : "JA",
         "resultat" : "OPPFYLT"
-      }
+      },
+      "aktivitetsdager" : 3
     },
     "kilde" : "MANUELL",
     "resultat" : "OPPFYLT",
@@ -117,7 +118,8 @@
     "faktaOgVurderinger" : {
       "@type" : "AktivitetDagligReiseTsoFaktaOgVurderingerDto",
       "lønnet" : null,
-      "harUtgifter" : null
+      "harUtgifter" : null,
+      "aktivitetsdager" : 3
     },
     "kilde" : "MANUELL",
     "resultat" : "IKKE_OPPFYLT",
@@ -153,6 +155,8 @@
     "utgift" : null,
     "slettetKommentar" : null,
     "fakta" : {
+      "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
+      "adresse" : "Tiltaksgata 1",
       "reisedagerPerUke" : 5,
       "prisEnkelbillett" : 44,
       "prisSyvdagersbillett" : null,
@@ -172,7 +176,7 @@
       "offentligTransport" : {
         "reiser" : [ {
           "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
-          "adresse" : null,
+          "adresse" : "Tiltaksgata 1",
           "perioder" : [ {
             "fom" : "2024-02-05",
             "tom" : "2024-02-10",
@@ -204,7 +208,7 @@
           } ]
         }, {
           "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
-          "adresse" : null,
+          "adresse" : "Tiltaksgata 1",
           "perioder" : [ {
             "fom" : "2025-02-05",
             "tom" : "2024-02-10",

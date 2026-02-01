@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import java.math.BigDecimal
 
@@ -18,15 +19,18 @@ import java.math.BigDecimal
 @JsonSubTypes(
     JsonSubTypes.Type(FaktaDagligReiseOffentligTransportDto::class, name = "OFFENTLIG_TRANSPORT"),
     JsonSubTypes.Type(FaktaDagligReisePrivatBilDto::class, name = "PRIVAT_BIL"),
+    JsonSubTypes.Type(FaktaDagligReiseUbestemtDto::class, name = "UBESTEMT"),
 )
 sealed interface FaktaDagligReiseDto {
     val type: TypeDagligReise
 
-    fun mapTilFakta(): FaktaDagligReise
+    fun mapTilFakta(
+        reiseId: ReiseId,
+        adresse: String?,
+    ): FaktaDagligReise
 }
 
 data class FaktaDagligReiseOffentligTransportDto(
-    val reiseId: ReiseId,
     val reisedagerPerUke: Int,
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
@@ -34,18 +38,20 @@ data class FaktaDagligReiseOffentligTransportDto(
 ) : FaktaDagligReiseDto {
     override val type = TypeDagligReise.OFFENTLIG_TRANSPORT
 
-    override fun mapTilFakta() =
-        FaktaOffentligTransport(
-            reiseId = reiseId,
-            reisedagerPerUke = reisedagerPerUke,
-            prisEnkelbillett = prisEnkelbillett,
-            prisTrettidagersbillett = prisTrettidagersbillett,
-            prisSyvdagersbillett = prisSyvdagersbillett,
-        )
+    override fun mapTilFakta(
+        reiseId: ReiseId,
+        adresse: String?,
+    ) = FaktaOffentligTransport(
+        reiseId = reiseId,
+        adresse = adresse,
+        reisedagerPerUke = reisedagerPerUke,
+        prisEnkelbillett = prisEnkelbillett,
+        prisTrettidagersbillett = prisTrettidagersbillett,
+        prisSyvdagersbillett = prisSyvdagersbillett,
+    )
 }
 
 data class FaktaDagligReisePrivatBilDto(
-    val reiseId: ReiseId,
     val reisedagerPerUke: Int,
     val reiseavstandEnVei: BigDecimal,
     val bompengerEnVei: Int?,
@@ -53,12 +59,27 @@ data class FaktaDagligReisePrivatBilDto(
 ) : FaktaDagligReiseDto {
     override val type = TypeDagligReise.PRIVAT_BIL
 
-    override fun mapTilFakta() =
-        FaktaPrivatBil(
-            reiseId = reiseId,
-            reisedagerPerUke = reisedagerPerUke,
-            reiseavstandEnVei = reiseavstandEnVei,
-            bompengerEnVei = bompengerEnVei,
-            fergekostandEnVei = fergekostandEnVei,
-        )
+    override fun mapTilFakta(
+        reiseId: ReiseId,
+        adresse: String?,
+    ) = FaktaPrivatBil(
+        reiseId = reiseId,
+        adresse = adresse,
+        reisedagerPerUke = reisedagerPerUke,
+        reiseavstandEnVei = reiseavstandEnVei,
+        bompengerEnVei = bompengerEnVei,
+        fergekostandEnVei = fergekostandEnVei,
+    )
+}
+
+data object FaktaDagligReiseUbestemtDto : FaktaDagligReiseDto {
+    override val type = TypeDagligReise.UBESTEMT
+
+    override fun mapTilFakta(
+        reiseId: ReiseId,
+        adresse: String?,
+    ) = FaktaUbestemtType(
+        reiseId = reiseId,
+        adresse = adresse,
+    )
 }

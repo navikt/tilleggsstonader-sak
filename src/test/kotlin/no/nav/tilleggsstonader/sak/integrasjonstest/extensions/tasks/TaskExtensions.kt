@@ -44,17 +44,6 @@ fun IntegrationTest.kjørTask(task: Task) {
     }
 }
 
-fun IntegrationTest.kjørAlleTaskMedSenererTriggertid() {
-    taskService
-        .findAll()
-        .filter {
-            it.status != Status.FERDIG &&
-                it.status != Status.PLUKKET &&
-                it.triggerTid > LocalDateTime.now()
-        }.map { task -> taskService.save(task.copy(triggerTid = LocalDateTime.now())) }
-        .forEach { kjørTask(it) }
-}
-
 private fun taskMsg(it: Task): String =
     when (it.type) {
         OpprettOppgaveTask.TYPE -> {

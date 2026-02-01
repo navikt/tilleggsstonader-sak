@@ -15,6 +15,7 @@ object OppgaveUtil {
     val GYLDIGE_ENHETER_TILLEGGSTØNADER =
         setOf(
             Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr,
+            Enhet.NAV_TILTAK_OSLO.enhetsnr,
             Enhet.NAV_ARBEID_OG_YTELSER_EGNE_ANSATTE.enhetsnr,
             Enhet.VIKAFOSSEN.enhetsnr,
         )

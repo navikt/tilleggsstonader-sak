@@ -1,5 +1,9 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.august
+import no.nav.tilleggsstonader.libs.utils.dato.oktober
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.finnPåTopic
@@ -8,6 +12,10 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
+import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -20,10 +28,12 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
 
     @Test
     fun `utbetalingsdato i fremtiden - ingen andeler skal bli utbetalt`() {
-        opprettBehandlingOgGjennomførBehandlingsløp {
+        opprettBehandlingOgGjennomførBehandlingsløp(
+            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+        ) {
             aktivitet {
                 opprett {
-                    aktivitetTiltak(fom = fom, tom = tom)
+                    aktivitetTiltakTso(fom = fom, tom = tom)
                 }
             }
             målgruppe {
@@ -61,10 +71,12 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             )
 
         val behandlingId =
-            opprettBehandlingOgGjennomførBehandlingsløp {
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
                 aktivitet {
                     opprett {
-                        aktivitetTiltak(fom = fom, tom = tom)
+                        aktivitetTiltakTso(fom = fom, tom = tom)
                     }
                 }
                 målgruppe {
@@ -74,7 +86,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 }
                 vilkår {
                     opprett {
-                        add(reiser)
+                        reiser.forEach { reise -> add { _, _ -> reise } }
                     }
                 }
             }
@@ -107,10 +119,12 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 lagreDagligReiseDto(fom = nå.plusWeeks(1), tom = nå.plusWeeks(2)),
             )
 
-        opprettBehandlingOgGjennomførBehandlingsløp {
+        opprettBehandlingOgGjennomførBehandlingsløp(
+            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+        ) {
             aktivitet {
                 opprett {
-                    aktivitetTiltak(fom = fom, tom = tom)
+                    aktivitetTiltakTso(fom = fom, tom = tom)
                 }
             }
             målgruppe {
@@ -120,7 +134,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             }
             vilkår {
                 opprett {
-                    add(reiser)
+                    reiser.forEach { reise -> add { _, _ -> reise } }
                 }
             }
         }
@@ -150,21 +164,71 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
 
     @Test
     fun `to andeler tilbake i tid med forskjellige type, skal bli to utbetalinger`() {
-    }
+        val førstePeriode = Datoperiode(1 august 2025, 31 august 2025)
+        val andrePeriode = Datoperiode(1 oktober 2025, 20 oktober 2025)
 
-    @Test
-    fun `iverksettingId blir riktig`() {
-    }
+        val behandlingId =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTso(førstePeriode.fom, førstePeriode.tom)
+                        add { behandlingId ->
+                            lagreVilkårperiodeAktivitet(
+                                behandlingId = behandlingId,
+                                aktivitetType = AktivitetType.UTDANNING,
+                                typeAktivitet = null,
+                                fom = andrePeriode.fom,
+                                tom = andrePeriode.tom,
+                                faktaOgSvar =
+                                    FaktaOgSvarAktivitetDagligReiseTsoDto(
+                                        svarLønnet = SvarJaNei.JA,
+                                        svarHarUtgifter = SvarJaNei.JA,
+                                    ),
+                            )
+                        }
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(førstePeriode.fom, førstePeriode.tom)
+                        målgruppeOvergangsstønad(andrePeriode.fom, andrePeriode.tom)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        offentligTransport(førstePeriode.fom, førstePeriode.tom)
+                        offentligTransport(andrePeriode.fom, andrePeriode.tom)
+                    }
+                }
+            }
 
-    @Test
-    fun `én andel i april, én i juni, skal havne på riktig utbetalingsmåned`() {
-    }
+        val utbetaling =
+            KafkaTestConfig
+                .sendteMeldinger()
+                .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
+                .single()
+                .also { assertThat(it.key()).isEqualTo(behandlingId.toString()) } // Første iverksettingId skal være behandlingId
+                .verdiEllerFeil<IverksettingDto>()
 
-    @Test
-    fun `tester på status-oppdatering`() {
-    }
+        assertThat(utbetaling.utbetalinger.map { it.stønad }).containsExactlyInAnyOrder(
+            StønadUtbetaling.DAGLIG_REISE_ENSLIG_FORSØRGER,
+            StønadUtbetaling.DAGLIG_REISE_AAP,
+        )
 
-    @Test
-    fun `Håndtering av error-status på topic`() {
+        with(utbetaling.utbetalinger.single { it.stønad == StønadUtbetaling.DAGLIG_REISE_AAP }) {
+            assertThat(perioder).hasSize(1)
+            assertThat(perioder.single().fom)
+                .isEqualTo(perioder.single().fom)
+                .isEqualTo(førstePeriode.fom.datoEllerNesteMandagHvisLørdagEllerSøndag())
+        }
+
+        with(utbetaling.utbetalinger.single { it.stønad == StønadUtbetaling.DAGLIG_REISE_ENSLIG_FORSØRGER }) {
+            assertThat(perioder).hasSize(1)
+            assertThat(perioder.single().fom)
+                .isEqualTo(perioder.single().fom)
+                .isEqualTo(andrePeriode.fom.datoEllerNesteMandagHvisLørdagEllerSøndag())
+        }
     }
 }

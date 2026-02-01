@@ -27,7 +27,6 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksK
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import no.nav.tilleggsstonader.sak.klage.KlageClient
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
-import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil.søknadBoutgifter
 import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil.søknadDagligReise
@@ -47,9 +46,7 @@ class JournalpostControllerTest(
     @Autowired val fagsakService: FagsakService,
     @Autowired val behandlingService: BehandlingService,
     @Autowired val klageClient: KlageClient,
-    @Autowired val journalpostClient: JournalpostClient,
     @Autowired val oppgaveClient: OppgaveClient,
-    @Autowired val ytelseClient: YtelseClient,
 ) : CleanDatabaseIntegrationTest() {
     val ident = "12345678910"
     val saksbehandler = "ole"

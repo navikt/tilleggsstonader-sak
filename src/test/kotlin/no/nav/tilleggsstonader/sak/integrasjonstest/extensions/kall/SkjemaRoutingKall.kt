@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
 import no.nav.tilleggsstonader.kontrakter.felles.IdentSkjematype
-import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRoutingResponse
 
@@ -21,7 +20,7 @@ class SkjemaRoutingKall(
                     .uri("/api/ekstern/skjema-routing")
                     .body(identSkjematype)
                     .medClientCredentials(
-                        clientId = EksternApplikasjon.SOKNAD_API.namespaceAppNavn,
+                        clientId = eksternApplikasjon.soknadApi,
                         accessAsApplication = true,
                     ).exchange()
             }

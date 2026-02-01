@@ -1,8 +1,21 @@
 package no.nav.tilleggsstonader.sak.googlemaps
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.sak.googlemaps.dto.KollektivDetaljerDto
+import no.nav.tilleggsstonader.sak.googlemaps.dto.LokasjonDto
+import no.nav.tilleggsstonader.sak.googlemaps.dto.OperatørDto
+import no.nav.tilleggsstonader.sak.googlemaps.dto.ReisedataDto
+import no.nav.tilleggsstonader.sak.googlemaps.dto.RuteDto
+import no.nav.tilleggsstonader.sak.googlemaps.dto.StrekningDto
+import no.nav.tilleggsstonader.sak.googlemaps.placeDetailsApi.GooglePlaceDetailsClient
+import no.nav.tilleggsstonader.sak.googlemaps.placeDetailsApi.PlaceDetailsResponse
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Address
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.GoogleRoutesClient
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.LinjeType
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Polyline
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Reisetype
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.RuteResponse
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import org.assertj.core.api.Assertions.assertThat
@@ -28,13 +41,13 @@ class GooglemapsServiceTest {
     @BeforeEach
     fun setUp() {
         every { googlePlaceDetailsClient.finnStedDetaljer(fraId) } returns
-            StedDetaljerResponse(
+            PlaceDetailsResponse(
                 id = "testId",
                 formattedAddress = "Myravegen 2, 6360 Åfarnes, Norway",
                 displayName = null,
             )
         every { googlePlaceDetailsClient.finnStedDetaljer(tilId) } returns
-            StedDetaljerResponse(
+            PlaceDetailsResponse(
                 id = "testId",
                 formattedAddress = "Fv64 40, 6456 Skåla, Norway",
                 displayName = null,
@@ -113,7 +126,7 @@ class GooglemapsServiceTest {
                                             linjeType = LinjeType.FERRY,
                                             operatør =
                                                 listOf(
-                                                    OperatørDto(
+                                                    `OperatørDto`(
                                                         navn = "Møre og Romsdal fylkeskommune",
                                                         url = "https://frammr.no/",
                                                     ),

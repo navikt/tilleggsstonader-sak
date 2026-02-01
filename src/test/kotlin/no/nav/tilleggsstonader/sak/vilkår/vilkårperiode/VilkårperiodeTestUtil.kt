@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DagpengerDagligReiseTsr
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetBoutgifter
@@ -322,6 +323,7 @@ object VilkårperiodeTestUtil {
                             lønnet = lønnet,
                         ),
                 )
+
             AktivitetType.UTDANNING -> UtdanningBoutgifter
 
             AktivitetType.INGEN_AKTIVITET -> IngenAktivitetBoutgifter
@@ -448,8 +450,12 @@ object VilkårperiodeTestUtil {
     ): AktivitetFaktaOgVurdering =
         when (type) {
             AktivitetType.TILTAK ->
-                TiltakDagligReiseTso(vurderinger = VurderingTiltakDagligReiseTso(lønnet = lønnet, harUtgifter = harUtgifter))
-            AktivitetType.UTDANNING -> UtdanningDagligReiseTso
+                TiltakDagligReiseTso(
+                    vurderinger = VurderingTiltakDagligReiseTso(lønnet = lønnet, harUtgifter = harUtgifter),
+                    fakta = FaktaAktivitetDagligReiseTso(aktivitetsdager = 3),
+                )
+
+            AktivitetType.UTDANNING -> UtdanningDagligReiseTso(fakta = FaktaAktivitetDagligReiseTso(aktivitetsdager = 3))
 
             AktivitetType.INGEN_AKTIVITET -> IngenAktivitetDagligReiseTso
 

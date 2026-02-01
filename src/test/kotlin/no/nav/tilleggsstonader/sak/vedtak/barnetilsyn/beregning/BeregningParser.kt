@@ -26,6 +26,7 @@ enum class BeregningNøkler(
     MÅNEDSBELØP("Månedsbeløp"),
     MAKSSATS("Makssats"),
     AKTIVITET("Aktivitet"),
+    TYPE_AKTIVITET("Type aktivitet"),
     MÅLGRUPPE("Målgruppe"),
     AKTIVITETSDAGER("Aktivitetsdager"),
     ANTALL_AKTIVITETER("Antall aktiviteter"),

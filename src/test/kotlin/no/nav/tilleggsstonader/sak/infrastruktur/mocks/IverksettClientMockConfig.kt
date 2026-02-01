@@ -2,11 +2,9 @@ package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 
 import io.mockk.clearMocks
 import io.mockk.every
-import io.mockk.justRun
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
-import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
-import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettStatus
+import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.SimuleringClient
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
 import no.nav.tilleggsstonader.sak.util.FileUtil.readFile
 import org.springframework.context.annotation.Bean
@@ -20,16 +18,12 @@ import tools.jackson.module.kotlin.readValue
 class IverksettClientMockConfig {
     @Bean
     @Primary
-    fun iverksettClient() = mockk<IverksettClient>(relaxed = true).apply { resetTilDefault(this) }
+    fun iverksettClient() = mockk<SimuleringClient>(relaxed = true).apply { resetTilDefault(this) }
 
     companion object {
-        fun resetTilDefault(iverksettClient: IverksettClient) {
-            clearMocks(iverksettClient)
-            justRun { iverksettClient.iverksett(any()) }
-            every { iverksettClient.hentStatus(any(), any(), any()) } returns IverksettStatus.OK
-            every { iverksettClient.simulerV2(any()) } returns simuleringsresultat
-            every { iverksettClient.simulerV3(any()) } returns simuleringsresultat
-            every { iverksettClient.simulerV2(match { it.personident == "identIngenEndring" }) } returns null
+        fun resetTilDefault(simuleringClient: SimuleringClient) {
+            clearMocks(simuleringClient)
+            every { simuleringClient.simuler(any()) } returns simuleringsresultat
         }
 
         private val simuleringsresultat =

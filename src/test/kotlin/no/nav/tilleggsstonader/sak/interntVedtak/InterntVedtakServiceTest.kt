@@ -14,7 +14,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
@@ -43,7 +42,6 @@ class InterntVedtakServiceTest {
     private val barnService = mockk<BarnService>()
     private val vilkårService = mockk<VilkårService>()
     private val vedtakService = mockk<VedtakService>()
-    private val dagligReiseVilkårService = mockk<DagligReiseVilkårService>(relaxed = true)
 
     val service =
         InterntVedtakService(
@@ -55,7 +53,6 @@ class InterntVedtakServiceTest {
             barnService = barnService,
             vilkårService = vilkårService,
             vedtakService = vedtakService,
-            dagligReiseVilkårService = dagligReiseVilkårService,
         )
 
     @BeforeEach

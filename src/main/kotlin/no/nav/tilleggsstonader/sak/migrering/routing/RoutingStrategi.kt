@@ -8,7 +8,7 @@ sealed interface RoutingStrategi {
     data object SendAlleBrukereTilNyLøsning : RoutingStrategi
 
     data class SendEnkelteBrukereTilNyLøsning(
-        val featureToggleMaksAntall: ToggleId,
+        val featureToggleMaksAntallForStønad: ToggleId,
         val kreverAtSøkerErUtenAktivtVedtakIArena: Boolean,
         val kreverAktivtAapVedtak: Boolean,
         val kreverUgradertAdresse: Boolean,
@@ -22,10 +22,11 @@ fun bestemRoutingStrategi(skjematype: Skjematype): RoutingStrategi =
         Skjematype.SØKNAD_BOUTGIFTER -> RoutingStrategi.SendAlleBrukereTilNyLøsning
         Skjematype.SØKNAD_DAGLIG_REISE ->
             RoutingStrategi.SendEnkelteBrukereTilNyLøsning(
-                featureToggleMaksAntall = Toggle.SØKNAD_ROUTING_DAGLIG_REISE,
+                featureToggleMaksAntallForStønad = Toggle.SØKNAD_ROUTING_DAGLIG_REISE,
                 kreverAtSøkerErUtenAktivtVedtakIArena = true,
-                kreverAktivtAapVedtak = true,
+                kreverAktivtAapVedtak = false,
                 kreverUgradertAdresse = true,
             )
+
         Skjematype.DAGLIG_REISE_KJØRELISTE -> TODO()
     }

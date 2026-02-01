@@ -1,7 +1,8 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingClient
-import no.nav.tilleggsstonader.sak.googlemaps.GoogleRoutesClient
+import no.nav.tilleggsstonader.sak.googlemaps.placeDetailsApi.GooglePlaceDetailsClient
+import no.nav.tilleggsstonader.sak.googlemaps.routesApi.GoogleRoutesClient
 import no.nav.tilleggsstonader.sak.interntVedtak.HtmlifyClient
 import no.nav.tilleggsstonader.sak.journalføring.FamilieDokumentClient
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
@@ -16,7 +17,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PdlClient
 import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.TilordnetSaksbehandlerClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
-import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettClient
+import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.SimuleringClient
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
 
@@ -31,7 +32,7 @@ class MockClientService(
     val familieDokumentClient: FamilieDokumentClient,
     val fullmaktClient: FullmaktClient,
     val htmlifyClient: HtmlifyClient,
-    val iverksettClient: IverksettClient,
+    val simuleringClient: SimuleringClient,
     val journalpostClient: JournalpostClient,
     val klageClient: KlageClient,
     val kodeverkClient: KodeverkClient,
@@ -43,6 +44,7 @@ class MockClientService(
     val ytelseClient: YtelseClient,
     val kafkaTemplate: KafkaTemplate<String, String>,
     val googleRoutesClient: GoogleRoutesClient,
+    val googlePlaceDetailsClient: GooglePlaceDetailsClient,
 ) {
     fun resetAlleTilDefaults() {
         ArbeidsfordelingClientMockConfig.resetTilDefault(arbeidsfordelingClient)
@@ -51,7 +53,7 @@ class MockClientService(
         FamilieDokumentClientMockConfig.resetTilDefault(familieDokumentClient)
         FullmaktClientMockConfig.resetTilDefault(fullmaktClient)
         HtmlifyClientMockConfig.resetTilDefault(htmlifyClient)
-        IverksettClientMockConfig.resetTilDefault(iverksettClient)
+        IverksettClientMockConfig.resetTilDefault(simuleringClient)
         JournalpostClientMockConfig.resetTilDefault(journalpostClient)
         KlageClientMockConfig.resetTilDefault(klageClient)
         KodeverkClientMockConfig.resetTilDefault(kodeverkClient)
@@ -62,5 +64,6 @@ class MockClientService(
         YtelseClientMockConfig.resetTilDefault(ytelseClient)
         KafkaTestConfig.resetMock(kafkaTemplate)
         GoogleRoutesClientMockConfig.resetTilDefault(googleRoutesClient)
+        GooglePlaceDetailsClientMockConfig.resetTilDefault(googlePlaceDetailsClient)
     }
 }

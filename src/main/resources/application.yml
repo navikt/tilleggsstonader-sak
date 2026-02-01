@@ -33,7 +33,7 @@ spring:
     hikari:
       maximum-pool-size: 20
       connection-test-query: "select 1"
-      max-lifetime: 30000
+      max-lifetime: 900000
       minimum-idle: 1
   kafka:
     bootstrap-servers: ${KAFKA_BROKERS}
@@ -150,20 +150,20 @@ no.nav.security.jwt:
         client-secret: ${AZURE_APP_CLIENT_SECRET}
         client-auth-method: client_secret_basic
 
-    iverksetting:
-      resource-url: ${clients.iverksetting.uri}
+    simulering:
+      resource-url: ${clients.simulering.uri}
       token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
       grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
-      scope: ${clients.iverksetting.scope}
+      scope: ${clients.simulering.scope}
       authentication:
         client-id: ${AZURE_APP_CLIENT_ID}
         client-secret: ${AZURE_APP_CLIENT_SECRET}
         client-auth-method: client_secret_basic
-    iverksetting-clientcredentials:
-      resource-url: ${clients.iverksetting.uri}
+    simulering-clientcredentials:
+      resource-url: ${clients.simulering.uri}
       token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
       grant-type: client_credentials
-      scope: ${clients.iverksetting.scope}
+      scope: ${clients.simulering.scope}
       authentication:
         client-id: ${AZURE_APP_CLIENT_ID}
         client-secret: ${AZURE_APP_CLIENT_SECRET}
@@ -202,10 +202,8 @@ google:
     uri: https://routes.googleapis.com/directions/v2:computeRoutes
   static-map:
     uri: https://maps.googleapis.com/maps/api/staticmap
-  autocomplete:
-    uri: https://places.googleapis.com/v1/places:autocomplete
   place-details:
-    uri: https://places.googleapis.com/v1/places/
+    uri: https://places.googleapis.com/v1
   embedded-map:
     uri: https://www.google.com/maps/embed/v1/directions
 
@@ -226,7 +224,7 @@ clients:
     scope: api://${CLIENT_ENV}-fss.tilleggsstonader.tilleggsstonader-arena/.default
   htmlify:
     uri: http://tilleggsstonader-htmlify
-  iverksetting:
+  simulering:
     uri: http://utsjekk.helved
     scope: api://${CLIENT_ENV}-gcp.helved.utsjekk/.default
   kodeverk:
@@ -248,3 +246,9 @@ topics:
   utbetaling: tilleggsstonader.utbetaling.v1
   utbetaling-status: helved.status.v1
   dvh-behandling: tilleggsstonader.aapen-tilleggsstonader-dvh-behandling
+
+eksterne-applikasjoner:
+  soknad-api: "gcp:tilleggsstonader:tilleggsstonader-soknad-api"
+  arena: "fss:teamarenanais:arena"
+  bidrag-grunnlag: "gcp:bidrag:bidrag-grunnlag"
+  bidrag-grunnlag-feature: "gcp:bidrag:bidrag-grunnlag-feature"

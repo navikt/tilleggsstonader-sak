@@ -6,17 +6,34 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.antallDagerIPeriodeInklusiv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import java.math.BigDecimal
 
 sealed interface FaktaDagligReise {
     val type: TypeDagligReise
+    val reiseId: ReiseId
+    val adresse: String?
 
     fun mapTilVilkårFakta(): VilkårFakta
 }
 
+data class FaktaUbestemtType(
+    override val reiseId: ReiseId,
+    override val adresse: String?,
+) : FaktaDagligReise {
+    override val type = TypeDagligReise.UBESTEMT
+
+    override fun mapTilVilkårFakta() =
+        FaktaDagligReiseUbestemt(
+            reiseId = reiseId,
+            adresse = adresse,
+        )
+}
+
 data class FaktaOffentligTransport(
-    val reiseId: ReiseId,
+    override val reiseId: ReiseId,
+    override val adresse: String?,
     val reisedagerPerUke: Int,
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
@@ -104,15 +121,17 @@ data class FaktaOffentligTransport(
             prisEnkelbillett = prisEnkelbillett,
             prisSyvdagersbillett = prisSyvdagersbillett,
             prisTrettidagersbillett = prisTrettidagersbillett,
+            adresse = adresse,
         )
 }
 
 data class FaktaPrivatBil(
-    val reiseId: ReiseId,
+    override val reiseId: ReiseId,
     val reisedagerPerUke: Int,
     val reiseavstandEnVei: BigDecimal,
     val bompengerEnVei: Int?,
     val fergekostandEnVei: Int?,
+    override val adresse: String?,
 ) : FaktaDagligReise {
     override val type = TypeDagligReise.PRIVAT_BIL
 
@@ -154,5 +173,6 @@ data class FaktaPrivatBil(
             reiseavstandEnVei = reiseavstandEnVei,
             bompengerEnVei = bompengerEnVei,
             fergekostandEnVei = fergekostandEnVei,
+            adresse = adresse,
         )
 }

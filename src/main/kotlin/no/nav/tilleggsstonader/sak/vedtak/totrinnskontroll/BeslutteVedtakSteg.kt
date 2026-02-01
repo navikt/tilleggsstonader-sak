@@ -1,6 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll
 
+import io.micrometer.core.instrument.Counter
+import io.micrometer.core.instrument.Metrics
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -17,6 +20,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
 import no.nav.tilleggsstonader.sak.vedtak.tilBehandlingResult
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
@@ -55,6 +59,7 @@ class BeslutteVedtakSteg(
     override fun utførOgReturnerNesteSteg(
         saksbehandling: Saksbehandling,
         data: BeslutteVedtakDto,
+        kanBehandlePrivatBil: Boolean,
     ): StegType {
         fagsakService.fagsakMedOppdatertPersonIdent(saksbehandling.fagsakId)
         val saksbehandler = totrinnskontrollService.lagreTotrinnskontrollOgReturnerSaksbehandler(saksbehandling, data)
@@ -62,7 +67,9 @@ class BeslutteVedtakSteg(
         ferdigstillOppgave(saksbehandling)
 
         return if (data.godkjent) {
-            oppdaterResultatPåBehandling(saksbehandling)
+            val typeVedtak = vedtaksresultatService.hentVedtaksresultat(saksbehandling)
+            oppdaterResultatPåBehandling(saksbehandling, typeVedtak)
+            vedtakCounter(saksbehandling.stønadstype, typeVedtak).increment()
 
             iverksettService.iverksettBehandlingFørsteGang(saksbehandling.id)
             if (!saksbehandling.skalIkkeSendeBrev) {
@@ -83,12 +90,13 @@ class BeslutteVedtakSteg(
         taskService.save(JournalførVedtaksbrevTask.opprettTask(saksbehandling.id))
     }
 
-    private fun oppdaterResultatPåBehandling(saksbehandling: Saksbehandling) {
-        val behandlingId = saksbehandling.id
-        val resultat = vedtaksresultatService.hentVedtaksresultat(saksbehandling)
+    private fun oppdaterResultatPåBehandling(
+        saksbehandling: Saksbehandling,
+        typeVedtak: TypeVedtak,
+    ) {
         behandlingService.oppdaterResultatPåBehandling(
-            behandlingId = behandlingId,
-            behandlingResultat = resultat.tilBehandlingResult(),
+            behandlingId = saksbehandling.id,
+            behandlingResultat = typeVedtak.tilBehandlingResult(),
         )
     }
 
@@ -131,4 +139,20 @@ class BeslutteVedtakSteg(
     override fun stegType(): StegType = StegType.BESLUTTE_VEDTAK
 
     override fun settInnHistorikk(): Boolean = false
+
+    companion object {
+        init {
+            // Initialiserer slik at de starter på 0
+            Stønadstype.entries.forEach { stønadstype ->
+                TypeVedtak.entries.forEach { typeVedtak ->
+                    vedtakCounter(stønadstype, typeVedtak)
+                }
+            }
+        }
+
+        fun vedtakCounter(
+            stønadstype: Stønadstype,
+            typeVedtak: TypeVedtak,
+        ) = Metrics.counter("vedtak.fattet", "stonad", stønadstype.name, "typevedtak", typeVedtak.name)
+    }
 }

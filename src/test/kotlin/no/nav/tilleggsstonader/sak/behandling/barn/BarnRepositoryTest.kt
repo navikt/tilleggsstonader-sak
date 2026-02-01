@@ -18,9 +18,6 @@ import org.springframework.dao.DuplicateKeyException
 import org.springframework.data.relational.core.conversion.DbActionExecutionException
 
 class BarnRepositoryTest : CleanDatabaseIntegrationTest() {
-    @Autowired
-    lateinit var barnRepository: BarnRepository
-
     @Test
     fun `skal kunne opprette barn og hente på behandlingId`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())

@@ -1,14 +1,12 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
-import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -31,7 +29,10 @@ class UtbetalingStatusHåndtererIntegrationTest(
     ) {
         // Gjennomfør behandling til iverksetting er ferdig
         val behandlingId =
-            opprettBehandlingOgGjennomførBehandlingsløp(tilSteg = StegType.BEHANDLING_FERDIGSTILT) {
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+                tilSteg = StegType.BEHANDLING_FERDIGSTILT,
+            ) {
                 defaultDagligReiseTsoTestdata()
             }
 
@@ -69,7 +70,9 @@ class UtbetalingStatusHåndtererIntegrationTest(
     @Test
     fun `FEILET status oppdaterer andeler med FEILET status og inkluderer error detaljer`() {
         val behandlingId =
-            opprettBehandlingOgGjennomførBehandlingsløp {
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
                 defaultDagligReiseTsoTestdata()
             }
 
@@ -116,10 +119,12 @@ class UtbetalingStatusHåndtererIntegrationTest(
 
         // Opprett behandling med flere andeler
         val behandlingId =
-            opprettBehandlingOgGjennomførBehandlingsløp {
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
                 aktivitet {
                     opprett {
-                        aktivitetTiltak(fom, tom)
+                        aktivitetTiltakTso(fom, tom)
                     }
                 }
                 målgruppe {
@@ -167,7 +172,9 @@ class UtbetalingStatusHåndtererIntegrationTest(
     @Test
     fun `ignorerer status for andre fagsystemer`() {
         val behandlingId =
-            opprettBehandlingOgGjennomførBehandlingsløp {
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
                 defaultDagligReiseTsoTestdata()
             }
 
@@ -193,5 +200,74 @@ class UtbetalingStatusHåndtererIntegrationTest(
         val tilkjentYtelseEtter = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
         val andelerEtter = tilkjentYtelseEtter!!.andelerTilkjentYtelse
         assertThat(andelerEtter).allMatch { it.statusIverksetting == originalStatus }
+    }
+
+    @Test
+    fun `mottar først status OK og deretter TIL_OPPDRAG, ignorerer da TIL_OPPDRAG-status`() {
+        val behandlingId =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                defaultDagligReiseTsoTestdata()
+            }
+
+        assertThat(
+            tilkjentYtelseRepository
+                .findByBehandlingId(behandlingId)
+                ?.andelerTilkjentYtelse
+                ?.filter { it.iverksetting != null },
+        ).isNotEmpty
+
+        // Sender OK-status
+        val okStatus =
+            UtbetalingStatusRecord(
+                status = UtbetalingStatus.OK,
+                detaljer =
+                    UtbetalingStatusDetaljer(
+                        ytelse = "TILLSTDR",
+                        linjer = emptyList(),
+                    ),
+                error = null,
+            )
+
+        // Første iverksettingid er alltid behandlingId
+        utbetalingStatusHåndterer.behandleStatusoppdatering(
+            iverksettingId = behandlingId.id.toString(),
+            melding = okStatus,
+            utbetalingGjelderFagsystem = UtbetalingStatusHåndterer.FAGSYSTEM_TILLEGGSSTØNADER,
+        )
+
+        assertThat(
+            tilkjentYtelseRepository
+                .findByBehandlingId(behandlingId)!!
+                .andelerTilkjentYtelse
+                .filter { it.iverksetting != null && it.iverksetting.iverksettingId == behandlingId.id },
+        ).isNotEmpty.allMatch { it.statusIverksetting == StatusIverksetting.OK }
+
+        // Sender HOS_OPPDRAG-status
+        val hosOppdragStatus =
+            UtbetalingStatusRecord(
+                status = UtbetalingStatus.HOS_OPPDRAG,
+                detaljer =
+                    UtbetalingStatusDetaljer(
+                        ytelse = "TILLSTDR",
+                        linjer = emptyList(),
+                    ),
+                error = null,
+            )
+
+        // Første iverksettingid er alltid behandlingId
+        utbetalingStatusHåndterer.behandleStatusoppdatering(
+            iverksettingId = behandlingId.id.toString(),
+            melding = hosOppdragStatus,
+            utbetalingGjelderFagsystem = UtbetalingStatusHåndterer.FAGSYSTEM_TILLEGGSSTØNADER,
+        )
+
+        assertThat(
+            tilkjentYtelseRepository
+                .findByBehandlingId(behandlingId)!!
+                .andelerTilkjentYtelse
+                .filter { it.iverksetting != null && it.iverksetting.iverksettingId == behandlingId.id },
+        ).isNotEmpty.allMatch { it.statusIverksetting == StatusIverksetting.OK }
     }
 }

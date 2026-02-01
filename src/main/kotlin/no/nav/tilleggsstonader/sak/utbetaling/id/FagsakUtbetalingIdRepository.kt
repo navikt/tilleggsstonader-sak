@@ -6,9 +6,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryI
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingId
 import org.springframework.data.annotation.Id
+import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.stereotype.Repository
-import java.util.UUID
-import java.util.UUID.randomUUID
 
 @Repository
 interface FagsakUtbetalingIdRepository :

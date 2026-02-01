@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.dsl
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
@@ -7,6 +8,10 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBoutgifterDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
@@ -17,14 +22,14 @@ import java.util.UUID
 @BehandlingTestdataDslMarker
 class VilkårperiodeTestdataDsl {
     internal val opprettScope = OpprettVilkårperiodeDsl()
-    internal val update = mutableListOf<(List<VilkårperiodeDto>) -> Pair<UUID, LagreVilkårperiode>>()
+    internal val update = mutableListOf<(List<VilkårperiodeDto>, BehandlingId) -> Pair<UUID, LagreVilkårperiode>>()
     internal val delete = mutableListOf<(List<VilkårperiodeDto>) -> Pair<UUID, SlettVikårperiode>>()
 
     fun opprett(builder: OpprettVilkårperiodeDsl.() -> Unit) {
         opprettScope.apply(builder)
     }
 
-    fun oppdater(builder: (List<VilkårperiodeDto>) -> Pair<UUID, LagreVilkårperiode>) {
+    fun oppdater(builder: (List<VilkårperiodeDto>, BehandlingId) -> Pair<UUID, LagreVilkårperiode>) {
         update += builder
     }
 
@@ -42,20 +47,116 @@ class OpprettVilkårperiodeDsl {
         tom: LocalDate,
     ) {
         add { behandlingId ->
-            lagreVilkårperiodeMålgruppe(behandlingId = behandlingId, fom = fom, tom = tom, målgruppeType = MålgruppeType.AAP)
+            lagreVilkårperiodeMålgruppe(
+                behandlingId = behandlingId,
+                fom = fom,
+                tom = tom,
+                målgruppeType = MålgruppeType.AAP,
+            )
         }
     }
 
-    fun aktivitetTiltak(
+    fun målgruppeTiltakspenger(
         fom: LocalDate,
         tom: LocalDate,
     ) {
         add { behandlingId ->
-            lagreVilkårperiodeAktivitet(behandlingId = behandlingId, fom = fom, tom = tom, aktivitetType = AktivitetType.TILTAK)
+            lagreVilkårperiodeMålgruppe(
+                behandlingId = behandlingId,
+                fom = fom,
+                tom = tom,
+                målgruppeType = MålgruppeType.TILTAKSPENGER,
+            )
         }
     }
 
-    fun aktivitetUtdanning(
+    fun målgruppeOvergangsstønad(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) {
+        add { behandlingId ->
+            lagreVilkårperiodeMålgruppe(behandlingId = behandlingId, fom = fom, tom = tom, målgruppeType = MålgruppeType.OVERGANGSSTØNAD)
+        }
+    }
+
+    fun aktivitetTiltakTilsynBarn(
+        fom: LocalDate,
+        tom: LocalDate,
+        aktivitetsdager: Int,
+    ) {
+        add { behandlingId ->
+            lagreVilkårperiodeAktivitet(
+                behandlingId = behandlingId,
+                fom = fom,
+                tom = tom,
+                faktaOgSvar =
+                    FaktaOgSvarAktivitetBarnetilsynDto(
+                        svarLønnet = SvarJaNei.NEI,
+                        aktivitetsdager = aktivitetsdager,
+                    ),
+            )
+        }
+    }
+
+    fun aktivitetTiltakBoutgifter(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) {
+        add { behandlingId ->
+            lagreVilkårperiodeAktivitet(
+                behandlingId = behandlingId,
+                fom = fom,
+                tom = tom,
+                faktaOgSvar =
+                    FaktaOgSvarAktivitetBoutgifterDto(
+                        svarLønnet = SvarJaNei.NEI,
+                    ),
+            )
+        }
+    }
+
+    fun aktivitetTiltakTso(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) {
+        add { behandlingId ->
+            lagreVilkårperiodeAktivitet(
+                behandlingId = behandlingId,
+                fom = fom,
+                tom = tom,
+                aktivitetType = AktivitetType.TILTAK,
+                faktaOgSvar =
+                    FaktaOgSvarAktivitetDagligReiseTsoDto(
+                        svarLønnet = SvarJaNei.NEI,
+                        svarHarUtgifter = SvarJaNei.JA,
+                        aktivitetsdager = 3,
+                    ),
+            )
+        }
+    }
+
+    fun aktivitetTiltakTsr(
+        fom: LocalDate,
+        tom: LocalDate,
+        typeAktivitet: TypeAktivitet,
+    ) {
+        add { behandlingId ->
+            lagreVilkårperiodeAktivitet(
+                behandlingId = behandlingId,
+                fom = fom,
+                tom = tom,
+                aktivitetType = AktivitetType.TILTAK,
+                typeAktivitet = typeAktivitet,
+                faktaOgSvar =
+                    FaktaOgSvarAktivitetDagligReiseTsrDto(
+                        svarHarUtgifter = SvarJaNei.JA,
+                        aktivitetsdager = 3,
+                    ),
+            )
+        }
+    }
+
+    fun aktivitetUtdanningLæremidler(
         fom: LocalDate,
         tom: LocalDate,
     ) {

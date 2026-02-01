@@ -39,3 +39,6 @@ clients:
 
 unleash:
   enabled: false
+
+eksterne-applikasjoner:
+  soknad-api: "gcp:tilleggsstonader:tilleggsstonader-soknad-api-lokal"

@@ -18,7 +18,7 @@ sealed interface TilbakekrevingJson
 data class Tilbakekrevingsstatus(
     val hendelseOpprettet: LocalDateTime,
     val sakOpprettet: LocalDateTime,
-    val varselSendtTidspunkt: LocalDateTime?,
+    val varselSendtTidspunkt: LocalDate?,
     val behandlingstatus: String,
     val totaltFeilutbetaltBeløp: BigDecimal,
     val tilbakekrevingFom: LocalDate,
