@@ -5,14 +5,14 @@ val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20250922094930_4bb329c"
 val tilleggsstønaderLibsVersion = "2025.09.11-09.26.d3123ecc47ce"
 val tilleggsstønaderKontrakterVersion = "2026.01.09-12.41.59ef9c5ad533"
-val avroVersion = "1.12.0"
+val avroVersion = "1.12.1"
 val confluentVersion = "8.0.1"
-val joarkHendelseVersion = "1.1.6"
+val joarkHendelseVersion = "1.1.8"
 val tokenSupportVersion = "5.0.37"
-val wiremockVersion = "3.13.1"
-val mockkVersion = "1.14.6"
-val testcontainerVersion = "1.21.3"
-val springDocVersion = "2.8.13"
+val wiremockVersion = "3.13.2"
+val mockkVersion = "1.14.7"
+val testcontainerVersion = "1.21.4"
+val springDocVersion = "3.0.1"
 
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
@@ -24,14 +24,14 @@ ext["junit-jupiter.version"] = "5.13.4"
 plugins {
     application
 
-    kotlin("jvm") version "2.2.20"
+    kotlin("jvm") version "2.3.0"
     id("com.diffplug.spotless") version "8.0.0"
     id("com.github.ben-manes.versions") version "0.53.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
 
-    id("org.springframework.boot") version "3.5.6"
+    id("org.springframework.boot") version "4.0.2"
     id("io.spring.dependency-management") version "1.1.7"
-    kotlin("plugin.spring") version "2.2.20"
+    kotlin("plugin.spring") version "2.3.0"
 }
 
 repositories {
@@ -76,7 +76,7 @@ dependencies {
     implementation("no.nav.teamdokumenthandtering:teamdokumenthandtering-avro-schemas:$joarkHendelseVersion")
 
     // Logging
-    implementation("net.logstash.logback:logstash-logback-encoder:8.1")
+    implementation("net.logstash.logback:logstash-logback-encoder:9.0")
 
     implementation("io.micrometer:micrometer-registry-prometheus")
 
@@ -111,13 +111,13 @@ dependencies {
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("no.nav.tilleggsstonader-libs:test-util:$tilleggsstønaderLibsVersion")
 
-    testImplementation(platform("io.cucumber:cucumber-bom:7.30.0"))
+    testImplementation(platform("io.cucumber:cucumber-bom:7.33.0"))
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
 
     // Transitiv avhengighet fra mock-oauth2-server -> bcpix. Disse under er definert som dynamisk versjon, noe bygget vårt ikke vil ha noe av
-    testImplementation("org.bouncycastle:bcutil-jdk18on:1.82")
-    testImplementation("org.bouncycastle:bcprov-jdk18on:1.82")
+    testImplementation("org.bouncycastle:bcutil-jdk18on:1.83")
+    testImplementation("org.bouncycastle:bcprov-jdk18on:1.83")
 }
 
 kotlin {
