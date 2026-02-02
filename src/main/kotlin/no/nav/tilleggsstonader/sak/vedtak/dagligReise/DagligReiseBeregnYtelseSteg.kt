@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDomene
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -58,7 +57,7 @@ class DagligReiseBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         vedtak: InnvilgelseDagligReiseRequest,
     ) {
-        val vedtaksperioder = vedtak.vedtaksperioder.tilDomene()
+        val vedtaksperioder = vedtak.vedtaksperioder()
 
         val tidligsteEndring =
             utledTidligsteEndringService.utledTidligsteEndringForBeregning(

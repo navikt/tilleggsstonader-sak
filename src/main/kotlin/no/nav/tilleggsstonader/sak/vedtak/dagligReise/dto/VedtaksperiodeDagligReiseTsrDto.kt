@@ -12,7 +12,7 @@ data class VedtaksperiodeDagligReiseTsrDto(
     override val id: UUID = UUID.randomUUID(),
     override val fom: LocalDate,
     override val tom: LocalDate,
-    override val typeAktivitet: TypeAktivitet? = null,
+    override val typeAktivitet: TypeAktivitet,
 ) : VedtaksperiodeDtoInterface {
     override val målgruppeType: FaktiskMålgruppe = FaktiskMålgruppe.ARBEIDSSØKER
     override val aktivitetType: AktivitetType = AktivitetType.TILTAK

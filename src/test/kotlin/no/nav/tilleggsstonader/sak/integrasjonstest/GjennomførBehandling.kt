@@ -35,7 +35,8 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnR
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsoRequest
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsrRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
@@ -319,12 +320,9 @@ fun IntegrationTest.gjennomførBeregningSteg(
                             Stønadstype.BARNETILSYN -> InnvilgelseTilsynBarnRequest(vedtaksperioder = vedtaksperioder)
                             Stønadstype.LÆREMIDLER -> InnvilgelseLæremidlerRequest(vedtaksperioder = vedtaksperioder)
                             Stønadstype.BOUTGIFTER -> InnvilgelseBoutgifterRequest(vedtaksperioder = vedtaksperioder)
-                            Stønadstype.DAGLIG_REISE_TSO ->
-                                InnvilgelseDagligReiseRequest(
-                                    vedtaksperioder = vedtaksperioder.tilVedtaksperiodeDagligReiseDto(),
-                                )
+                            Stønadstype.DAGLIG_REISE_TSO -> InnvilgelseDagligReiseTsoRequest(vedtaksperioder = vedtaksperioder)
                             Stønadstype.DAGLIG_REISE_TSR ->
-                                InnvilgelseDagligReiseRequest(
+                                InnvilgelseDagligReiseTsrRequest(
                                     vedtaksperioder = vedtaksperioder.tilVedtaksperiodeDagligReiseDto(),
                                 )
                         },
