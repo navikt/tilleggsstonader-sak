@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -45,7 +45,7 @@ class VilkårController(
         try {
             return vilkårService.oppdaterVilkår(svarPåVilkårDto).tilDto()
         } catch (e: Exception) {
-            val delvilkårJson = objectMapper.writeValueAsString(svarPåVilkårDto.delvilkårsett)
+            val delvilkårJson = jsonMapper.writeValueAsString(svarPåVilkårDto.delvilkårsett)
             secureLogger.warn(
                 "id=${svarPåVilkårDto.id}" +
                     " behandlingId=${svarPåVilkårDto.behandlingId}" +

@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.core.KafkaTemplate
+import tools.jackson.module.kotlin.readValue
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth

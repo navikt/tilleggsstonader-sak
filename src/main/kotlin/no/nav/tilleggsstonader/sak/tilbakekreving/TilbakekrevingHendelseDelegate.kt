@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.tilbakekreving
 
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.tilbakekreving.håndter.TilbakekrevingHendelseHåndterer
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.slf4j.LoggerFactory
@@ -13,7 +13,7 @@ class TilbakekrevingHendelseDelegate(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     fun håndter(consumerRecord: ConsumerRecord<String, String>) {
-        val payload = objectMapper.readTree(consumerRecord.value())
+        val payload = jsonMapper.readTree(consumerRecord.value())
         val hendelsestype = payload.get("hendelsestype")?.asText()
 
         val håndterer =

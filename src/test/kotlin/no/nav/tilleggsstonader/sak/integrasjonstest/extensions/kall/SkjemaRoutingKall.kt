@@ -15,10 +15,10 @@ class SkjemaRoutingKall(
     inner class SøknadRoutingApi {
         fun sjekk(identSkjematype: IdentSkjematype) =
             with(testklient.testkontekst) {
-                webTestClient
+                restTestClient
                     .post()
                     .uri("/api/ekstern/skjema-routing")
-                    .bodyValue(identSkjematype)
+                    .body(identSkjematype)
                     .medClientCredentials(
                         clientId = eksternApplikasjon.soknadApi,
                         accessAsApplication = true,

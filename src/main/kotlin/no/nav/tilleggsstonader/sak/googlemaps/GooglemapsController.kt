@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.googlemaps
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.googlemaps.dto.FinnReiseavstandDto
 import no.nav.tilleggsstonader.sak.googlemaps.dto.ReisedataDto
 import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Address
@@ -34,8 +34,8 @@ class GooglemapsController(
 
         kjøreavstandLoggRepository.insert(
             KjøreavstandLogg(
-                sporring = JsonWrapper(objectMapper.writeValueAsString(finnReiseAvstandDto)),
-                resultat = kjørerute?.let { JsonWrapper(objectMapper.writeValueAsString(it)) },
+                sporring = JsonWrapper(jsonMapper.writeValueAsString(finnReiseAvstandDto)),
+                resultat = kjørerute?.let { JsonWrapper(jsonMapper.writeValueAsString(it)) },
             ),
         )
 

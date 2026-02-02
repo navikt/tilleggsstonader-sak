@@ -2,11 +2,10 @@ package no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -16,6 +15,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.skalIkkeOppr
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import tools.jackson.module.kotlin.readValue
 import java.time.LocalDateTime
 import java.util.Properties
 
@@ -41,7 +41,7 @@ class OpprettOppgaveTask(
     )
 
     override fun doTask(task: Task) {
-        val data = objectMapper.readValue<OpprettOppgaveTaskData>(task.payload)
+        val data = jsonMapper.readValue<OpprettOppgaveTaskData>(task.payload)
         val kobling = data.kobling
         val oppgavetype = data.oppgave.oppgavetype
 
@@ -56,7 +56,9 @@ class OpprettOppgaveTask(
                     OppgavekoblingPerson(behandling.ident, behandling.stønadstype)
                 }
 
-                is OppgavekoblingPerson -> kobling
+                is OppgavekoblingPerson -> {
+                    kobling
+                }
             }
 
         val oppgaveId =
@@ -90,7 +92,7 @@ class OpprettOppgaveTask(
             Task(
                 type = TYPE,
                 payload =
-                    objectMapper.writeValueAsString(
+                    jsonMapper.writeValueAsString(
                         OpprettOppgaveTaskData(
                             kobling = oppgavekobling,
                             oppgave = oppgave,

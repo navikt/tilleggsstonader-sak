@@ -6,7 +6,7 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
 import no.nav.tilleggsstonader.kontrakter.dokdist.Distribusjonstype
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakereFrittståendeBrevService
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
@@ -27,7 +27,7 @@ class DistribuerFrittståendeBrevTask(
     private val brevmottakereFrittståendeBrevService: BrevmottakereFrittståendeBrevService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
-        val payload = objectMapper.readValue(task.payload, DistribuerFrittståendeBrevPayload::class.java)
+        val payload = jsonMapper.readValue(task.payload, DistribuerFrittståendeBrevPayload::class.java)
 
         val bestillingId =
             journalpostClient.distribuerJournalpost(
@@ -53,7 +53,7 @@ class DistribuerFrittståendeBrevTask(
             Task(
                 type = TYPE,
                 payload =
-                    objectMapper.writeValueAsString(
+                    jsonMapper.writeValueAsString(
                         DistribuerFrittståendeBrevPayload(
                             fagsakId = fagsakId,
                             journalpostId = journalpostId,

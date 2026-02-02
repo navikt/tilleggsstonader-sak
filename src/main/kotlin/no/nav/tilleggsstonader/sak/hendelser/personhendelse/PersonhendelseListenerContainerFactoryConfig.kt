@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.libs.kafka.KafkaErrorHandler
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.springframework.beans.factory.ObjectProvider
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties
+import org.springframework.boot.kafka.autoconfigure.KafkaProperties
 import org.springframework.boot.ssl.SslBundles
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -24,10 +24,9 @@ class PersonhendelseListenerContainerFactoryConfig {
     fun personhendelserListenerContainerFactory(
         properties: KafkaProperties,
         kafkaErrorHandler: KafkaErrorHandler,
-        sslBundles: ObjectProvider<SslBundles>,
     ): ConcurrentKafkaListenerContainerFactory<Long, JournalfoeringHendelseRecord> {
         val consumerProperties =
-            properties.buildConsumerProperties(sslBundles.getIfAvailable()).apply {
+            properties.buildConsumerProperties().apply {
                 this[ConsumerConfig.MAX_POLL_RECORDS_CONFIG] = 500
                 this[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
                 this[ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG] = false
@@ -40,8 +39,8 @@ class PersonhendelseListenerContainerFactoryConfig {
             containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
             containerProperties.setAuthExceptionRetryInterval(Duration.ofSeconds(2))
             setCommonErrorHandler(kafkaErrorHandler)
-            consumerFactory = DefaultKafkaConsumerFactory(consumerProperties)
-            isBatchListener = true
+            setConsumerFactory(DefaultKafkaConsumerFactory(consumerProperties))
+            setBatchListener(true)
         }
     }
 }

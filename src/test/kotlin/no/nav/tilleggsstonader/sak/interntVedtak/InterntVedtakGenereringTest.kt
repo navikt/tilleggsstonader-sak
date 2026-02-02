@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.interntVedtak
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -22,13 +22,13 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
-import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.boot.test.web.client.postForEntity
+import org.springframework.boot.resttestclient.TestRestTemplate
+import org.springframework.boot.resttestclient.postForEntity
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.converter.StringHttpMessageConverter
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter
 import java.net.URI
 
 class InterntVedtakGenereringTest {
@@ -180,7 +180,7 @@ class InterntVedtakGenereringTest {
         restTemplate.messageConverters =
             listOf(
                 StringHttpMessageConverter(),
-                MappingJackson2HttpMessageConverter(ObjectMapperProvider.objectMapper),
+                JacksonJsonHttpMessageConverter(JsonMapperProvider.jsonMapper),
             )
         return HtmlifyClient(URI.create("http://localhost:8001"), restTemplate)
     }

@@ -1,8 +1,6 @@
 package no.nav.tilleggsstonader.sak.tilbakekreving.håndter
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.treeToValue
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
@@ -22,6 +20,8 @@ import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevingBehandl
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import tools.jackson.databind.JsonNode
+import tools.jackson.module.kotlin.treeToValue
 import java.time.LocalDate
 
 @Service
@@ -41,7 +41,7 @@ class BehandlingEndretHåndterer(
         hendelseKey: String,
         payload: JsonNode,
     ) {
-        val behandlingEndret = objectMapper.treeToValue<TilbakekrevingBehandlingEndret>(payload)
+        val behandlingEndret = jsonMapper.treeToValue<TilbakekrevingBehandlingEndret>(payload)
 
         if (behandlingEndret.eksternBehandlingId == null) {
             logger.warn(

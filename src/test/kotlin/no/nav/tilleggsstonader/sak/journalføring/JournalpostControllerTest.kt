@@ -5,7 +5,7 @@ import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.BulkOppdaterLogiskVedleggRequest
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
@@ -39,6 +39,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate
 
 class JournalpostControllerTest(
@@ -60,7 +61,7 @@ class JournalpostControllerTest(
         @Test
         fun `fullfør journalpost - skal ferdigstille journalpost, og opprette behandling og oppgave`() {
             val journalpost = opprettJournalpost(journalpostMedStrukturertSøknad(DokumentBrevkode.BARNETILSYN))
-            leggTilJournalpostMedSøknadIMock(journalpost, objectMapper.writeValueAsBytes(søknadskjemaBarnetilsyn()))
+            leggTilJournalpostMedSøknadIMock(journalpost, jsonMapper.writeValueAsBytes(søknadskjemaBarnetilsyn()))
             val dokumentInfoId = journalpost.dokumenter!!.single().dokumentInfoId
             val oppgave = opprettJournalføringsoppgave(journalpostId = journalpost.journalpostId)
             val journalpostId =
@@ -171,7 +172,7 @@ class JournalpostControllerTest(
         @Test
         fun `hent journalpost som inneholder søknad daglig reise, kan kun opprette stønadstyper for daglig reise`() {
             val journalpost = journalpostMedStrukturertSøknad(DokumentBrevkode.DAGLIG_REISE)
-            leggTilJournalpostMedSøknadIMock(journalpost, objectMapper.writeValueAsBytes(søknadDagligReise()))
+            leggTilJournalpostMedSøknadIMock(journalpost, jsonMapper.writeValueAsBytes(søknadDagligReise()))
             every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoAAP()
 
             val journalpostResponse = kall.journalpost.journalpost(journalpost.journalpostId)
@@ -187,7 +188,7 @@ class JournalpostControllerTest(
         @Test
         fun `hent journalpost som inneholder søknad boutgifter, kan kunn opprette stønadstype boutgifter`() {
             val journalpost = journalpostMedStrukturertSøknad(DokumentBrevkode.BOUTGIFTER)
-            leggTilJournalpostMedSøknadIMock(journalpost, objectMapper.writeValueAsBytes(søknadBoutgifter()))
+            leggTilJournalpostMedSøknadIMock(journalpost, jsonMapper.writeValueAsBytes(søknadBoutgifter()))
 
             val journalpostResponse = kall.journalpost.journalpost(journalpost.journalpostId)
 

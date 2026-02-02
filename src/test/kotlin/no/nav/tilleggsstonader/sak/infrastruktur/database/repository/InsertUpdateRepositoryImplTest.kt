@@ -12,6 +12,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowable
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.relational.core.conversion.DbActionExecutionException
 
 class InsertUpdateRepositoryImplTest : CleanDatabaseIntegrationTest() {
@@ -108,13 +109,13 @@ class InsertUpdateRepositoryImplTest : CleanDatabaseIntegrationTest() {
             catchThrowable {
                 fagsakPersonRepository.update(fagsakPerson())
             },
-        ).isInstanceOf(DbActionExecutionException::class.java)
+        ).isInstanceOf(DataIntegrityViolationException::class.java)
 
         assertThat(
             catchThrowable {
                 fagsakPersonRepository.updateAll(listOf(fagsakPerson(), fagsakPerson()))
             },
-        ).isInstanceOf(DbActionExecutionException::class.java)
+        ).isInstanceOf(DataIntegrityViolationException::class.java)
     }
 
     @Test

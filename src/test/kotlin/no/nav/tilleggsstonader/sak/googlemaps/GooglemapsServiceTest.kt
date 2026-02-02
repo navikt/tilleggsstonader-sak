@@ -1,9 +1,8 @@
 package no.nav.tilleggsstonader.sak.googlemaps
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.googlemaps.dto.KollektivDetaljerDto
 import no.nav.tilleggsstonader.sak.googlemaps.dto.LokasjonDto
 import no.nav.tilleggsstonader.sak.googlemaps.dto.OperatørDto
@@ -22,6 +21,7 @@ import no.nav.tilleggsstonader.sak.util.FileUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import tools.jackson.module.kotlin.readValue
 
 class GooglemapsServiceTest {
     val googleRoutesClient = mockk<GoogleRoutesClient>()
@@ -57,7 +57,7 @@ class GooglemapsServiceTest {
     @Test
     fun `skal hente kjøreruter fra google`() {
         val ruteJson = FileUtil.readFile("no/nav/tilleggsstonader/sak/googlemaps/kjørerute_response.json")
-        val ruteResponse = objectMapper.readValue<RuteResponse>(ruteJson)
+        val ruteResponse = jsonMapper.readValue<RuteResponse>(ruteJson)
         every { googleRoutesClient.hentRuter(any()) } returns ruteResponse
 
         val forventet =
@@ -95,7 +95,7 @@ class GooglemapsServiceTest {
     @Test
     fun `skal hente kollektivrute fra google`() {
         val ruteJson = FileUtil.readFile("no/nav/tilleggsstonader/sak/googlemaps/kollektivrute_response.json")
-        val ruteResponse = objectMapper.readValue<RuteResponse>(ruteJson)
+        val ruteResponse = jsonMapper.readValue<RuteResponse>(ruteJson)
         every { googleRoutesClient.hentRuter(any()) } returns ruteResponse
 
         val forventet =

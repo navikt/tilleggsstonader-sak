@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.database
 
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.UtbetalingerDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
@@ -23,7 +23,7 @@ private class VedtaksperioderDvhWriter : Converter<VedtaksperioderDvh.JsonWrappe
     override fun convert(data: VedtaksperioderDvh.JsonWrapper) =
         PGobject().apply {
             type = "json"
-            value = objectMapper.writeValueAsString(data.vedtaksperioder)
+            value = jsonMapper.writeValueAsString(data.vedtaksperioder)
         }
 }
 
@@ -32,7 +32,7 @@ private class UtbetalingerDvhWriter : Converter<UtbetalingerDvh.JsonWrapper, PGo
     override fun convert(data: UtbetalingerDvh.JsonWrapper) =
         PGobject().apply {
             type = "json"
-            value = objectMapper.writeValueAsString(data.utbetalinger)
+            value = jsonMapper.writeValueAsString(data.utbetalinger)
         }
 }
 

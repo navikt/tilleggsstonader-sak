@@ -1,12 +1,12 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles
 
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonDeserializer
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.vilkårperiodetyper
+import tools.jackson.core.JsonParser
+import tools.jackson.databind.DeserializationContext
+import tools.jackson.databind.ValueDeserializer
 
-class VilkårperiodeTypeDeserializer : JsonDeserializer<VilkårperiodeType>() {
+class VilkårperiodeTypeDeserializer : ValueDeserializer<VilkårperiodeType>() {
     override fun deserialize(
         p: JsonParser,
         ctxt: DeserializationContext,
