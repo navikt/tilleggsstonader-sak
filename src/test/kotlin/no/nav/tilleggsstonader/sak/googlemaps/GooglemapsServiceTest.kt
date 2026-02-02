@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.googlemaps
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.googlemaps.dto.KollektivDetaljerDto
 import no.nav.tilleggsstonader.sak.googlemaps.dto.LokasjonDto
 import no.nav.tilleggsstonader.sak.googlemaps.dto.OperatørDto
@@ -16,7 +17,6 @@ import no.nav.tilleggsstonader.sak.googlemaps.routesApi.LinjeType
 import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Polyline
 import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Reisetype
 import no.nav.tilleggsstonader.sak.googlemaps.routesApi.RuteResponse
-import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
