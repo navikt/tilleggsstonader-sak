@@ -7,11 +7,13 @@ import no.nav.tilleggsstonader.libs.utils.dato.oktober
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
     val fomTiltaksenheten = 1 september 2025
@@ -78,5 +80,16 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             .isEqualTo(
                 "Kan ikke ha overlappende vedtaksperioder for Nay og Tiltaksenheten. Se oversikt øverst på siden for å finne overlappende vedtaksperiode.",
             )
+    }
+
+    @Test
+    fun `innvilge rammevedtak privat bil`() {
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
+
+        opprettBehandlingOgGjennomførBehandlingsløp(
+            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+        ) {
+            defaultDagligReisePrivatBilTsoTestdata(fomNay, tomNay)
+        }
     }
 }

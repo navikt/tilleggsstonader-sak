@@ -31,12 +31,10 @@ class DagligReiseBeregnSteg(
         val vedtak = vedtakRepository.findByIdOrThrow(saksbehandling.id).withTypeOrThrow<InnvilgelseDagligReise>()
         val beregningsresultatOffentligTransport = vedtak.data.beregningsresultat.offentligTransport
 
-        if (beregningsresultatOffentligTransport != null) {
-            tilkjentYtelseService.lagreTilkjentYtelse(
-                behandlingId = saksbehandling.id,
-                andeler = beregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandling),
-            )
-        }
+        tilkjentYtelseService.lagreTilkjentYtelse(
+            behandlingId = saksbehandling.id,
+            andeler = beregningsresultatOffentligTransport?.mapTilAndelTilkjentYtelse(saksbehandling) ?: emptyList(),
+        )
     }
 
     private fun nullstillEksisterendeAndelerPåBehandling(saksbehandling: Saksbehandling) {

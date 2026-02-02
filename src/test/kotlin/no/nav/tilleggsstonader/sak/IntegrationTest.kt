@@ -78,7 +78,7 @@ abstract class IntegrationTest {
     protected lateinit var testoppsettService: TestoppsettService
 
     @Autowired
-    protected lateinit var unleashService: UnleashService
+    lateinit var unleashService: UnleashService
 
     @Autowired
     private lateinit var cacheManagers: List<CacheManager>
