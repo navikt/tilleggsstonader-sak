@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
@@ -36,9 +37,13 @@ class DagligReiseVedtaksperioderValideringService(
             behandling = behandling,
             vedtaksperioder = vedtaksperioder,
         )
+        validerTypeAktivitetForTsr(
+            behandling = behandling,
+            vedtaksperioder = vedtaksperioder,
+        )
     }
 
-    fun validerIkkeOverlappendeVedtaksperioderForTsrOgTso(
+    private fun validerIkkeOverlappendeVedtaksperioderForTsrOgTso(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
     ) {
@@ -64,6 +69,23 @@ class DagligReiseVedtaksperioderValideringService(
             }
         }
     }
+
+    private fun validerTypeAktivitetForTsr(
+        behandling: Saksbehandling,
+        vedtaksperioder: List<Vedtaksperiode>,
+    ) {
+        feilHvis(
+            behandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR &&
+                finnesVedtaksperiodeUtenTypeAktivitet(
+                    vedtaksperioder,
+                ),
+        ) {
+            "Fant ikke Variant/TypeAktivitet for Daglig Reise Tsr. Ta kontakt med utvikler teamet"
+        }
+    }
+
+    private fun finnesVedtaksperiodeUtenTypeAktivitet(vedtaksperioder: List<Vedtaksperiode>) =
+        vedtaksperioder.any { it.typeAktivitet == null }
 
     private fun harOverlappendeVedtaksperioderPåTversAvEnheter(
         vedtaksperioderDenneEnhenten: List<Vedtaksperiode>,
