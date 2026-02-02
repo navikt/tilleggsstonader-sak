@@ -110,7 +110,7 @@ class DagligReiseVedtakController(
                     behandling = behandling,
                     typeVedtak = TypeVedtak.INNVILGELSE,
                     tidligsteEndring = tidligsteEndring,
-                )
+                ).beregningsresultatDagligReise
 
         val vilkår = dagligReiseVilkårService.hentVilkårForBehandling(behandlingId)
         return beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring, vilkår)
