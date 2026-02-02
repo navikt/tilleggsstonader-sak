@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkEmpty
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
+import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilVedtaksperiodeDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -145,7 +146,14 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
 
     @Test
     fun `hent ut lagrede vedtak av type innvilgelse`() {
-        val vedtakRequest = InnvilgelseDagligReiseRequest(listOf(vedtaksperiode.tilDto()))
+        val vedtakRequest =
+            InnvilgelseDagligReiseRequest(
+                listOf(
+                    vedtaksperiode
+                        .tilDto()
+                        .tilVedtaksperiodeDagligReiseDto(),
+                ),
+            )
 
         kall.vedtak.lagreInnvilgelse(
             Stønadstype.DAGLIG_REISE_TSO,
