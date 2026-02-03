@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.GjenopprettO
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.JournalpostKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.KartKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.PersonKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.PrivatBilKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.SatsjusteringKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.SettPåVentKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.SimuleringKall
@@ -30,6 +31,7 @@ class Kall(
     val journalpost = JournalpostKall(testklient)
     val kart = KartKall(testklient)
     val person = PersonKall(testklient)
+    val privatBil = PrivatBilKall(testklient)
     val satsjustering = SatsjusteringKall(testklient)
     val settPaVent = SettPåVentKall(testklient)
     val simulering = SimuleringKall(testklient)

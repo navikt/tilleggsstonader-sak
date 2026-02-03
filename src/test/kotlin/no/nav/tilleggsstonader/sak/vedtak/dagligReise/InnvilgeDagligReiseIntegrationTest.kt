@@ -7,13 +7,14 @@ import no.nav.tilleggsstonader.libs.utils.dato.oktober
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
 
 class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
     val fomTiltaksenheten = 1 september 2025
@@ -83,7 +84,7 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `innvilge rammevedtak privat bil`() {
+    fun `innvilge rammevedtak privat bil og henter ut rammevedtak`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
         opprettBehandlingOgGjennomførBehandlingsløp(
@@ -91,5 +92,8 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
         ) {
             defaultDagligReisePrivatBilTsoTestdata(fomNay, tomNay)
         }
+        val rammevedtak = kall.privatBil.hentRammevedtak(IdentRequest("12345678910"))
+
+        assertThat(rammevedtak).isNotEmpty()
     }
 }
