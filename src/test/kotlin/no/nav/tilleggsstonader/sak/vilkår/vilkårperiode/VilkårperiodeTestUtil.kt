@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DagpengerDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetDagligReiseTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetBoutgifter
@@ -38,6 +39,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SykepengerTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakDagligReiseTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakspengerDagligReiseTsr
@@ -61,6 +63,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingOmstillingsstønad
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakDagligReiseTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
@@ -456,6 +459,26 @@ object VilkårperiodeTestUtil {
                 )
 
             AktivitetType.UTDANNING -> UtdanningDagligReiseTso(fakta = FaktaAktivitetDagligReiseTso(aktivitetsdager = 3))
+
+            AktivitetType.INGEN_AKTIVITET -> IngenAktivitetDagligReiseTso
+
+            else -> {
+                throw IllegalArgumentException("$type er ikke en gyldig aktivitetstype for daglig reise")
+            }
+        }
+
+    fun faktaOgVurderingAktivitetDagligReiseTsr(
+        type: AktivitetType = AktivitetType.TILTAK,
+        harUtgifter: VurderingHarUtgifter = vurderingHarUtgifter(),
+    ): AktivitetFaktaOgVurdering =
+        when (type) {
+            AktivitetType.TILTAK ->
+                TiltakDagligReiseTsr(
+                    vurderinger = VurderingTiltakDagligReiseTsr(harUtgifter = harUtgifter),
+                    fakta = FaktaAktivitetDagligReiseTsr(aktivitetsdager = 3),
+                )
+
+            // AktivitetType.UTDANNING -> UtdanningDagligReiseTsr(fakta = FaktaAktivitetDagligReiseTsr(aktivitetsdager = 3))
 
             AktivitetType.INGEN_AKTIVITET -> IngenAktivitetDagligReiseTso
 
