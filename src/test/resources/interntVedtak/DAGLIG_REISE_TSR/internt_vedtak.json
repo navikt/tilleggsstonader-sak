@@ -95,11 +95,7 @@
     "fom" : "2024-02-05",
     "tom" : "2024-02-10",
     "faktaOgVurderinger" : {
-      "@type" : "AktivitetDagligReiseTsoFaktaOgVurderingerDto",
-      "lønnet" : {
-        "svar" : "NEI",
-        "resultat" : "OPPFYLT"
-      },
+      "@type" : "AktivitetDagligReiseTsrFaktaOgVurderingerDto",
       "harUtgifter" : {
         "svar" : "JA",
         "resultat" : "OPPFYLT"
@@ -111,21 +107,6 @@
     "begrunnelse" : null,
     "slettetKommentar" : null,
     "tiltaksvariant" : "Gruppe AMO"
-  }, {
-    "type" : "UTDANNING",
-    "fom" : "2024-02-05",
-    "tom" : "2024-02-10",
-    "faktaOgVurderinger" : {
-      "@type" : "AktivitetDagligReiseTsoFaktaOgVurderingerDto",
-      "lønnet" : null,
-      "harUtgifter" : null,
-      "aktivitetsdager" : 3
-    },
-    "kilde" : "MANUELL",
-    "resultat" : "IKKE_OPPFYLT",
-    "begrunnelse" : "ikke oppfylt",
-    "slettetKommentar" : null,
-    "tiltaksvariant" : "Enkeltplass AMO"
   } ],
   "vedtaksperioder" : [ {
     "fom" : "2024-01-01",
