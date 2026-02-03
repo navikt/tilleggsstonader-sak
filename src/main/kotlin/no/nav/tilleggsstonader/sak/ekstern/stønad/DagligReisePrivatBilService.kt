@@ -50,9 +50,9 @@ class DagligReisePrivatBilService(
     }
 
     private fun mapRammevedtakTilDto(rammevedtak: RammevedtakPrivatBil): List<RammevedtakDto> =
-        rammevedtak.reiser.mapIndexed { index, reise ->
+        rammevedtak.reiser.map { reise ->
             RammevedtakDto(
-                id = index.toString(),
+                id = reise.reiseId,
                 fom = reise.grunnlag.fom,
                 tom = reise.grunnlag.tom,
                 reisedagerPerUke = reise.grunnlag.reisedagerPerUke,

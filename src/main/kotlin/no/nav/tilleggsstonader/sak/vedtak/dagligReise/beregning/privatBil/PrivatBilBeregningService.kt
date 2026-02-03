@@ -59,6 +59,7 @@ class PrivatBilBeregningService {
         if (uker.isEmpty()) return null
 
         return RammeForReiseMedPrivatBil(
+            reiseId = reise.reiseId,
             uker = uker,
             grunnlag = grunnlagForReise,
         )
