@@ -14,7 +14,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringDeta
 object SimuleringKontraktTilDomeneMapper {
     fun map(dto: SimuleringResponseDto): SimuleringJson =
         SimuleringJson(
-            oppsummeringer = mapOppsummering(dto.oppsummeringer),
+            oppsummeringer = dto.oppsummeringer?.let { mapOppsummering(it) } ?: emptyList(),
             detaljer = mapDetaljer(dto.detaljer),
         )
 

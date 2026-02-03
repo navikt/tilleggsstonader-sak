@@ -51,7 +51,7 @@ class SimuleringService(
             Simuleringsresultat(
                 behandlingId = saksbehandling.id,
                 data = resultat?.let { SimuleringKontraktTilDomeneMapper.map(it) },
-                ingenEndringIUtbetaling = resultat == null || resultat.oppsummeringer.isEmpty(),
+                ingenEndringIUtbetaling = resultat == null || resultat.oppsummeringer.isNullOrEmpty(),
             ),
         )
     }

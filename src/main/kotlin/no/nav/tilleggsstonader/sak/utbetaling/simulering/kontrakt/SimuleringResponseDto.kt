@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt
 import java.time.LocalDate
 
 data class SimuleringResponseDto(
-    val oppsummeringer: List<OppsummeringForPeriode>,
+    val oppsummeringer: List<OppsummeringForPeriode>?,
     val detaljer: SimuleringDetaljer,
 )
 
