@@ -484,4 +484,20 @@ object VilkårperiodeTestUtil {
                 throw IllegalArgumentException("$type er ikke en gyldig aktivitetstype for daglig reise")
             }
         }
+
+    fun faktaOgVurderingAktivitetDagligReiseTsr(
+        type: AktivitetType = AktivitetType.TILTAK,
+        harUtgifter: VurderingHarUtgifter = vurderingHarUtgifter(),
+    ): AktivitetFaktaOgVurdering =
+        when (type) {
+            AktivitetType.TILTAK ->
+                TiltakDagligReiseTsr(
+                    vurderinger = VurderingTiltakDagligReiseTsr(harUtgifter = harUtgifter),
+                    fakta = FaktaAktivitetDagligReiseTsr(aktivitetsdager = 3),
+                )
+
+            else -> {
+                throw IllegalArgumentException("$type er ikke en gyldig aktivitetstype for daglig reise")
+            }
+        }
 }
