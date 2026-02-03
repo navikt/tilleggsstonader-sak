@@ -15,7 +15,7 @@ object SimuleringKontraktTilDomeneMapper {
     fun map(dto: SimuleringResponseDto): SimuleringJson =
         SimuleringJson(
             oppsummeringer = dto.oppsummeringer?.let { mapOppsummering(it) } ?: emptyList(),
-            detaljer = mapDetaljer(dto.detaljer),
+            detaljer = dto.detaljer?.let { mapDetaljer(it) },
         )
 
     private fun mapDetaljer(detaljer: SimuleringDetaljerKontrakt): SimuleringDetaljer =

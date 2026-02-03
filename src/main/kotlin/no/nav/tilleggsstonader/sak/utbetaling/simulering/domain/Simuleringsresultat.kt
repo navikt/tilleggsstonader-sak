@@ -25,7 +25,7 @@ data class Simuleringsresultat(
 
 data class SimuleringJson(
     val oppsummeringer: List<OppsummeringForPeriode>,
-    val detaljer: SimuleringDetaljer,
+    val detaljer: SimuleringDetaljer?,
 )
 
 data class OppsummeringForPeriode(

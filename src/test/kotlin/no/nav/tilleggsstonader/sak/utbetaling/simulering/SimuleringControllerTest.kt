@@ -51,7 +51,7 @@ internal class SimuleringControllerTest : CleanDatabaseIntegrationTest() {
         val simuleringsresultat = simuleringsresultatRepository.findByIdOrThrow(behandling.id)
 
         // Verifiser at simuleringsresultatet er lagret
-        assertThat(simuleringsresultat.data!!.detaljer.perioder).hasSize(16)
+        assertThat(simuleringsresultat.data!!.detaljer?.perioder).hasSize(16)
         assertThat(simuleringsresultat.ingenEndringIUtbetaling).isFalse()
     }
 

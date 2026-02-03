@@ -4,7 +4,9 @@ import java.time.LocalDate
 
 data class SimuleringResponseDto(
     val oppsummeringer: List<OppsummeringForPeriode>?,
-    val detaljer: SimuleringDetaljer,
+    val detaljer: SimuleringDetaljer?,
+    // Settes til OK_UTEN_ENDRING om ingen endring med http-status 302
+    val status: String? = null,
 )
 
 data class OppsummeringForPeriode(
