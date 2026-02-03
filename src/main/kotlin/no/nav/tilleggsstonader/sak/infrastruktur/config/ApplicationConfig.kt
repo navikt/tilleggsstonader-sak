@@ -34,7 +34,7 @@ class ApplicationConfig {
     @Bean
     fun behandlingLoggingFilter(): FilterRegistrationBean<BehandlingLogFilter> {
         val filterRegistration = FilterRegistrationBean<BehandlingLogFilter>()
-        filterRegistration.filter = BehandlingLogFilter()
+        filterRegistration.setFilter(BehandlingLogFilter())
         filterRegistration.order = 1 // Samme nivå som LogFilter sånn at navIdent blir med på RequestTimeFilter
         return filterRegistration
     }
@@ -42,7 +42,7 @@ class ApplicationConfig {
     @Bean
     fun navIdentFilter(): FilterRegistrationBean<NAVIdentFilter> {
         val filterRegistration = FilterRegistrationBean<NAVIdentFilter>()
-        filterRegistration.filter = NAVIdentFilter()
+        filterRegistration.setFilter(NAVIdentFilter())
         filterRegistration.order = 1 // Samme nivå som LogFilter sånn at navIdent blir med på RequestTimeFilter
         return filterRegistration
     }

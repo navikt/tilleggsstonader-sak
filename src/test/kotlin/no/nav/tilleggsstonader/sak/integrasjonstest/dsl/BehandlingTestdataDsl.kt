@@ -57,6 +57,27 @@ class BehandlingTestdataDsl internal constructor() {
         }
     }
 
+    fun defaultDagligReisePrivatBilTsoTestdata(
+        fom: LocalDate = defaultFom,
+        tom: LocalDate = defaultTom,
+    ) {
+        aktivitet {
+            opprett {
+                aktivitetTiltakTso(fom, tom)
+            }
+        }
+        målgruppe {
+            opprett {
+                målgruppeAAP(fom, tom)
+            }
+        }
+        vilkår {
+            opprett {
+                privatBil(fom, tom)
+            }
+        }
+    }
+
     fun defaultDagligReiseTsrTestdata(
         fom: LocalDate = defaultFom,
         tom: LocalDate = defaultTom,

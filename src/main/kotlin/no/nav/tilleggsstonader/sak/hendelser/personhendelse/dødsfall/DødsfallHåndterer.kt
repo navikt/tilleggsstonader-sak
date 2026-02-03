@@ -1,10 +1,9 @@
 package no.nav.tilleggsstonader.sak.hendelser.personhendelse.dødsfall
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
@@ -17,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -103,7 +103,7 @@ class DødsfallHåndterer(
     }
 
     private fun håndterAnnullertDødsfallhendelse(hendelse: Hendelse) {
-        val taskId = objectMapper.readTree(hendelse.metadata!!.json)["taskId"].first().asLong()
+        val taskId = jsonMapper.readTree(hendelse.metadata!!.json)["taskId"].first().asLong()
         val opprinneligTask = taskService.findById(taskId)
         if (opprinneligTask.status != Status.FERDIG) {
             logger.info(
@@ -122,7 +122,7 @@ class DødsfallHåndterer(
                 )
             } else {
                 logger.info("Tidligere oppgave for dødsfall er ferdigstilt, oppretter ny oppgave for annullering av dødsfall")
-                val tidligereTaskData = objectMapper.readValue<OpprettDødsfallOppgaveTask.DødsfallOppgaveTaskData>(opprinneligTask.payload)
+                val tidligereTaskData = jsonMapper.readValue<OpprettDødsfallOppgaveTask.DødsfallOppgaveTaskData>(opprinneligTask.payload)
                 taskService.save(
                     OpprettDødsfallOppgaveTask.opprettTask(
                         tidligereTaskData

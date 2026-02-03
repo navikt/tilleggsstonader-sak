@@ -1,8 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandlingsflyt
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.domene.Status
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.libs.log.IdUtils
@@ -54,6 +53,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
+import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate
 import java.util.UUID
 
@@ -351,7 +351,7 @@ class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
             taskService
                 .finnTasksMedStatus(Status.entries, FerdigstillOppgaveTask.TYPE)
                 .maxByOrNull { it.opprettetTid }!!
-        val taskData = objectMapper.readValue<FerdigstillOppgaveTask.FerdigstillOppgaveTaskData>(sisteTask.payload)
+        val taskData = jsonMapper.readValue<FerdigstillOppgaveTask.FerdigstillOppgaveTaskData>(sisteTask.payload)
         assertThat(taskData.oppgavetype).isEqualTo(expectedOppgaveType)
     }
 

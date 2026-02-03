@@ -1,15 +1,15 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.config
 
-import com.fasterxml.jackson.databind.exc.MismatchedInputException
-import com.fasterxml.jackson.module.kotlin.readValue
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
+import tools.jackson.databind.exc.MismatchedInputException
+import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-class ObjectMapperProviderTest {
+class JsonMapperProviderTest {
     val expectedJson =
         """
         {
@@ -26,7 +26,7 @@ class ObjectMapperProviderTest {
         }
         """.trimIndent()
 
-    private val prettyPrinter = objectMapper.writerWithDefaultPrettyPrinter()
+    private val prettyPrinter = jsonMapper.writerWithDefaultPrettyPrinter()
 
     @Test
     fun `skal parsea json riktig`() {
@@ -34,26 +34,26 @@ class ObjectMapperProviderTest {
         val json = prettyPrinter.writeValueAsString(root)
         assertThat(json).isEqualTo(expectedJson)
 
-        val rootFraJson = objectMapper.readValue<Root>(json)
+        val rootFraJson = jsonMapper.readValue<Root>(json)
         assertThat(prettyPrinter.writeValueAsString(rootFraJson)).isEqualTo(expectedJson)
     }
 
     @Test
     fun `skal kunne parsea data når et verdi mangler`() {
-        assertThat(objectMapper.readValue<ElementMedOptionalFelt>("""{"verdi": "verdi"}"""))
+        assertThat(jsonMapper.readValue<ElementMedOptionalFelt>("""{"verdi": "verdi"}"""))
             .isEqualTo(ElementMedOptionalFelt("verdi"))
     }
 
     @Test
     fun `skal feile hvis et felt mangler verdi`() {
         assertThatThrownBy {
-            objectMapper.readValue<ElementMedOptionalFelt>("""{}""")
+            jsonMapper.readValue<ElementMedOptionalFelt>("""{}""")
         }.isInstanceOf(MismatchedInputException::class.java)
     }
 
     @Test
     fun `skal sette defaultverdi når det finnes`() {
-        assertThat(objectMapper.readValue<Element>("""{}"""))
+        assertThat(jsonMapper.readValue<Element>("""{}"""))
             .isEqualTo(Element("verdi"))
     }
 }

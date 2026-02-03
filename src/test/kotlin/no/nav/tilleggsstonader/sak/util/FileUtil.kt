@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.util
 
-import com.fasterxml.jackson.databind.JsonNode
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider
 import org.assertj.core.api.Assertions.assertThat
+import tools.jackson.databind.JsonNode
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -51,8 +51,8 @@ object FileUtil {
         filnavn: String,
         json: Any,
     ) {
-        val jsonNode = ObjectMapperProvider.objectMapper.valueToTree<JsonNode>(json)
-        val filJsonNode = ObjectMapperProvider.objectMapper.readTree(readFile(filnavn))
+        val jsonNode = JsonMapperProvider.jsonMapper.valueToTree<JsonNode>(json)
+        val filJsonNode = JsonMapperProvider.jsonMapper.readTree(readFile(filnavn))
 
         skrivTilFil(filnavn, jsonNode.toString())
         assertThat(jsonNode).isEqualTo(filJsonNode)
@@ -62,7 +62,7 @@ object FileUtil {
         filnavn: String,
         data: Any,
     ) {
-        val json = ObjectMapperProvider.objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data)
+        val json = JsonMapperProvider.jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data)
         assertFileIsEqual(filnavn, json)
     }
 

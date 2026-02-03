@@ -7,10 +7,15 @@ import no.nav.tilleggsstonader.libs.utils.dato.oktober
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
@@ -78,5 +83,24 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             .isEqualTo(
                 "Kan ikke ha overlappende vedtaksperioder for Nay og Tiltaksenheten. Se oversikt øverst på siden for å finne overlappende vedtaksperiode.",
             )
+    }
+
+    @Test
+    fun `innvilge rammevedtak privat bil og henter ut rammevedtak`() {
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
+
+        opprettBehandlingOgGjennomførBehandlingsløp(
+            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+        ) {
+            defaultDagligReisePrivatBilTsoTestdata(fomNay, tomNay)
+        }
+
+        KafkaTestConfig
+            .sendteMeldinger()
+            .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
+
+        val rammevedtak = kall.privatBil.hentRammevedtak(IdentRequest("12345678910"))
+
+        assertThat(rammevedtak).isNotEmpty()
     }
 }

@@ -1,12 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
@@ -45,6 +44,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import tools.jackson.module.kotlin.readValue
 import java.util.Properties
 import java.util.UUID
 
@@ -144,7 +144,7 @@ class BeslutteVedtakStegTest {
                 årsakerUnderkjent = listOf(ÅrsakUnderkjent.VEDTAKSBREV),
             )
 
-        val taskData = objectMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(taskSlot[1].payload)
+        val taskData = jsonMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(taskSlot[1].payload)
 
         assertThat(nesteSteg).isEqualTo(StegType.SEND_TIL_BESLUTTER)
         assertHarOpprettetTaskerAvType(FerdigstillOppgaveTask.TYPE, OpprettOppgaveTask.TYPE)

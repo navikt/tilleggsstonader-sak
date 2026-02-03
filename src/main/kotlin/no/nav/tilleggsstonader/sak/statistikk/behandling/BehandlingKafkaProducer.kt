@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.statistikk.behandling
 
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -29,7 +29,7 @@ class BehandlingKafkaProducer(
                 topic,
                 stønadstype,
                 behandlingDVH.behandlingId,
-                objectMapper.writeValueAsString(behandlingDVH),
+                jsonMapper.writeValueAsString(behandlingDVH),
             )
             logger.info(
                 "Behandlingstatistikk for behandling=${behandlingDVH.behandlingId} " +

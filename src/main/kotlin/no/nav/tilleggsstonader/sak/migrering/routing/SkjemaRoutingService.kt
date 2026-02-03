@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.migrering.routing
 
 import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusDto
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Skjematype
 import no.nav.tilleggsstonader.kontrakter.felles.tilStønadstyper
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
@@ -40,9 +40,13 @@ class SkjemaRoutingService(
         val routingStrategi = bestemRoutingStrategi(skjematype)
 
         return when (routingStrategi) {
-            RoutingStrategi.SendAlleBrukereTilNyLøsning -> true
-            is RoutingStrategi.SendEnkelteBrukereTilNyLøsning ->
+            RoutingStrategi.SendAlleBrukereTilNyLøsning -> {
+                true
+            }
+
+            is RoutingStrategi.SendEnkelteBrukereTilNyLøsning -> {
                 skalBrukerRoutesTilNyLøsning(ident, skjematype, routingStrategi)
+            }
         }.also { loggRoutingResultatet(skjematype, it) }
     }
 
@@ -101,7 +105,7 @@ class SkjemaRoutingService(
         val antall =
             routingRepository.countByTypeAndDetaljerContains(
                 skjematype,
-                detaljer = objectMapper.writeValueAsString(mapOf("harAktivTsrMålgruppe" to true)),
+                detaljer = jsonMapper.writeValueAsString(mapOf("harAktivTsrMålgruppe" to true)),
             )
         logger.info("routing - stønadstype=$skjematype antallIDatabase=$antall toggleMaksAntall=$maksAntall (kun harAktivTsrMålgruppe)")
         return antall >= maksAntall
@@ -126,7 +130,7 @@ class SkjemaRoutingService(
             SkjemaRouting(
                 ident = ident,
                 type = skjematype,
-                detaljer = JsonWrapper(objectMapper.writeValueAsString(detaljer)),
+                detaljer = JsonWrapper(jsonMapper.writeValueAsString(detaljer)),
             ),
         )
     }

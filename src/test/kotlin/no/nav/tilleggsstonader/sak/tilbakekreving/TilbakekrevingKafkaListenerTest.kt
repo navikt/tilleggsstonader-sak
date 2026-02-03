@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.tilbakekreving
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
@@ -79,7 +79,7 @@ class TilbakekrevingKafkaListenerTest {
             EksternBehandlingId(eksternBehandlingId, behandling.id)
         every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
 
-        val consumerRecord = ConsumerRecordUtil.lagConsumerRecord(UUID.randomUUID().toString(), objectMapper.writeValueAsString(payload))
+        val consumerRecord = ConsumerRecordUtil.lagConsumerRecord(UUID.randomUUID().toString(), jsonMapper.writeValueAsString(payload))
 
         assertThatExceptionOfType(Feil::class.java)
             .isThrownBy {

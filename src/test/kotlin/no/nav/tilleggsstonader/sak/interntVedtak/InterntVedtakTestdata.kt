@@ -745,7 +745,6 @@ object InterntVedtakTestdata {
                                 ),
                             ),
                     ),
-                privatBil = null,
             )
 
         val vedtaksperioderTso =
@@ -785,6 +784,7 @@ object InterntVedtakTestdata {
                 InnvilgelseDagligReise(
                     vedtaksperioder = vedtaksperioder,
                     beregningsresultat = beregningsresultatDagligReise,
+                    rammevedtakPrivatBil = null,
                     begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
                 ),
             gitVersjon = Applikasjonsversjon.versjon,

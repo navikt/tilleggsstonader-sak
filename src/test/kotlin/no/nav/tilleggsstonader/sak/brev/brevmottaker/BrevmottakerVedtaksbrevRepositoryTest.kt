@@ -9,8 +9,10 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
+import org.postgresql.util.PSQLException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.data.repository.findByIdOrNull
@@ -86,7 +88,7 @@ internal class BrevmottakerVedtaksbrevRepositoryTest : CleanDatabaseIntegrationT
         brevmottakerVedtaksbrevRepository.insert(brevmottaker1)
         assertThatThrownBy {
             brevmottakerVedtaksbrevRepository.insert(brevmottaker2)
-        }.hasCauseInstanceOf(DuplicateKeyException::class.java)
+        }.isInstanceOf(DuplicateKeyException::class.java)
     }
 
     @Test

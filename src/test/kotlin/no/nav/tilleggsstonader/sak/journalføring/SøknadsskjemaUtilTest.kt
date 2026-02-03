@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.journalføring
 
-import com.fasterxml.jackson.databind.node.ObjectNode
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadskjemaKjørelisteMapper
 import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil
@@ -14,6 +13,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
+import tools.jackson.databind.node.ObjectNode
 import java.time.LocalDateTime
 
 class SøknadsskjemaUtilTest {
@@ -23,7 +23,7 @@ class SøknadsskjemaUtilTest {
         val parsetSkjema =
             SøknadsskjemaUtil.parseSøknadsskjema(
                 Stønadstype.BARNETILSYN,
-                data = objectMapper.writeValueAsBytes(skjema),
+                data = jsonMapper.writeValueAsBytes(skjema),
                 mottattTidspunkt = LocalDateTime.now(),
             )
 
@@ -36,7 +36,7 @@ class SøknadsskjemaUtilTest {
         val parsetSkjema =
             SøknadsskjemaUtil.parseSøknadsskjema(
                 Stønadstype.LÆREMIDLER,
-                data = objectMapper.writeValueAsBytes(skjema),
+                data = jsonMapper.writeValueAsBytes(skjema),
                 mottattTidspunkt = LocalDateTime.now(),
             )
 
@@ -51,7 +51,7 @@ class SøknadsskjemaUtilTest {
             val parsetSkjema =
                 SøknadsskjemaUtil.parseSøknadsskjema(
                     Stønadstype.BOUTGIFTER,
-                    data = objectMapper.writeValueAsBytes(skjema),
+                    data = jsonMapper.writeValueAsBytes(skjema),
                     mottattTidspunkt = LocalDateTime.now(),
                 )
             assertThat(parsetSkjema.skjema).isEqualTo(skjema)
@@ -61,16 +61,16 @@ class SøknadsskjemaUtilTest {
         fun `Skal feile hvis et ukjent felt finnes i skjemaet`() {
             val skjema = SøknadBoutgifterUtil.søknadBoutgifter()
             val json =
-                objectMapper.readTree(objectMapper.writeValueAsBytes(skjema)).apply {
+                jsonMapper.readTree(jsonMapper.writeValueAsBytes(skjema)).apply {
                     (this as ObjectNode).put("ukjentFelt", "test")
                 }
             assertThatThrownBy {
                 SøknadsskjemaUtil.parseSøknadsskjema(
                     Stønadstype.BOUTGIFTER,
-                    data = objectMapper.writeValueAsBytes(json),
+                    data = jsonMapper.writeValueAsBytes(json),
                     mottattTidspunkt = LocalDateTime.now(),
                 )
-            }.hasMessageContaining("Unrecognized field \"ukjentFelt\"")
+            }.hasMessageContaining("Unrecognized property \"ukjentFelt\"")
         }
     }
 
@@ -83,7 +83,7 @@ class SøknadsskjemaUtilTest {
             val parsetSkjema =
                 SøknadsskjemaUtil.parseSøknadsskjema(
                     stønadstype,
-                    data = objectMapper.writeValueAsBytes(skjema),
+                    data = jsonMapper.writeValueAsBytes(skjema),
                     mottattTidspunkt = LocalDateTime.now(),
                 )
             assertThat(parsetSkjema.skjema).isEqualTo(skjema)
@@ -93,16 +93,16 @@ class SøknadsskjemaUtilTest {
         fun `Skal feile hvis et ukjent felt finnes i skjemaet`() {
             val skjema = SøknadDagligReiseUtil.søknadDagligReise()
             val json =
-                objectMapper.readTree(objectMapper.writeValueAsBytes(skjema)).apply {
+                jsonMapper.readTree(jsonMapper.writeValueAsBytes(skjema)).apply {
                     (this as ObjectNode).put("ukjentFelt", "test")
                 }
             assertThatThrownBy {
                 SøknadsskjemaUtil.parseSøknadsskjema(
                     Stønadstype.DAGLIG_REISE_TSO,
-                    data = objectMapper.writeValueAsBytes(json),
+                    data = jsonMapper.writeValueAsBytes(json),
                     mottattTidspunkt = LocalDateTime.now(),
                 )
-            }.hasMessageContaining("Unrecognized field \"ukjentFelt\"")
+            }.hasMessageContaining("Unrecognized property \"ukjentFelt\"")
         }
     }
 
@@ -112,7 +112,7 @@ class SøknadsskjemaUtilTest {
         @Test
         fun `Skal kunne parse søknad av type daglig reise kjøreliste`() {
             val skjema = SøknadKjørelisteUtil.søknadKjøreliste()
-            val parsetSkjema = SøknadsskjemaUtil.parseKjøreliste(data = objectMapper.writeValueAsBytes(skjema))
+            val parsetSkjema = SøknadsskjemaUtil.parseKjøreliste(data = jsonMapper.writeValueAsBytes(skjema))
             val parsetOgMappetSkjema = SøknadskjemaKjørelisteMapper.mapSkjemaKjøreliste(parsetSkjema.skjema)
             assertThat(parsetOgMappetSkjema).isEqualTo(skjema.data)
         }
@@ -121,12 +121,12 @@ class SøknadsskjemaUtilTest {
         fun `Skal feile hvis et ukjent felt finnes i skjemaet`() {
             val skjema = SøknadKjørelisteUtil.søknadKjøreliste()
             val json =
-                objectMapper.readTree(objectMapper.writeValueAsBytes(skjema)).apply {
+                jsonMapper.readTree(jsonMapper.writeValueAsBytes(skjema)).apply {
                     (this as ObjectNode).put("ukjentFelt", "test")
                 }
             assertThatThrownBy {
-                SøknadsskjemaUtil.parseKjøreliste(data = objectMapper.writeValueAsBytes(json))
-            }.hasMessageContaining("Unrecognized field \"ukjentFelt\"")
+                SøknadsskjemaUtil.parseKjøreliste(data = jsonMapper.writeValueAsBytes(json))
+            }.hasMessageContaining("Unrecognized property \"ukjentFelt\"")
         }
     }
 }

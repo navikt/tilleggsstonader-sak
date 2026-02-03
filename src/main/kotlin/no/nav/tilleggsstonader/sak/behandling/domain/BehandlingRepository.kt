@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.behandling.domain
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
 import org.springframework.data.jdbc.repository.query.Query
@@ -174,6 +175,18 @@ interface BehandlingRepository :
         personidenter: Collection<String>,
         stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
     ): List<Pair<String, BehandlingId>>
+
+    @Query(
+        """
+        SELECT id from gjeldende_iverksatte_behandlinger
+         WHERE fagsak_person_id = :fagsakPersonId 
+           AND stonadstype IN (:stønadstyper)
+        """,
+    )
+    fun finnSisteIverksatteBehandlingerForFagsakPersonId(
+        fagsakPersonId: FagsakPersonId,
+        stønadstyper: List<Stønadstype>,
+    ): List<BehandlingId>
 
     fun findAllByStatusAndResultatIn(
         status: BehandlingStatus,

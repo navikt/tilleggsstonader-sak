@@ -1,73 +1,71 @@
 package no.nav.tilleggsstonader.sak.ekstern.stønad
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakUkeDto
+import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
-class DagligReisePrivatBilService {
-    fun hentRammevedtaksPrivatBil(ident: IdentRequest): List<RammevedtakDto> = hentRammevedtakMock()
+class DagligReisePrivatBilService(
+    private val fagsakPersonService: FagsakPersonService,
+    private val personService: PersonService,
+    private val behandlingRepository: BehandlingRepository,
+    private val vedtakService: VedtakService,
+) {
+    fun hentRammevedtaksPrivatBil(ident: IdentRequest): List<RammevedtakDto> =
+        hentRammevedtakPåBruker(ident).flatMap {
+            mapRammevedtakTilDto(it)
+        }
 
-    private fun hentRammevedtakMock(): List<RammevedtakDto> =
-        listOf(
+    private fun hentRammevedtakPåBruker(ident: IdentRequest): List<RammevedtakPrivatBil> {
+        val alleIdenterPåPerson =
+            personService
+                .hentFolkeregisterIdenter(ident.ident)
+                .identer
+                .map { it.ident }
+                .toSet()
+        val fagsakPerson = fagsakPersonService.finnPerson(alleIdenterPåPerson)
+
+        brukerfeilHvis(fagsakPerson == null) {
+            "Fant ingen fagsakperson for ident"
+        }
+
+        val iverksatteBehandlingIder =
+            behandlingRepository.finnSisteIverksatteBehandlingerForFagsakPersonId(
+                fagsakPersonId = fagsakPerson.id,
+                stønadstyper = listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
+            )
+
+        return iverksatteBehandlingIder.mapNotNull {
+            vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(it)?.data?.rammevedtakPrivatBil
+        }
+    }
+
+    private fun mapRammevedtakTilDto(rammevedtak: RammevedtakPrivatBil): List<RammevedtakDto> =
+        rammevedtak.reiser.mapIndexed { index, reise ->
             RammevedtakDto(
-                id = "1",
-                fom = LocalDate.of(2025, 1, 1),
-                tom = LocalDate.of(2025, 2, 6),
-                reisedagerPerUke = 3,
-                aktivitetsadresse = "Tiurveien 34, 0356 Oslo",
-                aktivitetsnavn = "Arbeidstrening",
+                id = index.toString(),
+                fom = reise.grunnlag.fom,
+                tom = reise.grunnlag.tom,
+                reisedagerPerUke = reise.grunnlag.reisedagerPerUke,
+                aktivitetsadresse = "Ukjent adresse",
+                aktivitetsnavn = "Ukjent aktivitet",
                 uker =
-                    listOf(
+                    reise.uker.mapIndexed { idx, uke ->
                         RammevedtakUkeDto(
-                            fom = LocalDate.of(2025, 1, 1),
-                            tom = LocalDate.of(2025, 1, 5),
-                            ukeNummer = 1,
-                        ),
-                        RammevedtakUkeDto(
-                            fom = LocalDate.of(2025, 1, 6),
-                            tom = LocalDate.of(2025, 1, 12),
-                            ukeNummer = 2,
-                        ),
-                        RammevedtakUkeDto(
-                            fom = LocalDate.of(2025, 1, 13),
-                            tom = LocalDate.of(2025, 1, 19),
-                            ukeNummer = 3,
-                        ),
-                        RammevedtakUkeDto(
-                            fom = LocalDate.of(2025, 1, 20),
-                            tom = LocalDate.of(2025, 1, 26),
-                            ukeNummer = 4,
-                        ),
-                        RammevedtakUkeDto(
-                            fom = LocalDate.of(2025, 1, 27),
-                            tom = LocalDate.of(2025, 2, 2),
-                            ukeNummer = 5,
-                        ),
-                        RammevedtakUkeDto(
-                            fom = LocalDate.of(2025, 2, 3),
-                            tom = LocalDate.of(2025, 2, 6),
-                            ukeNummer = 6,
-                        ),
-                    ),
-            ),
-            RammevedtakDto(
-                id = "2",
-                fom = LocalDate.of(2025, 2, 10),
-                tom = LocalDate.of(2025, 2, 16),
-                reisedagerPerUke = 3,
-                aktivitetsadresse = "Drammensveien 1, 0356 Oslo",
-                aktivitetsnavn = "Tiltak",
-                uker =
-                    listOf(
-                        RammevedtakUkeDto(
-                            fom = LocalDate.of(2025, 2, 10),
-                            tom = LocalDate.of(2025, 2, 16),
-                            ukeNummer = 7,
-                        ),
-                    ),
-            ),
-        )
+                            fom = uke.grunnlag.fom,
+                            tom = uke.grunnlag.tom,
+                            ukeNummer = idx + 1,
+                        )
+                    },
+            )
+        }
 }

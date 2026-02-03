@@ -8,7 +8,7 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.relational.core.conversion.DbActionExecutionException
+import org.springframework.dao.DuplicateKeyException
 
 class FaktaGrunnlagRepositoryTest : CleanDatabaseIntegrationTest() {
     @Autowired
@@ -43,7 +43,7 @@ class FaktaGrunnlagRepositoryTest : CleanDatabaseIntegrationTest() {
             GeneriskFaktaGrunnlagTestUtil.faktaGrunnlagBarnAnnenForelder(behandlingId = behandling.id)
 
         faktaGrunnlagRepository.insert(faktaGrunnlagBarnAnnenForelder)
-        assertThrows<DbActionExecutionException> {
+        assertThrows<DuplicateKeyException> {
             faktaGrunnlagRepository.insert(faktaGrunnlagBarnAnnenForelderDuplikat)
         }
     }
@@ -56,7 +56,7 @@ class FaktaGrunnlagRepositoryTest : CleanDatabaseIntegrationTest() {
         val faktaGrunnlagPersonopplysningerDuplikat =
             GeneriskFaktaGrunnlagTestUtil.faktaGrunnlagPersonopplysninger(behandlingId = behandling.id)
 
-        assertThrows<DbActionExecutionException> {
+        assertThrows<DuplicateKeyException> {
             faktaGrunnlagRepository.insert(faktaGrunnlagPersonopplysningerDuplikat)
         }
     }

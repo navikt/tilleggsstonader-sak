@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.okJson
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.util.FileUtil.readFile
 import org.assertj.core.api.Assertions
@@ -13,14 +14,19 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
-import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.boot.restclient.RestTemplateBuilder
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter
 import org.springframework.web.client.RestTemplate
 import java.net.URI
 import java.time.LocalDate
 
 class PdlClientTest {
     companion object {
-        private val restTemplate: RestTemplate = RestTemplateBuilder().build()
+        private val restTemplate: RestTemplate =
+            RestTemplateBuilder()
+                .messageConverters(
+                    JacksonJsonHttpMessageConverter(jsonMapper),
+                ).build()
         lateinit var pdlClient: PdlClient
         lateinit var wiremockServerItem: WireMockServer
 

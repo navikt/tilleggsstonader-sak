@@ -68,11 +68,7 @@
               "mellomnavn": null,
               "etternavn": "KAMELEON",
               "metadata": {
-                "endringer": [
-                  {
-                    "registrert": "2020-01-01T09:00:00"
-                  }
-                ]
+                "historisk": false
               }
             }
           ],

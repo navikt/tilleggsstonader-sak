@@ -56,10 +56,12 @@ import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReisePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SvarOgBegrunnelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
@@ -79,6 +81,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
@@ -548,6 +551,22 @@ fun faktaOffentligTransport(
     periode = periode,
 )
 
+fun faktaPrivatBil(
+    reiseId: ReiseId = dummyReiseId,
+    adresse: String = "Tiltaksveien 1",
+    reisedagerPerUke: Int = 5,
+    reiseavstandEnVei: BigDecimal = 10.toBigDecimal(),
+    bompengerEnVei: Int? = null,
+    fergekostandEnVei: Int? = null,
+) = FaktaPrivatBil(
+    reiseId = reiseId,
+    adresse = adresse,
+    reisedagerPerUke = reisedagerPerUke,
+    reiseavstandEnVei = reiseavstandEnVei,
+    bompengerEnVei = bompengerEnVei,
+    fergekostandEnVei = fergekostandEnVei,
+)
+
 fun lagreVilkårperiodeMålgruppe(
     behandlingId: BehandlingId,
     målgruppeType: MålgruppeType = MålgruppeType.AAP,
@@ -602,6 +621,35 @@ fun lagreDagligReiseDto(
                 prisEnkelbillett = prisEnkelbillett,
                 prisSyvdagersbillett = prisSyvdagersbillett,
                 prisTrettidagersbillett = prisTrettidagersbillett,
+                reisedagerPerUke = reisedagerPerUke,
+            )
+        },
+) = LagreDagligReiseDto(
+    fom = fom,
+    tom = tom,
+    reiseId = reiseId,
+    adresse = adresse,
+    svar = svar,
+    fakta = fakta,
+)
+
+fun lagreDagligReisePrivatBilDto(
+    fom: LocalDate = 1 januar 2025,
+    tom: LocalDate = 31 januar 2025,
+    adresse: String = "Tiltaksveien 1",
+    reiseId: ReiseId = dummyReiseId,
+    svar: Map<RegelId, SvarOgBegrunnelseDto> =
+        mapOf(
+            RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
+            RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.NEI, begrunnelse = "må kjøre bil"),
+            RegelId.KAN_KJØRE_MED_EGEN_BIL to SvarOgBegrunnelseDto(svar = SvarId.JA),
+        ),
+    fakta: FaktaDagligReiseDto =
+        faktaPrivatBil(adresse = adresse, reiseId = reiseId).run {
+            FaktaDagligReisePrivatBilDto(
+                reiseavstandEnVei = reiseavstandEnVei,
+                bompengerEnVei = bompengerEnVei,
+                fergekostandEnVei = fergekostandEnVei,
                 reisedagerPerUke = reisedagerPerUke,
             )
         },

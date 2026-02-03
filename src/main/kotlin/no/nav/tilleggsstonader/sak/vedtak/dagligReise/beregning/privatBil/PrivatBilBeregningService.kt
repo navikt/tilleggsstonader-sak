@@ -4,10 +4,10 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForUke
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReiseMedPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForUke
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Ekstrakostnader
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForUke
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import org.springframework.stereotype.Service
@@ -19,10 +19,10 @@ import java.math.RoundingMode
 
 @Service
 class PrivatBilBeregningService {
-    fun beregn(
+    fun beregnRammevedtak(
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkår: List<VilkårDagligReise>,
-    ): BeregningsresultatPrivatBil? {
+    ): RammevedtakPrivatBil? {
         val reiseInformasjon = oppfylteVilkår.map { it.tilReiseMedPrivatBil() }
 
         val resultatForReiser =
@@ -32,7 +32,7 @@ class PrivatBilBeregningService {
 
         if (resultatForReiser.isEmpty()) return null
 
-        return BeregningsresultatPrivatBil(
+        return RammevedtakPrivatBil(
             reiser = resultatForReiser,
         )
     }
@@ -40,7 +40,7 @@ class PrivatBilBeregningService {
     private fun beregnForReise(
         reise: ReiseMedPrivatBil,
         vedtaksperioder: List<Vedtaksperiode>,
-    ): BeregningsresultatForReiseMedPrivatBil? {
+    ): RammeForReiseMedPrivatBil? {
         val justertReise = finnSnittMellomReiseOgVedtaksperioder(reise, vedtaksperioder).justertReiseperiode ?: return null
 
         val grunnlagForReise = lagBeregningsgrunnlagForReise(justertReise)
@@ -58,7 +58,7 @@ class PrivatBilBeregningService {
 
         if (uker.isEmpty()) return null
 
-        return BeregningsresultatForReiseMedPrivatBil(
+        return RammeForReiseMedPrivatBil(
             uker = uker,
             grunnlag = grunnlagForReise,
         )
@@ -68,7 +68,7 @@ class PrivatBilBeregningService {
         uke: Datoperiode,
         grunnlagForReise: BeregningsgrunnlagForReiseMedPrivatBil,
         vedtaksperioder: List<Vedtaksperiode>,
-    ): BeregningsresultatForUke? {
+    ): RammeForUke? {
         val grunnlagForUke =
             lagBeregningsgrunnlagForUke(
                 uke = uke,
@@ -82,7 +82,7 @@ class PrivatBilBeregningService {
                 grunnlagForReise = grunnlagForReise,
             )
 
-        return BeregningsresultatForUke(
+        return RammeForUke(
             grunnlag = grunnlagForUke,
             dagsatsUtenParkering = dagsatsUtenParkering,
             maksBeløpSomKanDekkesFørParkering =

@@ -30,8 +30,9 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.postgresql.util.PSQLException
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.dao.DuplicateKeyException
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.relational.core.conversion.DbActionExecutionException
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -50,7 +51,7 @@ class BehandlingRepositoryTest : CleanDatabaseIntegrationTest() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         assertThatThrownBy {
             testoppsettService.lagre(behandling(fagsak, forrigeIverksatteBehandlingId = BehandlingId.random()))
-        }.isInstanceOf(DbActionExecutionException::class.java)
+        }.isInstanceOf(DataIntegrityViolationException::class.java)
     }
 
     @Test
@@ -320,7 +321,7 @@ class BehandlingRepositoryTest : CleanDatabaseIntegrationTest() {
                     assertThatThrownBy {
                         testoppsettService.lagre(behandling(fagsak, status = status))
                     }.cause()
-                cause.isInstanceOf(DuplicateKeyException::class.java)
+                cause.isInstanceOf(PSQLException::class.java)
                 cause.hasMessageContaining("duplicate key value violates unique constraint \"idx_behandlinger_i_arbeid\"")
             }
         }
@@ -346,7 +347,7 @@ class BehandlingRepositoryTest : CleanDatabaseIntegrationTest() {
                 assertThatThrownBy {
                     behandlingRepository.update(påVent.copy(status = UTREDES))
                 }.cause()
-            cause.isInstanceOf(DuplicateKeyException::class.java)
+            cause.isInstanceOf(PSQLException::class.java)
             cause.hasMessageContaining("duplicate key value violates unique constraint \"idx_behandlinger_i_arbeid\"")
         }
 

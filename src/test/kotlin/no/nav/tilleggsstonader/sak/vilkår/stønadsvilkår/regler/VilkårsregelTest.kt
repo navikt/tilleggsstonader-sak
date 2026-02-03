@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler
 
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
+import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileJsonIsEqual
 import no.nav.tilleggsstonader.sak.util.FileUtil.listFiles
 import org.assertj.core.api.Assertions.assertThat
@@ -33,7 +34,7 @@ internal class VilkårsregelTest {
     @Test
     @Disabled
     internal fun `print alle vilkår`() {
-        val objectWriter = objectMapper.writerWithDefaultPrettyPrinter()
+        val objectWriter = jsonMapper.writerWithDefaultPrettyPrinter()
         println(objectWriter.writeValueAsString(Vilkårsregler.ALLE_VILKÅRSREGLER))
     }
 }

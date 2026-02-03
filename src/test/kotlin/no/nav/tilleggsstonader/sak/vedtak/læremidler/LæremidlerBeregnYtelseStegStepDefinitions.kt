@@ -7,7 +7,7 @@ import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -247,7 +247,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
                 assertThat(beregningsresultat.perioder[index]).isEqualTo(periode)
             } catch (e: Throwable) {
                 val actual =
-                    objectMapper
+                    jsonMapper
                         .writerWithDefaultPrettyPrinter()
                         .writeValueAsString(beregningsresultat.perioder[index])
                 logger.error("Feilet validering av rad ${index + 1} $actual")
@@ -276,7 +276,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             try {
                 assertThat(andel).isEqualTo(forventedeAndeler[index])
             } catch (e: Throwable) {
-                val actual = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(andel)
+                val actual = jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(andel)
                 logger.error("Feilet validering av rad ${index + 1} $actual")
                 throw e
             }
@@ -299,7 +299,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             try {
                 assertThat(vedtaksperioder[index]).isEqualTo(periode)
             } catch (e: Throwable) {
-                val actual = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(periode)
+                val actual = jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(periode)
                 logger.error("Feilet validering av rad ${index + 1} $actual")
                 throw e
             }

@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -28,6 +27,7 @@ import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.InsertOnlyProperty
 import org.springframework.data.relational.core.mapping.Table
+import tools.jackson.databind.annotation.JsonDeserialize
 import java.time.LocalDate
 import java.util.UUID
 
@@ -209,15 +209,21 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
      */
     private fun forrigeVilkårPeriodeIdForKopiertVilkår(): UUID =
         when (status) {
-            Vilkårstatus.SLETTET -> error("Skal ikke kopiere vilkårperiode som er slettet")
-            Vilkårstatus.UENDRET ->
+            Vilkårstatus.SLETTET -> {
+                error("Skal ikke kopiere vilkårperiode som er slettet")
+            }
+
+            Vilkårstatus.UENDRET -> {
                 forrigeVilkårperiodeId
                     ?: error("Forventer at vilkårperiode med status=$status har forrigeVilkårperiodeId")
+            }
 
             null,
             Vilkårstatus.NY,
             Vilkårstatus.ENDRET,
-            -> id
+            -> {
+                id
+            }
         }
 }
 

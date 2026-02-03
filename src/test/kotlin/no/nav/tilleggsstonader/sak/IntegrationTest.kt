@@ -24,7 +24,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.cache.CacheManager
@@ -32,7 +32,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.servlet.client.RestTestClient
 
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(initializers = [DbContainerInitializer::class])
@@ -59,7 +59,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
     "mock-google-place-details",
 )
 @EnableMockOAuth2Server
-@AutoConfigureWebTestClient
+@AutoConfigureRestTestClient
 @EnableConfigurationProperties(KafkaTopics::class, EksternApplikasjon::class)
 abstract class IntegrationTest {
     @LocalServerPort
@@ -78,7 +78,7 @@ abstract class IntegrationTest {
     protected lateinit var testoppsettService: TestoppsettService
 
     @Autowired
-    protected lateinit var unleashService: UnleashService
+    lateinit var unleashService: UnleashService
 
     @Autowired
     private lateinit var cacheManagers: List<CacheManager>
@@ -96,7 +96,7 @@ abstract class IntegrationTest {
     lateinit var håndterSøknadService: HåndterSøknadService
 
     @Autowired
-    lateinit var webTestClient: WebTestClient
+    lateinit var restTestClient: RestTestClient
 
     @Autowired
     lateinit var oppgaveRepository: OppgaveRepository
@@ -165,17 +165,18 @@ abstract class IntegrationTest {
         return fn().also { testBrukerkontekst.reset() }
     }
 
-    fun WebTestClient.RequestHeadersSpec<*>.medOnBehalfOfToken() =
+    fun RestTestClient.RequestHeadersSpec<*>.medOnBehalfOfToken(): RestTestClient.RequestHeadersSpec<*> =
         this.headers {
             it.setBearerAuth(onBehalfOfToken(testBrukerkontekst.roller, testBrukerkontekst.bruker))
         }
 
-    fun WebTestClient.RequestHeadersSpec<*>.medClientCredentials(
+    fun RestTestClient.RequestHeadersSpec<*>.medClientCredentials(
         clientId: String,
         accessAsApplication: Boolean,
-    ) = this.headers {
-        it.setBearerAuth(clientCredential(clientId, accessAsApplication))
-    }
+    ): RestTestClient.RequestHeadersSpec<*> =
+        this.headers {
+            it.setBearerAuth(clientCredential(clientId, accessAsApplication))
+        }
 
     data class TestBrukerKontekst(
         val defaultBruker: String,

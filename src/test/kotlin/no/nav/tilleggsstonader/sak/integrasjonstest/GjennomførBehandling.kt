@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest
 
 import io.mockk.every
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientMockConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.dsl.BehandlingTestdataDsl
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
@@ -45,7 +46,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
-import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.servlet.client.RestTestClient
 import java.time.LocalDate
 import java.util.UUID
 
@@ -88,7 +89,7 @@ private fun IntegrationTest.mockStrukturertSøknadForJournalpost(
             journalpost.dokumenter?.single()!!.dokumentInfoId,
             Dokumentvariantformat.ORIGINAL,
         )
-    } returns objectMapper.writeValueAsBytes(søknadForStønadstype(stønadstype))
+    } returns jsonMapper.writeValueAsBytes(søknadForStønadstype(stønadstype))
 }
 
 private fun søknadForStønadstype(stønadstype: Stønadstype) =
@@ -133,11 +134,31 @@ fun IntegrationTest.gjennomførBehandlingsløp(
         gjennomførVilkårSteg(testdata, behandling.id, behandling.stønadstype)
     }
 
-    if (tilSteg == StegType.BEREGNE_YTELSE) {
-        return
-    }
+    if (unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) && behandling.stønadstype.gjelderDagligReise()) {
+        if (tilSteg == StegType.VEDTAK) {
+            return
+        }
 
-    gjennomførBeregningSteg(behandling.id, behandling.stønadstype, testdata.vedtak.vedtak)
+        gjennomførVedtakSteg(behandling.id, behandling.stønadstype, testdata.vedtak.vedtak)
+
+        if (tilSteg == StegType.KJØRELISTE) {
+            return
+        }
+
+        gjennomførKjørelisteSteg(behandlingId)
+
+        if (tilSteg == StegType.BEREGNING) {
+            return
+        }
+
+        gjennomførBeregningStegDagligReise(behandlingId)
+    } else {
+        if (tilSteg == StegType.BEREGNE_YTELSE) {
+            return
+        }
+
+        gjennomførBeregningSteg(behandling.id, behandling.stønadstype, testdata.vedtak.vedtak)
+    }
 
     if (tilSteg == StegType.SIMULERING) {
         return
@@ -259,11 +280,27 @@ fun IntegrationTest.gjennomførSimuleringSteg(behandlingId: BehandlingId) {
     kjørTasksKlareForProsessering()
 }
 
+fun IntegrationTest.gjennomførVedtakSteg(
+    behandlingId: BehandlingId,
+    stønadstype: Stønadstype,
+    opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
+) {
+    gjennomførBeregningSteg(behandlingId, stønadstype, opprettVedtak)
+}
+
+fun IntegrationTest.gjennomførKjørelisteSteg(behandlingId: BehandlingId) {
+    kall.steg.ferdigstill(behandlingId, StegController.FerdigstillStegRequest(StegType.KJØRELISTE))
+}
+
+fun IntegrationTest.gjennomførBeregningStegDagligReise(behandlingId: BehandlingId) {
+    kall.steg.ferdigstill(behandlingId, StegController.FerdigstillStegRequest(StegType.BEREGNING))
+}
+
 fun IntegrationTest.gjennomførBeregningSteg(
     behandlingId: BehandlingId,
     stønadstype: Stønadstype,
     opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
-): WebTestClient.ResponseSpec {
+): RestTestClient.ResponseSpec {
     val foreslåtteVedtaksperioder = kall.vedtak.foreslåVedtaksperioder(behandlingId)
 
     val vedtaksperioder =

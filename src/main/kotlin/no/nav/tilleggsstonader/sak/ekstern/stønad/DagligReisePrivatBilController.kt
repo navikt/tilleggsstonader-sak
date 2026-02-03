@@ -25,7 +25,7 @@ class DagligReisePrivatBilController(
 ) {
     @PostMapping("/rammevedtak")
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
-    fun hentRammevedtaksinformasjon(
+    fun hentRammevedtak(
         @RequestBody request: IdentRequest,
     ): List<RammevedtakDto> {
         feilHvisIkke(SikkerhetContext.kallKommerFra(eksternApplikasjon.soknadApi), HttpStatus.UNAUTHORIZED) {

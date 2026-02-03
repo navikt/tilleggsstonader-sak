@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -46,7 +46,7 @@ class VedtaksstatistikkRepositoryV2Test : CleanDatabaseIntegrationTest() {
                     .filter { it != "endret_tid" } // endret_tid endrer seg hver gang man lagrer vedtaksstatistikk
                     .associate { it to rs.getString(it) }
             }
-        val json = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(res)
+        val json = jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(res)
         assertFileIsEqual("statistikk/vedtaksstatistikk.json", json)
     }
 

@@ -43,12 +43,12 @@ class SimuleringKontraktTilDomeneMapperTest {
         assertThat(oppsummeringer[0].totalFeilutbetaling).isEqualTo(40)
     }
 
-    private fun assertDetaljer(detaljer: SimuleringDetaljer) {
-        assertThat(detaljer.gjelderId).isEqualTo("abc123")
-        assertThat(detaljer.datoBeregnet).isEqualTo(datoBeregnet)
-        assertThat(detaljer.totalBeløp).isEqualTo(5000)
+    private fun assertDetaljer(detaljer: SimuleringDetaljer?) {
+        assertThat(detaljer?.gjelderId).isEqualTo("abc123")
+        assertThat(detaljer?.datoBeregnet).isEqualTo(datoBeregnet)
+        assertThat(detaljer?.totalBeløp).isEqualTo(5000)
 
-        assertPerioder(detaljer.perioder)
+        assertPerioder(detaljer?.perioder!!)
     }
 
     private fun assertPerioder(perioder: List<Periode>) {

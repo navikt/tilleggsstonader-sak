@@ -85,9 +85,6 @@ class BehandlingService(
             eksternBehandlingId,
         ) ?: error("Kan ikke finne behandling med eksternId=$eksternBehandlingId")
 
-    fun hentBehandlinger(behandlingIder: Set<BehandlingId>): List<Behandling> =
-        behandlingRepository.findAllByIdOrThrow(behandlingIder) { it.id }
-
     fun oppdaterStatusPåBehandling(
         behandlingId: BehandlingId,
         status: BehandlingStatus,

@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
+import no.nav.tilleggsstonader.sak.util.lagreDagligReisePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
@@ -58,6 +59,15 @@ class OpprettStønadsvilkårDsl {
     ) {
         dtoer += { _, _ ->
             lagreDagligReiseDto(fom = fom, tom = tom)
+        }
+    }
+
+    fun privatBil(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) {
+        dtoer += { _, _ ->
+            lagreDagligReisePrivatBilDto(fom = fom, tom = tom)
         }
     }
 

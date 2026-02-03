@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import org.assertj.core.api.Assertions.assertThat
@@ -46,7 +46,7 @@ class HelvedDtoTest {
                 utbetalinger = testUtbetalinger,
             )
 
-        val faktiskJson = objectMapper.writeValueAsString(iverksettingDto)
+        val faktiskJson = jsonMapper.writeValueAsString(iverksettingDto)
 
         val forventetJson =
             """
@@ -83,8 +83,8 @@ class HelvedDtoTest {
             }
             """.trimIndent()
 
-        val faktisk = objectMapper.readTree(faktiskJson)
-        val forventet = objectMapper.readTree(forventetJson)
+        val faktisk = jsonMapper.readTree(faktiskJson)
+        val forventet = jsonMapper.readTree(forventetJson)
 
         assertThat(faktisk).isEqualTo(forventet)
     }
@@ -103,7 +103,7 @@ class HelvedDtoTest {
                 utbetalinger = testUtbetalinger,
             )
 
-        val faktiskJson = objectMapper.writeValueAsString(simuleringDto)
+        val faktiskJson = jsonMapper.writeValueAsString(simuleringDto)
 
         val forventetJson =
             """
@@ -138,8 +138,8 @@ class HelvedDtoTest {
             }
             """.trimIndent()
 
-        val faktisk = objectMapper.readTree(faktiskJson)
-        val forventet = objectMapper.readTree(forventetJson)
+        val faktisk = jsonMapper.readTree(faktiskJson)
+        val forventet = jsonMapper.readTree(forventetJson)
 
         assertThat(faktisk).isEqualTo(forventet)
     }

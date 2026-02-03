@@ -88,13 +88,13 @@ fun lagDagligReiseInnvilgelseMedBeløp(
                             ),
                         ),
                 ),
-            privatBil = null,
         )
 
     val vedtaksdata =
         InnvilgelseDagligReise(
             vedtaksperioder = listOf(vedtaksperiode),
             beregningsresultat = beregningsresultat,
+            rammevedtakPrivatBil = null,
             begrunnelse = "test",
         )
 

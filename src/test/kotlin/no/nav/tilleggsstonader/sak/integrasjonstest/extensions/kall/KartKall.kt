@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 import no.nav.tilleggsstonader.sak.googlemaps.dto.FinnReiseavstandDto
 import no.nav.tilleggsstonader.sak.googlemaps.dto.ReisedataDto
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
-import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.servlet.client.RestTestClient
 
 class KartKall(
     private val testklient: Testklient,
@@ -19,6 +19,6 @@ class KartKall(
         fun hentKjoreavstand(
             fraAdresse: String,
             tilAdresse: String,
-        ): WebTestClient.ResponseSpec = testklient.post("/api/kart/kjoreavstand", FinnReiseavstandDto(fraAdresse, tilAdresse))
+        ): RestTestClient.ResponseSpec = testklient.post("/api/kart/kjoreavstand", FinnReiseavstandDto(fraAdresse, tilAdresse))
     }
 }

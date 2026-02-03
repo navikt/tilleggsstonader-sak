@@ -6,7 +6,7 @@ import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
@@ -210,7 +210,7 @@ class TilsynBarnBeregningStepDefinitions {
                         .isEqualTo(it)
                 }
             } catch (e: Throwable) {
-                val acutal = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(resultat)
+                val acutal = jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(resultat)
                 logger.error("Feilet validering av rad ${index + 1} $acutal")
                 throw e
             }

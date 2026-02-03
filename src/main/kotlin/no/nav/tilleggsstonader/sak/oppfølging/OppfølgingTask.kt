@@ -1,12 +1,12 @@
 package no.nav.tilleggsstonader.sak.oppfølging
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.tilleggsstonader.kontrakter.felles.ObjectMapperProvider.objectMapper
+import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import org.springframework.stereotype.Service
+import tools.jackson.module.kotlin.readValue
 import java.time.LocalDateTime
 
 @Service
@@ -18,7 +18,7 @@ class OppfølgingTask(
     private val oppfølgingOpprettKontrollerService: OppfølgingOpprettKontrollerService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
-        val data = objectMapper.readValue<OppfølgingTaskData>(task.payload)
+        val data = jsonMapper.readValue<OppfølgingTaskData>(task.payload)
         oppfølgingOpprettKontrollerService.opprettOppfølging(data.behandlingId)
     }
 
@@ -30,7 +30,7 @@ class OppfølgingTask(
             tidspunkt: LocalDateTime,
         ) = Task(
             type = TYPE,
-            payload = objectMapper.writeValueAsString(OppfølgingTaskData(behandlingId = behandlingId, tidspunkt)),
+            payload = jsonMapper.writeValueAsString(OppfølgingTaskData(behandlingId = behandlingId, tidspunkt)),
         )
     }
 }
