@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import tools.jackson.module.kotlin.readValue
 import java.time.LocalDateTime
 
@@ -44,6 +45,7 @@ object SøknadsskjemaUtil {
         data: ByteArray,
         mottattTidspunkt: LocalDateTime,
     ): InnsendtSkjema<SøknadsskjemaDagligReiseFyllUtSendInn> {
+        secureLogger.info("Deserialiserer daglig reise skjema: \n ${String(data)}")
         val skjema = jsonMapperFailOnUnknownProperties.readValue<SøknadsskjemaDagligReiseFyllUtSendInn>(data)
         return InnsendtSkjema(
             ident = skjema.data.data.dineOpplysninger.identitet.identitetsnummer,

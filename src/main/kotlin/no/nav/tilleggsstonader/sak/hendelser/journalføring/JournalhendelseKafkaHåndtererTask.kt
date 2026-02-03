@@ -5,8 +5,8 @@ import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
+import no.nav.tilleggsstonader.libs.log.logger
 import org.jboss.logging.MDC
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import tools.jackson.module.kotlin.readValue
 
@@ -23,8 +23,6 @@ const val JOURNALPOST_ID = "journalpostId"
 class JournalhendelseKafkaHåndtererTask(
     private val journalhendelseKafkaHåndtererService: JournalhendelseKafkaHåndtererService,
 ) : AsyncTaskStep {
-    private val logger = LoggerFactory.getLogger(javaClass)
-
     override fun doTask(task: Task) {
         val hendelse = jsonMapper.readValue<JournalhendelseTaskData>(task.payload)
         try {
