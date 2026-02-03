@@ -5,10 +5,10 @@ import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakUkeDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForUke
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReiseMedPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForUke
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Ekstrakostnader
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForUke
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -20,7 +20,7 @@ class DagligReisePrivatBilService {
         return mapBeregningsresultatTilRammevedtak(beregningsresultat)
     }
 
-    private fun mapBeregningsresultatTilRammevedtak(beregningsresultat: BeregningsresultatPrivatBil): List<RammevedtakDto> =
+    private fun mapBeregningsresultatTilRammevedtak(beregningsresultat: RammevedtakPrivatBil): List<RammevedtakDto> =
         beregningsresultat.reiser.mapIndexed { index, reise ->
             RammevedtakDto(
                 id = index.toString(),
@@ -40,14 +40,14 @@ class DagligReisePrivatBilService {
             )
         }
 
-    private fun hentBeregningsresultatMock(): BeregningsresultatPrivatBil =
-        BeregningsresultatPrivatBil(
+    private fun hentBeregningsresultatMock(): RammevedtakPrivatBil =
+        RammevedtakPrivatBil(
             reiser =
                 listOf(
-                    BeregningsresultatForReiseMedPrivatBil(
+                    RammeForReiseMedPrivatBil(
                         uker =
                             listOf(
-                                BeregningsresultatForUke(
+                                RammeForUke(
                                     grunnlag =
                                         BeregningsgrunnlagForUke(
                                             fom = LocalDate.of(2025, 1, 1),
@@ -60,7 +60,7 @@ class DagligReisePrivatBilService {
                                     dagsatsUtenParkering = BigDecimal(500),
                                     maksBeløpSomKanDekkesFørParkering = BigDecimal(100).toBigInteger(),
                                 ),
-                                BeregningsresultatForUke(
+                                RammeForUke(
                                     grunnlag =
                                         BeregningsgrunnlagForUke(
                                             fom = LocalDate.of(2025, 1, 5),
@@ -87,10 +87,10 @@ class DagligReisePrivatBilService {
                                     ),
                             ),
                     ),
-                    BeregningsresultatForReiseMedPrivatBil(
+                    RammeForReiseMedPrivatBil(
                         uker =
                             listOf(
-                                BeregningsresultatForUke(
+                                RammeForUke(
                                     grunnlag =
                                         BeregningsgrunnlagForUke(
                                             fom = LocalDate.of(2025, 2, 2),
@@ -103,7 +103,7 @@ class DagligReisePrivatBilService {
                                     dagsatsUtenParkering = BigDecimal(500),
                                     maksBeløpSomKanDekkesFørParkering = BigDecimal(100).toBigInteger(),
                                 ),
-                                BeregningsresultatForUke(
+                                RammeForUke(
                                     grunnlag =
                                         BeregningsgrunnlagForUke(
                                             fom = LocalDate.of(2025, 2, 9),

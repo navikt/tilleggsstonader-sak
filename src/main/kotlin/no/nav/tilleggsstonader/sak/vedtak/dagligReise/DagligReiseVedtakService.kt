@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
@@ -31,6 +32,7 @@ class DagligReiseVedtakService(
     fun lagreInnvilgetVedtak(
         behandling: Saksbehandling,
         beregningsresultat: BeregningsresultatDagligReise,
+        rammevedtakPrivatBil: RammevedtakPrivatBil?,
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
         tidligsteEndring: LocalDate?,
@@ -44,6 +46,7 @@ class DagligReiseVedtakService(
                         vedtaksperioder = vedtaksperioder,
                         begrunnelse = begrunnelse,
                         beregningsresultat = beregningsresultat,
+                        rammevedtakPrivatBil = rammevedtakPrivatBil,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = tidligsteEndring,
@@ -73,6 +76,7 @@ class DagligReiseVedtakService(
     fun lagreOpphørsvedtak(
         saksbehandling: Saksbehandling,
         beregningsresultat: BeregningsresultatDagligReise,
+        rammevedtakPrivatBil: RammevedtakPrivatBil?,
         avkortetVedtaksperioder: List<Vedtaksperiode>,
         vedtak: OpphørDagligReiseRequest,
     ) {
@@ -83,6 +87,7 @@ class DagligReiseVedtakService(
                 data =
                     OpphørDagligReise(
                         beregningsresultat = beregningsresultat,
+                        rammevedtakPrivatBil = rammevedtakPrivatBil,
                         årsaker = vedtak.årsakerOpphør,
                         begrunnelse = vedtak.begrunnelse,
                         vedtaksperioder = avkortetVedtaksperioder,

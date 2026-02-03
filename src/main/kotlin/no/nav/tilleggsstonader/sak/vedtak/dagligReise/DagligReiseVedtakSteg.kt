@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
@@ -66,7 +65,7 @@ class DagligReiseVedtakSteg(
                 vedtaksperioder,
             )
 
-        val beregningsresultat =
+        val (beregningsresultat, rammevedtakPrivatBil) =
             beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
@@ -77,6 +76,7 @@ class DagligReiseVedtakSteg(
         dagligReiseVedtakService.lagreInnvilgetVedtak(
             behandling = saksbehandling,
             beregningsresultat = beregningsresultat,
+            rammevedtakPrivatBil = rammevedtakPrivatBil,
             vedtaksperioder = vedtaksperioder,
             begrunnelse = vedtak.begrunnelse,
             tidligsteEndring = tidligsteEndring,
@@ -105,7 +105,7 @@ class DagligReiseVedtakSteg(
 
         val avkortetVedtaksperioder = dagligReiseVedtakService.avkortVedtaksperiodeVedOpphør(forrigeVedtak, opphørsdato)
 
-        val beregningsresultat =
+        val (beregningsresultat, rammevedtakPrivatBil) =
             beregningService.beregn(
                 vedtaksperioder = avkortetVedtaksperioder,
                 behandling = saksbehandling,
@@ -113,11 +113,17 @@ class DagligReiseVedtakSteg(
                 tidligsteEndring = opphørsdato,
             )
         opphørValideringService.validerIngenUtbetalingEtterOpphørsdatoDagligReise(
-            beregningsresultat,
-            opphørsdato,
+            beregningsresultatDagligReise = beregningsresultat,
+            opphørsdato = opphørsdato,
         )
 
-        dagligReiseVedtakService.lagreOpphørsvedtak(saksbehandling, beregningsresultat, avkortetVedtaksperioder, vedtak)
+        dagligReiseVedtakService.lagreOpphørsvedtak(
+            saksbehandling = saksbehandling,
+            beregningsresultat = beregningsresultat,
+            rammevedtakPrivatBil = rammevedtakPrivatBil,
+            avkortetVedtaksperioder = avkortetVedtaksperioder,
+            vedtak = vedtak,
+        )
 
         tilkjentYtelseService.lagreTilkjentYtelse(
             behandlingId = saksbehandling.id,

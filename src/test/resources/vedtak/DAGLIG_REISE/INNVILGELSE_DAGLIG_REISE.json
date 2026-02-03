@@ -35,9 +35,9 @@
           ]
         }
       ]
-    },
-    "privatBil" : null
+    }
   },
+  "rammevedtakPrivatBil": null,
   "type": "INNVILGELSE_DAGLIG_REISE",
   "vedtaksperioder": [
     {

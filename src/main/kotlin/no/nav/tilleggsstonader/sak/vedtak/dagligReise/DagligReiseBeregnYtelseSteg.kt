@@ -65,7 +65,7 @@ class DagligReiseBeregnYtelseSteg(
                 saksbehandling.id,
                 vedtaksperioder,
             )
-        val beregningsresultat =
+        val (beregningsresultat, _) =
             beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
@@ -75,6 +75,7 @@ class DagligReiseBeregnYtelseSteg(
         dagligReiseVedtakService.lagreInnvilgetVedtak(
             behandling = saksbehandling,
             beregningsresultat = beregningsresultat,
+            rammevedtakPrivatBil = null,
             vedtaksperioder = vedtaksperioder,
             begrunnelse = vedtak.begrunnelse,
             tidligsteEndring = tidligsteEndring,
@@ -112,7 +113,7 @@ class DagligReiseBeregnYtelseSteg(
 
         val avkortetVedtaksperioder = dagligReiseVedtakService.avkortVedtaksperiodeVedOpphør(forrigeVedtak, opphørsdato)
 
-        val beregningsresultat =
+        val (beregningsresultat, _) =
             beregningService.beregn(
                 vedtaksperioder = avkortetVedtaksperioder,
                 behandling = saksbehandling,
@@ -124,7 +125,13 @@ class DagligReiseBeregnYtelseSteg(
             opphørsdato,
         )
 
-        dagligReiseVedtakService.lagreOpphørsvedtak(saksbehandling, beregningsresultat, avkortetVedtaksperioder, vedtak)
+        dagligReiseVedtakService.lagreOpphørsvedtak(
+            saksbehandling = saksbehandling,
+            beregningsresultat = beregningsresultat,
+            rammevedtakPrivatBil = null,
+            avkortetVedtaksperioder = avkortetVedtaksperioder,
+            vedtak = vedtak,
+        )
 
         tilkjentYtelseService.lagreTilkjentYtelse(
             behandlingId = saksbehandling.id,

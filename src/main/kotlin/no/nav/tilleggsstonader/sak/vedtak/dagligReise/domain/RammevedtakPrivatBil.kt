@@ -6,12 +6,12 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.LocalDate
 
-data class BeregningsresultatPrivatBil(
-    val reiser: List<BeregningsresultatForReiseMedPrivatBil>,
+data class RammevedtakPrivatBil(
+    val reiser: List<RammeForReiseMedPrivatBil>,
 )
 
-data class BeregningsresultatForReiseMedPrivatBil(
-    val uker: List<BeregningsresultatForUke>,
+data class RammeForReiseMedPrivatBil(
+    val uker: List<RammeForUke>,
     val grunnlag: BeregningsgrunnlagForReiseMedPrivatBil,
 )
 
@@ -19,7 +19,7 @@ data class BeregningsresultatForReiseMedPrivatBil(
  * dagsatsUtenParkering: hva brukeren kan få dekt per dag. Inkluderer bompenger og ferge, men ikke parkering.
  * maksBeløpSomKanDekkesFørParkering: maksimalt beløp bruker kan få dekt dersom hen kjører hver dag.
  */
-data class BeregningsresultatForUke(
+data class RammeForUke(
     val grunnlag: BeregningsgrunnlagForUke,
     val dagsatsUtenParkering: BigDecimal,
     val maksBeløpSomKanDekkesFørParkering: BigInteger,
