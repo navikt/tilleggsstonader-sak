@@ -1,27 +1,56 @@
 package no.nav.tilleggsstonader.sak.ekstern.stønad
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakUkeDto
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForReiseMedPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForUke
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Ekstrakostnader
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForUke
+import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import org.springframework.stereotype.Service
-import java.math.BigDecimal
-import java.time.LocalDate
 
 @Service
-class DagligReisePrivatBilService {
-    fun hentRammevedtaksPrivatBil(ident: IdentRequest): List<RammevedtakDto> {
-        val beregningsresultat = hentBeregningsresultatMock()
-        return mapBeregningsresultatTilRammevedtak(beregningsresultat)
+class DagligReisePrivatBilService(
+    private val fagsakPersonService: FagsakPersonService,
+    private val personService: PersonService,
+    private val behandlingRepository: BehandlingRepository,
+    private val vedtakService: VedtakService,
+) {
+    fun hentRammevedtaksPrivatBil(ident: IdentRequest): List<RammevedtakDto> =
+        hentRammevedtakPåBruker(ident).flatMap {
+            mapRammevedtakTilDto(it)
+        }
+
+    private fun hentRammevedtakPåBruker(ident: IdentRequest): List<RammevedtakPrivatBil> {
+        val alleIdenterPåPerson =
+            personService
+                .hentFolkeregisterIdenter(ident.ident)
+                .identer
+                .map { it.ident }
+                .toSet()
+        val fagsakPerson = fagsakPersonService.finnPerson(alleIdenterPåPerson)
+
+        brukerfeilHvis(fagsakPerson == null) {
+            "Fant ingen fagsakperson for ident"
+        }
+
+        val iverksatteBehandlingIder =
+            behandlingRepository.finnSisteIverksatteBehandlingerForFagsakPersonId(
+                fagsakPersonId = fagsakPerson.id,
+                stønadstyper = listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
+            )
+
+        return iverksatteBehandlingIder.mapNotNull {
+            vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(it)?.data?.rammevedtakPrivatBil
+        }
     }
 
-    private fun mapBeregningsresultatTilRammevedtak(beregningsresultat: RammevedtakPrivatBil): List<RammevedtakDto> =
-        beregningsresultat.reiser.mapIndexed { index, reise ->
+    private fun mapRammevedtakTilDto(rammevedtak: RammevedtakPrivatBil): List<RammevedtakDto> =
+        rammevedtak.reiser.mapIndexed { index, reise ->
             RammevedtakDto(
                 id = index.toString(),
                 fom = reise.grunnlag.fom,
@@ -39,97 +68,4 @@ class DagligReisePrivatBilService {
                     },
             )
         }
-
-    private fun hentBeregningsresultatMock(): RammevedtakPrivatBil =
-        RammevedtakPrivatBil(
-            reiser =
-                listOf(
-                    RammeForReiseMedPrivatBil(
-                        uker =
-                            listOf(
-                                RammeForUke(
-                                    grunnlag =
-                                        BeregningsgrunnlagForUke(
-                                            fom = LocalDate.of(2025, 1, 1),
-                                            tom = LocalDate.of(2025, 1, 4),
-                                            maksAntallDagerSomKanDekkes = 3,
-                                            antallDagerInkludererHelg = true,
-                                            vedtaksperioder = emptyList(),
-                                            kilometersats = BigDecimal(4.03),
-                                        ),
-                                    dagsatsUtenParkering = BigDecimal(500),
-                                    maksBeløpSomKanDekkesFørParkering = BigDecimal(100).toBigInteger(),
-                                ),
-                                RammeForUke(
-                                    grunnlag =
-                                        BeregningsgrunnlagForUke(
-                                            fom = LocalDate.of(2025, 1, 5),
-                                            tom = LocalDate.of(2025, 1, 11),
-                                            maksAntallDagerSomKanDekkes = 3,
-                                            antallDagerInkludererHelg = true,
-                                            vedtaksperioder = emptyList(),
-                                            kilometersats = BigDecimal(4.03),
-                                        ),
-                                    dagsatsUtenParkering = BigDecimal(500),
-                                    maksBeløpSomKanDekkesFørParkering = BigDecimal(100).toBigInteger(),
-                                ),
-                            ),
-                        grunnlag =
-                            BeregningsgrunnlagForReiseMedPrivatBil(
-                                fom = LocalDate.of(2025, 1, 1),
-                                tom = LocalDate.of(2025, 1, 11),
-                                reisedagerPerUke = 3,
-                                reiseavstandEnVei = BigDecimal(15),
-                                ekstrakostnader =
-                                    Ekstrakostnader(
-                                        bompengerEnVei = 20,
-                                        fergekostnadEnVei = 50,
-                                    ),
-                            ),
-                    ),
-                    RammeForReiseMedPrivatBil(
-                        uker =
-                            listOf(
-                                RammeForUke(
-                                    grunnlag =
-                                        BeregningsgrunnlagForUke(
-                                            fom = LocalDate.of(2025, 2, 2),
-                                            tom = LocalDate.of(2025, 2, 8),
-                                            maksAntallDagerSomKanDekkes = 4,
-                                            antallDagerInkludererHelg = true,
-                                            vedtaksperioder = emptyList(),
-                                            kilometersats = BigDecimal(4.03),
-                                        ),
-                                    dagsatsUtenParkering = BigDecimal(500),
-                                    maksBeløpSomKanDekkesFørParkering = BigDecimal(100).toBigInteger(),
-                                ),
-                                RammeForUke(
-                                    grunnlag =
-                                        BeregningsgrunnlagForUke(
-                                            fom = LocalDate.of(2025, 2, 9),
-                                            tom = LocalDate.of(2025, 2, 13),
-                                            maksAntallDagerSomKanDekkes = 4,
-                                            antallDagerInkludererHelg = false,
-                                            vedtaksperioder = emptyList(),
-                                            kilometersats = BigDecimal(4.03),
-                                        ),
-                                    dagsatsUtenParkering = BigDecimal(500),
-                                    maksBeløpSomKanDekkesFørParkering = BigDecimal(100).toBigInteger(),
-                                ),
-                            ),
-                        grunnlag =
-                            BeregningsgrunnlagForReiseMedPrivatBil(
-                                fom = LocalDate.of(2025, 2, 2),
-                                tom = LocalDate.of(2025, 2, 13),
-                                reisedagerPerUke = 4,
-                                reiseavstandEnVei = BigDecimal(15),
-                                ekstrakostnader =
-                                    Ekstrakostnader(
-                                        bompengerEnVei = 200,
-                                        fergekostnadEnVei = null,
-                                    ),
-                            ),
-                    ),
-                ),
-        )
 }
