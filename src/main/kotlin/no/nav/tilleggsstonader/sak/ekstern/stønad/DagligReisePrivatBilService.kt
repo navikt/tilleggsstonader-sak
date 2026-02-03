@@ -81,10 +81,11 @@ class DagligReisePrivatBilService(
     private fun hentAktivitetsadresse(
         behandlingId: BehandlingId,
         reiseId: ReiseId,
-    ): String {
-        val vilkår = vilkårService.hentOppfylteDagligReiseVilkår(behandlingId)
-        val vilkårMedPrivatBil = vilkår.firstOrNull { it.fakta?.reiseId?.id == reiseId.id }
-
-        return vilkårMedPrivatBil?.fakta?.adresse ?: "Ukjent adresse"
-    }
+    ): String =
+        vilkårService
+            .hentOppfylteDagligReiseVilkår(behandlingId)
+            .firstOrNull { it.fakta?.reiseId?.id == reiseId.id }
+            ?.fakta
+            ?.adresse
+            ?: "Ukjent adresse"
 }
