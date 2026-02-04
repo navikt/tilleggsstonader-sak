@@ -5,14 +5,12 @@ import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapperFa
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
-import no.nav.tilleggsstonader.kontrakter.søknad.KjørelisteSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.Skjemadata
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadKjøreliste
 import tools.jackson.module.kotlin.readValue
 import java.time.LocalDateTime
 
@@ -29,20 +27,6 @@ object SøknadsskjemaUtil {
             Stønadstype.DAGLIG_REISE_TSO -> håndterDagligReise(data, mottattTidspunkt)
             Stønadstype.DAGLIG_REISE_TSR -> håndterDagligReise(data, mottattTidspunkt)
         }
-
-    fun parseKjøreliste(data: ByteArray): InnsendtSkjema<KjørelisteSkjema> {
-        val skjema = jsonMapperFailOnUnknownProperties.readValue<SøknadKjøreliste>(data)
-        return InnsendtSkjema(
-            ident = skjema.id.toString(),
-            mottattTidspunkt = skjema.mottattTidspunkt,
-            språk = skjema.språk,
-            skjema =
-                KjørelisteSkjema(
-                    reisedagerPerUkeAvsnitt = skjema.data.reiser,
-                    dokumentasjon = skjema.data.dokumentasjon,
-                ),
-        )
-    }
 
     private fun håndterBoutgifter(
         data: ByteArray,

@@ -37,7 +37,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelse
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
 import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil.søknadBoutgifter
 import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil.søknadDagligReise
-import no.nav.tilleggsstonader.sak.util.SøknadKjørelisteUtil.søknadKjøreliste
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaLæremidler
 import no.nav.tilleggsstonader.sak.util.dokumentInfo

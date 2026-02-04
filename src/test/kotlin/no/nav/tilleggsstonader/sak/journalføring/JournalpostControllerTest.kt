@@ -28,9 +28,9 @@ import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import no.nav.tilleggsstonader.sak.klage.KlageClient
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
+import no.nav.tilleggsstonader.sak.util.`KjørelisteSkjemaUtil`.`kjørelisteSkjema`
 import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil.søknadBoutgifter
 import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil.søknadDagligReise
-import no.nav.tilleggsstonader.sak.util.SøknadKjørelisteUtil.søknadKjøreliste
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.util.dokumentInfo
 import no.nav.tilleggsstonader.sak.util.journalpost
@@ -132,7 +132,7 @@ class JournalpostControllerTest(
         fun `fullfør journalpost - skal ferdigstille journalpost, og opprette behandling og oppgave for kjøreliste`() {
             val journalpost =
                 opprettJournalpost(journalpostMedStrukturertSøknad(DokumentBrevkode.DAGLIG_REISE_KJØRELISTE))
-            leggTilJournalpostMedSøknadIMock(journalpost, jsonMapper.writeValueAsBytes(søknadKjøreliste()))
+            leggTilJournalpostMedSøknadIMock(journalpost, jsonMapper.writeValueAsBytes(kjørelisteSkjema()))
             val dokumentInfoId = journalpost.dokumenter!!.single().dokumentInfoId
             val oppgave = opprettJournalføringsoppgave(journalpostId = journalpost.journalpostId)
             val journalpostId =

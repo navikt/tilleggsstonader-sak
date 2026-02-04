@@ -27,7 +27,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadKjøreliste
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.tilMålgruppeType

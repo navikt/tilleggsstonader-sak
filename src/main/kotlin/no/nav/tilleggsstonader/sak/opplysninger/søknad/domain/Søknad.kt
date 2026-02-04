@@ -124,24 +124,6 @@ data class SøknadDagligReise(
     override val data: SkjemaDagligReise,
 ) : Søknad<SkjemaDagligReise>
 
-@Table("soknad")
-data class SøknadKjøreliste(
-    @Id
-    override val id: UUID = UUID.randomUUID(),
-    override val journalpostId: String,
-    override val mottattTidspunkt: LocalDateTime,
-    @Column("sprak")
-    override val språk: Språkkode,
-    @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
-    override val sporbar: Sporbar = Sporbar(),
-    override val data: SkjemaKjøreliste,
-) : Søknad<SkjemaKjøreliste>
-
-data class SkjemaKjøreliste(
-    val reiser: List<UkeMedReisedager>,
-    val dokumentasjon: List<DokumentasjonFelt>,
-)
-
 data class UtdanningAvsnitt(
     val aktiviteter: List<ValgtAktivitet>?,
     val annenUtdanning: AnnenUtdanningType?,

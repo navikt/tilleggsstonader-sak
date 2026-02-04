@@ -6,15 +6,17 @@ import io.mockk.verify
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
+import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
-import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
+import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
+import no.nav.tilleggsstonader.kontrakter.søknad.KjørelisteSkjema
 import no.nav.tilleggsstonader.libs.utils.dato.oktober
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
@@ -26,10 +28,9 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettJournalpost
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
-import no.nav.tilleggsstonader.sak.util.SøknadKjørelisteUtil.søknadKjøreliste
+import no.nav.tilleggsstonader.sak.util.`KjørelisteSkjemaUtil`.`kjørelisteSkjema`
 import no.nav.tilleggsstonader.sak.util.dokumentInfo
 import no.nav.tilleggsstonader.sak.util.dokumentvariant
 import no.nav.tilleggsstonader.sak.util.journalpost
@@ -37,7 +38,9 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.support.Acknowledgment
+import java.time.LocalDateTime
 import java.util.UUID
+import kotlin.random.Random
 
 class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
     @Autowired
@@ -75,14 +78,14 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
         verify(exactly = 1) {
             journalpostClient.ferdigstillJournalpost(
                 journalpostId = journalpostId,
-                journalførendeEnhet = Stønadstype.DAGLIG_REISE_TSO.behandlendeEnhet().enhetsnr,
-                saksbehandler = null,
+                journalførendeEnhet = "9999",
+                saksbehandler = "VL",
             )
         }
     }
 
     private fun sendInnKjøreliste(): String {
-        val journalpostId = "123321"
+        val journalpostId = Random.nextLong().toString()
         val journalhendelseRecord = journalfoeringHendelseRecord(journalpostId.toLong())
 
         journalhendelseKafkaListener.listen(
@@ -92,7 +95,7 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
 
         mockJournalpost(
             brevkode = DokumentBrevkode.DAGLIG_REISE_KJØRELISTE,
-            søknad = søknadKjøreliste(),
+            skjema = InnsendtSkjema("", LocalDateTime.now(), Språkkode.NB, kjørelisteSkjema()),
             journalpostId = journalpostId.toLong(),
         )
 
@@ -114,11 +117,11 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
 
     private fun mockJournalpost(
         brevkode: DokumentBrevkode,
-        søknad: Any?,
+        skjema: Any?,
         journalpostKanal: String = "NAV_NO",
         journalpostId: Long,
     ): Journalpost {
-        val dokumentvariantformat = if (søknad != null) Dokumentvariantformat.ORIGINAL else Dokumentvariantformat.ARKIV
+        val dokumentvariantformat = if (skjema != null) Dokumentvariantformat.ORIGINAL else Dokumentvariantformat.ARKIV
         val søknaddookumentInfo =
             dokumentInfo(
                 brevkode = brevkode.verdi,
@@ -136,7 +139,7 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
 
         opprettJournalpost(journalpost)
 
-        if (søknad != null) {
+        if (skjema != null) {
             every {
                 journalpostClient.hentDokument(
                     journalpostId.toString(),
@@ -144,7 +147,7 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
                     Dokumentvariantformat.ORIGINAL,
                 )
             } returns
-                jsonMapper.writeValueAsBytes(søknad)
+                jsonMapper.writeValueAsBytes(skjema)
         }
 
         return journalpost

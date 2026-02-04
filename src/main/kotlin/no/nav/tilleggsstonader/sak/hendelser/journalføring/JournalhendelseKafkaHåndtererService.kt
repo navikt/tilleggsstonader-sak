@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.BOUTGIFTER
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.DAGLIG_REISE
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.DAGLIG_REISE_KJØRELISTE
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.LÆREMIDLER
+import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterMottattKjørelisteService
 import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterSøknadService
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.journalføring.brevkoder
@@ -28,6 +29,7 @@ class JournalhendelseKafkaHåndtererService(
     private val journalpostService: JournalpostService,
     private val håndterSøknadService: HåndterSøknadService,
     private val journalpostMottattMetrikker: JournalpostMottattMetrikker,
+    private val håndterMottattKjørelisteService: HåndterMottattKjørelisteService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -39,7 +41,7 @@ class JournalhendelseKafkaHåndtererService(
             if (journalpost.gjelderSøknad()) {
                 håndterSøknadService.håndterSøknad(journalpost)
             } else if (journalpost.gjelderKjøreliste()) {
-                
+                håndterMottattKjørelisteService.behandleKjøreliste(journalpost)
             }
         } else if (journalpost.erInnkommende()) {
             logSkalBehandles(journalpost, kanBehandles = false)
