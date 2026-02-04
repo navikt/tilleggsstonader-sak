@@ -13,6 +13,7 @@ data class RammevedtakPrivatBil(
 
 data class RammeForReiseMedPrivatBil(
     val reiseId: ReiseId,
+    val aktivitetsadresse: String?,
     val uker: List<RammeForUke>,
     val grunnlag: BeregningsgrunnlagForReiseMedPrivatBil,
 )

@@ -6,14 +6,11 @@ import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakUkeDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.springframework.stereotype.Service
 
 @Service
@@ -22,14 +19,13 @@ class DagligReisePrivatBilService(
     private val personService: PersonService,
     private val behandlingRepository: BehandlingRepository,
     private val vedtakService: VedtakService,
-    private val vilkårService: VilkårService,
 ) {
     fun hentRammevedtaksPrivatBil(ident: IdentRequest): List<RammevedtakDto> =
-        hentRammevedtakPåBruker(ident).flatMap { (rammevedtak, behandlingId) ->
-            mapRammevedtakTilDto(rammevedtak, behandlingId)
+        hentRammevedtakPåBruker(ident).flatMap {
+            mapRammevedtakTilDto(it)
         }
 
-    private fun hentRammevedtakPåBruker(ident: IdentRequest): List<Pair<RammevedtakPrivatBil, BehandlingId>> {
+    private fun hentRammevedtakPåBruker(ident: IdentRequest): List<RammevedtakPrivatBil> {
         val alleIdenterPåPerson =
             personService
                 .hentFolkeregisterIdenter(ident.ident)
@@ -48,44 +44,28 @@ class DagligReisePrivatBilService(
                 stønadstyper = listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
             )
 
-        return iverksatteBehandlingIder.mapNotNull { behandlingId ->
-            vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandlingId)?.data?.rammevedtakPrivatBil?.let {
-                Pair(it, behandlingId)
-            }
+        return iverksatteBehandlingIder.mapNotNull {
+            vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(it)?.data?.rammevedtakPrivatBil
         }
     }
-
-    private fun mapRammevedtakTilDto(
-        rammevedtak: RammevedtakPrivatBil,
-        behandlingId: BehandlingId,
-    ): List<RammevedtakDto> =
-        rammevedtak.reiser.map { reise ->
-            RammevedtakDto(
-                id = reise.reiseId,
-                fom = reise.grunnlag.fom,
-                tom = reise.grunnlag.tom,
-                reisedagerPerUke = reise.grunnlag.reisedagerPerUke,
-                aktivitetsadresse = hentAktivitetsadresse(behandlingId, reise.reiseId),
-                aktivitetsnavn = "Ukjent aktivitet",
-                uker =
-                    reise.uker.mapIndexed { idx, uke ->
-                        RammevedtakUkeDto(
-                            fom = uke.grunnlag.fom,
-                            tom = uke.grunnlag.tom,
-                            ukeNummer = idx + 1,
-                        )
-                    },
-            )
-        }
-
-    private fun hentAktivitetsadresse(
-        behandlingId: BehandlingId,
-        reiseId: ReiseId,
-    ): String =
-        vilkårService
-            .hentOppfylteDagligReiseVilkår(behandlingId)
-            .firstOrNull { it.fakta?.reiseId?.id == reiseId.id }
-            ?.fakta
-            ?.adresse
-            ?: "Ukjent adresse"
 }
+
+private fun mapRammevedtakTilDto(rammevedtak: RammevedtakPrivatBil): List<RammevedtakDto> =
+    rammevedtak.reiser.map { reise ->
+        RammevedtakDto(
+            id = reise.reiseId,
+            fom = reise.grunnlag.fom,
+            tom = reise.grunnlag.tom,
+            reisedagerPerUke = reise.grunnlag.reisedagerPerUke,
+            aktivitetsadresse = reise.aktivitetsadresse ?: "Ukjent adresse",
+            aktivitetsnavn = "Ukjent aktivitet",
+            uker =
+                reise.uker.mapIndexed { idx, uke ->
+                    RammevedtakUkeDto(
+                        fom = uke.grunnlag.fom,
+                        tom = uke.grunnlag.tom,
+                        ukeNummer = idx + 1,
+                    )
+                },
+        )
+    }
