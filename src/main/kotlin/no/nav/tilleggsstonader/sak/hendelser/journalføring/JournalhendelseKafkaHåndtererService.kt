@@ -14,6 +14,8 @@ import no.nav.tilleggsstonader.sak.journalføring.brevkoder
 import no.nav.tilleggsstonader.sak.journalføring.dokumentBrevkode
 import no.nav.tilleggsstonader.sak.journalføring.erInnkommende
 import no.nav.tilleggsstonader.sak.journalføring.gjelderKanalSkanningEllerNavNo
+import no.nav.tilleggsstonader.sak.journalføring.gjelderKjøreliste
+import no.nav.tilleggsstonader.sak.journalføring.gjelderSøknad
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -34,7 +36,11 @@ class JournalhendelseKafkaHåndtererService(
 
         if (journalpost.kanBehandles()) {
             logSkalBehandles(journalpost, kanBehandles = true)
-            håndterSøknadService.håndterSøknad(journalpost)
+            if (journalpost.gjelderSøknad()) {
+                håndterSøknadService.håndterSøknad(journalpost)
+            } else if (journalpost.gjelderKjøreliste()) {
+                
+            }
         } else if (journalpost.erInnkommende()) {
             logSkalBehandles(journalpost, kanBehandles = false)
         }
@@ -50,14 +56,7 @@ class JournalhendelseKafkaHåndtererService(
         Tema.gjelderTemaTilleggsstønader(this.tema) &&
             this.erInnkommende() &&
             this.gjelderKanalSkanningEllerNavNo() &&
-            this.dokumentBrevkode() in
-            listOf(
-                BARNETILSYN,
-                LÆREMIDLER,
-                BOUTGIFTER,
-                DAGLIG_REISE,
-                DAGLIG_REISE_KJØRELISTE,
-            ) &&
+            (this.gjelderSøknad() || this.gjelderKjøreliste()) &&
             !this.erFerdigstilt()
 
     /*

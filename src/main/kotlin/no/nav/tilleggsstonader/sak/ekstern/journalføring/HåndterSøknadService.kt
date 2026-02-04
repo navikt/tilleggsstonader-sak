@@ -104,10 +104,7 @@ class HåndterSøknadService(
                 )
 
             Skjematype.DAGLIG_REISE_KJØRELISTE ->
-                ValgbareStønadstyperForJournalpost(
-                    finnStønadstypeForKjøreliste(journalpost),
-                    Stønadstype.entries.filter { it.gjelderDagligReise() },
-                )
+                error("Skal ikke behandle kjøreliste")
         }
     }
 
@@ -140,27 +137,6 @@ class HåndterSøknadService(
         } else {
             Stønadstype.DAGLIG_REISE_TSR
         }
-    }
-
-    private fun finnStønadstypeForKjøreliste(journalpost: Journalpost): Stønadstype {
-        if (!journalpost.harStrukturertSøknad()) {
-            return if (journalpost.tema == Tema.TSO.name) {
-                Stønadstype.DAGLIG_REISE_TSO
-            } else {
-                Stønadstype.DAGLIG_REISE_TSR
-            }
-        }
-
-        val søknadsskjema =
-            journalpostService.hentSøknadFraJournalpost(journalpost, Stønadstype.DAGLIG_REISE_TSO)
-        val søknad = søknadService.mapSøknad(søknadsskjema, journalpost)
-
-        if (søknad !is SøknadKjøreliste) {
-            error("Søknaden fra journalposten er ikke en kjøreliste søknad")
-        }
-
-        // TODO her må jeg sjekke på målgruppe eller annet for å kunne skille på TSO og TSR for kjøreliste
-        return Stønadstype.DAGLIG_REISE_TSO
     }
 
     private fun hentMålgrupperFraRegister(

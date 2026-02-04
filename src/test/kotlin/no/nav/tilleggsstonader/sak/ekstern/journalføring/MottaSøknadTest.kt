@@ -280,30 +280,6 @@ class MottaSøknadTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `mottar daglig-resise-kjøreliste-søknad fra kafka, bruker mottar AAP, journalføres og oppretter sak på TSO`() {
-        val hendelse = journalfoeringHendelseRecord()
-
-        journalhendelseKafkaListener.listen(
-            ConsumerRecordUtil.lagConsumerRecord("key", hendelse),
-            mockk<Acknowledgment>(relaxed = true),
-        )
-
-        assertThat(hendelseRepository.findByTypeAndId(TypeHendelse.JOURNALPOST, hendelse.hendelsesId)).isNotNull
-
-        every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoAAP()
-
-        mockJournalpost(brevkode = DokumentBrevkode.DAGLIG_REISE_KJØRELISTE, søknad = søknadKjøreliste())
-
-        kjørTasksKlareForProsessering()
-
-        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(
-            ident,
-            Stønadstype.DAGLIG_REISE_TSO,
-            journalpostId.toString(),
-        )
-    }
-
-    @Test
     fun `mottar journalpost som er ferdigstilt, lager task men behandler ikke`() {
         val hendelse = journalfoeringHendelseRecord()
 

@@ -303,22 +303,6 @@ class JournalpostControllerTest(
         }
     }
 
-    @Test
-    fun `hent journalpost som inneholder søknad daglig reise kjøreliste, kan kun opprette stønadstyper for daglig reise`() {
-        val journalpost = journalpostMedStrukturertSøknad(DokumentBrevkode.DAGLIG_REISE_KJØRELISTE)
-        leggTilJournalpostMedSøknadIMock(journalpost, jsonMapper.writeValueAsBytes(søknadKjøreliste()))
-        every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoAAP()
-
-        val journalpostResponse = kall.journalpost.journalpost(journalpost.journalpostId)
-
-        assertThat(journalpostResponse.defaultStønadstype).isEqualTo(Stønadstype.DAGLIG_REISE_TSO)
-
-        assertThat(journalpostResponse.valgbareStønadstyper).containsExactlyInAnyOrder(
-            Stønadstype.DAGLIG_REISE_TSO,
-            Stønadstype.DAGLIG_REISE_TSR,
-        )
-    }
-
     // Journalpost må ha dokumentinfo med variant ORIGINAL
     fun leggTilJournalpostMedSøknadIMock(
         journalpost: Journalpost,
