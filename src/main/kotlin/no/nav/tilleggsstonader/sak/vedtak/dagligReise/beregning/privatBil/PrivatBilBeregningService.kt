@@ -41,7 +41,8 @@ class PrivatBilBeregningService {
         reise: ReiseMedPrivatBil,
         vedtaksperioder: List<Vedtaksperiode>,
     ): RammeForReiseMedPrivatBil? {
-        val justertReise = finnSnittMellomReiseOgVedtaksperioder(reise, vedtaksperioder).justertReiseperiode ?: return null
+        val justertReise =
+            finnSnittMellomReiseOgVedtaksperioder(reise, vedtaksperioder).justertReiseperiode ?: return null
 
         val grunnlagForReise = lagBeregningsgrunnlagForReise(justertReise)
 
@@ -59,6 +60,8 @@ class PrivatBilBeregningService {
         if (uker.isEmpty()) return null
 
         return RammeForReiseMedPrivatBil(
+            reiseId = reise.reiseId,
+            aktivitetsadresse = reise.aktivitetsadresse,
             uker = uker,
             grunnlag = grunnlagForReise,
         )
@@ -121,9 +124,14 @@ class PrivatBilBeregningService {
     ): BeregningsgrunnlagForUke? {
         val relevantVedtaksperiode = finnRelevantVedtaksperiodeForUke(uke, vedtaksperioder) ?: return null
 
-        val justertUkeMedAntallDager = uke.finnAntallDagerIUkeInnenforVedtaksperiode(relevantVedtaksperiode) ?: return null
+        val justertUkeMedAntallDager =
+            uke.finnAntallDagerIUkeInnenforVedtaksperiode(relevantVedtaksperiode) ?: return null
 
-        val (antallDager, antallDagerInkludererHelg) = finnAntallDagerSomDekkes(justertUkeMedAntallDager, reisedagerPerUke)
+        val (antallDager, antallDagerInkludererHelg) =
+            finnAntallDagerSomDekkes(
+                justertUkeMedAntallDager,
+                reisedagerPerUke,
+            )
 
         return BeregningsgrunnlagForUke(
             fom = justertUkeMedAntallDager.fom,
