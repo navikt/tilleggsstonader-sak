@@ -48,24 +48,24 @@ class DagligReisePrivatBilService(
             vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(it)?.data?.rammevedtakPrivatBil
         }
     }
-
-    private fun mapRammevedtakTilDto(rammevedtak: RammevedtakPrivatBil): List<RammevedtakDto> =
-        rammevedtak.reiser.mapIndexed { index, reise ->
-            RammevedtakDto(
-                id = index.toString(),
-                fom = reise.grunnlag.fom,
-                tom = reise.grunnlag.tom,
-                reisedagerPerUke = reise.grunnlag.reisedagerPerUke,
-                aktivitetsadresse = "Ukjent adresse",
-                aktivitetsnavn = "Ukjent aktivitet",
-                uker =
-                    reise.uker.mapIndexed { idx, uke ->
-                        RammevedtakUkeDto(
-                            fom = uke.grunnlag.fom,
-                            tom = uke.grunnlag.tom,
-                            ukeNummer = idx + 1,
-                        )
-                    },
-            )
-        }
 }
+
+private fun mapRammevedtakTilDto(rammevedtak: RammevedtakPrivatBil): List<RammevedtakDto> =
+    rammevedtak.reiser.map { reise ->
+        RammevedtakDto(
+            id = reise.reiseId,
+            fom = reise.grunnlag.fom,
+            tom = reise.grunnlag.tom,
+            reisedagerPerUke = reise.grunnlag.reisedagerPerUke,
+            aktivitetsadresse = reise.aktivitetsadresse ?: "Ukjent adresse",
+            aktivitetsnavn = "Ukjent aktivitet",
+            uker =
+                reise.uker.mapIndexed { idx, uke ->
+                    RammevedtakUkeDto(
+                        fom = uke.grunnlag.fom,
+                        tom = uke.grunnlag.tom,
+                        ukeNummer = idx + 1,
+                    )
+                },
+        )
+    }
