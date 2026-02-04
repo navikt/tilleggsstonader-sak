@@ -64,6 +64,61 @@ class UtledTidligsteEndringService(
             ?: tidligsteEndringResultat?.tidligsteEndring
     }
 
+    fun utledTidligsteEndringV2(
+        behandlingId: BehandlingId,
+        vedtaksperioder: List<Vedtaksperiode>,
+    ): UtledTidligsteEndringResultatV2 {
+        val tidligsteEndringResultat =
+            utledTidligsteEndring(
+                behandlingId = behandlingId,
+                vedtaksperioder = vedtaksperioder,
+                hentVedtaksperioderTidligereBehandlingFunction = { behandlingId ->
+                    vedtakRepository.findByIdOrThrow(behandlingId).vedtaksperioderHvisFinnes() ?: emptyList()
+                },
+            )
+
+        return if (tidligsteEndringResultat == null) {
+            UtledTidligsteEndringResultatV2(
+                konsekvens = EndringKonsekvens.INGEN_ENDRING,
+            )
+        } else if (tidligsteEndringResultat.tidligsteEndringSomPåvirkerUtbetalinger != null) {
+            UtledTidligsteEndringResultatV2(
+                konsekvens = EndringKonsekvens.ENDRING_PÅVIRKER_BEREGNING,
+                tidligsteEndring = tidligsteEndringResultat.tidligsteEndringSomPåvirkerUtbetalinger,
+            )
+        } else {
+            UtledTidligsteEndringResultatV2(
+                konsekvens = EndringKonsekvens.ENDRING_PÅVIRKER_IKKE_BEREGNING,
+                tidligsteEndring = tidligsteEndringResultat.tidligsteEndring,
+            )
+        }
+    }
+
+    data class UtledTidligsteEndringResultatV2(
+        val konsekvens: EndringKonsekvens,
+        val tidligsteEndring: LocalDate? = null,
+    ) {
+        init {
+            if (konsekvens != EndringKonsekvens.INGEN_ENDRING) {
+                require(tidligsteEndring != null) { "tidligsteEndring er null" }
+            } else {
+                require(tidligsteEndring == null) { "Forventer at tidligsteEndring er null, men er $tidligsteEndring" }
+            }
+        }
+
+        /*
+         I tilfeller hvor man har innvilget uten å ha gjort noen endringer som påvirker beregning kan denne brukes
+         for å sørge for at man ikke beregner noe på nytt
+         */
+        fun tidligsteEndringEllerLocalDateMaxHvisIngenEndring() = tidligsteEndring ?: LocalDate.MAX
+    }
+
+    enum class EndringKonsekvens {
+        INGEN_ENDRING,
+        ENDRING_PÅVIRKER_BEREGNING,
+        ENDRING_PÅVIRKER_IKKE_BEREGNING,
+    }
+
     /**
      * Sammenligner gitt behandling med tidligere iverksatte behandling, for å finne tidligste endring i vilkårsperioder og vilkår.
      *

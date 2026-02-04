@@ -68,7 +68,7 @@ class TilsynBarnBeregnYtelseSteg(
         vedtak: InnvilgelseTilsynBarnRequest,
     ) {
         val tidligsteEndring =
-            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
+            utledTidligsteEndringService.utledTidligsteEndringV2(
                 saksbehandling.id,
                 vedtak.vedtaksperioder.tilDomene(),
             )
@@ -78,7 +78,7 @@ class TilsynBarnBeregnYtelseSteg(
                 vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,
-                tidligsteEndring = tidligsteEndring,
+                tidligsteEndring = tidligsteEndring.tidligsteEndringEllerLocalDateMaxHvisIngenEndring(),
             )
         vedtakRepository.insert(
             lagInnvilgetVedtak(
@@ -86,7 +86,7 @@ class TilsynBarnBeregnYtelseSteg(
                 beregningsresultat = beregningsresultat,
                 vedtaksperioder = vedtak.vedtaksperioder.tilDomene().sorted(),
                 begrunnelse = vedtak.begrunnelse,
-                tidligsteEndring = tidligsteEndring,
+                tidligsteEndring = tidligsteEndring.tidligsteEndringEllerLocalDateMaxHvisIngenEndring(),
             ),
         )
         lagreAndeler(saksbehandling, beregningsresultat)
