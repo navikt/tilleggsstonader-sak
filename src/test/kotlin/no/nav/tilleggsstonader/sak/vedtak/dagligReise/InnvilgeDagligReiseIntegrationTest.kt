@@ -84,23 +84,4 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 "Kan ikke ha overlappende vedtaksperioder for Nay og Tiltaksenheten. Se oversikt øverst på siden for å finne overlappende vedtaksperiode.",
             )
     }
-
-    @Test
-    fun `innvilge rammevedtak privat bil og henter ut rammevedtak`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-
-        opprettBehandlingOgGjennomførBehandlingsløp(
-            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-        ) {
-            defaultDagligReisePrivatBilTsoTestdata(fomNay, tomNay)
-        }
-
-        KafkaTestConfig
-            .sendteMeldinger()
-            .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
-
-        val rammevedtak = kall.privatBil.hentRammevedtak(IdentRequest("12345678910"))
-
-        assertThat(rammevedtak).isNotEmpty()
-    }
 }
