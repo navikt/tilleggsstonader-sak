@@ -463,7 +463,7 @@ object VilkårperiodeTestUtil {
             AktivitetType.INGEN_AKTIVITET -> IngenAktivitetDagligReiseTso
 
             else -> {
-                throw IllegalArgumentException("$type er ikke en gyldig aktivitetstype for daglig reise")
+                throw IllegalArgumentException("$type er ikke en gyldig aktivitetstype for daglig reise nay")
             }
         }
 
@@ -497,7 +497,7 @@ object VilkårperiodeTestUtil {
                 )
 
             else -> {
-                throw IllegalArgumentException("$type er ikke en gyldig aktivitetstype for daglig reise")
+                throw IllegalArgumentException("$type er ikke en gyldig aktivitetstype for daglig reise tiltaksenheten")
             }
         }
 }
