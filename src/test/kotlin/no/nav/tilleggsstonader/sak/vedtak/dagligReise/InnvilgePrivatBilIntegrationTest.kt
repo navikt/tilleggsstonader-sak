@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeld
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettJournalpost
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.opplysninger.kjøreliste.KjørelisteRepository
 import no.nav.tilleggsstonader.sak.util.`KjørelisteSkjemaUtil`.`kjørelisteSkjema`
 import no.nav.tilleggsstonader.sak.util.dokumentInfo
 import no.nav.tilleggsstonader.sak.util.dokumentvariant
@@ -46,6 +47,9 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var journalhendelseKafkaListener: JournalhendelseKafkaListener
 
+    @Autowired
+    lateinit var kjørelisteRepository: KjørelisteRepository
+
     val fom = 15 september 2025
     val tom = 14 oktober 2025
 
@@ -53,11 +57,13 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
     fun `innvilge rammevedtak privat bil og henter ut rammevedtak`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
-        opprettBehandlingOgGjennomførBehandlingsløp(
-            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-        ) {
-            defaultDagligReisePrivatBilTsoTestdata(fom, tom)
-        }
+        val behandlingId =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                defaultDagligReisePrivatBilTsoTestdata(fom, tom)
+            }
+        val saksbehandling = testoppsettService.hentSaksbehandling(behandlingId)
 
         // Sjekk at ingenting blir utbetalt
         KafkaTestConfig
@@ -83,6 +89,13 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
                 saksbehandler = "VL",
             )
         }
+
+        val lagredeKjørelister = kjørelisteRepository.findByFagsakId(saksbehandling.fagsakId)
+        assertThat(lagredeKjørelister).hasSize(1)
+        val lagretKjøreliste = lagredeKjørelister.single()
+        assertThat(lagretKjøreliste.fagsakId).isEqualTo(saksbehandling.fagsakId)
+        assertThat(lagretKjøreliste.journalpostId).isEqualTo(journalpostId)
+        assertThat(lagretKjøreliste.data.reiseId).isEqualTo(reiseId)
     }
 
     private fun sendInnKjøreliste(reiseId: ReiseId): String {

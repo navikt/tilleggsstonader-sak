@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.ekstern.journalføring
 
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
@@ -10,12 +9,16 @@ import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Comp
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.ekstern.stønad.DagligReisePrivatBilService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext.SYSTEM_FORKORTELSE
 import no.nav.tilleggsstonader.sak.journalføring.JournalføringHelper
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.journalføring.dokumentBrevkode
+import no.nav.tilleggsstonader.sak.opplysninger.kjøreliste.InnsendtKjøreliste
+import no.nav.tilleggsstonader.sak.opplysninger.kjøreliste.KjørelisteDag
+import no.nav.tilleggsstonader.sak.opplysninger.kjøreliste.KjørelisteService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.springframework.stereotype.Service
 import tools.jackson.module.kotlin.readValue
@@ -28,6 +31,7 @@ class HåndterMottattKjørelisteService(
     private val behandlingService: BehandlingService,
     private val journalpostService: JournalpostService,
     private val fagsakService: FagsakService,
+    private val kjørelisteService: KjørelisteService,
 ) {
     fun behandleKjøreliste(journalpost: Journalpost) {
         val kjørelisteSkjema =
@@ -49,6 +53,7 @@ class HåndterMottattKjørelisteService(
         val fagsak = fagsakService.hentFagsak(saksbehandling.fagsakId)
 
         // TODO - lagre kjøreliste, opprette behandling
+        lagreKjøreliste(kjørelisteSkjema, reiseId, fagsak, journalpost.journalpostId)
 
         journalpostService.oppdaterOgFerdigstillJournalpost(
             journalpost = journalpost,
@@ -60,6 +65,29 @@ class HåndterMottattKjørelisteService(
             avsender = null,
         )
         println(kjørelisteSkjema)
+    }
+
+    private fun lagreKjøreliste(
+        skjema: KjørelisteSkjema,
+        reiseId: ReiseId,
+        fagsak: Fagsak,
+        journalpostId: String,
+    ) {
+        val kjørelisteDomene =
+            InnsendtKjøreliste(
+                reiseId = reiseId,
+                dagerKjørt =
+                    skjema.reisedagerPerUkeAvsnitt.flatMap { ukeMedReisedager ->
+                        ukeMedReisedager.reisedager.map { reisedag ->
+                            KjørelisteDag(
+                                dato = reisedag.dato.verdi,
+                                parkeringsutgift = reisedag.parkeringsutgift.verdi?.toInt(),
+                            )
+                        }
+                    },
+            )
+
+        kjørelisteService.lagre(kjørelisteDomene, fagsak.id, journalpostId)
     }
 
     private fun hentKjørelisteSkjemaFraJournalpost(journalpost: Journalpost): KjørelisteSkjema {
