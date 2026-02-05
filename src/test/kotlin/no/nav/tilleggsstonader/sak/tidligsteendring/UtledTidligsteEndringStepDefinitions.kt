@@ -4,6 +4,7 @@ import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
 import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
@@ -26,6 +27,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetBoutgifter
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
@@ -54,6 +56,7 @@ enum class VilkårperiodeNøkler(
     STUDIENIVÅ("Studienivå"),
     STUDIEPROSENT("Studieprosent"),
     KILDE_ID("Kilde Id"),
+    TYPE_AKTIVITET("Type Aktivitet"),
 }
 
 enum class VilkårNøkler(
@@ -216,6 +219,7 @@ class UtledTidligsteEndringStepDefinitions {
                 resultat = parseEnum(TidligsteEndringFellesNøkler.RESULTAT, rad),
                 status = parseEnum(TidligsteEndringFellesNøkler.STATUS, rad),
                 kildeId = parseValgfriString(VilkårperiodeNøkler.KILDE_ID, rad),
+                typeAktivitet = parseValgfriEnum<TypeAktivitet>(VilkårperiodeNøkler.TYPE_AKTIVITET, rad),
             )
         }
 
@@ -266,6 +270,11 @@ class UtledTidligsteEndringStepDefinitions {
 
             Stønadstype.BOUTGIFTER ->
                 faktaOgVurderingAktivitetBoutgifter(
+                    type = parseEnum(VilkårperiodeNøkler.TYPE, rad),
+                )
+
+            Stønadstype.DAGLIG_REISE_TSR ->
+                faktaOgVurderingAktivitetDagligReiseTsr(
                     type = parseEnum(VilkårperiodeNøkler.TYPE, rad),
                 )
 
