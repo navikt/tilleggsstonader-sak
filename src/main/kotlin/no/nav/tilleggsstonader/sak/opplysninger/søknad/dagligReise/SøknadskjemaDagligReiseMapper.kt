@@ -83,10 +83,10 @@ class SøknadskjemaDagligReiseMapper(
         dokumentasjon: List<DokumentasjonDagligReise>,
     ): SkjemaDagligReise =
         SkjemaDagligReise(
-            personopplysninger = mapPersonopplysninger(søknadsdataDagligReise.data.dineOpplysninger),
-            hovedytelse = mapHovedytelse(søknadsdataDagligReise.data),
-            aktivitet = mapAktivitet(søknadsdataDagligReise.data.aktiviteter, søknadsdataDagligReise.metadata),
-            reiser = mapReiser(søknadsdataDagligReise.data.reise, søknadsdataDagligReise.data.dineOpplysninger),
+            personopplysninger = mapPersonopplysninger(opplysninger = søknadsdataDagligReise.data.dineOpplysninger),
+            hovedytelse = mapHovedytelse(skjemaDagligReise = søknadsdataDagligReise.data),
+            aktivitet = mapAktivitet(aktiviteter = søknadsdataDagligReise.data.aktiviteter, metadata = søknadsdataDagligReise.metadata),
+            reiser = mapReiser(reiser = søknadsdataDagligReise.data.reise, dineOpplysninger = søknadsdataDagligReise.data.dineOpplysninger),
             dokumentasjon = dokumentasjon,
         )
 
