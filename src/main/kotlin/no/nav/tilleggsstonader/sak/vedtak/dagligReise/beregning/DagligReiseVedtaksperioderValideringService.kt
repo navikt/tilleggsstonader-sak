@@ -86,7 +86,7 @@ class DagligReiseVedtaksperioderValideringService(
                     vedtaksperioder,
                 ),
             ) {
-                "Fant ikke Variant/TypeAktivitet for Daglig Reise Tsr. Ta kontakt med utvikler teamet"
+                "Fant ikke tiltaksvariant. Ta kontakt med utviklerteamet"
             }
 
             validerFinnesAktivitetMedTypeAktivitetForHeleVedtaksperioden(
