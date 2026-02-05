@@ -168,7 +168,6 @@ class HåndterSøknadService(
         val allePersonIdenter = personService.hentFolkeregisterIdenter(personIdent).identer()
         val fagsak = fagsakService.finnFagsak(allePersonIdenter, stønadstype)
 
-        // todo sjekke for parkeringsutgifter
         return if (fagsak == null) {
             true
         } else {

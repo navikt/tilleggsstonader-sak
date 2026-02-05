@@ -3,11 +3,6 @@ package no.nav.tilleggsstonader.sak.hendelser.journalføring
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
-import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.BARNETILSYN
-import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.BOUTGIFTER
-import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.DAGLIG_REISE
-import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.DAGLIG_REISE_KJØRELISTE
-import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.LÆREMIDLER
 import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterMottattKjørelisteService
 import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterSøknadService
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
@@ -38,11 +33,7 @@ class JournalhendelseKafkaHåndtererService(
 
         if (journalpost.kanBehandles()) {
             logSkalBehandles(journalpost, kanBehandles = true)
-            if (journalpost.gjelderSøknad()) {
-                håndterSøknadService.håndterSøknad(journalpost)
-            } else if (journalpost.gjelderKjøreliste()) {
-                håndterMottattKjørelisteService.behandleKjøreliste(journalpost)
-            }
+            behandleMottattJournalpost(journalpost)
         } else if (journalpost.erInnkommende()) {
             logSkalBehandles(journalpost, kanBehandles = false)
         }
@@ -51,6 +42,16 @@ class JournalhendelseKafkaHåndtererService(
         // Teller antall mottatte journalposter per brevkode. Ignorerer evt ferdigstilte
         if (!journalpost.erFerdigstilt()) {
             journalpostMottattMetrikker.journalpostMottatt(journalpost)
+        }
+    }
+
+    private fun behandleMottattJournalpost(journalpost: Journalpost) {
+        if (journalpost.gjelderSøknad()) {
+            håndterSøknadService.håndterSøknad(journalpost)
+        } else if (journalpost.gjelderKjøreliste()) {
+            håndterMottattKjørelisteService.behandleKjøreliste(journalpost)
+        } else {
+            error("Kan ikke behandle journalpost med brevkode ${journalpost.dokumentBrevkode()}")
         }
     }
 

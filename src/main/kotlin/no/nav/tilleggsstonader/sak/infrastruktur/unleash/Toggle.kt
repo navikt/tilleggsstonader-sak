@@ -25,5 +25,4 @@ enum class Toggle(
     TILGANGSSTYRE_PÅ_TILORDNET_OPPGAVE("sak.tilgangsstyring-tildelt-oppgave"),
 
     KAN_BEHANDLE_PRIVAT_BIL("sak.daglig-reise-privat-bil"),
-    SØKNAD_ROUTING_DAGLIG_REISE_KJORELISTE("sak.soknad-routing.daglig-reise-kjoreliste"),
 }

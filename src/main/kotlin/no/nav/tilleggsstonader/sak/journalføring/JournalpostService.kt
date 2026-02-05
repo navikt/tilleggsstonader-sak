@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.AvsenderMottaker
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.BulkOppdaterLogiskVedleggRequest
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
-import no.nav.tilleggsstonader.kontrakter.felles.Skjematype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
@@ -140,7 +139,6 @@ class JournalpostService(
                 Dokumentvariantformat.ORIGINAL,
             )
         val mottattTidspunkt = mestRelevanteDato(søknadJournalpost) ?: LocalDateTime.now()
-
         return SøknadsskjemaUtil.parseSøknadsskjema(stønadstype, data, mottattTidspunkt = mottattTidspunkt)
     }
 
