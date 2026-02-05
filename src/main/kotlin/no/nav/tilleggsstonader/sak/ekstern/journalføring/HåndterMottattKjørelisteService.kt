@@ -6,9 +6,12 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.KjørelisteSkjema
+import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.ekstern.stønad.DagligReisePrivatBilService
+import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext.SYSTEM_FORKORTELSE
 import no.nav.tilleggsstonader.sak.journalføring.JournalføringHelper
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
@@ -23,6 +26,8 @@ class HåndterMottattKjørelisteService(
     private val journalpostClient: JournalpostClient,
     private val dagligReisePrivatBilService: DagligReisePrivatBilService,
     private val behandlingService: BehandlingService,
+    private val journalpostService: JournalpostService,
+    private val fagsakService: FagsakService,
 ) {
     fun behandleKjøreliste(journalpost: Journalpost) {
         val kjørelisteSkjema =
@@ -41,7 +46,19 @@ class HåndterMottattKjørelisteService(
             } ?: error("Finner ingen rammevedtak med reiseId $reiseId for innsendt kjøreliste")
 
         val saksbehandling = behandlingService.hentSaksbehandling(rammevedtakTilhørendeKjøreliste.behandlingId)
+        val fagsak = fagsakService.hentFagsak(saksbehandling.fagsakId)
 
+        // TODO - lagre kjøreliste, opprette behandling
+
+        journalpostService.oppdaterOgFerdigstillJournalpost(
+            journalpost = journalpost,
+            dokumenttitler = null,
+            logiskeVedlegg = null,
+            journalførendeEnhet = MASKINELL_JOURNALFOERENDE_ENHET,
+            fagsak = fagsak,
+            saksbehandler = SYSTEM_FORKORTELSE,
+            avsender = null,
+        )
         println(kjørelisteSkjema)
     }
 
