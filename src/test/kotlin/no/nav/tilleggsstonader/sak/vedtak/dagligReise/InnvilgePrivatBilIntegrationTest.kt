@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
-import no.nav.tilleggsstonader.kontrakter.søknad.KjørelisteSkjema
 import no.nav.tilleggsstonader.libs.utils.dato.oktober
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
@@ -34,6 +33,7 @@ import no.nav.tilleggsstonader.sak.util.`KjørelisteSkjemaUtil`.`kjørelisteSkje
 import no.nav.tilleggsstonader.sak.util.dokumentInfo
 import no.nav.tilleggsstonader.sak.util.dokumentvariant
 import no.nav.tilleggsstonader.sak.util.journalpost
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -66,13 +66,14 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
 
         // Sjekk at rammevedtaket kan hentes
         val rammevedtak = kall.privatBil.hentRammevedtak(IdentRequest("12345678910"))
+        val reiseId = rammevedtak.single().id
 
         assertThat(rammevedtak).hasSize(1)
         assertThat(rammevedtak.single().fom).isEqualTo(fom)
         assertThat(rammevedtak.single().tom).isEqualTo(tom)
 
         // Send inn kjøreliste
-        val journalpostId = sendInnKjøreliste()
+        val journalpostId = sendInnKjøreliste(reiseId)
 
         // Verifisere kjøreliste-journalpost blitt arkivert
         verify(exactly = 1) {
@@ -84,7 +85,7 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
         }
     }
 
-    private fun sendInnKjøreliste(): String {
+    private fun sendInnKjøreliste(reiseId: ReiseId): String {
         val journalpostId = Random.nextLong().toString()
         val journalhendelseRecord = journalfoeringHendelseRecord(journalpostId.toLong())
 
@@ -95,7 +96,7 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
 
         mockJournalpost(
             brevkode = DokumentBrevkode.DAGLIG_REISE_KJØRELISTE,
-            skjema = InnsendtSkjema("", LocalDateTime.now(), Språkkode.NB, kjørelisteSkjema()),
+            skjema = InnsendtSkjema("", LocalDateTime.now(), Språkkode.NB, kjørelisteSkjema(reiseId.toString())),
             journalpostId = journalpostId.toLong(),
         )
 

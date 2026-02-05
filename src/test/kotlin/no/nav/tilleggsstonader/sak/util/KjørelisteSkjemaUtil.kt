@@ -8,8 +8,9 @@ import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
 import java.time.LocalDate
 
 object KjørelisteSkjemaUtil {
-    fun kjørelisteSkjema() =
+    fun kjørelisteSkjema(reiseId: String) =
         KjørelisteSkjema(
+            reiseId = reiseId,
             reisedagerPerUkeAvsnitt =
                 listOf(
                     UkeMedReisedager(

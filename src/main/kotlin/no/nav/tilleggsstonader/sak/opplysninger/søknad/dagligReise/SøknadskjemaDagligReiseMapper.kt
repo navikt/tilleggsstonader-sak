@@ -161,8 +161,8 @@ class SøknadskjemaDagligReiseMapper(
         val aktiviteterDagligReise =
             valgteAktiviteter?.let {
                 metadata.dataFetcher.aktiviteter.aktiviteterOgMaalgruppe.data
-                    .filter { valgteAktiviteter.contains(it.value) }
-                    .map {
+                    ?.filter { valgteAktiviteter.contains(it.value) }
+                    ?.map {
                         AktivitetDagligReise(
                             id = it.value,
                             label = it.label,
