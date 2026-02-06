@@ -1,7 +1,5 @@
 package no.nav.tilleggsstonader.sak.behandling.domain
 
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak.MANUELT_OPPRETTET
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -74,6 +72,7 @@ enum class BehandlingKategori {
  * via admin der man ikke skal sende brev. Eks ved migrering der noe skal stanses i Arena og opprettes i TS
  */
 enum class BehandlingÅrsak {
+    KJØRELISTE,
     KLAGE,
     NYE_OPPLYSNINGER,
     SØKNAD,

@@ -7,6 +7,10 @@ import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.KjørelisteSkjema
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.OpprettBehandling
+import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingOppgaveMetadata
+import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.ekstern.stønad.DagligReisePrivatBilService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
@@ -32,6 +36,7 @@ class HåndterMottattKjørelisteService(
     private val journalpostService: JournalpostService,
     private val fagsakService: FagsakService,
     private val kjørelisteService: KjørelisteService,
+    private val opprettBehandlingService: OpprettBehandlingService,
 ) {
     fun behandleKjøreliste(journalpost: Journalpost) {
         val kjørelisteSkjema =
@@ -55,6 +60,18 @@ class HåndterMottattKjørelisteService(
         // TODO - lagre kjøreliste, opprette behandling
         lagreKjøreliste(kjørelisteSkjema, reiseId, fagsak, journalpost.journalpostId)
 
+        val behandling =
+            opprettBehandlingService.opprettBehandling(
+                OpprettBehandling(
+                    fagsakId = fagsak.id,
+                    behandlingsårsak = BehandlingÅrsak.KJØRELISTE,
+                    kravMottatt = journalpost.datoMottatt?.toLocalDate(),
+                    oppgaveMetadata = OpprettBehandlingOppgaveMetadata.UtenOppgave,
+                ),
+            )
+
+        // TODO -
+
         journalpostService.oppdaterOgFerdigstillJournalpost(
             journalpost = journalpost,
             dokumenttitler = null,
@@ -64,7 +81,6 @@ class HåndterMottattKjørelisteService(
             saksbehandler = SYSTEM_FORKORTELSE,
             avsender = null,
         )
-        println(kjørelisteSkjema)
     }
 
     private fun lagreKjøreliste(
