@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import org.slf4j.LoggerFactory
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -18,12 +19,13 @@ class FagsakUtbetalingIdMigreringController(
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
-    @PostMapping
-    fun migrerFagsak(fagsakId: FagsakId) {
+    @PostMapping("/{fagsakId}")
+    fun migrerFagsak(
+        @PathVariable fagsakId: FagsakId,
+    ) {
         logger.info("Migrerer fagsak $fagsakId")
-        val prosess =
-            Executors.newVirtualThreadPerTaskExecutor().submit {
-                fagsakUtbetalingIdMigreringService.migrerForFagsak(fagsakId)
-            }
+        Executors.newVirtualThreadPerTaskExecutor().submit {
+            fagsakUtbetalingIdMigreringService.migrerForFagsak(fagsakId)
+        }
     }
 }
