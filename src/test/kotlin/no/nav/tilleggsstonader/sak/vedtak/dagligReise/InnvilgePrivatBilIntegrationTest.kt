@@ -19,6 +19,8 @@ import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.libs.utils.dato.oktober
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
 import no.nav.tilleggsstonader.sak.hendelser.ConsumerRecordUtil
 import no.nav.tilleggsstonader.sak.hendelser.journalføring.JournalhendelseKafkaListener
@@ -30,7 +32,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettJournalpos
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.opplysninger.kjøreliste.KjørelisteRepository
-import no.nav.tilleggsstonader.sak.util.`KjørelisteSkjemaUtil`.`kjørelisteSkjema`
+import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
 import no.nav.tilleggsstonader.sak.util.dokumentInfo
 import no.nav.tilleggsstonader.sak.util.dokumentvariant
 import no.nav.tilleggsstonader.sak.util.journalpost
@@ -49,6 +51,9 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
 
     @Autowired
     lateinit var kjørelisteRepository: KjørelisteRepository
+
+    @Autowired
+    lateinit var behandlingRepository: BehandlingRepository
 
     val fom = 15 september 2025
     val tom = 14 oktober 2025
@@ -96,6 +101,12 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
         assertThat(lagretKjøreliste.fagsakId).isEqualTo(saksbehandling.fagsakId)
         assertThat(lagretKjøreliste.journalpostId).isEqualTo(journalpostId)
         assertThat(lagretKjøreliste.data.reiseId).isEqualTo(reiseId)
+
+        val behandlingerPåFagsak = behandlingRepository.findByFagsakId(saksbehandling.fagsakId)
+        assertThat(behandlingerPåFagsak).hasSize(2)
+        // TODO - bør behandlingstype si at det er en kjøreliste?
+        // TODO - verifiser at behandlingsstatistikk finnes
+        assertThat(behandlingerPåFagsak.filter { it.årsak == BehandlingÅrsak.KJØRELISTE }).hasSize(1)
     }
 
     private fun sendInnKjøreliste(reiseId: ReiseId): String {
