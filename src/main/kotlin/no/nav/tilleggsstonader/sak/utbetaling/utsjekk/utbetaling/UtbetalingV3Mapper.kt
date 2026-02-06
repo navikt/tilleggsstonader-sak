@@ -104,14 +104,15 @@ class UtbetalingV3Mapper(
                 )
             }
 
+    // Grupperer alle andeler som har samme fom. NB: hvis vi tar i bruk noe annet enn dagsats må dette endres, da tom kan være ulik
     private fun grupperPåDagOgMapTilPerioder(andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>): List<UtbetalingPeriodeDto> =
         andelerTilkjentYtelse
             .filter { it.beløp != 0 }
-            .groupBy { UtbetalingsDatoOgEnhet(it.utbetalingsdato, it.brukersNavKontor) }
+            .groupBy { UtbetalingsDatoOgEnhet(it.fom, it.brukersNavKontor) }
             .map { (utbetalingsdatoOgEnhet, andeler) ->
                 UtbetalingPeriodeDto(
-                    fom = utbetalingsdatoOgEnhet.utbetalingsdato,
-                    tom = utbetalingsdatoOgEnhet.utbetalingsdato,
+                    fom = utbetalingsdatoOgEnhet.utbetalingsperiodeFom,
+                    tom = utbetalingsdatoOgEnhet.utbetalingsperiodeFom,
                     beløp = andeler.sumOf { it.beløp }.toUInt(),
                     betalendeEnhet = utbetalingsdatoOgEnhet.betalendeEnhet,
                 )
@@ -119,7 +120,7 @@ class UtbetalingV3Mapper(
 
     // Hjelpeklasse for å gruppere andeler på utbetalingsdato og betalende enhet
     private data class UtbetalingsDatoOgEnhet(
-        val utbetalingsdato: LocalDate,
+        val utbetalingsperiodeFom: LocalDate,
         val betalendeEnhet: String?,
     )
 
