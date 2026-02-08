@@ -10,7 +10,9 @@ import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.JournalposterForBrukerRequest
-import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
+import no.nav.tilleggsstonader.libs.http.client.getForEntity
+import no.nav.tilleggsstonader.libs.http.client.postForEntity
+import no.nav.tilleggsstonader.libs.http.client.putForEntity
 import no.nav.tilleggsstonader.libs.log.NavHttpHeaders
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import org.slf4j.LoggerFactory
@@ -27,8 +29,8 @@ import java.net.URI
 @Component
 class JournalpostClient(
     @Value("\${clients.integrasjoner.uri}") private val integrasjonerBaseUrl: URI,
-    @Qualifier("azure") restTemplate: RestTemplate,
-) : AbstractRestClient(restTemplate) {
+    @Qualifier("azure") private val restTemplate: RestTemplate,
+) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     private val journalpostUri =
@@ -55,7 +57,7 @@ class JournalpostClient(
     fun finnJournalposterForBruker(journalposterForBrukerRequest: JournalposterForBrukerRequest): List<Journalpost> {
         val uri = URI.create("$journalpostUri").toString()
 
-        return postForEntity<List<Journalpost>>(uri, journalposterForBrukerRequest)
+        return restTemplate.postForEntity<List<Journalpost>>(uri, journalposterForBrukerRequest)
     }
 
     fun hentJournalpost(journalpostId: String): Journalpost {
@@ -66,7 +68,7 @@ class JournalpostClient(
                 .encode()
                 .toUriString()
 
-        return getForEntity<Journalpost>(uri, uriVariables = journalpostIdUriVariables(journalpostId))
+        return restTemplate.getForEntity<Journalpost>(uri, uriVariables = journalpostIdUriVariables(journalpostId))
     }
 
     fun opprettJournalpost(
@@ -74,7 +76,7 @@ class JournalpostClient(
         saksbehandler: String?,
     ): ArkiverDokumentResponse {
         try {
-            return postForEntity(dokarkivUri.toString(), arkiverDokumentRequest, headerMedSaksbehandler(saksbehandler))
+            return restTemplate.postForEntity(dokarkivUri.toString(), arkiverDokumentRequest, headerMedSaksbehandler(saksbehandler))
         } catch (e: Exception) {
             if (e is HttpClientErrorException.Conflict) {
                 håndterConflictArkiverDokument(e)
@@ -94,7 +96,7 @@ class JournalpostClient(
                 .pathSegment("{journalpostId}")
                 .encode()
                 .toUriString()
-        return putForEntity<OppdaterJournalpostResponse>(
+        return restTemplate.putForEntity<OppdaterJournalpostResponse>(
             uri,
             oppdaterJournalpostRequest,
             headerMedSaksbehandler(saksbehandler),
@@ -115,7 +117,7 @@ class JournalpostClient(
                 .encode()
                 .toUriString()
 
-        return putForEntity<OppdaterJournalpostResponse>(
+        return restTemplate.putForEntity<OppdaterJournalpostResponse>(
             uri,
             "",
             headerMedSaksbehandler(saksbehandler),
@@ -128,7 +130,7 @@ class JournalpostClient(
         saksbehandler: String? = null,
     ): String {
         try {
-            return postForEntity<String>(
+            return restTemplate.postForEntity<String>(
                 dokdistUri.toString(),
                 request,
                 headerMedSaksbehandler(saksbehandler),
@@ -154,7 +156,7 @@ class JournalpostClient(
                 .encode()
                 .toUriString()
 
-        return getForEntity<ByteArray>(
+        return restTemplate.getForEntity<ByteArray>(
             uri,
             uriVariables = mapOf("journalpostId" to journalpostId, "dokumentInfoId" to dokumentInfoId),
         )
@@ -171,7 +173,7 @@ class JournalpostClient(
                 .encode()
                 .toUriString()
 
-        return putForEntity<String>(
+        return restTemplate.putForEntity<String>(
             uri,
             request,
             uriVariables = mapOf("dokumentInfoId" to dokumentInfoId),

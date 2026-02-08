@@ -31,7 +31,7 @@ class VilkårsoppsummeringService(
         if (aktivitetsperioder.isEmpty()) {
             return false
         }
-        val barn = faktaGrunnlagService.hentEnkeltGrunnlag<FaktaGrunnlagPersonopplysninger>(behandlingId).data.barn
+        val barn = faktaGrunnlagService.hentPersonopplysningerGrunnlag(behandlingId).data.barn
         return harBarnUnder2ÅrIAktivitetsperiode(barn, aktivitetsperioder)
     }
 

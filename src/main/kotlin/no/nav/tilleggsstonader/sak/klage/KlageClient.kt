@@ -5,7 +5,9 @@ import no.nav.tilleggsstonader.kontrakter.klage.KlagebehandlingDto
 import no.nav.tilleggsstonader.kontrakter.klage.OppgaverBehandlingerRequest
 import no.nav.tilleggsstonader.kontrakter.klage.OppgaverBehandlingerResponse
 import no.nav.tilleggsstonader.kontrakter.klage.OpprettKlagebehandlingRequest
-import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
+import no.nav.tilleggsstonader.libs.http.client.getForEntity
+import no.nav.tilleggsstonader.libs.http.client.postForEntity
+import no.nav.tilleggsstonader.libs.http.client.postForEntityNullable
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -16,9 +18,9 @@ import java.util.UUID
 
 @Component
 class KlageClient(
-    @Qualifier("azure") restTemplate: RestTemplate,
+    @Qualifier("azure") private val restTemplate: RestTemplate,
     @Value("\${clients.klage.uri}") private val klageUri: URI,
-) : AbstractRestClient(restTemplate) {
+) {
     private val opprettKlage =
         UriComponentsBuilder
             .fromUri(klageUri)
@@ -27,7 +29,7 @@ class KlageClient(
             .toUriString()
 
     fun opprettKlage(opprettKlagebehandlingRequest: OpprettKlagebehandlingRequest) {
-        postForEntityNullable<Void>(opprettKlage, opprettKlagebehandlingRequest)
+        restTemplate.postForEntityNullable<Void>(opprettKlage, opprettKlagebehandlingRequest)
     }
 
     fun hentKlagebehandlinger(eksternIder: Set<Long>): Map<Long, List<KlagebehandlingDto>> {
@@ -39,7 +41,7 @@ class KlageClient(
                 .encode()
                 .toUriString()
 
-        return getForEntity<Map<Long, List<KlagebehandlingDto>>>(
+        return restTemplate.getForEntity<Map<Long, List<KlagebehandlingDto>>>(
             uri = uri,
             uriVariables =
                 mapOf(
@@ -57,6 +59,6 @@ class KlageClient(
                 .build()
                 .toUriString()
         val request = OppgaverBehandlingerRequest(oppgaveIder)
-        return postForEntity<OppgaverBehandlingerResponse>(uri, request).oppgaver
+        return restTemplate.postForEntity<OppgaverBehandlingerResponse>(uri, request).oppgaver
     }
 }

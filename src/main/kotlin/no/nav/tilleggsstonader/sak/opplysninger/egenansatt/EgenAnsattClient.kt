@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.opplysninger.egenansatt
 
-import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
@@ -14,8 +13,8 @@ import java.net.URI
 @Component
 class EgenAnsattClient(
     @Value("\${clients.egen_ansatt.uri}") private val uri: URI,
-    @Qualifier("azureClientCredential") restTemplate: RestTemplate,
-) : AbstractRestClient(restTemplate) {
+    @Qualifier("azureClientCredential") private val restTemplate: RestTemplate,
+) {
     private val egenAnsattUri: URI =
         UriComponentsBuilder
             .fromUri(uri)

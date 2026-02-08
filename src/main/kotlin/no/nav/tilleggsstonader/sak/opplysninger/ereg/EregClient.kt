@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.ereg
 
-import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
+import no.nav.tilleggsstonader.libs.http.client.getForEntity
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -13,8 +13,8 @@ import java.net.URI
 class EregClient(
     @Value("\${clients.ereg.uri}")
     private val uri: URI,
-    @Qualifier("utenAuth") restTemplate: RestTemplate,
-) : AbstractRestClient(restTemplate) {
+    @Qualifier("utenAuth") private val restTemplate: RestTemplate,
+) {
     fun hentOrganisasjoner(organisasjonsnummer: String): OrganisasjonDto? {
         val uriBuilder =
             UriComponentsBuilder
@@ -24,7 +24,7 @@ class EregClient(
                 .toUriString()
 
         return try {
-            getForEntity<OrganisasjonDto>(uriBuilder)
+            restTemplate.getForEntity<OrganisasjonDto>(uriBuilder)
         } catch (e: HttpClientErrorException.NotFound) {
             return null
         }

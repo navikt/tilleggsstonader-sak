@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.journalføring
 
-import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
+import no.nav.tilleggsstonader.libs.http.client.postForEntity
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
@@ -14,12 +14,12 @@ import java.net.URI
 class FamilieDokumentClient(
     @Value("\${clients.familie-dokument.uri}")
     private val dokumentApiURI: URI,
-    @Qualifier("utenAuth") restTemplate: RestTemplate,
-) : AbstractRestClient(restTemplate) {
+    @Qualifier("utenAuth") private val restTemplate: RestTemplate,
+) {
     private val htmlTilPdfUri =
         UriComponentsBuilder.fromUri(dokumentApiURI).pathSegment("api", "html-til-pdf").toUriString()
 
-    fun genererPdf(html: String): ByteArray = postForEntity<ByteArray>(htmlTilPdfUri, html, htmlTilPdfHeaders)
+    fun genererPdf(html: String): ByteArray = restTemplate.postForEntity<ByteArray>(htmlTilPdfUri, html, htmlTilPdfHeaders)
 
     companion object {
         val htmlTilPdfHeaders =

@@ -11,8 +11,10 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.vent.OppdaterPåVentRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.TaAvVentRequest
-import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
 import no.nav.tilleggsstonader.libs.http.client.ProblemDetailException
+import no.nav.tilleggsstonader.libs.http.client.getForEntity
+import no.nav.tilleggsstonader.libs.http.client.patchForEntity
+import no.nav.tilleggsstonader.libs.http.client.postForEntity
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.util.medContentTypeJsonUTF8
@@ -28,8 +30,8 @@ import java.net.URI
 @Component
 class OppgaveClient(
     @Value("\${clients.integrasjoner.uri}") private val integrasjonerBaseUrl: URI,
-    @Qualifier("azure") restTemplate: RestTemplate,
-) : AbstractRestClient(restTemplate) {
+    @Qualifier("azure") private val restTemplate: RestTemplate,
+) {
     private val oppgaveUri =
         UriComponentsBuilder
             .fromUri(integrasjonerBaseUrl)
@@ -47,7 +49,8 @@ class OppgaveClient(
     fun opprettOppgave(opprettOppgave: OpprettOppgaveRequest): Long {
         val uri = UriComponentsBuilder.fromUri(oppgaveUri).pathSegment("opprett").toUriString()
 
-        return postForEntity<OppgaveResponse>(uri, opprettOppgave, HttpHeaders().medContentTypeJsonUTF8())
+        return restTemplate
+            .postForEntity<OppgaveResponse>(uri, opprettOppgave, HttpHeaders().medContentTypeJsonUTF8())
             .oppgaveId
     }
 
@@ -59,13 +62,13 @@ class OppgaveClient(
                 .encode()
                 .toUriString()
 
-        return getForEntity<Oppgave>(uri, uriVariables = oppgaveIdUriVariables(oppgaveId))
+        return restTemplate.getForEntity<Oppgave>(uri, uriVariables = oppgaveIdUriVariables(oppgaveId))
     }
 
     fun hentOppgaver(finnOppgaveRequest: FinnOppgaveRequest): FinnOppgaveResponseDto {
         val uri = UriComponentsBuilder.fromUri(oppgaveUri).pathSegment("finn").toUriString()
 
-        return postForEntity<FinnOppgaveResponseDto>(
+        return restTemplate.postForEntity<FinnOppgaveResponseDto>(
             uri,
             finnOppgaveRequest,
             HttpHeaders().medContentTypeJsonUTF8(),
@@ -93,7 +96,7 @@ class OppgaveClient(
         }
 
         try {
-            return postForEntity<Oppgave>(
+            return restTemplate.postForEntity<Oppgave>(
                 uriBuilder.encode().toUriString(),
                 HttpHeaders().medContentTypeJsonUTF8(),
                 uriVariables = uriVariables,
@@ -130,7 +133,7 @@ class OppgaveClient(
             }
         }
 
-        patchForEntity<OppgaveResponse>(uriBuilder.encode().toUriString(), "", uriVariables = uriVariables)
+        restTemplate.patchForEntity<OppgaveResponse>(uriBuilder.encode().toUriString(), "", uriVariables = uriVariables)
     }
 
     fun oppdaterOppgave(oppgave: Oppgave): OppdatertOppgaveResponse {
@@ -142,7 +145,7 @@ class OppgaveClient(
                 .toUriString()
         try {
             val response =
-                patchForEntity<OppdatertOppgaveResponse>(
+                restTemplate.patchForEntity<OppdatertOppgaveResponse>(
                     uri,
                     oppgave,
                     HttpHeaders().medContentTypeJsonUTF8(),
@@ -168,7 +171,7 @@ class OppgaveClient(
                 .encode()
                 .toUriString()
         val uriVariables = mapOf("enhetsnr" to enhetsnummer, "limit" to limit)
-        return getForEntity<FinnMappeResponseDto>(uri, uriVariables = uriVariables)
+        return restTemplate.getForEntity<FinnMappeResponseDto>(uri, uriVariables = uriVariables)
     }
 
     fun settPåVent(settPåVent: SettPåVentRequest): SettPåVentResponse {
@@ -178,7 +181,7 @@ class OppgaveClient(
                 .pathSegment("sett-pa-vent")
                 .encode()
                 .toUriString()
-        return kastBrukerFeilHvisBadRequest { postForEntity<SettPåVentResponse>(uri, settPåVent) }
+        return kastBrukerFeilHvisBadRequest { restTemplate.postForEntity<SettPåVentResponse>(uri, settPåVent) }
     }
 
     fun oppdaterPåVent(oppdaterPåVent: OppdaterPåVentRequest): SettPåVentResponse {
@@ -188,7 +191,7 @@ class OppgaveClient(
                 .pathSegment("oppdater-pa-vent")
                 .encode()
                 .toUriString()
-        return kastBrukerFeilHvisBadRequest { postForEntity<SettPåVentResponse>(uri, oppdaterPåVent) }
+        return kastBrukerFeilHvisBadRequest { restTemplate.postForEntity<SettPåVentResponse>(uri, oppdaterPåVent) }
     }
 
     fun taAvVent(taAvVent: TaAvVentRequest): SettPåVentResponse {
@@ -198,7 +201,7 @@ class OppgaveClient(
                 .pathSegment("ta-av-vent")
                 .encode()
                 .toUriString()
-        return kastBrukerFeilHvisBadRequest { postForEntity<SettPåVentResponse>(uri, taAvVent) }
+        return kastBrukerFeilHvisBadRequest { restTemplate.postForEntity<SettPåVentResponse>(uri, taAvVent) }
     }
 
     private fun <T> kastBrukerFeilHvisBadRequest(fn: () -> T): T =

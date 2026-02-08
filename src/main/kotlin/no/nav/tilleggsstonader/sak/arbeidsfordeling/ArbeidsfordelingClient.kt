@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.arbeidsfordeling
 
-import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
+import no.nav.tilleggsstonader.libs.http.client.getForEntity
+import no.nav.tilleggsstonader.libs.http.client.postForEntity
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -12,8 +13,8 @@ import java.net.URI
 class ArbeidsfordelingClient(
     @Value("\${clients.norg2.uri}")
     private val uri: URI,
-    @Qualifier("utenAuth") restTemplate: RestTemplate,
-) : AbstractRestClient(restTemplate) {
+    @Qualifier("utenAuth") private val restTemplate: RestTemplate,
+) {
     fun finnArbeidsfordelingsenhet(arbeidsfordelingskriterie: ArbeidsfordelingKriterie): List<Arbeidsfordelingsenhet> {
         val bestMatchUri =
             UriComponentsBuilder
@@ -22,7 +23,7 @@ class ArbeidsfordelingClient(
                 .build()
                 .toUriString()
 
-        return postForEntity(bestMatchUri, arbeidsfordelingskriterie)
+        return restTemplate.postForEntity(bestMatchUri, arbeidsfordelingskriterie)
     }
 
     fun finnNavKontorForGeografiskOmråde(
@@ -39,7 +40,7 @@ class ArbeidsfordelingClient(
                 .build()
                 .toUriString()
 
-        return getForEntity<NavKontor>(
+        return restTemplate.getForEntity<NavKontor>(
             uri = uri,
             uriVariables =
                 mapOf(

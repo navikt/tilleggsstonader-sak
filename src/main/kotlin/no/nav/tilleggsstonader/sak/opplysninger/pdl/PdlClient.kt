@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningDto
 import no.nav.tilleggsstonader.kontrakter.pdl.PdlGeografiskTilknytningRequest
 import no.nav.tilleggsstonader.kontrakter.pdl.PdlGeografiskTilknytningVariables
 import no.nav.tilleggsstonader.kontrakter.pdl.PdlHentGeografiskTilknytning
-import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
+import no.nav.tilleggsstonader.libs.http.client.postForEntity
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlAnnenForelder
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
@@ -31,8 +31,8 @@ import java.net.URI
 @Service
 class PdlClient(
     @Value("\${clients.pdl.uri}") private val pdlUrl: URI,
-    @Qualifier("azureClientCredential") restTemplate: RestTemplate,
-) : AbstractRestClient(restTemplate) {
+    @Qualifier("azureClientCredential") private val restTemplate: RestTemplate,
+) {
     private val pdlUri: String = UriComponentsBuilder.fromUri(pdlUrl).pathSegment(PdlConfig.PATH_GRAPHQL).toUriString()
 
     fun hentSøker(personIdent: String): PdlSøker {
@@ -42,7 +42,7 @@ class PdlClient(
                 query = PdlConfig.søkerQuery,
             )
 
-        val pdlResponse = postForEntity<PdlResponse<PdlSøkerData>>(pdlUri, request, PdlUtil.httpHeaders)
+        val pdlResponse = restTemplate.postForEntity<PdlResponse<PdlSøkerData>>(pdlUri, request, PdlUtil.httpHeaders)
 
         return feilsjekkOgReturnerData(personIdent, pdlResponse) { it.person }
     }
@@ -55,7 +55,7 @@ class PdlClient(
                 query = PdlConfig.forelderBarnQuery,
             )
 
-        val pdlResponse = postForEntity<PdlBolkResponse<PdlBarn>>(pdlUri, request, PdlUtil.httpHeaders)
+        val pdlResponse = restTemplate.postForEntity<PdlBolkResponse<PdlBarn>>(pdlUri, request, PdlUtil.httpHeaders)
 
         return feilsjekkOgReturnerData(pdlResponse)
     }
@@ -67,7 +67,7 @@ class PdlClient(
                 variables = PdlPersonBolkRequestVariables(personIdenter),
                 query = PdlConfig.annenForelderQuery,
             )
-        val pdlResponse = postForEntity<PdlBolkResponse<PdlAnnenForelder>>(pdlUri, request, PdlUtil.httpHeaders)
+        val pdlResponse = restTemplate.postForEntity<PdlBolkResponse<PdlAnnenForelder>>(pdlUri, request, PdlUtil.httpHeaders)
         return feilsjekkOgReturnerData(pdlResponse)
     }
 
@@ -78,7 +78,7 @@ class PdlClient(
                 variables = PdlPersonBolkRequestVariables(personIdenter),
                 query = PdlConfig.personBolkKortQuery,
             )
-        val pdlResponse = postForEntity<PdlBolkResponse<PdlPersonKort>>(pdlUri, request, PdlUtil.httpHeaders)
+        val pdlResponse = restTemplate.postForEntity<PdlBolkResponse<PdlPersonKort>>(pdlUri, request, PdlUtil.httpHeaders)
         return feilsjekkOgReturnerData(pdlResponse)
     }
 
@@ -92,7 +92,7 @@ class PdlClient(
                 variables = PdlIdentRequestVariables(ident = ident, historikk = true),
                 query = PdlConfig.hentIdentQuery,
             )
-        val pdlResponse = postForEntity<PdlResponse<PdlHentIdenter>>(pdlUri, request, PdlUtil.httpHeaders)
+        val pdlResponse = restTemplate.postForEntity<PdlResponse<PdlHentIdenter>>(pdlUri, request, PdlUtil.httpHeaders)
 
         val pdlIdenter = feilsjekkOgReturnerData(ident, pdlResponse) { it.hentIdenter }
 
@@ -109,7 +109,7 @@ class PdlClient(
                 query = PdlConfig.hentGeografiskTilknytningQuery,
             )
 
-        val response = postForEntity<PdlResponse<PdlHentGeografiskTilknytning>>(pdlUri, request, PdlUtil.httpHeaders)
+        val response = restTemplate.postForEntity<PdlResponse<PdlHentGeografiskTilknytning>>(pdlUri, request, PdlUtil.httpHeaders)
 
         return feilsjekkOgReturnerData(ident, response) { it.hentGeografiskTilknytning }
     }

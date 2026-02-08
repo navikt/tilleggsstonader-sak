@@ -85,7 +85,7 @@ class VilkårperiodeService(
 
         val fødselFaktaGrunnlag =
             faktaGrunnlagService
-                .hentEnkeltGrunnlag<FaktaGrunnlagPersonopplysninger>(behandling.id)
+                .hentPersonopplysningerGrunnlag(behandling.id)
                 .data.fødsel
 
         val faktaOgVurdering =
@@ -127,7 +127,7 @@ class VilkårperiodeService(
 
         val fødselFaktaGrunnlag =
             faktaGrunnlagService
-                .hentEnkeltGrunnlag<FaktaGrunnlagPersonopplysninger>(behandling.id)
+                .hentPersonopplysningerGrunnlag(behandling.id)
                 .data.fødsel
 
         return oppdaterVilkårperiodeHvorAltKanEndres(

@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.migrering
 
-import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
+import no.nav.tilleggsstonader.libs.http.client.postForEntityNullable
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingId
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -12,8 +12,8 @@ import java.net.URI
 @Component
 class MigreringClient(
     @Value("\${clients.simulering.uri}") private val uri: URI,
-    @Qualifier("azure") restTemplate: RestTemplate,
-) : AbstractRestClient(restTemplate) {
+    @Qualifier("azure") private val restTemplate: RestTemplate,
+) {
     private val migreringUrl =
         UriComponentsBuilder
             .fromUri(uri)
@@ -22,7 +22,7 @@ class MigreringClient(
             .toUriString()
 
     fun migrer(dto: MigrerUtbetalingDto) {
-        postForEntityNullable<Void>(migreringUrl, dto)
+        restTemplate.postForEntityNullable<Void>(migreringUrl, dto)
     }
 }
 
