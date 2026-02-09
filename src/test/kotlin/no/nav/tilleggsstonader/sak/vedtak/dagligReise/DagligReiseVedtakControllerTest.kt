@@ -21,8 +21,8 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatDagl
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatForPeriodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatForReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatOffentligTransportDto
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequestGammel
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseResponse
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsoRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
@@ -145,7 +145,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
 
     @Test
     fun `hent ut lagrede vedtak av type innvilgelse`() {
-        val vedtakRequest = InnvilgelseDagligReiseRequestGammel(listOf(vedtaksperiode.tilDto()))
+        val vedtakRequest = InnvilgelseDagligReiseTsoRequest(listOf(vedtaksperiode.tilDto()))
 
         kall.vedtak.lagreInnvilgelse(
             Stønadstype.DAGLIG_REISE_TSO,

@@ -25,14 +25,6 @@ sealed interface InnvilgelseDagligReiseRequest : VedtakDagligReiseRequest {
     fun vedtaksperioder(): List<Vedtaksperiode>
 }
 
-@Deprecated("Går over til å bruke egne typer for tso og tsr da vedaksperiodene er forskjellig bygget opp")
-data class InnvilgelseDagligReiseRequestGammel(
-    val vedtaksperioder: List<VedtaksperiodeDto>,
-    override val begrunnelse: String? = null,
-) : InnvilgelseDagligReiseRequest {
-    override fun vedtaksperioder(): List<Vedtaksperiode> = vedtaksperioder.tilDomene()
-}
-
 data class InnvilgelseDagligReiseTsoRequest(
     val vedtaksperioder: List<VedtaksperiodeDto>,
     override val begrunnelse: String? = null,

@@ -36,6 +36,19 @@ class VedtakKall(
             .isOk
     }
 
+    fun lagreEnhetsspesifiktVedtak(
+        stønadstype: Stønadstype,
+        behandlingId: BehandlingId,
+        typeVedtakPath: String,
+        vedtakDto: VedtakRequest,
+        enhet: Enhet,
+    ) {
+        apiRespons
+            .lagreEnhetsspesifiktVedtak(stønadstype, behandlingId, typeVedtakPath, vedtakDto, enhet)
+            .expectStatus()
+            .isOk
+    }
+
     fun lagreOpphør(
         stønadstype: Stønadstype,
         behandlingId: BehandlingId,
@@ -52,7 +65,18 @@ class VedtakKall(
         stønadstype: Stønadstype,
         behandlingId: BehandlingId,
         innvilgelseDto: VedtakRequest,
-    ) = lagreVedtak(stønadstype, behandlingId, "innvilgelse", innvilgelseDto)
+    ) {
+        if (stønadstype.gjelderDagligReise()) {
+            return lagreEnhetsspesifiktVedtak(
+                stønadstype,
+                behandlingId,
+                "innvilgelse",
+                innvilgelseDto,
+                stønadstype.behandlendeEnhet(),
+            )
+        }
+        lagreVedtak(stønadstype, behandlingId, "innvilgelse", innvilgelseDto)
+    }
 
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = VedtakApi()

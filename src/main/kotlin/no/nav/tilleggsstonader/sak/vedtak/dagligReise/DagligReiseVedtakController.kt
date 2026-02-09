@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatDagligReiseDto
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequestGammel
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsoRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsrRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
@@ -50,15 +49,6 @@ class DagligReiseVedtakController(
     private val unleashService: UnleashService,
     private val dagligReiseVilkårService: DagligReiseVilkårService,
 ) {
-    @Deprecated("Går over til å bruke egne endepunkt for tso og tsr da vedaksperiodene er forskjellig bygget opp")
-    @PostMapping("{behandlingId}/innvilgelse")
-    fun innvilge(
-        @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtak: InnvilgelseDagligReiseRequestGammel,
-    ) {
-        lagreVedtak(behandlingId, vedtak)
-    }
-
     @PostMapping("{behandlingId}/tso/innvilgelse")
     fun innvilge(
         @PathVariable behandlingId: BehandlingId,
@@ -109,13 +99,6 @@ class DagligReiseVedtakController(
     ) {
         lagreVedtak(behandlingId, vedtak)
     }
-
-    @Deprecated("Går over til å bruke egne endepunkt for tso og tsr da vedaksperiodene er forskjellig bygget opp")
-    @PostMapping("{behandlingId}/beregn")
-    fun beregn(
-        @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtak: InnvilgelseDagligReiseRequestGammel,
-    ): BeregningsresultatDagligReiseDto = beregnVedtak(behandlingId, vedtak.vedtaksperioder())
 
     @PostMapping("{behandlingId}/tso/beregn")
     fun beregn(
