@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.ekstern.stønad
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
@@ -56,11 +57,11 @@ private fun mapRammevedtakTilDto(rammevedtak: RammevedtakPrivatBil): List<Rammev
             aktivitetsadresse = reise.aktivitetsadresse ?: "Ukjent adresse",
             aktivitetsnavn = "Ukjent aktivitet",
             uker =
-                reise.uker.mapIndexed { idx, uke ->
+                reise.uker.map { uke ->
                     RammevedtakUkeDto(
                         fom = uke.grunnlag.fom,
                         tom = uke.grunnlag.tom,
-                        ukeNummer = idx + 1,
+                        ukeNummer = uke.grunnlag.fom.ukenummer(),
                     )
                 },
         )

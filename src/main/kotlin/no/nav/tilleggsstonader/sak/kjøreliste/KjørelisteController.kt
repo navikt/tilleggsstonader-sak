@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.kjøreliste
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
@@ -22,23 +23,26 @@ class KjørelisteController(
         @PathVariable behandlingId: BehandlingId,
     ): List<KjørelisteDto> {
         val behandling = behandlingService.hentBehandling(behandlingId)
-        return kjørelisteService.hentForFagsakId(behandling.fagsakId).map {
+
+        return kjørelisteService.hentForFagsakId(behandling.fagsakId).map { kjøreliste ->
             KjørelisteDto(
-                reiseId = it.data.reiseId,
+                reiseId = kjøreliste.data.reiseId,
                 uker =
-                    listOf(
-                        KjørelisteUkeDto(
-                            ukeNummer = 1,
-                            reisedager =
-                                it.data.reisedager.map { reisedag ->
-                                    KjørelisteDagDto(
-                                        dato = reisedag.dato,
-                                        harKjørt = reisedag.harKjørt,
-                                        parkeringsutgift = reisedag.parkeringsutgift,
-                                    )
-                                },
-                        ),
-                    ),
+                    kjøreliste.data.reisedager
+                        .map { reisedag ->
+                            KjørelisteDagDto(
+                                dato = reisedag.dato,
+                                harKjørt = reisedag.harKjørt,
+                                parkeringsutgift = reisedag.parkeringsutgift,
+                            )
+                        }.groupBy {
+                            it.dato.ukenummer()
+                        }.map { (uke, reisedagerIUke) ->
+                            KjørelisteUkeDto(
+                                ukeNummer = uke,
+                                reisedager = reisedagerIUke,
+                            )
+                        },
             )
         }
     }
