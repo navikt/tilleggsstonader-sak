@@ -70,6 +70,12 @@ management:
     base-path: "/internal"
   prometheus.metrics.export.enabled: true
 
+springdoc:
+  swagger-ui:
+    enabled: true
+  api-docs:
+    enabled: true
+
 prosessering:
   continuousRunning.enabled: true
   fixedDelayString.in.milliseconds: 2000
