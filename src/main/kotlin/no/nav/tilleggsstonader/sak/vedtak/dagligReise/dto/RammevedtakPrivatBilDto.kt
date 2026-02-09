@@ -55,7 +55,7 @@ private fun RammeForReiseMedPrivatBil.tilDto(): List<RammeForReiseMedPrivatBilDt
             dagsatsUtenParkering = ukerMedSammeSats.first().dagsatsUtenParkering,
             fergekostnadEnVei = grunnlag.ekstrakostnader.fergekostnadEnVei,
             uker = ukerMedSammeSats.map { it.tilDto() },
-            aktivitetsadresse = this.aktivitetsadresse
+            aktivitetsadresse = this.aktivitetsadresse,
         )
     }
 }
