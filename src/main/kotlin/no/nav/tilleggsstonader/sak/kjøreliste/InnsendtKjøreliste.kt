@@ -5,7 +5,7 @@ import java.time.LocalDate
 
 data class InnsendtKjøreliste(
     val reiseId: ReiseId,
-    val dagerKjørt: List<KjørelisteDag>,
+    val reisedager: List<KjørelisteDag>,
 )
 
 data class KjørelisteDag(

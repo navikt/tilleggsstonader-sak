@@ -113,7 +113,7 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
         assertThat(lagretKjøreliste.journalpostId).isEqualTo(journalpostId)
         assertThat(lagretKjøreliste.data.reiseId).isEqualTo(reiseId)
         assertThat(
-            lagretKjøreliste.data.dagerKjørt
+            lagretKjøreliste.data.reisedager
                 .filter { it.harKjørt }
                 .map { it.dato },
         ).containsExactlyInAnyOrder(*dagerKjørt)

@@ -91,7 +91,7 @@ class HåndterMottattKjørelisteService(
         val kjørelisteDomene =
             InnsendtKjøreliste(
                 reiseId = reiseId,
-                dagerKjørt =
+                reisedager =
                     skjema.reisedagerPerUkeAvsnitt.flatMap { ukeMedReisedager ->
                         ukeMedReisedager.reisedager
                             .map { reisedag ->
