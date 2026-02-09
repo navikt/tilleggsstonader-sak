@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.ekstern.journalføring
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.KjørelisteSkjema
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
@@ -20,9 +21,9 @@ import no.nav.tilleggsstonader.sak.journalføring.JournalføringHelper
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.journalføring.dokumentBrevkode
-import no.nav.tilleggsstonader.sak.opplysninger.kjøreliste.InnsendtKjøreliste
-import no.nav.tilleggsstonader.sak.opplysninger.kjøreliste.KjørelisteDag
-import no.nav.tilleggsstonader.sak.opplysninger.kjøreliste.KjørelisteService
+import no.nav.tilleggsstonader.sak.kjøreliste.InnsendtKjøreliste
+import no.nav.tilleggsstonader.sak.kjøreliste.KjørelisteDag
+import no.nav.tilleggsstonader.sak.kjøreliste.KjørelisteService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.springframework.stereotype.Service
 import tools.jackson.module.kotlin.readValue
@@ -57,20 +58,23 @@ class HåndterMottattKjørelisteService(
         val saksbehandling = behandlingService.hentSaksbehandling(rammevedtakTilhørendeKjøreliste.behandlingId)
         val fagsak = fagsakService.hentFagsak(saksbehandling.fagsakId)
 
-        // TODO - lagre kjøreliste, opprette behandling
         lagreKjøreliste(kjørelisteSkjema, reiseId, fagsak, journalpost.journalpostId)
 
-        val behandling =
-            opprettBehandlingService.opprettBehandling(
-                OpprettBehandling(
-                    fagsakId = fagsak.id,
-                    behandlingsårsak = BehandlingÅrsak.KJØRELISTE,
-                    kravMottatt = journalpost.datoMottatt?.toLocalDate(),
-                    oppgaveMetadata = OpprettBehandlingOppgaveMetadata.UtenOppgave,
-                ),
-            )
+        opprettBehandlingService.opprettBehandling(
+            OpprettBehandling(
+                fagsakId = fagsak.id,
+                behandlingsårsak = BehandlingÅrsak.KJØRELISTE,
+                kravMottatt = journalpost.datoMottatt?.toLocalDate(),
+                oppgaveMetadata =
+                    OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
+                        tilordneSaksbehandler = null,
+                        beskrivelse = "Mottatt kjøreliste",
+                        prioritet = OppgavePrioritet.NORM,
+                    ),
+            ),
+        )
 
-        // TODO -
+        // TODO - opprette task for videre prosessering
 
         journalpostService.oppdaterOgFerdigstillJournalpost(
             journalpost = journalpost,

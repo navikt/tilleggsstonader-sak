@@ -1,8 +1,6 @@
-package no.nav.tilleggsstonader.sak.opplysninger.kjøreliste
+package no.nav.tilleggsstonader.sak.kjøreliste
 
-import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
-import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import org.springframework.stereotype.Service
 

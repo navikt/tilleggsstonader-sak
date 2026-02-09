@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.opplysninger.kjøreliste
+package no.nav.tilleggsstonader.sak.kjøreliste
 
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import java.time.LocalDate

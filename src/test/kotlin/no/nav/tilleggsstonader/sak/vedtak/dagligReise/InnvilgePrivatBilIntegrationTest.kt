@@ -29,9 +29,10 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettJournalpost
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
-import no.nav.tilleggsstonader.sak.opplysninger.kjøreliste.KjørelisteRepository
+import no.nav.tilleggsstonader.sak.kjøreliste.KjørelisteRepository
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
 import no.nav.tilleggsstonader.sak.util.dokumentInfo
 import no.nav.tilleggsstonader.sak.util.dokumentvariant
@@ -107,6 +108,12 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
         // TODO - bør behandlingstype si at det er en kjøreliste?
         // TODO - verifiser at behandlingsstatistikk finnes
         assertThat(behandlingerPåFagsak.filter { it.årsak == BehandlingÅrsak.KJØRELISTE }).hasSize(1)
+
+        // Trigger opprett-oppgave task
+        kjørTasksKlareForProsessering()
+
+        val kjørelisteBehandling = behandlingerPåFagsak.single { it.årsak == BehandlingÅrsak.KJØRELISTE }
+        assertThat(oppgaveRepository.findByBehandlingId(kjørelisteBehandling.id)).hasSize(1)
     }
 
     private fun sendInnKjøreliste(reiseId: ReiseId): String {
