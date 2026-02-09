@@ -37,7 +37,9 @@ class PersonopplysningerService(
         return PersonopplysningerDto(
             personIdent = ident,
             navn = pdlSøker.navn.gjeldende().let { NavnDto.fraNavn(it) },
-            alder = antallÅrSiden(pdlSøker.fødselsdato.gjeldende().fødselsdato),
+            alder =
+                antallÅrSiden(pdlSøker.fødselsdato.gjeldende().fødselsdato)
+                    ?: error("Forventer at fødselsdato skal finnes på alle brukere"),
             harVergemål =
                 pdlSøker.vergemaalEllerFremtidsfullmakt
                     .any { it.type != "stadfestetFremtidsfullmakt" },
