@@ -121,7 +121,8 @@ private fun Stønadstype.tilPath(): String =
 private fun Enhet.tilPath(): String =
     when (this) {
         Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD -> "tso"
+        Enhet.NAV_ARBEID_OG_YTELSER_EGNE_ANSATTE -> "tso"
         Enhet.NAV_TILTAK_OSLO -> "tsr"
-        Enhet.NAV_ARBEID_OG_YTELSER_EGNE_ANSATTE -> TODO()
+        Enhet.NAV_EGNE_ANSATTE_OSLO -> "tsr"
         Enhet.VIKAFOSSEN -> TODO()
     }
