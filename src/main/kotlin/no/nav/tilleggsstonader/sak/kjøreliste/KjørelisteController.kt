@@ -24,7 +24,7 @@ class KjørelisteController(
         val behandling = behandlingService.hentBehandling(behandlingId)
         return kjørelisteService.hentForFagsakId(behandling.fagsakId).map {
             KjørelisteDto(
-                reiseId = ReiseId(it.id),
+                reiseId = it.data.reiseId,
                 uker =
                     listOf(
                         KjørelisteUkeDto(
