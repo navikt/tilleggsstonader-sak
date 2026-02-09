@@ -54,6 +54,16 @@ object SikkerhetContext {
                 onFailure = { SYSTEM_FORKORTELSE },
             )
 
+    fun hentSaksbehandlerHvisFinnes() =
+        Result
+            .runCatching { SpringTokenValidationContextHolder().getTokenValidationContext() }
+            .fold(
+                onSuccess = {
+                    it.getClaim("NAVident")?.toString() ?: SYSTEM_FORKORTELSE
+                },
+                onFailure = { null },
+            )
+
     fun hentSaksbehandlerNavn(strict: Boolean = false): String =
         Result
             .runCatching { SpringTokenValidationContextHolder().getTokenValidationContext() }
