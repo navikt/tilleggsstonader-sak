@@ -5,6 +5,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
@@ -16,6 +17,8 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
+import no.nav.tilleggsstonader.kontrakter.søknad.KjørelisteSkjema
+import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.oktober
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
@@ -37,7 +40,6 @@ import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
 import no.nav.tilleggsstonader.sak.util.dokumentInfo
 import no.nav.tilleggsstonader.sak.util.dokumentvariant
 import no.nav.tilleggsstonader.sak.util.journalpost
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -84,8 +86,16 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
         assertThat(rammevedtak.single().fom).isEqualTo(fom)
         assertThat(rammevedtak.single().tom).isEqualTo(tom)
 
+        val dagerKjørt = arrayOf(2 februar 2026, 9 februar 2026, 16 februar 2026)
+        val kjøreliste =
+            kjørelisteSkjema(
+                reiseId = reiseId.toString(),
+                periode = Datoperiode(1 februar 2026, 28 februar 2026),
+                dagerKjørt = dagerKjørt,
+            )
+
         // Send inn kjøreliste
-        val journalpostId = sendInnKjøreliste(reiseId)
+        val journalpostId = sendInnKjøreliste(kjøreliste)
 
         // Verifisere kjøreliste-journalpost blitt arkivert
         verify(exactly = 1) {
@@ -102,6 +112,11 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
         assertThat(lagretKjøreliste.fagsakId).isEqualTo(saksbehandling.fagsakId)
         assertThat(lagretKjøreliste.journalpostId).isEqualTo(journalpostId)
         assertThat(lagretKjøreliste.data.reiseId).isEqualTo(reiseId)
+        assertThat(
+            lagretKjøreliste.data.dagerKjørt
+                .filter { it.harKjørt }
+                .map { it.dato },
+        ).containsExactlyInAnyOrder(*dagerKjørt)
 
         val behandlingerPåFagsak = behandlingRepository.findByFagsakId(saksbehandling.fagsakId)
         assertThat(behandlingerPåFagsak).hasSize(2)
@@ -116,7 +131,7 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
         assertThat(oppgaveRepository.findByBehandlingId(kjørelisteBehandling.id)).hasSize(1)
     }
 
-    private fun sendInnKjøreliste(reiseId: ReiseId): String {
+    private fun sendInnKjøreliste(kjøreliste: KjørelisteSkjema): String {
         val journalpostId = Random.nextLong().toString()
         val journalhendelseRecord = journalfoeringHendelseRecord(journalpostId.toLong())
 
@@ -127,7 +142,7 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
 
         mockJournalpost(
             brevkode = DokumentBrevkode.DAGLIG_REISE_KJØRELISTE,
-            skjema = InnsendtSkjema("", LocalDateTime.now(), Språkkode.NB, kjørelisteSkjema(reiseId.toString())),
+            skjema = InnsendtSkjema("", LocalDateTime.now(), Språkkode.NB, kjøreliste),
             journalpostId = journalpostId.toLong(),
         )
 

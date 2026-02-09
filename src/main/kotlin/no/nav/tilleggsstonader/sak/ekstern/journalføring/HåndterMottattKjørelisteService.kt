@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.KjørelisteSkjema
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingService
 import no.nav.tilleggsstonader.sak.behandling.OpprettRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
@@ -36,7 +35,6 @@ class HåndterMottattKjørelisteService(
     private val journalpostService: JournalpostService,
     private val fagsakService: FagsakService,
     private val kjørelisteService: KjørelisteService,
-    private val opprettBehandlingService: OpprettBehandlingService,
     private val opprettRevurderingService: OpprettRevurderingService,
 ) {
     fun behandleKjøreliste(journalpost: Journalpost) {
@@ -95,12 +93,14 @@ class HåndterMottattKjørelisteService(
                 reiseId = reiseId,
                 dagerKjørt =
                     skjema.reisedagerPerUkeAvsnitt.flatMap { ukeMedReisedager ->
-                        ukeMedReisedager.reisedager.map { reisedag ->
-                            KjørelisteDag(
-                                dato = reisedag.dato.verdi,
-                                parkeringsutgift = reisedag.parkeringsutgift.verdi?.toInt(),
-                            )
-                        }
+                        ukeMedReisedager.reisedager
+                            .map { reisedag ->
+                                KjørelisteDag(
+                                    dato = reisedag.dato.verdi,
+                                    harKjørt = reisedag.harKjørt,
+                                    parkeringsutgift = reisedag.parkeringsutgift.verdi?.toInt(),
+                                )
+                            }
                     },
             )
 

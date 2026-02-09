@@ -10,5 +10,6 @@ data class InnsendtKjøreliste(
 
 data class KjørelisteDag(
     val dato: LocalDate,
+    val harKjørt: Boolean,
     val parkeringsutgift: Int?,
 )
