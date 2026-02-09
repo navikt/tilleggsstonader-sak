@@ -137,6 +137,23 @@ object InterntVedtakTestdata {
             ),
         )
 
+    private val målgrupperTsr: List<VilkårperiodeMålgruppe> =
+        listOf(
+            VilkårperiodeTestUtil.målgruppe(
+                begrunnelse = "målgruppe dagpenger",
+                faktaOgVurdering =
+                    faktaOgVurderingMålgruppe(
+                        type = MålgruppeType.DAGPENGER,
+                        medlemskap = vurderingMedlemskap(SvarJaNei.JA_IMPLISITT),
+                        dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(SvarJaNei.NEI),
+                        aldersvilkår = vurderingAldersVilkår(),
+                        mottarSykepengerForFulltidsstilling = vurderingMottarSykepengerForFulltidsstilling(SvarJaNei.NEI_IMPLISITT),
+                    ),
+                fom = LocalDate.of(2024, 2, 5),
+                tom = LocalDate.of(2024, 2, 10),
+            ),
+        )
+
     object TilsynBarn {
         val fagsak = fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()))
 
@@ -612,6 +629,8 @@ object InterntVedtakTestdata {
     object DagligReise {
         val fagsak =
             fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()), stønadstype = Stønadstype.DAGLIG_REISE_TSO)
+        val fagsakTsr =
+            fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()), stønadstype = Stønadstype.DAGLIG_REISE_TSR)
         val behandling =
             saksbehandling(
                 behandling =
@@ -624,6 +643,19 @@ object InterntVedtakTestdata {
                         type = BehandlingType.FØRSTEGANGSBEHANDLING,
                     ),
                 fagsak = fagsak,
+            )
+        val behandlingTsr =
+            saksbehandling(
+                behandling =
+                    behandling(
+                        id = behandlingId,
+                        vedtakstidspunkt = LocalDate.of(2024, 2, 5).atStartOfDay(),
+                        opprettetTid = LocalDate.of(2024, 2, 10).atStartOfDay(),
+                        fagsak = fagsakTsr,
+                        resultat = BehandlingResultat.INNVILGET,
+                        type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    ),
+                fagsak = fagsakTsr,
             )
         private val aktivitetererDagligReiseTso =
             listOf(
@@ -659,7 +691,7 @@ object InterntVedtakTestdata {
 
         val vilkårperioderTsr =
             Vilkårperioder(
-                målgrupper = målgrupper,
+                målgrupper = målgrupperTsr,
                 aktiviteter = aktivitetererDagligReiseTsr,
             )
 

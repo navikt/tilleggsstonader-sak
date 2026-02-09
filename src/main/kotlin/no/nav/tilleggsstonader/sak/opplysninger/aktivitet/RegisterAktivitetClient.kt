@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.aktivitet
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
 import no.nav.tilleggsstonader.kontrakter.felles.IdentRequest
-import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
+import no.nav.tilleggsstonader.libs.http.client.postForEntity
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.IntegrasjonException
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.IntegrasjonsTjeneste
 import org.springframework.beans.factory.annotation.Qualifier
@@ -16,8 +16,8 @@ import java.time.LocalDate
 @Service
 class RegisterAktivitetClient(
     @Value("\${clients.integrasjoner.uri}") private val baseUrl: URI,
-    @Qualifier("azureClientCredential") restTemplate: RestTemplate,
-) : AbstractRestClient(restTemplate) {
+    @Qualifier("azureClientCredential") private val restTemplate: RestTemplate,
+) {
     val uriAktiviteter =
         UriComponentsBuilder
             .fromUri(baseUrl)
@@ -34,7 +34,7 @@ class RegisterAktivitetClient(
     ): List<AktivitetArenaDto> {
         val uriVariables = mutableMapOf<String, Any>("fom" to fom, "tom" to tom)
         try {
-            return postForEntity(uriAktiviteter, IdentRequest(ident), uriVariables = uriVariables)
+            return restTemplate.postForEntity(uriAktiviteter, IdentRequest(ident), uriVariables = uriVariables)
         } catch (e: Exception) {
             throw IntegrasjonException(
                 hendelse = "henting av aktiviteter",

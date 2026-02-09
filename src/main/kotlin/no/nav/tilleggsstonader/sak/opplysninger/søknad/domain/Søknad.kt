@@ -90,6 +90,12 @@ data class SøknadLæremidler(
     override val data: SkjemaLæremidler,
 ) : Søknad<SkjemaLæremidler>
 
+data class SkjemaLæremidler(
+    val hovedytelse: HovedytelseAvsnitt,
+    val utdanning: UtdanningAvsnitt,
+    val dokumentasjon: List<Dokumentasjon>,
+)
+
 @Table("soknad")
 data class SøknadBoutgifter(
     @Id
@@ -115,12 +121,6 @@ data class SøknadDagligReise(
     override val sporbar: Sporbar = Sporbar(),
     override val data: SkjemaDagligReise,
 ) : Søknad<SkjemaDagligReise>
-
-data class SkjemaLæremidler(
-    val hovedytelse: HovedytelseAvsnitt,
-    val utdanning: UtdanningAvsnitt,
-    val dokumentasjon: List<Dokumentasjon>,
-)
 
 data class UtdanningAvsnitt(
     val aktiviteter: List<ValgtAktivitet>?,

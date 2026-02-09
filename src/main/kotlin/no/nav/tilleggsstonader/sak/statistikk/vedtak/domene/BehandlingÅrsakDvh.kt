@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 
 enum class BehandlingÅrsakDvh {
+    KJØRELISTE,
     KLAGE,
     NYE_OPPLYSNINGER,
     SØKNAD,
@@ -16,6 +17,7 @@ enum class BehandlingÅrsakDvh {
     companion object {
         fun fraDomene(årsak: BehandlingÅrsak) =
             when (årsak) {
+                BehandlingÅrsak.KJØRELISTE -> KJØRELISTE
                 BehandlingÅrsak.KLAGE -> KLAGE
                 BehandlingÅrsak.NYE_OPPLYSNINGER -> NYE_OPPLYSNINGER
                 BehandlingÅrsak.SØKNAD -> SØKNAD

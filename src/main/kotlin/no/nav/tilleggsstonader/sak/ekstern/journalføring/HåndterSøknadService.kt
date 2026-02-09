@@ -101,7 +101,9 @@ class HåndterSøknadService(
                     finnStønadstypeForDagligReise(journalpost),
                     Stønadstype.entries.filter { it.gjelderDagligReise() },
                 )
-            Skjematype.DAGLIG_REISE_KJØRELISTE -> TODO()
+
+            Skjematype.DAGLIG_REISE_KJØRELISTE ->
+                error("Skal ikke behandle kjøreliste")
         }
     }
 
@@ -114,8 +116,9 @@ class HåndterSøknadService(
             }
         }
 
-        // Alle daglige reiser støknader legges på TSO fra fyll ut send inn
-        val søknadsskjema = journalpostService.hentSøknadFraJournalpost(journalpost, Stønadstype.DAGLIG_REISE_TSO)
+        // Alle daglige reiser stønader legges på TSO fra fyll ut send inn
+        val søknadsskjema =
+            journalpostService.hentSøknadFraJournalpost(journalpost, Stønadstype.DAGLIG_REISE_TSO)
         val søknad = søknadService.mapSøknad(søknadsskjema, journalpost)
 
         if (søknad !is SøknadDagligReise) {

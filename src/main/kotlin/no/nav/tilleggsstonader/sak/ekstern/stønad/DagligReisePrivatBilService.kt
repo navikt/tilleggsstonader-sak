@@ -6,10 +6,10 @@ import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakUkeDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import org.springframework.stereotype.Service
 
@@ -21,31 +21,27 @@ class DagligReisePrivatBilService(
     private val vedtakService: VedtakService,
 ) {
     fun hentRammevedtaksPrivatBil(ident: IdentRequest): List<RammevedtakDto> =
-        hentRammevedtakPåBruker(ident).flatMap {
-            mapRammevedtakTilDto(it)
-        }
+        hentRammevedtakPåIdent(ident.ident)
+            .mapNotNull { it.data.rammevedtakPrivatBil }
+            .flatMap { mapRammevedtakTilDto(it) }
 
-    private fun hentRammevedtakPåBruker(ident: IdentRequest): List<RammevedtakPrivatBil> {
+    fun hentRammevedtakPåIdent(ident: String): List<GeneriskVedtak<InnvilgelseEllerOpphørDagligReise>> {
         val alleIdenterPåPerson =
             personService
-                .hentFolkeregisterIdenter(ident.ident)
+                .hentFolkeregisterIdenter(ident)
                 .identer
                 .map { it.ident }
                 .toSet()
         val fagsakPerson = fagsakPersonService.finnPerson(alleIdenterPåPerson)
 
-        brukerfeilHvis(fagsakPerson == null) {
-            "Fant ingen fagsakperson for ident"
-        }
-
         val iverksatteBehandlingIder =
             behandlingRepository.finnSisteIverksatteBehandlingerForFagsakPersonId(
-                fagsakPersonId = fagsakPerson.id,
+                fagsakPersonId = fagsakPerson?.id!!,
                 stønadstyper = listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
             )
 
         return iverksatteBehandlingIder.mapNotNull {
-            vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(it)?.data?.rammevedtakPrivatBil
+            vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(it)
         }
     }
 }
@@ -53,7 +49,7 @@ class DagligReisePrivatBilService(
 private fun mapRammevedtakTilDto(rammevedtak: RammevedtakPrivatBil): List<RammevedtakDto> =
     rammevedtak.reiser.map { reise ->
         RammevedtakDto(
-            id = reise.reiseId,
+            reiseId = reise.reiseId,
             fom = reise.grunnlag.fom,
             tom = reise.grunnlag.tom,
             reisedagerPerUke = reise.grunnlag.reisedagerPerUke,

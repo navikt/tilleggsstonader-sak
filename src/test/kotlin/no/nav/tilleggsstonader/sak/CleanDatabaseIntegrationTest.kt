@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.migrering.routing.SkjemaRouting
 import no.nav.tilleggsstonader.sak.oppfølging.Oppfølging
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlag
+import no.nav.tilleggsstonader.sak.opplysninger.kjøreliste.Kjøreliste
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
@@ -77,6 +78,7 @@ abstract class CleanDatabaseIntegrationTest : IntegrationTest() {
             Behandlingsjournalpost::class,
             EksternBehandlingId::class,
             TilbakekrevingHendelse::class,
+            Kjøreliste::class,
             Behandling::class,
             EksternFagsakId::class,
             FagsakDomain::class,

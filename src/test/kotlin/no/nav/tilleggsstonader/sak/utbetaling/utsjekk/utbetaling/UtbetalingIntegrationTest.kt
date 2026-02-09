@@ -2,6 +2,8 @@ package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.august
+import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
@@ -24,6 +26,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatus
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatusHåndterer
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatusRecord
 import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -126,5 +129,44 @@ class UtbetalingIntegrationTest : CleanDatabaseIntegrationTest() {
         val andelerRevurdering = tilkjentYtelseRepository.findByBehandlingId(revurderingId)!!.andelerTilkjentYtelse
         Assertions.assertThat(andelerRevurdering).hasSize(1)
         Assertions.assertThat(andelerRevurdering.single().erNullandel()).isTrue
+    }
+
+    @Test
+    fun `utbetalingsperioder sendt til helved skal matche periode i andelene`() {
+        val fom = 9 august 2025
+        val tom = 9 desember 2025
+
+        val behandlingId =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.BARNETILSYN,
+            ) {
+                defaultTilsynBarnTestdata(fom, tom)
+            }
+
+        val andeler =
+            tilkjentYtelseRepository
+                .findByBehandlingId(behandlingId)!!
+                .andelerTilkjentYtelse
+                .sortedBy { it.fom }
+
+        val sendtUtbetaling =
+            KafkaTestConfig
+                .sendteMeldinger()
+                .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
+                .single()
+                .verdiEllerFeil<IverksettingDto>()
+
+        assertThat(sendtUtbetaling.utbetalinger).hasSize(1)
+        assertThat(sendtUtbetaling.utbetalinger.single().perioder).hasSize(andeler.size)
+
+        val sortertePerioderSendtTilØkonomi =
+            sendtUtbetaling.utbetalinger
+                .single()
+                .perioder
+                .sortedBy { it.fom }
+        andeler.forEachIndexed { index, andelTilkjentYtelse ->
+            assertThat(andelTilkjentYtelse.fom).isEqualTo(sortertePerioderSendtTilØkonomi[index].fom)
+            assertThat(andelTilkjentYtelse.tom).isEqualTo(sortertePerioderSendtTilØkonomi[index].tom)
+        }
     }
 }

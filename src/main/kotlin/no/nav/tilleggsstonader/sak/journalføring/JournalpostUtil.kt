@@ -9,6 +9,17 @@ import no.nav.tilleggsstonader.libs.utils.CollectionUtil.singleOrNullOrError
 
 fun Journalpost.erInnkommende(): Boolean = journalposttype == Journalposttype.I
 
+fun Journalpost.gjelderSøknad() =
+    this.dokumentBrevkode() in
+        listOf(
+            DokumentBrevkode.LÆREMIDLER,
+            DokumentBrevkode.BOUTGIFTER,
+            DokumentBrevkode.BARNETILSYN,
+            DokumentBrevkode.DAGLIG_REISE,
+        )
+
+fun Journalpost.gjelderKjøreliste() = this.dokumentBrevkode() == DokumentBrevkode.DAGLIG_REISE_KJØRELISTE
+
 /**
  * Finner brevkode for orginaldokument
  */

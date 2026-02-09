@@ -3,16 +3,15 @@ package no.nav.tilleggsstonader.sak.hendelser.journalføring
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
-import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.BARNETILSYN
-import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.BOUTGIFTER
-import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.DAGLIG_REISE
-import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode.LÆREMIDLER
+import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterMottattKjørelisteService
 import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterSøknadService
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.journalføring.brevkoder
 import no.nav.tilleggsstonader.sak.journalføring.dokumentBrevkode
 import no.nav.tilleggsstonader.sak.journalføring.erInnkommende
 import no.nav.tilleggsstonader.sak.journalføring.gjelderKanalSkanningEllerNavNo
+import no.nav.tilleggsstonader.sak.journalføring.gjelderKjøreliste
+import no.nav.tilleggsstonader.sak.journalføring.gjelderSøknad
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -25,6 +24,7 @@ class JournalhendelseKafkaHåndtererService(
     private val journalpostService: JournalpostService,
     private val håndterSøknadService: HåndterSøknadService,
     private val journalpostMottattMetrikker: JournalpostMottattMetrikker,
+    private val håndterMottattKjørelisteService: HåndterMottattKjørelisteService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -33,7 +33,7 @@ class JournalhendelseKafkaHåndtererService(
 
         if (journalpost.kanBehandles()) {
             logSkalBehandles(journalpost, kanBehandles = true)
-            håndterSøknadService.håndterSøknad(journalpost)
+            behandleMottattJournalpost(journalpost)
         } else if (journalpost.erInnkommende()) {
             logSkalBehandles(journalpost, kanBehandles = false)
         }
@@ -45,11 +45,21 @@ class JournalhendelseKafkaHåndtererService(
         }
     }
 
+    private fun behandleMottattJournalpost(journalpost: Journalpost) {
+        if (journalpost.gjelderSøknad()) {
+            håndterSøknadService.håndterSøknad(journalpost)
+        } else if (journalpost.gjelderKjøreliste()) {
+            håndterMottattKjørelisteService.behandleKjøreliste(journalpost)
+        } else {
+            error("Kan ikke behandle journalpost med brevkode ${journalpost.dokumentBrevkode()}")
+        }
+    }
+
     private fun Journalpost.kanBehandles() =
         Tema.gjelderTemaTilleggsstønader(this.tema) &&
             this.erInnkommende() &&
             this.gjelderKanalSkanningEllerNavNo() &&
-            this.dokumentBrevkode() in listOf(BARNETILSYN, LÆREMIDLER, BOUTGIFTER, DAGLIG_REISE) &&
+            (this.gjelderSøknad() || this.gjelderKjøreliste()) &&
             !this.erFerdigstilt()
 
     /*
