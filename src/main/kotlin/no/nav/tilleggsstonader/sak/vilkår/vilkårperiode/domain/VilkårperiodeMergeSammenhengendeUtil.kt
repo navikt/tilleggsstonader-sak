@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
@@ -34,6 +35,19 @@ fun List<Vilkårperiode>.mergeSammenhengendeOppfylteFaktiskeMålgrupper(): Map<F
         .groupBy {
             require(it.type is MålgruppeType) { "${it.type} er ikke av type ${MålgruppeType::class.simpleName}" }
             it.type.faktiskMålgruppe()
+        }.mapValues {
+            it.value
+                .sorted()
+                .map { Datoperiode(fom = it.fom, tom = it.tom) }
+                .mergeSammenhengende { a, b -> a.overlapperEllerPåfølgesAv(b) }
+        }
+
+fun List<Vilkårperiode>.mergeSammenhengendeOppfylteAktiviteterMedLikTypeAktivitet(): Map<TypeAktivitet, List<Datoperiode>> =
+    this
+        .filter { it.resultat == ResultatVilkårperiode.OPPFYLT && it.typeAktivitet != null }
+        .groupBy {
+            require(it.typeAktivitet is TypeAktivitet) { "${it.type} er ikke av type ${TypeAktivitet::class.simpleName}" }
+            it.typeAktivitet
         }.mapValues {
             it.value
                 .sorted()

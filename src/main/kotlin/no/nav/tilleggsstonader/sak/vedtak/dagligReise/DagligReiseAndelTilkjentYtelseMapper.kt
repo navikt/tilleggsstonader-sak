@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
@@ -58,8 +59,10 @@ private fun lagAndelForDagligReise(
                 målgruppe.tilTypeAndel(saksbehandling.stønadstype)
             }
             Stønadstype.DAGLIG_REISE_TSR -> {
-                // Validert i funksjon over at den ikke er null for TSR
-                finnTypeAndelFraTypeAktivitet(typeAktivitet!!)
+                feilHvis(typeAktivitet == null) {
+                    "Variant/Typeaktivitet skal alltid være satt for Daglig Reise Tsr. Var $typeAktivitet"
+                }
+                finnTypeAndelFraTypeAktivitet(typeAktivitet)
             }
             else -> {
                 error("Uforventet stønadstype ${saksbehandling.stønadstype}")

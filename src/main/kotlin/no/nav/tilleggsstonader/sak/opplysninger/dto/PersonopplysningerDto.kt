@@ -13,6 +13,7 @@ data class PersonopplysningerDto(
     val adressebeskyttelse: Adressebeskyttelse,
     val erSkjermet: Boolean,
     val dødsdato: LocalDate?,
+    val alder: Int,
     val harGeografiskTilknytningUtland: Boolean,
 )
 

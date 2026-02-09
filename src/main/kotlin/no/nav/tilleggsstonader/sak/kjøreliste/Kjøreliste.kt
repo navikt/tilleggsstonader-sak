@@ -1,7 +1,6 @@
-package no.nav.tilleggsstonader.sak.opplysninger.kjøreliste
+package no.nav.tilleggsstonader.sak.kjøreliste
 
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
-import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column

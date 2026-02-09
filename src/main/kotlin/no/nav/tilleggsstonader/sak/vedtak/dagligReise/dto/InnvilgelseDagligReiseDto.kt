@@ -1,8 +1,10 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto
 
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import java.time.LocalDate
 
 /**
@@ -18,7 +20,22 @@ data class InnvilgelseDagligReiseResponse(
 ) : VedtakDagligReiseDto(TypeVedtak.INNVILGELSE),
     VedtakDagligReiseResponse
 
-data class InnvilgelseDagligReiseRequest(
+sealed interface InnvilgelseDagligReiseRequest : VedtakDagligReiseRequest {
+    val begrunnelse: String?
+
+    fun vedtaksperioder(): List<Vedtaksperiode>
+}
+
+data class InnvilgelseDagligReiseTsoRequest(
     val vedtaksperioder: List<VedtaksperiodeDto>,
-    val begrunnelse: String? = null,
-) : VedtakDagligReiseRequest
+    override val begrunnelse: String? = null,
+) : InnvilgelseDagligReiseRequest {
+    override fun vedtaksperioder(): List<Vedtaksperiode> = vedtaksperioder.tilDomene()
+}
+
+data class InnvilgelseDagligReiseTsrRequest(
+    val vedtaksperioder: List<VedtaksperiodeDagligReiseTsrDto>,
+    override val begrunnelse: String? = null,
+) : InnvilgelseDagligReiseRequest {
+    override fun vedtaksperioder(): List<Vedtaksperiode> = vedtaksperioder.tilDomene()
+}

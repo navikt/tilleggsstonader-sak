@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.fullmakt.FullmaktService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
+import no.nav.tilleggsstonader.sak.util.antallÅrSiden
 import org.springframework.stereotype.Service
 
 @Service
@@ -36,6 +37,9 @@ class PersonopplysningerService(
         return PersonopplysningerDto(
             personIdent = ident,
             navn = pdlSøker.navn.gjeldende().let { NavnDto.fraNavn(it) },
+            alder =
+                antallÅrSiden(pdlSøker.fødselsdato.gjeldende().fødselsdato)
+                    ?: error("Forventer at fødselsdato skal finnes på alle brukere"),
             harVergemål =
                 pdlSøker.vergemaalEllerFremtidsfullmakt
                     .any { it.type != "stadfestetFremtidsfullmakt" },

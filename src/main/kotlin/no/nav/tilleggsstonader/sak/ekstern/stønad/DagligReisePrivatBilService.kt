@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakUkeDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
@@ -50,7 +49,7 @@ class DagligReisePrivatBilService(
 private fun mapRammevedtakTilDto(rammevedtak: RammevedtakPrivatBil): List<RammevedtakDto> =
     rammevedtak.reiser.map { reise ->
         RammevedtakDto(
-            id = reise.reiseId,
+            reiseId = reise.reiseId,
             fom = reise.grunnlag.fom,
             tom = reise.grunnlag.tom,
             reisedagerPerUke = reise.grunnlag.reisedagerPerUke,
