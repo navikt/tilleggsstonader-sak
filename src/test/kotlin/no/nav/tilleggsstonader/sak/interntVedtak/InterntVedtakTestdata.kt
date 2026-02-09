@@ -61,6 +61,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBa
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetDagligReiseTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
@@ -130,6 +131,23 @@ object InterntVedtakTestdata {
                         medlemskap = vurderingMedlemskap(SvarJaNei.JA),
                         dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(svar = null),
                         mottarSykepengerForFulltidsstilling = vurderingMottarSykepengerForFulltidsstilling(SvarJaNei.NEI),
+                    ),
+                fom = LocalDate.of(2024, 2, 5),
+                tom = LocalDate.of(2024, 2, 10),
+            ),
+        )
+
+    private val målgrupperTsr: List<VilkårperiodeMålgruppe> =
+        listOf(
+            VilkårperiodeTestUtil.målgruppe(
+                begrunnelse = "målgruppe dagpenger",
+                faktaOgVurdering =
+                    faktaOgVurderingMålgruppe(
+                        type = MålgruppeType.DAGPENGER,
+                        medlemskap = vurderingMedlemskap(SvarJaNei.JA_IMPLISITT),
+                        dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(SvarJaNei.NEI),
+                        aldersvilkår = vurderingAldersVilkår(),
+                        mottarSykepengerForFulltidsstilling = vurderingMottarSykepengerForFulltidsstilling(SvarJaNei.NEI_IMPLISITT),
                     ),
                 fom = LocalDate.of(2024, 2, 5),
                 tom = LocalDate.of(2024, 2, 10),
@@ -611,6 +629,8 @@ object InterntVedtakTestdata {
     object DagligReise {
         val fagsak =
             fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()), stønadstype = Stønadstype.DAGLIG_REISE_TSO)
+        val fagsakTsr =
+            fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()), stønadstype = Stønadstype.DAGLIG_REISE_TSR)
         val behandling =
             saksbehandling(
                 behandling =
@@ -623,6 +643,19 @@ object InterntVedtakTestdata {
                         type = BehandlingType.FØRSTEGANGSBEHANDLING,
                     ),
                 fagsak = fagsak,
+            )
+        val behandlingTsr =
+            saksbehandling(
+                behandling =
+                    behandling(
+                        id = behandlingId,
+                        vedtakstidspunkt = LocalDate.of(2024, 2, 5).atStartOfDay(),
+                        opprettetTid = LocalDate.of(2024, 2, 10).atStartOfDay(),
+                        fagsak = fagsakTsr,
+                        resultat = BehandlingResultat.INNVILGET,
+                        type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    ),
+                fagsak = fagsakTsr,
             )
         private val aktivitetererDagligReiseTso =
             listOf(
@@ -645,16 +678,8 @@ object InterntVedtakTestdata {
                 VilkårperiodeTestUtil.aktivitet(
                     fom = LocalDate.of(2024, 2, 5),
                     tom = LocalDate.of(2024, 2, 10),
-                    faktaOgVurdering = faktaOgVurderingAktivitetDagligReiseTso(),
+                    faktaOgVurdering = faktaOgVurderingAktivitetDagligReiseTsr(),
                     typeAktivitet = TypeAktivitet.GRUPPEAMO,
-                ),
-                VilkårperiodeTestUtil.aktivitet(
-                    fom = LocalDate.of(2024, 2, 5),
-                    tom = LocalDate.of(2024, 2, 10),
-                    resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
-                    begrunnelse = "ikke oppfylt",
-                    faktaOgVurdering = faktaOgVurderingAktivitetDagligReiseTso(type = AktivitetType.UTDANNING),
-                    typeAktivitet = TypeAktivitet.ENKELAMO,
                 ),
             )
 
@@ -666,7 +691,7 @@ object InterntVedtakTestdata {
 
         val vilkårperioderTsr =
             Vilkårperioder(
-                målgrupper = målgrupper,
+                målgrupper = målgrupperTsr,
                 aktiviteter = aktivitetererDagligReiseTsr,
             )
 
@@ -745,7 +770,6 @@ object InterntVedtakTestdata {
                                 ),
                             ),
                     ),
-                privatBil = null,
             )
 
         val vedtaksperioderTso =
@@ -785,6 +809,7 @@ object InterntVedtakTestdata {
                 InnvilgelseDagligReise(
                     vedtaksperioder = vedtaksperioder,
                     beregningsresultat = beregningsresultatDagligReise,
+                    rammevedtakPrivatBil = null,
                     begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
                 ),
             gitVersjon = Applikasjonsversjon.versjon,

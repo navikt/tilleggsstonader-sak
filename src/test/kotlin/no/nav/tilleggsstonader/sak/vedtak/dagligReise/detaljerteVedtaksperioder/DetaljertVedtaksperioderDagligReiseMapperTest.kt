@@ -121,6 +121,7 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                 vedtaksperiode(fom = fom, tom = tom),
             ),
         beregningsresultat = lagBeregningsresultatMedToReiser(fom, tom),
+        rammevedtakPrivatBil = null,
     )
 
     private fun detaljertVedtaksperiodeDagligReiseTso(
@@ -161,6 +162,7 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                 vedtaksperiode(fom = fom2, tom = tom2),
             ),
         beregningsresultat = lagBeregningsresultatMedToPerioder(fom1, tom1, fom2, tom2),
+        rammevedtakPrivatBil = null,
     )
 
     private fun lagBeregningsresultatMedToReiser(
@@ -187,7 +189,6 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                         ),
                     ),
             ),
-        privatBil = null,
     )
 
     private fun lagBeregningsresultatMedToPerioder(
@@ -210,7 +211,6 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                         ),
                     ),
             ),
-        privatBil = null,
     )
 
     val defaultVedtaksperioder =
@@ -236,12 +236,12 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                             ),
                         ),
                 ),
-            privatBil = null,
         )
     val defaultInnvilgelseDagligReise =
         InnvilgelseDagligReise(
             vedtaksperioder = defaultVedtaksperioder,
             beregningsresultat = defaultBeregningsresultat,
+            rammevedtakPrivatBil = null,
         )
 
     fun vedtaksperiode(

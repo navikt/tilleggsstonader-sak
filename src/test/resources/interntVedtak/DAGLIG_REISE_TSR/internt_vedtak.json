@@ -2,7 +2,7 @@
   "behandling" : {
     "behandlingId" : "001464ca-20dc-4f6c-b3e8-c83bd98b3e31",
     "eksternFagsakId" : 1673,
-    "stønadstype" : "DAGLIG_REISE_TSO",
+    "stønadstype" : "DAGLIG_REISE_TSR",
     "årsak" : "SØKNAD",
     "ident" : "15",
     "opprettetTidspunkt" : "2024-02-10T00:00:00",
@@ -15,78 +15,19 @@
     "mottattTidspunkt" : "2023-01-01T00:00:00"
   },
   "målgrupper" : [ {
-    "type" : "AAP",
+    "type" : "DAGPENGER",
     "fom" : "2024-02-05",
     "tom" : "2024-02-10",
     "faktaOgVurderinger" : {
       "@type" : "MÅLGRUPPE",
-      "medlemskap" : {
-        "svar" : "JA_IMPLISITT",
-        "resultat" : "OPPFYLT"
-      },
-      "utgifterDekketAvAnnetRegelverk" : {
-        "svar" : "NEI",
-        "resultat" : "OPPFYLT"
-      },
-      "aldersvilkår" : {
-        "svar" : "JA",
-        "resultat" : "OPPFYLT"
-      },
-      "mottarSykepengerForFulltidsstilling" : {
-        "svar" : "NEI_IMPLISITT",
-        "resultat" : "OPPFYLT"
-      }
-    },
-    "kilde" : "MANUELL",
-    "resultat" : "OPPFYLT",
-    "begrunnelse" : "målgruppe aap",
-    "slettetKommentar" : null,
-    "tiltaksvariant" : null
-  }, {
-    "type" : "OVERGANGSSTØNAD",
-    "fom" : "2024-02-05",
-    "tom" : "2024-02-10",
-    "faktaOgVurderinger" : {
-      "@type" : "MÅLGRUPPE",
-      "medlemskap" : {
-        "svar" : "JA_IMPLISITT",
-        "resultat" : "OPPFYLT"
-      },
+      "medlemskap" : null,
       "utgifterDekketAvAnnetRegelverk" : null,
       "aldersvilkår" : null,
       "mottarSykepengerForFulltidsstilling" : null
     },
     "kilde" : "MANUELL",
     "resultat" : "OPPFYLT",
-    "begrunnelse" : "målgruppe os",
-    "slettetKommentar" : null,
-    "tiltaksvariant" : null
-  }, {
-    "type" : "NEDSATT_ARBEIDSEVNE",
-    "fom" : "2024-02-05",
-    "tom" : "2024-02-10",
-    "faktaOgVurderinger" : {
-      "@type" : "MÅLGRUPPE",
-      "medlemskap" : {
-        "svar" : "JA",
-        "resultat" : "OPPFYLT"
-      },
-      "utgifterDekketAvAnnetRegelverk" : {
-        "svar" : null,
-        "resultat" : "IKKE_VURDERT"
-      },
-      "aldersvilkår" : {
-        "svar" : "JA",
-        "resultat" : "OPPFYLT"
-      },
-      "mottarSykepengerForFulltidsstilling" : {
-        "svar" : "NEI",
-        "resultat" : "OPPFYLT"
-      }
-    },
-    "kilde" : "MANUELL",
-    "resultat" : "IKKE_VURDERT",
-    "begrunnelse" : "målgruppe na",
+    "begrunnelse" : "målgruppe dagpenger",
     "slettetKommentar" : null,
     "tiltaksvariant" : null
   } ],
@@ -95,11 +36,7 @@
     "fom" : "2024-02-05",
     "tom" : "2024-02-10",
     "faktaOgVurderinger" : {
-      "@type" : "AktivitetDagligReiseTsoFaktaOgVurderingerDto",
-      "lønnet" : {
-        "svar" : "NEI",
-        "resultat" : "OPPFYLT"
-      },
+      "@type" : "AktivitetDagligReiseTsrFaktaOgVurderingerDto",
       "harUtgifter" : {
         "svar" : "JA",
         "resultat" : "OPPFYLT"
@@ -111,21 +48,6 @@
     "begrunnelse" : null,
     "slettetKommentar" : null,
     "tiltaksvariant" : "Gruppe AMO"
-  }, {
-    "type" : "UTDANNING",
-    "fom" : "2024-02-05",
-    "tom" : "2024-02-10",
-    "faktaOgVurderinger" : {
-      "@type" : "AktivitetDagligReiseTsoFaktaOgVurderingerDto",
-      "lønnet" : null,
-      "harUtgifter" : null,
-      "aktivitetsdager" : 3
-    },
-    "kilde" : "MANUELL",
-    "resultat" : "IKKE_OPPFYLT",
-    "begrunnelse" : "ikke oppfylt",
-    "slettetKommentar" : null,
-    "tiltaksvariant" : "Enkeltplass AMO"
   } ],
   "vedtaksperioder" : [ {
     "fom" : "2024-01-01",

@@ -18,6 +18,7 @@ object OppgaveUtil {
             Enhet.NAV_TILTAK_OSLO.enhetsnr,
             Enhet.NAV_ARBEID_OG_YTELSER_EGNE_ANSATTE.enhetsnr,
             Enhet.VIKAFOSSEN.enhetsnr,
+            Enhet.NAV_EGNE_ANSATTE_OSLO.enhetsnr,
         )
 
     fun utledBehandlesAvApplikasjon(oppgavetype: Oppgavetype) =

@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.IdConverters.alleValueClassConverters
 import no.nav.tilleggsstonader.sak.oppfølging.OppfølgingData
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagData
+import no.nav.tilleggsstonader.sak.opplysninger.kjøreliste.InnsendtKjøreliste
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.SkjemaBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.SkjemaDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
@@ -124,6 +125,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
             VilkårFaktaDataWriter(),
             TilbakekrevingJsonDataReader(),
             TilbakekrevingJsonDataWriter(),
+            InnsendtKjørelisteReader(),
+            InnsendtKjørelisteWriter(),
         ) + alleVedtaksstatistikkJsonConverters +
             alleValueClassConverters
 
@@ -248,4 +251,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     class TilbakekrevingJsonDataReader : JsonReader<TilbakekrevingJson>(TilbakekrevingJson::class)
 
     class TilbakekrevingJsonDataWriter : JsonWriter<TilbakekrevingJson>()
+
+    class InnsendtKjørelisteReader : JsonReader<InnsendtKjøreliste>(InnsendtKjøreliste::class)
+
+    class InnsendtKjørelisteWriter : JsonWriter<InnsendtKjøreliste>()
 }

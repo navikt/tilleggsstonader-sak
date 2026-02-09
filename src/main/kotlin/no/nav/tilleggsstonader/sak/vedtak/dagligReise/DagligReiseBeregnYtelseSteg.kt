@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -58,14 +57,14 @@ class DagligReiseBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         vedtak: InnvilgelseDagligReiseRequest,
     ) {
-        val vedtaksperioder = vedtak.vedtaksperioder.tilDomene()
+        val vedtaksperioder = vedtak.vedtaksperioder()
 
         val tidligsteEndring =
             utledTidligsteEndringService.utledTidligsteEndringForBeregning(
                 saksbehandling.id,
                 vedtaksperioder,
             )
-        val beregningsresultat =
+        val (beregningsresultat, _) =
             beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
@@ -75,6 +74,7 @@ class DagligReiseBeregnYtelseSteg(
         dagligReiseVedtakService.lagreInnvilgetVedtak(
             behandling = saksbehandling,
             beregningsresultat = beregningsresultat,
+            rammevedtakPrivatBil = null,
             vedtaksperioder = vedtaksperioder,
             begrunnelse = vedtak.begrunnelse,
             tidligsteEndring = tidligsteEndring,
@@ -112,7 +112,7 @@ class DagligReiseBeregnYtelseSteg(
 
         val avkortetVedtaksperioder = dagligReiseVedtakService.avkortVedtaksperiodeVedOpphør(forrigeVedtak, opphørsdato)
 
-        val beregningsresultat =
+        val (beregningsresultat, _) =
             beregningService.beregn(
                 vedtaksperioder = avkortetVedtaksperioder,
                 behandling = saksbehandling,
@@ -124,7 +124,13 @@ class DagligReiseBeregnYtelseSteg(
             opphørsdato,
         )
 
-        dagligReiseVedtakService.lagreOpphørsvedtak(saksbehandling, beregningsresultat, avkortetVedtaksperioder, vedtak)
+        dagligReiseVedtakService.lagreOpphørsvedtak(
+            saksbehandling = saksbehandling,
+            beregningsresultat = beregningsresultat,
+            rammevedtakPrivatBil = null,
+            avkortetVedtaksperioder = avkortetVedtaksperioder,
+            vedtak = vedtak,
+        )
 
         tilkjentYtelseService.lagreTilkjentYtelse(
             behandlingId = saksbehandling.id,

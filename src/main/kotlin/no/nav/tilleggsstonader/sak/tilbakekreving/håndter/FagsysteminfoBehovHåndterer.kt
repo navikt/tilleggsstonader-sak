@@ -69,7 +69,8 @@ class FagsysteminfoBehovHåndterer(
         kafkaKey: String,
         fagsystemBehovMelding: TilbakekrevingFagsysteminfoBehov,
     ) {
-        val referanse = fagsystemBehovMelding.kravgrunnlagReferanse ?: error("Ikke mottatt referanse fra tilbakekreving")
+        val referanse =
+            fagsystemBehovMelding.kravgrunnlagReferanse ?: error("Ikke mottatt referanse fra tilbakekreving")
 
         logger.info(
             "Mottatt hendelse ${fagsystemBehovMelding.hendelsestype} fra tilbakekreving for behandlingId=$referanse og fagsak=${fagsystemBehovMelding.eksternFagsakId}",
@@ -115,7 +116,9 @@ class FagsysteminfoBehovHåndterer(
         saksbehandling: Saksbehandling,
         eksternBehandlingId: String,
     ): TilbakekrevingFagsysteminfoSvarRevurdering {
-        val vedtak = vedtakService.hentVedtak(saksbehandling.id) ?: error("Finner ikke vedtak for behandling ${saksbehandling.id}")
+        val vedtak =
+            vedtakService.hentVedtak(saksbehandling.id)
+                ?: error("Finner ikke vedtak for behandling ${saksbehandling.id}")
 
         return TilbakekrevingFagsysteminfoSvarRevurdering(
             behandlingId = eksternBehandlingId,
@@ -139,6 +142,7 @@ class FagsysteminfoBehovHåndterer(
             BehandlingÅrsak.SØKNAD,
             BehandlingÅrsak.PAPIRSØKNAD,
             BehandlingÅrsak.SATSENDRING,
+            BehandlingÅrsak.KJØRELISTE,
             -> TilbakekrevingRevurderingÅrsak.UKJENT
         }
 

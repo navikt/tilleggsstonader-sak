@@ -28,6 +28,7 @@ import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import no.nav.tilleggsstonader.sak.klage.KlageClient
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
+import no.nav.tilleggsstonader.sak.util.`KjørelisteSkjemaUtil`.`kjørelisteSkjema`
 import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil.søknadBoutgifter
 import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil.søknadDagligReise
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaBarnetilsyn
@@ -39,7 +40,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate
 
 class JournalpostControllerTest(
@@ -74,7 +74,16 @@ class JournalpostControllerTest(
                                 aksjon = JournalføringRequest.Journalføringsaksjon.OPPRETT_BEHANDLING,
                                 årsak = JournalføringRequest.Journalføringsårsak.DIGITAL_SØKNAD,
                                 oppgaveId = oppgave.id.toString(),
-                                logiskeVedlegg = mapOf(dokumentInfoId to listOf(LogiskVedlegg(dokumentInfoId, "ny tittel"))),
+                                logiskeVedlegg =
+                                    mapOf(
+                                        dokumentInfoId to
+                                            listOf(
+                                                LogiskVedlegg(
+                                                    dokumentInfoId,
+                                                    "ny tittel",
+                                                ),
+                                            ),
+                                    ),
                             ),
                     )
                 }
@@ -97,9 +106,19 @@ class JournalpostControllerTest(
             assertThat(
                 mockClientService.journalpostClient.hentJournalpost(journalpostId).journalstatus,
             ).isEqualTo(Journalstatus.FERDIGSTILT)
-            assertThat(oppgaveRepository.findByBehandlingId(opprettetBehandling.id).filter { it.erBehandlingsoppgave() }).hasSize(1)
+            assertThat(
+                oppgaveRepository
+                    .findByBehandlingId(opprettetBehandling.id)
+                    .filter { it.erBehandlingsoppgave() },
+            ).hasSize(1)
 
-            verify(exactly = 1) { journalpostClient.ferdigstillJournalpost(journalpostId, oppgave.tildeltEnhetsnr!!, saksbehandler) }
+            verify(exactly = 1) {
+                journalpostClient.ferdigstillJournalpost(
+                    journalpostId,
+                    oppgave.tildeltEnhetsnr!!,
+                    saksbehandler,
+                )
+            }
             verify(exactly = 1) {
                 journalpostClient.oppdaterLogiskeVedlegg(
                     dokumentInfoId = dokumentInfoId,
@@ -130,7 +149,16 @@ class JournalpostControllerTest(
                                 aksjon = JournalføringRequest.Journalføringsaksjon.OPPRETT_BEHANDLING,
                                 årsak = JournalføringRequest.Journalføringsårsak.KLAGE,
                                 oppgaveId = oppgave.id.toString(),
-                                logiskeVedlegg = mapOf(dokumentInfoId to listOf(LogiskVedlegg(dokumentInfoId, "ny tittel"))),
+                                logiskeVedlegg =
+                                    mapOf(
+                                        dokumentInfoId to
+                                            listOf(
+                                                LogiskVedlegg(
+                                                    dokumentInfoId,
+                                                    "ny tittel",
+                                                ),
+                                            ),
+                                    ),
                             ),
                     )
                 }
@@ -156,7 +184,13 @@ class JournalpostControllerTest(
                 )
             }
 
-            verify(exactly = 1) { journalpostClient.ferdigstillJournalpost(journalpostId, oppgave.tildeltEnhetsnr!!, saksbehandler) }
+            verify(exactly = 1) {
+                journalpostClient.ferdigstillJournalpost(
+                    journalpostId,
+                    oppgave.tildeltEnhetsnr!!,
+                    saksbehandler,
+                )
+            }
             verify(exactly = 1) {
                 journalpostClient.oppdaterLogiskeVedlegg(
                     dokumentInfoId = dokumentInfoId,

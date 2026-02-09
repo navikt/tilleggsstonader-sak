@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler
 
 import no.nav.tilleggsstonader.kontrakter.felles.Saksbehandler
-import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
+import no.nav.tilleggsstonader.libs.http.client.getForEntity
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.Cacheable
@@ -13,8 +13,8 @@ import java.net.URI
 @Component
 class TilordnetSaksbehandlerClient(
     @Value("\${clients.integrasjoner.uri}") private val integrasjonerBaseUrl: URI,
-    @Qualifier("azure") restTemplate: RestTemplate,
-) : AbstractRestClient(restTemplate) {
+    @Qualifier("azure") private val restTemplate: RestTemplate,
+) {
     private val saksbehandlerUri =
         UriComponentsBuilder
             .fromUri(integrasjonerBaseUrl)
@@ -35,6 +35,6 @@ class TilordnetSaksbehandlerClient(
                 "id" to navIdent,
             )
 
-        return getForEntity<Saksbehandler>(uri, null, uriVariables)
+        return restTemplate.getForEntity<Saksbehandler>(uri, null, uriVariables)
     }
 }

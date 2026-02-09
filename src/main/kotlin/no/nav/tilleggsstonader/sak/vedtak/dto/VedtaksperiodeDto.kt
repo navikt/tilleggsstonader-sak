@@ -10,24 +10,15 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 import java.util.UUID
 
-interface VedtaksperiodeDtoInterface : Periode<LocalDate> {
-    val id: UUID
-    override val fom: LocalDate
-    override val tom: LocalDate
-    val målgruppeType: FaktiskMålgruppe
-    val aktivitetType: AktivitetType
-    val typeAktivitet: TypeAktivitet?
-}
-
 data class LagretVedtaksperiodeDto(
-    override val id: UUID,
+    val id: UUID,
     override val fom: LocalDate,
     override val tom: LocalDate,
-    override val målgruppeType: FaktiskMålgruppe,
-    override val aktivitetType: AktivitetType,
-    override val typeAktivitet: TypeAktivitet? = null,
+    val målgruppeType: FaktiskMålgruppe,
+    val aktivitetType: AktivitetType,
+    val typeAktivitet: TypeAktivitet? = null,
     val vedtaksperiodeFraForrigeVedtak: VedtaksperiodeDto?,
-) : VedtaksperiodeDtoInterface,
+) : Periode<LocalDate>,
     KopierPeriode<LagretVedtaksperiodeDto> {
     override fun medPeriode(
         fom: LocalDate,
@@ -46,13 +37,13 @@ data class LagretVedtaksperiodeDto(
 }
 
 data class VedtaksperiodeDto(
-    override val id: UUID = UUID.randomUUID(),
+    val id: UUID = UUID.randomUUID(),
     override val fom: LocalDate,
     override val tom: LocalDate,
-    override val målgruppeType: FaktiskMålgruppe,
-    override val aktivitetType: AktivitetType,
-    override val typeAktivitet: TypeAktivitet? = null,
-) : VedtaksperiodeDtoInterface {
+    val målgruppeType: FaktiskMålgruppe,
+    val aktivitetType: AktivitetType,
+    val typeAktivitet: TypeAktivitet? = null,
+) : Periode<LocalDate> {
     fun tilDomene() =
         Vedtaksperiode(
             id = id,

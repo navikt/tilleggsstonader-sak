@@ -107,12 +107,16 @@ class FaktaGrunnlagService(
         )
     }
 
-    final inline fun <reified TYPE : FaktaGrunnlagData> hentGrunnlag(behandlingId: BehandlingId): List<GeneriskFaktaGrunnlag<TYPE>> =
+    private final inline fun <reified TYPE : FaktaGrunnlagData> hentGrunnlag(
+        behandlingId: BehandlingId,
+    ): List<GeneriskFaktaGrunnlag<TYPE>> =
         hentGrunnlag(behandlingId, TypeFaktaGrunnlag.finnType(TYPE::class))
             .map { faktaGrunnlag -> faktaGrunnlag.withTypeOrThrow<TYPE>() }
 
-    final inline fun <reified TYPE : FaktaGrunnlagData> hentEnkeltGrunnlag(behandlingId: BehandlingId): GeneriskFaktaGrunnlag<TYPE> =
-        hentGrunnlag<TYPE>(behandlingId).single()
+    fun hentPersonopplysningerGrunnlag(behandlingId: BehandlingId) = hentGrunnlag<FaktaGrunnlagPersonopplysninger>(behandlingId).single()
+
+    fun hentFaktaGrunnlagBarnAndreForeldre(behandlingId: BehandlingId) =
+        hentGrunnlag<FaktaGrunnlagBarnAndreForeldreSaksinformasjon>(behandlingId).single()
 
     fun hentGrunnlag(
         behandlingId: BehandlingId,

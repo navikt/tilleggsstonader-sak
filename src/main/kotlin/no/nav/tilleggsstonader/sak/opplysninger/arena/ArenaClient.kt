@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.arena.oppgave.ArenaOppgaveDto
 import no.nav.tilleggsstonader.kontrakter.arena.vedtak.ArenaSakOgVedtakDto
 import no.nav.tilleggsstonader.kontrakter.felles.IdenterRequest
 import no.nav.tilleggsstonader.kontrakter.felles.IdenterStønadstyper
-import no.nav.tilleggsstonader.libs.http.client.AbstractRestClient
+import no.nav.tilleggsstonader.libs.http.client.postForEntity
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -17,8 +17,8 @@ import java.net.URI
 @Service
 class ArenaClient(
     @Value($$"${clients.arena.uri}") private val arenaUri: URI,
-    @Qualifier("azureClientCredential") restTemplate: RestTemplate,
-) : AbstractRestClient(restTemplate) {
+    @Qualifier("azureClientCredential") private val restTemplate: RestTemplate,
+) {
     val statusV2Uri = UriComponentsBuilder.fromUri(arenaUri).pathSegment("api", "status", "v2").toUriString()
 
     val vedtakUri = UriComponentsBuilder.fromUri(arenaUri).pathSegment("api", "vedtak").toUriString()
@@ -27,11 +27,11 @@ class ArenaClient(
 
     val oppgaverUri = UriComponentsBuilder.fromUri(arenaUri).pathSegment("api", "oppgave").toUriString()
 
-    fun hentStatus(request: IdenterStønadstyper): ArenaStatusDto = postForEntity(statusV2Uri, request)
+    fun hentStatus(request: IdenterStønadstyper): ArenaStatusDto = restTemplate.postForEntity(statusV2Uri, request)
 
-    fun hentVedtak(request: IdenterRequest): ArenaSakOgVedtakDto = postForEntity(vedtakUri, request)
+    fun hentVedtak(request: IdenterRequest): ArenaSakOgVedtakDto = restTemplate.postForEntity(vedtakUri, request)
 
-    fun harSaker(request: IdenterRequest): ArenaStatusHarSakerDto = postForEntity(statusHarSakerUri, request)
+    fun harSaker(request: IdenterRequest): ArenaStatusHarSakerDto = restTemplate.postForEntity(statusHarSakerUri, request)
 
-    fun hentOppgaver(request: IdenterRequest): List<ArenaOppgaveDto> = postForEntity(oppgaverUri, request)
+    fun hentOppgaver(request: IdenterRequest): List<ArenaOppgaveDto> = restTemplate.postForEntity(oppgaverUri, request)
 }

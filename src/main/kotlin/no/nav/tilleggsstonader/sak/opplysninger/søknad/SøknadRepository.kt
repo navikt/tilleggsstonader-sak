@@ -55,6 +55,7 @@ interface SøknadBehandlingRepository :
     RepositoryInterface<SøknadBehandling, BehandlingId>,
     InsertUpdateRepository<SøknadBehandling>
 
+@Repository
 interface SøknadDagligReiseRepository :
     RepositoryInterface<SøknadDagligReise, UUID>,
     InsertUpdateRepository<SøknadDagligReise>

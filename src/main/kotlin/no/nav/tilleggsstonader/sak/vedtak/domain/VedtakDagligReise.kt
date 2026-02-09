@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.domain
 
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 
 enum class TypeVedtakDagligReise(
     override val typeVedtak: TypeVedtak,
@@ -22,11 +23,13 @@ sealed interface VedtakDagligReise : Vedtaksdata
 
 sealed interface InnvilgelseEllerOpphørDagligReise : VedtakDagligReise {
     val beregningsresultat: BeregningsresultatDagligReise
+    val rammevedtakPrivatBil: RammevedtakPrivatBil?
     val vedtaksperioder: List<Vedtaksperiode>
 }
 
 data class InnvilgelseDagligReise(
     override val beregningsresultat: BeregningsresultatDagligReise,
+    override val rammevedtakPrivatBil: RammevedtakPrivatBil?,
     override val vedtaksperioder: List<Vedtaksperiode>,
     val begrunnelse: String? = null,
 ) : InnvilgelseEllerOpphørDagligReise,
@@ -53,6 +56,7 @@ data class AvslagDagligReise(
 data class OpphørDagligReise(
     override val vedtaksperioder: List<Vedtaksperiode>,
     override val beregningsresultat: BeregningsresultatDagligReise,
+    override val rammevedtakPrivatBil: RammevedtakPrivatBil?,
     override val årsaker: List<ÅrsakOpphør>,
     override val begrunnelse: String,
 ) : InnvilgelseEllerOpphørDagligReise,

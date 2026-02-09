@@ -1,9 +1,10 @@
 package no.nav.tilleggsstonader.sak.ekstern.stønad.dto
 
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import java.time.LocalDate
 
 data class RammevedtakDto(
-    val id: String,
+    val reiseId: ReiseId,
     val fom: LocalDate,
     val tom: LocalDate,
     val reisedagerPerUke: Int,

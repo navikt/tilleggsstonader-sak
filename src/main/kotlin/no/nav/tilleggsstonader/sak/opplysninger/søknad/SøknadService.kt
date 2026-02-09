@@ -115,7 +115,8 @@ class SøknadService(
                     søknadsskjema,
                 )
 
-            is KjørelisteSkjema -> TODO()
+            is KjørelisteSkjema ->
+                error("${KjørelisteSkjema::class} er ikke en søknad")
         }
 
     fun kopierSøknad(

@@ -12,7 +12,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTranspo
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
@@ -37,7 +37,7 @@ class DagligReiseBeregningService(
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
         tidligsteEndring: LocalDate?,
-    ): BeregningsresultatDagligReise {
+    ): BeregningDagligReise {
         dagligReiseVedtaksperioderValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
@@ -56,16 +56,19 @@ class DagligReiseBeregningService(
                 null
             }
 
-        return BeregningsresultatDagligReise(
-            offentligTransport =
-                beregnOffentligTransport(
-                    oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
-                    vedtaksperioder = vedtaksperioder,
-                    behandling = behandling,
-                    brukersNavKontor = brukersNavKontor,
-                    tidligsteEndring = tidligsteEndring,
+        return BeregningDagligReise(
+            beregningsresultatDagligReise =
+                BeregningsresultatDagligReise(
+                    offentligTransport =
+                        beregnOffentligTransport(
+                            oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
+                            vedtaksperioder = vedtaksperioder,
+                            behandling = behandling,
+                            brukersNavKontor = brukersNavKontor,
+                            tidligsteEndring = tidligsteEndring,
+                        ),
                 ),
-            privatBil =
+            rammevedtakPrivatBil =
                 beregnRammePrivatBil(
                     oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
                     vedtaksperioder = vedtaksperioder,
@@ -106,13 +109,13 @@ class DagligReiseBeregningService(
     private fun beregnRammePrivatBil(
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkårDagligReise: List<VilkårDagligReise>,
-    ): BeregningsresultatPrivatBil? {
+    ): RammevedtakPrivatBil? {
         if (!unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)) return null
 
         val oppfylteVilkårPrivatBil = oppfylteVilkårDagligReise.filter { it.fakta is FaktaPrivatBil }
 
         if (oppfylteVilkårPrivatBil.isEmpty()) return null
-        return privatBilBeregningService.beregn(vedtaksperioder = vedtaksperioder, oppfylteVilkårPrivatBil)
+        return privatBilBeregningService.beregnRammevedtak(vedtaksperioder = vedtaksperioder, oppfylteVilkårPrivatBil)
     }
 }
 
@@ -121,3 +124,8 @@ private fun validerFinnesReiser(vilkår: List<VilkårDagligReise>) {
         "Innvilgelse er ikke et gyldig vedtaksresultat når det ikke er lagt inn perioder med reise"
     }
 }
+
+data class BeregningDagligReise(
+    val beregningsresultatDagligReise: BeregningsresultatDagligReise,
+    val rammevedtakPrivatBil: RammevedtakPrivatBil?,
+)

@@ -13,6 +13,7 @@ data class ReiseMedPrivatBil(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val reiseId: ReiseId,
+    val aktivitetsadresse: String?,
     val reisedagerPerUke: Int,
     val reiseavstandEnVei: BigDecimal,
     val bompengerEnVei: Int?,
@@ -38,5 +39,6 @@ fun VilkårDagligReise.tilReiseMedPrivatBil(): ReiseMedPrivatBil {
         reiseavstandEnVei = this.fakta.reiseavstandEnVei,
         bompengerEnVei = this.fakta.bompengerEnVei,
         fergekostandEnVei = this.fakta.fergekostandEnVei,
+        aktivitetsadresse = this.fakta.adresse,
     )
 }

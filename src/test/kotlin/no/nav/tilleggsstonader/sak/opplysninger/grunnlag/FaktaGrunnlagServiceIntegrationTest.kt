@@ -82,8 +82,7 @@ class FaktaGrunnlagServiceIntegrationTest : CleanDatabaseIntegrationTest() {
 
             val grunnlagsdata =
                 faktaGrunnlagService
-                    .hentGrunnlag<FaktaGrunnlagPersonopplysninger>(behandling.id)
-                    .single()
+                    .hentPersonopplysningerGrunnlag(behandling.id)
                     .data
 
             assertThat(grunnlagsdata.barn).hasSize(1)
@@ -123,8 +122,7 @@ class FaktaGrunnlagServiceIntegrationTest : CleanDatabaseIntegrationTest() {
 
             val grunnlag = hentGrunnlag()
 
-            assertThat(grunnlag).hasSize(1)
-            assertThat(grunnlag[0].data).isInstanceOf(FaktaGrunnlagBarnAndreForeldreSaksinformasjon::class.java)
+            assertThat(grunnlag.data).isInstanceOf(FaktaGrunnlagBarnAndreForeldreSaksinformasjon::class.java)
         }
 
         @Test
@@ -134,8 +132,7 @@ class FaktaGrunnlagServiceIntegrationTest : CleanDatabaseIntegrationTest() {
             faktaGrunnlagService.opprettGrunnlagHvisDetIkkeEksisterer(behandlingId = behandling.id)
 
             val grunnlagAndreForeldre = hentGrunnlag()
-            assertThat(grunnlagAndreForeldre).hasSize(1)
-            with(grunnlagAndreForeldre.single().data) {
+            with(grunnlagAndreForeldre.data) {
                 assertThat(this.identBarn).isEqualTo(PdlClientMockConfig.BARN_FNR)
                 assertThat(this.andreForeldre).hasSize(1)
                 assertThat(this.andreForeldre[0].ident).isEqualTo(PdlClientMockConfig.ANNEN_FORELDER_FNR)
@@ -154,14 +151,11 @@ class FaktaGrunnlagServiceIntegrationTest : CleanDatabaseIntegrationTest() {
 
             val grunnlagAndreForeldre = hentGrunnlag()
 
-            assertThat(grunnlagAndreForeldre).hasSize(1)
-            grunnlagAndreForeldre.forEach { grunnlag ->
-                assertThat(grunnlag.data.identBarn).isEqualTo(PdlClientMockConfig.BARN_FNR)
-                assertThat(grunnlag.data.andreForeldre).isEmpty()
-            }
+            assertThat(grunnlagAndreForeldre.data.identBarn).isEqualTo(PdlClientMockConfig.BARN_FNR)
+            assertThat(grunnlagAndreForeldre.data.andreForeldre).isEmpty()
         }
 
-        private fun hentGrunnlag() = faktaGrunnlagService.hentGrunnlag<FaktaGrunnlagBarnAndreForeldreSaksinformasjon>(behandling.id)
+        private fun hentGrunnlag() = faktaGrunnlagService.hentFaktaGrunnlagBarnAndreForeldre(behandling.id)
 
         private fun opprettVedtakAnnenForelder() {
             testoppsettService.lagreFagsak(fagsakAnnenForelder)

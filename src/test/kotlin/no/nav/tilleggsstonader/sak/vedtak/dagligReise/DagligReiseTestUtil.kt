@@ -36,11 +36,11 @@ object DagligReiseTestUtil {
         BeregningsresultatDagligReise(
             offentligTransport =
                 beregningsresultatOffentligTransport(),
-            privatBil = null,
         )
     val defaultInnvilgelseDagligReise =
         InnvilgelseDagligReise(
             vedtaksperioder = defaultVedtaksperioder,
+            rammevedtakPrivatBil = null,
             beregningsresultat = defaultBeregningsresultat,
         )
 
@@ -65,6 +65,7 @@ object DagligReiseTestUtil {
             InnvilgelseDagligReise(
                 vedtaksperioder = vedtaksperioder,
                 beregningsresultat = beregningsresultat,
+                rammevedtakPrivatBil = null,
             ),
         gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = null,

@@ -161,6 +161,20 @@ Egenskap: Utled tidligste endring av aktivitet
 
       Så forvent følgende dato for tidligste endring: 14.03.2024
 
+    Scenario: Endring i resultat
+      Gitt følgende aktiviteter i forrige behandling - utledTidligsteEndring
+        | Fom        | Tom        | Stønadstype      | Type   | Type Aktivitet | Resultat | Status |
+        | 14.03.2024 | 31.03.2024 | DAGLIG_REISE_TSR | TILTAK | ENKELAMO       | OPPFYLT  | NY     |
+
+      Gitt følgende aktiviteter i revurdering - utledTidligsteEndring
+        | Fom        | Tom        | Stønadstype      | Type   | Type Aktivitet | Resultat | Status |
+        | 14.03.2024 | 31.03.2024 | DAGLIG_REISE_TSR | TILTAK | GRUPPEAMO      | OPPFYLT  | ENDRET |
+
+
+      Når utleder tidligste endring
+
+      Så forvent følgende dato for tidligste endring: 14.03.2024
+
   Regel: Sletting av aktiviteter skal gi tidligste endring lik fom på slettet periode
     Scenario: Aktivitet blir slettet
       Gitt følgende aktiviteter i forrige behandling - utledTidligsteEndring

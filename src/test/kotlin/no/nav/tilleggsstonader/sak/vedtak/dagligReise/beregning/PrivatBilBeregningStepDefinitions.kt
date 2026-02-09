@@ -24,7 +24,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepo
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.finnRelevantKilometerSats
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -58,7 +58,7 @@ class PrivatBilBeregningStepDefinitions {
 
     var vedtaksperioder: List<Vedtaksperiode> = emptyList()
 
-    var beregningsResultat: BeregningsresultatPrivatBil? = null
+    var beregningsResultat: RammevedtakPrivatBil? = null
     var forventetBeregningsresultat: List<BeregningsresultatUkeCucumber> = emptyList()
     var feil: Exception? = null
 
@@ -87,7 +87,7 @@ class PrivatBilBeregningStepDefinitions {
     @Når("beregner for daglig reise privat bil")
     fun `beregner for daglig reise privat bil`() {
         try {
-            beregningsResultat = beregningService.beregn(vedtaksperioder, reiser)
+            beregningsResultat = beregningService.beregnRammevedtak(vedtaksperioder, reiser)
         } catch (e: Exception) {
             feil = e
         }

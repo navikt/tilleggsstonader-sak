@@ -157,6 +157,8 @@ class BehandlingService(
 
     fun finnesBehandlingForFagsak(fagsakId: FagsakId) = behandlingRepository.existsByFagsakId(fagsakId)
 
+    fun finnAlleBehandlingerForFagsak(fagsakId: FagsakId): List<Behandling> = behandlingRepository.findByFagsakId(fagsakId)
+
     fun hentBehandlinger(fagsakId: FagsakId): List<Behandling> =
         behandlingRepository.findByFagsakId(fagsakId).sortertEtterVedtakstidspunkt()
 
