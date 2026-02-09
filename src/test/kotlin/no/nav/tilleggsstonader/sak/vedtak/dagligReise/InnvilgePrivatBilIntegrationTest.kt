@@ -77,7 +77,7 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
 
         // Sjekk at rammevedtaket kan hentes
         val rammevedtak = kall.privatBil.hentRammevedtak(IdentRequest("12345678910"))
-        val reiseId = rammevedtak.single().id
+        val reiseId = rammevedtak.single().reiseId
 
         assertThat(rammevedtak).hasSize(1)
         assertThat(rammevedtak.single().fom).isEqualTo(fom)

@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Re
 import java.time.LocalDate
 
 data class RammevedtakDto(
-    val id: ReiseId,
+    val reiseId: ReiseId,
     val fom: LocalDate,
     val tom: LocalDate,
     val reisedagerPerUke: Int,
