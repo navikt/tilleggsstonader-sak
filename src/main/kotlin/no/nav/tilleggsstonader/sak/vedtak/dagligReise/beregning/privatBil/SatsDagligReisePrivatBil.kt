@@ -30,8 +30,8 @@ val satser: List<SatsDagligReisePrivatBil> =
             beløp = BigDecimal("2.79"),
         ),
         SatsDagligReisePrivatBil(
-            fom = 1 januar 2025,
-            tom = 31 desember 2025,
+            fom = 1 januar 2023,
+            tom = 31 desember 2023,
             beløp = BigDecimal("2.62"),
         ),
     )
