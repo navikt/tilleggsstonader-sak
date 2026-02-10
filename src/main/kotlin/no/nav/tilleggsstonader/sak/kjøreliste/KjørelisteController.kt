@@ -57,17 +57,20 @@ class KjørelisteController(
         } ?: emptyList()
     }
 
-    private fun lagUke(rammeForUke: RammeForUke, kjørelisteForUke: Kjøreliste?): UkeDto {
-
-        val dager = (
+    private fun lagUke(
+        rammeForUke: RammeForUke,
+        kjørelisteForUke: Kjøreliste?,
+    ): UkeDto {
+        val dager =
+            (
                 0L..ChronoUnit.DAYS.between(
                     rammeForUke.grunnlag.fom,
                     rammeForUke.grunnlag.tom,
                 )
-                ).map { rammeForUke.grunnlag.fom.plusDays(it) }
-            .map { dato ->
-                lagDag(dato, kjørelisteForUke)
-            }
+            ).map { rammeForUke.grunnlag.fom.plusDays(it) }
+                .map { dato ->
+                    lagDag(dato, kjørelisteForUke)
+                }
 
         val antalldagerInnenforRamme = vurderAntallDagerInnenforRamme(dager, rammeForUke)
 
@@ -81,11 +84,14 @@ class KjørelisteController(
             behandletDato = null,
             kjørelisteInnsendtDato = kjørelisteForUke?.datoMottatt?.toLocalDate(),
             kjørelisteId = kjørelisteForUke?.id,
-            dager = dager
+            dager = dager,
         )
     }
 
-    private fun vurderAntallDagerInnenforRamme(dager: List<DagDto>, rammeForUke: RammeForUke): Boolean {
+    private fun vurderAntallDagerInnenforRamme(
+        dager: List<DagDto>,
+        rammeForUke: RammeForUke,
+    ): Boolean {
         val antallDagerMedUtbetaling = dager.filter { it.avklartDag?.resultat == UtfyltDagResultat.UTBETALING }.size
 
         return antallDagerMedUtbetaling <= rammeForUke.grunnlag.maksAntallDagerSomKanDekkes
@@ -94,7 +100,7 @@ class KjørelisteController(
     private fun utledStatusForUke(
         kjørelisteForUke: Kjøreliste?,
         dager: List<DagDto>,
-        antalldagerInnenforRamme: Boolean
+        antalldagerInnenforRamme: Boolean,
     ): UkeStatus {
         if (kjørelisteForUke == null) return UkeStatus.IKKE_MOTTATT_KJØRELISTE
 
@@ -111,13 +117,17 @@ class KjørelisteController(
         return UkeStatus.AVVIK
     }
 
-    private fun lagDag(dato: LocalDate, kjørelisteForUke: Kjøreliste?): DagDto {
+    private fun lagDag(
+        dato: LocalDate,
+        kjørelisteForUke: Kjøreliste?,
+    ): DagDto {
         // TODO: Vurder å kaste feil dersom denne er null
         // Hvis den eksisterer for en uke så burde alle dager eksistere?
-        val kjørelisteForDag = kjørelisteForUke
-            ?.data
-            ?.reisedager
-            ?.firstOrNull { reisedag -> reisedag.dato == dato }
+        val kjørelisteForDag =
+            kjørelisteForUke
+                ?.data
+                ?.reisedager
+                ?.firstOrNull { reisedag -> reisedag.dato == dato }
 
         return DagDto(
             dato = dato,
@@ -133,13 +143,17 @@ class KjørelisteController(
         )
     }
 
-    private fun lagAvklartDag(dato: LocalDate, kjørelisteForDag: KjørelisteDag?): AvklartDag? {
+    private fun lagAvklartDag(
+        dato: LocalDate,
+        kjørelisteForDag: KjørelisteDag?,
+    ): AvklartDag? {
         if (kjørelisteForDag == null) return null
 
-        val avviksbegrunnelse = utledAvviksbegrunnelse(
-            parkeringsutgift = kjørelisteForDag.parkeringsutgift,
-            dato = dato
-        )
+        val avviksbegrunnelse =
+            utledAvviksbegrunnelse(
+                parkeringsutgift = kjørelisteForDag.parkeringsutgift,
+                dato = dato,
+            )
 
         return AvklartDag(
             resultat = finnResultat(kjørelisteForDag.harKjørt),
@@ -155,7 +169,10 @@ class KjørelisteController(
         return UtfyltDagResultat.IKKE_UTBETALING
     }
 
-    private fun utledAvviksbegrunnelse(parkeringsutgift: Int?, dato: LocalDate): AvviksbegrunnelseDag? {
+    private fun utledAvviksbegrunnelse(
+        parkeringsutgift: Int?,
+        dato: LocalDate,
+    ): AvviksbegrunnelseDag? {
         // TODO: Finn ut om vi skal ta hensyn til helg
         val erHelg = dato.dayOfWeek == DayOfWeek.SATURDAY || dato.dayOfWeek == DayOfWeek.SUNDAY
 
