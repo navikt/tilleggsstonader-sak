@@ -13,6 +13,7 @@ import java.time.LocalDate
 data class InnvilgelseDagligReiseResponse(
     val vedtaksperioder: List<LagretVedtaksperiodeDto>?,
     val beregningsresultat: BeregningsresultatDagligReiseDto,
+    val rammevedtakPrivatBil: RammevedtakPrivatBilDto?,
     val gjelderFraOgMed: LocalDate?,
     val gjelderTilOgMed: LocalDate?,
     val begrunnelse: String? = null,

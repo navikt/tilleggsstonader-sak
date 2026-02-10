@@ -117,6 +117,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
             gjelderFraOgMed = dummyFom,
             gjelderTilOgMed = dummyTom,
             begrunnelse = null,
+            rammevedtakPrivatBil = null,
         )
 
     val vilkår =
