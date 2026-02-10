@@ -31,13 +31,15 @@ class KjørelisteController(
 
         val kjørelister = kjørelisteService.hentForFagsakId(behandling.fagsakId)
         val reiserIRammevedtak =
-            vedtakService
-                .hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandling.id)
-                ?.data
+            behandling.forrigeIverksatteBehandlingId
+                ?.let {
+                    vedtakService
+                        .hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandling.forrigeIverksatteBehandlingId)
+                }?.data
                 ?.rammevedtakPrivatBil
                 ?.reiser
 
-        reiserIRammevedtak?.map { reise ->
+        return reiserIRammevedtak?.map { reise ->
             KjørelisteDto(
                 reiseId = reise.reiseId,
                 uker =
@@ -86,9 +88,7 @@ class KjørelisteController(
                         )
                     },
             )
-        }
-
-        return emptyList()
+        } ?: emptyList()
     }
 }
 
