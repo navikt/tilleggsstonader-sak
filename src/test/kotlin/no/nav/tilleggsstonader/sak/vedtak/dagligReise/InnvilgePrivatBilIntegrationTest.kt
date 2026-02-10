@@ -18,7 +18,6 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.KjørelisteSkjema
-import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.oktober
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
@@ -35,6 +34,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettJournalpos
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.kjøreliste.KjørelisteDto
 import no.nav.tilleggsstonader.sak.kjøreliste.KjørelisteRepository
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
 import no.nav.tilleggsstonader.sak.util.dokumentInfo
@@ -44,6 +44,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.support.Acknowledgment
+import org.springframework.test.web.servlet.client.expectBody
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.random.Random
@@ -86,11 +87,11 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
         assertThat(rammevedtak.single().fom).isEqualTo(fom)
         assertThat(rammevedtak.single().tom).isEqualTo(tom)
 
-        val dagerKjørt = arrayOf(2 februar 2026, 9 februar 2026, 16 februar 2026)
+        val dagerKjørt = arrayOf(15 september 2025, 20 september 2025, 23 september 2025)
         val kjøreliste =
             kjørelisteSkjema(
                 reiseId = reiseId.toString(),
-                periode = Datoperiode(1 februar 2026, 28 februar 2026),
+                periode = Datoperiode(fom, tom),
                 dagerKjørt = dagerKjørt,
             )
 
@@ -122,13 +123,37 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
         assertThat(behandlingerPåFagsak).hasSize(2)
         // TODO - bør behandlingstype si at det er en kjøreliste?
         // TODO - verifiser at behandlingsstatistikk finnes
-        assertThat(behandlingerPåFagsak.filter { it.årsak == BehandlingÅrsak.KJØRELISTE }).hasSize(1)
+        val behandlingKjøreliste = behandlingerPåFagsak.single { it.årsak == BehandlingÅrsak.KJØRELISTE }
 
         // Trigger opprett-oppgave task
         kjørTasksKlareForProsessering()
 
         val kjørelisteBehandling = behandlingerPåFagsak.single { it.årsak == BehandlingÅrsak.KJØRELISTE }
         assertThat(oppgaveRepository.findByBehandlingId(kjørelisteBehandling.id)).hasSize(1)
+
+        val hentetKjøreliste =
+            restTestClient
+                .get()
+                .uri("/api/kjoreliste/${behandlingKjøreliste.id}")
+                .medOnBehalfOfToken()
+                .exchange()
+                .expectStatus()
+                .isOk
+                .expectBody<List<KjørelisteDto>>()
+                .returnResult()
+                .responseBody
+
+        assertThat(hentetKjøreliste).isNotNull.isNotEmpty
+        // Sjekker at alle dager fra kjøreliste kommer i respons
+        assertThat(
+            hentetKjøreliste!!
+                .single()
+                .uker
+                .flatMap { it.dager }
+                .filter { it.dato in dagerKjørt },
+        ).allMatch {
+            it.kjørelisteDag?.harKjørt == true
+        }
     }
 
     private fun sendInnKjøreliste(kjøreliste: KjørelisteSkjema): String {
