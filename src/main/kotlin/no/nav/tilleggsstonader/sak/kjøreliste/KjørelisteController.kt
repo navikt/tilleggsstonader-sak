@@ -58,7 +58,7 @@ class KjørelisteController(
                             behandletDato = null,
                             kjørelisteInnsendtDato = kjørelisteForUke?.datoMottatt?.toLocalDate(),
                             kjørelisteId = kjørelisteForUke?.id,
-                            dag =
+                            dager =
                                 (
                                     0L..ChronoUnit.DAYS.between(
                                         uke.grunnlag.fom,
@@ -107,7 +107,7 @@ data class UkeDto(
     val behandletDato: LocalDate?,
     val kjørelisteInnsendtDato: LocalDate?, // null hvis kjøreliste ikke er mottatt
     val kjørelisteId: UUID?, // null hvis kjøreliste ikke er mottatt
-    val dag: List<DagDto>,
+    val dager: List<DagDto>,
 )
 
 data class DagDto(
