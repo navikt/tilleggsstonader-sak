@@ -4,12 +4,15 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 @RestController
@@ -18,6 +21,7 @@ import java.util.UUID
 class KjørelisteController(
     private val behandlingService: BehandlingService,
     private val kjørelisteService: KjørelisteService,
+    private val vedtakService: VedtakService,
 ) {
     @GetMapping("{behandlingId}")
     fun hentKjørelisteForBehandling(
@@ -25,27 +29,66 @@ class KjørelisteController(
     ): List<KjørelisteDto> {
         val behandling = behandlingService.hentBehandling(behandlingId)
 
-        return kjørelisteService.hentForFagsakId(behandling.fagsakId).map { kjøreliste ->
+        val kjørelister = kjørelisteService.hentForFagsakId(behandling.fagsakId)
+        val reiserIRammevedtak =
+            vedtakService
+                .hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandling.id)
+                ?.data
+                ?.rammevedtakPrivatBil
+                ?.reiser
+
+        reiserIRammevedtak?.map { reise ->
             KjørelisteDto(
-                reiseId = kjøreliste.data.reiseId,
-                innsendteUker =
-                    kjøreliste.data.reisedager
-                        .map { reisedag ->
-                            KjørelisteDagDto(
-                                dato = reisedag.dato,
-                                harKjørt = reisedag.harKjørt,
-                                parkeringsutgift = reisedag.parkeringsutgift,
-                            )
-                        }.groupBy {
-                            it.dato.ukenummer()
-                        }.map { (uke, reisedagerIUke) ->
-                            KjørelisteUkeDto(
-                                ukeNummer = uke,
-                                reisedager = reisedagerIUke,
-                            )
-                        },
+                reiseId = reise.reiseId,
+                uker =
+                    reise.uker.map { uke ->
+                        val kjørelisteForUke =
+                            kjørelister.firstOrNull {
+                                it.data.reiseId == reise.reiseId &&
+                                    it.inneholderUkenummer(uke.grunnlag.fom.ukenummer())
+                            }
+                        UkeDto(
+                            ukenummer = uke.grunnlag.fom.ukenummer(),
+                            fraDato = uke.grunnlag.fom,
+                            tilDato = uke.grunnlag.tom,
+                            // TODO: må utvides med flere statuser
+                            status = if (kjørelisteForUke == null) UkeStatus.IKKE_MOTTATT_KJØRELISTE else UkeStatus.AVVIK,
+                            avviksbegrunnelse = AvviksbegrunnelseUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK,
+                            avviksMelding = "Dette er egentlig ikke et avvik, bare en test",
+                            behandletDato = null,
+                            kjørelisteInnsendtDato = kjørelisteForUke?.datoMottatt?.toLocalDate(),
+                            kjørelisteId = kjørelisteForUke?.id,
+                            dag =
+                                (
+                                    0L..ChronoUnit.DAYS.between(
+                                        uke.grunnlag.fom,
+                                        uke.grunnlag.tom,
+                                    )
+                                ).map { uke.grunnlag.fom.plusDays(it) }
+                                    .map {
+                                        DagDto(
+                                            dato = it,
+                                            ukedag = it.dayOfWeek.name,
+                                            kjørelisteDag =
+                                                kjørelisteForUke
+                                                    ?.data
+                                                    ?.reisedager
+                                                    ?.firstOrNull { reisedag -> reisedag.dato == it }
+                                                    ?.let { reisedag ->
+                                                        KjørelisteDagDto(
+                                                            harKjørt = reisedag.harKjørt,
+                                                            parkeringsutgift = reisedag.parkeringsutgift,
+                                                        )
+                                                    },
+                                            avklartDag = null,
+                                        )
+                                    },
+                        )
+                    },
             )
         }
+
+        return emptyList()
     }
 }
 
@@ -64,14 +107,14 @@ data class UkeDto(
     val behandletDato: LocalDate?,
     val kjørelisteInnsendtDato: LocalDate?, // null hvis kjøreliste ikke er mottatt
     val kjørelisteId: UUID?, // null hvis kjøreliste ikke er mottatt
-    val dag: List<DagDto>
+    val dag: List<DagDto>,
 )
 
 data class DagDto(
     val dato: LocalDate,
     val ukedag: String, // avklar om faktisk trenger, eller om frontend skal mappe ut fra dag
     val kjørelisteDag: KjørelisteDagDto?,
-    val avklartDag: AvklartDag?
+    val avklartDag: AvklartDag?,
 )
 
 data class KjørelisteDagDto(
@@ -97,12 +140,12 @@ enum class UkeStatus {
 
 enum class UtfyltDagResultat {
     UTBETALING,
-    IKKE_UTBETALING
+    IKKE_UTBETALING,
 }
 
 enum class UtfyltDagAutomatiskVurdering {
     OK,
-    AVVIK
+    AVVIK,
 }
 
 enum class AvviksbegrunnelseDag {
@@ -111,5 +154,5 @@ enum class AvviksbegrunnelseDag {
 }
 
 enum class AvviksbegrunnelseUke {
-    FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK
+    FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK,
 }
