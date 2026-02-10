@@ -80,12 +80,17 @@ class PersonService(
 
     fun hentFolkeregisterIdenter(ident: String): PdlIdenter = hentIdenterCached(ident).folkeregisteridenter()
 
+    /**
+     * For å kunne støtte kall fra sluttbruker, og at disse kallene går i sluttbruker sin context
+     */
+    fun hentFolkeregisterIdenterISluttbrukerContext(ident: String): PdlIdenter = pdlClient.hentPersonidenterMedSluttbrukerSinContext(ident)
+
     fun hentFolkeregisterOgNpidIdenter(ident: String): PdlIdenter =
         hentIdenterCached(ident).medIdentgrupper(PdlIdentGruppe.FOLKEREGISTERIDENT, PdlIdentGruppe.NPID)
 
     private fun hentIdenterCached(ident: String): PdlIdenter =
         cacheManager.getValue("personidenter", ident) {
-            pdlClient.hentPersonidenter(ident)
+            pdlClient.hentPersonidenterMedSystemContext(ident)
         }
 
     /**
@@ -100,7 +105,7 @@ class PersonService(
 
     fun hentAktørIder(ident: String): PdlIdenter =
         cacheManager.getValue("pdl-aktørId", ident) {
-            pdlClient.hentPersonidenter(ident).aktørIder()
+            pdlClient.hentPersonidenterMedSystemContext(ident).aktørIder()
         }
 
     fun hentGeografiskTilknytning(ident: String): GeografiskTilknytningDto? =

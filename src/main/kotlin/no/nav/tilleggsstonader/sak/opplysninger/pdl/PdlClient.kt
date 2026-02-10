@@ -32,6 +32,7 @@ import java.net.URI
 class PdlClient(
     @Value("\${clients.pdl.uri}") private val pdlUrl: URI,
     @Qualifier("azureClientCredential") private val restTemplate: RestTemplate,
+    @Qualifier("tokenExchange") private val restTemplateTokenX: RestTemplate,
 ) {
     private val pdlUri: String = UriComponentsBuilder.fromUri(pdlUrl).pathSegment(PdlConfig.PATH_GRAPHQL).toUriString()
 
@@ -86,7 +87,14 @@ class PdlClient(
      * @param ident Ident til personen, samme hvilke type (Folkeregisterident, aktørid eller npid)
      * @return liste med personidenter (Folkeregisterident, aktørid eller npid)
      */
-    fun hentPersonidenter(ident: String): PdlIdenter {
+    fun hentPersonidenterMedSystemContext(ident: String) = hentPersonidenter(ident, restTemplate)
+
+    fun hentPersonidenterMedSluttbrukerSinContext(ident: String) = hentPersonidenter(ident, restTemplateTokenX)
+
+    private fun hentPersonidenter(
+        ident: String,
+        restTemplate: RestTemplate,
+    ): PdlIdenter {
         val request =
             PdlIdentRequest(
                 variables = PdlIdentRequestVariables(ident = ident, historikk = true),

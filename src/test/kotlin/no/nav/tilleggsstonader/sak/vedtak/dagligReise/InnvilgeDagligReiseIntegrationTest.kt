@@ -103,7 +103,7 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
 
-        val rammevedtak = kall.privatBil.hentRammevedtak(IdentRequest("12345678910"))
+        val rammevedtak = kall.privatBil.hentRammevedtak("12345678910")
 
         assertThat(rammevedtak).isNotEmpty()
     }

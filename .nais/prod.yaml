@@ -66,6 +66,8 @@ spec:
               - name: datastream # ekstra databasebruker
   kafka:
     pool: nav-prod
+  tokenx:
+    enabled: true
   azure:
     sidecar:
       enabled: true

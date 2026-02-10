@@ -1,5 +1,8 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 
+import io.mockk.Call
+import io.mockk.CapturingSlot
+import io.mockk.MockKAnswerScope
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
@@ -79,7 +82,19 @@ class PdlClientMockConfig {
             every { pdlClient.hentAndreForeldre(any()) } returns mapOf(ANNEN_FORELDER_FNR to annenForelder())
 
             val personIdent = slot<String>()
-            every { pdlClient.hentPersonidenter(capture(personIdent)) } answers {
+            every { pdlClient.hentPersonidenterMedSystemContext(capture(personIdent)) } answers hentPersonidenter(personIdent)
+            every { pdlClient.hentPersonidenterMedSluttbrukerSinContext(capture(personIdent)) } answers hentPersonidenter(personIdent)
+            every { pdlClient.hentGeografiskTilknytning(any()) } returns
+                GeografiskTilknytningDto(
+                    gtBydel = "030103",
+                    gtKommune = "0301",
+                    gtType = GeografiskTilknytningType.BYDEL,
+                    gtLand = "NOR",
+                )
+        }
+
+        private fun hentPersonidenter(personIdent: CapturingSlot<String>): MockKAnswerScope<PdlIdenter, PdlIdenter>.(Call) -> PdlIdenter =
+            {
                 val capturedIdent = personIdent.captured
                 if (personIdent.captured == "19117313797") {
                     throw PdlNotFoundException()
@@ -94,14 +109,6 @@ class PdlClientMockConfig {
                     )
                 }
             }
-            every { pdlClient.hentGeografiskTilknytning(any()) } returns
-                GeografiskTilknytningDto(
-                    gtBydel = "030103",
-                    gtKommune = "0301",
-                    gtType = GeografiskTilknytningType.BYDEL,
-                    gtLand = "NOR",
-                )
-        }
 
         fun lagPersonKort(
             fornavn: String,
