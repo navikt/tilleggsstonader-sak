@@ -154,7 +154,7 @@ class PrivatBilBeregningStepDefinitions {
 enum class DomenenøkkelPrivatBil(
     override val nøkkel: String,
 ) : Domenenøkkel {
-    ANTALL_REISEDAGER_PER_UKE("Reisedager per uke"),
+    ANTALL_REISEDAGER_PER_UKE("Antall reisedager per uke"),
     REISEAVSTAND_EN_VEI("Reiseavstand"),
     BOMPENGER("Bompenger"),
     FERGEKOSTNAD("Fergekostnad"),
