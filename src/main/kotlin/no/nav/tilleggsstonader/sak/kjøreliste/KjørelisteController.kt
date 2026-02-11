@@ -55,8 +55,10 @@ class KjørelisteController(
                             tilDato = uke.grunnlag.tom,
                             // TODO: må utvides med flere statuser
                             status = if (kjørelisteForUke == null) UkeStatus.IKKE_MOTTATT_KJØRELISTE else UkeStatus.AVVIK,
-                            avviksbegrunnelse = AvviksbegrunnelseUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK,
-                            avviksMelding = "Dette er egentlig ikke et avvik, bare en test",
+                            automatiskVurdering = AutomatiskVurderingUke(
+                                typeAvvike = TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK,
+                                avviksMelding = "Dette er egentlig ikke et avvik, bare en test"
+                            ),
                             behandletDato = null,
                             kjørelisteInnsendtDato = kjørelisteForUke?.datoMottatt?.toLocalDate(),
                             kjørelisteId = kjørelisteForUke?.id,
@@ -102,12 +104,16 @@ data class UkeDto(
     val fraDato: LocalDate,
     val tilDato: LocalDate,
     val status: UkeStatus,
-    val avviksbegrunnelse: AvviksbegrunnelseUke?,
-    val avviksMelding: String?,
+    val automatiskVurdering: AutomatiskVurderingUke,
     val behandletDato: LocalDate?,
     val kjørelisteInnsendtDato: LocalDate?, // null hvis kjøreliste ikke er mottatt
     val kjørelisteId: UUID?, // null hvis kjøreliste ikke er mottatt
     val dager: List<DagDto>,
+)
+
+data class AutomatiskVurderingUke(
+    val typeAvvike: TypeAvvikUke,
+    val avviksMelding: String,
 )
 
 data class DagDto(
@@ -123,9 +129,9 @@ data class KjørelisteDagDto(
 )
 
 data class AvklartDag(
-    val resultat: UtfyltDagResultat,
+    val godkjentGjennomførtKjøring: Boolean,
     val automatiskVurdering: UtfyltDagAutomatiskVurdering,
-    val avviksbegrunnelse: AvviksbegrunnelseDag,
+    val avvik: List<TypeAvvikDag>,
     val begrunnelse: String?, // må fylles ut om avvik?
     val parkeringsutgift: Int?,
 )
@@ -134,25 +140,20 @@ enum class UkeStatus {
     OK_AUTOMATISK, // brukes hvis automatisk godkjent
     OK_MANUELT, // brukes hvis saksbehandler godtar avvik
     AVVIK, // parkeringsutgifter/for mange dager etc. saksbehandler må ta stilling til uka
-    KORRIGERT, // saksbehandler har endret innsendte dager
     IKKE_MOTTATT_KJØRELISTE,
 }
 
-enum class UtfyltDagResultat {
-    UTBETALING,
-    IKKE_UTBETALING,
-}
 
 enum class UtfyltDagAutomatiskVurdering {
     OK,
     AVVIK,
 }
 
-enum class AvviksbegrunnelseDag {
+enum class TypeAvvikDag {
     FOR_HØY_PARKERINGSUTGIFT,
     HELLIDAG_ELLER_HELG,
 }
 
-enum class AvviksbegrunnelseUke {
+enum class TypeAvvikUke {
     FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK,
 }
