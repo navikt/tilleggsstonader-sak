@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+@Suppress("unused", "ktlint:standard:function-naming")
 class PrivatBilKjørelisteStepDefinitions : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var journalhendelseKafkaListener: JournalhendelseKafkaListener
@@ -63,26 +64,26 @@ class PrivatBilKjørelisteStepDefinitions : CleanDatabaseIntegrationTest() {
 
         val ramme = mapRamme(dataTable)
 
-        val behandlingId = opprettBehandlingOgGjennomførBehandlingsløp(
-            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-        ) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTso(fom = ramme.fom, tom = ramme.tom)
+        val behandlingId =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTso(fom = ramme.fom, tom = ramme.tom)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(fom = ramme.fom, tom = ramme.tom)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        privatBil(fom = ramme.fom, tom = ramme.tom, reisedagerPerUke = ramme.antallDagerPerUke)
+                    }
                 }
             }
-            målgruppe {
-                opprett {
-                    målgruppeAAP(fom = ramme.fom, tom = ramme.tom)
-                }
-            }
-            vilkår {
-                opprett {
-                    //TODO: Legg inn antall dager her
-                    privatBil(fom = ramme.fom, tom = ramme.tom)
-                }
-            }
-        }
 
         saksbehandling = behandlingRepository.finnSaksbehandling(behandlingId)
 
@@ -90,18 +91,19 @@ class PrivatBilKjørelisteStepDefinitions : CleanDatabaseIntegrationTest() {
         reiseId = rammevedtak.single().reiseId
     }
 
-    @Gitt("gitt en kjøreliste for én uke med følgende dager kjørt")
+    @Gitt("gitt følgende kjøreliste for privat bil")
     fun `gitt følgende kjøreliste for privat bil`(dataTable: DataTable) {
         kjørelisteRepository.insert(
             Kjøreliste(
                 journalpostId = "",
                 fagsakId = saksbehandling!!.fagsakId,
                 datoMottatt = LocalDateTime.now(),
-                data = InnsendtKjøreliste(
-                    reiseId = reiseId!!,
-                    reisedager = mapKjøreliste(dataTable),
-                )
-            )
+                data =
+                    InnsendtKjøreliste(
+                        reiseId = reiseId!!,
+                        reisedager = mapKjøreliste(dataTable),
+                    ),
+            ),
         )
     }
 
@@ -118,7 +120,6 @@ class PrivatBilKjørelisteStepDefinitions : CleanDatabaseIntegrationTest() {
         assertThat(resultatSomDager).isEqualTo(forventetResultat)
     }
 
-
     data class RammeVedtakCucumber(
         val fom: LocalDate,
         val tom: LocalDate,
@@ -126,20 +127,21 @@ class PrivatBilKjørelisteStepDefinitions : CleanDatabaseIntegrationTest() {
     )
 
     private fun mapRamme(dataTable: DataTable) =
-        dataTable.mapRad { rad ->
-            RammeVedtakCucumber(
-                fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                antallDagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, rad)
-            )
-        }.single()
+        dataTable
+            .mapRad { rad ->
+                RammeVedtakCucumber(
+                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                    antallDagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, rad),
+                )
+            }.single()
 
     private fun mapKjøreliste(dataTable: DataTable) =
         dataTable.mapRad { rad ->
             KjørelisteDag(
                 dato = parseDato(DomenenøkkelFelles.FOM, rad),
                 harKjørt = parseBoolean(DomenenøkkelPrivatBilIntegrasjon.HAR_KJØRT, rad),
-                parkeringsutgift = parseInt(DomenenøkkelPrivatBilIntegrasjon.PARKERINGSUTGIFT, rad)
+                parkeringsutgift = parseInt(DomenenøkkelPrivatBilIntegrasjon.PARKERINGSUTGIFT, rad),
             )
         }
 
@@ -153,23 +155,25 @@ class PrivatBilKjørelisteStepDefinitions : CleanDatabaseIntegrationTest() {
         val parkeringsutgift: Int?,
     )
 
-    private fun mapDager(dataTable: DataTable) = dataTable.mapRad { rad ->
-        DagDtoCucumber(
-            ukeNr = parseInt(DomenenøkkelPrivatBilIntegrasjon.UKE_NR, rad),
-            ukedag = parseString(DomenenøkkelPrivatBilIntegrasjon.UKEDAG, rad),
-            dato = parseDato(DomenenøkkelPrivatBilIntegrasjon.DATO, rad),
-            resultat = parseEnum(DomenenøkkelPrivatBilIntegrasjon.RESULTAT, rad),
-            automatiskVurdering = parseEnum(DomenenøkkelPrivatBilIntegrasjon.AUTOMATISK_VURDERING, rad),
-            avviksbegrunnelse = parseValgfriEnum<AvviksbegrunnelseDag>(
-                DomenenøkkelPrivatBilIntegrasjon.AVVIKSBEGRUNNELSE,
-                rad
-            ),
-            parkeringsutgift = parseValgfriInt(DomenenøkkelPrivatBilIntegrasjon.PARKERINGSUTGIFT, rad)
-        )
-    }
+    private fun mapDager(dataTable: DataTable) =
+        dataTable.mapRad { rad ->
+            DagDtoCucumber(
+                ukeNr = parseInt(DomenenøkkelPrivatBilIntegrasjon.UKE_NR, rad),
+                ukedag = parseString(DomenenøkkelPrivatBilIntegrasjon.UKEDAG, rad),
+                dato = parseDato(DomenenøkkelPrivatBilIntegrasjon.DATO, rad),
+                resultat = parseEnum(DomenenøkkelPrivatBilIntegrasjon.RESULTAT, rad),
+                automatiskVurdering = parseEnum(DomenenøkkelPrivatBilIntegrasjon.AUTOMATISK_VURDERING, rad),
+                avviksbegrunnelse =
+                    parseValgfriEnum<AvviksbegrunnelseDag>(
+                        DomenenøkkelPrivatBilIntegrasjon.AVVIKSBEGRUNNELSE,
+                        rad,
+                    ),
+                parkeringsutgift = parseValgfriInt(DomenenøkkelPrivatBilIntegrasjon.PARKERINGSUTGIFT, rad),
+            )
+        }
 
-    private fun List<KjørelisteDto>.tilCucumberUker(): List<DagDtoCucumber> {
-        return this.flatMap { it.uker }.flatMap { uke ->
+    private fun List<KjørelisteDto>.tilCucumberUker(): List<DagDtoCucumber> =
+        this.flatMap { it.uker }.flatMap { uke ->
             uke.dager.map { dag ->
                 DagDtoCucumber(
                     ukeNr = uke.ukenummer,
@@ -178,11 +182,10 @@ class PrivatBilKjørelisteStepDefinitions : CleanDatabaseIntegrationTest() {
                     resultat = dag.avklartDag!!.resultat,
                     automatiskVurdering = dag.avklartDag.automatiskVurdering,
                     avviksbegrunnelse = dag.avklartDag.avviksbegrunnelse,
-                    parkeringsutgift = dag.avklartDag.parkeringsutgift
+                    parkeringsutgift = dag.avklartDag.parkeringsutgift,
                 )
             }
         }
-    }
 
     enum class DomenenøkkelPrivatBilIntegrasjon(
         override val nøkkel: String,

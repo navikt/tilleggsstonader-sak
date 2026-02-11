@@ -110,7 +110,7 @@ class KjørelisteController(
 
         // Usikker på hvordan denne sjekken dersom vi tillater at man kan sende inn en halv uke, som vil gi
         // en dag hvor avklartDag = null og dermed ikke har en automatisk vurdering
-        if (automatiskeVurderingForDager.size == 1 && automatiskeVurderingForDager.first() == UtfyltDagAutomatiskVurdering.OK) {
+        if (automatiskeVurderingForDager.size == 1 && automatiskeVurderingForDager.single() == UtfyltDagAutomatiskVurdering.OK) {
             return UkeStatus.OK_AUTOMATISK
         }
 
@@ -173,11 +173,10 @@ class KjørelisteController(
         parkeringsutgift: Int?,
         dato: LocalDate,
     ): AvviksbegrunnelseDag? {
-        // TODO: Finn ut om vi skal ta hensyn til helg
-        val erHelg = dato.dayOfWeek == DayOfWeek.SATURDAY || dato.dayOfWeek == DayOfWeek.SUNDAY
-
         if (parkeringsutgift != null && parkeringsutgift > 100) return AvviksbegrunnelseDag.FOR_HØY_PARKERINGSUTGIFT
 
+        // TODO: Finn ut om vi skal ta hensyn til helg
+        val erHelg = dato.dayOfWeek == DayOfWeek.SATURDAY || dato.dayOfWeek == DayOfWeek.SUNDAY
         if (erHelg) return AvviksbegrunnelseDag.HELLIDAG_ELLER_HELG
 
         return null

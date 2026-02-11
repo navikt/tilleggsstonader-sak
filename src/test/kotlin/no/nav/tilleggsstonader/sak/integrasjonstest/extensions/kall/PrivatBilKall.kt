@@ -33,6 +33,7 @@ class PrivatBilKall(
                 restTestClient
                     .get()
                     .uri("/api/kjoreliste/$behandlingId")
+                    .medOnBehalfOfToken()
                     .exchange()
             }
     }
