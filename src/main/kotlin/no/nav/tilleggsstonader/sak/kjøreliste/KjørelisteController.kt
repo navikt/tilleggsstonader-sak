@@ -72,7 +72,7 @@ class KjørelisteController(
                     lagDag(dato, kjørelisteForUke)
                 }
 
-        val avvik = if (vurderAntallDagerInnenforRamme(dager, rammeForUke)) {
+        val avvik = if (!vurderAntallDagerInnenforRamme(dager, rammeForUke)) {
             AvvikUke(
                 typeAvvik = TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK,
                 avviksMelding = "Dette er egentlig ikke et avvik, bare en test"
