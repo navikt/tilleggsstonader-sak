@@ -4,6 +4,10 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.kjøreliste.avklartedager.TypeAvvikDag
+import no.nav.tilleggsstonader.sak.kjøreliste.avklartedager.TypeAvvikUke
+import no.nav.tilleggsstonader.sak.kjøreliste.avklartedager.UkeStatus
+import no.nav.tilleggsstonader.sak.kjøreliste.avklartedager.UtfyltDagAutomatiskVurdering
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForUke
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
@@ -72,12 +76,15 @@ class KjørelisteController(
                     lagDag(dato, kjørelisteForUke)
                 }
 
-        val avvik = if (vurderAntallDagerInnenforRamme(dager, rammeForUke)) {
-            AvvikUke(
-                typeAvvik = TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK,
-                avviksMelding = "Dette er egentlig ikke et avvik, bare en test"
-            )
-        } else null
+        val avvik =
+            if (vurderAntallDagerInnenforRamme(dager, rammeForUke)) {
+                AvvikUke(
+                    typeAvvik = TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK,
+                    avviksMelding = "Dette er egentlig ikke et avvik, bare en test",
+                )
+            } else {
+                null
+            }
 
         return UkeVurderingDto(
             ukenummer = rammeForUke.grunnlag.fom.ukenummer(),
@@ -221,24 +228,3 @@ data class AvklartDag(
     val begrunnelse: String?, // må fylles ut om avvik?
     val parkeringsutgift: Int?,
 )
-
-enum class UkeStatus {
-    OK_AUTOMATISK, // brukes hvis automatisk godkjent
-    OK_MANUELT, // brukes hvis saksbehandler godtar avvik
-    AVVIK, // parkeringsutgifter/for mange dager etc. saksbehandler må ta stilling til uka
-    IKKE_MOTTATT_KJØRELISTE,
-}
-
-enum class UtfyltDagAutomatiskVurdering {
-    OK,
-    AVVIK,
-}
-
-enum class TypeAvvikDag {
-    FOR_HØY_PARKERINGSUTGIFT,
-    HELLIDAG_ELLER_HELG,
-}
-
-enum class TypeAvvikUke {
-    FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK,
-}
