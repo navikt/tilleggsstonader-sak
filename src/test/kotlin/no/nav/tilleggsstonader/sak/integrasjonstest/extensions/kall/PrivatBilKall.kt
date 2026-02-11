@@ -2,12 +2,17 @@ package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
+import no.nav.tilleggsstonader.sak.kjøreliste.KjørelisteDto
 
 class PrivatBilKall(
     private val testklient: Testklient,
 ) {
     fun hentRammevedtak(dto: IdentRequest) = apiRespons.hentRammevedtak(dto).expectOkWithBody<List<RammevedtakDto>>()
+
+    fun hentKjørelisteForBehandling(behandlingId: BehandlingId) =
+        apiRespons.hentKjørelisteForBehandling(behandlingId).expectOkWithBody<List<KjørelisteDto>>()
 
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = PrivatBilApi()
@@ -20,6 +25,15 @@ class PrivatBilKall(
                     .uri("/api/ekstern/privat-bil/rammevedtak")
                     .body(dto)
                     .medClientCredentials(eksternApplikasjon.soknadApi, true)
+                    .exchange()
+            }
+
+        fun hentKjørelisteForBehandling(behandlingId: BehandlingId) =
+            with(testklient.testkontekst) {
+                restTestClient
+                    .get()
+                    .uri("/api/kjoreliste/$behandlingId")
+                    .medOnBehalfOfToken()
                     .exchange()
             }
     }
