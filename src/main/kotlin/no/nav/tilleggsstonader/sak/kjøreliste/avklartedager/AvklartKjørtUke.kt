@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.kjøreliste.avklartedager
 
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
@@ -14,15 +16,21 @@ data class AvklartKjørtUke(
     val id: UUID = UUID.randomUUID(),
     @Column("behandling_id")
     val behandlingId: BehandlingId,
-    val fom: LocalDate,
-    val tom: LocalDate,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
     val ukenummer: Int,
     val status: UkeStatus,
     val typeAvvik: TypeAvvikUke? = null,
     val behandletDato: LocalDate? = null,
     @MappedCollection(idColumn = "avklart_kjort_uke_id")
     val dager: List<AvklartKjørtDag>,
-)
+) : Periode<LocalDate> {
+    init {
+        require(dager.all { inneholder(it.dato) }) { "Alle dager må være innenfor perioden til uken" }
+        require(fom.ukenummer() == tom.ukenummer()) { "Fom og tom må være i samme uke" }
+        require(fom.ukenummer() == ukenummer) { "Ukenummer $ukenummer stemmer ikke med perioden" }
+    }
+}
 
 enum class UkeStatus {
     OK_AUTOMATISK, // brukes hvis automatisk godkjent
