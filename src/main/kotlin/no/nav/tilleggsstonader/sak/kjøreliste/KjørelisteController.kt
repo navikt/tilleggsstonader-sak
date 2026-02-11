@@ -24,9 +24,9 @@ class KjørelisteController(
     private val vedtakService: VedtakService,
 ) {
     @GetMapping("{behandlingId}")
-    fun hentKjørelisteForBehandling(
+    fun hentReisevurderingForBehandling(
         @PathVariable behandlingId: BehandlingId,
-    ): List<KjørelisteDto> {
+    ): List<ReisevurderingPrivatBilDto> {
         val behandling = behandlingService.hentBehandling(behandlingId)
 
         val kjørelister = kjørelisteService.hentForFagsakId(behandling.fagsakId)
@@ -40,7 +40,7 @@ class KjørelisteController(
                 ?.reiser
 
         return reiserIRammevedtak?.map { reise ->
-            KjørelisteDto(
+            ReisevurderingPrivatBilDto(
                 reiseId = reise.reiseId,
                 uker =
                     reise.uker.map { uke ->
@@ -55,10 +55,11 @@ class KjørelisteController(
                             tilDato = uke.grunnlag.tom,
                             // TODO: må utvides med flere statuser
                             status = if (kjørelisteForUke == null) UkeStatus.IKKE_MOTTATT_KJØRELISTE else UkeStatus.AVVIK,
-                            automatiskVurdering = AutomatiskVurderingUke(
-                                typeAvvike = TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK,
-                                avviksMelding = "Dette er egentlig ikke et avvik, bare en test"
-                            ),
+                            automatiskVurdering =
+                                AutomatiskVurderingUke(
+                                    typeAvvike = TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK,
+                                    avviksMelding = "Dette er egentlig ikke et avvik, bare en test",
+                                ),
                             behandletDato = null,
                             kjørelisteInnsendtDato = kjørelisteForUke?.datoMottatt?.toLocalDate(),
                             kjørelisteId = kjørelisteForUke?.id,
@@ -94,7 +95,7 @@ class KjørelisteController(
     }
 }
 
-data class KjørelisteDto(
+data class ReisevurderingPrivatBilDto(
     val reiseId: ReiseId,
     val uker: List<UkeDto>,
 )
@@ -142,7 +143,6 @@ enum class UkeStatus {
     AVVIK, // parkeringsutgifter/for mange dager etc. saksbehandler må ta stilling til uka
     IKKE_MOTTATT_KJØRELISTE,
 }
-
 
 enum class UtfyltDagAutomatiskVurdering {
     OK,
