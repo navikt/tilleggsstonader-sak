@@ -65,9 +65,10 @@ class OpprettStønadsvilkårDsl {
     fun privatBil(
         fom: LocalDate,
         tom: LocalDate,
+        reisedagerPerUke: Int = 5,
     ) {
         dtoer += { _, _ ->
-            lagreDagligReisePrivatBilDto(fom = fom, tom = tom)
+            lagreDagligReisePrivatBilDto(fom = fom, tom = tom, reisedagerPerUke = reisedagerPerUke)
         }
     }
 

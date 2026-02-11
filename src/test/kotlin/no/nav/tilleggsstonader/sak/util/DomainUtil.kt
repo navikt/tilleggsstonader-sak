@@ -638,6 +638,7 @@ fun lagreDagligReisePrivatBilDto(
     tom: LocalDate = 31 januar 2025,
     adresse: String = "Tiltaksveien 1",
     reiseId: ReiseId = dummyReiseId,
+    reisedagerPerUke: Int = 5,
     svar: Map<RegelId, SvarOgBegrunnelseDto> =
         mapOf(
             RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
