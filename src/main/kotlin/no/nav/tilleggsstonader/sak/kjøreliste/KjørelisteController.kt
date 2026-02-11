@@ -26,9 +26,9 @@ class KjørelisteController(
     private val vedtakService: VedtakService,
 ) {
     @GetMapping("{behandlingId}")
-    fun hentKjørelisteForBehandling(
+    fun hentReisevurderingForBehandling(
         @PathVariable behandlingId: BehandlingId,
-    ): List<KjørelisteDto> {
+    ): List<ReisevurderingPrivatBilDto> {
         val behandling = behandlingService.hentBehandling(behandlingId)
 
         val kjørelister = kjørelisteService.hentForFagsakId(behandling.fagsakId)
@@ -42,7 +42,7 @@ class KjørelisteController(
                 ?.reiser
 
         return reiserIRammevedtak?.map { reise ->
-            KjørelisteDto(
+            ReisevurderingPrivatBilDto(
                 reiseId = reise.reiseId,
                 uker =
                     reise.uker.map { uke ->
@@ -60,7 +60,7 @@ class KjørelisteController(
     private fun lagUke(
         rammeForUke: RammeForUke,
         kjørelisteForUke: Kjøreliste?,
-    ): UkeDto {
+    ): UkeVurderingDto {
         val dager =
             (
                 0L..ChronoUnit.DAYS.between(
@@ -72,15 +72,19 @@ class KjørelisteController(
                     lagDag(dato, kjørelisteForUke)
                 }
 
-        val antalldagerInnenforRamme = vurderAntallDagerInnenforRamme(dager, rammeForUke)
+        val avvik = if (vurderAntallDagerInnenforRamme(dager, rammeForUke)) {
+            AvvikUke(
+                typeAvvik = TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK,
+                avviksMelding = "Dette er egentlig ikke et avvik, bare en test"
+            )
+        } else null
 
-        return UkeDto(
+        return UkeVurderingDto(
             ukenummer = rammeForUke.grunnlag.fom.ukenummer(),
             fraDato = rammeForUke.grunnlag.fom,
             tilDato = rammeForUke.grunnlag.tom,
-            status = utledStatusForUke(kjørelisteForUke, dager, antalldagerInnenforRamme),
-            avviksbegrunnelse = if (!antalldagerInnenforRamme) AvviksbegrunnelseUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK else null,
-            avviksMelding = "Dette er egentlig ikke et avvik, bare en test",
+            status = utledStatusForUke(kjørelisteForUke, dager, avvik),
+            avvik = avvik,
             behandletDato = null,
             kjørelisteInnsendtDato = kjørelisteForUke?.datoMottatt?.toLocalDate(),
             kjørelisteId = kjørelisteForUke?.id,
@@ -92,7 +96,7 @@ class KjørelisteController(
         dager: List<DagDto>,
         rammeForUke: RammeForUke,
     ): Boolean {
-        val antallDagerMedUtbetaling = dager.filter { it.avklartDag?.resultat == UtfyltDagResultat.UTBETALING }.size
+        val antallDagerMedUtbetaling = dager.filter { it.kjørelisteDag?.harKjørt == true }.size
 
         return antallDagerMedUtbetaling <= rammeForUke.grunnlag.maksAntallDagerSomKanDekkes
     }
@@ -100,11 +104,11 @@ class KjørelisteController(
     private fun utledStatusForUke(
         kjørelisteForUke: Kjøreliste?,
         dager: List<DagDto>,
-        antalldagerInnenforRamme: Boolean,
+        avvikUke: AvvikUke?,
     ): UkeStatus {
         if (kjørelisteForUke == null) return UkeStatus.IKKE_MOTTATT_KJØRELISTE
 
-        if (!antalldagerInnenforRamme) return UkeStatus.AVVIK
+        if (avvikUke != null) return UkeStatus.AVVIK
 
         val automatiskeVurderingForDager = dager.map { it.avklartDag?.automatiskVurdering }.toSet()
 
@@ -149,56 +153,53 @@ class KjørelisteController(
     ): AvklartDag? {
         if (kjørelisteForDag == null) return null
 
-        val avviksbegrunnelse =
-            utledAvviksbegrunnelse(
+        val avvik =
+            utledAvvik(
                 parkeringsutgift = kjørelisteForDag.parkeringsutgift,
                 dato = dato,
             )
 
         return AvklartDag(
-            resultat = finnResultat(kjørelisteForDag.harKjørt),
-            automatiskVurdering = if (avviksbegrunnelse == null) UtfyltDagAutomatiskVurdering.OK else UtfyltDagAutomatiskVurdering.AVVIK,
-            avviksbegrunnelse = avviksbegrunnelse,
+            godkjentGjennomførtKjøring = kjørelisteForDag.harKjørt,
+            automatiskVurdering = if (avvik.isEmpty()) UtfyltDagAutomatiskVurdering.OK else UtfyltDagAutomatiskVurdering.AVVIK,
+            avvik = avvik,
             begrunnelse = null,
             parkeringsutgift = kjørelisteForDag.parkeringsutgift,
         )
     }
 
-    private fun finnResultat(harKjørt: Boolean): UtfyltDagResultat {
-        if (harKjørt) return UtfyltDagResultat.UTBETALING
-        return UtfyltDagResultat.IKKE_UTBETALING
-    }
-
-    private fun utledAvviksbegrunnelse(
+    private fun utledAvvik(
         parkeringsutgift: Int?,
         dato: LocalDate,
-    ): AvviksbegrunnelseDag? {
-        if (parkeringsutgift != null && parkeringsutgift > 100) return AvviksbegrunnelseDag.FOR_HØY_PARKERINGSUTGIFT
-
-        // TODO: Finn ut om vi skal ta hensyn til helg
+    ): List<TypeAvvikDag> {
         val erHelg = dato.dayOfWeek == DayOfWeek.SATURDAY || dato.dayOfWeek == DayOfWeek.SUNDAY
-        if (erHelg) return AvviksbegrunnelseDag.HELLIDAG_ELLER_HELG
-
-        return null
+        return listOfNotNull(
+            TypeAvvikDag.FOR_HØY_PARKERINGSUTGIFT.takeIf { parkeringsutgift != null && parkeringsutgift > 100 },
+            TypeAvvikDag.HELLIDAG_ELLER_HELG.takeIf { erHelg },
+        )
     }
 }
 
-data class KjørelisteDto(
+data class ReisevurderingPrivatBilDto(
     val reiseId: ReiseId,
-    val uker: List<UkeDto>,
+    val uker: List<UkeVurderingDto>,
 )
 
-data class UkeDto(
+data class UkeVurderingDto(
     val ukenummer: Int,
     val fraDato: LocalDate,
     val tilDato: LocalDate,
     val status: UkeStatus,
-    val avviksbegrunnelse: AvviksbegrunnelseUke?,
-    val avviksMelding: String?,
+    val avvik: AvvikUke?,
     val behandletDato: LocalDate?,
     val kjørelisteInnsendtDato: LocalDate?, // null hvis kjøreliste ikke er mottatt
     val kjørelisteId: UUID?, // null hvis kjøreliste ikke er mottatt
     val dager: List<DagDto>,
+)
+
+data class AvvikUke(
+    val typeAvvik: TypeAvvikUke,
+    val avviksMelding: String,
 )
 
 data class DagDto(
@@ -214,9 +215,9 @@ data class KjørelisteDagDto(
 )
 
 data class AvklartDag(
-    val resultat: UtfyltDagResultat,
+    val godkjentGjennomførtKjøring: Boolean,
     val automatiskVurdering: UtfyltDagAutomatiskVurdering,
-    val avviksbegrunnelse: AvviksbegrunnelseDag?,
+    val avvik: List<TypeAvvikDag>,
     val begrunnelse: String?, // må fylles ut om avvik?
     val parkeringsutgift: Int?,
 )
@@ -225,13 +226,7 @@ enum class UkeStatus {
     OK_AUTOMATISK, // brukes hvis automatisk godkjent
     OK_MANUELT, // brukes hvis saksbehandler godtar avvik
     AVVIK, // parkeringsutgifter/for mange dager etc. saksbehandler må ta stilling til uka
-    KORRIGERT, // saksbehandler har endret innsendte dager
     IKKE_MOTTATT_KJØRELISTE,
-}
-
-enum class UtfyltDagResultat {
-    UTBETALING,
-    IKKE_UTBETALING,
 }
 
 enum class UtfyltDagAutomatiskVurdering {
@@ -239,11 +234,11 @@ enum class UtfyltDagAutomatiskVurdering {
     AVVIK,
 }
 
-enum class AvviksbegrunnelseDag {
+enum class TypeAvvikDag {
     FOR_HØY_PARKERINGSUTGIFT,
     HELLIDAG_ELLER_HELG,
 }
 
-enum class AvviksbegrunnelseUke {
+enum class TypeAvvikUke {
     FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK,
 }

@@ -34,8 +34,8 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettJournalpos
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
-import no.nav.tilleggsstonader.sak.kjøreliste.KjørelisteDto
 import no.nav.tilleggsstonader.sak.kjøreliste.KjørelisteRepository
+import no.nav.tilleggsstonader.sak.kjøreliste.ReisevurderingPrivatBilDto
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
 import no.nav.tilleggsstonader.sak.util.dokumentInfo
 import no.nav.tilleggsstonader.sak.util.dokumentvariant
@@ -139,7 +139,7 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
                 .exchange()
                 .expectStatus()
                 .isOk
-                .expectBody<List<KjørelisteDto>>()
+                .expectBody<List<ReisevurderingPrivatBilDto>>()
                 .returnResult()
                 .responseBody
 

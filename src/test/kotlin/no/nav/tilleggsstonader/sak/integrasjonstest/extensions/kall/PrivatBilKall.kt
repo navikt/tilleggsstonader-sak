@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
-import no.nav.tilleggsstonader.sak.kjøreliste.KjørelisteDto
+import no.nav.tilleggsstonader.sak.kjøreliste.ReisevurderingPrivatBilDto
 
 class PrivatBilKall(
     private val testklient: Testklient,
@@ -12,7 +12,7 @@ class PrivatBilKall(
     fun hentRammevedtak(dto: IdentRequest) = apiRespons.hentRammevedtak(dto).expectOkWithBody<List<RammevedtakDto>>()
 
     fun hentKjørelisteForBehandling(behandlingId: BehandlingId) =
-        apiRespons.hentKjørelisteForBehandling(behandlingId).expectOkWithBody<List<KjørelisteDto>>()
+        apiRespons.hentKjørelisteForBehandling(behandlingId).expectOkWithBody<List<ReisevurderingPrivatBilDto>>()
 
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = PrivatBilApi()
