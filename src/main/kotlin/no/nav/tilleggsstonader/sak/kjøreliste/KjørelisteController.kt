@@ -72,12 +72,15 @@ class KjørelisteController(
                     lagDag(dato, kjørelisteForUke)
                 }
 
-        val avvik = if (!vurderAntallDagerInnenforRamme(dager, rammeForUke)) {
-            AvvikUke(
-                typeAvvik = TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK,
-                avviksMelding = "Dette er egentlig ikke et avvik, bare en test"
-            )
-        } else null
+        val avvik =
+            if (!vurderAntallDagerInnenforRamme(dager, rammeForUke)) {
+                AvvikUke(
+                    typeAvvik = TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK,
+                    avviksMelding = "Dette er egentlig ikke et avvik, bare en test",
+                )
+            } else {
+                null
+            }
 
         return UkeVurderingDto(
             ukenummer = rammeForUke.grunnlag.fom.ukenummer(),
@@ -155,8 +158,8 @@ class KjørelisteController(
 
         val avvik =
             utledAvvik(
-                parkeringsutgift = kjørelisteForDag.parkeringsutgift,
                 dato = dato,
+                kjørelisteForDag = kjørelisteForDag,
             )
 
         return AvklartDag(
@@ -169,12 +172,17 @@ class KjørelisteController(
     }
 
     private fun utledAvvik(
-        parkeringsutgift: Int?,
         dato: LocalDate,
+        kjørelisteForDag: KjørelisteDag,
     ): List<TypeAvvikDag> {
+        if (!kjørelisteForDag.harKjørt) return emptyList()
+
         val erHelg = dato.dayOfWeek == DayOfWeek.SATURDAY || dato.dayOfWeek == DayOfWeek.SUNDAY
         return listOfNotNull(
-            TypeAvvikDag.FOR_HØY_PARKERINGSUTGIFT.takeIf { parkeringsutgift != null && parkeringsutgift > 100 },
+            TypeAvvikDag.FOR_HØY_PARKERINGSUTGIFT.takeIf {
+                kjørelisteForDag.parkeringsutgift != null &&
+                    kjørelisteForDag.parkeringsutgift > 100
+            },
             TypeAvvikDag.HELLIDAG_ELLER_HELG.takeIf { erHelg },
         )
     }
