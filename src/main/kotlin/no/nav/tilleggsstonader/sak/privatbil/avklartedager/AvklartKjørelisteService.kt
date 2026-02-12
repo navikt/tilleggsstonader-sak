@@ -21,6 +21,9 @@ class AvklartKjørelisteService(
     private val vedtakService: VedtakService,
     private val avklartKjørtUkeRepository: AvklartKjørtUkeRepository,
 ) {
+    fun hentAvklarteUkerForBehandling(behandlingId: BehandlingId): List<AvklartKjørtUke> =
+        avklartKjørtUkeRepository.findByBehandlingId(behandlingId)
+
     fun avklarUkerFraKjøreliste(
         behandling: Saksbehandling,
         kjøreliste: Kjøreliste,
