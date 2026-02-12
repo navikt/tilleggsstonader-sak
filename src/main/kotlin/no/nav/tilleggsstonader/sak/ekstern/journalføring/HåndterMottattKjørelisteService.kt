@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.ekstern.journalføring
 
+import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
@@ -7,9 +8,6 @@ import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.KjørelisteSkjema
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.OpprettRevurderingService
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
 import no.nav.tilleggsstonader.sak.ekstern.stønad.DagligReisePrivatBilService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
@@ -19,7 +17,9 @@ import no.nav.tilleggsstonader.sak.journalføring.JournalføringHelper
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.journalføring.dokumentBrevkode
+import no.nav.tilleggsstonader.sak.kjøreliste.BehandleMottattKjørelisteTask
 import no.nav.tilleggsstonader.sak.kjøreliste.InnsendtKjøreliste
+import no.nav.tilleggsstonader.sak.kjøreliste.Kjøreliste
 import no.nav.tilleggsstonader.sak.kjøreliste.KjørelisteDag
 import no.nav.tilleggsstonader.sak.kjøreliste.KjørelisteService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
@@ -35,7 +35,7 @@ class HåndterMottattKjørelisteService(
     private val journalpostService: JournalpostService,
     private val fagsakService: FagsakService,
     private val kjørelisteService: KjørelisteService,
-    private val opprettRevurderingService: OpprettRevurderingService,
+    private val taskService: TaskService,
 ) {
     fun behandleKjøreliste(journalpost: Journalpost) {
         val kjørelisteSkjema =
@@ -56,20 +56,9 @@ class HåndterMottattKjørelisteService(
         val saksbehandling = behandlingService.hentSaksbehandling(rammevedtakTilhørendeKjøreliste.behandlingId)
         val fagsak = fagsakService.hentFagsak(saksbehandling.fagsakId)
 
-        lagreKjøreliste(kjørelisteSkjema, reiseId, fagsak, journalpost.journalpostId)
+        val kjøreliste = lagreKjøreliste(kjørelisteSkjema, reiseId, fagsak, journalpost.journalpostId)
 
-        opprettRevurderingService.opprettRevurdering(
-            OpprettRevurdering(
-                fagsakId = fagsak.id,
-                årsak = BehandlingÅrsak.KJØRELISTE,
-                nyeOpplysningerMetadata = null,
-                valgteBarn = emptySet(),
-                kravMottatt = journalpost.datoMottatt?.toLocalDate(),
-                skalOppretteOppgave = true,
-            ),
-        )
-
-        // TODO - opprette task for videre prosessering
+        taskService.save(BehandleMottattKjørelisteTask.opprettTask(kjøreliste.id))
 
         journalpostService.oppdaterOgFerdigstillJournalpost(
             journalpost = journalpost,
@@ -87,7 +76,7 @@ class HåndterMottattKjørelisteService(
         reiseId: ReiseId,
         fagsak: Fagsak,
         journalpostId: String,
-    ) {
+    ): Kjøreliste {
         val kjørelisteDomene =
             InnsendtKjøreliste(
                 reiseId = reiseId,
@@ -104,7 +93,7 @@ class HåndterMottattKjørelisteService(
                     },
             )
 
-        kjørelisteService.lagre(kjørelisteDomene, fagsak.id, journalpostId)
+        return kjørelisteService.lagre(kjørelisteDomene, fagsak.id, journalpostId)
     }
 
     private fun hentKjørelisteSkjemaFraJournalpost(journalpost: Journalpost): KjørelisteSkjema {
