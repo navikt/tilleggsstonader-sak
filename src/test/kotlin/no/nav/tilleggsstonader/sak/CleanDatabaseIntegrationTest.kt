@@ -28,6 +28,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.tilbakekreving.domene.TilbakekrevingHendelse
 import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingId
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Simuleringsresultat
@@ -78,6 +80,8 @@ abstract class CleanDatabaseIntegrationTest : IntegrationTest() {
             Behandlingsjournalpost::class,
             EksternBehandlingId::class,
             TilbakekrevingHendelse::class,
+            AvklartKjørtDag::class,
+            AvklartKjørtUke::class,
             Kjøreliste::class,
             Behandling::class,
             EksternFagsakId::class,
