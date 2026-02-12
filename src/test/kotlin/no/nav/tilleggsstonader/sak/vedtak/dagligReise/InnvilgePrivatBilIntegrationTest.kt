@@ -80,7 +80,7 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
             .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
 
         // Sjekk at rammevedtaket kan hentes
-        val rammevedtak = kall.privatBil.hentRammevedtak(IdentRequest("12345678910"))
+        val rammevedtak = kall.privatBil.hentRammevedtak("12345678910")
         val reiseId = rammevedtak.single().reiseId
 
         assertThat(rammevedtak).hasSize(1)

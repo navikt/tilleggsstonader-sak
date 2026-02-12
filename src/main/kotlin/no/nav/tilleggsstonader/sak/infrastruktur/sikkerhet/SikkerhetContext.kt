@@ -3,7 +3,9 @@ package no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet
 import no.nav.security.token.support.core.context.TokenValidationContext
 import no.nav.security.token.support.core.exceptions.JwtTokenMissingException
 import no.nav.security.token.support.spring.SpringTokenValidationContextHolder
+import no.nav.tilleggsstonader.libs.sikkerhet.EksternBrukerUtils
 import org.slf4j.LoggerFactory
+import org.springframework.web.context.request.RequestContextHolder.getRequestAttributes
 
 object SikkerhetContext {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -18,6 +20,10 @@ object SikkerhetContext {
     fun hentToken() =
         SpringTokenValidationContextHolder().getTokenValidationContext().getJwtToken("azuread")
             ?: throw JwtTokenMissingException()
+
+    fun erTokenMedIssuerTokenX() =
+        getRequestAttributes() != null &&
+            SpringTokenValidationContextHolder().getTokenValidationContext().hasTokenFor(EksternBrukerUtils.ISSUER_TOKENX)
 
     fun erMaskinTilMaskinToken(): Boolean {
         val claims = SpringTokenValidationContextHolder().getTokenValidationContext().getClaims("azuread")

@@ -154,6 +154,11 @@ abstract class IntegrationTest {
         accessAsApplication: Boolean,
     ): String = TokenUtil.clientToken(mockOAuth2Server, clientId, accessAsApplication)
 
+    protected fun tokenX(
+        clientId: String,
+        ident: String,
+    ): String = TokenUtil.tokenXToken(mockOAuth2Server, clientId = clientId, subject = ident)
+
     fun <T : Any> medBrukercontext(
         bruker: String = testBrukerkontekst.defaultBruker,
         roller: List<String> = testBrukerkontekst.roller,
@@ -176,6 +181,14 @@ abstract class IntegrationTest {
     ): RestTestClient.RequestHeadersSpec<*> =
         this.headers {
             it.setBearerAuth(clientCredential(clientId, accessAsApplication))
+        }
+
+    fun RestTestClient.RequestHeadersSpec<*>.medTokenXToken(
+        clientId: String,
+        ident: String,
+    ): RestTestClient.RequestHeadersSpec<*> =
+        this.headers {
+            it.setBearerAuth(tokenX(clientId, ident))
         }
 
     data class TestBrukerKontekst(

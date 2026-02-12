@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.util
 
 import no.nav.security.mock.oauth2.MockOAuth2Server
+import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import java.util.UUID
 
 object TokenUtil {
@@ -63,4 +64,29 @@ object TokenUtil {
                 claims = claims,
             ).serialize()
     }
+
+    fun tokenXToken(
+        mockOAuth2Server: MockOAuth2Server,
+        subject: String,
+        issuerId: String = "tokenx",
+        clientId: String = UUID.randomUUID().toString(),
+        audience: String = "aud-localhost",
+        claims: Map<String, Any> =
+            mapOf(
+                "acr" to "Level4",
+                "pid" to subject,
+            ),
+    ): String =
+        mockOAuth2Server
+            .issueToken(
+                issuerId,
+                clientId,
+                DefaultOAuth2TokenCallback(
+                    issuerId = issuerId,
+                    subject = subject,
+                    audience = listOf(audience),
+                    claims = claims,
+                    expiry = 3600,
+                ),
+            ).serialize()
 }
