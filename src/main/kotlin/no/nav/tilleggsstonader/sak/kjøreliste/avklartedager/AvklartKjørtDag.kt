@@ -12,7 +12,7 @@ data class AvklartKjørtDag(
     val id: UUID = UUID.randomUUID(),
     val dato: LocalDate,
     @Column("godkjent_gjennomfort_kjoring")
-    val godkjentGjennomfortKjøring: Boolean,
+    val godkjentGjennomførtKjøring: Boolean,
     val automatiskVurdering: UtfyltDagAutomatiskVurdering,
     val avvik: List<TypeAvvikDag>,
     val begrunnelse: String? = null,
