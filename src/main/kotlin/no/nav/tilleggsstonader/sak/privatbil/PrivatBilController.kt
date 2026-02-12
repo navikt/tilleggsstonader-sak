@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.privatbil
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.ekstern.stønad.DagligReisePrivatBilService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikUke
@@ -28,6 +29,7 @@ class PrivatBilController(
     private val behandlingService: BehandlingService,
     private val kjørelisteService: KjørelisteService,
     private val vedtakService: VedtakService,
+    private val dagligReisePrivatBilService: DagligReisePrivatBilService,
 ) {
     @GetMapping("{behandlingId}")
     fun hentReisevurderingForBehandling(
@@ -38,12 +40,7 @@ class PrivatBilController(
         val kjørelister = kjørelisteService.hentForFagsakId(behandling.fagsakId)
         val reiserIRammevedtak =
             behandling.forrigeIverksatteBehandlingId
-                ?.let {
-                    vedtakService
-                        .hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandling.forrigeIverksatteBehandlingId)
-                }?.data
-                ?.rammevedtakPrivatBil
-                ?.reiser
+                ?.let { dagligReisePrivatBilService.hentRammevedtakForBehandlingId(it)?.reiser }
 
         return reiserIRammevedtak?.map { reise ->
             ReisevurderingPrivatBilDto(

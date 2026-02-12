@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakUkeDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
@@ -44,4 +45,7 @@ class DagligReisePrivatBilService(
             vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(it)
         }
     }
+
+    fun hentRammevedtakForBehandlingId(behandlingId: BehandlingId): RammevedtakPrivatBil? =
+        vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandlingId)?.data?.rammevedtakPrivatBil
 }

@@ -34,7 +34,8 @@ class DagligReisePrivatBilController(
         feilHvisIkke(SikkerhetContext.kallKommerFra(eksternApplikasjon.soknadApi), HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
         }
-        return dagligReisePrivatBilService.hentRammevedtaksPrivatBil(request)
+        return dagligReisePrivatBilService
+            .hentRammevedtaksPrivatBil(request)
             .flatMap { it.tilDto() }
     }
 }
