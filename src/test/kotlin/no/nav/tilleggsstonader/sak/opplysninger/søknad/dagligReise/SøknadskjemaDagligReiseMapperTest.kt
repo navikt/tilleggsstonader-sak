@@ -6,10 +6,18 @@ import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapperFailOnUnknownProperties
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DagligReiseFyllUtSendInnData
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.OppholdUtenforNorge
+import no.nav.tilleggsstonader.sak.journalføring.SøknadsskjemaUtil
 import no.nav.tilleggsstonader.sak.opplysninger.kodeverk.KodeverkService
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
 import org.junit.jupiter.api.Test
+import tools.jackson.core.JsonParser
+import tools.jackson.core.json.ReaderBasedJsonParser
+import tools.jackson.databind.DeserializationContext
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.deser.std.StdDeserializer
+import tools.jackson.databind.module.SimpleModule
 import tools.jackson.module.kotlin.readValue
 
 class SøknadskjemaDagligReiseMapperTest {
@@ -50,9 +58,18 @@ class SøknadskjemaDagligReiseMapperTest {
         assertFileIsEqual("søknad/dagligReise/eksempel3/mappet-domene.json", mappetJson)
     }
 
+    @Test
+    fun `skal kunne mappe skjema-eksempel fra fyllUtSendInn med offentlig transport hvor oppholdUtenforNorge er et tomt objekt`() {
+        val skjema = mapSkjemadata("søknad/dagligReise/eksempel4/skjema-eksempel-offentlig-transport.json")
+        val mappetSkjema = mapper.mapSkjema(skjema, emptyList())
+
+        val mappetJson = jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(mappetSkjema)
+        assertFileIsEqual("søknad/dagligReise/eksempel4/mappet-domene.json", mappetJson)
+    }
+
     private fun mapSkjemadata(skjemaJsonFil: String): SøknadsskjemaDagligReiseFyllUtSendInn {
         val json = FileUtil.readFile(skjemaJsonFil)
-        val dagligReise = jsonMapperFailOnUnknownProperties.readValue<DagligReiseFyllUtSendInnData>(json)
+        val dagligReise = SøknadsskjemaUtil.jsonMapperMedCustomDeserializerForDagligReise.readValue<DagligReiseFyllUtSendInnData>(json)
         return SøknadsskjemaDagligReiseFyllUtSendInn("nb-NO", dagligReise)
     }
 }

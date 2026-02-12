@@ -10,11 +10,25 @@ import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.OppholdUtenforNorge
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
+import tools.jackson.core.JsonParser
+import tools.jackson.core.json.ReaderBasedJsonParser
+import tools.jackson.databind.DeserializationContext
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.deser.std.StdDeserializer
+import tools.jackson.databind.module.SimpleModule
 import tools.jackson.module.kotlin.readValue
+import tools.jackson.module.kotlin.treeToValue
 import java.time.LocalDateTime
 
 object SøknadsskjemaUtil {
+    val jsonMapperMedCustomDeserializerForDagligReise =
+        jsonMapperFailOnUnknownProperties
+            .rebuild()
+            .addModule(SimpleModule().addDeserializer(OppholdUtenforNorge::class.java, OppholdUtenforNorgeDeserializer()))
+            .build()
+
     fun parseSøknadsskjema(
         stønadstype: Stønadstype,
         data: ByteArray,
@@ -46,7 +60,7 @@ object SøknadsskjemaUtil {
         mottattTidspunkt: LocalDateTime,
     ): InnsendtSkjema<SøknadsskjemaDagligReiseFyllUtSendInn> {
         secureLogger.info("Deserialiserer daglig reise skjema: \n ${String(data)}")
-        val skjema = jsonMapperFailOnUnknownProperties.readValue<SøknadsskjemaDagligReiseFyllUtSendInn>(data)
+        val skjema = jsonMapperMedCustomDeserializerForDagligReise.readValue<SøknadsskjemaDagligReiseFyllUtSendInn>(data)
         return InnsendtSkjema(
             ident = skjema.data.data.dineOpplysninger.identitet.identitetsnummer,
             mottattTidspunkt = mottattTidspunkt,
@@ -61,4 +75,18 @@ object SøknadsskjemaUtil {
             "nn-NO" -> Språkkode.NN
             else -> error("Har ikke mapping for språk=$språk")
         }
+}
+
+class OppholdUtenforNorgeDeserializer : StdDeserializer<OppholdUtenforNorge>(OppholdUtenforNorge::class.java) {
+    override fun deserialize(
+        p: JsonParser?,
+        ctxt: DeserializationContext?,
+    ): OppholdUtenforNorge? {
+        val jsonNode = (p as ReaderBasedJsonParser).readValueAsTree<JsonNode>()
+        return if (jsonNode.isEmpty) {
+            null
+        } else {
+            jsonMapper.treeToValue<OppholdUtenforNorge>(jsonNode)
+        }
+    }
 }
