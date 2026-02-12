@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.kjøreliste
+package no.nav.tilleggsstonader.sak.privatbil
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import no.nav.tilleggsstonader.kontrakter.felles.Periode

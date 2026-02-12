@@ -17,11 +17,11 @@ import no.nav.tilleggsstonader.sak.journalføring.JournalføringHelper
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.journalføring.dokumentBrevkode
-import no.nav.tilleggsstonader.sak.kjøreliste.BehandleMottattKjørelisteTask
-import no.nav.tilleggsstonader.sak.kjøreliste.InnsendtKjøreliste
-import no.nav.tilleggsstonader.sak.kjøreliste.Kjøreliste
-import no.nav.tilleggsstonader.sak.kjøreliste.KjørelisteDag
-import no.nav.tilleggsstonader.sak.kjøreliste.KjørelisteService
+import no.nav.tilleggsstonader.sak.privatbil.BehandleMottattKjørelisteTask
+import no.nav.tilleggsstonader.sak.privatbil.InnsendtKjøreliste
+import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
+import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
+import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.springframework.stereotype.Service
 import tools.jackson.module.kotlin.readValue

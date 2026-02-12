@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
-import no.nav.tilleggsstonader.sak.kjøreliste.ReisevurderingPrivatBilDto
+import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingPrivatBilDto
 
 class PrivatBilKall(
     private val testklient: Testklient,

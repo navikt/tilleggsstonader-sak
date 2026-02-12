@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.kjøreliste
+package no.nav.tilleggsstonader.sak.privatbil
 
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.OpprettRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
-import no.nav.tilleggsstonader.sak.kjøreliste.avklartedager.AvklartKjørelisteService
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import org.springframework.stereotype.Service
 import java.util.Properties
 import java.util.UUID

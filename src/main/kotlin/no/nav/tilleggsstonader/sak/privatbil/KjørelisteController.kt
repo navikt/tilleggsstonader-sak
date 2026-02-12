@@ -1,13 +1,13 @@
-package no.nav.tilleggsstonader.sak.kjøreliste
+package no.nav.tilleggsstonader.sak.privatbil
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.kjøreliste.avklartedager.TypeAvvikDag
-import no.nav.tilleggsstonader.sak.kjøreliste.avklartedager.TypeAvvikUke
-import no.nav.tilleggsstonader.sak.kjøreliste.avklartedager.UkeStatus
-import no.nav.tilleggsstonader.sak.kjøreliste.avklartedager.UtfyltDagAutomatiskVurdering
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikDag
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikUke
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UtfyltDagAutomatiskVurdering
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForUke
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise

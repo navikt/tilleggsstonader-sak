@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.kjøreliste.avklartedager
+package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer

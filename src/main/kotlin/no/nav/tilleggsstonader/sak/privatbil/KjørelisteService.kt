@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.kjøreliste
+package no.nav.tilleggsstonader.sak.privatbil
 
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils

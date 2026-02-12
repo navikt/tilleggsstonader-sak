@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.kjøreliste.avklartedager
+package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column

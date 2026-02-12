@@ -21,10 +21,9 @@ class DagligReisePrivatBilService(
     private val behandlingRepository: BehandlingRepository,
     private val vedtakService: VedtakService,
 ) {
-    fun hentRammevedtaksPrivatBil(ident: IdentRequest): List<RammevedtakDto> =
+    fun hentRammevedtaksPrivatBil(ident: IdentRequest): List<RammevedtakPrivatBil> =
         hentRammevedtakPåIdent(ident.ident)
             .mapNotNull { it.data.rammevedtakPrivatBil }
-            .flatMap { mapRammevedtakTilDto(it) }
 
     fun hentRammevedtakPåIdent(ident: String): List<GeneriskVedtak<InnvilgelseEllerOpphørDagligReise>> {
         val alleIdenterPåPerson =
@@ -46,23 +45,3 @@ class DagligReisePrivatBilService(
         }
     }
 }
-
-private fun mapRammevedtakTilDto(rammevedtak: RammevedtakPrivatBil): List<RammevedtakDto> =
-    rammevedtak.reiser.map { reise ->
-        RammevedtakDto(
-            reiseId = reise.reiseId,
-            fom = reise.grunnlag.fom,
-            tom = reise.grunnlag.tom,
-            reisedagerPerUke = reise.grunnlag.reisedagerPerUke,
-            aktivitetsadresse = reise.aktivitetsadresse ?: "Ukjent adresse",
-            aktivitetsnavn = "Ukjent aktivitet",
-            uker =
-                reise.uker.map { uke ->
-                    RammevedtakUkeDto(
-                        fom = uke.grunnlag.fom,
-                        tom = uke.grunnlag.tom,
-                        ukeNummer = uke.grunnlag.fom.ukenummer(),
-                    )
-                },
-        )
-    }

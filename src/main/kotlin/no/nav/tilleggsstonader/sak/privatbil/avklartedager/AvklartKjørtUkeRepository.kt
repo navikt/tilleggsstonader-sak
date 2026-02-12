@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.kjøreliste.avklartedager
+package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
