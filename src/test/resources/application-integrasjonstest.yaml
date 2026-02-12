@@ -10,9 +10,23 @@ prosessering:
 AZURE_APP_TENANT_ID: navq.onmicrosoft.com
 AZURE_OPENID_CONFIG_TOKEN_ENDPOINT: https://login.microsoftonline.com/${AZURE_APP_TENANT_ID}/oauth2/v2.0/token
 no.nav.security.jwt:
-  issuer.azuread:
-    discoveryurl: http://localhost:${mock-oauth2-server.port}/azuread/.well-known/openid-configuration
-    accepted_audience: aud-localhost
+  issuer:
+    azuread:
+      discoveryurl: http://localhost:${mock-oauth2-server.port}/azuread/.well-known/openid-configuration
+      accepted_audience: aud-localhost
+    tokenx:
+      discovery-url: http://localhost:${mock-oauth2-server.port}/tokenx/.well-known/openid-configuration
+      accepted-audience: aud-localhost
+
+
+TOKEN_X_WELL_KNOWN_URL: http://localhost:${mock-oauth2-server.port}/tokenx/.well-known/openid-configuration
+TOKEN_X_PRIVATE_JWK: '{
+    "kty" : "RSA",
+    "e" : "AQAB",
+    "use" : "sig",
+    "kid" : "mock-oauth2-server-key",
+    "n" : ""
+  }'
 
 unleash:
   enabled: false

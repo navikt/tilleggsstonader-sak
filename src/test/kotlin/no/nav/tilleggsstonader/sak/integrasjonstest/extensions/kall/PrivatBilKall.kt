@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
-import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
@@ -9,7 +8,7 @@ import no.nav.tilleggsstonader.sak.kjøreliste.ReisevurderingPrivatBilDto
 class PrivatBilKall(
     private val testklient: Testklient,
 ) {
-    fun hentRammevedtak(dto: IdentRequest) = apiRespons.hentRammevedtak(dto).expectOkWithBody<List<RammevedtakDto>>()
+    fun hentRammevedtak(ident: String) = apiRespons.hentRammevedtak(ident).expectOkWithBody<List<RammevedtakDto>>()
 
     fun hentKjørelisteForBehandling(behandlingId: BehandlingId) =
         apiRespons.hentKjørelisteForBehandling(behandlingId).expectOkWithBody<List<ReisevurderingPrivatBilDto>>()
@@ -18,13 +17,12 @@ class PrivatBilKall(
     val apiRespons = PrivatBilApi()
 
     inner class PrivatBilApi {
-        fun hentRammevedtak(dto: IdentRequest) =
+        fun hentRammevedtak(ident: String) =
             with(testklient.testkontekst) {
                 restTestClient
-                    .post()
+                    .get()
                     .uri("/api/ekstern/privat-bil/rammevedtak")
-                    .body(dto)
-                    .medClientCredentials(eksternApplikasjon.soknadApi, true)
+                    .medTokenXToken(eksternApplikasjon.soknadApi, ident)
                     .exchange()
             }
 

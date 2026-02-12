@@ -35,7 +35,7 @@ class PdlClientTest {
         fun initClass() {
             wiremockServerItem = WireMockServer(wireMockConfig().dynamicPort())
             wiremockServerItem.start()
-            pdlClient = PdlClient(URI.create(wiremockServerItem.baseUrl()), restTemplate)
+            pdlClient = PdlClient(URI.create(wiremockServerItem.baseUrl()), restTemplate, restTemplate)
         }
 
         @AfterAll
@@ -106,7 +106,7 @@ class PdlClientTest {
             post(urlEqualTo("/${PdlConfig.PATH_GRAPHQL}"))
                 .willReturn(okJson(readFile("pdl/hent_identer.json"))),
         )
-        val response = pdlClient.hentPersonidenter("12345")
+        val response = pdlClient.hentPersonidenterMedSystemContext("12345")
         assertThat(response.identer).containsExactlyInAnyOrder(
             PdlIdent("10987654321", false, "FOLKEREGISTERIDENT"),
             PdlIdent("12345678901", false, "AKTORID"),

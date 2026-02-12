@@ -220,7 +220,7 @@ class SkjemaRoutingIntegrationTest(
         }
 
         private fun mockHentIdenterFraPdl() {
-            every { pdlClient.hentPersonidenter(any()) } answers
+            every { pdlClient.hentPersonidenterMedSluttbrukerSinContext(any()) } answers
                 {
                     PdlIdenter(
                         listOf(
