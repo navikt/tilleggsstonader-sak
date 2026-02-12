@@ -25,6 +25,7 @@ class DetaljertVedtaksperiodeDagligReiseTsrTest {
             typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
             typeAktivtet = TypeAktivitet.ENKELAMO,
             stønadstype = Stønadstype.DAGLIG_REISE_TSR,
+            beregningsDetaljer = null,
         )
 
     val vedtaksperiodeFeb =
@@ -36,6 +37,7 @@ class DetaljertVedtaksperiodeDagligReiseTsrTest {
             typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
             typeAktivtet = TypeAktivitet.GRUPPEAMO,
             stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            beregningsDetaljer = null,
         )
 
     @Test

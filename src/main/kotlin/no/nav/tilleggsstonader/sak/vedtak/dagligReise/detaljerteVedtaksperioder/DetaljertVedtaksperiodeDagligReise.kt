@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatForPeriodeDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.DetaljertVedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -20,6 +21,8 @@ data class DetaljertVedtaksperiodeDagligReise(
     val målgruppe: FaktiskMålgruppe,
     val typeDagligReise: TypeDagligReise,
     val stønadstype: Stønadstype,
+    val beregningsDetaljer: List<BeregningsresultatForPeriodeDto>?,
+//    val beregningsDetaljer: BeregningsresultatDagligReiseDto?
 ) : Periode<LocalDate>,
     DetaljertVedtaksperiode,
     Mergeable<LocalDate, DetaljertVedtaksperiodeDagligReise> {

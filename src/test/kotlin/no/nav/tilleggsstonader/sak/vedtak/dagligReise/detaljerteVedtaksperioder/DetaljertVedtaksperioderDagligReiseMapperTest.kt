@@ -138,6 +138,7 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
         typeDagligReise = typeDagligReise,
         stønadstype = Stønadstype.DAGLIG_REISE_TSO,
         typeAktivtet = null,
+        beregningsDetaljer = null,
     )
 
     private fun innvilgelse(data: InnvilgelseDagligReise = defaultInnvilgelseDagligReise) =

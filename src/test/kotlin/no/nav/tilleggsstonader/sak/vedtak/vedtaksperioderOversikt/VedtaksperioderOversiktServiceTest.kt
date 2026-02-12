@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
-import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -90,6 +89,7 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
                     målgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
                     typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
                     stønadstype = Stønadstype.DAGLIG_REISE_TSR,
+                    beregningsDetaljer = null,
                 ),
             )
 
