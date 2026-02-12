@@ -1,0 +1,103 @@
+{
+  "personopplysninger" : {
+    "adresse" : {
+      "gyldigFraOgMed" : "2004-10-29",
+      "adresse" : "Hestehagen 2",
+      "postnummer" : "2069",
+      "poststed" : "JESSHEIM",
+      "landkode" : "Land1"
+    }
+  },
+  "hovedytelse" : {
+    "hovedytelse" : [ "AAP" ],
+    "harNedsattArbeidsevne" : null,
+    "arbeidOgOpphold" : {
+      "jobberIAnnetLand" : "JA",
+      "jobbAnnetLand" : "Land1",
+      "harPengestøtteAnnetLand" : [ "SYKEPENGER", "PENSJON", "ANNEN_PENGESTØTTE", "MOTTAR_IKKE" ],
+      "pengestøtteAnnetLand" : "Land1",
+      "harOppholdUtenforNorgeSiste12mnd" : "JA",
+      "oppholdUtenforNorgeSiste12mnd" : [ ],
+      "harOppholdUtenforNorgeNeste12mnd" : "JA",
+      "oppholdUtenforNorgeNeste12mnd" : [ ]
+    }
+  },
+  "aktivitet" : {
+    "aktiviteter" : [ {
+      "id" : "134125430",
+      "label" : "Høyere utdanning: 10. september 2025 - 30. juni 2026",
+      "type" : "TILTAK"
+    }, {
+      "id" : "134124111",
+      "label" : "Arbeidstrening: 16. juni 2025 - 31. juli 2025",
+      "type" : "TILTAK"
+    } ],
+    "dekkesUtgiftenAvAndre" : {
+      "typeUtdanning" : "VIDEREGÅENDE",
+      "lærling" : "JA",
+      "arbeidsgiverDekkerUtgift" : "JA",
+      "erUnder25år" : "JA",
+      "betalerForReisenTilSkolenSelv" : "JA",
+      "lønnetAktivitet" : "JA"
+    },
+    "annenAktivitet" : "TILTAK"
+  },
+  "reiser" : [ {
+    "skalReiseFraFolkeregistrertAdresse" : "NEI",
+    "adresseDetSkalReisesFra" : {
+      "gateadresse" : "Annen gate 2",
+      "postnummer" : "0482",
+      "poststed" : "Oslo"
+    },
+    "adresse" : {
+      "gateadresse" : "Oslogate 42",
+      "postnummer" : "0482",
+      "poststed" : "Olso"
+    },
+    "periode" : {
+      "fom" : "2025-01-01",
+      "tom" : "2025-01-01"
+    },
+    "dagerPerUke" : "4",
+    "harMerEnn6KmReisevei" : "JA",
+    "lengdeReisevei" : 18.5,
+    "harBehovForTransportUavhengigAvReisensLengde" : null,
+    "kanReiseMedOffentligTransport" : "JA",
+    "offentligTransport" : {
+      "billettTyperValgt" : [ "ENKELTBILLETT", "TRETTIDAGERSBILLETT" ],
+      "enkeltbillettPris" : 44,
+      "syvdagersbillettPris" : null,
+      "månedskortPris" : 788
+    },
+    "privatTransport" : null
+  }, {
+    "skalReiseFraFolkeregistrertAdresse" : "NEI",
+    "adresseDetSkalReisesFra" : {
+      "gateadresse" : "Annen gate 2",
+      "postnummer" : "0482",
+      "poststed" : "Oslo"
+    },
+    "adresse" : {
+      "gateadresse" : "Drammensveien 42",
+      "postnummer" : "0482",
+      "poststed" : "Oslo"
+    },
+    "periode" : {
+      "fom" : "2025-01-01",
+      "tom" : "2025-01-01"
+    },
+    "dagerPerUke" : "1",
+    "harMerEnn6KmReisevei" : "NEI",
+    "lengdeReisevei" : 1.0,
+    "harBehovForTransportUavhengigAvReisensLengde" : "NEI",
+    "kanReiseMedOffentligTransport" : "JA",
+    "offentligTransport" : {
+      "billettTyperValgt" : [ "SYVDAGERSBILLETT" ],
+      "enkeltbillettPris" : null,
+      "syvdagersbillettPris" : 233,
+      "månedskortPris" : null
+    },
+    "privatTransport" : null
+  } ],
+  "dokumentasjon" : [ ]
+}

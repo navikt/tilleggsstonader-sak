@@ -16,6 +16,12 @@ object FileUtil {
             ?.readText()
             ?: error("Finner ikke fil: $filnavn")
 
+    fun readFileBinary(filnavn: String): ByteArray =
+        FileUtil::class.java.classLoader
+            .getResource(filnavn)
+            ?.readBytes()
+            ?: error("Finner ikke fil: $filnavn")
+
     fun listFiles(path: String): List<Path> {
         val uri =
             FileUtil::class.java.classLoader
