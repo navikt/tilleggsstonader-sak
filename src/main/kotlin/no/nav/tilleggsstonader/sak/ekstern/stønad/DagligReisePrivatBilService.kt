@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakUkeDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -21,10 +22,9 @@ class DagligReisePrivatBilService(
     private val behandlingRepository: BehandlingRepository,
     private val vedtakService: VedtakService,
 ) {
-    fun hentRammevedtaksPrivatBil(ident: String): List<RammevedtakDto> =
+    fun hentRammevedtaksPrivatBil(ident: String): List<RammevedtakPrivatBil> =
         hentRammevedtakPåIdent(ident)
             .mapNotNull { it.data.rammevedtakPrivatBil }
-            .flatMap { mapRammevedtakTilDto(it) }
 
     fun hentRammevedtakPåIdent(ident: String): List<GeneriskVedtak<InnvilgelseEllerOpphørDagligReise>> {
         val alleIdenterPåPerson = hentAlleIdenterPåPerson(ident)
@@ -54,24 +54,7 @@ class DagligReisePrivatBilService(
             .map { it.ident }
             .toSet()
     }
-}
 
-private fun mapRammevedtakTilDto(rammevedtak: RammevedtakPrivatBil): List<RammevedtakDto> =
-    rammevedtak.reiser.map { reise ->
-        RammevedtakDto(
-            reiseId = reise.reiseId,
-            fom = reise.grunnlag.fom,
-            tom = reise.grunnlag.tom,
-            reisedagerPerUke = reise.grunnlag.reisedagerPerUke,
-            aktivitetsadresse = reise.aktivitetsadresse ?: "Ukjent adresse",
-            aktivitetsnavn = "Ukjent aktivitet",
-            uker =
-                reise.uker.map { uke ->
-                    RammevedtakUkeDto(
-                        fom = uke.grunnlag.fom,
-                        tom = uke.grunnlag.tom,
-                        ukeNummer = uke.grunnlag.fom.ukenummer(),
-                    )
-                },
-        )
-    }
+    fun hentRammevedtakForBehandlingId(behandlingId: BehandlingId): RammevedtakPrivatBil? =
+        vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandlingId)?.data?.rammevedtakPrivatBil
+}

@@ -5,7 +5,6 @@ import no.nav.familie.prosessering.StringTilPropertiesWrapperConverter
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.IdConverters.alleValueClassConverters
-import no.nav.tilleggsstonader.sak.kjøreliste.InnsendtKjøreliste
 import no.nav.tilleggsstonader.sak.oppfølging.OppfølgingData
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagData
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.SkjemaBoutgifter
@@ -13,6 +12,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.SkjemaDaglig
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaLæremidler
+import no.nav.tilleggsstonader.sak.privatbil.InnsendtKjøreliste
 import no.nav.tilleggsstonader.sak.tilbakekreving.domene.TilbakekrevingJson
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringJson
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
