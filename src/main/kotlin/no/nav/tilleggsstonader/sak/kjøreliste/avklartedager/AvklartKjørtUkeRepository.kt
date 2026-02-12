@@ -10,7 +10,5 @@ import java.util.UUID
 interface AvklartKjørtUkeRepository :
     RepositoryInterface<AvklartKjørtUke, UUID>,
     InsertUpdateRepository<AvklartKjørtUke> {
-
     fun findByBehandlingId(behandlingId: BehandlingId): List<AvklartKjørtUke>
-
 }

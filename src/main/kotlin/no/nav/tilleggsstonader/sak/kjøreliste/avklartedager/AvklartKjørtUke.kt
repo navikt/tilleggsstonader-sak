@@ -16,6 +16,8 @@ data class AvklartKjørtUke(
     val id: UUID = UUID.randomUUID(),
     @Column("behandling_id")
     val behandlingId: BehandlingId,
+    @Column("kjoreliste_id")
+    val kjørelisteId: UUID,
     override val fom: LocalDate,
     override val tom: LocalDate,
     val ukenummer: Int,

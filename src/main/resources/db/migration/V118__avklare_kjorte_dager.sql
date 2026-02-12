@@ -2,6 +2,7 @@ create table avklart_kjort_uke
 (
     id             UUID                            NOT NULL PRIMARY KEY,
     behandling_id  UUID REFERENCES behandling (id) NOT NULL,
+    kjoreliste_id  UUID                            NOT NULL,
     fom            DATE                            NOT NULL,
     tom            DATE                            NOT NULL,
     ukenummer      INT                             NOT NULL,
