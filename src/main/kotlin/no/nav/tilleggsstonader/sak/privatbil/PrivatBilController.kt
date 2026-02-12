@@ -24,7 +24,7 @@ import java.util.UUID
 @RestController
 @RequestMapping(path = ["/api/kjoreliste"])
 @ProtectedWithClaims(issuer = "azuread")
-class KjørelisteController(
+class PrivatBilController(
     private val behandlingService: BehandlingService,
     private val kjørelisteService: KjørelisteService,
     private val vedtakService: VedtakService,
