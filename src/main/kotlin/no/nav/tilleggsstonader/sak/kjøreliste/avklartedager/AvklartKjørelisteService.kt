@@ -18,9 +18,10 @@ import java.util.UUID
 
 @Service
 class AvklartKjørelisteService(
-    val vedtakService: VedtakService,
+    private val vedtakService: VedtakService,
+    private val avklartKjørtUkeRepository: AvklartKjørtUkeRepository,
 ) {
-    fun utledAvklarteUkerFraKjøreliste(
+    fun avklarUkerFraKjøreliste(
         behandling: Saksbehandling,
         kjøreliste: Kjøreliste,
     ) {
@@ -40,6 +41,8 @@ class AvklartKjørelisteService(
                     rammevedtakForUke = finnRammevedtakForUke(rammeForReise, ukenummer),
                 )
             }
+
+        avklartKjørtUkeRepository.insertAll(avklarteUker)
     }
 
     private fun utledAvklartUke(
@@ -69,7 +72,7 @@ class AvklartKjørelisteService(
             status = utledStatusForUke(avklarteDager, avvik),
             typeAvvik = avvik,
             behandletDato = null,
-            dager = avklarteDager,
+            dager = avklarteDager.toSet(),
         )
     }
 

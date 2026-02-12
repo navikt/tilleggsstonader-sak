@@ -28,7 +28,7 @@ object KjørelisteSkjemaUtil {
                 Reisedag(
                     dato = DatoFelt(label = "Dato", verdi = dato),
                     harKjørt = dato in dagerKjørt,
-                    parkeringsutgift = VerdiFelt(if (dato in dagerKjørt) 90 else 0, "Kroner"),
+                    parkeringsutgift = VerdiFelt(if (dato in dagerKjørt) 90 else null, "Kroner"),
                 )
             }
 

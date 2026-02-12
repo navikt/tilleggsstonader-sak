@@ -25,7 +25,7 @@ data class AvklartKjørtUke(
     val typeAvvik: TypeAvvikUke? = null,
     val behandletDato: LocalDate? = null,
     @MappedCollection(idColumn = "avklart_kjort_uke_id")
-    val dager: List<AvklartKjørtDag>,
+    val dager: Set<AvklartKjørtDag>,
 ) : Periode<LocalDate> {
     init {
         require(dager.all { inneholder(it.dato) }) { "Alle dager må være innenfor perioden til uken" }
