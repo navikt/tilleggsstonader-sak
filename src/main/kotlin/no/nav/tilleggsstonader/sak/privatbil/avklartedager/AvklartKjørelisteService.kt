@@ -58,7 +58,7 @@ class AvklartKjørelisteService(
         val avklarteDager = reisedager.map { utledAvklartDag(it) }
 
         val avvik =
-            if (vurderAntallDagerInnenforRamme(reisedager, rammevedtakForUke)) {
+            if (!vurderAntallDagerInnenforRamme(reisedager, rammevedtakForUke)) {
                 TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK
             } else {
                 null
