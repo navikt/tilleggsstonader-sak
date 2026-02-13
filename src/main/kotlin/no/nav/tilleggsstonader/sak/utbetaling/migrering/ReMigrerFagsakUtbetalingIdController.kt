@@ -14,8 +14,8 @@ import java.util.concurrent.Executors
 @RestController
 @RequestMapping("/api/forvaltning/migrer-utbetalinger")
 @ProtectedWithClaims(issuer = "azuread")
-class FagsakUtbetalingIdMigreringController(
-    private val fagsakUtbetalingIdMigreringService: FagsakUtbetalingIdMigreringService,
+class ReMigrerFagsakUtbetalingIdController(
+    private val reMigrerFagsakUtbetalingIdService: ReMigrerFagsakUtbetalingIdService,
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -25,7 +25,7 @@ class FagsakUtbetalingIdMigreringController(
     ) {
         logger.info("Migrerer fagsak $fagsakId")
         Executors.newVirtualThreadPerTaskExecutor().submit {
-            fagsakUtbetalingIdMigreringService.migrerForFagsak(fagsakId)
+            reMigrerFagsakUtbetalingIdService.migrerForFagsak(fagsakId)
         }
     }
 }

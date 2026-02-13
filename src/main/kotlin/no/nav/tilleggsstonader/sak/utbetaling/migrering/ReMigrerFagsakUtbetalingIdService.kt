@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
-class FagsakUtbetalingIdMigreringService(
+class ReMigrerFagsakUtbetalingIdService(
     private val migreringClient: MigreringClient,
     private val fagsakUtbetalingIdService: FagsakUtbetalingIdService,
     private val behandlingService: BehandlingService,
@@ -47,11 +47,10 @@ class FagsakUtbetalingIdMigreringService(
                     .filter { it != TypeAndel.UGYLDIG }
                     .toSet()
 
-            logger.info("Migrerer typeAndeler: {} for fagsak {}", typeAndelerPåFagsaken, fagsakId)
-
             typeAndelerPåFagsaken.forEach { typeAndel ->
-                if (sisteIverksatteBehandling != null && skalMigrereTilKafka(fagsakId, typeAndel)) {
+                if (sisteIverksatteBehandling != null) {
                     transactionHandler.runInNewTransaction {
+                        logger.info("Migrerer $typeAndel for fagsak $fagsakId")
                         migrerForFagsakOgTypeAndel(sisteIverksatteBehandling, typeAndel)
                     }
                 }
@@ -60,11 +59,6 @@ class FagsakUtbetalingIdMigreringService(
             secureLogger.error("Feil ved migrering av fagsak {}", fagsakId, e)
         }
     }
-
-    private fun skalMigrereTilKafka(
-        fagsakId: FagsakId,
-        typeAndel: TypeAndel,
-    ): Boolean = !fagsakUtbetalingIdService.finnesUtbetalingsId(fagsakId, typeAndel)
 
     private fun migrerForFagsakOgTypeAndel(
         sisteIverksatteBehandling: Saksbehandling,
@@ -96,7 +90,7 @@ class FagsakUtbetalingIdMigreringService(
             ?: error("Fant ingen iverksetting for behandling $sisteIverksatteBehandlingId")
 
     companion object {
-        private val logger = LoggerFactory.getLogger(FagsakUtbetalingIdMigreringService::class.java)
+        private val logger = LoggerFactory.getLogger(ReMigrerFagsakUtbetalingIdService::class.java)
     }
 }
 
