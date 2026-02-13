@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
@@ -20,13 +21,13 @@ fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandlin
             val målgrupper = reiseperioder.flatMap { it.grunnlag.vedtaksperioder }.map { it.målgruppe }
             val typeAktivitet = reiseperioder.flatMap { it.grunnlag.vedtaksperioder }.map { it.typeAktivitet }
 
-            require(målgrupper.distinct().size == 1) {
-                "Støtter foreløpig ikke ulike målgrupper på samme utbetalingsdato"
+            brukerfeilHvisIkke(målgrupper.distinct().size == 1) {
+                "Vi støtter foreløpig ikke ulike målgrupper på samme utbetaling. Ta kontakt med utvikler teamet hvis du trenger å gjøre dette."
             }
 
             if (saksbehandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
-                require(typeAktivitet.distinct().size == 1) {
-                    "Støtter foreløpig ikke ulike typer aktiviteter på samme utbetalingsdato"
+                brukerfeilHvisIkke(typeAktivitet.distinct().size == 1) {
+                    "Vi støtter foreløpig ikke ulike aktivitetsvarianter på samme utbetaling. Ta kontakt med utvikler teamet hvis du trenger å gjøre dette/"
                 }
             }
 
@@ -58,12 +59,14 @@ private fun lagAndelForDagligReise(
             Stønadstype.DAGLIG_REISE_TSO -> {
                 målgruppe.tilTypeAndel(saksbehandling.stønadstype)
             }
+
             Stønadstype.DAGLIG_REISE_TSR -> {
                 feilHvis(typeAktivitet == null) {
                     "Variant/Typeaktivitet skal alltid være satt for Daglig Reise Tsr. Var $typeAktivitet"
                 }
                 finnTypeAndelFraTypeAktivitet(typeAktivitet)
             }
+
             else -> {
                 error("Uforventet stønadstype ${saksbehandling.stønadstype}")
             }
@@ -93,6 +96,7 @@ private fun validerBrukersNavKontorForStønadstype(
                 "Brukers NAV-kontor må være satt for stønadstype $stønadstype"
             }
         }
+
         Stønadstype.DAGLIG_REISE_TSO -> {
             require(brukersNavKontor == null) {
                 "Brukers NAV-kontor skal ikke være satt for stønadstype $stønadstype"

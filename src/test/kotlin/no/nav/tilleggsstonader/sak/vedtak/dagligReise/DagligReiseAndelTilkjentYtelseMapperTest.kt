@@ -2,8 +2,8 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.september
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
@@ -101,7 +101,8 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
     @Test
     fun `to ulike målgrupper på samme dag er ikke støttet enda, og skal derfor feile`() {
         val fredag = 5 september 2025
-        val vedtaksperiodeEnsligForsørger = listOf(lagVedtaksperiodeGrunnlag(fredag, målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER))
+        val vedtaksperiodeEnsligForsørger =
+            listOf(lagVedtaksperiodeGrunnlag(fredag, målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER))
         val vedtaksperioderNedsattArbeidsevne =
             listOf(
                 lagVedtaksperiodeGrunnlag(fredag, målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE),
@@ -129,7 +130,12 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
                     ),
             )
 
-        val message = assertThrows<IllegalArgumentException> { beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling) }.message
-        assertThat(message).isEqualTo("Støtter foreløpig ikke ulike målgrupper på samme utbetalingsdato")
+        val message =
+            assertThrows<ApiFeil> { beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling) }.message
+        assertThat(
+            message,
+        ).isEqualTo(
+            "Vi støtter foreløpig ikke ulike målgrupper på samme utbetaling. Ta kontakt med utvikler teamet hvis du trenger å gjøre dette.",
+        )
     }
 }
