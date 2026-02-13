@@ -300,7 +300,9 @@ data class TidligsteEndringIBehandlingUtleder(
         vilkårperiode.resultat != tidligereVilkårperiode.resultat ||
             vilkårperiode.type != tidligereVilkårperiode.type ||
             vilkårperiode.faktaOgVurdering.fakta != tidligereVilkårperiode.faktaOgVurdering.fakta ||
-            vilkårperiode.typeAktivitet != tidligereVilkårperiode.typeAktivitet
+            vilkårperiode.typeAktivitet != tidligereVilkårperiode.typeAktivitet ||
+            vilkårperiode.kildeId != tidligereVilkårperiode.kildeId
+
 
     private fun erMålgruppeEndret(
         vilkårperiode: ForenkletMålgruppe,
