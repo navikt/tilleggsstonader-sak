@@ -6,9 +6,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.JournalpostClientMockConfig.Companion.journalposter
 import no.nav.tilleggsstonader.sak.util.journalpostMedStrukturertSøknad
 
-fun IntegrationTest.opprettJournalpost(
-    journalpost: Journalpost = journalpostMedStrukturertSøknad(DokumentBrevkode.BOUTGIFTER),
-): Journalpost {
+fun opprettJournalpost(journalpost: Journalpost = journalpostMedStrukturertSøknad(DokumentBrevkode.BOUTGIFTER)): Journalpost {
     journalposter[journalpost.journalpostId.toLong()] = journalpost
     return journalpost
 }

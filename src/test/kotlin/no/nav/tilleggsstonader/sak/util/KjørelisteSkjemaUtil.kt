@@ -13,9 +13,9 @@ object KjørelisteSkjemaUtil {
     fun kjørelisteSkjema(
         reiseId: String,
         periode: Datoperiode,
-        vararg dagerKjørt: LocalDate,
+        dagerKjørt: List<KjørtDag>,
     ): KjørelisteSkjema {
-        require(dagerKjørt.all { periode.inneholder(it) }) {
+        require(dagerKjørt.all { periode.inneholder(it.dato) }) {
             "dagerKjørt må være innenfor perioden"
         }
 
@@ -27,8 +27,8 @@ object KjørelisteSkjemaUtil {
             alleDager.map { dato ->
                 Reisedag(
                     dato = DatoFelt(label = "Dato", verdi = dato),
-                    harKjørt = dato in dagerKjørt,
-                    parkeringsutgift = VerdiFelt(if (dato in dagerKjørt) 90 else null, "Kroner"),
+                    harKjørt = dagerKjørt.any { it.dato == dato },
+                    parkeringsutgift = VerdiFelt(dagerKjørt.singleOrNull { it.dato == dato }?.parkeringsutgift, "Kroner"),
                 )
             }
 
@@ -45,4 +45,9 @@ object KjørelisteSkjemaUtil {
             dokumentasjon = listOf(),
         )
     }
+
+    data class KjørtDag(
+        val dato: LocalDate,
+        val parkeringsutgift: Int? = null,
+    )
 }
