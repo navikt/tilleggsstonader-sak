@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.mergeSammenhengende
+import no.nav.tilleggsstonader.sak.vedtak.domain.mergeSammenhengendeMedTypeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -26,12 +27,14 @@ object ForeslåVedtaksperioderUtil {
     fun foreslåPerioder(
         vilkårperioder: Vilkårperioder,
         vilkår: List<Vilkår>,
+        skalTaHøydeForTypeAktivitet: Boolean = false,
     ): List<Vedtaksperiode> {
         val forslag =
             foreslåPerioder(
                 målgrupper = forenkledeMålgrupper(vilkårperioder),
-                aktiviteter = vilkårperioder.aktiviteter.forenklet { it.type as AktivitetType },
+                aktiviteter = vilkårperioder.aktiviteter.forenklet(skalTaHøydeForTypeAktivitet) { it.type as AktivitetType },
                 vilkår = vilkår.forenklet(),
+                skalTaHøydeForTypeAktivitet = skalTaHøydeForTypeAktivitet,
             )
         brukerfeilHvis(forslag.isEmpty()) {
             "Fant ingen gyldig overlapp mellom aktivitet, målgruppe og utgiftsperiodene"
@@ -39,11 +42,15 @@ object ForeslåVedtaksperioderUtil {
         return forslag
     }
 
-    fun foreslåPerioderUtenVilkår(vilkårperioder: Vilkårperioder): List<Vedtaksperiode> {
+    fun foreslåPerioderUtenVilkår(
+        vilkårperioder: Vilkårperioder,
+        skalTaHøydeForTypeAktivitet: Boolean = false,
+    ): List<Vedtaksperiode> {
         val forslag =
             forslagVedtaksperiodeForInngangsvilkår(
                 målgrupper = forenkledeMålgrupper(vilkårperioder),
-                aktiviteter = vilkårperioder.aktiviteter.forenklet { it.type as AktivitetType },
+                aktiviteter = vilkårperioder.aktiviteter.forenklet(skalTaHøydeForTypeAktivitet) { it.type as AktivitetType },
+                skalTaHøydeForTypeAktivitet = skalTaHøydeForTypeAktivitet,
             )
         brukerfeilHvis(forslag.isEmpty()) {
             "Fant ingen gyldig overlapp mellom aktivitet, målgruppe og utgiftsperiodene"
@@ -61,8 +68,13 @@ object ForeslåVedtaksperioderUtil {
         målgrupper: List<ForenkletVilkårperiode<FaktiskMålgruppe>>,
         aktiviteter: Map<AktivitetType, List<ForenkletVilkårperiode<AktivitetType>>>,
         vilkår: List<Datoperiode>,
+        skalTaHøydeForTypeAktivitet: Boolean,
     ): List<Vedtaksperiode> {
-        val snittAvGyldigeKombinasjoner = forslagVedtaksperiodeForInngangsvilkår(målgrupper, aktiviteter)
+        val snittAvGyldigeKombinasjoner = forslagVedtaksperiodeForInngangsvilkår(
+            målgrupper = målgrupper,
+            aktiviteter = aktiviteter,
+            skalTaHøydeForTypeAktivitet = skalTaHøydeForTypeAktivitet,
+        )
         snittAvGyldigeKombinasjoner.forEach { snitt ->
             brukerfeilHvis(snittAvGyldigeKombinasjoner.any { it.id != snitt.id && it.overlapper(snitt) }) {
                 // TODO bedre feilmelding. Har overlapp mellom flere kombinasjoner av målgruppe og aktivitet
@@ -75,7 +87,7 @@ object ForeslåVedtaksperioderUtil {
                 .map { snitt -> vilkår.mapNotNull { snitt.beregnSnitt(it) } }
                 .flatten()
                 .sorted()
-                .mergeSammenhengende()
+                .let { if (skalTaHøydeForTypeAktivitet) it.mergeSammenhengendeMedTypeAktivitet() else it.mergeSammenhengende() }
                 .map { it.copy(id = UUID.randomUUID()) }
         return forslag
     }
@@ -83,6 +95,7 @@ object ForeslåVedtaksperioderUtil {
     private fun forslagVedtaksperiodeForInngangsvilkår(
         målgrupper: List<ForenkletVilkårperiode<FaktiskMålgruppe>>,
         aktiviteter: Map<AktivitetType, List<ForenkletVilkårperiode<AktivitetType>>>,
+        skalTaHøydeForTypeAktivitet: Boolean,
     ): List<Vedtaksperiode> =
         målgrupper
             .flatMap { målgruppe ->
@@ -90,7 +103,7 @@ object ForeslåVedtaksperioderUtil {
                     .mapNotNull { aktiviteter[it] }
                     .flatten()
                     .mapNotNull { målgruppe.snitt(it) }
-            }.mergeSammenhengende()
+            }.let { if (skalTaHøydeForTypeAktivitet) it.mergeSammenhengendeMedTypeAktivitet() else it.mergeSammenhengende() }
 
     private fun List<Vilkår>.forenklet(): List<Datoperiode> =
         this
@@ -99,19 +112,55 @@ object ForeslåVedtaksperioderUtil {
             .map { Datoperiode(fom = it.fom!!, tom = it.tom!!) }
 
     private inline fun <reified T : Enum<T>, V : Vilkårperiode> List<V>.forenklet(
+        skalTaHøydeForTypeAktivitet: Boolean = false,
         mapType: (V) -> T,
-    ): Map<T, List<ForenkletVilkårperiode<T>>> =
-        this
-            .filter { it.resultat == ResultatVilkårperiode.OPPFYLT }
-            .map {
-                ForenkletVilkårperiode(
-                    fom = it.fom,
-                    tom = it.tom,
-                    type = mapType(it),
-                    typeAktivitet = it.typeAktivitet,
-                )
-            }.groupBy { it.type }
-            .mapValues { it.value.sorted().mergeSammenhengende(ForenkletVilkårperiode<T>::skalMerges) }
+    ): Map<T, List<ForenkletVilkårperiode<T>>> {
+        val forenkletPerioder =
+            this
+                .filter { it.resultat == ResultatVilkårperiode.OPPFYLT }
+                .map {
+                    ForenkletVilkårperiode(
+                        fom = it.fom,
+                        tom = it.tom,
+                        type = mapType(it),
+                        typeAktivitet = it.typeAktivitet,
+                    )
+                }.groupBy { it.type }
+
+        if (skalTaHøydeForTypeAktivitet) {
+            // Valider at aktiviteter med lik AktivitetType men ulik typeAktivitet ikke overlapper
+            forenkletPerioder.forEach { (aktivitetType, perioder) ->
+                val perioderGruppertPåTypeAktivitet = perioder.groupBy { it.typeAktivitet }
+                if (perioderGruppertPåTypeAktivitet.size > 1) {
+                    perioderGruppertPåTypeAktivitet.forEach { (typeAktivitet1, perioder1) ->
+                        perioderGruppertPåTypeAktivitet.forEach { (typeAktivitet2, perioder2) ->
+                            if (typeAktivitet1 != typeAktivitet2) {
+                                perioder1.forEach { p1 ->
+                                    perioder2.forEach { p2 ->
+                                        brukerfeilHvis(p1.overlapper(p2)) {
+                                            "Aktiviteter med type=$aktivitetType kan ikke ha ulik typeAktivitet ($typeAktivitet1 og $typeAktivitet2) som overlapper i tid"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return forenkletPerioder.mapValues {
+            it.value.sorted().mergeSammenhengende(ForenkletVilkårperiode<T>::skalMerges.let { merge ->
+                if (skalTaHøydeForTypeAktivitet) {
+                    { a: ForenkletVilkårperiode<T>, b: ForenkletVilkårperiode<T> ->
+                        merge(a, b) && a.typeAktivitet == b.typeAktivitet
+                    }
+                } else {
+                    merge
+                }
+            })
+        }
+    }
 
     private fun ForenkletVilkårperiode<FaktiskMålgruppe>.snitt(aktivitet: ForenkletVilkårperiode<AktivitetType>) =
         this.beregnSnitt(aktivitet)?.let {

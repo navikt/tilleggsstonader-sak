@@ -21,17 +21,36 @@ object ForeslåVedtaksperiode {
         vilkår: List<Vilkår>,
         forrigeVedtaksperioder: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
+        skalTaHøydeForTypeAktivitet: Boolean = false,
     ): List<Vedtaksperiode> {
-        val forslag = ForeslåVedtaksperioderUtil.foreslåPerioder(vilkårperioder, vilkår)
-        return beholdTidligereIdnForVedtaksperioder(forrigeVedtaksperioder, forslag, tidligsteEndring)
+        val forslag = ForeslåVedtaksperioderUtil.foreslåPerioder(
+            vilkårperioder = vilkårperioder,
+            vilkår = vilkår,
+            skalTaHøydeForTypeAktivitet = skalTaHøydeForTypeAktivitet,
+        )
+        return beholdTidligereIdnForVedtaksperioder(
+            forrigeVedtaksperioder = forrigeVedtaksperioder,
+            forslag = forslag,
+            tidligsteEndring = tidligsteEndring,
+            skalTaHøydeForTypeAktivitet = skalTaHøydeForTypeAktivitet,
+        )
     }
 
     fun finnVedtaksperiodeUtenVilkår(
         vilkårperioder: Vilkårperioder,
         forrigeVedtaksperioder: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
+        skalTaHøydeForTypeAktivitet: Boolean = false,
     ): List<Vedtaksperiode> {
-        val forslag = ForeslåVedtaksperioderUtil.foreslåPerioderUtenVilkår(vilkårperioder)
-        return beholdTidligereIdnForVedtaksperioder(forrigeVedtaksperioder, forslag, tidligsteEndring)
+        val forslag = ForeslåVedtaksperioderUtil.foreslåPerioderUtenVilkår(
+            vilkårperioder = vilkårperioder,
+            skalTaHøydeForTypeAktivitet = skalTaHøydeForTypeAktivitet,
+        )
+        return beholdTidligereIdnForVedtaksperioder(
+            forrigeVedtaksperioder = forrigeVedtaksperioder,
+            forslag = forslag,
+            tidligsteEndring = tidligsteEndring,
+            skalTaHøydeForTypeAktivitet = skalTaHøydeForTypeAktivitet,
+        )
     }
 }

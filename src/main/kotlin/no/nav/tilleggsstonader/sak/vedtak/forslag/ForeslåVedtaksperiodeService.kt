@@ -31,18 +31,21 @@ class ForeslåVedtaksperiodeService(
             } ?: emptyList()
         val tidligsteEndring =
             utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(saksbehandling.id)
+        val skalTaHøydeForTypeAktivitet = saksbehandling.stønadstype.skalTaHøydeForTypeAktivitet()
         return if (saksbehandling.stønadstype.skalHenteStønadsvilkår()) {
             ForeslåVedtaksperiode.finnVedtaksperiode(
                 vilkårperioder = vilkårperioder,
                 vilkår = vilkårService.hentVilkår(saksbehandling.id),
                 forrigeVedtaksperioder = forrigeVedtaksperioder,
                 tidligsteEndring = tidligsteEndring,
+                skalTaHøydeForTypeAktivitet = skalTaHøydeForTypeAktivitet,
             )
         } else {
             ForeslåVedtaksperiode.finnVedtaksperiodeUtenVilkår(
                 vilkårperioder = vilkårperioder,
                 forrigeVedtaksperioder = forrigeVedtaksperioder,
                 tidligsteEndring = tidligsteEndring,
+                skalTaHøydeForTypeAktivitet = skalTaHøydeForTypeAktivitet,
             )
         }
     }
@@ -54,5 +57,11 @@ class ForeslåVedtaksperiodeService(
             Stønadstype.BOUTGIFTER -> true
             Stønadstype.DAGLIG_REISE_TSO -> true
             Stønadstype.DAGLIG_REISE_TSR -> true
+        }
+
+    private fun Stønadstype.skalTaHøydeForTypeAktivitet(): Boolean =
+        when (this) {
+            Stønadstype.DAGLIG_REISE_TSR -> true
+            else -> false
         }
 }

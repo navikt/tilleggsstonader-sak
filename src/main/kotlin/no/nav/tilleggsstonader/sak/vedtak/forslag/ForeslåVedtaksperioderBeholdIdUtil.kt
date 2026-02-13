@@ -14,12 +14,14 @@ object ForeslåVedtaksperioderBeholdIdUtil {
         forrigeVedtaksperioder: List<Vedtaksperiode>,
         forslag: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
+        skalTaHøydeForTypeAktivitet: Boolean = false,
     ): List<Vedtaksperiode> {
         val vedtaksperiodeBeregner =
             lagVedtaksperiodeBeregner(
                 forrigeVedtaksperioder = forrigeVedtaksperioder,
                 forslag = forslag,
                 tidligsteEndring = tidligsteEndring,
+                skalTaHøydeForTypeAktivitet = skalTaHøydeForTypeAktivitet,
             )
         return vedtaksperiodeBeregner.beregnNyeVedtaksperioder()
     }
@@ -31,6 +33,7 @@ object ForeslåVedtaksperioderBeholdIdUtil {
         forrigeVedtaksperioder: List<Vedtaksperiode>,
         forslag: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
+        skalTaHøydeForTypeAktivitet: Boolean,
     ): VedtaksperiodeBeregner {
         val kanEndrePerioderFraOgMed = min(tidligsteEndring, forrigeVedtaksperioder.maxOfOrNull { it.tom }?.plusDays(1))
 
@@ -51,6 +54,7 @@ object ForeslåVedtaksperioderBeholdIdUtil {
             forrigeVedtaksperioderSkalIkkeEndres = forrigeVedtaksperioderSkalIkkeEndres,
             forrigeVedtaksperioder = forrigeVedtaksperioder,
             forslagEtterTidligsteEndring = forslagEtterTidligsteEndring,
+            skalTaHøydeForTypeAktivitet = skalTaHøydeForTypeAktivitet,
         )
     }
 
@@ -58,6 +62,7 @@ object ForeslåVedtaksperioderBeholdIdUtil {
         private val forrigeVedtaksperioderSkalIkkeEndres: List<Vedtaksperiode>,
         private val forrigeVedtaksperioder: List<Vedtaksperiode>,
         private val forslagEtterTidligsteEndring: List<Vedtaksperiode>,
+        private val skalTaHøydeForTypeAktivitet: Boolean,
     ) {
         private val idnSomIkkeSkalMerges = forrigeVedtaksperioder.map { it.id }.toSet()
 
@@ -72,23 +77,16 @@ object ForeslåVedtaksperioderBeholdIdUtil {
                 .mergeNyeVedtaksperioder()
         }
 
-        /**
-         * Slår sammen forrige vedtaksperioder og nye forslag
-         * Hvis man har en periode
-         * 01.01.01 - 31.01.01 og man revurderer fra 1 feb, men man får ny målgruppe/aktivitet så skal man ikke forlenge den første perioden
-         * Den første perioden finnes i [forrigeVedtaksperioderSkalIkkeEndres] samtidig har den blitt sendt inn til forslag, så ID på perioden finnes også i forslag
-         * Det håndteres gjennom å sjekke at ID'n ikke finnes flere ganger. Hvis de finnes flere ganger, så genereres en ny ID for den perioden.
-         */
         private fun mergeFOrrigeMedNyttForslagHvisLikeMedSammeId(nyttForslag: List<Vedtaksperiode>): List<Vedtaksperiode> =
             (forrigeVedtaksperioderSkalIkkeEndres + nyttForslag)
                 .mergeSammenhengende { v1, v2 ->
-                    v1.id == v2.id && v1.erSammenhengendeMedLikMålgruppeOgAktivitet(v2)
+                    if (skalTaHøydeForTypeAktivitet) {
+                        v1.id == v2.id && v1.erSammenhengendeMedLikMålgruppeOgTypeAktivitet(v2)
+                    } else {
+                        v1.id == v2.id && v1.erSammenhengendeMedLikMålgruppeOgAktivitet(v2)
+                    }
                 }
 
-        /**
-         * Hvis man ikke slått sammen perioder med lik ID pga ulik målgruppe eller aktivitet så kan det oppstå duplikate ID'er
-         * Det korrigeres ved å generere en ny ID for de som har duplikat
-         */
         private fun List<Vedtaksperiode>.korrigerIdnPåDuplikat(): List<Vedtaksperiode> {
             val idnSomErBrukte = mutableSetOf<UUID>()
             return this.map {
@@ -101,15 +99,15 @@ object ForeslåVedtaksperioderBeholdIdUtil {
             }
         }
 
-        /**
-         * Pga at man kun slår sammen de som har lik ID og sen korrigerer idn på vedtaksperioder som har duplikate
-         * så merges alle nye sammenhengende vedtaksperioder sammen
-         */
         private fun List<Vedtaksperiode>.mergeNyeVedtaksperioder() =
             mergeSammenhengende { v1, v2 ->
                 !idnSomIkkeSkalMerges.contains(v1.id) &&
                     !idnSomIkkeSkalMerges.contains(v2.id) &&
-                    v1.erSammenhengendeMedLikMålgruppeOgAktivitet(v2)
+                    if (skalTaHøydeForTypeAktivitet) {
+                        v1.erSammenhengendeMedLikMålgruppeOgTypeAktivitet(v2)
+                    } else {
+                        v1.erSammenhengendeMedLikMålgruppeOgAktivitet(v2)
+                    }
             }
     }
 }
