@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.OppholdUtenforNorge
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import tools.jackson.core.JsonParser
-import tools.jackson.core.json.ReaderBasedJsonParser
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.JsonNode
 import tools.jackson.databind.deser.std.StdDeserializer
@@ -79,10 +78,10 @@ object SøknadsskjemaUtil {
 
 class OppholdUtenforNorgeDeserializer : StdDeserializer<OppholdUtenforNorge>(OppholdUtenforNorge::class.java) {
     override fun deserialize(
-        p: JsonParser?,
+        p: JsonParser,
         ctxt: DeserializationContext?,
     ): OppholdUtenforNorge? {
-        val jsonNode = (p as ReaderBasedJsonParser).readValueAsTree<JsonNode>()
+        val jsonNode = p.readValueAsTree<JsonNode>()
         return if (jsonNode.isEmpty) {
             null
         } else {
