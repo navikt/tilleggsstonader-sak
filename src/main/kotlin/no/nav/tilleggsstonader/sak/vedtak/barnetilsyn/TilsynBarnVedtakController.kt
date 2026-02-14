@@ -81,7 +81,7 @@ class TilsynBarnVedtakController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val vedtaksperioder = vedtak.vedtaksperioder.tilDomene()
-        val tidligsteEndring =
+        val (tidligsteEndring, beregnFra) =
             utledTidligsteEndringService.utledTidligsteEndringForBeregning(
                 behandling.id,
                 vedtaksperioder,
@@ -92,7 +92,7 @@ class TilsynBarnVedtakController(
                 vedtaksperioder = vedtaksperioder,
                 behandling = behandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,
-                tidligsteEndring = tidligsteEndring,
+                beregnFra = beregnFra,
             ).tilDto(tidligsteEndring)
     }
 

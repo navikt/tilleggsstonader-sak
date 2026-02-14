@@ -87,16 +87,16 @@ class LæremidlerVedtakController(
     ): BeregningsresultatLæremidlerDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        val tidligsteEndring =
+        val (tidligsteEndring, beregnFra) =
             utledTidligsteEndringService.utledTidligsteEndringForBeregning(
                 behandling.id,
                 vedtaksperioder.tilDomene(),
             )
         return beregningService
             .beregn(
-                behandling,
-                vedtaksperioder.tilDomene(),
-                tidligsteEndring,
+                behandling = behandling,
+                vedtaksperioder = vedtaksperioder.tilDomene(),
+                beregnFra = beregnFra,
             ).tilDto(tidligsteEndring = tidligsteEndring)
     }
 

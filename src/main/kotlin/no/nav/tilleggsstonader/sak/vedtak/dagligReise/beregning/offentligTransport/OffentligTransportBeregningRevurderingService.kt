@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransp
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
@@ -28,7 +27,7 @@ class OffentligTransportBeregningRevurderingService(
         val forrigeIverksatte =
             hentForrigeVedtak(behandling)?.beregningsresultat?.offentligTransport ?: return nyttBeregningsresultat
 
-        brukerfeilHvis(tidligsteEndring == null) { "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen" }
+        if (tidligsteEndring == null) return nyttBeregningsresultat
 
         validerEndringAvAlleredeUtbetaltPeriode(
             nyttBeregningsresultat = nyttBeregningsresultat,
