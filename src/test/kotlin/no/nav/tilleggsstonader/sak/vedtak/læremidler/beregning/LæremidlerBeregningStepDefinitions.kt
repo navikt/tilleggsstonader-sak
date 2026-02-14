@@ -120,9 +120,9 @@ class LæremidlerBeregningStepDefinitions {
         try {
             resultat =
                 læremidlerBeregningService.beregn(
-                    behandling,
-                    vedtaksPerioder,
-                    tidligsteEndring = null,
+                    behandling = behandling,
+                    vedtaksperioder = vedtaksPerioder,
+                    beregnFra = null,
                 )
         } catch (e: Exception) {
             beregningException = e

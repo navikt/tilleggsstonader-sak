@@ -105,7 +105,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                     behandling = saksbehandling(),
                     vedtaksperioder = vedtaksperioder,
                     typeVedtak = TypeVedtak.INNVILGELSE,
-                    tidligsteEndring = null,
+                    beregnFra = null,
                 ).perioder
 
         assertThat(res).isEqualTo(beregningsresultatFørstegangsbehandlingMidlertidigOvernatting)
@@ -120,7 +120,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 behandling = saksbehandling(),
                 vedtaksperioder = vedtaksperioder,
                 typeVedtak = TypeVedtak.INNVILGELSE,
-                tidligsteEndring = null,
+                beregnFra = null,
             )
         }.hasMessage("Det er ikke lagt inn noen oppfylte utgiftsperioder")
     }
@@ -146,7 +146,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 behandling = saksbehandling(),
                 vedtaksperioder = vedtaksperioder,
                 typeVedtak = TypeVedtak.INNVILGELSE,
-                tidligsteEndring = null,
+                beregnFra = null,
             )
         }.hasMessage("Vedtaksperioden 01.01.2025–31.01.2025 mangler oppfylt utgift hele eller deler av perioden.")
     }
@@ -189,7 +189,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 behandling = saksbehandling(),
                 vedtaksperioder = vedtaksperioder,
                 typeVedtak = TypeVedtak.INNVILGELSE,
-                tidligsteEndring = null,
+                beregnFra = null,
             )
         }.hasMessage(
             """
@@ -284,7 +284,7 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                     behandling = saksbehandling,
                     vedtaksperioder = vedtaksperioderRevurdering,
                     typeVedtak = TypeVedtak.INNVILGELSE,
-                    tidligsteEndring = tidligsteEndring,
+                    beregnFra = tidligsteEndring,
                 ).perioder
 
         assertThat(res.size).isEqualTo(2)

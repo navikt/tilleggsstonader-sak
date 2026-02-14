@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
+import no.nav.tilleggsstonader.sak.tidligsteendring.TidligsteEndringForBeregning
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
@@ -45,7 +46,7 @@ class OffentligTransportBeregningStepDefinitions {
     val behandlingId = BehandlingId.random()
     val utledTidligsteEndringService =
         mockk<UtledTidligsteEndringService> {
-            every { utledTidligsteEndringForBeregning(any(), any()) } returns null
+            every { utledTidligsteEndringForBeregning(any(), any()) } returns TidligsteEndringForBeregning(null, null)
         }
     val vilkårperiodeServiceMock =
         mockk<VilkårperiodeService>().apply {

@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.tidligsteendring.TidligsteEndringForBeregning
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -47,7 +48,7 @@ class TilsynBarnBeregnYtelseStegTest {
         mockk<VedtaksperiodeValideringService>(relaxed = true)
     private val utledTidligsteEndringService =
         mockk<UtledTidligsteEndringService> {
-            every { utledTidligsteEndringForBeregning(any(), any()) } returns null
+            every { utledTidligsteEndringForBeregning(any(), any()) } returns TidligsteEndringForBeregning(null, null)
         }
 
     val tilsynBarnBeregningService =
@@ -145,7 +146,8 @@ class TilsynBarnBeregnYtelseStegTest {
         val vedtak = innvilgelseDto(listOf(vedtaksperiode))
 
         mockVilkårperioder(behandlingId = revurdering.id)
-        every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(any(), any()) } returns LocalDate.now()
+        every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(any(), any()) } returns
+            TidligsteEndringForBeregning(LocalDate.now(), LocalDate.now())
 
         val nesteSteg = steg.utførOgReturnerNesteSteg(revurdering, vedtak)
         assertThat(revurdering.type).isEqualTo(BehandlingType.REVURDERING)

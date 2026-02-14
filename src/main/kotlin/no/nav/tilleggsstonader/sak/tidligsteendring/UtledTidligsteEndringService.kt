@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -43,25 +44,34 @@ class UtledTidligsteEndringService(
      * vilkår og vedtaksperioder. Sjekker deretter denne datoen mot alle vedtaksperioder for å finne første dato som
      * vil påvirke beregningen.
      *
-     * - Om det ikke finnes noen tidligere iverksatte behandlinger, returneres null.
-     * - Om det ikke utledes endringer, returnreres null.
-     * - Om utbetalinger ikke vil påvirkes av endringer, returneres tidligste endring hvis det finnes en.
+     * [TidligsteEndringForBeregning.tidligsteEndring] er den opprinnelige verdien (null hvis ingen endring), brukes i DTOer og vedtak.
+     * [TidligsteEndringForBeregning.beregnFra] er verdien som brukes i selve beregningen,
+     * der [LocalDate.MAX] sikrer at alle perioder fra forrige vedtak beholdes i revurderinger uten endring.
      */
     fun utledTidligsteEndringForBeregning(
         behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
-    ): LocalDate? {
+    ): TidligsteEndringForBeregning {
+        val behandling = behandlingService.hentBehandling(behandlingId)
+        val erRevurdering = behandling.forrigeIverksatteBehandlingId != null
+
         val tidligsteEndringResultat =
             utledTidligsteEndring(
-                behandlingId = behandlingId,
+                behandling = behandling,
                 vedtaksperioder = vedtaksperioder,
-                hentVedtaksperioderTidligereBehandlingFunction = { behandlingId ->
-                    vedtakRepository.findByIdOrThrow(behandlingId).vedtaksperioderHvisFinnes() ?: emptyList()
+                hentVedtaksperioderTidligereBehandlingFunction = { id ->
+                    vedtakRepository.findByIdOrThrow(id).vedtaksperioderHvisFinnes() ?: emptyList()
                 },
             )
 
-        return tidligsteEndringResultat?.tidligsteEndringSomPåvirkerUtbetalinger
-            ?: tidligsteEndringResultat?.tidligsteEndring
+        val tidligsteEndring =
+            tidligsteEndringResultat?.tidligsteEndringSomPåvirkerUtbetalinger
+                ?: tidligsteEndringResultat?.tidligsteEndring
+
+        return TidligsteEndringForBeregning(
+            tidligsteEndring = tidligsteEndring,
+            beregnFra = tidligsteEndring ?: if (erRevurdering) LocalDate.MAX else null,
+        )
     }
 
     /**
@@ -70,20 +80,21 @@ class UtledTidligsteEndringService(
      * - Om det ikke finnes noen tidligere iverksatte behandlinger, returneres null.
      * - Om det ikke utledes endringer, returnreres null.
      */
-    fun utledTidligsteEndringIgnorerVedtaksperioder(behandlingId: BehandlingId): LocalDate? =
-        utledTidligsteEndring(
-            behandlingId = behandlingId,
+    fun utledTidligsteEndringIgnorerVedtaksperioder(behandlingId: BehandlingId): LocalDate? {
+        val behandling = behandlingService.hentBehandling(behandlingId)
+
+        return utledTidligsteEndring(
+            behandling = behandling,
             vedtaksperioder = emptyList(),
             hentVedtaksperioderTidligereBehandlingFunction = { _ -> emptyList() },
         )?.tidligsteEndring
+    }
 
     private fun utledTidligsteEndring(
-        behandlingId: BehandlingId,
+        behandling: Behandling,
         vedtaksperioder: List<Vedtaksperiode>,
         hentVedtaksperioderTidligereBehandlingFunction: (BehandlingId) -> List<Vedtaksperiode>,
     ): TidligsteEndringResultat? {
-        val behandling = behandlingService.hentBehandling(behandlingId)
-
         val sisteIverksatteBehandling =
             behandling.forrigeIverksatteBehandlingId?.let { behandlingService.hentBehandling(it) }
 
@@ -91,8 +102,8 @@ class UtledTidligsteEndringService(
             return null
         }
 
-        val vilkår = vilkårService.hentVilkår(behandlingId)
-        val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandlingId)
+        val vilkår = vilkårService.hentVilkår(behandling.id)
+        val vilkårsperioder = vilkårperiodeService.hentVilkårperioder(behandling.id)
 
         val vilkårTidligereBehandling = vilkårService.hentVilkår(sisteIverksatteBehandling.id)
         val vilkårsperioderTidligereBehandling = vilkårperiodeService.hentVilkårperioder(sisteIverksatteBehandling.id)
@@ -100,7 +111,7 @@ class UtledTidligsteEndringService(
         val vedtaksperioderTidligereBehandling =
             hentVedtaksperioderTidligereBehandlingFunction(sisteIverksatteBehandling.id)
 
-        val barnIder = barnService.finnBarnPåBehandling(behandlingId)
+        val barnIder = barnService.finnBarnPåBehandling(behandling.id)
         val barnIderTidligereBehandling = barnService.finnBarnPåBehandling(sisteIverksatteBehandling.id)
 
         return TidligsteEndringIBehandlingUtleder(
@@ -118,6 +129,16 @@ class UtledTidligsteEndringService(
 data class TidligsteEndringResultat(
     val tidligsteEndring: LocalDate,
     val tidligsteEndringSomPåvirkerUtbetalinger: LocalDate?,
+)
+
+/**
+ * @param tidligsteEndring den opprinnelige verdien fra utledTidligsteEndringForBeregning, null hvis ingen endring
+ * @param beregnFra verdien som brukes i beregningen, LocalDate.MAX for revurderinger uten endring, slik at ingen
+ * perioder reberegnes.
+ */
+data class TidligsteEndringForBeregning(
+    val tidligsteEndring: LocalDate?,
+    val beregnFra: LocalDate?,
 )
 
 data class TidligsteEndringIBehandlingUtleder(

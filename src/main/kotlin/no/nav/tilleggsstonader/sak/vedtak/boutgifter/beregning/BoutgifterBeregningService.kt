@@ -51,7 +51,7 @@ class BoutgifterBeregningService(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
         typeVedtak: TypeVedtak,
-        tidligsteEndring: LocalDate?,
+        beregnFra: LocalDate?,
     ): BeregningsresultatBoutgifter {
         val forrigeVedtak = hentForrigeVedtak(behandling)
 
@@ -62,7 +62,7 @@ class BoutgifterBeregningService(
         )
 
         val vedtaksperioderBeregning =
-            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFra(tidligsteEndring)
+            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFra(beregnFra)
 
         val utgifterPerVilkårtype =
             boutgifterUtgiftService
@@ -91,12 +91,9 @@ class BoutgifterBeregningService(
                 utgifter = utgifterPerVilkårtype,
             )
 
-        return if (forrigeVedtak != null) {
-            brukerfeilHvis(tidligsteEndring == null) {
-                "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
-            }
+        return if (forrigeVedtak != null && beregnFra != null) {
             settSammenGamleOgNyePerioder(
-                tidligsteEndring = tidligsteEndring,
+                tidligsteEndring = beregnFra,
                 nyttBeregningsresultat = beregningsresultat,
                 forrigeBeregningsresultat = forrigeVedtak.beregningsresultat,
             )
