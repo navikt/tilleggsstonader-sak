@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.finnPeriodeFraAndel as finnPeriodeTilsynBarnFraAndel
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.finnPeriodeFraAndel as finnPeriodeBoutgifterFraAndel
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.finnPeriodeFraAndel as finnPeriodeDagligReiseFraAndel
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.finnPerioderFraAndel as finnPerioderLæremidlerFraAndel
 
 @Service
@@ -37,7 +38,7 @@ class AndelTilkjentYtelseTilPeriodeService(
     private fun finnFaktiskPeriodeForAndel(
         andelTilkjentYtelse: AndelTilkjentYtelse,
         vedtak: Vedtak,
-    ): Periode<LocalDate> {
+    ): Datoperiode {
         val vedtakdata = vedtak.data
         return when (vedtakdata) {
             is InnvilgelseEllerOpphørBoutgifter ->
@@ -52,7 +53,8 @@ class AndelTilkjentYtelseTilPeriodeService(
                 finnPerioderLæremidlerFraAndel(vedtakdata.beregningsresultat, andelTilkjentYtelse)
                     .let { perioder -> Datoperiode(perioder.minOf { it.fom }, perioder.maxOf { it.tom }) }
 
-            is InnvilgelseEllerOpphørDagligReise -> TODO() // Vil gi mer mening å returnere flere perioder?
+            is InnvilgelseEllerOpphørDagligReise ->
+                finnPeriodeDagligReiseFraAndel(vedtakdata.beregningsresultat, andelTilkjentYtelse)
             else -> error("Behandling ${vedtak.behandlingId} har ikke et iverksatt vedtak")
         }
     }

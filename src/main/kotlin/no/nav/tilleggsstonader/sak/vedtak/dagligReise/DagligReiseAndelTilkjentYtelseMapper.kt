@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
@@ -10,6 +11,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import java.time.LocalDate
 
@@ -131,3 +133,31 @@ val typeAktivitetTilTypeAndelMap =
 fun finnTypeAndelFraTypeAktivitet(typeAktivitet: TypeAktivitet): TypeAndel =
     typeAktivitetTilTypeAndelMap[typeAktivitet]
         ?: error("Kan ikke mappe til TypeAndel fra TypeAktivitet $typeAktivitet")
+
+fun finnPeriodeFraAndel(
+    beregningsresultat: BeregningsresultatDagligReise,
+    andelTilkjentYtelse: AndelTilkjentYtelse,
+): Datoperiode {
+    // TODO - må implementeres for privat bil også
+    val reiseperiodeMedSammeDatoSomAndel =
+        beregningsresultat.offentligTransport
+            ?.reiser
+            ?.flatMap { it.perioder }
+            ?.filter { it.grunnlag.fom == andelTilkjentYtelse.fom }
+
+    if (reiseperiodeMedSammeDatoSomAndel == null) {
+        throw NotImplementedError("Det er kun implementert å finne periode fra andel for offentlig transport")
+    }
+
+    if (reiseperiodeMedSammeDatoSomAndel.isEmpty()) {
+        error("Finner ingen reiseperiode fra andel med fom ${andelTilkjentYtelse.fom}")
+    }
+
+    if (reiseperiodeMedSammeDatoSomAndel.size > 1) {
+        error("Finner flere reiseperioder fra andel med fom ${andelTilkjentYtelse.fom}")
+    }
+
+    return reiseperiodeMedSammeDatoSomAndel.single().grunnlag.let {
+        Datoperiode(it.fom, it.tom)
+    }
+}
