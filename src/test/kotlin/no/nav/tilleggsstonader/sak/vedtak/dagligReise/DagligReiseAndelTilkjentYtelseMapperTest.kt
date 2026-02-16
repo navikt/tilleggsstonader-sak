@@ -6,8 +6,10 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil.defaultInnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
@@ -137,5 +139,30 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
         ).isEqualTo(
             "Vi støtter foreløpig ikke ulike målgrupper på samme utbetaling. Ta kontakt med utvikler teamet hvis du trenger å gjøre dette.",
         )
+    }
+
+    @Nested
+    inner class FinnPeriodeFraAndel {
+        @Test
+        fun `finner periode fra andel`() {
+            val beregningsresultat = defaultInnvilgelseDagligReise.beregningsresultat
+            val andeler = beregningsresultat.offentligTransport!!.mapTilAndelTilkjentYtelse(saksbehandling)
+
+            andeler.forEachIndexed { index, andelTilkjentYtelse ->
+                val periodeFraAndel = finnPeriodeFraAndel(beregningsresultat, andelTilkjentYtelse)
+                assertThat(periodeFraAndel.fom).isEqualTo(
+                    beregningsresultat.offentligTransport.reiser
+                        .first()
+                        .perioder[index]
+                        .grunnlag.fom,
+                )
+                assertThat(periodeFraAndel.tom).isEqualTo(
+                    beregningsresultat.offentligTransport.reiser
+                        .first()
+                        .perioder[index]
+                        .grunnlag.tom,
+                )
+            }
+        }
     }
 }
