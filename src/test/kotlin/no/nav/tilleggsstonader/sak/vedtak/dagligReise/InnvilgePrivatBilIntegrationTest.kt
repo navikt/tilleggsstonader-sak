@@ -36,6 +36,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksK
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteRepository
 import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingPrivatBilDto
+import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
 import no.nav.tilleggsstonader.sak.util.dokumentInfo
 import no.nav.tilleggsstonader.sak.util.dokumentvariant
@@ -87,7 +88,12 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
         assertThat(rammevedtak.single().fom).isEqualTo(fom)
         assertThat(rammevedtak.single().tom).isEqualTo(tom)
 
-        val dagerKjørt = arrayOf(15 september 2025, 20 september 2025, 23 september 2025)
+        val dagerKjørt =
+            listOf(
+                KjørelisteSkjemaUtil.KjørtDag(15 september 2025),
+                KjørelisteSkjemaUtil.KjørtDag(20 september 2025),
+                KjørelisteSkjemaUtil.KjørtDag(23 september 2025),
+            )
         val kjøreliste =
             kjørelisteSkjema(
                 reiseId = reiseId.toString(),
@@ -117,7 +123,7 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
             lagretKjøreliste.data.reisedager
                 .filter { it.harKjørt }
                 .map { it.dato },
-        ).containsExactlyInAnyOrder(*dagerKjørt)
+        ).containsExactlyInAnyOrder(*dagerKjørt.map { it.dato }.toTypedArray())
 
         val behandlingerPåFagsak = behandlingRepository.findByFagsakId(saksbehandling.fagsakId)
         assertThat(behandlingerPåFagsak).hasSize(2)
@@ -150,7 +156,7 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
                 .single()
                 .uker
                 .flatMap { it.dager }
-                .filter { it.dato in dagerKjørt },
+                .filter { it.dato in dagerKjørt.map { d -> d.dato } },
         ).allMatch {
             it.kjørelisteDag?.harKjørt == true
         }
