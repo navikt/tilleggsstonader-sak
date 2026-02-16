@@ -237,12 +237,12 @@ class OppfølgingOpprettKontrollerService(
             MålgruppeType.DAGPENGER -> TypeYtelsePeriode.DAGPENGER
             MålgruppeType.OMSTILLINGSSTØNAD -> TypeYtelsePeriode.OMSTILLINGSSTØNAD
             MålgruppeType.OVERGANGSSTØNAD -> TypeYtelsePeriode.ENSLIG_FORSØRGER
+            MålgruppeType.TILTAKSPENGER -> TypeYtelsePeriode.TILTAKSPENGER_TPSAK
 
             MålgruppeType.NEDSATT_ARBEIDSEVNE,
             MålgruppeType.UFØRETRYGD,
             MålgruppeType.SYKEPENGER_100_PROSENT,
             MålgruppeType.INGEN_MÅLGRUPPE,
-            MålgruppeType.TILTAKSPENGER,
             MålgruppeType.KVALIFISERINGSSTØNAD,
             MålgruppeType.INNSATT_I_FENGSEL,
             -> error("Skal ikke sjekke målgruppe=$this")
