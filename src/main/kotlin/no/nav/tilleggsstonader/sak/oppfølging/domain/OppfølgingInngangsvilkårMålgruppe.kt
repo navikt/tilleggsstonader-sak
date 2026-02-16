@@ -33,9 +33,9 @@ data class OppfølgingInngangsvilkårMålgruppe(
             MålgruppeType.OMSTILLINGSSTØNAD,
             MålgruppeType.OVERGANGSSTØNAD,
             MålgruppeType.TILTAKSPENGER,
+            MålgruppeType.DAGPENGER,
             -> true
 
-            MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger ennå")
             MålgruppeType.NEDSATT_ARBEIDSEVNE,
             MålgruppeType.UFØRETRYGD,
             MålgruppeType.SYKEPENGER_100_PROSENT,
