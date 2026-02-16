@@ -21,7 +21,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import java.time.LocalDate
 import java.util.UUID
-import kotlin.collections.forEach
 
 object ForeslåVedtaksperioderUtil {
     fun foreslåPerioder(
@@ -70,11 +69,12 @@ object ForeslåVedtaksperioderUtil {
         vilkår: List<Datoperiode>,
         skalTaHøydeForTypeAktivitet: Boolean,
     ): List<Vedtaksperiode> {
-        val snittAvGyldigeKombinasjoner = forslagVedtaksperiodeForInngangsvilkår(
-            målgrupper = målgrupper,
-            aktiviteter = aktiviteter,
-            skalTaHøydeForTypeAktivitet = skalTaHøydeForTypeAktivitet,
-        )
+        val snittAvGyldigeKombinasjoner =
+            forslagVedtaksperiodeForInngangsvilkår(
+                målgrupper = målgrupper,
+                aktiviteter = aktiviteter,
+                skalTaHøydeForTypeAktivitet = skalTaHøydeForTypeAktivitet,
+            )
         snittAvGyldigeKombinasjoner.forEach { snitt ->
             brukerfeilHvis(snittAvGyldigeKombinasjoner.any { it.id != snitt.id && it.overlapper(snitt) }) {
                 // TODO bedre feilmelding. Har overlapp mellom flere kombinasjoner av målgruppe og aktivitet
@@ -125,40 +125,32 @@ object ForeslåVedtaksperioderUtil {
                         type = mapType(it),
                         typeAktivitet = it.typeAktivitet,
                     )
+                }.also {
+                    it.validerIngenOverlappMedUlikTypeaktivitet(skalTaHøydeForTypeAktivitet)
                 }.groupBy { it.type }
 
-        if (skalTaHøydeForTypeAktivitet) {
-            // Valider at aktiviteter med lik AktivitetType men ulik typeAktivitet ikke overlapper
-            forenkletPerioder.forEach { (aktivitetType, perioder) ->
-                val perioderGruppertPåTypeAktivitet = perioder.groupBy { it.typeAktivitet }
-                if (perioderGruppertPåTypeAktivitet.size > 1) {
-                    perioderGruppertPåTypeAktivitet.forEach { (typeAktivitet1, perioder1) ->
-                        perioderGruppertPåTypeAktivitet.forEach { (typeAktivitet2, perioder2) ->
-                            if (typeAktivitet1 != typeAktivitet2) {
-                                perioder1.forEach { p1 ->
-                                    perioder2.forEach { p2 ->
-                                        brukerfeilHvis(p1.overlapper(p2)) {
-                                            "Aktiviteter med type=$aktivitetType kan ikke ha ulik typeAktivitet ($typeAktivitet1 og $typeAktivitet2) som overlapper i tid"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+        return forenkletPerioder.mapValues { (_, perioder) ->
+            perioder.sorted().mergeSammenhengende { a, b ->
+                a.skalMerges(b) && (!skalTaHøydeForTypeAktivitet || a.typeAktivitet == b.typeAktivitet)
             }
         }
+    }
 
-        return forenkletPerioder.mapValues {
-            it.value.sorted().mergeSammenhengende(ForenkletVilkårperiode<T>::skalMerges.let { merge ->
-                if (skalTaHøydeForTypeAktivitet) {
-                    { a: ForenkletVilkårperiode<T>, b: ForenkletVilkårperiode<T> ->
-                        merge(a, b) && a.typeAktivitet == b.typeAktivitet
+    private fun <T> List<ForenkletVilkårperiode<T>>.validerIngenOverlappMedUlikTypeaktivitet(skalTaHøydeForTypeAktivitet: Boolean) {
+        if (skalTaHøydeForTypeAktivitet) {
+            this
+                .sortedBy { it.fom }
+                .zipWithNext()
+                .forEach {
+                    brukerfeilHvis(
+                        it.first.typeAktivitet != it.second.typeAktivitet &&
+                            it.first.overlapper(
+                                it.second,
+                            ),
+                    ) {
+                        "Foreløpig klarer vi ikke å foreslå perioder når to ulike tiltaksvarianter overlapper i tid (${it.first.typeAktivitet} og ${it.second.typeAktivitet}). Her må du i stedet legge inn periodene manuelt."
                     }
-                } else {
-                    merge
                 }
-            })
         }
     }
 

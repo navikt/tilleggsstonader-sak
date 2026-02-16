@@ -68,7 +68,7 @@ Egenskap: Beregning av vedtaksperioder med typeAktivitet-flagg
 
       Når forslag til vedtaksperioder lages
 
-      Så forvent følgende feil for vedtaksforsalg: Aktiviteter med type=TILTAK kan ikke ha ulik typeAktivitet (GRUPPEAMO og JOBBKLUBB) som overlapper i tid
+      Så forvent følgende feil for vedtaksforsalg: Foreløpig klarer vi ikke å foreslå perioder når to ulike tiltaksvarianter overlapper i tid (GRUPPEAMO og JOBBKLUBB). Her må du i stedet legge inn periodene manuelt.
 
     Scenario: To aktiviteter med ulik AktivitetType og ulik typeAktivitet som ikke overlapper
       Gitt ta høyde for typeAktivitet er satt til true
