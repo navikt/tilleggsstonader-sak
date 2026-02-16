@@ -21,8 +21,7 @@ data class DetaljertVedtaksperiodeDagligReise(
     val målgruppe: FaktiskMålgruppe,
     val typeDagligReise: TypeDagligReise,
     val stønadstype: Stønadstype,
-    val beregningsDetaljer: List<BeregningsresultatForPeriodeDto>?,
-//    val beregningsDetaljer: BeregningsresultatDagligReiseDto?
+    val beregningsDetaljer: BeregningsresultatForPeriodeDto?,
 ) : Periode<LocalDate>,
     DetaljertVedtaksperiode,
     Mergeable<LocalDate, DetaljertVedtaksperiodeDagligReise> {
@@ -37,7 +36,8 @@ data class DetaljertVedtaksperiodeDagligReise(
             this.aktivitet == other.aktivitet &&
                 this.målgruppe == other.målgruppe &&
                 this.typeDagligReise == other.typeDagligReise &&
-                this.typeAktivtet == other.typeAktivtet
+                this.typeAktivtet == other.typeAktivtet &&
+                this.beregningsDetaljer?.billettdetaljer == other.beregningsDetaljer?.billettdetaljer
         return erLik && this.overlapperEllerPåfølgesAv(other)
     }
 }
