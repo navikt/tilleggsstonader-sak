@@ -62,6 +62,11 @@ class ForeslåVedtaksperiodeService(
     private fun Stønadstype.skalTaHøydeForTypeAktivitet(): Boolean =
         when (this) {
             Stønadstype.DAGLIG_REISE_TSR -> true
-            else -> false
+
+            Stønadstype.BARNETILSYN,
+            Stønadstype.LÆREMIDLER,
+            Stønadstype.BOUTGIFTER,
+            Stønadstype.DAGLIG_REISE_TSO,
+            -> false
         }
 }

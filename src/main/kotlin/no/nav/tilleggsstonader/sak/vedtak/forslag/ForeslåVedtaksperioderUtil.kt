@@ -12,7 +12,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.mergeSammenhengende
-import no.nav.tilleggsstonader.sak.vedtak.domain.mergeSammenhengendeMedTypeAktivitet
+import no.nav.tilleggsstonader.sak.vedtak.domain.mergeSammenhengendeMedLikTypeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -26,7 +26,7 @@ object ForeslåVedtaksperioderUtil {
     fun foreslåPerioder(
         vilkårperioder: Vilkårperioder,
         vilkår: List<Vilkår>,
-        skalTaHøydeForTypeAktivitet: Boolean = false,
+        skalTaHøydeForTypeAktivitet: Boolean,
     ): List<Vedtaksperiode> {
         val forslag =
             foreslåPerioder(
@@ -43,7 +43,7 @@ object ForeslåVedtaksperioderUtil {
 
     fun foreslåPerioderUtenVilkår(
         vilkårperioder: Vilkårperioder,
-        skalTaHøydeForTypeAktivitet: Boolean = false,
+        skalTaHøydeForTypeAktivitet: Boolean,
     ): List<Vedtaksperiode> {
         val forslag =
             forslagVedtaksperiodeForInngangsvilkår(
@@ -87,7 +87,7 @@ object ForeslåVedtaksperioderUtil {
                 .map { snitt -> vilkår.mapNotNull { snitt.beregnSnitt(it) } }
                 .flatten()
                 .sorted()
-                .let { if (skalTaHøydeForTypeAktivitet) it.mergeSammenhengendeMedTypeAktivitet() else it.mergeSammenhengende() }
+                .let { if (skalTaHøydeForTypeAktivitet) it.mergeSammenhengendeMedLikTypeAktivitet() else it.mergeSammenhengende() }
                 .map { it.copy(id = UUID.randomUUID()) }
         return forslag
     }
@@ -103,7 +103,7 @@ object ForeslåVedtaksperioderUtil {
                     .mapNotNull { aktiviteter[it] }
                     .flatten()
                     .mapNotNull { målgruppe.snitt(it) }
-            }.let { if (skalTaHøydeForTypeAktivitet) it.mergeSammenhengendeMedTypeAktivitet() else it.mergeSammenhengende() }
+            }.let { if (skalTaHøydeForTypeAktivitet) it.mergeSammenhengendeMedLikTypeAktivitet() else it.mergeSammenhengende() }
 
     private fun List<Vilkår>.forenklet(): List<Datoperiode> =
         this

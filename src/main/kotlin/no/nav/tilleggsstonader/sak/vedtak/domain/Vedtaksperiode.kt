@@ -79,7 +79,7 @@ fun List<Vedtaksperiode>.mergeSammenhengende() =
         .sorted()
         .mergeSammenhengende { v1, v2 -> v1.erSammenhengendeMedLikMålgruppeOgAktivitet(v2) }
 
-fun List<Vedtaksperiode>.mergeSammenhengendeMedTypeAktivitet() =
+fun List<Vedtaksperiode>.mergeSammenhengendeMedLikTypeAktivitet() =
     this
         .sorted()
         .mergeSammenhengende { v1, v2 -> v1.erSammenhengendeMedLikMålgruppeOgTypeAktivitet(v2) }
