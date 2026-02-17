@@ -48,7 +48,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.support.Acknowledgment
 import java.util.UUID
 
-class MottaSøknadTest : CleanDatabaseIntegrationTest() {
+class MottaSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var oppgavelager: Oppgavelager
 
@@ -57,9 +57,6 @@ class MottaSøknadTest : CleanDatabaseIntegrationTest() {
 
     @Autowired
     private lateinit var fagsakRepository: FagsakRepository
-
-    @Autowired
-    lateinit var journalhendelseKafkaListener: JournalhendelseKafkaListener
 
     @Autowired
     lateinit var hendelseRepository: HendelseRepository

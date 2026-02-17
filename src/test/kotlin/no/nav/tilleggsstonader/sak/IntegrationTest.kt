@@ -7,6 +7,7 @@ import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterSøknadService
+import no.nav.tilleggsstonader.sak.hendelser.journalføring.JournalhendelseKafkaListener
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.MockClientService
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
@@ -75,7 +76,7 @@ abstract class IntegrationTest {
     lateinit var rolleConfig: RolleConfig
 
     @Autowired
-    protected lateinit var testoppsettService: TestoppsettService
+    lateinit var testoppsettService: TestoppsettService
 
     @Autowired
     lateinit var unleashService: UnleashService
@@ -112,6 +113,9 @@ abstract class IntegrationTest {
 
     @Autowired
     lateinit var kafkaTopics: KafkaTopics
+
+    @Autowired
+    lateinit var journalhendelseKafkaListener: JournalhendelseKafkaListener
 
     @Autowired
     lateinit var eksternApplikasjon: EksternApplikasjon
