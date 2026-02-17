@@ -139,6 +139,22 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
         stønadstype = Stønadstype.DAGLIG_REISE_TSO,
         typeAktivtet = null,
         beregningsDetaljer = null,
+//            BeregningsresultatForPeriodeDto(
+//                fom = fom,
+//                tom = tom,
+//                prisEnkeltbillett = 50,
+//                prisSyvdagersbillett = 300,
+//                pris30dagersbillett = 1000,
+//                antallReisedagerPerUke = 5,
+//                beløp = 1000,
+//                billettdetaljer =
+//                    mapOf(
+//                        Billettype.TRETTIDAGERSBILLETT to 1,
+//                    ),
+//                antallReisedager = 20,
+//                fraTidligereVedtak = false,
+//                brukersNavKontor = null,
+//            ),
     )
 
     private fun innvilgelse(data: InnvilgelseDagligReise = defaultInnvilgelseDagligReise) =
@@ -292,6 +308,6 @@ private fun beregningsresultatForPeriode(
         billettdetaljer =
             mapOf(
                 Billettype.TRETTIDAGERSBILLETT to
-                    1000,
+                    1,
             ),
     )

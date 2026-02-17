@@ -20,7 +20,9 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatForPeriodeDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
@@ -89,10 +91,27 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
                     målgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
                     typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
                     stønadstype = Stønadstype.DAGLIG_REISE_TSR,
-                    beregningsDetaljer = null,
+                    beregningsDetaljer =
+                        BeregningsresultatForPeriodeDto(
+                            fom = fomTiltaksenheten,
+                            tom = tomTiltaksenheten,
+                            prisEnkeltbillett = 40,
+                            prisSyvdagersbillett = null,
+                            pris30dagersbillett = 800,
+                            antallReisedagerPerUke = 5,
+                            beløp = 800,
+                            billettdetaljer =
+                                mapOf(
+                                    Billettype.TRETTIDAGERSBILLETT to 1,
+                                ),
+                            antallReisedager = 22,
+                            fraTidligereVedtak = false,
+                            brukersNavKontor = "1014",
+                        ),
                 ),
             )
-
+// [DetaljertVedtaksperiodeDagligReise(fom=2025-09-01, tom=2025-09-30, aktivitet=TILTAK, typeAktivtet=GRUPPEAMO, målgruppe=ARBEIDSSØKER, typeDagligReise=OFFENTLIG_TRANSPORT, stønadstype=DAGLIG_REISE_TSR,
+// beregningsDetaljer=BeregningsresultatForPeriodeDto(fom=2025-09-01, tom=2025-09-30, prisEnkeltbillett=40, prisSyvdagersbillett=null, pris30dagersbillett=800, antallReisedagerPerUke=5, beløp=800, billettdetaljer={TRETTIDAGERSBILLETT=1}, antallReisedager=22, fraTidligereVedtak=false, brukersNavKontor=1014))]
         assertThat(vedtaksperioderOversiktService.hentDetaljerteVedtaksperioderForBehandling(behandlingId)).isEqualTo(
             forventetDetaljertVedtaksperiodeTsr,
         )
