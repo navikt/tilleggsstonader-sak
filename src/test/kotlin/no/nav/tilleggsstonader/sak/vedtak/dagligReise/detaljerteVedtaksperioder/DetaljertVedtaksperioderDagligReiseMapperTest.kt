@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatForPeriodeDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
@@ -138,23 +139,23 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
         typeDagligReise = typeDagligReise,
         stønadstype = Stønadstype.DAGLIG_REISE_TSO,
         typeAktivtet = null,
-        beregningsDetaljer = null,
-//            BeregningsresultatForPeriodeDto(
-//                fom = fom,
-//                tom = tom,
-//                prisEnkeltbillett = 50,
-//                prisSyvdagersbillett = 300,
-//                pris30dagersbillett = 1000,
-//                antallReisedagerPerUke = 5,
-//                beløp = 1000,
-//                billettdetaljer =
-//                    mapOf(
-//                        Billettype.TRETTIDAGERSBILLETT to 1,
-//                    ),
-//                antallReisedager = 20,
-//                fraTidligereVedtak = false,
-//                brukersNavKontor = null,
-//            ),
+        beregningsDetaljer =
+            BeregningsresultatForPeriodeDto(
+                fom = fom,
+                tom = tom,
+                prisEnkeltbillett = 50,
+                prisSyvdagersbillett = 300,
+                pris30dagersbillett = 1000,
+                antallReisedagerPerUke = 5,
+                beløp = 1000,
+                billettdetaljer =
+                    mapOf(
+                        Billettype.TRETTIDAGERSBILLETT to 1,
+                    ),
+                antallReisedager = 20,
+                fraTidligereVedtak = false,
+                brukersNavKontor = null,
+            ),
     )
 
     private fun innvilgelse(data: InnvilgelseDagligReise = defaultInnvilgelseDagligReise) =
