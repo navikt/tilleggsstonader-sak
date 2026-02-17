@@ -1,10 +1,12 @@
 package no.nav.tilleggsstonader.sak.brev.vedtaksbrev
 
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.FerdigstillBehandlingTask
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.privatbil.SendKjorelisteTask
 import org.springframework.stereotype.Service
 
 @Service
@@ -16,6 +18,15 @@ class BrevSteg(
         data: Void?,
     ) {
         taskService.save(FerdigstillBehandlingTask.opprettTask(saksbehandling))
+        if (saksbehandling.erFerdigstilt()
+            && saksbehandling.stønadstype == Stønadstype.DAGLIG_REISE_TSO
+            || saksbehandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR
+        ) {
+            // TODO - hent kjørelisteId
+            // val behandling = hentAvklarteUkerForBehandling(saksbehandling.id)
+            val kjørelisteId = "123"
+            taskService.save(SendKjorelisteTask.opprettTask(kjørelisteId))
+        }
     }
 
     override fun stegType(): StegType = StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV

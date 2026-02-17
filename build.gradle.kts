@@ -71,6 +71,7 @@ dependencies {
     implementation("org.apache.avro:avro:$avroVersion")
     implementation("io.confluent:kafka-avro-serializer:$confluentVersion")
     implementation("no.nav.teamdokumenthandtering:teamdokumenthandtering-avro-schemas:$joarkHendelseVersion")
+    implementation("no.nav.tms.varsel:kotlin-builder:2.1.1")
 
     // Logging
     implementation("net.logstash.logback:logstash-logback-encoder:9.0")
