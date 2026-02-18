@@ -14,8 +14,10 @@ object DetaljertVedtaksperioderDagligReiseMapper {
         val alleReisePerioderTso = vedtaksdataTso?.tilReiseperioder()
         val alleReisePerioderTsr = vedtaksdataTsr?.tilReiseperioder()
 
-        val vedaksperioderFraBeregningsresultatTso = alleReisePerioderTso?.tilDetaljertVedtaksperiode(Stønadstype.DAGLIG_REISE_TSO)
-        val vedaksperioderFraBeregningsresultatTsr = alleReisePerioderTsr?.tilDetaljertVedtaksperiode(Stønadstype.DAGLIG_REISE_TSR)
+        val vedaksperioderFraBeregningsresultatTso =
+            alleReisePerioderTso?.tilDetaljertVedtaksperiode(Stønadstype.DAGLIG_REISE_TSO)
+        val vedaksperioderFraBeregningsresultatTsr =
+            alleReisePerioderTsr?.tilDetaljertVedtaksperiode(Stønadstype.DAGLIG_REISE_TSR)
 
         val vedaksperioderFraBeregningsresultat =
             listOf(
@@ -41,23 +43,40 @@ object DetaljertVedtaksperioderDagligReiseMapper {
                     målgruppe = vedtaksperiode.målgruppe,
                     typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
                     stønadstype = stønadstype,
-                    beregningsDetaljer = mapBeregnDetajlerForPerioder(periode),
+                    beregningsresultat = mapBeregnDetajlerForPerioder(periode),
                 )
             }
         }
 
-    private fun mapBeregnDetajlerForPerioder(periode: BeregningsresultatForPeriode): BeregningsresultatForPeriodeDto =
-        BeregningsresultatForPeriodeDto(
-            fom = periode.grunnlag.fom,
-            tom = periode.grunnlag.tom,
-            prisEnkeltbillett = periode.grunnlag.prisEnkeltbillett,
-            prisSyvdagersbillett = periode.grunnlag.prisSyvdagersbillett,
-            pris30dagersbillett = periode.grunnlag.pris30dagersbillett,
-            antallReisedagerPerUke = periode.grunnlag.antallReisedagerPerUke,
-            beløp = periode.beløp,
-            billettdetaljer = periode.billettdetaljer,
-            antallReisedager = periode.grunnlag.antallReisedager,
-            fraTidligereVedtak = periode.fraTidligereVedtak,
-            brukersNavKontor = periode.grunnlag.brukersNavKontor,
-        )
+    //    private fun mapBeregnDetajlerForPerioder(periode: BeregningsresultatForPeriode): List<BeregningsresultatForPeriodeDto> =
+//        BeregningsresultatForPeriodeDto(
+//            fom = periode.grunnlag.fom,
+//            tom = periode.grunnlag.tom,
+//            prisEnkeltbillett = periode.grunnlag.prisEnkeltbillett,
+//            prisSyvdagersbillett = periode.grunnlag.prisSyvdagersbillett,
+//            pris30dagersbillett = periode.grunnlag.pris30dagersbillett,
+//            antallReisedagerPerUke = periode.grunnlag.antallReisedagerPerUke,
+//            beløp = periode.beløp,
+//            billettdetaljer = periode.billettdetaljer,
+//            antallReisedager = periode.grunnlag.antallReisedager,
+//            fraTidligereVedtak = periode.fraTidligereVedtak,
+//            brukersNavKontor = periode.grunnlag.brukersNavKontor,
+//        )
+// }
+    private fun mapBeregnDetajlerForPerioder(periode: BeregningsresultatForPeriode): List<BeregningsresultatForPeriodeDto> =
+        periode.grunnlag.vedtaksperioder.map { vedtaksperiode ->
+            BeregningsresultatForPeriodeDto(
+                fom = vedtaksperiode.fom,
+                tom = vedtaksperiode.tom,
+                prisEnkeltbillett = periode.grunnlag.prisEnkeltbillett,
+                prisSyvdagersbillett = periode.grunnlag.prisSyvdagersbillett,
+                pris30dagersbillett = periode.grunnlag.pris30dagersbillett,
+                antallReisedagerPerUke = periode.grunnlag.antallReisedagerPerUke,
+                beløp = periode.beløp,
+                billettdetaljer = periode.billettdetaljer,
+                antallReisedager = periode.grunnlag.antallReisedager,
+                fraTidligereVedtak = periode.fraTidligereVedtak,
+                brukersNavKontor = null,
+            )
+        }
 }

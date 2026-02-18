@@ -21,7 +21,7 @@ data class DetaljertVedtaksperiodeDagligReise(
     val målgruppe: FaktiskMålgruppe,
     val typeDagligReise: TypeDagligReise,
     val stønadstype: Stønadstype,
-    val beregningsDetaljer: BeregningsresultatForPeriodeDto?,
+    val beregningsresultat: List<BeregningsresultatForPeriodeDto>,
 ) : Periode<LocalDate>,
     DetaljertVedtaksperiode,
     Mergeable<LocalDate, DetaljertVedtaksperiodeDagligReise> {
@@ -29,15 +29,20 @@ data class DetaljertVedtaksperiodeDagligReise(
         validatePeriode()
     }
 
-    override fun merge(other: DetaljertVedtaksperiodeDagligReise): DetaljertVedtaksperiodeDagligReise = this.copy(tom = other.tom)
+    override fun merge(other: DetaljertVedtaksperiodeDagligReise): DetaljertVedtaksperiodeDagligReise =
+        this.copy(
+            fom = minOf(this.fom, other.fom),
+            tom = maxOf(this.tom, other.tom),
+            beregningsresultat =
+                this.beregningsresultat + other.beregningsresultat,
+        )
 
     fun erLikOgOverlapperEllerPåfølgesAv(other: DetaljertVedtaksperiodeDagligReise): Boolean {
         val erLik =
             this.aktivitet == other.aktivitet &&
                 this.målgruppe == other.målgruppe &&
                 this.typeDagligReise == other.typeDagligReise &&
-                this.typeAktivtet == other.typeAktivtet &&
-                this.beregningsDetaljer?.billettdetaljer == other.beregningsDetaljer?.billettdetaljer
+                this.typeAktivtet == other.typeAktivtet
         return erLik && this.overlapperEllerPåfølgesAv(other)
     }
 }
