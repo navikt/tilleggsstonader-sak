@@ -48,7 +48,7 @@ object ForeslåVedtaksperioderUtil {
         val forslag =
             forslagVedtaksperiodeForInngangsvilkår(
                 målgrupper = forenkledeMålgrupper(vilkårperioder),
-                aktiviteter = vilkårperioder.aktiviteter.forenklet(skalTaHøydeForTypeAktivitet) { it.type as AktivitetType },
+                aktiviteter = vilkårperioder.aktiviteter.forenklet { it.type as AktivitetType },
                 skalTaHøydeForTypeAktivitet = skalTaHøydeForTypeAktivitet,
             )
         brukerfeilHvis(forslag.isEmpty()) {
