@@ -45,7 +45,6 @@ class ForeslåVedtaksperiodeService(
                 vilkårperioder = vilkårperioder,
                 forrigeVedtaksperioder = forrigeVedtaksperioder,
                 tidligsteEndring = tidligsteEndring,
-                skalTaHøydeForTypeAktivitet = skalTaHøydeForTypeAktivitet,
             )
         }
     }
