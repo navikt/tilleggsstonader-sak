@@ -39,6 +39,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsrRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
@@ -100,6 +101,7 @@ private fun søknadForStønadstype(stønadstype: Stønadstype) =
             søknadskjemaBarnetilsyn(
                 barnMedBarnepass = listOf(barnMedBarnepass(ident = PdlClientMockConfig.BARN_FNR)),
             )
+
         Stønadstype.LÆREMIDLER -> søknadskjemaLæremidler()
         Stønadstype.BOUTGIFTER -> søknadBoutgifter()
         Stønadstype.DAGLIG_REISE_TSO,
@@ -285,7 +287,7 @@ fun IntegrationTest.gjennomførSimuleringSteg(behandlingId: BehandlingId) {
 fun IntegrationTest.gjennomførVedtakSteg(
     behandlingId: BehandlingId,
     stønadstype: Stønadstype,
-    opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
+    opprettVedtak: OpprettVedtak = OpprettInnvilgelse(),
 ) {
     gjennomførBeregningSteg(behandlingId, stønadstype, opprettVedtak)
 }
@@ -301,16 +303,14 @@ fun IntegrationTest.gjennomførBeregningStegDagligReise(behandlingId: Behandling
 fun IntegrationTest.gjennomførBeregningSteg(
     behandlingId: BehandlingId,
     stønadstype: Stønadstype,
-    opprettVedtak: OpprettVedtak = OpprettInnvilgelse,
-): RestTestClient.ResponseSpec {
-    val foreslåtteVedtaksperioder = kall.vedtak.foreslåVedtaksperioder(behandlingId)
-
-    val vedtaksperioder =
-        foreslåtteVedtaksperioder.map {
-            it.tilVedtaksperiodeDto()
-        }
-    return when (opprettVedtak) {
-        is OpprettInnvilgelse ->
+    opprettVedtak: OpprettVedtak = OpprettInnvilgelse(),
+): RestTestClient.ResponseSpec =
+    when (opprettVedtak) {
+        is OpprettInnvilgelse -> {
+            val vedtaksperioder =
+                opprettVedtak.vedtaksperioder ?: kall.vedtak
+                    .foreslåVedtaksperioder(behandlingId)
+                    .map { it.tilVedtaksperiodeDto() }
             kall.vedtak.apiRespons
                 .lagreInnvilgelse(
                     stønadstype = stønadstype,
@@ -327,6 +327,8 @@ fun IntegrationTest.gjennomførBeregningSteg(
                                 )
                         },
                 )
+        }
+
         is OpprettAvslag -> TODO()
         is OpprettOpphør ->
             kall.vedtak.apiRespons
@@ -341,18 +343,21 @@ fun IntegrationTest.gjennomførBeregningSteg(
                                     begrunnelse = opprettVedtak.begrunnelse,
                                     opphørsdato = opprettVedtak.opphørsdato,
                                 )
+
                             Stønadstype.LÆREMIDLER ->
                                 OpphørLæremidlerRequest(
                                     årsakerOpphør = opprettVedtak.årsaker,
                                     begrunnelse = opprettVedtak.begrunnelse,
                                     opphørsdato = opprettVedtak.opphørsdato,
                                 )
+
                             Stønadstype.BOUTGIFTER ->
                                 OpphørBoutgifterRequest(
                                     årsakerOpphør = opprettVedtak.årsaker,
                                     begrunnelse = opprettVedtak.begrunnelse,
                                     opphørsdato = opprettVedtak.opphørsdato,
                                 )
+
                             Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR ->
                                 OpphørDagligReiseRequest(
                                     årsakerOpphør = opprettVedtak.årsaker,
@@ -362,11 +367,12 @@ fun IntegrationTest.gjennomførBeregningSteg(
                         },
                 )
     }
-}
 
 sealed interface OpprettVedtak
 
-data object OpprettInnvilgelse : OpprettVedtak
+data class OpprettInnvilgelse(
+    val vedtaksperioder: List<VedtaksperiodeDto>? = null,
+) : OpprettVedtak
 
 data object OpprettAvslag : OpprettVedtak
 

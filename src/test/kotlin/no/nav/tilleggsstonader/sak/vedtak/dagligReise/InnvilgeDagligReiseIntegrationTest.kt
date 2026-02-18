@@ -10,13 +10,17 @@ import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.integrasjonstest.OpprettInnvilgelse
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -140,8 +144,22 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 }
             }
 
-        gjennomførBeregningSteg(behandlingId, Stønadstype.DAGLIG_REISE_TSO)
-            .expectStatus()
+        gjennomførBeregningSteg(
+            behandlingId,
+            Stønadstype.DAGLIG_REISE_TSO,
+            OpprettInnvilgelse(
+                vedtaksperioder =
+                    listOf(
+                        VedtaksperiodeDto(
+                            fom = fom,
+                            tom = tom,
+                            målgruppeType = FaktiskMålgruppe.ARBEIDSSØKER,
+                            aktivitetType = AktivitetType.TILTAK,
+                            typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                        ),
+                    ),
+            ),
+        ).expectStatus()
             .isBadRequest
             .expectBody()
             .jsonPath("$.detail")
