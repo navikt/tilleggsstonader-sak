@@ -148,7 +148,7 @@ object ForeslåVedtaksperioderUtil {
                                 it.second,
                             ),
                     ) {
-                        "Foreløpig klarer vi ikke å foreslå perioder når to ulike tiltaksvarianter overlapper i tid (${it.first.typeAktivitet} og ${it.second.typeAktivitet}). Her må du i stedet legge inn periodene manuelt."
+                        "Foreløpig klarer vi ikke å foreslå perioder når to ulike tiltaksvarianter overlapper i tid (${it.first.typeAktivitet?.beskrivelse} og ${it.second.typeAktivitet?.beskrivelse}). Her må du i stedet legge inn periodene manuelt."
                     }
                 }
         }
