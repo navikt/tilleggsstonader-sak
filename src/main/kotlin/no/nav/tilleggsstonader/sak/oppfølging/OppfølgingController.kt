@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.oppfølging
 
-import no.nav.familie.prosessering.util.MDCConstants
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
@@ -12,13 +12,12 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.concurrent.Executors
 
 @RestController
 @RequestMapping(path = ["/api/oppfolging"])
@@ -32,15 +31,19 @@ class OppfølgingController(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    @GetMapping
-    fun hentAktiveOppfølginger(): List<KontrollerOppfølgingResponse> {
+    @GetMapping("{enhetString}")
+    fun hentAktiveOppfølginger(
+        @PathVariable enhetString: String,
+    ): List<KontrollerOppfølgingResponse> {
         tilgangService.validerTilgangTilRolle(BehandlerRolle.VEILEDER)
 
         feilHvisIkke(unleashService.isEnabled(Toggle.HENT_BEHANDLINGER_FOR_OPPFØLGING)) {
             "Feature toggle ${Toggle.HENT_BEHANDLINGER_FOR_OPPFØLGING} er ikke aktivert"
         }
 
-        return oppfølgingService.hentAktiveOppfølginger().tilDto()
+        val enhet = Enhet.fraEnhetsnr(enhetString)
+
+        return oppfølgingService.hentAktiveOppfølginger(enhet).tilDto()
     }
 
     @PostMapping("kontroller")
@@ -63,17 +66,11 @@ class OppfølgingController(
     @PostMapping("start")
     fun startJobb() {
         tilgangService.validerTilgangTilRolle(BehandlerRolle.VEILEDER)
-        val callId = MDC.get(MDCConstants.MDC_CALL_ID)
-        Executors.newVirtualThreadPerTaskExecutor().submit {
-            try {
-                MDC.put(MDCConstants.MDC_CALL_ID, callId)
-                oppfølgingOpprettKontrollerService.opprettTaskerForOppfølging()
-            } catch (e: Exception) {
-                logger.warn("Feilet start av oppfølgingjobb, se secure logs for flere detaljer")
-                secureLogger.error("Feilet start av oppfølgingjobb", e)
-            } finally {
-                MDC.remove(MDCConstants.MDC_CALL_ID)
-            }
+        try {
+            oppfølgingOpprettKontrollerService.opprettTaskerForOppfølging()
+        } catch (e: Exception) {
+            logger.warn("Feilet start av oppfølgingjobb, se secure logs for flere detaljer")
+            secureLogger.error("Feilet start av oppfølgingjobb", e)
         }
     }
 

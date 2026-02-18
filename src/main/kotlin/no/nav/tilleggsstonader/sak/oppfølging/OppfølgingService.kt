@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.oppfølging
 
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
+import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -26,8 +28,9 @@ class OppfølgingService(
         return oppfølgingRepository.finnAktivMedDetaljer(oppfølging.behandlingId)
     }
 
-    fun hentAktiveOppfølginger(): List<OppfølgingMedDetaljer> =
+    fun hentAktiveOppfølginger(enhet: Enhet): List<OppfølgingMedDetaljer> =
         oppfølgingRepository
             .finnAktiveMedDetaljer()
+            .filter { it.behandlingsdetaljer.stønadstype.behandlendeEnhet() == enhet }
             .sortedBy { it.behandlingsdetaljer.vedtakstidspunkt }
 }

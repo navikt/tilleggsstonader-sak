@@ -1,7 +1,12 @@
 package no.nav.tilleggsstonader.sak.oppfølging
 
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.OppfølgingRepositoryFake
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.fagsak
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -11,7 +16,14 @@ class OppfølgingServiceTest {
     val repository = OppfølgingRepositoryFake()
     val service = OppfølgingService(repository)
 
-    val behandling = behandling()
+    val behandlingTilsynBarn = behandling()
+    val behandlingDagligReiseTSR =
+        behandling(
+            fagsak =
+                fagsak(
+                    stønadstype = Stønadstype.DAGLIG_REISE_TSR,
+                ),
+        )
 
     @BeforeEach
     fun setUp() {
@@ -25,7 +37,7 @@ class OppfølgingServiceTest {
             val oppfølging =
                 repository.insert(
                     Oppfølging(
-                        behandlingId = behandling.id,
+                        behandlingId = behandlingTilsynBarn.id,
                         data = OppfølgingData(emptyList()),
                         aktiv = false,
                     ),
@@ -42,5 +54,34 @@ class OppfølgingServiceTest {
                 )
             }.hasMessageContaining("Kan ikke redigere en oppfølging som ikke lengre er aktiv")
         }
+    }
+
+    @Test
+    fun `hent oppgølginger henter bare oppgaver for NAY`() {
+        val oppfølgingTsr =
+            repository.insert(
+                Oppfølging(
+                    behandlingId = behandlingDagligReiseTSR.id,
+                    data = OppfølgingData(emptyList()),
+                    aktiv = false,
+                ),
+            )
+        val oppfølgingNay =
+            repository.insert(
+                Oppfølging(
+                    behandlingId = behandlingTilsynBarn.id,
+                    data = OppfølgingData(emptyList()),
+                    aktiv = false,
+                ),
+            )
+
+        assertThat(
+            service
+                .hentAktiveOppfølginger(Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD)
+                .single()
+                .behandlingsdetaljer
+                .stønadstype
+                .behandlendeEnhet(),
+        ).isEqualTo(Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD)
     }
 }
