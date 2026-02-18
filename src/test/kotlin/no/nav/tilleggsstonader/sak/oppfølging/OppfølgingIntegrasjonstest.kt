@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
+import org.apache.kafka.shaded.com.google.protobuf.LazyStringArrayList.emptyList
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,7 +28,8 @@ class OppfølgingIntegrasjonstest : CleanDatabaseIntegrationTest() {
             stønadstype = Stønadstype.DAGLIG_REISE_TSR,
         ) { defaultDagligReiseTsrTestdata() }
 
-        kall.oppfølging.startJobb()
+        kall.oppfølging.startJobb(Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD)
+        kall.oppfølging.startJobb(Enhet.NAV_TILTAK_OSLO)
 
         kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 
@@ -48,5 +50,34 @@ class OppfølgingIntegrasjonstest : CleanDatabaseIntegrationTest() {
                 .stønadstype
                 .behandlendeEnhet(),
         ).isEqualTo(Enhet.NAV_TILTAK_OSLO)
+    }
+
+    @Test
+    fun `oppretter oppgølginger oppretter bare oppgaver for spesifiesert enhet`() {
+        opprettBehandlingOgGjennomførBehandlingsløp(
+            stønadstype = Stønadstype.BARNETILSYN,
+        ) { defaultTilsynBarnTestdata() }
+
+        opprettBehandlingOgGjennomførBehandlingsløp(
+            stønadstype = Stønadstype.DAGLIG_REISE_TSR,
+        ) { defaultDagligReiseTsrTestdata() }
+
+        kall.oppfølging.startJobb(Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD)
+
+        kjørTasksKlareForProsesseringTilIngenTasksIgjen()
+
+        assertThat(
+            kall.oppfølging
+                .hentAktiveOppfølginger(Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD)
+                .single()
+                .behandlingsdetaljer
+                .stønadstype
+                .behandlendeEnhet(),
+        ).isEqualTo(Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD)
+
+        assertThat(
+            kall.oppfølging
+                .hentAktiveOppfølginger(Enhet.NAV_TILTAK_OSLO),
+        ).isEqualTo(emptyList())
     }
 }

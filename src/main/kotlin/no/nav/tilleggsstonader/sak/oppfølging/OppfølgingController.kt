@@ -63,11 +63,14 @@ class OppfølgingController(
         }
     }
 
-    @PostMapping("start")
-    fun startJobb() {
+    @PostMapping("start/{enhetString}")
+    fun startJobb(
+        @PathVariable enhetString: String,
+    ) {
         tilgangService.validerTilgangTilRolle(BehandlerRolle.VEILEDER)
+        val enhet = Enhet.fraEnhetsnr(enhetString)
         try {
-            oppfølgingOpprettKontrollerService.opprettTaskerForOppfølging()
+            oppfølgingOpprettKontrollerService.opprettTaskerForOppfølging(enhet)
         } catch (e: Exception) {
             logger.warn("Feilet start av oppfølgingjobb, se secure logs for flere detaljer")
             secureLogger.error("Feilet start av oppfølgingjobb", e)

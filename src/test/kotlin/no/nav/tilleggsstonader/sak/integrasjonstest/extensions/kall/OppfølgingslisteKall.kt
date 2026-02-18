@@ -10,14 +10,14 @@ class OppfølgingslisteKall(
     fun hentAktiveOppfølginger(enhet: Enhet): List<KontrollerOppfølgingResponse> =
         apiRespons.hentAktiveOppfølginger(enhet).expectOkWithBody()
 
-    fun startJobb() = apiRespons.startJobb().expectOkEmpty()
+    fun startJobb(enhet: Enhet) = apiRespons.startJobb(enhet).expectOkEmpty()
 
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = OppfølgingslisteApi()
 
     inner class OppfølgingslisteApi {
-        fun hentAktiveOppfølginger(enhet: Enhet) = testklient.get("/api/oppfolging/$enhet")
+        fun hentAktiveOppfølginger(enhet: Enhet) = testklient.get("/api/oppfolging/${enhet.enhetsnr}")
 
-        fun startJobb() = testklient.post("/api/oppfolging/start")
+        fun startJobb(enhet: Enhet) = testklient.post("/api/oppfolging/start/${enhet.enhetsnr}")
     }
 }

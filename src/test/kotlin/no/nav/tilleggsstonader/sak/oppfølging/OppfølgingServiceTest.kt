@@ -2,11 +2,9 @@ package no.nav.tilleggsstonader.sak.oppfølging
 
 import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.OppfølgingRepositoryFake
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
-import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -40,6 +38,7 @@ class OppfølgingServiceTest {
                         behandlingId = behandlingTilsynBarn.id,
                         data = OppfølgingData(emptyList()),
                         aktiv = false,
+                        behandlendeEnhet = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD,
                     ),
                 )
 
@@ -54,34 +53,5 @@ class OppfølgingServiceTest {
                 )
             }.hasMessageContaining("Kan ikke redigere en oppfølging som ikke lengre er aktiv")
         }
-    }
-
-    @Test
-    fun `hent oppgølginger henter bare oppgaver for NAY`() {
-        val oppfølgingTsr =
-            repository.insert(
-                Oppfølging(
-                    behandlingId = behandlingDagligReiseTSR.id,
-                    data = OppfølgingData(emptyList()),
-                    aktiv = false,
-                ),
-            )
-        val oppfølgingNay =
-            repository.insert(
-                Oppfølging(
-                    behandlingId = behandlingTilsynBarn.id,
-                    data = OppfølgingData(emptyList()),
-                    aktiv = false,
-                ),
-            )
-
-        assertThat(
-            service
-                .hentAktiveOppfølginger(Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD)
-                .single()
-                .behandlingsdetaljer
-                .stønadstype
-                .behandlendeEnhet(),
-        ).isEqualTo(Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD)
     }
 }

@@ -1,0 +1,1 @@
+alter table oppfolging add column behandlende_enhet varchar(255) default 'NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD';

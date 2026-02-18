@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.oppfølging
 
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
@@ -18,15 +19,15 @@ import org.springframework.data.relational.core.mapping.Table
 import org.springframework.stereotype.Repository
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 @Repository
 interface OppfølgingRepository :
     RepositoryInterface<Oppfølging, UUID>,
     InsertUpdateRepository<Oppfølging> {
     @Modifying
-    @Query("update oppfolging SET aktiv = false, version=version + 1 WHERE aktiv = true")
-    fun markerAlleAktiveSomIkkeAktive()
+    @Query("update oppfolging SET aktiv = false, version=version + 1 WHERE aktiv = true AND behandlende_enhet = :enhet")
+    fun markerAlleAktiveSomIkkeAktive(enhet: Enhet)
 
     @Query(
         """
@@ -94,6 +95,7 @@ data class Oppfølging(
     val data: OppfølgingData,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL, prefix = "kontrollert_")
     val kontrollert: Kontrollert? = null,
+    val behandlendeEnhet: Enhet,
 )
 
 data class OppfølgingData(
