@@ -12,14 +12,16 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Vi
 import java.time.LocalDate
 
 /**
- * Validerer at en revurdering av offentlig transport ikke endrer en periode som inneholder dagens dato (er tidligere utbetalt) som enkeltbilletter
- * til månedskort, da dette kan være til ugunst for søker. Valideringen resulterer i en brukerfeil som veileder saksbehandler må legge inn en ny reise i stedet for å
+ * Validerer at en revurdering av offentlig transport ikke endrer en periode som inneholder
+ * dagens dato (er tidligere utbetalt) som enkeltbilletter til månedskort, da dette kan være til ugunst for søker.
+ * Valideringen resulterer i en brukerfeil som veileder saksbehandler må legge inn en ny reise i stedet for å
  * forlenge en eksisterende periode.
  *
  * For hver reise i det nye beregningsresultatet:
  *  - Sjekker vi om det finnes en tilsvarende reise i forrige beregningsresultat (basert på reiseId).
  *  - Hvis ja, sjekker om det finnes en periode for dagens dato i både revurderingen og førstegangsbehandlingen.
- *  - Dersom endringen på perioden endrer billetttype fra enkeltbilletter til månedskort, kastes en veiledende brukerfeil.
+ *  - Dersom endringen på perioden endrer billetttype fra enkeltbilletter til månedskort, kastes en veiledende
+ *      brukerfeil.
  */
 fun validerEndringAvAlleredeUtbetaltPeriode(
     nyttBeregningsresultat: BeregningsresultatOffentligTransport,
@@ -69,7 +71,10 @@ private fun endrerFraEnkeltbilletterTilMånedskort(
 ): Boolean =
     førstegangs != null &&
         revurdering != null &&
-        førstegangs.beløp < (revurdering.grunnlag.pris30dagersbillett ?: Int.MAX_VALUE) &&
+        førstegangs.beløp < (
+            førstegangs.grunnlag.pris30dagersbillett
+                ?: Int.MAX_VALUE
+        ) && // var det enkeltbilletter i førstegangsbehandlingen?
         revurdering.beløp == revurdering.grunnlag.pris30dagersbillett
 
 fun validerReiser(
