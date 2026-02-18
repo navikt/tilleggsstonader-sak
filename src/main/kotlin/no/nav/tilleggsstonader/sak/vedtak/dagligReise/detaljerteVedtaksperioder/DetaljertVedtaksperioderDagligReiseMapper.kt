@@ -48,21 +48,6 @@ object DetaljertVedtaksperioderDagligReiseMapper {
             }
         }
 
-    //    private fun mapBeregnDetajlerForPerioder(periode: BeregningsresultatForPeriode): List<BeregningsresultatForPeriodeDto> =
-//        BeregningsresultatForPeriodeDto(
-//            fom = periode.grunnlag.fom,
-//            tom = periode.grunnlag.tom,
-//            prisEnkeltbillett = periode.grunnlag.prisEnkeltbillett,
-//            prisSyvdagersbillett = periode.grunnlag.prisSyvdagersbillett,
-//            pris30dagersbillett = periode.grunnlag.pris30dagersbillett,
-//            antallReisedagerPerUke = periode.grunnlag.antallReisedagerPerUke,
-//            beløp = periode.beløp,
-//            billettdetaljer = periode.billettdetaljer,
-//            antallReisedager = periode.grunnlag.antallReisedager,
-//            fraTidligereVedtak = periode.fraTidligereVedtak,
-//            brukersNavKontor = periode.grunnlag.brukersNavKontor,
-//        )
-// }
     private fun mapBeregnDetajlerForPerioder(periode: BeregningsresultatForPeriode): List<BeregningsresultatForPeriodeDto> =
         periode.grunnlag.vedtaksperioder.map { vedtaksperiode ->
             BeregningsresultatForPeriodeDto(
