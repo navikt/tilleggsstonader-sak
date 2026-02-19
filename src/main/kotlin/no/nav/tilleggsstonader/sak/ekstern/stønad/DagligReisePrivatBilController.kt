@@ -43,8 +43,6 @@ private fun RammevedtakPrivatBil.tilDto(): List<RammevedtakDto> =
                         fom = uke.grunnlag.fom,
                         tom = uke.grunnlag.tom,
                         ukeNummer = uke.grunnlag.fom.ukenummer(),
-                        innsendtDato = LocalDate.now().toString(),
-                        kanSendeInnKjøreliste = false
                     )
                 },
         )
