@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatForPeriodeDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
@@ -60,7 +61,11 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
             )
         val forventetResultat =
             listOf(
-                detaljertVedtaksperiodeDagligReiseTso(fom = førsteJanuar, tom = sisteFeb),
+                detaljertVedtaksperiodeDagligReiseTso(
+                    fom = førsteJanuar,
+                    tom = sisteFeb,
+                    beregningsresultat = listOf(beregningsDto(førsteJanuar, sisteJanuar), beregningsDto(førsteFeb, sisteFeb)),
+                ),
             )
         assertThat(resultat).isEqualTo(forventetResultat)
     }
@@ -83,8 +88,12 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
             )
         val forventetResultat =
             listOf(
-                detaljertVedtaksperiodeDagligReiseTso(førsteFeb, sisteFeb),
-                detaljertVedtaksperiodeDagligReiseTso(førsteApril, sisteApril),
+                detaljertVedtaksperiodeDagligReiseTso(førsteFeb, sisteFeb, beregningsresultat = listOf(beregningsDto(førsteFeb, sisteFeb))),
+                detaljertVedtaksperiodeDagligReiseTso(
+                    førsteApril,
+                    sisteApril,
+                    beregningsresultat = listOf(beregningsDto(førsteApril, sisteApril)),
+                ),
             )
 
         assertThat(resultat).isEqualTo(forventetResultat)
@@ -107,7 +116,11 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
             )
         val forventetResultat =
             listOf(
-                detaljertVedtaksperiodeDagligReiseTso(førsteJanuar, sisteJanuar),
+                detaljertVedtaksperiodeDagligReiseTso(
+                    førsteJanuar,
+                    sisteJanuar,
+                    beregningsresultat = listOf(beregningsDto(førsteJanuar, sisteJanuar), beregningsDto(førsteJanuar, sisteJanuar)),
+                ),
             )
         assertThat(resultat).isEqualTo(forventetResultat)
     }
@@ -130,6 +143,7 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
         aktivitet: AktivitetType = defaultAktivitet,
         målgruppe: FaktiskMålgruppe = defaultMålgruppe,
         typeDagligReise: TypeDagligReise = defaultTypeDagligReise,
+        beregningsresultat: List<BeregningsresultatForPeriodeDto>,
     ) = DetaljertVedtaksperiodeDagligReise(
         fom = fom,
         tom = tom,
@@ -138,6 +152,25 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
         typeDagligReise = typeDagligReise,
         stønadstype = Stønadstype.DAGLIG_REISE_TSO,
         typeAktivtet = null,
+        beregningsresultat =
+        beregningsresultat,
+    )
+
+    private fun beregningsDto(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) = BeregningsresultatForPeriodeDto(
+        fom = fom,
+        tom = tom,
+        prisEnkeltbillett = 50,
+        prisSyvdagersbillett = 300,
+        pris30dagersbillett = 1000,
+        antallReisedagerPerUke = 5,
+        beløp = 1000,
+        billettdetaljer = mapOf(Billettype.TRETTIDAGERSBILLETT to 1),
+        antallReisedager = 20,
+        fraTidligereVedtak = false,
+        brukersNavKontor = null,
     )
 
     private fun innvilgelse(data: InnvilgelseDagligReise = defaultInnvilgelseDagligReise) =
@@ -291,6 +324,6 @@ private fun beregningsresultatForPeriode(
         billettdetaljer =
             mapOf(
                 Billettype.TRETTIDAGERSBILLETT to
-                    1000,
+                    1,
             ),
     )

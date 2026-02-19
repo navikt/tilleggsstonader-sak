@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
-import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -21,7 +20,9 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatForPeriodeDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
@@ -90,9 +91,27 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
                     målgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
                     typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
                     stønadstype = Stønadstype.DAGLIG_REISE_TSR,
+                    beregningsresultat =
+                        listOf(
+                            BeregningsresultatForPeriodeDto(
+                                fom = fomTiltaksenheten,
+                                tom = tomTiltaksenheten,
+                                prisEnkeltbillett = 40,
+                                prisSyvdagersbillett = null,
+                                pris30dagersbillett = 800,
+                                antallReisedagerPerUke = 5,
+                                beløp = 800,
+                                billettdetaljer =
+                                    mapOf(
+                                        Billettype.TRETTIDAGERSBILLETT to 1,
+                                    ),
+                                antallReisedager = 22,
+                                fraTidligereVedtak = false,
+                                brukersNavKontor = null,
+                            ),
+                        ),
                 ),
             )
-
         assertThat(vedtaksperioderOversiktService.hentDetaljerteVedtaksperioderForBehandling(behandlingId)).isEqualTo(
             forventetDetaljertVedtaksperiodeTsr,
         )
