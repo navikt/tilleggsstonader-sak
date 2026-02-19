@@ -143,7 +143,7 @@ fun finnPeriodeFraAndel(
         beregningsresultat.offentligTransport
             ?.reiser
             ?.flatMap { it.perioder }
-            ?.filter { it.grunnlag.fom == andelTilkjentYtelse.fom }
+            ?.filter { it.grunnlag.fom.datoEllerNesteMandagHvisLørdagEllerSøndag() == andelTilkjentYtelse.fom }
 
     if (reiseperiodeMedSammeDatoSomAndel == null) {
         throw NotImplementedError("Det er kun implementert å finne periode fra andel for offentlig transport")
