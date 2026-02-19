@@ -31,9 +31,9 @@ class OppfølgingController(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    @GetMapping("{enhetString}")
+    @GetMapping("{enhetsnummer}")
     fun hentAktiveOppfølginger(
-        @PathVariable enhetString: String,
+        @PathVariable enhetsnummer: String,
     ): List<KontrollerOppfølgingResponse> {
         tilgangService.validerTilgangTilRolle(BehandlerRolle.VEILEDER)
 
@@ -41,7 +41,7 @@ class OppfølgingController(
             "Feature toggle ${Toggle.HENT_BEHANDLINGER_FOR_OPPFØLGING} er ikke aktivert"
         }
 
-        val enhet = Enhet.fraEnhetsnr(enhetString)
+        val enhet = Enhet.fraEnhetsnr(enhetsnummer)
 
         return oppfølgingService.hentAktiveOppfølginger(enhet).tilDto()
     }
@@ -63,12 +63,12 @@ class OppfølgingController(
         }
     }
 
-    @PostMapping("start/{enhetString}")
+    @PostMapping("start/{enhetsnummer}")
     fun startJobb(
-        @PathVariable enhetString: String,
+        @PathVariable enhetsnummer: String,
     ) {
         tilgangService.validerTilgangTilRolle(BehandlerRolle.VEILEDER)
-        val enhet = Enhet.fraEnhetsnr(enhetString)
+        val enhet = Enhet.fraEnhetsnr(enhetsnummer)
         try {
             oppfølgingOpprettKontrollerService.opprettTaskerForOppfølging(enhet)
         } catch (e: Exception) {

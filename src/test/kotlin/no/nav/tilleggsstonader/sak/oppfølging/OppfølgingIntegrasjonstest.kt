@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.`oppfølging`
+package no.nav.tilleggsstonader.sak.oppfølging
 
 import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
-import org.apache.kafka.shaded.com.google.protobuf.LazyStringArrayList.emptyList
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,7 +18,7 @@ class OppfølgingIntegrasjonstest : CleanDatabaseIntegrationTest() {
     private lateinit var oppfølgingRepository: OppfølgingRepository
 
     @Test
-    fun `hent oppgølginger henter bare oppgaver for spesifiesert enhet`() {
+    fun `henter kun oppfølginger for spesifiesert enhet`() {
         opprettBehandlingOgGjennomførBehandlingsløp(
             stønadstype = Stønadstype.BARNETILSYN,
         ) { defaultTilsynBarnTestdata() }
@@ -53,7 +52,7 @@ class OppfølgingIntegrasjonstest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `oppretter oppgølginger oppretter bare oppgaver for spesifiesert enhet`() {
+    fun `oppretter oppfølginger bare oppgaver for spesifiesert enhet`() {
         opprettBehandlingOgGjennomførBehandlingsløp(
             stønadstype = Stønadstype.BARNETILSYN,
         ) { defaultTilsynBarnTestdata() }
@@ -78,6 +77,6 @@ class OppfølgingIntegrasjonstest : CleanDatabaseIntegrationTest() {
         assertThat(
             kall.oppfølging
                 .hentAktiveOppfølginger(Enhet.NAV_TILTAK_OSLO),
-        ).isEqualTo(emptyList())
+        ).isEmpty()
     }
 }
