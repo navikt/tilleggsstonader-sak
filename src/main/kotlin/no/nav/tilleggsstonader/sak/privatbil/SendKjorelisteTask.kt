@@ -12,7 +12,7 @@ import java.util.Properties
 @Service
 @TaskStepBeskrivelse(taskStepType = SendKjorelisteTask.TYPE, beskrivelse = "Send varsel om tilgjengelig kjoreliste")
 class SendKjorelisteTask(
-    private val notifikasjonsService: DittNavKafkaProducer,
+    private val notifikasjonsService: VarselDittNavKafkaProducer,
     private val avklartKjørelisteService: AvklartKjørelisteService
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {

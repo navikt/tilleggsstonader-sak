@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomf�
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteRepository
 import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingPrivatBilDto
+import no.nav.tilleggsstonader.sak.privatbil.SendKjorelisteTask
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
 import org.assertj.core.api.Assertions.assertThat
@@ -83,6 +84,12 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
                 saksbehandler = "VL",
             )
         }
+
+        taskService.save(SendKjorelisteTask.opprettTask(kjøreliste.reiseId))
+        // Sjekk at varsel blir sendt til dittNav
+        KafkaTestConfig
+            .sendteMeldinger()
+            .forventAntallMeldingerPåTopic(kafkaTopics.dittnav, 1)
 
         val behandlingerPåFagsak = behandlingRepository.findByFagsakId(saksbehandling.fagsakId)
         assertThat(behandlingerPåFagsak).hasSize(2)

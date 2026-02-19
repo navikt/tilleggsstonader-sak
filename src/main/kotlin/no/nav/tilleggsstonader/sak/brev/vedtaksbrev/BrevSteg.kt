@@ -18,15 +18,6 @@ class BrevSteg(
         data: Void?,
     ) {
         taskService.save(FerdigstillBehandlingTask.opprettTask(saksbehandling))
-        if (saksbehandling.erFerdigstilt()
-            && saksbehandling.stønadstype == Stønadstype.DAGLIG_REISE_TSO
-            || saksbehandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR
-        ) {
-            // TODO - hent kjørelisteId
-            // val behandling = hentAvklarteUkerForBehandling(saksbehandling.id)
-            val kjørelisteId = "123"
-            taskService.save(SendKjorelisteTask.opprettTask(kjørelisteId))
-        }
     }
 
     override fun stegType(): StegType = StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV

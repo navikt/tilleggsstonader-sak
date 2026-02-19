@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 
 
 @Service
-class DittNavKafkaProducer(
+class VarselDittNavKafkaProducer(
     val kafkaTemplate: KafkaTemplate<String, String>,
 ) {
     @Value("\${topics.dittnav}")
