@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.oppfølging
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -37,7 +38,10 @@ class OppfølgingRepositoryTest : CleanDatabaseIntegrationTest() {
 
     @Test
     fun `skal kunne lagre og hente oppfølgning`() {
-        val oppfølging = oppfølgingRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
+        val oppfølging =
+            oppfølgingRepository.insert(
+                Oppfølging(behandlingId = behandlingId, data = data, tema = Tema.TSO),
+            )
 
         val fraDb = oppfølgingRepository.findByIdOrThrow(oppfølging.id)
         assertThat(fraDb).isEqualTo(oppfølging)
@@ -47,7 +51,10 @@ class OppfølgingRepositoryTest : CleanDatabaseIntegrationTest() {
 
     @Test
     fun `skal oppdatere med kontrollert informasjon`() {
-        val oppfølging = oppfølgingRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
+        val oppfølging =
+            oppfølgingRepository.insert(
+                Oppfølging(behandlingId = behandlingId, data = data, tema = Tema.TSO),
+            )
 
         val kontrollert =
             Kontrollert(
@@ -66,9 +73,12 @@ class OppfølgingRepositoryTest : CleanDatabaseIntegrationTest() {
     inner class MarkerAlleAktiveSomIkkeAktive {
         @Test
         fun `skal oppdatere alle aktive til ikke aktive og oppdatere version`() {
-            val oppfølging = oppfølgingRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
+            val oppfølging =
+                oppfølgingRepository.insert(
+                    Oppfølging(behandlingId = behandlingId, data = data, tema = Tema.TSO),
+                )
 
-            oppfølgingRepository.markerAlleAktiveSomIkkeAktive()
+            oppfølgingRepository.markerAlleAktiveSomIkkeAktive(Tema.TSO)
 
             val fraDb = oppfølgingRepository.findByIdOrThrow(oppfølging.id)
             assertThat(fraDb.version).isEqualTo(2)
@@ -80,7 +90,9 @@ class OppfølgingRepositoryTest : CleanDatabaseIntegrationTest() {
     inner class FinnAktiveMedDetaljer {
         @Test
         fun `skal finne alle aktive`() {
-            oppfølgingRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
+            oppfølgingRepository.insert(
+                Oppfølging(behandlingId = behandlingId, data = data, tema = Tema.TSO),
+            )
 
             val aktive = oppfølgingRepository.finnAktiveMedDetaljer()
 
@@ -92,7 +104,13 @@ class OppfølgingRepositoryTest : CleanDatabaseIntegrationTest() {
         fun `skal finne alle aktive med informasjon om at det finnes en ny behandling`() {
             val revurdering = opprettRevurdering()
 
-            oppfølgingRepository.insert(Oppfølging(behandlingId = revurdering.forrigeIverksatteBehandlingId!!, data = data))
+            oppfølgingRepository.insert(
+                Oppfølging(
+                    behandlingId = revurdering.forrigeIverksatteBehandlingId!!,
+                    data = data,
+                    tema = Tema.TSO,
+                ),
+            )
 
             val aktive = oppfølgingRepository.finnAktiveMedDetaljer()
             assertThat(aktive).hasSize(1)
@@ -101,13 +119,22 @@ class OppfølgingRepositoryTest : CleanDatabaseIntegrationTest() {
 
         @Test
         fun `skal ikke finne noen hvis det kun finnes ikke aktive`() {
-            oppfølgingRepository.insert(Oppfølging(behandlingId = behandlingId, data = data, aktiv = false))
+            oppfølgingRepository.insert(
+                Oppfølging(
+                    behandlingId = behandlingId,
+                    data = data,
+                    aktiv = false,
+                    tema = Tema.TSO,
+                ),
+            )
             assertThat(oppfølgingRepository.finnAktiveMedDetaljer()).isEmpty()
         }
 
         @Test
         fun `skal finne aktiv for behandling`() {
-            oppfølgingRepository.insert(Oppfølging(behandlingId = behandlingId, data = data))
+            oppfølgingRepository.insert(
+                Oppfølging(behandlingId = behandlingId, data = data, tema = Tema.TSO),
+            )
 
             val aktiv = oppfølgingRepository.finnAktivMedDetaljer(behandlingId)
 
@@ -169,6 +196,7 @@ class OppfølgingRepositoryTest : CleanDatabaseIntegrationTest() {
             aktiv = false,
             data = data,
             opprettetTidspunkt = opprettet,
+            tema = Tema.TSO,
         )
     }
 
