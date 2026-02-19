@@ -2,10 +2,10 @@ package no.nav.tilleggsstonader.sak.oppfølging
 
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
-import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
+import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.tilTema
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
@@ -73,11 +73,11 @@ class OppfølgingOpprettKontrollerService(
      * Oppretter en task med unik behandlingId og tidspunkt
      */
     @Transactional
-    fun opprettTaskerForOppfølging(enhet: Enhet) {
+    fun opprettTaskerForOppfølging(tema: Tema) {
         val tidspunkt = LocalDateTime.now()
-        oppfølgingRepository.markerAlleAktiveSomIkkeAktive(enhet)
+        oppfølgingRepository.markerAlleAktiveSomIkkeAktive(tema)
         Stønadstype.entries.forEach { stønadstype ->
-            if (stønadstype.behandlendeEnhet() == enhet) {
+            if (stønadstype.tilTema() == tema) {
                 val behandlinger = behandlingRepository.finnGjeldendeIverksatteBehandlinger(stønadstype = stønadstype)
                 taskService.saveAll(behandlinger.map { OppfølgingTask.opprettTask(it.id, tidspunkt) })
             }
@@ -99,7 +99,7 @@ class OppfølgingOpprettKontrollerService(
             val sisteForFagsak = oppfølgingRepository.finnSisteForFagsak(behandlingId)
             if (sisteForFagsak?.kontrollert?.utfall != KontrollertUtfall.IGNORERES || sisteForFagsak.data != data) {
                 return oppfølgingRepository.insert(
-                    Oppfølging(behandlingId = behandlingId, data = data, behandlendeEnhet = fagsakMetadata.stønadstype.behandlendeEnhet()),
+                    Oppfølging(behandlingId = behandlingId, data = data, tema = fagsakMetadata.stønadstype.tilTema()),
                 )
             } else {
                 logger.warn(

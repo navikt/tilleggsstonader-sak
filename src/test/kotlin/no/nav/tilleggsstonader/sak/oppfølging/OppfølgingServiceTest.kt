@@ -1,10 +1,8 @@
 package no.nav.tilleggsstonader.sak.oppfølging
 
-import no.nav.tilleggsstonader.kontrakter.felles.Enhet
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.OppfølgingRepositoryFake
 import no.nav.tilleggsstonader.sak.util.behandling
-import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -15,13 +13,6 @@ class OppfølgingServiceTest {
     val service = OppfølgingService(repository)
 
     val behandlingTilsynBarn = behandling()
-    val behandlingDagligReiseTSR =
-        behandling(
-            fagsak =
-                fagsak(
-                    stønadstype = Stønadstype.DAGLIG_REISE_TSR,
-                ),
-        )
 
     @BeforeEach
     fun setUp() {
@@ -38,7 +29,7 @@ class OppfølgingServiceTest {
                         behandlingId = behandlingTilsynBarn.id,
                         data = OppfølgingData(emptyList()),
                         aktiv = false,
-                        behandlendeEnhet = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD,
+                        tema = Tema.TSO,
                     ),
                 )
 

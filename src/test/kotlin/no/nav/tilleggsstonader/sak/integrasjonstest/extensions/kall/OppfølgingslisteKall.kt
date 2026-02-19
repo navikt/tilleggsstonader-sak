@@ -1,23 +1,22 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
-import no.nav.tilleggsstonader.kontrakter.felles.Enhet
+import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.oppfølging.KontrollerOppfølgingResponse
 
 class OppfølgingslisteKall(
     private val testklient: Testklient,
 ) {
-    fun hentAktiveOppfølginger(enhet: Enhet): List<KontrollerOppfølgingResponse> =
-        apiRespons.hentAktiveOppfølginger(enhet).expectOkWithBody()
+    fun hentAktiveOppfølginger(tema: Tema): List<KontrollerOppfølgingResponse> = apiRespons.hentAktiveOppfølginger(tema).expectOkWithBody()
 
-    fun startJobb(enhet: Enhet) = apiRespons.startJobb(enhet).expectOkEmpty()
+    fun startJobb(tema: Tema) = apiRespons.startJobb(tema).expectOkEmpty()
 
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = OppfølgingslisteApi()
 
     inner class OppfølgingslisteApi {
-        fun hentAktiveOppfølginger(enhet: Enhet) = testklient.get("/api/oppfolging/${enhet.enhetsnr}")
+        fun hentAktiveOppfølginger(tema: Tema) = testklient.get("/api/oppfolging/$tema")
 
-        fun startJobb(enhet: Enhet) = testklient.post("/api/oppfolging/start/${enhet.enhetsnr}")
+        fun startJobb(tema: Tema) = testklient.post("/api/oppfolging/start/$tema")
     }
 }

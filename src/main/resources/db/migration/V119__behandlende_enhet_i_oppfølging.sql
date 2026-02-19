@@ -1,1 +1,3 @@
-alter table oppfolging add column behandlende_enhet varchar(255) default 'NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD';
+alter table oppfolging add column tema varchar(255);
+
+update oppfolging set tema='TSO';

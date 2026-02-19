@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.oppfølging
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.kontrakter.felles.Enhet
+import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
@@ -31,9 +31,9 @@ class OppfølgingController(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    @GetMapping("{enhetsnummer}")
+    @GetMapping("{tema}")
     fun hentAktiveOppfølginger(
-        @PathVariable enhetsnummer: String,
+        @PathVariable tema: Tema,
     ): List<KontrollerOppfølgingResponse> {
         tilgangService.validerTilgangTilRolle(BehandlerRolle.VEILEDER)
 
@@ -41,9 +41,7 @@ class OppfølgingController(
             "Feature toggle ${Toggle.HENT_BEHANDLINGER_FOR_OPPFØLGING} er ikke aktivert"
         }
 
-        val enhet = Enhet.fraEnhetsnr(enhetsnummer)
-
-        return oppfølgingService.hentAktiveOppfølginger(enhet).tilDto()
+        return oppfølgingService.hentAktiveOppfølginger(tema).tilDto()
     }
 
     @PostMapping("kontroller")
@@ -63,14 +61,13 @@ class OppfølgingController(
         }
     }
 
-    @PostMapping("start/{enhetsnummer}")
+    @PostMapping("start/{tema}")
     fun startJobb(
-        @PathVariable enhetsnummer: String,
+        @PathVariable tema: Tema,
     ) {
         tilgangService.validerTilgangTilRolle(BehandlerRolle.VEILEDER)
-        val enhet = Enhet.fraEnhetsnr(enhetsnummer)
         try {
-            oppfølgingOpprettKontrollerService.opprettTaskerForOppfølging(enhet)
+            oppfølgingOpprettKontrollerService.opprettTaskerForOppfølging(tema)
         } catch (e: Exception) {
             logger.warn("Feilet start av oppfølgingjobb, se secure logs for flere detaljer")
             secureLogger.error("Feilet start av oppfølgingjobb", e)

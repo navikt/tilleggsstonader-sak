@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.database.repository
 
-import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.oppfølging.Behandlingsdetaljer
@@ -9,13 +9,13 @@ import no.nav.tilleggsstonader.sak.oppfølging.Oppfølging
 import no.nav.tilleggsstonader.sak.oppfølging.OppfølgingMedDetaljer
 import no.nav.tilleggsstonader.sak.oppfølging.OppfølgingRepository
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 class OppfølgingRepositoryFake :
     DummyRepository<Oppfølging, UUID>({ it.id }),
     OppfølgingRepository {
-    override fun markerAlleAktiveSomIkkeAktive(enhet: Enhet) {
-        updateAll(findAll().filter { it.behandlendeEnhet == enhet }.map { it.copy(aktiv = false) })
+    override fun markerAlleAktiveSomIkkeAktive(tema: Tema) {
+        updateAll(findAll().filter { it.tema == tema }.map { it.copy(aktiv = false) })
     }
 
     /**
