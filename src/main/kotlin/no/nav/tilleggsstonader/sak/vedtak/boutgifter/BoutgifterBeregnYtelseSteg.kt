@@ -54,20 +54,19 @@ class BoutgifterBeregnYtelseSteg(
 
         val innvilgelse = vedtak as InnvilgelseBoutgifterRequest
         val vedtaksperioder = innvilgelse.vedtaksperioder.tilDomene().sorted()
-        val tidligsteEndring = satsjusteringFra
         val beregningsresultat =
             beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,
-                tidligsteEndring = tidligsteEndring,
+                beregnFra = satsjusteringFra,
             )
         lagreInnvilgetVedtak(
             behandling = saksbehandling,
             beregningsresultat = beregningsresultat,
             vedtaksperioder = vedtaksperioder,
             begrunnelse = innvilgelse.begrunnelse,
-            tidligsteEndring = tidligsteEndring,
+            tidligsteEndring = satsjusteringFra,
         )
         lagreTilkjentYtelse(saksbehandling.id, beregningsresultat)
     }
@@ -88,7 +87,7 @@ class BoutgifterBeregnYtelseSteg(
         vedtak: InnvilgelseBoutgifterRequest,
     ) {
         val vedtaksperioder = vedtak.vedtaksperioder.tilDomene().sorted()
-        val tidligsteEndring =
+        val (tidligsteEndring, beregnFra) =
             utledTidligsteEndringService.utledTidligsteEndringForBeregning(
                 saksbehandling.id,
                 vedtaksperioder,
@@ -98,7 +97,7 @@ class BoutgifterBeregnYtelseSteg(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,
-                tidligsteEndring = tidligsteEndring,
+                beregnFra = beregnFra,
             )
         lagreInnvilgetVedtak(
             behandling = saksbehandling,

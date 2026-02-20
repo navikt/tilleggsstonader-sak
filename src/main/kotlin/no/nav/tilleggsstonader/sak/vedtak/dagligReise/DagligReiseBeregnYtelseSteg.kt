@@ -59,7 +59,7 @@ class DagligReiseBeregnYtelseSteg(
     ) {
         val vedtaksperioder = vedtak.vedtaksperioder()
 
-        val tidligsteEndring =
+        val (tidligsteEndring, beregnFra) =
             utledTidligsteEndringService.utledTidligsteEndringForBeregning(
                 saksbehandling.id,
                 vedtaksperioder,
@@ -69,7 +69,7 @@ class DagligReiseBeregnYtelseSteg(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,
-                tidligsteEndring = tidligsteEndring,
+                beregnFra = beregnFra,
             )
         dagligReiseVedtakService.lagreInnvilgetVedtak(
             behandling = saksbehandling,
@@ -117,7 +117,7 @@ class DagligReiseBeregnYtelseSteg(
                 vedtaksperioder = avkortetVedtaksperioder,
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.OPPHØR,
-                tidligsteEndring = opphørsdato,
+                beregnFra = opphørsdato,
             )
         opphørValideringService.validerIngenUtbetalingEtterOpphørsdatoDagligReise(
             beregningsresultat,

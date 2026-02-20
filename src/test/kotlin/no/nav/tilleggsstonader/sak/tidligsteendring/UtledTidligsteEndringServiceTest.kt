@@ -125,7 +125,7 @@ class UtledTidligsteEndringServiceTest {
 
         val result = utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandling.id, vedtaksperioder)
 
-        assertThat(result).isEqualTo(nyttVilkår.fom)
+        assertThat(result.tidligsteEndring).isEqualTo(nyttVilkår.fom)
     }
 
     @Test
@@ -174,7 +174,7 @@ class UtledTidligsteEndringServiceTest {
                 vedtaksperioder,
             )
 
-        assertThat(result).isEqualTo(fom)
+        assertThat(result.tidligsteEndring).isEqualTo(fom)
     }
 
     @Test
@@ -215,7 +215,7 @@ class UtledTidligsteEndringServiceTest {
                 vedtaksperioder,
             )
 
-        assertThat(result).isEqualTo(originalFom)
+        assertThat(result.tidligsteEndring).isEqualTo(originalFom)
     }
 }
 

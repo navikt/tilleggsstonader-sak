@@ -67,7 +67,7 @@ class TilsynBarnBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         vedtak: InnvilgelseTilsynBarnRequest,
     ) {
-        val tidligsteEndring =
+        val (tidligsteEndring, beregnFra) =
             utledTidligsteEndringService.utledTidligsteEndringForBeregning(
                 saksbehandling.id,
                 vedtak.vedtaksperioder.tilDomene(),
@@ -78,7 +78,7 @@ class TilsynBarnBeregnYtelseSteg(
                 vedtaksperioder = vedtak.vedtaksperioder.tilDomene(),
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.INNVILGELSE,
-                tidligsteEndring = tidligsteEndring,
+                beregnFra = beregnFra,
             )
         vedtakRepository.insert(
             lagInnvilgetVedtak(
@@ -114,7 +114,7 @@ class TilsynBarnBeregnYtelseSteg(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 typeVedtak = TypeVedtak.OPPHØR,
-                tidligsteEndring = opphørsdato,
+                beregnFra = opphørsdato,
             )
         opphørValideringService.validerIngenUtbetalingEtterOpphørsdato(
             beregningsresultat,

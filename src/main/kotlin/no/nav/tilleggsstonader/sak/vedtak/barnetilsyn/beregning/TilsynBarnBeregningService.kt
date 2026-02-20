@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.YEAR_MONTH_MIN
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
@@ -59,7 +58,7 @@ class TilsynBarnBeregningService(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
-        tidligsteEndring: LocalDate?,
+        beregnFra: LocalDate?,
     ): BeregningsresultatTilsynBarn {
         feilHvis(typeVedtak == TypeVedtak.AVSLAG) {
             "Skal ikke beregne for avslag"
@@ -75,15 +74,12 @@ class TilsynBarnBeregningService(
         )
 
         val vedtaksperioderBeregning =
-            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFra(tidligsteEndring)
+            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFra(beregnFra)
 
-        val perioder = beregnAktuellePerioder(behandling, typeVedtak, vedtaksperioderBeregning, tidligsteEndring)
+        val perioder = beregnAktuellePerioder(behandling, typeVedtak, vedtaksperioderBeregning, beregnFra)
         val relevantePerioderFraForrigeVedtak =
-            finnRelevantePerioderFraForrigeVedtak(behandling, tidligsteEndring)
+            finnRelevantePerioderFraForrigeVedtak(behandling, beregnFra)
 
-        brukerfeilHvis(tidligsteEndring == null && behandling.forrigeIverksatteBehandlingId != null) {
-            "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
-        }
         return BeregningsresultatTilsynBarn(relevantePerioderFraForrigeVedtak + perioder)
     }
 
@@ -95,7 +91,7 @@ class TilsynBarnBeregningService(
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
         vedtaksperioder: List<VedtaksperiodeBeregning>,
-        tidligsteEndring: LocalDate?,
+        beregnFra: LocalDate?,
     ): List<BeregningsresultatForMåned> {
         val utgifterPerBarn = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandling.id)
 
@@ -105,7 +101,7 @@ class TilsynBarnBeregningService(
 
         val beregningsgrunnlag =
             lagBeregningsgrunnlagPerMåned(vedtaksperioder, aktiviteter, utgifterPerBarn)
-                .brukPerioderFraOgMedTidligsteEndring(tidligsteEndring)
+                .brukPerioderFraOgMed(beregnFra)
         return beregn(beregningsgrunnlag)
     }
 
@@ -259,10 +255,10 @@ class TilsynBarnBeregningService(
      * For at beregningen då skal bli riktig må man ha med grunnlaget til hele måneden og beregne det på nytt, sånn at man får en ny periode som er
      * 1-14 aug, 500kr, 15-30 aug 700kr.
      */
-    private fun List<Beregningsgrunnlag>.brukPerioderFraOgMedTidligsteEndring(tidligsteEndring: LocalDate?): List<Beregningsgrunnlag> {
-        val tidligsteEndringMåned = tidligsteEndring?.toYearMonth() ?: return this
+    private fun List<Beregningsgrunnlag>.brukPerioderFraOgMed(fra: LocalDate?): List<Beregningsgrunnlag> {
+        val beregnFraMåned = fra?.toYearMonth() ?: return this
 
-        return this.filter { it.måned >= tidligsteEndringMåned }
+        return this.filter { it.måned >= beregnFraMåned }
     }
 
     private fun finnAktiviteter(behandlingId: BehandlingId): List<Aktivitet> =

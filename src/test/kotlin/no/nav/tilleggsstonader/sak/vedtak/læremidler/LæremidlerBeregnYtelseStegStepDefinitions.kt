@@ -28,6 +28,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.TilkjentYte
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.tidligsteendring.TidligsteEndringForBeregning
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -79,7 +80,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     val behandlingService = mockk<BehandlingService>()
     val utledTidligsteEndringService =
         mockk<UtledTidligsteEndringService> {
-            every { utledTidligsteEndringForBeregning(any(), any()) } returns null
+            every { utledTidligsteEndringForBeregning(any(), any()) } returns TidligsteEndringForBeregning(null, null)
         }
     val vilkårperiodeService =
         mockk<VilkårperiodeService>().apply {
@@ -158,7 +159,8 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         val tidligsteEndring = parseDato(tidligsteEndringStr)
 
-        every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandlingId, any()) } returns tidligsteEndring
+        every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandlingId, any()) } returns
+            TidligsteEndringForBeregning(tidligsteEndring, tidligsteEndring)
 
         val vedtaksperioder = mapVedtaksperioderDto(dataTable)
         steg.utførSteg(dummyBehandling(behandlingId), InnvilgelseLæremidlerRequest(vedtaksperioder))
