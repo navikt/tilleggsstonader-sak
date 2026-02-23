@@ -93,6 +93,8 @@ class PrivatBilBeregningService {
                     grunnlagForUke = grunnlagForUke,
                     dagsatsUtenParkering = dagsatsUtenParkering,
                 ),
+            innsendtDato = null,
+            kanSendeInnKjøreliste = true,
         )
     }
 

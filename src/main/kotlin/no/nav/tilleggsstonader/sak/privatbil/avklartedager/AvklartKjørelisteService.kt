@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
@@ -76,6 +77,7 @@ class AvklartKjørelisteService(
             typeAvvik = avvik,
             behandletDato = null,
             dager = avklarteDager.toSet(),
+            innsendtDato = null,
         )
     }
 
@@ -157,4 +159,13 @@ class AvklartKjørelisteService(
         ukenummer: Int,
     ) = rammeForReise.uker.singleOrNull { it.grunnlag.fom.ukenummer() == ukenummer }
         ?: error("Forventet å finne rammevedtak for uke")
+
+    fun settInnsendtDatoForUke(
+        ukeId: UUID,
+        dato: LocalDate = LocalDate.now(),
+    ) {
+        val eksisterendeUke = avklartKjørtUkeRepository.findByIdOrThrow(ukeId)
+        val oppdatertUke = eksisterendeUke.copy(innsendtDato = dato)
+        avklartKjørtUkeRepository.update(oppdatertUke)
+    }
 }
