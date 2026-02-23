@@ -45,6 +45,7 @@ class YtelseClientMockConfig {
                                     fom = LocalDate.now(),
                                     tom = null,
                                     ensligForsørgerStønadstype = ensligForsørgerStønadstype,
+                                    gjennståendeDagerFraTelleverk = 40,
                                 )
                             } else {
                                 YtelsePeriode(
