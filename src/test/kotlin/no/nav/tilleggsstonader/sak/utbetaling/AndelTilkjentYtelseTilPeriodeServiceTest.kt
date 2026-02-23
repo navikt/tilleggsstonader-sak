@@ -19,18 +19,14 @@ class AndelTilkjentYtelseTilPeriodeServiceTest {
     val andelTilkjentYtelseTilPeriodeService = AndelTilkjentYtelseTilPeriodeService(tilkjentYtelseService, vedtakservice)
 
     @Test
-    fun `mapAndelerTilVedtaksperiodeForBehandling, andel er nullandel, tom vedtaksperiode`() {
+    fun `mapAndelerTilVedtaksperiodeForBehandling, har kun nullandel, tom response`() {
         val behandlingId = BehandlingId.random()
         every { tilkjentYtelseService.hentForBehandling(behandlingId) } returns
             tilkjentYtelse(behandlingId = behandlingId, andeler = arrayOf(nullAndel()))
         every { vedtakservice.hentVedtak(behandlingId) } returns InterntVedtakTestdata.Boutgifter.innvilgetVedtak
 
         val response = andelTilkjentYtelseTilPeriodeService.mapAndelerTilVedtaksperiodeForBehandling(behandlingId)
-        assertThat(response).hasSize(1)
-
-        val mappetAndel = response.single()
-        assertThat(mappetAndel.andelTilkjentYtelse.beløp).isEqualTo(0)
-        assertThat(mappetAndel.vedtaksperiode).isNull()
+        assertThat(response).isEmpty()
     }
 
     @Test

@@ -27,12 +27,14 @@ class AndelTilkjentYtelseTilPeriodeService(
         val andeler = tilkjentYtelseService.hentForBehandling(behandlingId).andelerTilkjentYtelse
         val vedtak = vedtakService.hentVedtak(behandlingId) ?: error("Behandling $behandlingId har ingen vedtak")
 
-        return andeler.map {
-            AndelMedVedtaksperioder(
-                andelTilkjentYtelse = it,
-                vedtaksperiode = if (it.erNullandel()) null else finnFaktiskPeriodeForAndel(it, vedtak),
-            )
-        }
+        return andeler
+            .filterNot { it.erNullandel() }
+            .map {
+                AndelMedVedtaksperioder(
+                    andelTilkjentYtelse = it,
+                    vedtaksperiode = finnFaktiskPeriodeForAndel(it, vedtak),
+                )
+            }
     }
 
     private fun finnFaktiskPeriodeForAndel(
