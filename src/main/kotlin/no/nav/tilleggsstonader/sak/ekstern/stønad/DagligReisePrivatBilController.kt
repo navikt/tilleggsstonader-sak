@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.ekstern.stønad
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.security.token.support.core.api.Unprotected
 import no.nav.tilleggsstonader.libs.sikkerhet.EksternBrukerUtils
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
