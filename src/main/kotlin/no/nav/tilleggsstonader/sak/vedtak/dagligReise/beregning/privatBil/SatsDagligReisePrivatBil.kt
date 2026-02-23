@@ -10,9 +10,12 @@ data class SatsDagligReisePrivatBil(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val beløp: BigDecimal,
+    val bekreftet: Boolean = true,
 ) : Periode<LocalDate>
 
-val satser: List<SatsDagligReisePrivatBil> =
+private val MAX = LocalDate.of(2099, 12, 31)
+
+private val bekreftedeSatser: List<SatsDagligReisePrivatBil> =
     listOf(
         SatsDagligReisePrivatBil(
             fom = 1 januar 2026,
@@ -36,10 +39,21 @@ val satser: List<SatsDagligReisePrivatBil> =
         ),
     )
 
+private val alleSatser: List<SatsDagligReisePrivatBil> =
+    listOf(
+        bekreftedeSatser.max().let {
+            it.copy(
+                fom = it.tom.plusDays(1),
+                tom = MAX,
+                bekreftet = false,
+            )
+        }
+    ) + bekreftedeSatser
+
 /**
  * Tar kun hensyn til fra datoen slik at vi klarer å håndtere uker som strekker seg
  * over til et nytt år. Det vil gi maks 4 dager med feil sats.
  */
-fun finnRelevantKilometerSats(periode: Periode<LocalDate>): BigDecimal =
-    satser.find { it.inneholder(periode.fom) }?.beløp
+fun finnRelevantKilometerSats(periode: Periode<LocalDate>): SatsDagligReisePrivatBil =
+    alleSatser.find { it.inneholder(periode.fom) }
         ?: error("Kan ikke finne relevant kilometersats for $periode")
