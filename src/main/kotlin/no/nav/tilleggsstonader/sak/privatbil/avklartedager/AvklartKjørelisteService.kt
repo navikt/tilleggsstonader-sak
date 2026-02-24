@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForUke
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.springframework.stereotype.Service
@@ -41,7 +40,7 @@ class AvklartKjørelisteService(
                     ukenummer = ukenummer,
                     reisedager = reisedager,
                     kjørelisteId = kjøreliste.id,
-                    rammevedtakForUke = finnRammevedtakForUke(rammeForReise, ukenummer),
+                    rammevedtakForUke = rammeForReise,
                 )
             }
 
@@ -53,7 +52,7 @@ class AvklartKjørelisteService(
         kjørelisteId: UUID,
         ukenummer: Int,
         reisedager: List<KjørelisteDag>,
-        rammevedtakForUke: RammeForUke,
+        rammevedtakForUke: RammeForReiseMedPrivatBil,
     ): AvklartKjørtUke {
         val avklarteDager = reisedager.map { utledAvklartDag(it) }
 
@@ -81,11 +80,11 @@ class AvklartKjørelisteService(
 
     private fun vurderAntallDagerInnenforRamme(
         dager: List<KjørelisteDag>,
-        rammevedtakForUke: RammeForUke,
+        rammevedtakForUke: RammeForReiseMedPrivatBil,
     ): Boolean {
         val antallDagerMedUtbetaling = dager.filter { it.harKjørt }.size
 
-        return antallDagerMedUtbetaling <= rammevedtakForUke.grunnlag.maksAntallDagerSomKanDekkes
+        return antallDagerMedUtbetaling <= rammevedtakForUke.grunnlag.reisedagerPerUke
     }
 
     private fun utledStatusForUke(
@@ -151,10 +150,4 @@ class AvklartKjørelisteService(
         return rammeFraForrigeBehandling.reiser.singleOrNull { it.reiseId == reiseId }
             ?: error("Forventet å finne ramme for reise med id $reiseId")
     }
-
-    private fun finnRammevedtakForUke(
-        rammeForReise: RammeForReiseMedPrivatBil,
-        ukenummer: Int,
-    ) = rammeForReise.uker.singleOrNull { it.grunnlag.fom.ukenummer() == ukenummer }
-        ?: error("Forventet å finne rammevedtak for uke")
 }
