@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.KjørelisteSkjema
-import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.ekstern.stønad.DagligReisePrivatBilService
@@ -23,7 +22,6 @@ import no.nav.tilleggsstonader.sak.privatbil.InnsendtKjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
-import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.springframework.stereotype.Service
 import tools.jackson.module.kotlin.readValue
@@ -31,7 +29,6 @@ import java.util.UUID
 
 @Service
 class HåndterMottattKjørelisteService(
-    private val avklartKjørelisteService: AvklartKjørelisteService,
     private val journalpostClient: JournalpostClient,
     private val dagligReisePrivatBilService: DagligReisePrivatBilService,
     private val behandlingService: BehandlingService,
@@ -60,17 +57,6 @@ class HåndterMottattKjørelisteService(
         val fagsak = fagsakService.hentFagsak(saksbehandling.fagsakId)
 
         val kjøreliste = lagreKjøreliste(kjørelisteSkjema, reiseId, fagsak, journalpost.journalpostId)
-
-        kjøreliste.data.reisedager
-            .groupBy { it.dato.ukenummer() }
-            .forEach { (ukenummer) ->
-                val avklarteUker = avklartKjørelisteService.hentAvklarteUkerForBehandling(saksbehandling.id)
-                avklarteUker
-                    .filter { it.ukenummer == ukenummer }
-                    .forEach { avklartUke ->
-                        avklartKjørelisteService.settInnsendtDatoForUke(avklartUke.id)
-                    }
-            }
 
         taskService.save(BehandleMottattKjørelisteTask.opprettTask(kjøreliste.id))
 

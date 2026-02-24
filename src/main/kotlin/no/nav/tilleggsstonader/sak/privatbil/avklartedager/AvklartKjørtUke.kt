@@ -26,11 +26,7 @@ data class AvklartKjørtUke(
     val behandletDato: LocalDate? = null,
     @MappedCollection(idColumn = "avklart_kjort_uke_id")
     val dager: Set<AvklartKjørtDag>,
-    val innsendtDato: LocalDate? = null,
 ) : Periode<LocalDate> {
-    val kanSendeInnKjøreliste: Boolean
-        get() = innsendtDato == null && status != UkeStatus.IKKE_MOTTATT_KJØRELISTE
-
     init {
         require(dager.all { inneholder(it.dato) }) { "Alle dager må være innenfor perioden til uken" }
         require(fom.ukenummer() == tom.ukenummer()) { "Fom og tom må være i samme uke" }
