@@ -17,4 +17,6 @@ data class RammevedtakUkeDto(
     val fom: LocalDate,
     val tom: LocalDate,
     val ukeNummer: Int,
+    val innsendtDato: LocalDate?,
+    val kanSendeInnKjøreliste: Boolean,
 )

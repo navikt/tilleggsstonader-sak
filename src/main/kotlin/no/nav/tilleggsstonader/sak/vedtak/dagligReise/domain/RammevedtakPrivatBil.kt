@@ -26,6 +26,8 @@ data class RammeForUke(
     val grunnlag: BeregningsgrunnlagForUke,
     val dagsatsUtenParkering: BigDecimal,
     val maksBeløpSomKanDekkesFørParkering: BigInteger,
+    val innsendtDato: LocalDate? = null,
+    val kanSendeInnKjøreliste: Boolean = false,
 )
 
 data class BeregningsgrunnlagForReiseMedPrivatBil(
