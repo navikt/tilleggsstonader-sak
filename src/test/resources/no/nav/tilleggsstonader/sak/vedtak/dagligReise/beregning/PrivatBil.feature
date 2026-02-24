@@ -14,7 +14,7 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
 
     Når beregner for daglig reise privat bil
 
-    Så forventer vi følgende beregningsrsultat for daglig reise privatBil
+    Så forventer vi følgende rammevedtak for daglig reise privatBil
       | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Dagsats uten parkering | Beløp | Inkluderer helg |
       | 1       | 06.01.2025 | 12.01.2025 | 5                       | 57.60                  | 288   | Nei             |
       | 1       | 13.01.2025 | 19.01.2025 | 5                       | 57.60                  | 288   | Nei             |
@@ -30,7 +30,7 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
 
     Når beregner for daglig reise privat bil
 
-    Så forventer vi følgende beregningsrsultat for daglig reise privatBil
+    Så forventer vi følgende rammevedtak for daglig reise privatBil
       | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Dagsats uten parkering | Beløp | Inkluderer helg |
       | 1       | 01.01.2025 | 05.01.2025 | 5                       | 57.60                  | 288   | Ja              |
 
@@ -45,7 +45,7 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
 
     Når beregner for daglig reise privat bil
 
-    Så forventer vi følgende beregningsrsultat for daglig reise privatBil
+    Så forventer vi følgende rammevedtak for daglig reise privatBil
       | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Dagsats uten parkering | Beløp | Inkluderer helg |
       | 1       | 24.03.2025 | 30.03.2025 | 3                       | 57.60                  | 173   | Nei             |
       | 1       | 31.03.2025 | 31.03.2025 | 1                       | 57.60                  | 58    | Nei             |
@@ -61,7 +61,7 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
 
     Når beregner for daglig reise privat bil
 
-    Så forventer vi følgende beregningsrsultat for daglig reise privatBil
+    Så forventer vi følgende rammevedtak for daglig reise privatBil
       | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Dagsats uten parkering | Beløp | Inkluderer helg |
       | 1       | 01.05.2025 | 04.05.2025 | 4                       | 57.60                  | 230   | Ja              |
       | 1       | 05.05.2025 | 11.05.2025 | 5                       | 57.60                  | 288   | Nei             |
@@ -77,7 +77,7 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
 
     Når beregner for daglig reise privat bil
 
-    Så forventer vi følgende beregningsrsultat for daglig reise privatBil
+    Så forventer vi følgende rammevedtak for daglig reise privatBil
       | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Dagsats uten parkering | Beløp | Inkluderer helg |
       | 1       | 06.01.2025 | 12.01.2025 | 5                       | 457.60                 | 2288   | Nei             |
 
@@ -92,6 +92,6 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
 
     Når beregner for daglig reise privat bil
 
-    Så forventer vi følgende beregningsrsultat for daglig reise privatBil
+    Så forventer vi følgende rammevedtak for daglig reise privatBil
       | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Dagsats uten parkering | Beløp | Inkluderer helg |
       | 1       | 06.01.2025 | 12.01.2025 | 5                       | 57.60                  | 288   | Nei             |

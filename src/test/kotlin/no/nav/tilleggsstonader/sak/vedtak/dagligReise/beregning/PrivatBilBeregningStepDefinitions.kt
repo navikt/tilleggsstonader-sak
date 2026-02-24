@@ -58,7 +58,7 @@ class PrivatBilBeregningStepDefinitions {
 
     var vedtaksperioder: List<Vedtaksperiode> = emptyList()
 
-    var beregningsResultat: RammevedtakPrivatBil? = null
+    var rammevedtak: RammevedtakPrivatBil? = null
     var forventetBeregningsresultat: List<BeregningsresultatUkeCucumber> = emptyList()
     var feil: Exception? = null
 
@@ -87,20 +87,20 @@ class PrivatBilBeregningStepDefinitions {
     @Når("beregner for daglig reise privat bil")
     fun `beregner for daglig reise privat bil`() {
         try {
-            beregningsResultat = beregningService.beregnRammevedtak(vedtaksperioder, reiser)
+            rammevedtak = beregningService.beregnRammevedtak(vedtaksperioder, reiser)
         } catch (e: Exception) {
             feil = e
         }
     }
 
-    @Så("forventer vi følgende beregningsrsultat for daglig reise privatBil")
+    @Så("forventer vi følgende rammevedtak for daglig reise privatBil")
     fun `forventer vi følgende beregningsrsultat for daglig reise privat bil`(dataTable: DataTable) {
         assertThat(feil).isNull()
 
-        val forventetBeregningsresultatForReise = mapUker(dataTable)
+        val forventetRammevedtakForReise = mapUker(dataTable)
 
-        forventetBeregningsresultatForReise.forEachIndexed { index, uke ->
-            val gjeldendeReise = beregningsResultat!!.reiser[uke.reiseNr - 1]
+        forventetRammevedtakForReise.forEachIndexed { index, uke ->
+            val gjeldendeReise = rammevedtak!!.reiser[uke.reiseNr - 1]
 
             assertThat(gjeldendeReise.uker[index].grunnlag.fom).isEqualTo(uke.grunnlag.fom)
             assertThat(gjeldendeReise.uker[index].grunnlag.tom).isEqualTo(uke.grunnlag.tom)
@@ -127,7 +127,7 @@ class PrivatBilBeregningStepDefinitions {
 
     @Så("forvent at det ikke finnes et beregninsresultat for privat bil")
     fun `forvent at det ikke finnes et beregninsresultat`() {
-        assertThat(beregningsResultat).isNull()
+        assertThat(rammevedtak).isNull()
     }
 
     private fun mapUker(dataTable: DataTable) =

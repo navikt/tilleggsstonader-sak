@@ -15,7 +15,7 @@ Egenskap: Beregning av privat bil og vedtaksperioder
 
     Når beregner for daglig reise privat bil
 
-    Så forventer vi følgende beregningsrsultat for daglig reise privatBil
+    Så forventer vi følgende rammevedtak for daglig reise privatBil
       | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Inkluderer helg |
       | 1       | 12.01.2026 | 15.01.2026 | 4                       | Nei             |
 
@@ -30,7 +30,7 @@ Egenskap: Beregning av privat bil og vedtaksperioder
 
     Når beregner for daglig reise privat bil
 
-    Så forventer vi følgende beregningsrsultat for daglig reise privatBil
+    Så forventer vi følgende rammevedtak for daglig reise privatBil
       | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Inkluderer helg |
       | 1       | 12.01.2026 | 15.01.2026 | 4                       | Nei             |
 
@@ -46,7 +46,7 @@ Egenskap: Beregning av privat bil og vedtaksperioder
 
       Når beregner for daglig reise privat bil
 
-      Så forventer vi følgende beregningsrsultat for daglig reise privatBil
+      Så forventer vi følgende rammevedtak for daglig reise privatBil
         | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Inkluderer helg |
         | 1       | 05.01.2026 | 11.01.2026 | 5                       | Nei             |
         | 1       | 19.01.2026 | 25.01.2026 | 5                       | Nei             |
@@ -79,7 +79,7 @@ Egenskap: Beregning av privat bil og vedtaksperioder
 
       Når beregner for daglig reise privat bil
 
-      Så forventer vi følgende beregningsrsultat for daglig reise privatBil
+      Så forventer vi følgende rammevedtak for daglig reise privatBil
         | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Inkluderer helg |
         | 1       | 05.01.2026 | 11.01.2026 | 5                       | Nei             |
 
@@ -96,7 +96,7 @@ Egenskap: Beregning av privat bil og vedtaksperioder
 
       Når beregner for daglig reise privat bil
 
-      Så forventer vi følgende beregningsrsultat for daglig reise privatBil
+      Så forventer vi følgende rammevedtak for daglig reise privatBil
         | Reisenr | Fom        | Tom        | Antall dager dekt i uke | Inkluderer helg |
         | 1       | 05.01.2026 | 07.01.2026 | 3                       | Nei             |
         | 1       | 12.01.2026 | 18.01.2026 | 5                       | Nei             |
