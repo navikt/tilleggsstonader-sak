@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Ekstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.SatsForPeriodePrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import org.springframework.stereotype.Service
@@ -41,19 +42,21 @@ class PrivatBilBeregningService {
         reise: ReiseMedPrivatBil,
         vedtaksperioder: List<Vedtaksperiode>,
     ): RammeForReiseMedPrivatBil? {
-        val justertReise =
-            finnSnittMellomReiseOgVedtaksperioder(reise, vedtaksperioder).justertReiseperiode ?: return null
+        val reiseOgVedtaksperioderSnitt = finnSnittMellomReiseOgVedtaksperioder(reise, vedtaksperioder)
 
-        val grunnlagForReise = lagBeregningsgrunnlagForReise(justertReise)
-
-        return RammeForReiseMedPrivatBil(
-            reiseId = reise.reiseId,
-            aktivitetsadresse = reise.aktivitetsadresse,
-            grunnlag = grunnlagForReise,
-        )
+        return reiseOgVedtaksperioderSnitt.justertReiseperiode?.let { justertReise ->
+            RammeForReiseMedPrivatBil(
+                reiseId = reise.reiseId,
+                aktivitetsadresse = reise.aktivitetsadresse,
+                grunnlag = lagBeregningsgrunnlagForReise(justertReise, reiseOgVedtaksperioderSnitt.justerteVedtaksperioder),
+            )
+        }
     }
 
-    private fun lagBeregningsgrunnlagForReise(reise: ReiseMedPrivatBil): BeregningsgrunnlagForReiseMedPrivatBil {
+    private fun lagBeregningsgrunnlagForReise(
+        reise: ReiseMedPrivatBil,
+        vedtaksperioder: List<Vedtaksperiode>,
+    ): BeregningsgrunnlagForReiseMedPrivatBil {
         val ekstrakostnader =
             Ekstrakostnader(
                 fergekostnadEnVei = reise.fergekostandEnVei,
@@ -66,6 +69,7 @@ class PrivatBilBeregningService {
             reiseavstandEnVei = reise.reiseavstandEnVei,
             ekstrakostnader = ekstrakostnader,
             satser = beregnSatserForReise(reise, ekstrakostnader),
+            vedtaksperioder = vedtaksperioder.map { VedtaksperiodeGrunnlag(it, reise.reisedagerPerUke) },
         )
     }
 
