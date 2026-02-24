@@ -15,7 +15,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.journalføring.JournalføringService
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.journalføring.dokumentBrevkode
@@ -77,20 +76,6 @@ class HåndterSøknadService(
 
     fun finnStønadstyperSomKanOpprettesFraJournalpost(journalpost: Journalpost): ValgbareStønadstyperForJournalpost {
         val skjematype = journalpost.dokumentBrevkode()?.tilSkjematype()
-        if (skjematype == null) {
-            val valgbareStønadstyper =
-                if (unleashService.isEnabled(Toggle.KAN_SAKSBEHANDLE_DAGLIG_REISE_TSO) &&
-                    unleashService.isEnabled(Toggle.KAN_SAKSBEHANDLE_DAGLIG_REISE_TSR)
-                ) {
-                    Stønadstype.entries
-                } else {
-                    Stønadstype.entries.filterNot { it.gjelderDagligReise() }
-                }
-            return ValgbareStønadstyperForJournalpost(
-                defaultStønadstype = null,
-                valgbareStønadstyper = valgbareStønadstyper,
-            )
-        }
 
         return when (skjematype) {
             Skjematype.SØKNAD_BARNETILSYN -> ValgbareStønadstyperForJournalpost(Stønadstype.BARNETILSYN)
@@ -104,6 +89,12 @@ class HåndterSøknadService(
 
             Skjematype.DAGLIG_REISE_KJØRELISTE ->
                 error("Skal ikke behandle kjøreliste")
+
+            null ->
+                ValgbareStønadstyperForJournalpost(
+                    defaultStønadstype = null,
+                    valgbareStønadstyper = Stønadstype.entries,
+                )
         }
     }
 
