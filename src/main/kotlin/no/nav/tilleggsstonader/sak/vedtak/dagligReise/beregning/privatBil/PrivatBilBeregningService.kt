@@ -54,21 +54,25 @@ class PrivatBilBeregningService {
     }
 
     private fun lagBeregningsgrunnlagForReise(reise: ReiseMedPrivatBil): BeregningsgrunnlagForReiseMedPrivatBil {
-        val ekstrakostnader = Ekstrakostnader(
-            fergekostnadEnVei = reise.fergekostandEnVei,
-            bompengerEnVei = reise.bompengerEnVei,
-        )
+        val ekstrakostnader =
+            Ekstrakostnader(
+                fergekostnadEnVei = reise.fergekostandEnVei,
+                bompengerEnVei = reise.bompengerEnVei,
+            )
         return BeregningsgrunnlagForReiseMedPrivatBil(
             fom = reise.fom,
             tom = reise.tom,
             reisedagerPerUke = reise.reisedagerPerUke,
             reiseavstandEnVei = reise.reiseavstandEnVei,
             ekstrakostnader = ekstrakostnader,
-            satser = beregnSatserForReise(reise, ekstrakostnader)
+            satser = beregnSatserForReise(reise, ekstrakostnader),
         )
     }
 
-    private fun beregnSatserForReise(reise: ReiseMedPrivatBil, ekstrakostnader: Ekstrakostnader): List<SatsForPeriodePrivatBil> =
+    private fun beregnSatserForReise(
+        reise: ReiseMedPrivatBil,
+        ekstrakostnader: Ekstrakostnader,
+    ): List<SatsForPeriodePrivatBil> =
         reise.splitPerÅr { fom, tom ->
             val periode = Datoperiode(fom, tom)
             val sats = finnRelevantKilometerSats(periode)
@@ -77,11 +81,12 @@ class PrivatBilBeregningService {
                 tom = tom,
                 satsBekreftetVedVedtakstidspunkt = sats.bekreftet,
                 kilometersats = sats.beløp,
-                dagsatsUtenParkering = beregnDagsatsUtenParkering(
-                    reiseavstandEnVei = reise.reiseavstandEnVei,
-                    ekstrakostnader = ekstrakostnader,
-                    kilometersats = sats.beløp
-                )
+                dagsatsUtenParkering =
+                    beregnDagsatsUtenParkering(
+                        reiseavstandEnVei = reise.reiseavstandEnVei,
+                        ekstrakostnader = ekstrakostnader,
+                        kilometersats = sats.beløp,
+                    ),
             )
         }
 

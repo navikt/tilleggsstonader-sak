@@ -54,16 +54,18 @@ private fun RammevedtakPrivatBil.tilDto(kjøreliste: Map<ReiseId, Kjøreliste>):
             reisedagerPerUke = reise.grunnlag.reisedagerPerUke,
             aktivitetsadresse = reise.aktivitetsadresse ?: "Ukjent adresse",
             aktivitetsnavn = "Ukjent aktivitet",
-            uker = reise.grunnlag.alleDatoerGruppertPåUke()
-                .map { (uke, datoer) ->
-                    RammevedtakUkeDto(
-                        fom = datoer.min(),
-                        tom = datoer.max(),
-                        ukeNummer = uke.ukenummer,
-                        innsendtDato = kjøreliste?.datoMottatt?.toLocalDate(),
-                        kanSendeInnKjøreliste =
-                            uke.ukenummer <= LocalDate.now().ukenummer() && uke.år <= LocalDate.now().year,
-                    )
-                },
+            uker =
+                reise.grunnlag
+                    .alleDatoerGruppertPåUke()
+                    .map { (uke, datoer) ->
+                        RammevedtakUkeDto(
+                            fom = datoer.min(),
+                            tom = datoer.max(),
+                            ukeNummer = uke.ukenummer,
+                            innsendtDato = kjøreliste?.datoMottatt?.toLocalDate(),
+                            kanSendeInnKjøreliste =
+                                uke.ukenummer <= LocalDate.now().ukenummer() && uke.år <= LocalDate.now().year,
+                        )
+                    },
         )
     }

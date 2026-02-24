@@ -46,15 +46,16 @@ class PrivatBilController(
             ReisevurderingPrivatBilDto(
                 reiseId = reise.reiseId,
                 uker =
-                    reise.grunnlag.alleDatoerGruppertPåUke()
+                    reise.grunnlag
+                        .alleDatoerGruppertPåUke()
                         .map { (uke, datoer) ->
-                        val kjørelisteForUke =
-                            kjørelister.firstOrNull {
-                                it.data.reiseId == reise.reiseId && it.inneholderUkenummer(uke.ukenummer) // TODO ogå skille på år
-                            }
-                        val avklartUke = avklarteUker.singleOrNull { it.ukenummer == uke.ukenummer }
-                        lagUke(uke = uke, datoer= datoer, kjørelisteForUke = kjørelisteForUke, avklartUke = avklartUke)
-                    },
+                            val kjørelisteForUke =
+                                kjørelister.firstOrNull {
+                                    it.data.reiseId == reise.reiseId && it.inneholderUkenummer(uke.ukenummer) // TODO ogå skille på år
+                                }
+                            val avklartUke = avklarteUker.singleOrNull { it.ukenummer == uke.ukenummer }
+                            lagUke(uke = uke, datoer = datoer, kjørelisteForUke = kjørelisteForUke, avklartUke = avklartUke)
+                        },
             )
         } ?: emptyList()
     }
@@ -65,9 +66,10 @@ class PrivatBilController(
         kjørelisteForUke: Kjøreliste?,
         avklartUke: AvklartKjørtUke?,
     ): UkeVurderingDto {
-        val dager = datoer.map { dato ->
-            lagDag(dato, kjørelisteForUke, avklartUke)
-        }
+        val dager =
+            datoer.map { dato ->
+                lagDag(dato, kjørelisteForUke, avklartUke)
+            }
 
         return UkeVurderingDto(
             ukenummer = uke.ukenummer,

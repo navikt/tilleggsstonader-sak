@@ -47,7 +47,7 @@ private val alleSatser: List<SatsDagligReisePrivatBil> =
                 tom = MAX,
                 bekreftet = false,
             )
-        }
+        },
     ) + bekreftedeSatser
 
 /**

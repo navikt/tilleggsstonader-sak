@@ -16,14 +16,13 @@ data class RammeForReiseMedPrivatBil(
     val grunnlag: BeregningsgrunnlagForReiseMedPrivatBil,
 )
 
-
 data class BeregningsgrunnlagForReiseMedPrivatBil(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val reisedagerPerUke: Int,
     val reiseavstandEnVei: BigDecimal,
     val ekstrakostnader: Ekstrakostnader,
-    val satser: List<SatsForPeriodePrivatBil>
+    val satser: List<SatsForPeriodePrivatBil>,
 ) : Periode<LocalDate>
 
 // TODO: Finn ut om det finnes abbonnement på disse prisene og om det påvirker hvordan vi vil løse dette
@@ -51,4 +50,4 @@ data class SatsForPeriodePrivatBil(
     val satsBekreftetVedVedtakstidspunkt: Boolean,
     val kilometersats: BigDecimal,
     val dagsatsUtenParkering: BigDecimal,
-): Periode<LocalDate>
+) : Periode<LocalDate>

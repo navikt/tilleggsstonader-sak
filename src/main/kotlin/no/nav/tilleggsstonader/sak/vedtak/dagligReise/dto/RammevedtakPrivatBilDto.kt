@@ -31,8 +31,8 @@ fun RammevedtakPrivatBil.tilDto() =
     )
 
 // TODO: Flytt splitting til beregning dersom vi vil beholde det
-private fun RammeForReiseMedPrivatBil.tilDto(): List<RammeForReiseMedPrivatBilDto> {
-    return grunnlag.satser.map {
+private fun RammeForReiseMedPrivatBil.tilDto(): List<RammeForReiseMedPrivatBilDto> =
+    grunnlag.satser.map {
         RammeForReiseMedPrivatBilDto(
             reiseId = reiseId,
             fom = it.fom,
@@ -46,4 +46,3 @@ private fun RammeForReiseMedPrivatBil.tilDto(): List<RammeForReiseMedPrivatBilDt
             aktivitetsadresse = this.aktivitetsadresse,
         )
     }
-}
