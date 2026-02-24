@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.no.Gitt
 import io.cucumber.java.no.Når
+import io.cucumber.java.no.Og
 import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
@@ -14,6 +15,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
+import no.nav.tilleggsstonader.sak.cucumber.parseBigDecimal
 import no.nav.tilleggsstonader.sak.cucumber.parseBoolean
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
@@ -93,31 +95,65 @@ class PrivatBilBeregningStepDefinitions {
         }
     }
 
-    @Så("forventer vi følgende rammevedtak for daglig reise privatBil")
-    fun `forventer vi følgende beregningsrsultat for daglig reise privat bil`(dataTable: DataTable) {
+    @Så("forventer vi rammevedtak for følgende periode")
+    fun `forventer vi følgende beregningsrsultat for følgende periode`(dataTable: DataTable) {
         assertThat(feil).isNull()
 
-        val forventetRammevedtakForReise = mapUker(dataTable)
+        val forventetRammevedtakForReise = mapRammevedtak(dataTable)
 
-        forventetRammevedtakForReise.forEachIndexed { index, uke ->
-            val gjeldendeReise = rammevedtak!!.reiser[uke.reiseNr - 1]
+        forventetRammevedtakForReise.forEach { forventetRammevedtak ->
+            val gjeldendeReise = rammevedtak!!.reiser[forventetRammevedtak.reiseNr - 1]
 
-            assertThat(gjeldendeReise.uker[index].grunnlag.fom).isEqualTo(uke.grunnlag.fom)
-            assertThat(gjeldendeReise.uker[index].grunnlag.tom).isEqualTo(uke.grunnlag.tom)
-            assertThat(
-                gjeldendeReise.uker[index].grunnlag.maksAntallDagerSomKanDekkes,
-            ).isEqualTo(uke.grunnlag.maksAntallDagerSomKanDekkes)
-            assertThat(gjeldendeReise.uker[index].grunnlag.antallDagerInkludererHelg).isEqualTo(uke.grunnlag.antallDagerInkludererHelg)
+            assertThat(gjeldendeReise.grunnlag.fom).isEqualTo(forventetRammevedtak.fom)
+            assertThat(gjeldendeReise.grunnlag.tom).isEqualTo(forventetRammevedtak.tom)
+            assertThat(gjeldendeReise.grunnlag.reisedagerPerUke).isEqualTo(forventetRammevedtak.reisedagerPerUke)
+        }
+    }
 
-            uke.maksBeløpSomKanDekkesFørParkering?.let {
-                assertThat(gjeldendeReise.uker[index].maksBeløpSomKanDekkesFørParkering).isEqualTo(
-                    it,
-                )
+    @Og("vi forventer følgende innvilgede perioder i rammevedtaket")
+    fun `vi forventer følgende innvilgede perioder i rammevedtaket`(dataTable: DataTable) {
+        val forventedeInnvilgedePerioder = mapForventedeInnvilgedePerioder(dataTable)
+
+        forventedeInnvilgedePerioder
+            .groupBy { it.reiseNr }
+            .forEach { (reiseNr, innvilgedePerioderForReise) ->
+                val gjeldendeReise = rammevedtak!!.reiser[reiseNr - 1]
+                assertThat(gjeldendeReise.grunnlag.vedtaksperioder).hasSameSizeAs(innvilgedePerioderForReise)
+                assertThat(
+                    gjeldendeReise.grunnlag.vedtaksperioder
+                        .map { it.tilDatoPeriode() }
+                        .sorted(),
+                ).isEqualTo(innvilgedePerioderForReise.map { it.tilDatoPeriode() }.sorted())
             }
-            uke.grunnlag.dagsatsUtenParkering?.let {
-                assertThat(gjeldendeReise.uker[index].dagsatsUtenParkering).isEqualTo(it)
+    }
+
+    @Og("vi forventer følgende satser for rammevedtak")
+    fun `vi forventer følgende satser for rammevedtak`(dataTable: DataTable) {
+        val forventedeSatserPerReise = mapForventedeSatser(dataTable).groupBy { it.reiseNr }
+
+        forventedeSatserPerReise.forEach { (reiseNr, satserForReise) ->
+            val satserIRammevedtak = rammevedtak!!.reiser[reiseNr - 1].grunnlag.satser
+            assertThat(satserIRammevedtak).hasSameSizeAs(satserForReise)
+            satserForReise.forEachIndexed { index, forventetSats ->
+                val satsIRammevedtak = satserIRammevedtak[index]
+                assertThat(satsIRammevedtak.fom).isEqualTo(forventetSats.fom)
+                assertThat(satsIRammevedtak.tom).isEqualTo(forventetSats.tom)
+                assertThat(satsIRammevedtak.dagsatsUtenParkering).isEqualTo(forventetSats.dagsatsUtenParkering)
+                assertThat(satsIRammevedtak.kilometersats).isEqualTo(forventetSats.kilometersats)
             }
         }
+    }
+
+    private fun Periode<LocalDate>.tilDatoPeriode() = Datoperiode(fom, tom)
+
+    @Så("forvent følgende satser for reiseNr={}")
+    fun `forvent følgende satser for reisenr`(
+        reiseNr: Int,
+        dataTable: DataTable,
+    ) {
+        val gjeldendeReise = rammevedtak!!.reiser[reiseNr - 1]
+
+        TODO()
     }
 
     @Så("forvent følgende feilmelding for beregning privat bil: {}")
@@ -130,23 +166,44 @@ class PrivatBilBeregningStepDefinitions {
         assertThat(rammevedtak).isNull()
     }
 
-    private fun mapUker(dataTable: DataTable) =
+    private fun mapRammevedtak(dataTable: DataTable) =
         dataTable.mapRad { rad ->
-            val fom = parseDato(DomenenøkkelFelles.FOM, rad)
-            val tom = parseDato(DomenenøkkelFelles.TOM, rad)
-            BeregningsresultatUkeCucumber(
+            RammevedtakCucumber(
                 reiseNr = parseInt(DomenenøkkelPrivatBil.REISENR, rad),
-                maksBeløpSomKanDekkesFørParkering = parseValgfriInt(DomenenøkkelFelles.BELØP, rad),
-                grunnlag =
-                    BeregningsgrunnlagForUkeCucumber(
-                        fom = fom,
-                        tom = tom,
-                        maksAntallDagerSomKanDekkes = parseInt(DomenenøkkelPrivatBil.ANTALL_DAGER_DEKT_UKE, rad),
-                        antallDagerInkludererHelg = parseBoolean(DomenenøkkelPrivatBil.INKLUDERER_HELG, rad),
-                        vedtaksperioder = emptyList(),
-                        kilometersats = finnRelevantKilometerSats(Datoperiode(fom, tom)),
-                        dagsatsUtenParkering = parseValgfriBigDecimal(DomenenøkkelPrivatBil.DAGSATS_UTEN_PARKERING, rad),
-                    ),
+                fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, rad),
+            )
+        }
+
+    fun mapForventedeInnvilgedePerioder(dataTable: DataTable) =
+        dataTable.mapRad { rad ->
+            InnvilgetPeriodeIRammevedtakCucumber(
+                reiseNr = parseInt(DomenenøkkelPrivatBil.REISENR, rad),
+                fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                tom = parseDato(DomenenøkkelFelles.TOM, rad),
+            )
+        }
+
+    fun mapForventedeSatser(dataTable: DataTable) =
+        dataTable.mapRad { rad ->
+            ForventetSats(
+                reiseNr = parseInt(DomenenøkkelPrivatBil.REISENR, rad),
+                fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                dagsatsUtenParkering = parseBigDecimal(DomenenøkkelPrivatBil.DAGSATS_UTEN_PARKERING, rad),
+                kilometersats = parseBigDecimal(DomenenøkkelPrivatBil.KILOMETERSATS, rad),
+            )
+        }
+
+    private fun mapSatser(dataTable: DataTable) =
+        dataTable.mapRad { rad ->
+            SatsForPeriodePrivatBilCucumber(
+                fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                satsBekreftetVedVedtakstidspunkt = true,
+                kilometersats = parseBigDecimal(DomenenøkkelPrivatBil.KILOMETERSATS, rad),
+                dagsatsUtenParkering = parseBigDecimal(DomenenøkkelPrivatBil.DAGSATS_UTEN_PARKERING, rad),
             )
         }
 }
@@ -159,10 +216,38 @@ enum class DomenenøkkelPrivatBil(
     BOMPENGER("Bompenger"),
     FERGEKOSTNAD("Fergekostnad"),
     REISENR("Reisenr"),
-    ANTALL_DAGER_DEKT_UKE("Antall dager dekt i uke"),
-    INKLUDERER_HELG("Inkluderer helg"),
     DAGSATS_UTEN_PARKERING("Dagsats uten parkering"),
+    KILOMETERSATS("Kilometersats"),
 }
+
+data class RammevedtakCucumber(
+    val reiseNr: Int,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val reisedagerPerUke: Int,
+) : Periode<LocalDate>
+
+data class SatsForPeriodePrivatBilCucumber(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val satsBekreftetVedVedtakstidspunkt: Boolean,
+    val kilometersats: BigDecimal,
+    val dagsatsUtenParkering: BigDecimal,
+) : Periode<LocalDate>
+
+data class InnvilgetPeriodeIRammevedtakCucumber(
+    val reiseNr: Int,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+) : Periode<LocalDate>
+
+data class ForventetSats(
+    val reiseNr: Int,
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val dagsatsUtenParkering: BigDecimal,
+    val kilometersats: BigDecimal,
+)
 
 data class BeregningsresultatUkeCucumber(
     val reiseNr: Int,
