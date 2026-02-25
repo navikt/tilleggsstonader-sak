@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.allePerioderErSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.finnesPerioderSomOverlapper
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerÅr
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForReiseMedPrivatBil
@@ -8,7 +10,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Ekstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.SatsForPeriodePrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import org.springframework.stereotype.Service
@@ -45,11 +46,30 @@ class PrivatBilBeregningService {
         val reiseOgVedtaksperioderSnitt = finnSnittMellomReiseOgVedtaksperioder(reise, vedtaksperioder)
 
         return reiseOgVedtaksperioderSnitt.justertReiseperiode?.let { justertReise ->
+            validerVedtaksperioderErSammenhengendeInnenforReise(justertReise, reiseOgVedtaksperioderSnitt.justerteVedtaksperioder)
             RammeForReiseMedPrivatBil(
                 reiseId = reise.reiseId,
                 aktivitetsadresse = reise.aktivitetsadresse,
                 grunnlag = lagBeregningsgrunnlagForReise(justertReise, reiseOgVedtaksperioderSnitt.justerteVedtaksperioder),
             )
+        }
+    }
+
+    private fun validerVedtaksperioderErSammenhengendeInnenforReise(
+        justertReise: ReiseMedPrivatBil,
+        justerteVedtaksperioder: List<Vedtaksperiode>,
+    ) {
+        require(justertReise.fom == justerteVedtaksperioder.minOf { it.fom }) {
+            "Fom på reise er ulik tidligste fom på vedtaksperiodene"
+        }
+        require(justertReise.tom == justerteVedtaksperioder.maxOf { it.tom }) {
+            "Tom på reise ulik største tom på vedtaksperiodene"
+        }
+        require(!justerteVedtaksperioder.finnesPerioderSomOverlapper()) {
+            "Vedtaksperioder innenfor en reise kan ikke overlappe"
+        }
+        require(justerteVedtaksperioder.allePerioderErSammenhengende()) {
+            "Alle vedtaksperioder må være sammenhengende"
         }
     }
 
@@ -69,7 +89,7 @@ class PrivatBilBeregningService {
             reiseavstandEnVei = reise.reiseavstandEnVei,
             ekstrakostnader = ekstrakostnader,
             satser = beregnSatserForReise(reise, ekstrakostnader),
-            vedtaksperioder = vedtaksperioder.map { VedtaksperiodeGrunnlag(it, reise.reisedagerPerUke) },
+            vedtaksperioder = vedtaksperioder,
         )
     }
 

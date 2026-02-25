@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -22,7 +23,7 @@ data class BeregningsgrunnlagForReiseMedPrivatBil(
     val reiseavstandEnVei: BigDecimal,
     val ekstrakostnader: Ekstrakostnader,
     val satser: List<SatsForPeriodePrivatBil>,
-    val vedtaksperioder: List<VedtaksperiodeGrunnlag>,
+    val vedtaksperioder: List<Vedtaksperiode>,
 ) : Periode<LocalDate>
 
 // TODO: Finn ut om det finnes abbonnement på disse prisene og om det påvirker hvordan vi vil løse dette

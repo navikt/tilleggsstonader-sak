@@ -16,16 +16,12 @@ import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseBigDecimal
-import no.nav.tilleggsstonader.sak.cucumber.parseBoolean
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
-import no.nav.tilleggsstonader.sak.cucumber.parseValgfriBigDecimal
-import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.finnRelevantKilometerSats
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -35,6 +31,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Vi
 import org.assertj.core.api.Assertions.assertThat
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.UUID
 
 @Suppress("unused", "ktlint:standard:function-naming")
 class PrivatBilBeregningStepDefinitions {
@@ -110,23 +107,6 @@ class PrivatBilBeregningStepDefinitions {
         }
     }
 
-    @Og("vi forventer følgende innvilgede perioder i rammevedtaket")
-    fun `vi forventer følgende innvilgede perioder i rammevedtaket`(dataTable: DataTable) {
-        val forventedeInnvilgedePerioder = mapForventedeInnvilgedePerioder(dataTable)
-
-        forventedeInnvilgedePerioder
-            .groupBy { it.reiseNr }
-            .forEach { (reiseNr, innvilgedePerioderForReise) ->
-                val gjeldendeReise = rammevedtak!!.reiser[reiseNr - 1]
-                assertThat(gjeldendeReise.grunnlag.vedtaksperioder).hasSameSizeAs(innvilgedePerioderForReise)
-                assertThat(
-                    gjeldendeReise.grunnlag.vedtaksperioder
-                        .map { it.tilDatoPeriode() }
-                        .sorted(),
-                ).isEqualTo(innvilgedePerioderForReise.map { it.tilDatoPeriode() }.sorted())
-            }
-    }
-
     @Og("vi forventer følgende satser for rammevedtak")
     fun `vi forventer følgende satser for rammevedtak`(dataTable: DataTable) {
         val forventedeSatserPerReise = mapForventedeSatser(dataTable).groupBy { it.reiseNr }
@@ -144,17 +124,26 @@ class PrivatBilBeregningStepDefinitions {
         }
     }
 
-    private fun Periode<LocalDate>.tilDatoPeriode() = Datoperiode(fom, tom)
-
-    @Så("forvent følgende satser for reiseNr={}")
-    fun `forvent følgende satser for reisenr`(
+    @Og("vi forventer følgende vedtaksperioder for rammevedtak med reiseNr={}")
+    fun `vi forventer følgende vedtaksperioder for rammevedtak`(
         reiseNr: Int,
         dataTable: DataTable,
     ) {
-        val gjeldendeReise = rammevedtak!!.reiser[reiseNr - 1]
+        val forventedeVedtaksperioder = mapVedtaksperioder(dataTable)
 
-        TODO()
+        // Sammenlign uten uuid da den genereres i mapVedtaksperioder() over
+        val dummyUuid = UUID.randomUUID()
+        assertThat(
+            rammevedtak!!
+                .reiser[reiseNr - 1]
+                .grunnlag.vedtaksperioder
+                .map { it.copy(id = dummyUuid) },
+        ).isEqualTo(
+            forventedeVedtaksperioder.map { it.copy(id = dummyUuid) },
+        )
     }
+
+    private fun Periode<LocalDate>.tilDatoPeriode() = Datoperiode(fom, tom)
 
     @Så("forvent følgende feilmelding for beregning privat bil: {}")
     fun `forvent følgelde feilmelding for beregning privat bil`(feilmelding: String) {
@@ -187,7 +176,7 @@ class PrivatBilBeregningStepDefinitions {
 
     fun mapForventedeSatser(dataTable: DataTable) =
         dataTable.mapRad { rad ->
-            ForventetSats(
+            ForventetSatsCucumber(
                 reiseNr = parseInt(DomenenøkkelPrivatBil.REISENR, rad),
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
@@ -241,7 +230,7 @@ data class InnvilgetPeriodeIRammevedtakCucumber(
     override val tom: LocalDate,
 ) : Periode<LocalDate>
 
-data class ForventetSats(
+data class ForventetSatsCucumber(
     val reiseNr: Int,
     val fom: LocalDate,
     val tom: LocalDate,

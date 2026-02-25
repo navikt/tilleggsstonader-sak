@@ -18,10 +18,6 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
       | Reisenr | Fom        | Tom        | Antall reisedager per uke |
       | 1       | 06.01.2025 | 19.01.2025 | 5                         |
 
-    Og vi forventer følgende innvilgede perioder i rammevedtaket
-      | Reisenr | Fom        | Tom        |
-      | 1       | 06.01.2025 | 19.01.2025 |
-
     Og vi forventer følgende satser for rammevedtak
       | Reisenr | Fom        | Tom        | Dagsats uten parkering | Kilometersats |
       | 1       | 06.01.2025 | 19.01.2025 | 57.60                  | 2.88          |
@@ -40,10 +36,6 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
     Så forventer vi rammevedtak for følgende periode
       | Reisenr | Fom        | Tom        | Antall reisedager per uke |
       | 1       | 06.01.2025 | 12.01.2025 | 5                         |
-
-    Og vi forventer følgende innvilgede perioder i rammevedtaket
-      | Reisenr | Fom        | Tom        |
-      | 1       | 06.01.2025 | 12.01.2025 |
 
     Og vi forventer følgende satser for rammevedtak
       | Reisenr | Fom        | Tom        | Dagsats uten parkering | Kilometersats |
@@ -64,10 +56,42 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
       | Reisenr | Fom        | Tom        | Antall reisedager per uke |
       | 1       | 06.01.2025 | 12.01.2025 | 5                         |
 
-    Og vi forventer følgende innvilgede perioder i rammevedtaket
-      | Reisenr | Fom        | Tom        |
-      | 1       | 06.01.2025 | 12.01.2025 |
-
     Og vi forventer følgende satser for rammevedtak
       | Reisenr | Fom        | Tom        | Dagsats uten parkering | Kilometersats |
       | 1       | 06.01.2025 | 12.01.2025 | 57.60                  | 2.88          |
+
+  Scenario: støtter ulike men sammenhengende vedtaksperioder innenfor reise
+    Gitt følgende vedtaksperioder for daglig reise privat bil
+      | Fom        | Tom        | Målgruppe | Aktivitet |
+      | 01.01.2025 | 15.01.2025 | NEDSATT_ARBEIDSEVNE       | TILTAK    |
+      | 16.01.2025 | 30.02.2025 | NEDSATT_ARBEIDSEVNE       | UTDANNING    |
+
+    Gitt følgende vilkår for daglig reise med privat bil
+      | Fom        | Tom        | Antall reisedager per uke | Reiseavstand | Bompenger | Fergekostnad |
+      | 01.01.2025 | 30.01.2025 | 5                         | 10           | 0         | 0            |
+
+    Når beregner for daglig reise privat bil
+
+    Så forventer vi rammevedtak for følgende periode
+      | Reisenr | Fom        | Tom        | Antall reisedager per uke |
+      | 1       | 01.01.2025 | 30.01.2025 | 5                         |
+
+    Og vi forventer følgende vedtaksperioder for rammevedtak med reiseNr=1
+      | Fom        | Tom        | Målgruppe | Aktivitet |
+      | 01.01.2025 | 15.01.2025 | NEDSATT_ARBEIDSEVNE       | TILTAK    |
+      | 16.01.2025 | 30.01.2025 | NEDSATT_ARBEIDSEVNE       | UTDANNING    |
+
+
+  Scenario: må ha sammenhengende vedtaksperioder innenfor en reise
+    Gitt følgende vedtaksperioder for daglig reise privat bil
+      | Fom        | Tom        | Målgruppe | Aktivitet |
+      | 01.01.2025 | 15.01.2025 | NEDSATT_ARBEIDSEVNE       | TILTAK    |
+      | 17.01.2025 | 30.02.2025 | NEDSATT_ARBEIDSEVNE       | TILTAK    |
+
+    Gitt følgende vilkår for daglig reise med privat bil
+      | Fom        | Tom        | Antall reisedager per uke | Reiseavstand | Bompenger | Fergekostnad |
+      | 01.01.2025 | 30.01.2025 | 5                         | 10           | 0         | 0            |
+
+    Når beregner for daglig reise privat bil
+
+    Så forvent følgende feilmelding for beregning privat bil: Alle vedtaksperioder må være sammenhengende
