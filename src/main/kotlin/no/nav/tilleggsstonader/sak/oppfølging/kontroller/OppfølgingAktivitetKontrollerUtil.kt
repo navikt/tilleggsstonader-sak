@@ -1,15 +1,16 @@
 package no.nav.tilleggsstonader.sak.oppfølging.kontroller
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
 import no.nav.tilleggsstonader.sak.oppfølging.Kontroll
 import no.nav.tilleggsstonader.sak.oppfølging.PeriodeForKontroll
-import no.nav.tilleggsstonader.sak.oppfølging.domain.DatoperiodeNullableTom
 import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingInngangsvilkårAktivitet
 import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingRegisterAktiviteter
 import no.nav.tilleggsstonader.sak.oppfølging.ÅrsakKontroll
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import java.time.LocalDate
 
 /**
  * Finner endringer i aktivitet i forhold til hvilke vedtaksperioder som finnes
@@ -68,7 +69,7 @@ object OppfølgingAktivitetKontrollerUtil {
     private fun finnEndringIRegisteraktivitetEllerAlle(
         vedtaksperiode: Vedtaksperiode,
         aktiviteter: List<OppfølgingInngangsvilkårAktivitet>,
-        registerperioder: List<DatoperiodeNullableTom>,
+        registerperioder: List<Periode<LocalDate>>,
     ): List<Kontroll> {
         val kontroller = mutableListOf<Kontroll>()
 
@@ -113,9 +114,9 @@ object OppfølgingAktivitetKontrollerUtil {
 
     private fun finnKontroller(
         vedtaksperiode: Vedtaksperiode,
-        registerperioder: List<DatoperiodeNullableTom>,
+        registerperioder: List<Periode<LocalDate>>,
     ): List<Kontroll> {
-        val snitt = registerperioder.mapNotNull { it.beregnSnitt(vedtaksperiode) }.singleOrNull()
+        val snitt = registerperioder.mapNotNull { vedtaksperiode.beregnSnitt(it) }.singleOrNull()
 
         if (snitt == null) {
             return listOf(Kontroll(ÅrsakKontroll.INGEN_TREFF))

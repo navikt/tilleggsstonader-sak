@@ -16,8 +16,6 @@ data class DatoperiodeNullableTom(
             tom = if (tom != null && other.tom != null) maxOf(tom, other.tom) else null,
         )
 
-    fun inneholder(periode: Periode<LocalDate>): Boolean = fom <= periode.fom && (tom == null || tom >= periode.tom)
-
     fun beregnSnitt(periode: Periode<LocalDate>): Datoperiode? {
         val snittFom = maxOf(fom, periode.fom)
         val snittTom = if (tom != null) minOf(tom, periode.tom) else periode.tom
