@@ -34,31 +34,41 @@ object DetaljertVedtaksperioderDagligReiseMapper {
 
     private fun List<BeregningsresultatForPeriode>.tilDetaljertVedtaksperiode(
         stønadstype: Stønadstype,
-    ): List<DetaljertVedtaksperiodeDagligReise> {
-        val perioder = this
-        val perioderMedLikAktivitetOgMålgruppe =
-            perioder
-                .map { it.tilBeregningsresultatForPeriodeMedFomOgTom() }
-                .mergeSammenhengendeMedLikAktivitetOgMålgruppe()
-        return perioderMedLikAktivitetOgMålgruppe.map { periode ->
+    ): List<DetaljertVedtaksperiodeDagligReise> =
+        map { periode ->
+            val målgrupper = periode.grunnlag.vedtaksperioder.map { it.målgruppe }
+            val typeAktiviteter = periode.grunnlag.vedtaksperioder.map { it.typeAktivitet }
+            val aktiviteter = periode.grunnlag.vedtaksperioder.map { it.aktivitet }
+
+            // Nå klarer vi ikke å opprette andeler hvis det finnes ulike målgrupper eller typeAktiviteter på samme behandling.
+            // Vi kan derfor sette dette som krav.
+            require(målgrupper.distinct().size == 1) {
+                "Klarer foreløbig ikke å vise vedtaksperioder når det er flere i målgrupper i samme beregningsperiode."
+            }
+
+            require(typeAktiviteter.distinct().size == 1) {
+                "Klarer foreløbig ikke å vise vedtaksperioder når det er flere i tiltaksvarianter i samme beregningsperiode"
+            }
+
+            // TODO for tso må vi kunne støtte ulike aktiviteter i samme beregningsperiode
+            require(aktiviteter.distinct().size == 1) {
+                "Klarer foreløbig ikke å vise vedtaksperioder når det er flere i aktiviteter i samme beregningsperiode"
+            }
+
             DetaljertVedtaksperiodeDagligReise(
                 fom = periode.grunnlag.fom,
                 tom = periode.grunnlag.tom,
-                aktivitet = periode.grunnlag.vedtaksperiode.aktivitet,
-                typeAktivtet = periode.grunnlag.vedtaksperiode.typeAktivitet,
-                målgruppe = periode.grunnlag.vedtaksperiode.målgruppe,
+                aktivitet = aktiviteter.first(),
+                typeAktivtet = typeAktiviteter.first(),
+                målgruppe = målgrupper.first(),
                 typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
                 stønadstype = stønadstype,
                 beregningsresultat = mapBeregnDetajlerForPerioder(periode),
             )
         }
-    }
-
-    fun BeregningsresultatForPeriode.mergeSammenhengendeVedtaksperioderMedLikAktivitetOgMålgruppe() {
-    }
 
     private fun mapBeregnDetajlerForPerioder(periode: BeregningsresultatForPeriode): List<BeregningsresultatForPeriodeDto> =
-        periode.grunnlag.vedtaksperioder.map { vedtaksperiode ->
+        listOf(
             BeregningsresultatForPeriodeDto(
                 fom = periode.grunnlag.fom,
                 tom = periode.grunnlag.tom,
@@ -70,7 +80,7 @@ object DetaljertVedtaksperioderDagligReiseMapper {
                 billettdetaljer = periode.billettdetaljer,
                 antallReisedager = periode.grunnlag.antallReisedager,
                 fraTidligereVedtak = periode.fraTidligereVedtak,
-                brukersNavKontor = null,
-            )
-        }
+                brukersNavKontor = periode.grunnlag.brukersNavKontor,
+            ),
+        )
 }
