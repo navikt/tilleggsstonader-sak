@@ -32,27 +32,36 @@ object DetaljertVedtaksperioderDagligReiseMapper {
             reise.perioder
         }
 
-    private fun List<BeregningsresultatForPeriode>.tilDetaljertVedtaksperiode(stønadstype: Stønadstype) =
-        flatMap { periode ->
-            periode.grunnlag.vedtaksperioder.map { vedtaksperiode ->
-                DetaljertVedtaksperiodeDagligReise(
-                    fom = vedtaksperiode.fom,
-                    tom = vedtaksperiode.tom,
-                    aktivitet = vedtaksperiode.aktivitet,
-                    typeAktivtet = vedtaksperiode.typeAktivitet,
-                    målgruppe = vedtaksperiode.målgruppe,
-                    typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
-                    stønadstype = stønadstype,
-                    beregningsresultat = mapBeregnDetajlerForPerioder(periode),
-                )
-            }
+    private fun List<BeregningsresultatForPeriode>.tilDetaljertVedtaksperiode(
+        stønadstype: Stønadstype,
+    ): List<DetaljertVedtaksperiodeDagligReise> {
+        val perioder = this
+        val perioderMedLikAktivitetOgMålgruppe =
+            perioder
+                .map { it.tilBeregningsresultatForPeriodeMedFomOgTom() }
+                .mergeSammenhengendeMedLikAktivitetOgMålgruppe()
+        return perioderMedLikAktivitetOgMålgruppe.map { periode ->
+            DetaljertVedtaksperiodeDagligReise(
+                fom = periode.grunnlag.fom,
+                tom = periode.grunnlag.tom,
+                aktivitet = periode.grunnlag.vedtaksperiode.aktivitet,
+                typeAktivtet = periode.grunnlag.vedtaksperiode.typeAktivitet,
+                målgruppe = periode.grunnlag.vedtaksperiode.målgruppe,
+                typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
+                stønadstype = stønadstype,
+                beregningsresultat = mapBeregnDetajlerForPerioder(periode),
+            )
         }
+    }
+
+    fun BeregningsresultatForPeriode.mergeSammenhengendeVedtaksperioderMedLikAktivitetOgMålgruppe() {
+    }
 
     private fun mapBeregnDetajlerForPerioder(periode: BeregningsresultatForPeriode): List<BeregningsresultatForPeriodeDto> =
         periode.grunnlag.vedtaksperioder.map { vedtaksperiode ->
             BeregningsresultatForPeriodeDto(
-                fom = vedtaksperiode.fom,
-                tom = vedtaksperiode.tom,
+                fom = periode.grunnlag.fom,
+                tom = periode.grunnlag.tom,
                 prisEnkeltbillett = periode.grunnlag.prisEnkeltbillett,
                 prisSyvdagersbillett = periode.grunnlag.prisSyvdagersbillett,
                 pris30dagersbillett = periode.grunnlag.pris30dagersbillett,
