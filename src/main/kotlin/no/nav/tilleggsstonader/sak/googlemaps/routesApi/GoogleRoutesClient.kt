@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.googlemaps.routesApi
 
+import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.logger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatusCode
