@@ -117,6 +117,9 @@ fun IntegrationTest.gjennomførBehandlingsløp(
     // Oppretter grunnlagsdata
     val behandling = kall.behandling.hent(behandlingId)
 
+    // Oppretter vilkårperiode grunnlag
+    kall.vilkårperiode.hentForBehandling(behandlingId)
+
     // Oppretter oppgave
     kjørTasksKlareForProsessering()
 
