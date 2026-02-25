@@ -88,5 +88,6 @@ class ArenaStatusService(
     private val saksnummerSomKanBehandlesIArena: List<Long> =
         listOf(
             9807,
+            8153, // Gjelder betaling direkte til hotell. Fjern etter at saken er løst.
         )
 }
