@@ -1,14 +1,11 @@
 package no.nav.tilleggsstonader.sak.oppfølging
 
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
-import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.tilTema
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
-import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -17,10 +14,12 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakMetadata
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.oppfølging.domain.DatoperiodeNullableTom
 import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingInngangsvilkårAktivitet.Companion.fraVilkårperioder
 import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingInngangsvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingInngangsvilkårMålgruppe.Companion.fraVilkårperioder
 import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingRegisterAktiviteter
+import no.nav.tilleggsstonader.sak.oppfølging.domain.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.oppfølging.kontroller.OppfølgingAktivitetKontrollerUtil
 import no.nav.tilleggsstonader.sak.oppfølging.kontroller.OppfølgingMålgruppeKontrollerUtil
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetService
@@ -193,7 +192,7 @@ class OppfølgingOpprettKontrollerService(
     private fun hentRegisterYtelser(
         fagsak: FagsakMetadata,
         målgrupper: List<OppfølgingInngangsvilkårMålgruppe>,
-    ): Map<MålgruppeType, List<Datoperiode>> {
+    ): Map<MålgruppeType, List<DatoperiodeNullableTom>> {
         val typerSomSkalHentes =
             målgrupper.map { periode -> periode.målgruppe.tilTypeYtelsePeriode().let { it to periode } }
 
@@ -208,26 +207,10 @@ class OppfølgingOpprettKontrollerService(
             .also { validerResultat(it.kildeResultat) }
             .perioder
             .filter { it.aapErFerdigAvklart != true }
-            .korrigerTom()
-            .filter { it.tom != null }
-            .map { it.type.tilMålgruppe() to Datoperiode(fom = it.fom, tom = it.tom!!) }
+            .map { it.type.tilMålgruppe() to DatoperiodeNullableTom(fom = it.fom, tom = it.tom) }
             .groupBy({ it.first }, { it.second })
             .mapValues { it.value.mergeSammenhengende() }
     }
-
-    /**
-     * Det er vanlig at omstillingsstønad mangler TOM,
-     * og de kan være lagt inn hos oss med tom 3 år frem i tiden fordi det er det som står på vedtaket
-     * Av den grunnen settes tom = MAX for omstillingsstønad når den er null.
-     */
-    private fun List<YtelsePeriode>.korrigerTom(): List<YtelsePeriode> =
-        this.map {
-            if (it.type == TypeYtelsePeriode.OMSTILLINGSSTØNAD && it.tom == null) {
-                it.copy(tom = LocalDate.MAX)
-            } else {
-                it
-            }
-        }
 
     private fun validerResultat(kildeResultat: List<YtelsePerioderDto.KildeResultatYtelse>) {
         val test = kildeResultat.filter { it.resultat != ResultatKilde.OK }

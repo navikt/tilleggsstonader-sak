@@ -1,9 +1,9 @@
 package no.nav.tilleggsstonader.sak.oppfølging.kontroller
 
-import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
 import no.nav.tilleggsstonader.sak.oppfølging.Kontroll
 import no.nav.tilleggsstonader.sak.oppfølging.PeriodeForKontroll
+import no.nav.tilleggsstonader.sak.oppfølging.domain.DatoperiodeNullableTom
 import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingInngangsvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.oppfølging.ÅrsakKontroll
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -26,7 +26,7 @@ object OppfølgingMålgruppeKontrollerUtil {
     fun finnEndringer(
         inngangsvilkår: List<OppfølgingInngangsvilkårMålgruppe>,
         vedtaksperioder: List<Vedtaksperiode>,
-        registerYtelser: Map<MålgruppeType, List<Datoperiode>>,
+        registerYtelser: Map<MålgruppeType, List<DatoperiodeNullableTom>>,
     ): List<PeriodeForKontroll> =
         inngangsvilkår
             .map {
@@ -43,7 +43,7 @@ object OppfølgingMålgruppeKontrollerUtil {
      */
     private fun OppfølgingInngangsvilkårMålgruppe.finnEndringer(
         vedtaksperioder: List<Vedtaksperiode>,
-        ytelserPerMålgruppe: Map<MålgruppeType, List<Datoperiode>>,
+        ytelserPerMålgruppe: Map<MålgruppeType, List<DatoperiodeNullableTom>>,
     ): List<Kontroll> {
         val snittInngangsvilkårVedtaksperioder =
             vedtaksperioder
@@ -65,7 +65,7 @@ object OppfølgingMålgruppeKontrollerUtil {
      */
     private fun beregnSnitt(
         snittVedtaksperiode: Vedtaksperiode,
-        ytelserFraRegister: List<Datoperiode>,
+        ytelserFraRegister: List<DatoperiodeNullableTom>,
     ): List<Kontroll> {
         @Suppress("SimplifiableCallChain")
         val snitt = ytelserFraRegister.mapNotNull { it.beregnSnitt(snittVedtaksperiode) }.firstOrNull()

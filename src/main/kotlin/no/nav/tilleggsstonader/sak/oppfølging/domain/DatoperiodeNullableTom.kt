@@ -24,3 +24,17 @@ data class DatoperiodeNullableTom(
         return if (snittFom <= snittTom) Datoperiode(snittFom, snittTom) else null
     }
 }
+
+fun List<DatoperiodeNullableTom>.mergeSammenhengende(): List<DatoperiodeNullableTom> =
+    this
+        .sortedBy { it.fom }
+        .fold(mutableListOf()) { resultat, periode ->
+            val forrige = resultat.lastOrNull()
+            if (forrige != null && forrige.overlapperEllerPåfølgesAv(periode)) {
+                resultat.removeLast()
+                resultat.add(forrige.merge(periode))
+            } else {
+                resultat.add(periode)
+            }
+            resultat
+        }

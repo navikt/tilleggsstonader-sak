@@ -32,17 +32,7 @@ class OppfølgingRegisterAktiviteter(
     private fun List<AktivitetArenaDto>.mergeSammenhengende(): List<DatoperiodeNullableTom> =
         this
             .mapNotNull { mapTilPeriode(it) }
-            .sortedBy { it.fom }
-            .fold(mutableListOf()) { resultat, periode ->
-                val forrige = resultat.lastOrNull()
-                if (forrige != null && forrige.overlapperEllerPåfølgesAv(periode)) {
-                    resultat.removeLast()
-                    resultat.add(forrige.merge(periode))
-                } else {
-                    resultat.add(periode)
-                }
-                resultat
-            }
+            .mergeSammenhengende()
 
     private fun mapTilPeriode(aktivitet: AktivitetArenaDto): DatoperiodeNullableTom? {
         if (aktivitet.fom == null) {
