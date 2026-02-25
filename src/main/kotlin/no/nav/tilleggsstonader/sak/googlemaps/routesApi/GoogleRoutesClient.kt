@@ -41,7 +41,6 @@ class GoogleRoutesClient(
     private val clientErrorHandler: (HttpRequest, ClientHttpResponse) -> Unit = { _, response ->
         val body = String(response.body.readAllBytes())
         if (body.contains("Address not found")) {
-            logger.warn(body)
             brukerfeil("Kunne ikke finne adressen")
         } else {
             logger.error(body)
