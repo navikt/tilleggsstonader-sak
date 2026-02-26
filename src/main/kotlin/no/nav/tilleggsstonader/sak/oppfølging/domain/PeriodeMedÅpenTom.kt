@@ -4,13 +4,13 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import java.time.LocalDate
 
-data class DatoperiodeNullableTom(
+data class PeriodeMedÅpenTom(
     val fom: LocalDate,
     val tom: LocalDate?,
 ) {
-    fun overlapperEllerPåfølgesAv(neste: DatoperiodeNullableTom): Boolean = tom != null && neste.fom <= tom.plusDays(1)
+    fun overlapperEllerPåfølgesAv(neste: PeriodeMedÅpenTom): Boolean = tom != null && neste.fom <= tom.plusDays(1)
 
-    fun merge(other: DatoperiodeNullableTom): DatoperiodeNullableTom =
+    fun merge(other: PeriodeMedÅpenTom): PeriodeMedÅpenTom =
         copy(
             fom = minOf(fom, other.fom),
             tom = if (tom != null && other.tom != null) maxOf(tom, other.tom) else null,
@@ -23,7 +23,7 @@ data class DatoperiodeNullableTom(
     }
 }
 
-fun List<DatoperiodeNullableTom>.mergeSammenhengende(): List<DatoperiodeNullableTom> =
+fun List<PeriodeMedÅpenTom>.mergeSammenhengende(): List<PeriodeMedÅpenTom> =
     this
         .sortedBy { it.fom }
         .fold(mutableListOf()) { resultat, periode ->

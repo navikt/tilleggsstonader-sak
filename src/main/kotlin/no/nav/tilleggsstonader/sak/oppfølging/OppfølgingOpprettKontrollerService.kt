@@ -14,11 +14,11 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakMetadata
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.oppfølging.domain.DatoperiodeNullableTom
 import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingInngangsvilkårAktivitet.Companion.fraVilkårperioder
 import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingInngangsvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingInngangsvilkårMålgruppe.Companion.fraVilkårperioder
 import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingRegisterAktiviteter
+import no.nav.tilleggsstonader.sak.oppfølging.domain.PeriodeMedÅpenTom
 import no.nav.tilleggsstonader.sak.oppfølging.domain.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.oppfølging.kontroller.OppfølgingAktivitetKontrollerUtil
 import no.nav.tilleggsstonader.sak.oppfølging.kontroller.OppfølgingMålgruppeKontrollerUtil
@@ -192,7 +192,7 @@ class OppfølgingOpprettKontrollerService(
     private fun hentRegisterYtelser(
         fagsak: FagsakMetadata,
         målgrupper: List<OppfølgingInngangsvilkårMålgruppe>,
-    ): Map<MålgruppeType, List<DatoperiodeNullableTom>> {
+    ): Map<MålgruppeType, List<PeriodeMedÅpenTom>> {
         val typerSomSkalHentes =
             målgrupper.map { periode -> periode.målgruppe.tilTypeYtelsePeriode().let { it to periode } }
 
@@ -207,7 +207,7 @@ class OppfølgingOpprettKontrollerService(
             .also { validerResultat(it.kildeResultat) }
             .perioder
             .filter { it.aapErFerdigAvklart != true }
-            .map { it.type.tilMålgruppe() to DatoperiodeNullableTom(fom = it.fom, tom = it.tom) }
+            .map { it.type.tilMålgruppe() to PeriodeMedÅpenTom(fom = it.fom, tom = it.tom) }
             .groupBy({ it.first }, { it.second })
             .mapValues { it.value.mergeSammenhengende() }
     }
