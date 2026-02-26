@@ -7,7 +7,9 @@ import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
+import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -153,8 +155,17 @@ class HåndterSøknadService(
                 fom = søknad.data.reiser.minOf { it.periode.fom },
                 tom = søknad.data.reiser.maxOf { it.periode.tom },
                 typer = TypeYtelsePeriode.entries.toList(),
-            ).perioder
+            ).also { validerResultat(it.kildeResultat) }
+            .perioder
             .map { it.type.tilMålgruppe() }
+    }
+
+    private fun validerResultat(kildeResultat: List<YtelsePerioderDto.KildeResultatYtelse>) {
+        val feiledeHentingerAvYtelse = kildeResultat.filter { it.resultat == ResultatKilde.FEILET }
+
+        feilHvis(feiledeHentingerAvYtelse.isNotEmpty()) {
+            "Feil ved henting av ytelser ${feiledeHentingerAvYtelse.map { it.type }}"
+        }
     }
 
     fun kanAutomatiskJournalføre(
