@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.flyway.autoconfigure.FlywayConfigurationCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
 import org.springframework.core.convert.converter.Converter
 import org.springframework.core.env.Environment
 import org.springframework.data.convert.ReadingConverter
@@ -44,6 +45,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.annotation.EnableTransactionManagement
 import org.springframework.transaction.annotation.RollbackOn
+import org.springframework.transaction.support.TransactionTemplate
 import tools.jackson.module.kotlin.readValue
 import java.util.Optional
 import javax.sql.DataSource
@@ -58,7 +60,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     fun operations(dataSource: DataSource): NamedParameterJdbcOperations = NamedParameterJdbcTemplate(dataSource)
 
     @Bean
-    fun transactionManager(dataSource: DataSource): PlatformTransactionManager = DataSourceTransactionManager(dataSource)
+    @Primary
+    fun transactionManager(dataSource: DataSource) = DataSourceTransactionManager(dataSource)
 
     @Bean
     fun auditSporbarEndret(): AuditorAware<Endret> = AuditorAware { Optional.of(Endret()) }
