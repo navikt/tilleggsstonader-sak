@@ -107,7 +107,7 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
                                     ),
                                 antallReisedager = 22,
                                 fraTidligereVedtak = false,
-                                brukersNavKontor = null,
+                                brukersNavKontor = "1014",
                             ),
                         ),
                 ),
