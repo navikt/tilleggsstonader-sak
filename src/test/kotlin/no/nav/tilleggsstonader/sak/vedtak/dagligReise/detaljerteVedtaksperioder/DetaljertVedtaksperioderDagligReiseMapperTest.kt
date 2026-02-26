@@ -136,10 +136,16 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                 innvilgelseMedUlikeVedtaksperioder(
                     fom = førsteJanuar,
                     tom = sisteJanuar,
-                    vedtaksperioder = listOf(
-                        vedtaksperiodeGrunnlag(førsteJanuar, sisteJanuar, målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE),
-                        vedtaksperiodeGrunnlag(førsteJanuar, sisteJanuar, målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER, aktivitet = AktivitetType.UTDANNING),
-                    ),
+                    vedtaksperioder =
+                        listOf(
+                            vedtaksperiodeGrunnlag(førsteJanuar, sisteJanuar, målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE),
+                            vedtaksperiodeGrunnlag(
+                                førsteJanuar,
+                                sisteJanuar,
+                                målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER,
+                                aktivitet = AktivitetType.UTDANNING,
+                            ),
+                        ),
                 ),
             )
 
@@ -163,10 +169,16 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                 innvilgelseMedUlikeVedtaksperioder(
                     fom = førsteJanuar,
                     tom = sisteJanuar,
-                    vedtaksperioder = listOf(
-                        vedtaksperiodeGrunnlag(førsteJanuar, sisteJanuar, aktivitet = AktivitetType.TILTAK),
-                        vedtaksperiodeGrunnlag(førsteJanuar, sisteJanuar, aktivitet = AktivitetType.UTDANNING, målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER),
-                    ),
+                    vedtaksperioder =
+                        listOf(
+                            vedtaksperiodeGrunnlag(førsteJanuar, sisteJanuar, aktivitet = AktivitetType.TILTAK),
+                            vedtaksperiodeGrunnlag(
+                                førsteJanuar,
+                                sisteJanuar,
+                                aktivitet = AktivitetType.UTDANNING,
+                                målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER,
+                            ),
+                        ),
                 ),
             )
 
@@ -190,10 +202,11 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                 innvilgelseMedUlikeVedtaksperioder(
                     fom = førsteJanuar,
                     tom = sisteMars,
-                    vedtaksperioder = listOf(
-                        vedtaksperiodeGrunnlag(førsteJanuar, sisteJanuar),
-                        vedtaksperiodeGrunnlag(førsteFeb, sisteMars),
-                    ),
+                    vedtaksperioder =
+                        listOf(
+                            vedtaksperiodeGrunnlag(førsteJanuar, sisteJanuar),
+                            vedtaksperiodeGrunnlag(førsteFeb, sisteMars),
+                        ),
                 ),
             )
 
@@ -215,11 +228,17 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                 innvilgelseMedUlikeVedtaksperioder(
                     fom = førsteJanuar,
                     tom = sisteApril,
-                    vedtaksperioder = listOf(
-                        vedtaksperiodeGrunnlag(førsteJanuar, sisteJanuar, aktivitet = AktivitetType.TILTAK),
-                        vedtaksperiodeGrunnlag(førsteFeb, sisteFeb, aktivitet = AktivitetType.TILTAK),
-                        vedtaksperiodeGrunnlag(førsteMars, sisteApril, aktivitet = AktivitetType.UTDANNING, målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER),
-                    ),
+                    vedtaksperioder =
+                        listOf(
+                            vedtaksperiodeGrunnlag(førsteJanuar, sisteJanuar, aktivitet = AktivitetType.TILTAK),
+                            vedtaksperiodeGrunnlag(førsteFeb, sisteFeb, aktivitet = AktivitetType.TILTAK),
+                            vedtaksperiodeGrunnlag(
+                                førsteMars,
+                                sisteApril,
+                                aktivitet = AktivitetType.UTDANNING,
+                                målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER,
+                            ),
+                        ),
                 ),
             )
 
@@ -428,32 +447,37 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
         vedtaksperioder: List<VedtaksperiodeGrunnlag>,
     ) = InnvilgelseDagligReise(
         vedtaksperioder = listOf(vedtaksperiode(fom = fom, tom = tom)),
-        beregningsresultat = BeregningsresultatDagligReise(
-            offentligTransport = BeregningsresultatOffentligTransport(
-                reiser = listOf(
-                    BeregningsresultatForReise(
-                        reiseId = dummyReiseId,
-                        perioder = listOf(
-                            BeregningsresultatForPeriode(
-                                grunnlag = BeregningsgrunnlagOffentligTransport(
-                                    fom = fom,
-                                    tom = tom,
-                                    prisEnkeltbillett = 50,
-                                    prisSyvdagersbillett = 300,
-                                    pris30dagersbillett = 1000,
-                                    antallReisedagerPerUke = 5,
-                                    vedtaksperioder = vedtaksperioder,
-                                    antallReisedager = 20,
-                                    brukersNavKontor = null,
+        beregningsresultat =
+            BeregningsresultatDagligReise(
+                offentligTransport =
+                    BeregningsresultatOffentligTransport(
+                        reiser =
+                            listOf(
+                                BeregningsresultatForReise(
+                                    reiseId = dummyReiseId,
+                                    perioder =
+                                        listOf(
+                                            BeregningsresultatForPeriode(
+                                                grunnlag =
+                                                    BeregningsgrunnlagOffentligTransport(
+                                                        fom = fom,
+                                                        tom = tom,
+                                                        prisEnkeltbillett = 50,
+                                                        prisSyvdagersbillett = 300,
+                                                        pris30dagersbillett = 1000,
+                                                        antallReisedagerPerUke = 5,
+                                                        vedtaksperioder = vedtaksperioder,
+                                                        antallReisedager = 20,
+                                                        brukersNavKontor = null,
+                                                    ),
+                                                beløp = 1000,
+                                                billettdetaljer = mapOf(Billettype.TRETTIDAGERSBILLETT to 1),
+                                            ),
+                                        ),
                                 ),
-                                beløp = 1000,
-                                billettdetaljer = mapOf(Billettype.TRETTIDAGERSBILLETT to 1),
                             ),
-                        ),
                     ),
-                ),
             ),
-        ),
         rammevedtakPrivatBil = null,
     )
 }
