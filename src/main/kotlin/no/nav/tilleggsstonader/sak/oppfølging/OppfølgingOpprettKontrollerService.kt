@@ -213,10 +213,12 @@ class OppfølgingOpprettKontrollerService(
     }
 
     private fun validerResultat(kildeResultat: List<YtelsePerioderDto.KildeResultatYtelse>) {
-        val test = kildeResultat.filter { it.resultat != ResultatKilde.OK }
+        val kildeResulatUtenOK = kildeResultat.filter { it.resultat != ResultatKilde.OK }
 
-        feilHvis(test.isNotEmpty()) {
-            "Feil ved henting av ytelser fra andre systemer: ${test.joinToString(", ") { it.type.name }}. Prøv å laste inn siden på nytt."
+        feilHvis(kildeResulatUtenOK.isNotEmpty()) {
+            "Feil ved henting av ytelser fra andre systemer: ${kildeResulatUtenOK.joinToString(
+                ", ",
+            ) { it.type.name }}. Prøv å laste inn siden på nytt."
         }
     }
 
