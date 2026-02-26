@@ -595,6 +595,7 @@ fun lagreVilkårperiodeAktivitet(
             svarHarUtgifter = SvarJaNei.JA,
         ),
     begrunnelse: String = "begrunnelse",
+    kildeId: String? = null,
 ) = LagreVilkårperiode(
     type = aktivitetType,
     typeAktivitet = typeAktivitet,
@@ -603,6 +604,7 @@ fun lagreVilkårperiodeAktivitet(
     faktaOgSvar = faktaOgSvar,
     behandlingId = behandlingId,
     begrunnelse = begrunnelse,
+    kildeId = kildeId,
 )
 
 fun lagreDagligReiseDto(
