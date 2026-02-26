@@ -193,15 +193,12 @@ class OppfølgingOpprettKontrollerService(
         fagsak: FagsakMetadata,
         målgrupper: List<OppfølgingInngangsvilkårMålgruppe>,
     ): Map<MålgruppeType, List<PeriodeMedÅpenTom>> {
-        val typerSomSkalHentes =
-            målgrupper.map { periode -> periode.målgruppe.tilTypeYtelsePeriode().let { it to periode } }
-
-        if (typerSomSkalHentes.isEmpty()) {
+        if (målgrupper.isEmpty()) {
             return emptyMap()
         }
-        val typer = typerSomSkalHentes.map { it.first }.distinct()
-        val fom = typerSomSkalHentes.minOf { it.second.fom }
-        val tom = typerSomSkalHentes.maxOf { it.second.tom }
+        val typer = målgrupper.flatMap { it.målgruppe.tilTypeYtelsePerioder() }.distinct()
+        val fom = målgrupper.minOf { it.fom }
+        val tom = målgrupper.maxOf { it.tom }
         return ytelseService
             .hentYtelser(fagsak.ident, fom = fom, tom = tom, typer)
             .also { validerResultat(it.kildeResultat) }
@@ -222,13 +219,13 @@ class OppfølgingOpprettKontrollerService(
         }
     }
 
-    private fun MålgruppeType.tilTypeYtelsePeriode() =
+    private fun MålgruppeType.tilTypeYtelsePerioder(): List<TypeYtelsePeriode> =
         when (this) {
-            MålgruppeType.AAP -> TypeYtelsePeriode.AAP
-            MålgruppeType.DAGPENGER -> TypeYtelsePeriode.DAGPENGER
-            MålgruppeType.OMSTILLINGSSTØNAD -> TypeYtelsePeriode.OMSTILLINGSSTØNAD
-            MålgruppeType.OVERGANGSSTØNAD -> TypeYtelsePeriode.ENSLIG_FORSØRGER
-            MålgruppeType.TILTAKSPENGER -> TypeYtelsePeriode.TILTAKSPENGER_TPSAK
+            MålgruppeType.AAP -> listOf(TypeYtelsePeriode.AAP)
+            MålgruppeType.DAGPENGER -> listOf(TypeYtelsePeriode.DAGPENGER)
+            MålgruppeType.OMSTILLINGSSTØNAD -> listOf(TypeYtelsePeriode.OMSTILLINGSSTØNAD)
+            MålgruppeType.OVERGANGSSTØNAD -> listOf(TypeYtelsePeriode.ENSLIG_FORSØRGER)
+            MålgruppeType.TILTAKSPENGER -> listOf(TypeYtelsePeriode.TILTAKSPENGER_TPSAK, TypeYtelsePeriode.TILTAKSPENGER_ARENA)
 
             MålgruppeType.NEDSATT_ARBEIDSEVNE,
             MålgruppeType.UFØRETRYGD,
