@@ -16,6 +16,10 @@ data class PeriodeMedÅpenTom(
             tom = if (tom != null && other.tom != null) maxOf(tom, other.tom) else null,
         )
 
+    /**
+     * Dagpengevedtak har ofte tom=null når vedtaket løper. I TS-sak kan vi ikke legge inn en målgruppe med tom=null.
+     * For å unngå at vi oppretter oppfølgingsoppgave på disse setter vi sluttdatoen for snittet til perioden som finnes i TS-sak.
+     */
     fun beregnSnitt(periode: Periode<LocalDate>): Datoperiode? {
         val snittFom = maxOf(fom, periode.fom)
         val snittTom = if (tom != null) minOf(tom, periode.tom) else periode.tom
