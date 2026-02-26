@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTask
+import no.nav.tilleggsstonader.sak.privatbil.varsel.MittNavVarselService
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -19,8 +20,9 @@ import org.junit.jupiter.api.Test
 class FerdigstillBehandlingStegTest {
     private val behandlingService = mockk<BehandlingService>(relaxed = true)
     private val taskService = mockk<TaskService>()
+    private val varselService = mockk<MittNavVarselService>()
 
-    private val steg = FerdigstillBehandlingSteg(behandlingService, taskService)
+    private val steg = FerdigstillBehandlingSteg(behandlingService, taskService, varselService)
 
     private val taskSlot = mutableListOf<Task>()
     private val fagsak = fagsak()

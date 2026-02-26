@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.oktober
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
@@ -16,7 +17,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomf�
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteRepository
 import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingPrivatBilDto
-import no.nav.tilleggsstonader.sak.privatbil.SendKjorelisteTask
+import no.nav.tilleggsstonader.sak.privatbil.varsel.SendKjorelisteTask
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
 import org.assertj.core.api.Assertions.assertThat
@@ -85,7 +86,6 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
             )
         }
 
-        taskService.save(SendKjorelisteTask.opprettTask(kjøreliste.reiseId))
         // Sjekk at varsel blir sendt til dittNav
         KafkaTestConfig
             .sendteMeldinger()

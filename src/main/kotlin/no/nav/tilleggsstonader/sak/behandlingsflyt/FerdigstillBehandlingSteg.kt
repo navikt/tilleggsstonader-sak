@@ -1,10 +1,13 @@
 package no.nav.tilleggsstonader.sak.behandlingsflyt
 
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTask
+import no.nav.tilleggsstonader.sak.privatbil.varsel.MittNavVarselService
+import no.nav.tilleggsstonader.sak.privatbil.varsel.SendKjorelisteTask
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.VedtaksstatistikkTask
 import org.slf4j.Logger
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service
 class FerdigstillBehandlingSteg(
     private val behandlingService: BehandlingService,
     private val taskService: TaskService,
+    private val varselService: MittNavVarselService,
 ) : BehandlingSteg<Void?> {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -29,6 +33,17 @@ class FerdigstillBehandlingSteg(
         taskService.save(InterntVedtakTask.lagTask(saksbehandling.id))
 
         taskService.save(BehandlingsstatistikkTask.opprettFerdigTask(behandlingId = saksbehandling.id))
+
+        val varselTilMittNav = varselService.sendVarselOmTilgjengeligKjøreliste(saksbehandling.id)
+
+        if (saksbehandling.stønadstype.gjelderDagligReise() && varselTilMittNav.isNotEmpty()) {
+            taskService.save(
+                task =
+                    SendKjorelisteTask.opprettTask(
+                        behandlingId = saksbehandling.id,
+                    ),
+            )
+        }
 
         taskService.save(
             VedtaksstatistikkTask.opprettVedtaksstatistikkTask(

@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.privatbil
+package no.nav.tilleggsstonader.sak.privatbil.varsel
 
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tms.varsel.action.Produsent
@@ -10,7 +10,6 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
-
 
 @Service
 class VarselDittNavKafkaProducer(
@@ -29,7 +28,7 @@ class VarselDittNavKafkaProducer(
     private lateinit var appName: String
 
     fun sendToKafka(
-        // fnr: String,
+        fnr: String,
         melding: String,
         eventId: String,
     ): String {
@@ -38,19 +37,19 @@ class VarselDittNavKafkaProducer(
                 type = Varseltype.Beskjed
                 varselId = eventId
                 sensitivitet = Sensitivitet.Substantial
-                // TODO hva må jeg sende med
-                // ident = fnr
+                ident = fnr
                 tekster +=
                     Tekst(
                         spraakkode = "nb",
                         tekst = melding,
                         default = true,
                     )
-                produsent = Produsent(
-                    cluster = cluster,
-                    namespace = namespace,
-                    appnavn = appName,
-                )
+                produsent =
+                    Produsent(
+                        cluster = cluster,
+                        namespace = namespace,
+                        appnavn = appName,
+                    )
             }
 
         runCatching {
