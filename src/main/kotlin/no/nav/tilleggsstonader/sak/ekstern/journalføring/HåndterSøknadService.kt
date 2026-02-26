@@ -116,17 +116,27 @@ class HåndterSøknadService(
             error("Søknaden fra journalposten er ikke en daglige reiser søknad")
         }
 
-        val målgrupper =
-            hentMålgrupperFraRegister(journalpost, søknad).takeIf { it.isNotEmpty() }?.toSet()
-                ?: søknad.data.hovedytelse.hovedytelse
-                    .map { it.tilMålgruppeType() }
-                    .toSet()
+        val målgrupperFraRegister = hentMålgrupperFraRegister(journalpost, søknad).toSet()
+        val målgrupperFraSøknad =
+            søknad.data.hovedytelse.hovedytelse
+                .map { it.tilMålgruppeType() }
+                .toSet()
 
-        return if (målgrupper.all { it.kanBrukesForStønad(Stønadstype.DAGLIG_REISE_TSO) }) {
-            Stønadstype.DAGLIG_REISE_TSO
-        } else {
-            Stønadstype.DAGLIG_REISE_TSR
-        }
+        logger.info(
+            "Forsøker å finne stønadstype for journalpost ${journalpost.journalpostId}, målgrupper fra register: $målgrupperFraRegister, målgrupper fra søknad: $målgrupperFraSøknad",
+        )
+
+        val målgrupper = målgrupperFraRegister.takeIf { it.isNotEmpty() } ?: målgrupperFraSøknad
+
+        val stønadstype =
+            if (målgrupper.all { it.kanBrukesForStønad(Stønadstype.DAGLIG_REISE_TSO) }) {
+                Stønadstype.DAGLIG_REISE_TSO
+            } else {
+                Stønadstype.DAGLIG_REISE_TSR
+            }
+
+        logger.info("Stønadstype for ${journalpost.journalpostId}: $stønadstype")
+        return stønadstype
     }
 
     private fun hentMålgrupperFraRegister(
