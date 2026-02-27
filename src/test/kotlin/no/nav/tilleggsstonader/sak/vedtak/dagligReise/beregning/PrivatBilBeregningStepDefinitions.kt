@@ -170,15 +170,6 @@ class PrivatBilBeregningStepDefinitions {
             )
         }
 
-    fun mapForventedeInnvilgedePerioder(dataTable: DataTable) =
-        dataTable.mapRad { rad ->
-            InnvilgetPeriodeIRammevedtakCucumber(
-                reiseNr = parseInt(DomenenøkkelPrivatBil.REISENR, rad),
-                fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                tom = parseDato(DomenenøkkelFelles.TOM, rad),
-            )
-        }
-
     fun mapForventedeSatser(dataTable: DataTable) =
         dataTable.mapRad { rad ->
             ForventetSatsCucumber(
@@ -229,12 +220,6 @@ data class SatsForPeriodePrivatBilCucumber(
     val satsBekreftetVedVedtakstidspunkt: Boolean,
     val kilometersats: BigDecimal,
     val dagsatsUtenParkering: BigDecimal,
-) : Periode<LocalDate>
-
-data class InnvilgetPeriodeIRammevedtakCucumber(
-    val reiseNr: Int,
-    override val fom: LocalDate,
-    override val tom: LocalDate,
 ) : Periode<LocalDate>
 
 data class ForventetSatsCucumber(
