@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto
 
+import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForUke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import java.math.BigDecimal
@@ -23,15 +23,6 @@ data class RammeForReiseMedPrivatBilDto(
     val aktivitetsadresse: String?,
     val kilometersats: BigDecimal,
     val dagsatsUtenParkering: BigDecimal,
-    val uker: List<RammeForUkeDto>,
-)
-
-data class RammeForUkeDto(
-    val fom: LocalDate,
-    val tom: LocalDate,
-    val maksAntallDagerSomKanDekkes: Int,
-    val antallDagerInkludererHelg: Boolean,
-    val maksBeløpSomKanDekkesFørParkering: BigInteger,
 )
 
 fun RammevedtakPrivatBil.tilDto() =
@@ -40,31 +31,18 @@ fun RammevedtakPrivatBil.tilDto() =
     )
 
 // TODO: Flytt splitting til beregning dersom vi vil beholde det
-private fun RammeForReiseMedPrivatBil.tilDto(): List<RammeForReiseMedPrivatBilDto> {
-    val ukerGruppertPåSats = this.uker.groupBy { it.grunnlag.kilometersats }
-
-    return ukerGruppertPåSats.entries.map { (kilometersats, ukerMedSammeSats) ->
+private fun RammeForReiseMedPrivatBil.tilDto(): List<RammeForReiseMedPrivatBilDto> =
+    grunnlag.satser.map {
         RammeForReiseMedPrivatBilDto(
             reiseId = reiseId,
-            fom = ukerMedSammeSats.first().grunnlag.fom,
-            tom = ukerMedSammeSats.last().grunnlag.tom,
+            fom = it.fom,
+            tom = it.tom,
             reisedagerPerUke = grunnlag.reisedagerPerUke,
             reiseavstandEnVei = grunnlag.reiseavstandEnVei,
             bompengerEnVei = grunnlag.ekstrakostnader.bompengerEnVei,
-            kilometersats = kilometersats,
-            dagsatsUtenParkering = ukerMedSammeSats.first().dagsatsUtenParkering,
+            kilometersats = it.kilometersats,
+            dagsatsUtenParkering = it.dagsatsUtenParkering,
             fergekostnadEnVei = grunnlag.ekstrakostnader.fergekostnadEnVei,
-            uker = ukerMedSammeSats.map { it.tilDto() },
             aktivitetsadresse = this.aktivitetsadresse,
         )
     }
-}
-
-private fun RammeForUke.tilDto() =
-    RammeForUkeDto(
-        fom = grunnlag.fom,
-        tom = grunnlag.tom,
-        maksAntallDagerSomKanDekkes = grunnlag.maksAntallDagerSomKanDekkes,
-        antallDagerInkludererHelg = grunnlag.antallDagerInkludererHelg,
-        maksBeløpSomKanDekkesFørParkering = maksBeløpSomKanDekkesFørParkering,
-    )

@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.ekstern.stønad
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.libs.sikkerhet.EksternBrukerUtils
+import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakUkeDto
@@ -54,15 +55,17 @@ private fun RammevedtakPrivatBil.tilDto(kjøreliste: Map<ReiseId, Kjøreliste>):
             aktivitetsadresse = reise.aktivitetsadresse ?: "Ukjent adresse",
             aktivitetsnavn = "Ukjent aktivitet",
             uker =
-                reise.uker.map { uke ->
-                    RammevedtakUkeDto(
-                        fom = uke.grunnlag.fom,
-                        tom = uke.grunnlag.tom,
-                        ukeNummer = uke.grunnlag.fom.ukenummer(),
-                        innsendtDato = kjøreliste?.datoMottatt?.toLocalDate(),
-                        kanSendeInnKjøreliste =
-                            uke.grunnlag.fom.ukenummer() <= LocalDate.now().ukenummer() && uke.grunnlag.fom.year <= LocalDate.now().year,
-                    )
-                },
+                reise.grunnlag
+                    .alleDatoerGruppertPåUke()
+                    .map { (uke, datoer) ->
+                        RammevedtakUkeDto(
+                            fom = datoer.min(),
+                            tom = datoer.max(),
+                            ukeNummer = uke.ukenummer,
+                            innsendtDato = kjøreliste?.datoMottatt?.toLocalDate(),
+                            kanSendeInnKjøreliste =
+                                uke.ukenummer <= LocalDate.now().ukenummer() && uke.år <= LocalDate.now().year,
+                        )
+                    },
         )
     }
