@@ -1,7 +1,8 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
+import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
+import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.ekstern.stønad.DagligReisePrivatBilService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -12,16 +13,12 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UtfyltDagAutomatiskVurdering
-import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForUke
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 @RestController
@@ -49,39 +46,35 @@ class PrivatBilController(
             ReisevurderingPrivatBilDto(
                 reiseId = reise.reiseId,
                 uker =
-                    reise.uker.map { uke ->
-                        val kjørelisteForUke =
-                            kjørelister.firstOrNull {
-                                it.data.reiseId == reise.reiseId &&
-                                    it.inneholderUkenummer(uke.grunnlag.fom.ukenummer())
-                            }
-                        val avklartUke = avklarteUker.singleOrNull { it.ukenummer == uke.grunnlag.fom.ukenummer() }
-                        lagUke(rammeForUke = uke, kjørelisteForUke = kjørelisteForUke, avklartUke = avklartUke)
-                    },
+                    reise.grunnlag
+                        .alleDatoerGruppertPåUke()
+                        .map { (uke, datoer) ->
+                            val kjørelisteForUke =
+                                kjørelister.firstOrNull {
+                                    it.data.reiseId == reise.reiseId && it.inneholderUkenummer(uke.ukenummer) // TODO ogå skille på år
+                                }
+                            val avklartUke = avklarteUker.singleOrNull { it.ukenummer == uke.ukenummer }
+                            lagUke(uke = uke, datoer = datoer, kjørelisteForUke = kjørelisteForUke, avklartUke = avklartUke)
+                        },
             )
         } ?: emptyList()
     }
 
     private fun lagUke(
-        rammeForUke: RammeForUke,
+        uke: UkeIÅr,
+        datoer: List<LocalDate>,
         kjørelisteForUke: Kjøreliste?,
         avklartUke: AvklartKjørtUke?,
     ): UkeVurderingDto {
         val dager =
-            (
-                0L..ChronoUnit.DAYS.between(
-                    rammeForUke.grunnlag.fom,
-                    rammeForUke.grunnlag.tom,
-                )
-            ).map { rammeForUke.grunnlag.fom.plusDays(it) }
-                .map { dato ->
-                    lagDag(dato, kjørelisteForUke, avklartUke)
-                }
+            datoer.map { dato ->
+                lagDag(dato, kjørelisteForUke, avklartUke)
+            }
 
         return UkeVurderingDto(
-            ukenummer = rammeForUke.grunnlag.fom.ukenummer(),
-            fraDato = rammeForUke.grunnlag.fom,
-            tilDato = rammeForUke.grunnlag.tom,
+            ukenummer = uke.ukenummer,
+            fraDato = datoer.min(),
+            tilDato = datoer.max(),
             status = avklartUke?.status ?: UkeStatus.IKKE_MOTTATT_KJØRELISTE,
             avvik =
                 avklartUke?.typeAvvik?.let {

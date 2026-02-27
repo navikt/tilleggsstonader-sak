@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.libs.unleash.ToggleId
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.infrastruktur.database.AdvisoryLockService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.UnleashUtil.getVariantWithNameOrDefault
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
@@ -17,6 +18,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class SkjemaRoutingService(
@@ -27,28 +29,31 @@ class SkjemaRoutingService(
     private val unleashService: UnleashService,
     private val ytelseService: YtelseService,
     private val personService: PersonService,
+    private val advisoryLockService: AdvisoryLockService,
 ) {
     private fun harLagretRouting(
         ident: String,
         skjematype: Skjematype,
     ) = routingRepository.findByIdentAndType(ident, skjematype) != null
 
+    @Transactional
     fun skalRoutesTilNyLøsning(
         ident: String,
         skjematype: Skjematype,
-    ): Boolean {
-        val routingStrategi = bestemRoutingStrategi(skjematype)
+    ): Boolean =
+        advisoryLockService.lockForTransaction(lock = ident) {
+            val routingStrategi = bestemRoutingStrategi(skjematype)
 
-        return when (routingStrategi) {
-            RoutingStrategi.SendAlleBrukereTilNyLøsning -> {
-                true
-            }
+            when (routingStrategi) {
+                RoutingStrategi.SendAlleBrukereTilNyLøsning -> {
+                    true
+                }
 
-            is RoutingStrategi.SendEnkelteBrukereTilNyLøsning -> {
-                skalBrukerRoutesTilNyLøsning(ident, skjematype, routingStrategi)
-            }
-        }.also { loggRoutingResultatet(skjematype, it) }
-    }
+                is RoutingStrategi.SendEnkelteBrukereTilNyLøsning -> {
+                    skalBrukerRoutesTilNyLøsning(ident, skjematype, routingStrategi)
+                }
+            }.also { loggRoutingResultatet(skjematype, it) }
+        }
 
     private fun skalBrukerRoutesTilNyLøsning(
         ident: String,

@@ -151,7 +151,7 @@ class StegService(
         } catch (exception: Exception) {
             val stegType = behandlingSteg.stegType()
             metrics.failure(stegType)
-            logger.warn("Håndtering av stegtype '$stegType' feilet på behandling ${saksbehandling.id}.")
+            logger.info("Håndtering av stegtype '$stegType' feilet på behandling ${saksbehandling.id}.")
             throw exception
         }
     }

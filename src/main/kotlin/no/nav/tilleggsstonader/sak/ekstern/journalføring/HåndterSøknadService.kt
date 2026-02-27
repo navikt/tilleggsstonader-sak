@@ -7,7 +7,9 @@ import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
+import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -15,7 +17,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.journalføring.JournalføringService
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.journalføring.dokumentBrevkode
@@ -77,20 +78,6 @@ class HåndterSøknadService(
 
     fun finnStønadstyperSomKanOpprettesFraJournalpost(journalpost: Journalpost): ValgbareStønadstyperForJournalpost {
         val skjematype = journalpost.dokumentBrevkode()?.tilSkjematype()
-        if (skjematype == null) {
-            val valgbareStønadstyper =
-                if (unleashService.isEnabled(Toggle.KAN_SAKSBEHANDLE_DAGLIG_REISE_TSO) &&
-                    unleashService.isEnabled(Toggle.KAN_SAKSBEHANDLE_DAGLIG_REISE_TSR)
-                ) {
-                    Stønadstype.entries
-                } else {
-                    Stønadstype.entries.filterNot { it.gjelderDagligReise() }
-                }
-            return ValgbareStønadstyperForJournalpost(
-                defaultStønadstype = null,
-                valgbareStønadstyper = valgbareStønadstyper,
-            )
-        }
 
         return when (skjematype) {
             Skjematype.SØKNAD_BARNETILSYN -> ValgbareStønadstyperForJournalpost(Stønadstype.BARNETILSYN)
@@ -104,6 +91,12 @@ class HåndterSøknadService(
 
             Skjematype.DAGLIG_REISE_KJØRELISTE ->
                 error("Skal ikke behandle kjøreliste")
+
+            null ->
+                ValgbareStønadstyperForJournalpost(
+                    defaultStønadstype = null,
+                    valgbareStønadstyper = Stønadstype.entries,
+                )
         }
     }
 
@@ -125,17 +118,27 @@ class HåndterSøknadService(
             error("Søknaden fra journalposten er ikke en daglige reiser søknad")
         }
 
-        val målgrupper =
-            hentMålgrupperFraRegister(journalpost, søknad).takeIf { it.isNotEmpty() }?.toSet()
-                ?: søknad.data.hovedytelse.hovedytelse
-                    .map { it.tilMålgruppeType() }
-                    .toSet()
+        val målgrupperFraRegister = hentMålgrupperFraRegister(journalpost, søknad).toSet()
+        val målgrupperFraSøknad =
+            søknad.data.hovedytelse.hovedytelse
+                .map { it.tilMålgruppeType() }
+                .toSet()
 
-        return if (målgrupper.all { it.kanBrukesForStønad(Stønadstype.DAGLIG_REISE_TSO) }) {
-            Stønadstype.DAGLIG_REISE_TSO
-        } else {
-            Stønadstype.DAGLIG_REISE_TSR
-        }
+        logger.info(
+            "Forsøker å finne stønadstype for journalpost ${journalpost.journalpostId}, målgrupper fra register: $målgrupperFraRegister, målgrupper fra søknad: $målgrupperFraSøknad",
+        )
+
+        val målgrupper = målgrupperFraRegister.takeIf { it.isNotEmpty() } ?: målgrupperFraSøknad
+
+        val stønadstype =
+            if (målgrupper.all { it.kanBrukesForStønad(Stønadstype.DAGLIG_REISE_TSO) }) {
+                Stønadstype.DAGLIG_REISE_TSO
+            } else {
+                Stønadstype.DAGLIG_REISE_TSR
+            }
+
+        logger.info("Stønadstype for ${journalpost.journalpostId}: $stønadstype")
+        return stønadstype
     }
 
     private fun hentMålgrupperFraRegister(
@@ -152,8 +155,17 @@ class HåndterSøknadService(
                 fom = søknad.data.reiser.minOf { it.periode.fom },
                 tom = søknad.data.reiser.maxOf { it.periode.tom },
                 typer = TypeYtelsePeriode.entries.toList(),
-            ).perioder
+            ).also { validerResultat(it.kildeResultat) }
+            .perioder
             .map { it.type.tilMålgruppe() }
+    }
+
+    private fun validerResultat(kildeResultat: List<YtelsePerioderDto.KildeResultatYtelse>) {
+        val feiledeHentingerAvYtelse = kildeResultat.filter { it.resultat == ResultatKilde.FEILET }
+
+        feilHvis(feiledeHentingerAvYtelse.isNotEmpty()) {
+            "Feil ved henting av ytelser ${feiledeHentingerAvYtelse.map { it.type }}"
+        }
     }
 
     fun kanAutomatiskJournalføre(

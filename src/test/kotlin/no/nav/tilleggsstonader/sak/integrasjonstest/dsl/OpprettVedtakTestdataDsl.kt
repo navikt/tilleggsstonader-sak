@@ -5,14 +5,15 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.OpprettInnvilgelse
 import no.nav.tilleggsstonader.sak.integrasjonstest.OpprettOpphør
 import no.nav.tilleggsstonader.sak.integrasjonstest.OpprettVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import java.time.LocalDate
 
 @BehandlingTestdataDslMarker
 class OpprettVedtakTestdataDsl {
-    var vedtak: OpprettVedtak = OpprettInnvilgelse
+    var vedtak: OpprettVedtak = OpprettInnvilgelse()
 
-    fun innvilgelse() {
-        vedtak = OpprettInnvilgelse
+    fun innvilgelse(vedtaksperioder: List<VedtaksperiodeDto>? = null) {
+        vedtak = OpprettInnvilgelse(vedtaksperioder)
     }
 
     fun opphør(

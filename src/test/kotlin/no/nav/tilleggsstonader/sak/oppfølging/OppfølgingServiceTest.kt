@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.oppfølging
 
+import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.OppfølgingRepositoryFake
 import no.nav.tilleggsstonader.sak.util.behandling
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -11,7 +12,7 @@ class OppfølgingServiceTest {
     val repository = OppfølgingRepositoryFake()
     val service = OppfølgingService(repository)
 
-    val behandling = behandling()
+    val behandlingTilsynBarn = behandling()
 
     @BeforeEach
     fun setUp() {
@@ -25,9 +26,10 @@ class OppfølgingServiceTest {
             val oppfølging =
                 repository.insert(
                     Oppfølging(
-                        behandlingId = behandling.id,
+                        behandlingId = behandlingTilsynBarn.id,
                         data = OppfølgingData(emptyList()),
                         aktiv = false,
+                        tema = Tema.TSO,
                     ),
                 )
 

@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.dto
 
-import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
@@ -16,7 +15,7 @@ data class LagretVedtaksperiodeDto(
     override val tom: LocalDate,
     val målgruppeType: FaktiskMålgruppe,
     val aktivitetType: AktivitetType,
-    val typeAktivitet: TypeAktivitet? = null,
+    val typeAktivitet: TypeAktivitetDto? = null,
     val vedtaksperiodeFraForrigeVedtak: VedtaksperiodeDto?,
 ) : Periode<LocalDate>,
     KopierPeriode<LagretVedtaksperiodeDto> {
@@ -42,7 +41,7 @@ data class VedtaksperiodeDto(
     override val tom: LocalDate,
     val målgruppeType: FaktiskMålgruppe,
     val aktivitetType: AktivitetType,
-    val typeAktivitet: TypeAktivitet? = null,
+    val typeAktivitet: TypeAktivitetDto? = null,
 ) : Periode<LocalDate> {
     fun tilDomene() =
         Vedtaksperiode(
@@ -51,7 +50,7 @@ data class VedtaksperiodeDto(
             tom = tom,
             målgruppe = målgruppeType,
             aktivitet = aktivitetType,
-            typeAktivitet = typeAktivitet,
+            typeAktivitet = typeAktivitet?.tilDomene(),
         )
 }
 
@@ -67,7 +66,7 @@ fun Vedtaksperiode.tilLagretVedtaksperiodeDto(forrigeVedtaksperiode: Vedtaksperi
         tom = tom,
         målgruppeType = målgruppe,
         aktivitetType = aktivitet,
-        typeAktivitet = typeAktivitet,
+        typeAktivitet = typeAktivitet?.tilDto(),
         vedtaksperiodeFraForrigeVedtak = forrigeVedtaksperiode?.tilDto(),
     )
 
@@ -80,7 +79,7 @@ fun Vedtaksperiode.tilDto() =
         tom = tom,
         målgruppeType = målgruppe,
         aktivitetType = aktivitet,
-        typeAktivitet = typeAktivitet,
+        typeAktivitet = typeAktivitet?.tilDto(),
     )
 
 fun List<VedtaksperiodeDto>.tilDomene() = map { it.tilDomene() }.sorted()

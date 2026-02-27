@@ -40,7 +40,7 @@ class JournalhendelseKafkaHåndtererTask(
     )
 
     companion object {
-        private const val TYPE = "journalhendelseTask"
+        const val TYPE = "journalhendelseTask"
 
         fun opprettTask(hendelse: JournalfoeringHendelseRecord): Task {
             val taskData =

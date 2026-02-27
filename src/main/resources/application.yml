@@ -56,6 +56,7 @@ spring:
       acks: all
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      transaction-id-prefix: tx-ts-sak-${random.uuid}
 
 
 

@@ -89,6 +89,68 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
                 """.trimIndent(),
             )
     }
+
+    @Test
+    fun `skal være lov å redigere billettpriser`() {
+        val dagensDato = LocalDate.now()
+        val fom = dagensDato.minusDays(46)
+        val tom = dagensDato.plusDays(42)
+
+        val reiser =
+            lagreDagligReiseDto(
+                fom = fom,
+                tom = dagensDato.plusDays(7),
+                fakta =
+                    FaktaDagligReiseOffentligTransportDto(
+                        reisedagerPerUke = 5,
+                        prisEnkelbillett = 44,
+                        prisSyvdagersbillett = null,
+                        prisTrettidagersbillett = 1000,
+                    ),
+            )
+
+        val førstegangsbehandlingId =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTso(fom, tom)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(fom, tom)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        add { _, _ -> reiser }
+                    }
+                }
+            }
+
+        val revurderingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = førstegangsbehandlingId,
+                tilSteg = StegType.BEREGNE_YTELSE,
+            ) {
+                vilkår {
+                    oppdaterDagligReise { vilkårDagligReise ->
+                        // Utvider tom og antall reisedager
+                        vilkårDagligReise.single().id to
+                            reiser.copy(
+                                fakta = (reiser.fakta as FaktaDagligReiseOffentligTransportDto).copy(prisTrettidagersbillett = 800),
+                            )
+                    }
+                }
+            }
+
+        gjennomførBeregningSteg(
+            behandlingId = revurderingId,
+            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+        ).expectStatus().isOk
+    }
 }
 
 private fun lagreAktivitet(behandlingId: BehandlingId): LagreVilkårperiode =
