@@ -50,10 +50,7 @@ private val alleSatser: List<SatsDagligReisePrivatBil> =
         },
     ) + bekreftedeSatser
 
-/**
- * Tar kun hensyn til fra datoen slik at vi klarer å håndtere uker som strekker seg
- * over til et nytt år. Det vil gi maks 4 dager med feil sats.
- */
-fun finnRelevantKilometerSats(periode: Periode<LocalDate>): SatsDagligReisePrivatBil =
-    alleSatser.find { it.inneholder(periode.fom) }
+fun finnRelevantKilometerSatsForPeriode(periode: Periode<LocalDate>): SatsDagligReisePrivatBil =
+    alleSatser.find { it.inneholder(periode) }
         ?: error("Kan ikke finne relevant kilometersats for $periode")
+

@@ -14,7 +14,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
-import java.math.RoundingMode
 
 // Begrensninger:
 // Håndterer ikke ulik kilometersats i årskifte dersom en uke går på tvers av to år.
@@ -99,7 +98,7 @@ class PrivatBilBeregningService {
     ): List<SatsForPeriodePrivatBil> =
         reise.splitPerÅr { fom, tom ->
             val periode = Datoperiode(fom, tom)
-            val sats = finnRelevantKilometerSats(periode)
+            val sats = finnRelevantKilometerSatsForPeriode(periode)
             SatsForPeriodePrivatBil(
                 fom = fom,
                 tom = tom,
