@@ -49,3 +49,25 @@ data class BeregningsgrunnlagOffentligTransport(
     @JsonInclude(JsonInclude.Include.NON_NULL)
     val brukersNavKontor: String?,
 ) : Periode<LocalDate>
+
+// Legger på Include.NON_NULL for å unngå at vi serialiserer "typeAktivitet": null" i JSON for TSO som er i produksjon
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class VedtaksperiodeGrunnlag(
+    val id: UUID,
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val målgruppe: FaktiskMålgruppe,
+    val aktivitet: AktivitetType,
+    val typeAktivitet: TypeAktivitet?,
+    val antallReisedagerIVedtaksperioden: Int,
+) {
+    constructor(vedtaksperiode: Vedtaksperiode, antallReisedager: Int) : this(
+        id = vedtaksperiode.id,
+        fom = vedtaksperiode.fom,
+        tom = vedtaksperiode.tom,
+        målgruppe = vedtaksperiode.målgruppe,
+        aktivitet = vedtaksperiode.aktivitet,
+        typeAktivitet = vedtaksperiode.typeAktivitet,
+        antallReisedagerIVedtaksperioden = antallReisedager,
+    )
+}
