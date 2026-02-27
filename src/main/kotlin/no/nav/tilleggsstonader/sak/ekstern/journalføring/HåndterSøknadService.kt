@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.Reise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -152,8 +153,8 @@ class HåndterSøknadService(
         return ytelseService
             .hentYtelser(
                 ident = journalpost.bruker!!.id,
-                fom = søknad.data.reiser.minOf { it.periode.fom },
-                tom = søknad.data.reiser.maxOf { it.periode.tom },
+                fom = søknad.data.reiser.finnTidligsteDato(),
+                tom = søknad.data.reiser.finnSenesteDato(),
                 typer = TypeYtelsePeriode.entries.toList(),
             ).also { validerResultat(it.kildeResultat) }
             .perioder
@@ -167,6 +168,10 @@ class HåndterSøknadService(
             "Feil ved henting av ytelser ${feiledeHentingerAvYtelse.map { it.type }}"
         }
     }
+
+    private fun List<Reise>.finnTidligsteDato() = flatMap { listOf(it.periode.fom, it.periode.tom) }.min()
+
+    private fun List<Reise>.finnSenesteDato() = flatMap { listOf(it.periode.fom, it.periode.tom) }.max()
 
     fun kanAutomatiskJournalføre(
         personIdent: String,
