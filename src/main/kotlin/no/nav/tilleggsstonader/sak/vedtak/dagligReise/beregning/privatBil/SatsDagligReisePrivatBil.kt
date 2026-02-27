@@ -40,7 +40,7 @@ private val bekreftedeSatser: List<SatsDagligReisePrivatBil> =
         ),
     )
 
-private val satser: List<SatsDagligReisePrivatBil> =
+val satser: List<SatsDagligReisePrivatBil> =
     listOf(
         bekreftedeSatser.max().let {
             it.copy(

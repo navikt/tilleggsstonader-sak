@@ -16,12 +16,15 @@ import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseBigDecimal
+import no.nav.tilleggsstonader.sak.cucumber.parseBoolean
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.SatsDagligReisePrivatBilProvider
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.satser
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -50,8 +53,9 @@ class PrivatBilBeregningStepDefinitions {
 
     val behandlingId = BehandlingId.random()
 
+    val satsDagligReisePrivatBilProvider = SatsDagligReisePrivatBilProvider()
     val beregningService =
-        PrivatBilBeregningService()
+        PrivatBilBeregningService(satsDagligReisePrivatBilProvider)
 
     var reiser: List<VilkårDagligReise> = emptyList()
 
@@ -120,6 +124,7 @@ class PrivatBilBeregningStepDefinitions {
                 assertThat(satsIRammevedtak.tom).isEqualTo(forventetSats.tom)
                 assertThat(satsIRammevedtak.dagsatsUtenParkering).isEqualTo(forventetSats.dagsatsUtenParkering)
                 assertThat(satsIRammevedtak.kilometersats).isEqualTo(forventetSats.kilometersats)
+                assertThat(satsIRammevedtak.satsBekreftetVedVedtakstidspunkt).isEqualTo(forventetSats.satsBekreftetVedVedtakstidspunkt)
             }
         }
     }
@@ -182,6 +187,7 @@ class PrivatBilBeregningStepDefinitions {
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
                 dagsatsUtenParkering = parseBigDecimal(DomenenøkkelPrivatBil.DAGSATS_UTEN_PARKERING, rad),
                 kilometersats = parseBigDecimal(DomenenøkkelPrivatBil.KILOMETERSATS, rad),
+                satsBekreftetVedVedtakstidspunkt = parseBoolean(DomenenøkkelPrivatBil.SATS_BEKREFTET, rad),
             )
         }
 
@@ -207,6 +213,7 @@ enum class DomenenøkkelPrivatBil(
     REISENR("Reisenr"),
     DAGSATS_UTEN_PARKERING("Dagsats uten parkering"),
     KILOMETERSATS("Kilometersats"),
+    SATS_BEKREFTET("Sats bekreftet"),
 }
 
 data class RammevedtakCucumber(
@@ -236,6 +243,7 @@ data class ForventetSatsCucumber(
     val tom: LocalDate,
     val dagsatsUtenParkering: BigDecimal,
     val kilometersats: BigDecimal,
+    val satsBekreftetVedVedtakstidspunkt: Boolean,
 )
 
 data class BeregningsresultatUkeCucumber(
