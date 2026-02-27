@@ -32,6 +32,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
+import java.util.concurrent.CompletableFuture
 
 class SkjemaRoutingIntegrationTest(
     @Autowired private val arenaClient: ArenaClient,
@@ -164,6 +165,35 @@ class SkjemaRoutingIntegrationTest(
             assertThat(routingHarBlittLagret(ident = jonasIdent)).isTrue()
             assertThat(routingSjekkAndreRouting.skalBehandlesINyLøsning).isFalse()
             assertThat(routingHarBlittLagret(ident = ernaIdent)).isFalse()
+        }
+
+        @Test
+        fun `skal håndtere samtidige kall og ikke kaste feil`() {
+            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 1)
+            mockDagligReiseVedtakIArena(erAktivt = false)
+
+            // Legger til en sleep før aap-perioder returneres
+            every {
+                ytelseClient.hentYtelser(match { it.typer == listOf(TypeYtelsePeriode.AAP) })
+            } answers {
+                Thread.sleep(50)
+                ytelsePerioderDto(
+                    perioder = listOf(periodeAAP(LocalDate.now().minusDays(1), LocalDate.now().plusDays(1))),
+                    kildeResultat = listOf(kildeResultatAAP()),
+                )
+            }
+
+            // Trigger 5 samtidige kall
+            val routingKall =
+                (1..5).map {
+                    CompletableFuture.supplyAsync {
+                        kall.skjemaRouting.apiRespons.sjekk((IdentSkjematype(jonasIdent, Skjematype.SØKNAD_DAGLIG_REISE)))
+                    }
+                }
+
+            routingKall.forEach {
+                it.get().expectStatus().isOk
+            }
         }
 
         private fun mockMaksAntallSomKanRoutesPåDagligReise(maksAntall: Int) {

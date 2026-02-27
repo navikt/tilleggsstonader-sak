@@ -1,14 +1,11 @@
 package no.nav.tilleggsstonader.sak.oppfølging
 
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
-import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.tilTema
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
-import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -21,6 +18,8 @@ import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingInngangsvilkår
 import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingInngangsvilkårMålgruppe
 import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingInngangsvilkårMålgruppe.Companion.fraVilkårperioder
 import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingRegisterAktiviteter
+import no.nav.tilleggsstonader.sak.oppfølging.domain.PeriodeMedÅpenTom
+import no.nav.tilleggsstonader.sak.oppfølging.domain.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.oppfølging.kontroller.OppfølgingAktivitetKontrollerUtil
 import no.nav.tilleggsstonader.sak.oppfølging.kontroller.OppfølgingMålgruppeKontrollerUtil
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetService
@@ -193,57 +192,40 @@ class OppfølgingOpprettKontrollerService(
     private fun hentRegisterYtelser(
         fagsak: FagsakMetadata,
         målgrupper: List<OppfølgingInngangsvilkårMålgruppe>,
-    ): Map<MålgruppeType, List<Datoperiode>> {
-        val typerSomSkalHentes =
-            målgrupper.map { periode -> periode.målgruppe.tilTypeYtelsePeriode().let { it to periode } }
-
-        if (typerSomSkalHentes.isEmpty()) {
+    ): Map<MålgruppeType, List<PeriodeMedÅpenTom>> {
+        if (målgrupper.isEmpty()) {
             return emptyMap()
         }
-        val typer = typerSomSkalHentes.map { it.first }.distinct()
-        val fom = typerSomSkalHentes.minOf { it.second.fom }
-        val tom = typerSomSkalHentes.maxOf { it.second.tom }
+        val typer = målgrupper.flatMap { it.målgruppe.tilTypeYtelsePerioder() }.distinct()
+        val fom = målgrupper.minOf { it.fom }
+        val tom = målgrupper.maxOf { it.tom }
         return ytelseService
             .hentYtelser(fagsak.ident, fom = fom, tom = tom, typer)
             .also { validerResultat(it.kildeResultat) }
             .perioder
             .filter { it.aapErFerdigAvklart != true }
-            .korrigerTom()
-            .filter { it.tom != null }
-            .map { it.type.tilMålgruppe() to Datoperiode(fom = it.fom, tom = it.tom!!) }
+            .map { it.type.tilMålgruppe() to PeriodeMedÅpenTom(fom = it.fom, tom = it.tom) }
             .groupBy({ it.first }, { it.second })
             .mapValues { it.value.mergeSammenhengende() }
     }
 
-    /**
-     * Det er vanlig at omstillingsstønad mangler TOM,
-     * og de kan være lagt inn hos oss med tom 3 år frem i tiden fordi det er det som står på vedtaket
-     * Av den grunnen settes tom = MAX for omstillingsstønad når den er null.
-     */
-    private fun List<YtelsePeriode>.korrigerTom(): List<YtelsePeriode> =
-        this.map {
-            if (it.type == TypeYtelsePeriode.OMSTILLINGSSTØNAD && it.tom == null) {
-                it.copy(tom = LocalDate.MAX)
-            } else {
-                it
-            }
-        }
-
     private fun validerResultat(kildeResultat: List<YtelsePerioderDto.KildeResultatYtelse>) {
-        val test = kildeResultat.filter { it.resultat != ResultatKilde.OK }
+        val kildeResulatUtenOK = kildeResultat.filter { it.resultat != ResultatKilde.OK }
 
-        feilHvis(test.isNotEmpty()) {
-            "Feil ved henting av ytelser fra andre systemer: ${test.joinToString(", ") { it.type.name }}. Prøv å laste inn siden på nytt."
+        feilHvis(kildeResulatUtenOK.isNotEmpty()) {
+            "Feil ved henting av ytelser fra andre systemer: ${kildeResulatUtenOK.joinToString(
+                ", ",
+            ) { it.type.name }}. Prøv å laste inn siden på nytt."
         }
     }
 
-    private fun MålgruppeType.tilTypeYtelsePeriode() =
+    private fun MålgruppeType.tilTypeYtelsePerioder(): List<TypeYtelsePeriode> =
         when (this) {
-            MålgruppeType.AAP -> TypeYtelsePeriode.AAP
-            MålgruppeType.DAGPENGER -> TypeYtelsePeriode.DAGPENGER
-            MålgruppeType.OMSTILLINGSSTØNAD -> TypeYtelsePeriode.OMSTILLINGSSTØNAD
-            MålgruppeType.OVERGANGSSTØNAD -> TypeYtelsePeriode.ENSLIG_FORSØRGER
-            MålgruppeType.TILTAKSPENGER -> TypeYtelsePeriode.TILTAKSPENGER_TPSAK
+            MålgruppeType.AAP -> listOf(TypeYtelsePeriode.AAP)
+            MålgruppeType.DAGPENGER -> listOf(TypeYtelsePeriode.DAGPENGER)
+            MålgruppeType.OMSTILLINGSSTØNAD -> listOf(TypeYtelsePeriode.OMSTILLINGSSTØNAD)
+            MålgruppeType.OVERGANGSSTØNAD -> listOf(TypeYtelsePeriode.ENSLIG_FORSØRGER)
+            MålgruppeType.TILTAKSPENGER -> listOf(TypeYtelsePeriode.TILTAKSPENGER_TPSAK, TypeYtelsePeriode.TILTAKSPENGER_ARENA)
 
             MålgruppeType.NEDSATT_ARBEIDSEVNE,
             MålgruppeType.UFØRETRYGD,

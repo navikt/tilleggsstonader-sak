@@ -62,6 +62,11 @@ object YtelsePerioderUtil {
         tom: LocalDate? = LocalDate.now(),
     ): YtelsePeriode = YtelsePeriode(type = TypeYtelsePeriode.TILTAKSPENGER_TPSAK, fom = fom, tom = tom)
 
+    fun periodeTiltakspengerArena(
+        fom: LocalDate = LocalDate.now(),
+        tom: LocalDate? = LocalDate.now(),
+    ): YtelsePeriode = YtelsePeriode(type = TypeYtelsePeriode.TILTAKSPENGER_ARENA, fom = fom, tom = tom)
+
     fun periodeEnsligForsørger(
         fom: LocalDate = LocalDate.now(),
         tom: LocalDate? = LocalDate.now(),

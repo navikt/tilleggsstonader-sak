@@ -35,7 +35,7 @@ class AntallBehandlingerUtenOppgaveGaugeConfig(
                             gyldigeEnheterForOppgave = GYLDIGE_ENHETER_TILLEGGSTØNADER,
                         )
                     if (behandlingerUtenOppgave.isNotEmpty()) {
-                        logger.warn("Behandlinger uten oppgave: {}", behandlingerUtenOppgave)
+                        logger.info("Behandlinger uten oppgave: {}", behandlingerUtenOppgave)
                     }
 
                     sisteVerdi = behandlingerUtenOppgave.size.toDouble()

@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetServi
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.periodeAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.periodeEnsligForsørger
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.periodeOmstillingsstønad
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.periodeTiltakspengerArena
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDto
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -268,6 +269,54 @@ class OppfølgingOpprettKontrollerServiceTest {
                     Kontroll(ÅrsakKontroll.TOM_ENDRET, tom = vedtaksperiode1.fom),
                 )
                 this.assertIngenEndringForAktiviteter()
+            }
+        }
+    }
+
+    @Nested
+    inner class EndringIMålgruppeTiltakspengerArena {
+        @BeforeEach
+        fun setUp() {
+            every { vilkårperiodeRepository.findByBehandlingIdAndResultat(any(), any()) } returns
+                listOf(
+                    målgruppe(
+                        faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.TILTAKSPENGER),
+                        fom = vedtaksperiode.fom,
+                        tom = vedtaksperiode.tom,
+                    ),
+                    aktivitet,
+                )
+            mockVedtakTilsynBarn(vedtaksperiode.copy(målgruppe = FaktiskMålgruppe.ARBEIDSSØKER))
+            mockHentAktiviteter(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom))
+        }
+
+        @Test
+        fun `skal ikke gi treff hvis tiltakspengerperioden i Arena dekker vedtaksperioden`() {
+            mockHentYtelser(periodeTiltakspengerArena(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom))
+
+            assertThat(opprettOppfølging()).isNull()
+        }
+
+        @Test
+        fun `skal gi treff hvis tiltakspengerperioden i Arena slutter tidligere enn vedtaksperioden`() {
+            val arenaPerioderTom = vedtaksperiode.tom.minusDays(5)
+            mockHentYtelser(periodeTiltakspengerArena(fom = vedtaksperiode.fom, tom = arenaPerioderTom))
+
+            with(opprettOppfølging()) {
+                assertThat(this).isNotNull
+                assertThat(this.endringMålgruppe())
+                    .containsExactly(Kontroll(ÅrsakKontroll.TOM_ENDRET, tom = arenaPerioderTom))
+            }
+        }
+
+        @Test
+        fun `skal gi INGEN_TREFF hvis ingen tiltakspengerperioder i Arena finnes i registeret`() {
+            mockHentYtelser()
+
+            with(opprettOppfølging()) {
+                assertThat(this).isNotNull
+                assertThat(this.endringMålgruppe())
+                    .containsExactly(Kontroll(ÅrsakKontroll.INGEN_TREFF))
             }
         }
     }

@@ -70,6 +70,20 @@ class OpprettVilkårperiodeDsl {
         }
     }
 
+    fun målgruppeDagpenger(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) {
+        add { behandlingId ->
+            lagreVilkårperiodeMålgruppe(
+                behandlingId = behandlingId,
+                fom = fom,
+                tom = tom,
+                målgruppeType = MålgruppeType.DAGPENGER,
+            )
+        }
+    }
+
     fun målgruppeOvergangsstønad(
         fom: LocalDate,
         tom: LocalDate,
@@ -139,6 +153,7 @@ class OpprettVilkårperiodeDsl {
         fom: LocalDate,
         tom: LocalDate,
         typeAktivitet: TypeAktivitet,
+        kildeId: String? = null,
     ) {
         add { behandlingId ->
             lagreVilkårperiodeAktivitet(
@@ -152,6 +167,7 @@ class OpprettVilkårperiodeDsl {
                         svarHarUtgifter = SvarJaNei.JA,
                         aktivitetsdager = 3,
                     ),
+                kildeId = kildeId,
             )
         }
     }

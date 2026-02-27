@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.googlemaps.routesApi
 
+import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.logger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpRequest
 import org.springframework.http.HttpStatusCode
@@ -41,7 +41,6 @@ class GoogleRoutesClient(
     private val clientErrorHandler: (HttpRequest, ClientHttpResponse) -> Unit = { _, response ->
         val body = String(response.body.readAllBytes())
         if (body.contains("Address not found")) {
-            logger.warn(body)
             brukerfeil("Kunne ikke finne adressen")
         } else {
             logger.error(body)

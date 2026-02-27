@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.ekstern.journalføring
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.familie.prosessering.domene.Status
 import no.nav.joarkjournalfoeringhendelser.JournalfoeringHendelseRecord
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
@@ -17,6 +18,9 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HovedytelseType
+import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
+import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingsjournalpostRepository
@@ -25,7 +29,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakRepository
 import no.nav.tilleggsstonader.sak.hendelser.ConsumerRecordUtil
 import no.nav.tilleggsstonader.sak.hendelser.HendelseRepository
 import no.nav.tilleggsstonader.sak.hendelser.TypeHendelse
-import no.nav.tilleggsstonader.sak.hendelser.journalføring.JournalhendelseKafkaListener
+import no.nav.tilleggsstonader.sak.hendelser.journalføring.JournalhendelseKafkaHåndtererTask
 import no.nav.tilleggsstonader.sak.hendelser.journalføring.JournalpostHendelseType
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.Oppgavelager
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettJournalpost
@@ -33,6 +37,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksK
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.tomYtelsePerioderDto
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDto
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
 import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil.søknadBoutgifter
@@ -246,6 +251,36 @@ class MottaSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
             Stønadstype.DAGLIG_REISE_TSO,
             journalpostId.toString(),
         )
+    }
+
+    @Test
+    fun `mottar daglig-reise-søknad fra kafka, feiler i oppslag av ytelser, task feiler`() {
+        val hendelse = journalfoeringHendelseRecord()
+
+        journalhendelseKafkaListener.listen(
+            ConsumerRecordUtil.lagConsumerRecord("key", hendelse),
+            mockk<Acknowledgment>(relaxed = true),
+        )
+
+        assertThat(hendelseRepository.findByTypeAndId(TypeHendelse.JOURNALPOST, hendelse.hendelsesId)).isNotNull
+
+        every { ytelseClient.hentYtelser(any()) } returns
+            ytelsePerioderDto(
+                kildeResultat =
+                    listOf(
+                        YtelsePerioderDto.KildeResultatYtelse(
+                            TypeYtelsePeriode.AAP,
+                            ResultatKilde.FEILET,
+                        ),
+                    ),
+            )
+
+        mockJournalpost(brevkode = DokumentBrevkode.DAGLIG_REISE, søknad = søknadDagligReise())
+        kjørTasksKlareForProsessering()
+
+        val journalhendelseTasks = taskService.finnAlleTaskerMedType(JournalhendelseKafkaHåndtererTask.TYPE)
+        assertThat(journalhendelseTasks).hasSize(1)
+        assertThat(journalhendelseTasks.single().status).isNotEqualTo(Status.FERDIG)
     }
 
     @Test
