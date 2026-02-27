@@ -1,42 +1,54 @@
 package no.nav.tilleggsstonader.sak.privatbil.varsel
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.splitPerUkeMedHelg
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import org.springframework.stereotype.Service
 
 @Service
 class MittNavVarselService(
-    private val behandlingService: BehandlingService,
     private val kjørelisteService: KjørelisteService,
     private val vedtakRepository: VedtakRepository,
 ) {
-    fun sendVarselOmTilgjengeligKjøreliste(behandlingId: BehandlingId): List<Int> {
-        val behandling = behandlingService.hentBehandling(behandlingId)
+    fun skalOppretteKjørelisteVarselTask(behandling: Saksbehandling): Boolean {
+        if (!behandling.stønadstype.gjelderDagligReise()) {
+            return false
+        }
+        if (behandling.resultat != BehandlingResultat.INNVILGET && behandling.resultat != BehandlingResultat.OPPHØRT) {
+            return false
+        }
+
         val rammevedtak =
             vedtakRepository
                 .findByIdOrThrow(behandling.id)
-                .withTypeOrThrow<`InnvilgelseEllerOpphørDagligReise`>()
-                .data.rammevedtakPrivatBil
+                .withTypeOrThrow<InnvilgelseEllerOpphørDagligReise>()
+                // Hvis null er det fordi det er offentlig transport
+                .data.rammevedtakPrivatBil ?: return false
 
-        val kjørelister = kjørelisteService.hentForFagsakId(behandling.fagsakId)
-
-        val kjørelisteMap = kjørelister.associateBy { it.data.reiseId }
+        val innsendtKjøreliste = kjørelisteService.hentForFagsakId(behandling.fagsakId)
+        val innsendtKjørelisteMap = innsendtKjøreliste.associateBy { it.data.reiseId }
 
         return rammevedtak
-            ?.reiser
-            ?.flatMap { reise ->
-                val rammevedtakUker = reise.uker.map { it.grunnlag.fom.ukenummer() }
-                val kjørelisteUker =
-                    kjørelisteMap[reise.reiseId]?.data?.reisedager?.map { it.dato.ukenummer() } ?: emptyList()
+            .reiser
+            .map { reise ->
+                val fom = reise.grunnlag.fom
+                val tom = reise.grunnlag.tom
+                val periode = Datoperiode(fom, tom).splitPerUkeMedHelg()
 
-                return rammevedtakUker.filter { it !in kjørelisteUker }
-            }
-            ?: emptyList()
+                val rammevedtakUker = periode.map { it.fom.ukenummer() }
+                val innsendtKjørelisteUker =
+                    innsendtKjørelisteMap[reise.reiseId]?.data?.reisedager?.map { it.dato.ukenummer() } ?: emptyList()
+
+                return rammevedtakUker.filter { it !in innsendtKjørelisteUker }.isNotEmpty()
+            }.isNotEmpty()
     }
 }

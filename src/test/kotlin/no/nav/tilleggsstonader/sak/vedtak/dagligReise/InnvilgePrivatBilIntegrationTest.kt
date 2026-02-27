@@ -4,6 +4,8 @@ import io.mockk.every
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.februar
+import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.libs.utils.dato.oktober
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
@@ -12,6 +14,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørAlleTaskMedSenererTriggertid
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteRepository
@@ -31,8 +34,8 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var behandlingRepository: BehandlingRepository
 
-    val fom: LocalDate = 15 september 2025
-    val tom: LocalDate = 14 oktober 2025
+    val fom: LocalDate = 1 februar 2026
+    val tom: LocalDate = 20 mars 2026
 
     @Test
     fun `innvilge rammevedtak privat bil og henter ut rammevedtak`() {
@@ -61,9 +64,9 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
 
         val dagerKjørt =
             listOf(
-                KjørelisteSkjemaUtil.KjørtDag(15 september 2025),
-                KjørelisteSkjemaUtil.KjørtDag(20 september 2025),
-                KjørelisteSkjemaUtil.KjørtDag(23 september 2025),
+                KjørelisteSkjemaUtil.KjørtDag(1 februar 2026),
+                KjørelisteSkjemaUtil.KjørtDag(9 februar 2026),
+                KjørelisteSkjemaUtil.KjørtDag(22 februar 2026),
             )
         val kjøreliste =
             kjørelisteSkjema(
@@ -85,6 +88,7 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
         }
 
         // Sjekk at varsel blir sendt til dittNav
+        kjørAlleTaskMedSenererTriggertid()
         KafkaTestConfig
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.dittnav, 1)

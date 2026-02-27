@@ -6,8 +6,11 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.util.finnMandagNesteUke
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import java.util.Properties
+import java.util.UUID
 
 @Service
 @TaskStepBeskrivelse(
@@ -40,8 +43,7 @@ class SendKjorelisteTask(
                 setProperty("behandlingId", behandlingId.toString())
             }
             return Task(TYPE, behandlingId.toString())
-            // TODO: hvordan sjekker jeg for dette i integrasjonstesten?
-            // .medTriggerTid(LocalDate.now().finnMandagNesteUke().atTime(10, 0))
+                .medTriggerTid(LocalDate.now().finnMandagNesteUke().atTime(10, 0))
         }
     }
 }

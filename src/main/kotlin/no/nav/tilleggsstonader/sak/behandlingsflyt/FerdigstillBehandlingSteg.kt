@@ -34,9 +34,8 @@ class FerdigstillBehandlingSteg(
 
         taskService.save(BehandlingsstatistikkTask.opprettFerdigTask(behandlingId = saksbehandling.id))
 
-        val varselTilMittNav = varselService.sendVarselOmTilgjengeligKjøreliste(saksbehandling.id)
-
-        if (saksbehandling.stønadstype.gjelderDagligReise() && varselTilMittNav.isNotEmpty()) {
+        val varselTilMittNav = varselService.skalOppretteKjørelisteVarselTask(saksbehandling)
+        if (varselTilMittNav) {
             taskService.save(
                 task =
                     SendKjorelisteTask.opprettTask(
