@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.allePerioderErSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerÅr
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Ekstrakostnader
@@ -63,14 +64,17 @@ class PrivatBilBeregningService(
         require(justertReise.fom == justerteVedtaksperioder.minOf { it.fom }) {
             "Fom på reise er ulik tidligste fom på vedtaksperiodene"
         }
+
         require(justertReise.tom == justerteVedtaksperioder.maxOf { it.tom }) {
             "Tom på reise ulik største tom på vedtaksperiodene"
         }
+
         require(!justerteVedtaksperioder.overlapper()) {
             "Vedtaksperioder innenfor en reise kan ikke overlappe"
         }
-        require(justerteVedtaksperioder.allePerioderErSammenhengende()) {
-            "Alle vedtaksperioder må være sammenhengende"
+
+        brukerfeilHvis(!justerteVedtaksperioder.allePerioderErSammenhengende()) {
+            "Alle vedtaksperioder må være sammenhengende innenfor en reise"
         }
     }
 
@@ -101,6 +105,7 @@ class PrivatBilBeregningService(
         reise.splitPerÅr { fom, tom ->
             val periode = Datoperiode(fom, tom)
             val sats = satsDagligReisePrivatBilProvider.finnRelevantKilometerSatsForPeriode(periode)
+
             SatsForPeriodePrivatBil(
                 fom = fom,
                 tom = tom,

@@ -40,7 +40,7 @@ class AvklartKjørelisteService(
                     ukenummer = ukenummer,
                     reisedager = reisedager,
                     kjørelisteId = kjøreliste.id,
-                    rammevedtakForUke = rammeForReise,
+                    rammevedtak = rammeForReise,
                 )
             }
 
@@ -52,12 +52,12 @@ class AvklartKjørelisteService(
         kjørelisteId: UUID,
         ukenummer: Int,
         reisedager: List<KjørelisteDag>,
-        rammevedtakForUke: RammeForReiseMedPrivatBil,
+        rammevedtak: RammeForReiseMedPrivatBil,
     ): AvklartKjørtUke {
         val avklarteDager = reisedager.map { utledAvklartDag(it) }
 
         val avvik =
-            if (!vurderAntallDagerInnenforRamme(reisedager, rammevedtakForUke)) {
+            if (!vurderAntallDagerInnenforRamme(reisedager, rammevedtak)) {
                 TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK
             } else {
                 null
@@ -80,11 +80,11 @@ class AvklartKjørelisteService(
 
     private fun vurderAntallDagerInnenforRamme(
         dager: List<KjørelisteDag>,
-        rammevedtakForUke: RammeForReiseMedPrivatBil,
+        rammevedtak: RammeForReiseMedPrivatBil,
     ): Boolean {
         val antallDagerMedUtbetaling = dager.filter { it.harKjørt }.size
 
-        return antallDagerMedUtbetaling <= rammevedtakForUke.grunnlag.reisedagerPerUke
+        return antallDagerMedUtbetaling <= rammevedtak.grunnlag.reisedagerPerUke
     }
 
     private fun utledStatusForUke(
