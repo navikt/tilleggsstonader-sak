@@ -19,7 +19,9 @@ import java.math.BigDecimal
 // Håndterer ikke ulik kilometersats i årskifte dersom en uke går på tvers av to år.
 
 @Service
-class PrivatBilBeregningService {
+class PrivatBilBeregningService(
+    private val satsDagligReisePrivatBilProvider: SatsDagligReisePrivatBilProvider,
+) {
     fun beregnRammevedtak(
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkår: List<VilkårDagligReise>,
@@ -98,7 +100,7 @@ class PrivatBilBeregningService {
     ): List<SatsForPeriodePrivatBil> =
         reise.splitPerÅr { fom, tom ->
             val periode = Datoperiode(fom, tom)
-            val sats = finnRelevantKilometerSatsForPeriode(periode)
+            val sats = satsDagligReisePrivatBilProvider.finnRelevantKilometerSatsForPeriode(periode)
             SatsForPeriodePrivatBil(
                 fom = fom,
                 tom = tom,

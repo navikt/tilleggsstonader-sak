@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import org.springframework.stereotype.Component
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -39,7 +40,7 @@ private val bekreftedeSatser: List<SatsDagligReisePrivatBil> =
         ),
     )
 
-private val alleSatser: List<SatsDagligReisePrivatBil> =
+private val satser: List<SatsDagligReisePrivatBil> =
     listOf(
         bekreftedeSatser.max().let {
             it.copy(
@@ -50,7 +51,12 @@ private val alleSatser: List<SatsDagligReisePrivatBil> =
         },
     ) + bekreftedeSatser
 
-fun finnRelevantKilometerSatsForPeriode(periode: Periode<LocalDate>): SatsDagligReisePrivatBil =
-    alleSatser.find { it.inneholder(periode) }
-        ?: error("Kan ikke finne relevant kilometersats for $periode")
+@Component
+class SatsDagligReisePrivatBilProvider {
+    val alleSatser: List<SatsDagligReisePrivatBil>
+        get() = satser
 
+    fun finnRelevantKilometerSatsForPeriode(periode: Periode<LocalDate>): SatsDagligReisePrivatBil =
+        alleSatser.find { it.inneholder(periode) }
+            ?: error("Kan ikke finne relevant kilometersats for $periode")
+}
