@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.libs.utils.dato.Uke
+import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.ekstern.stønad.DagligReisePrivatBilService
@@ -61,7 +61,7 @@ class PrivatBilController(
     }
 
     private fun lagUke(
-        uke: Uke,
+        uke: UkeIÅr,
         datoer: List<LocalDate>,
         kjørelisteForUke: Kjøreliste?,
         avklartUke: AvklartKjørtUke?,

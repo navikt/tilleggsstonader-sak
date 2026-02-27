@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.allePerioderErSammenhengende
-import no.nav.tilleggsstonader.kontrakter.felles.finnesPerioderSomOverlapper
+import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.kontrakter.felles.splitPerÅr
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForReiseMedPrivatBil
@@ -66,7 +66,7 @@ class PrivatBilBeregningService(
         require(justertReise.tom == justerteVedtaksperioder.maxOf { it.tom }) {
             "Tom på reise ulik største tom på vedtaksperiodene"
         }
-        require(!justerteVedtaksperioder.finnesPerioderSomOverlapper()) {
+        require(!justerteVedtaksperioder.overlapper()) {
             "Vedtaksperioder innenfor en reise kan ikke overlappe"
         }
         require(justerteVedtaksperioder.allePerioderErSammenhengende()) {
