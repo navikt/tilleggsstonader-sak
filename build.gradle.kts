@@ -8,7 +8,7 @@ val tilleggsstønaderKontrakterVersion = "2026.02.27-11.38.9b1257b649ec"
 val avroVersion = "1.12.1"
 val confluentVersion = "8.0.1"
 val joarkHendelseVersion = "1.1.8"
-val tokenSupportVersion = "6.0.2"
+val tokenSupportVersion = "6.0.3"
 val wiremockVersion = "3.13.2"
 val mockkVersion = "1.14.9"
 val testcontainerVersion = "1.21.4"
@@ -25,7 +25,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.53.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
 
-    id("org.springframework.boot") version "4.0.2"
+    id("org.springframework.boot") version "4.0.3"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.spring") version "2.2.21"
 }
