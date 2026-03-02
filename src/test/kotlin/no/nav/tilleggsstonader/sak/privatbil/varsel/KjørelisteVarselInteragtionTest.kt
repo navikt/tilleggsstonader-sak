@@ -78,5 +78,4 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
             taskService.finnAlleTaskerMedType(SendKjorelisteTask.TYPE).filter { it.status == Status.KLAR_TIL_PLUKK }
         assertThat(tasks).hasSize(0)
     }
-
 }
