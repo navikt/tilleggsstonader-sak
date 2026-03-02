@@ -37,11 +37,10 @@ class SendKjorelisteTask(
     }
 
     override fun onCompletion(task: Task) {
-        println("task test: ${task}")
         taskService.save(
             opprettTask(
-                BehandlingId(UUID.fromString(task.payload))
-            )
+                BehandlingId(UUID.fromString(task.payload)),
+            ),
         )
     }
 
@@ -49,10 +48,11 @@ class SendKjorelisteTask(
         const val TYPE = "SEND_NOTIFIKASJON"
 
         fun opprettTask(behandlingId: BehandlingId): Task {
-            val properties = Properties().apply {
-                setProperty("behandlingId", behandlingId.toString())
-                setProperty("eventId", UUID.randomUUID().toString())
-            }
+            val properties =
+                Properties().apply {
+                    setProperty("behandlingId", behandlingId.toString())
+                    setProperty("eventId", UUID.randomUUID().toString())
+                }
             return Task(TYPE, behandlingId.toString())
                 .copy(metadataWrapper = PropertiesWrapper(properties))
                 .medTriggerTid(LocalDate.now().finnMandagNesteUke().atTime(10, 0))

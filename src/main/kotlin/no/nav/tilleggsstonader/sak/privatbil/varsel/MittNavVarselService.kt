@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.privatbil.varsel
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
-import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -35,7 +34,7 @@ class MittNavVarselService(
                 .data.rammevedtakPrivatBil ?: return false
 
         val innsendtKjøreliste = kjørelisteService.hentForFagsakId(behandling.fagsakId)
-        val innsendtKjørelisteMap = innsendtKjøreliste.associateBy { it.data.reiseId }
+        val innsendtKjørelisteMap = innsendtKjøreliste.associateBy { it.data.reiseId.id }
 
         return rammevedtak
             .reiser
@@ -46,7 +45,8 @@ class MittNavVarselService(
 
                 val rammevedtakUker = periode.map { it.fom.ukenummer() }
                 val innsendtKjørelisteUker =
-                    innsendtKjørelisteMap[reise.reiseId]?.data?.reisedager?.map { it.dato.ukenummer() } ?: emptyList()
+                    innsendtKjørelisteMap[reise.reiseId.id]?.data?.reisedager?.map { it.dato.ukenummer() }
+                        ?: emptyList()
 
                 return rammevedtakUker.filter { it !in innsendtKjørelisteUker }.isNotEmpty()
             }.isNotEmpty()
