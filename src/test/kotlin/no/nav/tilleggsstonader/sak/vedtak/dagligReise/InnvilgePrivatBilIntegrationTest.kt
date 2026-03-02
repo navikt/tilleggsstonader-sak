@@ -6,8 +6,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
-import no.nav.tilleggsstonader.libs.utils.dato.oktober
-import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
@@ -87,7 +85,6 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
             )
         }
 
-        // Sjekk at varsel blir sendt til dittNav
         kjørAlleTaskMedSenererTriggertid()
         KafkaTestConfig
             .sendteMeldinger()
