@@ -18,30 +18,32 @@ import java.util.UUID
 @TaskStepBeskrivelse(
     taskStepType = SendKjorelisteTask.TYPE,
     beskrivelse = "Send varsel om tilgjengelig kjoreliste",
-    maxAntallFeil = 3,
+    maxAntallFeil = 1,
 )
 class SendKjorelisteTask(
     private val notifikasjonsService: VarselDittNavKafkaProducer,
     private val behandlingService: BehandlingService,
     private val fagsakService: FagsakService,
     private val taskService: TaskService,
+    private val mittNavVarselService: MittNavVarselService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
-        val behandling = behandlingService.hentBehandling(BehandlingId.fromString(task.payload))
+        val behandling =
+            behandlingService.hentSaksbehandling(BehandlingId.fromString(task.metadata.getProperty("behandlingId")))
         val fagsak = fagsakService.hentFagsak(behandling.fagsakId)
         val fnr = fagsak.hentAktivIdent()
 
         val melding = "Du har én eller flere kjørelister tilgjengelige for utfylling."
-        val eventId = task.metadata.getProperty("eventId")
-        notifikasjonsService.sendToKafka(fnr, melding, eventId)
-    }
+        val eventId = task.payload
 
-    override fun onCompletion(task: Task) {
-        taskService.save(
-            opprettTask(
-                BehandlingId(UUID.fromString(task.payload)),
-            ),
-        )
+        if (mittNavVarselService.skalOppretteKjørelisteVarselTask(behandling)) {
+            notifikasjonsService.sendToKafka(fnr, melding, eventId)
+            taskService.save(
+                opprettTask(
+                    BehandlingId.fromString(task.metadata.getProperty("behandlingId")),
+                ),
+            )
+        }
     }
 
     companion object {
@@ -51,9 +53,9 @@ class SendKjorelisteTask(
             val properties =
                 Properties().apply {
                     setProperty("behandlingId", behandlingId.toString())
-                    setProperty("eventId", UUID.randomUUID().toString())
                 }
-            return Task(TYPE, behandlingId.toString())
+            // Må gjøre dette for å ikke få duplicate på payload
+            return Task(TYPE, UUID.randomUUID().toString())
                 .copy(metadataWrapper = PropertiesWrapper(properties))
                 .medTriggerTid(LocalDate.now().finnMandagNesteUke().atTime(10, 0))
         }
