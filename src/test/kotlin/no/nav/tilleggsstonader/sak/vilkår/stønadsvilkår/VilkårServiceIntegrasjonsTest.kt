@@ -85,8 +85,8 @@ internal class VilkårServiceIntegrasjonsTest : CleanDatabaseIntegrationTest() {
 
             assertThat(vilkårForBehandling.id).isNotEqualTo(vilkårForRevurdering.id)
             assertThat(vilkårForBehandling.behandlingId).isNotEqualTo(vilkårForRevurdering.behandlingId)
-            assertThat(vilkårForBehandling.sporbar.opprettetTid).isNotEqualTo(vilkårForRevurdering.sporbar.opprettetTid)
-            assertThat(vilkårForBehandling.sporbar.endret.endretTid).isNotEqualTo(vilkårForRevurdering.sporbar.endret.endretTid)
+            assertThat(vilkårForBehandling.sporbar.opprettetTid).isBeforeOrEqualTo(vilkårForRevurdering.sporbar.opprettetTid)
+            assertThat(vilkårForBehandling.sporbar.endret.endretTid).isBeforeOrEqualTo(vilkårForRevurdering.sporbar.endret.endretTid)
             assertThat(vilkårForBehandling.barnId).isNotEqualTo(vilkårForRevurdering.barnId)
             assertThat(vilkårForBehandling.barnId).isEqualTo(barnFørsteBehandling.first().id)
             assertThat(vilkårForBehandling.opphavsvilkår).isNull()

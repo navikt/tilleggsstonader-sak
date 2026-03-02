@@ -11,6 +11,7 @@ class BehandlingTestdataDsl internal constructor() {
     internal val målgruppe: VilkårperiodeTestdataDsl = VilkårperiodeTestdataDsl()
     internal val vilkår: StønadsvilkårTestdataDsl = StønadsvilkårTestdataDsl()
     internal var vedtak: OpprettVedtakTestdataDsl = OpprettVedtakTestdataDsl()
+    internal var kjørelisterTilInnsending: List<KjørelisteTestdataDsl> = mutableListOf()
 
     fun aktivitet(block: VilkårperiodeTestdataDsl.() -> Unit) {
         aktivitet.apply(block)
@@ -26,6 +27,10 @@ class BehandlingTestdataDsl internal constructor() {
 
     fun vedtak(block: OpprettVedtakTestdataDsl.() -> Unit) {
         vedtak.apply(block)
+    }
+
+    fun sendInnKjøreliste(block: KjørelisteTestdataDsl.() -> Unit) {
+        kjørelisterTilInnsending += KjørelisteTestdataDsl().apply(block)
     }
 
     companion object {
