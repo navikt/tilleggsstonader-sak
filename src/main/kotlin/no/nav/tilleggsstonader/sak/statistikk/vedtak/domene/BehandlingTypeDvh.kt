@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 enum class BehandlingTypeDvh {
     FØRSTEGANGSBEHANDLING,
     REVURDERING,
+    KJØRELISTE
     ;
 
     companion object {
@@ -12,6 +13,7 @@ enum class BehandlingTypeDvh {
             when (type) {
                 BehandlingType.FØRSTEGANGSBEHANDLING -> FØRSTEGANGSBEHANDLING
                 BehandlingType.REVURDERING -> REVURDERING
+                BehandlingType.KJØRELISTE -> KJØRELISTE
             }
     }
 }

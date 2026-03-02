@@ -3,13 +3,11 @@ package no.nav.tilleggsstonader.sak.behandling
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sisteFerdigstilteBehandling
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType.FØRSTEGANGSBEHANDLING
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType.REVURDERING
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import org.springframework.http.HttpStatus
 
 object OpprettBehandlingUtil {
@@ -28,6 +26,7 @@ object OpprettBehandlingUtil {
         when (behandlingType) {
             FØRSTEGANGSBEHANDLING -> validerKanOppretteFørstegangsbehandling(sisteFerdigstilteBehandling)
             REVURDERING -> validerKanOppretteRevurdering(sisteFerdigstilteBehandling)
+            BehandlingType.KJØRELISTE -> validerKanOppretteKjørelisteBehandling(sisteFerdigstilteBehandling)
         }
     }
 
@@ -41,7 +40,14 @@ object OpprettBehandlingUtil {
         }
     }
 
+    // TODO: Bør det valideres noe mer?
     private fun validerKanOppretteRevurdering(sisteFerdigstilteBehandling: Behandling?) {
+        if (sisteFerdigstilteBehandling == null) {
+            throw ApiFeil("Det finnes ikke en tidligere behandling på fagsaken", HttpStatus.BAD_REQUEST)
+        }
+    }
+
+    private fun validerKanOppretteKjørelisteBehandling(sisteFerdigstilteBehandling: Behandling?) {
         if (sisteFerdigstilteBehandling == null) {
             throw ApiFeil("Det finnes ikke en tidligere behandling på fagsaken", HttpStatus.BAD_REQUEST)
         }

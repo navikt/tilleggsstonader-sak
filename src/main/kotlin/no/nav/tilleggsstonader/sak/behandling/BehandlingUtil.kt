@@ -4,11 +4,15 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 
 object BehandlingUtil {
-    fun utledBehandlingTypeV2(tidligereBehandlinger: List<Behandling>): BehandlingType {
+    fun utledBehandlingTypeV2(
+        tidligereBehandlinger: List<Behandling>,
+        behandlingÅrsak: BehandlingÅrsak
+    ): BehandlingType {
         val skalVæreRevurdering =
             tidligereBehandlinger.any {
                 val erFerdigstilt = it.status == BehandlingStatus.FERDIGSTILT
@@ -16,7 +20,9 @@ object BehandlingUtil {
                 erFerdigstilt && ikkeHenlagt
             }
         return if (skalVæreRevurdering) {
-            BehandlingType.REVURDERING
+            if (behandlingÅrsak == BehandlingÅrsak.KJØRELISTE) {
+                BehandlingType.KJØRELISTE
+            } else BehandlingType.REVURDERING
         } else {
             BehandlingType.FØRSTEGANGSBEHANDLING
         }

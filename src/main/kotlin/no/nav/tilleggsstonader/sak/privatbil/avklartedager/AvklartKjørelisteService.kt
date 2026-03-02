@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
-import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
@@ -24,10 +24,10 @@ class AvklartKjørelisteService(
         avklartKjørtUkeRepository.findByBehandlingId(behandlingId)
 
     fun avklarUkerFraKjøreliste(
-        behandling: Saksbehandling,
+        behandling: Behandling,
         kjøreliste: Kjøreliste,
     ) {
-        val rammeForReise = hentReiseFraForrigeVedtak(behandling, kjøreliste.data.reiseId)
+        val rammeForReise = henteReiseFraVedtak(behandling, kjøreliste.data.reiseId)
 
         validerAtAlleDagerIKjørelistaErInnenForRammevedtaket(rammeForReise, kjøreliste)
 
@@ -134,20 +134,18 @@ class AvklartKjørelisteService(
         }
     }
 
-    private fun hentReiseFraForrigeVedtak(
-        behandling: Saksbehandling,
+    private fun henteReiseFraVedtak(
+        behandling: Behandling,
         reiseId: ReiseId,
     ): RammeForReiseMedPrivatBil {
-        val rammeFraForrigeBehandling =
-            behandling.forrigeIverksatteBehandlingId
-                ?.let {
-                    vedtakService
-                        .hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandling.forrigeIverksatteBehandlingId)
-                }?.data
+        val rammevedtak =
+            vedtakService
+                .hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandling.id)
+                ?.data
                 ?.rammevedtakPrivatBil
-                ?: error("Fant ikke rammevedtak for forrige behandling med id ${behandling.forrigeIverksatteBehandlingId}")
+                ?: error("Fant ikke rammevedtak for behandling med id ${behandling.id}")
 
-        return rammeFraForrigeBehandling.reiser.singleOrNull { it.reiseId == reiseId }
+        return rammevedtak.reiser.singleOrNull { it.reiseId == reiseId }
             ?: error("Forventet å finne ramme for reise med id $reiseId")
     }
 }

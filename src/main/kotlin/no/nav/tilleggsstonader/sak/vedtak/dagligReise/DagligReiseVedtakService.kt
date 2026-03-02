@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligRe
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -114,4 +115,15 @@ class DagligReiseVedtakService(
         forrigeVedtak: GeneriskVedtak<out InnvilgelseEllerOpphørDagligReise>,
         opphørsdato: LocalDate,
     ): List<Vedtaksperiode> = forrigeVedtak.data.vedtaksperioder.avkortFraOgMed(opphørsdato.minusDays(1))
+
+    fun gjenbrukVedtak(
+        forrigeIverksatteBehandlingId: BehandlingId,
+        nyBehandlingId: BehandlingId,
+    ) {
+        val eksisterendeVedtak = hentVedtak(forrigeIverksatteBehandlingId)
+        //tidligste endring?
+        vedtakRepository.insert(eksisterendeVedtak.copy(
+            behandlingId = nyBehandlingId,
+        ))
+    }
 }

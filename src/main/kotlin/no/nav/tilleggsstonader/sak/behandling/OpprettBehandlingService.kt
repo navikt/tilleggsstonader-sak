@@ -53,7 +53,7 @@ class OpprettBehandlingService(
 
         val tidligereBehandlinger = behandlingRepository.findByFagsakId(request.fagsakId)
         val forrigeBehandling = behandlingRepository.finnSisteIverksatteBehandling(request.fagsakId)
-        val behandlingType = utledBehandlingTypeV2(tidligereBehandlinger)
+        val behandlingType = utledBehandlingTypeV2(tidligereBehandlinger, behandlingÅrsak = request.behandlingsårsak)
 
         validerKanOppretteNyBehandling(
             behandlingType = behandlingType,
