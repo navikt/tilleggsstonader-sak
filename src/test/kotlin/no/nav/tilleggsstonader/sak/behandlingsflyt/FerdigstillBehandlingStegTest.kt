@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTask
 import no.nav.tilleggsstonader.sak.privatbil.varsel.MittNavVarselService
+import no.nav.tilleggsstonader.sak.privatbil.varsel.SendKjorelisteTask
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -32,6 +33,7 @@ class FerdigstillBehandlingStegTest {
     internal fun setUp() {
         taskSlot.clear()
         every { taskService.save(capture(taskSlot)) } answers { firstArg() }
+        every { varselService.skalOppretteKjørelisteVarselTask(any()) } returns true
     }
 
     @Test
@@ -44,6 +46,14 @@ class FerdigstillBehandlingStegTest {
     fun `skal opprette task for å lage internt vedtak`() {
         steg.utførSteg(behandling, null)
         val tasks = taskSlot.filter { it.type == InterntVedtakTask.TYPE }
+        assertThat(tasks).hasSize(1)
+        assertThat(tasks[0].payload).isEqualTo(behandling.id.toString())
+    }
+
+    @Test
+    fun `skal opprette task for å lage varsel til mitt nav når det finnes tilgjengelige kjørelister`() {
+        steg.utførSteg(behandling, null)
+        val tasks = taskSlot.filter { it.type == SendKjorelisteTask.TYPE }
         assertThat(tasks).hasSize(1)
         assertThat(tasks[0].payload).isEqualTo(behandling.id.toString())
     }
