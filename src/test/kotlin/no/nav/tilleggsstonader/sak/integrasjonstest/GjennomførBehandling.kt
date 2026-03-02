@@ -43,6 +43,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReisePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
@@ -191,6 +192,15 @@ fun IntegrationTest.gjennomførBehandlingsløp(
 
     // Ferdigstiller behandling
     kjørTasksKlareForProsesseringTilIngenTasksIgjen()
+
+    val reiserMedPrivatBil by lazy {
+        kall.vilkårDagligReise.hentVilkår(behandlingId).filter { it.fakta is FaktaDagligReisePrivatBilDto }
+    }
+
+    testdata.kjørelisterTilInnsending.forEach {
+        val kjøreliste = it.build(reiserMedPrivatBil)
+        sendInnKjøreliste(kjøreliste)
+    }
 }
 
 fun IntegrationTest.opprettRevurdering(opprettBehandlingDto: OpprettBehandlingDto): BehandlingId {
