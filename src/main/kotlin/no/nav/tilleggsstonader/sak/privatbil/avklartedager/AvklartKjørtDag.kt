@@ -12,12 +12,18 @@ data class AvklartKjørtDag(
     val id: UUID = UUID.randomUUID(),
     val dato: LocalDate,
     @Column("godkjent_gjennomfort_kjoring")
-    val godkjentGjennomførtKjøring: Boolean,
+    val godkjentGjennomførtKjøring: GodkjentGjennomførtKjøring,
     val automatiskVurdering: UtfyltDagAutomatiskVurdering,
     val avvik: List<TypeAvvikDag>,
     val begrunnelse: String? = null,
     val parkeringsutgift: Int? = null,
 )
+
+enum class GodkjentGjennomførtKjøring {
+    JA,
+    NEI,
+    IKKE_VURDERT,
+}
 
 enum class UtfyltDagAutomatiskVurdering {
     OK,

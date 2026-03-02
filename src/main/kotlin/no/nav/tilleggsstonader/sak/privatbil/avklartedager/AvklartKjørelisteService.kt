@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
@@ -22,6 +23,8 @@ class AvklartKjørelisteService(
 ) {
     fun hentAvklarteUkerForBehandling(behandlingId: BehandlingId): List<AvklartKjørtUke> =
         avklartKjørtUkeRepository.findByBehandlingId(behandlingId)
+
+    fun hentAvklartUke(ukeId: UUID): AvklartKjørtUke = avklartKjørtUkeRepository.findByIdOrThrow(ukeId)
 
     fun avklarUkerFraKjøreliste(
         behandling: Saksbehandling,
@@ -47,6 +50,51 @@ class AvklartKjørelisteService(
         avklartKjørtUkeRepository.insertAll(avklarteUker)
     }
 
+    fun oppdaterAvklartUke(
+        ukeId: UUID,
+        request: List<EndreAvklartDagRequest>,
+    ): AvklartKjørtUke {
+        val eksisterendeUke = hentAvklartUke(ukeId)
+        val oppdaterteDager = oppdaterAvklarteDager(eksisterendeUke.dager, request)
+
+        return avklartKjørtUkeRepository.update(
+            eksisterendeUke.copy(
+                status = UkeStatus.OK_MANUELT,
+                behandletDato = LocalDate.now(),
+                dager = oppdaterteDager.toSet(),
+            ),
+        )
+    }
+
+    private fun oppdaterAvklarteDager(
+        eksisterendeDager: Collection<AvklartKjørtDag>,
+        oppdaterteDager: Collection<EndreAvklartDagRequest>,
+    ): List<AvklartKjørtDag> =
+        eksisterendeDager
+            .associateWith { eksisterendeDag -> oppdaterteDager.find { it.dato == eksisterendeDag.dato } }
+            .map { (eksisterendeDag, oppdatertDag) ->
+                if (oppdatertDag == null) {
+                    eksisterendeDag
+                } else {
+                    eksisterendeDag.copy(
+                        godkjentGjennomførtKjøring =
+                            oppdatertDag.godkjentGjennomførtKjøring.tilGodkjentGjennomførtKjøring(
+                                erAutomatiskVurdering = false,
+                            ),
+                        parkeringsutgift = oppdatertDag.parkeringsutgift,
+                        begrunnelse = oppdatertDag.begrunnelse,
+                    )
+                }
+            }
+
+    private fun Boolean.tilGodkjentGjennomførtKjøring(erAutomatiskVurdering: Boolean): GodkjentGjennomførtKjøring {
+        if (this) return GodkjentGjennomførtKjøring.JA
+
+        if (erAutomatiskVurdering) return GodkjentGjennomførtKjøring.IKKE_VURDERT
+
+        return GodkjentGjennomførtKjøring.NEI
+    }
+
     private fun utledAvklartUke(
         behandlingId: BehandlingId,
         kjørelisteId: UUID,
@@ -54,14 +102,14 @@ class AvklartKjørelisteService(
         reisedager: List<KjørelisteDag>,
         rammevedtak: RammeForReiseMedPrivatBil,
     ): AvklartKjørtUke {
-        val avklarteDager = reisedager.map { utledAvklartDag(it) }
-
-        val avvik =
+        val avvikUke =
             if (!vurderAntallDagerInnenforRamme(reisedager, rammevedtak)) {
                 TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK
             } else {
                 null
             }
+
+        val avklarteDager = reisedager.map { utledAvklartDag(it, avvikUke) }
 
         return AvklartKjørtUke(
             behandlingId = behandlingId,
@@ -71,8 +119,8 @@ class AvklartKjørelisteService(
             ukenummer = ukenummer,
             // Trengs denne? Kan lages i visningslogikk
             // Rart at den er avhengig av både ukeavvik og dagavvik
-            status = utledStatusForUke(avklarteDager, avvik),
-            typeAvvik = avvik,
+            status = utledAutomatiskStatusForUke(avklarteDager, avvikUke),
+            typeAvvik = avvikUke,
             behandletDato = null,
             dager = avklarteDager.toSet(),
         )
@@ -87,7 +135,7 @@ class AvklartKjørelisteService(
         return antallDagerMedUtbetaling <= rammevedtak.grunnlag.reisedagerPerUke
     }
 
-    private fun utledStatusForUke(
+    private fun utledAutomatiskStatusForUke(
         avklarteDager: List<AvklartKjørtDag>,
         avvikUke: TypeAvvikUke?,
     ): UkeStatus {
@@ -103,16 +151,21 @@ class AvklartKjørelisteService(
         return UkeStatus.AVVIK
     }
 
-    private fun utledAvklartDag(kjørelisteDag: KjørelisteDag): AvklartKjørtDag {
+    private fun utledAvklartDag(
+        kjørelisteDag: KjørelisteDag,
+        avvikUke: TypeAvvikUke?,
+    ): AvklartKjørtDag {
         val avvik = utledAvvik(kjørelisteDag)
+
+        val godkjentGjennomførtKjøring = avvikUke == null && avvik.isEmpty() && kjørelisteDag.harKjørt
 
         return AvklartKjørtDag(
             dato = kjørelisteDag.dato,
-            godkjentGjennomførtKjøring = kjørelisteDag.harKjørt,
+            godkjentGjennomførtKjøring = godkjentGjennomførtKjøring.tilGodkjentGjennomførtKjøring(erAutomatiskVurdering = true),
             avvik = avvik,
             automatiskVurdering = if (avvik.isEmpty()) UtfyltDagAutomatiskVurdering.OK else UtfyltDagAutomatiskVurdering.AVVIK,
             begrunnelse = null,
-            parkeringsutgift = kjørelisteDag.parkeringsutgift,
+            parkeringsutgift = if (godkjentGjennomførtKjøring) kjørelisteDag.parkeringsutgift else null,
         )
     }
 
