@@ -4,10 +4,6 @@ import io.mockk.every
 import no.nav.familie.prosessering.domene.Status
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.utils.dato.desember
-import no.nav.tilleggsstonader.libs.utils.dato.februar
-import no.nav.tilleggsstonader.libs.utils.dato.januar
-import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
@@ -19,6 +15,7 @@ import no.nav.tilleggsstonader.sak.privatbil.KjørelisteRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDate
 
 class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
     @Autowired
@@ -27,12 +24,14 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var behandlingRepository: BehandlingRepository
 
+    val dagensDato = LocalDate.now()
+
     @Test
     fun `innvilge rammevedtak privat bil og sjekk varsel for kjøreliste`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
-        val fom = 1 februar 2026
-        val tom = 20 mars 2026
+        val fom = dagensDato.minusDays(3)
+        val tom = dagensDato.plusWeeks(3)
 
         opprettBehandlingOgGjennomførBehandlingsløp(
             stønadstype = Stønadstype.DAGLIG_REISE_TSO,
@@ -53,8 +52,8 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
     fun `innvilge rammevedtak og sende inn kjørelister for alle dager og at det ikke blir sendt varsel`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
-        val fom = 1 februar 2026
-        val tom = 20 mars 2026
+        val fom = dagensDato.plusWeeks(1)
+        val tom = dagensDato.plusWeeks(6)
 
         opprettBehandlingOgGjennomførBehandlingsløp(
             stønadstype = Stønadstype.DAGLIG_REISE_TSO,
@@ -83,15 +82,16 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
     fun `innvilge rammevedtak og sende inn alle mulige kjørelister hittil og sjekker at varsel blir sendt `() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
-        val fom = 1 februar 2026
-        val tom = 31 mars 2026
+        val fom = dagensDato.minusWeeks(4)
+        val tom = dagensDato.plusWeeks(4)
+        val tomKjoreliste = dagensDato.minusWeeks(1)
 
         opprettBehandlingOgGjennomførBehandlingsløp(
             stønadstype = Stønadstype.DAGLIG_REISE_TSO,
         ) {
             defaultDagligReisePrivatBilTsoTestdata(fom, tom)
             sendInnKjøreliste {
-                periode = Datoperiode(fom, 1 mars 2026)
+                periode = Datoperiode(fom, tomKjoreliste)
                 kjørteDager =
                     listOf(
                         fom to 50,
@@ -113,15 +113,19 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
     fun `innvilge rammevedtak som strekker seg over et år`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
-        val fom = 22 desember 2025
-        val tom = 4 januar 2026
+        // Periode fra siste uke i fjor til første uke i år
+        val iÅr = dagensDato.year
+        val iFjor = iÅr - 1
+        val fom = LocalDate.of(iFjor, 12, 27)
+        val tom = LocalDate.of(iÅr, 1, 9)
+        val tomKjoreliste = fom.plusDays(6)
 
         opprettBehandlingOgGjennomførBehandlingsløp(
             stønadstype = Stønadstype.DAGLIG_REISE_TSO,
         ) {
             defaultDagligReisePrivatBilTsoTestdata(fom, tom)
             sendInnKjøreliste {
-                periode = Datoperiode(fom, 28 desember 2025)
+                periode = Datoperiode(fom, tomKjoreliste)
                 kjørteDager =
                     listOf(
                         fom to 50,
