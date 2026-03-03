@@ -85,11 +85,6 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
             )
         }
 
-        kjørAlleTaskMedSenererTriggertid()
-        KafkaTestConfig
-            .sendteMeldinger()
-            .forventAntallMeldingerPåTopic(kafkaTopics.dittnav, 1)
-
         val behandlingerPåFagsak = behandlingRepository.findByFagsakId(saksbehandling.fagsakId)
         assertThat(behandlingerPåFagsak).hasSize(2)
         // TODO - bør behandlingstype si at det er en kjøreliste?

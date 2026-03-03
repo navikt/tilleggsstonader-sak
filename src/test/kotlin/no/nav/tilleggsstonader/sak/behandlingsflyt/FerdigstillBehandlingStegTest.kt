@@ -55,6 +55,6 @@ class FerdigstillBehandlingStegTest {
         steg.utførSteg(behandling, null)
         val tasks = taskSlot.filter { it.type == SendKjorelisteTask.TYPE }
         assertThat(tasks).hasSize(1)
-        assertThat(tasks[0].payload).isEqualTo(behandling.id.toString())
+        assertThat(tasks[0].metadata.getProperty("behandlingId")).isEqualTo(behandling.id.toString())
     }
 }
