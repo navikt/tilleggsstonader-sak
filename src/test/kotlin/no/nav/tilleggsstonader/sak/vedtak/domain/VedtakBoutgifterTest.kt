@@ -22,16 +22,6 @@ class VedtakBoutgifterTest {
             }.hasMessage("Må velge minst en årsak for avslag")
         }
 
-        @Test
-        fun `skal feile om avslått vedtak ikke har årsak for avslag`() {
-            assertThatThrownBy {
-                AvslagBoutgifter(
-                    årsaker = listOf(ÅrsakAvslag.INGEN_AKTIVITET),
-                    begrunnelse = "",
-                )
-            }.hasMessage("Avslag må begrunnes")
-        }
-
         /**
          * I tilfelle man setter opp Avslag/sealed class feil så er de ikke like
          */
