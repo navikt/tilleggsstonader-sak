@@ -130,14 +130,16 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
         aktivitet: AktivitetType = defaultAktivitet,
         målgruppe: FaktiskMålgruppe = defaultMålgruppe,
         typeDagligReise: TypeDagligReise = defaultTypeDagligReise,
-    ) = DetaljertVedtaksperiodeDagligReise(
+    ) = DetaljertBeregningsperioderDagligReise(
         fom = fom,
         tom = tom,
-        aktivitet = aktivitet,
-        målgruppe = målgruppe,
-        typeDagligReise = typeDagligReise,
+        prisEnkeltbillett = 30,
+        prisSyvdagersbillett = 150,
+        pris30dagersbillett = 500,
+        beløp = 300,
+        billettdetaljer = mapOf(Billettype.ENKELTBILLETT to 20),
+        antallReisedager = 20,
         stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-        typeAktivtet = null,
     )
 
     private fun innvilgelse(data: InnvilgelseDagligReise = defaultInnvilgelseDagligReise) =
