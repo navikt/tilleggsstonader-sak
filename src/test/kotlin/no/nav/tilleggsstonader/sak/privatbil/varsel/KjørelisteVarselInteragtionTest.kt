@@ -4,6 +4,9 @@ import io.mockk.every
 import no.nav.familie.prosessering.domene.Status
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.desember
+import no.nav.tilleggsstonader.libs.utils.dato.februar
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
@@ -27,7 +30,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
     val dagensDato = LocalDate.now()
 
     @Test
-    fun `innvilge rammevedtak privat bil og sjekk varsel for kjøreliste`() {
+    fun `skal sende kjørelistevarsel hvis ingen uker er sendt inn`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
         val fom = dagensDato.minusDays(3)
@@ -44,16 +47,52 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.dittnav, 1)
 
-        val tasks = taskService.finnAlleTaskerMedType(SendKjorelisteTask.TYPE).filter { it.status == Status.UBEHANDLET }
-        assertThat(tasks).hasSize(1)
+        val tasks = taskService.finnAlleTaskerMedType(SendKjorelisteTask.TYPE)
+        assertThat(tasks.filter { it.status == Status.FERDIG }).hasSize(1)
+        assertThat(tasks.filter { it.status == Status.UBEHANDLET }).hasSize(1)
     }
 
     @Test
-    fun `innvilge rammevedtak og sende inn kjørelister for alle dager og at det ikke blir sendt varsel`() {
+    fun `skal sende kjørelistevarsel hvis et av to rammevedtak mangler kjøreliste`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
-        val fom = dagensDato.plusWeeks(1)
-        val tom = dagensDato.plusWeeks(6)
+        val fom1 = 1 januar 2026
+        val tom1 = 31 januar 2026
+
+        val fom2 = 1 februar 2026
+        val tom2 = 28 februar 2026
+
+        opprettBehandlingOgGjennomførBehandlingsløp(
+            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+        ) {
+            defaultDagligReisePrivatBilTsoTestdata(fom1, tom1)
+            defaultDagligReisePrivatBilTsoTestdata(fom2, tom2)
+            sendInnKjøreliste {
+                periode = Datoperiode(fom1, tom1)
+                kjørteDager =
+                    listOf(
+                        fom1 to 50,
+                    )
+                reiseIdProvider = { it.first().reiseId }
+            }
+        }
+
+        kjørAlleTaskMedSenererTriggertid()
+        KafkaTestConfig
+            .sendteMeldinger()
+            .forventAntallMeldingerPåTopic(kafkaTopics.dittnav, 1)
+
+        val tasks = taskService.finnAlleTaskerMedType(SendKjorelisteTask.TYPE)
+        assertThat(tasks.filter { it.status == Status.FERDIG }).hasSize(1)
+        assertThat(tasks.filter { it.status == Status.UBEHANDLET }).hasSize(1)
+    }
+
+    @Test
+    fun `skal ikke sende kjørelistevarsel hvis alle uker er sendt inn`() {
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
+
+        val fom = 1 januar 2026
+        val tom = 31 januar 2026
 
         opprettBehandlingOgGjennomførBehandlingsløp(
             stønadstype = Stønadstype.DAGLIG_REISE_TSO,
@@ -73,13 +112,13 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.dittnav, 0)
 
-        val tasks =
-            taskService.finnAlleTaskerMedType(SendKjorelisteTask.TYPE).filter { it.status == Status.KLAR_TIL_PLUKK }
-        assertThat(tasks).hasSize(0)
+        val tasks = taskService.finnAlleTaskerMedType(SendKjorelisteTask.TYPE)
+        assertThat(tasks.filter { it.status == Status.FERDIG }).hasSize(1)
+        assertThat(tasks.filter { it.status == Status.UBEHANDLET }).hasSize(0)
     }
 
     @Test
-    fun `innvilge rammevedtak og sende inn alle mulige kjørelister hittil og sjekker at varsel blir sendt `() {
+    fun `skal ikke sende kjørelistevarsel hvis alt frem til forrige uke er sendt inn`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
         val fom = dagensDato.minusWeeks(4)
@@ -105,20 +144,17 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
             .forventAntallMeldingerPåTopic(kafkaTopics.dittnav, 0)
 
         val tasks = taskService.finnAlleTaskerMedType(SendKjorelisteTask.TYPE)
-        assertThat(tasks.filter { it.status == Status.KLAR_TIL_PLUKK }).hasSize(0)
         assertThat(tasks.filter { it.status == Status.FERDIG }).hasSize(1)
+        assertThat(tasks.filter { it.status == Status.UBEHANDLET }).hasSize(1)
     }
 
     @Test
-    fun `innvilge rammevedtak som strekker seg over et år`() {
+    fun `skal sende kjørelistevarsel hvis det er sendt kjøreliste for uke 52 og ikke uke 1`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
-        // Periode fra siste uke i fjor til første uke i år
-        val iÅr = dagensDato.year
-        val iFjor = iÅr - 1
-        val fom = LocalDate.of(iFjor, 12, 27)
-        val tom = LocalDate.of(iÅr, 1, 9)
-        val tomKjoreliste = fom.plusDays(6)
+        val fom = 22 desember 2025
+        val tom = 4 januar 2026
+        val tomKjoreliste = 28 desember 2025
 
         opprettBehandlingOgGjennomførBehandlingsløp(
             stønadstype = Stønadstype.DAGLIG_REISE_TSO,
@@ -139,7 +175,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
             .forventAntallMeldingerPåTopic(kafkaTopics.dittnav, 1)
 
         val tasks = taskService.finnAlleTaskerMedType(SendKjorelisteTask.TYPE)
-        assertThat(tasks.filter { it.status == Status.KLAR_TIL_PLUKK }).hasSize(0)
         assertThat(tasks.filter { it.status == Status.FERDIG }).hasSize(1)
+        assertThat(tasks.filter { it.status == Status.UBEHANDLET }).hasSize(1)
     }
 }

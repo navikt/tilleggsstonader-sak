@@ -26,50 +26,48 @@ class MittNavVarselService(
     fun skalSendeKjørelisteVarsel(behandling: Saksbehandling): Boolean {
         if (!erBehandlingInnvilgelseEllerOpphørDagligReise(behandling)) return false
 
-        val rammevedtak = hentRammevedtakPrivatBil(behandling) ?: return false
-        val innsendtKjørelisteMap = hentInnsendtKjørelisteMap(behandling)
+        val rammevedtak = finnRammevedtakPrivatBil(behandling) ?: return false
+        val innsendtKjørelisteMap = finnInnsendtKjørelisteMap(behandling)
 
         return rammevedtak.reiser
-            .map { reise ->
-                val ikkeInsendteUker =
-                    hentRammevedtakUker(reise) - hentInnsendteKjørelisteUker(reise, innsendtKjørelisteMap)
-                return ikkeInsendteUker.any { it < LocalDate.now().tilUkeIÅr() }
-            }.isNotEmpty()
+            .any { reise ->
+                val ikkeInnsendteUker =
+                    finnRammevedtakUker(reise) - finnInnsendteKjørelisteUker(reise, innsendtKjørelisteMap)
+                ikkeInnsendteUker.any { it < LocalDate.now().tilUkeIÅr() }
+            }
     }
 
     fun skalSendeKjørelisteForNesteUke(behandling: Saksbehandling): Boolean {
         if (!erBehandlingInnvilgelseEllerOpphørDagligReise(behandling)) return false
 
-        val rammevedtak = hentRammevedtakPrivatBil(behandling) ?: return false
-        val innsendtKjørelisteMap = hentInnsendtKjørelisteMap(behandling)
+        val rammevedtak = finnRammevedtakPrivatBil(behandling) ?: return false
+        val innsendtKjørelisteMap = finnInnsendtKjørelisteMap(behandling)
 
         return rammevedtak.reiser
-            .map { reise ->
-                val ikkeInsendteUker =
-                    hentRammevedtakUker(reise) - hentInnsendteKjørelisteUker(reise, innsendtKjørelisteMap)
-                return ikkeInsendteUker.any { it > LocalDate.now().tilUkeIÅr() }
-            }.isNotEmpty()
+            .any { reise ->
+                (finnRammevedtakUker(reise) - finnInnsendteKjørelisteUker(reise, innsendtKjørelisteMap)).isNotEmpty()
+            }
     }
 
     private fun erBehandlingInnvilgelseEllerOpphørDagligReise(behandling: Saksbehandling) =
         behandling.stønadstype.gjelderDagligReise() &&
             (behandling.resultat == BehandlingResultat.INNVILGET || behandling.resultat == BehandlingResultat.OPPHØRT)
 
-    private fun hentRammevedtakPrivatBil(behandling: Saksbehandling): RammevedtakPrivatBil? =
+    private fun finnRammevedtakPrivatBil(behandling: Saksbehandling): RammevedtakPrivatBil? =
         vedtakRepository
             .findByIdOrThrow(behandling.id)
             .withTypeOrThrow<InnvilgelseEllerOpphørDagligReise>()
             .data.rammevedtakPrivatBil
 
-    private fun hentInnsendtKjørelisteMap(behandling: Saksbehandling): Map<UUID, Kjøreliste> {
+    private fun finnInnsendtKjørelisteMap(behandling: Saksbehandling): Map<UUID, Kjøreliste> {
         val innsendtKjøreliste = kjørelisteService.hentForFagsakId(behandling.fagsakId)
         return innsendtKjøreliste.associateBy { it.data.reiseId.id }
     }
 
-    private fun hentRammevedtakUker(reise: RammeForReiseMedPrivatBil) =
+    private fun finnRammevedtakUker(reise: RammeForReiseMedPrivatBil) =
         Datoperiode(reise.grunnlag.fom, reise.grunnlag.tom).splitPerUkeMedHelg().map { it.fom.tilUkeIÅr() }.toSet()
 
-    private fun hentInnsendteKjørelisteUker(
+    private fun finnInnsendteKjørelisteUker(
         reise: RammeForReiseMedPrivatBil,
         innsendtKjørelisteMap: Map<UUID, Kjøreliste>,
     ) = innsendtKjørelisteMap[reise.reiseId.id]
