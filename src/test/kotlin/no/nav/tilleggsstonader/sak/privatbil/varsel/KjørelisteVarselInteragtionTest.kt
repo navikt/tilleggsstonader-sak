@@ -78,4 +78,64 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
             taskService.finnAlleTaskerMedType(SendKjorelisteTask.TYPE).filter { it.status == Status.KLAR_TIL_PLUKK }
         assertThat(tasks).hasSize(0)
     }
+
+    @Test
+    fun `innvilge rammevedtak og sende inn alle mulige kjørelister hittil og sjekker at varsel blir sendt `() {
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
+
+        val fom = 1 februar 2026
+        val tom = 31 mars 2026
+
+        opprettBehandlingOgGjennomførBehandlingsløp(
+            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+        ) {
+            defaultDagligReisePrivatBilTsoTestdata(fom, tom)
+            sendInnKjøreliste {
+                periode = Datoperiode(fom, 1 mars 2026)
+                kjørteDager =
+                    listOf(
+                        fom to 50,
+                    )
+            }
+        }
+
+        kjørAlleTaskMedSenererTriggertid()
+        KafkaTestConfig
+            .sendteMeldinger()
+            .forventAntallMeldingerPåTopic(kafkaTopics.dittnav, 0)
+
+        val tasks = taskService.finnAlleTaskerMedType(SendKjorelisteTask.TYPE)
+        assertThat(tasks.filter { it.status == Status.KLAR_TIL_PLUKK }).hasSize(0)
+        assertThat(tasks.filter { it.status == Status.FERDIG }).hasSize(1)
+    }
+
+    @Test
+    fun `innvilge rammevedtak som strekker seg over et år`() {
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
+
+        val fom = 22 desember 2025
+        val tom = 4 januar 2026
+
+        opprettBehandlingOgGjennomførBehandlingsløp(
+            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+        ) {
+            defaultDagligReisePrivatBilTsoTestdata(fom, tom)
+            sendInnKjøreliste {
+                periode = Datoperiode(fom, 28 desember 2025)
+                kjørteDager =
+                    listOf(
+                        fom to 50,
+                    )
+            }
+        }
+
+        kjørAlleTaskMedSenererTriggertid()
+        KafkaTestConfig
+            .sendteMeldinger()
+            .forventAntallMeldingerPåTopic(kafkaTopics.dittnav, 1)
+
+        val tasks = taskService.finnAlleTaskerMedType(SendKjorelisteTask.TYPE)
+        assertThat(tasks.filter { it.status == Status.KLAR_TIL_PLUKK }).hasSize(0)
+        assertThat(tasks.filter { it.status == Status.FERDIG }).hasSize(1)
+    }
 }

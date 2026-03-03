@@ -36,8 +36,10 @@ class SendKjorelisteTask(
         val melding = "Du har én eller flere kjørelister tilgjengelige for utfylling."
         val eventId = task.payload
 
-        if (mittNavVarselService.skalOppretteKjørelisteVarselTask(behandling)) {
+        if (mittNavVarselService.skalSendeKjørelisteVarsel(behandling)) {
             notifikasjonsService.sendToKafka(fnr, melding, eventId)
+        }
+        if (mittNavVarselService.skalSendeKjørelisteForNesteUke(behandling)) {
             taskService.save(
                 opprettTask(
                     BehandlingId.fromString(task.metadata.getProperty("behandlingId")),
@@ -54,7 +56,6 @@ class SendKjorelisteTask(
                 Properties().apply {
                     setProperty("behandlingId", behandlingId.toString())
                 }
-            // Må gjøre dette for å ikke få duplicate på payload
             return Task(TYPE, UUID.randomUUID().toString())
                 .copy(metadataWrapper = PropertiesWrapper(properties))
                 .medTriggerTid(LocalDate.now().finnMandagNesteUke().atTime(10, 0))

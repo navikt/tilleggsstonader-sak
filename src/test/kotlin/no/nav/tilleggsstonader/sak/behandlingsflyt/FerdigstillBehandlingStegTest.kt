@@ -33,7 +33,7 @@ class FerdigstillBehandlingStegTest {
     internal fun setUp() {
         taskSlot.clear()
         every { taskService.save(capture(taskSlot)) } answers { firstArg() }
-        every { varselService.skalOppretteKjørelisteVarselTask(any()) } returns true
+        every { varselService.skalSendeKjørelisteVarsel(any()) } returns true
     }
 
     @Test

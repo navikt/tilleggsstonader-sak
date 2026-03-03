@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandlingsflyt
 
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -34,7 +33,7 @@ class FerdigstillBehandlingSteg(
 
         taskService.save(BehandlingsstatistikkTask.opprettFerdigTask(behandlingId = saksbehandling.id))
 
-        val varselTilMittNav = varselService.skalOppretteKjørelisteVarselTask(saksbehandling)
+        val varselTilMittNav = varselService.skalSendeKjørelisteVarsel(saksbehandling)
         if (varselTilMittNav) {
             taskService.save(
                 task =
