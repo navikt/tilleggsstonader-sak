@@ -27,63 +27,72 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
 
     val fom = 5 januar 2026
     val tom = 11 januar 2026
+
     @Test
     fun `fjern dager som overskrider antall dager i rammevedtaket`() {
-        val kjørelistebehandling = opprettBehandlingOgSendInnKjøreliste(
-            dagerKjørt = listOf(
-                5 januar 2026 to 50,
-                6 januar 2026 to 50,
-                7 januar 2026 to 50,
-                8 januar 2026 to 50,
-                9 januar 2026 to 50,
-                10 januar 2026 to 50,
-                11 januar 2026 to 50,
+        val kjørelistebehandling =
+            opprettBehandlingOgSendInnKjøreliste(
+                dagerKjørt =
+                    listOf(
+                        5 januar 2026 to 50,
+                        6 januar 2026 to 50,
+                        7 januar 2026 to 50,
+                        8 januar 2026 to 50,
+                        9 januar 2026 to 50,
+                        10 januar 2026 to 50,
+                        11 januar 2026 to 50,
+                    ),
             )
-        )
 
         val reisevurdering = kall.privatBil.hentKjørelisteForBehandling(kjørelistebehandling.id)
 
-        val avklartUkeId = reisevurdering.single().uker.first().avklartUkeId!!
+        val avklartUkeId =
+            reisevurdering
+                .single()
+                .uker
+                .first()
+                .avklartUkeId!!
 
-        val request = listOf(
-            EndreAvklartDagRequest(
-                dato = 5 januar 2026,
-                godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
-                parkeringsutgift = 50,
-            ),
-            EndreAvklartDagRequest(
-                dato = 6 januar 2026,
-                godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
-                parkeringsutgift = 50,
-            ),
-            EndreAvklartDagRequest(
-                dato = 7 januar 2026,
-                godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
-                parkeringsutgift = 50,
-            ),
-            EndreAvklartDagRequest(
-                dato = 8 januar 2026,
-                godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
-                parkeringsutgift = 50,
-            ),
-            EndreAvklartDagRequest(
-                dato = 9 januar 2026,
-                godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
-                parkeringsutgift = 50,
-            ),
-            EndreAvklartDagRequest(
-                dato = 10 januar 2026,
-                godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.NEI,
-                parkeringsutgift = null,
-                begrunnelse = "helg",
-            ),
-            EndreAvklartDagRequest(
-                dato = 11 januar 2026,
-                godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.NEI,
-                parkeringsutgift = null,
-                begrunnelse = "helg",
-            ),
-        )
+        val request =
+            listOf(
+                EndreAvklartDagRequest(
+                    dato = 5 januar 2026,
+                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
+                    parkeringsutgift = 50,
+                ),
+                EndreAvklartDagRequest(
+                    dato = 6 januar 2026,
+                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
+                    parkeringsutgift = 50,
+                ),
+                EndreAvklartDagRequest(
+                    dato = 7 januar 2026,
+                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
+                    parkeringsutgift = 50,
+                ),
+                EndreAvklartDagRequest(
+                    dato = 8 januar 2026,
+                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
+                    parkeringsutgift = 50,
+                ),
+                EndreAvklartDagRequest(
+                    dato = 9 januar 2026,
+                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
+                    parkeringsutgift = 50,
+                ),
+                EndreAvklartDagRequest(
+                    dato = 10 januar 2026,
+                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.NEI,
+                    parkeringsutgift = null,
+                    begrunnelse = "helg",
+                ),
+                EndreAvklartDagRequest(
+                    dato = 11 januar 2026,
+                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.NEI,
+                    parkeringsutgift = null,
+                    begrunnelse = "helg",
+                ),
+            )
 
         val oppdatertUke =
             kall.privatBil.oppdaterUke(
@@ -102,123 +111,100 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `ta i mot kjøreliste og opprett behandling med kopierte verdier`() {
-        val kjørelistebehandling = opprettBehandlingOgSendInnKjøreliste(
-            dagerKjørt = listOf(
-                5 januar 2026 to 50,
-                6 januar 2026 to 50,
-                7 januar 2026 to 50,
-                8 januar 2026 to 50,
-                9 januar 2026 to 50,
-                10 januar 2026 to 50,
-                11 januar 2026 to 50,
+    fun `skal feile dersom det ikke sendes inn en hel uke dersom hele uka er innsendt`() {
+        val kjørelistebehandling =
+            opprettBehandlingOgSendInnKjøreliste(
+                dagerKjørt =
+                    listOf(
+                        5 januar 2026 to 50,
+                        6 januar 2026 to 50,
+                        7 januar 2026 to 50,
+                    ),
             )
-        )
 
         val reisevurdering = kall.privatBil.hentKjørelisteForBehandling(kjørelistebehandling.id)
 
-        val avklartUkeId = reisevurdering.single().uker.first().avklartUkeId!!
+        val avklartUkeId =
+            reisevurdering
+                .single()
+                .uker
+                .first()
+                .avklartUkeId!!
 
-        val request = listOf(
-            EndreAvklartDagRequest(
-                dato = 5 januar 2026,
-                godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
-                parkeringsutgift = 50,
-            ),
-            EndreAvklartDagRequest(
-                dato = 6 januar 2026,
-                godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
-                parkeringsutgift = 50,
-            ),
-            EndreAvklartDagRequest(
-                dato = 7 januar 2026,
-                godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
-                parkeringsutgift = 50,
-            ),
-            EndreAvklartDagRequest(
-                dato = 8 januar 2026,
-                godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
-                parkeringsutgift = 50,
-            ),
-            EndreAvklartDagRequest(
-                dato = 9 januar 2026,
-                godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
-                parkeringsutgift = 50,
-            ),
-            EndreAvklartDagRequest(
-                dato = 10 januar 2026,
-                godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.NEI,
-                parkeringsutgift = null,
-                begrunnelse = "helg",
-            ),
-            EndreAvklartDagRequest(
-                dato = 11 januar 2026,
-                godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.NEI,
-                parkeringsutgift = null,
-                begrunnelse = "helg",
-            ),
-        )
+        val request =
+            listOf(
+                EndreAvklartDagRequest(
+                    dato = 5 januar 2026,
+                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
+                    parkeringsutgift = 50,
+                ),
+                EndreAvklartDagRequest(
+                    dato = 6 januar 2026,
+                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
+                    parkeringsutgift = 50,
+                ),
+                EndreAvklartDagRequest(
+                    dato = 7 januar 2026,
+                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
+                    parkeringsutgift = 50,
+                ),
+            )
 
-        val oppdatertUke =
-            kall.privatBil.oppdaterUke(
+        kall.privatBil.apiRespons
+            .oppdaterUke(
                 behandlingId = kjørelistebehandling.id,
                 avklartUkeId = avklartUkeId,
                 avklarteDager = request,
-            )
-
-        assertThat(oppdatertUke.status).isEqualTo(UkeStatus.OK_MANUELT)
-        assertThat(oppdatertUke.behandletDato).isEqualTo(LocalDate.now())
-        // Originalt avvik skal ikke fjernes ved manuell oppdatering, da det kan være relevant for saksbehandler å
-        // se at det har vært et avvik som førte til manuell behandling
-        assertThat(oppdatertUke.avvik!!.typeAvvik).isEqualTo(TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK)
-
-        oppdatertUke.validerOppdaterteDager(request)
+            ).expectStatus()
+            .is5xxServerError()
+            .expectBody()
+            .jsonPath("$.detail")
+            .isEqualTo("Alle dager i uke må sendes inn")
     }
 
-
     @Test
-    fun `sender ikke inn hel uke`() {
-        val kjørelistebehandling = opprettBehandlingOgSendInnKjøreliste(
-            dagerKjørt = listOf(
-                5 januar 2026 to 50,
-                6 januar 2026 to 50,
-                7 januar 2026 to 50,
+    fun `skal feile dersom det sendes inn endringer på dager som ikke er innenfor uke`() {
+        val kjørelistebehandling =
+            opprettBehandlingOgSendInnKjøreliste(
+                dagerKjørt =
+                    listOf(
+                        5 januar 2026 to 50,
+                        6 januar 2026 to 50,
+                        7 januar 2026 to 50,
+                    ),
             )
-        )
 
         val reisevurdering = kall.privatBil.hentKjørelisteForBehandling(kjørelistebehandling.id)
 
-        val avklartUkeId = reisevurdering.single().uker.first().avklartUkeId!!
+        val avklartUkeId =
+            reisevurdering
+                .single()
+                .uker
+                .first()
+                .avklartUkeId!!
 
-        val request = listOf(
-            EndreAvklartDagRequest(
-                dato = 5 januar 2026,
-                godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
-                parkeringsutgift = 50,
-            ),
-            EndreAvklartDagRequest(
-                dato = 6 januar 2026,
-                godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
-                parkeringsutgift = 50,
-            ),
-            EndreAvklartDagRequest(
-                dato = 7 januar 2026,
-                godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
-                parkeringsutgift = 50,
+        val request =
+            listOf(
+                EndreAvklartDagRequest(
+                    dato = 14 januar 2026,
+                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
+                    parkeringsutgift = 50,
+                ),
             )
-        )
 
-        kall.privatBil.apiRespons.oppdaterUke(
-            behandlingId = kjørelistebehandling.id,
-            avklartUkeId = avklartUkeId,
-            avklarteDager = request,
-        ).expectStatus().is5xxServerError()
-            .expectBody().jsonPath("$.detail").isEqualTo("Alle dager i uke må sendes inn")
+        kall.privatBil.apiRespons
+            .oppdaterUke(
+                behandlingId = kjørelistebehandling.id,
+                avklartUkeId = avklartUkeId,
+                avklarteDager = request,
+            ).expectStatus()
+            .is5xxServerError()
+            .expectBody()
+            .jsonPath("$.detail")
+            .isEqualTo("Alle dager i uke må sendes inn")
     }
 
-    private fun opprettBehandlingOgSendInnKjøreliste(
-        dagerKjørt: List<Pair<LocalDate, Int>>,
-    ): Saksbehandling {
+    private fun opprettBehandlingOgSendInnKjøreliste(dagerKjørt: List<Pair<LocalDate, Int>>): Saksbehandling {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
         val rammebehandlingId =

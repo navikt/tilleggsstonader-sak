@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
+import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -58,6 +59,8 @@ class AvklartKjørelisteService(
         val eksisterendeUke = hentAvklartUke(ukeId)
         val oppdaterteDager = oppdaterAvklarteDager(eksisterendeUke.dager, request)
 
+        validerInnsendteDagerErInnenforUken(eksisterendeUke.fom, oppdaterteDager)
+
         return avklartKjørtUkeRepository.update(
             eksisterendeUke.copy(
                 status = UkeStatus.OK_MANUELT,
@@ -65,6 +68,18 @@ class AvklartKjørelisteService(
                 dager = oppdaterteDager.toSet(),
             ),
         )
+    }
+
+    private fun validerInnsendteDagerErInnenforUken(
+        fomUke: LocalDate,
+        oppdaterteDager: List<AvklartKjørtDag>,
+    ) {
+        val uke = fomUke.tilUkeIÅr()
+        val ukerForInnsendteDager = oppdaterteDager.map { it.dato.tilUkeIÅr() }.toSet()
+
+        feilHvis(ukerForInnsendteDager.any { it.ukenummer != uke.ukenummer && it.år != uke.år }) {
+            "Alle dager må være innenfor uken som skal oppdateres"
+        }
     }
 
     private fun oppdaterAvklarteDager(
@@ -83,8 +98,10 @@ class AvklartKjørelisteService(
                 )
             }
 
-    private fun utledGodkjentGjennomførtKjøringAutomatisk(harKjørt: Boolean, harAvvik: Boolean) =
-        if (harKjørt && !harAvvik) GodkjentGjennomførtKjøring.JA else GodkjentGjennomførtKjøring.IKKE_VURDERT
+    private fun utledGodkjentGjennomførtKjøringAutomatisk(
+        harKjørt: Boolean,
+        harAvvik: Boolean,
+    ) = if (harKjørt && !harAvvik) GodkjentGjennomførtKjøring.JA else GodkjentGjennomførtKjøring.IKKE_VURDERT
 
     private fun utledAvklartUke(
         behandlingId: BehandlingId,
@@ -148,10 +165,11 @@ class AvklartKjørelisteService(
     ): AvklartKjørtDag {
         val avvik = utledAvvik(kjørelisteDag)
 
-        val godkjentGjennomførtKjøring = utledGodkjentGjennomførtKjøringAutomatisk(
-            harKjørt = kjørelisteDag.harKjørt,
-            harAvvik = (avvik.isNotEmpty() && avvikUke == null)
-        )
+        val godkjentGjennomførtKjøring =
+            utledGodkjentGjennomførtKjøringAutomatisk(
+                harKjørt = kjørelisteDag.harKjørt,
+                harAvvik = (avvik.isNotEmpty() && avvikUke == null),
+            )
 
         return AvklartKjørtDag(
             dato = kjørelisteDag.dato,
