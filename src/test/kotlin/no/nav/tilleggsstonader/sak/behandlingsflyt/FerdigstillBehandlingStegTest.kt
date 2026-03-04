@@ -33,7 +33,7 @@ class FerdigstillBehandlingStegTest {
     internal fun setUp() {
         taskSlot.clear()
         every { taskService.save(capture(taskSlot)) } answers { firstArg() }
-        every { varselService.skalSendeKjørelisteVarsel(any()) } returns true
+        every { varselService.skalSendeKjørelisteVarsel(any()) } returns false
     }
 
     @Test
@@ -52,6 +52,7 @@ class FerdigstillBehandlingStegTest {
 
     @Test
     fun `skal opprette task for å lage varsel til mitt nav når det finnes tilgjengelige kjørelister`() {
+        every { varselService.skalSendeKjørelisteVarsel(any()) } returns true
         steg.utførSteg(behandling, null)
         val tasks = taskSlot.filter { it.type == SendKjorelisteTask.TYPE }
         assertThat(tasks).hasSize(1)
