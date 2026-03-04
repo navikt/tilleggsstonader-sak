@@ -1,6 +1,9 @@
 package no.nav.tilleggsstonader.sak.privatbil.varsel
 
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
+import no.nav.tilleggsstonader.sak.util.EnvUtil.erIDev
+import no.nav.tilleggsstonader.sak.util.EnvUtil.erIProd
+import no.nav.tms.varsel.action.EksternKanal
 import no.nav.tms.varsel.action.Produsent
 import no.nav.tms.varsel.action.Sensitivitet
 import no.nav.tms.varsel.action.Tekst
@@ -44,6 +47,8 @@ class VarselDittNavKafkaProducer(
                         tekst = melding,
                         default = true,
                     )
+                link = søknadslenkeForMiljø()
+                eksternVarsling { preferertKanal = EksternKanal.SMS }
                 produsent =
                     Produsent(
                         cluster = cluster,
@@ -62,4 +67,11 @@ class VarselDittNavKafkaProducer(
         }
         return kafkaBeskjedJson
     }
+
+    private fun søknadslenkeForMiljø(): String =
+        when {
+            erIProd() -> "https://www.nav.no/tilleggsstonader/soknad/kjoreliste"
+            erIDev() -> "https://tilleggsstonader.ekstern.dev.nav.no/tilleggsstonader/soknad/kjoreliste"
+            else -> "http://localhost:8080/tilleggsstonader/soknad/kjoreliste"
+        }
 }
