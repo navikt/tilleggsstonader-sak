@@ -122,6 +122,8 @@ fun Periode<LocalDate>.formatertPeriodeNorskFormat() = "${this.fom.norskFormat()
 
 fun Periode<LocalDate>.inneholderUkedag() = this.alleDatoer().any { !it.lørdagEllerSøndag() }
 
+fun LocalDate.finnMandagNesteUke(): LocalDate = this.with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+
 /**
  * https://ts-docs.ansatt.dev.nav.no/Saksbehandling/Beregning%20av%20st%C3%B8nadsbel%C3%B8p/l%C3%B8pende-m%C3%A5neder
  * En løpende måned defineres som perioden fra en gitt startdato og én måned frem i tid.
