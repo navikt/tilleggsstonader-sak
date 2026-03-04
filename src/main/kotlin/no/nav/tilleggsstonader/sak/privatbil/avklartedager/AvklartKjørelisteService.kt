@@ -89,7 +89,15 @@ class AvklartKjørelisteService(
     private fun utledGodkjentGjennomførtKjøringAutomatisk(
         harKjørt: Boolean,
         harAvvik: Boolean,
-    ) = if (harKjørt && !harAvvik) GodkjentGjennomførtKjøring.JA else GodkjentGjennomførtKjøring.IKKE_VURDERT
+    ): GodkjentGjennomførtKjøring {
+        return if (!harKjørt) {
+            GodkjentGjennomførtKjøring.NEI
+        } else if (!harAvvik) {
+            GodkjentGjennomførtKjøring.JA
+        } else {
+            GodkjentGjennomførtKjøring.IKKE_VURDERT
+        }
+    }
 
     private fun utledAvklartUke(
         behandlingId: BehandlingId,
