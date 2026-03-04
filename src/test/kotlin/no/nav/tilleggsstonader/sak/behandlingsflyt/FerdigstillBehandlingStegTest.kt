@@ -9,6 +9,8 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTask
+import no.nav.tilleggsstonader.sak.privatbil.varsel.MittNavVarselService
+import no.nav.tilleggsstonader.sak.privatbil.varsel.SendKjorelisteTask
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -19,8 +21,9 @@ import org.junit.jupiter.api.Test
 class FerdigstillBehandlingStegTest {
     private val behandlingService = mockk<BehandlingService>(relaxed = true)
     private val taskService = mockk<TaskService>()
+    private val varselService = mockk<MittNavVarselService>()
 
-    private val steg = FerdigstillBehandlingSteg(behandlingService, taskService)
+    private val steg = FerdigstillBehandlingSteg(behandlingService, taskService, varselService)
 
     private val taskSlot = mutableListOf<Task>()
     private val fagsak = fagsak()
@@ -30,6 +33,7 @@ class FerdigstillBehandlingStegTest {
     internal fun setUp() {
         taskSlot.clear()
         every { taskService.save(capture(taskSlot)) } answers { firstArg() }
+        every { varselService.skalSendeKjørelisteVarsel(any()) } returns false
     }
 
     @Test
@@ -44,5 +48,14 @@ class FerdigstillBehandlingStegTest {
         val tasks = taskSlot.filter { it.type == InterntVedtakTask.TYPE }
         assertThat(tasks).hasSize(1)
         assertThat(tasks[0].payload).isEqualTo(behandling.id.toString())
+    }
+
+    @Test
+    fun `skal opprette task for å lage varsel til mitt nav når det finnes tilgjengelige kjørelister`() {
+        every { varselService.skalSendeKjørelisteVarsel(any()) } returns true
+        steg.utførSteg(behandling, null)
+        val tasks = taskSlot.filter { it.type == SendKjorelisteTask.TYPE }
+        assertThat(tasks).hasSize(1)
+        assertThat(tasks[0].metadata.getProperty("behandlingId")).isEqualTo(behandling.id.toString())
     }
 }
