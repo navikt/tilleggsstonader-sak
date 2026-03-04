@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTask
 import no.nav.tilleggsstonader.sak.privatbil.varsel.MittNavVarselService
-import no.nav.tilleggsstonader.sak.privatbil.varsel.SendKjorelisteTask
+import no.nav.tilleggsstonader.sak.privatbil.varsel.SendKjorelistevarselTask
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.VedtaksstatistikkTask
 import org.slf4j.Logger
@@ -37,7 +37,7 @@ class FerdigstillBehandlingSteg(
         if (varselTilMittNav) {
             taskService.save(
                 task =
-                    SendKjorelisteTask.opprettTask(
+                    SendKjorelistevarselTask.opprettTask(
                         behandlingId = saksbehandling.id,
                     ),
             )

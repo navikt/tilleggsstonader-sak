@@ -47,7 +47,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.dittnav, 1)
 
-        val tasks = taskService.finnAlleTaskerMedType(SendKjorelisteTask.TYPE)
+        val tasks = taskService.finnAlleTaskerMedType(SendKjorelistevarselTask.TYPE)
         assertThat(tasks.filter { it.status == Status.FERDIG }).hasSize(1)
         assertThat(tasks.filter { it.status == Status.UBEHANDLET }).hasSize(1)
     }
@@ -82,7 +82,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.dittnav, 1)
 
-        val tasks = taskService.finnAlleTaskerMedType(SendKjorelisteTask.TYPE)
+        val tasks = taskService.finnAlleTaskerMedType(SendKjorelistevarselTask.TYPE)
         assertThat(tasks.filter { it.status == Status.FERDIG }).hasSize(1)
         assertThat(tasks.filter { it.status == Status.UBEHANDLET }).hasSize(1)
     }
@@ -112,7 +112,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.dittnav, 0)
 
-        val tasks = taskService.finnAlleTaskerMedType(SendKjorelisteTask.TYPE)
+        val tasks = taskService.finnAlleTaskerMedType(SendKjorelistevarselTask.TYPE)
         assertThat(tasks.filter { it.status == Status.FERDIG }).hasSize(1)
         assertThat(tasks.filter { it.status == Status.UBEHANDLET }).hasSize(0)
     }
@@ -143,7 +143,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.dittnav, 0)
 
-        val tasks = taskService.finnAlleTaskerMedType(SendKjorelisteTask.TYPE)
+        val tasks = taskService.finnAlleTaskerMedType(SendKjorelistevarselTask.TYPE)
         assertThat(tasks.filter { it.status == Status.FERDIG }).hasSize(1)
         assertThat(tasks.filter { it.status == Status.UBEHANDLET }).hasSize(1)
     }
@@ -174,7 +174,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.dittnav, 1)
 
-        val tasks = taskService.finnAlleTaskerMedType(SendKjorelisteTask.TYPE)
+        val tasks = taskService.finnAlleTaskerMedType(SendKjorelistevarselTask.TYPE)
         assertThat(tasks.filter { it.status == Status.FERDIG }).hasSize(1)
         assertThat(tasks.filter { it.status == Status.UBEHANDLET }).hasSize(1)
     }

@@ -16,11 +16,11 @@ import java.util.UUID
 
 @Service
 @TaskStepBeskrivelse(
-    taskStepType = SendKjorelisteTask.TYPE,
+    taskStepType = SendKjorelistevarselTask.TYPE,
     beskrivelse = "Send varsel om tilgjengelig kjoreliste",
     maxAntallFeil = 1,
 )
-class SendKjorelisteTask(
+class SendKjorelistevarselTask(
     private val notifikasjonsService: VarselDittNavKafkaProducer,
     private val behandlingService: BehandlingService,
     private val fagsakService: FagsakService,
@@ -49,7 +49,7 @@ class SendKjorelisteTask(
     }
 
     companion object {
-        const val TYPE = "SEND_NOTIFIKASJON"
+        const val TYPE = "sendKjorelistevarselTask"
 
         fun opprettTask(behandlingId: BehandlingId): Task {
             val properties =
