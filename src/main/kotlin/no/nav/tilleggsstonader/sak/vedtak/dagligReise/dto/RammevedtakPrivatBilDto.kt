@@ -1,11 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto
 
-import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import java.math.BigDecimal
-import java.math.BigInteger
 import java.time.LocalDate
 
 data class RammevedtakPrivatBilDto(
@@ -31,7 +29,7 @@ fun RammevedtakPrivatBil.tilDto() =
     )
 
 // TODO: Flytt splitting til beregning dersom vi vil beholde det
-private fun RammeForReiseMedPrivatBil.tilDto(): List<RammeForReiseMedPrivatBilDto> =
+fun RammeForReiseMedPrivatBil.tilDto(): List<RammeForReiseMedPrivatBilDto> =
     grunnlag.satser.map {
         RammeForReiseMedPrivatBilDto(
             reiseId = reiseId,
