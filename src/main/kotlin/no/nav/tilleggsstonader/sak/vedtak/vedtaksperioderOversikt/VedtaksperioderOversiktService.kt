@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBa
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperiodeLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperioderLæremidlerMapper.finnDetaljerteVedtaksperioder
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
 import org.springframework.stereotype.Service
 
 @Service
@@ -29,6 +30,7 @@ class VedtaksperioderOversiktService(
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
     private val vedtakService: VedtakService,
+    private val vilkårService: DagligReiseVilkårService,
 ) {
     /**
      * Oversikten baserer seg på vedtaksperiodene fra beregningsresultatet, som inneholder mer
@@ -126,6 +128,8 @@ class VedtaksperioderOversiktService(
     }
 
     private fun oppsummerVedtaksperioderDagligReiseTso(fagsakId: FagsakId): List<DetaljertBeregningsperioderDagligReise> {
+        val test = behandlingService.finnesBehandlingForFagsak(fagsakId) ?: return emptyList()
+
         val vedtakForSisteIverksatteBehandling =
             hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørDagligReise>(fagsakId)
                 ?: return emptyList()
@@ -148,7 +152,11 @@ class VedtaksperioderOversiktService(
     }
 
     private inline fun <reified T : Vedtaksdata> hentVedtaksdataForSisteIverksatteBehandling(fagsakId: FagsakId): T? {
+        // hello
+
         val sisteIverksatteBehandling = behandlingService.finnSisteIverksatteBehandling(fagsakId) ?: return null
+//        val vilkårForsisteIverksatteBehandling = vilkårService.hentVilkårForBehandling(sisteIverksatteBehandling.id) ?: return null
+//        val adresse = vilkårForsisteIverksatteBehandling.
         val vedtak = vedtakService.hentVedtak<T>(sisteIverksatteBehandling.id) ?: return null
         return vedtak.data
     }

@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertBeregningsperioderDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -88,6 +89,8 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
                     billettdetaljer = mapOf(Billettype.ENKELTBILLETT to 20),
                     antallReisedager = 20,
                     stønadstype = Stønadstype.DAGLIG_REISE_TSR,
+                    antallReisedagerPerUke = 3,
+                    typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
                 ),
             )
 

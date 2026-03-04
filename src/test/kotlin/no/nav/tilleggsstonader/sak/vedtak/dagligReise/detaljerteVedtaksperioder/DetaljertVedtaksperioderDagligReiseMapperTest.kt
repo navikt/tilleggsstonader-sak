@@ -140,6 +140,8 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
         billettdetaljer = mapOf(Billettype.ENKELTBILLETT to 20),
         antallReisedager = 20,
         stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+        antallReisedagerPerUke = 3,
+        typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
     )
 
     private fun innvilgelse(data: InnvilgelseDagligReise = defaultInnvilgelseDagligReise) =

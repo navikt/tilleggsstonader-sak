@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 
 class DetaljertVedtaksperiodeDagligReiseTsrTest {
     val førsteJan = 1 januar 2024
@@ -22,6 +23,8 @@ class DetaljertVedtaksperiodeDagligReiseTsrTest {
             billettdetaljer = mapOf(Billettype.ENKELTBILLETT to 20),
             antallReisedager = 20,
             stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            antallReisedagerPerUke = 3,
+            typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
         )
 
     val vedtaksperiodeFeb =
@@ -35,6 +38,8 @@ class DetaljertVedtaksperiodeDagligReiseTsrTest {
             billettdetaljer = mapOf(Billettype.ENKELTBILLETT to 20),
             antallReisedager = 20,
             stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            antallReisedagerPerUke = 3,
+            typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
         )
 //
 //    @Test
