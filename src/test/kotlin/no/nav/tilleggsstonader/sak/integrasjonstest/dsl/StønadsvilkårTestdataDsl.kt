@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreDagligReisePrivatBilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
@@ -68,7 +69,7 @@ class OpprettStønadsvilkårDsl {
         reisedagerPerUke: Int = 5,
     ) {
         dtoer += { _, _ ->
-            lagreDagligReisePrivatBilDto(fom = fom, tom = tom, reisedagerPerUke = reisedagerPerUke)
+            lagreDagligReisePrivatBilDto(fom = fom, tom = tom, reisedagerPerUke = reisedagerPerUke, reiseId = ReiseId.random())
         }
     }
 

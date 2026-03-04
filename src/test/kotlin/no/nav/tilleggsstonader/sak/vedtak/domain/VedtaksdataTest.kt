@@ -45,6 +45,23 @@ class VedtaksdataTest {
         }.hasMessageContaining("but was: \"INNVILGELSE_TILSYN_BARN\"")
     }
 
+    @Test
+    fun `sjekker at begrunnelse må gis hvis årsaken er ANNET eller RETT_TIL_UTSTYRSSTIPEND for avslag`() {
+        assertThatThrownBy {
+            AvslagLæremidler(
+                årsaker = listOf(ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND),
+                begrunnelse = "",
+            )
+        }.hasMessageContaining("Avslag må begrunnes")
+
+        assertThatThrownBy {
+            AvslagBoutgifter(
+                årsaker = listOf(ÅrsakAvslag.ANNET),
+                begrunnelse = "",
+            )
+        }.hasMessageContaining("Avslag må begrunnes")
+    }
+
     private fun TypeVedtaksdata.assertHarRiktigNavn(stønadstype: Stønadstype) {
         assertThat(this.enumName())
             .isEqualTo("${this.typeVedtak.enumName()}_${stønadstype.tilTypeVedtaksdataSuffix()}")
