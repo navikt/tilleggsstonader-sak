@@ -70,18 +70,6 @@ class AvklartKjørelisteService(
         )
     }
 
-    private fun validerInnsendteDagerErInnenforUken(
-        fomUke: LocalDate,
-        oppdaterteDager: List<AvklartKjørtDag>,
-    ) {
-        val uke = fomUke.tilUkeIÅr()
-        val ukerForInnsendteDager = oppdaterteDager.map { it.dato.tilUkeIÅr() }.toSet()
-
-        feilHvis(ukerForInnsendteDager.any { it.ukenummer != uke.ukenummer && it.år != uke.år }) {
-            "Alle dager må være innenfor uken som skal oppdateres"
-        }
-    }
-
     private fun oppdaterAvklarteDager(
         eksisterendeDager: Collection<AvklartKjørtDag>,
         oppdaterteDager: Collection<EndreAvklartDagRequest>,
@@ -214,5 +202,14 @@ class AvklartKjørelisteService(
 
         return rammeFraForrigeBehandling.reiser.singleOrNull { it.reiseId == reiseId }
             ?: error("Forventet å finne ramme for reise med id $reiseId")
+    }
+
+    private fun validerInnsendteDagerErInnenforUken(
+        fomUke: LocalDate,
+        oppdaterteDager: List<AvklartKjørtDag>,
+    ) {
+        feilHvis(oppdaterteDager.any { it.dato.tilUkeIÅr() != fomUke.tilUkeIÅr() }) {
+            "Alle dager må være innenfor uken som skal oppdateres"
+        }
     }
 }
