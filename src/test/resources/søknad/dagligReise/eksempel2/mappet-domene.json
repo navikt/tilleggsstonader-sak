@@ -62,7 +62,8 @@
         "piggdekkavgift" : 22
       },
       "taxi" : null
-    }
+    },
+    "skalDuBetaleForReisenSelv" : "JA"
   } ],
   "dokumentasjon" : [ ]
 }

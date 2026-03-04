@@ -58,6 +58,7 @@ data class Reise(
     val kanReiseMedOffentligTransport: JaNei,
     val offentligTransport: OffentligTransport?,
     val privatTransport: PrivatTransport?,
+    val skalDuBetaleForReisenSelv: JaNei?,
 )
 
 data class ReiseAdresse(
@@ -81,7 +82,7 @@ enum class BillettType {
 
 data class PrivatTransport(
     val årsakIkkeOffentligTransport: List<ÅrsakIkkeOffentligTransport>,
-    val kanKjøreMedEgenBil: JaNei?,
+    val kanKjøreMedEgenBil: KanKjøreSelv?,
     val utgifterBil: UtgifterBil?,
     val taxi: Taxi?,
 )
@@ -93,13 +94,26 @@ enum class ÅrsakIkkeOffentligTransport {
     ANNET,
 }
 
+enum class KanKjøreSelv {
+    JA,
+    NEI,
+    SITTER_PÅ_MED_ANDRE,
+}
+
 data class UtgifterBil(
     val mottarGrunnstønad: JaNei?,
-    val parkering: JaNei,
+    val parkering: JaNei?,
     val bompenger: Int?,
     val ferge: Int?,
     val piggdekkavgift: Int?,
-)
+) {
+    fun alleFelterErTomme() =
+        mottarGrunnstønad == null &&
+            parkering == null &&
+            bompenger == null &&
+            ferge == null &&
+            piggdekkavgift == null
+}
 
 data class Taxi(
     val årsakIkkeKjøreBil: List<ÅrsakIkkeKjøreBil>,
