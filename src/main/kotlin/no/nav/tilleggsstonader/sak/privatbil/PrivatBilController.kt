@@ -44,6 +44,10 @@ class PrivatBilController(
     fun hentReisevurderingForBehandling(
         @PathVariable behandlingId: BehandlingId,
     ): List<ReisevurderingPrivatBilDto> {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
+        tilgangService.validerHarSaksbehandlerrolle() // TODO: Trengs denne når vi har den over?
+
         val behandling = behandlingService.hentBehandling(behandlingId)
 
         val kjørelister = kjørelisteService.hentForFagsakId(behandling.fagsakId)
@@ -80,7 +84,7 @@ class PrivatBilController(
     ): UkeVurderingDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
+        tilgangService.validerHarSaksbehandlerrolle() // TODO: Trengs denne når vi har den over?
 
         val oppdatertAvklartUke = avklartKjørelisteService.oppdaterAvklartUke(ukeId, avklarteDager)
         val kjøreliste = kjørelisteService.hentKjøreliste(oppdatertAvklartUke.kjørelisteId)

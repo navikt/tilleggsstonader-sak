@@ -1,9 +1,11 @@
 package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
+import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
@@ -57,6 +59,8 @@ class AvklartKjørelisteService(
         val eksisterendeUke = hentAvklartUke(ukeId)
         val oppdaterteDager = oppdaterAvklarteDager(eksisterendeUke.dager, request)
 
+        validerInnsendteDagerErInnenforUken(eksisterendeUke.fom, oppdaterteDager)
+
         return avklartKjørtUkeRepository.update(
             eksisterendeUke.copy(
                 status = UkeStatus.OK_MANUELT,
@@ -73,27 +77,26 @@ class AvklartKjørelisteService(
         eksisterendeDager
             .associateWith { eksisterendeDag -> oppdaterteDager.find { it.dato == eksisterendeDag.dato } }
             .map { (eksisterendeDag, oppdatertDag) ->
-                if (oppdatertDag == null) {
-                    eksisterendeDag
-                } else {
-                    eksisterendeDag.copy(
-                        godkjentGjennomførtKjøring =
-                            oppdatertDag.godkjentGjennomførtKjøring.tilGodkjentGjennomførtKjøring(
-                                erAutomatiskVurdering = false,
-                            ),
-                        parkeringsutgift = oppdatertDag.parkeringsutgift,
-                        begrunnelse = oppdatertDag.begrunnelse,
-                    )
-                }
+                feilHvis(oppdatertDag == null) { "Alle dager i uke må sendes inn" }
+
+                eksisterendeDag.copy(
+                    godkjentGjennomførtKjøring = oppdatertDag.godkjentGjennomførtKjøring,
+                    parkeringsutgift = oppdatertDag.parkeringsutgift,
+                    begrunnelse = oppdatertDag.begrunnelse,
+                )
             }
 
-    private fun Boolean.tilGodkjentGjennomførtKjøring(erAutomatiskVurdering: Boolean): GodkjentGjennomførtKjøring {
-        if (this) return GodkjentGjennomførtKjøring.JA
-
-        if (erAutomatiskVurdering) return GodkjentGjennomførtKjøring.IKKE_VURDERT
-
-        return GodkjentGjennomførtKjøring.NEI
-    }
+    private fun utledGodkjentGjennomførtKjøringAutomatisk(
+        harKjørt: Boolean,
+        harAvvik: Boolean,
+    ): GodkjentGjennomførtKjøring =
+        if (!harKjørt) {
+            GodkjentGjennomførtKjøring.NEI
+        } else if (!harAvvik) {
+            GodkjentGjennomførtKjøring.JA
+        } else {
+            GodkjentGjennomførtKjøring.IKKE_VURDERT
+        }
 
     private fun utledAvklartUke(
         behandlingId: BehandlingId,
@@ -157,15 +160,19 @@ class AvklartKjørelisteService(
     ): AvklartKjørtDag {
         val avvik = utledAvvik(kjørelisteDag)
 
-        val godkjentGjennomførtKjøring = avvikUke == null && avvik.isEmpty() && kjørelisteDag.harKjørt
+        val godkjentGjennomførtKjøring =
+            utledGodkjentGjennomførtKjøringAutomatisk(
+                harKjørt = kjørelisteDag.harKjørt,
+                harAvvik = (avvik.isNotEmpty() && avvikUke == null),
+            )
 
         return AvklartKjørtDag(
             dato = kjørelisteDag.dato,
-            godkjentGjennomførtKjøring = godkjentGjennomførtKjøring.tilGodkjentGjennomførtKjøring(erAutomatiskVurdering = true),
+            godkjentGjennomførtKjøring = godkjentGjennomførtKjøring,
             avvik = avvik,
             automatiskVurdering = if (avvik.isEmpty()) UtfyltDagAutomatiskVurdering.OK else UtfyltDagAutomatiskVurdering.AVVIK,
             begrunnelse = null,
-            parkeringsutgift = if (godkjentGjennomførtKjøring) kjørelisteDag.parkeringsutgift else null,
+            parkeringsutgift = if (godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.JA) kjørelisteDag.parkeringsutgift else null,
         )
     }
 
@@ -200,5 +207,14 @@ class AvklartKjørelisteService(
 
         return rammevedtak.reiser.singleOrNull { it.reiseId == reiseId }
             ?: error("Forventet å finne ramme for reise med id $reiseId")
+    }
+
+    private fun validerInnsendteDagerErInnenforUken(
+        fomUke: LocalDate,
+        oppdaterteDager: List<AvklartKjørtDag>,
+    ) {
+        feilHvis(oppdaterteDager.any { it.dato.tilUkeIÅr() != fomUke.tilUkeIÅr() }) {
+            "Alle dager må være innenfor uken som skal oppdateres"
+        }
     }
 }
