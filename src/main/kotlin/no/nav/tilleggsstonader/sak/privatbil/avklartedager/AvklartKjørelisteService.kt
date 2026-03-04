@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
@@ -75,15 +74,13 @@ class AvklartKjørelisteService(
         eksisterendeDager
             .associateWith { eksisterendeDag -> oppdaterteDager.find { it.dato == eksisterendeDag.dato } }
             .map { (eksisterendeDag, oppdatertDag) ->
-                if (oppdatertDag == null) {
-                    eksisterendeDag
-                } else {
-                    eksisterendeDag.copy(
-                        godkjentGjennomførtKjøring = oppdatertDag.godkjentGjennomførtKjøring,
-                        parkeringsutgift = oppdatertDag.parkeringsutgift,
-                        begrunnelse = oppdatertDag.begrunnelse,
-                    )
-                }
+                feilHvis(oppdatertDag == null) { "Alle dager i uke må sendes inn" }
+
+                eksisterendeDag.copy(
+                    godkjentGjennomførtKjøring = oppdatertDag.godkjentGjennomførtKjøring,
+                    parkeringsutgift = oppdatertDag.parkeringsutgift,
+                    begrunnelse = oppdatertDag.begrunnelse,
+                )
             }
 
     private fun utledGodkjentGjennomførtKjøringAutomatisk(harKjørt: Boolean, harAvvik: Boolean) =
