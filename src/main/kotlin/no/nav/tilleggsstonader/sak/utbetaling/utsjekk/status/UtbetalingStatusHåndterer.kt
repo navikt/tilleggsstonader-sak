@@ -13,13 +13,6 @@ import java.util.UUID
 class UtbetalingStatusHåndterer(
     private val andelTilkjentYtelseRepository: AndelTilkjentYtelseRepository,
 ) {
-    // I første omgang vil vi kun plukke opp status for nye fagområder, da disse har gått over kafka
-    // Ved migrering av gamle stønader til nye fagområder må vi også lytte på disse her
-    private val nyeFagområderTilleggsstønader =
-        UtbetalingFagområde.entries
-            .filter { it.erNyeFagområder() }
-            .map { it.kode }
-
     /*
      Iverksetting over v2/rest vil også komme inn her. Da vil key fra topic ikke være iverksettingId,
      men en id generert av helved som vi ikke har kjennskap til
