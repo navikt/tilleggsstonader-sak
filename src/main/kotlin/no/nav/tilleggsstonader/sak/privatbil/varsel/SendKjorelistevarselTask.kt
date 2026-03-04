@@ -56,8 +56,7 @@ class SendKjorelistevarselTask(
                 Properties().apply {
                     setProperty("behandlingId", behandlingId.toString())
                 }
-            return Task(TYPE, UUID.randomUUID().toString())
-                .copy(metadataWrapper = PropertiesWrapper(properties))
+            return Task(TYPE, UUID.randomUUID().toString(), properties)
                 .medTriggerTid(LocalDate.now().finnMandagNesteUke().atTime(10, 0))
         }
     }
