@@ -40,7 +40,9 @@ sealed interface Avslag : Vedtaksdata {
 
 fun Avslag.validerÅrsakerOgBegrunnelse() {
     require(årsaker.isNotEmpty()) { "Må velge minst en årsak for avslag" }
-    require(begrunnelse.isNotBlank()) { "Avslag må begrunnes" }
+    if (ÅrsakAvslag.ANNET in årsaker || ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND in årsaker) {
+        require(begrunnelse.isNotBlank()) { "Avslag må begrunnes" }
+    }
 }
 
 fun Opphør.validerÅrsakerOgBegrunnelse() {
