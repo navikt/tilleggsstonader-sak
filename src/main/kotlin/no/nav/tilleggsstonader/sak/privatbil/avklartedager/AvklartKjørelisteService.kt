@@ -4,6 +4,8 @@ import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
@@ -77,23 +79,15 @@ class AvklartKjørelisteService(
                     eksisterendeDag
                 } else {
                     eksisterendeDag.copy(
-                        godkjentGjennomførtKjøring =
-                            oppdatertDag.godkjentGjennomførtKjøring.tilGodkjentGjennomførtKjøring(
-                                erAutomatiskVurdering = false,
-                            ),
+                        godkjentGjennomførtKjøring = oppdatertDag.godkjentGjennomførtKjøring,
                         parkeringsutgift = oppdatertDag.parkeringsutgift,
                         begrunnelse = oppdatertDag.begrunnelse,
                     )
                 }
             }
 
-    private fun Boolean.tilGodkjentGjennomførtKjøring(erAutomatiskVurdering: Boolean): GodkjentGjennomførtKjøring {
-        if (this) return GodkjentGjennomførtKjøring.JA
-
-        if (erAutomatiskVurdering) return GodkjentGjennomførtKjøring.IKKE_VURDERT
-
-        return GodkjentGjennomførtKjøring.NEI
-    }
+    private fun utledGodkjentGjennomførtKjøringAutomatisk(harKjørt: Boolean, harAvvik: Boolean) =
+        if (harKjørt && !harAvvik) GodkjentGjennomførtKjøring.JA else GodkjentGjennomførtKjøring.IKKE_VURDERT
 
     private fun utledAvklartUke(
         behandlingId: BehandlingId,
@@ -157,15 +151,18 @@ class AvklartKjørelisteService(
     ): AvklartKjørtDag {
         val avvik = utledAvvik(kjørelisteDag)
 
-        val godkjentGjennomførtKjøring = avvikUke == null && avvik.isEmpty() && kjørelisteDag.harKjørt
+        val godkjentGjennomførtKjøring = utledGodkjentGjennomførtKjøringAutomatisk(
+            harKjørt = kjørelisteDag.harKjørt,
+            harAvvik = (avvik.isNotEmpty() && avvikUke == null)
+        )
 
         return AvklartKjørtDag(
             dato = kjørelisteDag.dato,
-            godkjentGjennomførtKjøring = godkjentGjennomførtKjøring.tilGodkjentGjennomførtKjøring(erAutomatiskVurdering = true),
+            godkjentGjennomførtKjøring = godkjentGjennomførtKjøring,
             avvik = avvik,
             automatiskVurdering = if (avvik.isEmpty()) UtfyltDagAutomatiskVurdering.OK else UtfyltDagAutomatiskVurdering.AVVIK,
             begrunnelse = null,
-            parkeringsutgift = if (godkjentGjennomførtKjøring) kjørelisteDag.parkeringsutgift else null,
+            parkeringsutgift = if (godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.JA) kjørelisteDag.parkeringsutgift else null,
         )
     }
 
