@@ -20,6 +20,9 @@ enum class UtbetalingFagområde(
     TILLEGGSTØNADER_REISE_OPPSTART("TILLSTRO"),
     TILLEGGSTØNADER_REISE_ARBEID("TILLSTRA"),
     TILLEGGSTØNADER_FLYTTING("TILLSTFL"),
+
+    // Kan motposteres mot TILLST, så vi kan få posteringer med dette fagområdet ved simulering
+    TILTAKSPENGER("TILTPENG"),
     ;
 
     fun erNyeFagområder(): Boolean =
