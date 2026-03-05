@@ -117,6 +117,7 @@ class AvklartKjørelisteService(
         return AvklartKjørtUke(
             behandlingId = behandlingId,
             kjørelisteId = kjørelisteId,
+            reiseId = rammevedtak.reiseId,
             fom = reisedager.minOf { it.dato },
             tom = reisedager.maxOf { it.dato },
             ukenummer = ukenummer,
