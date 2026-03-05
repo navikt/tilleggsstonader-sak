@@ -1,9 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.april
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
@@ -17,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatForPeriodeDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
@@ -38,6 +41,8 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
     private val sisteJanuar = 31 januar 2024
     private val førsteFeb = 1 februar 2024
     private val sisteFeb = 29 februar 2024
+    private val førsteMars = 1 mars 2024
+    private val sisteMars = 31 mars 2024
     private val førsteApril = 1 april 2024
     private val sisteApril = 30 april 2024
 
@@ -60,7 +65,11 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
             )
         val forventetResultat =
             listOf(
-                detaljertVedtaksperiodeDagligReiseTso(fom = førsteJanuar, tom = sisteFeb),
+                detaljertVedtaksperiodeDagligReiseTso(
+                    fom = førsteJanuar,
+                    tom = sisteFeb,
+                    beregningsresultat = listOf(beregningsDto(førsteJanuar, sisteJanuar), beregningsDto(førsteFeb, sisteFeb)),
+                ),
             )
         assertThat(resultat).isEqualTo(forventetResultat)
     }
@@ -83,8 +92,12 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
             )
         val forventetResultat =
             listOf(
-                detaljertVedtaksperiodeDagligReiseTso(førsteFeb, sisteFeb),
-                detaljertVedtaksperiodeDagligReiseTso(førsteApril, sisteApril),
+                detaljertVedtaksperiodeDagligReiseTso(førsteFeb, sisteFeb, beregningsresultat = listOf(beregningsDto(førsteFeb, sisteFeb))),
+                detaljertVedtaksperiodeDagligReiseTso(
+                    førsteApril,
+                    sisteApril,
+                    beregningsresultat = listOf(beregningsDto(førsteApril, sisteApril)),
+                ),
             )
 
         assertThat(resultat).isEqualTo(forventetResultat)
@@ -107,9 +120,143 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
             )
         val forventetResultat =
             listOf(
-                detaljertVedtaksperiodeDagligReiseTso(førsteJanuar, sisteJanuar),
+                detaljertVedtaksperiodeDagligReiseTso(
+                    førsteJanuar,
+                    sisteJanuar,
+                    beregningsresultat = listOf(beregningsDto(førsteJanuar, sisteJanuar), beregningsDto(førsteJanuar, sisteJanuar)),
+                ),
             )
         assertThat(resultat).isEqualTo(forventetResultat)
+    }
+
+    @Test
+    fun `skal opprette separate vedtaksperioder når vedtaksperioder har ulike målgrupper`() {
+        val vedtak =
+            innvilgelse(
+                innvilgelseMedUlikeVedtaksperioder(
+                    fom = førsteJanuar,
+                    tom = sisteJanuar,
+                    vedtaksperioder =
+                        listOf(
+                            vedtaksperiodeGrunnlag(førsteJanuar, sisteJanuar, målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE),
+                            vedtaksperiodeGrunnlag(
+                                førsteJanuar,
+                                sisteJanuar,
+                                målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER,
+                                aktivitet = AktivitetType.UTDANNING,
+                            ),
+                        ),
+                ),
+            )
+
+        val resultat =
+            finnDetaljerteVedtaksperioderDagligReise(
+                vedtaksdataTso = vedtak.data,
+                vedtaksdataTsr = null,
+            )
+
+        assertThat(resultat).hasSize(2)
+        assertThat(resultat.map { it.målgruppe }).containsExactlyInAnyOrder(
+            FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+            FaktiskMålgruppe.ENSLIG_FORSØRGER,
+        )
+    }
+
+    @Test
+    fun `skal opprette separate vedtaksperioder når vedtaksperioder har ulike aktiviteter`() {
+        val vedtak =
+            innvilgelse(
+                innvilgelseMedUlikeVedtaksperioder(
+                    fom = førsteJanuar,
+                    tom = sisteJanuar,
+                    vedtaksperioder =
+                        listOf(
+                            vedtaksperiodeGrunnlag(førsteJanuar, sisteJanuar, aktivitet = AktivitetType.TILTAK),
+                            vedtaksperiodeGrunnlag(
+                                førsteJanuar,
+                                sisteJanuar,
+                                aktivitet = AktivitetType.UTDANNING,
+                                målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER,
+                            ),
+                        ),
+                ),
+            )
+
+        val resultat =
+            finnDetaljerteVedtaksperioderDagligReise(
+                vedtaksdataTso = vedtak.data,
+                vedtaksdataTsr = null,
+            )
+
+        assertThat(resultat).hasSize(2)
+        assertThat(resultat.map { it.aktivitet }).containsExactlyInAnyOrder(
+            AktivitetType.TILTAK,
+            AktivitetType.UTDANNING,
+        )
+    }
+
+    @Test
+    fun `skal bruke fom og tom fra vedtaksperiodene når vedtaksperioder slås sammen`() {
+        val vedtak =
+            innvilgelse(
+                innvilgelseMedUlikeVedtaksperioder(
+                    fom = førsteJanuar,
+                    tom = sisteMars,
+                    vedtaksperioder =
+                        listOf(
+                            vedtaksperiodeGrunnlag(førsteJanuar, sisteJanuar),
+                            vedtaksperiodeGrunnlag(førsteFeb, sisteMars),
+                        ),
+                ),
+            )
+
+        val resultat =
+            finnDetaljerteVedtaksperioderDagligReise(
+                vedtaksdataTso = vedtak.data,
+                vedtaksdataTsr = null,
+            )
+
+        assertThat(resultat).hasSize(1)
+        assertThat(resultat.first().fom).isEqualTo(førsteJanuar)
+        assertThat(resultat.first().tom).isEqualTo(sisteMars)
+    }
+
+    @Test
+    fun `skal gruppere like vedtaksperioder og bruke fom og tom fra gruppert vedtaksperiode`() {
+        val vedtak =
+            innvilgelse(
+                innvilgelseMedUlikeVedtaksperioder(
+                    fom = førsteJanuar,
+                    tom = sisteApril,
+                    vedtaksperioder =
+                        listOf(
+                            vedtaksperiodeGrunnlag(førsteJanuar, sisteJanuar, aktivitet = AktivitetType.TILTAK),
+                            vedtaksperiodeGrunnlag(førsteFeb, sisteFeb, aktivitet = AktivitetType.TILTAK),
+                            vedtaksperiodeGrunnlag(
+                                førsteMars,
+                                sisteApril,
+                                aktivitet = AktivitetType.UTDANNING,
+                                målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER,
+                            ),
+                        ),
+                ),
+            )
+
+        val resultat =
+            finnDetaljerteVedtaksperioderDagligReise(
+                vedtaksdataTso = vedtak.data,
+                vedtaksdataTsr = null,
+            )
+
+        assertThat(resultat).hasSize(2)
+
+        val tiltakPeriode = resultat.first { it.aktivitet == AktivitetType.TILTAK }
+        assertThat(tiltakPeriode.fom).isEqualTo(førsteJanuar)
+        assertThat(tiltakPeriode.tom).isEqualTo(sisteFeb)
+
+        val utdanningPeriode = resultat.first { it.aktivitet == AktivitetType.UTDANNING }
+        assertThat(utdanningPeriode.fom).isEqualTo(førsteMars)
+        assertThat(utdanningPeriode.tom).isEqualTo(sisteApril)
     }
 
     private fun toReiser(
@@ -130,6 +277,7 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
         aktivitet: AktivitetType = defaultAktivitet,
         målgruppe: FaktiskMålgruppe = defaultMålgruppe,
         typeDagligReise: TypeDagligReise = defaultTypeDagligReise,
+        beregningsresultat: List<BeregningsresultatForPeriodeDto>,
     ) = DetaljertVedtaksperiodeDagligReise(
         fom = fom,
         tom = tom,
@@ -138,6 +286,25 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
         typeDagligReise = typeDagligReise,
         stønadstype = Stønadstype.DAGLIG_REISE_TSO,
         typeAktivtet = null,
+        beregningsresultat =
+        beregningsresultat,
+    )
+
+    private fun beregningsDto(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) = BeregningsresultatForPeriodeDto(
+        fom = fom,
+        tom = tom,
+        prisEnkeltbillett = 50,
+        prisSyvdagersbillett = 300,
+        pris30dagersbillett = 1000,
+        antallReisedagerPerUke = 5,
+        beløp = 1000,
+        billettdetaljer = mapOf(Billettype.TRETTIDAGERSBILLETT to 1),
+        antallReisedager = 20,
+        fraTidligereVedtak = false,
+        brukersNavKontor = null,
     )
 
     private fun innvilgelse(data: InnvilgelseDagligReise = defaultInnvilgelseDagligReise) =
@@ -257,6 +424,62 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
         målgruppe = målgruppe,
         aktivitet = aktivitet,
     )
+
+    private fun vedtaksperiodeGrunnlag(
+        fom: LocalDate,
+        tom: LocalDate,
+        målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+        aktivitet: AktivitetType = AktivitetType.TILTAK,
+        typeAktivitet: TypeAktivitet? = null,
+    ) = VedtaksperiodeGrunnlag(
+        id = randomUUID(),
+        fom = fom,
+        tom = tom,
+        målgruppe = målgruppe,
+        aktivitet = aktivitet,
+        typeAktivitet = typeAktivitet,
+        antallReisedagerIVedtaksperioden = 20,
+    )
+
+    private fun innvilgelseMedUlikeVedtaksperioder(
+        fom: LocalDate,
+        tom: LocalDate,
+        vedtaksperioder: List<VedtaksperiodeGrunnlag>,
+    ) = InnvilgelseDagligReise(
+        vedtaksperioder = listOf(vedtaksperiode(fom = fom, tom = tom)),
+        beregningsresultat =
+            BeregningsresultatDagligReise(
+                offentligTransport =
+                    BeregningsresultatOffentligTransport(
+                        reiser =
+                            listOf(
+                                BeregningsresultatForReise(
+                                    reiseId = dummyReiseId,
+                                    perioder =
+                                        listOf(
+                                            BeregningsresultatForPeriode(
+                                                grunnlag =
+                                                    BeregningsgrunnlagOffentligTransport(
+                                                        fom = fom,
+                                                        tom = tom,
+                                                        prisEnkeltbillett = 50,
+                                                        prisSyvdagersbillett = 300,
+                                                        pris30dagersbillett = 1000,
+                                                        antallReisedagerPerUke = 5,
+                                                        vedtaksperioder = vedtaksperioder,
+                                                        antallReisedager = 20,
+                                                        brukersNavKontor = null,
+                                                    ),
+                                                beløp = 1000,
+                                                billettdetaljer = mapOf(Billettype.TRETTIDAGERSBILLETT to 1),
+                                            ),
+                                        ),
+                                ),
+                            ),
+                    ),
+            ),
+        rammevedtakPrivatBil = null,
+    )
 }
 
 private fun beregningsresultatForPeriode(
@@ -291,6 +514,6 @@ private fun beregningsresultatForPeriode(
         billettdetaljer =
             mapOf(
                 Billettype.TRETTIDAGERSBILLETT to
-                    1000,
+                    1,
             ),
     )
