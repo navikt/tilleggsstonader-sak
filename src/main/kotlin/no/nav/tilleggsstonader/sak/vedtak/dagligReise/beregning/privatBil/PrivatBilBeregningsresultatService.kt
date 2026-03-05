@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
@@ -36,6 +37,8 @@ class PrivatBilBeregningsresultatService {
         rammeForReise: RammeForReiseMedPrivatBil,
         avklarteUkerForReise: List<AvklartKjørtUke>,
     ): BeregningsresultatForReisePrivatBil {
+        // Kaster feil om det finnes godkjente dager utenfor rammevedtak
+        validerDagerErInnenforRammevedtak(rammeForReise, avklarteUkerForReise)
         val satser = rammeForReise.grunnlag.satser
 
         // Grupper dager på sats
@@ -44,9 +47,24 @@ class PrivatBilBeregningsresultatService {
             perioder =
                 avklarteUkerForReise
                     .flatMap { it.dager }
+                    .filter { rammeForReise.grunnlag.inneholder(it.dato) }
                     .groupBy { satser.satsForDato(it.dato) }
                     .flatMap { (sats, dager) -> lagPerioderForDagerMedSammeSats(dager, sats) },
         )
+    }
+
+    private fun validerDagerErInnenforRammevedtak(
+        rammeForReise: RammeForReiseMedPrivatBil,
+        avklarteUkerForReise: List<AvklartKjørtUke>,
+    ) {
+        avklarteUkerForReise
+            .flatMap { it.dager }
+            .filter { it.godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.JA }
+            .forEach {
+                feilHvis(!rammeForReise.grunnlag.inneholder(it.dato)) {
+                    "Dag ${it.dato} er ikke innenfor rammevedtak (${rammeForReise.grunnlag.fom} - ${rammeForReise.grunnlag.tom})"
+                }
+            }
     }
 
     private fun lagPerioderForDagerMedSammeSats(
@@ -84,4 +102,6 @@ class PrivatBilBeregningsresultatService {
     }
 }
 
-private fun List<SatsForPeriodePrivatBil>.satsForDato(dato: LocalDate) = single { it.inneholder(dato) }
+private fun List<SatsForPeriodePrivatBil>.satsForDato(dato: LocalDate) =
+    singleOrNull { it.inneholder(dato) }
+        ?: error("Finner ingen sats i rammevedtak for dato $dato")

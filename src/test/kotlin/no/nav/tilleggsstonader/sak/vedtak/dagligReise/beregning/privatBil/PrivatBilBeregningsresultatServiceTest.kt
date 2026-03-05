@@ -20,13 +20,14 @@ import no.nav.tilleggsstonader.sak.util.finnMandagNesteUke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatException
+import org.assertj.core.api.Assertions.assertThatNoException
 import org.junit.jupiter.api.Test
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
 
 class PrivatBilBeregningsresultatServiceTest {
-
     private val behandlingId = BehandlingId.random()
     private val reiseId = ReiseId.random()
 
@@ -38,29 +39,38 @@ class PrivatBilBeregningsresultatServiceTest {
         val tomRammevedtak = 8 februar 2026
         val dagsatsUtenParkering = 150.toBigDecimal()
 
-        val rammevedtakPrivatBil = rammevedtakPrivatBil(
-            reiseId = reiseId,
-            fom = fomRammevedtak,
-            tom = tomRammevedtak,
-            satser = listOf(
-                satsForPeriodePrivatBil(
-                    fomRammevedtak, tomRammevedtak, 2.94.toBigDecimal(), dagsatsUtenParkering
-                )
-            ),
-        )
-
-        val kjøreliste = KjørelisteUtil.kjøreliste(
-            reiseId = reiseId,
-            periode = Datoperiode(
+        val rammevedtakPrivatBil =
+            rammevedtakPrivatBil(
+                reiseId = reiseId,
                 fom = fomRammevedtak,
-                tom = fomRammevedtak.with(TemporalAdjusters.next(DayOfWeek.SUNDAY))
-            ), // Mandag til søndag
-            kjørteDager = listOf(
-                KjørelisteUtil.KjørtDag(2 februar 2026, 50),
-                KjørelisteUtil.KjørtDag(3 februar 2026, 120),
-                KjørelisteUtil.KjørtDag(4 februar 2026, 3),
-            ),
-        )
+                tom = tomRammevedtak,
+                satser =
+                    listOf(
+                        satsForPeriodePrivatBil(
+                            fomRammevedtak,
+                            tomRammevedtak,
+                            2.94.toBigDecimal(),
+                            dagsatsUtenParkering,
+                        ),
+                    ),
+            )
+
+        val kjøreliste =
+            KjørelisteUtil.kjøreliste(
+                reiseId = reiseId,
+                periode =
+                    Datoperiode(
+                        fom = fomRammevedtak,
+                        tom = fomRammevedtak.with(TemporalAdjusters.next(DayOfWeek.SUNDAY)),
+                    ),
+                // Mandag til søndag
+                kjørteDager =
+                    listOf(
+                        KjørelisteUtil.KjørtDag(2 februar 2026, 50),
+                        KjørelisteUtil.KjørtDag(3 februar 2026, 120),
+                        KjørelisteUtil.KjørtDag(4 februar 2026, 3),
+                    ),
+            )
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)
 
         val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker)
@@ -94,28 +104,37 @@ class PrivatBilBeregningsresultatServiceTest {
         val tomRammevedtak = 15 februar 2026
         val dagsatsUtenParkering = 150.toBigDecimal()
 
-        val rammevedtakPrivatBil = rammevedtakPrivatBil(
-            reiseId = reiseId,
-            fom = fomRammevedtak,
-            tom = tomRammevedtak,
-            satser = listOf(
-                satsForPeriodePrivatBil(
-                    fomRammevedtak, tomRammevedtak, 2.94.toBigDecimal(), dagsatsUtenParkering
-                )
-            ),
-        )
-
-        val kjøreliste = KjørelisteUtil.kjøreliste(
-            reiseId = reiseId,
-            periode = Datoperiode(
+        val rammevedtakPrivatBil =
+            rammevedtakPrivatBil(
+                reiseId = reiseId,
                 fom = fomRammevedtak,
-                tom = fomRammevedtak.with(TemporalAdjusters.next(DayOfWeek.SUNDAY))
-            ), // Mandag til søndag
-            kjørteDager = listOf(
-                KjørelisteUtil.KjørtDag(2 februar 2026),
-                KjørelisteUtil.KjørtDag(3 februar 2026),
-            ),
-        )
+                tom = tomRammevedtak,
+                satser =
+                    listOf(
+                        satsForPeriodePrivatBil(
+                            fomRammevedtak,
+                            tomRammevedtak,
+                            2.94.toBigDecimal(),
+                            dagsatsUtenParkering,
+                        ),
+                    ),
+            )
+
+        val kjøreliste =
+            KjørelisteUtil.kjøreliste(
+                reiseId = reiseId,
+                periode =
+                    Datoperiode(
+                        fom = fomRammevedtak,
+                        tom = fomRammevedtak.with(TemporalAdjusters.next(DayOfWeek.SUNDAY)),
+                    ),
+                // Mandag til søndag
+                kjørteDager =
+                    listOf(
+                        KjørelisteUtil.KjørtDag(2 februar 2026),
+                        KjørelisteUtil.KjørtDag(3 februar 2026),
+                    ),
+            )
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)
 
         val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker)
@@ -144,33 +163,45 @@ class PrivatBilBeregningsresultatServiceTest {
         val dagsats2UtenParkering = 175.toBigDecimal()
         val forventetUtbetalingsdato = 5 januar 2026
 
-        val satser = listOf(
-            satsForPeriodePrivatBil(
-                fomRammevedtak, 31 desember 2025, 2.94.toBigDecimal(), dagsats1UtenParkering
-            ),
-            satsForPeriodePrivatBil(
-                1 januar 2026, tomRammevedtak, 2.94.toBigDecimal(), dagsats2UtenParkering
+        val satser =
+            listOf(
+                satsForPeriodePrivatBil(
+                    fomRammevedtak,
+                    31 desember 2025,
+                    2.94.toBigDecimal(),
+                    dagsats1UtenParkering,
+                ),
+                satsForPeriodePrivatBil(
+                    1 januar 2026,
+                    tomRammevedtak,
+                    2.94.toBigDecimal(),
+                    dagsats2UtenParkering,
+                ),
             )
-        )
 
-        val rammevedtakPrivatBil = rammevedtakPrivatBil(
-            reiseId = reiseId,
-            fom = fomRammevedtak,
-            tom = tomRammevedtak,
-            satser = satser
-        )
-
-        val kjøreliste = KjørelisteUtil.kjøreliste(
-            reiseId = reiseId,
-            periode = Datoperiode(
+        val rammevedtakPrivatBil =
+            rammevedtakPrivatBil(
+                reiseId = reiseId,
                 fom = fomRammevedtak,
-                tom = fomRammevedtak.with(TemporalAdjusters.next(DayOfWeek.SUNDAY))
-            ), // Mandag til søndag
-            kjørteDager = listOf(
-                KjørelisteUtil.KjørtDag(30 desember 2025),
-                KjørelisteUtil.KjørtDag(2 januar 2026),
-            ),
-        )
+                tom = tomRammevedtak,
+                satser = satser,
+            )
+
+        val kjøreliste =
+            KjørelisteUtil.kjøreliste(
+                reiseId = reiseId,
+                periode =
+                    Datoperiode(
+                        fom = fomRammevedtak,
+                        tom = fomRammevedtak.with(TemporalAdjusters.next(DayOfWeek.SUNDAY)),
+                    ),
+                // Mandag til søndag
+                kjørteDager =
+                    listOf(
+                        KjørelisteUtil.KjørtDag(30 desember 2025),
+                        KjørelisteUtil.KjørtDag(2 januar 2026),
+                    ),
+            )
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)
 
         val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker)
@@ -205,38 +236,51 @@ class PrivatBilBeregningsresultatServiceTest {
         val tomRammevedtak = 22 februar 2026
         val dagsatsUtenParkering = 150.toBigDecimal()
 
-        val rammevedtakPrivatBil = rammevedtakPrivatBil(
-            reiseId = reiseId,
-            fom = fomRammevedtak,
-            tom = tomRammevedtak,
-            satser = listOf(
-                satsForPeriodePrivatBil(
-                    fomRammevedtak, tomRammevedtak, 2.94.toBigDecimal(), dagsatsUtenParkering
-                )
-            ),
-        )
-
-        val kjøreliste1 = KjørelisteUtil.kjøreliste(
-            reiseId = reiseId,
-            periode = Datoperiode(
+        val rammevedtakPrivatBil =
+            rammevedtakPrivatBil(
+                reiseId = reiseId,
                 fom = fomRammevedtak,
-                tom = fomRammevedtak.with(TemporalAdjusters.next(DayOfWeek.SUNDAY))
-            ), // Mandag til søndag
-            kjørteDager = listOf(
-                KjørelisteUtil.KjørtDag(fomRammevedtak),
-            ),
-        )
+                tom = tomRammevedtak,
+                satser =
+                    listOf(
+                        satsForPeriodePrivatBil(
+                            fomRammevedtak,
+                            tomRammevedtak,
+                            2.94.toBigDecimal(),
+                            dagsatsUtenParkering,
+                        ),
+                    ),
+            )
 
-        val kjøreliste2 = KjørelisteUtil.kjøreliste(
-            reiseId = reiseId,
-            periode = Datoperiode(
-                fom = tomRammevedtak.with(TemporalAdjusters.previous(DayOfWeek.MONDAY)),
-                tom = tomRammevedtak
-            ), // Mandag til søndag
-            kjørteDager = listOf(
-                KjørelisteUtil.KjørtDag(tomRammevedtak),
-            ),
-        )
+        val kjøreliste1 =
+            KjørelisteUtil.kjøreliste(
+                reiseId = reiseId,
+                periode =
+                    Datoperiode(
+                        fom = fomRammevedtak,
+                        tom = fomRammevedtak.with(TemporalAdjusters.next(DayOfWeek.SUNDAY)),
+                    ),
+                // Mandag til søndag
+                kjørteDager =
+                    listOf(
+                        KjørelisteUtil.KjørtDag(fomRammevedtak),
+                    ),
+            )
+
+        val kjøreliste2 =
+            KjørelisteUtil.kjøreliste(
+                reiseId = reiseId,
+                periode =
+                    Datoperiode(
+                        fom = tomRammevedtak.with(TemporalAdjusters.previous(DayOfWeek.MONDAY)),
+                        tom = tomRammevedtak,
+                    ),
+                // Mandag til søndag
+                kjørteDager =
+                    listOf(
+                        KjørelisteUtil.KjørtDag(tomRammevedtak),
+                    ),
+            )
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste1) + avklarUkerFraKjøreliste(kjøreliste2)
 
         val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker)
@@ -265,11 +309,12 @@ class PrivatBilBeregningsresultatServiceTest {
 
     @Test
     fun `forventer tomt rammevedtak når det ikke finnes noen avklarte uker`() {
-        val rammevedtakPrivatBil = rammevedtakPrivatBil(
-            reiseId = reiseId,
-            fom = 2 februar 2026,
-            tom = 22 februar 2026,
-        )
+        val rammevedtakPrivatBil =
+            rammevedtakPrivatBil(
+                reiseId = reiseId,
+                fom = 2 februar 2026,
+                tom = 22 februar 2026,
+            )
 
         val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, emptyList())
 
@@ -281,7 +326,6 @@ class PrivatBilBeregningsresultatServiceTest {
         assertThat(beregningsresultatForReise.perioder).isEmpty()
     }
 
-
     @Test
     fun `håndterer kjørelister sendt inn for samme perioder for forskjellige rammevedtak`() {
         val fomRammevedtak = 2 februar 2026 // Mandag
@@ -292,33 +336,43 @@ class PrivatBilBeregningsresultatServiceTest {
         val reiseId2 = ReiseId.random()
         val reiseIder = listOf(reiseId1, reiseId2)
 
-        val rammevedtakPrivatBil = RammevedtakPrivatBil(
-            reiser = reiseIder.map {
-                rammeForReiseMedPrivatBil(
-                    reiseId = it,
-                    fom = fomRammevedtak,
-                    tom = tomRammevedtak,
-                    satser = listOf(
-                        satsForPeriodePrivatBil(
-                            fomRammevedtak, tomRammevedtak, 2.94.toBigDecimal(), dagsatsUtenParkering
+        val rammevedtakPrivatBil =
+            RammevedtakPrivatBil(
+                reiser =
+                    reiseIder.map {
+                        rammeForReiseMedPrivatBil(
+                            reiseId = it,
+                            fom = fomRammevedtak,
+                            tom = tomRammevedtak,
+                            satser =
+                                listOf(
+                                    satsForPeriodePrivatBil(
+                                        fomRammevedtak,
+                                        tomRammevedtak,
+                                        2.94.toBigDecimal(),
+                                        dagsatsUtenParkering,
+                                    ),
+                                ),
                         )
-                    ),
+                    },
+            )
+
+        val kjørelister =
+            reiseIder.map {
+                KjørelisteUtil.kjøreliste(
+                    reiseId = it,
+                    periode =
+                        Datoperiode(
+                            fom = fomRammevedtak,
+                            tom = tomRammevedtak,
+                        ),
+                    // Mandag til søndag
+                    kjørteDager =
+                        listOf(
+                            KjørelisteUtil.KjørtDag(fomRammevedtak),
+                        ),
                 )
             }
-        )
-
-        val kjørelister = reiseIder.map {
-            KjørelisteUtil.kjøreliste(
-                reiseId = it,
-                periode = Datoperiode(
-                    fom = fomRammevedtak,
-                    tom = tomRammevedtak
-                ), // Mandag til søndag
-                kjørteDager = listOf(
-                    KjørelisteUtil.KjørtDag(fomRammevedtak),
-                ),
-            )
-        }
 
         val avklarteUker = kjørelister.flatMap { avklarUkerFraKjøreliste(it) }
 
@@ -341,9 +395,96 @@ class PrivatBilBeregningsresultatServiceTest {
         }
     }
 
+    @Test
+    fun `kaster feil om det finnes avklarte dager med godkjentGjennomførtKjøring=true utenfor rammevedtaket`() {
+        val fomRammevedtak = 2 februar 2026 // Mandag
+        val tomRammevedtak = 8 februar 2026
+        val dagsatsUtenParkering = 150.toBigDecimal()
+
+        val rammevedtakPrivatBil =
+            rammevedtakPrivatBil(
+                reiseId = reiseId,
+                fom = fomRammevedtak,
+                tom = tomRammevedtak,
+                satser =
+                    listOf(
+                        satsForPeriodePrivatBil(
+                            fomRammevedtak,
+                            tomRammevedtak,
+                            2.94.toBigDecimal(),
+                            dagsatsUtenParkering,
+                        ),
+                    ),
+            )
+
+        val kjøreliste =
+            KjørelisteUtil.kjøreliste(
+                reiseId = reiseId,
+                periode =
+                    Datoperiode(
+                        fom = fomRammevedtak.plusDays(7),
+                        tom = tomRammevedtak.plusDays(7),
+                    ),
+                // Mandag til søndag
+                kjørteDager =
+                    listOf(
+                        KjørelisteUtil.KjørtDag(fomRammevedtak.plusDays(7)),
+                    ),
+            )
+        val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)
+
+        assertThatException()
+            .isThrownBy {
+                beregningService.beregn(rammevedtakPrivatBil, avklarteUker)
+            }.withMessageContaining("Dag ${kjøreliste.data.reisedager.single { it.harKjørt }.dato} er ikke innenfor rammevedtak")
+    }
+
+    @Test
+    fun `kaster ikke feil om det finnes avklarte dager med godkjentGjennomførtKjøring=false utenfor rammevedtaket`() {
+        val fomRammevedtak = 2 februar 2026 // Mandag
+        val tomRammevedtak = 8 februar 2026
+        val dagsatsUtenParkering = 150.toBigDecimal()
+
+        val rammevedtakPrivatBil =
+            rammevedtakPrivatBil(
+                reiseId = reiseId,
+                fom = fomRammevedtak,
+                tom = tomRammevedtak,
+                satser =
+                    listOf(
+                        satsForPeriodePrivatBil(
+                            fomRammevedtak,
+                            tomRammevedtak,
+                            2.94.toBigDecimal(),
+                            dagsatsUtenParkering,
+                        ),
+                    ),
+            )
+
+        val kjøreliste =
+            KjørelisteUtil.kjøreliste(
+                reiseId = reiseId,
+                periode =
+                    Datoperiode(
+                        fom = fomRammevedtak,
+                        tom = tomRammevedtak.plusDays(1), // Sendt inn en dag utenfor rammevedtak, men skal ikke utbetales
+                    ),
+                // Mandag til søndag
+                kjørteDager =
+                    listOf(
+                        KjørelisteUtil.KjørtDag(fomRammevedtak),
+                    ),
+            )
+        val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)
+
+        assertThatNoException().isThrownBy {
+            beregningService.beregn(rammevedtakPrivatBil, avklarteUker)
+        }
+    }
 
     private fun avklarUkerFraKjøreliste(kjøreliste: Kjøreliste): List<AvklartKjørtUke> =
-        kjøreliste.data.reisedager.groupBy { it.dato.tilUkeIÅr() }
+        kjøreliste.data.reisedager
+            .groupBy { it.dato.tilUkeIÅr() }
             .map { (uke, dager) ->
                 AvklartKjørtUke(
                     behandlingId = behandlingId,
@@ -355,16 +496,21 @@ class PrivatBilBeregningsresultatServiceTest {
                     status = UkeStatus.OK_AUTOMATISK,
                     behandletDato = LocalDate.now(),
                     dager =
-                        dager.map {
-                            AvklartKjørtDag(
-                                dato = it.dato,
-                                godkjentGjennomførtKjøring = if (it.harKjørt) GodkjentGjennomførtKjøring.JA else GodkjentGjennomførtKjøring.NEI,
-                                automatiskVurdering = UtfyltDagAutomatiskVurdering.OK,
-                                avvik = emptyList(),
-                                parkeringsutgift = it.parkeringsutgift
-                            )
-                        }.toSet()
-
+                        dager
+                            .map {
+                                AvklartKjørtDag(
+                                    dato = it.dato,
+                                    godkjentGjennomførtKjøring =
+                                        if (it.harKjørt) {
+                                            GodkjentGjennomførtKjøring.JA
+                                        } else {
+                                            GodkjentGjennomførtKjøring.NEI
+                                        },
+                                    automatiskVurdering = UtfyltDagAutomatiskVurdering.OK,
+                                    avvik = emptyList(),
+                                    parkeringsutgift = it.parkeringsutgift,
+                                )
+                            }.toSet(),
                 )
             }
 }
