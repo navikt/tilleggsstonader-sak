@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
+import no.nav.tilleggsstonader.sak.util.erFørNåværendeUke
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.splitPerUkeMedHelg
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
@@ -15,7 +16,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBi
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 import java.util.UUID
 
 @Service
@@ -33,7 +33,7 @@ class MittNavVarselService(
             .any { reise ->
                 val ikkeInnsendteUker =
                     finnRammevedtakUker(reise) - finnInnsendteKjørelisteUker(reise, innsendtKjørelisteMap)
-                ikkeInnsendteUker.any { it < LocalDate.now().tilUkeIÅr() }
+                ikkeInnsendteUker.any { it.erFørNåværendeUke() }
             }
     }
 
