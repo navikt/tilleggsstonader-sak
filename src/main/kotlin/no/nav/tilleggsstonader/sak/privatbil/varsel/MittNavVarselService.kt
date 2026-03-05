@@ -5,23 +5,21 @@ import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
 import no.nav.tilleggsstonader.sak.util.erFørNåværendeUke
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.splitPerUkeMedHelg
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
 class MittNavVarselService(
     private val kjørelisteService: KjørelisteService,
-    private val vedtakRepository: VedtakRepository,
+    private val vedtakService: VedtakService,
 ) {
     fun skalSendeKjørelisteVarsel(behandling: Saksbehandling): Boolean {
         if (!erBehandlingInnvilgelseEllerOpphørDagligReise(behandling)) return false
@@ -54,9 +52,8 @@ class MittNavVarselService(
             (behandling.resultat == BehandlingResultat.INNVILGET || behandling.resultat == BehandlingResultat.OPPHØRT)
 
     private fun finnRammevedtakPrivatBil(behandling: Saksbehandling): RammevedtakPrivatBil? =
-        vedtakRepository
-            .findByIdOrThrow(behandling.id)
-            .withTypeOrThrow<InnvilgelseEllerOpphørDagligReise>()
+        vedtakService
+            .hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandling.id)
             .data.rammevedtakPrivatBil
 
     private fun finnInnsendtKjørelisteMap(behandling: Saksbehandling): Map<UUID, Kjøreliste> {

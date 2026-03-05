@@ -73,7 +73,6 @@ class TilsynBarnVedtakController(
     ) {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
-        vedtakService.håndterSteg(behandlingId, vedtak)
         stegService.håndterSteg(behandlingId = behandlingId, behandlingSteg = tilsynBarnBeregnYtelseSteg, data = vedtak)
     }
 

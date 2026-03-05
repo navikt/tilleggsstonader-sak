@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringsresultatRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
@@ -25,7 +25,7 @@ class NullstillBehandlingService(
     private val vilkårperiodeRepository: VilkårperiodeRepository,
     private val vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository,
     private val vilkårRepository: VilkårRepository,
-    private val vedtakRepository: VedtakRepository,
+    private val vedtakService: VedtakService,
     private val simuleringsresultatRepository: SimuleringsresultatRepository,
     private val tilkjentYtelseRepository: TilkjentYtelseRepository,
     private val mellomlagerBrevRepository: MellomlagerBrevRepository,
@@ -72,7 +72,7 @@ class NullstillBehandlingService(
         vilkårperiodeRepository.findByBehandlingId(behandlingId).let(vilkårperiodeRepository::deleteAll)
         vilkårRepository.findByBehandlingId(behandlingId).let(vilkårRepository::deleteAll)
 
-        vedtakRepository.deleteById(behandlingId)
+        vedtakService.slettVedtakMedId(behandlingId)
         tilkjentYtelseRepository.findByBehandlingId(behandlingId)?.let(tilkjentYtelseRepository::delete)
         simuleringsresultatRepository.deleteById(behandlingId)
         mellomlagerBrevRepository.deleteById(behandlingId)

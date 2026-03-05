@@ -37,7 +37,7 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.ÅrsakUnderkjent
 import org.assertj.core.api.Assertions.assertThat
@@ -53,7 +53,7 @@ class BeslutteVedtakStegTest {
     private val fagsakService = mockk<FagsakService>()
     private val totrinnskontrollService = mockk<TotrinnskontrollService>(relaxed = true)
     private val oppgaveService = mockk<OppgaveService>()
-    private val vedtaksresultatService = mockk<VedtaksresultatService>()
+    private val vedtakService = mockk<VedtakService>()
     private val brevService = mockk<BrevService>()
     private val behandlingService = mockk<BehandlingService>()
     private val iverksettService = mockk<IverksettService>(relaxed = true)
@@ -65,7 +65,7 @@ class BeslutteVedtakStegTest {
             oppgaveService = oppgaveService,
             totrinnskontrollService = totrinnskontrollService,
             behandlingService = behandlingService,
-            vedtaksresultatService = vedtaksresultatService,
+            vedtakService = vedtakService,
             brevService = brevService,
             iverksettService = iverksettService,
         )
@@ -104,7 +104,7 @@ class BeslutteVedtakStegTest {
         // every { iverksettingDtoMapper.tilDto(any(), any()) } returns mockk()
         // every { iverksett.iverksett(any(), any()) } just Runs
         // every { iverksett.iverksettUtenBrev(any()) } just Runs
-        every { vedtaksresultatService.hentVedtaksresultat(any()) } returns TypeVedtak.INNVILGELSE
+        every { vedtakService.hentVedtaksresultat(any()) } returns TypeVedtak.INNVILGELSE
         // every { vedtaksresultatService.oppdaterBeslutter(any(), any()) } just Runs
         every { behandlingService.oppdaterResultatPåBehandling(any(), any()) } answers {
             behandling(fagsak, id = behandlingId, resultat = secondArg())
