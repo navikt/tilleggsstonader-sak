@@ -5,12 +5,12 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 data class BeregningsresultatPrivatBil(
-    private val reiser: List<BeregningsresultatForReisePrivatBil>
+    val reiser: List<BeregningsresultatForReisePrivatBil>,
 )
 
 data class BeregningsresultatForReisePrivatBil(
     val reiseId: ReiseId,
-    val perioder: List<BeregningsresultatForReisePrivatBilPeriode>
+    val perioder: List<BeregningsresultatForReisePrivatBilPeriode>,
 )
 
 data class BeregningsresultatForReisePrivatBilPeriode(

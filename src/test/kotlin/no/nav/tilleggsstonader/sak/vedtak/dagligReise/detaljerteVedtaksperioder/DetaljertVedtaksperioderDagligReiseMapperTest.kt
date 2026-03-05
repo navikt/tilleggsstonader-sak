@@ -189,6 +189,7 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                         ),
                     ),
             ),
+        privatBil = null, // TODO
     )
 
     private fun lagBeregningsresultatMedToPerioder(
@@ -211,6 +212,7 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                         ),
                     ),
             ),
+        privatBil = null,
     )
 
     val defaultVedtaksperioder =
@@ -236,6 +238,7 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                             ),
                         ),
                 ),
+            privatBil = null,
         )
     val defaultInnvilgelseDagligReise =
         InnvilgelseDagligReise(
