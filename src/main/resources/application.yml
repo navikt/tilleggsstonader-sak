@@ -261,10 +261,8 @@ clients:
     uri: https://ereg-services.${CLIENT_ENV}-fss-pub.nais.io
     scope: api://${CLIENT_ENV}-fss.arbeidsforhold.ereg-services/.default
 
-kjøreliste-søknad-uri:
-  local: http://localhost:8080/tilleggsstonader/soknad/kjoreliste
-  dev: https://tilleggsstonader.ekstern.dev.nav.no/tilleggsstonader/soknad/kjoreliste
-  prod: https://www.nav.no/tilleggsstonader/soknad/kjoreliste
+kjøreliste-søknad:
+  url: https://www.nav.no/tilleggsstonader/soknad/kjoreliste
 
 topics:
   journalhendelser: teamdokumenthandtering.aapen-dok-journalfoering

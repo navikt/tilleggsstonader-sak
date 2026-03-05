@@ -1,8 +1,6 @@
 package no.nav.tilleggsstonader.sak.privatbil.varsel
 
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
-import no.nav.tilleggsstonader.sak.util.EnvUtil.erIDev
-import no.nav.tilleggsstonader.sak.util.EnvUtil.erIProd
 import no.nav.tms.varsel.action.EksternKanal
 import no.nav.tms.varsel.action.Produsent
 import no.nav.tms.varsel.action.Sensitivitet
@@ -16,11 +14,11 @@ import org.springframework.stereotype.Service
 
 @Service
 class VarselDittNavKafkaProducer(
-    @Value("\${kjøreliste-søknad-uri.prod}") private val kjørelisteUriProd: String,
-    @Value("\${kjøreliste-søknad-uri.dev}") private val kjørelisteUriDev: String,
-    @Value("\${kjøreliste-søknad-uri.local}") private val kjørelisteUriLocal: String,
     val kafkaTemplate: KafkaTemplate<String, String>,
 ) {
+    @Value("\${kjøreliste-søknad.url}")
+    private lateinit var kjørelisteUrl: String
+
     @Value("\${topics.dittnav}")
     private lateinit var topic: String
 
@@ -50,7 +48,7 @@ class VarselDittNavKafkaProducer(
                         tekst = melding,
                         default = true,
                     )
-                link = søknadslenkeForMiljø()
+                link = kjørelisteUrl
                 eksternVarsling { preferertKanal = EksternKanal.SMS }
                 produsent =
                     Produsent(
@@ -70,11 +68,4 @@ class VarselDittNavKafkaProducer(
         }
         return kafkaBeskjedJson
     }
-
-    private fun søknadslenkeForMiljø(): String =
-        when {
-            erIProd() -> kjørelisteUriProd
-            erIDev() -> kjørelisteUriDev
-            else -> kjørelisteUriLocal
-        }
 }

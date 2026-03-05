@@ -33,7 +33,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
     fun `skal sende kjørelistevarsel hvis ingen uker er sendt inn`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
-        val fom = dagensDato.minusDays(3)
+        val fom = dagensDato.minusWeeks(3)
         val tom = dagensDato.plusWeeks(3)
 
         opprettBehandlingOgGjennomførBehandlingsløp(
