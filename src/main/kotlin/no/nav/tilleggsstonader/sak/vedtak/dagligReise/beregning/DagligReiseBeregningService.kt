@@ -6,12 +6,15 @@ import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.OffentligTransportBeregningRevurderingService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.OffentligTransportBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningsresultatService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -29,8 +32,10 @@ class DagligReiseBeregningService(
     private val offentligTransportBeregningService: OffentligTransportBeregningService,
     private val offentligTransportBeregningRevurderingService: OffentligTransportBeregningRevurderingService,
     private val privatBilBeregningService: PrivatBilBeregningService,
+    private val privatBilBeregningsresultatService: PrivatBilBeregningsresultatService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val unleashService: UnleashService,
+    private val avklartKjørelisteService: AvklartKjørelisteService,
 ) {
     fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
@@ -56,6 +61,12 @@ class DagligReiseBeregningService(
                 null
             }
 
+        val rammevedtakPrivatBil =
+            beregnRammePrivatBil(
+                oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
+                vedtaksperioder = vedtaksperioder,
+            )
+
         return BeregningDagligReise(
             beregningsresultatDagligReise =
                 BeregningsresultatDagligReise(
@@ -67,12 +78,13 @@ class DagligReiseBeregningService(
                             brukersNavKontor = brukersNavKontor,
                             tidligsteEndring = tidligsteEndring,
                         ),
+                    privatBil =
+                        beregnPrivatBil(
+                            behandling = behandling,
+                            rammevedtak = rammevedtakPrivatBil,
+                        ),
                 ),
-            rammevedtakPrivatBil =
-                beregnRammePrivatBil(
-                    oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
-                    vedtaksperioder = vedtaksperioder,
-                ),
+            rammevedtakPrivatBil = rammevedtakPrivatBil,
         )
     }
 
@@ -105,6 +117,19 @@ class DagligReiseBeregningService(
             behandling = behandling,
             tidligsteEndring = tidligsteEndring,
         )
+
+    private fun beregnPrivatBil(
+        behandling: Saksbehandling,
+        rammevedtak: RammevedtakPrivatBil?,
+    ): BeregningsresultatPrivatBil? =
+        if (rammevedtak == null) {
+            null
+        } else {
+            privatBilBeregningsresultatService.beregn(
+                rammevedtak = rammevedtak,
+                avklarteUkerForBehandling = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandling.id),
+            )
+        }
 
     private fun beregnRammePrivatBil(
         vedtaksperioder: List<Vedtaksperiode>,

@@ -35,7 +35,8 @@
           ]
         }
       ]
-    }
+    },
+    "privatBil" : null
   },
   "rammevedtakPrivatBil": null,
   "type": "OPPHØR_DAGLIG_REISE",
