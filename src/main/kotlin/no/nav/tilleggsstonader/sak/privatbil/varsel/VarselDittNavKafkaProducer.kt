@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service
 
 @Service
 class VarselDittNavKafkaProducer(
+    @Value("\${kjøreliste-søknad-uri.prod}") private val kjørelisteUriProd: String,
+    @Value("\${kjøreliste-søknad-uri.dev}") private val kjørelisteUriDev: String,
+    @Value("\${kjøreliste-søknad-uri.local}") private val kjørelisteUriLocal: String,
     val kafkaTemplate: KafkaTemplate<String, String>,
 ) {
     @Value("\${topics.dittnav}")
@@ -70,8 +73,8 @@ class VarselDittNavKafkaProducer(
 
     private fun søknadslenkeForMiljø(): String =
         when {
-            erIProd() -> "https://www.nav.no/tilleggsstonader/soknad/kjoreliste"
-            erIDev() -> "https://tilleggsstonader.ekstern.dev.nav.no/tilleggsstonader/soknad/kjoreliste"
-            else -> "http://localhost:8080/tilleggsstonader/soknad/kjoreliste"
+            erIProd() -> kjørelisteUriProd
+            erIDev() -> kjørelisteUriDev
+            else -> kjørelisteUriLocal
         }
 }
