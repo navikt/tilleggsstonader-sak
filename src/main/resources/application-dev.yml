@@ -13,7 +13,7 @@ clients:
   kodeverk:
     uri: https://kodeverk-api.nav.no
 
-kjøreliste-søknad:
+kjøreliste-skjema:
   url: https://tilleggsstonader.ekstern.dev.nav.no/tilleggsstonader/soknad/kjoreliste
 
 topics:

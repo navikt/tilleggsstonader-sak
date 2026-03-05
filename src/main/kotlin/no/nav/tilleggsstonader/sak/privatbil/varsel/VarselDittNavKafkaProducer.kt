@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service
 class VarselDittNavKafkaProducer(
     val kafkaTemplate: KafkaTemplate<String, String>,
 ) {
-    @Value("\${kjøreliste-søknad.url}")
-    private lateinit var kjørelisteUrl: String
+    @Value("\${kjøreliste-skjema.url}")
+    private lateinit var kjørelisteSkjemaUrl: String
 
     @Value("\${topics.dittnav}")
     private lateinit var topic: String
@@ -48,7 +48,7 @@ class VarselDittNavKafkaProducer(
                         tekst = melding,
                         default = true,
                     )
-                link = kjørelisteUrl
+                link = kjørelisteSkjemaUrl
                 eksternVarsling { preferertKanal = EksternKanal.SMS }
                 produsent =
                     Produsent(

@@ -52,7 +52,7 @@ clients:
 unleash:
   enabled: false
 
-kjøreliste-søknad:
+kjøreliste-skjema:
   url: http://localhost:8080/tilleggsstonader/soknad/kjoreliste
 
 eksterne-applikasjoner:

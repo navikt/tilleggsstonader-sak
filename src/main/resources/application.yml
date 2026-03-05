@@ -261,7 +261,7 @@ clients:
     uri: https://ereg-services.${CLIENT_ENV}-fss-pub.nais.io
     scope: api://${CLIENT_ENV}-fss.arbeidsforhold.ereg-services/.default
 
-kjøreliste-søknad:
+kjøreliste-skjema:
   url: https://www.nav.no/tilleggsstonader/soknad/kjoreliste
 
 topics:
