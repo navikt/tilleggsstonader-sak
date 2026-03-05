@@ -116,7 +116,8 @@
           "manedskort": true
         },
         "enkeltbillett": 44,
-        "manedskort": 788
+        "manedskort": 788,
+        "skalDuBetaleForReisenSelv": "ja"
       },
       {
         "gateadresse": "Drammensveien 42",
