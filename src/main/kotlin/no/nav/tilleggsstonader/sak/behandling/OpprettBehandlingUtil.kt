@@ -40,13 +40,14 @@ object OpprettBehandlingUtil {
         }
     }
 
-    // TODO: Bør det valideres noe mer?
     private fun validerKanOppretteRevurdering(sisteFerdigstilteBehandling: Behandling?) {
         if (sisteFerdigstilteBehandling == null) {
             throw ApiFeil("Det finnes ikke en tidligere behandling på fagsaken", HttpStatus.BAD_REQUEST)
         }
     }
 
+    // TODO: Bør det valideres noe mer? F.eks. at det finnes en kjøreliste på forrige behandling?
+    // At det er riktig stønadstype som kjøreliste skal opprettes for?
     private fun validerKanOppretteKjørelisteBehandling(sisteFerdigstilteBehandling: Behandling?) {
         if (sisteFerdigstilteBehandling == null) {
             throw ApiFeil("Det finnes ikke en tidligere behandling på fagsaken", HttpStatus.BAD_REQUEST)

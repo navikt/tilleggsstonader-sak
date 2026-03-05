@@ -29,13 +29,6 @@ class BehandleMottattKjørelisteService(
 
     @Transactional
     fun behandleMottattKjøreliste(kjøreliste: Kjøreliste) {
-        // TODO: Toggle for å skru av?
-
-        // Lag behandling av type "KJØRELISTE"
-        // Kopier data fra forrige behandling -> oppdater ramme med nye satser?
-        // Avklar uker så langt det går
-        // Opprett behandle sak oppgave (automatisk senere)
-
         val behandling = opprettKjørelisteBehandling(kjøreliste)
 
         gjenbrukData(behandling)
@@ -51,8 +44,8 @@ class BehandleMottattKjørelisteService(
                     behandlingId = behandling.id,
                     beskrivelse = "Skal behandles i TS-Sak",
                     prioritet = OppgavePrioritet.NORM,
-                )
-            )
+                ),
+            ),
         )
     }
 
@@ -60,15 +53,14 @@ class BehandleMottattKjørelisteService(
         logger.info("Oppretter kjørelistebehandling for fagsak=${kjøreliste.fagsakId}")
 
         return opprettBehandlingService.opprettBehandling(
-
             OpprettBehandling(
                 fagsakId = kjøreliste.fagsakId,
                 status = BehandlingStatus.OPPRETTET,
-                stegType = StegType.KJØRELISTE, //TODO: Vurder denne
+                stegType = StegType.KJØRELISTE,
                 behandlingsårsak = BehandlingÅrsak.KJØRELISTE,
                 kravMottatt = kjøreliste.datoMottatt.toLocalDate(),
-                oppgaveMetadata = OpprettBehandlingOppgaveMetadata.UtenOppgave
-            )
+                oppgaveMetadata = OpprettBehandlingOppgaveMetadata.UtenOppgave,
+            ),
         )
     }
 
