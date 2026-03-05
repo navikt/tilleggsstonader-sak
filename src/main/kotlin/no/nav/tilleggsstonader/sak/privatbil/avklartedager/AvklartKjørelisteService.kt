@@ -88,11 +88,11 @@ class AvklartKjørelisteService(
 
     private fun utledGodkjentGjennomførtKjøringAutomatisk(
         harKjørt: Boolean,
-        harAvvik: Boolean,
+        ukeEllerDagHarAvvik: Boolean,
     ): GodkjentGjennomførtKjøring =
         if (!harKjørt) {
             GodkjentGjennomførtKjøring.NEI
-        } else if (!harAvvik) {
+        } else if (!ukeEllerDagHarAvvik) {
             GodkjentGjennomførtKjøring.JA
         } else {
             GodkjentGjennomførtKjøring.IKKE_VURDERT
@@ -163,7 +163,7 @@ class AvklartKjørelisteService(
         val godkjentGjennomførtKjøring =
             utledGodkjentGjennomførtKjøringAutomatisk(
                 harKjørt = kjørelisteDag.harKjørt,
-                harAvvik = (avvik.isNotEmpty() && avvikUke == null),
+                ukeEllerDagHarAvvik = (avvik.isNotEmpty() || avvikUke != null),
             )
 
         return AvklartKjørtDag(
