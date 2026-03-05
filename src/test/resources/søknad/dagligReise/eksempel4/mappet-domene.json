@@ -69,7 +69,8 @@
       "syvdagersbillettPris" : null,
       "månedskortPris" : 788
     },
-    "privatTransport" : null
+    "privatTransport" : null,
+    "skalDuBetaleForReisenSelv" : "JA"
   }, {
     "skalReiseFraFolkeregistrertAdresse" : "NEI",
     "adresseDetSkalReisesFra" : {
@@ -97,7 +98,8 @@
       "syvdagersbillettPris" : 233,
       "månedskortPris" : null
     },
-    "privatTransport" : null
+    "privatTransport" : null,
+    "skalDuBetaleForReisenSelv" : "JA"
   } ],
   "dokumentasjon" : [ ]
 }

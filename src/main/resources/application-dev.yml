@@ -13,5 +13,8 @@ clients:
   kodeverk:
     uri: https://kodeverk-api.nav.no
 
+kjøreliste-skjema:
+  url: https://tilleggsstonader.ekstern.dev.nav.no/tilleggsstonader/soknad/kjoreliste
+
 topics:
   dvh-behandling: tilleggsstonader.aapen-tilleggsstonader-dvh-behandling-test

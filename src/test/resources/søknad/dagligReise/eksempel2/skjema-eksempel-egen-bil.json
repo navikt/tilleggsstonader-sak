@@ -71,7 +71,8 @@
         "parkering": "ja",
         "bompenger": 43,
         "ferge": 0,
-        "piggdekkavgift": 22
+        "piggdekkavgift": 22,
+        "skalDuBetaleForReisenSelv": "ja"
       }
     ]
   },

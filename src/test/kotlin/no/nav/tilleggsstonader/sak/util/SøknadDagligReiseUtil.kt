@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Hove
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaSlagsTypeBillettMaDuKjopeType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Identitet
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.JaNeiType
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.KanKjøreMedEgenBilType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Landvelger
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.MetadataDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.NavAdresse
@@ -123,7 +124,8 @@ object SøknadDagligReiseUtil {
             enkeltbillett = null,
             syvdagersbillett = null,
             manedskort = 800,
-            kanKjoreMedEgenBil = JaNeiType.nei,
+            kanKjoreMedEgenBil = KanKjøreMedEgenBilType.nei,
+            skalDuBetaleForReisenSelv = JaNeiType.nei,
             hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport = null,
             mottarDuGrunnstonadFraNav = null,
             hvorforIkkeBil = null,

@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaE
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaSlagsTypeBillettMaDuKjopeType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvorforIkkeBilType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.JaNeiType
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.KanKjøreMedEgenBilType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.MetadataDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
@@ -260,6 +261,7 @@ class SøknadskjemaDagligReiseMapper(
                 kanReiseMedOffentligTransport = kanReiseMedOffentligTransport,
                 offentligTransport = mapOffentligTransport(reise),
                 privatTransport = mapPrivatTransport(reise),
+                skalDuBetaleForReisenSelv = reise.skalDuBetaleForReisenSelv?.let(::mapJaNei),
             )
         }
     }
@@ -312,23 +314,18 @@ class SøknadskjemaDagligReiseMapper(
         )
     }
 
-    private fun mapUtgifterBil(reise: ReiseKontrakt): UtgifterBil? {
-        if (reise.kanKjoreMedEgenBil == JaNeiType.nei) {
-            return null
-        }
-
-        return UtgifterBil(
-            parkering = mapJaNei(reise.parkering ?: error("'Parkering' er påkrevd når bruker skal kjøre egen bil")),
+    private fun mapUtgifterBil(reise: ReiseKontrakt): UtgifterBil? =
+        UtgifterBil(
+            parkering = reise.parkering?.let(::mapJaNei),
             mottarGrunnstønad = reise.mottarDuGrunnstonadFraNav?.let(::mapJaNei),
             bompenger = reise.bompenger,
             ferge = reise.ferge,
             piggdekkavgift = reise.piggdekkavgift,
-        )
-    }
+        ).takeUnless { it.alleFelterErTomme() }
 
     private fun mapTaxi(reise: ReiseKontrakt): Taxi? {
         val skalTaTaxi =
-            reise.kanDuReiseMedOffentligTransport == JaNeiType.nei && reise.kanKjoreMedEgenBil == JaNeiType.nei
+            reise.kanDuReiseMedOffentligTransport == JaNeiType.nei && reise.kanKjoreMedEgenBil == KanKjøreMedEgenBilType.nei
         return if (skalTaTaxi) {
             Taxi(
                 årsakIkkeKjøreBil =
@@ -359,6 +356,13 @@ class SøknadskjemaDagligReiseMapper(
         when (verdi) {
             JaNeiType.ja -> JaNei.JA
             JaNeiType.nei -> JaNei.NEI
+        }
+
+    private fun mapJaNei(verdi: KanKjøreMedEgenBilType): KanKjøreSelv =
+        when (verdi) {
+            KanKjøreMedEgenBilType.ja -> KanKjøreSelv.JA
+            KanKjøreMedEgenBilType.nei -> KanKjøreSelv.NEI
+            KanKjøreMedEgenBilType.sitterPaMedAndre -> KanKjøreSelv.SITTER_PÅ_MED_ANDRE
         }
 
     private fun mapHovedytelse(hovedytelse: Map<HovedytelseType, Boolean>): List<Hovedytelse> =

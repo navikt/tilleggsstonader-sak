@@ -60,7 +60,8 @@
         "ønskerSøkeOmTaxi" : "JA",
         "ttkort" : "JA"
       }
-    }
+    },
+    "skalDuBetaleForReisenSelv" : "NEI"
   } ],
   "dokumentasjon" : [ ]
 }

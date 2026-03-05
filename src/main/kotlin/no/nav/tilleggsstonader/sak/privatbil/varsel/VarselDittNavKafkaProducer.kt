@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.privatbil.varsel
 
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
+import no.nav.tms.varsel.action.EksternKanal
 import no.nav.tms.varsel.action.Produsent
 import no.nav.tms.varsel.action.Sensitivitet
 import no.nav.tms.varsel.action.Tekst
@@ -15,6 +16,9 @@ import org.springframework.stereotype.Service
 class VarselDittNavKafkaProducer(
     val kafkaTemplate: KafkaTemplate<String, String>,
 ) {
+    @Value("\${kjøreliste-skjema.url}")
+    private lateinit var kjørelisteSkjemaUrl: String
+
     @Value("\${topics.dittnav}")
     private lateinit var topic: String
 
@@ -44,6 +48,8 @@ class VarselDittNavKafkaProducer(
                         tekst = melding,
                         default = true,
                     )
+                link = kjørelisteSkjemaUrl
+                eksternVarsling { preferertKanal = EksternKanal.SMS }
                 produsent =
                     Produsent(
                         cluster = cluster,

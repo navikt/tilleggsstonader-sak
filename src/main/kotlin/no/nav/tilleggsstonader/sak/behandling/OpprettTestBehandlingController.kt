@@ -467,6 +467,7 @@ class OpprettTestBehandlingController(
                 manedskort = 740,
                 hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport = null,
                 kanKjoreMedEgenBil = null,
+                skalDuBetaleForReisenSelv = JaNeiTypeDagligReise.nei,
                 mottarDuGrunnstonadFraNav = null,
                 hvorforIkkeBil = null,
                 reiseMedTaxi = null,
