@@ -3,19 +3,18 @@ package no.nav.tilleggsstonader.sak.ekstern.stønad
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.libs.sikkerhet.EksternBrukerUtils
 import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
-import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakUkeDto
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
+import no.nav.tilleggsstonader.sak.util.erFørNåværendeUke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.time.LocalDate
 
 @RestController
 @RequestMapping(
@@ -63,7 +62,7 @@ private fun RammevedtakPrivatBil.tilDto(kjøreliste: Map<ReiseId, Kjøreliste>):
                             tom = datoer.max(),
                             ukeNummer = uke.ukenummer,
                             innsendtDato = kjøreliste?.datoMottatt?.toLocalDate(),
-                            kanSendeInnKjøreliste = uke < LocalDate.now().tilUkeIÅr(),
+                            kanSendeInnKjøreliste = uke.erFørNåværendeUke(),
                         )
                     },
         )
