@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
@@ -32,6 +33,8 @@ import org.springframework.web.bind.annotation.RestController
 @ProtectedWithClaims(issuer = "azuread")
 class TilsynBarnVedtakController(
     private val beregningService: TilsynBarnBeregningService,
+    private val tilsynBarnBeregnYtelseSteg: TilsynBarnBeregnYtelseSteg,
+    private val stegService: StegService,
     private val tilgangService: TilgangService,
     private val vedtakService: VedtakService,
     private val behandlingService: BehandlingService,
@@ -71,6 +74,7 @@ class TilsynBarnVedtakController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
         vedtakService.håndterSteg(behandlingId, vedtak)
+        stegService.håndterSteg(behandlingId = behandlingId, behandlingSteg = tilsynBarnBeregnYtelseSteg, data = vedtak)
     }
 
     @PostMapping("{behandlingId}/beregn")
