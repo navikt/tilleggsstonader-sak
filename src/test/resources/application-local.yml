@@ -52,5 +52,8 @@ clients:
 unleash:
   enabled: false
 
+kjøreliste-skjema:
+  url: http://localhost:8080/tilleggsstonader/soknad/kjoreliste
+
 eksterne-applikasjoner:
   soknad-api: "gcp:tilleggsstonader:tilleggsstonader-soknad-api-lokal"
