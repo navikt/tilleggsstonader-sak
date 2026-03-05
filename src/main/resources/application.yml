@@ -91,7 +91,6 @@ rolle:
   egenAnsatt: "e750ceb5-b70b-4d94-b4fa-9d22467b786b" # 0000-GA-Egne_ansatte
   utvikler: "9f2c914f-9619-41a2-bea6-d62910514c8a" # Team Tilleggsstønader - Utviklere # tilgang til forvaltning-endepunkt og prosessering
 
-
 CLIENT_ENV: prod
 
 no.nav.security.jwt:
@@ -261,6 +260,9 @@ clients:
   ereg:
     uri: https://ereg-services.${CLIENT_ENV}-fss-pub.nais.io
     scope: api://${CLIENT_ENV}-fss.arbeidsforhold.ereg-services/.default
+
+kjøreliste-skjema:
+  url: https://www.nav.no/tilleggsstonader/soknad/kjoreliste
 
 topics:
   journalhendelser: teamdokumenthandtering.aapen-dok-journalfoering
