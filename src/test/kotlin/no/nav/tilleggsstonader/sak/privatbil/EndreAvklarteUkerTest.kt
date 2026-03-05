@@ -44,7 +44,7 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
                     ),
             )
 
-        val reisevurdering = kall.privatBil.hentKjørelisteForBehandling(kjørelistebehandling.id)
+        val reisevurdering = kall.privatBil.hentReisevurderingForBehandling(kjørelistebehandling.id)
 
         val avklartUkeId =
             reisevurdering
@@ -122,7 +122,7 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
                     ),
             )
 
-        val reisevurdering = kall.privatBil.hentKjørelisteForBehandling(kjørelistebehandling.id)
+        val reisevurdering = kall.privatBil.hentReisevurderingForBehandling(kjørelistebehandling.id)
 
         val avklartUkeId =
             reisevurdering
@@ -174,7 +174,7 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
                     ),
             )
 
-        val reisevurdering = kall.privatBil.hentKjørelisteForBehandling(kjørelistebehandling.id)
+        val reisevurdering = kall.privatBil.hentReisevurderingForBehandling(kjørelistebehandling.id)
 
         val avklartUkeId =
             reisevurdering
@@ -221,9 +221,7 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
 
         val rammebehandling = behandlingService.hentSaksbehandling(rammebehandlingId)
         val kjørelistebehandling =
-            behandlingService.hentBehandlinger(rammebehandling.fagsakId).first { it.type == BehandlingType.REVURDERING }
-
-        gjennomførBehandlingsløp(behandlingId = kjørelistebehandling.id, tilSteg = StegType.KJØRELISTE) {}
+            behandlingService.hentBehandlinger(rammebehandling.fagsakId).first { it.type == BehandlingType.KJØRELISTE }
 
         return behandlingService.hentSaksbehandling(kjørelistebehandling.id)
     }

@@ -25,7 +25,7 @@ internal class OpprettBehandlingUtilTest {
         @Test
         fun `hvis man kun har henlagte så skal neste type være førstegangsbehandling`() {
             assertThat(utledBehandlingTypeV2(listOf(henlagtBehandling()), BehandlingÅrsak.SØKNAD)).isEqualTo(
-                BehandlingType.FØRSTEGANGSBEHANDLING
+                BehandlingType.FØRSTEGANGSBEHANDLING,
             )
 
             val henlangteBehandlinger =
@@ -36,8 +36,8 @@ internal class OpprettBehandlingUtilTest {
             assertThat(
                 utledBehandlingTypeV2(
                     henlangteBehandlinger,
-                    BehandlingÅrsak.SØKNAD
-                )
+                    BehandlingÅrsak.SØKNAD,
+                ),
             ).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
         }
 
@@ -45,24 +45,26 @@ internal class OpprettBehandlingUtilTest {
         fun `hvis man har en ferdigstilt behandling som ikke er henlagt så blir neste behandling revurdering`() {
             assertThat(
                 utledBehandlingTypeV2(
-                    tidligereBehandlinger = listOf(
-                        behandling(
-                            resultat = BehandlingResultat.AVSLÅTT,
-                            status = BehandlingStatus.FERDIGSTILT,
+                    tidligereBehandlinger =
+                        listOf(
+                            behandling(
+                                resultat = BehandlingResultat.AVSLÅTT,
+                                status = BehandlingStatus.FERDIGSTILT,
+                            ),
                         ),
-                    ),
-                    behandlingÅrsak = BehandlingÅrsak.SØKNAD
+                    behandlingÅrsak = BehandlingÅrsak.SØKNAD,
                 ),
             ).isEqualTo(BehandlingType.REVURDERING)
             assertThat(
                 utledBehandlingTypeV2(
-                    tidligereBehandlinger = listOf(
-                        behandling(
-                            resultat = BehandlingResultat.INNVILGET,
-                            status = BehandlingStatus.FERDIGSTILT,
+                    tidligereBehandlinger =
+                        listOf(
+                            behandling(
+                                resultat = BehandlingResultat.INNVILGET,
+                                status = BehandlingStatus.FERDIGSTILT,
+                            ),
                         ),
-                    ),
-                    behandlingÅrsak = BehandlingÅrsak.SØKNAD
+                    behandlingÅrsak = BehandlingÅrsak.SØKNAD,
                 ),
             ).isEqualTo(BehandlingType.REVURDERING)
             assertThat(
@@ -73,7 +75,7 @@ internal class OpprettBehandlingUtilTest {
                             status = BehandlingStatus.FERDIGSTILT,
                         ),
                     ),
-                    behandlingÅrsak = BehandlingÅrsak.SØKNAD
+                    behandlingÅrsak = BehandlingÅrsak.SØKNAD,
                 ),
             ).isEqualTo(BehandlingType.REVURDERING)
         }
@@ -90,7 +92,7 @@ internal class OpprettBehandlingUtilTest {
                         ),
                         henlagtBehandling(),
                     ),
-                    behandlingÅrsak = BehandlingÅrsak.SØKNAD
+                    behandlingÅrsak = BehandlingÅrsak.SØKNAD,
                 ),
             ).isEqualTo(BehandlingType.REVURDERING)
         }

@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 object BehandlingUtil {
     fun utledBehandlingTypeV2(
         tidligereBehandlinger: List<Behandling>,
-        behandlingÅrsak: BehandlingÅrsak
+        behandlingÅrsak: BehandlingÅrsak,
     ): BehandlingType {
         val skalVæreRevurdering =
             tidligereBehandlinger.any {
@@ -22,7 +22,9 @@ object BehandlingUtil {
         return if (skalVæreRevurdering) {
             if (behandlingÅrsak == BehandlingÅrsak.KJØRELISTE) {
                 BehandlingType.KJØRELISTE
-            } else BehandlingType.REVURDERING
+            } else {
+                BehandlingType.REVURDERING
+            }
         } else {
             BehandlingType.FØRSTEGANGSBEHANDLING
         }
