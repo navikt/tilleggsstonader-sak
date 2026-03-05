@@ -118,7 +118,7 @@ class DagligReiseVedtakController(
     ): BeregningsresultatDagligReiseDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        val tidligsteEndring =
+        val (tidligsteEndring, beregnFra) =
             utledTidligsteEndringService.utledTidligsteEndringForBeregning(
                 behandling.id,
                 vedtaksperioder,
@@ -129,7 +129,7 @@ class DagligReiseVedtakController(
                     vedtaksperioder = vedtaksperioder,
                     behandling = behandling,
                     typeVedtak = TypeVedtak.INNVILGELSE,
-                    tidligsteEndring = tidligsteEndring,
+                    beregnFra = beregnFra,
                 ).beregningsresultatDagligReise
 
         val vilkår = dagligReiseVilkårService.hentVilkårForBehandling(behandlingId)

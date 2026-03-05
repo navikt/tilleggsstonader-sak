@@ -36,7 +36,7 @@ class DagligReiseBeregningService(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
-        tidligsteEndring: LocalDate?,
+        beregnFra: LocalDate?,
     ): BeregningDagligReise {
         dagligReiseVedtaksperioderValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,
@@ -65,7 +65,7 @@ class DagligReiseBeregningService(
                             vedtaksperioder = vedtaksperioder,
                             behandling = behandling,
                             brukersNavKontor = brukersNavKontor,
-                            tidligsteEndring = tidligsteEndring,
+                            tidligsteEndring = beregnFra,
                         ),
                 ),
             rammevedtakPrivatBil =

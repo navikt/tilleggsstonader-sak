@@ -126,7 +126,7 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                     behandling = saksbehandling(),
                     vedtaksperioder = vedtaksperioderFørstegangsbehandling,
                     typeVedtak = TypeVedtak.INNVILGELSE,
-                    tidligsteEndring = null,
+                    beregnFra = null,
                 ).perioder
 
         assertThat(beregningsresultat).isEqualTo(beregningsresultatFørstegangsbehandlingLøpendeUtgifterEnBolig)
@@ -223,7 +223,7 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                     behandling = saksbehandling,
                     vedtaksperioder = vedtaksperioderRevurdering,
                     typeVedtak = TypeVedtak.INNVILGELSE,
-                    tidligsteEndring = tidligsteEndring,
+                    beregnFra = tidligsteEndring,
                 ).perioder
 
         assertThat(res.size).isEqualTo(4)

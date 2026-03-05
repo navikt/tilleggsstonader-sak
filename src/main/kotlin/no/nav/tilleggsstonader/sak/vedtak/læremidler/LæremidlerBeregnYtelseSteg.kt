@@ -84,15 +84,17 @@ class LæremidlerBeregnYtelseSteg(
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
     ) {
+        val (tidligsteEndring, beregnFra) =
+            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
+                saksbehandling.id,
+                vedtaksperioder,
+            )
         lagreVedtak(
             saksbehandling = saksbehandling,
             vedtaksperioder = vedtaksperioder,
             begrunnelse = begrunnelse,
-            tidligsteEndring =
-                utledTidligsteEndringService.utledTidligsteEndringForBeregning(
-                    saksbehandling.id,
-                    vedtaksperioder,
-                ),
+            tidligsteEndring = tidligsteEndring,
+            beregnFra = beregnFra,
         )
     }
 
@@ -106,12 +108,13 @@ class LæremidlerBeregnYtelseSteg(
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
         tidligsteEndring: LocalDate?,
+        beregnFra: LocalDate? = tidligsteEndring,
     ) {
         val beregningsresultat =
             beregningService.beregn(
                 behandling = saksbehandling,
                 vedtaksperioder = vedtaksperioder,
-                tidligsteEndring = tidligsteEndring,
+                beregnFra = beregnFra,
             )
 
         vedtakRepository.insert(
