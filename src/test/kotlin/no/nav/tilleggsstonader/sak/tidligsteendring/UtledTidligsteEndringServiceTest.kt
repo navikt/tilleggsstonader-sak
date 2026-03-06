@@ -5,12 +5,10 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
-import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
@@ -37,14 +35,14 @@ class UtledTidligsteEndringServiceTest {
     private val behandlingService = mockk<BehandlingService>()
     private val vilkårService = mockk<VilkårService>()
     private val vilkårperiodeService = mockk<VilkårperiodeService>()
-    private val vedtakRepository = mockk<VedtakRepository>()
+    private val vedtakService = mockk<VedtakService>()
     private val barnService = mockk<BarnService>()
     private val utledTidligsteEndringService =
         UtledTidligsteEndringService(
             behandlingService,
             vilkårService,
             vilkårperiodeService,
-            vedtakRepository,
+            vedtakService,
             barnService,
         )
 
@@ -71,8 +69,8 @@ class UtledTidligsteEndringServiceTest {
 
         every { vilkårService.hentVilkår(sisteIverksatteBehandling.id) } answers { vilkårSisteIverksatteBehandling }
         every { vilkårperiodeService.hentVilkårperioder(sisteIverksatteBehandling.id) } answers { vilkårperioderSisteIverksattBehandling }
-        every { vedtakRepository.findByIdOrThrow(sisteIverksatteBehandling.id) } answers
-            { mockVedtakMedVedtaksperioder(vedtaksperioderSisteIverksatteBehandling) }
+        every { vedtakService.hentVedtaksperioder(sisteIverksatteBehandling.id) } answers
+            { vedtaksperioderSisteIverksatteBehandling }
 
         every { barnService.finnBarnPåBehandling(any()) } returns emptyList()
 
@@ -95,11 +93,6 @@ class UtledTidligsteEndringServiceTest {
                 vedtaksperiode(originalFom, originalTom),
             )
     }
-
-    private fun mockVedtakMedVedtaksperioder(vedtaksperioder: List<Vedtaksperiode>): Vedtak =
-        mockk<Vedtak> {
-            every { vedtaksperioderHvisFinnes() } returns vedtaksperioder
-        }
 
     @Test
     fun `utled tidligste endring, lagt på nye perioder, data hentes ut fra servicer og tidligste endring blir fom-dato på ny periode`() {

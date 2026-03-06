@@ -1,20 +1,17 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
 class OffentligTransportBeregningRevurderingService(
-    private val vedtakRepository: VedtakRepository,
+    private val vedtakService: VedtakService,
 ) {
     /**
      * Beholder de reisene og perioder fra forrige iverksatte behandling som er berørt av revurderingen, slik at vi ikke risikerer at gamle
@@ -80,11 +77,9 @@ class OffentligTransportBeregningRevurderingService(
         )
     }
 
-    private fun hentVedtak(behandlingId: BehandlingId) =
-        vedtakRepository
-            .findByIdOrThrow(behandlingId)
-            .withTypeOrThrow<InnvilgelseEllerOpphørDagligReise>()
-
     private fun hentForrigeVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørDagligReise? =
-        behandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it) }?.data
+        behandling.forrigeIverksatteBehandlingId
+            ?.let {
+                vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(it)
+            }?.data
 }

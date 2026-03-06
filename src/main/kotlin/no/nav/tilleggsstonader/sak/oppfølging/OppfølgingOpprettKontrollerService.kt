@@ -24,13 +24,7 @@ import no.nav.tilleggsstonader.sak.oppfølging.kontroller.OppfølgingAktivitetKo
 import no.nav.tilleggsstonader.sak.oppfølging.kontroller.OppfølgingMålgruppeKontrollerUtil
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetService
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -59,7 +53,7 @@ import java.time.LocalDateTime
 class OppfølgingOpprettKontrollerService(
     private val behandlingRepository: BehandlingRepository,
     private val vilkårperiodeRepository: VilkårperiodeRepository,
-    private val vedtakRepository: VedtakRepository,
+    private val vedtakService: VedtakService,
     private val registerAktivitetService: RegisterAktivitetService,
     private val ytelseService: YtelseService,
     private val fagsakService: FagsakService,
@@ -114,7 +108,7 @@ class OppfølgingOpprettKontrollerService(
         behandling: Behandling,
         fagsak: FagsakMetadata,
     ): List<PeriodeForKontroll> {
-        val vedtaksperioder = hentVedtaksperioder(fagsak, behandling).mergeSammenhengende()
+        val vedtaksperioder = vedtakService.hentVedtaksperioder(behandling.id).mergeSammenhengende()
         if (vedtaksperioder.isEmpty()) {
             return emptyList()
         }
@@ -146,30 +140,6 @@ class OppfølgingOpprettKontrollerService(
         val registerYtelser = hentRegisterYtelser(fagsak, målgrupper)
         return OppfølgingMålgruppeKontrollerUtil.finnEndringer(målgrupper, vedtaksperioder, registerYtelser)
     }
-
-    private fun hentVedtaksperioder(
-        fagsak: FagsakMetadata,
-        behandling: Behandling,
-    ): List<Vedtaksperiode> =
-        when (fagsak.stønadstype) {
-            Stønadstype.BARNETILSYN ->
-                hentVedtak<InnvilgelseEllerOpphørTilsynBarn>(behandling).vedtaksperioder
-
-            Stønadstype.LÆREMIDLER ->
-                hentVedtak<InnvilgelseEllerOpphørLæremidler>(behandling).vedtaksperioder
-
-            Stønadstype.BOUTGIFTER ->
-                hentVedtak<InnvilgelseEllerOpphørBoutgifter>(behandling).vedtaksperioder
-
-            Stønadstype.DAGLIG_REISE_TSO ->
-                hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandling).vedtaksperioder
-
-            Stønadstype.DAGLIG_REISE_TSR ->
-                hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandling).vedtaksperioder
-        }
-
-    private inline fun <reified T : Vedtaksdata> hentVedtak(behandling: Behandling) =
-        vedtakRepository.findByIdOrThrow(behandling.id).withTypeOrThrow<T>().data
 
     private fun hentInngangsvilkår(behandling: Behandling): List<Vilkårperiode> =
         vilkårperiodeRepository.findByBehandlingIdAndResultat(behandling.id, ResultatVilkårperiode.OPPFYLT)

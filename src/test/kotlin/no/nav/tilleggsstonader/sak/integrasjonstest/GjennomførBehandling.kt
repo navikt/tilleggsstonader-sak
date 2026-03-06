@@ -317,6 +317,16 @@ fun IntegrationTest.gjennomførBeregningSteg(
     behandlingId: BehandlingId,
     stønadstype: Stønadstype,
     opprettVedtak: OpprettVedtak = OpprettInnvilgelse(),
+) {
+    gjennomførBeregningStegKall(behandlingId, stønadstype, opprettVedtak)
+        .expectStatus()
+        .isOk
+}
+
+fun IntegrationTest.gjennomførBeregningStegKall(
+    behandlingId: BehandlingId,
+    stønadstype: Stønadstype,
+    opprettVedtak: OpprettVedtak = OpprettInnvilgelse(),
 ): RestTestClient.ResponseSpec =
     when (opprettVedtak) {
         is OpprettInnvilgelse -> {

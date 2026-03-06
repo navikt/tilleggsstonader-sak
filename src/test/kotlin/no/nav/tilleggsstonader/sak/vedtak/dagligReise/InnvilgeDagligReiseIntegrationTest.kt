@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.OpprettInnvilgelse
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningSteg
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningStegKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
@@ -81,7 +82,7 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 }
             }
 
-        gjennomførBeregningSteg(behandlingId, Stønadstype.DAGLIG_REISE_TSO)
+        gjennomførBeregningStegKall(behandlingId, Stønadstype.DAGLIG_REISE_TSO)
             .expectStatus()
             .isBadRequest
             .expectBody()
@@ -144,7 +145,7 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 }
             }
 
-        gjennomførBeregningSteg(
+        gjennomførBeregningStegKall(
             behandlingId,
             Stønadstype.DAGLIG_REISE_TSO,
             OpprettInnvilgelse(
