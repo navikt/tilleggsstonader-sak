@@ -12,7 +12,7 @@ val tokenSupportVersion = "6.0.3"
 val wiremockVersion = "3.13.2"
 val mockkVersion = "1.14.9"
 val testcontainerVersion = "1.21.4"
-val springDocVersion = "3.0.1"
+val springDocVersion = "3.0.2"
 
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
@@ -71,7 +71,7 @@ dependencies {
     implementation("org.apache.avro:avro:$avroVersion")
     implementation("io.confluent:kafka-avro-serializer:$confluentVersion")
     implementation("no.nav.teamdokumenthandtering:teamdokumenthandtering-avro-schemas:$joarkHendelseVersion")
-    implementation("no.nav.tms.varsel:kotlin-builder:2.1.1")
+    implementation("no.nav.tms.varsel:kotlin-builder:2.2.0")
 
     // Logging
     implementation("net.logstash.logback:logstash-logback-encoder:9.0")
