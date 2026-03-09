@@ -17,7 +17,7 @@ class DetaljertVedtaksperiodeDagligReiseTsoTest {
         DetaljertVedtaksperiodeDagligReise(
             stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
-            detaljertVedtaksperiode =
+            detaljertBeregningsperioder =
                 listOf(
                     DetaljertBeregningsperioder(
                         fom = førsteJan,
@@ -37,7 +37,7 @@ class DetaljertVedtaksperiodeDagligReiseTsoTest {
         DetaljertVedtaksperiodeDagligReise(
             stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
-            detaljertVedtaksperiode =
+            detaljertBeregningsperioder =
                 listOf(
                     DetaljertBeregningsperioder(
                         fom = førsteFeb,

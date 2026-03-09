@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.utils.dato.april
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -24,79 +23,74 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.util.UUID
 import java.util.UUID.randomUUID
 
 class DetaljertVedtaksperioderDagligReiseMapperTest {
-    private val defaultAktivitet = AktivitetType.TILTAK
-    private val defaultMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
-    private val defaultTypeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT
-
     private val førsteJanuar = 1 januar 2024
     private val sisteJanuar = 31 januar 2024
     private val førsteFeb = 1 februar 2024
     private val sisteFeb = 29 februar 2024
-    private val førsteApril = 1 april 2024
-    private val sisteApril = 30 april 2024
 
     @Test
-    fun `skal slå sammen like perioder når det er flere enn 1 reise`() {
-        val vedtak =
+    fun `skal mappe TSO vedtak til detaljerte vedtaksperioder`() {
+        val tsoVedtak =
             innvilgelse(
-                toReiser(
-                    førsteJanuar,
-                    sisteJanuar,
+                InnvilgelseDagligReise(
+                    vedtaksperioder = defaultVedtaksperioder,
+                    beregningsresultat = defaultBeregningsresultat,
+                    rammevedtakPrivatBil = null,
+                ),
+            )
+        val tsrVedtak =
+            innvilgelse(
+                InnvilgelseDagligReise(
+                    vedtaksperioder = defaultVedtaksperioder,
+                    beregningsresultat = defaultBeregningsresultat,
+                    rammevedtakPrivatBil = null,
                 ),
             )
 
         val resultat =
             finnDetaljerteVedtaksperioderDagligReise(
-                vedtaksdataTso = vedtak.data,
-                vedtaksdataTsr = null,
+                vedtaksdataTso = tsoVedtak.data,
+                vedtaksdataTsr = tsrVedtak.data,
             )
-        val forventetResultat =
-            listOf(
-                detaljertVedtaksperiodeDagligReiseTso(førsteJanuar, sisteJanuar),
+        val forventetTso =
+            DetaljertVedtaksperiodeDagligReise(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+                typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
+                detaljertBeregningsperioder =
+                    listOf(
+                        DetaljertBeregningsperioder(
+                            fom = førsteJanuar,
+                            tom = sisteJanuar,
+                            prisEnkeltbillett = 50,
+                            prisSyvdagersbillett = 300,
+                            pris30dagersbillett = 1000,
+                            beløp = 1000,
+                            billettdetaljer = mapOf(Billettype.TRETTIDAGERSBILLETT to 1000),
+                            antallReisedager = 20,
+                            antallReisedagerPerUke = 5,
+                        ),
+                        DetaljertBeregningsperioder(
+                            fom = førsteFeb,
+                            tom = sisteFeb,
+                            prisEnkeltbillett = 50,
+                            prisSyvdagersbillett = 300,
+                            pris30dagersbillett = 1000,
+                            beløp = 1000,
+                            billettdetaljer = mapOf(Billettype.TRETTIDAGERSBILLETT to 1000),
+                            antallReisedager = 20,
+                            antallReisedagerPerUke = 5,
+                        ),
+                    ),
             )
-        assertThat(resultat).isEqualTo(forventetResultat)
+        val forventetTsr = forventetTso.copy(stønadstype = Stønadstype.DAGLIG_REISE_TSR)
+        assertThat(resultat).containsExactly(forventetTso, forventetTsr)
     }
-
-    private fun toReiser(
-        fom: LocalDate,
-        tom: LocalDate,
-    ) = InnvilgelseDagligReise(
-        vedtaksperioder =
-            listOf(
-                vedtaksperiode(fom = fom, tom = tom),
-            ),
-        beregningsresultat = lagBeregningsresultatMedToReiser(fom, tom),
-        rammevedtakPrivatBil = null,
-    )
-
-    private fun detaljertVedtaksperiodeDagligReiseTso(
-        fom: LocalDate,
-        tom: LocalDate,
-        typeDagligReise: TypeDagligReise = defaultTypeDagligReise,
-    ) = DetaljertVedtaksperiodeDagligReise(
-        stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-        typeDagligReise = typeDagligReise,
-        detaljertVedtaksperiode =
-            listOf(
-                DetaljertBeregningsperioder(
-                    fom = fom,
-                    tom = tom,
-                    prisEnkeltbillett = 30,
-                    prisSyvdagersbillett = 150,
-                    pris30dagersbillett = 500,
-                    beløp = 300,
-                    billettdetaljer = mapOf(Billettype.ENKELTBILLETT to 20),
-                    antallReisedager = 20,
-                    antallReisedagerPerUke = 3,
-                ),
-            ),
-    )
 
     private fun innvilgelse(data: InnvilgelseDagligReise = defaultInnvilgelseDagligReise) =
         GeneriskVedtak(
@@ -107,69 +101,6 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
             tidligsteEndring = null,
             opphørsdato = null,
         )
-
-    private fun toVedtaksperioder(
-        fom1: LocalDate,
-        tom1: LocalDate,
-        fom2: LocalDate,
-        tom2: LocalDate,
-    ) = InnvilgelseDagligReise(
-        vedtaksperioder =
-            listOf(
-                vedtaksperiode(fom = fom1, tom = tom1),
-                vedtaksperiode(fom = fom2, tom = tom2),
-            ),
-        beregningsresultat = lagBeregningsresultatMedToPerioder(fom1, tom1, fom2, tom2),
-        rammevedtakPrivatBil = null,
-    )
-
-    private fun lagBeregningsresultatMedToReiser(
-        fom: LocalDate,
-        tom: LocalDate,
-    ) = BeregningsresultatDagligReise(
-        offentligTransport =
-            BeregningsresultatOffentligTransport(
-                reiser =
-                    listOf(
-                        BeregningsresultatForReise(
-                            reiseId = dummyReiseId,
-                            perioder =
-                                listOf(
-                                    beregningsresultatForPeriode(fom, tom),
-                                ),
-                        ),
-                        BeregningsresultatForReise(
-                            reiseId = dummyReiseId,
-                            perioder =
-                                listOf(
-                                    beregningsresultatForPeriode(fom, tom),
-                                ),
-                        ),
-                    ),
-            ),
-    )
-
-    private fun lagBeregningsresultatMedToPerioder(
-        fom1: LocalDate,
-        tom1: LocalDate,
-        fom2: LocalDate,
-        tom2: LocalDate,
-    ) = BeregningsresultatDagligReise(
-        offentligTransport =
-            BeregningsresultatOffentligTransport(
-                reiser =
-                    listOf(
-                        BeregningsresultatForReise(
-                            reiseId = dummyReiseId,
-                            perioder =
-                                listOf(
-                                    beregningsresultatForPeriode(fom1, tom1),
-                                    beregningsresultatForPeriode(fom2, tom2),
-                                ),
-                        ),
-                    ),
-            ),
-    )
 
     val defaultVedtaksperioder =
         listOf(

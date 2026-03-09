@@ -11,7 +11,7 @@ import java.time.LocalDate
 data class DetaljertVedtaksperiodeDagligReise(
     val stønadstype: Stønadstype,
     val typeDagligReise: TypeDagligReise,
-    val detaljertVedtaksperiode: List<DetaljertBeregningsperioder>?,
+    val detaljertBeregningsperioder: List<DetaljertBeregningsperioder>?,
 ) : DetaljertVedtaksperiode
 
 data class DetaljertBeregningsperioder(

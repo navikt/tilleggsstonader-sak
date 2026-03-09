@@ -83,7 +83,7 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
                 DetaljertVedtaksperiodeDagligReise(
                     stønadstype = Stønadstype.DAGLIG_REISE_TSR,
                     typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
-                    detaljertVedtaksperiode =
+                    detaljertBeregningsperioder =
                         listOf(
                             DetaljertBeregningsperioder(
                                 fom = fomTiltaksenheten,

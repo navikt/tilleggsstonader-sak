@@ -32,26 +32,28 @@ object DetaljertVedtaksperioderDagligReiseMapper {
 
     private fun List<BeregningsresultatForPeriode>.tilDetaljertBeregningsperioder(
         stønadstype: Stønadstype,
-    ): List<DetaljertVedtaksperiodeDagligReise> =
+    ): List<DetaljertVedtaksperiodeDagligReise> {
+        val detaljertBeregningsperioder =
+            this.map { beregningsresultatForPeriode ->
+                DetaljertBeregningsperioder(
+                    fom = beregningsresultatForPeriode.grunnlag.fom,
+                    tom = beregningsresultatForPeriode.grunnlag.tom,
+                    prisEnkeltbillett = beregningsresultatForPeriode.grunnlag.prisEnkeltbillett,
+                    prisSyvdagersbillett = beregningsresultatForPeriode.grunnlag.prisSyvdagersbillett,
+                    pris30dagersbillett = beregningsresultatForPeriode.grunnlag.pris30dagersbillett,
+                    beløp = beregningsresultatForPeriode.beløp,
+                    billettdetaljer = beregningsresultatForPeriode.billettdetaljer,
+                    antallReisedager = beregningsresultatForPeriode.grunnlag.antallReisedager,
+                    antallReisedagerPerUke = beregningsresultatForPeriode.grunnlag.antallReisedagerPerUke,
+                )
+            }
 
-        this.map { beregningsresultatForPeriode ->
+        return listOf(
             DetaljertVedtaksperiodeDagligReise(
                 stønadstype = stønadstype,
                 typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
-                detaljertVedtaksperiode =
-                    listOf(
-                        DetaljertBeregningsperioder(
-                            fom = beregningsresultatForPeriode.grunnlag.fom,
-                            tom = beregningsresultatForPeriode.grunnlag.tom,
-                            prisEnkeltbillett = beregningsresultatForPeriode.grunnlag.prisEnkeltbillett,
-                            prisSyvdagersbillett = beregningsresultatForPeriode.grunnlag.prisSyvdagersbillett,
-                            pris30dagersbillett = beregningsresultatForPeriode.grunnlag.pris30dagersbillett,
-                            beløp = beregningsresultatForPeriode.beløp,
-                            billettdetaljer = beregningsresultatForPeriode.billettdetaljer,
-                            antallReisedager = beregningsresultatForPeriode.grunnlag.antallReisedager,
-                            antallReisedagerPerUke = beregningsresultatForPeriode.grunnlag.antallReisedagerPerUke,
-                        ),
-                    ),
-            )
-        }
+                detaljertBeregningsperioder = detaljertBeregningsperioder,
+            ),
+        )
+    }
 }
