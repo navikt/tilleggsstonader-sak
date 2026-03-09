@@ -12,7 +12,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.detaljerteVedtaksperioder.
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.detaljerteVedtaksperioder.DetaljertVedtaksperioderTilsynBarnMapper.finnDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.DetaljertVedtaksperiodeBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.DetaljertVedtaksperioderBoutgifterMapper.finnDetaljerteVedtaksperioder
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertBeregningsperioderDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperioderDagligReiseMapper.finnDetaljerteVedtaksperioderDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.DetaljertVedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
@@ -22,7 +22,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBa
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperiodeLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperioderLæremidlerMapper.finnDetaljerteVedtaksperioder
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
 import org.springframework.stereotype.Service
 
 @Service
@@ -30,7 +29,6 @@ class VedtaksperioderOversiktService(
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
     private val vedtakService: VedtakService,
-    private val vilkårService: DagligReiseVilkårService,
 ) {
     /**
      * Oversikten baserer seg på vedtaksperiodene fra beregningsresultatet, som inneholder mer
@@ -127,9 +125,7 @@ class VedtaksperioderOversiktService(
         return vedtakForSisteIverksatteBehandling.finnDetaljerteVedtaksperioder()
     }
 
-    private fun oppsummerVedtaksperioderDagligReiseTso(fagsakId: FagsakId): List<DetaljertBeregningsperioderDagligReise> {
-        val test = behandlingService.finnesBehandlingForFagsak(fagsakId) ?: return emptyList()
-
+    private fun oppsummerVedtaksperioderDagligReiseTso(fagsakId: FagsakId): List<DetaljertVedtaksperiodeDagligReise> {
         val vedtakForSisteIverksatteBehandling =
             hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørDagligReise>(fagsakId)
                 ?: return emptyList()
@@ -140,7 +136,7 @@ class VedtaksperioderOversiktService(
         )
     }
 
-    private fun oppsummerVedtaksperioderDagligReiseTsr(fagsakId: FagsakId): List<DetaljertBeregningsperioderDagligReise> {
+    private fun oppsummerVedtaksperioderDagligReiseTsr(fagsakId: FagsakId): List<DetaljertVedtaksperiodeDagligReise> {
         val vedtakForSisteIverksatteBehandling =
             hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørDagligReise>(fagsakId)
                 ?: return emptyList()
@@ -152,11 +148,7 @@ class VedtaksperioderOversiktService(
     }
 
     private inline fun <reified T : Vedtaksdata> hentVedtaksdataForSisteIverksatteBehandling(fagsakId: FagsakId): T? {
-        // hello
-
         val sisteIverksatteBehandling = behandlingService.finnSisteIverksatteBehandling(fagsakId) ?: return null
-//        val vilkårForsisteIverksatteBehandling = vilkårService.hentVilkårForBehandling(sisteIverksatteBehandling.id) ?: return null
-//        val adresse = vilkårForsisteIverksatteBehandling.
         val vedtak = vedtakService.hentVedtak<T>(sisteIverksatteBehandling.id) ?: return null
         return vedtak.data
     }

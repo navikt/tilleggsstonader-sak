@@ -19,7 +19,8 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgif
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertBeregningsperioderDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertBeregningsperioder
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
@@ -79,18 +80,23 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
 
         val forventetDetaljertVedtaksperiodeTsr =
             listOf(
-                DetaljertBeregningsperioderDagligReise(
-                    fom = fomTiltaksenheten,
-                    tom = tomTiltaksenheten,
-                    prisEnkeltbillett = 30,
-                    prisSyvdagersbillett = 150,
-                    pris30dagersbillett = 500,
-                    beløp = 300,
-                    billettdetaljer = mapOf(Billettype.ENKELTBILLETT to 20),
-                    antallReisedager = 20,
+                DetaljertVedtaksperiodeDagligReise(
                     stønadstype = Stønadstype.DAGLIG_REISE_TSR,
-                    antallReisedagerPerUke = 3,
                     typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
+                    detaljertVedtaksperiode =
+                        listOf(
+                            DetaljertBeregningsperioder(
+                                fom = fomTiltaksenheten,
+                                tom = tomTiltaksenheten,
+                                prisEnkeltbillett = 40,
+                                prisSyvdagersbillett = null,
+                                pris30dagersbillett = 800,
+                                beløp = 800,
+                                billettdetaljer = mapOf(Billettype.TRETTIDAGERSBILLETT to 1),
+                                antallReisedager = 22,
+                                antallReisedagerPerUke = 5,
+                            ),
+                        ),
                 ),
             )
 

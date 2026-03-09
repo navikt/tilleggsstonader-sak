@@ -8,7 +8,13 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.DetaljertVedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import java.time.LocalDate
 
-data class DetaljertBeregningsperioderDagligReise(
+data class DetaljertVedtaksperiodeDagligReise(
+    val stønadstype: Stønadstype,
+    val typeDagligReise: TypeDagligReise,
+    val detaljertVedtaksperiode: List<DetaljertBeregningsperioder>?,
+) : DetaljertVedtaksperiode
+
+data class DetaljertBeregningsperioder(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val prisEnkeltbillett: Int?,
@@ -18,14 +24,12 @@ data class DetaljertBeregningsperioderDagligReise(
     val billettdetaljer: Map<Billettype, Int>,
     val antallReisedager: Int,
     val antallReisedagerPerUke: Int,
-    val stønadstype: Stønadstype,
-    val typeDagligReise: TypeDagligReise,
 ) : Periode<LocalDate>,
     DetaljertVedtaksperiode,
-    Mergeable<LocalDate, DetaljertBeregningsperioderDagligReise> {
+    Mergeable<LocalDate, DetaljertBeregningsperioder> {
     init {
         validatePeriode()
     }
 
-    override fun merge(other: DetaljertBeregningsperioderDagligReise): DetaljertBeregningsperioderDagligReise = this.copy(tom = other.tom)
+    override fun merge(other: DetaljertBeregningsperioder): DetaljertBeregningsperioder = this.copy(tom = other.tom)
 }

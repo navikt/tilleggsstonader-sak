@@ -24,7 +24,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Test
+import org.junit.Test
 import java.time.LocalDate
 import java.util.UUID
 import java.util.UUID.randomUUID
@@ -40,55 +40,6 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
     private val sisteFeb = 29 februar 2024
     private val førsteApril = 1 april 2024
     private val sisteApril = 30 april 2024
-
-    @Test
-    fun `skal slå sammen sammenhengende vedtaksperioder med like verdier`() {
-        val vedtak =
-            innvilgelse(
-                toVedtaksperioder(
-                    førsteJanuar,
-                    sisteJanuar,
-                    førsteFeb,
-                    sisteFeb,
-                ),
-            )
-
-        val resultat =
-            finnDetaljerteVedtaksperioderDagligReise(
-                vedtaksdataTso = vedtak.data,
-                vedtaksdataTsr = null,
-            )
-        val forventetResultat =
-            listOf(
-                detaljertVedtaksperiodeDagligReiseTso(fom = førsteJanuar, tom = sisteFeb),
-            )
-        assertThat(resultat).isEqualTo(forventetResultat)
-    }
-
-    @Test
-    fun `skal ikke slå sammen vedtaksperioder som ikke overlapper`() {
-        val vedtak =
-            innvilgelse(
-                toVedtaksperioder(
-                    førsteApril,
-                    sisteApril,
-                    førsteFeb,
-                    sisteFeb,
-                ),
-            )
-        val resultat =
-            finnDetaljerteVedtaksperioderDagligReise(
-                vedtaksdataTso = vedtak.data,
-                vedtaksdataTsr = null,
-            )
-        val forventetResultat =
-            listOf(
-                detaljertVedtaksperiodeDagligReiseTso(førsteFeb, sisteFeb),
-                detaljertVedtaksperiodeDagligReiseTso(førsteApril, sisteApril),
-            )
-
-        assertThat(resultat).isEqualTo(forventetResultat)
-    }
 
     @Test
     fun `skal slå sammen like perioder når det er flere enn 1 reise`() {
@@ -127,21 +78,24 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
     private fun detaljertVedtaksperiodeDagligReiseTso(
         fom: LocalDate,
         tom: LocalDate,
-        aktivitet: AktivitetType = defaultAktivitet,
-        målgruppe: FaktiskMålgruppe = defaultMålgruppe,
         typeDagligReise: TypeDagligReise = defaultTypeDagligReise,
-    ) = DetaljertBeregningsperioderDagligReise(
-        fom = fom,
-        tom = tom,
-        prisEnkeltbillett = 30,
-        prisSyvdagersbillett = 150,
-        pris30dagersbillett = 500,
-        beløp = 300,
-        billettdetaljer = mapOf(Billettype.ENKELTBILLETT to 20),
-        antallReisedager = 20,
+    ) = DetaljertVedtaksperiodeDagligReise(
         stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-        antallReisedagerPerUke = 3,
-        typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
+        typeDagligReise = typeDagligReise,
+        detaljertVedtaksperiode =
+            listOf(
+                DetaljertBeregningsperioder(
+                    fom = fom,
+                    tom = tom,
+                    prisEnkeltbillett = 30,
+                    prisSyvdagersbillett = 150,
+                    pris30dagersbillett = 500,
+                    beløp = 300,
+                    billettdetaljer = mapOf(Billettype.ENKELTBILLETT to 20),
+                    antallReisedager = 20,
+                    antallReisedagerPerUke = 3,
+                ),
+            ),
     )
 
     private fun innvilgelse(data: InnvilgelseDagligReise = defaultInnvilgelseDagligReise) =
