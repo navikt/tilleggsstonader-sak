@@ -251,6 +251,16 @@ class BehandlingService(
         behandlingshistorikkService.slettFritekstMetadataVedFerdigstillelse(behandlingId)
     }
 
+    fun markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(behandlingId: BehandlingId) {
+        val behandling = hentBehandling(behandlingId)
+
+        return markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(
+            behandlingId = behandlingId,
+            behandlingStatus = behandling.status,
+            behandlingSteg = behandling.steg,
+        )
+    }
+
     fun markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(
         behandlingId: BehandlingId,
         behandlingStatus: BehandlingStatus,
