@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatD
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -64,7 +65,7 @@ fun lagDagligReiseInnvilgelseMedBeløp(
                                                     antallReisedagerPerUke = 5,
                                                     vedtaksperioder =
                                                         listOf(
-                                                            no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag(
+                                                            VedtaksperiodeGrunnlag(
                                                                 id = randomUUID(),
                                                                 fom = fom,
                                                                 tom = tom,
@@ -88,6 +89,7 @@ fun lagDagligReiseInnvilgelseMedBeløp(
                             ),
                         ),
                 ),
+            privatBil = null, // TODO
         )
 
     val vedtaksdata =

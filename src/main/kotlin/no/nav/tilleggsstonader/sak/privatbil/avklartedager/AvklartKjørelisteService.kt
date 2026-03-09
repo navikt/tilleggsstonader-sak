@@ -9,9 +9,10 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
-import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.springframework.stereotype.Service
 import java.time.DayOfWeek
@@ -20,7 +21,7 @@ import java.util.UUID
 
 @Service
 class AvklartKjørelisteService(
-    private val vedtakService: VedtakService,
+    private val vedtakRepository: VedtakRepository,
     private val avklartKjørtUkeRepository: AvklartKjørtUkeRepository,
 ) {
     fun hentAvklarteUkerForBehandling(behandlingId: BehandlingId): List<AvklartKjørtUke> =
@@ -117,6 +118,7 @@ class AvklartKjørelisteService(
         return AvklartKjørtUke(
             behandlingId = behandlingId,
             kjørelisteId = kjørelisteId,
+            reiseId = rammevedtak.reiseId,
             fom = reisedager.minOf { it.dato },
             tom = reisedager.maxOf { it.dato },
             ukenummer = ukenummer,
@@ -199,8 +201,9 @@ class AvklartKjørelisteService(
         reiseId: ReiseId,
     ): RammeForReiseMedPrivatBil {
         val rammevedtak =
-            vedtakService
-                .hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandling.id)
+            vedtakRepository
+                .findByIdOrThrow(behandling.id)
+                .withTypeOrThrow<InnvilgelseEllerOpphørDagligReise>()
                 ?.data
                 ?.rammevedtakPrivatBil
                 ?: error("Fant ikke rammevedtak for behandling med id ${behandling.id}")

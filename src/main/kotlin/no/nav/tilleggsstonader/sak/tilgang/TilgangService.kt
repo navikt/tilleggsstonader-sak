@@ -153,10 +153,7 @@ class TilgangService(
         val tilordnetSaksbehandler =
             oppgaveService.hentÅpenBehandlingsoppgave(behandling.id)?.tilordnetSaksbehandler
 
-        val skalValidereTilordnetSaksbehandler = unleashService.isEnabled(Toggle.TILGANGSSTYRE_PÅ_TILORDNET_OPPGAVE)
-
         return if (validerTilordnetOppgave &&
-            skalValidereTilordnetSaksbehandler &&
             tilordnetSaksbehandler != SikkerhetContext.hentSaksbehandler()
         ) {
             Tilgang(harTilgang = false, begrunnelse = "Behandling er tilordnet en annen saksbehandler")

@@ -24,7 +24,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelse
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -56,12 +56,12 @@ class OppfølgingOpprettKontrollerServiceTest {
     val taskService = mockk<TaskService>()
     val oppfølgingRepository = OppfølgingRepositoryFake()
     val vilkårperiodeRepository = mockk<VilkårperiodeRepository>()
-    val vedtakRepository = mockk<VedtakRepository>()
+    val vedtakService = mockk<VedtakService>()
 
     val oppfølgingOpprettKontrollerService =
         OppfølgingOpprettKontrollerService(
             behandlingRepository = behandlingRepository,
-            vedtakRepository = vedtakRepository,
+            vedtakService = vedtakService,
             vilkårperiodeRepository = vilkårperiodeRepository,
             registerAktivitetService = registerAktivitetService,
             ytelseService = ytelseService,
@@ -97,7 +97,7 @@ class OppfølgingOpprettKontrollerServiceTest {
             fagsakIds.associateWith { FagsakMetadata(it, 1, Stønadstype.BARNETILSYN, "1") }
         }
 
-        mockVedtakTilsynBarn(vedtaksperiode)
+        mockVedtaksperioder(vedtaksperiode)
         mockHentYtelser()
         mockHentAktiviteter()
         mockHentAktiviteter()
@@ -122,14 +122,14 @@ class OppfølgingOpprettKontrollerServiceTest {
         fun `skal ikke finne treff hvis det ikke finnes noen vedtaksperioder`() {
             val ytelse = periodeAAP(fom = vedtaksperiode.fom.plusDays(3), tom = vedtaksperiode.tom)
             mockHentYtelser(ytelse)
-            mockVedtakTilsynBarn()
+            mockVedtaksperioder()
 
             assertThat(opprettOppfølging()).isNull()
         }
 
         @Test
         fun `skal ikke finne treff hvis endring ikke påvirker vedtaksperiode`() {
-            mockVedtakTilsynBarn(vedtaksperiode.copy(fom = LocalDate.now(), tom = LocalDate.now()))
+            mockVedtaksperioder(vedtaksperiode.copy(fom = LocalDate.now(), tom = LocalDate.now()))
             mockHentYtelser(periodeAAP(fom = vedtaksperiode.fom, tom = LocalDate.now()))
             mockHentAktiviteter(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = LocalDate.now()))
 
@@ -200,7 +200,7 @@ class OppfølgingOpprettKontrollerServiceTest {
         @Test
         fun `skal ikke finne treff hvis det gjelder gjelder endring i AAP som gjelder fra og med siste dagen i neste måneden`() {
             val tom = YearMonth.now().plusMonths(2).atDay(1)
-            mockVedtakTilsynBarn(vedtaksperiode.copy(tom = tom))
+            mockVedtaksperioder(vedtaksperiode.copy(tom = tom))
             mockHentYtelser(periodeAAP(fom = vedtaksperiode.fom, tom = tom.minusDays(1)))
             mockHentAktiviteter(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = tom))
 
@@ -210,7 +210,7 @@ class OppfølgingOpprettKontrollerServiceTest {
         @Test
         fun `skal finne treff hvis det gjelder gjelder endring i AAP som gjelder neste måned`() {
             val tom = YearMonth.now().plusMonths(1).atEndOfMonth()
-            mockVedtakTilsynBarn(vedtaksperiode.copy(tom = tom))
+            mockVedtaksperioder(vedtaksperiode.copy(tom = tom))
             mockHentYtelser(periodeAAP(fom = vedtaksperiode.fom, tom = tom.minusDays(1)))
             mockHentAktiviteter(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = tom))
 
@@ -233,7 +233,7 @@ class OppfølgingOpprettKontrollerServiceTest {
                     fom = LocalDate.now().plusDays(2),
                     tom = LocalDate.now().plusDays(2),
                 )
-            mockVedtakTilsynBarn(vedtaksperiode1, vedtaksperiode2)
+            mockVedtaksperioder(vedtaksperiode1, vedtaksperiode2)
             mockHentYtelser(periodeAAP(fom = vedtaksperiode1.fom, tom = vedtaksperiode1.fom))
             mockHentAktiviteter(aktivitetArenaDto(fom = vedtaksperiode1.fom, tom = vedtaksperiode2.tom))
 
@@ -259,7 +259,7 @@ class OppfølgingOpprettKontrollerServiceTest {
                     fom = LocalDate.now().plusDays(1),
                     tom = LocalDate.now().plusDays(2),
                 )
-            mockVedtakTilsynBarn(vedtaksperiode1, vedtaksperiode2)
+            mockVedtaksperioder(vedtaksperiode1, vedtaksperiode2)
             mockHentYtelser(periodeAAP(fom = vedtaksperiode1.fom, tom = vedtaksperiode1.fom))
             mockHentAktiviteter(aktivitetArenaDto(fom = vedtaksperiode1.fom, tom = vedtaksperiode2.tom))
 
@@ -286,7 +286,7 @@ class OppfølgingOpprettKontrollerServiceTest {
                     ),
                     aktivitet,
                 )
-            mockVedtakTilsynBarn(vedtaksperiode.copy(målgruppe = FaktiskMålgruppe.ARBEIDSSØKER))
+            mockVedtaksperioder(vedtaksperiode.copy(målgruppe = FaktiskMålgruppe.ARBEIDSSØKER))
             mockHentAktiviteter(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = vedtaksperiode.tom))
         }
 
@@ -341,7 +341,7 @@ class OppfølgingOpprettKontrollerServiceTest {
             every { vilkårperiodeRepository.findByBehandlingIdAndResultat(any(), any()) } returns
                 listOf(målgruppe, aktivitet.copy(tom = tom))
 
-            mockVedtakTilsynBarn(vedtaksperiode.copy(målgruppe = FaktiskMålgruppe.GJENLEVENDE, tom = tom))
+            mockVedtaksperioder(vedtaksperiode.copy(målgruppe = FaktiskMålgruppe.GJENLEVENDE, tom = tom))
             mockHentYtelser(periodeOmstillingsstønad(fom = vedtaksperiode.fom, tom = null))
             mockHentAktiviteter(aktivitetArenaDto(fom = vedtaksperiode.fom, tom = tom))
         }
@@ -424,7 +424,7 @@ class OppfølgingOpprettKontrollerServiceTest {
 
         @Test
         fun `skal ikke finne treff hvis det gjelder aktivitet som vi ikke henter fra annet system`() {
-            mockVedtakTilsynBarn(vedtaksperiode.copy(aktivitet = AktivitetType.REELL_ARBEIDSSØKER))
+            mockVedtaksperioder(vedtaksperiode.copy(aktivitet = AktivitetType.REELL_ARBEIDSSØKER))
 
             assertThat(opprettOppfølging()).isNull()
         }
@@ -634,11 +634,8 @@ class OppfølgingOpprettKontrollerServiceTest {
                 .flatMap { periode -> periode.endringer }
         } ?: emptyList()
 
-    private fun mockVedtakTilsynBarn(vararg vedtaksperioder: Vedtaksperiode) {
-        every { vedtakRepository.findByIdOrThrow(behandling.id) } returns
-            innvilgetVedtak(
-                vedtaksperioder = vedtaksperioder.toList(),
-            )
+    private fun mockVedtaksperioder(vararg vedtaksperioder: Vedtaksperiode) {
+        every { vedtakService.hentVedtaksperioder(behandling.id) } returns vedtaksperioder.toList()
     }
 
     private fun mockHentYtelser(vararg perioder: YtelsePeriode) {

@@ -20,7 +20,5 @@ enum class Toggle(
 
     OPPRETT_OPPGAVE_TILBAKEKREVING("sak.opprett-oppgave-tilbakekreving"),
 
-    TILGANGSSTYRE_PÅ_TILORDNET_OPPGAVE("sak.tilgangsstyring-tildelt-oppgave"),
-
     KAN_BEHANDLE_PRIVAT_BIL("sak.daglig-reise-privat-bil"),
 }

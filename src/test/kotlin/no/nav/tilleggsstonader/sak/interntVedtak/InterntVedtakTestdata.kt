@@ -770,6 +770,7 @@ object InterntVedtakTestdata {
                                 ),
                             ),
                     ),
+                privatBil = null, // TODO
             )
 
         val vedtaksperioderTso =
