@@ -4,7 +4,9 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetDagligReiseTsoFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetDagligReiseTsrFaktaOgVurderingerDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
@@ -37,12 +39,20 @@ fun VilkårperiodeDto.tilLagreVilkårperiodeMålgruppe(behandlingId: BehandlingI
 
 private fun FaktaOgVurderingerDto.tilFaktaOgSvarDto(): FaktaOgSvarDto =
     when (this) {
+        is AktivitetDagligReiseTsoFaktaOgVurderingerDto -> {
+            FaktaOgSvarAktivitetDagligReiseTsoDto(
+                svarHarUtgifter = this.harUtgifter?.svar,
+                aktivitetsdager = this.aktivitetsdager,
+            )
+        }
+
         is AktivitetDagligReiseTsrFaktaOgVurderingerDto -> {
             FaktaOgSvarAktivitetDagligReiseTsrDto(
                 svarHarUtgifter = this.harUtgifter?.svar,
                 aktivitetsdager = this.aktivitetsdager,
             )
         }
+
         is MålgruppeFaktaOgVurderingerDto -> {
             FaktaOgSvarMålgruppeDto(
                 svarMedlemskap = this.medlemskap?.svar,
@@ -50,5 +60,6 @@ private fun FaktaOgVurderingerDto.tilFaktaOgSvarDto(): FaktaOgSvarDto =
                 svarMottarSykepengerForFulltidsstilling = this.mottarSykepengerForFulltidsstilling?.svar,
             )
         }
+
         else -> TODO()
     }
