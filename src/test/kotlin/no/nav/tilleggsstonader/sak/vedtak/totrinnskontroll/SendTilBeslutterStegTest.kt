@@ -33,7 +33,7 @@ import no.nav.tilleggsstonader.sak.util.oppgave
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.totrinnskontroll
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.SendTilBeslutterRequest
 import org.assertj.core.api.Assertions.assertThat
@@ -48,7 +48,7 @@ class SendTilBeslutterStegTest {
     private val taskService = mockk<TaskService>()
     private val behandlingService = mockk<BehandlingService>(relaxed = true)
     private val vedtaksbrevRepository = mockk<VedtaksbrevRepository>()
-    private val vedtaksresultatService = mockk<VedtaksresultatService>()
+    private val vedtakService = mockk<VedtakService>()
     private val oppgaveService = mockk<OppgaveService>()
     private val totrinnskontrollService = mockk<TotrinnskontrollService>(relaxed = true)
 
@@ -113,7 +113,7 @@ class SendTilBeslutterStegTest {
         // every { tilbakekrevingService.harSaksbehandlerTattStillingTilTilbakekreving(any()) } returns true
         // every { tilbakekrevingService.finnesÅpenTilbakekrevingsBehandling(any()) } returns true
 
-        every { vedtaksresultatService.hentVedtaksresultat(any()) } returns TypeVedtak.INNVILGELSE
+        every { vedtakService.hentVedtaksresultat(any()) } returns TypeVedtak.INNVILGELSE
         mockBrukerContext(saksbehandlerNavn)
     }
 
@@ -185,7 +185,7 @@ class SendTilBeslutterStegTest {
 
     @Test
     internal fun `skal ikke hente brev når man håndterer behandling med årsak korrigering uten brev`() {
-        every { vedtaksresultatService.hentVedtaksresultat(any()) } returns TypeVedtak.INNVILGELSE
+        every { vedtakService.hentVedtaksresultat(any()) } returns TypeVedtak.INNVILGELSE
         val behandling = behandling.copy(årsak = BehandlingÅrsak.KORRIGERING_UTEN_BREV)
 
         beslutteVedtakSteg.validerSteg(behandling)
