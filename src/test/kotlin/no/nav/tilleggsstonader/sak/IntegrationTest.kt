@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterSøknadService
 import no.nav.tilleggsstonader.sak.hendelser.journalføring.JournalhendelseKafkaListener
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.MockClientService
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.MockClients
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
@@ -85,7 +85,7 @@ abstract class IntegrationTest {
     private lateinit var cacheManagers: List<CacheManager>
 
     @Autowired
-    lateinit var mockClientService: MockClientService
+    lateinit var mockClients: MockClients
 
     @Autowired
     lateinit var taskService: TaskService
@@ -136,7 +136,7 @@ abstract class IntegrationTest {
     @AfterEach
     fun tearDown() {
         clearCaches()
-        mockClientService.resetAlleTilDefaults()
+        mockClients.resetAlleTilDefaults()
         resetMock(unleashService)
     }
 

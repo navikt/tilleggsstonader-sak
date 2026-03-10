@@ -38,8 +38,8 @@ fun IntegrationTest.tilordneÅpenBehandlingOppgaveForBehandling(
             .single { it.erÅpen() && it.erBehandlingsoppgave() }
             .also { oppgaveRepository.update(it.copy(tilordnetSaksbehandler = tilordneTilSaksbehandler)) }
 
-    val oppgave = mockClientService.oppgaveClient.finnOppgaveMedId(oppgaveDomain.gsakOppgaveId)
-    mockClientService.oppgaveClient.fordelOppgave(oppgave.id, tilordneTilSaksbehandler, oppgave.versjon, null)
+    val oppgave = mockClients.oppgaveClient.finnOppgaveMedId(oppgaveDomain.gsakOppgaveId)
+    mockClients.oppgaveClient.fordelOppgave(oppgave.id, tilordneTilSaksbehandler, oppgave.versjon, null)
 }
 
 fun IntegrationTest.opprettJournalføringsoppgave(
@@ -55,5 +55,5 @@ fun IntegrationTest.opprettJournalføringsoppgave(
             tildeltEnhetsnummer = tildeltEnhetsnummer,
             journalpostId = journalpostId,
         ).tilNyOppgave()
-    return mockClientService.oppgavelager.leggTilOppgave(oppgave)
+    return mockClients.oppgavelager.leggTilOppgave(oppgave)
 }

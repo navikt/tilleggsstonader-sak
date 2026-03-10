@@ -101,9 +101,9 @@ class JournalpostControllerTest(
             assertThat(opprettetBehandling.status).isEqualTo(BehandlingStatus.OPPRETTET)
 
             kjørTasksKlareForProsessering()
-            assertThat(mockClientService.oppgavelager.hentOppgave(oppgave.id).status).isEqualTo(StatusEnum.FERDIGSTILT)
+            assertThat(mockClients.oppgavelager.hentOppgave(oppgave.id).status).isEqualTo(StatusEnum.FERDIGSTILT)
             assertThat(
-                mockClientService.journalpostClient.hentJournalpost(journalpostId).journalstatus,
+                mockClients.journalpostClient.hentJournalpost(journalpostId).journalstatus,
             ).isEqualTo(Journalstatus.FERDIGSTILT)
             assertThat(
                 oppgaveRepository

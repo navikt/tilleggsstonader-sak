@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.satsjustering
 
 import io.mockk.clearMocks
 import io.mockk.every
-import no.nav.familie.prosessering.domene.Status
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
@@ -20,10 +19,9 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVentRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakRepository
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettJournalpost
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
@@ -114,7 +112,7 @@ class SatsjusteringMedÅpenBehandlingTest : CleanDatabaseIntegrationTest() {
         assertThat(oppdatertOppgave.tilordnetSaksbehandler).isNull()
 
         val behandlingsstatistikkForÅpenBehandling =
-            KafkaTestConfig
+            KafkaFake
                 .sendteMeldinger()
                 .forventAntallMeldingerPåTopic(kafkaTopics.dvhBehandling, 3)
                 .map { it.verdiEllerFeil<BehandlingDVH>() }

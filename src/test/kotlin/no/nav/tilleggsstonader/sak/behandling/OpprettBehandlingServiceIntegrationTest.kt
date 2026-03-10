@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.behandling
 
-import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
@@ -12,8 +11,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.assertFinnesTaskMedType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
@@ -206,7 +204,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
      */
     private fun validerHarSendtMottattOgVenterBehandlingsstistikk(behandlingId: BehandlingId) {
         val behandlingsstatistikkRecords =
-            KafkaTestConfig
+            KafkaFake
                 .sendteMeldinger()
                 .forventAntallMeldingerPåTopic(kafkaTopics.dvhBehandling, 2)
                 .map { it.verdiEllerFeil<BehandlingDVH>() }

@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
@@ -184,7 +184,7 @@ class InnvilgeDaligReiseTsrIntegrationTest : CleanDatabaseIntegrationTest() {
 
     private fun validerUtebalingerPåKafka(antallUtbetalinger: Int) {
         val utbetalingRecord =
-            KafkaTestConfig
+            KafkaFake
                 .sendteMeldinger()
                 .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, antallUtbetalinger)
                 .map { it.verdiEllerFeil<IverksettingDto>() }
