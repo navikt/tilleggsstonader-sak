@@ -26,13 +26,13 @@ class GooglemapsControllerTest : IntegrationTest() {
         val tilAdresse = "Tjugenfossen, 6789 Loen"
 
         every { mockClients.googleRoutesClient.hentRuter(any()) } returns dummyRute
-        every { mockClients.googlePlaceDetailsClient.finnStedDetaljer("test-origin-place-id") } returns
+        every { mockClients.googlePlaceDetailsClient.finnStedDetaljer(PlaceId("test-origin-place-id")) } returns
             no.nav.tilleggsstonader.sak.googlemaps.placeDetailsApi.PlaceDetailsResponse(
                 id = "test-origin-place-id",
                 formattedAddress = fraAdresse,
                 displayName = null,
             )
-        every { mockClients.googlePlaceDetailsClient.finnStedDetaljer("test-destination-place-id") } returns
+        every { mockClients.googlePlaceDetailsClient.finnStedDetaljer(PlaceId("test-destination-place-id")) } returns
             no.nav.tilleggsstonader.sak.googlemaps.placeDetailsApi.PlaceDetailsResponse(
                 id = "test-destination-place-id",
                 formattedAddress = tilAdresse,
@@ -102,7 +102,7 @@ var dummyRute =
             ),
         geocodingResults =
             GeocodingResults(
-                origin = GeocodedWaypoint(placeId = "test-origin-place-id"),
-                destination = GeocodedWaypoint(placeId = "test-destination-place-id"),
+                origin = GeocodedWaypoint(placeId = PlaceId("test-origin-place-id")),
+                destination = GeocodedWaypoint(placeId = PlaceId("test-destination-place-id")),
             ),
     )
