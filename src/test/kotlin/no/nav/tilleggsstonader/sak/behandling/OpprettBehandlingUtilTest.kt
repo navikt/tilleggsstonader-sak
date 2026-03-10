@@ -258,7 +258,7 @@ internal class OpprettBehandlingUtilTest {
             assertThatThrownBy {
                 validerKanOppretteNyBehandling(
                     stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-                    behandlingType = BehandlingType.REVURDERING,
+                    behandlingType = BehandlingType.KJØRELISTE,
                     tidligereBehandlinger = listOf(),
                     sisteIverksatteBehandlinger = null,
                 )

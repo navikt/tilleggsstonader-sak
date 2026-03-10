@@ -50,7 +50,6 @@ object OpprettBehandlingUtil {
     }
 
     // TODO: Bør det valideres noe mer? F.eks. at det finnes en kjøreliste på forrige behandling?
-    // At det er riktig stønadstype som kjøreliste skal opprettes for?
     private fun validerKanOppretteKjørelisteBehandling(
         sisteIverksatteBehandlinger: Behandling?,
         stønadstype: Stønadstype,
@@ -59,7 +58,7 @@ object OpprettBehandlingUtil {
             throw ApiFeil("Det er ikke lov å opprette en kjørelistebehandling på stønadstype $stønadstype", HttpStatus.BAD_REQUEST)
         }
 
-        if (sisteIverksatteBehandlinger != null) {
+        if (sisteIverksatteBehandlinger == null) {
             throw ApiFeil("Det finnes ikke en tidligere iverksatt behandling på fagsaken", HttpStatus.BAD_REQUEST)
         }
     }
