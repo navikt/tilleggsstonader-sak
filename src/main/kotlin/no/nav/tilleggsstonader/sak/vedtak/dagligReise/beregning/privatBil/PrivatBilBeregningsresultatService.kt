@@ -23,7 +23,7 @@ class PrivatBilBeregningsresultatService {
         rammevedtak: RammevedtakPrivatBil,
         avklarteUkerForBehandling: Collection<AvklartKjørtUke>,
         brukersNavKontor: String?,
-    ): BeregningsresultatPrivatBil? =
+    ): BeregningsresultatPrivatBil =
         BeregningsresultatPrivatBil(
             reiser =
                 rammevedtak.reiser.map { reise ->
