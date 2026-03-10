@@ -86,6 +86,8 @@ class PrivatBilController(
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle() // TODO: Trengs denne når vi har den over?
 
+        behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(behandlingId)
+
         val oppdatertAvklartUke = avklartKjørelisteService.oppdaterAvklartUke(ukeId, avklarteDager)
         val kjøreliste = kjørelisteService.hentKjøreliste(oppdatertAvklartUke.kjørelisteId)
 

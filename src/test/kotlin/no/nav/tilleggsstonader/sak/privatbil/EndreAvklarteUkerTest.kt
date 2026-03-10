@@ -9,9 +9,11 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagRequest
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikUke
@@ -24,6 +26,9 @@ import java.time.LocalDate
 class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var behandlingService: BehandlingService
+
+    @Autowired
+    lateinit var oppgaveService: OppgaveService
 
     val fom = 5 januar 2026
     val tom = 11 januar 2026
@@ -44,7 +49,7 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
                     ),
             )
 
-        val reisevurdering = kall.privatBil.hentKjørelisteForBehandling(kjørelistebehandling.id)
+        val reisevurdering = kall.privatBil.hentReisevurderingForBehandling(kjørelistebehandling.id)
 
         val avklartUkeId =
             reisevurdering
@@ -122,7 +127,7 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
                     ),
             )
 
-        val reisevurdering = kall.privatBil.hentKjørelisteForBehandling(kjørelistebehandling.id)
+        val reisevurdering = kall.privatBil.hentReisevurderingForBehandling(kjørelistebehandling.id)
 
         val avklartUkeId =
             reisevurdering
@@ -174,7 +179,7 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
                     ),
             )
 
-        val reisevurdering = kall.privatBil.hentKjørelisteForBehandling(kjørelistebehandling.id)
+        val reisevurdering = kall.privatBil.hentReisevurderingForBehandling(kjørelistebehandling.id)
 
         val avklartUkeId =
             reisevurdering
@@ -221,9 +226,9 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
 
         val rammebehandling = behandlingService.hentSaksbehandling(rammebehandlingId)
         val kjørelistebehandling =
-            behandlingService.hentBehandlinger(rammebehandling.fagsakId).first { it.type == BehandlingType.REVURDERING }
+            behandlingService.hentBehandlinger(rammebehandling.fagsakId).first { it.type == BehandlingType.KJØRELISTE }
 
-        gjennomførBehandlingsløp(behandlingId = kjørelistebehandling.id, tilSteg = StegType.KJØRELISTE) {}
+        plukkOppgaven(kjørelistebehandling.id)
 
         return behandlingService.hentSaksbehandling(kjørelistebehandling.id)
     }
@@ -236,5 +241,10 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
             assertThat(oppdatertDag.avklartDag?.parkeringsutgift).isEqualTo(requestDag.parkeringsutgift)
             assertThat(oppdatertDag.avklartDag?.begrunnelse).isEqualTo(requestDag.begrunnelse)
         }
+    }
+
+    private fun plukkOppgaven(behandlingId: BehandlingId) {
+        val opppgave = oppgaveService.hentAktivBehandleSakOppgave(behandlingId)
+        oppgaveService.fordelOppgave(opppgave.id, testBrukerkontekst.bruker, opppgave.versjon)
     }
 }
