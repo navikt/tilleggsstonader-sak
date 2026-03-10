@@ -9,8 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
@@ -35,7 +34,7 @@ class UtledTidligsteEndringService(
     private val behandlingService: BehandlingService,
     private val vilkårService: VilkårService,
     private val vilkårperiodeService: VilkårperiodeService,
-    private val vedtakRepository: VedtakRepository,
+    private val vedtakService: VedtakService,
     private val barnService: BarnService,
 ) {
     /**
@@ -56,7 +55,7 @@ class UtledTidligsteEndringService(
                 behandlingId = behandlingId,
                 vedtaksperioder = vedtaksperioder,
                 hentVedtaksperioderTidligereBehandlingFunction = { behandlingId ->
-                    vedtakRepository.findByIdOrThrow(behandlingId).vedtaksperioderHvisFinnes() ?: emptyList()
+                    vedtakService.hentVedtaksperioder(behandlingId)
                 },
             )
 

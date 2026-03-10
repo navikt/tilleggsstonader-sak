@@ -2,6 +2,8 @@ package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
+import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
+import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.util.DatoFormat.DATE_FORMAT_NORSK
 import no.nav.tilleggsstonader.sak.util.DatoUtil.dagensDato
 import no.nav.tilleggsstonader.sak.util.DatoUtil.dagensDatoMedTid
@@ -69,6 +71,8 @@ fun max(
         else -> maxOf(first, second)
     }
 
+fun UkeIÅr.erFørNåværendeUke() = this < LocalDate.now().tilUkeIÅr()
+
 fun LocalDate.isEqualOrBefore(other: LocalDate) = this == other || this.isBefore(other)
 
 fun LocalDate.isEqualOrAfter(other: LocalDate) = this == other || this.isAfter(other)
@@ -121,6 +125,8 @@ fun LocalDate.lørdagEllerSøndag() = this.dayOfWeek == DayOfWeek.SATURDAY || th
 fun Periode<LocalDate>.formatertPeriodeNorskFormat() = "${this.fom.norskFormat()}–${this.tom.norskFormat()}"
 
 fun Periode<LocalDate>.inneholderUkedag() = this.alleDatoer().any { !it.lørdagEllerSøndag() }
+
+fun LocalDate.finnMandagNesteUke(): LocalDate = this.with(TemporalAdjusters.next(DayOfWeek.MONDAY))
 
 /**
  * https://ts-docs.ansatt.dev.nav.no/Saksbehandling/Beregning%20av%20st%C3%B8nadsbel%C3%B8p/l%C3%B8pende-m%C3%A5neder

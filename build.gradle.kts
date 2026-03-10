@@ -3,8 +3,8 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20260120121808_b5446a9"
-val tilleggsstønaderLibsVersion = "2026.02.27-11.33.ca5674648d1b"
-val tilleggsstønaderKontrakterVersion = "2026.02.27-11.38.9b1257b649ec"
+val tilleggsstønaderLibsVersion = "2026.03.03-10.23.f286f5829acc"
+val tilleggsstønaderKontrakterVersion = "2026.03.04-12.32.d3cae5e3937a"
 val avroVersion = "1.12.1"
 val confluentVersion = "8.0.1"
 val joarkHendelseVersion = "1.1.8"
@@ -71,6 +71,7 @@ dependencies {
     implementation("org.apache.avro:avro:$avroVersion")
     implementation("io.confluent:kafka-avro-serializer:$confluentVersion")
     implementation("no.nav.teamdokumenthandtering:teamdokumenthandtering-avro-schemas:$joarkHendelseVersion")
+    implementation("no.nav.tms.varsel:kotlin-builder:2.1.1")
 
     // Logging
     implementation("net.logstash.logback:logstash-logback-encoder:9.0")

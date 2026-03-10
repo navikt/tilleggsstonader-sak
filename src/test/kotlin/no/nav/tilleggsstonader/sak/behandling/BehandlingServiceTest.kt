@@ -275,10 +275,33 @@ internal class BehandlingServiceTest {
 
             assertThat(behandlingService.utledNesteBehandlingstypeV2(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
         }
+
+        @Test
+        internal fun `skal returnere kjørelistebehandling dersom årsak er kjøreliste`() {
+            val fagsak = fagsak()
+            every {
+                behandlingRepository.findByFagsakId(fagsak.id)
+            } returns
+                listOf(
+                    behandling(
+                        fagsak,
+                        type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                        status = BehandlingStatus.FERDIGSTILT,
+                        resultat = BehandlingResultat.INNVILGET,
+                    ),
+                )
+
+            assertThat(
+                behandlingService.utledNesteBehandlingstypeV2(fagsak.id, behandlingÅrsak = BehandlingÅrsak.KJØRELISTE),
+            ).isEqualTo(BehandlingType.KJØRELISTE)
+        }
     }
 }
 
-fun BehandlingService.utledNesteBehandlingstypeV2(fagsakId: FagsakId): BehandlingType {
+fun BehandlingService.utledNesteBehandlingstypeV2(
+    fagsakId: FagsakId,
+    behandlingÅrsak: BehandlingÅrsak = BehandlingÅrsak.SØKNAD,
+): BehandlingType {
     val behandlinger = hentBehandlinger(fagsakId)
-    return utledBehandlingTypeV2(behandlinger)
+    return utledBehandlingTypeV2(behandlinger, behandlingÅrsak)
 }

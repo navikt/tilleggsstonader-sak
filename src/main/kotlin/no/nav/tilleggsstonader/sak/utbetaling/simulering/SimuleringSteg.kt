@@ -1,20 +1,18 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering
 
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import org.springframework.stereotype.Service
 
 @Service
 class SimuleringSteg(
-    val simuleringService: SimuleringService,
-    val vedtaksresultatService: VedtaksresultatService,
-    val unleashService: UnleashService,
-    val tilkjentYtelseService: TilkjentYtelseService,
+    private val simuleringService: SimuleringService,
+    private val vedtakService: VedtakService,
+    private val tilkjentYtelseService: TilkjentYtelseService,
 ) : BehandlingSteg<Void?> {
     override fun utførSteg(
         saksbehandling: Saksbehandling,
@@ -26,7 +24,7 @@ class SimuleringSteg(
     }
 
     private fun skalUtføreSimulering(saksbehandling: Saksbehandling): Boolean {
-        val typeVedtak = vedtaksresultatService.hentVedtaksresultat(saksbehandling)
+        val typeVedtak = vedtakService.hentVedtaksresultat(saksbehandling)
 
         return when (typeVedtak) {
             TypeVedtak.INNVILGELSE -> tilkjentYtelseService.hentForBehandling(saksbehandling.id).andelerTilkjentYtelse.isNotEmpty()

@@ -28,6 +28,10 @@ TOKEN_X_PRIVATE_JWK: '{
     "n" : ""
   }'
 
+NAIS_CLUSTER_NAME: dev-gcp
+NAIS_NAMESPACE: tilleggsstonader
+NAIS_APP_NAME: tilleggsstonader-soknad-api
+
 unleash:
   enabled: false
 

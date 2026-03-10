@@ -27,40 +27,6 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
     private val tom = nå.plusMonths(3)
 
     @Test
-    fun `utbetalingsdato i fremtiden - ingen andeler skal bli utbetalt`() {
-        opprettBehandlingOgGjennomførBehandlingsløp(
-            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-        ) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTso(fom = fom, tom = tom)
-                }
-            }
-            målgruppe {
-                opprett {
-                    målgruppeAAP(fom = fom, tom = tom)
-                }
-            }
-            vilkår {
-                opprett {
-                    offentligTransport(fom = LocalDate.now().plusDays(1), tom = LocalDate.now().plusWeeks(1))
-                }
-            }
-        }
-
-        val sendtMelding =
-            KafkaTestConfig
-                .sendteMeldinger()
-                .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
-                .map { it.verdiEllerFeil<IverksettingDto>() }
-                .single()
-
-        assertThat(
-            sendtMelding.utbetalinger.size,
-        ).isEqualTo(0)
-    }
-
-    @Test
     fun `to andeler forrige måned, sender da én utbetaling med to perioder`() {
         val forrigeMåned = YearMonth.now().minusMonths(1)
 

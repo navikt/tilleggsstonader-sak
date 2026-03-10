@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -26,7 +27,7 @@ class DagligReiseVedtaksperioderValideringService(
     private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
-    private val vedtakRepository: VedtakRepository,
+    private val vedtakService: VedtakService,
     private val vilkårperiodeService: VilkårperiodeService,
 ) {
     fun validerVedtaksperioder(
@@ -134,6 +135,6 @@ class DagligReiseVedtaksperioderValideringService(
         behandlingService
             .finnSisteIverksatteBehandling(fagsakId)
             ?.let {
-                vedtakRepository.findByIdOrNull(it.id)?.withTypeOrThrow<InnvilgelseEllerOpphørDagligReise>()
+                vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(it.id)
             }?.data
 }

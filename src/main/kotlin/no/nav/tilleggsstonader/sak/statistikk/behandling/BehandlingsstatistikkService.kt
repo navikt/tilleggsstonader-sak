@@ -109,6 +109,10 @@ class BehandlingsstatistikkService(
             BehandlingType.REVURDERING -> {
                 saksbehandling.opprettetTid
             }
+
+            BehandlingType.KJØRELISTE -> {
+                saksbehandling.opprettetTid
+            }
         }
 
     private fun evaluerAdresseBeskyttelseStrengtFortrolig(personIdent: String): Boolean {

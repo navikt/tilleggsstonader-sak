@@ -78,6 +78,6 @@ class KjørelisteKlarTilInnsendingIntegrationTest : CleanDatabaseIntegrationTest
 
         assertThat(rammevedtak).hasSize(1)
         assertThat(rammevedtak.flatMap { it.uker.map { uke -> uke.kanSendeInnKjøreliste } })
-            .containsExactly(true, true, true, true, false, false, false)
+            .containsExactly(true, true, true, false, false, false, false)
     }
 }

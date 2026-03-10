@@ -10,4 +10,5 @@ data class KafkaTopics(
     val utbetaling: String,
     val utbetalingStatus: String,
     val dvhBehandling: String,
+    val dittnav: String,
 )

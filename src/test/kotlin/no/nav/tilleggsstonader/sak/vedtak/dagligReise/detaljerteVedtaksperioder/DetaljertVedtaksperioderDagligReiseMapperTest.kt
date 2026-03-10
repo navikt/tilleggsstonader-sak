@@ -102,6 +102,71 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
             opphørsdato = null,
         )
 
+    private fun toVedtaksperioder(
+        fom1: LocalDate,
+        tom1: LocalDate,
+        fom2: LocalDate,
+        tom2: LocalDate,
+    ) = InnvilgelseDagligReise(
+        vedtaksperioder =
+            listOf(
+                vedtaksperiode(fom = fom1, tom = tom1),
+                vedtaksperiode(fom = fom2, tom = tom2),
+            ),
+        beregningsresultat = lagBeregningsresultatMedToPerioder(fom1, tom1, fom2, tom2),
+        rammevedtakPrivatBil = null,
+    )
+
+    private fun lagBeregningsresultatMedToReiser(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) = BeregningsresultatDagligReise(
+        offentligTransport =
+            BeregningsresultatOffentligTransport(
+                reiser =
+                    listOf(
+                        BeregningsresultatForReise(
+                            reiseId = dummyReiseId,
+                            perioder =
+                                listOf(
+                                    beregningsresultatForPeriode(fom, tom),
+                                ),
+                        ),
+                        BeregningsresultatForReise(
+                            reiseId = dummyReiseId,
+                            perioder =
+                                listOf(
+                                    beregningsresultatForPeriode(fom, tom),
+                                ),
+                        ),
+                    ),
+            ),
+        privatBil = null, // TODO
+    )
+
+    private fun lagBeregningsresultatMedToPerioder(
+        fom1: LocalDate,
+        tom1: LocalDate,
+        fom2: LocalDate,
+        tom2: LocalDate,
+    ) = BeregningsresultatDagligReise(
+        offentligTransport =
+            BeregningsresultatOffentligTransport(
+                reiser =
+                    listOf(
+                        BeregningsresultatForReise(
+                            reiseId = dummyReiseId,
+                            perioder =
+                                listOf(
+                                    beregningsresultatForPeriode(fom1, tom1),
+                                    beregningsresultatForPeriode(fom2, tom2),
+                                ),
+                        ),
+                    ),
+            ),
+        privatBil = null,
+    )
+
     val defaultVedtaksperioder =
         listOf(
             vedtaksperiode(
@@ -125,6 +190,7 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                             ),
                         ),
                 ),
+            privatBil = null,
         )
     val defaultInnvilgelseDagligReise =
         InnvilgelseDagligReise(

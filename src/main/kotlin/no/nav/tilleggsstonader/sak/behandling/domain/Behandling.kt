@@ -91,6 +91,7 @@ enum class BehandlingType(
 ) {
     FØRSTEGANGSBEHANDLING("Førstegangsbehandling"),
     REVURDERING("Revurdering"),
+    KJØRELISTE("Kjøreliste"),
 }
 
 /**

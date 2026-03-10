@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.MappedCollection
@@ -18,6 +19,7 @@ data class AvklartKjørtUke(
     val behandlingId: BehandlingId,
     @Column("kjoreliste_id")
     val kjørelisteId: UUID,
+    val reiseId: ReiseId,
     override val fom: LocalDate,
     override val tom: LocalDate,
     val ukenummer: Int,
