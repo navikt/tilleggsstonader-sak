@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.tilbakekreving
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
+import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
@@ -10,7 +11,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdReposito
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.hendelser.ConsumerRecordUtil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevingFagsysteminfoBehov
 import no.nav.tilleggsstonader.sak.tilbakekreving.håndter.FagsysteminfoBehovHåndterer
@@ -18,7 +18,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.AndelTilkjentYtelseTilPeriodeServi
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.kafka.core.KafkaTemplate
@@ -62,7 +61,7 @@ class TilbakekrevingKafkaListenerTest {
     }
 
     @Test
-    fun `mottar hendelsestype fagsysteminfo_behov, behandling har ikke forrigeIverksattVedtak, kaster feil`() {
+    fun `mottar hendelsestype fagsysteminfo_behov, behandling har ikke forrigeIverksattVedtak, sender ikke svar`() {
         val eksternBehandlingId = 22L
         val behandling = saksbehandling(forrigeIverksatteBehandlingId = null)
 
@@ -81,9 +80,7 @@ class TilbakekrevingKafkaListenerTest {
 
         val consumerRecord = ConsumerRecordUtil.lagConsumerRecord(UUID.randomUUID().toString(), jsonMapper.writeValueAsString(payload))
 
-        assertThatExceptionOfType(Feil::class.java)
-            .isThrownBy {
-                tilbakekrevingKafkaListener.listen(consumerRecord, ack)
-            }
+        tilbakekrevingKafkaListener.listen(consumerRecord, ack)
+        verify(exactly = 0) { kafkaTemplate.send(any(), any()) }
     }
 }
