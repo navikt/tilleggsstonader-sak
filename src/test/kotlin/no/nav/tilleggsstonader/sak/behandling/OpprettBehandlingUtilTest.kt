@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingTypeV2
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingUtil.validerKanOppretteNyBehandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -14,6 +15,8 @@ import org.assertj.core.api.Assertions.assertThatNoException
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import java.time.LocalDateTime
 
 internal class OpprettBehandlingUtilTest {
@@ -102,12 +105,22 @@ internal class OpprettBehandlingUtilTest {
     inner class Førstegangsbehandling {
         @Test
         fun `mulig å lage behandling når det ikke finnes behandling fra før`() {
-            validerKanOppretteNyBehandling(BehandlingType.FØRSTEGANGSBEHANDLING, listOf())
+            validerKanOppretteNyBehandling(
+                stønadstype = Stønadstype.BARNETILSYN,
+                BehandlingType.FØRSTEGANGSBEHANDLING,
+                listOf(),
+                null,
+            )
         }
 
         @Test
         fun `det skal være mulig å opprette hvis eksisterende behandling er henlagt førstegangsbehandling`() {
-            validerKanOppretteNyBehandling(BehandlingType.FØRSTEGANGSBEHANDLING, listOf(henlagtBehandling()))
+            validerKanOppretteNyBehandling(
+                stønadstype = Stønadstype.BARNETILSYN,
+                BehandlingType.FØRSTEGANGSBEHANDLING,
+                listOf(henlagtBehandling()),
+                null,
+            )
         }
 
         @Test
@@ -120,7 +133,12 @@ internal class OpprettBehandlingUtilTest {
                     type = BehandlingType.REVURDERING,
                 )
             assertThatThrownBy {
-                validerKanOppretteNyBehandling(BehandlingType.FØRSTEGANGSBEHANDLING, listOf(behandling))
+                validerKanOppretteNyBehandling(
+                    stønadstype = Stønadstype.BARNETILSYN,
+                    BehandlingType.FØRSTEGANGSBEHANDLING,
+                    listOf(behandling),
+                    behandling,
+                )
             }.hasMessage("Kan ikke opprette en førstegangsbehandling når forrige behandling ikke er en førstegangsbehandling")
         }
 
@@ -133,7 +151,12 @@ internal class OpprettBehandlingUtilTest {
                     status = BehandlingStatus.FERDIGSTILT,
                 )
             assertThatThrownBy {
-                validerKanOppretteNyBehandling(BehandlingType.FØRSTEGANGSBEHANDLING, listOf(behandling))
+                validerKanOppretteNyBehandling(
+                    stønadstype = Stønadstype.BARNETILSYN,
+                    behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    tidligereBehandlinger = listOf(behandling),
+                    sisteIverksatteBehandlinger = null,
+                )
             }.hasMessage("Kan ikke opprette en førstegangsbehandling når siste behandling ikke er henlagt")
         }
 
@@ -148,8 +171,10 @@ internal class OpprettBehandlingUtilTest {
 
             assertThatNoException().isThrownBy {
                 validerKanOppretteNyBehandling(
+                    stønadstype = Stønadstype.BARNETILSYN,
                     behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
                     tidligereBehandlinger = listOf(behandling),
+                    sisteIverksatteBehandlinger = null,
                 )
             }
         }
@@ -165,21 +190,103 @@ internal class OpprettBehandlingUtilTest {
                     resultat = BehandlingResultat.AVSLÅTT,
                     status = BehandlingStatus.FERDIGSTILT,
                 )
-            validerKanOppretteNyBehandling(BehandlingType.REVURDERING, listOf(behandling))
+            validerKanOppretteNyBehandling(
+                stønadstype = Stønadstype.BARNETILSYN,
+                behandlingType = BehandlingType.REVURDERING,
+                tidligereBehandlinger = listOf(behandling),
+                sisteIverksatteBehandlinger = null,
+            )
         }
 
         @Test
         fun `det skal ikke være mulig å opprette en revurdering om eksisterende behandling er henlagt`() {
             assertThatThrownBy {
-                validerKanOppretteNyBehandling(BehandlingType.REVURDERING, listOf(henlagtBehandling(fagsak = fagsak)))
+                validerKanOppretteNyBehandling(
+                    stønadstype = Stønadstype.BARNETILSYN,
+                    behandlingType = BehandlingType.REVURDERING,
+                    tidligereBehandlinger = listOf(henlagtBehandling(fagsak = fagsak)),
+                    sisteIverksatteBehandlinger = null,
+                )
             }.hasMessage("Det finnes ikke en tidligere behandling på fagsaken")
         }
 
         @Test
         fun `skal ikke være mulig å opprette en revurdering hvis det ikke finnes en behandling fra før`() {
             assertThatThrownBy {
-                validerKanOppretteNyBehandling(BehandlingType.REVURDERING, listOf())
+                validerKanOppretteNyBehandling(
+                    stønadstype = Stønadstype.BARNETILSYN,
+                    behandlingType = BehandlingType.REVURDERING,
+                    tidligereBehandlinger = listOf(),
+                    sisteIverksatteBehandlinger = null,
+                )
             }.hasMessage("Det finnes ikke en tidligere behandling på fagsaken")
+        }
+    }
+
+    @Nested
+    inner class Kjøreliste {
+        @Test
+        fun `det skal være mulig å opprette en kjørelistebehandling om det finnes en iverksatt behandling`() {
+            val behandling =
+                behandling(
+                    fagsak = fagsak,
+                    resultat = BehandlingResultat.INNVILGET,
+                    status = BehandlingStatus.FERDIGSTILT,
+                )
+
+            assertThatNoException().isThrownBy {
+                validerKanOppretteNyBehandling(
+                    stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+                    behandlingType = BehandlingType.KJØRELISTE,
+                    tidligereBehandlinger = listOf(behandling),
+                    sisteIverksatteBehandlinger = behandling,
+                )
+            }
+
+            assertThatNoException().isThrownBy {
+                validerKanOppretteNyBehandling(
+                    stønadstype = Stønadstype.DAGLIG_REISE_TSR,
+                    behandlingType = BehandlingType.KJØRELISTE,
+                    tidligereBehandlinger = listOf(behandling),
+                    sisteIverksatteBehandlinger = behandling,
+                )
+            }
+        }
+
+        @Test
+        fun `det skal ikke være mulig å opprette en kjørelistebehandling om det ikke finnes en iverksatt behandling`() {
+            assertThatThrownBy {
+                validerKanOppretteNyBehandling(
+                    stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+                    behandlingType = BehandlingType.REVURDERING,
+                    tidligereBehandlinger = listOf(),
+                    sisteIverksatteBehandlinger = null,
+                )
+            }.hasMessage("Det finnes ikke en tidligere iverksatt behandling på fagsaken")
+        }
+
+        @ParameterizedTest
+        @EnumSource(
+            value = Stønadstype::class,
+            names = ["DAGLIG_REISE_TSO", "DAGLIG_REISE_TSR"],
+            mode = EnumSource.Mode.EXCLUDE,
+        )
+        fun `det skal ikke være mulig å opprette en kjørelistebehandling på noe annet enn daglig reise`(stønadstype: Stønadstype) {
+            val behandling =
+                behandling(
+                    fagsak = fagsak,
+                    resultat = BehandlingResultat.INNVILGET,
+                    status = BehandlingStatus.FERDIGSTILT,
+                )
+
+            assertThatThrownBy {
+                validerKanOppretteNyBehandling(
+                    stønadstype = stønadstype,
+                    behandlingType = BehandlingType.KJØRELISTE,
+                    tidligereBehandlinger = listOf(behandling),
+                    sisteIverksatteBehandlinger = behandling,
+                )
+            }.hasMessage("Det er ikke lov å opprette en kjørelistebehandling på stønadstype $stønadstype")
         }
     }
 }
