@@ -67,9 +67,16 @@ class OpprettStønadsvilkårDsl {
         fom: LocalDate,
         tom: LocalDate,
         reisedagerPerUke: Int = 5,
+        reiseavstandEnVei: Int = 10,
     ) {
         dtoer += { _, _ ->
-            lagreDagligReisePrivatBilDto(fom = fom, tom = tom, reisedagerPerUke = reisedagerPerUke, reiseId = ReiseId.random())
+            lagreDagligReisePrivatBilDto(
+                fom = fom,
+                tom = tom,
+                reisedagerPerUke = reisedagerPerUke,
+                reiseId = ReiseId.random(),
+                reiseavstandEnVei = reiseavstandEnVei,
+            )
         }
     }
 
