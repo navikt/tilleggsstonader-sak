@@ -82,6 +82,7 @@ class DagligReiseBeregningService(
                         beregnPrivatBil(
                             behandling = behandling,
                             rammevedtak = rammevedtakPrivatBil,
+                            brukersNavKontor = brukersNavKontor,
                         ),
                 ),
             rammevedtakPrivatBil = rammevedtakPrivatBil,
@@ -121,6 +122,7 @@ class DagligReiseBeregningService(
     private fun beregnPrivatBil(
         behandling: Saksbehandling,
         rammevedtak: RammevedtakPrivatBil?,
+        brukersNavKontor: String?,
     ): BeregningsresultatPrivatBil? =
         if (rammevedtak == null) {
             null
@@ -128,6 +130,7 @@ class DagligReiseBeregningService(
             privatBilBeregningsresultatService.beregn(
                 rammevedtak = rammevedtak,
                 avklarteUkerForBehandling = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandling.id),
+                brukersNavKontor = brukersNavKontor,
             )
         }
 

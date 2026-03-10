@@ -30,6 +30,7 @@ import java.time.temporal.TemporalAdjusters
 class PrivatBilBeregningsresultatServiceTest {
     private val behandlingId = BehandlingId.random()
     private val reiseId = ReiseId.random()
+    private val brukersNavKontor = "6767"
 
     val beregningService = PrivatBilBeregningsresultatService()
 
@@ -73,7 +74,7 @@ class PrivatBilBeregningsresultatServiceTest {
             )
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)
 
-        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker)
+        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
 
         assertThat(beregningsresultat).isNotNull
         assertThat(beregningsresultat!!.reiser).hasSize(1)
@@ -86,6 +87,7 @@ class PrivatBilBeregningsresultatServiceTest {
         assertThat(beregningsresultatUke.fom).isEqualTo(kjøreliste.data.fom)
         assertThat(beregningsresultatUke.tom).isEqualTo(kjøreliste.data.tom)
         assertThat(beregningsresultatUke.utbetalingsdato).isEqualTo(9 februar 2026) // Første mandag etter uke
+        assertThat(beregningsresultatUke.brukersNavKontor).isEqualTo(brukersNavKontor)
 
         val reisedager = kjøreliste.data.reisedager.filter { it.harKjørt }
         val totaleParkeringsutgifter = reisedager.mapNotNull { it.parkeringsutgift }.sum().toBigDecimal()
@@ -137,7 +139,7 @@ class PrivatBilBeregningsresultatServiceTest {
             )
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)
 
-        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker)
+        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
 
         assertThat(beregningsresultat).isNotNull
         assertThat(beregningsresultat!!.reiser).hasSize(1)
@@ -204,7 +206,7 @@ class PrivatBilBeregningsresultatServiceTest {
             )
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)
 
-        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker)
+        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
 
         assertThat(beregningsresultat).isNotNull
         assertThat(beregningsresultat!!.reiser).hasSize(1)
@@ -283,7 +285,7 @@ class PrivatBilBeregningsresultatServiceTest {
             )
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste1) + avklarUkerFraKjøreliste(kjøreliste2)
 
-        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker)
+        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
 
         assertThat(beregningsresultat).isNotNull
         assertThat(beregningsresultat!!.reiser).hasSize(1)
@@ -316,7 +318,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 tom = 22 februar 2026,
             )
 
-        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, emptyList())
+        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, emptyList(), brukersNavKontor)
 
         assertThat(beregningsresultat).isNotNull
         assertThat(beregningsresultat!!.reiser).hasSize(1)
@@ -376,7 +378,7 @@ class PrivatBilBeregningsresultatServiceTest {
 
         val avklarteUker = kjørelister.flatMap { avklarUkerFraKjøreliste(it) }
 
-        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker)
+        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
 
         assertThat(beregningsresultat).isNotNull
         assertThat(beregningsresultat!!.reiser).hasSize(2)
@@ -435,7 +437,7 @@ class PrivatBilBeregningsresultatServiceTest {
 
         assertThatException()
             .isThrownBy {
-                beregningService.beregn(rammevedtakPrivatBil, avklarteUker)
+                beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
             }.withMessageContaining("Dag ${kjøreliste.data.reisedager.single { it.harKjørt }.dato} er ikke innenfor rammevedtak")
     }
 
@@ -478,7 +480,7 @@ class PrivatBilBeregningsresultatServiceTest {
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)
 
         assertThatNoException().isThrownBy {
-            beregningService.beregn(rammevedtakPrivatBil, avklarteUker)
+            beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
         }
     }
 

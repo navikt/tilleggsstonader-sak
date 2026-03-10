@@ -19,6 +19,7 @@ data class BeregningsresultatForReisePrivatBilPeriode(
     val utbetalingsdato: LocalDate,
     val grunnlag: BeregningsresultatForReisePrivatBilGrunnlag,
     val stønadsbeløp: BigDecimal,
+    val brukersNavKontor: String?,
 )
 
 data class BeregningsresultatForReisePrivatBilGrunnlag(
