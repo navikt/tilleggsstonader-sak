@@ -34,7 +34,7 @@ object DetaljertVedtaksperioderDagligReiseMapper {
         stønadstype: Stønadstype,
     ): List<DetaljertVedtaksperiodeDagligReise> {
         val detaljertBeregningsperioder =
-            this.map { beregningsresultatForPeriode ->
+            this.sortedBy { it.grunnlag.fom }.map { beregningsresultatForPeriode ->
                 DetaljertBeregningsperioder(
                     fom = beregningsresultatForPeriode.grunnlag.fom,
                     tom = beregningsresultatForPeriode.grunnlag.tom,
