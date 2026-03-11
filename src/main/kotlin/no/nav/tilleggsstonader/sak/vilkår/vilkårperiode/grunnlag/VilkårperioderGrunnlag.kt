@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.Kilde
 import no.nav.tilleggsstonader.kontrakter.aktivitet.StatusAktivitet
-import no.nav.tilleggsstonader.kontrakter.ytelse.GjennståendeDagerFraTelleverk
+import no.nav.tilleggsstonader.kontrakter.ytelse.GjenståendeDagerFraTelleverk
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -101,7 +101,7 @@ data class PeriodeGrunnlagYtelse(
     val fom: LocalDate,
     val tom: LocalDate?,
     val subtype: YtelseSubtype? = null,
-    val gjennståendeDagerFraTelleverk: GjennståendeDagerFraTelleverk? = null,
+    val gjennståendeDagerFraTelleverk: GjenståendeDagerFraTelleverk? = null,
 ) {
     init {
         feilHvis(subtype != null && subtype.gyldigSammenMed != type) {

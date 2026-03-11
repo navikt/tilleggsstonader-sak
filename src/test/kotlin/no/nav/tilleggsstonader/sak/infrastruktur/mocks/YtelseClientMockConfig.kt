@@ -4,7 +4,7 @@ import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
-import no.nav.tilleggsstonader.kontrakter.ytelse.GjennståendeDagerFraTelleverk
+import no.nav.tilleggsstonader.kontrakter.ytelse.GjenståendeDagerFraTelleverk
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
@@ -46,8 +46,8 @@ class YtelseClientMockConfig {
                                     fom = LocalDate.now(),
                                     tom = null,
                                     ensligForsørgerStønadstype = ensligForsørgerStønadstype,
-                                    gjennståendeDagerFraTelleverk =
-                                        GjennståendeDagerFraTelleverk(
+                                    gjenståendeDagerFraTelleverk =
+                                        GjenståendeDagerFraTelleverk(
                                             dato = LocalDate.now(),
                                             antallDager = 40,
                                         ),

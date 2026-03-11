@@ -192,7 +192,7 @@ class VilkårperiodeGrunnlagService(
                             fom = it.fom,
                             tom = it.tom,
                             subtype = it.tilYtelseSubtype(),
-                            gjennståendeDagerFraTelleverk = it.gjennståendeDagerFraTelleverk,
+                            gjennståendeDagerFraTelleverk = it.gjenståendeDagerFraTelleverk,
                         )
                     }.slåSammenOverlappendeEllerPåfølgende(),
             kildeResultat =

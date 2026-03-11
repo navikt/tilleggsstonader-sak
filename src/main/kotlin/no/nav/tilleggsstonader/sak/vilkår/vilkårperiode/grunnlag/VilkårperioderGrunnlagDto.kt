@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.AktivitetArenaDto
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.ytelse.GjennståendeDagerFraTelleverk
+import no.nav.tilleggsstonader.kontrakter.ytelse.GjenståendeDagerFraTelleverk
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagYtelse.KildeResultatYtelse
@@ -35,7 +35,7 @@ data class PeriodeGrunnlagYtelseDto(
     val tom: LocalDate?,
     val subtype: PeriodeGrunnlagYtelse.YtelseSubtype?,
     val kanYtelseBrukesIBehandling: Boolean,
-    val gjennståendeDagerFraTelleverk: GjennståendeDagerFraTelleverk?,
+    val gjennståendeDagerFraTelleverk: GjenståendeDagerFraTelleverk?,
 )
 
 data class HentetInformasjonDto(
