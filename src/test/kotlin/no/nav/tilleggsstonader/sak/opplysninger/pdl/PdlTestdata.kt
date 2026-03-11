@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Bostedsadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Dødsfall
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Familierelasjonsrolle
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisteridentifikator
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.FolkeregisteridentifikatorFraSøk
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.FolkeregisteridentifikatorStatus
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregistermetadata
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Folkeregisterpersonstatus
@@ -24,15 +23,11 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Oppholdsadresse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Oppholdstillatelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlAnnenForelder
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonFraSøk
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøker
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøkerData
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PersonBolk
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PersonDataBolk
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PersonSøk
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PersonSøkResultat
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PersonSøkTreff
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Personnavn
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PostadresseIFrittFormat
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Postboksadresse

@@ -3,21 +3,13 @@ package no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
-import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapperFailOnUnknownProperties
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DagligReiseFyllUtSendInnData
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.OppholdUtenforNorge
 import no.nav.tilleggsstonader.sak.journalføring.SøknadsskjemaUtil
 import no.nav.tilleggsstonader.sak.opplysninger.kodeverk.KodeverkService
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
 import org.junit.jupiter.api.Test
-import tools.jackson.core.JsonParser
-import tools.jackson.core.json.ReaderBasedJsonParser
-import tools.jackson.databind.DeserializationContext
-import tools.jackson.databind.JsonNode
-import tools.jackson.databind.deser.std.StdDeserializer
-import tools.jackson.databind.module.SimpleModule
 import tools.jackson.module.kotlin.readValue
 
 class SøknadskjemaDagligReiseMapperTest {

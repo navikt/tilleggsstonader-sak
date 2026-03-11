@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.kontrakter.søknad.Reisedag
 import no.nav.tilleggsstonader.kontrakter.søknad.UkeMedReisedager
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 
 object KjørelisteSkjemaUtil {
     fun kjørelisteSkjema(
