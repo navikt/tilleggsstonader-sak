@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetBarnetilsynFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetBoutgifterFaktaOgVurderingerDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetDagligReiseTsoFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetLæremidlerFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.MålgruppeFaktaOgVurderingerDto
 import org.assertj.core.api.Assertions.assertThat
@@ -444,6 +445,102 @@ class InterntVedtakServiceTest {
                     opphørBegrunnelse = dummyOpphørtVedtak.data.begrunnelse,
                 ),
             )
+        }
+    }
+
+    @Nested
+    inner class DagligReise {
+        @BeforeEach
+        fun setUp() {
+            every { behandlingService.hentSaksbehandling(behandlingId) } returns InterntVedtakTestdata.DagligReise.behandling
+            every { barnService.finnBarnPåBehandling(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.behandlingBarn
+            every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.DagligReise.vilkårperioderTso
+            every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.DagligReise.grunnlagsdata
+            every { vilkårService.hentVilkår(behandlingId) } returns InterntVedtakTestdata.DagligReise.vilkårOffentligTransport
+            every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.DagligReise.innvilgetVedtakTso()
+        }
+
+        @Test
+        fun `behandlingsfelter skal bli riktig mappet`() {
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+
+            with(interntVedtak.behandling) {
+                assertThat(behandlingId).isEqualTo(InterntVedtakTestdata.behandlingId)
+                assertThat(eksternFagsakId).isEqualTo(1673L)
+                assertThat(stønadstype).isEqualTo(Stønadstype.DAGLIG_REISE_TSO)
+                assertThat(årsak).isEqualTo(InterntVedtakTestdata.DagligReise.behandling.årsak)
+                assertThat(ident).isEqualTo(InterntVedtakTestdata.DagligReise.behandling.ident)
+                assertThat(opprettetTidspunkt).isEqualTo(InterntVedtakTestdata.DagligReise.behandling.opprettetTid)
+                assertThat(resultat).isEqualTo(InterntVedtakTestdata.DagligReise.behandling.resultat)
+                assertThat(vedtakstidspunkt).isEqualTo(vedtakstidspunkt)
+                assertThat(saksbehandler).isEqualTo("saksbehandler")
+                assertThat(beslutter).isEqualTo("saksbeh2")
+            }
+        }
+
+        @Test
+        fun `søknadsfelter skal bli riktig mappet`() {
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+
+            assertThat(interntVedtak.søknad!!.mottattTidspunkt).isEqualTo(InterntVedtakTestdata.søknadMetadata.mottattTidspunkt)
+        }
+
+        @Test
+        fun `målgruppefelter skal bli riktig mappet`() {
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+            assertThat(interntVedtak.målgrupper).hasSize(3)
+
+            val målgruppe =
+                InterntVedtakTestdata.DagligReise.vilkårperioderTso.målgrupper
+                    .single { it.type == MålgruppeType.AAP }
+
+            with(interntVedtak.målgrupper.single { it.type == MålgruppeType.AAP }) {
+                assertThat(type).isEqualTo(MålgruppeType.AAP)
+                assertThat(fom).isEqualTo(målgruppe.fom)
+                assertThat(tom).isEqualTo(målgruppe.tom)
+                assertThat(kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
+                assertThat(resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
+                assertThat(begrunnelse).isEqualTo("målgruppe aap")
+                with((faktaOgVurderinger as MålgruppeFaktaOgVurderingerDto).medlemskap!!) {
+                    assertThat(svar).isEqualTo(SvarJaNei.JA_IMPLISITT)
+                    assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
+                }
+            }
+        }
+
+        @Test
+        fun `aktivitetsfelter skal bli riktig mappet`() {
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+            assertThat(interntVedtak.aktiviteter).hasSize(2)
+
+            val aktivitet = InterntVedtakTestdata.DagligReise.vilkårperioderTso.aktiviteter.first()
+
+            with(interntVedtak.aktiviteter.first()) {
+                assertThat(type).isEqualTo(AktivitetType.TILTAK)
+                assertThat(fom).isEqualTo(aktivitet.fom)
+                assertThat(tom).isEqualTo(aktivitet.tom)
+                assertThat(kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
+                assertThat(resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
+                with((faktaOgVurderinger as AktivitetDagligReiseTsoFaktaOgVurderingerDto).lønnet!!) {
+                    assertThat(svar).isEqualTo(SvarJaNei.NEI)
+                    assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
+                }
+            }
+        }
+
+        @Test
+        fun `rammevedtak for privatBil skal bli riktig mappet`() {
+            val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+
+            val forventet = InterntVedtakTestdata.DagligReise.rammevedtakPrivatBil.reiser
+
+            interntVedtak.rammevedtakPrivatBil?.reiser?.map { reise  ->
+                with(reise.grunnlag) {
+                    assertThat(this.fom).isEqualTo(forventet.first().grunnlag.fom)
+                    assertThat(this.tom).isEqualTo(forventet.first().grunnlag.tom)
+                    assertThat(this.reisedagerPerUke).isEqualTo(forventet.first().grunnlag.reisedagerPerUke)
+                }
+            }
         }
     }
 }

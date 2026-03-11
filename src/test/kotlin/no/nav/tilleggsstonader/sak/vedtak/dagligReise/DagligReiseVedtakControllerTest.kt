@@ -113,6 +113,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                                     ),
                                 ),
                         ),
+                    privatBil = null
                 ),
             gjelderFraOgMed = dummyFom,
             gjelderTilOgMed = dummyTom,

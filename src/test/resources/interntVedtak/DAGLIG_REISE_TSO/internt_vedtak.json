@@ -163,6 +163,35 @@
       "prisTrettidagersbillett" : 750,
       "type" : "DAGLIG_REISE_OFFENTLIG_TRANSPORT"
     }
+  }, {
+    "type" : "DAGLIG_REISE",
+    "resultat" : "OPPFYLT",
+    "delvilkår" : [ {
+      "resultat" : "IKKE_TATT_STILLING_TIL",
+      "vurderinger" : [ {
+        "regel" : "Er reiseavstanden over 6km?",
+        "svar" : "Ja",
+        "begrunnelse" : "antall km"
+      }, {
+        "regel" : "Kan søker benytte seg av offentlig transport?",
+        "svar" : "Ja",
+        "begrunnelse" : "En begrunnelse på delvilkåret"
+      } ]
+    } ],
+    "fødselsdatoBarn" : null,
+    "fom" : "2025-01-01",
+    "tom" : "2025-02-28",
+    "utgift" : null,
+    "slettetKommentar" : null,
+    "fakta" : {
+      "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
+      "adresse" : "Tiltaksgata 1",
+      "reisedagerPerUke" : 3,
+      "reiseavstandEnVei" : 40.5,
+      "bompengerEnVei" : 20,
+      "fergekostandEnVei" : 30,
+      "type" : "DAGLIG_REISE_PRIVAT_BIL"
+    }
   } ],
   "vedtak" : {
     "innvilgelseBegrunnelse" : "Sånn her vil en begrunnelse se ut i det interne vedtaket",
@@ -172,7 +201,7 @@
     "tilsynBarn" : null,
     "læremidler" : null,
     "boutgifter" : null,
-    "dagligReiseTso" : {
+    "dagligReise" : {
       "offentligTransport" : {
         "reiser" : [ {
           "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
@@ -223,6 +252,57 @@
             "antallReisedager" : 2,
             "fraTidligereVedtak" : false,
             "brukersNavKontor" : null
+          } ]
+        } ]
+      },
+      "privatBil" : {
+        "reiser" : [ {
+          "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
+          "perioder" : [ {
+            "fom" : "2025-01-01",
+            "tom" : "2025-02-28",
+            "utbetalingsdato" : "2025-02-28",
+            "grunnlag" : {
+              "dager" : [ {
+                "dato" : "2025-01-02",
+                "parkeringskostnad" : 100,
+                "stønadsbeløpForDag" : 195
+              }, {
+                "dato" : "2025-01-03",
+                "parkeringskostnad" : 100,
+                "stønadsbeløpForDag" : 195
+              }, {
+                "dato" : "2025-01-04",
+                "parkeringskostnad" : 100,
+                "stønadsbeløpForDag" : 195
+              }, {
+                "dato" : "2025-01-22",
+                "parkeringskostnad" : 100,
+                "stønadsbeløpForDag" : 195
+              }, {
+                "dato" : "2025-01-23",
+                "parkeringskostnad" : 100,
+                "stønadsbeløpForDag" : 195
+              }, {
+                "dato" : "2025-01-24",
+                "parkeringskostnad" : 100,
+                "stønadsbeløpForDag" : 195
+              }, {
+                "dato" : "2025-02-07",
+                "parkeringskostnad" : 100,
+                "stønadsbeløpForDag" : 195
+              }, {
+                "dato" : "2025-02-08",
+                "parkeringskostnad" : 100,
+                "stønadsbeløpForDag" : 195
+              }, {
+                "dato" : "2025-02-09",
+                "parkeringskostnad" : 100,
+                "stønadsbeløpForDag" : 195
+              } ],
+              "dagsatsUtenParkering" : 100
+            },
+            "stønadsbeløp" : 500
           } ]
         } ]
       },

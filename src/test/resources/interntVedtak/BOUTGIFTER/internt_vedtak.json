@@ -250,6 +250,6 @@
       "skalFåDekketFaktiskeUtgifter" : false,
       "inneholderUtgifterOvernatting" : true
     } ],
-    "dagligReiseTso" : null
+    "dagligReise" : null
   }
 }
