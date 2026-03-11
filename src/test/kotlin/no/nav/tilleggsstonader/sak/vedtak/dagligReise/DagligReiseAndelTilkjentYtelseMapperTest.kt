@@ -206,8 +206,8 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
                                 reiseId = reiseId,
                                 perioder =
                                     listOf(
-                                        lagBeregningsperiodePrivatBil(1 september 2025, 7 september 2025, mandag, 0),
-                                        lagBeregningsperiodePrivatBil(8 september 2025, 14 september 2025, 15 september 2025, 0),
+                                        lagBeregningsperiodePrivatBil(1 september 2025, 7 september 2025, 0),
+                                        lagBeregningsperiodePrivatBil(8 september 2025, 14 september 2025, 0),
                                     ),
                             ),
                         ),
@@ -225,9 +225,9 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
         @Test
         fun `en reise med tre perioder gir tre andeler med fom og tom lik påfølgende mandag`() {
             val reiseId = ReiseId.random()
-            val førsteMandag = 8 september 2025
-            val andreMandag = 15 september 2025
-            val tredjeMandag = 22 september 2025
+            val mandagFørsteUke = 1 september 2025
+            val mandagAndreUke = 8 september 2025
+            val mandagTredjeUke = 15 september 2025
             val beregningsresultat =
                 BeregningsresultatPrivatBil(
                     reiser =
@@ -236,9 +236,9 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
                                 reiseId = reiseId,
                                 perioder =
                                     listOf(
-                                        lagBeregningsperiodePrivatBil(1 september 2025, 7 september 2025, førsteMandag, 100),
-                                        lagBeregningsperiodePrivatBil(8 september 2025, 14 september 2025, andreMandag, 200),
-                                        lagBeregningsperiodePrivatBil(15 september 2025, 21 september 2025, tredjeMandag, 300),
+                                        lagBeregningsperiodePrivatBil(mandagFørsteUke, 7 september 2025, 100),
+                                        lagBeregningsperiodePrivatBil(mandagAndreUke, 14 september 2025, 200),
+                                        lagBeregningsperiodePrivatBil(mandagTredjeUke, 21 september 2025, 300),
                                     ),
                             ),
                         ),
@@ -253,18 +253,18 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
             assertThat(andeler).hasSize(3)
             with(andeler[0]) {
                 assertThat(beløp).isEqualTo(100)
-                assertThat(fom).isEqualTo(førsteMandag)
-                assertThat(tom).isEqualTo(førsteMandag)
+                assertThat(fom).isEqualTo(mandagFørsteUke)
+                assertThat(tom).isEqualTo(mandagFørsteUke)
             }
             with(andeler[1]) {
                 assertThat(beløp).isEqualTo(200)
-                assertThat(fom).isEqualTo(andreMandag)
-                assertThat(tom).isEqualTo(andreMandag)
+                assertThat(fom).isEqualTo(mandagAndreUke)
+                assertThat(tom).isEqualTo(mandagAndreUke)
             }
             with(andeler[2]) {
                 assertThat(beløp).isEqualTo(300)
-                assertThat(fom).isEqualTo(tredjeMandag)
-                assertThat(tom).isEqualTo(tredjeMandag)
+                assertThat(fom).isEqualTo(mandagTredjeUke)
+                assertThat(tom).isEqualTo(mandagTredjeUke)
             }
         }
 
@@ -272,7 +272,8 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
         fun `to reiser med med samme periode i beregningsresultat gir to andeler`() {
             val reiseId1 = ReiseId.random()
             val reiseId2 = ReiseId.random()
-            val mandag = 8 september 2025
+            val fomUke = 1 september 2025 // mandag
+            val tomUke = 7 september 2025 // søndag
             val beregningsresultat =
                 BeregningsresultatPrivatBil(
                     reiser =
@@ -281,14 +282,14 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
                                 reiseId = reiseId1,
                                 perioder =
                                     listOf(
-                                        lagBeregningsperiodePrivatBil(1 september 2025, 7 september 2025, mandag, 100),
+                                        lagBeregningsperiodePrivatBil(fomUke, tomUke, 100),
                                     ),
                             ),
                             BeregningsresultatForReisePrivatBil(
                                 reiseId = reiseId2,
                                 perioder =
                                     listOf(
-                                        lagBeregningsperiodePrivatBil(1 september 2025, 7 september 2025, mandag, 200),
+                                        lagBeregningsperiodePrivatBil(fomUke, tomUke, 200),
                                     ),
                             ),
                         ),
@@ -297,32 +298,62 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
             val andeler =
                 beregningsresultat.mapTilAndelTilkjentYtelse(
                     saksbehandling = saksbehandling,
-                    rammevedtakPrivatBil = lagRammevedtakPrivatBil(listOf(reiseId1, reiseId2), 1 september 2025, 30 september 2025),
+                    rammevedtakPrivatBil = lagRammevedtakPrivatBil(listOf(reiseId1, reiseId2), fomUke, 30 september 2025),
                 )
 
-            // TODO: må vurderes om det skal bli én eller to andeler.
+            // TODO: bør andeler grupperes på hvilken reise de tilhører?
             assertThat(andeler).hasSize(2)
             with(andeler[0]) {
                 assertThat(beløp).isEqualTo(100)
-                assertThat(fom).isEqualTo(mandag)
-                assertThat(tom).isEqualTo(mandag)
+                assertThat(fom).isEqualTo(fomUke)
+                assertThat(tom).isEqualTo(fomUke)
             }
             with(andeler[1]) {
                 assertThat(beløp).isEqualTo(200)
-                assertThat(fom).isEqualTo(mandag)
-                assertThat(tom).isEqualTo(mandag)
+                assertThat(fom).isEqualTo(fomUke)
+                assertThat(tom).isEqualTo(fomUke)
+            }
+        }
+
+        @Test
+        fun `en reiser med periode som starter midt i uka returnerer andel med dato forrige mandag`() {
+            val reiseId1 = ReiseId.random()
+            val fomUke = 3 september 2025 // mandag
+            val tomUke = 7 september 2025 // søndag
+            val beregningsresultat =
+                BeregningsresultatPrivatBil(
+                    reiser =
+                        listOf(
+                            BeregningsresultatForReisePrivatBil(
+                                reiseId = reiseId1,
+                                perioder =
+                                    listOf(
+                                        lagBeregningsperiodePrivatBil(fomUke, tomUke, 100),
+                                    ),
+                            ),
+                        ),
+                )
+
+            val andeler =
+                beregningsresultat.mapTilAndelTilkjentYtelse(
+                    saksbehandling = saksbehandling,
+                    rammevedtakPrivatBil = lagRammevedtakPrivatBil(listOf(reiseId1), fomUke, 30 september 2025),
+                )
+
+            assertThat(andeler).hasSize(1)
+            with(andeler[0]) {
+                assertThat(beløp).isEqualTo(100)
+                assertThat(fom).isEqualTo(1 september 2025)
             }
         }
 
         private fun lagBeregningsperiodePrivatBil(
             fom: LocalDate,
             tom: LocalDate,
-            utbetalingsdato: LocalDate,
             stønadsbeløp: Int,
         ) = BeregningsresultatForReisePrivatBilPeriode(
             fom = fom,
             tom = tom,
-            utbetalingsdato = utbetalingsdato,
             grunnlag =
                 BeregningsresultatForReisePrivatBilGrunnlag(
                     dager =

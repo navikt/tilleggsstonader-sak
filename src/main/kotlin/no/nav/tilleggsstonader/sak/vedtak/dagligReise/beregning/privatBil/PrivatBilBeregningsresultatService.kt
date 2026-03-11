@@ -94,7 +94,6 @@ class PrivatBilBeregningsresultatService {
                 BeregningsresultatForReisePrivatBilPeriode(
                     fom = dager.minOf { it.dato },
                     tom = dager.maxOf { it.dato },
-                    utbetalingsdato = dager.minOf { it.dato }.finnMandagNesteUke(), // Utbetalingsdato mandag uka etter
                     grunnlag =
                         BeregningsresultatForReisePrivatBilGrunnlag(
                             dager = beregnedeDager,

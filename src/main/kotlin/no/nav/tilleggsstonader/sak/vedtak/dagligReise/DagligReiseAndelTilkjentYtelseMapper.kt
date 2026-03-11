@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
+import no.nav.tilleggsstonader.sak.util.iDagHvisMandagEllerForrigeMandag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
@@ -75,20 +76,17 @@ fun BeregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(
             }
 
             reise.perioder
-                .groupBy { it.utbetalingsdato }
-                .map { (utbetalingsdato, perioder) ->
-                    val vedtaksperiode =
-                        rammevedtakForReise.grunnlag.vedtaksperiodeForPeriode(
-                            Datoperiode(perioder.minOf { it.fom }, perioder.maxOf { it.tom }),
-                        )
+                .map { periode ->
+                    val fom = periode.fom
+                    val vedtaksperiode = rammevedtakForReise.grunnlag.vedtaksperiodeForPeriode(periode)
 
                     lagAndelForDagligReise(
                         saksbehandling = saksbehandling,
-                        fomUkedag = utbetalingsdato,
-                        beløp = perioder.sumOf { it.stønadsbeløp }.toInt(),
+                        fomUkedag = fom.iDagHvisMandagEllerForrigeMandag(),
+                        beløp = periode.stønadsbeløp.toInt(),
                         målgruppe = vedtaksperiode.målgruppe,
                         typeAktivitet = vedtaksperiode.typeAktivitet,
-                        brukersNavKontor = perioder.first().brukersNavKontor,
+                        brukersNavKontor = periode.brukersNavKontor,
                     )
                 }
         }.filterNot { it.beløp == 0 }

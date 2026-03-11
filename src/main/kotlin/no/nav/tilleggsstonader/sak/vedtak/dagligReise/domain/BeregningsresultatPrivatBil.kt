@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -14,13 +15,12 @@ data class BeregningsresultatForReisePrivatBil(
 )
 
 data class BeregningsresultatForReisePrivatBilPeriode(
-    val fom: LocalDate,
-    val tom: LocalDate,
-    val utbetalingsdato: LocalDate,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
     val grunnlag: BeregningsresultatForReisePrivatBilGrunnlag,
     val stønadsbeløp: BigDecimal,
     val brukersNavKontor: String?,
-)
+) : Periode<LocalDate>
 
 data class BeregningsresultatForReisePrivatBilGrunnlag(
     val dager: List<BeregningsresultatForReisePrivatBilDag>,
