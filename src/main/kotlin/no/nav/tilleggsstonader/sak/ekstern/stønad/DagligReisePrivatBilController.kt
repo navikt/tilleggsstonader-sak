@@ -1,10 +1,10 @@
 package no.nav.tilleggsstonader.sak.ekstern.stønad
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.kontrakter.søknad.RammevedtakDto
+import no.nav.tilleggsstonader.kontrakter.søknad.RammevedtakUkeDto
 import no.nav.tilleggsstonader.libs.sikkerhet.EksternBrukerUtils
 import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
-import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
-import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakUkeDto
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
@@ -47,7 +47,7 @@ private fun RammevedtakPrivatBil.tilDto(kjøreliste: Map<ReiseId, Kjøreliste>):
     reiser.map { reise ->
         val kjøreliste = kjøreliste[reise.reiseId]
         RammevedtakDto(
-            reiseId = reise.reiseId,
+            reiseId = reise.reiseId.toString(),
             fom = reise.grunnlag.fom,
             tom = reise.grunnlag.tom,
             reisedagerPerUke = reise.grunnlag.reisedagerPerUke,
