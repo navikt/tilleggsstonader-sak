@@ -36,7 +36,7 @@ class EksternArenaController(
             return arenaStatusService.finnStatus(request)
         } catch (e: Exception) {
             if (!erIProd() && e.message == "Finner ikke mapping for AAP") {
-                /**
+                /*
                  * Spesialhåndtering i test fordi Arena tester tjenesten med rettighet=AAP som ikke eksisterer
                  * Kaster [ApiFeil] som logger info i stedet for error, med INTERNAL_SERVER_ERROR som skjer ellers
                  */

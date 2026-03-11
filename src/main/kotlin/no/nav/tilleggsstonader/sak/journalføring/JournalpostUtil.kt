@@ -52,4 +52,4 @@ fun Journalpost.harUgyldigAvsenderMottaker(): Boolean =
     this.journalposttype != Journalposttype.N && this.avsenderMottaker?.navn.isNullOrBlank()
 
 fun Journalpost.manglerAvsenderMottaker(): Boolean =
-    this.avsenderMottaker?.erLikBruker != true && this.avsenderMottaker?.navn.isNullOrBlank() || this.avsenderMottaker?.id.isNullOrBlank()
+    (this.avsenderMottaker?.erLikBruker != true && this.avsenderMottaker?.navn.isNullOrBlank()) || this.avsenderMottaker?.id.isNullOrBlank()
