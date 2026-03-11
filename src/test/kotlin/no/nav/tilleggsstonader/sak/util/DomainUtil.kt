@@ -641,6 +641,9 @@ fun lagreDagligReisePrivatBilDto(
     adresse: String = "Tiltaksveien 1",
     reiseId: ReiseId = dummyReiseId,
     reisedagerPerUke: Int = 5,
+    reiseavstandEnVei: Int = 10,
+    bompengerEnVei: Int? = null,
+    fergekostandEnVei: Int? = null,
     svar: Map<RegelId, SvarOgBegrunnelseDto> =
         mapOf(
             RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
@@ -648,14 +651,12 @@ fun lagreDagligReisePrivatBilDto(
             RegelId.KAN_KJØRE_MED_EGEN_BIL to SvarOgBegrunnelseDto(svar = SvarId.JA),
         ),
     fakta: FaktaDagligReiseDto =
-        faktaPrivatBil(adresse = adresse, reiseId = reiseId).run {
-            FaktaDagligReisePrivatBilDto(
-                reiseavstandEnVei = reiseavstandEnVei,
-                bompengerEnVei = bompengerEnVei,
-                fergekostandEnVei = fergekostandEnVei,
-                reisedagerPerUke = reisedagerPerUke,
-            )
-        },
+        FaktaDagligReisePrivatBilDto(
+            reiseavstandEnVei = reiseavstandEnVei.toBigDecimal(),
+            bompengerEnVei = bompengerEnVei,
+            fergekostandEnVei = fergekostandEnVei,
+            reisedagerPerUke = reisedagerPerUke,
+        ),
 ) = LagreDagligReiseDto(
     fom = fom,
     tom = tom,

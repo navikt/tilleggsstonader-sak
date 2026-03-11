@@ -1,0 +1,22 @@
+package no.nav.tilleggsstonader.sak.integrasjonstest
+
+import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegController
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
+
+fun IntegrationTest.gjennomførKjørelisteBehandling(behandling: Behandling) {
+    require(behandling.type == BehandlingType.KJØRELISTE) {
+        "Behandling er ikke en kjøreliste-behandling"
+    }
+    testoppsettService.oppdater(behandling.copy(status = BehandlingStatus.UTREDES))
+    tilordneÅpenBehandlingOppgaveForBehandling(behandling.id)
+    kall.steg.ferdigstill(behandling.id, StegController.FerdigstillStegRequest(StegType.KJØRELISTE))
+    kall.steg.ferdigstill(behandling.id, StegController.FerdigstillStegRequest(StegType.BEREGNING))
+    kall.steg.ferdigstill(behandling.id, StegController.FerdigstillStegRequest(StegType.SIMULERING))
+
+    // TODO - send til utbetaling
+}

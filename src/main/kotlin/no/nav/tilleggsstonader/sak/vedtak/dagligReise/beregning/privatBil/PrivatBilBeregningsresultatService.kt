@@ -22,13 +22,15 @@ class PrivatBilBeregningsresultatService {
     fun beregn(
         rammevedtak: RammevedtakPrivatBil,
         avklarteUkerForBehandling: Collection<AvklartKjørtUke>,
-    ): BeregningsresultatPrivatBil? =
+        brukersNavKontor: String?,
+    ): BeregningsresultatPrivatBil =
         BeregningsresultatPrivatBil(
             reiser =
                 rammevedtak.reiser.map { reise ->
                     lagBeregningsresultatForReise(
                         rammeForReise = reise,
                         avklarteUkerForReise = avklarteUkerForBehandling.filter { it.reiseId == reise.reiseId },
+                        brukersNavKontor = brukersNavKontor,
                     )
                 },
         )
@@ -36,6 +38,7 @@ class PrivatBilBeregningsresultatService {
     private fun lagBeregningsresultatForReise(
         rammeForReise: RammeForReiseMedPrivatBil,
         avklarteUkerForReise: List<AvklartKjørtUke>,
+        brukersNavKontor: String?,
     ): BeregningsresultatForReisePrivatBil {
         // Kaster feil om det finnes godkjente dager utenfor rammevedtak
         validerDagerErInnenforRammevedtak(rammeForReise, avklarteUkerForReise)
@@ -49,7 +52,7 @@ class PrivatBilBeregningsresultatService {
                     .flatMap { it.dager }
                     .filter { rammeForReise.grunnlag.inneholder(it.dato) }
                     .groupBy { satser.satsForDato(it.dato) }
-                    .flatMap { (sats, dager) -> lagPerioderForDagerMedSammeSats(dager, sats) },
+                    .flatMap { (sats, dager) -> lagPerioderForDagerMedSammeSats(dager, sats, brukersNavKontor) },
         )
     }
 
@@ -70,6 +73,7 @@ class PrivatBilBeregningsresultatService {
     private fun lagPerioderForDagerMedSammeSats(
         dager: List<AvklartKjørtDag>,
         sats: SatsForPeriodePrivatBil,
+        brukersNavKontor: String?,
     ): Collection<BeregningsresultatForReisePrivatBilPeriode> {
         // Grupper dager på uke, slik at alle dager innenfor en uke utbetales samme dag
         return dager
@@ -90,13 +94,13 @@ class PrivatBilBeregningsresultatService {
                 BeregningsresultatForReisePrivatBilPeriode(
                     fom = dager.minOf { it.dato },
                     tom = dager.maxOf { it.dato },
-                    utbetalingsdato = dager.minOf { it.dato }.finnMandagNesteUke(), // Utbetalingsdato mandag uka etter
                     grunnlag =
                         BeregningsresultatForReisePrivatBilGrunnlag(
                             dager = beregnedeDager,
                             dagsatsUtenParkering = sats.dagsatsUtenParkering,
                         ),
                     stønadsbeløp = beregnedeDager.sumOf { it.stønadsbeløpForDag },
+                    brukersNavKontor = brukersNavKontor,
                 )
             }
     }

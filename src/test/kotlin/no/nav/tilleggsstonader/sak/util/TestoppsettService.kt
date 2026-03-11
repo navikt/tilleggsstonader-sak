@@ -63,6 +63,8 @@ class TestoppsettService(
 
     fun hentBehandling(behandlingId: BehandlingId) = behandlingRepository.findByIdOrThrow(behandlingId)
 
+    fun hentBehandlinger(fagsakId: FagsakId) = behandlingRepository.findByFagsakId(fagsakId)
+
     fun hentSaksbehandling(behandlingId: BehandlingId) = behandlingRepository.finnSaksbehandling(behandlingId)
 
     fun opprettBehandlingMedFagsak(

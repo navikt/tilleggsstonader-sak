@@ -99,7 +99,16 @@ fun dagensDatoMedTidNorskFormat(): String = dagensDatoMedTid().medGosysTid()
 
 fun LocalDateTime.medGosysTid(): String = this.format(DatoFormat.GOSYS_DATE_TIME)
 
+fun LocalDate.erMandag() = this.dayOfWeek == DayOfWeek.MONDAY
+
 fun LocalDate.erLørdagEllerSøndag() = this.dayOfWeek == DayOfWeek.SATURDAY || this.dayOfWeek == DayOfWeek.SUNDAY
+
+fun LocalDate.iDagHvisMandagEllerForrigeMandag() =
+    if (this.erMandag()) {
+        this
+    } else {
+        with(TemporalAdjusters.previous(DayOfWeek.MONDAY))
+    }
 
 fun LocalDate.datoEllerNesteMandagHvisLørdagEllerSøndag() =
     if (this.erLørdagEllerSøndag()) {

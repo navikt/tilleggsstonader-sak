@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
@@ -20,7 +21,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligRe
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -105,6 +105,11 @@ class DagligReiseVedtakService(
             .findByIdOrThrow(behandlingId)
             .withTypeOrThrow<InnvilgelseEllerOpphørDagligReise>()
 
+    fun hentInnvilgelseVedtak(behandlingId: BehandlingId): GeneriskVedtak<InnvilgelseDagligReise> =
+        vedtakRepository
+            .findByIdOrThrow(behandlingId)
+            .withTypeOrThrow<InnvilgelseDagligReise>()
+
     fun nullstillEksisterendeVedtakPåBehandling(saksbehandling: Saksbehandling) {
         vedtakRepository.deleteById(saksbehandling.id)
         tilkjentYtelseService.slettTilkjentYtelseForBehandling(saksbehandling)
@@ -125,6 +130,24 @@ class DagligReiseVedtakService(
         vedtakRepository.insert(
             eksisterendeVedtak.copy(
                 behandlingId = nyBehandlingId,
+            ),
+        )
+    }
+
+    fun oppdaterVedtakMedBeregningPrivatBil(
+        behandlingId: BehandlingId,
+        beregningsresultatPrivatBil: BeregningsresultatPrivatBil,
+    ) {
+        val eksisterendeVedtak = hentInnvilgelseVedtak(behandlingId)
+        vedtakRepository.update(
+            eksisterendeVedtak.copy(
+                data =
+                    eksisterendeVedtak.data.copy(
+                        beregningsresultat =
+                            eksisterendeVedtak.data.beregningsresultat.copy(
+                                privatBil = beregningsresultatPrivatBil,
+                            ),
+                    ),
             ),
         )
     }
