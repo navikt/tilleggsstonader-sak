@@ -4,14 +4,24 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
+import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil.defaultInnvilgelseDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilDag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import java.time.LocalDate
 
 class DagligReiseAndelTilkjentYtelseMapperTest {
     val saksbehandling = saksbehandling(fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO))
@@ -167,5 +177,182 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
                 }
             }
         }
+    }
+
+    @Nested
+    inner class PrivatBil {
+        @Test
+        fun `når beregningsresultat ikke har reiser returneres ingen andeler`() {
+            val beregningsresultat = BeregningsresultatPrivatBil(reiser = emptyList())
+
+            val andeler =
+                beregningsresultat.mapTilAndelTilkjentYtelse(
+                    saksbehandling = saksbehandling,
+                    rammevedtakPrivatBil = RammevedtakPrivatBil(reiser = emptyList()),
+                )
+
+            assertThat(andeler).isEmpty()
+        }
+
+        @Test
+        fun `når alle perioder har beløp 0 returneres ingen andeler`() {
+            val reiseId = ReiseId.random()
+            val mandag = 8 september 2025
+            val beregningsresultat =
+                BeregningsresultatPrivatBil(
+                    reiser =
+                        listOf(
+                            BeregningsresultatForReisePrivatBil(
+                                reiseId = reiseId,
+                                perioder =
+                                    listOf(
+                                        lagBeregningsperiodePrivatBil(1 september 2025, 7 september 2025, mandag, 0),
+                                        lagBeregningsperiodePrivatBil(8 september 2025, 14 september 2025, 15 september 2025, 0),
+                                    ),
+                            ),
+                        ),
+                )
+
+            val andeler =
+                beregningsresultat.mapTilAndelTilkjentYtelse(
+                    saksbehandling = saksbehandling,
+                    rammevedtakPrivatBil = lagRammevedtakPrivatBil(listOf(reiseId), 1 september 2025, 30 september 2025),
+                )
+
+            assertThat(andeler).isEmpty()
+        }
+
+        @Test
+        fun `en reise med tre perioder gir tre andeler med fom og tom lik påfølgende mandag`() {
+            val reiseId = ReiseId.random()
+            val førsteMandag = 8 september 2025
+            val andreMandag = 15 september 2025
+            val tredjeMandag = 22 september 2025
+            val beregningsresultat =
+                BeregningsresultatPrivatBil(
+                    reiser =
+                        listOf(
+                            BeregningsresultatForReisePrivatBil(
+                                reiseId = reiseId,
+                                perioder =
+                                    listOf(
+                                        lagBeregningsperiodePrivatBil(1 september 2025, 7 september 2025, førsteMandag, 100),
+                                        lagBeregningsperiodePrivatBil(8 september 2025, 14 september 2025, andreMandag, 200),
+                                        lagBeregningsperiodePrivatBil(15 september 2025, 21 september 2025, tredjeMandag, 300),
+                                    ),
+                            ),
+                        ),
+                )
+
+            val andeler =
+                beregningsresultat.mapTilAndelTilkjentYtelse(
+                    saksbehandling = saksbehandling,
+                    rammevedtakPrivatBil = lagRammevedtakPrivatBil(listOf(reiseId), 1 september 2025, 30 september 2025),
+                )
+
+            assertThat(andeler).hasSize(3)
+            with(andeler[0]) {
+                assertThat(beløp).isEqualTo(100)
+                assertThat(fom).isEqualTo(førsteMandag)
+                assertThat(tom).isEqualTo(førsteMandag)
+            }
+            with(andeler[1]) {
+                assertThat(beløp).isEqualTo(200)
+                assertThat(fom).isEqualTo(andreMandag)
+                assertThat(tom).isEqualTo(andreMandag)
+            }
+            with(andeler[2]) {
+                assertThat(beløp).isEqualTo(300)
+                assertThat(fom).isEqualTo(tredjeMandag)
+                assertThat(tom).isEqualTo(tredjeMandag)
+            }
+        }
+
+        @Test
+        fun `to reiser med med samme periode i beregningsresultat gir to andeler`() {
+            val reiseId1 = ReiseId.random()
+            val reiseId2 = ReiseId.random()
+            val mandag = 8 september 2025
+            val beregningsresultat =
+                BeregningsresultatPrivatBil(
+                    reiser =
+                        listOf(
+                            BeregningsresultatForReisePrivatBil(
+                                reiseId = reiseId1,
+                                perioder =
+                                    listOf(
+                                        lagBeregningsperiodePrivatBil(1 september 2025, 7 september 2025, mandag, 100),
+                                    ),
+                            ),
+                            BeregningsresultatForReisePrivatBil(
+                                reiseId = reiseId2,
+                                perioder =
+                                    listOf(
+                                        lagBeregningsperiodePrivatBil(1 september 2025, 7 september 2025, mandag, 200),
+                                    ),
+                            ),
+                        ),
+                )
+
+            val andeler =
+                beregningsresultat.mapTilAndelTilkjentYtelse(
+                    saksbehandling = saksbehandling,
+                    rammevedtakPrivatBil = lagRammevedtakPrivatBil(listOf(reiseId1, reiseId2), 1 september 2025, 30 september 2025),
+                )
+
+            // TODO: må vurderes om det skal bli én eller to andeler.
+            assertThat(andeler).hasSize(2)
+            with(andeler[0]) {
+                assertThat(beløp).isEqualTo(100)
+                assertThat(fom).isEqualTo(mandag)
+                assertThat(tom).isEqualTo(mandag)
+            }
+            with(andeler[1]) {
+                assertThat(beløp).isEqualTo(200)
+                assertThat(fom).isEqualTo(mandag)
+                assertThat(tom).isEqualTo(mandag)
+            }
+        }
+
+        private fun lagBeregningsperiodePrivatBil(
+            fom: LocalDate,
+            tom: LocalDate,
+            utbetalingsdato: LocalDate,
+            stønadsbeløp: Int,
+        ) = BeregningsresultatForReisePrivatBilPeriode(
+            fom = fom,
+            tom = tom,
+            utbetalingsdato = utbetalingsdato,
+            grunnlag =
+                BeregningsresultatForReisePrivatBilGrunnlag(
+                    dager =
+                        listOf(
+                            BeregningsresultatForReisePrivatBilDag(
+                                dato = fom,
+                                parkeringskostnad = 0,
+                                stønadsbeløpForDag = stønadsbeløp.toBigDecimal(),
+                            ),
+                        ),
+                    dagsatsUtenParkering = 100.toBigDecimal(),
+                ),
+            stønadsbeløp = stønadsbeløp.toBigDecimal(),
+            brukersNavKontor = null,
+        )
+
+        private fun lagRammevedtakPrivatBil(
+            reiseIder: List<ReiseId>,
+            fom: LocalDate,
+            tom: LocalDate,
+        ) = RammevedtakPrivatBil(
+            reiser =
+                reiseIder.map { reiseId ->
+                    rammeForReiseMedPrivatBil(
+                        reiseId = reiseId,
+                        fom = fom,
+                        tom = tom,
+                        vedtaksperioder = listOf(vedtaksperiode(fom = fom, tom = tom)),
+                    )
+                },
+        )
     }
 }
