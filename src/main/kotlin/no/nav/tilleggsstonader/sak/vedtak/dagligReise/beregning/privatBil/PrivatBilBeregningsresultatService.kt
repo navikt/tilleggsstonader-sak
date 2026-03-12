@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
-import no.nav.tilleggsstonader.sak.util.finnMandagNesteUke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilDag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilGrunnlag

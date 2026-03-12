@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
-import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak

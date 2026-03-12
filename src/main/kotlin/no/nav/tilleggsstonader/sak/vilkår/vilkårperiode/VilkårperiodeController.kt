@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.dto.KodeverkDto
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent

@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.tilbakekreving.TILBAKEKREVING_TOPIC
 import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TILBAKEKREVING_TYPE_FAGSYSTEMINFO_BEHOV
