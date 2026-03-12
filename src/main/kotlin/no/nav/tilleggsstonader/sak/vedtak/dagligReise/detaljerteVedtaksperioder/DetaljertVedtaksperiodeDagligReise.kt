@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder
 
-import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
@@ -25,11 +24,8 @@ data class DetaljertBeregningsperioder(
     val antallReisedager: Int,
     val antallReisedagerPerUke: Int,
 ) : Periode<LocalDate>,
-    DetaljertVedtaksperiode,
-    Mergeable<LocalDate, DetaljertBeregningsperioder> {
+    DetaljertVedtaksperiode {
     init {
         validatePeriode()
     }
-
-    override fun merge(other: DetaljertBeregningsperioder): DetaljertBeregningsperioder = this.copy(tom = other.tom)
 }
