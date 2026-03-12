@@ -88,6 +88,6 @@ class ArenaStatusService(
     private val saksnummerSomKanBehandlesIArena: List<Long> =
         listOf(
             9807,
-            10384
+            10384,
         )
 }

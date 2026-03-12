@@ -35,7 +35,7 @@ data class PeriodeGrunnlagYtelseDto(
     val tom: LocalDate?,
     val subtype: PeriodeGrunnlagYtelse.YtelseSubtype?,
     val kanYtelseBrukesIBehandling: Boolean,
-    val gjennståendeDagerFraTelleverk: GjenståendeDagerFraTelleverk?,
+    val gjenståendeDagerFraTelleverk: GjenståendeDagerFraTelleverk?,
 )
 
 data class HentetInformasjonDto(
@@ -96,7 +96,7 @@ fun PeriodeGrunnlagYtelse.tilDto(stønadstype: Stønadstype) =
                 stønadstype = stønadstype,
                 ytelse = this,
             ),
-        gjennståendeDagerFraTelleverk = this.gjennståendeDagerFraTelleverk,
+        gjenståendeDagerFraTelleverk = this.gjenståendeDagerFraTelleverk,
     )
 
 fun HentetInformasjon.tilDto() =
