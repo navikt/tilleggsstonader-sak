@@ -21,8 +21,8 @@ data class Rute(
     val strekninger: List<Strekning>,
     val startLokasjon: Lokasjon,
     val sluttLokasjon: Lokasjon,
-    val startLokasjonId: String?,
-    val sluttLokasjonId: String?,
+    val startLokasjonId: PlaceId?,
+    val sluttLokasjonId: PlaceId?,
 )
 
 data class Strekning(
@@ -65,8 +65,8 @@ fun RuteResponse.tilDomene(): List<Rute>? =
     }
 
 fun Route.tilDomene(
-    startLokasjonId: String?,
-    sluttLokasjonId: String?,
+    startLokasjonId: PlaceId?,
+    sluttLokasjonId: PlaceId?,
 ): Rute =
     Rute(
         erDefualtRute = routeLabels.contains(RouteLabel.DEFAULT_ROUTE),

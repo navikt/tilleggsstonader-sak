@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
@@ -21,7 +21,7 @@ class IverksettingIntegrationTest : CleanDatabaseIntegrationTest() {
                 defaultDagligReiseTsoTestdata(fom = omTrettiDager, tom = omSekstiDager)
             }
 
-        KafkaTestConfig
+        KafkaFake
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
 
@@ -29,7 +29,7 @@ class IverksettingIntegrationTest : CleanDatabaseIntegrationTest() {
             defaultDagligReiseTsoTestdata(fom = omSekstiDager.plusDays(1), tom = omNittiDager)
         }
 
-        KafkaTestConfig
+        KafkaFake
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
     }

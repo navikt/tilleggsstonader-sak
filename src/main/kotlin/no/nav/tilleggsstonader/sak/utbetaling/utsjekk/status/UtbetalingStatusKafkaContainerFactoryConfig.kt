@@ -3,9 +3,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status
 import no.nav.tilleggsstonader.libs.kafka.KafkaErrorHandler
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
-import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.kafka.autoconfigure.KafkaProperties
-import org.springframework.boot.ssl.SslBundles
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile

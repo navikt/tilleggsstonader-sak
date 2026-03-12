@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
@@ -38,7 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 
 class SatsjusteringBoutgifterTest(
-    @Autowired private val kafkaTestConfig: KafkaTestConfig,
+    @Autowired private val kafkaFake: KafkaFake,
 ) : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var faktaGrunnlagService: FaktaGrunnlagService

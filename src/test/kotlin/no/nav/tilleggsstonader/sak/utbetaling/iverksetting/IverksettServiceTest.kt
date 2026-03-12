@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.finnPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
@@ -32,7 +32,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.kafka.core.KafkaTemplate
-import tools.jackson.module.kotlin.readValue
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -74,7 +73,7 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
 
         iverksettService.iverksett(behandling.id, behandling.id, nesteMåned.atEndOfMonth())
 
-        KafkaTestConfig
+        KafkaFake
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
     }
@@ -88,7 +87,7 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
 
         iverksettService.iverksett(behandling.id, behandling.id, nesteMåned.atEndOfMonth())
 
-        KafkaTestConfig
+        KafkaFake
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
 
@@ -130,7 +129,7 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling.id)
 
             val iverksettingDto =
-                KafkaTestConfig
+                KafkaFake
                     .sendteMeldinger()
                     .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
                     .single()
@@ -167,7 +166,7 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
 
             val iverksettingDto =
-                KafkaTestConfig
+                KafkaFake
                     .sendteMeldinger()
                     .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 2)
                     .single { it.key() == iverksettingId.toString() }
@@ -191,7 +190,7 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
 
             val iverksettingDto =
-                KafkaTestConfig
+                KafkaFake
                     .sendteMeldinger()
                     .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 2)
                     .single { it.key() == behandling2.id.toString() }
@@ -225,7 +224,7 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UBEHANDLET)
 
             val iverksettingDto =
-                KafkaTestConfig
+                KafkaFake
                     .sendteMeldinger()
                     .finnPåTopic(kafkaTopics.utbetaling)
                     .single { it.key() == behandling2.id.toString() }
@@ -267,7 +266,7 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             }
 
             val iverksettingDto =
-                KafkaTestConfig
+                KafkaFake
                     .sendteMeldinger()
                     .finnPåTopic(kafkaTopics.utbetaling)
                     .single { it.key() == iverksettingId.toString() }
@@ -296,7 +295,7 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.SENDT, behandling2.id)
 
             val iverksettingDto =
-                KafkaTestConfig
+                KafkaFake
                     .sendteMeldinger()
                     .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 2)
                     .single { it.key() == behandling2.id.toString() }
@@ -517,7 +516,7 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             tilkjentYtelseRepository.insert(tilkjentYtelse)
             iverksettService.iverksettBehandlingFørsteGang(behandling.id)
 
-            KafkaTestConfig
+            KafkaFake
                 .sendteMeldinger()
                 .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
 

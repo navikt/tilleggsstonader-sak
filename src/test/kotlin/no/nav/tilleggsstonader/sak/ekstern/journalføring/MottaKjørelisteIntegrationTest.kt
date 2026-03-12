@@ -57,7 +57,7 @@ class MottaKjørelisteIntegrationTest : CleanDatabaseIntegrationTest() {
             )
         val kjøreliste =
             kjørelisteSkjema(
-                reiseId = reiseId.toString(),
+                reiseId = reiseId,
                 periode = Datoperiode(fom, tom),
                 dagerKjørt = dagerKjørt,
             )
@@ -69,7 +69,7 @@ class MottaKjørelisteIntegrationTest : CleanDatabaseIntegrationTest() {
         val lagretKjøreliste = lagredeKjørelister.single()
         assertThat(lagretKjøreliste.fagsakId).isEqualTo(saksbehandling.fagsakId)
         assertThat(lagretKjøreliste.journalpostId).isEqualTo(journalpostId)
-        assertThat(lagretKjøreliste.data.reiseId).isEqualTo(reiseId)
+        assertThat(lagretKjøreliste.data.reiseId.toString()).isEqualTo(reiseId)
         assertLagretKjørelisteInneholderDager(innsendtKjøreliste = kjøreliste, lagretKjøreliste = lagretKjøreliste)
 
         val behandlingerPåFagsak = behandlingRepository.findByFagsakId(saksbehandling.fagsakId)

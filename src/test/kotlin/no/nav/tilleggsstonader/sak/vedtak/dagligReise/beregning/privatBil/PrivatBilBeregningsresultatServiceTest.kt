@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.util.KjørelisteUtil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.satsForPeriodePrivatBil
-import no.nav.tilleggsstonader.sak.util.finnMandagNesteUke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
@@ -30,6 +29,7 @@ import java.time.temporal.TemporalAdjusters
 class PrivatBilBeregningsresultatServiceTest {
     private val behandlingId = BehandlingId.random()
     private val reiseId = ReiseId.random()
+    private val brukersNavKontor = "6767"
 
     val beregningService = PrivatBilBeregningsresultatService()
 
@@ -73,7 +73,7 @@ class PrivatBilBeregningsresultatServiceTest {
             )
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)
 
-        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker)
+        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
 
         assertThat(beregningsresultat).isNotNull
         assertThat(beregningsresultat!!.reiser).hasSize(1)
@@ -85,7 +85,7 @@ class PrivatBilBeregningsresultatServiceTest {
         val beregningsresultatUke = beregningsresultatForReise.perioder.single()
         assertThat(beregningsresultatUke.fom).isEqualTo(kjøreliste.data.fom)
         assertThat(beregningsresultatUke.tom).isEqualTo(kjøreliste.data.tom)
-        assertThat(beregningsresultatUke.utbetalingsdato).isEqualTo(9 februar 2026) // Første mandag etter uke
+        assertThat(beregningsresultatUke.brukersNavKontor).isEqualTo(brukersNavKontor)
 
         val reisedager = kjøreliste.data.reisedager.filter { it.harKjørt }
         val totaleParkeringsutgifter = reisedager.mapNotNull { it.parkeringsutgift }.sum().toBigDecimal()
@@ -137,7 +137,7 @@ class PrivatBilBeregningsresultatServiceTest {
             )
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)
 
-        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker)
+        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
 
         assertThat(beregningsresultat).isNotNull
         assertThat(beregningsresultat!!.reiser).hasSize(1)
@@ -149,7 +149,6 @@ class PrivatBilBeregningsresultatServiceTest {
         val beregningsresultatUke = beregningsresultatForReise.perioder.single()
         assertThat(beregningsresultatUke.fom).isEqualTo(kjøreliste.data.fom)
         assertThat(beregningsresultatUke.tom).isEqualTo(kjøreliste.data.tom)
-        assertThat(beregningsresultatUke.utbetalingsdato).isEqualTo(9 februar 2026) // Første mandag etter uke
         assertThat(beregningsresultatUke.stønadsbeløp).isEqualTo(dagsatsUtenParkering * 2.toBigDecimal())
 
         assertThat(beregningsresultatUke.grunnlag.dager).hasSize(2).allMatch { it.parkeringskostnad == 0 }
@@ -204,7 +203,7 @@ class PrivatBilBeregningsresultatServiceTest {
             )
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)
 
-        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker)
+        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
 
         assertThat(beregningsresultat).isNotNull
         assertThat(beregningsresultat!!.reiser).hasSize(1)
@@ -217,7 +216,6 @@ class PrivatBilBeregningsresultatServiceTest {
         val sats1 = satser[0]
         assertThat(beregningsresultatUke1.fom).isEqualTo(sats1.fom)
         assertThat(beregningsresultatUke1.tom).isEqualTo(sats1.tom)
-        assertThat(beregningsresultatUke1.utbetalingsdato).isEqualTo(forventetUtbetalingsdato) // Første mandag etter uke
         assertThat(beregningsresultatUke1.stønadsbeløp).isEqualTo(dagsats1UtenParkering)
         assertThat(beregningsresultatUke1.grunnlag.dager).hasSize(1)
 
@@ -225,7 +223,6 @@ class PrivatBilBeregningsresultatServiceTest {
         val sats2 = satser[1]
         assertThat(beregningsresultatUke2.fom).isEqualTo(sats2.fom)
         assertThat(beregningsresultatUke2.tom).isEqualTo(sats2.tom)
-        assertThat(beregningsresultatUke2.utbetalingsdato).isEqualTo(forventetUtbetalingsdato) // Første mandag etter uke
         assertThat(beregningsresultatUke2.stønadsbeløp).isEqualTo(dagsats2UtenParkering)
         assertThat(beregningsresultatUke2.grunnlag.dager).hasSize(1).allMatch { it.parkeringskostnad == 0 }
     }
@@ -283,7 +280,7 @@ class PrivatBilBeregningsresultatServiceTest {
             )
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste1) + avklarUkerFraKjøreliste(kjøreliste2)
 
-        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker)
+        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
 
         assertThat(beregningsresultat).isNotNull
         assertThat(beregningsresultat!!.reiser).hasSize(1)
@@ -295,14 +292,12 @@ class PrivatBilBeregningsresultatServiceTest {
         val beregningsresultatUke1 = beregningsresultatForReise.perioder[0]
         assertThat(beregningsresultatUke1.fom).isEqualTo(kjøreliste1.data.fom)
         assertThat(beregningsresultatUke1.tom).isEqualTo(kjøreliste1.data.tom)
-        assertThat(beregningsresultatUke1.utbetalingsdato).isEqualTo(kjøreliste1.data.tom.finnMandagNesteUke()) // Første mandag etter uke
         assertThat(beregningsresultatUke1.stønadsbeløp).isEqualTo(dagsatsUtenParkering)
         assertThat(beregningsresultatUke1.grunnlag.dager).hasSize(1).allMatch { it.parkeringskostnad == 0 }
 
         val beregningsresultatUke2 = beregningsresultatForReise.perioder[1]
         assertThat(beregningsresultatUke2.fom).isEqualTo(kjøreliste2.data.fom)
         assertThat(beregningsresultatUke2.tom).isEqualTo(kjøreliste2.data.tom)
-        assertThat(beregningsresultatUke2.utbetalingsdato).isEqualTo(kjøreliste2.data.tom.finnMandagNesteUke()) // Første mandag etter uke
         assertThat(beregningsresultatUke2.stønadsbeløp).isEqualTo(dagsatsUtenParkering)
         assertThat(beregningsresultatUke2.grunnlag.dager).hasSize(1).allMatch { it.parkeringskostnad == 0 }
     }
@@ -316,7 +311,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 tom = 22 februar 2026,
             )
 
-        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, emptyList())
+        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, emptyList(), brukersNavKontor)
 
         assertThat(beregningsresultat).isNotNull
         assertThat(beregningsresultat!!.reiser).hasSize(1)
@@ -376,7 +371,7 @@ class PrivatBilBeregningsresultatServiceTest {
 
         val avklarteUker = kjørelister.flatMap { avklarUkerFraKjøreliste(it) }
 
-        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker)
+        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
 
         assertThat(beregningsresultat).isNotNull
         assertThat(beregningsresultat!!.reiser).hasSize(2)
@@ -389,7 +384,6 @@ class PrivatBilBeregningsresultatServiceTest {
             val beregningsresultatUke1 = beregningsresultatForReise.perioder.single()
             assertThat(beregningsresultatUke1.fom).isEqualTo(fomRammevedtak)
             assertThat(beregningsresultatUke1.tom).isEqualTo(tomRammevedtak)
-            assertThat(beregningsresultatUke1.utbetalingsdato).isEqualTo(tomRammevedtak.finnMandagNesteUke()) // Første mandag etter uke
             assertThat(beregningsresultatUke1.stønadsbeløp).isEqualTo(dagsatsUtenParkering)
             assertThat(beregningsresultatUke1.grunnlag.dager).hasSize(1).allMatch { it.parkeringskostnad == 0 }
         }
@@ -435,7 +429,7 @@ class PrivatBilBeregningsresultatServiceTest {
 
         assertThatException()
             .isThrownBy {
-                beregningService.beregn(rammevedtakPrivatBil, avklarteUker)
+                beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
             }.withMessageContaining("Dag ${kjøreliste.data.reisedager.single { it.harKjørt }.dato} er ikke innenfor rammevedtak")
     }
 
@@ -478,7 +472,7 @@ class PrivatBilBeregningsresultatServiceTest {
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)
 
         assertThatNoException().isThrownBy {
-            beregningService.beregn(rammevedtakPrivatBil, avklarteUker)
+            beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
         }
     }
 

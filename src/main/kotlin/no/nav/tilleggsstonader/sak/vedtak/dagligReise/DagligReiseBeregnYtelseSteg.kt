@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
@@ -12,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.OpprettAndelerDagligReiseService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
@@ -25,6 +25,7 @@ class DagligReiseBeregnYtelseSteg(
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
     private val opphørValideringService: OpphørValideringService,
     private val dagligReiseVedtakService: DagligReiseVedtakService,
+    private val opprettAndelerDagligReiseService: OpprettAndelerDagligReiseService,
     vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -84,10 +85,7 @@ class DagligReiseBeregnYtelseSteg(
             "Foreløpig støttes kun beregning av offentlig transport."
         }
 
-        tilkjentYtelseService.lagreTilkjentYtelse(
-            behandlingId = saksbehandling.id,
-            andeler = beregningsresultat.offentligTransport.mapTilAndelTilkjentYtelse(saksbehandling),
-        )
+        opprettAndelerDagligReiseService.lagreAndelerForBehandling(saksbehandling)
     }
 
     private fun beregnOgLagreOpphør(
@@ -132,12 +130,6 @@ class DagligReiseBeregnYtelseSteg(
             vedtak = vedtak,
         )
 
-        tilkjentYtelseService.lagreTilkjentYtelse(
-            behandlingId = saksbehandling.id,
-            andeler =
-                beregningsresultat.offentligTransport?.mapTilAndelTilkjentYtelse(saksbehandling) ?: feil(
-                    "Mangler beregningsresultat for offentlig transport",
-                ),
-        )
+        opprettAndelerDagligReiseService.lagreAndelerForBehandling(saksbehandling)
     }
 }

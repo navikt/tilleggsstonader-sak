@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVentService
 import no.nav.tilleggsstonader.sak.behandling.vent.ÅrsakSettPåVent
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
+import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
@@ -41,6 +42,7 @@ class OpprettBehandlingService(
     private val unleashService: UnleashService,
     private val settPåVentService: SettPåVentService,
     private val taskService: TaskService,
+    private val fagsakService: FagsakService,
 ) {
     @Transactional
     fun opprettBehandling(request: OpprettBehandling): Behandling {
@@ -52,12 +54,16 @@ class OpprettBehandlingService(
         }
 
         val tidligereBehandlinger = behandlingRepository.findByFagsakId(request.fagsakId)
+        val sisteIverksatteBehandlinger = behandlingRepository.finnSisteIverksatteBehandling(request.fagsakId)
         val forrigeBehandling = behandlingRepository.finnSisteIverksatteBehandling(request.fagsakId)
-        val behandlingType = utledBehandlingTypeV2(tidligereBehandlinger)
+        val behandlingType = utledBehandlingTypeV2(tidligereBehandlinger, behandlingÅrsak = request.behandlingsårsak)
+        val fagsak = fagsakService.hentFagsak(request.fagsakId)
 
         validerKanOppretteNyBehandling(
+            stønadstype = fagsak.stønadstype,
             behandlingType = behandlingType,
             tidligereBehandlinger = tidligereBehandlinger,
+            sisteIverksatteBehandlinger = sisteIverksatteBehandlinger,
         )
 
         val behandlingStatus = utledBehandlingStatus(tidligereBehandlinger)

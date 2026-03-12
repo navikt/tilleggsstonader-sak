@@ -13,16 +13,16 @@ object DetaljertVedtaksperioderDagligReiseMapper {
         val alleReisePerioderTso = vedtaksdataTso?.tilReiseperioder()
         val alleReisePerioderTsr = vedtaksdataTsr?.tilReiseperioder()
 
-        val vedaksperioderFraBeregningsresultatTso = alleReisePerioderTso?.tilDetaljertVedtaksperiode(Stønadstype.DAGLIG_REISE_TSO)
-        val vedaksperioderFraBeregningsresultatTsr = alleReisePerioderTsr?.tilDetaljertVedtaksperiode(Stønadstype.DAGLIG_REISE_TSR)
-
-        val vedaksperioderFraBeregningsresultat =
+        val beregningsresultatDetaljeertForDagligReiseTSO =
+            alleReisePerioderTso?.tilDetaljertBeregningsperioder(Stønadstype.DAGLIG_REISE_TSO)
+        val beregningsresultatDetaljeertForDagligReiseTSR =
+            alleReisePerioderTsr?.tilDetaljertBeregningsperioder(Stønadstype.DAGLIG_REISE_TSR)
+        val beregningsDetaljertForDagligReise =
             listOf(
-                vedaksperioderFraBeregningsresultatTso.orEmpty(),
-                vedaksperioderFraBeregningsresultatTsr.orEmpty(),
+                beregningsresultatDetaljeertForDagligReiseTSO.orEmpty(),
+                beregningsresultatDetaljeertForDagligReiseTSR.orEmpty(),
             ).flatten()
-
-        return vedaksperioderFraBeregningsresultat.sorterOgMergeSammenhengendeEllerOverlappende()
+        return beregningsDetaljertForDagligReise
     }
 
     private fun InnvilgelseEllerOpphørDagligReise.tilReiseperioder() =
@@ -30,18 +30,30 @@ object DetaljertVedtaksperioderDagligReiseMapper {
             reise.perioder
         }
 
-    private fun List<BeregningsresultatForPeriode>.tilDetaljertVedtaksperiode(stønadstype: Stønadstype) =
-        flatMap { periode ->
-            periode.grunnlag.vedtaksperioder.map { vedtaksperiode ->
-                DetaljertVedtaksperiodeDagligReise(
-                    fom = vedtaksperiode.fom,
-                    tom = vedtaksperiode.tom,
-                    aktivitet = vedtaksperiode.aktivitet,
-                    typeAktivtet = vedtaksperiode.typeAktivitet,
-                    målgruppe = vedtaksperiode.målgruppe,
-                    typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
-                    stønadstype = stønadstype,
+    private fun List<BeregningsresultatForPeriode>.tilDetaljertBeregningsperioder(
+        stønadstype: Stønadstype,
+    ): List<DetaljertVedtaksperiodeDagligReise> {
+        val detaljertBeregningsperioder =
+            this.sortedBy { it.grunnlag.fom }.map { beregningsresultatForPeriode ->
+                DetaljertBeregningsperioder(
+                    fom = beregningsresultatForPeriode.grunnlag.fom,
+                    tom = beregningsresultatForPeriode.grunnlag.tom,
+                    prisEnkeltbillett = beregningsresultatForPeriode.grunnlag.prisEnkeltbillett,
+                    prisSyvdagersbillett = beregningsresultatForPeriode.grunnlag.prisSyvdagersbillett,
+                    pris30dagersbillett = beregningsresultatForPeriode.grunnlag.pris30dagersbillett,
+                    beløp = beregningsresultatForPeriode.beløp,
+                    billettdetaljer = beregningsresultatForPeriode.billettdetaljer,
+                    antallReisedager = beregningsresultatForPeriode.grunnlag.antallReisedager,
+                    antallReisedagerPerUke = beregningsresultatForPeriode.grunnlag.antallReisedagerPerUke,
                 )
             }
-        }
+
+        return listOf(
+            DetaljertVedtaksperiodeDagligReise(
+                stønadstype = stønadstype,
+                typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
+                detaljertBeregningsperioder = detaljertBeregningsperioder,
+            ),
+        )
+    }
 }

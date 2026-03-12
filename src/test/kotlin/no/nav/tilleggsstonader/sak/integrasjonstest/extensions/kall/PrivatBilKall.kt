@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
-import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.RammevedtakDto
+import no.nav.tilleggsstonader.kontrakter.søknad.RammevedtakDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingPrivatBilDto
@@ -13,8 +13,8 @@ class PrivatBilKall(
 ) {
     fun hentRammevedtak(ident: String) = apiRespons.hentRammevedtak(ident).expectOkWithBody<List<RammevedtakDto>>()
 
-    fun hentKjørelisteForBehandling(behandlingId: BehandlingId) =
-        apiRespons.hentKjørelisteForBehandling(behandlingId).expectOkWithBody<List<ReisevurderingPrivatBilDto>>()
+    fun hentReisevurderingForBehandling(behandlingId: BehandlingId) =
+        apiRespons.hentReisevurderingForBehandling(behandlingId).expectOkWithBody<List<ReisevurderingPrivatBilDto>>()
 
     fun oppdaterUke(
         behandlingId: BehandlingId,
@@ -35,7 +35,7 @@ class PrivatBilKall(
                     .exchange()
             }
 
-        fun hentKjørelisteForBehandling(behandlingId: BehandlingId) =
+        fun hentReisevurderingForBehandling(behandlingId: BehandlingId) =
             with(testklient.testkontekst) {
                 restTestClient
                     .get()

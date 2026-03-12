@@ -33,10 +33,10 @@ class GooglemapsServiceTest {
         )
 
     val fraAdresse = "Myravegen 2, 6360 Åfarnes"
-    val fraId = "ChIJtS1aVfb4E0YRRJobI6t2Mdw"
+    val fraId = PlaceId("ChIJtS1aVfb4E0YRRJobI6t2Mdw")
 
     val tilAdresse = "Veøy Church, Fv64 40, 6456 Skåla"
-    val tilId = "ChIJ6fHTti_5E0YRJhSJLbVl_Rk"
+    val tilId = PlaceId("ChIJ6fHTti_5E0YRJhSJLbVl_Rk")
 
     @BeforeEach
     fun setUp() {

@@ -65,6 +65,7 @@ class BehandlingTestdataDsl internal constructor() {
     fun defaultDagligReisePrivatBilTsoTestdata(
         fom: LocalDate = defaultFom,
         tom: LocalDate = defaultTom,
+        antallReisedager: Int = 5,
     ) {
         aktivitet {
             opprett {
@@ -78,7 +79,7 @@ class BehandlingTestdataDsl internal constructor() {
         }
         vilkår {
             opprett {
-                privatBil(fom, tom)
+                privatBil(fom, tom, antallReisedager)
             }
         }
     }

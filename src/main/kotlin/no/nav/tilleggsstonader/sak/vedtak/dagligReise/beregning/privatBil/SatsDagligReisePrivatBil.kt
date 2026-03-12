@@ -59,4 +59,9 @@ class SatsDagligReisePrivatBilProvider {
     fun finnRelevantKilometerSatsForPeriode(periode: Periode<LocalDate>): SatsDagligReisePrivatBil =
         alleSatser.find { it.inneholder(periode) }
             ?: error("Kan ikke finne relevant kilometersats for $periode")
+
+    fun finnSatsForÅr(år: Int) =
+        alleSatser.single {
+            it.fom.year == år && it.tom.year == år
+        }
 }

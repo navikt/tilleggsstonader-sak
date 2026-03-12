@@ -4,7 +4,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20260120121808_b5446a9"
 val tilleggsstønaderLibsVersion = "2026.03.03-10.23.f286f5829acc"
-val tilleggsstønaderKontrakterVersion = "2026.03.04-12.32.d3cae5e3937a"
+val tilleggsstønaderKontrakterVersion = "2026.03.11-10.42.c0a4c6977460"
 val avroVersion = "1.12.1"
 val confluentVersion = "8.0.1"
 val joarkHendelseVersion = "1.1.8"
@@ -42,7 +42,7 @@ apply(plugin = "com.diffplug.spotless")
 
 spotless {
     kotlin {
-        ktlint("1.7.1")
+        ktlint("1.8.0")
     }
 }
 

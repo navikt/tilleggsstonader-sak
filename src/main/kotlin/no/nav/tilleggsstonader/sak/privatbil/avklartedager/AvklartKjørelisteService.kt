@@ -2,17 +2,16 @@ package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
-import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.springframework.stereotype.Service
 import java.time.DayOfWeek
@@ -21,7 +20,7 @@ import java.util.UUID
 
 @Service
 class AvklartKjørelisteService(
-    private val vedtakRepository: VedtakRepository,
+    private val vedtakService: VedtakService,
     private val avklartKjørtUkeRepository: AvklartKjørtUkeRepository,
 ) {
     fun hentAvklarteUkerForBehandling(behandlingId: BehandlingId): List<AvklartKjørtUke> =
@@ -30,10 +29,10 @@ class AvklartKjørelisteService(
     fun hentAvklartUke(ukeId: UUID): AvklartKjørtUke = avklartKjørtUkeRepository.findByIdOrThrow(ukeId)
 
     fun avklarUkerFraKjøreliste(
-        behandling: Saksbehandling,
+        behandling: Behandling,
         kjøreliste: Kjøreliste,
     ) {
-        val rammeForReise = hentReiseFraForrigeVedtak(behandling, kjøreliste.data.reiseId)
+        val rammeForReise = henteReiseFraVedtak(behandling, kjøreliste.data.reiseId)
 
         validerAtAlleDagerIKjørelistaErInnenForRammevedtaket(rammeForReise, kjøreliste)
 
@@ -89,11 +88,11 @@ class AvklartKjørelisteService(
 
     private fun utledGodkjentGjennomførtKjøringAutomatisk(
         harKjørt: Boolean,
-        harAvvik: Boolean,
+        ukeEllerDagHarAvvik: Boolean,
     ): GodkjentGjennomførtKjøring =
         if (!harKjørt) {
             GodkjentGjennomførtKjøring.NEI
-        } else if (!harAvvik) {
+        } else if (!ukeEllerDagHarAvvik) {
             GodkjentGjennomførtKjøring.JA
         } else {
             GodkjentGjennomførtKjøring.IKKE_VURDERT
@@ -165,7 +164,7 @@ class AvklartKjørelisteService(
         val godkjentGjennomførtKjøring =
             utledGodkjentGjennomførtKjøringAutomatisk(
                 harKjørt = kjørelisteDag.harKjørt,
-                harAvvik = (avvik.isNotEmpty() && avvikUke == null),
+                ukeEllerDagHarAvvik = (avvik.isNotEmpty() || avvikUke != null),
             )
 
         return AvklartKjørtDag(
@@ -196,21 +195,18 @@ class AvklartKjørelisteService(
         }
     }
 
-    private fun hentReiseFraForrigeVedtak(
-        behandling: Saksbehandling,
+    private fun henteReiseFraVedtak(
+        behandling: Behandling,
         reiseId: ReiseId,
     ): RammeForReiseMedPrivatBil {
-        val rammeFraForrigeBehandling =
-            behandling.forrigeIverksatteBehandlingId
-                ?.let {
-                    vedtakRepository
-                        .findByIdOrThrow(behandling.forrigeIverksatteBehandlingId)
-                        .withTypeOrThrow<InnvilgelseEllerOpphørDagligReise>()
-                }?.data
-                ?.rammevedtakPrivatBil
-                ?: error("Fant ikke rammevedtak for forrige behandling med id ${behandling.forrigeIverksatteBehandlingId}")
+        val rammevedtak =
+            vedtakService
+                .hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandling.id)
+                .data
+                .rammevedtakPrivatBil
+                ?: error("Fant ikke rammevedtak for behandling med id ${behandling.id}")
 
-        return rammeFraForrigeBehandling.reiser.singleOrNull { it.reiseId == reiseId }
+        return rammevedtak.reiser.singleOrNull { it.reiseId == reiseId }
             ?: error("Forventet å finne ramme for reise med id $reiseId")
     }
 

@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.sak.googlemaps.PlaceId
 import no.nav.tilleggsstonader.sak.googlemaps.placeDetailsApi.GooglePlaceDetailsClient
 import no.nav.tilleggsstonader.sak.googlemaps.placeDetailsApi.PlaceDetailsResponse
 import org.springframework.context.annotation.Bean
@@ -21,9 +22,9 @@ class GooglePlaceDetailsClientMockConfig {
         fun resetTilDefault(client: GooglePlaceDetailsClient) {
             clearMocks(client)
             every { client.finnStedDetaljer(any()) } answers {
-                val placeId = firstArg<String>()
+                val placeId = firstArg<PlaceId>()
                 PlaceDetailsResponse(
-                    id = placeId,
+                    id = placeId.value,
                     formattedAddress = "Mock address for $placeId",
                     displayName = null,
                 )

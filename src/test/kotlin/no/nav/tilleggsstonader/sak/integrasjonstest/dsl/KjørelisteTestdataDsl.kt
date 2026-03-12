@@ -11,7 +11,7 @@ import java.time.LocalDate
 @BehandlingTestdataDslMarker
 class KjørelisteTestdataDsl {
     internal var periode: Datoperiode? = null
-    internal var kjørteDager: List<Pair<LocalDate, Int>> = mutableListOf() // dato med parkeringsutgifter
+    internal var kjørteDager: List<Pair<LocalDate, Int?>> = mutableListOf() // dato med parkeringsutgifter
     internal var reiseIdProvider: ((List<VilkårDagligReiseDto>) -> ReiseId)? = { it.first().reiseId }
 
     fun reiseId(provider: (List<VilkårDagligReiseDto>) -> ReiseId) {

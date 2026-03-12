@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørAlleTaskMedSenererTriggertid
@@ -43,7 +43,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
         }
 
         kjørAlleTaskMedSenererTriggertid()
-        KafkaTestConfig
+        KafkaFake
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.dittnav, 1)
 
@@ -78,7 +78,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
         }
 
         kjørAlleTaskMedSenererTriggertid()
-        KafkaTestConfig
+        KafkaFake
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.dittnav, 1)
 
@@ -108,7 +108,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
         }
 
         kjørAlleTaskMedSenererTriggertid()
-        KafkaTestConfig
+        KafkaFake
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.dittnav, 0)
 
@@ -139,7 +139,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
         }
 
         kjørAlleTaskMedSenererTriggertid()
-        KafkaTestConfig
+        KafkaFake
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.dittnav, 0)
 
@@ -170,7 +170,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
         }
 
         kjørAlleTaskMedSenererTriggertid()
-        KafkaTestConfig
+        KafkaFake
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.dittnav, 1)
 

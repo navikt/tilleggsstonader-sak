@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
@@ -76,7 +76,7 @@ class UtbetalingIntegrationTest : CleanDatabaseIntegrationTest() {
 
         Assertions.assertThat(finnesUtbetalingIdEtterFørstegangsbehandling).isTrue
         verify(exactly = 1) { simuleringClient.simuler(any()) }
-        KafkaTestConfig
+        KafkaFake
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
 
@@ -117,7 +117,7 @@ class UtbetalingIntegrationTest : CleanDatabaseIntegrationTest() {
         Assertions.assertThat(finnesUtbetalingIdEtterRevurdering).isTrue
         verify(exactly = 2) { simuleringClient.simuler(any()) }
         val opphørUtbetaling =
-            KafkaTestConfig
+            KafkaFake
                 .sendteMeldinger()
                 .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 2)
                 .map { it.verdiEllerFeil<IverksettingDto>() }
@@ -150,7 +150,7 @@ class UtbetalingIntegrationTest : CleanDatabaseIntegrationTest() {
                 .sortedBy { it.fom }
 
         val sendtUtbetaling =
-            KafkaTestConfig
+            KafkaFake
                 .sendteMeldinger()
                 .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
                 .single()
