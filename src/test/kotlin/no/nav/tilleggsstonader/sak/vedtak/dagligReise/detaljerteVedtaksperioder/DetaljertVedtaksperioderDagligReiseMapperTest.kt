@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.utils.dato.april
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -30,115 +29,68 @@ import java.util.UUID
 import java.util.UUID.randomUUID
 
 class DetaljertVedtaksperioderDagligReiseMapperTest {
-    private val defaultAktivitet = AktivitetType.TILTAK
-    private val defaultMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
-    private val defaultTypeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT
-
     private val førsteJanuar = 1 januar 2024
     private val sisteJanuar = 31 januar 2024
     private val førsteFeb = 1 februar 2024
     private val sisteFeb = 29 februar 2024
-    private val førsteApril = 1 april 2024
-    private val sisteApril = 30 april 2024
 
     @Test
-    fun `skal slå sammen sammenhengende vedtaksperioder med like verdier`() {
-        val vedtak =
+    fun `skal mappe TSO vedtak til detaljerte vedtaksperioder`() {
+        val tsoVedtak =
             innvilgelse(
-                toVedtaksperioder(
-                    førsteJanuar,
-                    sisteJanuar,
-                    førsteFeb,
-                    sisteFeb,
+                InnvilgelseDagligReise(
+                    vedtaksperioder = defaultVedtaksperioder,
+                    beregningsresultat = defaultBeregningsresultat,
+                    rammevedtakPrivatBil = null,
+                ),
+            )
+        val tsrVedtak =
+            innvilgelse(
+                InnvilgelseDagligReise(
+                    vedtaksperioder = defaultVedtaksperioder,
+                    beregningsresultat = defaultBeregningsresultat,
+                    rammevedtakPrivatBil = null,
                 ),
             )
 
         val resultat =
             finnDetaljerteVedtaksperioderDagligReise(
-                vedtaksdataTso = vedtak.data,
-                vedtaksdataTsr = null,
+                vedtaksdataTso = tsoVedtak.data,
+                vedtaksdataTsr = tsrVedtak.data,
             )
-        val forventetResultat =
-            listOf(
-                detaljertVedtaksperiodeDagligReiseTso(fom = førsteJanuar, tom = sisteFeb),
+        val forventetTso =
+            DetaljertVedtaksperiodeDagligReise(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+                typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
+                detaljertBeregningsperioder =
+                    listOf(
+                        DetaljertBeregningsperioder(
+                            fom = førsteJanuar,
+                            tom = sisteJanuar,
+                            prisEnkeltbillett = 50,
+                            prisSyvdagersbillett = 300,
+                            pris30dagersbillett = 1000,
+                            beløp = 1000,
+                            billettdetaljer = mapOf(Billettype.TRETTIDAGERSBILLETT to 1000),
+                            antallReisedager = 20,
+                            antallReisedagerPerUke = 5,
+                        ),
+                        DetaljertBeregningsperioder(
+                            fom = førsteFeb,
+                            tom = sisteFeb,
+                            prisEnkeltbillett = 50,
+                            prisSyvdagersbillett = 300,
+                            pris30dagersbillett = 1000,
+                            beløp = 1000,
+                            billettdetaljer = mapOf(Billettype.TRETTIDAGERSBILLETT to 1000),
+                            antallReisedager = 20,
+                            antallReisedagerPerUke = 5,
+                        ),
+                    ),
             )
-        assertThat(resultat).isEqualTo(forventetResultat)
+        val forventetTsr = forventetTso.copy(stønadstype = Stønadstype.DAGLIG_REISE_TSR)
+        assertThat(resultat).containsExactly(forventetTso, forventetTsr)
     }
-
-    @Test
-    fun `skal ikke slå sammen vedtaksperioder som ikke overlapper`() {
-        val vedtak =
-            innvilgelse(
-                toVedtaksperioder(
-                    førsteApril,
-                    sisteApril,
-                    førsteFeb,
-                    sisteFeb,
-                ),
-            )
-        val resultat =
-            finnDetaljerteVedtaksperioderDagligReise(
-                vedtaksdataTso = vedtak.data,
-                vedtaksdataTsr = null,
-            )
-        val forventetResultat =
-            listOf(
-                detaljertVedtaksperiodeDagligReiseTso(førsteFeb, sisteFeb),
-                detaljertVedtaksperiodeDagligReiseTso(førsteApril, sisteApril),
-            )
-
-        assertThat(resultat).isEqualTo(forventetResultat)
-    }
-
-    @Test
-    fun `skal slå sammen like perioder når det er flere enn 1 reise`() {
-        val vedtak =
-            innvilgelse(
-                toReiser(
-                    førsteJanuar,
-                    sisteJanuar,
-                ),
-            )
-
-        val resultat =
-            finnDetaljerteVedtaksperioderDagligReise(
-                vedtaksdataTso = vedtak.data,
-                vedtaksdataTsr = null,
-            )
-        val forventetResultat =
-            listOf(
-                detaljertVedtaksperiodeDagligReiseTso(førsteJanuar, sisteJanuar),
-            )
-        assertThat(resultat).isEqualTo(forventetResultat)
-    }
-
-    private fun toReiser(
-        fom: LocalDate,
-        tom: LocalDate,
-    ) = InnvilgelseDagligReise(
-        vedtaksperioder =
-            listOf(
-                vedtaksperiode(fom = fom, tom = tom),
-            ),
-        beregningsresultat = lagBeregningsresultatMedToReiser(fom, tom),
-        rammevedtakPrivatBil = null,
-    )
-
-    private fun detaljertVedtaksperiodeDagligReiseTso(
-        fom: LocalDate,
-        tom: LocalDate,
-        aktivitet: AktivitetType = defaultAktivitet,
-        målgruppe: FaktiskMålgruppe = defaultMålgruppe,
-        typeDagligReise: TypeDagligReise = defaultTypeDagligReise,
-    ) = DetaljertVedtaksperiodeDagligReise(
-        fom = fom,
-        tom = tom,
-        aktivitet = aktivitet,
-        målgruppe = målgruppe,
-        typeDagligReise = typeDagligReise,
-        stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-        typeAktivtet = null,
-    )
 
     private fun innvilgelse(data: InnvilgelseDagligReise = defaultInnvilgelseDagligReise) =
         GeneriskVedtak(

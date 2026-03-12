@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt
 
 import io.mockk.every
-import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
@@ -9,7 +8,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
-import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
@@ -20,11 +18,12 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertBeregningsperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -82,13 +81,22 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
         val forventetDetaljertVedtaksperiodeTsr =
             listOf(
                 DetaljertVedtaksperiodeDagligReise(
-                    fom = fomTiltaksenheten,
-                    tom = tomTiltaksenheten,
-                    aktivitet = AktivitetType.TILTAK,
-                    typeAktivtet = TypeAktivitet.GRUPPEAMO,
-                    målgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
-                    typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
                     stønadstype = Stønadstype.DAGLIG_REISE_TSR,
+                    typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
+                    detaljertBeregningsperioder =
+                        listOf(
+                            DetaljertBeregningsperioder(
+                                fom = fomTiltaksenheten,
+                                tom = tomTiltaksenheten,
+                                prisEnkeltbillett = 40,
+                                prisSyvdagersbillett = null,
+                                pris30dagersbillett = 800,
+                                beløp = 800,
+                                billettdetaljer = mapOf(Billettype.TRETTIDAGERSBILLETT to 1),
+                                antallReisedager = 22,
+                                antallReisedagerPerUke = 5,
+                            ),
+                        ),
                 ),
             )
 
