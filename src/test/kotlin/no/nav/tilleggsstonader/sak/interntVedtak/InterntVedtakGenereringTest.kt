@@ -149,8 +149,8 @@ class InterntVedtakGenereringTest {
         every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.DagligReise.grunnlagsdata
         every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
         every { vilkårService.hentVilkår(behandlingId) } returns
-                InterntVedtakTestdata.DagligReise.vilkårOffentligTransport +
-                InterntVedtakTestdata.DagligReise.vilkårPrivatBil
+            InterntVedtakTestdata.DagligReise.vilkårOffentligTransport +
+            InterntVedtakTestdata.DagligReise.vilkårPrivatBil
         every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.DagligReise.innvilgetVedtakTso()
     }
 
@@ -160,8 +160,8 @@ class InterntVedtakGenereringTest {
         every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.DagligReise.grunnlagsdata
         every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
         every { vilkårService.hentVilkår(behandlingId) } returns
-                InterntVedtakTestdata.DagligReise.vilkårOffentligTransport +
-                InterntVedtakTestdata.DagligReise.vilkårPrivatBil
+            InterntVedtakTestdata.DagligReise.vilkårOffentligTransport +
+            InterntVedtakTestdata.DagligReise.vilkårPrivatBil
         every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.DagligReise.innvilgetVedtakTsr()
     }
 

@@ -251,5 +251,6 @@
       "inneholderUtgifterOvernatting" : true
     } ],
     "dagligReise" : null
-  }
+  },
+  "rammevedtakPrivatBil" : null
 }

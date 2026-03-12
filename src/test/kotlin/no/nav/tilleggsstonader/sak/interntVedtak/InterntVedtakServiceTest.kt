@@ -513,7 +513,9 @@ class InterntVedtakServiceTest {
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
             assertThat(interntVedtak.aktiviteter).hasSize(2)
 
-            val aktivitet = InterntVedtakTestdata.DagligReise.vilkårperioderTso.aktiviteter.first()
+            val aktivitet =
+                InterntVedtakTestdata.DagligReise.vilkårperioderTso.aktiviteter
+                    .first()
 
             with(interntVedtak.aktiviteter.first()) {
                 assertThat(type).isEqualTo(AktivitetType.TILTAK)
@@ -534,11 +536,15 @@ class InterntVedtakServiceTest {
 
             val forventet = InterntVedtakTestdata.DagligReise.rammevedtakPrivatBil.reiser
 
-            interntVedtak.rammevedtakPrivatBil?.reiser?.map { reise  ->
+            interntVedtak.rammevedtakPrivatBil?.reiser?.forEachIndexed { index, reise ->
                 with(reise.grunnlag) {
-                    assertThat(this.fom).isEqualTo(forventet.first().grunnlag.fom)
-                    assertThat(this.tom).isEqualTo(forventet.first().grunnlag.tom)
-                    assertThat(this.reisedagerPerUke).isEqualTo(forventet.first().grunnlag.reisedagerPerUke)
+                    assertThat(this.fom).isEqualTo(forventet[index].grunnlag.fom)
+                    assertThat(this.tom).isEqualTo(forventet[index].grunnlag.tom)
+                    assertThat(this.vedtaksperioder).isEqualTo(forventet[index].grunnlag.vedtaksperioder)
+                    assertThat(this.reisedagerPerUke).isEqualTo(forventet[index].grunnlag.reisedagerPerUke)
+                    assertThat(this.reiseavstandEnVei).isEqualTo(forventet[index].grunnlag.reiseavstandEnVei)
+                    assertThat(this.satser).isEqualTo(forventet[index].grunnlag.satser)
+                    assertThat(this.ekstrakostnader).isEqualTo(forventet[index].grunnlag.ekstrakostnader)
                 }
             }
         }

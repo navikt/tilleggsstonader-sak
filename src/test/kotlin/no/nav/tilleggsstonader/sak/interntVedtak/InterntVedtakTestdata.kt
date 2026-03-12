@@ -100,6 +100,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning as Vedt
 
 object InterntVedtakTestdata {
     val behandlingId = BehandlingId.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e31")
+    val vedtaksperiodeId = UUID.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e37")
 
     val totrinnskontroll = totrinnskontroll(behandlingId, beslutter = "saksbeh2")
 
@@ -252,7 +253,7 @@ object InterntVedtakTestdata {
 
         val vedtaksperiode =
             Vedtaksperiode(
-                id = UUID.randomUUID(),
+                id = vedtaksperiodeId,
                 fom = LocalDate.of(2024, 1, 1),
                 tom = LocalDate.of(2024, 2, 1),
                 målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
@@ -485,7 +486,7 @@ object InterntVedtakTestdata {
         val vedtaksperioder =
             listOf(
                 Vedtaksperiode(
-                    id = UUID.randomUUID(),
+                    id = vedtaksperiodeId,
                     fom = LocalDate.of(2024, JANUARY, 1),
                     tom = LocalDate.of(2024, FEBRUARY, 29),
                     aktivitet = AktivitetType.TILTAK,
@@ -508,13 +509,13 @@ object InterntVedtakTestdata {
                                     utgifter =
                                         mapOf(
                                             TypeBoutgift.UTGIFTER_OVERNATTING to
-                                                    listOf(
-                                                        lagUtgiftBeregningBoutgifter(
-                                                            fom = LocalDate.of(2024, 1, 1),
-                                                            tom = LocalDate.of(2024, 1, 31),
-                                                            utgift = 3000,
-                                                        ),
+                                                listOf(
+                                                    lagUtgiftBeregningBoutgifter(
+                                                        fom = LocalDate.of(2024, 1, 1),
+                                                        tom = LocalDate.of(2024, 1, 31),
+                                                        utgift = 3000,
                                                     ),
+                                                ),
                                         ),
                                 ),
                             stønadsbeløp = 3000,
@@ -531,21 +532,21 @@ object InterntVedtakTestdata {
                                     utgifter =
                                         mapOf(
                                             TypeBoutgift.UTGIFTER_OVERNATTING to
-                                                    listOf(
-                                                        lagUtgiftBeregningBoutgifter(
-                                                            fom = LocalDate.of(2024, FEBRUARY, 1),
-                                                            tom = LocalDate.of(2024, FEBRUARY, 2),
-                                                            utgift = 3000,
-                                                        ),
+                                                listOf(
+                                                    lagUtgiftBeregningBoutgifter(
+                                                        fom = LocalDate.of(2024, FEBRUARY, 1),
+                                                        tom = LocalDate.of(2024, FEBRUARY, 2),
+                                                        utgift = 3000,
                                                     ),
+                                                ),
                                             TypeBoutgift.UTGIFTER_OVERNATTING to
-                                                    listOf(
-                                                        lagUtgiftBeregningBoutgifter(
-                                                            fom = LocalDate.of(2024, FEBRUARY, 26),
-                                                            tom = LocalDate.of(2024, FEBRUARY, 29),
-                                                            utgift = 4000,
-                                                        ),
+                                                listOf(
+                                                    lagUtgiftBeregningBoutgifter(
+                                                        fom = LocalDate.of(2024, FEBRUARY, 26),
+                                                        tom = LocalDate.of(2024, FEBRUARY, 29),
+                                                        utgift = 4000,
                                                     ),
+                                                ),
                                         ),
                                 ),
                             stønadsbeløp = 4953,
@@ -711,34 +712,66 @@ object InterntVedtakTestdata {
         val grunnlagsdata =
             lagGrunnlagsdata(personopplysninger = lagFaktaGrunnlagPersonopplysninger(barn = emptyList()))
 
-        val rammevedtakPrivatBil = RammevedtakPrivatBil(
-            reiser = listOf(
-                RammeForReiseMedPrivatBil(
-                    reiseId = dummyReiseId,
-                    aktivitetsadresse = "Testveien 1, 1234 Testby",
-                    grunnlag = BeregningsgrunnlagForReiseMedPrivatBil(
-                        fom = LocalDate.of(2024, 1, 1),
-                        tom = LocalDate.of(2024, 1, 31),
-                        reisedagerPerUke = 3,
-                        ekstrakostnader = Ekstrakostnader(
-                            bompengerEnVei = 40,
-                            fergekostnadEnVei = 50,
+        val rammevedtakPrivatBil =
+            RammevedtakPrivatBil(
+                reiser =
+                    listOf(
+                        RammeForReiseMedPrivatBil(
+                            reiseId = dummyReiseId,
+                            aktivitetsadresse = "Testveien 1, 1234 Testby",
+                            grunnlag =
+                                BeregningsgrunnlagForReiseMedPrivatBil(
+                                    fom = LocalDate.of(2024, 1, 1),
+                                    tom = LocalDate.of(2024, 1, 31),
+                                    reisedagerPerUke = 3,
+                                    ekstrakostnader =
+                                        Ekstrakostnader(
+                                            bompengerEnVei = 40,
+                                            fergekostnadEnVei = 50,
+                                        ),
+                                    reiseavstandEnVei = BigDecimal.valueOf(40.0),
+                                    satser =
+                                        listOf(
+                                            SatsForPeriodePrivatBil(
+                                                fom = LocalDate.of(2024, 1, 1),
+                                                tom = LocalDate.of(2024, 1, 31),
+                                                satsBekreftetVedVedtakstidspunkt = true,
+                                                kilometersats = BigDecimal.valueOf(2.94),
+                                                dagsatsUtenParkering = BigDecimal.valueOf(100.0),
+                                            ),
+                                        ),
+                                    vedtaksperioder = vedtaksperioder,
+                                ),
                         ),
-                        reiseavstandEnVei = BigDecimal.valueOf(40.0),
-                        satser = listOf(
-                            SatsForPeriodePrivatBil(
-                                fom = LocalDate.of(2024, 1, 1),
-                                tom = LocalDate.of(2024, 1, 31),
-                                satsBekreftetVedVedtakstidspunkt = true,
-                                kilometersats = BigDecimal.valueOf(4.0),
-                                dagsatsUtenParkering = BigDecimal.valueOf(5.0),
-                            ),
+                        RammeForReiseMedPrivatBil(
+                            reiseId = dummyReiseId,
+                            aktivitetsadresse = "Testveien 2, 1234 Testby",
+                            grunnlag =
+                                BeregningsgrunnlagForReiseMedPrivatBil(
+                                    fom = LocalDate.of(2024, 1, 1),
+                                    tom = LocalDate.of(2024, 1, 31),
+                                    reisedagerPerUke = 3,
+                                    ekstrakostnader =
+                                        Ekstrakostnader(
+                                            bompengerEnVei = 40,
+                                            fergekostnadEnVei = 50,
+                                        ),
+                                    reiseavstandEnVei = BigDecimal.valueOf(60.0),
+                                    satser =
+                                        listOf(
+                                            SatsForPeriodePrivatBil(
+                                                fom = LocalDate.of(2024, 1, 1),
+                                                tom = LocalDate.of(2024, 1, 31),
+                                                satsBekreftetVedVedtakstidspunkt = true,
+                                                kilometersats = BigDecimal.valueOf(3.50),
+                                                dagsatsUtenParkering = BigDecimal.valueOf(100.0),
+                                            ),
+                                        ),
+                                    vedtaksperioder = vedtaksperioder,
+                                ),
                         ),
-                        vedtaksperioder = vedtaksperioder,
                     ),
-                )
             )
-        )
 
         fun beregningsresultatTso() = beregningsresultat(brukersNavKontor = null)
 
@@ -812,79 +845,82 @@ object InterntVedtakTestdata {
                                 ),
                             ),
                     ),
-                privatBil = BeregningsresultatPrivatBil(
-                    reiser = listOf(
-                        BeregningsresultatForReisePrivatBil(
-                            reiseId = dummyReiseId,
-                            perioder =
-                                listOf(
-                                    BeregningsresultatForReisePrivatBilPeriode(
-                                        fom = LocalDate.of(2025, 1, 1),
-                                        tom = LocalDate.of(2025, 2, 28),
-                                        utbetalingsdato = LocalDate.of(2025, 2, 28),
-                                        grunnlag =
-                                            BeregningsresultatForReisePrivatBilGrunnlag(
-                                                dager = listOf(
-                                                    BeregningsresultatForReisePrivatBilDag(
-                                                        dato = LocalDate.of(2025, 1, 2),
-                                                        parkeringskostnad = 100,
-                                                        stønadsbeløpForDag = BigDecimal(195),
+                privatBil =
+                    BeregningsresultatPrivatBil(
+                        reiser =
+                            listOf(
+                                BeregningsresultatForReisePrivatBil(
+                                    reiseId = dummyReiseId,
+                                    perioder =
+                                        listOf(
+                                            BeregningsresultatForReisePrivatBilPeriode(
+                                                fom = LocalDate.of(2025, 1, 1),
+                                                tom = LocalDate.of(2025, 2, 28),
+                                                utbetalingsdato = LocalDate.of(2025, 2, 28),
+                                                grunnlag =
+                                                    BeregningsresultatForReisePrivatBilGrunnlag(
+                                                        dager =
+                                                            listOf(
+                                                                BeregningsresultatForReisePrivatBilDag(
+                                                                    dato = LocalDate.of(2025, 1, 2),
+                                                                    parkeringskostnad = 100,
+                                                                    stønadsbeløpForDag = BigDecimal(195),
+                                                                ),
+                                                                BeregningsresultatForReisePrivatBilDag(
+                                                                    dato = LocalDate.of(2025, 1, 3),
+                                                                    parkeringskostnad = 100,
+                                                                    stønadsbeløpForDag = BigDecimal(195),
+                                                                ),
+                                                                BeregningsresultatForReisePrivatBilDag(
+                                                                    dato = LocalDate.of(2025, 1, 4),
+                                                                    parkeringskostnad = 100,
+                                                                    stønadsbeløpForDag = BigDecimal(195),
+                                                                ),
+                                                                BeregningsresultatForReisePrivatBilDag(
+                                                                    dato = LocalDate.of(2025, 1, 22),
+                                                                    parkeringskostnad = 100,
+                                                                    stønadsbeløpForDag = BigDecimal(195),
+                                                                ),
+                                                                BeregningsresultatForReisePrivatBilDag(
+                                                                    dato = LocalDate.of(2025, 1, 23),
+                                                                    parkeringskostnad = 100,
+                                                                    stønadsbeløpForDag = BigDecimal(195),
+                                                                ),
+                                                                BeregningsresultatForReisePrivatBilDag(
+                                                                    dato = LocalDate.of(2025, 1, 24),
+                                                                    parkeringskostnad = 100,
+                                                                    stønadsbeløpForDag = BigDecimal(195),
+                                                                ),
+                                                                BeregningsresultatForReisePrivatBilDag(
+                                                                    dato = LocalDate.of(2025, 2, 7),
+                                                                    parkeringskostnad = 100,
+                                                                    stønadsbeløpForDag = BigDecimal(195),
+                                                                ),
+                                                                BeregningsresultatForReisePrivatBilDag(
+                                                                    dato = LocalDate.of(2025, 2, 8),
+                                                                    parkeringskostnad = 100,
+                                                                    stønadsbeløpForDag = BigDecimal(195),
+                                                                ),
+                                                                BeregningsresultatForReisePrivatBilDag(
+                                                                    dato = LocalDate.of(2025, 2, 9),
+                                                                    parkeringskostnad = 100,
+                                                                    stønadsbeløpForDag = BigDecimal(195),
+                                                                ),
+                                                            ),
+                                                        dagsatsUtenParkering = BigDecimal(100),
                                                     ),
-                                                    BeregningsresultatForReisePrivatBilDag(
-                                                        dato = LocalDate.of(2025, 1, 3),
-                                                        parkeringskostnad = 100,
-                                                        stønadsbeløpForDag = BigDecimal(195),
-                                                    ),
-                                                    BeregningsresultatForReisePrivatBilDag(
-                                                        dato = LocalDate.of(2025, 1, 4),
-                                                        parkeringskostnad = 100,
-                                                        stønadsbeløpForDag = BigDecimal(195),
-                                                    ),
-                                                    BeregningsresultatForReisePrivatBilDag(
-                                                        dato = LocalDate.of(2025, 1, 22),
-                                                        parkeringskostnad = 100,
-                                                        stønadsbeløpForDag = BigDecimal(195),
-                                                    ),
-                                                    BeregningsresultatForReisePrivatBilDag(
-                                                        dato = LocalDate.of(2025, 1, 23),
-                                                        parkeringskostnad = 100,
-                                                        stønadsbeløpForDag = BigDecimal(195),
-                                                    ),
-                                                    BeregningsresultatForReisePrivatBilDag(
-                                                        dato = LocalDate.of(2025, 1, 24),
-                                                        parkeringskostnad = 100,
-                                                        stønadsbeløpForDag = BigDecimal(195),
-                                                    ),
-                                                    BeregningsresultatForReisePrivatBilDag(
-                                                        dato = LocalDate.of(2025, 2, 7),
-                                                        parkeringskostnad = 100,
-                                                        stønadsbeløpForDag = BigDecimal(195),
-                                                    ),
-                                                    BeregningsresultatForReisePrivatBilDag(
-                                                        dato = LocalDate.of(2025, 2, 8),
-                                                        parkeringskostnad = 100,
-                                                        stønadsbeløpForDag = BigDecimal(195),
-                                                    ),
-                                                    BeregningsresultatForReisePrivatBilDag(
-                                                        dato = LocalDate.of(2025, 2, 9),
-                                                        parkeringskostnad = 100,
-                                                        stønadsbeløpForDag = BigDecimal(195),
-                                                    )
-                                                ),
-                                                dagsatsUtenParkering = BigDecimal(100),
+                                                stønadsbeløp = BigDecimal(500),
                                             ),
-                                        stønadsbeløp = BigDecimal(500),
-                                    ),
+                                        ),
                                 ),
-                        ),
-                    )
-                )
+                            ),
+                    ),
             )
 
         val vedtaksperioderTso =
             listOf(
                 Vedtaksperiode(
-                    id = UUID.randomUUID(),
+                    id = vedtaksperiodeId,
                     fom = LocalDate.of(2024, JANUARY, 1),
                     tom = LocalDate.of(2024, FEBRUARY, 29),
                     aktivitet = AktivitetType.TILTAK,
@@ -895,7 +931,7 @@ object InterntVedtakTestdata {
         val vedtaksperioderTsr =
             listOf(
                 Vedtaksperiode(
-                    id = UUID.randomUUID(),
+                    id = vedtaksperiodeId,
                     fom = LocalDate.of(2024, JANUARY, 1),
                     tom = LocalDate.of(2024, FEBRUARY, 29),
                     aktivitet = AktivitetType.TILTAK,

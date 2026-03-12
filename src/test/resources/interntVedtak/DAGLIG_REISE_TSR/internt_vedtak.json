@@ -230,5 +230,62 @@
       },
       "tidligsteEndring" : null
     }
+  },
+  "rammevedtakPrivatBil" : {
+    "reiser" : [ {
+      "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
+      "aktivitetsadresse" : "Testveien 1, 1234 Testby",
+      "grunnlag" : {
+        "fom" : "2024-01-01",
+        "tom" : "2024-01-31",
+        "reisedagerPerUke" : 3,
+        "reiseavstandEnVei" : 40.0,
+        "ekstrakostnader" : {
+          "bompengerEnVei" : 40,
+          "fergekostnadEnVei" : 50
+        },
+        "satser" : [ {
+          "fom" : "2024-01-01",
+          "tom" : "2024-01-31",
+          "satsBekreftetVedVedtakstidspunkt" : true,
+          "kilometersats" : 2.94,
+          "dagsatsUtenParkering" : 100.0
+        } ],
+        "vedtaksperioder" : [ {
+          "id" : "001464ca-20dc-4f6c-b3e8-c83bd98b3e37",
+          "fom" : "2024-01-01",
+          "tom" : "2024-02-29",
+          "målgruppe" : "NEDSATT_ARBEIDSEVNE",
+          "aktivitet" : "TILTAK"
+        } ]
+      }
+    }, {
+      "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
+      "aktivitetsadresse" : "Testveien 2, 1234 Testby",
+      "grunnlag" : {
+        "fom" : "2024-01-01",
+        "tom" : "2024-01-31",
+        "reisedagerPerUke" : 3,
+        "reiseavstandEnVei" : 60.0,
+        "ekstrakostnader" : {
+          "bompengerEnVei" : 40,
+          "fergekostnadEnVei" : 50
+        },
+        "satser" : [ {
+          "fom" : "2024-01-01",
+          "tom" : "2024-01-31",
+          "satsBekreftetVedVedtakstidspunkt" : true,
+          "kilometersats" : 3.5,
+          "dagsatsUtenParkering" : 100.0
+        } ],
+        "vedtaksperioder" : [ {
+          "id" : "001464ca-20dc-4f6c-b3e8-c83bd98b3e37",
+          "fom" : "2024-01-01",
+          "tom" : "2024-02-29",
+          "målgruppe" : "NEDSATT_ARBEIDSEVNE",
+          "aktivitet" : "TILTAK"
+        } ]
+      }
+    } ]
   }
 }

@@ -12,11 +12,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForReiseMedPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Ekstrakostnader
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.SatsForPeriodePrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
@@ -49,7 +45,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligRei
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgVurderingDto
@@ -87,7 +82,7 @@ class InterntVedtakService(
             vilkår = mapVilkår(vilkår, behandlingbarn),
             vedtak = mapVedtak(vedtak),
             beregningsresultat = mapBeregningsresultatForStønadstype(vedtak, vilkår),
-            rammevedtakPrivatBil = mapRammevedtakPrivatBil(vilkår, vedtak),
+            rammevedtakPrivatBil = mapRammevedtakPrivatBil(vedtak),
         )
     }
 
@@ -123,7 +118,7 @@ class InterntVedtakService(
                 }
 
                 is Innvilgelse,
-                    -> error("Mangler mapping av beregningsresultat for ${data.type}")
+                -> error("Mangler mapping av beregningsresultat for ${data.type}")
 
                 else -> null
             }
@@ -317,50 +312,15 @@ class InterntVedtakService(
                 )
         }
 
-    private fun mapRammevedtakPrivatBil(
-        vilkår: List<Vilkår>,
-        vedtak: Vedtak?,
-    ): RammevedtakPrivatBil? {
-        if (vedtak?.data !is InnvilgelseDagligReise) return null
-        val vilkårDagligReise = vilkår.firstOrNull { it.type == VilkårType.DAGLIG_REISE } ?: return null
-
-        return when (vilkårDagligReise.fakta) {
-            is FaktaDagligReisePrivatBil ->
-                RammevedtakPrivatBil(
-                    reiser = listOf(
-                        RammeForReiseMedPrivatBil(
-                            reiseId = vilkårDagligReise.fakta.reiseId,
-                            aktivitetsadresse = vilkårDagligReise.fakta.adresse,
-                            grunnlag = BeregningsgrunnlagForReiseMedPrivatBil(
-                                fom = vilkårDagligReise.fom!!,
-                                tom = vilkårDagligReise.tom!!,
-                                reisedagerPerUke = vilkårDagligReise.fakta.reisedagerPerUke,
-                                reiseavstandEnVei = vilkårDagligReise.fakta.reiseavstandEnVei,
-                                ekstrakostnader = Ekstrakostnader(
-                                    bompengerEnVei = vilkårDagligReise.fakta.bompengerEnVei,
-                                    fergekostnadEnVei = vilkårDagligReise.fakta.fergekostandEnVei,
-                                ),
-                                satser = vedtak.data.rammevedtakPrivatBil?.reiser?.flatMap {
-                                    it.grunnlag.satser.map { sats ->
-                                        SatsForPeriodePrivatBil(
-                                            fom = sats.fom,
-                                            tom = sats.tom,
-                                            satsBekreftetVedVedtakstidspunkt = sats.satsBekreftetVedVedtakstidspunkt,
-                                            dagsatsUtenParkering = sats.dagsatsUtenParkering,
-                                            kilometersats = sats.kilometersats,
-                                        )
-                                    }
-                                } ?: emptyList(),
-                                vedtaksperioder = vedtak.data.vedtaksperioder,
-                            )
-                        )
-                    )
-                )
-
-            else -> null
+    private fun mapRammevedtakPrivatBil(vedtak: Vedtak?): RammevedtakPrivatBil? =
+        vedtak?.let {
+            when (vedtak.data) {
+                is InnvilgelseDagligReise -> {
+                    vedtak.data.rammevedtakPrivatBil
+                }
+                else -> null
+            }
         }
-    }
-
 
     private fun Map<BarnId, GrunnlagBarn>.finnFødselsdato(barnId: BarnId): LocalDate {
         val barn = this[barnId] ?: error("Finner ikke barn=$barnId")
