@@ -89,5 +89,7 @@ class ArenaStatusService(
         listOf(
             9807,
             10384,
+            10000,
+            11248,
         )
 }
