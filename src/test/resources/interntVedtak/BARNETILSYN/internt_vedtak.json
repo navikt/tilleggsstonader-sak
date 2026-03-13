@@ -242,6 +242,7 @@
     } ],
     "læremidler" : null,
     "boutgifter" : null,
-    "dagligReiseTso" : null
-  }
+    "dagligReise" : null
+  },
+  "rammevedtakPrivatBil" : null
 }

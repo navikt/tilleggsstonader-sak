@@ -86,7 +86,8 @@ class InterntVedtakGenereringTest {
     @ParameterizedTest
     @EnumSource(
         value = Stønadstype::class,
-        names = [// Kommenter ut stønadstypene du ikke ønsker å generere internt vedtak for
+        names = [
+// Kommenter ut stønadstypene du ikke ønsker å generere internt vedtak for
             "BARNETILSYN",
             "LÆREMIDLER",
             "BOUTGIFTER",
@@ -147,7 +148,9 @@ class InterntVedtakGenereringTest {
         every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.DagligReise.vilkårperioderTso
         every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.DagligReise.grunnlagsdata
         every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
-        every { vilkårService.hentVilkår(behandlingId) } returns InterntVedtakTestdata.DagligReise.vilkårOffentligTransport
+        every { vilkårService.hentVilkår(behandlingId) } returns
+            InterntVedtakTestdata.DagligReise.vilkårOffentligTransport +
+            InterntVedtakTestdata.DagligReise.vilkårPrivatBil
         every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.DagligReise.innvilgetVedtakTso()
     }
 
@@ -156,7 +159,9 @@ class InterntVedtakGenereringTest {
         every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.DagligReise.vilkårperioderTsr
         every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.DagligReise.grunnlagsdata
         every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
-        every { vilkårService.hentVilkår(behandlingId) } returns InterntVedtakTestdata.DagligReise.vilkårOffentligTransport
+        every { vilkårService.hentVilkår(behandlingId) } returns
+            InterntVedtakTestdata.DagligReise.vilkårOffentligTransport +
+            InterntVedtakTestdata.DagligReise.vilkårPrivatBil
         every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.DagligReise.innvilgetVedtakTsr()
     }
 

@@ -130,6 +130,7 @@
       "delAvTidligereUtbetaling" : false
     } ],
     "boutgifter" : null,
-    "dagligReiseTso" : null
-  }
+    "dagligReise" : null
+  },
+  "rammevedtakPrivatBil" : null
 }

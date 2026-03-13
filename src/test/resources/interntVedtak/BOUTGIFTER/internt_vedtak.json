@@ -250,6 +250,7 @@
       "skalFåDekketFaktiskeUtgifter" : false,
       "inneholderUtgifterOvernatting" : true
     } ],
-    "dagligReiseTso" : null
-  }
+    "dagligReise" : null
+  },
+  "rammevedtakPrivatBil" : null
 }
