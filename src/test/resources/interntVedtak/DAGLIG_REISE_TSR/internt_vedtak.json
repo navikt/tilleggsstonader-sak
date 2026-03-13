@@ -183,7 +183,6 @@
           "perioder" : [ {
             "fom" : "2025-01-01",
             "tom" : "2025-02-28",
-            "utbetalingsdato" : "2025-02-28",
             "grunnlag" : {
               "dager" : [ {
                 "dato" : "2025-01-02",
@@ -224,7 +223,8 @@
               } ],
               "dagsatsUtenParkering" : 100
             },
-            "stønadsbeløp" : 500
+            "stønadsbeløp" : 500,
+            "brukersNavKontor" : "1234"
           } ]
         } ]
       },

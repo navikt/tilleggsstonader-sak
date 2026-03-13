@@ -856,7 +856,6 @@ object InterntVedtakTestdata {
                                             BeregningsresultatForReisePrivatBilPeriode(
                                                 fom = LocalDate.of(2025, 1, 1),
                                                 tom = LocalDate.of(2025, 2, 28),
-                                                utbetalingsdato = LocalDate.of(2025, 2, 28),
                                                 grunnlag =
                                                     BeregningsresultatForReisePrivatBilGrunnlag(
                                                         dager =
@@ -910,6 +909,7 @@ object InterntVedtakTestdata {
                                                         dagsatsUtenParkering = BigDecimal(100),
                                                     ),
                                                 stønadsbeløp = BigDecimal(500),
+                                                brukersNavKontor = brukersNavKontor,
                                             ),
                                         ),
                                 ),
