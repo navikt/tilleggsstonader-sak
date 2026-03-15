@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBa
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperiodeLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperioderLæremidlerMapper.finnDetaljerteVedtaksperioder
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import org.springframework.stereotype.Service
 
 @Service
@@ -29,6 +30,7 @@ class VedtaksperioderOversiktService(
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
     private val vedtakService: VedtakService,
+    private val vilkårService: VilkårService,
 ) {
     /**
      * Oversikten baserer seg på vedtaksperiodene fra beregningsresultatet, som inneholder mer
@@ -94,10 +96,22 @@ class VedtaksperioderOversiktService(
             fagsakIdDagligReiseTsr?.let {
                 hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørDagligReise>(fagsakId = it)
             }
+        val behandlingIdDagligReiseTso =
+            fagsakIdDagligReiseTso?.let {
+                behandlingService.finnSisteIverksatteBehandling(fagsakIdDagligReiseTso)?.id
+            }
+        val behandlingIdDagligReiseTsr =
+            fagsakIdDagligReiseTsr?.let {
+                behandlingService.finnSisteIverksatteBehandling(fagsakIdDagligReiseTsr)?.id
+            }
+        val adresseTso = behandlingIdDagligReiseTso?.let { hentAdresse(it) }
+        val adresseTsr = behandlingIdDagligReiseTsr?.let { hentAdresse(it) }
 
         return finnDetaljerteVedtaksperioderDagligReise(
             vedtaksdataTso = vedtaksdataTso,
             vedtaksdataTsr = vedtaksdataTsr,
+            adresseTso = adresseTso,
+            adresseTsr = adresseTsr,
         )
     }
 
@@ -126,6 +140,8 @@ class VedtaksperioderOversiktService(
     }
 
     private fun oppsummerVedtaksperioderDagligReiseTso(fagsakId: FagsakId): List<DetaljertVedtaksperiodeDagligReise> {
+        val behandlingId = behandlingService.finnSisteIverksatteBehandling(fagsakId)?.id
+        val adresseTso = hentAdresse(behandlingId)
         val vedtakForSisteIverksatteBehandling =
             hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørDagligReise>(fagsakId)
                 ?: return emptyList()
@@ -133,10 +149,14 @@ class VedtaksperioderOversiktService(
         return finnDetaljerteVedtaksperioderDagligReise(
             vedtaksdataTso = vedtakForSisteIverksatteBehandling,
             vedtaksdataTsr = null,
+            adresseTso = adresseTso,
+            adresseTsr = null,
         )
     }
 
     private fun oppsummerVedtaksperioderDagligReiseTsr(fagsakId: FagsakId): List<DetaljertVedtaksperiodeDagligReise> {
+        val behandlingId = behandlingService.finnSisteIverksatteBehandling(fagsakId)?.id
+        val adresseTsr = hentAdresse(behandlingId)
         val vedtakForSisteIverksatteBehandling =
             hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørDagligReise>(fagsakId)
                 ?: return emptyList()
@@ -144,6 +164,8 @@ class VedtaksperioderOversiktService(
         return finnDetaljerteVedtaksperioderDagligReise(
             vedtaksdataTso = null,
             vedtaksdataTsr = vedtakForSisteIverksatteBehandling,
+            adresseTso = null,
+            adresseTsr = adresseTsr,
         )
     }
 
@@ -151,4 +173,11 @@ class VedtaksperioderOversiktService(
         behandlingService.finnSisteIverksatteBehandling(fagsakId)?.let {
             vedtakService.hentVedtak<T>(it.id).data
         }
+
+    private fun hentAdresse(behandlingId: BehandlingId?): String? =
+        behandlingId
+            ?.let { vilkårService.hentVilkår(it) }
+            ?.firstOrNull()
+            ?.fakta
+            ?.adresse
 }

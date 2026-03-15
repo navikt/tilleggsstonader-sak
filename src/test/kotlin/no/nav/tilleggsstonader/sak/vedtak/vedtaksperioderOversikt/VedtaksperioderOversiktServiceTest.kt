@@ -97,6 +97,7 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
                                 antallReisedagerPerUke = 5,
                             ),
                         ),
+                    adresse = "Tiltaksveien 1",
                 ),
             )
 
