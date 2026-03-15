@@ -57,6 +57,8 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
             finnDetaljerteVedtaksperioderDagligReise(
                 vedtaksdataTso = tsoVedtak.data,
                 vedtaksdataTsr = tsrVedtak.data,
+                adresseTso = "adresseTso",
+                adresseTsr = "adresseTsr",
             )
         val forventetTso =
             DetaljertVedtaksperiodeDagligReise(
@@ -87,8 +89,9 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                             antallReisedagerPerUke = 5,
                         ),
                     ),
+                adresse = "adresseTso",
             )
-        val forventetTsr = forventetTso.copy(stønadstype = Stønadstype.DAGLIG_REISE_TSR)
+        val forventetTsr = forventetTso.copy(stønadstype = Stønadstype.DAGLIG_REISE_TSR, adresse = "adresseTsr")
         assertThat(resultat).containsExactly(forventetTso, forventetTsr)
     }
 

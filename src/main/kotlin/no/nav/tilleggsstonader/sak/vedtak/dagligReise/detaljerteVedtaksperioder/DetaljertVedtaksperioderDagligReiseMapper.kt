@@ -9,14 +9,16 @@ object DetaljertVedtaksperioderDagligReiseMapper {
     fun finnDetaljerteVedtaksperioderDagligReise(
         vedtaksdataTso: InnvilgelseEllerOpphørDagligReise?,
         vedtaksdataTsr: InnvilgelseEllerOpphørDagligReise?,
+        adresseTso: String?,
+        adresseTsr: String?,
     ): List<DetaljertVedtaksperiodeDagligReise> {
         val alleReisePerioderTso = vedtaksdataTso?.tilReiseperioder()
         val alleReisePerioderTsr = vedtaksdataTsr?.tilReiseperioder()
 
         val beregningsresultatDetaljeertForDagligReiseTSO =
-            alleReisePerioderTso?.tilDetaljertBeregningsperioder(Stønadstype.DAGLIG_REISE_TSO)
+            alleReisePerioderTso?.tilDetaljertBeregningsperioder(Stønadstype.DAGLIG_REISE_TSO, adresseTso)
         val beregningsresultatDetaljeertForDagligReiseTSR =
-            alleReisePerioderTsr?.tilDetaljertBeregningsperioder(Stønadstype.DAGLIG_REISE_TSR)
+            alleReisePerioderTsr?.tilDetaljertBeregningsperioder(Stønadstype.DAGLIG_REISE_TSR, adresseTsr)
         val beregningsDetaljertForDagligReise =
             listOf(
                 beregningsresultatDetaljeertForDagligReiseTSO.orEmpty(),
@@ -32,6 +34,7 @@ object DetaljertVedtaksperioderDagligReiseMapper {
 
     private fun List<BeregningsresultatForPeriode>.tilDetaljertBeregningsperioder(
         stønadstype: Stønadstype,
+        adresse: String?,
     ): List<DetaljertVedtaksperiodeDagligReise> {
         val detaljertBeregningsperioder =
             this.sortedBy { it.grunnlag.fom }.map { beregningsresultatForPeriode ->
@@ -53,6 +56,7 @@ object DetaljertVedtaksperioderDagligReiseMapper {
                 stønadstype = stønadstype,
                 typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
                 detaljertBeregningsperioder = detaljertBeregningsperioder,
+                adresse = adresse,
             ),
         )
     }
