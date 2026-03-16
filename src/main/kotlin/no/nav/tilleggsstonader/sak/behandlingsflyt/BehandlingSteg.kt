@@ -81,28 +81,33 @@ enum class StegType(
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    SEND_TIL_BESLUTTER(
+    FULLFØR_KJØRELISTE(
         rekkefølge = 8,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    BESLUTTE_VEDTAK(
+    SEND_TIL_BESLUTTER(
         rekkefølge = 9,
+        tillattFor = BehandlerRolle.SAKSBEHANDLER,
+        gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
+    ),
+    BESLUTTE_VEDTAK(
+        rekkefølge = 10,
         tillattFor = BehandlerRolle.BESLUTTER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.FATTER_VEDTAK),
     ),
     JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV(
-        rekkefølge = 10,
-        tillattFor = BehandlerRolle.SYSTEM,
-        gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
-    ),
-    FERDIGSTILLE_BEHANDLING(
         rekkefølge = 11,
         tillattFor = BehandlerRolle.SYSTEM,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
     ),
-    BEHANDLING_FERDIGSTILT(
+    FERDIGSTILLE_BEHANDLING(
         rekkefølge = 12,
+        tillattFor = BehandlerRolle.SYSTEM,
+        gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
+    ),
+    BEHANDLING_FERDIGSTILT(
+        rekkefølge = 13,
         tillattFor = BehandlerRolle.SYSTEM,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.FERDIGSTILT),
     ),
@@ -151,6 +156,7 @@ enum class StegType(
             SEND_TIL_BESLUTTER -> BESLUTTE_VEDTAK
             BESLUTTE_VEDTAK -> JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV
             JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV -> FERDIGSTILLE_BEHANDLING
+            FULLFØR_KJØRELISTE -> FERDIGSTILLE_BEHANDLING
             FERDIGSTILLE_BEHANDLING -> BEHANDLING_FERDIGSTILT
             BEHANDLING_FERDIGSTILT -> BEHANDLING_FERDIGSTILT
             else -> error("Finner ikke neste steg etter ${this.visningsnavn()}")

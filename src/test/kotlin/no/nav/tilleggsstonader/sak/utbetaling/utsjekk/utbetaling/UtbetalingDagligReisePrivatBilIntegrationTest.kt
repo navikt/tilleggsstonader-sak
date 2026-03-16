@@ -5,18 +5,26 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeRepository
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.SatsDagligReisePrivatBilProvider
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.math.RoundingMode
+import java.time.LocalDate
 
 class UtbetalingDagligReisePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
     @Autowired
@@ -35,6 +43,13 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : CleanDatabaseIntegrationTe
         val fom = 2 februar 2026
         val tom = 22 februar 2026
         val reiseavstandEnVei = 10
+        val kjørteDager =
+            listOf(
+                2 februar 2026 to 50,
+                4 februar 2026 to 50,
+                5 februar 2026 to 50,
+            )
+
         val behandlingId =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
@@ -59,12 +74,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : CleanDatabaseIntegrationTe
 
                 sendInnKjøreliste {
                     periode = Datoperiode(fom, tom)
-                    kjørteDager =
-                        listOf(
-                            2 februar 2026 to 50,
-                            4 februar 2026 to 50,
-                            5 februar 2026 to 50,
-                        )
+                    this.kjørteDager = kjørteDager
                 }
             }
 
@@ -76,26 +86,57 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : CleanDatabaseIntegrationTe
 
         gjennomførKjørelisteBehandling(kjørelisteBehandling)
 
-        val andelerForKjørelistebehandling = tilkjentYtelseRepository.findByBehandlingId(kjørelisteBehandling.id)?.andelerTilkjentYtelse
-        assertThat(andelerForKjørelistebehandling).isNotNull
-
-        // Andeler blir opprettet per uke. Alle tre uker er sendt inn, men kun første uke har beløp > 0. De to siste filtreres ut
-        assertThat(andelerForKjørelistebehandling).hasSize(1)
-
-        val andel = andelerForKjørelistebehandling!!.single()
-        assertThat(andel.type).isEqualTo(TypeAndel.DAGLIG_REISE_AAP)
-        assertThat(andel.beløp).isEqualTo(
-            satsDagligReisePrivatBilProvider
-                .finnSatsForÅr(fom.year)
-                .beløp
-                .multiply(reiseavstandEnVei.toBigDecimal())
-                .multiply(2.toBigDecimal()) // tur/retur, reiseavstand
-                .multiply(3.toBigDecimal()) // 3 reisedager
-                .plus(150.toBigDecimal()) // totale parkeringskostnader
-                .setScale(0, RoundingMode.HALF_UP)
-                .toInt(),
+        val forventetBeløp = kjørteDager.kalkulerForventetBeløp(reiseavstandEnVei)
+        assertAndelOpprettet(
+            andelerForKjørelistebehandling = tilkjentYtelseRepository.findByBehandlingId(kjørelisteBehandling.id)?.andelerTilkjentYtelse,
+            forventetBeløp = forventetBeløp,
+            forventetTypeAndel = TypeAndel.DAGLIG_REISE_AAP,
         )
 
-        // TODO - innvilge og sende andeler til helved
+        val iverksettingDto =
+            KafkaFake
+                .sendteMeldinger()
+                .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
+                .single()
+                .verdiEllerFeil<IverksettingDto>()
+
+        assertThat(iverksettingDto.saksbehandler).isEqualTo(testBrukerkontekst.bruker)
+        assertThat(iverksettingDto.beslutter).isEqualTo(SikkerhetContext.SYSTEM_FORKORTELSE)
+        assertThat(iverksettingDto.utbetalinger).hasSize(1)
+        val utbetaling = iverksettingDto.utbetalinger.single()
+        assertThat(utbetaling.stønad).isEqualTo(StønadUtbetaling.DAGLIG_REISE_AAP)
+        assertThat(utbetaling.perioder).hasSize(1)
+        val periode = utbetaling.perioder.single()
+        // Fom og tom samme verdi, gjelder for en uke
+        assertThat(periode.fom).isEqualTo(fom)
+        assertThat(periode.tom).isEqualTo(fom)
+        assertThat(periode.beløp).isEqualTo(forventetBeløp.toUInt())
+
+        val ferdigstiltBehandling = testoppsettService.hentBehandling(kjørelisteBehandling.id)
+        assertThat(ferdigstiltBehandling.resultat).isEqualTo(BehandlingResultat.INNVILGET)
+        assertThat(ferdigstiltBehandling.status).isEqualTo(BehandlingStatus.FERDIGSTILT)
+        assertThat(ferdigstiltBehandling.steg).isEqualTo(StegType.BEHANDLING_FERDIGSTILT)
     }
+
+    private fun assertAndelOpprettet(
+        andelerForKjørelistebehandling: Set<AndelTilkjentYtelse>?,
+        forventetBeløp: Int,
+        forventetTypeAndel: TypeAndel,
+    ) {
+        assertThat(andelerForKjørelistebehandling).isNotNull
+        assertThat(andelerForKjørelistebehandling).hasSize(1)
+        val andel = andelerForKjørelistebehandling!!.single()
+        assertThat(andel.type).isEqualTo(forventetTypeAndel)
+        assertThat(andel.beløp).isEqualTo(forventetBeløp)
+    }
+
+    private fun List<Pair<LocalDate, Int>>.kalkulerForventetBeløp(reiseavstandEnVei: Int): Int =
+        sumOf { (dato, parkeringskostnader) ->
+            satsDagligReisePrivatBilProvider
+                .finnSatsForÅr(dato.year)
+                .beløp
+                .multiply(reiseavstandEnVei.toBigDecimal())
+                .multiply(2.toBigDecimal())
+                .plus(parkeringskostnader.toBigDecimal())
+        }.toInt()
 }
