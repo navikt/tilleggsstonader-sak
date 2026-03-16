@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
-import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -35,7 +34,8 @@ class UtbetalingV3Mapper(
         behandling: Saksbehandling,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
         erFørsteIverksettingForBehandling: Boolean,
-        totrinnskontroll: Totrinnskontroll?,
+        saksbehandler: String,
+        beslutter: String,
         vedtakstidspunkt: LocalDateTime,
     ): IverksettingDto {
         validerAndeler(andelerTilkjentYtelse)
@@ -45,8 +45,8 @@ class UtbetalingV3Mapper(
             personident = behandling.ident,
             periodetype = PeriodetypeUtbetaling.UKEDAG,
             utbetalinger = lagUtbetalinger(behandling, andelerTilkjentYtelse, erFørsteIverksettingForBehandling),
-            saksbehandler = totrinnskontroll?.saksbehandler ?: error("Saksbehandler mangler"),
-            beslutter = totrinnskontroll.beslutter ?: error("Beslutter mangler"),
+            saksbehandler = saksbehandler,
+            beslutter = beslutter,
             vedtakstidspunkt = vedtakstidspunkt,
         )
     }
