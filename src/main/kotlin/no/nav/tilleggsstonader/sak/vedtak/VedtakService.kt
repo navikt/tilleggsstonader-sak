@@ -1,68 +1,37 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
-import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnBeregnYtelseSteg
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnRequest
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterBeregnYtelseSteg
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.VedtakBoutgifterRequest
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseBeregnYtelseSteg
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerBeregnYtelseSteg
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerRequest
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
 class VedtakService(
-    private val repository: VedtakRepository,
-    private val stegService: StegService,
-    private val tilsynBarnBeregnYtelseSteg: TilsynBarnBeregnYtelseSteg,
-    private val læremidlerBeregnYtelseSteg: LæremidlerBeregnYtelseSteg,
-    private val boutgifterBeregnYtelseSteg: BoutgifterBeregnYtelseSteg,
-    private val dagligReiseBeregnYtelseSteg: DagligReiseBeregnYtelseSteg,
+    private val vedtakRepository: VedtakRepository,
 ) {
-    fun hentVedtak(behandlingId: BehandlingId): Vedtak? = repository.findByIdOrNull(behandlingId)
+    fun hentVedtak(behandlingId: BehandlingId): Vedtak? = vedtakRepository.findByIdOrNull(behandlingId)
+
+    fun hentVedtakEllerFeil(behandlingId: BehandlingId): Vedtak =
+        hentVedtak(behandlingId)
+            ?: error("Finner ikke vedtak for behandling $behandlingId")
 
     @JvmName("hentTypetVedtak")
-    final inline fun <reified T : Vedtaksdata> hentVedtak(behandlingId: BehandlingId): GeneriskVedtak<T>? =
-        hentVedtak(behandlingId)?.withTypeOrThrow<T>()
+    final inline fun <reified T : Vedtaksdata> hentVedtak(behandlingId: BehandlingId): GeneriskVedtak<T> =
+        hentVedtakEllerFeil(behandlingId).withTypeOrThrow<T>()
 
     fun hentVedtaksperioder(behandlingId: BehandlingId): List<Vedtaksperiode> =
         hentVedtak(behandlingId)?.vedtaksperioderHvisFinnes() ?: emptyList()
 
-    fun håndterSteg(
-        behandling: BehandlingId,
-        data: VedtakTilsynBarnRequest,
-    ) {
-        stegService.håndterSteg(behandlingId = behandling, behandlingSteg = tilsynBarnBeregnYtelseSteg, data = data)
+    fun slettVedtakMedId(behandlingId: BehandlingId) {
+        vedtakRepository.deleteById(behandlingId)
     }
 
-    fun håndterSteg(
-        behandling: BehandlingId,
-        data: VedtakLæremidlerRequest,
-    ) {
-        stegService.håndterSteg(behandlingId = behandling, behandlingSteg = læremidlerBeregnYtelseSteg, data = data)
-    }
-
-    fun håndterSteg(
-        behandlingId: BehandlingId,
-        data: VedtakBoutgifterRequest,
-    ) {
-        stegService.håndterSteg(behandlingId = behandlingId, behandlingSteg = boutgifterBeregnYtelseSteg, data = data)
-    }
-
-    fun håndterSteg(
-        behandlingId: BehandlingId,
-        data: VedtakDagligReiseRequest,
-    ) {
-        stegService.håndterSteg(behandlingId = behandlingId, behandlingSteg = dagligReiseBeregnYtelseSteg, data = data)
-    }
+    fun hentVedtaksresultat(saksbehandling: Saksbehandling): TypeVedtak =
+        vedtakRepository.findByIdOrNull(saksbehandling.id)?.type
+            ?: error("Finner ikke vedtaksresultat for behandling=$saksbehandling")
 }

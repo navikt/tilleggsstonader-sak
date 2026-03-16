@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service
  * Service for å enklere tilbakestille mocks i tester, og er eksponert i [no.nav.tilleggsstonader.sak.IntegrationTest]
  */
 @Service
-class MockClientService(
+class MockClients(
     val arbeidsfordelingClient: ArbeidsfordelingClient,
     val arenaClient: ArenaClient,
     val egenAnsattClient: EgenAnsattClient,
@@ -62,7 +62,7 @@ class MockClientService(
         RegisterAktivitetClientMockConfig.resetTilDefault(registerAktivitetClient)
         TilordnetSaksbehandlerClientMockConfig.resetTilDefault(tilordnetSaksbehandlerClient)
         YtelseClientMockConfig.resetTilDefault(ytelseClient)
-        KafkaTestConfig.resetMock(kafkaTemplate)
+        KafkaFake.resetMock(kafkaTemplate)
         GoogleRoutesClientMockConfig.resetTilDefault(googleRoutesClient)
         GooglePlaceDetailsClientMockConfig.resetTilDefault(googlePlaceDetailsClient)
     }

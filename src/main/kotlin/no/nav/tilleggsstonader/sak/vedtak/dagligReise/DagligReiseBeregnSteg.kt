@@ -3,19 +3,16 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.OpprettAndelerDagligReiseService
 import org.springframework.stereotype.Service
 
 @Service
 class DagligReiseBeregnSteg(
-    private val vedtakRepository: VedtakRepository,
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val simuleringService: SimuleringService,
+    private val opprettAndelerDagligReiseService: OpprettAndelerDagligReiseService,
 ) : BehandlingSteg<Void?> {
     override fun utførSteg(
         saksbehandling: Saksbehandling,
@@ -26,15 +23,7 @@ class DagligReiseBeregnSteg(
     }
 
     private fun opprettAndeler(saksbehandling: Saksbehandling) {
-        // TODO: Vurder å lage en egen vedtakService som henter vedtak på en penere måte
-        // VedtakService kan ikke brukes fordi det fører til circle dependency
-        val vedtak = vedtakRepository.findByIdOrThrow(saksbehandling.id).withTypeOrThrow<InnvilgelseDagligReise>()
-        val beregningsresultatOffentligTransport = vedtak.data.beregningsresultat.offentligTransport
-
-        tilkjentYtelseService.lagreTilkjentYtelse(
-            behandlingId = saksbehandling.id,
-            andeler = beregningsresultatOffentligTransport?.mapTilAndelTilkjentYtelse(saksbehandling) ?: emptyList(),
-        )
+        opprettAndelerDagligReiseService.lagreAndelerForBehandling(saksbehandling)
     }
 
     private fun nullstillEksisterendeAndelerPåBehandling(saksbehandling: Saksbehandling) {

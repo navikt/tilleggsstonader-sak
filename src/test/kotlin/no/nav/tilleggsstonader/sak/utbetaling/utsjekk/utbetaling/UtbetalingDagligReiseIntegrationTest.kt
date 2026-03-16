@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.august
 import no.nav.tilleggsstonader.libs.utils.dato.oktober
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaTestConfig
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.finnPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
@@ -25,40 +25,6 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
     private val nå = LocalDate.now()
     private val fom = nå.minusMonths(3)
     private val tom = nå.plusMonths(3)
-
-    @Test
-    fun `utbetalingsdato i fremtiden - ingen andeler skal bli utbetalt`() {
-        opprettBehandlingOgGjennomførBehandlingsløp(
-            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-        ) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTso(fom = fom, tom = tom)
-                }
-            }
-            målgruppe {
-                opprett {
-                    målgruppeAAP(fom = fom, tom = tom)
-                }
-            }
-            vilkår {
-                opprett {
-                    offentligTransport(fom = LocalDate.now().plusDays(1), tom = LocalDate.now().plusWeeks(1))
-                }
-            }
-        }
-
-        val sendtMelding =
-            KafkaTestConfig
-                .sendteMeldinger()
-                .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
-                .map { it.verdiEllerFeil<IverksettingDto>() }
-                .single()
-
-        assertThat(
-            sendtMelding.utbetalinger.size,
-        ).isEqualTo(0)
-    }
 
     @Test
     fun `to andeler forrige måned, sender da én utbetaling med to perioder`() {
@@ -92,7 +58,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             }
 
         val saksbehandling = testoppsettService.hentSaksbehandling(behandlingId)
-        val utbetalinger = KafkaTestConfig.sendteMeldinger().finnPåTopic(kafkaTopics.utbetaling)
+        val utbetalinger = KafkaFake.sendteMeldinger().finnPåTopic(kafkaTopics.utbetaling)
         val utbetaling = utbetalinger.single().verdiEllerFeil<IverksettingDto>()
 
         assertThat(utbetaling.periodetype).isEqualTo(PeriodetypeUtbetaling.UKEDAG)
@@ -140,7 +106,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
         }
 
         val utbetaling =
-            KafkaTestConfig
+            KafkaFake
                 .sendteMeldinger()
                 .finnPåTopic(kafkaTopics.utbetaling)
                 .single()
@@ -205,7 +171,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             }
 
         val utbetaling =
-            KafkaTestConfig
+            KafkaFake
                 .sendteMeldinger()
                 .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
                 .single()

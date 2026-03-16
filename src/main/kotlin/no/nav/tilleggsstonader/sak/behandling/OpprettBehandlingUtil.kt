@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sisteFerdigstilteBehandling
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -15,8 +16,10 @@ object OpprettBehandlingUtil {
      * @param behandlingType for ny behandling
      */
     fun validerKanOppretteNyBehandling(
+        stønadstype: Stønadstype,
         behandlingType: BehandlingType,
         tidligereBehandlinger: List<Behandling>,
+        sisteIverksatteBehandlinger: Behandling?,
     ) {
         val sisteFerdigstilteBehandling =
             tidligereBehandlinger
@@ -26,7 +29,7 @@ object OpprettBehandlingUtil {
         when (behandlingType) {
             FØRSTEGANGSBEHANDLING -> validerKanOppretteFørstegangsbehandling(sisteFerdigstilteBehandling)
             REVURDERING -> validerKanOppretteRevurdering(sisteFerdigstilteBehandling)
-            BehandlingType.KJØRELISTE -> validerKanOppretteKjørelisteBehandling(sisteFerdigstilteBehandling)
+            BehandlingType.KJØRELISTE -> validerKanOppretteKjørelisteBehandling(sisteIverksatteBehandlinger, stønadstype)
         }
     }
 
@@ -47,10 +50,16 @@ object OpprettBehandlingUtil {
     }
 
     // TODO: Bør det valideres noe mer? F.eks. at det finnes en kjøreliste på forrige behandling?
-    // At det er riktig stønadstype som kjøreliste skal opprettes for?
-    private fun validerKanOppretteKjørelisteBehandling(sisteFerdigstilteBehandling: Behandling?) {
-        if (sisteFerdigstilteBehandling == null) {
-            throw ApiFeil("Det finnes ikke en tidligere behandling på fagsaken", HttpStatus.BAD_REQUEST)
+    private fun validerKanOppretteKjørelisteBehandling(
+        sisteIverksatteBehandlinger: Behandling?,
+        stønadstype: Stønadstype,
+    ) {
+        if (stønadstype != Stønadstype.DAGLIG_REISE_TSO && stønadstype != Stønadstype.DAGLIG_REISE_TSR) {
+            throw ApiFeil("Det er ikke lov å opprette en kjørelistebehandling på stønadstype $stønadstype", HttpStatus.BAD_REQUEST)
+        }
+
+        if (sisteIverksatteBehandlinger == null) {
+            throw ApiFeil("Det finnes ikke en tidligere iverksatt behandling på fagsaken", HttpStatus.BAD_REQUEST)
         }
     }
 }

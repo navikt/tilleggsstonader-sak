@@ -147,9 +147,8 @@ class VedtaksperioderOversiktService(
         )
     }
 
-    private inline fun <reified T : Vedtaksdata> hentVedtaksdataForSisteIverksatteBehandling(fagsakId: FagsakId): T? {
-        val sisteIverksatteBehandling = behandlingService.finnSisteIverksatteBehandling(fagsakId) ?: return null
-        val vedtak = vedtakService.hentVedtak<T>(sisteIverksatteBehandling.id) ?: return null
-        return vedtak.data
-    }
+    private inline fun <reified T : Vedtaksdata> hentVedtaksdataForSisteIverksatteBehandling(fagsakId: FagsakId): T? =
+        behandlingService.finnSisteIverksatteBehandling(fagsakId)?.let {
+            vedtakService.hentVedtak<T>(it.id).data
+        }
 }

@@ -11,8 +11,11 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
+import no.nav.tilleggsstonader.sak.util.iDagHvisMandagEllerForrigeMandag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import java.time.LocalDate
 
 fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandling: Saksbehandling): List<AndelTilkjentYtelse> =
@@ -47,6 +50,46 @@ fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandlin
                     )
                 }
         }
+
+fun BeregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(
+    saksbehandling: Saksbehandling,
+    rammevedtakPrivatBil: RammevedtakPrivatBil,
+): List<AndelTilkjentYtelse> =
+    reiser
+        .flatMap { reise ->
+            val rammevedtakForReise = rammevedtakPrivatBil.hentRammevedtakForReise(reise.reiseId)
+            val målgrupper =
+                rammevedtakForReise.grunnlag.vedtaksperioder
+                    .map { it.målgruppe }
+                    .toSet()
+            val typeAktivitet =
+                rammevedtakForReise.grunnlag.vedtaksperioder
+                    .map { it.typeAktivitet }
+                    .toSet()
+
+            require(målgrupper.size == 1) {
+                "Forventer kun én målgruppe, men fikk ${målgrupper.size}: $målgrupper"
+            }
+
+            require(typeAktivitet.size == 1) {
+                "Forventer kun én typeAktivitet, men fikk ${typeAktivitet.size}: $typeAktivitet"
+            }
+
+            reise.perioder
+                .map { periode ->
+                    val fom = periode.fom
+                    val vedtaksperiode = rammevedtakForReise.grunnlag.vedtaksperiodeForPeriode(periode)
+
+                    lagAndelForDagligReise(
+                        saksbehandling = saksbehandling,
+                        fomUkedag = fom.iDagHvisMandagEllerForrigeMandag(),
+                        beløp = periode.stønadsbeløp.toInt(),
+                        målgruppe = vedtaksperiode.målgruppe,
+                        typeAktivitet = vedtaksperiode.typeAktivitet,
+                        brukersNavKontor = periode.brukersNavKontor,
+                    )
+                }
+        }.filterNot { it.beløp == 0 }
 
 private fun lagAndelForDagligReise(
     saksbehandling: Saksbehandling,

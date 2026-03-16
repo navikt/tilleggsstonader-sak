@@ -4,30 +4,29 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class SimuleringStegTest {
     val simuleringService = mockk<SimuleringService>()
-    val vedtaksresultatService = mockk<VedtaksresultatService>()
+    val vedtakService = mockk<VedtakService>()
     val tilkjentYtelseSerivce = mockk<TilkjentYtelseService>()
 
     val simuleringSteg =
-        SimuleringSteg(simuleringService, vedtaksresultatService, mockUnleashService(), tilkjentYtelseSerivce)
+        SimuleringSteg(simuleringService, vedtakService, tilkjentYtelseSerivce)
 
     @BeforeEach
     fun setUp() {
         every { simuleringService.hentOgLagreSimuleringsresultat(any()) } returns mockk()
     }
 
-    private fun mockVedtakMedType(type: TypeVedtak) = every { vedtaksresultatService.hentVedtaksresultat(any()) } returns type
+    private fun mockVedtakMedType(type: TypeVedtak) = every { vedtakService.hentVedtaksresultat(any()) } returns type
 
     @Nested
     inner class Revurdering {

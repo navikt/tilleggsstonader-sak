@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
-import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelseRepository
@@ -35,7 +34,6 @@ class IverksettService(
     private val andelTilkjentYtelseRepository: AndelTilkjentYtelseRepository,
     private val utbetalingMessageProducer: UtbetalingMessageProducer,
     private val utbetalingV3Mapper: UtbetalingV3Mapper,
-    private val fagsakUtbetalingIdService: FagsakUtbetalingIdService,
 ) {
     private val iverksettingerOverKafkaCounter = Metrics.counter("iverksettinger.til.helved", "type", "kafka")
 
@@ -103,7 +101,15 @@ class IverksettService(
     private fun skalOppretteNullandelForFørsteIverksettingAvBehandling(
         behandling: Saksbehandling,
         andelerTilIverksetting: Collection<AndelTilkjentYtelse>,
-    ): Boolean = andelerTilIverksetting.isEmpty() && behandling.forrigeIverksatteBehandlingId != null
+    ): Boolean = andelerTilIverksetting.isEmpty() && finnesIverksatteAndelerPåForrigeIverksatteBehandling(behandling)
+
+    private fun finnesIverksatteAndelerPåForrigeIverksatteBehandling(behandling: Saksbehandling): Boolean =
+        behandling.forrigeIverksatteBehandlingId != null &&
+            tilkjentYtelseService
+                .hentForBehandling(behandling.forrigeIverksatteBehandlingId)
+                .andelerTilkjentYtelse
+                .filterNot { it.erNullandel() }
+                .any { it.iverksetting != null }
 
     /**
      * Kalles på av daglig jobb som plukker opp alle andeler som har utbetalingsdato <= dagens dato.
@@ -145,9 +151,7 @@ class IverksettService(
         totrinnskontroll: Totrinnskontroll,
         erFørsteIverksettingForBehandling: Boolean,
     ) {
-        val utbetalingsIderPåFagsak =
-            fagsakUtbetalingIdService.hentUtbetalingIderForFagsakId(fagsakId = behandling.fagsakId)
-        if (andelerTilUtbetaling.isNotEmpty() || utbetalingsIderPåFagsak.isNotEmpty()) {
+        if (andelerTilUtbetaling.isNotEmpty() || finnesIverksatteAndelerPåForrigeIverksatteBehandling(behandling)) {
             iverksettingerOverKafkaCounter.increment()
             val utbetalingRecords =
                 utbetalingV3Mapper.lagIverksettingDtoer(

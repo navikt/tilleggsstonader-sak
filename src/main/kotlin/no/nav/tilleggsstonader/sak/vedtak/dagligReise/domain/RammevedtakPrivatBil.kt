@@ -8,7 +8,9 @@ import java.time.LocalDate
 
 data class RammevedtakPrivatBil(
     val reiser: List<RammeForReiseMedPrivatBil>,
-)
+) {
+    fun hentRammevedtakForReise(reiseId: ReiseId): RammeForReiseMedPrivatBil = reiser.single { it.reiseId == reiseId }
+}
 
 data class RammeForReiseMedPrivatBil(
     val reiseId: ReiseId,
@@ -24,7 +26,9 @@ data class BeregningsgrunnlagForReiseMedPrivatBil(
     val ekstrakostnader: Ekstrakostnader,
     val satser: List<SatsForPeriodePrivatBil>,
     val vedtaksperioder: List<Vedtaksperiode>,
-) : Periode<LocalDate>
+) : Periode<LocalDate> {
+    fun vedtaksperiodeForPeriode(periode: Periode<LocalDate>) = vedtaksperioder.single { it.inneholder(periode) }
+}
 
 // TODO: Finn ut om det finnes abbonnement på disse prisene og om det påvirker hvordan vi vil løse dette
 data class Ekstrakostnader(

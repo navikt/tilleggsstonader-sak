@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.tilbakekreving.TILBAKEKREVING_TOPIC
 import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TILBAKEKREVING_TYPE_FAGSYSTEMINFO_BEHOV
@@ -83,29 +82,36 @@ class FagsysteminfoBehovHåndterer(
 
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
 
-        feilHvis(behandling.forrigeIverksatteBehandlingId == null) {
-            "Behandling med id=$behandlingId har ingen forrige iverksatte behandling"
-        }
+        // feilHvis(behandling.forrigeIverksatteBehandlingId == null) {
+        //    "Behandling med id=$behandlingId har ingen forrige iverksatte behandling"
+        // }
 
-        val svarTilbakekrevingKravgrunnlagOppslagRecord =
-            TilbakekrevingFagsysteminfoSvar(
-                eksternFagsakId = fagsystemBehovMelding.eksternFagsakId,
-                hendelseOpprettet = LocalDateTime.now(),
-                mottaker = TilbakekrevingMottaker(ident = behandling.ident),
-                revurdering = mapRevurderinginformsjon(saksbehandling = behandling, eksternBehandlingId = referanse),
-                utvidPerioder = mapUtvidedePerioder(behandling.forrigeIverksatteBehandlingId),
-                behandlendeEnhet = finnBehandlendeEnhet(behandling),
+        if (behandling.forrigeIverksatteBehandlingId != null) {
+            val svarTilbakekrevingKravgrunnlagOppslagRecord =
+                TilbakekrevingFagsysteminfoSvar(
+                    eksternFagsakId = fagsystemBehovMelding.eksternFagsakId,
+                    hendelseOpprettet = LocalDateTime.now(),
+                    mottaker = TilbakekrevingMottaker(ident = behandling.ident),
+                    revurdering = mapRevurderinginformsjon(saksbehandling = behandling, eksternBehandlingId = referanse),
+                    utvidPerioder = mapUtvidedePerioder(behandling.forrigeIverksatteBehandlingId),
+                    behandlendeEnhet = finnBehandlendeEnhet(behandling),
+                )
+
+            // Sender med samme key på kafka, slik at tilbake får meldinger i rekkefølge
+            kafkaTemplate
+                .send(
+                    ProducerRecord(
+                        TILBAKEKREVING_TOPIC,
+                        kafkaKey,
+                        jsonMapper.writeValueAsString(svarTilbakekrevingKravgrunnlagOppslagRecord),
+                    ),
+                ).get()
+        } else {
+            logger.error(
+                "Mottatt hendelse $TILBAKEKREVING_TYPE_FAGSYSTEMINFO_BEHOV, " +
+                    "men referanse $referanse peker på en behandling som ikke har en forrige iverksatt behandling",
             )
-
-        // Sender med samme key på kafka, slik at tilbake får meldinger i rekkefølge
-        kafkaTemplate
-            .send(
-                ProducerRecord(
-                    TILBAKEKREVING_TOPIC,
-                    kafkaKey,
-                    jsonMapper.writeValueAsString(svarTilbakekrevingKravgrunnlagOppslagRecord),
-                ),
-            ).get()
+        }
     }
 
     private fun finnBehandlendeEnhet(behandling: Saksbehandling): String? =

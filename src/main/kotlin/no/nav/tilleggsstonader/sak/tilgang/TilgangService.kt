@@ -19,7 +19,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext.hentGrupperFraToken
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering.FORTROLIG
@@ -153,10 +152,7 @@ class TilgangService(
         val tilordnetSaksbehandler =
             oppgaveService.hentÅpenBehandlingsoppgave(behandling.id)?.tilordnetSaksbehandler
 
-        val skalValidereTilordnetSaksbehandler = unleashService.isEnabled(Toggle.TILGANGSSTYRE_PÅ_TILORDNET_OPPGAVE)
-
         return if (validerTilordnetOppgave &&
-            skalValidereTilordnetSaksbehandler &&
             tilordnetSaksbehandler != SikkerhetContext.hentSaksbehandler()
         ) {
             Tilgang(harTilgang = false, begrunnelse = "Behandling er tilordnet en annen saksbehandler")

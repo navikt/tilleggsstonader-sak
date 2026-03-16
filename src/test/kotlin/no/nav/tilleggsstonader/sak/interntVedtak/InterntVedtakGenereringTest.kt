@@ -86,7 +86,7 @@ class InterntVedtakGenereringTest {
     @ParameterizedTest
     @EnumSource(
         value = Stønadstype::class,
-        names = [ // Kommenter ut stønadstypene du ikke ønsker å generere internt vedtak for
+        names = [// Kommenter ut stønadstypene du ikke ønsker å generere internt vedtak for
             "BARNETILSYN",
             "LÆREMIDLER",
             "BOUTGIFTER",

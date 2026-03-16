@@ -11,14 +11,12 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mergeSammenhengendeOppfylteAktiviteterMedLikTypeAktivitet
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -26,7 +24,7 @@ class DagligReiseVedtaksperioderValideringService(
     private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
-    private val vedtakRepository: VedtakRepository,
+    private val vedtakService: VedtakService,
     private val vilkårperiodeService: VilkårperiodeService,
 ) {
     fun validerVedtaksperioder(
@@ -134,6 +132,6 @@ class DagligReiseVedtaksperioderValideringService(
         behandlingService
             .finnSisteIverksatteBehandling(fagsakId)
             ?.let {
-                vedtakRepository.findByIdOrNull(it.id)?.withTypeOrThrow<InnvilgelseEllerOpphørDagligReise>()
+                vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(it.id)
             }?.data
 }

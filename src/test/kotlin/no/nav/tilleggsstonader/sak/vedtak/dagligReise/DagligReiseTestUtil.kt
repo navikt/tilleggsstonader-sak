@@ -34,8 +34,8 @@ object DagligReiseTestUtil {
         )
     val defaultBeregningsresultat =
         BeregningsresultatDagligReise(
-            offentligTransport =
-                beregningsresultatOffentligTransport(),
+            offentligTransport = beregningsresultatOffentligTransport(),
+            privatBil = null, // TODO
         )
     val defaultInnvilgelseDagligReise =
         InnvilgelseDagligReise(

@@ -3,13 +3,12 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
-import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.OpprettAndelerDagligReiseService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
@@ -20,9 +19,9 @@ import org.springframework.stereotype.Service
 class DagligReiseVedtakSteg(
     private val beregningService: DagligReiseBeregningService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
-    private val tilkjentYtelseService: TilkjentYtelseService,
     private val opphørValideringService: OpphørValideringService,
     private val dagligReiseVedtakService: DagligReiseVedtakService,
+    private val opprettAndelerDagligReiseService: OpprettAndelerDagligReiseService,
 ) : BehandlingSteg<VedtakDagligReiseRequest> {
     override fun utførSteg(
         saksbehandling: Saksbehandling,
@@ -124,12 +123,7 @@ class DagligReiseVedtakSteg(
             vedtak = vedtak,
         )
 
-        tilkjentYtelseService.lagreTilkjentYtelse(
-            behandlingId = saksbehandling.id,
-            andeler =
-                beregningsresultat.offentligTransport?.mapTilAndelTilkjentYtelse(saksbehandling)
-                    ?: feil("Mangler beregningsresultat for offentlig transport"),
-        )
+        opprettAndelerDagligReiseService.lagreAndelerForBehandling(saksbehandling)
     }
 
     private fun finnNesteSteg(vedtak: VedtakDagligReiseRequest): StegType =

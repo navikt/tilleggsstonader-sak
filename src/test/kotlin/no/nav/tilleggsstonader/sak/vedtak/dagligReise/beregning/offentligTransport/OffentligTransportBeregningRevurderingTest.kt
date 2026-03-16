@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningSteg
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningStegKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
@@ -73,7 +74,7 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
                 }
             }
 
-        gjennomførBeregningSteg(
+        gjennomførBeregningStegKall(
             behandlingId = revurderingId,
             stønadstype = Stønadstype.DAGLIG_REISE_TSO,
         ).expectStatus()
@@ -149,7 +150,7 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
         gjennomførBeregningSteg(
             behandlingId = revurderingId,
             stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-        ).expectStatus().isOk
+        )
     }
 }
 

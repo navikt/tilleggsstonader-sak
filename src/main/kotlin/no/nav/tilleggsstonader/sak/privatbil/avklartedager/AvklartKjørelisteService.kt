@@ -117,6 +117,7 @@ class AvklartKjørelisteService(
         return AvklartKjørtUke(
             behandlingId = behandlingId,
             kjørelisteId = kjørelisteId,
+            reiseId = rammevedtak.reiseId,
             fom = reisedager.minOf { it.dato },
             tom = reisedager.maxOf { it.dato },
             ukenummer = ukenummer,
@@ -201,8 +202,8 @@ class AvklartKjørelisteService(
         val rammevedtak =
             vedtakService
                 .hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandling.id)
-                ?.data
-                ?.rammevedtakPrivatBil
+                .data
+                .rammevedtakPrivatBil
                 ?: error("Fant ikke rammevedtak for behandling med id ${behandling.id}")
 
         return rammevedtak.reiser.singleOrNull { it.reiseId == reiseId }

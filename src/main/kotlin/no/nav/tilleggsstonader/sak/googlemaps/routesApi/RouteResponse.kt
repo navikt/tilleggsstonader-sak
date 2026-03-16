@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.googlemaps.routesApi
 
+import no.nav.tilleggsstonader.sak.googlemaps.PlaceId
+
 data class RuteResponse(
     val routes: List<Route>?,
     val geocodingResults: GeocodingResults,
@@ -82,7 +84,7 @@ data class GeocodingResults(
 )
 
 data class GeocodedWaypoint(
-    val placeId: String?,
+    val placeId: PlaceId?,
 )
 
 enum class LinjeType {

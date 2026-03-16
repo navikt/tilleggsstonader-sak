@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktaGrunnlagId
 import no.nav.tilleggsstonader.sak.felles.domain.gjelderBarn
 import no.nav.tilleggsstonader.sak.infrastruktur.database.AdvisoryLockService
-import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagUtil.ofType
@@ -26,9 +25,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.TypeFakta
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Familierelasjonsrolle
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -40,7 +38,7 @@ class FaktaGrunnlagService(
     private val faktaGrunnlagRepository: FaktaGrunnlagRepository,
     private val barnService: BarnService,
     private val personService: PersonService,
-    private val vedtakRepository: VedtakRepository,
+    private val vedtakService: VedtakService,
     private val arenaService: ArenaService,
     private val advisoryLockService: AdvisoryLockService,
 ) {
@@ -195,10 +193,7 @@ class FaktaGrunnlagService(
             }
 
     private fun Behandling.iverksattBehandlingAnnenForelder(): BehandlingsinformasjonAnnenForelder.IverksattBehandlingForelder {
-        val vedtak =
-            vedtakRepository
-                .findByIdOrThrow(this.id)
-                .withTypeOrThrow<InnvilgelseEllerOpphørTilsynBarn>()
+        val vedtak = vedtakService.hentVedtak<InnvilgelseEllerOpphørTilsynBarn>(this.id)
         return BehandlingsinformasjonAnnenForelder.IverksattBehandlingForelder(
             barnFraTidligereVedtak = barnService.finnBarnPåFagsak(fagsakId).associate { it.id to it.ident },
             tidligereVedtak = vedtak.data,

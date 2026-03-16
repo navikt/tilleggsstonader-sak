@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
-import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -461,7 +460,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
                 // Januar og februar beholder fra forrige behandling, selv om det ikke finnes noen perioder for de denne gangen.
                 assertHarPerioderForJanuarOgFebruar(this)
 
-                /**
+                /*
                  * På grunn av at man har endret fra den 15 mars splittes vedtakssperioder i 2
                  * Det er fordi man i beregningsresultat i behandlingen kun ønsker å se
                  * beløp som blir innvilget fra datoet man revurderer fra

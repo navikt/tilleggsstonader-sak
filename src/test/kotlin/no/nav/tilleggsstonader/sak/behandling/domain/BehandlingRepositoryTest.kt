@@ -33,7 +33,6 @@ import org.junit.jupiter.api.Test
 import org.postgresql.util.PSQLException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.data.relational.core.conversion.DbActionExecutionException
 import java.time.LocalDate
 import java.time.LocalDateTime
 

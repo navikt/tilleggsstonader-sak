@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll
 
-import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
@@ -21,7 +20,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.VedtaksresultatService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.tilBehandlingResult
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import org.springframework.stereotype.Service
@@ -43,7 +42,7 @@ class BeslutteVedtakSteg(
     private val oppgaveService: OppgaveService,
     private val taskService: TaskService,
     private val totrinnskontrollService: TotrinnskontrollService,
-    private val vedtaksresultatService: VedtaksresultatService,
+    private val vedtakService: VedtakService,
     private val brevService: BrevService,
     private val iverksettService: IverksettService,
 ) : BehandlingSteg<BeslutteVedtakDto> {
@@ -67,7 +66,7 @@ class BeslutteVedtakSteg(
         ferdigstillOppgave(saksbehandling)
 
         return if (data.godkjent) {
-            val typeVedtak = vedtaksresultatService.hentVedtaksresultat(saksbehandling)
+            val typeVedtak = vedtakService.hentVedtaksresultat(saksbehandling)
             oppdaterResultatPåBehandling(saksbehandling, typeVedtak)
             vedtakCounter(saksbehandling.stønadstype, typeVedtak).increment()
 
