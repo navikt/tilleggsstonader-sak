@@ -24,6 +24,27 @@ object DagligReiseRegelTestUtil {
             ),
         )
 
+    fun oppfylteDelvilkårDagligReisePrivatBil() =
+        listOf(
+            delvilkår(
+                Vurdering(
+                    regelId = RegelId.AVSTAND_OVER_SEKS_KM,
+                    svar = SvarId.JA,
+                    begrunnelse = "antall km",
+                ),
+                Vurdering(
+                    regelId = RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT,
+                    svar = SvarId.NEI,
+                    begrunnelse = "En begrunnelse på delvilkåret",
+                ),
+                Vurdering(
+                    regelId = RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT,
+                    svar = SvarId.JA,
+                    begrunnelse = "En begrunnelse på delvilkåret",
+                ),
+            ),
+        )
+
     private fun delvilkår(vararg vurderinger: Vurdering) =
         Delvilkår(
             resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,

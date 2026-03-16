@@ -69,6 +69,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernatting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.oppfylteDelvilkårDagligReiseOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.oppfylteDelvilkårDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetBoutgifter
@@ -1001,7 +1002,7 @@ object InterntVedtakTestdata {
                     resultat = Vilkårsresultat.OPPFYLT,
                     behandlingId = behandlingId,
                     type = VilkårType.DAGLIG_REISE,
-                    delvilkår = oppfylteDelvilkårDagligReiseOffentligTransport(),
+                    delvilkår = oppfylteDelvilkårDagligReisePrivatBil(),
                     fom = LocalDate.of(2025, JANUARY, 1),
                     tom = LocalDate.of(2025, FEBRUARY, 28),
                     utgift = null,

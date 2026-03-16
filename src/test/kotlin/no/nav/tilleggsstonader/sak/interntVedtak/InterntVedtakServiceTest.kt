@@ -456,7 +456,9 @@ class InterntVedtakServiceTest {
             every { barnService.finnBarnPåBehandling(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.behandlingBarn
             every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.DagligReise.vilkårperioderTso
             every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.DagligReise.grunnlagsdata
-            every { vilkårService.hentVilkår(behandlingId) } returns InterntVedtakTestdata.DagligReise.vilkårOffentligTransport
+            every { vilkårService.hentVilkår(behandlingId) } returns
+                InterntVedtakTestdata.DagligReise.vilkårOffentligTransport +
+                InterntVedtakTestdata.DagligReise.vilkårPrivatBil
             every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.DagligReise.innvilgetVedtakTso()
         }
 
