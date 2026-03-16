@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.BeregningDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
@@ -9,6 +10,11 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatO
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import java.time.LocalDate
+
+data class BeregningDagligReiseDto(
+    val beregningsresultatDagligReise: BeregningsresultatDagligReiseDto,
+    val rammevedtakPrivatBil: RammevedtakPrivatBilDto?,
+)
 
 data class BeregningsresultatDagligReiseDto(
     val offentligTransport: BeregningsresultatOffentligTransportDto?,
@@ -38,6 +44,15 @@ data class BeregningsresultatForPeriodeDto(
     val fraTidligereVedtak: Boolean,
     val brukersNavKontor: String?,
 ) : Periode<LocalDate>
+
+fun BeregningDagligReise.tilDto(
+    tidligsteEndring: LocalDate?,
+    vilkår: List<VilkårDagligReise>,
+): BeregningDagligReiseDto =
+    BeregningDagligReiseDto(
+        beregningsresultatDagligReise = beregningsresultatDagligReise.tilDto(tidligsteEndring, vilkår),
+        rammevedtakPrivatBil = rammevedtakPrivatBil?.tilDto(),
+    )
 
 fun BeregningsresultatDagligReise.tilDto(
     tidligsteEndring: LocalDate?,

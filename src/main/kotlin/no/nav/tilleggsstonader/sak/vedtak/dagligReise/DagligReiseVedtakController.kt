@@ -15,7 +15,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatDagligReiseDto
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsoRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsrRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
@@ -48,6 +48,8 @@ class DagligReiseVedtakController(
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
     private val unleashService: UnleashService,
     private val dagligReiseVilkårService: DagligReiseVilkårService,
+    private val kjørelisteSteg: KjørelisteSteg,
+    private val beregnSteg: DagligReiseBeregnSteg,
 ) {
     @PostMapping("{behandlingId}/tso/innvilgelse")
     fun innvilge(
@@ -104,18 +106,18 @@ class DagligReiseVedtakController(
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseDagligReiseTsoRequest,
-    ): BeregningsresultatDagligReiseDto = beregnVedtak(behandlingId, vedtak.vedtaksperioder())
+    ): BeregningDagligReiseDto = beregnVedtak(behandlingId, vedtak.vedtaksperioder())
 
     @PostMapping("{behandlingId}/tsr/beregn")
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseDagligReiseTsrRequest,
-    ): BeregningsresultatDagligReiseDto = beregnVedtak(behandlingId, vedtak.vedtaksperioder())
+    ): BeregningDagligReiseDto = beregnVedtak(behandlingId, vedtak.vedtaksperioder())
 
     private fun beregnVedtak(
         behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
-    ): BeregningsresultatDagligReiseDto {
+    ): BeregningDagligReiseDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val tidligsteEndring =
@@ -130,7 +132,7 @@ class DagligReiseVedtakController(
                     behandling = behandling,
                     typeVedtak = TypeVedtak.INNVILGELSE,
                     tidligsteEndring = tidligsteEndring,
-                ).beregningsresultatDagligReise
+                )
 
         val vilkår = dagligReiseVilkårService.hentVilkårForBehandling(behandlingId)
         return beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring, vilkår)
@@ -144,7 +146,9 @@ class DagligReiseVedtakController(
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
 
         val steg = finnRiktigSteg()
-        stegService.håndterSteg(behandlingId, steg, vedtak)
+        stegService.håndterSteg(behandlingId, steg, vedtak).steg
+        stegService.håndterSteg(behandlingId, kjørelisteSteg, null )
+        stegService.håndterSteg(behandlingId, beregnSteg, null)
     }
 
     private fun finnRiktigSteg(): BehandlingSteg<VedtakDagligReiseRequest> {
