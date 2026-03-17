@@ -51,7 +51,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : CleanDatabaseIntegrationTe
                 5 februar 2026 to 50,
             )
 
-        val behandlingId =
+        val førstegangsBehandlingId =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
@@ -79,7 +79,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : CleanDatabaseIntegrationTe
                 }
             }
 
-        val førstegangsBehandling = testoppsettService.hentBehandling(behandlingId)
+        val førstegangsBehandling = testoppsettService.hentBehandling(førstegangsBehandlingId)
         val kjørelisteBehandling =
             testoppsettService
                 .hentBehandlinger(førstegangsBehandling.fagsakId)
@@ -113,14 +113,19 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : CleanDatabaseIntegrationTe
         assertThat(periode.tom).isEqualTo(fom)
         assertThat(periode.beløp).isEqualTo(forventetBeløp.toUInt())
 
-        val ferdigstiltBehandling = testoppsettService.hentBehandling(kjørelisteBehandling.id)
-        assertThat(ferdigstiltBehandling.resultat).isEqualTo(BehandlingResultat.INNVILGET)
-        assertThat(ferdigstiltBehandling.status).isEqualTo(BehandlingStatus.FERDIGSTILT)
-        assertThat(ferdigstiltBehandling.steg).isEqualTo(StegType.BEHANDLING_FERDIGSTILT)
+        val ferdigstiltKjørelistebehandling = testoppsettService.hentBehandling(kjørelisteBehandling.id)
+        assertThat(ferdigstiltKjørelistebehandling.resultat).isEqualTo(BehandlingResultat.INNVILGET)
+        assertThat(ferdigstiltKjørelistebehandling.status).isEqualTo(BehandlingStatus.FERDIGSTILT)
+        assertThat(ferdigstiltKjørelistebehandling.steg).isEqualTo(StegType.BEHANDLING_FERDIGSTILT)
 
         val oppgaverPåKjørelisteBehandling = oppgaveRepository.findByBehandlingId(kjørelisteBehandling.id)
         assertThat(oppgaverPåKjørelisteBehandling).hasSize(1)
         assertThat(oppgaverPåKjørelisteBehandling.single().status).isEqualTo(Oppgavestatus.FERDIGSTILT)
+
+        val gjeldendeIverksatteBehandlinger = testoppsettService.hentGjeldendeIverksatteBehandlinger(Stønadstype.DAGLIG_REISE_TSO)
+        assertThat(gjeldendeIverksatteBehandlinger.map { it.id })
+            .contains(kjørelisteBehandling.id)
+            .doesNotContain(førstegangsBehandling.id)
     }
 
     private fun assertAndelOpprettet(
