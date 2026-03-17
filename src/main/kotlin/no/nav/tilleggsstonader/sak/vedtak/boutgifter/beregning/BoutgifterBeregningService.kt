@@ -87,10 +87,9 @@ class BoutgifterBeregningService(
         )
 
         val beregningsresultat =
-            beregnAktuellePerioder(
-                vedtaksperioder = vedtaksperioderBeregning,
-                utgifter = utgifterPerVilkårtype,
-            )
+            vedtaksperioderBeregning
+                .splittVedGrensenTilFaktiskeUtgifter(utgifter = utgifterPerVilkårtype)
+                .flatMap { beregnPeriodesegment(it, utgifter = utgifterPerVilkårtype) }
 
         return if (forrigeVedtak != null) {
             brukerfeilHvis(tidligsteEndring == null) {
@@ -104,25 +103,6 @@ class BoutgifterBeregningService(
         } else {
             BeregningsresultatBoutgifter(perioder = beregningsresultat)
         }
-    }
-
-    private fun beregnAktuellePerioder(
-        vedtaksperioder: List<VedtaksperiodeBeregning>,
-        utgifter: BoutgifterPerUtgiftstype,
-    ): List<BeregningsresultatForLøpendeMåned> {
-        val faktiskeUtgifterGrenser =
-            utgifter.values
-                .asSequence()
-                .flatten()
-                .filter { it.skalFåDekketFaktiskeUtgifter }
-                .map { it.fom }
-                .distinct()
-                .sorted()
-                .toList()
-
-        return vedtaksperioder
-            .splittVedGrensenTilFaktiskeUtgifter(faktiskeUtgifterGrenser)
-            .flatMap { beregnPeriodesegment(it, utgifter) }
     }
 
     private fun beregnPeriodesegment(

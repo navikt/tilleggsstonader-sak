@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.splitPerLøpendeMåneder
-import java.time.LocalDate
 import kotlin.math.min
 
 object BoutgifterBeregnUtil {
@@ -20,35 +19,40 @@ object BoutgifterBeregnUtil {
      * - Segment 2: VP(01.03.2026–31.05.2026)
      */
     fun List<VedtaksperiodeBeregning>.splittVedGrensenTilFaktiskeUtgifter(
-        grensedatoer: List<LocalDate>,
+        utgifter: BoutgifterPerUtgiftstype,
     ): List<List<VedtaksperiodeBeregning>> {
-        if (grensedatoer.isEmpty()) return listOf(this)
-
-        val grensedato = grensedatoer.first()
-
-        val segmentMedNormaleUtgifter =
-            mapNotNull { vedtaksperiode ->
-                when {
-                    vedtaksperiode.fom >= grensedato -> null
-                    vedtaksperiode.tom < grensedato -> vedtaksperiode
-                    else -> vedtaksperiode.copy(tom = grensedato.minusDays(1))
-                }
-            }
-
-        val sekgmentMedfaktiskeOgResterendeUtgfifter =
-            mapNotNull { vedtaksperiode ->
-                when {
-                    vedtaksperiode.tom < grensedato -> null
-                    vedtaksperiode.fom >= grensedato -> vedtaksperiode
-                    else -> vedtaksperiode.copy(fom = grensedato)
-                }
-            }
+        val grensedatoer =
+            utgifter.values
+                .flatten()
+                .filter { it.skalFåDekketFaktiskeUtgifter }
+                .map { it.fom }
+                .distinct()
+                .sorted()
+                .toList()
 
         val segmenter = mutableListOf<List<VedtaksperiodeBeregning>>()
-        if (segmentMedNormaleUtgifter.isNotEmpty()) {
-            segmenter.add(segmentMedNormaleUtgifter)
+        var gjenværendeSegmenter = this
+
+        for (grensedato in grensedatoer) {
+            val before =
+                gjenværendeSegmenter.mapNotNull { vp ->
+                    when {
+                        vp.fom >= grensedato -> null
+                        vp.tom < grensedato -> vp
+                        else -> vp.copy(tom = grensedato.minusDays(1))
+                    }
+                }
+            gjenværendeSegmenter =
+                gjenværendeSegmenter.mapNotNull { vp ->
+                    when {
+                        vp.tom < grensedato -> null
+                        vp.fom >= grensedato -> vp
+                        else -> vp.copy(fom = grensedato)
+                    }
+                }
+            if (before.isNotEmpty()) segmenter.add(before)
         }
-        segmenter.addAll(sekgmentMedfaktiskeOgResterendeUtgfifter.splittVedGrensenTilFaktiskeUtgifter(grensedatoer.drop(1)))
+        if (gjenværendeSegmenter.isNotEmpty()) segmenter.add(gjenværendeSegmenter)
         return segmenter
     }
 
