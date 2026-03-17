@@ -19,13 +19,13 @@ interface BehandlingSteg<T> {
         kanBehandlePrivatBil: Boolean = false,
     ): StegType {
         utførSteg(saksbehandling, data)
-        return nesteSteg(stønadstype = saksbehandling.stønadstype, kanBehandlePrivatBil)
+        return nesteSteg(saksbehandling, kanBehandlePrivatBil)
     }
 
     fun nesteSteg(
-        stønadstype: Stønadstype,
+        saksbehandling: Saksbehandling,
         kanBehandlePrivatBil: Boolean,
-    ) = stegType().hentNesteSteg(stønadstype, kanBehandlePrivatBil)
+    ) = stegType().hentNesteSteg(saksbehandling.stønadstype, kanBehandlePrivatBil)
 
     fun utførSteg(
         saksbehandling: Saksbehandling,
@@ -147,6 +147,7 @@ enum class StegType(
             VEDTAK -> KJØRELISTE
             KJØRELISTE -> BEREGNING
             BEREGNING -> SIMULERING
+            SIMULERING -> FULLFØR_KJØRELISTE
             else -> fellesNesteSteg()
         }
 

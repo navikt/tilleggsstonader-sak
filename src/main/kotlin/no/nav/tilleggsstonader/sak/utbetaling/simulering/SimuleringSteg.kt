@@ -34,4 +34,12 @@ class SimuleringSteg(
     }
 
     override fun stegType(): StegType = StegType.SIMULERING
+
+    override fun nesteSteg(saksbehandling: Saksbehandling, kanBehandlePrivatBil: Boolean): StegType {
+        return if (saksbehandling.erKjørelisteBehandling()) {
+            StegType.FULLFØR_KJØRELISTE
+        } else {
+            StegType.SEND_TIL_BESLUTTER
+        }
+    }
 }
