@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegController
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 
 fun IntegrationTest.gjennomførKjørelisteBehandling(behandling: Behandling) {
@@ -17,6 +18,6 @@ fun IntegrationTest.gjennomførKjørelisteBehandling(behandling: Behandling) {
     kall.steg.ferdigstill(behandling.id, StegController.FerdigstillStegRequest(StegType.KJØRELISTE))
     kall.steg.ferdigstill(behandling.id, StegController.FerdigstillStegRequest(StegType.BEREGNING))
     kall.steg.ferdigstill(behandling.id, StegController.FerdigstillStegRequest(StegType.SIMULERING))
-
-    // TODO - send til utbetaling
+    kall.privatBil.fullførKjørelisteBehandling(behandling.id)
+    kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 }

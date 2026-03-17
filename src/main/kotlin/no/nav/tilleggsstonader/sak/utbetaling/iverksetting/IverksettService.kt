@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelseRepository
@@ -18,7 +19,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingMessa
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingV3Mapper
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
-import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -59,14 +59,11 @@ class IverksettService(
                 tilkjentYtelse,
             )
 
-        val totrinnskontroll = hentTotrinnskontroll(behandling)
-
         val iverksettingId = behandlingId.id
         sendAndelerTilUtsjekk(
             andelerTilUtbetaling = andelerSomSkalIverksettesNå,
             behandling = behandling,
             iverksettingId = iverksettingId,
-            totrinnskontroll = totrinnskontroll,
             erFørsteIverksettingForBehandling = true,
         )
     }
@@ -127,8 +124,6 @@ class IverksettService(
         }
         val tilkjentYtelse = tilkjentYtelseService.hentForBehandlingMedLås(behandlingId)
 
-        val totrinnskontroll = hentTotrinnskontroll(behandling)
-
         val andelerTilkjentYtelse =
             finnAndelerTilIverksetting(tilkjentYtelse, iverksettingId, utbetalingsdato = utbetalingsdato)
         feilHvis(andelerTilkjentYtelse.isEmpty()) {
@@ -139,7 +134,6 @@ class IverksettService(
             behandling = behandling,
             iverksettingId = iverksettingId,
             andelerTilUtbetaling = andelerTilkjentYtelse,
-            totrinnskontroll = totrinnskontroll,
             erFørsteIverksettingForBehandling = false,
         )
     }
@@ -148,16 +142,17 @@ class IverksettService(
         behandling: Saksbehandling,
         iverksettingId: UUID,
         andelerTilUtbetaling: Collection<AndelTilkjentYtelse>,
-        totrinnskontroll: Totrinnskontroll,
         erFørsteIverksettingForBehandling: Boolean,
     ) {
         if (andelerTilUtbetaling.isNotEmpty() || finnesIverksatteAndelerPåForrigeIverksatteBehandling(behandling)) {
             iverksettingerOverKafkaCounter.increment()
+            val saksbehandlerOgBeslutter = hentSaksbehandlerOgBeslutter(behandling)
             val utbetalingRecords =
                 utbetalingV3Mapper.lagIverksettingDtoer(
                     behandling = behandling,
                     andelerTilkjentYtelse = andelerTilUtbetaling.filterNot { it.erNullandel() },
-                    totrinnskontroll = totrinnskontroll,
+                    saksbehandler = saksbehandlerOgBeslutter.saksbehandler,
+                    beslutter = saksbehandlerOgBeslutter.beslutter,
                     erFørsteIverksettingForBehandling = erFørsteIverksettingForBehandling,
                     vedtakstidspunkt = behandling.vedtakstidspunkt ?: feil("Vedtakstidspunkt er påkrevd"),
                 )
@@ -243,18 +238,39 @@ class IverksettService(
         andelTilkjentYtelseRepository.updateAll(andelerSomSkalOppdateres)
     }
 
-    private fun hentTotrinnskontroll(saksbehandling: Saksbehandling): Totrinnskontroll {
-        val totrinnskontroll =
-            if (saksbehandling.erSatsendring) {
-                Totrinnskontroll.maskineltBesluttet(saksbehandling.id)
-            } else {
-                totrinnskontrollService.hentTotrinnskontroll(saksbehandling.id)
-                    ?: error("Finner ikke totrinnskontroll for behandling=${saksbehandling.id}")
-            }
+    private fun hentSaksbehandlerOgBeslutter(saksbehandling: Saksbehandling): SaksbehandlerOgBeslutter =
+        if (saksbehandling.erSatsendring) {
+            SaksbehandlerOgBeslutter(SikkerhetContext.SYSTEM_FORKORTELSE)
+        } else if (saksbehandling.erKjørelisteBehandling()) {
+            SaksbehandlerOgBeslutter(
+                saksbehandler = saksbehandling.endretAv,
+                beslutter = SikkerhetContext.SYSTEM_FORKORTELSE,
+            )
+        } else {
+            saksbehandlerOgBeslutterFraTotrinnskontroll(saksbehandling)
+        }
 
+    private fun saksbehandlerOgBeslutterFraTotrinnskontroll(saksbehandling: Saksbehandling): SaksbehandlerOgBeslutter {
+        val totrinnskontroll =
+            totrinnskontrollService.hentTotrinnskontroll(saksbehandling.id)
+                ?: error("Finner ikke totrinnskontroll for behandling=${saksbehandling.id}")
+
+        feilHvis(totrinnskontroll.beslutter == null) {
+            "Beslutter er ikke satt på totrinnskontroll"
+        }
         feilHvis(totrinnskontroll.status != TotrinnInternStatus.GODKJENT) {
             "Totrinnskontroll må være godkjent for å kunne iverksette"
         }
-        return totrinnskontroll
+        return SaksbehandlerOgBeslutter(
+            saksbehandler = totrinnskontroll.saksbehandler,
+            beslutter = totrinnskontroll.beslutter,
+        )
+    }
+
+    private data class SaksbehandlerOgBeslutter(
+        val saksbehandler: String,
+        val beslutter: String,
+    ) {
+        constructor(saksbehandler: String) : this(saksbehandler = saksbehandler, beslutter = saksbehandler)
     }
 }

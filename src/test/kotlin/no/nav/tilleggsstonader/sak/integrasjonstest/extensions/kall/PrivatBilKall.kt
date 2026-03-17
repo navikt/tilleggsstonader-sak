@@ -22,6 +22,8 @@ class PrivatBilKall(
         avklarteDager: List<EndreAvklartDagRequest>,
     ) = apiRespons.oppdaterUke(behandlingId, avklartUkeId, avklarteDager).expectOkWithBody<UkeVurderingDto>()
 
+    fun fullførKjørelisteBehandling(behandlingId: BehandlingId) = apiRespons.fullførKjørelisteBehandling(behandlingId).expectStatus().isOk
+
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = PrivatBilApi()
 
@@ -56,5 +58,14 @@ class PrivatBilKall(
                 .medOnBehalfOfToken()
                 .exchange()
         }
+
+        fun fullførKjørelisteBehandling(behandlingId: BehandlingId) =
+            with(testklient.testkontekst) {
+                restTestClient
+                    .post()
+                    .uri("/api/behandling/$behandlingId/fullfør-kjørelistebehandling")
+                    .medOnBehalfOfToken()
+                    .exchange()
+            }
     }
 }

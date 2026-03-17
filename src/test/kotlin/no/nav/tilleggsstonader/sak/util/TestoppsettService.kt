@@ -66,6 +66,9 @@ class TestoppsettService(
 
     fun hentSaksbehandling(behandlingId: BehandlingId) = behandlingRepository.finnSaksbehandling(behandlingId)
 
+    fun hentGjeldendeIverksatteBehandlinger(stønadstype: Stønadstype) =
+        behandlingRepository.finnGjeldendeIverksatteBehandlinger(stønadstype)
+
     fun opprettBehandlingMedFagsak(
         behandling: Behandling = behandling(),
         stønadstype: Stønadstype = Stønadstype.BARNETILSYN,

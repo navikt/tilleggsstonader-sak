@@ -51,4 +51,6 @@ data class Saksbehandling(
     val harStatusOpprettet get() = status == BehandlingStatus.OPPRETTET
 
     fun erFerdigstilt(): Boolean = status == BehandlingStatus.FERDIGSTILT
+
+    fun erKjørelisteBehandling(): Boolean = type == BehandlingType.KJØRELISTE
 }
