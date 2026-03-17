@@ -47,6 +47,7 @@ class BehandlingOppsummeringService(
                 skalMerges = { v1, v2 ->
                     v1.type == v2.type &&
                         v1.resultat == v2.resultat &&
+                        v1.varient == v2.varient &&
                         v1.overlapperEllerPåfølgesAv(
                             v2,
                         )

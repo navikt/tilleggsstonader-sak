@@ -43,6 +43,7 @@ data class OppsummertVilkårperiode(
     val type: VilkårperiodeType,
     val resultat: ResultatVilkårperiode,
     val aktivitetsdager: Int?,
+    val varient: String?,
     val studienivå: Studienivå?,
 ) : Periode<LocalDate>,
     KopierPeriode<OppsummertVilkårperiode> {
@@ -67,6 +68,7 @@ fun Vilkårperiode.tilOppsummertVilkårperiode(): OppsummertVilkårperiode =
             this.faktaOgVurdering.fakta
                 .takeIfFakta<FaktaStudienivå>()
                 ?.studienivå,
+        varient = this.typeAktivitet?.beskrivelse,
     )
 
 data class Stønadsvilkår(
