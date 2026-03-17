@@ -54,7 +54,10 @@ object FileUtil {
         val jsonNode = JsonMapperProvider.jsonMapper.valueToTree<JsonNode>(json)
         val filJsonNode = JsonMapperProvider.jsonMapper.readTree(readFile(filnavn))
 
-        skrivTilFil(filnavn, jsonNode.toString())
+        skrivTilFil(
+            filnavn,
+            JsonMapperProvider.jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode)
+        )
         assertThat(jsonNode).isEqualTo(filJsonNode)
     }
 
