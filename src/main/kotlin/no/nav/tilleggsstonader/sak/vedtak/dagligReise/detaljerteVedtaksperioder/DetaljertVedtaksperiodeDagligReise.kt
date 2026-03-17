@@ -11,6 +11,7 @@ data class DetaljertVedtaksperiodeDagligReise(
     val stønadstype: Stønadstype,
     val typeDagligReise: TypeDagligReise,
     val detaljertBeregningsperioder: List<DetaljertBeregningsperioder>?,
+    val adresse: String?,
 ) : DetaljertVedtaksperiode
 
 data class DetaljertBeregningsperioder(
