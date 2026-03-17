@@ -6,10 +6,52 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.splitPerLøpendeMåneder
-import kotlin.collections.plus
+import java.time.LocalDate
 import kotlin.math.min
 
 object BoutgifterBeregnUtil {
+    /**
+     * Splitter vedtaksperioder i segmenter ved grensedatoene til faktiske utgifter.
+     * Hvert segment beregnes uavhengig med sin egen periodetelling, slik at faktiske utgifter
+     * ikke trenger å følge de samme 30-dagers-vinduene som de normale utgiftene.
+     *
+     * Eksempel: VP 15.09.2025–31.05.2026 med grensedato 01.03.2026 gir
+     * - Segment 1: VP(15.09.2025–28.02.2026)
+     * - Segment 2: VP(01.03.2026–31.05.2026)
+     */
+    fun List<VedtaksperiodeBeregning>.splittVedGrensenTilFaktiskeUtgifter(
+        grensedatoer: List<LocalDate>,
+    ): List<List<VedtaksperiodeBeregning>> {
+        if (grensedatoer.isEmpty()) return listOf(this)
+
+        val grensedato = grensedatoer.first()
+
+        val segmentMedNormaleUtgifter =
+            mapNotNull { vedtaksperiode ->
+                when {
+                    vedtaksperiode.fom >= grensedato -> null
+                    vedtaksperiode.tom < grensedato -> vedtaksperiode
+                    else -> vedtaksperiode.copy(tom = grensedato.minusDays(1))
+                }
+            }
+
+        val sekgmentMedfaktiskeOgResterendeUtgfifter =
+            mapNotNull { vedtaksperiode ->
+                when {
+                    vedtaksperiode.tom < grensedato -> null
+                    vedtaksperiode.fom >= grensedato -> vedtaksperiode
+                    else -> vedtaksperiode.copy(fom = grensedato)
+                }
+            }
+
+        val segmenter = mutableListOf<List<VedtaksperiodeBeregning>>()
+        if (segmentMedNormaleUtgifter.isNotEmpty()) {
+            segmenter.add(segmentMedNormaleUtgifter)
+        }
+        segmenter.addAll(sekgmentMedfaktiskeOgResterendeUtgfifter.splittVedGrensenTilFaktiskeUtgifter(grensedatoer.drop(1)))
+        return segmenter
+    }
+
     /**
      * Splitter opp vedtaksperioder på løpende måneder.
      *

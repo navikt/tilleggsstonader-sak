@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.beregnStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.lagBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.splittTilLøpendeMåneder
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.splittVedGrensenTilFaktiskeUtgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningServiceFeilmeldingUtil.lagDetFinnesUtgifterSomKrysserUtbetlingsperioderFeilmelding
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.MarkerSomDelAvTidligereUtbetlingUtils.markerSomDelAvTidligereUtbetaling
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgifterValideringUtil.validerUtgifter
@@ -106,6 +107,25 @@ class BoutgifterBeregningService(
     }
 
     private fun beregnAktuellePerioder(
+        vedtaksperioder: List<VedtaksperiodeBeregning>,
+        utgifter: BoutgifterPerUtgiftstype,
+    ): List<BeregningsresultatForLøpendeMåned> {
+        val faktiskeUtgifterGrenser =
+            utgifter.values
+                .asSequence()
+                .flatten()
+                .filter { it.skalFåDekketFaktiskeUtgifter }
+                .map { it.fom }
+                .distinct()
+                .sorted()
+                .toList()
+
+        return vedtaksperioder
+            .splittVedGrensenTilFaktiskeUtgifter(faktiskeUtgifterGrenser)
+            .flatMap { beregnPeriodesegment(it, utgifter) }
+    }
+
+    private fun beregnPeriodesegment(
         vedtaksperioder: List<VedtaksperiodeBeregning>,
         utgifter: BoutgifterPerUtgiftstype,
     ): List<BeregningsresultatForLøpendeMåned> =

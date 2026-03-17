@@ -22,7 +22,10 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgifts
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -228,5 +231,73 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
 
         assertThat(res.size).isEqualTo(4)
         assertThat(res).isEqualTo(forventet)
+    }
+
+    @Test
+    fun `faktiske utgifter starter ny periodetelling - vilkårperiode midt i måneden med grense mellom normal og faktiske utgifter`() {
+        val vidtVilkårperioder =
+            Vilkårperioder(
+                målgrupper = listOf(målgruppe(fom = LocalDate.of(2025, 9, 15), tom = LocalDate.of(2026, 5, 31))),
+                aktiviteter = listOf(aktivitet(fom = LocalDate.of(2025, 9, 15), tom = LocalDate.of(2026, 5, 31))),
+            )
+        every { vilkårperiodeService.hentVilkårperioder(any()) } returns vidtVilkårperioder
+
+        val utgifter =
+            mapOf(
+                TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
+                    listOf(
+                        lagUtgiftBeregningBoutgifter(
+                            fom = LocalDate.of(2025, 9, 1),
+                            tom = LocalDate.of(2026, 2, 28),
+                            utgift = 600,
+                        ),
+                        lagUtgiftBeregningBoutgifter(
+                            fom = LocalDate.of(2026, 3, 1),
+                            tom = LocalDate.of(2026, 5, 31),
+                            utgift = 11500,
+                            skalFåDekketFaktiskeUtgifter = true,
+                        ),
+                    ),
+            )
+        every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgifter
+
+        val perioder =
+            boutgifterBeregningService
+                .beregn(
+                    behandling = saksbehandling(),
+                    vedtaksperioder =
+                        listOf(
+                            vedtaksperiode(
+                                fom = LocalDate.of(2025, 9, 15),
+                                tom = LocalDate.of(2026, 5, 31),
+                            ),
+                        ),
+                    typeVedtak = TypeVedtak.INNVILGELSE,
+                    tidligsteEndring = null,
+                ).perioder
+
+        assertThat(perioder).hasSize(9)
+
+        // Normale perioder — 30-dagersvinduer fra 15.09 (forskyves ikke til kalendergrenser)
+        assertThat(perioder[0].fom).isEqualTo(LocalDate.of(2025, 9, 15))
+        assertThat(perioder[0].tom).isEqualTo(LocalDate.of(2025, 10, 14))
+        assertThat(perioder[0].stønadsbeløp).isEqualTo(600)
+
+        assertThat(perioder[5].fom).isEqualTo(LocalDate.of(2026, 2, 15))
+        assertThat(perioder[5].tom).isEqualTo(LocalDate.of(2026, 2, 28)) // avkortet til utgift-tom, ikke 14.03
+        assertThat(perioder[5].stønadsbeløp).isEqualTo(600)
+
+        // Faktiske utgifter — starter på nytt fra 01.03 (ikke 15.03 som ville fulgt 30-dagerstellingen)
+        assertThat(perioder[6].fom).isEqualTo(LocalDate.of(2026, 3, 1))
+        assertThat(perioder[6].tom).isEqualTo(LocalDate.of(2026, 3, 31))
+        assertThat(perioder[6].stønadsbeløp).isEqualTo(11500) // faktiske utgifter, ikke cappa av makssats
+
+        assertThat(perioder[7].fom).isEqualTo(LocalDate.of(2026, 4, 1))
+        assertThat(perioder[7].tom).isEqualTo(LocalDate.of(2026, 4, 30))
+        assertThat(perioder[7].stønadsbeløp).isEqualTo(11500)
+
+        assertThat(perioder[8].fom).isEqualTo(LocalDate.of(2026, 5, 1))
+        assertThat(perioder[8].tom).isEqualTo(LocalDate.of(2026, 5, 31))
+        assertThat(perioder[8].stønadsbeløp).isEqualTo(11500)
     }
 }
