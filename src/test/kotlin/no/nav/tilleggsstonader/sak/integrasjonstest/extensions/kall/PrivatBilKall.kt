@@ -63,7 +63,7 @@ class PrivatBilKall(
             with(testklient.testkontekst) {
                 restTestClient
                     .post()
-                    .uri("/api/kjoreliste/$behandlingId/fullfør")
+                    .uri("/api/behandling/$behandlingId/fullfør-kjørelistebehandling")
                     .medOnBehalfOfToken()
                     .exchange()
             }

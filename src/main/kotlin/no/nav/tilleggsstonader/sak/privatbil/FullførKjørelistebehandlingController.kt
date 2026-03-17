@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping(path = ["/api/kjoreliste"])
+@RequestMapping(path = ["/api/behandling"])
 @ProtectedWithClaims(issuer = "azuread")
 class FullførKjørelistebehandlingController(
     private val tilgangService: TilgangService,
     private val stegService: StegService,
     private val fullførKjørelisteBehandlingSteg: FullførKjørelistebehandlingSteg,
 ) {
-    @PostMapping("/{behandlingId}/fullfør")
+    @PostMapping("/{behandlingId}/fullfør-kjørelistebehandling")
     fun fullførKjørelisteBehandling(
         @PathVariable behandlingId: BehandlingId,
     ) {
