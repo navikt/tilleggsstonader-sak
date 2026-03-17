@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeld
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
@@ -116,6 +117,10 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : CleanDatabaseIntegrationTe
         assertThat(ferdigstiltBehandling.resultat).isEqualTo(BehandlingResultat.INNVILGET)
         assertThat(ferdigstiltBehandling.status).isEqualTo(BehandlingStatus.FERDIGSTILT)
         assertThat(ferdigstiltBehandling.steg).isEqualTo(StegType.BEHANDLING_FERDIGSTILT)
+
+        val oppgaverPåKjørelisteBehandling = oppgaveRepository.findByBehandlingId(kjørelisteBehandling.id)
+        assertThat(oppgaverPåKjørelisteBehandling).hasSize(1)
+        assertThat(oppgaverPåKjørelisteBehandling.single().status).isEqualTo(Oppgavestatus.FERDIGSTILT)
     }
 
     private fun assertAndelOpprettet(
