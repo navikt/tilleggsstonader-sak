@@ -1,1 +1,69 @@
-{"regler":{"HØYERE_BOUTGIFTER_SAMMENLIGNET_MED_TIDLIGERE":{"regelId":"HØYERE_BOUTGIFTER_SAMMENLIGNET_MED_TIDLIGERE","erHovedregel":true,"svarMapping":{"JA":{"begrunnelseType":"VALGFRI","tilhørendeFaktaType":null,"regelId":"SLUTT_NODE"},"NEI":{"begrunnelseType":"PÅKREVD","tilhørendeFaktaType":null,"regelId":"SLUTT_NODE"}}},"NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET":{"regelId":"NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET","erHovedregel":true,"svarMapping":{"JA":{"begrunnelseType":"PÅKREVD","tilhørendeFaktaType":null,"regelId":"SLUTT_NODE"},"NEI":{"begrunnelseType":"PÅKREVD","tilhørendeFaktaType":null,"regelId":"SLUTT_NODE"}}},"RETT_TIL_BOSTØTTE":{"regelId":"RETT_TIL_BOSTØTTE","erHovedregel":true,"svarMapping":{"JA":{"begrunnelseType":"PÅKREVD","tilhørendeFaktaType":null,"regelId":"SLUTT_NODE"},"NEI":{"begrunnelseType":"VALGFRI","tilhørendeFaktaType":null,"regelId":"SLUTT_NODE"}}},"HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER":{"regelId":"HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER","erHovedregel":true,"svarMapping":{"JA":{"begrunnelseType":"PÅKREVD","tilhørendeFaktaType":null,"regelId":"SLUTT_NODE"},"NEI":{"begrunnelseType":"VALGFRI","tilhørendeFaktaType":null,"regelId":"SLUTT_NODE"}}}},"vilkårType":"LØPENDE_UTGIFTER_EN_BOLIG"}
+{
+  "regler": {
+    "HØYERE_BOUTGIFTER_SAMMENLIGNET_MED_TIDLIGERE": {
+      "regelId": "HØYERE_BOUTGIFTER_SAMMENLIGNET_MED_TIDLIGERE",
+      "erHovedregel": true,
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "VALGFRI",
+          "tilhørendeFaktaType": null,
+          "regelId": "SLUTT_NODE"
+        },
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "tilhørendeFaktaType": null,
+          "regelId": "SLUTT_NODE"
+        }
+      }
+    },
+    "NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET": {
+      "regelId": "NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET",
+      "erHovedregel": true,
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "PÅKREVD",
+          "tilhørendeFaktaType": null,
+          "regelId": "SLUTT_NODE"
+        },
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "tilhørendeFaktaType": null,
+          "regelId": "SLUTT_NODE"
+        }
+      }
+    },
+    "RETT_TIL_BOSTØTTE": {
+      "regelId": "RETT_TIL_BOSTØTTE",
+      "erHovedregel": true,
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "PÅKREVD",
+          "tilhørendeFaktaType": null,
+          "regelId": "SLUTT_NODE"
+        },
+        "NEI": {
+          "begrunnelseType": "VALGFRI",
+          "tilhørendeFaktaType": null,
+          "regelId": "SLUTT_NODE"
+        }
+      }
+    },
+    "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER": {
+      "regelId": "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER",
+      "erHovedregel": true,
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "PÅKREVD",
+          "tilhørendeFaktaType": null,
+          "regelId": "SLUTT_NODE"
+        },
+        "NEI": {
+          "begrunnelseType": "VALGFRI",
+          "tilhørendeFaktaType": null,
+          "regelId": "SLUTT_NODE"
+        }
+      }
+    }
+  },
+  "vilkårType": "LØPENDE_UTGIFTER_EN_BOLIG"
+}
