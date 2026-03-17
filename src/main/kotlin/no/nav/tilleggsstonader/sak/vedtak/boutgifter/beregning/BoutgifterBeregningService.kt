@@ -45,7 +45,8 @@ class BoutgifterBeregningService(
     /**
      * Kjente begrensninger i beregningen (programmet kaster feil dersom antagelsene ikke stemmer):
      * - Vi antar at det er overlapp mellom utgift og vedtaksperiode
-     * - Utgiftene krysser ikke overgangen fra én løpende måned til en annen
+     * - Utgiftene krysser ikke overgangen fra én løpende måned til en annen (med mindre normale utgifter blir etterfulgt av faktiske
+     *      utgifter, for da trenger vi ikke forholde oss til makssatsen)
      * - Det finnes bare én type målgruppe og aktivitet innenfor hver løpende måned
      */
     fun beregn(
