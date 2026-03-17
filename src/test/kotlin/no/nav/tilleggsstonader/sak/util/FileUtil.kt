@@ -56,7 +56,7 @@ object FileUtil {
 
         skrivTilFil(
             filnavn,
-            JsonMapperProvider.jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode)
+            JsonMapperProvider.jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode),
         )
         assertThat(jsonNode).isEqualTo(filJsonNode)
     }
