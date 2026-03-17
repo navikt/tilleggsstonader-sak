@@ -11,17 +11,12 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeld
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
-import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.YearMonth
 
-class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
+class UtbetalingDagligReiseOffentligTransportIntegrationTest : CleanDatabaseIntegrationTest() {
     private val nå = LocalDate.now()
     private val fom = nå.minusMonths(3)
     private val tom = nå.plusMonths(3)
@@ -30,11 +25,8 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
     fun `to andeler forrige måned, sender da én utbetaling med to perioder`() {
         val forrigeMåned = YearMonth.now().minusMonths(1)
 
-        val reiser =
-            listOf(
-                lagreDagligReiseDto(fom = forrigeMåned.atDay(1), tom = forrigeMåned.atDay(7)),
-                lagreDagligReiseDto(fom = forrigeMåned.atDay(10), tom = forrigeMåned.atDay(17)),
-            )
+        val reiseperiode1 = Datoperiode(forrigeMåned.atDay(1), tom = forrigeMåned.atDay(7))
+        val reiseperiode2 = Datoperiode(forrigeMåned.atDay(10), tom = forrigeMåned.atDay(17))
 
         val behandlingId =
             opprettBehandlingOgGjennomførBehandlingsløp(
@@ -52,7 +44,8 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 }
                 vilkår {
                     opprett {
-                        reiser.forEach { reise -> add { _, _ -> reise } }
+                        offentligTransport(reiseperiode1.fom, reiseperiode1.tom)
+                        offentligTransport(reiseperiode2.fom, reiseperiode2.tom)
                     }
                 }
             }
@@ -68,22 +61,19 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             assertThat(perioder).hasSize(2)
 
             with(perioder.first()) {
-                assertThat(fom).isEqualTo(tom).isEqualTo(reiser.first().fom.datoEllerNesteMandagHvisLørdagEllerSøndag())
+                assertThat(fom).isEqualTo(tom).isEqualTo(reiseperiode1.fom.datoEllerNesteMandagHvisLørdagEllerSøndag())
             }
 
             with(perioder.last()) {
-                assertThat(fom).isEqualTo(tom).isEqualTo(reiser.last().fom.datoEllerNesteMandagHvisLørdagEllerSøndag())
+                assertThat(fom).isEqualTo(tom).isEqualTo(reiseperiode2.fom.datoEllerNesteMandagHvisLørdagEllerSøndag())
             }
         }
     }
 
     @Test
     fun `hvis vi har én andel nå og én andel fram i tid, skal vi bare iverksette den første andelen`() {
-        val reiser =
-            listOf(
-                lagreDagligReiseDto(fom = nå.minusDays(5), tom = nå),
-                lagreDagligReiseDto(fom = nå.plusWeeks(1), tom = nå.plusWeeks(2)),
-            )
+        val reiseperiode1 = Datoperiode(nå.minusDays(5), tom = nå)
+        val reiseperiode2 = Datoperiode(nå.plusWeeks(1), tom = nå.plusWeeks(2))
 
         opprettBehandlingOgGjennomførBehandlingsløp(
             stønadstype = Stønadstype.DAGLIG_REISE_TSO,
@@ -100,7 +90,8 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             }
             vilkår {
                 opprett {
-                    reiser.forEach { reise -> add { _, _ -> reise } }
+                    offentligTransport(reiseperiode1.fom, reiseperiode1.tom)
+                    offentligTransport(reiseperiode2.fom, reiseperiode2.tom)
                 }
             }
         }
@@ -113,8 +104,7 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 .verdiEllerFeil<IverksettingDto>()
 
         val forventetUtbetalingsdato =
-            reiser
-                .first()
+            reiseperiode1
                 .fom
                 .datoEllerNesteMandagHvisLørdagEllerSøndag()
 
@@ -130,8 +120,8 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
 
     @Test
     fun `to andeler tilbake i tid med forskjellige type, skal bli to utbetalinger`() {
-        val førstePeriode = Datoperiode(1 august 2025, 31 august 2025)
-        val andrePeriode = Datoperiode(1 oktober 2025, 20 oktober 2025)
+        val reiseperiode1 = Datoperiode(1 august 2025, 31 august 2025)
+        val reiseperiode2 = Datoperiode(1 oktober 2025, 20 oktober 2025)
 
         val behandlingId =
             opprettBehandlingOgGjennomførBehandlingsløp(
@@ -139,33 +129,20 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             ) {
                 aktivitet {
                     opprett {
-                        aktivitetTiltakTso(førstePeriode.fom, førstePeriode.tom)
-                        add { behandlingId ->
-                            lagreVilkårperiodeAktivitet(
-                                behandlingId = behandlingId,
-                                aktivitetType = AktivitetType.UTDANNING,
-                                typeAktivitet = null,
-                                fom = andrePeriode.fom,
-                                tom = andrePeriode.tom,
-                                faktaOgSvar =
-                                    FaktaOgSvarAktivitetDagligReiseTsoDto(
-                                        svarLønnet = SvarJaNei.JA,
-                                        svarHarUtgifter = SvarJaNei.JA,
-                                    ),
-                            )
-                        }
+                        aktivitetTiltakTso(reiseperiode1.fom, reiseperiode1.tom)
+                        aktivitetUtdanningDagligReiseTso(reiseperiode2.fom, reiseperiode2.tom)
                     }
                 }
                 målgruppe {
                     opprett {
-                        målgruppeAAP(førstePeriode.fom, førstePeriode.tom)
-                        målgruppeOvergangsstønad(andrePeriode.fom, andrePeriode.tom)
+                        målgruppeAAP(reiseperiode1.fom, reiseperiode1.tom)
+                        målgruppeOvergangsstønad(reiseperiode2.fom, reiseperiode2.tom)
                     }
                 }
                 vilkår {
                     opprett {
-                        offentligTransport(førstePeriode.fom, førstePeriode.tom)
-                        offentligTransport(andrePeriode.fom, andrePeriode.tom)
+                        offentligTransport(reiseperiode1.fom, reiseperiode1.tom)
+                        offentligTransport(reiseperiode2.fom, reiseperiode2.tom)
                     }
                 }
             }
@@ -187,14 +164,14 @@ class UtbetalingDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             assertThat(perioder).hasSize(1)
             assertThat(perioder.single().fom)
                 .isEqualTo(perioder.single().fom)
-                .isEqualTo(førstePeriode.fom.datoEllerNesteMandagHvisLørdagEllerSøndag())
+                .isEqualTo(reiseperiode1.fom.datoEllerNesteMandagHvisLørdagEllerSøndag())
         }
 
         with(utbetaling.utbetalinger.single { it.stønad == StønadUtbetaling.DAGLIG_REISE_ENSLIG_FORSØRGER }) {
             assertThat(perioder).hasSize(1)
             assertThat(perioder.single().fom)
                 .isEqualTo(perioder.single().fom)
-                .isEqualTo(andrePeriode.fom.datoEllerNesteMandagHvisLørdagEllerSøndag())
+                .isEqualTo(reiseperiode2.fom.datoEllerNesteMandagHvisLørdagEllerSøndag())
         }
     }
 }

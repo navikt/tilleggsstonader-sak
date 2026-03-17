@@ -193,6 +193,26 @@ class OpprettVilkårperiodeDsl {
         }
     }
 
+    fun aktivitetUtdanningDagligReiseTso(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) {
+        add { behandlingId ->
+            lagreVilkårperiodeAktivitet(
+                behandlingId = behandlingId,
+                aktivitetType = AktivitetType.UTDANNING,
+                fom = fom,
+                tom = tom,
+                faktaOgSvar =
+                    FaktaOgSvarAktivitetDagligReiseTsoDto(
+                        svarLønnet = SvarJaNei.NEI,
+                        svarHarUtgifter = SvarJaNei.JA,
+                        aktivitetsdager = 3,
+                    ),
+            )
+        }
+    }
+
     fun add(lagreVilkår: (BehandlingId) -> LagreVilkårperiode) {
         dtoer += lagreVilkår
     }
