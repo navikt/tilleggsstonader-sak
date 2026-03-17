@@ -1,5 +1,4 @@
 {
-  "vilkårType" : "LØPENDE_UTGIFTER_EN_BOLIG",
   "regler" : {
     "HØYERE_BOUTGIFTER_SAMMENLIGNET_MED_TIDLIGERE" : {
       "regelId" : "HØYERE_BOUTGIFTER_SAMMENLIGNET_MED_TIDLIGERE",
@@ -65,5 +64,6 @@
         }
       }
     }
-  }
+  },
+  "vilkårType" : "LØPENDE_UTGIFTER_EN_BOLIG"
 }

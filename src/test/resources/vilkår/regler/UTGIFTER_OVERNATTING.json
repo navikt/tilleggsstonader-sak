@@ -1,5 +1,4 @@
 {
-  "vilkårType" : "UTGIFTER_OVERNATTING",
   "regler" : {
     "DOKUMENTERT_DELTAKELSE" : {
       "regelId" : "DOKUMENTERT_DELTAKELSE",
@@ -65,5 +64,6 @@
         }
       }
     }
-  }
+  },
+  "vilkårType" : "UTGIFTER_OVERNATTING"
 }

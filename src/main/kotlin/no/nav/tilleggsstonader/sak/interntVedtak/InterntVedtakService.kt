@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
@@ -81,6 +82,7 @@ class InterntVedtakService(
             vilkår = mapVilkår(vilkår, behandlingbarn),
             vedtak = mapVedtak(vedtak),
             beregningsresultat = mapBeregningsresultatForStønadstype(vedtak, vilkår),
+            rammevedtakPrivatBil = mapRammevedtakPrivatBil(vedtak),
         )
     }
 
@@ -111,7 +113,7 @@ class InterntVedtakService(
                 is InnvilgelseDagligReise -> {
                     val vilkårDagligReise = vilkår.map { it.mapTilVilkårDagligReise() }
                     BeregningsresultatInterntVedtakDto(
-                        dagligReiseTso = data.beregningsresultat.tilDto(vedtak.tidligsteEndring, vilkårDagligReise),
+                        dagligReise = data.beregningsresultat.tilDto(vedtak.tidligsteEndring, vilkårDagligReise),
                     )
                 }
 
@@ -308,6 +310,16 @@ class InterntVedtakService(
                     årsakerOpphør = vedtak.årsaker,
                     opphørBegrunnelse = vedtak.begrunnelse,
                 )
+        }
+
+    private fun mapRammevedtakPrivatBil(vedtak: Vedtak?): RammevedtakPrivatBil? =
+        vedtak?.let {
+            when (vedtak.data) {
+                is InnvilgelseDagligReise -> {
+                    vedtak.data.rammevedtakPrivatBil
+                }
+                else -> null
+            }
         }
 
     private fun Map<BarnId, GrunnlagBarn>.finnFødselsdato(barnId: BarnId): LocalDate {

@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -29,10 +30,12 @@ data class VilkårDagligReise(
     override fun merge(other: VilkårDagligReise): VilkårDagligReise =
         this.copy(fom = minOf(this.fom, other.fom), tom = maxOf(this.tom, other.tom))
 
-    // Foreløpig støttes kun offentlig transport.
-    // Når vi implementerer privat bil og taxi legge til logikk og validering for at innsendt fakta er av forventet type.
+    // TODO - Legge til validering for taxi når det implementeres.
     private fun validerFaktaErForventetType() {
-        return
-        // TODO() sjekk at fakta stemmer med riktig type
+        if (this.fakta.type === TypeDagligReise.UBESTEMT) return
+
+        return require(this.fakta.type == TypeDagligReise.OFFENTLIG_TRANSPORT || this.fakta.type == TypeDagligReise.PRIVAT_BIL) {
+            "Innsendtfakta har ikke gyldig type: ${this.fakta.type}. Forventet type er ${TypeDagligReise.OFFENTLIG_TRANSPORT} eller ${TypeDagligReise.PRIVAT_BIL}"
+        }
     }
 }

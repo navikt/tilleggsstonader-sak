@@ -1,5 +1,4 @@
 {
-  "vilkårType" : "DAGLIG_REISE",
   "regler" : {
     "AVSTAND_OVER_SEKS_KM" : {
       "regelId" : "AVSTAND_OVER_SEKS_KM",
@@ -61,5 +60,6 @@
         }
       }
     }
-  }
+  },
+  "vilkårType" : "DAGLIG_REISE"
 }

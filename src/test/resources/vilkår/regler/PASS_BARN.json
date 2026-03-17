@@ -1,5 +1,4 @@
 {
-  "vilkårType" : "PASS_BARN",
   "regler" : {
     "UTGIFTER_DOKUMENTERT" : {
       "regelId" : "UTGIFTER_DOKUMENTERT",
@@ -69,5 +68,6 @@
         }
       }
     }
-  }
+  },
+  "vilkårType" : "PASS_BARN"
 }
