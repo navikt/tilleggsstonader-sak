@@ -107,7 +107,8 @@ class FagsysteminfoBehovHåndterer(
                     ),
                 ).get()
         } else {
-            logger.error(
+            // TODO - gjør logg om til error igjen etter https://favro.com/organization/98c34fb974ce445eac854de0/4d617346d79341c7fbd9a40a?card=Nav-28115
+            logger.info(
                 "Mottatt hendelse $TILBAKEKREVING_TYPE_FAGSYSTEMINFO_BEHOV, " +
                     "men referanse $referanse peker på en behandling som ikke har en forrige iverksatt behandling",
             )
