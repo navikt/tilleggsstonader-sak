@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.splitPerLøpendeMåneder
+import java.time.LocalDate
 import kotlin.math.min
 
 object BoutgifterBeregnUtil {
@@ -21,38 +22,17 @@ object BoutgifterBeregnUtil {
     fun List<VedtaksperiodeBeregning>.splittVedGrensenTilFaktiskeUtgifter(
         utgifter: BoutgifterPerUtgiftstype,
     ): List<List<VedtaksperiodeBeregning>> {
-        val grensedatoer =
-            utgifter.values
-                .flatten()
-                .filter { it.skalFåDekketFaktiskeUtgifter }
-                .map { it.fom }
-                .distinct()
-                .sorted()
-                .toList()
-
+        val datoerPerioderMedFaktiskeUtgifterStarter = utgifter.grensedatoerForFaktiskeUtgifter()
         val segmenter = mutableListOf<List<VedtaksperiodeBeregning>>()
-        var gjenværendeSegmenter = this
+        var gjenstående = this
 
-        for (grensedato in grensedatoer) {
-            val before =
-                gjenværendeSegmenter.mapNotNull { vp ->
-                    when {
-                        vp.fom >= grensedato -> null
-                        vp.tom < grensedato -> vp
-                        else -> vp.copy(tom = grensedato.minusDays(1))
-                    }
-                }
-            gjenværendeSegmenter =
-                gjenværendeSegmenter.mapNotNull { vp ->
-                    when {
-                        vp.tom < grensedato -> null
-                        vp.fom >= grensedato -> vp
-                        else -> vp.copy(fom = grensedato)
-                    }
-                }
-            if (before.isNotEmpty()) segmenter.add(before)
+        for (grensedato in datoerPerioderMedFaktiskeUtgifterStarter) {
+            val delFørDato = gjenstående.mapNotNull { it.delFørDato(grensedato) }
+            gjenstående = gjenstående.mapNotNull { it.delFraOgMedDato(grensedato) }
+            if (delFørDato.isNotEmpty()) segmenter.add(delFørDato)
         }
-        if (gjenværendeSegmenter.isNotEmpty()) segmenter.add(gjenværendeSegmenter)
+
+        if (gjenstående.isNotEmpty()) segmenter.add(gjenstående)
         return segmenter
     }
 
@@ -147,6 +127,28 @@ object BoutgifterBeregnUtil {
             this.copy(fom = maxOf(this.fom, utbetalingPeriode.tom.plusDays(1)))
         } else {
             null
+        }
+
+    private fun BoutgifterPerUtgiftstype.grensedatoerForFaktiskeUtgifter(): List<LocalDate> =
+        values
+            .flatten()
+            .filter { it.skalFåDekketFaktiskeUtgifter }
+            .map { it.fom }
+            .distinct()
+            .sorted()
+
+    private fun VedtaksperiodeBeregning.delFørDato(dato: LocalDate): VedtaksperiodeBeregning? =
+        when {
+            fom >= dato -> null
+            tom < dato -> this
+            else -> copy(tom = dato.minusDays(1))
+        }
+
+    private fun VedtaksperiodeBeregning.delFraOgMedDato(dato: LocalDate): VedtaksperiodeBeregning? =
+        when {
+            tom < dato -> null
+            fom >= dato -> this
+            else -> copy(fom = dato)
         }
 
     /**

@@ -3,6 +3,12 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
+import no.nav.tilleggsstonader.libs.utils.dato.april
+import no.nav.tilleggsstonader.libs.utils.dato.februar
+import no.nav.tilleggsstonader.libs.utils.dato.mai
+import no.nav.tilleggsstonader.libs.utils.dato.mars
+import no.nav.tilleggsstonader.libs.utils.dato.oktober
+import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
@@ -235,25 +241,37 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
 
     @Test
     fun `faktiske utgifter starter ny periodetelling - vilkårperiode midt i måneden med grense mellom normal og faktiske utgifter`() {
-        val vidtVilkårperioder =
+        val vilkårperioder =
             Vilkårperioder(
-                målgrupper = listOf(målgruppe(fom = LocalDate.of(2025, 9, 15), tom = LocalDate.of(2026, 5, 31))),
-                aktiviteter = listOf(aktivitet(fom = LocalDate.of(2025, 9, 15), tom = LocalDate.of(2026, 5, 31))),
+                målgrupper =
+                    listOf(
+                        målgruppe(
+                            fom = 15 september 2025,
+                            tom = 31 mai 2026,
+                        ),
+                    ),
+                aktiviteter =
+                    listOf(
+                        aktivitet(
+                            fom = 15 september 2025,
+                            tom = 31 mai 2026,
+                        ),
+                    ),
             )
-        every { vilkårperiodeService.hentVilkårperioder(any()) } returns vidtVilkårperioder
+        every { vilkårperiodeService.hentVilkårperioder(any()) } returns vilkårperioder
 
         val utgifter =
             mapOf(
                 TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
                     listOf(
                         lagUtgiftBeregningBoutgifter(
-                            fom = LocalDate.of(2025, 9, 1),
-                            tom = LocalDate.of(2026, 2, 28),
+                            fom = 1 september 2025,
+                            tom = 28 februar 2026,
                             utgift = 600,
                         ),
                         lagUtgiftBeregningBoutgifter(
-                            fom = LocalDate.of(2026, 3, 1),
-                            tom = LocalDate.of(2026, 5, 31),
+                            fom = 1 mars 2026,
+                            tom = 31 mai 2026,
                             utgift = 11500,
                             skalFåDekketFaktiskeUtgifter = true,
                         ),
@@ -268,8 +286,8 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                     vedtaksperioder =
                         listOf(
                             vedtaksperiode(
-                                fom = LocalDate.of(2025, 9, 15),
-                                tom = LocalDate.of(2026, 5, 31),
+                                fom = 15 september 2025,
+                                tom = 31 mai 2026,
                             ),
                         ),
                     typeVedtak = TypeVedtak.INNVILGELSE,
@@ -278,26 +296,26 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
 
         assertThat(perioder).hasSize(9)
 
-        // Normale perioder — 30-dagersvinduer fra 15.09 (forskyves ikke til kalendergrenser)
-        assertThat(perioder[0].fom).isEqualTo(LocalDate.of(2025, 9, 15))
-        assertThat(perioder[0].tom).isEqualTo(LocalDate.of(2025, 10, 14))
+        // Normale perioder
+        assertThat(perioder[0].fom).isEqualTo(15 september 2025)
+        assertThat(perioder[0].tom).isEqualTo(14 oktober 2025)
         assertThat(perioder[0].stønadsbeløp).isEqualTo(600)
 
-        assertThat(perioder[5].fom).isEqualTo(LocalDate.of(2026, 2, 15))
-        assertThat(perioder[5].tom).isEqualTo(LocalDate.of(2026, 2, 28)) // avkortet til utgift-tom, ikke 14.03
+        assertThat(perioder[5].fom).isEqualTo(15 februar 2026)
+        assertThat(perioder[5].tom).isEqualTo(28 februar 2026)
         assertThat(perioder[5].stønadsbeløp).isEqualTo(600)
 
-        // Faktiske utgifter — starter på nytt fra 01.03 (ikke 15.03 som ville fulgt 30-dagerstellingen)
-        assertThat(perioder[6].fom).isEqualTo(LocalDate.of(2026, 3, 1))
-        assertThat(perioder[6].tom).isEqualTo(LocalDate.of(2026, 3, 31))
-        assertThat(perioder[6].stønadsbeløp).isEqualTo(11500) // faktiske utgifter, ikke cappa av makssats
+        // Faktiske utgifter
+        assertThat(perioder[6].fom).isEqualTo(1 mars 2026)
+        assertThat(perioder[6].tom).isEqualTo(31 mars 2026)
+        assertThat(perioder[6].stønadsbeløp).isEqualTo(11500)
 
-        assertThat(perioder[7].fom).isEqualTo(LocalDate.of(2026, 4, 1))
-        assertThat(perioder[7].tom).isEqualTo(LocalDate.of(2026, 4, 30))
+        assertThat(perioder[7].fom).isEqualTo(1 april 2026)
+        assertThat(perioder[7].tom).isEqualTo(30 april 2026)
         assertThat(perioder[7].stønadsbeløp).isEqualTo(11500)
 
-        assertThat(perioder[8].fom).isEqualTo(LocalDate.of(2026, 5, 1))
-        assertThat(perioder[8].tom).isEqualTo(LocalDate.of(2026, 5, 31))
+        assertThat(perioder[8].fom).isEqualTo(1 mai 2026)
+        assertThat(perioder[8].tom).isEqualTo(31 mai 2026)
         assertThat(perioder[8].stønadsbeløp).isEqualTo(11500)
     }
 }
