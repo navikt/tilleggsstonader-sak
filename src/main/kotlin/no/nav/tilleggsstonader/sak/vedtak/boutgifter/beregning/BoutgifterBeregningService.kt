@@ -114,9 +114,9 @@ class BoutgifterBeregningService(
             .sorted()
             .splittTilLøpendeMåneder()
             .map { UtbetalingPeriode(it, skalAvkorteUtbetalingPeriode(utgifter)) }
+            .validerIngenLøpendeOgMidlertidigUtgiftISammeUtbetalingsperiode(utgifter)
             .validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(utgifter)
             .validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(utgifter)
-            .validerIngenLøpendeOgMidlertidigUtgiftISammeUtbetalingsperiode(utgifter)
             .map { lagBeregningsgrunnlag(periode = it, utgifter = utgifter, makssats = satsBoutgifterService.finnMakssats(it.fom)) }
             .validerIkkeUlikeKombinasjonerAvSvarPåFaktiskeUtgifter()
             .map {
