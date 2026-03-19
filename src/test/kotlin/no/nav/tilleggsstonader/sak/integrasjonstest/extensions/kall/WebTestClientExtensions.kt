@@ -18,6 +18,12 @@ fun RestTestClient.ResponseSpec.expectOkEmpty() =
         .expectBody()
         .isEmpty
 
+fun RestTestClient.ResponseSpec.expectNoContent() =
+    expectStatus()
+        .isNoContent
+        .expectBody()
+        .isEmpty
+
 fun RestTestClient.ResponseSpec.expectProblemDetail(
     forventetStatus: HttpStatus,
     forventetDetail: String,

@@ -29,6 +29,8 @@ class BehandlingKall(
     fun opprettRevurdering(opprettBehandlingDto: OpprettBehandlingDto) =
         apiRespons.opprettRevurdering(opprettBehandlingDto).expectOkWithBody<BehandlingId>()
 
+    fun nullstill(behandlingId: BehandlingId) = apiRespons.nullstill(behandlingId).expectNoContent()
+
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = BehandlingApi()
 
@@ -45,5 +47,7 @@ class BehandlingKall(
         fun historikk(behandlingId: BehandlingId) = testklient.get("/api/behandlingshistorikk/$behandlingId")
 
         fun opprettRevurdering(opprettBehandlingDto: OpprettBehandlingDto) = testklient.post("/api/behandling", opprettBehandlingDto)
+
+        fun nullstill(behandlingId: BehandlingId) = testklient.post("/api/behandling/$behandlingId/nullstill")
     }
 }
