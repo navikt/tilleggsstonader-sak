@@ -8,7 +8,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Fa
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseperiodePrivatBil
 import java.math.BigDecimal
+import java.time.LocalDate
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -52,10 +54,9 @@ data class FaktaDagligReiseOffentligTransportDto(
 }
 
 data class FaktaDagligReisePrivatBilDto(
-    val reisedagerPerUke: Int,
     val reiseavstandEnVei: BigDecimal,
-    val bompengerEnVei: Int?,
-    val fergekostandEnVei: Int?,
+    val reiseperioder: List<FaktaReisePeriodePrivatBilDto>,
+    val adresse: String?,
 ) : FaktaDagligReiseDto {
     override val type = TypeDagligReise.PRIVAT_BIL
 
@@ -64,13 +65,30 @@ data class FaktaDagligReisePrivatBilDto(
         adresse: String?,
     ) = FaktaPrivatBil(
         reiseId = reiseId,
-        adresse = adresse,
-        reisedagerPerUke = reisedagerPerUke,
         reiseavstandEnVei = reiseavstandEnVei,
-        bompengerEnVei = bompengerEnVei,
-        fergekostandEnVei = fergekostandEnVei,
+        reiseperioder =
+            reiseperioder.map {
+                FaktaReiseperiodePrivatBil(
+                    periodeId = it.periodeId,
+                    fom = it.fom,
+                    tom = it.tom,
+                    reisedagerPerUke = it.reisedagerPerUke,
+                    bompengerEnVei = it.bompengerEnVei,
+                    fergekostandEnVei = it.fergekostandEnVei,
+                )
+            },
+        adresse = adresse,
     )
 }
+
+data class FaktaReisePeriodePrivatBilDto(
+    val periodeId: String,
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val reisedagerPerUke: Int,
+    val bompengerEnVei: Int?,
+    val fergekostandEnVei: Int?,
+)
 
 data object FaktaDagligReiseUbestemtDto : FaktaDagligReiseDto {
     override val type = TypeDagligReise.UBESTEMT

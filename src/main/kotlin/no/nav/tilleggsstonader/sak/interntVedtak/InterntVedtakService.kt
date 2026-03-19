@@ -352,11 +352,9 @@ class InterntVedtakService(
 
             is FaktaDagligReisePrivatBil ->
                 VilkårFaktaPrivatBilInterntVedtak(
-                    reisedagerPerUke = fakta.reisedagerPerUke,
-                    reiseavstandEnVei = fakta.reiseavstandEnVei,
-                    bompengerEnVei = fakta.bompengerEnVei,
-                    fergekostandEnVei = fakta.fergekostandEnVei,
                     reiseId = fakta.reiseId,
+                    reiseavstandEnVei = fakta.reiseavstandEnVei,
+                    reiseperioder = fakta.reiseperioder,
                     adresse = fakta.adresse,
                 )
 

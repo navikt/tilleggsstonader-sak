@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import java.math.BigDecimal
+import java.time.LocalDate
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -37,12 +38,19 @@ data class FaktaDagligReiseOffentligTransport(
 
 data class FaktaDagligReisePrivatBil(
     override val reiseId: ReiseId,
-    val reisedagerPerUke: Int,
     val reiseavstandEnVei: BigDecimal,
-    val bompengerEnVei: Int?,
-    val fergekostandEnVei: Int?,
+    val reiseperioder: List<FaktaReiseperiodePrivatBil>,
     override val adresse: String?,
 ) : VilkårFakta
+
+data class FaktaReiseperiodePrivatBil(
+    val periodeId: String,
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val reisedagerPerUke: Int,
+    val bompengerEnVei: Int?,
+    val fergekostandEnVei: Int?,
+)
 
 enum class TypeVilkårFakta {
     DAGLIG_REISE_OFFENTLIG_TRANSPORT,

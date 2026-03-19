@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.faktaOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseperiodePrivatBil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -145,10 +146,18 @@ class FaktaDagligReiseTest {
                     FaktaPrivatBil(
                         reiseId = ReiseId.random(),
                         adresse = "Tiltaksveien 1",
-                        reisedagerPerUke = 4,
+                        reiseperioder =
+                            listOf(
+                                FaktaReiseperiodePrivatBil(
+                                    periodeId = "1",
+                                    fom = LocalDate.now(),
+                                    tom = LocalDate.now().plusDays(10),
+                                    reisedagerPerUke = 4,
+                                    bompengerEnVei = -10,
+                                    fergekostandEnVei = 0,
+                                ),
+                            ),
                         reiseavstandEnVei = BigDecimal(10),
-                        bompengerEnVei = -10,
-                        fergekostandEnVei = 0,
                     )
                 }
             assertThat(feil.message).isEqualTo("Bompenge- og fergeprisen må være større enn 0")
@@ -161,10 +170,18 @@ class FaktaDagligReiseTest {
                     FaktaPrivatBil(
                         reiseId = ReiseId.random(),
                         adresse = "Tiltaksveien 1",
-                        reisedagerPerUke = 4,
+                        reiseperioder =
+                            listOf(
+                                FaktaReiseperiodePrivatBil(
+                                    periodeId = "1",
+                                    fom = LocalDate.now(),
+                                    tom = LocalDate.now().plusDays(10),
+                                    reisedagerPerUke = 4,
+                                    bompengerEnVei = 0,
+                                    fergekostandEnVei = 0,
+                                ),
+                            ),
                         reiseavstandEnVei = BigDecimal("-10"),
-                        bompengerEnVei = 0,
-                        fergekostandEnVei = 0,
                     )
                 }
             assertThat(feil.message).isEqualTo("Reiseavstanden må være større enn 0")
@@ -177,10 +194,18 @@ class FaktaDagligReiseTest {
                     FaktaPrivatBil(
                         reiseId = ReiseId.random(),
                         adresse = "Tiltaksveien 1",
-                        reisedagerPerUke = -4,
                         reiseavstandEnVei = BigDecimal(10),
-                        bompengerEnVei = 0,
-                        fergekostandEnVei = 0,
+                        reiseperioder =
+                            listOf(
+                                FaktaReiseperiodePrivatBil(
+                                    periodeId = "1",
+                                    fom = LocalDate.now(),
+                                    tom = LocalDate.now().plusDays(10),
+                                    reisedagerPerUke = -4,
+                                    bompengerEnVei = 0,
+                                    fergekostandEnVei = 0,
+                                ),
+                            ),
                     )
                 }
             assertThat(feil.message).isEqualTo("Reisedager per uke må være 0 eller mer")
@@ -193,10 +218,18 @@ class FaktaDagligReiseTest {
                     FaktaPrivatBil(
                         reiseId = ReiseId.random(),
                         adresse = "Tiltaksveien 1",
-                        reisedagerPerUke = 8,
                         reiseavstandEnVei = BigDecimal(10),
-                        bompengerEnVei = 0,
-                        fergekostandEnVei = 0,
+                        reiseperioder =
+                            listOf(
+                                FaktaReiseperiodePrivatBil(
+                                    periodeId = "1",
+                                    fom = LocalDate.now(),
+                                    tom = LocalDate.now().plusDays(10),
+                                    reisedagerPerUke = 8,
+                                    bompengerEnVei = 0,
+                                    fergekostandEnVei = 0,
+                                ),
+                            ),
                     )
                 }
             assertThat(feil.message).isEqualTo("Reisedager per uke kan ikke være mer enn 7")

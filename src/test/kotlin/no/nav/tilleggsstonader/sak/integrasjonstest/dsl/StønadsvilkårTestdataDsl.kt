@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreDagligReisePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaReisePeriodePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
@@ -18,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.Vilkårsvurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBolig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -66,16 +68,31 @@ class OpprettStønadsvilkårDsl {
     fun privatBil(
         fom: LocalDate,
         tom: LocalDate,
+        reiseavstandEnVei: BigDecimal = BigDecimal(10),
         reisedagerPerUke: Int = 5,
-        reiseavstandEnVei: Int = 10,
+        bompengerEnVei: Int? = 80,
+        fergekostandEnVei: Int? = null,
     ) {
         dtoer += { _, _ ->
             lagreDagligReisePrivatBilDto(
                 fom = fom,
                 tom = tom,
-                reisedagerPerUke = reisedagerPerUke,
                 reiseId = ReiseId.random(),
                 reiseavstandEnVei = reiseavstandEnVei,
+                reiseperioder =
+                    listOf(
+                        FaktaReisePeriodePrivatBilDto(
+                            periodeId =
+                                java.util.UUID
+                                    .randomUUID()
+                                    .toString(),
+                            fom = fom,
+                            tom = tom,
+                            reisedagerPerUke = reisedagerPerUke,
+                            bompengerEnVei = bompengerEnVei,
+                            fergekostandEnVei = fergekostandEnVei,
+                        ),
+                    ),
             )
         }
     }

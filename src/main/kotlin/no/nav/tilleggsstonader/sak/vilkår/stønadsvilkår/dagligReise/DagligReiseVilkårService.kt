@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.SlettetVilkårResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -162,7 +161,7 @@ class DagligReiseVilkårService(
 
     private fun validerKanBehandleVilkåret(nyttVilkår: LagreDagligReise) {
         val gjelderPrivatBil = nyttVilkår.fakta.type == TypeDagligReise.PRIVAT_BIL
-        val kanBehandlePrivatBil = unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)
+        val kanBehandlePrivatBil = true
 
         feilHvis(gjelderPrivatBil && !kanBehandlePrivatBil) {
             "TS-sak støtter foreløpig ikke behandling av saker som gjelder privat bil"

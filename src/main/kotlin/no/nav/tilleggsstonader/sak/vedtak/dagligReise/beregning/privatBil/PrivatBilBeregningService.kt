@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPri
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.SatsForPeriodePrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
@@ -27,7 +28,26 @@ class PrivatBilBeregningService(
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkår: List<VilkårDagligReise>,
     ): RammevedtakPrivatBil? {
-        val reiseInformasjon = oppfylteVilkår.map { it.tilReiseMedPrivatBil() }
+        val reiseInformasjon =
+            oppfylteVilkår.flatMap { vilkår ->
+                val fakta = vilkår.fakta
+                if (fakta is FaktaPrivatBil) {
+                    fakta.reiseperioder.map { periode ->
+                        ReiseMedPrivatBil(
+                            fom = periode.fom,
+                            tom = periode.tom,
+                            reiseId = fakta.reiseId,
+                            aktivitetsadresse = fakta.adresse,
+                            reisedagerPerUke = periode.reisedagerPerUke,
+                            reiseavstandEnVei = fakta.reiseavstandEnVei,
+                            bompengerEnVei = periode.bompengerEnVei,
+                            fergekostandEnVei = periode.fergekostandEnVei,
+                        )
+                    }
+                } else {
+                    emptyList()
+                }
+            }
 
         val resultatForReiser =
             reiseInformasjon.mapNotNull {

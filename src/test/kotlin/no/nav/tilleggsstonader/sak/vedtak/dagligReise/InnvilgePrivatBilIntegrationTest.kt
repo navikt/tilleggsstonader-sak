@@ -18,10 +18,13 @@ import no.nav.tilleggsstonader.sak.privatbil.KjørelisteRepository
 import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingPrivatBilDto
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.web.servlet.client.expectBody
+import java.math.BigDecimal
 import java.time.LocalDate
 
 class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
@@ -113,5 +116,32 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
         ).allMatch {
             it.kjørelisteDag?.harKjørt == true
         }
+    }
+
+    @Test
+    fun `skal lagre og hente fakta med to perioder for privat bil`() {
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
+
+        val behandlingId =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                defaultDagligReisePrivatBilTsoTestdata(fom, tom)
+            }
+        val saksbehandling = testoppsettService.hentSaksbehandling(behandlingId)
+        val vilkårListe = kall.vilkårDagligReise.hentVilkår(saksbehandling.id)
+        val vilkårPrivatBil = vilkårListe.single { it.fakta.type == TypeDagligReise.PRIVAT_BIL }
+
+        val fakta =
+            vilkårPrivatBil.fakta.mapTilFakta(vilkårPrivatBil.reiseId, vilkårPrivatBil.adresse) as FaktaPrivatBil
+
+        assertThat(fakta.reiseId).isNotNull
+        assertThat(fakta.reiseavstandEnVei).isEqualTo(BigDecimal(10))
+        assertThat(fakta.reiseperioder).hasSize(1)
+        assertThat(fakta.reiseperioder[0].fom).isEqualTo(fom)
+        assertThat(fakta.reiseperioder[0].tom).isEqualTo(tom)
+        assertThat(fakta.reiseperioder[0].reisedagerPerUke).isEqualTo(5)
+        assertThat(fakta.reiseperioder[0].bompengerEnVei).isEqualTo(80)
+        assertThat(fakta.reiseperioder[0].fergekostandEnVei).isNull()
     }
 }

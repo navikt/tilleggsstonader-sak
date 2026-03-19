@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatDagl
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.TypeVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -142,10 +143,8 @@ data class VilkårFaktaOffentligTransportInterntVedtak(
 data class VilkårFaktaPrivatBilInterntVedtak(
     override val reiseId: ReiseId,
     override val adresse: String?,
-    val reisedagerPerUke: Int,
     val reiseavstandEnVei: BigDecimal,
-    val bompengerEnVei: Int?,
-    val fergekostandEnVei: Int?,
+    val reiseperioder: List<FaktaReiseperiodePrivatBil>,
 ) : VilkårFaktaInterntVedtak {
     override val type = TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL
 }

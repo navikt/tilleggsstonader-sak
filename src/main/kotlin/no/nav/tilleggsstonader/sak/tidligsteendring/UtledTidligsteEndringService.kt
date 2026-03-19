@@ -260,14 +260,18 @@ data class TidligsteEndringIBehandlingUtleder(
                     faktaNå.prisSyvdagersbillett != faktaTidligere.prisSyvdagersbillett ||
                     faktaNå.prisTrettidagersbillett != faktaTidligere.prisTrettidagersbillett
             }
-
             faktaNå is FaktaDagligReisePrivatBil && faktaTidligere is FaktaDagligReisePrivatBil -> {
-                faktaNå.reisedagerPerUke != faktaTidligere.reisedagerPerUke ||
-                    faktaNå.reiseavstandEnVei != faktaTidligere.reiseavstandEnVei ||
-                    faktaNå.bompengerEnVei != faktaTidligere.bompengerEnVei ||
-                    faktaNå.fergekostandEnVei != faktaTidligere.fergekostandEnVei
+                faktaNå.reiseavstandEnVei != faktaTidligere.reiseavstandEnVei ||
+                    faktaNå.reiseperioder.size != faktaTidligere.reiseperioder.size ||
+                    faktaNå.reiseperioder.zip(faktaTidligere.reiseperioder).any { (nå, tidligere) ->
+                        nå.periodeId != tidligere.periodeId ||
+                            nå.fom != tidligere.fom ||
+                            nå.tom != tidligere.tom ||
+                            nå.reisedagerPerUke != tidligere.reisedagerPerUke ||
+                            nå.bompengerEnVei != tidligere.bompengerEnVei ||
+                            nå.fergekostandEnVei != tidligere.fergekostandEnVei
+                    }
             }
-
             else -> {
                 false
             }

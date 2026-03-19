@@ -79,7 +79,7 @@ class BehandlingTestdataDsl internal constructor() {
         }
         vilkår {
             opprett {
-                privatBil(fom, tom, antallReisedager)
+                privatBil(fom, tom, reisedagerPerUke = antallReisedager)
             }
         }
     }

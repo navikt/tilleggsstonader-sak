@@ -62,10 +62,12 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Vi
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReisePrivatBilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaReisePeriodePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SvarOgBegrunnelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
@@ -554,17 +556,31 @@ fun faktaOffentligTransport(
 fun faktaPrivatBil(
     reiseId: ReiseId = dummyReiseId,
     adresse: String = "Tiltaksveien 1",
-    reisedagerPerUke: Int = 5,
     reiseavstandEnVei: BigDecimal = 10.toBigDecimal(),
-    bompengerEnVei: Int? = null,
-    fergekostandEnVei: Int? = null,
+    reiseperioder: List<FaktaReiseperiodePrivatBil> =
+        listOf(
+            FaktaReiseperiodePrivatBil(
+                periodeId = UUID.randomUUID().toString(),
+                fom = 1 januar 2025,
+                tom = 15 januar 2025,
+                reisedagerPerUke = 5,
+                bompengerEnVei = 80,
+                fergekostandEnVei = null,
+            ),
+            FaktaReiseperiodePrivatBil(
+                periodeId = UUID.randomUUID().toString(),
+                fom = 16 januar 2025,
+                tom = 31 januar 2025,
+                reisedagerPerUke = 3,
+                bompengerEnVei = 50,
+                fergekostandEnVei = 20,
+            ),
+        ),
 ) = FaktaPrivatBil(
     reiseId = reiseId,
-    adresse = adresse,
-    reisedagerPerUke = reisedagerPerUke,
     reiseavstandEnVei = reiseavstandEnVei,
-    bompengerEnVei = bompengerEnVei,
-    fergekostandEnVei = fergekostandEnVei,
+    reiseperioder = reiseperioder,
+    adresse = adresse,
 )
 
 fun lagreVilkårperiodeMålgruppe(
@@ -640,22 +656,33 @@ fun lagreDagligReisePrivatBilDto(
     tom: LocalDate = 31 januar 2025,
     adresse: String = "Tiltaksveien 1",
     reiseId: ReiseId = dummyReiseId,
-    reisedagerPerUke: Int = 5,
-    reiseavstandEnVei: Int = 10,
-    bompengerEnVei: Int? = null,
-    fergekostandEnVei: Int? = null,
+    reiseavstandEnVei: BigDecimal = BigDecimal(10),
+    reiseperioder: List<FaktaReisePeriodePrivatBilDto> =
+        listOf(
+            FaktaReisePeriodePrivatBilDto(
+                periodeId = UUID.randomUUID().toString(),
+                fom = fom,
+                tom = tom,
+                reisedagerPerUke = 5,
+                bompengerEnVei = 80,
+                fergekostandEnVei = null,
+            ),
+        ),
     svar: Map<RegelId, SvarOgBegrunnelseDto> =
         mapOf(
             RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
-            RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.NEI, begrunnelse = "må kjøre bil"),
+            RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to
+                SvarOgBegrunnelseDto(
+                    svar = SvarId.NEI,
+                    begrunnelse = "må kjøre bil",
+                ),
             RegelId.KAN_KJØRE_MED_EGEN_BIL to SvarOgBegrunnelseDto(svar = SvarId.JA),
         ),
     fakta: FaktaDagligReiseDto =
         FaktaDagligReisePrivatBilDto(
-            reiseavstandEnVei = reiseavstandEnVei.toBigDecimal(),
-            bompengerEnVei = bompengerEnVei,
-            fergekostandEnVei = fergekostandEnVei,
-            reisedagerPerUke = reisedagerPerUke,
+            reiseavstandEnVei = reiseavstandEnVei,
+            reiseperioder = reiseperioder,
+            adresse = adresse,
         ),
 ) = LagreDagligReiseDto(
     fom = fom,
