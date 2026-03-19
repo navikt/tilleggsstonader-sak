@@ -2,9 +2,8 @@ package no.nav.tilleggsstonader.sak.infrastruktur
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
-import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
+import no.nav.tilleggsstonader.sak.IntegrationTest
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpHeaders
@@ -23,8 +22,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.collections.mapOf
 
-@Disabled
-class TestControllerTest : CleanDatabaseIntegrationTest() {
+class TestControllerTest : IntegrationTest() {
     val json = """{"tekst":"abc","dato":"2023-01-01","tidspunkt":"2023-01-01T12:00:03"}"""
 
     @Test
@@ -115,12 +113,6 @@ class TestControllerTest : CleanDatabaseIntegrationTest() {
 
     @Nested
     inner class PrimtiveFelter {
-        val headers =
-            HttpHeaders().apply {
-                contentType = APPLICATION_JSON
-                accept = listOf(APPLICATION_JSON)
-            }
-
         @Test
         fun `skal feile hvis påkrevd booleanfelt er null`() {
             restTestClient
