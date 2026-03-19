@@ -87,10 +87,14 @@ class BoutgifterBeregningService(
             vedtaksperioderBeregning,
         )
 
+        val res = vedtaksperioderBeregning.splittVedGrensenTilFaktiskeUtgifter(utgifter = utgifterPerVilkårtype)
+
         val beregningsresultat =
-            vedtaksperioderBeregning
-                .splittVedGrensenTilFaktiskeUtgifter(utgifter = utgifterPerVilkårtype)
-                .flatMap { beregnPeriodesegment(it, utgifter = utgifterPerVilkårtype) }
+            beregnPeriodesegment(
+                vedtaksperioderBeregning
+                    .splittVedGrensenTilFaktiskeUtgifter(utgifter = utgifterPerVilkårtype),
+                utgifter = utgifterPerVilkårtype,
+            )
 
         return if (forrigeVedtak != null) {
             brukerfeilHvis(tidligsteEndring == null) {

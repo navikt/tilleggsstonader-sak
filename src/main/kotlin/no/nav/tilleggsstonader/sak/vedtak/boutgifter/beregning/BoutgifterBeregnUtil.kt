@@ -22,7 +22,7 @@ object BoutgifterBeregnUtil {
      */
     fun List<VedtaksperiodeBeregning>.splittVedGrensenTilFaktiskeUtgifter(
         utgifter: BoutgifterPerUtgiftstype,
-    ): List<List<VedtaksperiodeBeregning>> =
+    ): List<VedtaksperiodeBeregning> =
         Tidslinje(this)
             .splittVedDatoer(
                 utgifter.values
@@ -31,7 +31,7 @@ object BoutgifterBeregnUtil {
                     .flatMap { listOf(it.fom, it.tom.plusDays(1)) }
                     .distinct()
                     .sorted(),
-            ).map { it.perioder }
+            ).perioder
 
     /**
      * Splitter opp vedtaksperioder på løpende måneder.

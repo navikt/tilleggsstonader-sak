@@ -27,67 +27,66 @@ class TidslinjeTest {
     @Nested
     inner class SplittVedDatoer {
         @Test
-        fun `ingen grensedatoer gir ett segment med alle perioder`() {
+        fun `ingen grensedatoer returnerer uendret tidslinje`() {
             val tidslinje = Tidslinje(listOf(periode(1 januar 2025, 31 mars 2025)))
 
-            val segmenter = tidslinje.splittVedDatoer(emptyList())
+            val resultat = tidslinje.splittVedDatoer(emptyList())
 
-            assertThat(segmenter).hasSize(1)
-            assertThat(segmenter[0].perioder).hasSize(1)
-            assertThat(segmenter[0].perioder[0].fom).isEqualTo(1 januar 2025)
-            assertThat(segmenter[0].perioder[0].tom).isEqualTo(31 mars 2025)
+            assertThat(resultat.perioder).hasSize(1)
+            assertThat(resultat.perioder[0].fom).isEqualTo(1 januar 2025)
+            assertThat(resultat.perioder[0].tom).isEqualTo(31 mars 2025)
         }
 
         @Test
-        fun `grensedato midt i periode deler perioden i to segmenter`() {
+        fun `grensedato midt i periode deler perioden i to`() {
             val tidslinje = Tidslinje(listOf(periode(1 januar 2025, 31 mars 2025)))
 
-            val segmenter = tidslinje.splittVedDatoer(listOf(1 mars 2025))
+            val resultat = tidslinje.splittVedDatoer(listOf(1 mars 2025))
 
-            assertThat(segmenter).hasSize(2)
-            assertThat(segmenter[0].perioder[0].fom).isEqualTo(1 januar 2025)
-            assertThat(segmenter[0].perioder[0].tom).isEqualTo(28 februar 2025)
-            assertThat(segmenter[1].perioder[0].fom).isEqualTo(1 mars 2025)
-            assertThat(segmenter[1].perioder[0].tom).isEqualTo(31 mars 2025)
+            assertThat(resultat.perioder).hasSize(2)
+            assertThat(resultat.perioder[0].fom).isEqualTo(1 januar 2025)
+            assertThat(resultat.perioder[0].tom).isEqualTo(28 februar 2025)
+            assertThat(resultat.perioder[1].fom).isEqualTo(1 mars 2025)
+            assertThat(resultat.perioder[1].tom).isEqualTo(31 mars 2025)
         }
 
         @Test
-        fun `grensedato på starten av periode gir ett segment`() {
+        fun `grensedato på starten av periode endrer ikke perioden`() {
             val tidslinje = Tidslinje(listOf(periode(1 mars 2025, 31 mars 2025)))
 
-            val segmenter = tidslinje.splittVedDatoer(listOf(1 mars 2025))
+            val resultat = tidslinje.splittVedDatoer(listOf(1 mars 2025))
 
-            assertThat(segmenter).hasSize(1)
-            assertThat(segmenter[0].perioder[0].fom).isEqualTo(1 mars 2025)
+            assertThat(resultat.perioder).hasSize(1)
+            assertThat(resultat.perioder[0].fom).isEqualTo(1 mars 2025)
         }
 
         @Test
         fun `grensedato etter alle perioder påvirker ikke resultatet`() {
             val tidslinje = Tidslinje(listOf(periode(1 januar 2025, 28 februar 2025)))
 
-            val segmenter = tidslinje.splittVedDatoer(listOf(1 april 2025))
+            val resultat = tidslinje.splittVedDatoer(listOf(1 april 2025))
 
-            assertThat(segmenter).hasSize(1)
-            assertThat(segmenter[0].perioder[0].tom).isEqualTo(28 februar 2025)
+            assertThat(resultat.perioder).hasSize(1)
+            assertThat(resultat.perioder[0].tom).isEqualTo(28 februar 2025)
         }
 
         @Test
-        fun `to grensedatoer gir tre segmenter`() {
+        fun `to grensedatoer gir tre perioder`() {
             val tidslinje = Tidslinje(listOf(periode(1 januar 2025, 30 april 2025)))
 
-            val segmenter = tidslinje.splittVedDatoer(listOf(1 februar 2025, 1 april 2025))
+            val resultat = tidslinje.splittVedDatoer(listOf(1 februar 2025, 1 april 2025))
 
-            assertThat(segmenter).hasSize(3)
-            assertThat(segmenter[0].perioder[0].fom).isEqualTo(1 januar 2025)
-            assertThat(segmenter[0].perioder[0].tom).isEqualTo(31 januar 2025)
-            assertThat(segmenter[1].perioder[0].fom).isEqualTo(1 februar 2025)
-            assertThat(segmenter[1].perioder[0].tom).isEqualTo(31 mars 2025)
-            assertThat(segmenter[2].perioder[0].fom).isEqualTo(1 april 2025)
-            assertThat(segmenter[2].perioder[0].tom).isEqualTo(30 april 2025)
+            assertThat(resultat.perioder).hasSize(3)
+            assertThat(resultat.perioder[0].fom).isEqualTo(1 januar 2025)
+            assertThat(resultat.perioder[0].tom).isEqualTo(31 januar 2025)
+            assertThat(resultat.perioder[1].fom).isEqualTo(1 februar 2025)
+            assertThat(resultat.perioder[1].tom).isEqualTo(31 mars 2025)
+            assertThat(resultat.perioder[2].fom).isEqualTo(1 april 2025)
+            assertThat(resultat.perioder[2].tom).isEqualTo(30 april 2025)
         }
 
         @Test
-        fun `grensedato mellom to perioder beholder begge i hvert sitt segment`() {
+        fun `grensedato mellom to perioder beholder begge`() {
             val tidslinje =
                 Tidslinje(
                     listOf(
@@ -96,13 +95,11 @@ class TidslinjeTest {
                     ),
                 )
 
-            val segmenter = tidslinje.splittVedDatoer(listOf(1 februar 2025))
+            val resultat = tidslinje.splittVedDatoer(listOf(1 februar 2025))
 
-            assertThat(segmenter).hasSize(2)
-            assertThat(segmenter[0].perioder).hasSize(1)
-            assertThat(segmenter[0].perioder[0].fom).isEqualTo(1 januar 2025)
-            assertThat(segmenter[1].perioder).hasSize(1)
-            assertThat(segmenter[1].perioder[0].fom).isEqualTo(1 mars 2025)
+            assertThat(resultat.perioder).hasSize(2)
+            assertThat(resultat.perioder[0].fom).isEqualTo(1 januar 2025)
+            assertThat(resultat.perioder[1].fom).isEqualTo(1 mars 2025)
         }
     }
 }
