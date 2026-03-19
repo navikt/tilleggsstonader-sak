@@ -1,12 +1,12 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.sisteDagIÅret
+import no.nav.tilleggsstonader.sak.felles.Tidslinje
 import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.splitPerLøpendeMåneder
-import java.time.LocalDate
 import kotlin.math.min
 
 object BoutgifterBeregnUtil {
@@ -21,20 +21,16 @@ object BoutgifterBeregnUtil {
      */
     fun List<VedtaksperiodeBeregning>.splittVedGrensenTilFaktiskeUtgifter(
         utgifter: BoutgifterPerUtgiftstype,
-    ): List<List<VedtaksperiodeBeregning>> {
-        val datoerPerioderMedFaktiskeUtgifterStarter = utgifter.grensedatoerForFaktiskeUtgifter()
-        val segmenter = mutableListOf<List<VedtaksperiodeBeregning>>()
-        var gjenstående = this
-
-        for (grensedato in datoerPerioderMedFaktiskeUtgifterStarter) {
-            val delFørDato = gjenstående.mapNotNull { it.delFørDato(grensedato) }
-            gjenstående = gjenstående.mapNotNull { it.delFraOgMedDato(grensedato) }
-            if (delFørDato.isNotEmpty()) segmenter.add(delFørDato)
-        }
-
-        if (gjenstående.isNotEmpty()) segmenter.add(gjenstående)
-        return segmenter
-    }
+    ): List<List<VedtaksperiodeBeregning>> =
+        Tidslinje(this)
+            .splittVedDatoer(
+                utgifter.values
+                    .flatten()
+                    .filter { it.skalFåDekketFaktiskeUtgifter }
+                    .map { it.fom }
+                    .distinct()
+                    .sorted(),
+            ).map { it.perioder }
 
     /**
      * Splitter opp vedtaksperioder på løpende måneder.
@@ -127,28 +123,6 @@ object BoutgifterBeregnUtil {
             this.copy(fom = maxOf(this.fom, utbetalingPeriode.tom.plusDays(1)))
         } else {
             null
-        }
-
-    private fun BoutgifterPerUtgiftstype.grensedatoerForFaktiskeUtgifter(): List<LocalDate> =
-        values
-            .flatten()
-            .filter { it.skalFåDekketFaktiskeUtgifter }
-            .map { it.fom }
-            .distinct()
-            .sorted()
-
-    private fun VedtaksperiodeBeregning.delFørDato(dato: LocalDate): VedtaksperiodeBeregning? =
-        when {
-            fom >= dato -> null
-            tom < dato -> this
-            else -> copy(tom = dato.minusDays(1))
-        }
-
-    private fun VedtaksperiodeBeregning.delFraOgMedDato(dato: LocalDate): VedtaksperiodeBeregning? =
-        when {
-            tom < dato -> null
-            fom >= dato -> this
-            else -> copy(fom = dato)
         }
 
     /**
