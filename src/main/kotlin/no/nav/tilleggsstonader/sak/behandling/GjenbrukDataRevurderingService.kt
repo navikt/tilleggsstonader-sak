@@ -4,8 +4,11 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.NyttBarnId
 import no.nav.tilleggsstonader.sak.behandling.barn.TidligereBarnId
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseVedtakService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
@@ -17,6 +20,8 @@ class GjenbrukDataRevurderingService(
     private val barnService: BarnService,
     private val vilkårperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
+    private val avklartKjørelisteService: AvklartKjørelisteService,
+    private val dagligReiseVedtakService: DagligReiseVedtakService,
 ) {
     @Transactional
     fun gjenbrukData(
@@ -47,6 +52,15 @@ class GjenbrukDataRevurderingService(
             nyBehandling = behandling,
             barnIdMap = barnIder,
         )
+
+        if (behandling.type == BehandlingType.KJØRELISTE) {
+            dagligReiseVedtakService.gjenbrukVedtak(
+                forrigeIverksatteBehandlingId = behandlingIdForGjenbruk,
+                nyBehandlingId = behandling.id,
+            )
+        }
+
+        avklartKjørelisteService.nullstillOgGjenbrukAvklarteUker(behandling, behandlingIdForGjenbruk)
     }
 
     fun finnBehandlingIdForGjenbruk(fagsakId: FagsakId): BehandlingId? =
