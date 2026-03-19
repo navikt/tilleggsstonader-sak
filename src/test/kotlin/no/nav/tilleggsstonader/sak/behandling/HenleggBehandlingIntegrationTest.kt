@@ -22,7 +22,7 @@ class HenleggBehandlingIntegrationTest : CleanDatabaseIntegrationTest() {
         // 2 års-periode for at man skal få andeler som venter på satsendring
         val fom = LocalDate.now()
         val tom = LocalDate.now().plusYears(2)
-        val behandlingId =
+        val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.LÆREMIDLER,
                 tilSteg = StegType.SEND_TIL_BESLUTTER,
@@ -39,14 +39,14 @@ class HenleggBehandlingIntegrationTest : CleanDatabaseIntegrationTest() {
                 }
             }
 
-        val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
+        val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingContext.behandlingId)
         assertThat(
             tilkjentYtelse!!.andelerTilkjentYtelse.filter { it.statusIverksetting == StatusIverksetting.VENTER_PÅ_SATS_ENDRING },
         ).isNotEmpty
 
-        kall.behandling.henlegg(behandlingId, HenlagtDto(årsak = HenlagtÅrsak.TRUKKET_TILBAKE))
+        kall.behandling.henlegg(behandlingContext.behandlingId, HenlagtDto(årsak = HenlagtÅrsak.TRUKKET_TILBAKE))
 
-        val tilkjentYtelseEtterHenleggelse = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
+        val tilkjentYtelseEtterHenleggelse = tilkjentYtelseRepository.findByBehandlingId(behandlingContext.behandlingId)
         assertThat(
             tilkjentYtelseEtterHenleggelse!!.andelerTilkjentYtelse.filter {
                 it.statusIverksetting ==

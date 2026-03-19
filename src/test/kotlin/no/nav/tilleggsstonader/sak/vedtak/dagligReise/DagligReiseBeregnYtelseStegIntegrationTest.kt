@@ -21,19 +21,19 @@ class DagligReiseBeregnYtelseStegIntegrationTest(
 ) : CleanDatabaseIntegrationTest() {
     @Test
     fun `skal kunne opphøre`() {
-        val førstegangsbehandlingId =
+        val førstegangsbehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(Stønadstype.DAGLIG_REISE_TSO) {
                 defaultDagligReiseTsoTestdata(2 januar 2025, 6 juni 2025)
             }
 
         val revurderingId =
-            opprettRevurderingOgGjennomførBehandlingsløp(førstegangsbehandlingId, tilSteg = StegType.SIMULERING) {
+            opprettRevurderingOgGjennomførBehandlingsløp(førstegangsbehandlingContext.behandlingId, tilSteg = StegType.SIMULERING) {
                 vedtak {
                     opphør(opphørsdato = 15 mars 2025)
                 }
             }
 
-        val beregningsresultat = vedtakService.hentVedtak<OpphørDagligReise>(revurderingId)!!.data.beregningsresultat
+        val beregningsresultat = vedtakService.hentVedtak<OpphørDagligReise>(revurderingId).data.beregningsresultat
         assertThat(
             beregningsresultat.offentligTransport!!
                 .reiser[0]
@@ -44,7 +44,7 @@ class DagligReiseBeregnYtelseStegIntegrationTest(
                 .grunnlag.tom,
         ).isEqualTo(14 mars 2025)
 
-        val andelerFørstegangsbehandling = iverksettService.hentAndelTilkjentYtelse(førstegangsbehandlingId)
+        val andelerFørstegangsbehandling = iverksettService.hentAndelTilkjentYtelse(førstegangsbehandlingContext.behandlingId)
         val andelerOpphør = iverksettService.hentAndelTilkjentYtelse(revurderingId)
 
         assertThat(andelerOpphør.size).isNotEqualTo(andelerFørstegangsbehandling.size)

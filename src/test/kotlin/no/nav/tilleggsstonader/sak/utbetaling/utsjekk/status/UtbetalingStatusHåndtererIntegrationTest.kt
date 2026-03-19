@@ -28,7 +28,7 @@ class UtbetalingStatusHåndtererIntegrationTest(
         forventetStatus: StatusIverksetting,
     ) {
         // Gjennomfør behandling til iverksetting er ferdig
-        val behandlingId =
+        val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
                 tilSteg = StegType.BEHANDLING_FERDIGSTILT,
@@ -37,12 +37,12 @@ class UtbetalingStatusHåndtererIntegrationTest(
             }
 
         // Hent iverksettingId fra andel
-        val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
+        val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingContext.behandlingId)
         assertThat(tilkjentYtelse).isNotNull
         val andelerFørStatus = tilkjentYtelse!!.andelerTilkjentYtelse
         assertThat(andelerFørStatus).isNotEmpty
         val iverksettingId = andelerFørStatus.first().iverksetting?.iverksettingId
-        assertThat(iverksettingId).isEqualTo(behandlingId.id)
+        assertThat(iverksettingId).isEqualTo(behandlingContext.behandlingId.id)
 
         val statusRecord =
             UtbetalingStatusRecord(
@@ -61,7 +61,7 @@ class UtbetalingStatusHåndtererIntegrationTest(
         )
 
         // Andeler skal være oppdatert med korrekt status
-        val tilkjentYtelseEtter = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
+        val tilkjentYtelseEtter = tilkjentYtelseRepository.findByBehandlingId(behandlingContext.behandlingId)
         assertThat(tilkjentYtelseEtter!!.andelerTilkjentYtelse).allMatch {
             it.statusIverksetting == forventetStatus
         }
@@ -69,7 +69,7 @@ class UtbetalingStatusHåndtererIntegrationTest(
 
     @Test
     fun `FEILET status oppdaterer andeler med FEILET status og inkluderer error detaljer`() {
-        val behandlingId =
+        val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
@@ -77,12 +77,12 @@ class UtbetalingStatusHåndtererIntegrationTest(
             }
 
         // Hent iverksettingId fra andel
-        val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
+        val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingContext.behandlingId)
         assertThat(tilkjentYtelse).isNotNull
         val andelerFørStatus = tilkjentYtelse!!.andelerTilkjentYtelse
         assertThat(andelerFørStatus).isNotEmpty
         val iverksettingId = andelerFørStatus.first().iverksetting?.iverksettingId
-        assertThat(iverksettingId).isEqualTo(behandlingId.id)
+        assertThat(iverksettingId).isEqualTo(behandlingContext.behandlingId.id)
 
         val statusRecord =
             UtbetalingStatusRecord(
@@ -106,7 +106,7 @@ class UtbetalingStatusHåndtererIntegrationTest(
         )
 
         // SJekk at andeler er oppdatert med FEILET-status
-        val tilkjentYtelseEtter = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
+        val tilkjentYtelseEtter = tilkjentYtelseRepository.findByBehandlingId(behandlingContext.behandlingId)
         assertThat(tilkjentYtelseEtter!!.andelerTilkjentYtelse).allMatch {
             it.statusIverksetting == StatusIverksetting.FEILET
         }
@@ -118,7 +118,7 @@ class UtbetalingStatusHåndtererIntegrationTest(
         val tom = 31 januar 2025
 
         // Opprett behandling med flere andeler
-        val behandlingId =
+        val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
@@ -140,7 +140,7 @@ class UtbetalingStatusHåndtererIntegrationTest(
                 }
             }
 
-        val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
+        val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingContext.behandlingId)
         val andelerFørStatus = tilkjentYtelse!!.andelerTilkjentYtelse
         assertThat(andelerFørStatus).hasSize(2)
         val iverksettingId = andelerFørStatus.first().iverksetting?.iverksettingId
@@ -163,7 +163,7 @@ class UtbetalingStatusHåndtererIntegrationTest(
         )
 
         // Alle andeler skal være oppdatert
-        val tilkjentYtelseEtter = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
+        val tilkjentYtelseEtter = tilkjentYtelseRepository.findByBehandlingId(behandlingContext.behandlingId)
         val andelerEtter = tilkjentYtelseEtter!!.andelerTilkjentYtelse
         assertThat(andelerEtter).hasSize(2)
         assertThat(andelerEtter).allMatch { it.statusIverksetting == StatusIverksetting.OK }
@@ -171,14 +171,14 @@ class UtbetalingStatusHåndtererIntegrationTest(
 
     @Test
     fun `ignorerer status for andre fagsystemer`() {
-        val behandlingId =
+        val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
                 defaultDagligReiseTsoTestdata()
             }
 
-        val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
+        val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingContext.behandlingId)
         val andelerFørStatus = tilkjentYtelse!!.andelerTilkjentYtelse
         val originalStatus = andelerFørStatus.first().statusIverksetting
 
@@ -197,14 +197,14 @@ class UtbetalingStatusHåndtererIntegrationTest(
         utbetalingStatusHåndterer.behandleStatusoppdatering(iverksettingId.toString(), statusGammeltFagomrade, "DAGPENGER")
 
         // Status skal IKKE endres fordi det er et annet fagsystem
-        val tilkjentYtelseEtter = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
+        val tilkjentYtelseEtter = tilkjentYtelseRepository.findByBehandlingId(behandlingContext.behandlingId)
         val andelerEtter = tilkjentYtelseEtter!!.andelerTilkjentYtelse
         assertThat(andelerEtter).allMatch { it.statusIverksetting == originalStatus }
     }
 
     @Test
     fun `mottar først status OK og deretter TIL_OPPDRAG, ignorerer da TIL_OPPDRAG-status`() {
-        val behandlingId =
+        val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
@@ -213,7 +213,7 @@ class UtbetalingStatusHåndtererIntegrationTest(
 
         assertThat(
             tilkjentYtelseRepository
-                .findByBehandlingId(behandlingId)
+                .findByBehandlingId(behandlingContext.behandlingId)
                 ?.andelerTilkjentYtelse
                 ?.filter { it.iverksetting != null },
         ).isNotEmpty
@@ -232,16 +232,16 @@ class UtbetalingStatusHåndtererIntegrationTest(
 
         // Første iverksettingid er alltid behandlingId
         utbetalingStatusHåndterer.behandleStatusoppdatering(
-            iverksettingId = behandlingId.id.toString(),
+            iverksettingId = behandlingContext.behandlingId.id.toString(),
             melding = okStatus,
             utbetalingGjelderFagsystem = UtbetalingStatusHåndterer.FAGSYSTEM_TILLEGGSSTØNADER,
         )
 
         assertThat(
             tilkjentYtelseRepository
-                .findByBehandlingId(behandlingId)!!
+                .findByBehandlingId(behandlingContext.behandlingId)!!
                 .andelerTilkjentYtelse
-                .filter { it.iverksetting != null && it.iverksetting.iverksettingId == behandlingId.id },
+                .filter { it.iverksetting != null && it.iverksetting.iverksettingId == behandlingContext.behandlingId.id },
         ).isNotEmpty.allMatch { it.statusIverksetting == StatusIverksetting.OK }
 
         // Sender HOS_OPPDRAG-status
@@ -258,16 +258,16 @@ class UtbetalingStatusHåndtererIntegrationTest(
 
         // Første iverksettingid er alltid behandlingId
         utbetalingStatusHåndterer.behandleStatusoppdatering(
-            iverksettingId = behandlingId.id.toString(),
+            iverksettingId = behandlingContext.behandlingId.id.toString(),
             melding = hosOppdragStatus,
             utbetalingGjelderFagsystem = UtbetalingStatusHåndterer.FAGSYSTEM_TILLEGGSSTØNADER,
         )
 
         assertThat(
             tilkjentYtelseRepository
-                .findByBehandlingId(behandlingId)!!
+                .findByBehandlingId(behandlingContext.behandlingId)!!
                 .andelerTilkjentYtelse
-                .filter { it.iverksetting != null && it.iverksetting.iverksettingId == behandlingId.id },
+                .filter { it.iverksetting != null && it.iverksetting.iverksettingId == behandlingContext.behandlingId.id },
         ).isNotEmpty.allMatch { it.statusIverksetting == StatusIverksetting.OK }
     }
 }

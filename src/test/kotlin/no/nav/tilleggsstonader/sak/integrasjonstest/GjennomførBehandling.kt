@@ -54,6 +54,10 @@ import org.springframework.test.web.servlet.client.RestTestClient
 import java.time.LocalDate
 import java.util.UUID
 
+data class BehandlingContext(
+    val behandlingId: BehandlingId,
+)
+
 /**
  * Gjennomfører en behandling fra journalpost og helt til et gitt steg.
  *
@@ -67,7 +71,7 @@ fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
     stønadstype: Stønadstype,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
     testdataProvider: BehandlingTestdataDsl.() -> Unit,
-): BehandlingId {
+): BehandlingContext {
     val journalpostSøknadForStønadstype = journalpostSøknadForStønadstype(stønadstype)
     mockStrukturertSøknadForJournalpost(journalpostSøknadForStønadstype, stønadstype)
     val behandlingId = håndterSøknadService.håndterSøknad(journalpostSøknadForStønadstype)!!.id
@@ -76,7 +80,7 @@ fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
         tilSteg = tilSteg,
         testdataProvider = testdataProvider,
     )
-    return behandlingId
+    return BehandlingContext(behandlingId)
 }
 
 private fun IntegrationTest.mockStrukturertSøknadForJournalpost(

@@ -34,13 +34,11 @@ class KjørelisteKlarTilInnsendingIntegrationTest : CleanDatabaseIntegrationTest
     fun `sjekke at kjørelister i nåværende uke og tre uker tilbake i tid er klare for innsending`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
-        val behandlingId =
-            opprettBehandlingOgGjennomførBehandlingsløp(
-                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-            ) {
-                defaultDagligReisePrivatBilTsoTestdata(fom, tom)
-            }
-        val saksbehandling = testoppsettService.hentSaksbehandling(behandlingId)
+        opprettBehandlingOgGjennomførBehandlingsløp(
+            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+        ) {
+            defaultDagligReisePrivatBilTsoTestdata(fom, tom)
+        }
 
         // Sjekk at ingenting blir utbetalt
         KafkaFake
@@ -59,7 +57,7 @@ class KjørelisteKlarTilInnsendingIntegrationTest : CleanDatabaseIntegrationTest
             )
         val kjøreliste =
             kjørelisteSkjema(
-                reiseId = reiseId.toString(),
+                reiseId = reiseId,
                 periode = Datoperiode(fom, tom),
                 dagerKjørt = dagerKjørt,
             )
