@@ -4,11 +4,8 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.april
-import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.mai
 import no.nav.tilleggsstonader.libs.utils.dato.mars
-import no.nav.tilleggsstonader.libs.utils.dato.oktober
-import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
@@ -240,20 +237,20 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
     }
 
     @Test
-    fun `faktiske utgifter starter ny periodetelling - vilkårperiode midt i måneden med grense mellom normal og faktiske utgifter`() {
+    fun `faktiske utgifter midt i perioden - splitter ved begge grenser slik at normale utgifter etter faktiske får ny periodetelling`() {
         val vilkårperioder =
             Vilkårperioder(
                 målgrupper =
                     listOf(
                         målgruppe(
-                            fom = 15 september 2025,
+                            fom = 1 mars 2026,
                             tom = 31 mai 2026,
                         ),
                     ),
                 aktiviteter =
                     listOf(
                         aktivitet(
-                            fom = 15 september 2025,
+                            fom = 1 mars 2026,
                             tom = 31 mai 2026,
                         ),
                     ),
@@ -265,15 +262,20 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                 TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
                     listOf(
                         lagUtgiftBeregningBoutgifter(
-                            fom = 1 september 2025,
-                            tom = 28 februar 2026,
+                            fom = 1 mars 2026,
+                            tom = 31 mars 2026,
                             utgift = 600,
                         ),
                         lagUtgiftBeregningBoutgifter(
-                            fom = 1 mars 2026,
-                            tom = 31 mai 2026,
+                            fom = 1 april 2026,
+                            tom = 30 april 2026,
                             utgift = 11500,
                             skalFåDekketFaktiskeUtgifter = true,
+                        ),
+                        lagUtgiftBeregningBoutgifter(
+                            fom = 1 mai 2026,
+                            tom = 31 mai 2026,
+                            utgift = 600,
                         ),
                     ),
             )
@@ -286,7 +288,7 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                     vedtaksperioder =
                         listOf(
                             vedtaksperiode(
-                                fom = 15 september 2025,
+                                fom = 1 mars 2026,
                                 tom = 31 mai 2026,
                             ),
                         ),
@@ -294,28 +296,21 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                     tidligsteEndring = null,
                 ).perioder
 
-        assertThat(perioder).hasSize(9)
+        assertThat(perioder).hasSize(3)
 
-        // Normale perioder
-        assertThat(perioder[0].fom).isEqualTo(15 september 2025)
-        assertThat(perioder[0].tom).isEqualTo(14 oktober 2025)
+        // Normale utgifter
+        assertThat(perioder[0].fom).isEqualTo(1 mars 2026)
+        assertThat(perioder[0].tom).isEqualTo(31 mars 2026)
         assertThat(perioder[0].stønadsbeløp).isEqualTo(600)
 
-        assertThat(perioder[5].fom).isEqualTo(15 februar 2026)
-        assertThat(perioder[5].tom).isEqualTo(28 februar 2026)
-        assertThat(perioder[5].stønadsbeløp).isEqualTo(600)
-
         // Faktiske utgifter
-        assertThat(perioder[6].fom).isEqualTo(1 mars 2026)
-        assertThat(perioder[6].tom).isEqualTo(31 mars 2026)
-        assertThat(perioder[6].stønadsbeløp).isEqualTo(11500)
+        assertThat(perioder[1].fom).isEqualTo(1 april 2026)
+        assertThat(perioder[1].tom).isEqualTo(30 april 2026)
+        assertThat(perioder[1].stønadsbeløp).isEqualTo(11500)
 
-        assertThat(perioder[7].fom).isEqualTo(1 april 2026)
-        assertThat(perioder[7].tom).isEqualTo(30 april 2026)
-        assertThat(perioder[7].stønadsbeløp).isEqualTo(11500)
-
-        assertThat(perioder[8].fom).isEqualTo(1 mai 2026)
-        assertThat(perioder[8].tom).isEqualTo(31 mai 2026)
-        assertThat(perioder[8].stønadsbeløp).isEqualTo(11500)
+        // Normale utgifter (ny periodetelling etter faktiske)
+        assertThat(perioder[2].fom).isEqualTo(1 mai 2026)
+        assertThat(perioder[2].tom).isEqualTo(31 mai 2026)
+        assertThat(perioder[2].stønadsbeløp).isEqualTo(600)
     }
 }

@@ -11,13 +11,14 @@ import kotlin.math.min
 
 object BoutgifterBeregnUtil {
     /**
-     * Splitter vedtaksperioder i segmenter ved grensedatoene til faktiske utgifter.
+     * Splitter vedtaksperioder i segmenter ved alle overganger mellom normale og faktiske utgifter.
      * Hvert segment beregnes uavhengig med sin egen periodetelling, slik at faktiske utgifter
      * ikke trenger å følge de samme 30-dagers-vinduene som de normale utgiftene.
      *
-     * Eksempel: VP 15.09.2025–31.05.2026 med grensedato 01.03.2026 gir
+     * Eksempel: VP 15.09.2025–31.05.2026 med faktiske utgifter 01.03.2026–30.04.2026 gir
      * - Segment 1: VP(15.09.2025–28.02.2026)
-     * - Segment 2: VP(01.03.2026–31.05.2026)
+     * - Segment 2: VP(01.03.2026–30.04.2026)
+     * - Segment 3: VP(01.05.2026–31.05.2026)
      */
     fun List<VedtaksperiodeBeregning>.splittVedGrensenTilFaktiskeUtgifter(
         utgifter: BoutgifterPerUtgiftstype,
@@ -27,7 +28,7 @@ object BoutgifterBeregnUtil {
                 utgifter.values
                     .flatten()
                     .filter { it.skalFåDekketFaktiskeUtgifter }
-                    .map { it.fom }
+                    .flatMap { listOf(it.fom, it.tom.plusDays(1)) }
                     .distinct()
                     .sorted(),
             ).map { it.perioder }
