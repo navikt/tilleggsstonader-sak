@@ -17,7 +17,6 @@ import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientMockConfig
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.dsl.BehandlingTestdataDsl
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
@@ -146,31 +145,11 @@ fun IntegrationTest.gjennomførBehandlingsløp(
         gjennomførVilkårSteg(testdata, behandling.id, behandling.stønadstype)
     }
 
-    if (unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) && behandling.stønadstype.gjelderDagligReise()) {
-        if (tilSteg == StegType.VEDTAK) {
-            return
-        }
-
-        gjennomførVedtakSteg(behandling.id, behandling.stønadstype, testdata.vedtak.vedtak)
-
-        if (tilSteg == StegType.KJØRELISTE) {
-            return
-        }
-
-        gjennomførKjørelisteSteg(behandlingId)
-
-        if (tilSteg == StegType.BEREGNING) {
-            return
-        }
-
-        gjennomførBeregningStegDagligReise(behandlingId)
-    } else {
-        if (tilSteg == StegType.BEREGNE_YTELSE) {
-            return
-        }
-
-        gjennomførBeregningSteg(behandling.id, behandling.stønadstype, testdata.vedtak.vedtak)
+    if (tilSteg == StegType.BEREGNE_YTELSE) {
+        return
     }
+
+    gjennomførBeregningSteg(behandling.id, behandling.stønadstype, testdata.vedtak.vedtak)
 
     if (tilSteg == StegType.SIMULERING) {
         return
