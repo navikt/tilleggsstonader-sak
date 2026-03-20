@@ -4,6 +4,8 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.april
+import no.nav.tilleggsstonader.libs.utils.dato.februar
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.mai
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -243,14 +245,14 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                 målgrupper =
                     listOf(
                         målgruppe(
-                            fom = 1 mars 2026,
+                            fom = 15 februar 2026,
                             tom = 31 mai 2026,
                         ),
                     ),
                 aktiviteter =
                     listOf(
                         aktivitet(
-                            fom = 1 mars 2026,
+                            fom = 1 januar 2026,
                             tom = 31 mai 2026,
                         ),
                     ),
@@ -262,19 +264,19 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                 TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
                     listOf(
                         lagUtgiftBeregningBoutgifter(
-                            fom = 1 mars 2026,
-                            tom = 31 mars 2026,
+                            fom = 1 februar 2026,
+                            tom = 28 februar 2026,
                             utgift = 600,
                         ),
                         lagUtgiftBeregningBoutgifter(
-                            fom = 1 april 2026,
-                            tom = 30 april 2026,
+                            fom = 1 mars 2026,
+                            tom = 31 mars 2026,
                             utgift = 11500,
                             skalFåDekketFaktiskeUtgifter = true,
                         ),
                         lagUtgiftBeregningBoutgifter(
-                            fom = 1 mai 2026,
-                            tom = 31 mai 2026,
+                            fom = 1 april 2026,
+                            tom = 30 april 2026,
                             utgift = 600,
                         ),
                     ),
@@ -288,8 +290,8 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                     vedtaksperioder =
                         listOf(
                             vedtaksperiode(
-                                fom = 1 mars 2026,
-                                tom = 31 mai 2026,
+                                fom = 15 februar 2026,
+                                tom = 30 april 2026,
                             ),
                         ),
                     typeVedtak = TypeVedtak.INNVILGELSE,
@@ -299,18 +301,18 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
         assertThat(perioder).hasSize(3)
 
         // Normale utgifter
-        assertThat(perioder[0].fom).isEqualTo(1 mars 2026)
-        assertThat(perioder[0].tom).isEqualTo(31 mars 2026)
+        assertThat(perioder[0].fom).isEqualTo(15 februar 2026)
+        assertThat(perioder[0].tom).isEqualTo(28 februar 2026) // Blir kuttet pga faktiske utgifter i neste periode
         assertThat(perioder[0].stønadsbeløp).isEqualTo(600)
 
         // Faktiske utgifter
-        assertThat(perioder[1].fom).isEqualTo(1 april 2026)
-        assertThat(perioder[1].tom).isEqualTo(30 april 2026)
+        assertThat(perioder[1].fom).isEqualTo(1 mars 2026)
+        assertThat(perioder[1].tom).isEqualTo(31 mars 2026)
         assertThat(perioder[1].stønadsbeløp).isEqualTo(11500)
 
         // Normale utgifter (ny periodetelling etter faktiske)
-        assertThat(perioder[2].fom).isEqualTo(1 mai 2026)
-        assertThat(perioder[2].tom).isEqualTo(31 mai 2026)
+        assertThat(perioder[2].fom).isEqualTo(1 april 2026)
+        assertThat(perioder[2].tom).isEqualTo(30 april 2026)
         assertThat(perioder[2].stønadsbeløp).isEqualTo(600)
     }
 }
