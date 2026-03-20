@@ -2,15 +2,9 @@ package no.nav.tilleggsstonader.sak.ekstern.stønad
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.søknad.RammevedtakDto
-import no.nav.tilleggsstonader.kontrakter.søknad.RammevedtakUkeDto
 import no.nav.tilleggsstonader.libs.sikkerhet.EksternBrukerUtils
-import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
-import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
-import no.nav.tilleggsstonader.sak.util.erFørNåværendeUke
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -37,33 +31,8 @@ class DagligReisePrivatBilController(
                 .flatMap { kjørelisteService.hentForFagsakId(it.id) }
 
         val rammevedtak = dagligReisePrivatBilService.hentRammevedtaksPrivatBil(ident)
-        val kjøreliste = kjørelister.associateBy { it.data.reiseId }
+        val kjøreliste = kjørelister.groupBy { it.data.reiseId }
 
         return rammevedtak.flatMap { it.tilDto(kjøreliste) }
     }
 }
-
-private fun RammevedtakPrivatBil.tilDto(kjøreliste: Map<ReiseId, Kjøreliste>): List<RammevedtakDto> =
-    reiser.map { reise ->
-        val kjøreliste = kjøreliste[reise.reiseId]
-        RammevedtakDto(
-            reiseId = reise.reiseId.toString(),
-            fom = reise.grunnlag.fom,
-            tom = reise.grunnlag.tom,
-            reisedagerPerUke = reise.grunnlag.reisedagerPerUke,
-            aktivitetsadresse = reise.aktivitetsadresse ?: "Ukjent adresse",
-            aktivitetsnavn = "Ukjent aktivitet",
-            uker =
-                reise.grunnlag
-                    .alleDatoerGruppertPåUke()
-                    .map { (uke, datoer) ->
-                        RammevedtakUkeDto(
-                            fom = datoer.min(),
-                            tom = datoer.max(),
-                            ukeNummer = uke.ukenummer,
-                            innsendtDato = kjøreliste?.datoMottatt?.toLocalDate(),
-                            kanSendeInnKjøreliste = uke.erFørNåværendeUke(),
-                        )
-                    },
-        )
-    }
