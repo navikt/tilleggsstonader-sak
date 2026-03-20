@@ -100,7 +100,7 @@ class DagligReiseVedtakService(
         )
     }
 
-    fun hentVedtak(behandlingId: BehandlingId): GeneriskVedtak<InnvilgelseEllerOpphørDagligReise> =
+    fun hentInnvilgelseEllerOpphørVedtak(behandlingId: BehandlingId): GeneriskVedtak<InnvilgelseEllerOpphørDagligReise> =
         vedtakRepository
             .findByIdOrThrow(behandlingId)
             .withTypeOrThrow<InnvilgelseEllerOpphørDagligReise>()
@@ -125,7 +125,7 @@ class DagligReiseVedtakService(
         forrigeIverksatteBehandlingId: BehandlingId,
         nyBehandlingId: BehandlingId,
     ) {
-        val eksisterendeVedtak = hentVedtak(forrigeIverksatteBehandlingId)
+        val eksisterendeVedtak = `hentInnvilgelseEllerOpphørVedtak`(forrigeIverksatteBehandlingId)
         // TODO: Når skal vi sette tidligste endring?
         vedtakRepository.insert(
             eksisterendeVedtak.copy(
@@ -150,5 +150,10 @@ class DagligReiseVedtakService(
                     ),
             ),
         )
+    }
+
+    fun forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(forrigeIverksatteBehandlingId: BehandlingId?): Boolean {
+        val forrigeVedtak = forrigeIverksatteBehandlingId?.let { hentInnvilgelseEllerOpphørVedtak(it) }
+        return forrigeVedtak?.data?.rammevedtakPrivatBil != null
     }
 }
