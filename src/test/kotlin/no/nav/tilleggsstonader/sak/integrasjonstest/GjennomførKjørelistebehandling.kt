@@ -15,9 +15,9 @@ fun IntegrationTest.gjennomførKjørelisteBehandling(behandling: Behandling) {
     }
     testoppsettService.oppdater(behandling.copy(status = BehandlingStatus.UTREDES))
     tilordneÅpenBehandlingOppgaveForBehandling(behandling.id)
-    kall.steg.ferdigstill(behandling.id, StegController.FerdigstillStegRequest(StegType.KJØRELISTE))
-    kall.steg.ferdigstill(behandling.id, StegController.FerdigstillStegRequest(StegType.BEREGNING))
-    kall.steg.ferdigstill(behandling.id, StegController.FerdigstillStegRequest(StegType.SIMULERING))
+    gjennomførKjørelisteSteg(behandling.id)
+    gjennomførBeregningStegDagligReise(behandling.id)
+    gjennomførSimuleringSteg(behandling.id)
     kall.privatBil.fullførKjørelisteBehandling(behandling.id)
     kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 }

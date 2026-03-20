@@ -280,14 +280,6 @@ fun IntegrationTest.gjennomførSimuleringSteg(behandlingId: BehandlingId) {
     kjørTasksKlareForProsessering()
 }
 
-fun IntegrationTest.gjennomførVedtakSteg(
-    behandlingId: BehandlingId,
-    stønadstype: Stønadstype,
-    opprettVedtak: OpprettVedtak = OpprettInnvilgelse(),
-) {
-    gjennomførBeregningSteg(behandlingId, stønadstype, opprettVedtak)
-}
-
 fun IntegrationTest.gjennomførKjørelisteSteg(behandlingId: BehandlingId) {
     kall.steg.ferdigstill(behandlingId, StegController.FerdigstillStegRequest(StegType.KJØRELISTE))
 }
