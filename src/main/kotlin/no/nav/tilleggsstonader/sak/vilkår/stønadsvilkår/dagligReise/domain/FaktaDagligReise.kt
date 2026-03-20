@@ -53,8 +53,8 @@ data class FaktaOffentligTransport(
     private fun validerIngenNegativeUtgifter() {
         brukerfeilHvis(
             (prisEnkelbillett != null && prisEnkelbillett <= 0) ||
-                (prisSyvdagersbillett != null && prisSyvdagersbillett <= 0) ||
-                (prisTrettidagersbillett != null && prisTrettidagersbillett <= 0),
+                    (prisSyvdagersbillett != null && prisSyvdagersbillett <= 0) ||
+                    (prisTrettidagersbillett != null && prisTrettidagersbillett <= 0),
         ) {
             "Billettprisen må være større enn 0"
         }
@@ -140,7 +140,7 @@ data class FaktaPrivatBil(
     }
 
     private fun validerIngenNegativReiseavstand() {
-        brukerfeilHvis(reiseavstandEnVei < BigDecimal.ZERO) {
+        brukerfeilHvis(reiseavstandEnVei <= BigDecimal.ZERO) {
             "Reiseavstanden må være større enn 0"
         }
     }
@@ -150,8 +150,8 @@ data class FaktaPrivatBil(
             "Minst én reiseperiode må være satt"
         }
         reiseperioder.forEach { periode ->
-            brukerfeilHvis(periode.reisedagerPerUke < 0) {
-                "Reisedager per uke må være 0 eller mer"
+            brukerfeilHvis(periode.reisedagerPerUke <= 0) {
+                "Reisedager per uke må være større enn 0"
             }
             brukerfeilHvis(periode.reisedagerPerUke > 7) {
                 "Reisedager per uke kan ikke være mer enn 7"
