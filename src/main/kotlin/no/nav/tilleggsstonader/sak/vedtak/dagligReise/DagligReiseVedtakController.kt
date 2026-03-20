@@ -12,7 +12,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatDagligReiseDto
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsoRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsrRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
@@ -99,18 +99,18 @@ class DagligReiseVedtakController(
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseDagligReiseTsoRequest,
-    ): BeregningsresultatDagligReiseDto = beregnVedtak(behandlingId, vedtak.vedtaksperioder())
+    ): BeregningDagligReiseDto = beregnVedtak(behandlingId, vedtak.vedtaksperioder())
 
     @PostMapping("{behandlingId}/tsr/beregn")
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseDagligReiseTsrRequest,
-    ): BeregningsresultatDagligReiseDto = beregnVedtak(behandlingId, vedtak.vedtaksperioder())
+    ): BeregningDagligReiseDto = beregnVedtak(behandlingId, vedtak.vedtaksperioder())
 
     private fun beregnVedtak(
         behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
-    ): BeregningsresultatDagligReiseDto {
+    ): BeregningDagligReiseDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val tidligsteEndring =
@@ -125,7 +125,7 @@ class DagligReiseVedtakController(
                     behandling = behandling,
                     typeVedtak = TypeVedtak.INNVILGELSE,
                     tidligsteEndring = tidligsteEndring,
-                ).beregningsresultatDagligReise
+                )
 
         val vilkår = dagligReiseVilkårService.hentVilkårForBehandling(behandlingId)
         return beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring, vilkår)
