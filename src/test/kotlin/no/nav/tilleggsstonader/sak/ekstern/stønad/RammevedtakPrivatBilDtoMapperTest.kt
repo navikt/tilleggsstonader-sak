@@ -11,24 +11,25 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 class RammevedtakPrivatBilDtoMapperTest {
-
     @Test
     fun `innsendtDato settes kun for uker som har kjørelistedata`() {
         val reiseId = ReiseId.random()
 
-        val rammevedtak = rammevedtakPrivatBil(
-            reiseId = reiseId,
-            fom = 6 januar 2025, // uke 2
-            tom = 19 januar 2025, // uke 3
-        )
+        val rammevedtak =
+            rammevedtakPrivatBil(
+                reiseId = reiseId,
+                fom = 6 januar 2025, // uke 2
+                tom = 19 januar 2025, // uke 3
+            )
 
         val datoMottatt = LocalDateTime.of(2025, 1, 15, 10, 0)
-        val kjøreliste = kjøreliste(
-            reiseId = reiseId,
-            datoMottatt = datoMottatt,
-            periode = Datoperiode(6 januar 2025, 12 januar 2025), // kun uke 2
-            kjørteDager = listOf(KjørtDag(6 januar 2025)),
-        )
+        val kjøreliste =
+            kjøreliste(
+                reiseId = reiseId,
+                datoMottatt = datoMottatt,
+                periode = Datoperiode(6 januar 2025, 12 januar 2025), // kun uke 2
+                kjørteDager = listOf(KjørtDag(6 januar 2025)),
+            )
 
         val kjørelister = listOf(kjøreliste).groupBy { it.data.reiseId }
         val result = rammevedtak.tilDto(kjørelister).single()
@@ -44,27 +45,30 @@ class RammevedtakPrivatBilDtoMapperTest {
     fun `flere kjørelister for samme reise gir riktig innsendtDato per uke`() {
         val reiseId = ReiseId.random()
 
-        val rammevedtak = rammevedtakPrivatBil(
-            reiseId = reiseId,
-            fom = 6 januar 2025, // uke 2
-            tom = 19 januar 2025, // uke 3
-        )
+        val rammevedtak =
+            rammevedtakPrivatBil(
+                reiseId = reiseId,
+                fom = 6 januar 2025, // uke 2
+                tom = 19 januar 2025, // uke 3
+            )
 
         val datoMottattUke2 = LocalDateTime.of(2025, 1, 13, 9, 0)
         val datoMottattUke3 = LocalDateTime.of(2025, 1, 20, 14, 30)
 
-        val kjørelisteUke2 = kjøreliste(
-            reiseId = reiseId,
-            datoMottatt = datoMottattUke2,
-            periode = Datoperiode(6 januar 2025, 12 januar 2025),
-            kjørteDager = listOf(KjørtDag(6 januar 2025)),
-        )
-        val kjørelisteUke3 = kjøreliste(
-            reiseId = reiseId,
-            datoMottatt = datoMottattUke3,
-            periode = Datoperiode(13 januar 2025, 19 januar 2025),
-            kjørteDager = listOf(KjørtDag(13 januar 2025)),
-        )
+        val kjørelisteUke2 =
+            kjøreliste(
+                reiseId = reiseId,
+                datoMottatt = datoMottattUke2,
+                periode = Datoperiode(6 januar 2025, 12 januar 2025),
+                kjørteDager = listOf(KjørtDag(6 januar 2025)),
+            )
+        val kjørelisteUke3 =
+            kjøreliste(
+                reiseId = reiseId,
+                datoMottatt = datoMottattUke3,
+                periode = Datoperiode(13 januar 2025, 19 januar 2025),
+                kjørteDager = listOf(KjørtDag(13 januar 2025)),
+            )
 
         val kjørelister = listOf(kjørelisteUke2, kjørelisteUke3).groupBy { it.data.reiseId }
         val result = rammevedtak.tilDto(kjørelister).single()
@@ -78,10 +82,11 @@ class RammevedtakPrivatBilDtoMapperTest {
 
     @Test
     fun `ingen kjøreliste gir null innsendtDato for alle uker`() {
-        val rammevedtak = rammevedtakPrivatBil(
-            fom = 6 januar 2025,
-            tom = 19 januar 2025,
-        )
+        val rammevedtak =
+            rammevedtakPrivatBil(
+                fom = 6 januar 2025,
+                tom = 19 januar 2025,
+            )
 
         val result = rammevedtak.tilDto(emptyMap()).single()
 
