@@ -19,12 +19,13 @@ class DagligReisePrivatBilServiceTest {
     private val behandlingRepository = mockk<BehandlingRepository>()
     private val vedtakService = mockk<VedtakService>()
 
-    private val service = DagligReisePrivatBilService(
-        fagsakPersonService = fagsakPersonService,
-        personService = personService,
-        behandlingRepository = behandlingRepository,
-        vedtakService = vedtakService,
-    )
+    private val service =
+        DagligReisePrivatBilService(
+            fagsakPersonService = fagsakPersonService,
+            personService = personService,
+            behandlingRepository = behandlingRepository,
+            vedtakService = vedtakService,
+        )
 
     private val ident = "12345678901"
 
@@ -43,5 +44,4 @@ class DagligReisePrivatBilServiceTest {
         assertThat(resultat).isEmpty()
         verify(exactly = 0) { behandlingRepository.finnSisteIverksatteBehandlingerForFagsakPersonId(any(), any()) }
     }
-
 }
