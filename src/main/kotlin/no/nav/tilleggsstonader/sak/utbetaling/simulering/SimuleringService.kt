@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering
 
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -14,6 +16,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 class SimuleringService(
@@ -22,6 +25,8 @@ class SimuleringService(
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val tilgangService: TilgangService,
     private val utbetalingV3Mapper: UtbetalingV3Mapper,
+    private val fagsakService: FagsakService,
+    private val behandlingService: BehandlingService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -66,5 +71,17 @@ class SimuleringService(
                 tilkjentYtelse.andelerTilkjentYtelse,
             ),
         )
+    }
+
+    fun skalSendeVarsel(behandlingId: BehandlingId): String? {
+        val fagsakId = fagsakService.hentFagsakForBehandling(behandlingId).id
+        val forrigeIverksettBehandling = behandlingService.finnSisteIverksatteBehandling(fagsakId)?.id
+        val tilkjentYtelse = forrigeIverksettBehandling?.let { tilkjentYtelseService.hentForBehandling(it) }
+        val dagensDato = LocalDate.now()
+        val betalingsDato = tilkjentYtelse?.andelerTilkjentYtelse?.map { it.utbetalingsdato }
+        if (betalingsDato?.contains(dagensDato) == true) {
+            return "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
+        }
+        return null
     }
 }

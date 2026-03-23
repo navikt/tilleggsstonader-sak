@@ -53,6 +53,8 @@ internal class SimuleringServiceTest {
             tilkjentYtelseService = tilkjentYtelseService,
             tilgangService = tilgangService,
             utbetalingV3Mapper = utbetalingV3Mapper,
+            behandlingService = behandlingService,
+            fagsakService = fagsakService,
         )
 
     private val personIdent = "12345678901"
