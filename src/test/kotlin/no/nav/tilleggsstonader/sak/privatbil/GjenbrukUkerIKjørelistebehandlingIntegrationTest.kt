@@ -20,7 +20,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-// FIXME - bør kunne bruke @TestInstance(TestInstance.Lifecycle.PER_CLASS) her om hver sak opprettes på ny bruker gjennom DSL
 class GjenbrukUkerIKjørelistebehandlingIntegrationTest : CleanDatabaseIntegrationTest() {
     private val førsteUkeFom = 5 januar 2026
     private val førsteUkeTom = 11 januar 2026
