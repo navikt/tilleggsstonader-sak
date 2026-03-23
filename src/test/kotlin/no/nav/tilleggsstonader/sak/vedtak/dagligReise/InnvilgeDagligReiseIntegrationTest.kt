@@ -36,33 +36,35 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
         val tomNay = 14 oktober 2025
 
         // Gjennomfører behandling for Tiltaksenheten
-        opprettBehandlingOgGjennomførBehandlingsløp(
-            stønadstype = Stønadstype.DAGLIG_REISE_TSR,
-        ) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTsr(fomTiltaksenheten, tomTiltaksenheten, typeAktivitet = TypeAktivitet.GRUPPEAMO)
+        val behandlingContextTiltaksenheten =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSR,
+            ) {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTsr(fomTiltaksenheten, tomTiltaksenheten, typeAktivitet = TypeAktivitet.GRUPPEAMO)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeTiltakspenger(fomTiltaksenheten, tomTiltaksenheten)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        offentligTransport(fomTiltaksenheten, tomTiltaksenheten)
+                    }
                 }
             }
-            målgruppe {
-                opprett {
-                    målgruppeTiltakspenger(fomTiltaksenheten, tomTiltaksenheten)
-                }
-            }
-            vilkår {
-                opprett {
-                    offentligTransport(fomTiltaksenheten, tomTiltaksenheten)
-                }
-            }
-        }
 
         every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoAAP()
 
         // Gjennomfører behandling for Nay
-        val behandlingContext =
+        val behandlingContextNay =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
                 tilSteg = StegType.BEREGNE_YTELSE,
+                ident = behandlingContextTiltaksenheten.ident,
             ) {
                 aktivitet {
                     opprett {
@@ -81,7 +83,7 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 }
             }
 
-        gjennomførBeregningStegKall(behandlingContext.behandlingId, Stønadstype.DAGLIG_REISE_TSO)
+        gjennomførBeregningStegKall(behandlingContextNay.behandlingId, Stønadstype.DAGLIG_REISE_TSO)
             .expectStatus()
             .isBadRequest
             .expectBody()
@@ -97,17 +99,18 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
         val fom = 15 september 2025
         val tom = 14 oktober 2025
 
-        opprettBehandlingOgGjennomførBehandlingsløp(
-            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-        ) {
-            defaultDagligReisePrivatBilTsoTestdata(fom, tom)
-        }
+        val behandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                defaultDagligReisePrivatBilTsoTestdata(fom, tom)
+            }
 
         KafkaFake
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
 
-        val rammevedtak = kall.privatBil.hentRammevedtak("12345678910")
+        val rammevedtak = kall.privatBil.hentRammevedtak(behandlingContext.ident)
 
         assertThat(rammevedtak).isNotEmpty()
     }

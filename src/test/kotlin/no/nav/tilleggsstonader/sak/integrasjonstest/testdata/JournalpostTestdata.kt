@@ -21,7 +21,10 @@ val defaultJournalpost =
         bruker = Bruker("12345678910", BrukerIdType.FNR),
     )
 
-fun journalpostSøknadForStønadstype(stønadstype: Stønadstype): Journalpost {
+fun journalpostSøknadForStønadstype(
+    stønadstype: Stønadstype,
+    ident: String,
+): Journalpost {
     val dokumentBrevkode = brevkodeForStønadstype(stønadstype)
     val tema = if (stønadstype == Stønadstype.DAGLIG_REISE_TSR) Tema.TSR else Tema.TSO
 
@@ -43,7 +46,7 @@ fun journalpostSøknadForStønadstype(stønadstype: Stønadstype): Journalpost {
                         ),
                 ),
             ),
-        bruker = Bruker("12345678910", BrukerIdType.FNR),
+        bruker = Bruker(ident, BrukerIdType.FNR),
         tema = tema.name,
     )
 }

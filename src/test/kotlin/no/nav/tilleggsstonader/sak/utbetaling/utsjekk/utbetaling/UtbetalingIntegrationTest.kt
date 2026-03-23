@@ -4,19 +4,14 @@ import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.august
 import no.nav.tilleggsstonader.libs.utils.dato.desember
-import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
-import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurdering
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdService
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.SimuleringClient
@@ -91,24 +86,15 @@ class UtbetalingIntegrationTest : CleanDatabaseIntegrationTest() {
             utbetalingGjelderFagsystem = UtbetalingStatusHåndterer.FAGSYSTEM_TILLEGGSSTØNADER,
         )
 
-        val revurderingId =
-            opprettRevurdering(
-                opprettBehandlingDto =
-                    OpprettBehandlingDto(
-                        fagsakId = førstegangsbehandling.fagsakId,
-                        årsak = BehandlingÅrsak.SØKNAD,
-                        kravMottatt = 15 februar 2025,
-                        nyeOpplysningerMetadata = null,
-                    ),
-            )
-
         // Opphører alt
-        gjennomførBehandlingsløp(revurderingId) {
-            vedtak {
-                opphør(opphørsdato = fom)
+        val revurderingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = førstegangsbehandling.id,
+            ) {
+                vedtak {
+                    opphør(opphørsdato = fom)
+                }
             }
-        }
-        kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 
         val revurdering = behandlingService.hentBehandling(revurderingId)
         val finnesUtbetalingIdEtterRevurdering =

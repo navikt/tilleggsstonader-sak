@@ -27,11 +27,14 @@ import no.nav.tilleggsstonader.libs.utils.dato.januar
 import java.time.LocalDate
 
 object SøknadDagligReiseUtil {
-    fun søknadDagligReise(hovedytelse: Map<HovedytelseType, Boolean> = defaultHovedytelse): SøknadsskjemaDagligReiseFyllUtSendInn {
+    fun søknadDagligReise(
+        hovedytelse: Map<HovedytelseType, Boolean> = defaultHovedytelse,
+        ident: String = "11111122222",
+    ): SøknadsskjemaDagligReiseFyllUtSendInn {
         val skjemaDagligReise =
             SkjemaDagligReise(
                 jegSokerPaVegneAvMegSelv = true,
-                dineOpplysninger = dineOpplysninger(),
+                dineOpplysninger = dineOpplysninger(ident),
                 hovedytelse = hovedytelse,
                 aktiviteter = aktiviteter(),
                 reise = listOf(reise()),
@@ -56,13 +59,13 @@ object SøknadDagligReiseUtil {
 
     private val defaultHovedytelse = mapOf(HovedytelseType.arbeidsavklaringspenger to true)
 
-    private fun dineOpplysninger(): DineOpplysninger =
+    private fun dineOpplysninger(ident: String): DineOpplysninger =
         DineOpplysninger(
             fornavn = "Fornavn",
             etternavn = "Etternavn",
             identitet =
                 Identitet(
-                    identitetsnummer = "11111122222",
+                    identitetsnummer = ident,
                 ),
             adresse =
                 NavAdresse(

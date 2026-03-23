@@ -28,7 +28,10 @@ import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.random.Random
 
-fun IntegrationTest.sendInnKjøreliste(kjøreliste: KjørelisteSkjema): String {
+fun IntegrationTest.sendInnKjøreliste(
+    kjøreliste: KjørelisteSkjema,
+    ident: String,
+): String {
     val journalpostId = Random.nextLong().toString()
     val journalhendelseRecord = journalfoeringHendelseRecord(journalpostId.toLong())
 
@@ -41,6 +44,7 @@ fun IntegrationTest.sendInnKjøreliste(kjøreliste: KjørelisteSkjema): String {
         brevkode = DokumentBrevkode.DAGLIG_REISE_KJØRELISTE,
         skjema = InnsendtSkjema("", LocalDateTime.now(), Språkkode.NB, kjøreliste),
         journalpostId = journalpostId.toLong(),
+        ident = ident,
     )
 
     kjørTasksKlareForProsesseringTilIngenTasksIgjen()
@@ -64,6 +68,7 @@ private fun IntegrationTest.mockJournalpost(
     skjema: Any?,
     journalpostKanal: String = "NAV_NO",
     journalpostId: Long,
+    ident: String,
 ): Journalpost {
     val dokumentvariantformat = if (skjema != null) Dokumentvariantformat.ORIGINAL else Dokumentvariantformat.ARKIV
     val søknaddookumentInfo =
@@ -77,7 +82,7 @@ private fun IntegrationTest.mockJournalpost(
             journalposttype = Journalposttype.I,
             dokumenter = listOf(søknaddookumentInfo),
             kanal = journalpostKanal,
-            bruker = Bruker("12345678910", BrukerIdType.FNR),
+            bruker = Bruker(ident, BrukerIdType.FNR),
             journalstatus = Journalstatus.MOTTATT,
         )
 

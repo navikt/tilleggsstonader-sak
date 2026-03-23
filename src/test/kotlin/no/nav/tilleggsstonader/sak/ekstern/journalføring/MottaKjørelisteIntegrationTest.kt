@@ -41,7 +41,7 @@ class MottaKjørelisteIntegrationTest : CleanDatabaseIntegrationTest() {
 
         val saksbehandling = testoppsettService.hentSaksbehandling(behandlingContext.behandlingId)
 
-        val rammevedtak = kall.privatBil.hentRammevedtak("12345678910")
+        val rammevedtak = kall.privatBil.hentRammevedtak(behandlingContext.ident)
         val reiseId = rammevedtak.single().reiseId
 
         assertThat(rammevedtak).hasSize(1)
@@ -62,7 +62,7 @@ class MottaKjørelisteIntegrationTest : CleanDatabaseIntegrationTest() {
                 dagerKjørt = dagerKjørt,
             )
 
-        val journalpostId = sendInnKjøreliste(kjøreliste)
+        val journalpostId = sendInnKjøreliste(kjøreliste, behandlingContext.ident)
 
         val lagredeKjørelister = kjørelisteRepository.findByFagsakId(saksbehandling.fagsakId)
         assertThat(lagredeKjørelister).hasSize(1)

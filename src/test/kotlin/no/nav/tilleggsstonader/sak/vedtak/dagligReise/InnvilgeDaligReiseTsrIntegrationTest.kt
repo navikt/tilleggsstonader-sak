@@ -133,7 +133,10 @@ class InnvilgeDaligReiseTsrIntegrationTest : CleanDatabaseIntegrationTest() {
             vilkårListeRevurdering = vilkårRevurdering,
         )
 
-        gjennomførBehandlingsløp(revurderingId) {
+        gjennomførBehandlingsløp(
+            behandlingId = revurderingId,
+            ident = testoppsettService.hentPersonidentForBehandlingId(revurderingId),
+        ) {
             aktivitet {
                 oppdater { aktiviteter, behandlingId ->
                     with(aktiviteter.single()) {
