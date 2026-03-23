@@ -38,4 +38,7 @@
 
     <logger name="no.nav" level="INFO"/>
 
+    <!-- Suppress harmless shutdown warning from Unleash SDK -->
+    <logger name="io.getunleash.repository.PollingFeatureFetcher" level="ERROR"/>
+
 </configuration>
