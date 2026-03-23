@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 class TotrinnskontrollIntegrationTest : CleanDatabaseIntegrationTest() {
     @Test
     fun `kan angre sende til beslutter`() {
-        val behandlingId =
+        val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
                 tilSteg = StegType.BESLUTTE_VEDTAK,
@@ -18,6 +18,6 @@ class TotrinnskontrollIntegrationTest : CleanDatabaseIntegrationTest() {
             }
 
         // Skal ikke kaste feil
-        kall.totrinnskontroll.angreSendTilBeslutter(behandlingId)
+        kall.totrinnskontroll.angreSendTilBeslutter(behandlingContext.behandlingId)
     }
 }

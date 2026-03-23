@@ -37,13 +37,11 @@ class LøpendeMånedTest {
     }
 
     private fun løpendeMåned(vararg vedtaksperioder: VedtaksperiodeInnenforLøpendeMåned) =
-        LøpendeMåned(
-            fom = LocalDate.of(2025, 2, 1),
-            tom = LocalDate.of(2025, 2, 28),
-            utbetalingsdato = LocalDate.of(2025, 2, 1),
-        ).apply {
-            vedtaksperioder.forEach {
-                this.medVedtaksperiode(it)
-            }
-        }
+        vedtaksperioder.fold(
+            LøpendeMåned(
+                fom = LocalDate.of(2025, 2, 1),
+                tom = LocalDate.of(2025, 2, 28),
+                utbetalingsdato = LocalDate.of(2025, 2, 1),
+            ),
+        ) { acc, vedtaksperiode -> acc.medVedtaksperiode(vedtaksperiode) }
 }

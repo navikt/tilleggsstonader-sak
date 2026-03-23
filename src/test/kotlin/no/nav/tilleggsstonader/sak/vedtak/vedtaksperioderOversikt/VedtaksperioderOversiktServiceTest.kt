@@ -72,7 +72,7 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
         every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoAAP()
 
         // Gjennomfører behandling for Nay
-        val behandlingId =
+        val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
                 tilSteg = StegType.INNGANGSVILKÅR,
@@ -101,7 +101,7 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
                 ),
             )
 
-        assertThat(vedtaksperioderOversiktService.hentDetaljerteVedtaksperioderForBehandling(behandlingId)).isEqualTo(
+        assertThat(vedtaksperioderOversiktService.hentDetaljerteVedtaksperioderForBehandling(behandlingContext.behandlingId)).isEqualTo(
             forventetDetaljertVedtaksperiodeTsr,
         )
     }

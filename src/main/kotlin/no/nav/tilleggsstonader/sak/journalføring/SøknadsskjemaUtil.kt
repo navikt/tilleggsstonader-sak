@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUt
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.OppholdUtenforNorge
-import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import tools.jackson.core.JsonParser
 import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.JsonNode
@@ -58,7 +57,6 @@ object SøknadsskjemaUtil {
         data: ByteArray,
         mottattTidspunkt: LocalDateTime,
     ): InnsendtSkjema<SøknadsskjemaDagligReiseFyllUtSendInn> {
-        secureLogger.info("Deserialiserer daglig reise skjema: \n ${String(data)}")
         val skjema = jsonMapperMedCustomDeserializerForDagligReise.readValue<SøknadsskjemaDagligReiseFyllUtSendInn>(data)
         return InnsendtSkjema(
             ident = skjema.data.data.dineOpplysninger.identitet.identitetsnummer,

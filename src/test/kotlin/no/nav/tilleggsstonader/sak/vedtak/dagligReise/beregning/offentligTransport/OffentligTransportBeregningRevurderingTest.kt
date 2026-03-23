@@ -3,16 +3,12 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransp
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningStegKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
-import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
@@ -36,7 +32,7 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
                     ),
             )
 
-        val førstegangsbehandlingId =
+        val førstegangsbehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
@@ -59,7 +55,7 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
 
         val revurderingId =
             opprettRevurderingOgGjennomførBehandlingsløp(
-                fraBehandlingId = førstegangsbehandlingId,
+                fraBehandlingId = førstegangsbehandlingContext.behandlingId,
                 tilSteg = StegType.BEREGNE_YTELSE,
             ) {
                 vilkår {
@@ -110,7 +106,7 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
                     ),
             )
 
-        val førstegangsbehandlingId =
+        val førstegangsbehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
@@ -133,7 +129,7 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
 
         val revurderingId =
             opprettRevurderingOgGjennomførBehandlingsløp(
-                fraBehandlingId = førstegangsbehandlingId,
+                fraBehandlingId = førstegangsbehandlingContext.behandlingId,
                 tilSteg = StegType.BEREGNE_YTELSE,
             ) {
                 vilkår {
@@ -153,9 +149,3 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
         )
     }
 }
-
-private fun lagreAktivitet(behandlingId: BehandlingId): LagreVilkårperiode =
-    lagreVilkårperiodeAktivitet(behandlingId, fom = LocalDate.now().minusDays(46), tom = LocalDate.now().plusDays(42))
-
-private fun lagreMålgruppe(behandlingId: BehandlingId): LagreVilkårperiode =
-    lagreVilkårperiodeMålgruppe(behandlingId, fom = LocalDate.now().minusDays(46), tom = LocalDate.now().plusDays(42))

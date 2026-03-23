@@ -60,7 +60,7 @@ class InnvilgeDaligReiseTsrIntegrationTest : CleanDatabaseIntegrationTest() {
         // For at det skal opprettes sak med stønadstype DAGLIG_REISE_TSR
         every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoTiltakspengerTpsak()
 
-        val behandlingId =
+        val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSR,
             ) {
@@ -81,7 +81,7 @@ class InnvilgeDaligReiseTsrIntegrationTest : CleanDatabaseIntegrationTest() {
                 }
             }
 
-        validerAndeler(behandlingId)
+        validerAndeler(behandlingContext.behandlingId)
         assertThat(taskService.finnAlleTaskerMedType(InterntVedtakTask.TYPE)).allMatch { it.status == Status.FERDIG }
         validerUtebalingerPåKafka(antallUtbetalinger = 1)
     }
@@ -92,21 +92,21 @@ class InnvilgeDaligReiseTsrIntegrationTest : CleanDatabaseIntegrationTest() {
         every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoTiltakspengerTpsak()
 
         // FØRSTEGANGSBEHANDLING
-        val førstegangsbehandlingId =
+        val førstegangsbehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSR,
             ) {
                 defaultDagligReiseTsrTestdata()
             }
 
-        validerAndeler(førstegangsbehandlingId)
+        validerAndeler(førstegangsbehandlingContext.behandlingId)
         assertThat(taskService.finnAlleTaskerMedType(InterntVedtakTask.TYPE)).allMatch { it.status == Status.FERDIG }
         validerUtebalingerPåKafka(antallUtbetalinger = 1)
 
-        sendOkPåAndelerFraØkonomi(førstegangsbehandlingId)
+        sendOkPåAndelerFraØkonomi(førstegangsbehandlingContext.behandlingId)
 
         // REVURDERING
-        val førstegangsbehandling = behandlingService.hentBehandling(førstegangsbehandlingId)
+        val førstegangsbehandling = behandlingService.hentBehandling(førstegangsbehandlingContext.behandlingId)
 
         val revurderingId =
             opprettRevurdering(
@@ -119,14 +119,14 @@ class InnvilgeDaligReiseTsrIntegrationTest : CleanDatabaseIntegrationTest() {
                     ),
             )
 
-        val vilkårsperioderFørstegangsbehandling = vilkårperiodeService.hentVilkårperioder(førstegangsbehandlingId)
+        val vilkårsperioderFørstegangsbehandling = vilkårperiodeService.hentVilkårperioder(førstegangsbehandlingContext.behandlingId)
         val vilkårsperioderRevurdering = vilkårperiodeService.hentVilkårperioder(revurderingId)
         validerErInngangsvilkårLike(
             vilkårsperioderFørstegangsbehandling = vilkårsperioderFørstegangsbehandling,
             vilkårsperioderRevurdering = vilkårsperioderRevurdering,
         )
 
-        val vilkårFørstegangsbehandling = vilkårService.hentVilkår(førstegangsbehandlingId)
+        val vilkårFørstegangsbehandling = vilkårService.hentVilkår(førstegangsbehandlingContext.behandlingId)
         val vilkårRevurdering = vilkårService.hentVilkår(revurderingId)
         validerErVilkårLike(
             vilkårListeFørstegangsbehanlding = vilkårFørstegangsbehandling,

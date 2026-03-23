@@ -1,15 +1,31 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.sisteDagIÅret
+import no.nav.tilleggsstonader.sak.felles.Tidslinje
 import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.splitPerLøpendeMåneder
-import kotlin.collections.plus
 import kotlin.math.min
 
 object BoutgifterBeregnUtil {
+    fun List<VedtaksperiodeBeregning>.splittVedGrensenTilFaktiskeUtgifter(
+        utgifter: BoutgifterPerUtgiftstype,
+    ): List<Tidslinje<VedtaksperiodeBeregning>> {
+        val kuttdatoer = utgifter.finnStartdatoForFaktiskeUtgifter()
+        if (kuttdatoer.isEmpty()) return listOf(Tidslinje(this))
+        return Tidslinje(this).partisjonerVedDatoer(kuttdatoer)
+    }
+
+    private fun BoutgifterPerUtgiftstype.finnStartdatoForFaktiskeUtgifter() =
+        values
+            .flatten()
+            .filter { it.skalFåDekketFaktiskeUtgifter }
+            .map { it.fom }
+            .distinct()
+            .sorted()
+
     /**
      * Splitter opp vedtaksperioder på løpende måneder.
      *

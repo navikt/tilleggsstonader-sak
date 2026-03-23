@@ -129,6 +129,26 @@ class OpprettVilkårperiodeDsl {
         }
     }
 
+    fun aktivitetTiltakLæremidler(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) {
+        add { behandlingId ->
+            lagreVilkårperiodeAktivitet(
+                behandlingId = behandlingId,
+                fom = fom,
+                tom = tom,
+                faktaOgSvar =
+                    FaktaOgSvarAktivitetLæremidlerDto(
+                        prosent = 100,
+                        studienivå = Studienivå.VIDEREGÅENDE,
+                        svarHarUtgifter = SvarJaNei.JA,
+                        svarHarRettTilUtstyrsstipend = SvarJaNei.NEI,
+                    ),
+            )
+        }
+    }
+
     fun aktivitetTiltakTso(
         fom: LocalDate,
         tom: LocalDate,

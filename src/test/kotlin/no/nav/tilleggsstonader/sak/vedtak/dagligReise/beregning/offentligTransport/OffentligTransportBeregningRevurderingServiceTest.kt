@@ -61,7 +61,7 @@ class OffentligTransportBeregningRevurderingServiceTest : CleanDatabaseIntegrati
             assertThat(first().beløp).isEqualTo(999999999)
 
             // Forventer at andre andel, ikke har endret grunnlaget sitt, ikke blir reberegnet
-            assertThat(get(1).fom).isEqualTo(`førsteJanuarPlussEnTrettidagersperiode`)
+            assertThat(get(1).fom).isEqualTo(førsteJanuarPlussEnTrettidagersperiode)
             assertThat(get(1).beløp).isEqualTo(999999999)
 
             // Forventer at tredje andel, som er helt ny i revurderingen, blir reberegnet
@@ -163,7 +163,7 @@ class OffentligTransportBeregningRevurderingServiceTest : CleanDatabaseIntegrati
                 revurderingId,
             ).expectOkWithBody<InnvilgelseDagligReiseResponse>()
             .beregningsresultat
-            ?.offentligTransport!!
+            .offentligTransport!!
             .reiser
 
     private fun gjennomførEnFørstegangsbehandling(
@@ -188,7 +188,7 @@ class OffentligTransportBeregningRevurderingServiceTest : CleanDatabaseIntegrati
                     offentligTransport(reiseFom, reiseTom)
                 }
             }
-        }
+        }.behandlingId
 
     private fun lagreAktivitet(behandlingId: BehandlingId): LagreVilkårperiode =
         lagreVilkårperiodeAktivitet(behandlingId, fom = 1 januar 2024, tom = 30 mars 2026)
