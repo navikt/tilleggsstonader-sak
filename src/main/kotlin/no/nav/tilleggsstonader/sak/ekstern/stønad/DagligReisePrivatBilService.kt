@@ -25,11 +25,11 @@ class DagligReisePrivatBilService(
 
     fun hentRammevedtakPåIdent(ident: String): List<GeneriskVedtak<InnvilgelseEllerOpphørDagligReise>> {
         val alleIdenterPåPerson = hentAlleIdenterPåPerson(ident)
-        val fagsakPerson = fagsakPersonService.finnPerson(alleIdenterPåPerson)
+        val fagsakPerson = fagsakPersonService.finnPerson(alleIdenterPåPerson) ?: return emptyList()
 
         val iverksatteBehandlingIder =
             behandlingRepository.finnSisteIverksatteBehandlingerForFagsakPersonId(
-                fagsakPersonId = fagsakPerson?.id!!,
+                fagsakPersonId = fagsakPerson.id,
                 stønadstyper = listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
             )
 
