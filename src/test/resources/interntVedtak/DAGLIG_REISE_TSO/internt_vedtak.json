@@ -193,7 +193,7 @@
       "reisedagerPerUke" : 3,
       "reiseavstandEnVei" : 40.5,
       "bompengerPerDag" : 20,
-      "fergekostandEnVei" : 30,
+      "fergekostnadPerDag" : 30,
       "type" : "DAGLIG_REISE_PRIVAT_BIL"
     }
   } ],

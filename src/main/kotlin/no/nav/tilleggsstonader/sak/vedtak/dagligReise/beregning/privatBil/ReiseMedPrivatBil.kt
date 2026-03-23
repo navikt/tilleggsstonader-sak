@@ -17,7 +17,7 @@ data class ReiseMedPrivatBil(
     val reisedagerPerUke: Int,
     val reiseavstandEnVei: BigDecimal,
     val bompengerPerDag: Int?,
-    val fergekostandEnVei: Int?,
+    val fergekostnadPerDag: Int?,
 ) : Periode<LocalDate>,
     KopierPeriode<ReiseMedPrivatBil> {
     override fun medPeriode(
@@ -38,7 +38,7 @@ fun VilkårDagligReise.tilReiseMedPrivatBil(): ReiseMedPrivatBil {
         reisedagerPerUke = this.fakta.reisedagerPerUke,
         reiseavstandEnVei = this.fakta.reiseavstandEnVei,
         bompengerPerDag = this.fakta.bompengerPerDag,
-        fergekostandEnVei = this.fakta.fergekostandEnVei,
+        fergekostnadPerDag = this.fakta.fergekostnadPerDag,
         aktivitetsadresse = this.fakta.adresse,
     )
 }

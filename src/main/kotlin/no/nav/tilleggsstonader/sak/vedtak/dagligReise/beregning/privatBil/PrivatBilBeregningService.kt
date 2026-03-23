@@ -84,7 +84,7 @@ class PrivatBilBeregningService(
     ): BeregningsgrunnlagForReiseMedPrivatBil {
         val ekstrakostnader =
             Ekstrakostnader(
-                fergekostnadPerDag = reise.fergekostandEnVei,
+                fergekostnadPerDag = reise.fergekostnadPerDag,
                 bompengerPerDag = reise.bompengerPerDag,
             )
         return BeregningsgrunnlagForReiseMedPrivatBil(

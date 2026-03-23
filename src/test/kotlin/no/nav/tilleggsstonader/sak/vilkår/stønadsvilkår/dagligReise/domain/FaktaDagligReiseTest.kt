@@ -148,7 +148,7 @@ class FaktaDagligReiseTest {
                         reisedagerPerUke = 4,
                         reiseavstandEnVei = BigDecimal(10),
                         bompengerPerDag = -10,
-                        fergekostandEnVei = 0,
+                        fergekostnadPerDag = 0,
                     )
                 }
             assertThat(feil.message).isEqualTo("Bompenge- og fergeprisen må være større enn 0")
@@ -164,7 +164,7 @@ class FaktaDagligReiseTest {
                         reisedagerPerUke = 4,
                         reiseavstandEnVei = BigDecimal("-10"),
                         bompengerPerDag = 0,
-                        fergekostandEnVei = 0,
+                        fergekostnadPerDag = 0,
                     )
                 }
             assertThat(feil.message).isEqualTo("Reiseavstanden må være større enn 0")
@@ -180,7 +180,7 @@ class FaktaDagligReiseTest {
                         reisedagerPerUke = -4,
                         reiseavstandEnVei = BigDecimal(10),
                         bompengerPerDag = 0,
-                        fergekostandEnVei = 0,
+                        fergekostnadPerDag = 0,
                     )
                 }
             assertThat(feil.message).isEqualTo("Reisedager per uke må være 0 eller mer")
@@ -196,7 +196,7 @@ class FaktaDagligReiseTest {
                         reisedagerPerUke = 8,
                         reiseavstandEnVei = BigDecimal(10),
                         bompengerPerDag = 0,
-                        fergekostandEnVei = 0,
+                        fergekostnadPerDag = 0,
                     )
                 }
             assertThat(feil.message).isEqualTo("Reisedager per uke kan ikke være mer enn 7")

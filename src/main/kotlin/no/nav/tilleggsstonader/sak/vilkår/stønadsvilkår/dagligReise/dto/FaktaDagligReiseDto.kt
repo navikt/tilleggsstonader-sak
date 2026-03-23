@@ -55,7 +55,7 @@ data class FaktaDagligReisePrivatBilDto(
     val reisedagerPerUke: Int,
     val reiseavstandEnVei: BigDecimal,
     val bompengerPerDag: Int?,
-    val fergekostandEnVei: Int?,
+    val fergekostnadPerDag: Int?,
 ) : FaktaDagligReiseDto {
     override val type = TypeDagligReise.PRIVAT_BIL
 
@@ -68,7 +68,7 @@ data class FaktaDagligReisePrivatBilDto(
         reisedagerPerUke = reisedagerPerUke,
         reiseavstandEnVei = reiseavstandEnVei,
         bompengerPerDag = bompengerPerDag,
-        fergekostandEnVei = fergekostandEnVei,
+        fergekostnadPerDag = fergekostnadPerDag,
     )
 }
 

@@ -557,14 +557,14 @@ fun faktaPrivatBil(
     reisedagerPerUke: Int = 5,
     reiseavstandEnVei: BigDecimal = 10.toBigDecimal(),
     bompengerPerDag: Int? = null,
-    fergekostandEnVei: Int? = null,
+    fergekostnadPerDag: Int? = null,
 ) = FaktaPrivatBil(
     reiseId = reiseId,
     adresse = adresse,
     reisedagerPerUke = reisedagerPerUke,
     reiseavstandEnVei = reiseavstandEnVei,
     bompengerPerDag = bompengerPerDag,
-    fergekostandEnVei = fergekostandEnVei,
+    fergekostnadPerDag = fergekostnadPerDag,
 )
 
 fun lagreVilkårperiodeMålgruppe(
@@ -643,7 +643,7 @@ fun lagreDagligReisePrivatBilDto(
     reisedagerPerUke: Int = 5,
     reiseavstandEnVei: Int = 10,
     bompengerPerDag: Int? = null,
-    fergekostandEnVei: Int? = null,
+    fergekostnadPerDag: Int? = null,
     svar: Map<RegelId, SvarOgBegrunnelseDto> =
         mapOf(
             RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
@@ -654,7 +654,7 @@ fun lagreDagligReisePrivatBilDto(
         FaktaDagligReisePrivatBilDto(
             reiseavstandEnVei = reiseavstandEnVei.toBigDecimal(),
             bompengerPerDag = bompengerPerDag,
-            fergekostandEnVei = fergekostandEnVei,
+            fergekostnadPerDag = fergekostnadPerDag,
             reisedagerPerUke = reisedagerPerUke,
         ),
 ) = LagreDagligReiseDto(

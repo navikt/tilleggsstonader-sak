@@ -265,7 +265,7 @@ data class TidligsteEndringIBehandlingUtleder(
                 faktaNå.reisedagerPerUke != faktaTidligere.reisedagerPerUke ||
                     faktaNå.reiseavstandEnVei != faktaTidligere.reiseavstandEnVei ||
                     faktaNå.bompengerPerDag != faktaTidligere.bompengerPerDag ||
-                    faktaNå.fergekostandEnVei != faktaTidligere.fergekostandEnVei
+                    faktaNå.fergekostnadPerDag != faktaTidligere.fergekostnadPerDag
             }
 
             else -> {

@@ -355,7 +355,7 @@ class InterntVedtakService(
                     reisedagerPerUke = fakta.reisedagerPerUke,
                     reiseavstandEnVei = fakta.reiseavstandEnVei,
                     bompengerPerDag = fakta.bompengerPerDag,
-                    fergekostandEnVei = fakta.fergekostandEnVei,
+                    fergekostnadPerDag = fakta.fergekostnadPerDag,
                     reiseId = fakta.reiseId,
                     adresse = fakta.adresse,
                 )

@@ -1013,7 +1013,7 @@ object InterntVedtakTestdata {
                             reisedagerPerUke = 3,
                             reiseavstandEnVei = BigDecimal(40.5),
                             bompengerPerDag = 20,
-                            fergekostandEnVei = 30,
+                            fergekostnadPerDag = 30,
                         ),
                 ),
             )

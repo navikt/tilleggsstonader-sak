@@ -119,7 +119,7 @@ fun mapFaktaPrivatBil(rad: Map<String, String>): FaktaPrivatBil =
         reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, rad),
         reiseavstandEnVei = parseBigDecimal(DomenenøkkelPrivatBil.REISEAVSTAND_EN_VEI, rad),
         bompengerPerDag = parseValgfriInt(DomenenøkkelPrivatBil.BOMPENGER, rad),
-        fergekostandEnVei = parseValgfriInt(DomenenøkkelPrivatBil.FERGEKOSTNAD, rad),
+        fergekostnadPerDag = parseValgfriInt(DomenenøkkelPrivatBil.FERGEKOSTNAD, rad),
     )
 
 fun mapAktiviteter(
