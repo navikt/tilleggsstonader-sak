@@ -12,9 +12,12 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.validerReiser
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mergeSammenhengendeOppfylteAktiviteterMedLikTypeAktivitet
 import org.springframework.stereotype.Service
@@ -26,6 +29,7 @@ class DagligReiseVedtaksperioderValideringService(
     private val behandlingService: BehandlingService,
     private val vedtakService: VedtakService,
     private val vilkårperiodeService: VilkårperiodeService,
+    private val vilkårService: VilkårService,
 ) {
     fun validerVedtaksperioder(
         vedtaksperioder: List<Vedtaksperiode>,
@@ -42,6 +46,10 @@ class DagligReiseVedtaksperioderValideringService(
             vedtaksperioder = vedtaksperioder,
         )
         validerTypeAktivitetForTsr(
+            behandling = behandling,
+            vedtaksperioder = vedtaksperioder,
+        )
+        validerFinnesReiseForHeleVedtaksperiode(
             behandling = behandling,
             vedtaksperioder = vedtaksperioder,
         )
@@ -134,4 +142,15 @@ class DagligReiseVedtaksperioderValideringService(
             ?.let {
                 vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(it.id)
             }?.data
+
+    private fun validerFinnesReiseForHeleVedtaksperiode(
+        behandling: Saksbehandling,
+        vedtaksperioder: List<Vedtaksperiode>,
+    ) {
+        val vilkår = vilkårService.hentVilkår(behandling.id).map { it.mapTilVilkårDagligReise() }
+        validerReiser(
+            vilkår = vilkår,
+            vedtaksperioder = vedtaksperioder,
+        )
+    }
 }
