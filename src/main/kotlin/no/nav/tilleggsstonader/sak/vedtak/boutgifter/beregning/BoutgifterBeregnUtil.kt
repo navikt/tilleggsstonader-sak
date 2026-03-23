@@ -13,9 +13,9 @@ object BoutgifterBeregnUtil {
     fun List<VedtaksperiodeBeregning>.splittVedGrensenTilFaktiskeUtgifter(
         utgifter: BoutgifterPerUtgiftstype,
     ): List<List<VedtaksperiodeBeregning>> {
-        val cutDates = utgifter.finnStartdatoForFaktiskeUtgifter()
-        if (cutDates.isEmpty()) return listOf(this)
-        return Tidslinje(this).grupperVedDatoer(cutDates)
+        val kuttdatoer = utgifter.finnStartdatoForFaktiskeUtgifter()
+        if (kuttdatoer.isEmpty()) return listOf(this)
+        return Tidslinje(this).grupperVedDatoer(kuttdatoer)
     }
 
     private fun BoutgifterPerUtgiftstype.finnStartdatoForFaktiskeUtgifter() =
@@ -36,10 +36,11 @@ object BoutgifterBeregnUtil {
             .sorted()
             .fold(listOf()) { acc, vedtaksperiode ->
                 if (acc.isEmpty()) {
-                    acc + vedtaksperiode.delTilUtbetalingPerioder()
+                    val nyeUtbetalingsperioder = vedtaksperiode.delTilUtbetalingPerioder()
+                    acc + nyeUtbetalingsperioder
                 } else {
-                    val (oppdatertForrige, nyePerioder) = vedtaksperiode.håndterNyUtbetalingsperiode(acc.last())
-                    acc.dropLast(1) + oppdatertForrige + nyePerioder
+                    val håndterNyUtbetalingsperiode = vedtaksperiode.håndterNyUtbetalingsperiode(acc)
+                    acc + håndterNyUtbetalingsperiode
                 }
             }
 
@@ -79,25 +80,34 @@ object BoutgifterBeregnUtil {
         )
     }
 
-    private fun VedtaksperiodeBeregning.håndterNyUtbetalingsperiode(
-        forrigeUtbetalingsperiode: LøpendeMåned,
-    ): Pair<LøpendeMåned, List<LøpendeMåned>> {
-        val oppdatert = forrigeUtbetalingsperiode.leggTilOverlappendeDel(this)
-        val nyePerioder = this.delEtterUtbetalingsperiode(oppdatert).delTilUtbetalingPerioder()
-        return oppdatert to nyePerioder
+    /**
+     * Legger til periode som overlapper med forrige utbetalingsperiode
+     * Returnerer utbetalingsperioder som løper etter forrige utbetalingsperiode
+     */
+    private fun VedtaksperiodeBeregning.håndterNyUtbetalingsperiode(acc: List<LøpendeMåned>): List<LøpendeMåned> {
+        val forrigeUtbetalingsperiode = acc.last()
+        forrigeUtbetalingsperiode.leggTilOverlappendeDel(this)
+
+        return lagUtbetalingPerioderEtterForrigeUtbetalingperiode(forrigeUtbetalingsperiode)
     }
 
-    private fun LøpendeMåned.leggTilOverlappendeDel(vedtaksperiode: VedtaksperiodeBeregning): LøpendeMåned {
-        if (vedtaksperiode.fom > this.tom) return this
-        val overlappendeVedtaksperiode =
-            VedtaksperiodeInnenforLøpendeMåned(
-                fom = vedtaksperiode.fom,
-                tom = minOf(this.tom, vedtaksperiode.tom),
-                målgruppe = vedtaksperiode.målgruppe,
-                aktivitet = vedtaksperiode.aktivitet,
-            )
-        return this.medVedtaksperiode(overlappendeVedtaksperiode)
+    private fun LøpendeMåned.leggTilOverlappendeDel(vedtaksperiode: VedtaksperiodeBeregning) {
+        if (vedtaksperiode.fom <= this.tom) {
+            val overlappendeVedtaksperiode =
+                VedtaksperiodeInnenforLøpendeMåned(
+                    fom = vedtaksperiode.fom,
+                    tom = minOf(this.tom, vedtaksperiode.tom),
+                    målgruppe = vedtaksperiode.målgruppe,
+                    aktivitet = vedtaksperiode.aktivitet,
+                )
+            this.medVedtaksperiode(overlappendeVedtaksperiode)
+        }
     }
+
+    private fun VedtaksperiodeBeregning.lagUtbetalingPerioderEtterForrigeUtbetalingperiode(forrigeUtbetalingsperiode: LøpendeMåned) =
+        this
+            .delEtterUtbetalingsperiode(forrigeUtbetalingsperiode)
+            .delTilUtbetalingPerioder()
 
     /**
      * Splitter vedtaksperiode som løper etter forrige utbetalingsperiode til nye vedtaksperioder
