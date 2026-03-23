@@ -23,8 +23,27 @@ class Tidslinje<P>(
      * - Perioder: 01.01–31.01 og 01.03–31.03, grensedato: 01.02
      * - Resultat: [01.01–31.01, 01.03–31.03]
      */
-    fun splittVedDatoer(splittdatoer: List<LocalDate>): Tidslinje<P> =
-        splittdatoer.fold(this) { acc, dato -> acc.splitVedDato(dato) }
+    fun splittVedDatoer(splittdatoer: List<LocalDate>): Tidslinje<P> = splittdatoer.fold(this) { acc, dato -> acc.splitVedDato(dato) }
+
+    /**
+     * Splitter periodene ved oppgitte grensedatoer og grupperer dem i segmenter,
+     * der hvert nytt segment starter ved en grensedato.
+     *
+     * Eksempel – én grensedato:
+     * - Perioder: 01.01–30.06, grensedato: 01.03
+     * - Resultat: [[01.01–28.02], [01.03–30.06]]
+     */
+    fun grupperVedDatoer(datoer: List<LocalDate>): List<List<P>> =
+        splittVedDatoer(datoer)
+            .perioder
+            .fold(mutableListOf<MutableList<P>>()) { acc, periode ->
+                if (acc.isEmpty() || periode.fom in datoer) {
+                    acc.add(mutableListOf(periode))
+                } else {
+                    acc.last().add(periode)
+                }
+                acc
+            }
 
     fun filter(predicate: (P) -> Boolean): Tidslinje<P> = Tidslinje(perioder.filter(predicate))
 

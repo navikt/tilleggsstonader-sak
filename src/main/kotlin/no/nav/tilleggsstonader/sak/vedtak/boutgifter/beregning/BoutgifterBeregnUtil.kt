@@ -10,28 +10,21 @@ import no.nav.tilleggsstonader.sak.vedtak.splitPerLøpendeMåneder
 import kotlin.math.min
 
 object BoutgifterBeregnUtil {
-    /**
-     * Splitter vedtaksperioder i segmenter ved alle overganger mellom normale og faktiske utgifter.
-     * Hvert segment beregnes uavhengig med sin egen periodetelling, slik at faktiske utgifter
-     * ikke trenger å følge de samme 30-dagers-vinduene som de normale utgiftene.
-     *
-     * Eksempel: VP 15.09.2025–31.05.2026 med faktiske utgifter 01.03.2026–30.04.2026 gir
-     * - Segment 1: VP(15.09.2025–28.02.2026)
-     * - Segment 2: VP(01.03.2026–30.04.2026)
-     * - Segment 3: VP(01.05.2026–31.05.2026)
-     */
     fun List<VedtaksperiodeBeregning>.splittVedGrensenTilFaktiskeUtgifter(
         utgifter: BoutgifterPerUtgiftstype,
-    ): List<VedtaksperiodeBeregning> =
-        Tidslinje(this)
-            .splittVedDatoer(
-                utgifter.values
-                    .flatten()
-                    .filter { it.skalFåDekketFaktiskeUtgifter }
-                    .flatMap { listOf(it.fom, it.tom.plusDays(1)) }
-                    .distinct()
-                    .sorted(),
-            ).perioder
+    ): List<List<VedtaksperiodeBeregning>> {
+        val cutDates = utgifter.finnStartdatoForFaktiskeUtgifter()
+        if (cutDates.isEmpty()) return listOf(this)
+        return Tidslinje(this).grupperVedDatoer(cutDates)
+    }
+
+    private fun BoutgifterPerUtgiftstype.finnStartdatoForFaktiskeUtgifter() =
+        values
+            .flatten()
+            .filter { it.skalFåDekketFaktiskeUtgifter }
+            .map { it.fom }
+            .distinct()
+            .sorted()
 
     /**
      * Splitter opp vedtaksperioder på løpende måneder.
@@ -43,11 +36,10 @@ object BoutgifterBeregnUtil {
             .sorted()
             .fold(listOf()) { acc, vedtaksperiode ->
                 if (acc.isEmpty()) {
-                    val nyeUtbetalingsperioder = vedtaksperiode.delTilUtbetalingPerioder()
-                    acc + nyeUtbetalingsperioder
+                    acc + vedtaksperiode.delTilUtbetalingPerioder()
                 } else {
-                    val håndterNyUtbetalingsperiode = vedtaksperiode.håndterNyUtbetalingsperiode(acc)
-                    acc + håndterNyUtbetalingsperiode
+                    val (oppdatertForrige, nyePerioder) = vedtaksperiode.håndterNyUtbetalingsperiode(acc.last())
+                    acc.dropLast(1) + oppdatertForrige + nyePerioder
                 }
             }
 
@@ -87,34 +79,25 @@ object BoutgifterBeregnUtil {
         )
     }
 
-    /**
-     * Legger til periode som overlapper med forrige utbetalingsperiode
-     * Returnerer utbetalingsperioder som løper etter forrige utbetalingsperiode
-     */
-    private fun VedtaksperiodeBeregning.håndterNyUtbetalingsperiode(acc: List<LøpendeMåned>): List<LøpendeMåned> {
-        val forrigeUtbetalingsperiode = acc.last()
-        forrigeUtbetalingsperiode.leggTilOverlappendeDel(this)
-
-        return lagUtbetalingPerioderEtterForrigeUtbetalingperiode(forrigeUtbetalingsperiode)
+    private fun VedtaksperiodeBeregning.håndterNyUtbetalingsperiode(
+        forrigeUtbetalingsperiode: LøpendeMåned,
+    ): Pair<LøpendeMåned, List<LøpendeMåned>> {
+        val oppdatert = forrigeUtbetalingsperiode.leggTilOverlappendeDel(this)
+        val nyePerioder = this.delEtterUtbetalingsperiode(oppdatert).delTilUtbetalingPerioder()
+        return oppdatert to nyePerioder
     }
 
-    private fun LøpendeMåned.leggTilOverlappendeDel(vedtaksperiode: VedtaksperiodeBeregning) {
-        if (vedtaksperiode.fom <= this.tom) {
-            val overlappendeVedtaksperiode =
-                VedtaksperiodeInnenforLøpendeMåned(
-                    fom = vedtaksperiode.fom,
-                    tom = minOf(this.tom, vedtaksperiode.tom),
-                    målgruppe = vedtaksperiode.målgruppe,
-                    aktivitet = vedtaksperiode.aktivitet,
-                )
-            this.medVedtaksperiode(overlappendeVedtaksperiode)
-        }
+    private fun LøpendeMåned.leggTilOverlappendeDel(vedtaksperiode: VedtaksperiodeBeregning): LøpendeMåned {
+        if (vedtaksperiode.fom > this.tom) return this
+        val overlappendeVedtaksperiode =
+            VedtaksperiodeInnenforLøpendeMåned(
+                fom = vedtaksperiode.fom,
+                tom = minOf(this.tom, vedtaksperiode.tom),
+                målgruppe = vedtaksperiode.målgruppe,
+                aktivitet = vedtaksperiode.aktivitet,
+            )
+        return this.medVedtaksperiode(overlappendeVedtaksperiode)
     }
-
-    private fun VedtaksperiodeBeregning.lagUtbetalingPerioderEtterForrigeUtbetalingperiode(forrigeUtbetalingsperiode: LøpendeMåned) =
-        this
-            .delEtterUtbetalingsperiode(forrigeUtbetalingsperiode)
-            .delTilUtbetalingPerioder()
 
     /**
      * Splitter vedtaksperiode som løper etter forrige utbetalingsperiode til nye vedtaksperioder

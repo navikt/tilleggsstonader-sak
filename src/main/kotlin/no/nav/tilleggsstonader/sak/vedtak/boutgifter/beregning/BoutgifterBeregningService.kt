@@ -87,14 +87,7 @@ class BoutgifterBeregningService(
             vedtaksperioderBeregning,
         )
 
-        val res = vedtaksperioderBeregning.splittVedGrensenTilFaktiskeUtgifter(utgifter = utgifterPerVilkårtype)
-
-        val beregningsresultat =
-            beregnPeriodesegment(
-                vedtaksperioderBeregning
-                    .splittVedGrensenTilFaktiskeUtgifter(utgifter = utgifterPerVilkårtype),
-                utgifter = utgifterPerVilkårtype,
-            )
+        val beregningsresultat = beregnAktuellePerioder(vedtaksperioderBeregning, utgifterPerVilkårtype)
 
         return if (forrigeVedtak != null) {
             brukerfeilHvis(tidligsteEndring == null) {
@@ -110,13 +103,14 @@ class BoutgifterBeregningService(
         }
     }
 
-    private fun beregnPeriodesegment(
+    private fun beregnAktuellePerioder(
         vedtaksperioder: List<VedtaksperiodeBeregning>,
         utgifter: BoutgifterPerUtgiftstype,
     ): List<BeregningsresultatForLøpendeMåned> =
         vedtaksperioder
             .sorted()
-            .splittTilLøpendeMåneder()
+            .splittVedGrensenTilFaktiskeUtgifter(utgifter)
+            .flatMap { it.splittTilLøpendeMåneder() }
             .map { UtbetalingPeriode(it, skalAvkorteUtbetalingPeriode(utgifter)) }
             .validerIngenLøpendeOgMidlertidigUtgiftISammeUtbetalingsperiode(utgifter)
             .validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(utgifter)
