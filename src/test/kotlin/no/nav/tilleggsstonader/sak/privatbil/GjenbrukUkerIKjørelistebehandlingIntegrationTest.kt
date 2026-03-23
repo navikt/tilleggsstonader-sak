@@ -42,7 +42,7 @@ class GjenbrukUkerIKjørelistebehandlingIntegrationTest : CleanDatabaseIntegrati
 
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
-        val førstegangsBehandlingId =
+        val førstegangsBehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
@@ -58,7 +58,7 @@ class GjenbrukUkerIKjørelistebehandlingIntegrationTest : CleanDatabaseIntegrati
                 }
             }
 
-        førstegangsbehandling = testoppsettService.hentBehandling(førstegangsBehandlingId)
+        førstegangsbehandling = testoppsettService.hentBehandling(førstegangsBehandlingContext.behandlingId)
 
         førsteKjørelistebehandling =
             testoppsettService
