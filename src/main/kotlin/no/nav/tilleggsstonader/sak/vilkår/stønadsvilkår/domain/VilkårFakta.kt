@@ -39,7 +39,7 @@ data class FaktaDagligReisePrivatBil(
     override val reiseId: ReiseId,
     val reisedagerPerUke: Int,
     val reiseavstandEnVei: BigDecimal,
-    val bompengerEnVei: Int?,
+    val bompengerPerDag: Int?,
     val fergekostandEnVei: Int?,
     override val adresse: String?,
 ) : VilkårFakta

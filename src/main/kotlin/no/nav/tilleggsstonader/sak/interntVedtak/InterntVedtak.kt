@@ -144,7 +144,7 @@ data class VilkårFaktaPrivatBilInterntVedtak(
     override val adresse: String?,
     val reisedagerPerUke: Int,
     val reiseavstandEnVei: BigDecimal,
-    val bompengerEnVei: Int?,
+    val bompengerPerDag: Int?,
     val fergekostandEnVei: Int?,
 ) : VilkårFaktaInterntVedtak {
     override val type = TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL

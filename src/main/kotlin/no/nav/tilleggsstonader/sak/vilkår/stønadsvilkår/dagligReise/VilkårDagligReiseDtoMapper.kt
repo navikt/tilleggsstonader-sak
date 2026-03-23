@@ -46,7 +46,7 @@ object VilkårDagligReiseDtoMapper {
         FaktaDagligReisePrivatBilDto(
             reisedagerPerUke = reisedagerPerUke,
             reiseavstandEnVei = reiseavstandEnVei,
-            bompengerEnVei = bompengerEnVei,
+            bompengerPerDag = bompengerPerDag,
             fergekostandEnVei = fergekostandEnVei,
         )
 }

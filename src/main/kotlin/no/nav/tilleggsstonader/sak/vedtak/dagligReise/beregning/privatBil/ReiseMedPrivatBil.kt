@@ -16,7 +16,7 @@ data class ReiseMedPrivatBil(
     val aktivitetsadresse: String?,
     val reisedagerPerUke: Int,
     val reiseavstandEnVei: BigDecimal,
-    val bompengerEnVei: Int?,
+    val bompengerPerDag: Int?,
     val fergekostandEnVei: Int?,
 ) : Periode<LocalDate>,
     KopierPeriode<ReiseMedPrivatBil> {
@@ -37,7 +37,7 @@ fun VilkårDagligReise.tilReiseMedPrivatBil(): ReiseMedPrivatBil {
         reiseId = this.fakta.reiseId,
         reisedagerPerUke = this.fakta.reisedagerPerUke,
         reiseavstandEnVei = this.fakta.reiseavstandEnVei,
-        bompengerEnVei = this.fakta.bompengerEnVei,
+        bompengerPerDag = this.fakta.bompengerPerDag,
         fergekostandEnVei = this.fakta.fergekostandEnVei,
         aktivitetsadresse = this.fakta.adresse,
     )

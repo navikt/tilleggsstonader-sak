@@ -727,8 +727,8 @@ object InterntVedtakTestdata {
                                     reisedagerPerUke = 3,
                                     ekstrakostnader =
                                         Ekstrakostnader(
-                                            bompengerEnVei = 40,
-                                            fergekostnadEnVei = 50,
+                                            bompengerPerDag = 40,
+                                            fergekostnadPerDag = 50,
                                         ),
                                     reiseavstandEnVei = BigDecimal.valueOf(40.0),
                                     satser =
@@ -754,8 +754,8 @@ object InterntVedtakTestdata {
                                     reisedagerPerUke = 3,
                                     ekstrakostnader =
                                         Ekstrakostnader(
-                                            bompengerEnVei = 40,
-                                            fergekostnadEnVei = 50,
+                                            bompengerPerDag = 40,
+                                            fergekostnadPerDag = 50,
                                         ),
                                     reiseavstandEnVei = BigDecimal.valueOf(60.0),
                                     satser =
@@ -1012,7 +1012,7 @@ object InterntVedtakTestdata {
                             adresse = "Tiltaksgata 1",
                             reisedagerPerUke = 3,
                             reiseavstandEnVei = BigDecimal(40.5),
-                            bompengerEnVei = 20,
+                            bompengerPerDag = 20,
                             fergekostandEnVei = 30,
                         ),
                 ),

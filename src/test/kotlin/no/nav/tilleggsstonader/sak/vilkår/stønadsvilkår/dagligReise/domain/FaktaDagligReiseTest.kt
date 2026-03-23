@@ -147,7 +147,7 @@ class FaktaDagligReiseTest {
                         adresse = "Tiltaksveien 1",
                         reisedagerPerUke = 4,
                         reiseavstandEnVei = BigDecimal(10),
-                        bompengerEnVei = -10,
+                        bompengerPerDag = -10,
                         fergekostandEnVei = 0,
                     )
                 }
@@ -163,7 +163,7 @@ class FaktaDagligReiseTest {
                         adresse = "Tiltaksveien 1",
                         reisedagerPerUke = 4,
                         reiseavstandEnVei = BigDecimal("-10"),
-                        bompengerEnVei = 0,
+                        bompengerPerDag = 0,
                         fergekostandEnVei = 0,
                     )
                 }
@@ -179,7 +179,7 @@ class FaktaDagligReiseTest {
                         adresse = "Tiltaksveien 1",
                         reisedagerPerUke = -4,
                         reiseavstandEnVei = BigDecimal(10),
-                        bompengerEnVei = 0,
+                        bompengerPerDag = 0,
                         fergekostandEnVei = 0,
                     )
                 }
@@ -195,7 +195,7 @@ class FaktaDagligReiseTest {
                         adresse = "Tiltaksveien 1",
                         reisedagerPerUke = 8,
                         reiseavstandEnVei = BigDecimal(10),
-                        bompengerEnVei = 0,
+                        bompengerPerDag = 0,
                         fergekostandEnVei = 0,
                     )
                 }

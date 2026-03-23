@@ -556,14 +556,14 @@ fun faktaPrivatBil(
     adresse: String = "Tiltaksveien 1",
     reisedagerPerUke: Int = 5,
     reiseavstandEnVei: BigDecimal = 10.toBigDecimal(),
-    bompengerEnVei: Int? = null,
+    bompengerPerDag: Int? = null,
     fergekostandEnVei: Int? = null,
 ) = FaktaPrivatBil(
     reiseId = reiseId,
     adresse = adresse,
     reisedagerPerUke = reisedagerPerUke,
     reiseavstandEnVei = reiseavstandEnVei,
-    bompengerEnVei = bompengerEnVei,
+    bompengerPerDag = bompengerPerDag,
     fergekostandEnVei = fergekostandEnVei,
 )
 
@@ -642,7 +642,7 @@ fun lagreDagligReisePrivatBilDto(
     reiseId: ReiseId = dummyReiseId,
     reisedagerPerUke: Int = 5,
     reiseavstandEnVei: Int = 10,
-    bompengerEnVei: Int? = null,
+    bompengerPerDag: Int? = null,
     fergekostandEnVei: Int? = null,
     svar: Map<RegelId, SvarOgBegrunnelseDto> =
         mapOf(
@@ -653,7 +653,7 @@ fun lagreDagligReisePrivatBilDto(
     fakta: FaktaDagligReiseDto =
         FaktaDagligReisePrivatBilDto(
             reiseavstandEnVei = reiseavstandEnVei.toBigDecimal(),
-            bompengerEnVei = bompengerEnVei,
+            bompengerPerDag = bompengerPerDag,
             fergekostandEnVei = fergekostandEnVei,
             reisedagerPerUke = reisedagerPerUke,
         ),
