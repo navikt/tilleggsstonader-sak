@@ -32,6 +32,8 @@ class GjenbrukDataRevurderingServiceTest {
             barnService = mockk(),
             vilkårperiodeService = mockk(),
             vilkårService = mockk(),
+            avklartKjørelisteService = mockk(),
+            dagligReiseVedtakService = mockk(),
         )
 
     val fagsakId = FagsakId.random()

@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
+import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
@@ -22,6 +23,7 @@ import java.util.UUID
 class AvklartKjørelisteService(
     private val vedtakService: VedtakService,
     private val avklartKjørtUkeRepository: AvklartKjørtUkeRepository,
+    private val kjørelisteService: KjørelisteService,
 ) {
     fun hentAvklarteUkerForBehandling(behandlingId: BehandlingId): List<AvklartKjørtUke> =
         avklartKjørtUkeRepository.findByBehandlingId(behandlingId)
@@ -216,6 +218,33 @@ class AvklartKjørelisteService(
     ) {
         feilHvis(oppdaterteDager.any { it.dato.tilUkeIÅr() != fomUke.tilUkeIÅr() }) {
             "Alle dager må være innenfor uken som skal oppdateres"
+        }
+    }
+
+    fun nullstillOgGjenbrukAvklarteUker(
+        behandling: Behandling,
+        behandlingIdForGjenbruk: BehandlingId,
+    ) {
+        val avklarteUkerForrigeBehandling = hentAvklarteUkerForBehandling(behandlingIdForGjenbruk)
+        val avklarteUkerNyBehandling = hentAvklarteUkerForBehandling(behandling.id)
+
+        val kjørelisterSomFinneIForrigeBehandling = avklarteUkerForrigeBehandling.map { it.kjørelisteId }.toSet()
+        val kjørelisterSomFinneINyMenIkkeGammelBehandling =
+            avklarteUkerNyBehandling
+                .map { it.kjørelisteId }
+                .filterNot { kjørelisterSomFinneIForrigeBehandling.contains(it) }
+                .map { kjørelisteService.hentKjøreliste(it) }
+
+        // Sletter evt eksisterende avklarte uker på ny behandling
+        avklartKjørtUkeRepository.deleteAll(avklarteUkerNyBehandling)
+
+        // Kopier over avklarte uker fra forrige behandling
+        val nyeAvklarteUker = avklarteUkerForrigeBehandling.map { it.kopierTilNyBehandling(behandling.id) }
+        avklartKjørtUkeRepository.insertAll(nyeAvklarteUker)
+
+        // Avklar nye kjørelister på nytt
+        kjørelisterSomFinneINyMenIkkeGammelBehandling.forEach {
+            avklarUkerFraKjøreliste(behandling, it)
         }
     }
 }

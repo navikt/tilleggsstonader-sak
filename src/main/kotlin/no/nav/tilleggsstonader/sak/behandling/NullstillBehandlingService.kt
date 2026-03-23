@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagerBrevRepository
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.VedtaksbrevRepository
@@ -42,7 +43,11 @@ class NullstillBehandlingService(
         }
         logger.info("Nullstiller behandling=${behandling.id}")
 
-        behandlingService.oppdaterStegPåBehandling(behandling.id, StegType.INNGANGSVILKÅR)
+        if (behandling.type == BehandlingType.KJØRELISTE) {
+            behandlingService.oppdaterStegPåBehandling(behandling.id, StegType.KJØRELISTE)
+        } else {
+            behandlingService.oppdaterStegPåBehandling(behandling.id, StegType.INNGANGSVILKÅR)
+        }
 
         slettDataIBehandling(behandling.id)
 

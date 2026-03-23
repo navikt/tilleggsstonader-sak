@@ -12,7 +12,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseVedtakService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -21,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional
 class BehandleMottattKjørelisteService(
     private val opprettBehandlingService: OpprettBehandlingService,
     private val gjenbrukDataRevurderingService: GjenbrukDataRevurderingService,
-    private val dagligReiseVedtakService: DagligReiseVedtakService,
     private val avklartKjørelisteService: AvklartKjørelisteService,
     private val taskService: TaskService,
 ) {
@@ -68,7 +66,6 @@ class BehandleMottattKjørelisteService(
         val behandlingIdForGjenbruk = gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling.fagsakId)
         behandlingIdForGjenbruk?.let {
             gjenbrukDataRevurderingService.gjenbrukData(behandling, it)
-            dagligReiseVedtakService.gjenbrukVedtak(forrigeIverksatteBehandlingId = it, nyBehandlingId = behandling.id)
         }
     }
 }
