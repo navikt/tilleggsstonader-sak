@@ -1,12 +1,10 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -40,7 +38,6 @@ class BoutgifterBeregningService(
     private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
     private val vedtakRepository: VedtakRepository,
     private val satsBoutgifterService: SatsBoutgifterService,
-    private val unleashService: UnleashService,
 ) {
     /**
      * Kjente begrensninger i beregningen (programmet kaster feil dersom antagelsene ikke stemmer):
@@ -71,12 +68,8 @@ class BoutgifterBeregningService(
                 .hentUtgifterTilBeregning(behandling.id)
                 .filtrerBortUtgifterSomIkkeOverlapperVedtaksperioder(vedtaksperioderBeregning)
 
-        val tillatLøpendeOgMidlertidigUtgiftSammeBehandling =
-            unleashService.isEnabled(Toggle.TILLAT_LØPENDE_OG_MIDLERTIDIG_UTGIFT_SAMME_BEHANDLING)
-
         validerUtgifter(
             utgifter = utgifterPerVilkårtype,
-            tillatLøpendeOgMidlertidigUtgiftSammeBehandling = tillatLøpendeOgMidlertidigUtgiftSammeBehandling,
             vedtakstype = typeVedtak,
             vedtaksperioder = vedtaksperioder,
         )

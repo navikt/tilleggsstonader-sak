@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.april
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
@@ -40,7 +39,6 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
     val boutgifterUtgiftService = mockk<BoutgifterUtgiftService>()
     val vedtakRepository = mockk<VedtakRepository>()
     val vilkårperiodeService = mockk<VilkårperiodeService>()
-    val unleashService = mockk<UnleashService>(relaxed = true)
 
     val vedtaksperiodeValideringService =
         VedtaksperiodeValideringService(
@@ -57,7 +55,6 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
             boutgifterUtgiftService = boutgifterUtgiftService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
             vedtakRepository = vedtakRepository,
-            unleashService = unleashService,
             satsBoutgifterService = satsBoutgifterService,
         )
 
