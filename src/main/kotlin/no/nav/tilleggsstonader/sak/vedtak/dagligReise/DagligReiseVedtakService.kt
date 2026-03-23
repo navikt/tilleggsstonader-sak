@@ -125,7 +125,7 @@ class DagligReiseVedtakService(
         forrigeIverksatteBehandlingId: BehandlingId,
         nyBehandlingId: BehandlingId,
     ) {
-        val eksisterendeVedtak = `hentInnvilgelseEllerOpphørVedtak`(forrigeIverksatteBehandlingId)
+        val eksisterendeVedtak = hentInnvilgelseEllerOpphørVedtak(forrigeIverksatteBehandlingId)
         // TODO: Når skal vi sette tidligste endring?
         vedtakRepository.insert(
             eksisterendeVedtak.copy(
