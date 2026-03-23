@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.beregnStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.lagBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.splittTilLøpendeMåneder
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.splittVedGrensenTilFaktiskeUtgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningServiceFeilmeldingUtil.lagDetFinnesUtgifterSomKrysserUtbetlingsperioderFeilmelding
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.MarkerSomDelAvTidligereUtbetlingUtils.markerSomDelAvTidligereUtbetaling
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgifterValideringUtil.validerUtgifter
@@ -44,7 +45,8 @@ class BoutgifterBeregningService(
     /**
      * Kjente begrensninger i beregningen (programmet kaster feil dersom antagelsene ikke stemmer):
      * - Vi antar at det er overlapp mellom utgift og vedtaksperiode
-     * - Utgiftene krysser ikke overgangen fra én løpende måned til en annen
+     * - Utgiftene krysser ikke overgangen fra én løpende måned til en annen (med mindre normale utgifter blir etterfulgt av faktiske
+     *      utgifter, for da trenger vi ikke forholde oss til makssatsen)
      * - Det finnes bare én type målgruppe og aktivitet innenfor hver løpende måned
      */
     fun beregn(
@@ -85,11 +87,7 @@ class BoutgifterBeregningService(
             vedtaksperioderBeregning,
         )
 
-        val beregningsresultat =
-            beregnAktuellePerioder(
-                vedtaksperioder = vedtaksperioderBeregning,
-                utgifter = utgifterPerVilkårtype,
-            )
+        val beregningsresultat = beregnAktuellePerioder(vedtaksperioderBeregning, utgifterPerVilkårtype)
 
         return if (forrigeVedtak != null) {
             brukerfeilHvis(tidligsteEndring == null) {
@@ -111,11 +109,12 @@ class BoutgifterBeregningService(
     ): List<BeregningsresultatForLøpendeMåned> =
         vedtaksperioder
             .sorted()
-            .splittTilLøpendeMåneder()
+            .splittVedGrensenTilFaktiskeUtgifter(utgifter)
+            .flatMap { it.perioder.splittTilLøpendeMåneder() }
             .map { UtbetalingPeriode(it, skalAvkorteUtbetalingPeriode(utgifter)) }
+            .validerIngenLøpendeOgMidlertidigUtgiftISammeUtbetalingsperiode(utgifter)
             .validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(utgifter)
             .validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(utgifter)
-            .validerIngenLøpendeOgMidlertidigUtgiftISammeUtbetalingsperiode(utgifter)
             .map { lagBeregningsgrunnlag(periode = it, utgifter = utgifter, makssats = satsBoutgifterService.finnMakssats(it.fom)) }
             .validerIkkeUlikeKombinasjonerAvSvarPåFaktiskeUtgifter()
             .map {

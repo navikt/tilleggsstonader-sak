@@ -3,6 +3,11 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
+import no.nav.tilleggsstonader.libs.utils.dato.april
+import no.nav.tilleggsstonader.libs.utils.dato.februar
+import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.mai
+import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
@@ -22,7 +27,10 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgifts
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -228,5 +236,83 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
 
         assertThat(res.size).isEqualTo(4)
         assertThat(res).isEqualTo(forventet)
+    }
+
+    @Test
+    fun `faktiske utgifter midt i perioden - splitter ved begge grenser slik at normale utgifter etter faktiske får ny periodetelling`() {
+        val vilkårperioder =
+            Vilkårperioder(
+                målgrupper =
+                    listOf(
+                        målgruppe(
+                            fom = 15 februar 2026,
+                            tom = 31 mai 2026,
+                        ),
+                    ),
+                aktiviteter =
+                    listOf(
+                        aktivitet(
+                            fom = 1 januar 2026,
+                            tom = 31 mai 2026,
+                        ),
+                    ),
+            )
+        every { vilkårperiodeService.hentVilkårperioder(any()) } returns vilkårperioder
+
+        val utgifter =
+            mapOf(
+                TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
+                    listOf(
+                        lagUtgiftBeregningBoutgifter(
+                            fom = 1 februar 2026,
+                            tom = 28 februar 2026,
+                            utgift = 600,
+                        ),
+                        lagUtgiftBeregningBoutgifter(
+                            fom = 1 mars 2026,
+                            tom = 31 mars 2026,
+                            utgift = 11500,
+                            skalFåDekketFaktiskeUtgifter = true,
+                        ),
+                        lagUtgiftBeregningBoutgifter(
+                            fom = 1 april 2026,
+                            tom = 30 april 2026,
+                            utgift = 600,
+                        ),
+                    ),
+            )
+        every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgifter
+
+        val perioder =
+            boutgifterBeregningService
+                .beregn(
+                    behandling = saksbehandling(),
+                    vedtaksperioder =
+                        listOf(
+                            vedtaksperiode(
+                                fom = 15 februar 2026,
+                                tom = 30 april 2026,
+                            ),
+                        ),
+                    typeVedtak = TypeVedtak.INNVILGELSE,
+                    tidligsteEndring = null,
+                ).perioder
+
+        assertThat(perioder).hasSize(3)
+
+        // Normale utgifter
+        assertThat(perioder[0].fom).isEqualTo(15 februar 2026)
+        assertThat(perioder[0].tom).isEqualTo(28 februar 2026) // Blir kuttet pga faktiske utgifter i neste periode
+        assertThat(perioder[0].stønadsbeløp).isEqualTo(600)
+
+        // Faktiske utgifter
+        assertThat(perioder[1].fom).isEqualTo(1 mars 2026)
+        assertThat(perioder[1].tom).isEqualTo(31 mars 2026)
+        assertThat(perioder[1].stønadsbeløp).isEqualTo(11500)
+
+        // Normale utgifter (ny periodetelling etter faktiske)
+        assertThat(perioder[2].fom).isEqualTo(1 april 2026)
+        assertThat(perioder[2].tom).isEqualTo(30 april 2026)
+        assertThat(perioder[2].stønadsbeløp).isEqualTo(600)
     }
 }
