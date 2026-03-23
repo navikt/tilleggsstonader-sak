@@ -59,7 +59,7 @@ class DagligReiseBeregningValideringIntegrationTest : CleanDatabaseIntegrationTe
         kall.vedtak.apiRespons
             .lagreEnhetsspesifiktVedtak(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-                behandlingId = behandlingId,
+                behandlingId = behandlingId.behandlingId,
                 "beregn",
                 vedtakDto = vedtakRequest,
                 enhet = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD,
