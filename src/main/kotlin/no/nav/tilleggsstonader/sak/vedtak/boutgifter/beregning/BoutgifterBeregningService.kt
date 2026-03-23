@@ -110,7 +110,7 @@ class BoutgifterBeregningService(
         vedtaksperioder
             .sorted()
             .splittVedGrensenTilFaktiskeUtgifter(utgifter)
-            .flatMap { it.splittTilLøpendeMåneder() }
+            .flatMap { it.perioder.splittTilLøpendeMåneder() }
             .map { UtbetalingPeriode(it, skalAvkorteUtbetalingPeriode(utgifter)) }
             .validerIngenLøpendeOgMidlertidigUtgiftISammeUtbetalingsperiode(utgifter)
             .validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(utgifter)

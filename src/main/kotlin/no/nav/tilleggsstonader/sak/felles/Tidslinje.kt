@@ -5,8 +5,12 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import java.time.LocalDate
 
 class Tidslinje<P>(
-    val perioder: List<P>,
-) where P : Periode<LocalDate>, P : KopierPeriode<P> {
+    perioder: List<P>,
+) : Iterable<P> where P : Periode<LocalDate>, P : KopierPeriode<P> {
+    val perioder: List<P> = perioder.sorted()
+
+    override fun iterator(): Iterator<P> = perioder.iterator()
+
     /**
      * Splitter periodene i tidslinja ved oppgitte grensedatoer.
      * Perioder som strekker seg over en grensedato deles i to.
@@ -33,7 +37,7 @@ class Tidslinje<P>(
      * - Perioder: 01.01–30.06, grensedato: 01.03
      * - Resultat: [[01.01–28.02], [01.03–30.06]]
      */
-    fun grupperVedDatoer(datoer: List<LocalDate>): List<List<P>> =
+    fun partisjonerVedDatoer(datoer: List<LocalDate>): List<Tidslinje<P>> =
         splittVedDatoer(datoer)
             .perioder
             .fold(mutableListOf<MutableList<P>>()) { acc, periode ->
@@ -43,7 +47,7 @@ class Tidslinje<P>(
                     acc.last().add(periode)
                 }
                 acc
-            }
+            }.map { Tidslinje(it) }
 
     fun filter(predicate: (P) -> Boolean): Tidslinje<P> = Tidslinje(perioder.filter(predicate))
 

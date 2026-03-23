@@ -12,10 +12,10 @@ import kotlin.math.min
 object BoutgifterBeregnUtil {
     fun List<VedtaksperiodeBeregning>.splittVedGrensenTilFaktiskeUtgifter(
         utgifter: BoutgifterPerUtgiftstype,
-    ): List<List<VedtaksperiodeBeregning>> {
+    ): List<Tidslinje<VedtaksperiodeBeregning>> {
         val kuttdatoer = utgifter.finnStartdatoForFaktiskeUtgifter()
-        if (kuttdatoer.isEmpty()) return listOf(this)
-        return Tidslinje(this).grupperVedDatoer(kuttdatoer)
+        if (kuttdatoer.isEmpty()) return listOf(Tidslinje(this))
+        return Tidslinje(this).partisjonerVedDatoer(kuttdatoer)
     }
 
     private fun BoutgifterPerUtgiftstype.finnStartdatoForFaktiskeUtgifter() =

@@ -77,7 +77,7 @@ class BoutgifterBeregnUtilTest {
             val segmenter = vedtaksperioder.splittVedGrensenTilFaktiskeUtgifter(utgifter)
 
             assertThat(segmenter).hasSize(1)
-            assertThat(segmenter.first()).isEqualTo(vedtaksperioder)
+            assertThat(segmenter.first().perioder).isEqualTo(vedtaksperioder)
         }
 
         @Test
@@ -104,8 +104,8 @@ class BoutgifterBeregnUtilTest {
             val segmenter = vedtaksperioder.splittVedGrensenTilFaktiskeUtgifter(utgifter)
 
             assertThat(segmenter).hasSize(2)
-            val seg0: List<VedtaksperiodeBeregning> = segmenter.first()
-            val seg1: List<VedtaksperiodeBeregning> = segmenter.last()
+            val seg0 = segmenter.first()
+            val seg1 = segmenter.last()
             assertThat(seg0).hasSize(1)
             assertThat(seg0.first().fom).isEqualTo(LocalDate.of(2025, 9, 15))
             assertThat(seg0.first().tom).isEqualTo(LocalDate.of(2026, 2, 28))
@@ -173,9 +173,9 @@ class BoutgifterBeregnUtilTest {
             val segmenter = vedtaksperioder.splittVedGrensenTilFaktiskeUtgifter(utgifter)
 
             assertThat(segmenter).hasSize(3)
-            val seg0: List<VedtaksperiodeBeregning> = segmenter[0]
-            val seg1: List<VedtaksperiodeBeregning> = segmenter[1]
-            val seg2: List<VedtaksperiodeBeregning> = segmenter[2]
+            val seg0 = segmenter[0]
+            val seg1 = segmenter[1]
+            val seg2 = segmenter[2]
             assertThat(seg0.first().fom).isEqualTo(LocalDate.of(2025, 1, 15))
             assertThat(seg0.first().tom).isEqualTo(LocalDate.of(2025, 2, 28))
             assertThat(seg1.first().fom).isEqualTo(LocalDate.of(2025, 3, 1))
@@ -206,7 +206,7 @@ class BoutgifterBeregnUtilTest {
                 )
 
             val segmenter = vedtaksperioder.splittVedGrensenTilFaktiskeUtgifter(utgifter)
-            val perioder = segmenter.flatMap { segment -> segment.splittTilLøpendeMåneder() }
+            val perioder = segmenter.flatMap { segment -> segment.perioder.splittTilLøpendeMåneder() }
 
             assertThat(perioder).hasSize(10)
 
