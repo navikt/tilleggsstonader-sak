@@ -64,8 +64,8 @@ class BehandleMottattKjørelisteTest : CleanDatabaseIntegrationTest() {
         assertThat(kjørelistebehandling.type).isEqualTo(BehandlingType.KJØRELISTE)
         assertThat(kjørelistebehandling.årsak).isEqualTo(BehandlingÅrsak.KJØRELISTE)
 
-        val vedtakForrigeBehandling = vedtakService.hentVedtak(behandlingContext.behandlingId)
-        val vedtakKjørelistebehandling = vedtakService.hentVedtak(kjørelistebehandling.id)
+        val vedtakForrigeBehandling = vedtakService.hentInnvilgelseEllerOpphørVedtak(behandlingContext.behandlingId)
+        val vedtakKjørelistebehandling = vedtakService.hentInnvilgelseEllerOpphørVedtak(kjørelistebehandling.id)
 
         assertThat(vedtakKjørelistebehandling.type).isEqualTo(vedtakForrigeBehandling.type)
         assertThat(vedtakKjørelistebehandling.data).isEqualTo(vedtakForrigeBehandling.data)

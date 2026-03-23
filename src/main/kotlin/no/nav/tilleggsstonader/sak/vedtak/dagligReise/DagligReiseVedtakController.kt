@@ -1,12 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -15,7 +12,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatDagligReiseDto
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsoRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsrRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
@@ -41,12 +38,10 @@ class DagligReiseVedtakController(
     private val tilgangService: TilgangService,
     private val stegService: StegService,
     private val beregnYtelseSteg: DagligReiseBeregnYtelseSteg,
-    private val vedtakSteg: DagligReiseVedtakSteg,
     private val vedtakService: VedtakService,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
-    private val unleashService: UnleashService,
     private val dagligReiseVilkårService: DagligReiseVilkårService,
 ) {
     @PostMapping("{behandlingId}/tso/innvilgelse")
@@ -104,18 +99,18 @@ class DagligReiseVedtakController(
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseDagligReiseTsoRequest,
-    ): BeregningsresultatDagligReiseDto = beregnVedtak(behandlingId, vedtak.vedtaksperioder())
+    ): BeregningDagligReiseDto = beregnVedtak(behandlingId, vedtak.vedtaksperioder())
 
     @PostMapping("{behandlingId}/tsr/beregn")
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseDagligReiseTsrRequest,
-    ): BeregningsresultatDagligReiseDto = beregnVedtak(behandlingId, vedtak.vedtaksperioder())
+    ): BeregningDagligReiseDto = beregnVedtak(behandlingId, vedtak.vedtaksperioder())
 
     private fun beregnVedtak(
         behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
-    ): BeregningsresultatDagligReiseDto {
+    ): BeregningDagligReiseDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val tidligsteEndring =
@@ -130,7 +125,7 @@ class DagligReiseVedtakController(
                     behandling = behandling,
                     typeVedtak = TypeVedtak.INNVILGELSE,
                     tidligsteEndring = tidligsteEndring,
-                ).beregningsresultatDagligReise
+                )
 
         val vilkår = dagligReiseVilkårService.hentVilkårForBehandling(behandlingId)
         return beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring, vilkår)
@@ -143,14 +138,6 @@ class DagligReiseVedtakController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
 
-        val steg = finnRiktigSteg()
-        stegService.håndterSteg(behandlingId, steg, vedtak)
-    }
-
-    private fun finnRiktigSteg(): BehandlingSteg<VedtakDagligReiseRequest> {
-        if (unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)) {
-            return vedtakSteg
-        }
-        return beregnYtelseSteg
+        stegService.håndterSteg(behandlingId, beregnYtelseSteg, vedtak)
     }
 }

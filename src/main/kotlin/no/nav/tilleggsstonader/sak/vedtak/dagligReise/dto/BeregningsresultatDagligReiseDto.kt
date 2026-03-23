@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.BeregningDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
@@ -15,6 +16,11 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Vi
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import java.math.BigDecimal
 import java.time.LocalDate
+
+data class BeregningDagligReiseDto(
+    val beregningsresultat: BeregningsresultatDagligReiseDto,
+    val rammevedtakPrivatBil: RammevedtakPrivatBilDto?,
+)
 
 data class BeregningsresultatDagligReiseDto(
     val offentligTransport: BeregningsresultatOffentligTransportDto?,
@@ -75,6 +81,15 @@ data class BeregningsresultatForReisePrivatBilDagDto(
     val parkeringskostnad: Int,
     val stønadsbeløpForDag: BigDecimal,
 )
+
+fun BeregningDagligReise.tilDto(
+    tidligsteEndring: LocalDate?,
+    vilkår: List<VilkårDagligReise>,
+): BeregningDagligReiseDto =
+    BeregningDagligReiseDto(
+        beregningsresultat = beregningsresultatDagligReise.tilDto(tidligsteEndring, vilkår),
+        rammevedtakPrivatBil = rammevedtakPrivatBil?.tilDto(),
+    )
 
 fun BeregningsresultatDagligReise.tilDto(
     tidligsteEndring: LocalDate?,
