@@ -122,13 +122,13 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
     fun `skal lagre og hente fakta med to perioder for privat bil`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
-        val behandlingId =
+        val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
                 defaultDagligReisePrivatBilTsoTestdata(fom, tom)
             }
-        val saksbehandling = testoppsettService.hentSaksbehandling(behandlingId)
+        val saksbehandling = testoppsettService.hentSaksbehandling(behandlingContext.behandlingId)
         val vilkårListe = kall.vilkårDagligReise.hentVilkår(saksbehandling.id)
         val vilkårPrivatBil = vilkårListe.single { it.fakta.type == TypeDagligReise.PRIVAT_BIL }
 
