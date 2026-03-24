@@ -72,7 +72,7 @@ class OpprettStønadsvilkårDsl {
         tom: LocalDate,
         reiseavstandEnVei: BigDecimal = BigDecimal(10),
         reisedagerPerUke: Int = 5,
-        bompengerEnVei: Int? = 80,
+        bompengerEnVei: Int? = null,
         fergekostandEnVei: Int? = null,
     ) {
         dtoer += { _, _ ->
