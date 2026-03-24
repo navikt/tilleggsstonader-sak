@@ -6,7 +6,9 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.finnesUkerMedAvvik
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningsresultatService
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
@@ -21,6 +23,13 @@ class KjørelisteSteg(
     private val dagligReiseVedtakService: DagligReiseVedtakService,
     private val avklartKjørelisteService: AvklartKjørelisteService,
 ) : BehandlingSteg<Void?> {
+    override fun validerSteg(saksbehandling: Saksbehandling) {
+        val avklarteUker = avklartKjørelisteService.hentAvklarteUkerForBehandling(saksbehandling.id)
+        brukerfeilHvis(avklarteUker.finnesUkerMedAvvik()) {
+            "Kan ikke gå videre til neste steg da det finnes uker med avvik"
+        }
+    }
+
     override fun utførSteg(
         saksbehandling: Saksbehandling,
         data: Void?,
