@@ -16,8 +16,8 @@ data class RammeForReiseMedPrivatBilDto(
     val tom: LocalDate,
     val reisedagerPerUke: Int,
     val reiseavstandEnVei: BigDecimal,
-    val bompengerEnVei: Int?,
-    val fergekostnadEnVei: Int?,
+    val bompengerPerDag: Int?,
+    val fergekostnadPerDag: Int?,
     val aktivitetsadresse: String?,
     val kilometersats: BigDecimal,
     val dagsatsUtenParkering: BigDecimal,
@@ -37,10 +37,10 @@ fun RammeForReiseMedPrivatBil.tilDto(): List<RammeForReiseMedPrivatBilDto> =
             tom = it.tom,
             reisedagerPerUke = grunnlag.reisedagerPerUke,
             reiseavstandEnVei = grunnlag.reiseavstandEnVei,
-            bompengerEnVei = grunnlag.ekstrakostnader.bompengerEnVei,
+            bompengerPerDag = grunnlag.ekstrakostnader.bompengerPerDag,
             kilometersats = it.kilometersats,
             dagsatsUtenParkering = it.dagsatsUtenParkering,
-            fergekostnadEnVei = grunnlag.ekstrakostnader.fergekostnadEnVei,
+            fergekostnadPerDag = grunnlag.ekstrakostnader.fergekostnadPerDag,
             aktivitetsadresse = this.aktivitetsadresse,
         )
     }

@@ -124,8 +124,8 @@ fun mapFaktaPrivatBil(rad: Map<String, String>): FaktaPrivatBil =
                     fom = parseDato(DomenenøkkelFelles.FOM, rad),
                     tom = parseDato(DomenenøkkelFelles.TOM, rad),
                     reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, rad),
-                    bompengerEnVei = parseValgfriInt(DomenenøkkelPrivatBil.BOMPENGER, rad),
-                    fergekostandEnVei = parseValgfriInt(DomenenøkkelPrivatBil.FERGEKOSTNAD, rad),
+                    bompengerPerDag = parseValgfriInt(DomenenøkkelPrivatBil.BOMPENGER, rad),
+                    fergekostnadPerDag = parseValgfriInt(DomenenøkkelPrivatBil.FERGEKOSTNAD, rad),
                 ),
             ),
     )

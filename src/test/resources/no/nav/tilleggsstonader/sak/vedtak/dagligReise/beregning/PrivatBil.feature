@@ -39,7 +39,7 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
 
     Og vi forventer følgende satser for rammevedtak
       | Reisenr | Fom        | Tom        | Dagsats uten parkering | Kilometersats | Sats bekreftet |
-      | 1       | 06.01.2025 | 12.01.2025 | 457.60                 | 2.88          | Ja           |
+      | 1       | 06.01.2025 | 12.01.2025 | 257.60                 | 2.88          | Ja           |
 
   Scenario: skal ikke få høyere sum dersom ekstrakostnader er 0
     Gitt følgende vedtaksperioder for daglig reise privat bil

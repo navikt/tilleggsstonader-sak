@@ -141,7 +141,7 @@ class InnvilgePrivatBilIntegrationTest : IntegrationTest() {
         assertThat(fakta.faktaDelperioder[0].fom).isEqualTo(fom)
         assertThat(fakta.faktaDelperioder[0].tom).isEqualTo(tom)
         assertThat(fakta.faktaDelperioder[0].reisedagerPerUke).isEqualTo(5)
-        assertThat(fakta.faktaDelperioder[0].bompengerEnVei).isNull()
-        assertThat(fakta.faktaDelperioder[0].fergekostandEnVei).isNull()
+        assertThat(fakta.faktaDelperioder[0].bompengerPerDag).isNull()
+        assertThat(fakta.faktaDelperioder[0].fergekostnadPerDag).isNull()
     }
 }

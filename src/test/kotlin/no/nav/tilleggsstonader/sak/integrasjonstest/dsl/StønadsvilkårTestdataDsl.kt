@@ -72,8 +72,8 @@ class OpprettStønadsvilkårDsl {
         tom: LocalDate,
         reiseavstandEnVei: BigDecimal = BigDecimal(10),
         reisedagerPerUke: Int = 5,
-        bompengerEnVei: Int? = null,
-        fergekostandEnVei: Int? = null,
+        bompengerPerDag: Int? = null,
+        fergekostnadPerDag: Int? = null,
     ) {
         dtoer += { _, _ ->
             lagreDagligReisePrivatBilDto(
@@ -87,8 +87,8 @@ class OpprettStønadsvilkårDsl {
                             fom = fom,
                             tom = tom,
                             reisedagerPerUke = reisedagerPerUke,
-                            bompengerEnVei = bompengerEnVei,
-                            fergekostandEnVei = fergekostandEnVei,
+                            bompengerPerDag = bompengerPerDag,
+                            fergekostnadPerDag = fergekostnadPerDag,
                         ),
                     ),
             )

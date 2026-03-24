@@ -47,8 +47,8 @@ data class FaktaDelperiodePrivatBil(
     val fom: LocalDate,
     val tom: LocalDate,
     val reisedagerPerUke: Int,
-    val bompengerEnVei: Int?,
-    val fergekostandEnVei: Int?,
+    val bompengerPerDag: Int?,
+    val fergekostnadPerDag: Int?,
 )
 
 enum class TypeVilkårFakta {

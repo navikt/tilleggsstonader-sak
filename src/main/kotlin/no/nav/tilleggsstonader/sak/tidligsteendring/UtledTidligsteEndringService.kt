@@ -277,8 +277,8 @@ data class TidligsteEndringIBehandlingUtleder(
                         nå.fom != tidligere.fom ||
                             nå.tom != tidligere.tom ||
                             nå.reisedagerPerUke != tidligere.reisedagerPerUke ||
-                            nå.bompengerEnVei != tidligere.bompengerEnVei ||
-                            nå.fergekostandEnVei != tidligere.fergekostandEnVei
+                            nå.bompengerPerDag != tidligere.bompengerPerDag ||
+                            nå.fergekostnadPerDag != tidligere.fergekostnadPerDag
                     }
             }
 

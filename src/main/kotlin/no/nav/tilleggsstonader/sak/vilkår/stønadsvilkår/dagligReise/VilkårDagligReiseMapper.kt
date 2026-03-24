@@ -73,8 +73,8 @@ object VilkårDagligReiseMapper {
                         fom = it.fom,
                         tom = it.tom,
                         reisedagerPerUke = it.reisedagerPerUke,
-                        bompengerEnVei = it.bompengerEnVei,
-                        fergekostandEnVei = it.fergekostandEnVei,
+                        bompengerPerDag = it.bompengerPerDag,
+                        fergekostnadPerDag = it.fergekostnadPerDag,
                     )
                 },
             adresse = this.adresse,

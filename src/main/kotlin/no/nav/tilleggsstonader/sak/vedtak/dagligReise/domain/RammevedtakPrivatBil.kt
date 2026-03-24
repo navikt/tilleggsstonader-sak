@@ -32,12 +32,12 @@ data class BeregningsgrunnlagForReiseMedPrivatBil(
 
 // TODO: Finn ut om det finnes abbonnement på disse prisene og om det påvirker hvordan vi vil løse dette
 data class Ekstrakostnader(
-    val bompengerEnVei: Int?,
-    val fergekostnadEnVei: Int?,
+    val bompengerPerDag: Int?,
+    val fergekostnadPerDag: Int?,
 ) {
     fun beregnTotalEkstrakostnadForEnDag(): BigDecimal {
-        val bompengerEnDag = bompengerEnVei?.times(2) ?: 0
-        val fergekostnadEnDag = fergekostnadEnVei?.times(2) ?: 0
+        val bompengerEnDag = bompengerPerDag ?: 0
+        val fergekostnadEnDag = fergekostnadPerDag ?: 0
 
         val sum = bompengerEnDag + fergekostnadEnDag
 

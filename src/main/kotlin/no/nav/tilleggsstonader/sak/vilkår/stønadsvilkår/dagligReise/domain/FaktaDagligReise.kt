@@ -156,10 +156,10 @@ data class FaktaPrivatBil(
             brukerfeilHvis(periode.reisedagerPerUke > 7) {
                 "Reisedager per uke kan ikke være mer enn 7"
             }
-            brukerfeilHvis(periode.bompengerEnVei != null && periode.bompengerEnVei < 0) {
+            brukerfeilHvis(periode.bompengerPerDag != null && periode.bompengerPerDag < 0) {
                 "Bompengeprisen må være større enn 0"
             }
-            brukerfeilHvis(periode.fergekostandEnVei != null && periode.fergekostandEnVei < 0) {
+            brukerfeilHvis(periode.fergekostnadPerDag != null && periode.fergekostnadPerDag < 0) {
                 "Fergekostnaden må være større enn 0"
             }
             brukerfeilHvis(periode.fom.isAfter(periode.tom)) {
@@ -178,8 +178,8 @@ data class FaktaPrivatBil(
                         fom = it.fom,
                         tom = it.tom,
                         reisedagerPerUke = it.reisedagerPerUke,
-                        bompengerEnVei = it.bompengerEnVei,
-                        fergekostandEnVei = it.fergekostandEnVei,
+                        bompengerPerDag = it.bompengerPerDag,
+                        fergekostnadPerDag = it.fergekostnadPerDag,
                     )
                 },
             adresse = adresse,

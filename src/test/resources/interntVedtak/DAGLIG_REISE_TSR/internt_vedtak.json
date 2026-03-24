@@ -117,8 +117,8 @@
         "fom" : "2025-01-01",
         "tom" : "2025-02-28",
         "reisedagerPerUke" : 3,
-        "bompengerEnVei" : 20,
-        "fergekostandEnVei" : 30
+        "bompengerPerDag" : 20,
+        "fergekostnadPerDag" : 30
       } ],
       "type" : "DAGLIG_REISE_PRIVAT_BIL"
     }
@@ -251,8 +251,8 @@
         "reisedagerPerUke" : 3,
         "reiseavstandEnVei" : 40.0,
         "ekstrakostnader" : {
-          "bompengerEnVei" : 40,
-          "fergekostnadEnVei" : 50
+          "bompengerPerDag" : 40,
+          "fergekostnadPerDag" : 50
         },
         "satser" : [ {
           "fom" : "2024-01-01",
@@ -278,8 +278,8 @@
         "reisedagerPerUke" : 3,
         "reiseavstandEnVei" : 60.0,
         "ekstrakostnader" : {
-          "bompengerEnVei" : 40,
-          "fergekostnadEnVei" : 50
+          "bompengerPerDag" : 40,
+          "fergekostnadPerDag" : 50
         },
         "satser" : [ {
           "fom" : "2024-01-01",
