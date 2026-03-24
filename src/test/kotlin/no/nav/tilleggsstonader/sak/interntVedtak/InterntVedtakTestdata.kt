@@ -1016,15 +1016,8 @@ object InterntVedtakTestdata {
                                 listOf(
                                     FaktaDelperiodePrivatBil(
                                         fom = LocalDate.of(2025, 1, 1),
-                                        tom = LocalDate.of(2025, 1, 31),
-                                        reisedagerPerUke = 3,
-                                        bompengerEnVei = 20,
-                                        fergekostandEnVei = 30,
-                                    ),
-                                    FaktaDelperiodePrivatBil(
-                                        fom = LocalDate.of(2025, 2, 1),
                                         tom = LocalDate.of(2025, 2, 28),
-                                        reisedagerPerUke = 2,
+                                        reisedagerPerUke = 3,
                                         bompengerEnVei = 20,
                                         fergekostandEnVei = 30,
                                     ),

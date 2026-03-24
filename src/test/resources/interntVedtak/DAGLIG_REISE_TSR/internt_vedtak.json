@@ -115,14 +115,8 @@
       "reiseavstandEnVei" : 40.5,
       "faktaDelperioder" : [ {
         "fom" : "2025-01-01",
-        "tom" : "2025-01-31",
-        "reisedagerPerUke" : 3,
-        "bompengerEnVei" : 20,
-        "fergekostandEnVei" : 30
-      }, {
-        "fom" : "2025-02-01",
         "tom" : "2025-02-28",
-        "reisedagerPerUke" : 2,
+        "reisedagerPerUke" : 3,
         "bompengerEnVei" : 20,
         "fergekostandEnVei" : 30
       } ],
@@ -195,7 +189,7 @@
         "reiser" : [ {
           "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
           "adresse" : "Tiltaksgata 1",
-          "reisedagerPerUke" : 5,
+          "reisedagerPerUke" : 3,
           "perioder" : [ {
             "fom" : "2025-01-01",
             "tom" : "2025-02-28",
