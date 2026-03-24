@@ -32,7 +32,7 @@ class PrivatBilBeregningService(
             oppfylteVilkår.flatMap { vilkår ->
                 val fakta = vilkår.fakta
                 if (fakta is FaktaPrivatBil) {
-                    fakta.reiseperioder.map { periode ->
+                    fakta.faktaDelperioder.map { periode ->
                         ReiseMedPrivatBil(
                             fom = periode.fom,
                             tom = periode.tom,

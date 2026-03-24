@@ -62,12 +62,12 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Vi
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReisePrivatBilDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaReisePeriodePrivatBilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SvarOgBegrunnelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseperiodePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
@@ -557,18 +557,16 @@ fun faktaPrivatBil(
     reiseId: ReiseId = dummyReiseId,
     adresse: String = "Tiltaksveien 1",
     reiseavstandEnVei: BigDecimal = 10.toBigDecimal(),
-    reiseperioder: List<FaktaReiseperiodePrivatBil> =
+    reiseperioder: List<FaktaDelperiodePrivatBil> =
         listOf(
-            FaktaReiseperiodePrivatBil(
-                periodeId = UUID.randomUUID().toString(),
+            FaktaDelperiodePrivatBil(
                 fom = 1 januar 2025,
                 tom = 15 januar 2025,
                 reisedagerPerUke = 5,
                 bompengerEnVei = 80,
                 fergekostandEnVei = null,
             ),
-            FaktaReiseperiodePrivatBil(
-                periodeId = UUID.randomUUID().toString(),
+            FaktaDelperiodePrivatBil(
                 fom = 16 januar 2025,
                 tom = 31 januar 2025,
                 reisedagerPerUke = 3,
@@ -579,7 +577,7 @@ fun faktaPrivatBil(
 ) = FaktaPrivatBil(
     reiseId = reiseId,
     reiseavstandEnVei = reiseavstandEnVei,
-    reiseperioder = reiseperioder,
+    faktaDelperioder = reiseperioder,
     adresse = adresse,
 )
 
@@ -657,10 +655,9 @@ fun lagreDagligReisePrivatBilDto(
     adresse: String = "Tiltaksveien 1",
     reiseId: ReiseId = dummyReiseId,
     reiseavstandEnVei: BigDecimal = BigDecimal(10),
-    reiseperioder: List<FaktaReisePeriodePrivatBilDto> =
+    reiseperioder: List<FaktaDelperiodePrivatBilDto> =
         listOf(
-            FaktaReisePeriodePrivatBilDto(
-                periodeId = UUID.randomUUID().toString(),
+            FaktaDelperiodePrivatBilDto(
                 fom = fom,
                 tom = tom,
                 reisedagerPerUke = 5,
@@ -681,7 +678,7 @@ fun lagreDagligReisePrivatBilDto(
     fakta: FaktaDagligReiseDto =
         FaktaDagligReisePrivatBilDto(
             reiseavstandEnVei = reiseavstandEnVei,
-            reiseperioder = reiseperioder,
+            faktaDelperioder = reiseperioder,
             adresse = adresse,
         ),
 ) = LagreDagligReiseDto(

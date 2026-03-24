@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreDagligReisePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaReisePeriodePrivatBilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
@@ -27,9 +27,11 @@ import java.time.YearMonth
 class StønadsvilkårTestdataDsl {
     internal val opprettScope = OpprettStønadsvilkårDsl()
     internal val update = mutableListOf<(VilkårsvurderingDto) -> SvarPåVilkårDto>()
-    internal val updateDagligReise = mutableListOf<(List<VilkårDagligReiseDto>) -> Pair<VilkårId, LagreDagligReiseDto>>()
+    internal val updateDagligReise =
+        mutableListOf<(List<VilkårDagligReiseDto>) -> Pair<VilkårId, LagreDagligReiseDto>>()
     internal val delete = mutableListOf<(VilkårsvurderingDto) -> SlettVilkårRequest>()
-    internal val deleteDagligReise = mutableListOf<(List<VilkårDagligReiseDto>) -> Pair<VilkårId, SlettVilkårRequestDto>>()
+    internal val deleteDagligReise =
+        mutableListOf<(List<VilkårDagligReiseDto>) -> Pair<VilkårId, SlettVilkårRequestDto>>()
 
     fun opprett(builder: OpprettStønadsvilkårDsl.() -> Unit) {
         opprettScope.apply(builder)
@@ -81,11 +83,7 @@ class OpprettStønadsvilkårDsl {
                 reiseavstandEnVei = reiseavstandEnVei,
                 reiseperioder =
                     listOf(
-                        FaktaReisePeriodePrivatBilDto(
-                            periodeId =
-                                java.util.UUID
-                                    .randomUUID()
-                                    .toString(),
+                        FaktaDelperiodePrivatBilDto(
                             fom = fom,
                             tom = tom,
                             reisedagerPerUke = reisedagerPerUke,

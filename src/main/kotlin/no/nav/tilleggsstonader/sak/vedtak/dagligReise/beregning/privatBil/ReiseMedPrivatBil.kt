@@ -32,7 +32,7 @@ fun VilkårDagligReise.tilReiseMedPrivatBil(): ReiseMedPrivatBil {
     }
 
     val fakta = this.fakta
-    val periode = fakta.reiseperioder.firstOrNull() ?: error("Mangler reiseperiode for privat bil")
+    val periode = fakta.faktaDelperioder.firstOrNull() ?: error("Mangler reiseperiode for privat bil")
 
     // TODO - her er jeg litt usikker på hva jeg skal gjøre og hvordan vi vil vise rammevedtaket dersom det er flere reiseperioder i perioden med rammevedtak.
 

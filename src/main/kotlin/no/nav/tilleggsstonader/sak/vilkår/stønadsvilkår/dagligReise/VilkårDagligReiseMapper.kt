@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrap
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseperiodePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -67,10 +67,9 @@ object VilkårDagligReiseMapper {
         FaktaPrivatBil(
             reiseId = this.reiseId,
             reiseavstandEnVei = this.reiseavstandEnVei,
-            reiseperioder =
-                this.reiseperioder.map {
-                    FaktaReiseperiodePrivatBil(
-                        periodeId = it.periodeId,
+            faktaDelperioder =
+                this.faktaDelperioder.map {
+                    FaktaDelperiodePrivatBil(
                         fom = it.fom,
                         tom = it.tom,
                         reisedagerPerUke = it.reisedagerPerUke,

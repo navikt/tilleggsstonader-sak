@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.ant
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseperiodePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import java.math.BigDecimal
 
@@ -53,8 +53,8 @@ data class FaktaOffentligTransport(
     private fun validerIngenNegativeUtgifter() {
         brukerfeilHvis(
             (prisEnkelbillett != null && prisEnkelbillett <= 0) ||
-                    (prisSyvdagersbillett != null && prisSyvdagersbillett <= 0) ||
-                    (prisTrettidagersbillett != null && prisTrettidagersbillett <= 0),
+                (prisSyvdagersbillett != null && prisSyvdagersbillett <= 0) ||
+                (prisTrettidagersbillett != null && prisTrettidagersbillett <= 0),
         ) {
             "Billettprisen må være større enn 0"
         }
@@ -129,7 +129,7 @@ data class FaktaOffentligTransport(
 data class FaktaPrivatBil(
     override val reiseId: ReiseId,
     val reiseavstandEnVei: BigDecimal,
-    val reiseperioder: List<FaktaReiseperiodePrivatBil>,
+    val faktaDelperioder: List<FaktaDelperiodePrivatBil>,
     override val adresse: String?,
 ) : FaktaDagligReise {
     override val type = TypeDagligReise.PRIVAT_BIL
@@ -146,10 +146,10 @@ data class FaktaPrivatBil(
     }
 
     private fun validerReiseperioder() {
-        brukerfeilHvis(reiseperioder.isEmpty()) {
+        brukerfeilHvis(faktaDelperioder.isEmpty()) {
             "Minst én reiseperiode må være satt"
         }
-        reiseperioder.forEach { periode ->
+        faktaDelperioder.forEach { periode ->
             brukerfeilHvis(periode.reisedagerPerUke <= 0) {
                 "Reisedager per uke må være større enn 0"
             }
@@ -172,10 +172,9 @@ data class FaktaPrivatBil(
         FaktaDagligReisePrivatBil(
             reiseId = reiseId,
             reiseavstandEnVei = reiseavstandEnVei,
-            reiseperioder =
-                reiseperioder.map {
-                    FaktaReiseperiodePrivatBil(
-                        periodeId = it.periodeId,
+            faktaDelperioder =
+                faktaDelperioder.map {
+                    FaktaDelperiodePrivatBil(
                         fom = it.fom,
                         tom = it.tom,
                         reisedagerPerUke = it.reisedagerPerUke,

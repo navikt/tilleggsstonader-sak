@@ -127,7 +127,7 @@ fun BeregningsresultatForReisePrivatBil.tilDto(vilkår: List<VilkårDagligReise>
         reiseId = reiseId,
         adresse = vilkårForReise?.fakta?.adresse,
         // TODO usikker på hva vi skal gjøre her
-        reisedagerPerUke = vilkårFakta?.reiseperioder?.sumOf { it.reisedagerPerUke },
+        reisedagerPerUke = vilkårFakta?.faktaDelperioder?.sumOf { it.reisedagerPerUke },
         perioder = perioder.map { it.tilDto() },
     )
 }

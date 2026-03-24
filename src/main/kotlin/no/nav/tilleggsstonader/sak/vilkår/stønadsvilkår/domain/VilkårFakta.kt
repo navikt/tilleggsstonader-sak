@@ -39,12 +39,11 @@ data class FaktaDagligReiseOffentligTransport(
 data class FaktaDagligReisePrivatBil(
     override val reiseId: ReiseId,
     val reiseavstandEnVei: BigDecimal,
-    val reiseperioder: List<FaktaReiseperiodePrivatBil>,
+    val faktaDelperioder: List<FaktaDelperiodePrivatBil>,
     override val adresse: String?,
 ) : VilkårFakta
 
-data class FaktaReiseperiodePrivatBil(
-    val periodeId: String,
+data class FaktaDelperiodePrivatBil(
     val fom: LocalDate,
     val tom: LocalDate,
     val reisedagerPerUke: Int,

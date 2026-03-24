@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.faktaOffentligTransport
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseperiodePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -146,10 +146,9 @@ class FaktaDagligReiseTest {
                     FaktaPrivatBil(
                         reiseId = ReiseId.random(),
                         adresse = "Tiltaksveien 1",
-                        reiseperioder =
+                        faktaDelperioder =
                             listOf(
-                                FaktaReiseperiodePrivatBil(
-                                    periodeId = "1",
+                                FaktaDelperiodePrivatBil(
                                     fom = LocalDate.now(),
                                     tom = LocalDate.now().plusDays(10),
                                     reisedagerPerUke = 4,
@@ -170,10 +169,9 @@ class FaktaDagligReiseTest {
                     FaktaPrivatBil(
                         reiseId = ReiseId.random(),
                         adresse = "Tiltaksveien 1",
-                        reiseperioder =
+                        faktaDelperioder =
                             listOf(
-                                FaktaReiseperiodePrivatBil(
-                                    periodeId = "1",
+                                FaktaDelperiodePrivatBil(
                                     fom = LocalDate.now(),
                                     tom = LocalDate.now().plusDays(10),
                                     reisedagerPerUke = 4,
@@ -195,10 +193,9 @@ class FaktaDagligReiseTest {
                         reiseId = ReiseId.random(),
                         adresse = "Tiltaksveien 1",
                         reiseavstandEnVei = BigDecimal(10),
-                        reiseperioder =
+                        faktaDelperioder =
                             listOf(
-                                FaktaReiseperiodePrivatBil(
-                                    periodeId = "1",
+                                FaktaDelperiodePrivatBil(
                                     fom = LocalDate.now(),
                                     tom = LocalDate.now().plusDays(10),
                                     reisedagerPerUke = -4,
@@ -219,10 +216,9 @@ class FaktaDagligReiseTest {
                         reiseId = ReiseId.random(),
                         adresse = "Tiltaksveien 1",
                         reiseavstandEnVei = BigDecimal(10),
-                        reiseperioder =
+                        faktaDelperioder =
                             listOf(
-                                FaktaReiseperiodePrivatBil(
-                                    periodeId = "1",
+                                FaktaDelperiodePrivatBil(
                                     fom = LocalDate.now(),
                                     tom = LocalDate.now().plusDays(10),
                                     reisedagerPerUke = 8,

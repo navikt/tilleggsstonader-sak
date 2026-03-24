@@ -65,7 +65,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatL
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseperiodePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernatting
@@ -1012,18 +1012,16 @@ object InterntVedtakTestdata {
                             reiseId = dummyReiseId,
                             adresse = "Tiltaksgata 1",
                             reiseavstandEnVei = BigDecimal(40.5),
-                            reiseperioder =
+                            faktaDelperioder =
                                 listOf(
-                                    FaktaReiseperiodePrivatBil(
-                                        periodeId = UUID.randomUUID().toString(),
+                                    FaktaDelperiodePrivatBil(
                                         fom = LocalDate.of(2025, 1, 1),
                                         tom = LocalDate.of(2025, 1, 31),
                                         reisedagerPerUke = 3,
                                         bompengerEnVei = 20,
                                         fergekostandEnVei = 30,
                                     ),
-                                    FaktaReiseperiodePrivatBil(
-                                        periodeId = UUID.randomUUID().toString(),
+                                    FaktaDelperiodePrivatBil(
                                         fom = LocalDate.of(2025, 2, 1),
                                         tom = LocalDate.of(2025, 2, 28),
                                         reisedagerPerUke = 2,

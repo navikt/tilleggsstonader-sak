@@ -137,11 +137,11 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
 
         assertThat(fakta.reiseId).isNotNull
         assertThat(fakta.reiseavstandEnVei).isEqualTo(BigDecimal(10))
-        assertThat(fakta.reiseperioder).hasSize(1)
-        assertThat(fakta.reiseperioder[0].fom).isEqualTo(fom)
-        assertThat(fakta.reiseperioder[0].tom).isEqualTo(tom)
-        assertThat(fakta.reiseperioder[0].reisedagerPerUke).isEqualTo(5)
-        assertThat(fakta.reiseperioder[0].bompengerEnVei).isEqualTo(80)
-        assertThat(fakta.reiseperioder[0].fergekostandEnVei).isNull()
+        assertThat(fakta.faktaDelperioder).hasSize(1)
+        assertThat(fakta.faktaDelperioder[0].fom).isEqualTo(fom)
+        assertThat(fakta.faktaDelperioder[0].tom).isEqualTo(tom)
+        assertThat(fakta.faktaDelperioder[0].reisedagerPerUke).isEqualTo(5)
+        assertThat(fakta.faktaDelperioder[0].bompengerEnVei).isEqualTo(80)
+        assertThat(fakta.faktaDelperioder[0].fergekostandEnVei).isNull()
     }
 }

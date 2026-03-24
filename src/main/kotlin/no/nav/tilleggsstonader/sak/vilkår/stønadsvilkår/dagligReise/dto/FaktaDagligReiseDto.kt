@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Fa
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseperiodePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -55,7 +55,7 @@ data class FaktaDagligReiseOffentligTransportDto(
 
 data class FaktaDagligReisePrivatBilDto(
     val reiseavstandEnVei: BigDecimal,
-    val reiseperioder: List<FaktaReisePeriodePrivatBilDto>,
+    val faktaDelperioder: List<FaktaDelperiodePrivatBilDto>,
     val adresse: String?,
 ) : FaktaDagligReiseDto {
     override val type = TypeDagligReise.PRIVAT_BIL
@@ -66,10 +66,9 @@ data class FaktaDagligReisePrivatBilDto(
     ) = FaktaPrivatBil(
         reiseId = reiseId,
         reiseavstandEnVei = reiseavstandEnVei,
-        reiseperioder =
-            reiseperioder.map {
-                FaktaReiseperiodePrivatBil(
-                    periodeId = it.periodeId,
+        faktaDelperioder =
+            faktaDelperioder.map {
+                FaktaDelperiodePrivatBil(
                     fom = it.fom,
                     tom = it.tom,
                     reisedagerPerUke = it.reisedagerPerUke,
@@ -81,8 +80,7 @@ data class FaktaDagligReisePrivatBilDto(
     )
 }
 
-data class FaktaReisePeriodePrivatBilDto(
-    val periodeId: String,
+data class FaktaDelperiodePrivatBilDto(
     val fom: LocalDate,
     val tom: LocalDate,
     val reisedagerPerUke: Int,
