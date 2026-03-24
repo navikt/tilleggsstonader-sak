@@ -140,7 +140,7 @@ class FaktaDagligReiseTest {
     @Nested
     inner class PrivatBil {
         @Test
-        fun `skal kaste feil hvis negative utgifter`() {
+        fun `skal kaste feil hvis negative bompenger`() {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaPrivatBil(
@@ -159,7 +159,30 @@ class FaktaDagligReiseTest {
                         reiseavstandEnVei = BigDecimal(10),
                     )
                 }
-            assertThat(feil.message).isEqualTo("Bompenge- og fergeprisen må være større enn 0")
+            assertThat(feil.message).isEqualTo("Bompengeprisen må være større enn 0")
+        }
+
+        @Test
+        fun `skal kaste feil hvis negative fergekostander`() {
+            val feil =
+                assertThrows<ApiFeil> {
+                    FaktaPrivatBil(
+                        reiseId = ReiseId.random(),
+                        adresse = "Tiltaksveien 1",
+                        faktaDelperioder =
+                            listOf(
+                                FaktaDelperiodePrivatBil(
+                                    fom = LocalDate.now(),
+                                    tom = LocalDate.now().plusDays(10),
+                                    reisedagerPerUke = 4,
+                                    bompengerEnVei = 0,
+                                    fergekostandEnVei = -10,
+                                ),
+                            ),
+                        reiseavstandEnVei = BigDecimal(10),
+                    )
+                }
+            assertThat(feil.message).isEqualTo("Fergekostnaden må være større enn 0")
         }
 
         @Test
@@ -205,7 +228,7 @@ class FaktaDagligReiseTest {
                             ),
                     )
                 }
-            assertThat(feil.message).isEqualTo("Reisedager per uke må være 0 eller mer")
+            assertThat(feil.message).isEqualTo("Reisedager per uke må være større enn 0")
         }
 
         @Test

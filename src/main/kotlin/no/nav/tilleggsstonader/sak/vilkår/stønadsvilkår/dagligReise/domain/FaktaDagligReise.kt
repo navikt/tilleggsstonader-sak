@@ -136,7 +136,7 @@ data class FaktaPrivatBil(
 
     init {
         validerIngenNegativReiseavstand()
-        validerReiseperioder()
+        validerDelperioder()
     }
 
     private fun validerIngenNegativReiseavstand() {
@@ -145,7 +145,7 @@ data class FaktaPrivatBil(
         }
     }
 
-    private fun validerReiseperioder() {
+    private fun validerDelperioder() {
         brukerfeilHvis(faktaDelperioder.isEmpty()) {
             "Minst én reiseperiode må være satt"
         }
