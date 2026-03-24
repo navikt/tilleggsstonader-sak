@@ -112,10 +112,14 @@
     "fakta" : {
       "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
       "adresse" : "Tiltaksgata 1",
-      "reisedagerPerUke" : 3,
       "reiseavstandEnVei" : 40.5,
-      "bompengerPerDag" : 20,
-      "fergekostnadPerDag" : 30,
+      "faktaDelperioder" : [ {
+        "fom" : "2025-01-01",
+        "tom" : "2025-02-28",
+        "reisedagerPerUke" : 3,
+        "bompengerPerDag" : 20,
+        "fergekostnadPerDag" : 30
+      } ],
       "type" : "DAGLIG_REISE_PRIVAT_BIL"
     }
   } ],

@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.Fakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReisePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseUbestemtDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 
@@ -44,9 +45,17 @@ object VilkårDagligReiseDtoMapper {
 
     private fun FaktaPrivatBil.tilDto() =
         FaktaDagligReisePrivatBilDto(
-            reisedagerPerUke = reisedagerPerUke,
             reiseavstandEnVei = reiseavstandEnVei,
-            bompengerPerDag = bompengerPerDag,
-            fergekostnadPerDag = fergekostnadPerDag,
+            faktaDelperioder =
+                faktaDelperioder.map {
+                    FaktaDelperiodePrivatBilDto(
+                        fom = it.fom,
+                        tom = it.tom,
+                        reisedagerPerUke = it.reisedagerPerUke,
+                        bompengerPerDag = it.bompengerPerDag,
+                        fergekostnadPerDag = it.fergekostnadPerDag,
+                    )
+                },
+            adresse = adresse,
         )
 }

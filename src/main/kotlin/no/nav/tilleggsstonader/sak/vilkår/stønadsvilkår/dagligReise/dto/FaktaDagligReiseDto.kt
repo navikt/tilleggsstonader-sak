@@ -8,7 +8,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Fa
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import java.math.BigDecimal
+import java.time.LocalDate
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -52,10 +54,9 @@ data class FaktaDagligReiseOffentligTransportDto(
 }
 
 data class FaktaDagligReisePrivatBilDto(
-    val reisedagerPerUke: Int,
     val reiseavstandEnVei: BigDecimal,
-    val bompengerPerDag: Int?,
-    val fergekostnadPerDag: Int?,
+    val faktaDelperioder: List<FaktaDelperiodePrivatBilDto>,
+    val adresse: String?,
 ) : FaktaDagligReiseDto {
     override val type = TypeDagligReise.PRIVAT_BIL
 
@@ -64,13 +65,28 @@ data class FaktaDagligReisePrivatBilDto(
         adresse: String?,
     ) = FaktaPrivatBil(
         reiseId = reiseId,
-        adresse = adresse,
-        reisedagerPerUke = reisedagerPerUke,
         reiseavstandEnVei = reiseavstandEnVei,
-        bompengerPerDag = bompengerPerDag,
-        fergekostnadPerDag = fergekostnadPerDag,
+        faktaDelperioder =
+            faktaDelperioder.map {
+                FaktaDelperiodePrivatBil(
+                    fom = it.fom,
+                    tom = it.tom,
+                    reisedagerPerUke = it.reisedagerPerUke,
+                    bompengerPerDag = it.bompengerPerDag,
+                    fergekostnadPerDag = it.fergekostnadPerDag,
+                )
+            },
+        adresse = adresse,
     )
 }
+
+data class FaktaDelperiodePrivatBilDto(
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val reisedagerPerUke: Int,
+    val bompengerPerDag: Int?,
+    val fergekostnadPerDag: Int?,
+)
 
 data object FaktaDagligReiseUbestemtDto : FaktaDagligReiseDto {
     override val type = TypeDagligReise.UBESTEMT

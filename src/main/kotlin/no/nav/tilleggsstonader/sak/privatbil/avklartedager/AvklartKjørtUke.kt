@@ -53,3 +53,5 @@ enum class UkeStatus {
 enum class TypeAvvikUke {
     FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK,
 }
+
+fun Collection<AvklartKjørtUke>.finnesUkerMedAvvik() = this.any { uke -> uke.status == UkeStatus.AVVIK }

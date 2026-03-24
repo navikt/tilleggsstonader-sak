@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreDagligReisePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
@@ -18,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.Vilkårsvurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBolig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -25,9 +27,11 @@ import java.time.YearMonth
 class StønadsvilkårTestdataDsl {
     internal val opprettScope = OpprettStønadsvilkårDsl()
     internal val update = mutableListOf<(VilkårsvurderingDto) -> SvarPåVilkårDto>()
-    internal val updateDagligReise = mutableListOf<(List<VilkårDagligReiseDto>) -> Pair<VilkårId, LagreDagligReiseDto>>()
+    internal val updateDagligReise =
+        mutableListOf<(List<VilkårDagligReiseDto>) -> Pair<VilkårId, LagreDagligReiseDto>>()
     internal val delete = mutableListOf<(VilkårsvurderingDto) -> SlettVilkårRequest>()
-    internal val deleteDagligReise = mutableListOf<(List<VilkårDagligReiseDto>) -> Pair<VilkårId, SlettVilkårRequestDto>>()
+    internal val deleteDagligReise =
+        mutableListOf<(List<VilkårDagligReiseDto>) -> Pair<VilkårId, SlettVilkårRequestDto>>()
 
     fun opprett(builder: OpprettStønadsvilkårDsl.() -> Unit) {
         opprettScope.apply(builder)
@@ -66,16 +70,27 @@ class OpprettStønadsvilkårDsl {
     fun privatBil(
         fom: LocalDate,
         tom: LocalDate,
+        reiseavstandEnVei: BigDecimal = BigDecimal(10),
         reisedagerPerUke: Int = 5,
-        reiseavstandEnVei: Int = 10,
+        bompengerPerDag: Int? = null,
+        fergekostnadPerDag: Int? = null,
     ) {
         dtoer += { _, _ ->
             lagreDagligReisePrivatBilDto(
                 fom = fom,
                 tom = tom,
-                reisedagerPerUke = reisedagerPerUke,
                 reiseId = ReiseId.random(),
                 reiseavstandEnVei = reiseavstandEnVei,
+                reiseperioder =
+                    listOf(
+                        FaktaDelperiodePrivatBilDto(
+                            fom = fom,
+                            tom = tom,
+                            reisedagerPerUke = reisedagerPerUke,
+                            bompengerPerDag = bompengerPerDag,
+                            fergekostnadPerDag = fergekostnadPerDag,
+                        ),
+                    ),
             )
         }
     }

@@ -31,14 +31,19 @@ fun VilkårDagligReise.tilReiseMedPrivatBil(): ReiseMedPrivatBil {
         "Forventer kun å få inn vilkår med fakta som er av type privat bil ved beregning av privat bil"
     }
 
+    val fakta = this.fakta
+    val periode = fakta.faktaDelperioder.single()
+
+    // TODO - her er jeg litt usikker på hva jeg skal gjøre og hvordan vi vil vise rammevedtaket dersom det er flere reiseperioder i perioden med rammevedtak.
+
     return ReiseMedPrivatBil(
         fom = this.fom,
         tom = this.tom,
-        reiseId = this.fakta.reiseId,
-        reisedagerPerUke = this.fakta.reisedagerPerUke,
-        reiseavstandEnVei = this.fakta.reiseavstandEnVei,
-        bompengerPerDag = this.fakta.bompengerPerDag,
-        fergekostnadPerDag = this.fakta.fergekostnadPerDag,
-        aktivitetsadresse = this.fakta.adresse,
+        reiseId = fakta.reiseId,
+        reisedagerPerUke = periode.reisedagerPerUke,
+        reiseavstandEnVei = fakta.reiseavstandEnVei,
+        bompengerPerDag = periode.bompengerPerDag,
+        fergekostnadPerDag = periode.fergekostnadPerDag,
+        aktivitetsadresse = fakta.adresse,
     )
 }

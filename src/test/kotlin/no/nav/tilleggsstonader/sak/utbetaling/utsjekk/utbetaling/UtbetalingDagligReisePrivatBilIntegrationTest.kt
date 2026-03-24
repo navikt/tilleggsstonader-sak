@@ -25,6 +25,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.SatsDa
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.math.BigDecimal
 import java.time.LocalDate
 
 class UtbetalingDagligReisePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
@@ -43,7 +44,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : CleanDatabaseIntegrationTe
 
         val fom = 2 februar 2026
         val tom = 22 februar 2026
-        val reiseavstandEnVei = 10
+        val reiseavstandEnVei = BigDecimal(10)
         val kjørteDager =
             listOf(
                 2 februar 2026 to 50,
@@ -122,7 +123,8 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : CleanDatabaseIntegrationTe
         assertThat(oppgaverPåKjørelisteBehandling).hasSize(1)
         assertThat(oppgaverPåKjørelisteBehandling.single().status).isEqualTo(Oppgavestatus.FERDIGSTILT)
 
-        val gjeldendeIverksatteBehandlinger = testoppsettService.hentGjeldendeIverksatteBehandlinger(Stønadstype.DAGLIG_REISE_TSO)
+        val gjeldendeIverksatteBehandlinger =
+            testoppsettService.hentGjeldendeIverksatteBehandlinger(Stønadstype.DAGLIG_REISE_TSO)
         assertThat(gjeldendeIverksatteBehandlinger.map { it.id })
             .contains(kjørelisteBehandling.id)
             .doesNotContain(førstegangsBehandling.id)
@@ -140,12 +142,12 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : CleanDatabaseIntegrationTe
         assertThat(andel.beløp).isEqualTo(forventetBeløp)
     }
 
-    private fun List<Pair<LocalDate, Int>>.kalkulerForventetBeløp(reiseavstandEnVei: Int): Int =
+    private fun List<Pair<LocalDate, Int>>.kalkulerForventetBeløp(reiseavstandEnVei: BigDecimal): Int =
         sumOf { (dato, parkeringskostnader) ->
             satsDagligReisePrivatBilProvider
                 .finnSatsForÅr(dato.year)
                 .beløp
-                .multiply(reiseavstandEnVei.toBigDecimal())
+                .multiply(reiseavstandEnVei)
                 .multiply(2.toBigDecimal())
                 .plus(parkeringskostnader.toBigDecimal())
         }.toInt()

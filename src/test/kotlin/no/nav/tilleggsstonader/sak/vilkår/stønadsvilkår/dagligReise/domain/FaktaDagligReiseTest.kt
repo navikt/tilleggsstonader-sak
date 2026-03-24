@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.faktaOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -139,19 +140,49 @@ class FaktaDagligReiseTest {
     @Nested
     inner class PrivatBil {
         @Test
-        fun `skal kaste feil hvis negative utgifter`() {
+        fun `skal kaste feil hvis negative bompenger`() {
             val feil =
                 assertThrows<ApiFeil> {
                     FaktaPrivatBil(
                         reiseId = ReiseId.random(),
                         adresse = "Tiltaksveien 1",
-                        reisedagerPerUke = 4,
+                        faktaDelperioder =
+                            listOf(
+                                FaktaDelperiodePrivatBil(
+                                    fom = LocalDate.now(),
+                                    tom = LocalDate.now().plusDays(10),
+                                    reisedagerPerUke = 4,
+                                    bompengerPerDag = -10,
+                                    fergekostnadPerDag = 0,
+                                ),
+                            ),
                         reiseavstandEnVei = BigDecimal(10),
-                        bompengerPerDag = -10,
-                        fergekostnadPerDag = 0,
                     )
                 }
-            assertThat(feil.message).isEqualTo("Bompenge- og fergeprisen må være større enn 0")
+            assertThat(feil.message).isEqualTo("Bompengeprisen må være større enn 0")
+        }
+
+        @Test
+        fun `skal kaste feil hvis negative fergekostander`() {
+            val feil =
+                assertThrows<ApiFeil> {
+                    FaktaPrivatBil(
+                        reiseId = ReiseId.random(),
+                        adresse = "Tiltaksveien 1",
+                        faktaDelperioder =
+                            listOf(
+                                FaktaDelperiodePrivatBil(
+                                    fom = LocalDate.now(),
+                                    tom = LocalDate.now().plusDays(10),
+                                    reisedagerPerUke = 4,
+                                    bompengerPerDag = 0,
+                                    fergekostnadPerDag = -10,
+                                ),
+                            ),
+                        reiseavstandEnVei = BigDecimal(10),
+                    )
+                }
+            assertThat(feil.message).isEqualTo("Fergekostnaden må være større enn 0")
         }
 
         @Test
@@ -161,10 +192,17 @@ class FaktaDagligReiseTest {
                     FaktaPrivatBil(
                         reiseId = ReiseId.random(),
                         adresse = "Tiltaksveien 1",
-                        reisedagerPerUke = 4,
+                        faktaDelperioder =
+                            listOf(
+                                FaktaDelperiodePrivatBil(
+                                    fom = LocalDate.now(),
+                                    tom = LocalDate.now().plusDays(10),
+                                    reisedagerPerUke = 4,
+                                    bompengerPerDag = 0,
+                                    fergekostnadPerDag = 0,
+                                ),
+                            ),
                         reiseavstandEnVei = BigDecimal("-10"),
-                        bompengerPerDag = 0,
-                        fergekostnadPerDag = 0,
                     )
                 }
             assertThat(feil.message).isEqualTo("Reiseavstanden må være større enn 0")
@@ -177,13 +215,20 @@ class FaktaDagligReiseTest {
                     FaktaPrivatBil(
                         reiseId = ReiseId.random(),
                         adresse = "Tiltaksveien 1",
-                        reisedagerPerUke = -4,
                         reiseavstandEnVei = BigDecimal(10),
-                        bompengerPerDag = 0,
-                        fergekostnadPerDag = 0,
+                        faktaDelperioder =
+                            listOf(
+                                FaktaDelperiodePrivatBil(
+                                    fom = LocalDate.now(),
+                                    tom = LocalDate.now().plusDays(10),
+                                    reisedagerPerUke = -4,
+                                    bompengerPerDag = 0,
+                                    fergekostnadPerDag = 0,
+                                ),
+                            ),
                     )
                 }
-            assertThat(feil.message).isEqualTo("Reisedager per uke må være 0 eller mer")
+            assertThat(feil.message).isEqualTo("Reisedager per uke må være større enn 0")
         }
 
         @Test
@@ -193,10 +238,17 @@ class FaktaDagligReiseTest {
                     FaktaPrivatBil(
                         reiseId = ReiseId.random(),
                         adresse = "Tiltaksveien 1",
-                        reisedagerPerUke = 8,
                         reiseavstandEnVei = BigDecimal(10),
-                        bompengerPerDag = 0,
-                        fergekostnadPerDag = 0,
+                        faktaDelperioder =
+                            listOf(
+                                FaktaDelperiodePrivatBil(
+                                    fom = LocalDate.now(),
+                                    tom = LocalDate.now().plusDays(10),
+                                    reisedagerPerUke = 8,
+                                    bompengerPerDag = 0,
+                                    fergekostnadPerDag = 0,
+                                ),
+                            ),
                     )
                 }
             assertThat(feil.message).isEqualTo("Reisedager per uke kan ikke være mer enn 7")

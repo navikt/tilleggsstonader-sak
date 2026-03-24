@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.ant
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import java.math.BigDecimal
 
@@ -127,52 +128,60 @@ data class FaktaOffentligTransport(
 
 data class FaktaPrivatBil(
     override val reiseId: ReiseId,
-    val reisedagerPerUke: Int,
     val reiseavstandEnVei: BigDecimal,
-    val bompengerPerDag: Int?,
-    val fergekostnadPerDag: Int?,
+    val faktaDelperioder: List<FaktaDelperiodePrivatBil>,
     override val adresse: String?,
 ) : FaktaDagligReise {
     override val type = TypeDagligReise.PRIVAT_BIL
 
     init {
-        validerIngenNegativeUtgifter()
-        validerReisdager()
         validerIngenNegativReiseavstand()
-    }
-
-    private fun validerIngenNegativeUtgifter() {
-        brukerfeilHvis(
-            (bompengerPerDag != null && bompengerPerDag < 0) ||
-                (fergekostnadPerDag != null && fergekostnadPerDag < 0),
-        ) {
-            "Bompenge- og fergeprisen må være større enn 0"
-        }
+        validerDelperioder()
     }
 
     private fun validerIngenNegativReiseavstand() {
-        brukerfeilHvis(reiseavstandEnVei < BigDecimal.ZERO) {
+        brukerfeilHvis(reiseavstandEnVei <= BigDecimal.ZERO) {
             "Reiseavstanden må være større enn 0"
         }
     }
 
-    private fun validerReisdager() {
-        brukerfeilHvis(reisedagerPerUke < 0) {
-            "Reisedager per uke må være 0 eller mer"
+    private fun validerDelperioder() {
+        brukerfeilHvis(faktaDelperioder.isEmpty()) {
+            "Minst én reiseperiode må være satt"
         }
-
-        brukerfeilHvis(reisedagerPerUke > 7) {
-            "Reisedager per uke kan ikke være mer enn 7"
+        faktaDelperioder.forEach { periode ->
+            brukerfeilHvis(periode.reisedagerPerUke <= 0) {
+                "Reisedager per uke må være større enn 0"
+            }
+            brukerfeilHvis(periode.reisedagerPerUke > 7) {
+                "Reisedager per uke kan ikke være mer enn 7"
+            }
+            brukerfeilHvis(periode.bompengerPerDag != null && periode.bompengerPerDag < 0) {
+                "Bompengeprisen må være større enn 0"
+            }
+            brukerfeilHvis(periode.fergekostnadPerDag != null && periode.fergekostnadPerDag < 0) {
+                "Fergekostnaden må være større enn 0"
+            }
+            brukerfeilHvis(periode.fom.isAfter(periode.tom)) {
+                "Periode: tom kan ikke være før fom"
+            }
         }
     }
 
     override fun mapTilVilkårFakta() =
         FaktaDagligReisePrivatBil(
             reiseId = reiseId,
-            reisedagerPerUke = reisedagerPerUke,
             reiseavstandEnVei = reiseavstandEnVei,
-            bompengerPerDag = bompengerPerDag,
-            fergekostnadPerDag = fergekostnadPerDag,
+            faktaDelperioder =
+                faktaDelperioder.map {
+                    FaktaDelperiodePrivatBil(
+                        fom = it.fom,
+                        tom = it.tom,
+                        reisedagerPerUke = it.reisedagerPerUke,
+                        bompengerPerDag = it.bompengerPerDag,
+                        fergekostnadPerDag = it.fergekostnadPerDag,
+                    )
+                },
             adresse = adresse,
         )
 }
