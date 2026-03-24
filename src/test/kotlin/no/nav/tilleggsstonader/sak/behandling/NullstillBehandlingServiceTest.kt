@@ -1,18 +1,31 @@
 package no.nav.tilleggsstonader.sak.behandling
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.VedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientMockConfig
+import no.nav.tilleggsstonader.sak.privatbil.KjørelisteRepository
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeRepository
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikUke
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UtfyltDagAutomatiskVurdering
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringTestUtil.simuleringsresultat
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringsresultatRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
+import no.nav.tilleggsstonader.sak.util.KjørelisteUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -20,6 +33,8 @@ import no.nav.tilleggsstonader.sak.util.vedtaksbrev
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil.innvilgelse
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Opphavsvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -39,6 +54,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
+import java.time.LocalDate
 
 class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
@@ -71,6 +87,12 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
     lateinit var simuleringsresultatRepository: SimuleringsresultatRepository
 
+    @Autowired
+    lateinit var avklartKjørtUkeRepository: AvklartKjørtUkeRepository
+
+    @Autowired
+    lateinit var kjørelisteRepository: KjørelisteRepository
+
     val fagsak = fagsak()
     val behandling = behandling(fagsak, status = BehandlingStatus.FERDIGSTILT, resultat = BehandlingResultat.INNVILGET)
     val revurdering = behandling(fagsak, forrigeIverksatteBehandlingId = behandling.id)
@@ -101,9 +123,11 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
         opprettBarn()
         opprettVilkårperiode(behandling.id)
         opprettVilkår(behandling.id, barnId = behandlingBarn1.id)
+        opprettAvklartKjørtUke(behandling.id)
 
         val vilkårperiode = vilkårperiodeRepository.findByBehandlingId(behandling.id).single()
         val vilkår = vilkårRepository.findByBehandlingId(behandling.id).single()
+        val avklartKjørtUke = avklartKjørtUkeRepository.findByBehandlingId(behandling.id).single()
 
         assertIngenDataPåRevurdering()
 
@@ -111,6 +135,22 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
 
         assertVilkårPeriodeErGjenbrukt(vilkårperiode)
         assertVilkårErGjenbrukt(vilkår)
+        assertAvklarteUkerErGjenbrukt(avklartKjørtUke)
+    }
+
+    @Test
+    fun `avklarte kjørte uker skal tilbakestilles`() {
+        opprettAvklartKjørtUke(behandling.id)
+
+        val avklartKjørtUke = avklartKjørtUkeRepository.findByBehandlingId(behandling.id).single()
+        val avklartKjørtUkeRevurdering = avklartKjørtUkeRepository.insert(avklartKjørtUke.kopierTilNyBehandling(revurdering.id))
+        avklartKjørtUkeRepository.update(
+            avklartKjørtUkeRevurdering.copy(dager = emptySet(), typeAvvik = TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK),
+        )
+
+        nullstillBehandlingService.nullstillBehandling(revurdering)
+
+        assertAvklarteUkerErGjenbrukt(avklartKjørtUke)
     }
 
     @Test
@@ -154,6 +194,18 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
+    fun `skal ikke slette vedtak når kjørelistebehandling`() {
+        vedtakRepository.insert(innvilgelse(behandlingId = behandling.id))
+        vedtakRepository.insert(innvilgelse(behandlingId = revurdering.id))
+        val kjørelisteRevurdering = testoppsettService.oppdater(revurdering.copy(type = BehandlingType.KJØRELISTE))
+
+        nullstillBehandlingService.nullstillBehandling(kjørelisteRevurdering)
+
+        assertThat(vedtakRepository.findByIdOrNull(behandling.id)).isNotNull
+        assertThat(vedtakRepository.findByIdOrNull(revurdering.id)).isNotNull
+    }
+
+    @Test
     fun `skal slette brev`() {
         vedtaksbrevRepository.insert(vedtaksbrev(behandling.id))
         vedtaksbrevRepository.insert(vedtaksbrev(revurdering.id))
@@ -193,11 +245,35 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
 
         @Test
         fun `skal slette grunnlag for behandling under arbeid`() {
-            vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(revurdering.id, Vilkårperioder(emptyList(), emptyList()))
+            vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(
+                revurdering.id,
+                Vilkårperioder(emptyList(), emptyList()),
+            )
 
             nullstillBehandlingService.slettVilkårperiodegrunnlag(revurdering.id)
 
             assertThat(vilkårperioderGrunnlagRepository.findByBehandlingId(revurdering.id)).isNull()
+        }
+    }
+
+    @Nested
+    inner class OppdaterSteg {
+        @Test
+        fun `skal oppdatere steg til INNGANGSVILKÅR når behandlingstype ikke er KJØRELSITE`() {
+            nullstillBehandlingService.nullstillBehandling(revurdering)
+
+            val nullstiltBehandling = testoppsettService.hentBehandling(revurdering.id)
+            assertThat(nullstiltBehandling.steg).isEqualTo(StegType.INNGANGSVILKÅR)
+        }
+
+        @Test
+        fun `skal oppdatere steg til KJØRELISTE når behandlingstype er KJØRELSITE`() {
+            vedtakRepository.insert(innvilgelse(behandlingId = behandling.id))
+            val kjørelisteBehandling = testoppsettService.oppdater(revurdering.copy(type = BehandlingType.KJØRELISTE))
+            nullstillBehandlingService.nullstillBehandling(kjørelisteBehandling)
+
+            val nullstiltBehandling = testoppsettService.hentBehandling(kjørelisteBehandling.id)
+            assertThat(nullstiltBehandling.steg).isEqualTo(StegType.KJØRELISTE)
         }
     }
 
@@ -224,9 +300,29 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
         }
     }
 
+    private fun assertAvklarteUkerErGjenbrukt(avklartKjørtUke: AvklartKjørtUke) {
+        val gjenbruktAvklartKjørtUke = avklartKjørtUkeRepository.findByBehandlingId(revurdering.id).single()
+
+        assertThat(gjenbruktAvklartKjørtUke)
+            .usingRecursiveComparison()
+            .ignoringFields("id", "sporbar", "behandlingId", "dager")
+            .isEqualTo(avklartKjørtUke)
+        assertThat(gjenbruktAvklartKjørtUke.id).isNotEqualTo(avklartKjørtUke.id)
+
+        val avklartKjørtDag = avklartKjørtUke.dager.single()
+        val gjenbruktAvklartKjørtDag = gjenbruktAvklartKjørtUke.dager.single()
+
+        assertThat(gjenbruktAvklartKjørtDag)
+            .usingRecursiveComparison()
+            .ignoringFields("id")
+            .isEqualTo(avklartKjørtDag)
+        assertThat(gjenbruktAvklartKjørtDag.id).isNotEqualTo(avklartKjørtDag.id)
+    }
+
     private fun assertIngenDataPåRevurdering() {
         assertThat(vilkårperiodeRepository.findByBehandlingId(revurdering.id)).isEmpty()
         assertThat(vilkårRepository.findByBehandlingId(revurdering.id)).isEmpty()
+        assertThat(avklartKjørtUkeRepository.findByBehandlingId(revurdering.id)).isEmpty()
     }
 
     private fun opprettBarn() {
@@ -243,5 +339,32 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
         barnId: BarnId,
     ) {
         vilkårRepository.insert(vilkår(behandlingId = behandlingId, type = VilkårType.PASS_BARN, barnId = barnId))
+    }
+
+    private fun opprettAvklartKjørtUke(behandlingId: BehandlingId) {
+        val kjøreliste =
+            kjørelisteRepository.insert(
+                KjørelisteUtil.kjøreliste(periode = Datoperiode(LocalDate.now(), LocalDate.now()), fagsakId = fagsak.id),
+            )
+        avklartKjørtUkeRepository.insert(
+            AvklartKjørtUke(
+                behandlingId = behandlingId,
+                kjørelisteId = kjøreliste.id,
+                reiseId = ReiseId.random(),
+                fom = LocalDate.now(),
+                tom = LocalDate.now(),
+                ukenummer = LocalDate.now().ukenummer(),
+                status = UkeStatus.OK_AUTOMATISK,
+                dager =
+                    setOf(
+                        AvklartKjørtDag(
+                            dato = LocalDate.now(),
+                            godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
+                            automatiskVurdering = UtfyltDagAutomatiskVurdering.OK,
+                            avvik = listOf(),
+                        ),
+                    ),
+            ),
+        )
     }
 }

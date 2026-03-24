@@ -54,7 +54,7 @@ class UtbetalingIntegrationTest : CleanDatabaseIntegrationTest() {
         val fom = 1 september 2025
         val tom = 30 september 2025
 
-        val førstegangsbehandlingId =
+        val førstegangsbehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.LÆREMIDLER,
             ) {
@@ -70,7 +70,7 @@ class UtbetalingIntegrationTest : CleanDatabaseIntegrationTest() {
                 }
             }
 
-        val førstegangsbehandling = behandlingService.hentBehandling(førstegangsbehandlingId)
+        val førstegangsbehandling = behandlingService.hentBehandling(førstegangsbehandlingContext.behandlingId)
         val finnesUtbetalingIdEtterFørstegangsbehandling =
             fagsakUtbetalingIdService.finnesUtbetalingsId(førstegangsbehandling.fagsakId, TypeAndel.LÆREMIDLER_AAP)
 
@@ -81,7 +81,7 @@ class UtbetalingIntegrationTest : CleanDatabaseIntegrationTest() {
             .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
 
         utbetalingStatusHåndterer.behandleStatusoppdatering(
-            iverksettingId = førstegangsbehandlingId.toString(),
+            iverksettingId = førstegangsbehandlingContext.behandlingId.toString(),
             melding =
                 UtbetalingStatusRecord(
                     status = UtbetalingStatus.OK,
@@ -96,7 +96,7 @@ class UtbetalingIntegrationTest : CleanDatabaseIntegrationTest() {
                 opprettBehandlingDto =
                     OpprettBehandlingDto(
                         fagsakId = førstegangsbehandling.fagsakId,
-                        årsak = `BehandlingÅrsak`.SØKNAD,
+                        årsak = BehandlingÅrsak.SØKNAD,
                         kravMottatt = 15 februar 2025,
                         nyeOpplysningerMetadata = null,
                     ),
@@ -136,7 +136,7 @@ class UtbetalingIntegrationTest : CleanDatabaseIntegrationTest() {
         val fom = 9 august 2025
         val tom = 9 desember 2025
 
-        val behandlingId =
+        val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.BARNETILSYN,
             ) {
@@ -145,7 +145,7 @@ class UtbetalingIntegrationTest : CleanDatabaseIntegrationTest() {
 
         val andeler =
             tilkjentYtelseRepository
-                .findByBehandlingId(behandlingId)!!
+                .findByBehandlingId(behandlingContext.behandlingId)!!
                 .andelerTilkjentYtelse
                 .sortedBy { it.fom }
 

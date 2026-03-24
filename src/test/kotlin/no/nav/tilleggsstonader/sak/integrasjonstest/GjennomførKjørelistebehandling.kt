@@ -4,8 +4,6 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegController
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 
@@ -15,9 +13,9 @@ fun IntegrationTest.gjennomførKjørelisteBehandling(behandling: Behandling) {
     }
     testoppsettService.oppdater(behandling.copy(status = BehandlingStatus.UTREDES))
     tilordneÅpenBehandlingOppgaveForBehandling(behandling.id)
-    kall.steg.ferdigstill(behandling.id, StegController.FerdigstillStegRequest(StegType.KJØRELISTE))
-    kall.steg.ferdigstill(behandling.id, StegController.FerdigstillStegRequest(StegType.BEREGNING))
-    kall.steg.ferdigstill(behandling.id, StegController.FerdigstillStegRequest(StegType.SIMULERING))
+    gjennomførKjørelisteSteg(behandling.id)
+    gjennomførBeregningStegDagligReise(behandling.id)
+    gjennomførSimuleringSteg(behandling.id)
     kall.privatBil.fullførKjørelisteBehandling(behandling.id)
     kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 }

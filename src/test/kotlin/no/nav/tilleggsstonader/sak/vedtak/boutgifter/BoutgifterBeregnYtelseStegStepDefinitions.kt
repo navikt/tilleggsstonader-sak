@@ -26,7 +26,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepos
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -96,7 +95,6 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
                 )
             }
         }
-    val unleashService = mockUnleashService()
     val vilkårService =
         VilkårService(
             behandlingService = behandlingServiceMock,
@@ -119,7 +117,6 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             boutgifterUtgiftService = boutgifterUtgiftService,
             vedtaksperiodeValideringService = vedtaksperiodeValideringService,
             vedtakRepository = vedtakRepositoryFake,
-            unleashService = unleashService,
             satsBoutgifterService = satsBoutgifterService,
         )
     val opphørValideringService =

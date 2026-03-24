@@ -89,6 +89,7 @@ class FagsakService(
                 .findByFagsakPersonId(fagsakPersonId)
                 .map { it.tilFagsakMedPerson() }
                 .associateBy { it.stønadstype }
+
         return Fagsaker(
             barnetilsyn = fagsaker[Stønadstype.BARNETILSYN],
             læremidler = fagsaker[Stønadstype.LÆREMIDLER],

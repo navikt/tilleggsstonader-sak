@@ -17,7 +17,6 @@ import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientMockConfig
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.dsl.BehandlingTestdataDsl
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
@@ -54,6 +53,10 @@ import org.springframework.test.web.servlet.client.RestTestClient
 import java.time.LocalDate
 import java.util.UUID
 
+data class BehandlingContext(
+    val behandlingId: BehandlingId,
+)
+
 /**
  * Gjennomfører en behandling fra journalpost og helt til et gitt steg.
  *
@@ -67,7 +70,7 @@ fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
     stønadstype: Stønadstype,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
     testdataProvider: BehandlingTestdataDsl.() -> Unit,
-): BehandlingId {
+): BehandlingContext {
     val journalpostSøknadForStønadstype = journalpostSøknadForStønadstype(stønadstype)
     mockStrukturertSøknadForJournalpost(journalpostSøknadForStønadstype, stønadstype)
     val behandlingId = håndterSøknadService.håndterSøknad(journalpostSøknadForStønadstype)!!.id
@@ -76,7 +79,7 @@ fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
         tilSteg = tilSteg,
         testdataProvider = testdataProvider,
     )
-    return behandlingId
+    return BehandlingContext(behandlingId)
 }
 
 private fun IntegrationTest.mockStrukturertSøknadForJournalpost(
@@ -142,31 +145,11 @@ fun IntegrationTest.gjennomførBehandlingsløp(
         gjennomførVilkårSteg(testdata, behandling.id, behandling.stønadstype)
     }
 
-    if (unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) && behandling.stønadstype.gjelderDagligReise()) {
-        if (tilSteg == StegType.VEDTAK) {
-            return
-        }
-
-        gjennomførVedtakSteg(behandling.id, behandling.stønadstype, testdata.vedtak.vedtak)
-
-        if (tilSteg == StegType.KJØRELISTE) {
-            return
-        }
-
-        gjennomførKjørelisteSteg(behandlingId)
-
-        if (tilSteg == StegType.BEREGNING) {
-            return
-        }
-
-        gjennomførBeregningStegDagligReise(behandlingId)
-    } else {
-        if (tilSteg == StegType.BEREGNE_YTELSE) {
-            return
-        }
-
-        gjennomførBeregningSteg(behandling.id, behandling.stønadstype, testdata.vedtak.vedtak)
+    if (tilSteg == StegType.BEREGNE_YTELSE) {
+        return
     }
+
+    gjennomførBeregningSteg(behandling.id, behandling.stønadstype, testdata.vedtak.vedtak)
 
     if (tilSteg == StegType.SIMULERING) {
         return
@@ -295,14 +278,6 @@ fun IntegrationTest.gjennomførSimuleringSteg(behandlingId: BehandlingId) {
         ),
     )
     kjørTasksKlareForProsessering()
-}
-
-fun IntegrationTest.gjennomførVedtakSteg(
-    behandlingId: BehandlingId,
-    stønadstype: Stønadstype,
-    opprettVedtak: OpprettVedtak = OpprettInnvilgelse(),
-) {
-    gjennomførBeregningSteg(behandlingId, stønadstype, opprettVedtak)
 }
 
 fun IntegrationTest.gjennomførKjørelisteSteg(behandlingId: BehandlingId) {

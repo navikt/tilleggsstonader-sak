@@ -28,7 +28,7 @@ class UtbetalingDagligReiseOffentligTransportIntegrationTest : CleanDatabaseInte
         val reiseperiode1 = Datoperiode(forrigeMåned.atDay(1), tom = forrigeMåned.atDay(7))
         val reiseperiode2 = Datoperiode(forrigeMåned.atDay(10), tom = forrigeMåned.atDay(17))
 
-        val behandlingId =
+        val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
@@ -50,7 +50,7 @@ class UtbetalingDagligReiseOffentligTransportIntegrationTest : CleanDatabaseInte
                 }
             }
 
-        val saksbehandling = testoppsettService.hentSaksbehandling(behandlingId)
+        val saksbehandling = testoppsettService.hentSaksbehandling(behandlingContext.behandlingId)
         val utbetalinger = KafkaFake.sendteMeldinger().finnPåTopic(kafkaTopics.utbetaling)
         val utbetaling = utbetalinger.single().verdiEllerFeil<IverksettingDto>()
 
@@ -123,7 +123,7 @@ class UtbetalingDagligReiseOffentligTransportIntegrationTest : CleanDatabaseInte
         val reiseperiode1 = Datoperiode(1 august 2025, 31 august 2025)
         val reiseperiode2 = Datoperiode(1 oktober 2025, 20 oktober 2025)
 
-        val behandlingId =
+        val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
@@ -152,7 +152,8 @@ class UtbetalingDagligReiseOffentligTransportIntegrationTest : CleanDatabaseInte
                 .sendteMeldinger()
                 .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
                 .single()
-                .also { assertThat(it.key()).isEqualTo(behandlingId.toString()) } // Første iverksettingId skal være behandlingId
+                // Første iverksettingId skal være behandlingId
+                .also { assertThat(it.key()).isEqualTo(behandlingContext.behandlingId.toString()) }
                 .verdiEllerFeil<IverksettingDto>()
 
         assertThat(utbetaling.utbetalinger.map { it.stønad }).containsExactlyInAnyOrder(

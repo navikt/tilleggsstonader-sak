@@ -34,6 +34,13 @@ data class AvklartKjørtUke(
         require(fom.ukenummer() == tom.ukenummer()) { "Fom og tom må være i samme uke" }
         require(fom.ukenummer() == ukenummer) { "Ukenummer $ukenummer stemmer ikke med perioden" }
     }
+
+    fun kopierTilNyBehandling(nyBehandlingId: BehandlingId): AvklartKjørtUke =
+        copy(
+            id = UUID.randomUUID(),
+            behandlingId = nyBehandlingId,
+            dager = dager.map { it.copy(id = UUID.randomUUID()) }.toSet(),
+        )
 }
 
 enum class UkeStatus {

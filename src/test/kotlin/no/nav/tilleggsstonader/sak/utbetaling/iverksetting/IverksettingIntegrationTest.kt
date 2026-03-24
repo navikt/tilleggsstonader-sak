@@ -16,7 +16,7 @@ class IverksettingIntegrationTest : CleanDatabaseIntegrationTest() {
         val omSekstiDager = LocalDate.now().plusDays(60)
         val omNittiDager = LocalDate.now().plusDays(90)
 
-        val førstegangsbehandlingId =
+        val førstegangsbehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(Stønadstype.DAGLIG_REISE_TSO) {
                 defaultDagligReiseTsoTestdata(fom = omTrettiDager, tom = omSekstiDager)
             }
@@ -25,7 +25,7 @@ class IverksettingIntegrationTest : CleanDatabaseIntegrationTest() {
             .sendteMeldinger()
             .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
 
-        opprettRevurderingOgGjennomførBehandlingsløp(førstegangsbehandlingId) {
+        opprettRevurderingOgGjennomførBehandlingsløp(førstegangsbehandlingContext.behandlingId) {
             defaultDagligReiseTsoTestdata(fom = omSekstiDager.plusDays(1), tom = omNittiDager)
         }
 

@@ -8,8 +8,8 @@ import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.integrasjonstest.BehandlingContext
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
@@ -301,16 +301,16 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
         }
     }
 
-    private fun finnKjørelistebehandling(behandlingId: BehandlingId): Behandling {
-        val rammebehandling = behandlingService.hentSaksbehandling(behandlingId)
+    private fun finnKjørelistebehandling(behandlingContext: BehandlingContext): Behandling {
+        val rammebehandling = behandlingService.hentSaksbehandling(behandlingContext.behandlingId)
 
         return behandlingService
             .hentBehandlinger(rammebehandling.fagsakId)
             .first { it.type == BehandlingType.KJØRELISTE }
     }
 
-    private fun finnInnsendtUkeIKjørelistebehandling(rammevedtakBehandlingId: BehandlingId): UkeVurderingDto {
-        val kjørelistebehandling = finnKjørelistebehandling(rammevedtakBehandlingId)
+    private fun finnInnsendtUkeIKjørelistebehandling(rammevedtakBehandlingContext: BehandlingContext): UkeVurderingDto {
+        val kjørelistebehandling = finnKjørelistebehandling(rammevedtakBehandlingContext)
         val reisevurdering = kall.privatBil.hentReisevurderingForBehandling(kjørelistebehandling.id).single()
 
         return reisevurdering.uker.single { it.kjørelisteId != null }

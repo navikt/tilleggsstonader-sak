@@ -41,13 +41,13 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
     fun `innvilge rammevedtak privat bil og henter ut rammevedtak`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
-        val behandlingId =
+        val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
                 defaultDagligReisePrivatBilTsoTestdata(fom, tom)
             }
-        val saksbehandling = testoppsettService.hentSaksbehandling(behandlingId)
+        val saksbehandling = testoppsettService.hentSaksbehandling(behandlingContext.behandlingId)
 
         // Sjekk at ingenting blir utbetalt
         KafkaFake
@@ -70,7 +70,7 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
             )
         val kjøreliste =
             kjørelisteSkjema(
-                reiseId = reiseId.toString(),
+                reiseId = reiseId,
                 periode = Datoperiode(fom, tom),
                 dagerKjørt = dagerKjørt,
             )

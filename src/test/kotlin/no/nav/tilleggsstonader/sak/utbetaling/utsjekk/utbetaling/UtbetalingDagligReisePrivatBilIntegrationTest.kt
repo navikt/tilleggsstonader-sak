@@ -52,7 +52,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : CleanDatabaseIntegrationTe
                 5 februar 2026 to 50,
             )
 
-        val førstegangsBehandlingId =
+        val førstegangsBehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
@@ -80,7 +80,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : CleanDatabaseIntegrationTe
                 }
             }
 
-        val førstegangsBehandling = testoppsettService.hentBehandling(førstegangsBehandlingId)
+        val førstegangsBehandling = testoppsettService.hentBehandling(førstegangsBehandlingContext.behandlingId)
         val kjørelisteBehandling =
             testoppsettService
                 .hentBehandlinger(førstegangsBehandling.fagsakId)

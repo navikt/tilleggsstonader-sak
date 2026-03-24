@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
@@ -35,6 +36,21 @@ class DagligReiseBeregnYtelseSteg(
         tilkjentYtelseService = tilkjentYtelseService,
         simuleringService = simuleringService,
     ) {
+    /**
+     * En daglige reiser behandling skal kun havne i steg "KJØRELISTE" dersom forrige behandling
+     * inneholdt et rammevedtak for privat bil.
+     */
+    override fun nesteSteg(
+        saksbehandling: Saksbehandling,
+        kanBehandlePrivatBil: Boolean,
+    ): StegType {
+        if (dagligReiseVedtakService.forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(saksbehandling.forrigeIverksatteBehandlingId)) {
+            return StegType.KJØRELISTE
+        }
+
+        return super.nesteSteg(saksbehandling, kanBehandlePrivatBil)
+    }
+
     override fun lagreVedtakForSatsjustering(
         saksbehandling: Saksbehandling,
         vedtak: VedtakDagligReiseRequest,
@@ -65,7 +81,7 @@ class DagligReiseBeregnYtelseSteg(
                 saksbehandling.id,
                 vedtaksperioder,
             )
-        val (beregningsresultat, _) =
+        val (beregningsresultat, rammevedtakPrivatBil) =
             beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
@@ -75,15 +91,11 @@ class DagligReiseBeregnYtelseSteg(
         dagligReiseVedtakService.lagreInnvilgetVedtak(
             behandling = saksbehandling,
             beregningsresultat = beregningsresultat,
-            rammevedtakPrivatBil = null,
+            rammevedtakPrivatBil = rammevedtakPrivatBil,
             vedtaksperioder = vedtaksperioder,
             begrunnelse = vedtak.begrunnelse,
             tidligsteEndring = tidligsteEndring,
         )
-
-        feilHvis(beregningsresultat.offentligTransport == null) {
-            "Foreløpig støttes kun beregning av offentlig transport."
-        }
 
         opprettAndelerDagligReiseService.lagreAndelerForBehandling(saksbehandling)
     }
@@ -99,7 +111,7 @@ class DagligReiseBeregnYtelseSteg(
             "Opphørsdato er ikke satt"
         }
         val opphørsdato = vedtak.opphørsdato
-        val forrigeVedtak = dagligReiseVedtakService.hentVedtak(saksbehandling.forrigeIverksatteBehandlingId)
+        val forrigeVedtak = dagligReiseVedtakService.hentInnvilgelseEllerOpphørVedtak(saksbehandling.forrigeIverksatteBehandlingId)
 
         opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
 
@@ -125,7 +137,7 @@ class DagligReiseBeregnYtelseSteg(
         dagligReiseVedtakService.lagreOpphørsvedtak(
             saksbehandling = saksbehandling,
             beregningsresultat = beregningsresultat,
-            rammevedtakPrivatBil = null,
+            rammevedtakPrivatBil = null, // TODO: Håndter rammevedtak i opphør
             avkortetVedtaksperioder = avkortetVedtaksperioder,
             vedtak = vedtak,
         )

@@ -210,7 +210,7 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
     private fun opprettBehandlingOgSendInnKjøreliste(dagerKjørt: List<Pair<LocalDate, Int>>): Saksbehandling {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
-        val rammebehandlingId =
+        val rammebehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
@@ -222,7 +222,7 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
                 }
             }
 
-        val rammebehandling = behandlingService.hentSaksbehandling(rammebehandlingId)
+        val rammebehandling = behandlingService.hentSaksbehandling(rammebehandlingContext.behandlingId)
         val kjørelistebehandling =
             behandlingService.hentBehandlinger(rammebehandling.fagsakId).first { it.type == BehandlingType.KJØRELISTE }
 

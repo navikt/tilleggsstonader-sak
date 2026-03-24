@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
-import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 
 object UtgifterValideringUtil {
@@ -17,7 +16,6 @@ object UtgifterValideringUtil {
      */
     fun validerUtgifter(
         utgifter: BoutgifterPerUtgiftstype,
-        tillatLøpendeOgMidlertidigUtgiftSammeBehandling: Boolean,
         vedtakstype: TypeVedtak,
         vedtaksperioder: List<Vedtaksperiode>,
     ) {
@@ -26,11 +24,6 @@ object UtgifterValideringUtil {
 
         brukerfeilHvis(utgifter.values.flatten().isEmpty()) {
             "Det er ikke lagt inn noen oppfylte utgiftsperioder"
-        }
-        if (!tillatLøpendeOgMidlertidigUtgiftSammeBehandling) {
-            brukerfeilHvis(detFinnesBådeLøpendeOgMidlertidigeUtgifter(utgifter)) {
-                "Foreløpig støtter vi ikke løpende og midlertidige utgifter i samme behandling"
-            }
         }
         utgifter.entries.forEach { (type, utgiftsperioderAvGittType) ->
             feilHvis(utgiftsperioderAvGittType.overlapper()) {
@@ -42,14 +35,5 @@ object UtgifterValideringUtil {
                 "Utgiftsperioder inneholder ugyldig utgift: $ikkePositivUtgift"
             }
         }
-    }
-
-    private fun detFinnesBådeLøpendeOgMidlertidigeUtgifter(utgifter: BoutgifterPerUtgiftstype): Boolean {
-        val finnesLøpendeUtgifter =
-            utgifter.keys.any {
-                it == TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG || it == TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER
-            }
-        val finnesUtgifterOvernatting = utgifter.keys.any { it == TypeBoutgift.UTGIFTER_OVERNATTING }
-        return finnesLøpendeUtgifter && finnesUtgifterOvernatting
     }
 }

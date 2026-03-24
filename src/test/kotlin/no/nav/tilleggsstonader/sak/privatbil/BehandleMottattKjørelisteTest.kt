@@ -38,7 +38,7 @@ class BehandleMottattKjørelisteTest : CleanDatabaseIntegrationTest() {
     @Test
     fun `ta i mot kjøreliste og opprett behandling med kopierte verdier`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-        val behandlingId =
+        val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
@@ -53,7 +53,7 @@ class BehandleMottattKjørelisteTest : CleanDatabaseIntegrationTest() {
                         )
                 }
             }
-        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        val behandling = behandlingService.hentSaksbehandling(behandlingContext.behandlingId)
         val alleBehandlinger = behandlingService.hentBehandlinger(behandling.fagsakId)
 
         val kjørelistebehandling = alleBehandlinger.first { it.type == BehandlingType.KJØRELISTE }
@@ -64,8 +64,8 @@ class BehandleMottattKjørelisteTest : CleanDatabaseIntegrationTest() {
         assertThat(kjørelistebehandling.type).isEqualTo(BehandlingType.KJØRELISTE)
         assertThat(kjørelistebehandling.årsak).isEqualTo(BehandlingÅrsak.KJØRELISTE)
 
-        val vedtakForrigeBehandling = vedtakService.hentVedtak(behandlingId)
-        val vedtakKjørelistebehandling = vedtakService.hentVedtak(kjørelistebehandling.id)
+        val vedtakForrigeBehandling = vedtakService.hentInnvilgelseEllerOpphørVedtak(behandlingContext.behandlingId)
+        val vedtakKjørelistebehandling = vedtakService.hentInnvilgelseEllerOpphørVedtak(kjørelistebehandling.id)
 
         assertThat(vedtakKjørelistebehandling.type).isEqualTo(vedtakForrigeBehandling.type)
         assertThat(vedtakKjørelistebehandling.data).isEqualTo(vedtakForrigeBehandling.data)

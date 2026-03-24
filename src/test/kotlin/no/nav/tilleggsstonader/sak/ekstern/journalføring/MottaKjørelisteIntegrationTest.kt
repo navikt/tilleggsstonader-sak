@@ -32,14 +32,14 @@ class MottaKjørelisteIntegrationTest : CleanDatabaseIntegrationTest() {
 
         val fom = 1 januar 2026
         val tom = 14 januar 2026
-        val behandlingId =
+        val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
                 defaultDagligReisePrivatBilTsoTestdata(fom, tom)
             }
 
-        val saksbehandling = testoppsettService.hentSaksbehandling(behandlingId)
+        val saksbehandling = testoppsettService.hentSaksbehandling(behandlingContext.behandlingId)
 
         val rammevedtak = kall.privatBil.hentRammevedtak("12345678910")
         val reiseId = rammevedtak.single().reiseId

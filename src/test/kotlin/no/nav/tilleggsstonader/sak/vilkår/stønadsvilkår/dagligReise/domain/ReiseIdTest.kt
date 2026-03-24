@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 class ReiseIdTest : CleanDatabaseIntegrationTest() {
     @Test
     fun `reiseId blir overført fra vilkår til beregningsresultat`() {
-        val behandlingId =
+        val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
@@ -20,12 +20,12 @@ class ReiseIdTest : CleanDatabaseIntegrationTest() {
 
         val vilkår =
             kall.vilkårDagligReise
-                .hentVilkår(behandlingId)
+                .hentVilkår(behandlingContext.behandlingId)
                 .single()
 
         val reiseIdBeregningsresultat =
             kall.vedtak
-                .hentVedtak(Stønadstype.DAGLIG_REISE_TSO, behandlingId)
+                .hentVedtak(Stønadstype.DAGLIG_REISE_TSO, behandlingContext.behandlingId)
                 .expectOkWithBody<InnvilgelseDagligReiseResponse>()
                 .beregningsresultat
                 .offentligTransport!!

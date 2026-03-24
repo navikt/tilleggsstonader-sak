@@ -59,7 +59,7 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
         every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoAAP()
 
         // Gjennomfører behandling for Nay
-        val behandlingId =
+        val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
                 tilSteg = StegType.BEREGNE_YTELSE,
@@ -81,7 +81,7 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
                 }
             }
 
-        gjennomførBeregningStegKall(behandlingId, Stønadstype.DAGLIG_REISE_TSO)
+        gjennomførBeregningStegKall(behandlingContext.behandlingId, Stønadstype.DAGLIG_REISE_TSO)
             .expectStatus()
             .isBadRequest
             .expectBody()
@@ -119,7 +119,7 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
         val fom = 1 januar 2025
         val tom = 28 februar 2025
 
-        val behandlingId =
+        val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSR,
                 tilSteg = StegType.BEREGNE_YTELSE,
@@ -145,7 +145,7 @@ class InnvilgeDagligReiseIntegrationTest : CleanDatabaseIntegrationTest() {
             }
 
         gjennomførBeregningStegKall(
-            behandlingId,
+            behandlingContext.behandlingId,
             Stønadstype.DAGLIG_REISE_TSO,
             OpprettInnvilgelse(
                 vedtaksperioder =
