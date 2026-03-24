@@ -79,6 +79,7 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
             insertQuery.trimIndent(),
             mapOf(
                 "id" to id,
+                "globalId" to UUID.randomUUID().toString(),
                 "behandlingId" to behandling.id.id,
                 "forrigeVilkårperiodeId" to null,
                 "type" to type.tilDbType(),

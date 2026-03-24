@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
@@ -46,6 +47,7 @@ import java.util.UUID
 
 data class VilkårperiodeDto(
     val id: UUID,
+    val globalId: VilkårperiodeGlobalId,
     @JsonDeserialize(using = VilkårperiodeTypeDeserializer::class)
     val type: VilkårperiodeType,
     val typeAktivitet: KodeverkDto?,
@@ -69,6 +71,7 @@ data class VilkårperiodeDto(
 fun Vilkårperiode.tilDto() =
     VilkårperiodeDto(
         id = this.id,
+        globalId = this.globalId,
         type = this.type,
         typeAktivitet = this.typeAktivitet?.tilKodeverkDto(),
         fom = this.fom,

@@ -46,6 +46,7 @@ typealias VilkårperiodeAktivitet = GeneriskVilkårperiode<AktivitetFaktaOgVurde
 data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
     @Id
     val id: UUID = UUID.randomUUID(),
+    val globalId: VilkårperiodeGlobalId = VilkårperiodeGlobalId.random(),
     val behandlingId: BehandlingId,
     @Column("forrige_vilkarperiode_id")
     val forrigeVilkårperiodeId: UUID? = null,
@@ -252,3 +253,16 @@ data class Vilkårperioder(
     val målgrupper: List<VilkårperiodeMålgruppe>,
     val aktiviteter: List<VilkårperiodeAktivitet>,
 )
+
+@JvmInline
+value class VilkårperiodeGlobalId(
+    val id: UUID,
+) {
+    override fun toString(): String = id.toString()
+
+    companion object {
+        fun random() = VilkårperiodeGlobalId(UUID.randomUUID())
+
+        fun fromString(id: String) = VilkårperiodeGlobalId(UUID.fromString(id))
+    }
+}
