@@ -12,7 +12,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPri
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.SatsForPeriodePrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
@@ -28,27 +27,7 @@ class PrivatBilBeregningService(
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkår: List<VilkårDagligReise>,
     ): RammevedtakPrivatBil? {
-        val reiseInformasjon =
-            oppfylteVilkår.flatMap { vilkår ->
-                val fakta = vilkår.fakta
-                if (fakta is FaktaPrivatBil) {
-                    fakta.faktaDelperioder.map { periode ->
-                        ReiseMedPrivatBil(
-                            fom = periode.fom,
-                            tom = periode.tom,
-                            reiseId = fakta.reiseId,
-                            aktivitetsadresse = fakta.adresse,
-                            reisedagerPerUke = periode.reisedagerPerUke,
-                            reiseavstandEnVei = fakta.reiseavstandEnVei,
-                            bompengerEnVei = periode.bompengerEnVei,
-                            fergekostandEnVei = periode.fergekostandEnVei,
-                        )
-                    }
-                } else {
-                    emptyList()
-                }
-            }
-
+        val reiseInformasjon = oppfylteVilkår.map { it.tilReiseMedPrivatBil() }
         val resultatForReiser =
             reiseInformasjon.mapNotNull {
                 beregnForReise(it, vedtaksperioder)
@@ -68,11 +47,18 @@ class PrivatBilBeregningService(
         val reiseOgVedtaksperioderSnitt = finnSnittMellomReiseOgVedtaksperioder(reise, vedtaksperioder)
 
         return reiseOgVedtaksperioderSnitt.justertReiseperiode?.let { justertReise ->
-            validerVedtaksperioderErSammenhengendeInnenforReise(justertReise, reiseOgVedtaksperioderSnitt.justerteVedtaksperioder)
+            validerVedtaksperioderErSammenhengendeInnenforReise(
+                justertReise,
+                reiseOgVedtaksperioderSnitt.justerteVedtaksperioder,
+            )
             RammeForReiseMedPrivatBil(
                 reiseId = reise.reiseId,
                 aktivitetsadresse = reise.aktivitetsadresse,
-                grunnlag = lagBeregningsgrunnlagForReise(justertReise, reiseOgVedtaksperioderSnitt.justerteVedtaksperioder),
+                grunnlag =
+                    lagBeregningsgrunnlagForReise(
+                        justertReise,
+                        reiseOgVedtaksperioderSnitt.justerteVedtaksperioder,
+                    ),
             )
         }
     }
