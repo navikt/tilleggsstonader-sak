@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
-import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
+import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
@@ -27,7 +27,7 @@ import org.springframework.test.web.servlet.client.expectBody
 import java.math.BigDecimal
 import java.time.LocalDate
 
-class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
+class InnvilgePrivatBilIntegrationTest : IntegrationTest() {
     @Autowired
     lateinit var kjørelisteRepository: KjørelisteRepository
 
@@ -55,7 +55,7 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
             .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
 
         // Sjekk at rammevedtaket kan hentes
-        val rammevedtak = kall.privatBil.hentRammevedtak("12345678910")
+        val rammevedtak = kall.privatBil.hentRammevedtak(behandlingContext.ident)
         val reiseId = rammevedtak.single().reiseId
 
         assertThat(rammevedtak).hasSize(1)
@@ -76,7 +76,7 @@ class InnvilgePrivatBilIntegrationTest : CleanDatabaseIntegrationTest() {
             )
 
         // Send inn kjøreliste
-        val journalpostId = sendInnKjøreliste(kjøreliste)
+        val journalpostId = sendInnKjøreliste(kjøreliste, behandlingContext.ident)
 
         // Verifisere kjøreliste-journalpost blitt arkivert
         verify(exactly = 1) {

@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
+import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomf
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class IverksettingIntegrationTest : CleanDatabaseIntegrationTest() {
+class IverksettingIntegrationTest : IntegrationTest() {
     @Test
     fun `skal ikke sende noe på kafka hvis vi bare har andeler fram i tid`() {
         val omTrettiDager = LocalDate.now().plusDays(30)

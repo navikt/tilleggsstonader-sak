@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.juni
 import no.nav.tilleggsstonader.libs.utils.dato.mars
-import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
+import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired
 class DagligReiseBeregnYtelseStegIntegrationTest(
     @Autowired private val vedtakService: VedtakService,
     @Autowired private val iverksettService: IverksettService,
-) : CleanDatabaseIntegrationTest() {
+) : IntegrationTest() {
     @Test
     fun `skal kunne opphøre`() {
         val førstegangsbehandlingContext =

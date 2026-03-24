@@ -63,11 +63,12 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
         val tomTiltaksenheten = 30 september 2025
 
         // Gjennomfører behandling for Tiltaksenheten
-        opprettBehandlingOgGjennomførBehandlingsløp(
-            stønadstype = Stønadstype.DAGLIG_REISE_TSR,
-        ) {
-            defaultDagligReiseTsrTestdata(fomTiltaksenheten, tomTiltaksenheten)
-        }
+        val behandlingContextTiltaksenheten =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSR,
+            ) {
+                defaultDagligReiseTsrTestdata(fomTiltaksenheten, tomTiltaksenheten)
+            }
 
         every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoAAP()
 
@@ -76,6 +77,7 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
                 tilSteg = StegType.INNGANGSVILKÅR,
+                ident = behandlingContextTiltaksenheten.ident,
             ) {}
 
         val forventetDetaljertVedtaksperiodeTsr =

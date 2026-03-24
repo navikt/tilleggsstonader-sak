@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.august
 import no.nav.tilleggsstonader.libs.utils.dato.oktober
-import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
+import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.finnPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.YearMonth
 
-class UtbetalingDagligReiseOffentligTransportIntegrationTest : CleanDatabaseIntegrationTest() {
+class UtbetalingDagligReiseOffentligTransportIntegrationTest : IntegrationTest() {
     private val nå = LocalDate.now()
     private val fom = nå.minusMonths(3)
     private val tom = nå.plusMonths(3)

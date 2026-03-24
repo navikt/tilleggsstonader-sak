@@ -232,4 +232,6 @@ class TestoppsettService(
                 identer = fagsak.personIdenter,
             ),
         )
+
+    fun hentPersonidentForBehandlingId(behandlingId: BehandlingId) = behandlingRepository.finnAktivIdent(behandlingId)
 }

@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
+import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
@@ -55,6 +56,7 @@ import java.util.UUID
 
 data class BehandlingContext(
     val behandlingId: BehandlingId,
+    val ident: String,
 )
 
 /**
@@ -64,22 +66,25 @@ data class BehandlingContext(
  *
  * [stønadstype] Oppretter journalpost med brevkode tilhørende stønadstype som brukes til å opprette fagsak
  * [tilSteg] I hvilket steg behandlingen skal ende opp. Som default blir den ferdigstilt.
+ * [ident] Bruker-ident på journalposten. Sak skal opprettes på denne brukeren
  *
  */
 fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
     stønadstype: Stønadstype,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
+    ident: String = FnrGenerator.generer(),
     testdataProvider: BehandlingTestdataDsl.() -> Unit,
 ): BehandlingContext {
-    val journalpostSøknadForStønadstype = journalpostSøknadForStønadstype(stønadstype)
+    val journalpostSøknadForStønadstype = journalpostSøknadForStønadstype(stønadstype, ident)
     mockStrukturertSøknadForJournalpost(journalpostSøknadForStønadstype, stønadstype)
     val behandlingId = håndterSøknadService.håndterSøknad(journalpostSøknadForStønadstype)!!.id
     gjennomførBehandlingsløp(
         behandlingId = behandlingId,
+        ident = ident,
         tilSteg = tilSteg,
         testdataProvider = testdataProvider,
     )
-    return BehandlingContext(behandlingId)
+    return BehandlingContext(behandlingId, ident)
 }
 
 private fun IntegrationTest.mockStrukturertSøknadForJournalpost(
@@ -96,25 +101,29 @@ private fun IntegrationTest.mockStrukturertSøknadForJournalpost(
             journalpost.dokumenter?.single()!!.dokumentInfoId,
             Dokumentvariantformat.ORIGINAL,
         )
-    } returns jsonMapper.writeValueAsBytes(søknadForStønadstype(stønadstype))
+    } returns jsonMapper.writeValueAsBytes(søknadForStønadstype(stønadstype, ident = journalpost.bruker!!.id))
 }
 
-private fun søknadForStønadstype(stønadstype: Stønadstype) =
-    when (stønadstype) {
-        Stønadstype.BARNETILSYN ->
-            søknadskjemaBarnetilsyn(
-                barnMedBarnepass = listOf(barnMedBarnepass(ident = PdlClientMockConfig.BARN_FNR)),
-            )
+private fun søknadForStønadstype(
+    stønadstype: Stønadstype,
+    ident: String,
+) = when (stønadstype) {
+    Stønadstype.BARNETILSYN ->
+        søknadskjemaBarnetilsyn(
+            ident = ident,
+            barnMedBarnepass = listOf(barnMedBarnepass(ident = PdlClientMockConfig.BARN_FNR)),
+        )
 
-        Stønadstype.LÆREMIDLER -> søknadskjemaLæremidler()
-        Stønadstype.BOUTGIFTER -> søknadBoutgifter()
-        Stønadstype.DAGLIG_REISE_TSO,
-        Stønadstype.DAGLIG_REISE_TSR,
-        -> søknadDagligReise()
-    }
+    Stønadstype.LÆREMIDLER -> søknadskjemaLæremidler(ident = ident)
+    Stønadstype.BOUTGIFTER -> søknadBoutgifter(ident = ident)
+    Stønadstype.DAGLIG_REISE_TSO,
+    Stønadstype.DAGLIG_REISE_TSR,
+    -> søknadDagligReise(ident = ident)
+}
 
 fun IntegrationTest.gjennomførBehandlingsløp(
     behandlingId: BehandlingId,
+    ident: String,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
     testdataProvider: BehandlingTestdataDsl.() -> Unit,
 ) {
@@ -182,7 +191,7 @@ fun IntegrationTest.gjennomførBehandlingsløp(
 
     testdata.kjørelisterTilInnsending.forEach {
         val kjøreliste = it.build(reiserMedPrivatBil)
-        sendInnKjøreliste(kjøreliste)
+        sendInnKjøreliste(kjøreliste, ident)
     }
 }
 
@@ -227,6 +236,7 @@ fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
     val revurderingId = opprettRevurdering(opprettBehandlingDto)
     gjennomførBehandlingsløp(
         behandlingId = revurderingId,
+        ident = testoppsettService.hentPersonidentForBehandlingId(revurderingId),
         tilSteg = tilSteg,
         testdataProvider = testdataProvider,
     )

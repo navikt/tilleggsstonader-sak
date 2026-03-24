@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
+import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 
-class HenleggBehandlingIntegrationTest : CleanDatabaseIntegrationTest() {
+class HenleggBehandlingIntegrationTest : IntegrationTest() {
     @Autowired
     lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
 
