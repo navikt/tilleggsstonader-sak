@@ -4,7 +4,7 @@ import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.januar
-import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
+import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
@@ -20,7 +20,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class GjenbrukUkerIKjørelistebehandlingIntegrationTest : CleanDatabaseIntegrationTest() {
+class GjenbrukUkerIKjørelistebehandlingIntegrationTest : IntegrationTest() {
     private val førsteUkeFom = 5 januar 2026
     private val førsteUkeTom = 11 januar 2026
     private val andreUkeFom = 12 januar 2026
@@ -74,20 +74,22 @@ class GjenbrukUkerIKjørelistebehandlingIntegrationTest : CleanDatabaseIntegrati
 
         val reiseId =
             kall.privatBil
-                .hentRammevedtak("12345678910")
+                .hentRammevedtak(førstegangsBehandlingContext.ident)
                 .single()
                 .reiseId
 
         sendInnKjøreliste(
-            kjørelisteSkjema(
-                reiseId = reiseId,
-                periode = Datoperiode(andreUkeFom, andreUkeTom),
-                dagerKjørt =
-                    listOf(
-                        KjørtDag(12 januar 2026, 50),
-                        KjørtDag(13 januar 2026, 50),
-                    ),
-            ),
+            kjøreliste =
+                kjørelisteSkjema(
+                    reiseId = reiseId,
+                    periode = Datoperiode(andreUkeFom, andreUkeTom),
+                    dagerKjørt =
+                        listOf(
+                            KjørtDag(12 januar 2026, 50),
+                            KjørtDag(13 januar 2026, 50),
+                        ),
+                ),
+            ident = førstegangsBehandlingContext.ident,
         )
 
         val kjørelistebehandlinger =
