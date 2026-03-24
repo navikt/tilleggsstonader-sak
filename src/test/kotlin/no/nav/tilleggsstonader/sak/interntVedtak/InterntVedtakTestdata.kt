@@ -65,6 +65,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatL
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernatting
@@ -1010,10 +1011,17 @@ object InterntVedtakTestdata {
                         FaktaDagligReisePrivatBil(
                             reiseId = dummyReiseId,
                             adresse = "Tiltaksgata 1",
-                            reisedagerPerUke = 3,
                             reiseavstandEnVei = BigDecimal(40.5),
-                            bompengerEnVei = 20,
-                            fergekostandEnVei = 30,
+                            faktaDelperioder =
+                                listOf(
+                                    FaktaDelperiodePrivatBil(
+                                        fom = LocalDate.of(2025, 1, 1),
+                                        tom = LocalDate.of(2025, 2, 28),
+                                        reisedagerPerUke = 3,
+                                        bompengerEnVei = 20,
+                                        fergekostandEnVei = 30,
+                                    ),
+                                ),
                         ),
                 ),
             )

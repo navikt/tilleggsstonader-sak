@@ -132,7 +132,9 @@ data class TidligsteEndringIBehandlingUtleder(
         Comparator
             .comparing<PeriodeWrapper<Vilkår>, LocalDate> { it.fom }
             .thenComparing { o1, o2 ->
-                (barnIdTilIdentMap[o1.periodeType.barnId] ?: "").compareTo(barnIdTilIdentMap[o2.periodeType.barnId] ?: "")
+                (barnIdTilIdentMap[o1.periodeType.barnId] ?: "").compareTo(
+                    barnIdTilIdentMap[o2.periodeType.barnId] ?: "",
+                )
             }.thenComparing { o1, o2 -> o1.tom.compareTo(o2.tom) }
 
     private val vilkårsperioderComparator =
@@ -188,7 +190,11 @@ data class TidligsteEndringIBehandlingUtleder(
     private fun utledTidligsteEndringForVilkår(): LocalDate? =
         utledEndringIPeriode(
             perioderNå = vilkår.fjernSlettede().mapNotNull { it.wrapSomPeriode() }.sortedWith(vilkårComparator),
-            perioderTidligere = vilkårTidligereBehandling.fjernSlettede().mapNotNull { it.wrapSomPeriode() }.sortedWith(vilkårComparator),
+            perioderTidligere =
+                vilkårTidligereBehandling
+                    .fjernSlettede()
+                    .mapNotNull { it.wrapSomPeriode() }
+                    .sortedWith(vilkårComparator),
         ) { vilkårNå, vilkårTidligereBehandling ->
             erVilkårEndret(vilkårNå.periodeType, vilkårTidligereBehandling.periodeType)
         }
@@ -198,7 +204,10 @@ data class TidligsteEndringIBehandlingUtleder(
     private fun utledTidligsteEndringForAktiviteter(): LocalDate? =
         utledEndringIPeriode(
             perioderNå = vilkårsperioder.aktiviteter.fjernSlettede().sortedWith(vilkårsperioderComparator),
-            perioderTidligere = vilkårsperioderTidligereBehandling.aktiviteter.fjernSlettede().sortedWith(vilkårsperioderComparator),
+            perioderTidligere =
+                vilkårsperioderTidligereBehandling.aktiviteter
+                    .fjernSlettede()
+                    .sortedWith(vilkårsperioderComparator),
             erEndret = ::erMålgruppeEllerAktivitetEndret,
         )
 
@@ -262,10 +271,15 @@ data class TidligsteEndringIBehandlingUtleder(
             }
 
             faktaNå is FaktaDagligReisePrivatBil && faktaTidligere is FaktaDagligReisePrivatBil -> {
-                faktaNå.reisedagerPerUke != faktaTidligere.reisedagerPerUke ||
-                    faktaNå.reiseavstandEnVei != faktaTidligere.reiseavstandEnVei ||
-                    faktaNå.bompengerEnVei != faktaTidligere.bompengerEnVei ||
-                    faktaNå.fergekostandEnVei != faktaTidligere.fergekostandEnVei
+                faktaNå.reiseavstandEnVei != faktaTidligere.reiseavstandEnVei ||
+                    faktaNå.faktaDelperioder.size != faktaTidligere.faktaDelperioder.size ||
+                    faktaNå.faktaDelperioder.zip(faktaTidligere.faktaDelperioder).any { (nå, tidligere) ->
+                        nå.fom != tidligere.fom ||
+                            nå.tom != tidligere.tom ||
+                            nå.reisedagerPerUke != tidligere.reisedagerPerUke ||
+                            nå.bompengerEnVei != tidligere.bompengerEnVei ||
+                            nå.fergekostandEnVei != tidligere.fergekostandEnVei
+                    }
             }
 
             else -> {

@@ -28,7 +28,6 @@ class PrivatBilBeregningService(
         oppfylteVilkår: List<VilkårDagligReise>,
     ): RammevedtakPrivatBil? {
         val reiseInformasjon = oppfylteVilkår.map { it.tilReiseMedPrivatBil() }
-
         val resultatForReiser =
             reiseInformasjon.mapNotNull {
                 beregnForReise(it, vedtaksperioder)
@@ -48,11 +47,18 @@ class PrivatBilBeregningService(
         val reiseOgVedtaksperioderSnitt = finnSnittMellomReiseOgVedtaksperioder(reise, vedtaksperioder)
 
         return reiseOgVedtaksperioderSnitt.justertReiseperiode?.let { justertReise ->
-            validerVedtaksperioderErSammenhengendeInnenforReise(justertReise, reiseOgVedtaksperioderSnitt.justerteVedtaksperioder)
+            validerVedtaksperioderErSammenhengendeInnenforReise(
+                justertReise,
+                reiseOgVedtaksperioderSnitt.justerteVedtaksperioder,
+            )
             RammeForReiseMedPrivatBil(
                 reiseId = reise.reiseId,
                 aktivitetsadresse = reise.aktivitetsadresse,
-                grunnlag = lagBeregningsgrunnlagForReise(justertReise, reiseOgVedtaksperioderSnitt.justerteVedtaksperioder),
+                grunnlag =
+                    lagBeregningsgrunnlagForReise(
+                        justertReise,
+                        reiseOgVedtaksperioderSnitt.justerteVedtaksperioder,
+                    ),
             )
         }
     }
