@@ -10,24 +10,29 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomf
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class BevarGlobalIdMellomBehandlingerIntegrationTest: IntegrationTest() {
-
+class BevarGlobalIdMellomBehandlingerIntegrationTest : IntegrationTest() {
     @Test
     fun `opprett to behandlinger, vilkårsperioder skal ha samme globalId for førstegangsbehandling og revurdering`() {
         val fom = 1 januar 2026
         val tom = 31 mai 2026
-        val førstegangsbehandlingContext = opprettBehandlingOgGjennomførBehandlingsløp(
-            stønadstype = Stønadstype.LÆREMIDLER
-        ) {
-            defaultLæremidlerTestdata(fom, tom)
-        }
+        val førstegangsbehandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.LÆREMIDLER,
+            ) {
+                defaultLæremidlerTestdata(fom, tom)
+            }
 
-        val revurderingBehandlingId = opprettRevurderingOgGjennomførBehandlingsløp(
-            fraBehandlingId = førstegangsbehandlingContext.behandlingId,
-            tilSteg = StegType.INNGANGSVILKÅR,
-        ) {}
+        val revurderingBehandlingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = førstegangsbehandlingContext.behandlingId,
+                tilSteg = StegType.INNGANGSVILKÅR,
+            ) {}
 
-        val vilkårperioderFørstegangsbehandling = kall.vilkårperiode.hentForBehandling(førstegangsbehandlingContext.behandlingId).vilkårperioder
+        val vilkårperioderFørstegangsbehandling =
+            kall.vilkårperiode
+                .hentForBehandling(
+                    førstegangsbehandlingContext.behandlingId,
+                ).vilkårperioder
         val vilkårperioderRevurdering = kall.vilkårperiode.hentForBehandling(revurderingBehandlingId).vilkårperioder
 
         assertThat(vilkårperioderFørstegangsbehandling.aktiviteter.single().globalId)
