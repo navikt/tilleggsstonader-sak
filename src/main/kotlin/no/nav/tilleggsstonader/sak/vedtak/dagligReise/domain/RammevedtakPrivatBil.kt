@@ -21,14 +21,22 @@ data class RammeForReiseMedPrivatBil(
 data class BeregningsgrunnlagForReiseMedPrivatBil(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val reisedagerPerUke: Int,
+    val delPerioder: List<Delperiode>,
     val reiseavstandEnVei: BigDecimal,
-    val ekstrakostnader: Ekstrakostnader,
-    val satser: List<SatsForPeriodePrivatBil>,
     val vedtaksperioder: List<Vedtaksperiode>,
 ) : Periode<LocalDate> {
     fun vedtaksperiodeForPeriode(periode: Periode<LocalDate>) = vedtaksperioder.single { it.inneholder(periode) }
 }
+
+data class Delperiode(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val ekstrakostnader: Ekstrakostnader,
+    val reisedagerPerUke: Int,
+    val satsBekreftetVedVedtakstidspunkt: Boolean,
+    val kilometersats: BigDecimal,
+    val dagsatsUtenParkering: BigDecimal, // hva brukeren kan få dekt per dag. Inkluderer bompenger og ferge, men ikke parkering.
+) : Periode<LocalDate>
 
 // TODO: Finn ut om det finnes abbonnement på disse prisene og om det påvirker hvordan vi vil løse dette
 data class Ekstrakostnader(
@@ -44,15 +52,3 @@ data class Ekstrakostnader(
         return sum.toBigDecimal()
     }
 }
-
-/**
- * dagsatsUtenParkering: hva brukeren kan få dekt per dag. Inkluderer bompenger og ferge, men ikke parkering.
- * maksBeløpSomKanDekkesFørParkering: maksimalt beløp bruker kan få dekt dersom hen kjører hver dag.
- */
-data class SatsForPeriodePrivatBil(
-    override val fom: LocalDate,
-    override val tom: LocalDate,
-    val satsBekreftetVedVedtakstidspunkt: Boolean,
-    val kilometersats: BigDecimal,
-    val dagsatsUtenParkering: BigDecimal,
-) : Periode<LocalDate>

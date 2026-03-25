@@ -10,9 +10,9 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Delperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.SatsForPeriodePrivatBil
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -41,17 +41,22 @@ class PrivatBilBeregningsresultatService {
     ): BeregningsresultatForReisePrivatBil {
         // Kaster feil om det finnes godkjente dager utenfor rammevedtak
         validerDagerErInnenforRammevedtak(rammeForReise, avklarteUkerForReise)
-        val satser = rammeForReise.grunnlag.satser
+        val delperioder = rammeForReise.grunnlag.delPerioder
 
-        // Grupper dager på sats
         return BeregningsresultatForReisePrivatBil(
             reiseId = rammeForReise.reiseId,
             perioder =
                 avklarteUkerForReise
                     .flatMap { it.dager }
                     .filter { rammeForReise.grunnlag.inneholder(it.dato) }
-                    .groupBy { satser.satsForDato(it.dato) }
-                    .flatMap { (sats, dager) -> lagPerioderForDagerMedSammeSats(dager, sats, brukersNavKontor) },
+                    .groupBy { delperioder.delperiodeForDato(it.dato) }
+                    .flatMap { (delperiode, dager) ->
+                        lagPerioderForDagerMedSammeSats(
+                            dager,
+                            delperiode,
+                            brukersNavKontor,
+                        )
+                    },
         )
     }
 
@@ -71,7 +76,7 @@ class PrivatBilBeregningsresultatService {
 
     private fun lagPerioderForDagerMedSammeSats(
         dager: List<AvklartKjørtDag>,
-        sats: SatsForPeriodePrivatBil,
+        delperiode: Delperiode,
         brukersNavKontor: String?,
     ): Collection<BeregningsresultatForReisePrivatBilPeriode> {
         // Grupper dager på uke, slik at alle dager innenfor en uke utbetales samme dag
@@ -86,7 +91,7 @@ class PrivatBilBeregningsresultatService {
                             BeregningsresultatForReisePrivatBilDag(
                                 dato = dag.dato,
                                 parkeringskostnad = parkeringsutgift,
-                                stønadsbeløpForDag = sats.dagsatsUtenParkering.plus(parkeringsutgift.toBigDecimal()),
+                                stønadsbeløpForDag = delperiode.dagsatsUtenParkering.plus(parkeringsutgift.toBigDecimal()),
                             )
                         }
 
@@ -96,7 +101,7 @@ class PrivatBilBeregningsresultatService {
                     grunnlag =
                         BeregningsresultatForReisePrivatBilGrunnlag(
                             dager = beregnedeDager,
-                            dagsatsUtenParkering = sats.dagsatsUtenParkering,
+                            dagsatsUtenParkering = delperiode.dagsatsUtenParkering,
                         ),
                     stønadsbeløp = beregnedeDager.sumOf { it.stønadsbeløpForDag },
                     brukersNavKontor = brukersNavKontor,
@@ -105,6 +110,6 @@ class PrivatBilBeregningsresultatService {
     }
 }
 
-private fun List<SatsForPeriodePrivatBil>.satsForDato(dato: LocalDate) =
-    singleOrNull { it.inneholder(dato) }
-        ?: error("Finner ingen sats i rammevedtak for dato $dato")
+private fun List<Delperiode>.delperiodeForDato(dato: LocalDate) =
+    singleOrNull { it.fom <= dato && dato <= it.tom }
+        ?: error("Finner ingen delperiode i rammevedtak for dato $dato")

@@ -7,10 +7,10 @@ import no.nav.tilleggsstonader.kontrakter.felles.splitPerÅr
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Delperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Ekstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.SatsForPeriodePrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import org.springframework.stereotype.Service
@@ -93,38 +93,35 @@ class PrivatBilBeregningService(
                 fergekostnadPerDag = reise.fergekostnadPerDag,
                 bompengerPerDag = reise.bompengerPerDag,
             )
-        return BeregningsgrunnlagForReiseMedPrivatBil(
-            fom = reise.fom,
-            tom = reise.tom,
-            reisedagerPerUke = reise.reisedagerPerUke,
-            reiseavstandEnVei = reise.reiseavstandEnVei,
-            ekstrakostnader = ekstrakostnader,
-            satser = beregnSatserForReise(reise, ekstrakostnader),
-            vedtaksperioder = vedtaksperioder,
-        )
-    }
 
-    private fun beregnSatserForReise(
-        reise: ReiseMedPrivatBil,
-        ekstrakostnader: Ekstrakostnader,
-    ): List<SatsForPeriodePrivatBil> =
-        reise.splitPerÅr { fom, tom ->
-            val periode = Datoperiode(fom, tom)
-            val sats = satsDagligReisePrivatBilProvider.finnRelevantKilometerSatsForPeriode(periode)
-
-            SatsForPeriodePrivatBil(
-                fom = fom,
-                tom = tom,
-                satsBekreftetVedVedtakstidspunkt = sats.bekreftet,
-                kilometersats = sats.beløp,
-                dagsatsUtenParkering =
+        val delPerioder =
+            reise.splitPerÅr { fom, tom ->
+                val periode = Datoperiode(fom, tom)
+                val sats = satsDagligReisePrivatBilProvider.finnRelevantKilometerSatsForPeriode(periode)
+                val dagsatsUtenParkering =
                     beregnDagsatsUtenParkering(
                         reiseavstandEnVei = reise.reiseavstandEnVei,
                         ekstrakostnader = ekstrakostnader,
                         kilometersats = sats.beløp,
-                    ),
-            )
-        }
+                    )
+                Delperiode(
+                    fom = fom,
+                    tom = tom,
+                    ekstrakostnader = ekstrakostnader,
+                    reisedagerPerUke = reise.reisedagerPerUke,
+                    satsBekreftetVedVedtakstidspunkt = sats.bekreftet,
+                    kilometersats = sats.beløp,
+                    dagsatsUtenParkering = dagsatsUtenParkering,
+                )
+            }
+        return BeregningsgrunnlagForReiseMedPrivatBil(
+            fom = reise.fom,
+            tom = reise.tom,
+            delPerioder = delPerioder,
+            reiseavstandEnVei = reise.reiseavstandEnVei,
+            vedtaksperioder = vedtaksperioder,
+        )
+    }
 
     private fun beregnDagsatsUtenParkering(
         reiseavstandEnVei: BigDecimal,

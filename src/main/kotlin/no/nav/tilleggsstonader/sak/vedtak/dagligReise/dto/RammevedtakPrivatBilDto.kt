@@ -30,17 +30,17 @@ fun RammevedtakPrivatBil.tilDto() =
 
 // TODO: Flytt splitting til beregning dersom vi vil beholde det
 fun RammeForReiseMedPrivatBil.tilDto(): List<RammeForReiseMedPrivatBilDto> =
-    grunnlag.satser.map {
+    grunnlag.delPerioder.map {
         RammeForReiseMedPrivatBilDto(
             reiseId = reiseId,
             fom = it.fom,
             tom = it.tom,
-            reisedagerPerUke = grunnlag.reisedagerPerUke,
+            reisedagerPerUke = it.reisedagerPerUke,
             reiseavstandEnVei = grunnlag.reiseavstandEnVei,
-            bompengerPerDag = grunnlag.ekstrakostnader.bompengerPerDag,
+            bompengerPerDag = it.ekstrakostnader.bompengerPerDag,
             kilometersats = it.kilometersats,
             dagsatsUtenParkering = it.dagsatsUtenParkering,
-            fergekostnadPerDag = grunnlag.ekstrakostnader.fergekostnadPerDag,
+            fergekostnadPerDag = it.ekstrakostnader.fergekostnadPerDag,
             aktivitetsadresse = this.aktivitetsadresse,
         )
     }

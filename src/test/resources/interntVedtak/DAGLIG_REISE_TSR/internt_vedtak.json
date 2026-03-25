@@ -248,19 +248,19 @@
       "grunnlag" : {
         "fom" : "2024-01-01",
         "tom" : "2024-01-31",
-        "reisedagerPerUke" : 3,
-        "reiseavstandEnVei" : 40.0,
-        "ekstrakostnader" : {
-          "bompengerPerDag" : 40,
-          "fergekostnadPerDag" : 50
-        },
-        "satser" : [ {
+        "delPerioder" : [ {
           "fom" : "2024-01-01",
           "tom" : "2024-01-31",
+          "ekstrakostnader" : {
+            "bompengerPerDag" : 40,
+            "fergekostnadPerDag" : 50
+          },
+          "reisedagerPerUke" : 3,
           "satsBekreftetVedVedtakstidspunkt" : true,
           "kilometersats" : 2.94,
           "dagsatsUtenParkering" : 100.0
         } ],
+        "reiseavstandEnVei" : 40.0,
         "vedtaksperioder" : [ {
           "id" : "001464ca-20dc-4f6c-b3e8-c83bd98b3e37",
           "fom" : "2024-01-01",
@@ -275,19 +275,19 @@
       "grunnlag" : {
         "fom" : "2024-01-01",
         "tom" : "2024-01-31",
-        "reisedagerPerUke" : 3,
-        "reiseavstandEnVei" : 60.0,
-        "ekstrakostnader" : {
-          "bompengerPerDag" : 40,
-          "fergekostnadPerDag" : 50
-        },
-        "satser" : [ {
+        "delPerioder" : [ {
           "fom" : "2024-01-01",
           "tom" : "2024-01-31",
+          "ekstrakostnader" : {
+            "bompengerPerDag" : 40,
+            "fergekostnadPerDag" : 50
+          },
+          "reisedagerPerUke" : 3,
           "satsBekreftetVedVedtakstidspunkt" : true,
           "kilometersats" : 3.5,
           "dagsatsUtenParkering" : 100.0
         } ],
+        "reiseavstandEnVei" : 60.0,
         "vedtaksperioder" : [ {
           "id" : "001464ca-20dc-4f6c-b3e8-c83bd98b3e37",
           "fom" : "2024-01-01",

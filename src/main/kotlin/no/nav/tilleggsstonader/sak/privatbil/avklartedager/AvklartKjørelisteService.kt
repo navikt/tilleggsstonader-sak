@@ -138,7 +138,10 @@ class AvklartKjørelisteService(
     ): Boolean {
         val antallDagerMedUtbetaling = dager.filter { it.harKjørt }.size
 
-        return antallDagerMedUtbetaling <= rammevedtak.grunnlag.reisedagerPerUke
+        return antallDagerMedUtbetaling <=
+            rammevedtak.grunnlag.delPerioder
+                .first()
+                .reisedagerPerUke
     }
 
     private fun utledAutomatiskStatusForUke(

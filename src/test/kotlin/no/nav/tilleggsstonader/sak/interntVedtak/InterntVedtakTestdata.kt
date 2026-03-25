@@ -41,10 +41,10 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Delperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Ekstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.SatsForPeriodePrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
@@ -725,23 +725,23 @@ object InterntVedtakTestdata {
                                 BeregningsgrunnlagForReiseMedPrivatBil(
                                     fom = LocalDate.of(2024, 1, 1),
                                     tom = LocalDate.of(2024, 1, 31),
-                                    reisedagerPerUke = 3,
-                                    ekstrakostnader =
-                                        Ekstrakostnader(
-                                            bompengerPerDag = 40,
-                                            fergekostnadPerDag = 50,
-                                        ),
-                                    reiseavstandEnVei = BigDecimal.valueOf(40.0),
-                                    satser =
+                                    delPerioder =
                                         listOf(
-                                            SatsForPeriodePrivatBil(
+                                            Delperiode(
                                                 fom = LocalDate.of(2024, 1, 1),
                                                 tom = LocalDate.of(2024, 1, 31),
+                                                reisedagerPerUke = 3,
+                                                ekstrakostnader =
+                                                    Ekstrakostnader(
+                                                        bompengerPerDag = 40,
+                                                        fergekostnadPerDag = 50,
+                                                    ),
                                                 satsBekreftetVedVedtakstidspunkt = true,
                                                 kilometersats = BigDecimal.valueOf(2.94),
                                                 dagsatsUtenParkering = BigDecimal.valueOf(100.0),
                                             ),
                                         ),
+                                    reiseavstandEnVei = BigDecimal.valueOf(40.0),
                                     vedtaksperioder = vedtaksperioder,
                                 ),
                         ),
@@ -752,23 +752,23 @@ object InterntVedtakTestdata {
                                 BeregningsgrunnlagForReiseMedPrivatBil(
                                     fom = LocalDate.of(2024, 1, 1),
                                     tom = LocalDate.of(2024, 1, 31),
-                                    reisedagerPerUke = 3,
-                                    ekstrakostnader =
-                                        Ekstrakostnader(
-                                            bompengerPerDag = 40,
-                                            fergekostnadPerDag = 50,
-                                        ),
-                                    reiseavstandEnVei = BigDecimal.valueOf(60.0),
-                                    satser =
+                                    delPerioder =
                                         listOf(
-                                            SatsForPeriodePrivatBil(
+                                            Delperiode(
                                                 fom = LocalDate.of(2024, 1, 1),
                                                 tom = LocalDate.of(2024, 1, 31),
+                                                reisedagerPerUke = 3,
+                                                ekstrakostnader =
+                                                    Ekstrakostnader(
+                                                        bompengerPerDag = 40,
+                                                        fergekostnadPerDag = 50,
+                                                    ),
                                                 satsBekreftetVedVedtakstidspunkt = true,
                                                 kilometersats = BigDecimal.valueOf(3.50),
                                                 dagsatsUtenParkering = BigDecimal.valueOf(100.0),
                                             ),
                                         ),
+                                    reiseavstandEnVei = BigDecimal.valueOf(60.0),
                                     vedtaksperioder = vedtaksperioder,
                                 ),
                         ),

@@ -17,7 +17,11 @@ fun RammevedtakPrivatBil.tilDto(kjørelister: Map<ReiseId, List<Kjøreliste>>): 
             reiseId = reise.reiseId.toString(),
             fom = reise.grunnlag.fom,
             tom = reise.grunnlag.tom,
-            reisedagerPerUke = reise.grunnlag.reisedagerPerUke,
+            reisedagerPerUke =
+                reise.grunnlag.delPerioder
+                    .first()
+                    .reisedagerPerUke,
+            // TODO - vise delperioder ut i front-end
             aktivitetsadresse = reise.aktivitetsadresse ?: "Ukjent adresse",
             aktivitetsnavn = "Ukjent aktivitet",
             uker =
