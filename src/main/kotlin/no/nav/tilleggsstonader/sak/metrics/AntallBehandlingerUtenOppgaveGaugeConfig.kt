@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.metrics
 import io.micrometer.core.instrument.Gauge
 import io.micrometer.core.instrument.Metrics
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveRepository
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.GYLDIGE_ENHETER_TILLEGGSTØNADER
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Configuration
@@ -13,36 +13,53 @@ import java.time.Instant
 @Configuration
 class AntallBehandlingerUtenOppgaveGaugeConfig(
     behandlingRepository: BehandlingRepository,
+    oppgaveRepository: OppgaveRepository,
 ) {
     private val logger = LoggerFactory.getLogger(AntallBehandlingerUtenOppgaveGaugeConfig::class.java)
 
-    var sistHentet = Instant.MIN
-    var sisteVerdi = 0.0
+    var sistHentetBehandlingerUtenOppgave = Instant.MIN
+    var sisteVerdiBehandlingerUtenOppgave = 0.0
+
+    var sistHentetOppgaverTildeltUkjentEnhet = Instant.MIN
+    var sisteVerdiOppgaverTildeltUkjentEnhet = 0.0
 
     init {
-        // Funksjonen her kalles for hver forspørsel på prometheus-endepunkt. Sørger for at v
+        // Funksjonen her kalles for hver forspørsel på prometheus-endepunkt. Cacher derfor svaret for å unngå unødvendig mange db-spørringer
         Gauge
-            .builder<BehandlingRepository>("behandlinger_uten_oppgave", behandlingRepository) {
+            .builder("behandlinger_uten_oppgave", behandlingRepository) {
                 // Slår ikke opp i databasen oftere enn hvert 30. minutt
-                if (sistHentet.isBefore(Instant.now().minus(Duration.ofMinutes(30)))) {
+                if (sistHentetBehandlingerUtenOppgave.isBefore(Instant.now().minus(Duration.ofMinutes(30)))) {
                     val behandlingerUtenOppgave =
-                        it.finnÅpneBehandlingerUtenOppgaveMedStatusOgTildeltEnhetsnummer(
-                            behandlingsstatuserHvorOppgaveIkkeSkalFinnes =
-                                listOf(
-                                    BehandlingStatus.IVERKSETTER_VEDTAK,
-                                    BehandlingStatus.FERDIGSTILT,
-                                ),
-                            gyldigeEnheterForOppgave = GYLDIGE_ENHETER_TILLEGGSTØNADER,
-                        )
+                        it.finnBehandlingerUtenÅpenOppgave()
                     if (behandlingerUtenOppgave.isNotEmpty()) {
                         logger.info("Behandlinger uten oppgave: {}", behandlingerUtenOppgave)
                     }
 
-                    sisteVerdi = behandlingerUtenOppgave.size.toDouble()
-                    sistHentet = Instant.now()
+                    sisteVerdiBehandlingerUtenOppgave = behandlingerUtenOppgave.size.toDouble()
+                    sistHentetBehandlingerUtenOppgave = Instant.now()
                 }
 
-                sisteVerdi
+                sisteVerdiBehandlingerUtenOppgave
+            }.register(Metrics.globalRegistry)
+
+        Gauge
+            .builder("oppgaver_tildelt_ukjent_enhet", oppgaveRepository) {
+                // Slår ikke opp i databasen oftere enn hvert 30. minutt
+                if (sistHentetOppgaverTildeltUkjentEnhet.isBefore(Instant.now().minus(Duration.ofMinutes(30)))) {
+                    val oppgaverTildeltUkjentEnhet =
+                        it.finnÅpneBehandlingsoppgaverIkkeTildeltEnhet(GYLDIGE_ENHETER_TILLEGGSTØNADER)
+                    if (oppgaverTildeltUkjentEnhet.isNotEmpty()) {
+                        logger.info(
+                            "Behandlinger som har oppgave tildelt ukjent enhet: {}",
+                            oppgaverTildeltUkjentEnhet.map { o -> o.behandlingId },
+                        )
+                    }
+
+                    sisteVerdiOppgaverTildeltUkjentEnhet = oppgaverTildeltUkjentEnhet.size.toDouble()
+                    sistHentetOppgaverTildeltUkjentEnhet = Instant.now()
+                }
+
+                sisteVerdiOppgaverTildeltUkjentEnhet
             }.register(Metrics.globalRegistry)
     }
 }

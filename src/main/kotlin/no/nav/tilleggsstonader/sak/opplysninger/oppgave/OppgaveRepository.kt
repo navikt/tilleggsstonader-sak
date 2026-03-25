@@ -53,4 +53,14 @@ interface OppgaveRepository :
         """,
     )
     fun finnOppgaveMetadata(oppgaveIder: Collection<Long>): List<OppgaveBehandlingMetadata>
+
+    @Query(
+        """
+            select *
+            from oppgave o
+            where o.status = 'ÅPEN'
+              and o.tildelt_enhetsnummer not in (:enheter)            
+        """,
+    )
+    fun finnÅpneBehandlingsoppgaverIkkeTildeltEnhet(enheter: Set<String>): List<OppgaveDomain>
 }

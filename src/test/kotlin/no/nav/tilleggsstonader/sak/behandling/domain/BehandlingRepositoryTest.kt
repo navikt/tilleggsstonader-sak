@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.behandling.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.libs.test.assertions.hasCauseMessageContaining
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat.AVSLÅTT
@@ -20,6 +22,9 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Endret
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
 import no.nav.tilleggsstonader.sak.util.BehandlingOppsettUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -30,6 +35,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.postgresql.util.PSQLException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataIntegrityViolationException
@@ -267,7 +273,7 @@ class BehandlingRepositoryTest : CleanDatabaseIntegrationTest() {
     fun `finnEksterneIder - send inn tomt sett, forvent unntak `() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         testoppsettService.lagre(behandling(fagsak))
-        org.junit.jupiter.api.assertThrows<Exception> {
+        assertThrows<Exception> {
             assertThat(behandlingRepository.finnEksterneIder(emptySet()))
         }
     }
@@ -475,6 +481,48 @@ class BehandlingRepositoryTest : CleanDatabaseIntegrationTest() {
 
             assertThat(behandlingRepository.finnGjeldendeIverksatteBehandlinger(Stønadstype.BARNETILSYN).map { it.id })
                 .containsExactly(behandling2.id)
+        }
+    }
+
+    @Nested
+    inner class BehandlingUtenOppgave {
+        @Test
+        fun `skal ikke returnere behandling når det finnes oppgave`() {
+            val behandling = behandling()
+            testoppsettService.opprettBehandlingMedFagsak(behandling)
+
+            opprettOgTilordneOppgaveForBehandling(behandling.id)
+
+            assertThat(behandlingRepository.finnBehandlingerUtenÅpenOppgave()).isEmpty()
+        }
+
+        @Test
+        fun `skal returnere behandling når det ikke finnes oppgave`() {
+            val behandling = behandling()
+            testoppsettService.opprettBehandlingMedFagsak(behandling)
+
+            assertThat(behandlingRepository.finnBehandlingerUtenÅpenOppgave()).containsExactly(behandling.id)
+        }
+
+        @Test
+        fun `skal returnere behandling når det kun finnes feilregistrert oppgave`() {
+            val behandling = behandling()
+            testoppsettService.opprettBehandlingMedFagsak(behandling)
+
+            oppgaveRepository.insert(
+                OppgaveDomain(
+                    behandlingId = behandling.id,
+                    gsakOppgaveId = 321,
+                    type = Oppgavetype.BehandleSak,
+                    status = Oppgavestatus.FEILREGISTRERT,
+                    tildeltEnhetsnummer = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr,
+                    enhetsmappeId = 123,
+                    tilordnetSaksbehandler = null,
+                    tilbakekrevingBehandlingId = null,
+                ),
+            )
+
+            assertThat(behandlingRepository.finnBehandlingerUtenÅpenOppgave()).containsExactly(behandling.id)
         }
     }
 }
