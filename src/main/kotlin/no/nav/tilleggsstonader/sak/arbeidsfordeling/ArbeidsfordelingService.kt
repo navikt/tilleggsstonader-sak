@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.arbeidsfordeling
 
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.tilTema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
@@ -31,6 +32,8 @@ class ArbeidsfordelingService(
     companion object {
         const val MASKINELL_JOURNALFOERENDE_ENHET = "9999"
         const val GEOGRAFISK_TILKNYTTING_OSLO = "0301"
+
+        const val ENHETSNUMMER_EGNE_ANSATTE_VEST_VIKEN = "0683"
     }
 
     fun hentNavEnhetId(
@@ -48,7 +51,17 @@ class ArbeidsfordelingService(
     ): Arbeidsfordelingsenhet? {
         val kriterie = lagArbeidsfordelingKritierieForPerson(ident, stønadstype)
         val enheter = finnArbeidsfordelingsenhet(kriterie)
-        return enheter.firstOrNull()
+        val enhet = enheter.firstOrNull()
+
+        // Ikke opprettet mappe for egne ansatte Vest-Viken. Vi har forventet at egne ansatte Oslo skal brukes, så ruter heller dit
+        return if (enhet?.enhetNr == ENHETSNUMMER_EGNE_ANSATTE_VEST_VIKEN && stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
+            Arbeidsfordelingsenhet(
+                enhetNr = Enhet.NAV_EGNE_ANSATTE_OSLO.enhetsnr,
+                navn = "Nav egne ansatte Vest-Viken",
+            )
+        } else {
+            enhet
+        }
     }
 
     fun hentNavEnhetForOppfølging(
