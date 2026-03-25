@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningDto
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningType
+import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.ENHETSNUMMER_EGNE_ANSATTE_VEST_VIKEN
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsatt
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -164,6 +165,17 @@ class ArbeidsfordelingServiceTest {
 
             assertThat(slotEgenAnsatt.captured)
                 .containsExactlyInAnyOrder(søkerIdent, annenForeldreIdent)
+        }
+
+        @Test
+        fun `skal overstyre arbeidsfordelingsenhet hvis norg sier skal rute til Nav egne ansatte Vest-Viken for daglig reise tsr`() {
+            every { personService.hentAdressebeskyttelse(søkerIdent) } returns lagPersonUtenRelasjoner()
+            every { arbeidsfordelingClient.finnArbeidsfordelingsenhet(any()) } returns
+                listOf(Arbeidsfordelingsenhet(ENHETSNUMMER_EGNE_ANSATTE_VEST_VIKEN, ""))
+
+            assertThat(
+                service.hentNavEnhet(søkerIdent, Stønadstype.DAGLIG_REISE_TSR)?.enhetNr,
+            ).isEqualTo(Enhet.NAV_EGNE_ANSATTE_OSLO.enhetsnr)
         }
     }
 
