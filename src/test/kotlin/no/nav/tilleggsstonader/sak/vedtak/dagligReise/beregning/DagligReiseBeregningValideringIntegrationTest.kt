@@ -60,7 +60,7 @@ class DagligReiseBeregningValideringIntegrationTest : CleanDatabaseIntegrationTe
             .lagreEnhetsspesifiktVedtak(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
                 behandlingId = behandlingId.behandlingId,
-                "beregn",
+                typeVedtakPath = "beregn",
                 vedtakDto = vedtakRequest,
                 enhet = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD,
             ).expectStatus()
