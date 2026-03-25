@@ -50,7 +50,7 @@ class StegService(
         if (steg.kommerEtter(behandling.steg)) {
             error(
                 "Kan ikke resette behandling til steg=$steg når behandling allerede " +
-                        "er på ${behandling.steg} behandling=$behandlingId",
+                    "er på ${behandling.steg} behandling=$behandlingId",
             )
         }
 
@@ -209,7 +209,7 @@ class StegService(
         if (!nesteSteg.erGyldigIKombinasjonMedStatus(behandlingService.hentBehandling(saksbehandling.id).status)) {
             error(
                 "Steg '${nesteSteg.visningsnavn()}' kan ikke settes " +
-                        "på behandling i kombinasjon med status ${saksbehandling.status}",
+                    "på behandling i kombinasjon med status ${saksbehandling.status}",
             )
         }
     }
