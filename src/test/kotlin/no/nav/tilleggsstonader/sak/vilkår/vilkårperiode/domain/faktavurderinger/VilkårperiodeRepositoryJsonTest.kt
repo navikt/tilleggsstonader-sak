@@ -79,7 +79,7 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
             insertQuery.trimIndent(),
             mapOf(
                 "id" to id,
-                "globalId" to UUID.randomUUID().toString(),
+                "globalId" to UUID.randomUUID(),
                 "behandlingId" to behandling.id.id,
                 "forrigeVilkårperiodeId" to null,
                 "type" to type.tilDbType(),
@@ -105,6 +105,7 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
         INSERT INTO vilkar_periode 
         (
             id,
+            global_id,
             behandling_id,
             forrige_vilkarperiode_id,
             type,
@@ -124,6 +125,7 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
             kilde
         ) values (
             :id,
+            :globalId,
             :behandlingId,
             :forrigeVilkårperiodeId,
             :type,
