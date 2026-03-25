@@ -152,7 +152,7 @@ interface BehandlingRepository :
     // language=PostgreSQL
     @Query(
         """
-        SELECT b.id behandling_id, be.id ekstern_behandling_id, fe.id ekstern_fagsak_id
+        SELECT b.id, behandling_id, be.id ekstern_behandling_id, fe.id ekstern_fagsak_id
         FROM behandling b
             JOIN behandling_ekstern be ON b.id = be.behandling_id
             JOIN fagsak_ekstern fe ON b.fagsak_id = fe.fagsak_id 
@@ -160,21 +160,6 @@ interface BehandlingRepository :
         """,
     )
     fun finnEksterneIder(behandlingId: Set<BehandlingId>): Set<EksternId>
-
-    // language=PostgreSQL
-    @Query(
-        """
-        SELECT pi.ident AS first, gib.id AS second 
-        FROM gjeldende_iverksatte_behandlinger gib 
-            JOIN person_ident pi ON gib.fagsak_person_id=pi.fagsak_person_id
-        WHERE pi.ident IN (:personidenter)
-            AND gib.stonadstype=:stønadstype
-    """,
-    )
-    fun finnSisteIverksatteBehandlingerForPersonIdenter(
-        personidenter: Collection<String>,
-        stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
-    ): List<Pair<String, BehandlingId>>
 
     @Query(
         """
@@ -188,11 +173,6 @@ interface BehandlingRepository :
         stønadstyper: List<Stønadstype>,
     ): List<BehandlingId>
 
-    fun findAllByStatusAndResultatIn(
-        status: BehandlingStatus,
-        resultat: List<BehandlingResultat>,
-    ): List<Behandling>
-
     @Query(
         """
             SELECT b.*
@@ -200,7 +180,7 @@ interface BehandlingRepository :
             WHERE b.stonadstype = :stønadstype
         """,
     )
-    fun finnGjeldendeIverksatteBehandlinger(stønadstype: Stønadstype = Stønadstype.BARNETILSYN): List<Behandling>
+    fun finnGjeldendeIverksatteBehandlinger(stønadstype: Stønadstype): List<Behandling>
 
     @Query(
         """
@@ -209,7 +189,7 @@ interface BehandlingRepository :
             WHERE b.stonadstype = :stønadstype
         """,
     )
-    fun antallGjeldendeIverksatteBehandlinger(stønadstype: Stønadstype = Stønadstype.BARNETILSYN): Int
+    fun antallGjeldendeIverksatteBehandlinger(stønadstype: Stønadstype): Int
 
     @Query(
         """
