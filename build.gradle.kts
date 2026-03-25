@@ -2,7 +2,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 val javaVersion = JavaLanguageVersion.of(21)
-val familieProsesseringVersion = "2.20260120121808_b5446a9"
+val familieProsesseringVersion = "2.20260306133947_d473c40"
 val tilleggsstønaderLibsVersion = "2026.03.03-10.23.f286f5829acc"
 val tilleggsstønaderKontrakterVersion = "2026.03.11-10.42.c0a4c6977460"
 val avroVersion = "1.12.1"
