@@ -345,10 +345,10 @@ class JournalføringService(
         behandlingÅrsak: BehandlingÅrsak,
         fagsak: Fagsak,
     ) {
-        feilHvis(behandlingÅrsak == BehandlingÅrsak.PAPIRSØKNAD) {
+        brukerfeilHvis(behandlingÅrsak == BehandlingÅrsak.PAPIRSØKNAD) {
             feilmeldingOpprettBehandlingManuelt("papirsøknad")
         }
-        feilHvis(
+        brukerfeilHvis(
             behandlingÅrsak == BehandlingÅrsak.NYE_OPPLYSNINGER &&
                 !behandlingService.finnesBehandlingForFagsak(fagsak.id),
         ) {
