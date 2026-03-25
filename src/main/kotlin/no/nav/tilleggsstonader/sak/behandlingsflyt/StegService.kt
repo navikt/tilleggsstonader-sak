@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringSteg
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseBeregnSteg
@@ -49,7 +50,7 @@ class StegService(
         if (steg.kommerEtter(behandling.steg)) {
             error(
                 "Kan ikke resette behandling til steg=$steg når behandling allerede " +
-                    "er på ${behandling.steg} behandling=$behandlingId",
+                        "er på ${behandling.steg} behandling=$behandlingId",
             )
         }
 
@@ -168,7 +169,7 @@ class StegService(
             behandlingSteg.utførOgReturnerNesteSteg(
                 saksbehandling,
                 data,
-                kanBehandlePrivatBil = true,
+                kanBehandlePrivatBil = unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL),
             )
 
         oppdaterHistorikk(behandlingSteg, saksbehandling.id, saksbehandlerIdent)
@@ -208,7 +209,7 @@ class StegService(
         if (!nesteSteg.erGyldigIKombinasjonMedStatus(behandlingService.hentBehandling(saksbehandling.id).status)) {
             error(
                 "Steg '${nesteSteg.visningsnavn()}' kan ikke settes " +
-                    "på behandling i kombinasjon med status ${saksbehandling.status}",
+                        "på behandling i kombinasjon med status ${saksbehandling.status}",
             )
         }
     }
