@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatP
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -59,16 +58,7 @@ data class BeregningsresultatPrivatBilDto(
 data class BeregningsresultatForReisePrivatBilDto(
     val reiseId: ReiseId,
     val adresse: String?,
-    val delperioder: List<DelperiodePrivatBilDto>,
     val perioder: List<BeregningsresultatForPeriodePrivatBilDto>,
-)
-
-data class DelperiodePrivatBilDto(
-    val fom: LocalDate,
-    val tom: LocalDate,
-    val reisedagerPerUke: Int,
-    val bompengerPerDag: Int?,
-    val fergekostnadPerDag: Int?,
 )
 
 data class BeregningsresultatForPeriodePrivatBilDto(
@@ -144,21 +134,10 @@ fun BeregningsresultatPrivatBil.tilDto(vilkår: List<VilkårDagligReise>): Bereg
 fun BeregningsresultatForReisePrivatBil.tilDto(vilkår: List<VilkårDagligReise>): BeregningsresultatForReisePrivatBilDto {
     val vilkårForReise =
         vilkår.filter { it.fakta.type == TypeDagligReise.PRIVAT_BIL }.firstOrNull { it.fakta.reiseId == reiseId }
-    val vilkårFakta = vilkårForReise?.fakta?.mapTilVilkårFakta() as? FaktaDagligReisePrivatBil
 
     return BeregningsresultatForReisePrivatBilDto(
         reiseId = reiseId,
         adresse = vilkårForReise?.fakta?.adresse,
-        delperioder =
-            vilkårFakta?.faktaDelperioder?.map {
-                DelperiodePrivatBilDto(
-                    fom = it.fom,
-                    tom = it.tom,
-                    reisedagerPerUke = it.reisedagerPerUke,
-                    bompengerPerDag = it.bompengerPerDag,
-                    fergekostnadPerDag = it.fergekostnadPerDag,
-                )
-            } ?: emptyList(),
         perioder = perioder.map { it.tilDto() },
     )
 }
