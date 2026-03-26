@@ -93,5 +93,6 @@ class ArenaStatusService(
             11248,
             12329,
             12411,
+            10184,
         )
 }
