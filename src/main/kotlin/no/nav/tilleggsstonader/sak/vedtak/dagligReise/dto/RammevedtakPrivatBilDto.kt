@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto
 
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
@@ -14,13 +15,24 @@ data class RammeForReiseMedPrivatBilDto(
     val reiseId: ReiseId,
     val fom: LocalDate,
     val tom: LocalDate,
-    val reisedagerPerUke: Int,
+    val delperioder: List<DelperiodeDto>,
     val reiseavstandEnVei: BigDecimal,
+    val aktivitetsadresse: String?,
+)
+
+data class DelperiodeDto(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val ekstrakostnader: EkstrakostnaderDto,
+    val reisedagerPerUke: Int,
+    val satsBekreftetVedVedtakstidspunkt: Boolean,
+    val kilometersats: BigDecimal,
+    val dagsatsUtenParkering: BigDecimal, // hva brukeren kan få dekt per dag. Inkluderer bompenger og ferge, men ikke parkering.
+) : Periode<LocalDate>
+
+data class EkstrakostnaderDto(
     val bompengerPerDag: Int?,
     val fergekostnadPerDag: Int?,
-    val aktivitetsadresse: String?,
-    val kilometersats: BigDecimal,
-    val dagsatsUtenParkering: BigDecimal,
 )
 
 fun RammevedtakPrivatBil.tilDto() =
@@ -35,12 +47,23 @@ fun RammeForReiseMedPrivatBil.tilDto(): List<RammeForReiseMedPrivatBilDto> =
             reiseId = reiseId,
             fom = it.fom,
             tom = it.tom,
-            reisedagerPerUke = it.reisedagerPerUke,
+            delperioder =
+                this.grunnlag.delPerioder.map { delperiode ->
+                    DelperiodeDto(
+                        fom = delperiode.fom,
+                        tom = delperiode.tom,
+                        ekstrakostnader =
+                            EkstrakostnaderDto(
+                                bompengerPerDag = delperiode.ekstrakostnader.bompengerPerDag,
+                                fergekostnadPerDag = delperiode.ekstrakostnader.fergekostnadPerDag,
+                            ),
+                        reisedagerPerUke = delperiode.reisedagerPerUke,
+                        satsBekreftetVedVedtakstidspunkt = delperiode.satsBekreftetVedVedtakstidspunkt,
+                        kilometersats = delperiode.kilometersats,
+                        dagsatsUtenParkering = delperiode.dagsatsUtenParkering,
+                    )
+                },
             reiseavstandEnVei = grunnlag.reiseavstandEnVei,
-            bompengerPerDag = it.ekstrakostnader.bompengerPerDag,
-            kilometersats = it.kilometersats,
-            dagsatsUtenParkering = it.dagsatsUtenParkering,
-            fergekostnadPerDag = it.ekstrakostnader.fergekostnadPerDag,
             aktivitetsadresse = this.aktivitetsadresse,
         )
     }

@@ -27,7 +27,8 @@ class PrivatBilBeregningService(
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkår: List<VilkårDagligReise>,
     ): RammevedtakPrivatBil? {
-        val reiseInformasjon = oppfylteVilkår.map { it.tilReiseMedPrivatBil() }
+        // TODO - skrive om denne til å ha delperioder og bruke map
+        val reiseInformasjon = oppfylteVilkår.flatMap { it.tilReiserMedPrivatBil() }
         val resultatForReiser =
             reiseInformasjon.mapNotNull {
                 beregnForReise(it, vedtaksperioder)

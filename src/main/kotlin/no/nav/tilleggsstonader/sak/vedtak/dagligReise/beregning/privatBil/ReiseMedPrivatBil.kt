@@ -26,24 +26,22 @@ data class ReiseMedPrivatBil(
     ): ReiseMedPrivatBil = this.copy(fom = fom, tom = tom)
 }
 
-fun VilkårDagligReise.tilReiseMedPrivatBil(): ReiseMedPrivatBil {
+fun VilkårDagligReise.tilReiserMedPrivatBil(): List<ReiseMedPrivatBil> {
     feilHvis(this.fakta !is FaktaPrivatBil) {
         "Forventer kun å få inn vilkår med fakta som er av type privat bil ved beregning av privat bil"
     }
 
     val fakta = this.fakta
-    val periode = fakta.faktaDelperioder.single()
-
-    // TODO - her er jeg litt usikker på hva jeg skal gjøre og hvordan vi vil vise rammevedtaket dersom det er flere reiseperioder i perioden med rammevedtak.
-
-    return ReiseMedPrivatBil(
-        fom = this.fom,
-        tom = this.tom,
-        reiseId = fakta.reiseId,
-        reisedagerPerUke = periode.reisedagerPerUke,
-        reiseavstandEnVei = fakta.reiseavstandEnVei,
-        bompengerPerDag = periode.bompengerPerDag,
-        fergekostnadPerDag = periode.fergekostnadPerDag,
-        aktivitetsadresse = fakta.adresse,
-    )
+    return fakta.faktaDelperioder.map { periode ->
+        ReiseMedPrivatBil(
+            fom = periode.fom,
+            tom = periode.tom,
+            reiseId = fakta.reiseId,
+            reisedagerPerUke = periode.reisedagerPerUke,
+            reiseavstandEnVei = fakta.reiseavstandEnVei,
+            bompengerPerDag = periode.bompengerPerDag,
+            fergekostnadPerDag = periode.fergekostnadPerDag,
+            aktivitetsadresse = fakta.adresse,
+        )
+    }
 }

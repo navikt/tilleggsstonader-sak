@@ -59,8 +59,16 @@ data class BeregningsresultatPrivatBilDto(
 data class BeregningsresultatForReisePrivatBilDto(
     val reiseId: ReiseId,
     val adresse: String?,
-    val reisedagerPerUke: Int?,
+    val delperioder: List<DelperiodePrivatBilDto>,
     val perioder: List<BeregningsresultatForPeriodePrivatBilDto>,
+)
+
+data class DelperiodePrivatBilDto(
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val reisedagerPerUke: Int,
+    val bompengerPerDag: Int?,
+    val fergekostnadPerDag: Int?,
 )
 
 data class BeregningsresultatForPeriodePrivatBilDto(
@@ -141,8 +149,16 @@ fun BeregningsresultatForReisePrivatBil.tilDto(vilkår: List<VilkårDagligReise>
     return BeregningsresultatForReisePrivatBilDto(
         reiseId = reiseId,
         adresse = vilkårForReise?.fakta?.adresse,
-        // TODO Mappe om denne til delperioder
-        reisedagerPerUke = vilkårFakta?.faktaDelperioder?.single()?.reisedagerPerUke,
+        delperioder =
+            vilkårFakta?.faktaDelperioder?.map {
+                DelperiodePrivatBilDto(
+                    fom = it.fom,
+                    tom = it.tom,
+                    reisedagerPerUke = it.reisedagerPerUke,
+                    bompengerPerDag = it.bompengerPerDag,
+                    fergekostnadPerDag = it.fergekostnadPerDag,
+                )
+            } ?: emptyList(),
         perioder = perioder.map { it.tilDto() },
     )
 }

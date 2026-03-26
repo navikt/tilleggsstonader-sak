@@ -15,7 +15,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringSteg
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseBeregnSteg
@@ -169,7 +168,7 @@ class StegService(
             behandlingSteg.utførOgReturnerNesteSteg(
                 saksbehandling,
                 data,
-                kanBehandlePrivatBil = unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL),
+                kanBehandlePrivatBil = true,
             )
 
         oppdaterHistorikk(behandlingSteg, saksbehandling.id, saksbehandlerIdent)
