@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.integrasjonstest.dsl
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.util.toYearMonth
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import java.time.LocalDate
 
 @BehandlingTestdataDslMarker
@@ -65,7 +66,16 @@ class BehandlingTestdataDsl internal constructor() {
     fun defaultDagligReisePrivatBilTsoTestdata(
         fom: LocalDate = defaultFom,
         tom: LocalDate = defaultTom,
-        antallReisedager: Int = 5,
+        delperioder: List<FaktaDelperiodePrivatBilDto> =
+            listOf(
+                FaktaDelperiodePrivatBilDto(
+                    fom = defaultFom,
+                    tom = defaultTom,
+                    reisedagerPerUke = 5,
+                    bompengerPerDag = null,
+                    fergekostnadPerDag = null,
+                ),
+            ),
     ) {
         aktivitet {
             opprett {
@@ -79,7 +89,7 @@ class BehandlingTestdataDsl internal constructor() {
         }
         vilkår {
             opprett {
-                privatBil(fom, tom, reisedagerPerUke = antallReisedager)
+                privatBil(fom, tom, delperioder = delperioder)
             }
         }
     }

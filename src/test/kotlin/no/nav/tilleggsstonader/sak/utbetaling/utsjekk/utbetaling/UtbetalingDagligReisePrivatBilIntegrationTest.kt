@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.SatsDagligReisePrivatBilProvider
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -51,7 +52,16 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
                 4 februar 2026 to 50,
                 5 februar 2026 to 50,
             )
-
+        val delperioder =
+            listOf(
+                FaktaDelperiodePrivatBilDto(
+                    fom = fom,
+                    tom = tom,
+                    reisedagerPerUke = 5,
+                    bompengerPerDag = null,
+                    fergekostnadPerDag = null,
+                ),
+            )
         val førstegangsBehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
@@ -70,7 +80,12 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
 
                 vilkår {
                     opprett {
-                        privatBil(fom, tom, reisedagerPerUke = 3, reiseavstandEnVei = reiseavstandEnVei)
+                        privatBil(
+                            fom,
+                            tom,
+                            reiseavstandEnVei = reiseavstandEnVei,
+                            delperioder = delperioder,
+                        )
                     }
                 }
 

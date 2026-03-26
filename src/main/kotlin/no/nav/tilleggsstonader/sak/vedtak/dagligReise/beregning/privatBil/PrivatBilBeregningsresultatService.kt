@@ -46,17 +46,20 @@ class PrivatBilBeregningsresultatService {
         return BeregningsresultatForReisePrivatBil(
             reiseId = rammeForReise.reiseId,
             perioder =
-                avklarteUkerForReise
-                    .flatMap { it.dager }
-                    .filter { rammeForReise.grunnlag.inneholder(it.dato) }
-                    .groupBy { delperioder.delperiodeForDato(it.dato) }
-                    .flatMap { (delperiode, dager) ->
-                        lagPerioderForDagerMedSammeSats(
-                            dager,
-                            delperiode,
-                            brukersNavKontor,
-                        )
-                    },
+                delperioder.flatMap { delperiode ->
+                    val dagerForDelperiode =
+                        avklarteUkerForReise
+                            .flatMap { it.dager }
+                            .filter { dag ->
+                                rammeForReise.grunnlag.inneholder(dag.dato) &&
+                                    delperiode.fom <= dag.dato && dag.dato <= delperiode.tom
+                            }
+                    lagPerioderForDagerMedSammeSats(
+                        dagerForDelperiode,
+                        delperiode,
+                        brukersNavKontor,
+                    )
+                },
         )
     }
 

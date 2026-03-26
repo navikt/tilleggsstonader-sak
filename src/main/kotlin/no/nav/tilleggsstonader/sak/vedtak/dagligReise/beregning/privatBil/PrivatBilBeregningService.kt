@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.allePerioderErSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
-import no.nav.tilleggsstonader.kontrakter.felles.splitPerÅr
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForReiseMedPrivatBil
@@ -28,7 +27,7 @@ class PrivatBilBeregningService(
         oppfylteVilkår: List<VilkårDagligReise>,
     ): RammevedtakPrivatBil? {
         // TODO - skrive om denne til å ha delperioder og bruke map
-        val reiseInformasjon = oppfylteVilkår.flatMap { it.tilReiserMedPrivatBil() }
+        val reiseInformasjon = oppfylteVilkår.map { it.tilReiserMedPrivatBil() }
         val resultatForReiser =
             reiseInformasjon.mapNotNull {
                 beregnForReise(it, vedtaksperioder)
@@ -89,27 +88,29 @@ class PrivatBilBeregningService(
         reise: ReiseMedPrivatBil,
         vedtaksperioder: List<Vedtaksperiode>,
     ): BeregningsgrunnlagForReiseMedPrivatBil {
-        val ekstrakostnader =
-            Ekstrakostnader(
-                fergekostnadPerDag = reise.fergekostnadPerDag,
-                bompengerPerDag = reise.bompengerPerDag,
-            )
-
         val delPerioder =
-            reise.splitPerÅr { fom, tom ->
-                val periode = Datoperiode(fom, tom)
+            reise.delPerioder.map { delperiode ->
+                val periode = Datoperiode(delperiode.fom, delperiode.tom)
                 val sats = satsDagligReisePrivatBilProvider.finnRelevantKilometerSatsForPeriode(periode)
                 val dagsatsUtenParkering =
                     beregnDagsatsUtenParkering(
                         reiseavstandEnVei = reise.reiseavstandEnVei,
-                        ekstrakostnader = ekstrakostnader,
+                        ekstrakostnader =
+                            Ekstrakostnader(
+                                bompengerPerDag = delperiode.bompengerPerDag,
+                                fergekostnadPerDag = delperiode.fergekostnadPerDag,
+                            ),
                         kilometersats = sats.beløp,
                     )
                 Delperiode(
-                    fom = fom,
-                    tom = tom,
-                    ekstrakostnader = ekstrakostnader,
-                    reisedagerPerUke = reise.reisedagerPerUke,
+                    fom = delperiode.fom,
+                    tom = delperiode.tom,
+                    ekstrakostnader =
+                        Ekstrakostnader(
+                            bompengerPerDag = delperiode.bompengerPerDag,
+                            fergekostnadPerDag = delperiode.fergekostnadPerDag,
+                        ),
+                    reisedagerPerUke = delperiode.reisedagerPerUke,
                     satsBekreftetVedVedtakstidspunkt = sats.bekreftet,
                     kilometersats = sats.beløp,
                     dagsatsUtenParkering = dagsatsUtenParkering,

@@ -655,13 +655,13 @@ fun lagreDagligReisePrivatBilDto(
     adresse: String = "Tiltaksveien 1",
     reiseId: ReiseId = dummyReiseId,
     reiseavstandEnVei: BigDecimal = BigDecimal(10),
-    reiseperioder: List<FaktaDelperiodePrivatBilDto> =
+    delperioder: List<FaktaDelperiodePrivatBilDto> =
         listOf(
             FaktaDelperiodePrivatBilDto(
                 fom = fom,
                 tom = tom,
                 reisedagerPerUke = 5,
-                bompengerPerDag = 80,
+                bompengerPerDag = null,
                 fergekostnadPerDag = null,
             ),
         ),
@@ -678,7 +678,7 @@ fun lagreDagligReisePrivatBilDto(
     fakta: FaktaDagligReiseDto =
         FaktaDagligReisePrivatBilDto(
             reiseavstandEnVei = reiseavstandEnVei,
-            faktaDelperioder = reiseperioder,
+            faktaDelperioder = delperioder,
             adresse = adresse,
         ),
 ) = LagreDagligReiseDto(

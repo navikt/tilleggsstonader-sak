@@ -71,9 +71,7 @@ class OpprettStønadsvilkårDsl {
         fom: LocalDate,
         tom: LocalDate,
         reiseavstandEnVei: BigDecimal = BigDecimal(10),
-        reisedagerPerUke: Int = 5,
-        bompengerPerDag: Int? = null,
-        fergekostnadPerDag: Int? = null,
+        delperioder: List<FaktaDelperiodePrivatBilDto>,
     ) {
         dtoer += { _, _ ->
             lagreDagligReisePrivatBilDto(
@@ -81,16 +79,7 @@ class OpprettStønadsvilkårDsl {
                 tom = tom,
                 reiseId = ReiseId.random(),
                 reiseavstandEnVei = reiseavstandEnVei,
-                reiseperioder =
-                    listOf(
-                        FaktaDelperiodePrivatBilDto(
-                            fom = fom,
-                            tom = tom,
-                            reisedagerPerUke = reisedagerPerUke,
-                            bompengerPerDag = bompengerPerDag,
-                            fergekostnadPerDag = fergekostnadPerDag,
-                        ),
-                    ),
+                delperioder = delperioder,
             )
         }
     }

@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -126,7 +127,27 @@ class InnvilgePrivatBilIntegrationTest : IntegrationTest() {
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
-                defaultDagligReisePrivatBilTsoTestdata(fom, tom)
+                defaultDagligReisePrivatBilTsoTestdata(
+                    fom,
+                    tom,
+                    delperioder =
+                        listOf(
+                            FaktaDelperiodePrivatBilDto(
+                                fom = fom,
+                                tom = tom,
+                                reisedagerPerUke = 5,
+                                bompengerPerDag = null,
+                                fergekostnadPerDag = null,
+                            ),
+                            FaktaDelperiodePrivatBilDto(
+                                fom = fom,
+                                tom = tom,
+                                reisedagerPerUke = 2,
+                                bompengerPerDag = 100,
+                                fergekostnadPerDag = 50,
+                            ),
+                        ),
+                )
             }
         val saksbehandling = testoppsettService.hentSaksbehandling(behandlingContext.behandlingId)
         val vilkårListe = kall.vilkårDagligReise.hentVilkår(saksbehandling.id)
@@ -137,11 +158,17 @@ class InnvilgePrivatBilIntegrationTest : IntegrationTest() {
 
         assertThat(fakta.reiseId).isNotNull
         assertThat(fakta.reiseavstandEnVei).isEqualTo(BigDecimal(10))
-        assertThat(fakta.faktaDelperioder).hasSize(1)
+        assertThat(fakta.faktaDelperioder).hasSize(2)
         assertThat(fakta.faktaDelperioder[0].fom).isEqualTo(fom)
         assertThat(fakta.faktaDelperioder[0].tom).isEqualTo(tom)
         assertThat(fakta.faktaDelperioder[0].reisedagerPerUke).isEqualTo(5)
         assertThat(fakta.faktaDelperioder[0].bompengerPerDag).isNull()
         assertThat(fakta.faktaDelperioder[0].fergekostnadPerDag).isNull()
+
+        assertThat(fakta.faktaDelperioder[1].fom).isEqualTo(fom)
+        assertThat(fakta.faktaDelperioder[1].tom).isEqualTo(tom)
+        assertThat(fakta.faktaDelperioder[1].reisedagerPerUke).isEqualTo(2)
+        assertThat(fakta.faktaDelperioder[1].bompengerPerDag).isEqualTo(100)
+        assertThat(fakta.faktaDelperioder[1].fergekostnadPerDag).isEqualTo(50)
     }
 }

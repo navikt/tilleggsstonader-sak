@@ -71,7 +71,7 @@ class PrivatBilController(
                             lagUke(uke = uke, datoer = datoer, kjørelisteForUke = kjørelisteForUke, avklartUke = avklartUke)
                         },
                 // TODO: Håndter at rammen kan ha flere satser og blir delt opp i flere
-                rammevedtak = reise.tilDto().first(),
+                rammevedtak = reise.tilDto(),
             )
         } ?: emptyList()
     }
