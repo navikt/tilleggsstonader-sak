@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.oppgave
 
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -7,6 +8,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.GYLDIGE_ENHETER_TILLEGGSTØNADER
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.oppgave
@@ -262,6 +264,50 @@ internal class OppgaveRepositoryTest : CleanDatabaseIntegrationTest() {
                     enhetsmappeId = null,
                 ),
             )
+        }
+    }
+
+    @Nested
+    inner class ÅpneBehandlingsoppgaverIkkeTilordnetEnhet {
+        @Test
+        fun `skal returnere oppgaver tilordnet ukjent enhet`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            val oppgave = oppgaveRepository.insert(oppgave(behandling, tildeltEnhetsnr = "6767"))
+
+            assertThat(oppgaveRepository.finnÅpneBehandlingsoppgaverIkkeTildeltEnhet(GYLDIGE_ENHETER_TILLEGGSTØNADER))
+                .containsExactly(oppgave)
+        }
+
+        @Test
+        fun `skal returnere oppgaver ikke tilordnet noen enhet`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            oppgaveRepository.insert(oppgave(behandling, tildeltEnhetsnr = null))
+
+            assertThat(oppgaveRepository.finnÅpneBehandlingsoppgaverIkkeTildeltEnhet(GYLDIGE_ENHETER_TILLEGGSTØNADER))
+                .isNotNull()
+        }
+
+        @Test
+        fun `skal ikke returnere oppgaver tilordnet NAY`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            oppgaveRepository.insert(oppgave(behandling, tildeltEnhetsnr = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr))
+
+            assertThat(oppgaveRepository.finnÅpneBehandlingsoppgaverIkkeTildeltEnhet(GYLDIGE_ENHETER_TILLEGGSTØNADER))
+                .isEmpty()
+        }
+
+        @Test
+        fun `skal ikke returnere journalføringsoppgaver`() {
+            oppgaveRepository.insert(
+                oppgave(
+                    behandlingId = null,
+                    type = Oppgavetype.Journalføring,
+                    tildeltEnhetsnr = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr,
+                ),
+            )
+
+            assertThat(oppgaveRepository.finnÅpneBehandlingsoppgaverIkkeTildeltEnhet(GYLDIGE_ENHETER_TILLEGGSTØNADER))
+                .isEmpty()
         }
     }
 }
