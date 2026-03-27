@@ -46,6 +46,7 @@ typealias VilkårperiodeAktivitet = GeneriskVilkårperiode<AktivitetFaktaOgVurde
 data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
     @Id
     val id: UUID = UUID.randomUUID(),
+    // Stabil referanse som blir med når vilkårperiode kopiere til ny behandling
     val globalId: VilkårperiodeGlobalId = VilkårperiodeGlobalId.random(),
     val behandlingId: BehandlingId,
     @Column("forrige_vilkarperiode_id")
@@ -254,6 +255,12 @@ data class Vilkårperioder(
     val aktiviteter: List<VilkårperiodeAktivitet>,
 )
 
+/**
+ * ID som kopieres over i revurderinger.
+ * En kopiert vilkar_periode vil ha samme global_id som vilkar_periode-raden den ble kopiert fra
+ *
+ * For å kunne ha en stabil referanse til aktiviteter/målgrupper i revurderinger
+ */
 @JvmInline
 value class VilkårperiodeGlobalId(
     val id: UUID,
