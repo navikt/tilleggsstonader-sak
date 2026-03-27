@@ -281,6 +281,15 @@ internal class OppgaveRepositoryTest : CleanDatabaseIntegrationTest() {
         @Test
         fun `skal returnere oppgaver ikke tilordnet noen enhet`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+            oppgaveRepository.insert(oppgave(behandling, tildeltEnhetsnr = null))
+
+            assertThat(oppgaveRepository.finnÅpneBehandlingsoppgaverIkkeTildeltEnhet(GYLDIGE_ENHETER_TILLEGGSTØNADER))
+                .isNotNull()
+        }
+
+        @Test
+        fun `skal ikke returnere oppgaver tilordnet NAY`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
             oppgaveRepository.insert(oppgave(behandling, tildeltEnhetsnr = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr))
 
             assertThat(oppgaveRepository.finnÅpneBehandlingsoppgaverIkkeTildeltEnhet(GYLDIGE_ENHETER_TILLEGGSTØNADER))
@@ -288,9 +297,14 @@ internal class OppgaveRepositoryTest : CleanDatabaseIntegrationTest() {
         }
 
         @Test
-        fun `skal ikke returnere oppgaver tilordnet NAY`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            oppgaveRepository.insert(oppgave(behandling, tildeltEnhetsnr = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr))
+        fun `skal ikke returnere journalføringsoppgaver`() {
+            oppgaveRepository.insert(
+                oppgave(
+                    behandlingId = null,
+                    type = Oppgavetype.Journalføring,
+                    tildeltEnhetsnr = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr,
+                ),
+            )
 
             assertThat(oppgaveRepository.finnÅpneBehandlingsoppgaverIkkeTildeltEnhet(GYLDIGE_ENHETER_TILLEGGSTØNADER))
                 .isEmpty()

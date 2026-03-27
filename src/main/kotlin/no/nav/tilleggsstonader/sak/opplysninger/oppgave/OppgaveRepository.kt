@@ -59,7 +59,8 @@ interface OppgaveRepository :
             select *
             from oppgave o
             where o.status = 'ÅPEN'
-              and o.tildelt_enhetsnummer not in (:enheter)            
+              and behandling_id is not null
+              and (o.tildelt_enhetsnummer is null or o.tildelt_enhetsnummer not in (:enheter))            
         """,
     )
     fun finnÅpneBehandlingsoppgaverIkkeTildeltEnhet(enheter: Set<String>): List<OppgaveDomain>
