@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
+import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsaker
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -79,37 +80,34 @@ class SimuleringService(
 
     fun skalSendeVarsel(behandlingId: BehandlingId): String? {
         val fagsak = fagsakService.hentFagsakForBehandling(behandlingId)
-        return when (fagsak.stønadstype) {
-            Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR ->
-                håndterDagligReiseVarsel(fagsak)
-
-            Stønadstype.BOUTGIFTER, Stønadstype.LÆREMIDLER, Stønadstype.BARNETILSYN ->
-                håndterTilsynbarnLæremidlerBoutgifterVarsel(fagsak)
-        }
-    }
-
-    fun håndterDagligReiseVarsel(fagsak: Fagsak): String? {
-        val dagensDato = LocalDate.now()
         val alleFagsaker =
             fagsakService
                 .finnFagsakerForFagsakPersonId(fagsak.fagsakPersonId)
+        return when (fagsak.stønadstype) {
+            Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR ->
+                håndterDagligReiseVarsel(alleFagsaker)
+
+            Stønadstype.BOUTGIFTER, Stønadstype.LÆREMIDLER, Stønadstype.BARNETILSYN ->
+                håndterTilsynbarnLæremidlerBoutgifterVarsel(alleFagsaker)
+        }
+    }
+
+    fun håndterDagligReiseVarsel(alleFagsaker: Fagsaker): String? {
+        val dagensDato = LocalDate.now()
         val relevanteFagsaker =
             listOfNotNull(alleFagsaker.dagligReiseTso, alleFagsaker.dagligReiseTsr)
-        return if (erVarselRelevant(relevanteFagsaker, dagensDato)) {
+        return if (erVarselRelevantForDagligReise(relevanteFagsaker, dagensDato)) {
             "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
         } else {
             null
         }
     }
 
-    fun håndterTilsynbarnLæremidlerBoutgifterVarsel(fagsak: Fagsak): String? {
-        val alleFagsaker =
-            fagsakService
-                .finnFagsakerForFagsakPersonId(fagsak.fagsakPersonId)
+    fun håndterTilsynbarnLæremidlerBoutgifterVarsel(alleFagsaker: Fagsaker): String? {
         val relevanteFagsaker =
             listOfNotNull(alleFagsaker.barnetilsyn, alleFagsaker.læremidler, alleFagsaker.boutgifter)
         val periode = Datoperiode(LocalDate.now().forrigeVirkedag(), LocalDate.now())
-        return if (erVarselRelevantForTilsynBarn(relevanteFagsaker, periode)) {
+        return if (erVarselRelevantForTilsynBarnLæremidlerBoutgifter(relevanteFagsaker, periode)) {
             "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
         } else {
             null
@@ -123,7 +121,7 @@ class SimuleringService(
             else -> this.minusDays(1)
         }
 
-    private fun erVarselRelevant(
+    private fun erVarselRelevantForDagligReise(
         fagsaker: List<Fagsak>,
         dagensDato: LocalDate,
     ): Boolean {
@@ -146,7 +144,7 @@ class SimuleringService(
         }
     }
 
-    private fun erVarselRelevantForTilsynBarn(
+    private fun erVarselRelevantForTilsynBarnLæremidlerBoutgifter(
         fagsaker: List<Fagsak>,
         periode: Datoperiode,
     ): Boolean {
