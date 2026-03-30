@@ -107,7 +107,7 @@ class SimuleringService(
             fagsakService
                 .finnFagsakerForFagsakPersonId(fagsak.fagsakPersonId)
         val relevanteFagsaker =
-            listOfNotNull(alleFagsaker.dagligReiseTso, alleFagsaker.dagligReiseTsr)
+            listOfNotNull(alleFagsaker.barnetilsyn, alleFagsaker.læremidler, alleFagsaker.boutgifter)
         val periode = Datoperiode(LocalDate.now().forrigeVirkedag(), LocalDate.now())
         return if (erVarselRelevantForTilsynBarn(relevanteFagsaker, periode)) {
             "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
