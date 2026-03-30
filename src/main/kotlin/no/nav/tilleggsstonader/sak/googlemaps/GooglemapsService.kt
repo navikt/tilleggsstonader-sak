@@ -94,8 +94,8 @@ class GooglemapsService(
     }
 
     private fun finnStartOgSluttAdresse(rute: Rute): StartOgSluttAdresse {
-        val startAdresse = rute.startLokasjonId?.let { googlePlaceDetailsClient.finnStedDetaljer(it)?.formattedAddress }
-        val sluttAdresse = rute.sluttLokasjonId?.let { googlePlaceDetailsClient.finnStedDetaljer(it)?.formattedAddress }
+        val startAdresse = rute.startLokasjonId?.let { googlePlaceDetailsClient.finnStedDetaljer(it)?.formattedAddress?.fjernLand() }
+        val sluttAdresse = rute.sluttLokasjonId?.let { googlePlaceDetailsClient.finnStedDetaljer(it)?.formattedAddress?.fjernLand() }
 
         feilHvis(startAdresse == null || sluttAdresse == null) { "Kunne ikke finne start- eller sluttadresse for den valgte reisen." }
         return StartOgSluttAdresse(
@@ -105,6 +105,8 @@ class GooglemapsService(
     }
 
     private fun Rute.finnFerjeavstand(): Int = strekninger.filter { it.erFerje }.sumOf { it.avstandMeter }
+
+    private fun String.fjernLand() = substringBeforeLast(",").trim()
 
     fun List<Rute>.finnKortesteRute() = minBy { it.avstandMeter }
 
