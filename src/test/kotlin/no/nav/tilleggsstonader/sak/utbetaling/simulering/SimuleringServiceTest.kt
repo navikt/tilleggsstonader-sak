@@ -212,7 +212,6 @@ internal class SimuleringServiceTest {
         val behandlingId = behandling(fagsak).id
         val fagsakDagligReiseTso = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.DAGLIG_REISE_TSO)
         val fagsakDagligReiseTsr = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.DAGLIG_REISE_TSR)
-        val varselTekst = "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
 
         val alleFagsaker =
             Fagsaker(
