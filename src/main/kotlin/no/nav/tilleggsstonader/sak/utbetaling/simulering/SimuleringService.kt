@@ -16,11 +16,11 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Simuleringsresul
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingV3Mapper
+import no.nav.tilleggsstonader.sak.util.forrigeVirkedag
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.DayOfWeek
 import java.time.LocalDate
 
 @Service
@@ -113,13 +113,6 @@ class SimuleringService(
             null
         }
     }
-
-    fun LocalDate.forrigeVirkedag(): LocalDate =
-        when (this.dayOfWeek) {
-            DayOfWeek.MONDAY -> this.minusDays(3)
-            DayOfWeek.SUNDAY -> this.minusDays(2)
-            else -> this.minusDays(1)
-        }
 
     private fun erVarselRelevantForDagligReise(
         fagsaker: List<Fagsak>,
