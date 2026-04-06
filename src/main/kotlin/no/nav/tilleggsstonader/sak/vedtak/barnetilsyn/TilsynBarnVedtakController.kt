@@ -5,10 +5,9 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
-import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
@@ -20,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnReques
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -38,7 +38,7 @@ class TilsynBarnVedtakController(
     private val tilgangService: TilgangService,
     private val vedtakService: VedtakService,
     private val behandlingService: BehandlingService,
-    private val utledTidligsteEndringService: UtledTidligsteEndringService,
+    private val beregningsplanUtleder: BeregningsplanUtleder,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
 ) {
@@ -84,19 +84,14 @@ class TilsynBarnVedtakController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val vedtaksperioder = vedtak.vedtaksperioder.tilDomene()
-        val tidligsteEndring =
-            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
-                behandling.id,
-                vedtaksperioder,
-            )
+        val beregningsplan = beregningsplanUtleder.utledForInnvilgelse(behandling, vedtaksperioder)
 
         return beregningService
             .beregn(
                 vedtaksperioder = vedtaksperioder,
                 behandling = behandling,
-                typeVedtak = TypeVedtak.INNVILGELSE,
-                tidligsteEndring = tidligsteEndring,
-            ).tilDto(tidligsteEndring)
+                plan = beregningsplan,
+            ).tilDto(beregningsplan.fraDato, beregningsplan.tilDto())
     }
 
     @GetMapping("{behandlingId}")

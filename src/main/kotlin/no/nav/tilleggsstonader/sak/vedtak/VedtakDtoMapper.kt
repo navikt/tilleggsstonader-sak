@@ -36,6 +36,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerResponse
@@ -101,8 +102,15 @@ class VedtakDtoMapper(
     ): VedtakTilsynBarnResponse =
         when (data) {
             is InnvilgelseTilsynBarn -> {
+                val beregningsplan =
+                    (data.beregningsplan ?: utledBeregningsplanLegacyForInnvilgelse(tidligsteEndring, forrigeIverksatteBehandlingId))
+                        .tilDto()
                 InnvilgelseTilsynBarnResponse(
-                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
+                    beregningsresultat =
+                        data.beregningsresultat.tilDto(
+                            tidligsteEndring = tidligsteEndring,
+                            beregningsplan = beregningsplan,
+                        ),
                     vedtaksperioder =
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
@@ -111,14 +119,22 @@ class VedtakDtoMapper(
                 )
             }
 
-            is OpphørTilsynBarn ->
+            is OpphørTilsynBarn -> {
+                val beregningsplan =
+                    (data.beregningsplan ?: utledBeregningsplanLegacyForOpphør(vedtak.opphørsdato))
+                        .tilDto()
                 OpphørTilsynBarnResponse(
-                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
+                    beregningsresultat =
+                        data.beregningsresultat.tilDto(
+                            tidligsteEndring = tidligsteEndring,
+                            beregningsplan = beregningsplan,
+                        ),
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
                     vedtaksperioder = data.vedtaksperioder.tilLagretVedtaksperiodeDto(null),
                     opphørsdato = vedtak.opphørsdato,
                 )
+            }
 
             is AvslagTilsynBarn ->
                 AvslagTilsynBarnDto(
@@ -241,4 +257,27 @@ class VedtakDtoMapper(
         forrigeIverksatteBehandlingId?.let {
             vedtakService.hentVedtaksperioder(behandlingId = it)
         }
+
+    private fun utledBeregningsplanLegacyForInnvilgelse(
+        tidligsteEndring: LocalDate?,
+        forrigeIverksatteBehandlingId: BehandlingId?,
+    ): BeregningPlan =
+        if (forrigeIverksatteBehandlingId == null) {
+            BeregningPlan(omfang = Beregningsomfang.ALLE_PERIODER, årsak = Beregningsårsak.FØRSTEGANGS)
+        } else if (tidligsteEndring != null) {
+            BeregningPlan(
+                omfang = Beregningsomfang.FRA_DATO,
+                årsak = Beregningsårsak.REVURDERING_MED_ENDRING,
+                fraDato = tidligsteEndring,
+            )
+        } else {
+            BeregningPlan(omfang = Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT, årsak = Beregningsårsak.REVURDERING_UTEN_ENDRING)
+        }
+
+    private fun utledBeregningsplanLegacyForOpphør(opphørsdato: LocalDate?): BeregningPlan =
+        BeregningPlan(
+            omfang = Beregningsomfang.FRA_DATO,
+            årsak = Beregningsårsak.OPPHØR,
+            fraDato = opphørsdato,
+        )
 }

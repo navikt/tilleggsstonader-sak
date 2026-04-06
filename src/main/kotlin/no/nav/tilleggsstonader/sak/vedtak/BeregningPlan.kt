@@ -1,0 +1,45 @@
+package no.nav.tilleggsstonader.sak.vedtak
+
+import java.time.LocalDate
+
+data class BeregningPlan(
+    val omfang: Beregningsomfang,
+    val årsak: Beregningsårsak,
+    val fraDato: LocalDate? = null,
+) {
+    init {
+        require(omfang != Beregningsomfang.FRA_DATO || fraDato != null) {
+            "fraDato må settes ved omfang ${Beregningsomfang.FRA_DATO}"
+        }
+        require(omfang == Beregningsomfang.FRA_DATO || fraDato == null) {
+            "fraDato kan kun settes ved omfang ${Beregningsomfang.FRA_DATO}"
+        }
+    }
+
+    fun tilTypeVedtak(): TypeVedtak =
+        when (årsak) {
+            Beregningsårsak.OPPHØR -> TypeVedtak.OPPHØR
+            else -> TypeVedtak.INNVILGELSE
+        }
+
+    fun beregnFra(): LocalDate? =
+        when (omfang) {
+            Beregningsomfang.ALLE_PERIODER -> null
+            Beregningsomfang.FRA_DATO -> fraDato
+            Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT -> error("beregnFra-dato er ikke relevant for $omfang")
+        }
+}
+
+enum class Beregningsomfang {
+    ALLE_PERIODER,
+    FRA_DATO,
+    GJENBRUK_FORRIGE_RESULTAT,
+}
+
+enum class Beregningsårsak {
+    FØRSTEGANGS,
+    REVURDERING_MED_ENDRING,
+    REVURDERING_UTEN_ENDRING,
+    SATSJUSTERING,
+    OPPHØR,
+}

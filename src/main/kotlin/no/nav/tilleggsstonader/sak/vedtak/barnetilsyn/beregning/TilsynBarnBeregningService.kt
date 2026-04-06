@@ -4,11 +4,12 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.YEAR_MONTH_MIN
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.toYearMonth
+import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningValideringUtil.validerPerioderForInnvilgelse
@@ -58,8 +59,19 @@ class TilsynBarnBeregningService(
     fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
+        plan: BeregningPlan,
+    ): BeregningsresultatTilsynBarn =
+        if (plan.omfang == Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT) {
+            hentForrigeBeregningsresultat(behandling)
+        } else {
+            beregnFra(vedtaksperioder, behandling, plan.tilTypeVedtak(), plan.beregnFra())
+        }
+
+    private fun beregnFra(
+        vedtaksperioder: List<Vedtaksperiode>,
+        behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
-        tidligsteEndring: LocalDate?,
+        beregnFra: LocalDate?,
     ): BeregningsresultatTilsynBarn {
         feilHvis(typeVedtak == TypeVedtak.AVSLAG) {
             "Skal ikke beregne for avslag"
@@ -75,16 +87,25 @@ class TilsynBarnBeregningService(
         )
 
         val vedtaksperioderBeregning =
-            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFra(tidligsteEndring)
+            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFra(beregnFra)
 
-        val perioder = beregnAktuellePerioder(behandling, typeVedtak, vedtaksperioderBeregning, tidligsteEndring)
+        val perioder = beregnAktuellePerioder(behandling, typeVedtak, vedtaksperioderBeregning, beregnFra)
         val relevantePerioderFraForrigeVedtak =
-            finnRelevantePerioderFraForrigeVedtak(behandling, tidligsteEndring)
+            finnRelevantePerioderFraForrigeVedtak(behandling, beregnFra)
 
-        brukerfeilHvis(tidligsteEndring == null && behandling.forrigeIverksatteBehandlingId != null) {
-            "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
-        }
         return BeregningsresultatTilsynBarn(relevantePerioderFraForrigeVedtak + perioder)
+    }
+
+    private fun hentForrigeBeregningsresultat(behandling: Saksbehandling): BeregningsresultatTilsynBarn {
+        val forrigeBehandlingId =
+            requireNotNull(behandling.forrigeIverksatteBehandlingId) {
+                "Kan ikke hente forrige beregningsresultat uten forrige iverksatt behandling"
+            }
+        return vedtakRepository
+            .findByIdOrThrow(forrigeBehandlingId)
+            .withTypeOrThrow<InnvilgelseEllerOpphørTilsynBarn>()
+            .data
+            .beregningsresultat
     }
 
     /**
@@ -113,13 +134,8 @@ class TilsynBarnBeregningService(
         behandling: Saksbehandling,
         tidligsteEndring: LocalDate?,
     ): List<BeregningsresultatForMåned> =
-        behandling.forrigeIverksatteBehandlingId?.let { forrigeIverksatteBehandlingId ->
-            val beregningsresultat =
-                vedtakRepository
-                    .findByIdOrThrow(forrigeIverksatteBehandlingId)
-                    .withTypeOrThrow<InnvilgelseEllerOpphørTilsynBarn>()
-                    .data
-                    .beregningsresultat
+        behandling.forrigeIverksatteBehandlingId?.let {
+            val beregningsresultat = hentForrigeBeregningsresultat(behandling)
             val tidligsteEndringMåned = tidligsteEndring?.toYearMonth() ?: YEAR_MONTH_MIN
 
             beregningsresultat.perioder.filter { it.grunnlag.måned < tidligsteEndringMåned }
