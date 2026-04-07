@@ -14,21 +14,21 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
       | 2        | 11.01.2026 | 31.01.2026 | 4                         | 8            |
 
     Gitt følgende delperioder for vilkår daglig reise med privat bil
-      | Vilkårnr | Fom        | Tom        | bompenger | fergekostnader |
-      | 1        | 01.01.2026 | 18.01.2026 | 50        | 80             |
-      | 2        | 11.01.2026 | 31.01.2026 | 60        | 80             |
+      | Vilkårnr | Fom        | Tom        | Bompenger | Fergekostnad | Antall reisedager per uke |
+      | 1        | 01.01.2026 | 18.01.2026 | 50        | 80           | 5                         |
+      | 2        | 11.01.2026 | 31.01.2026 | 60        | 80           | 4                         |
 
     Når beregner for daglig reise privat bil
 
     Så forventer vi rammevedtak for følgende periode
       | Reisenr | Fom        | Tom        | Reiseavstand |
-      | 1       | 01.01.2025 | 31.01.2025 | 18           |
+      | 1       | 01.01.2026 | 18.01.2026 | 10           |
+      | 2       | 11.01.2026 | 31.01.2026 | 8            |
 
     Og vi forventer følgende delperioder for rammevedtak
-      | Vilkårnr | Fom        | Tom        | Dagsats uten parkering | Kilometersats | Sats bekreftet |
-      | 1        | 06.01.2025 | 10.01.2025 | 57.60                  | 2.88          | Ja             |
-      | 2        | 11.01.2025 | 31.01.2025 | 57.60                  | 2.88          | Ja             |
-
+      | Reisenr | Fom        | Tom        | Dagsats uten parkering | Kilometersats | Sats bekreftet | Antall reisedager per uke |
+      | 1       | 01.01.2026 | 18.01.2026 | 188.80                 | 2.94          | Ja             | 5                          |
+      | 2       | 11.01.2026 | 31.01.2026 | 187.04                  | 2.94          | Ja            | 4                         |
 
   Scenario: to fulle uker
     Gitt følgende vedtaksperioder for daglig reise privat bil

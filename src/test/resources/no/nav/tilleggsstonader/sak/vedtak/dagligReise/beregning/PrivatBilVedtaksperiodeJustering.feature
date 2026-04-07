@@ -10,8 +10,8 @@ Egenskap: Beregning av privat bil og vedtaksperioder
       | 12.01.2026 | 15.01.2026 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Gitt følgende vilkår for daglig reise med privat bil
-      | Fom        | Tom        | Antall reisedager per uke | Reiseavstand |
-      | 01.01.2026 | 31.01.2026 | 5                         | 10           |
+      | Vilkårnr | Fom        | Tom        | Antall reisedager per uke | Reiseavstand |
+      | 1        | 01.01.2026 | 31.01.2026 | 5                         | 10           |
 
     Når beregner for daglig reise privat bil
 

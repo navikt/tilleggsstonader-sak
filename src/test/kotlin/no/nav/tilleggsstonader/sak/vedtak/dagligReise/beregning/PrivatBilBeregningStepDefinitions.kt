@@ -24,21 +24,19 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepo
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.SatsDagligReisePrivatBilProvider
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Delperiode
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Ekstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import org.assertj.core.api.Assertions.assertThat
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.UUID
+import kotlin.collections.emptyList
 
 @Suppress("unused", "ktlint:standard:function-naming")
 class PrivatBilBeregningStepDefinitions {
@@ -61,7 +59,8 @@ class PrivatBilBeregningStepDefinitions {
     val beregningService =
         PrivatBilBeregningService(satsDagligReisePrivatBilProvider)
 
-    var reiser: Map<String, VilkårDagligReise> = emptyMap()
+    var reiserUtenDelperioder: Map<String, LagreDagligReise> = emptyMap()
+    var delperioderForReisenummer: Map<String, List<FaktaDelperiodePrivatBil>> = emptyMap()
 
     var vedtaksperioder: List<Vedtaksperiode> = emptyList()
 
@@ -84,15 +83,10 @@ class PrivatBilBeregningStepDefinitions {
 
         every { unleashServiceMock.isEnabled(any()) } returns true
 
-        reiser =
+        reiserUtenDelperioder =
             dataTable
                 .mapRad { rad ->
-                    val nyttVilkår = mapTilVilkårDagligReise(TypeDagligReise.PRIVAT_BIL, rad)
-                    rad["Vilkårnr"]!! to
-                        dagligReiseVilkårService.opprettNyttVilkår(
-                            behandlingId = behandlingId,
-                            nyttVilkår = nyttVilkår,
-                        )
+                    rad["Vilkårnr"]!! to mapTilVilkårDagligReise(TypeDagligReise.PRIVAT_BIL, rad)
                 }.toMap()
     }
 
@@ -106,30 +100,30 @@ class PrivatBilBeregningStepDefinitions {
 
         every { unleashServiceMock.isEnabled(any()) } returns true
 
-        val delperioder = mapDelperioder(dataTable)
-
-        delperioder.forEach { vilkårnr, periode ->
-            val eksisterendeVilkår = reiser[vilkårnr] ?: error("Fant ikke vilkår med vilkårnr $vilkårnr")
-            val vilkårFakta = eksisterendeVilkår.fakta.mapTilVilkårFakta() as FaktaPrivatBil
-
-            vilkårRepositoryFake.update(
-                eksisterendeVilkår.copy(
-                    fakta = vilkårFakta.copy(faktaDelperioder = periode as List<FaktaDelperiodePrivatBil>),
-                ) as Vilkår,
-            )
-        }
+        delperioderForReisenummer = mapDelperioder(dataTable)
     }
 
     @Når("beregner for daglig reise privat bil")
     fun `beregner for daglig reise privat bil`() {
+        val oppfylteReisevilkår = reiserUtenDelperioder.map { (vilkårNr, lagreDagligReise) ->
+            dagligReiseVilkårService.opprettNyttVilkår(
+                behandlingId = behandlingId,
+                nyttVilkår = lagreDagligReise.copy(
+                    fakta = (lagreDagligReise.fakta as FaktaPrivatBil).copy(
+                        faktaDelperioder = delperioderForReisenummer[vilkårNr] ?: error("Må angi delperioder for vilkårNr $vilkårNr")
+                    )
+                ),
+            )
+        }
+
         try {
-            rammevedtak = beregningService.beregnRammevedtak(vedtaksperioder, reiser.values.toList())
+            rammevedtak = beregningService.beregnRammevedtak(vedtaksperioder, oppfylteReisevilkår)
         } catch (e: Exception) {
             feil = e
         }
     }
 
-    @Så("forventer vi rammevedtak for følgende reiseperiode")
+    @Så("forventer vi rammevedtak for følgende periode")
     fun `forventer vi følgende beregningsrsultat for følgende periode`(dataTable: DataTable) {
         assertThat(feil).isNull()
 
@@ -159,9 +153,9 @@ class PrivatBilBeregningStepDefinitions {
         }
     }
 
-    @Og("vi forventer følgende satser for rammevedtak")
-    fun `vi forventer følgende satser for rammevedtak`(dataTable: DataTable) {
-        val forventedeSatserPerReise = mapForventedeSatser(dataTable).groupBy { it.reiseNr }
+    @Og("vi forventer følgende delperioder for rammevedtak")
+    fun `vi forventer følgende delperioder for rammevedtak`(dataTable: DataTable) {
+        val forventedeSatserPerReise = mapDelperiodeCucumber(dataTable).groupBy { it.reiseNr }
         forventedeSatserPerReise.forEach { (reiseNr, satserForReise) ->
             val delPerioderIRammevedtak = rammevedtak!!.reiser[reiseNr - 1].grunnlag.delPerioder
             assertThat(delPerioderIRammevedtak).hasSameSizeAs(satserForReise)
@@ -172,6 +166,7 @@ class PrivatBilBeregningStepDefinitions {
                 assertThat(delperiode.dagsatsUtenParkering).isEqualTo(forventetSats.dagsatsUtenParkering)
                 assertThat(delperiode.kilometersats).isEqualTo(forventetSats.kilometersats)
                 assertThat(delperiode.satsBekreftetVedVedtakstidspunkt).isEqualTo(forventetSats.satsBekreftetVedVedtakstidspunkt)
+                assertThat(delperiode.reisedagerPerUke).isEqualTo(forventetSats.reisedagerPerUke)
             }
         }
     }
@@ -207,22 +202,16 @@ class PrivatBilBeregningStepDefinitions {
         assertThat(rammevedtak).isNull()
     }
 
-    private fun mapDelperioder(dataTable: DataTable): Map<String, List<Delperiode>> =
+    private fun mapDelperioder(dataTable: DataTable): Map<String, List<FaktaDelperiodePrivatBil>> =
         dataTable
             .mapRad {
                 it["Vilkårnr"]!! to
-                    Delperiode(
+                    FaktaDelperiodePrivatBil(
                         fom = parseDato(DomenenøkkelFelles.FOM, it),
                         tom = parseDato(DomenenøkkelFelles.TOM, it),
-                        ekstrakostnader =
-                            Ekstrakostnader(
-                                bompengerPerDag = parseInt(DomenenøkkelPrivatBil.BOMPENGER, it),
-                                fergekostnadPerDag = parseInt(DomenenøkkelPrivatBil.FERGEKOSTNAD, it),
-                            ),
+                        bompengerPerDag = parseInt(DomenenøkkelPrivatBil.BOMPENGER, it),
+                        fergekostnadPerDag = parseInt(DomenenøkkelPrivatBil.FERGEKOSTNAD, it),
                         reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, it),
-                        satsBekreftetVedVedtakstidspunkt = parseBoolean(DomenenøkkelPrivatBil.SATS_BEKREFTET, it),
-                        kilometersats = parseBigDecimal(DomenenøkkelPrivatBil.KILOMETERSATS, it),
-                        dagsatsUtenParkering = parseBigDecimal(DomenenøkkelPrivatBil.DAGSATS_UTEN_PARKERING, it),
                     )
             }.groupBy { it.first }
             .mapValues { it.value.map { it.second } }
@@ -231,25 +220,25 @@ class PrivatBilBeregningStepDefinitions {
         dataTable.mapRad { rad ->
             val fom = parseDato(DomenenøkkelFelles.FOM, rad)
             val tom = parseDato(DomenenøkkelFelles.TOM, rad)
-            val reiseavstandEnVei = parseBigDecimal(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, rad)
+            val reiseavstandEnVei = parseBigDecimal(DomenenøkkelPrivatBil.REISEAVSTAND_EN_VEI, rad)
             RammevedtakCucumber(
                 reiseNr = parseInt(DomenenøkkelPrivatBil.REISENR, rad),
                 fom = fom,
                 tom = tom,
                 reiseavstandEnVei = reiseavstandEnVei,
-                delperioder = emptyList(),
             )
         }
 
-    fun mapForventedeSatser(dataTable: DataTable) =
+    fun mapDelperiodeCucumber(dataTable: DataTable) =
         dataTable.mapRad { rad ->
-            ForventetSatsCucumber(
+            DelperiodeCucumber(
                 reiseNr = parseInt(DomenenøkkelPrivatBil.REISENR, rad),
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
                 dagsatsUtenParkering = parseBigDecimal(DomenenøkkelPrivatBil.DAGSATS_UTEN_PARKERING, rad),
                 kilometersats = parseBigDecimal(DomenenøkkelPrivatBil.KILOMETERSATS, rad),
                 satsBekreftetVedVedtakstidspunkt = parseBoolean(DomenenøkkelPrivatBil.SATS_BEKREFTET, rad),
+                reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE,rad)
             )
         }
 
@@ -283,16 +272,16 @@ data class RammevedtakCucumber(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val reiseavstandEnVei: BigDecimal? = null,
-    val delperioder: List<Delperiode>,
 ) : Periode<LocalDate>
 
 data class DelperiodeCucumber(
-    val vilkårnr: Int,
+    val reiseNr: Int,
     override val fom: LocalDate,
     override val tom: LocalDate,
     val dagsatsUtenParkering: BigDecimal,
     val kilometersats: BigDecimal,
     val satsBekreftetVedVedtakstidspunkt: Boolean,
+    val reisedagerPerUke: Int,
 ) : Periode<LocalDate>
 
 data class SatsForPeriodePrivatBilCucumber(
