@@ -15,10 +15,13 @@ class GooglePlaceDetailsClient(
 ) {
     private val restClient = builder.baseUrl(baseUrl.toString()).build()
 
-    fun finnStedDetaljer(stedId: PlaceId): PlaceDetailsResponse? =
+    fun finnStedDetaljer(
+        stedId: PlaceId,
+        regionCode: String? = "NO",
+    ): PlaceDetailsResponse? =
         restClient
             .get()
-            .uri("/places/{placesId}", stedId.value)
+            .uri("/places/{placesId}?regionCode={regionCode}", stedId.value, regionCode)
             .headers { headers ->
                 headers.apply {
                     add("X-Goog-Api-Key", apiKey)
