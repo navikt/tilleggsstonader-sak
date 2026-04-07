@@ -1,10 +1,12 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import java.time.LocalDate
 
 data class BeregningPlan(
     val omfang: Beregningsomfang,
     val årsak: Beregningsårsak,
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     val fraDato: LocalDate? = null,
 ) {
     init {

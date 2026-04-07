@@ -102,9 +102,7 @@ class VedtakDtoMapper(
     ): VedtakTilsynBarnResponse =
         when (data) {
             is InnvilgelseTilsynBarn -> {
-                val beregningsplan =
-                    (data.beregningsplan ?: utledBeregningsplanLegacyForInnvilgelse(tidligsteEndring, forrigeIverksatteBehandlingId))
-                        .tilDto()
+                val beregningsplan = data.beregningsplan.tilDto()
                 InnvilgelseTilsynBarnResponse(
                     beregningsresultat =
                         data.beregningsresultat.tilDto(
@@ -120,9 +118,7 @@ class VedtakDtoMapper(
             }
 
             is OpphørTilsynBarn -> {
-                val beregningsplan =
-                    (data.beregningsplan ?: utledBeregningsplanLegacyForOpphør(vedtak.opphørsdato))
-                        .tilDto()
+                val beregningsplan = data.beregningsplan.tilDto()
                 OpphørTilsynBarnResponse(
                     beregningsresultat =
                         data.beregningsresultat.tilDto(
@@ -257,27 +253,4 @@ class VedtakDtoMapper(
         forrigeIverksatteBehandlingId?.let {
             vedtakService.hentVedtaksperioder(behandlingId = it)
         }
-
-    private fun utledBeregningsplanLegacyForInnvilgelse(
-        tidligsteEndring: LocalDate?,
-        forrigeIverksatteBehandlingId: BehandlingId?,
-    ): BeregningPlan =
-        if (forrigeIverksatteBehandlingId == null) {
-            BeregningPlan(omfang = Beregningsomfang.ALLE_PERIODER, årsak = Beregningsårsak.FØRSTEGANGS)
-        } else if (tidligsteEndring != null) {
-            BeregningPlan(
-                omfang = Beregningsomfang.FRA_DATO,
-                årsak = Beregningsårsak.REVURDERING_MED_ENDRING,
-                fraDato = tidligsteEndring,
-            )
-        } else {
-            BeregningPlan(omfang = Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT, årsak = Beregningsårsak.REVURDERING_UTEN_ENDRING)
-        }
-
-    private fun utledBeregningsplanLegacyForOpphør(opphørsdato: LocalDate?): BeregningPlan =
-        BeregningPlan(
-            omfang = Beregningsomfang.FRA_DATO,
-            årsak = Beregningsårsak.OPPHØR,
-            fraDato = opphørsdato,
-        )
 }

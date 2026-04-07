@@ -4,6 +4,9 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagBarnAndreForeldreSaksinformasjonMapper.mapBarnAndreForeldreSaksinformasjon
+import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsårsak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtaksperiodeGrunnlag
@@ -223,6 +226,7 @@ class FaktaGrunnlagBarnAndreForeldreSaksinformasjonMapperTest {
         return InnvilgelseTilsynBarn(
             beregningsresultat = BeregningsresultatTilsynBarn(listOf(beregningsresultat)),
             vedtaksperioder = emptyList(),
+            beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER, Beregningsårsak.FØRSTEGANGS),
         )
     }
 
@@ -247,6 +251,7 @@ class FaktaGrunnlagBarnAndreForeldreSaksinformasjonMapperTest {
         return InnvilgelseTilsynBarn(
             beregningsresultat = BeregningsresultatTilsynBarn(listOf(beregningsresultatBarn1, beregningsresultatBarn1GammelId)),
             vedtaksperioder = emptyList(),
+            beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER, Beregningsårsak.FØRSTEGANGS),
         )
     }
 

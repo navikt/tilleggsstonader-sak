@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
-import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
@@ -24,8 +23,7 @@ data class InnvilgelseTilsynBarn(
     override val beregningsresultat: BeregningsresultatTilsynBarn,
     override val vedtaksperioder: List<Vedtaksperiode>,
     val begrunnelse: String? = null,
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    val beregningsplan: BeregningPlan? = null,
+    val beregningsplan: BeregningPlan,
 ) : InnvilgelseEllerOpphørTilsynBarn,
     Innvilgelse {
     override val type: TypeVedtaksdata = TypeVedtakTilsynBarn.INNVILGELSE_TILSYN_BARN
@@ -48,8 +46,7 @@ data class OpphørTilsynBarn(
     override val årsaker: List<ÅrsakOpphør>,
     override val begrunnelse: String,
     override val vedtaksperioder: List<Vedtaksperiode>,
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    val beregningsplan: BeregningPlan? = null,
+    val beregningsplan: BeregningPlan,
 ) : InnvilgelseEllerOpphørTilsynBarn,
     Opphør {
     override val type: TypeVedtaksdata = TypeVedtakTilsynBarn.OPPHØR_TILSYN_BARN

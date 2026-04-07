@@ -1,5 +1,9 @@
 {
   "begrunnelse" : "Begrunnelse for vedtaksperiodene",
+  "beregningsplan" : {
+    "omfang" : "ALLE_PERIODER",
+    "årsak" : "FØRSTEGANGS"
+  },
   "beregningsresultat": {
     "perioder" : [ {
       "dagsats" : 10.11,

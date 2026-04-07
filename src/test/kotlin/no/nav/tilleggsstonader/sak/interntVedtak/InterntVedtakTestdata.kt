@@ -22,6 +22,9 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.totrinnskontroll
 import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsårsak
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtaksperiodeGrunnlag
@@ -285,6 +288,7 @@ object InterntVedtakTestdata {
                             listOf(
                                 vedtaksperiode,
                             ),
+                        beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER, Beregningsårsak.FØRSTEGANGS),
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = LocalDate.of(2024, 1, 1),
