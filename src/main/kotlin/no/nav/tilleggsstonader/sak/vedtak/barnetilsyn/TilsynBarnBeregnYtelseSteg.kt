@@ -74,6 +74,7 @@ class TilsynBarnBeregnYtelseSteg(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 plan = beregningsplan,
+                typeVedtak = TypeVedtak.INNVILGELSE,
             )
         vedtakRepository.insert(
             lagInnvilgetVedtak(
@@ -111,6 +112,7 @@ class TilsynBarnBeregnYtelseSteg(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 plan = beregningsplan,
+                typeVedtak = TypeVedtak.OPPHØR,
             )
         opphørValideringService.validerIngenUtbetalingEtterOpphørsdato(
             beregningsresultat,

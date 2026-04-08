@@ -46,6 +46,7 @@ class LæremidlerBeregningService(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
         plan: BeregningPlan,
+        typeVedtak: TypeVedtak,
     ): BeregningsresultatLæremidler {
         if (plan.omfang == Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT) {
             val forrigeVedtak = requireNotNull(hentForrigeVedtak(behandling))
@@ -57,7 +58,7 @@ class LæremidlerBeregningService(
         vedtaksperiodeValideringService.validerVedtaksperioderLæremidler(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
-            typeVedtak = plan.tilTypeVedtak(),
+            typeVedtak = typeVedtak,
         )
 
         val vedtaksperioderBeregningsgrunnlag = vedtaksperioder.tilBeregningsgrunnlag()

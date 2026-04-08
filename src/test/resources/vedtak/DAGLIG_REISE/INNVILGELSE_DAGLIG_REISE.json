@@ -40,8 +40,7 @@
   },
   "rammevedtakPrivatBil": null,
   "beregningsplan": {
-    "omfang": "ALLE_PERIODER",
-    "årsak": "FØRSTEGANGS"
+    "omfang": "ALLE_PERIODER"
   },
   "type": "INNVILGELSE_DAGLIG_REISE",
   "vedtaksperioder": [

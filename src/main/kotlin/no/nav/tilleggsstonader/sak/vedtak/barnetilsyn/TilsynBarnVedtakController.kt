@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
@@ -91,6 +92,7 @@ class TilsynBarnVedtakController(
                 vedtaksperioder = vedtaksperioder,
                 behandling = behandling,
                 plan = beregningsplan,
+                typeVedtak = TypeVedtak.INNVILGELSE,
             ).tilDto(beregningsplan.fraDato, beregningsplan.tilDto())
     }
 

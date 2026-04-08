@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningService
@@ -94,6 +95,7 @@ class BoutgifterVedtakController(
                 behandling = behandling,
                 vedtaksperioder = vedtaksperioder,
                 plan = plan,
+                typeVedtak = TypeVedtak.INNVILGELSE,
             ).tilDto(tidligsteEndring = plan.beregnFra(), beregningsplan = plan.tilDto())
     }
 

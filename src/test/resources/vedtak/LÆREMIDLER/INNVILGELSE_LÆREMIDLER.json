@@ -2,8 +2,7 @@
   "begrunnelse": "En begrunnelse",
   "type": "INNVILGELSE_LÆREMIDLER",
   "beregningsplan": {
-    "omfang": "ALLE_PERIODER",
-    "årsak": "FØRSTEGANGS"
+    "omfang": "ALLE_PERIODER"
   },
   "vedtaksperioder": [
     {

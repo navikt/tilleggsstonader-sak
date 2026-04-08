@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsårsak
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -57,12 +56,13 @@ class BoutgifterBeregnYtelseSteg(
 
         val innvilgelse = vedtak as InnvilgelseBoutgifterRequest
         val vedtaksperioder = innvilgelse.vedtaksperioder.tilDomene().sorted()
-        val beregningsplan = BeregningPlan(omfang = Beregningsomfang.FRA_DATO, årsak = Beregningsårsak.SATSJUSTERING, fraDato = satsjusteringFra)
+        val beregningsplan = BeregningPlan(omfang = Beregningsomfang.FRA_DATO, fraDato = satsjusteringFra)
         val beregningsresultat =
             beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 plan = beregningsplan,
+                typeVedtak = TypeVedtak.INNVILGELSE,
             )
         lagreInnvilgetVedtak(
             behandling = saksbehandling,
@@ -96,6 +96,7 @@ class BoutgifterBeregnYtelseSteg(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 plan = beregningsplan,
+                typeVedtak = TypeVedtak.INNVILGELSE,
             )
         lagreInnvilgetVedtak(
             behandling = saksbehandling,
@@ -136,6 +137,7 @@ class BoutgifterBeregnYtelseSteg(
                 saksbehandling,
                 avkortedeVedtaksperioder,
                 beregningsplan,
+                TypeVedtak.OPPHØR,
             )
 
         lagreOpphørsvedtak(saksbehandling, avkortedeVedtaksperioder, beregningsresultat, vedtak, beregningsplan)

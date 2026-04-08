@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.beregnin
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsårsak
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
@@ -55,7 +54,7 @@ class VedtakBoutgifterTest {
                                 tom = førsteJan25,
                             ),
                         ),
-                    beregningsplan = BeregningPlan(Beregningsomfang.FRA_DATO, Beregningsårsak.OPPHØR, førsteJan25),
+                    beregningsplan = BeregningPlan(Beregningsomfang.FRA_DATO, førsteJan25),
                 )
             }.hasMessage("Må velge minst en årsak for opphør")
         }
@@ -74,7 +73,7 @@ class VedtakBoutgifterTest {
                                 tom = førsteJan25,
                             ),
                         ),
-                    beregningsplan = BeregningPlan(Beregningsomfang.FRA_DATO, Beregningsårsak.OPPHØR, førsteJan25),
+                    beregningsplan = BeregningPlan(Beregningsomfang.FRA_DATO, førsteJan25),
                 )
             }.hasMessage("Opphør må begrunnes")
         }
@@ -96,7 +95,7 @@ class VedtakBoutgifterTest {
                                 tom = førsteJan25,
                             ),
                         ),
-                    beregningsplan = BeregningPlan(Beregningsomfang.FRA_DATO, Beregningsårsak.OPPHØR, førsteJan25),
+                    beregningsplan = BeregningPlan(Beregningsomfang.FRA_DATO, førsteJan25),
                 )
 
             val avslagBoutgifter2 =
@@ -111,7 +110,7 @@ class VedtakBoutgifterTest {
                                 tom = førsteJan25,
                             ),
                         ),
-                    beregningsplan = BeregningPlan(Beregningsomfang.FRA_DATO, Beregningsårsak.OPPHØR, førsteJan25),
+                    beregningsplan = BeregningPlan(Beregningsomfang.FRA_DATO, førsteJan25),
                 )
 
             assertThat(avslagBoutgifter).isEqualTo(avslagBoutgifter2)

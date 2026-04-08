@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsårsak
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
@@ -34,7 +33,7 @@ class VedtakRepositoryTest : CleanDatabaseIntegrationTest() {
                     InnvilgelseTilsynBarn(
                         beregningsresultat = beregningsresultat,
                         vedtaksperioder = emptyList(),
-                        beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER, Beregningsårsak.FØRSTEGANGS),
+                        beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
                     ),
             ),
         )

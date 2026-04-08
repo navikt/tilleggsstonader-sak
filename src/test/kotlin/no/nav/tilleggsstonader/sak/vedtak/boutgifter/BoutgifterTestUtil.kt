@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsårsak
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBehandling
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.beregnStønadsbeløp
@@ -60,7 +59,7 @@ object BoutgifterTestUtil {
                 beregningsresultat = beregningsresultat,
                 vedtaksperioder = vedtaksperioder,
                 begrunnelse = null,
-                beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER, Beregningsårsak.FØRSTEGANGS),
+                beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
             ),
         type = TypeVedtak.INNVILGELSE,
         gitVersjon = "versjon-test",

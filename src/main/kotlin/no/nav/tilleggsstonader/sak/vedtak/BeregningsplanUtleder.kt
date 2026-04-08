@@ -15,21 +15,20 @@ class BeregningsplanUtleder(
         vedtaksperioder: List<Vedtaksperiode>,
     ): BeregningPlan {
         if (saksbehandling.forrigeIverksatteBehandlingId == null) {
-            return BeregningPlan(omfang = Beregningsomfang.ALLE_PERIODER, årsak = Beregningsårsak.FØRSTEGANGS)
+            return BeregningPlan(omfang = Beregningsomfang.ALLE_PERIODER)
         }
         val tidligsteEndring =
             utledTidligsteEndringService.utledTidligsteEndringForBeregning(saksbehandling.id, vedtaksperioder)
         return if (tidligsteEndring != null) {
             BeregningPlan(
                 omfang = Beregningsomfang.FRA_DATO,
-                årsak = Beregningsårsak.REVURDERING_MED_ENDRING,
                 fraDato = tidligsteEndring,
             )
         } else {
-            BeregningPlan(omfang = Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT, årsak = Beregningsårsak.REVURDERING_UTEN_ENDRING)
+            BeregningPlan(omfang = Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT)
         }
     }
 
     fun utledForOpphør(opphørsdato: LocalDate): BeregningPlan =
-        BeregningPlan(omfang = Beregningsomfang.FRA_DATO, årsak = Beregningsårsak.OPPHØR, fraDato = opphørsdato)
+        BeregningPlan(omfang = Beregningsomfang.FRA_DATO, fraDato = opphørsdato)
 }

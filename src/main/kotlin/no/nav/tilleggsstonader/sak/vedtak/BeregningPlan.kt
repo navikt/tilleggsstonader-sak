@@ -5,7 +5,6 @@ import java.time.LocalDate
 
 data class BeregningPlan(
     val omfang: Beregningsomfang,
-    val årsak: Beregningsårsak,
     @JsonInclude(JsonInclude.Include.NON_NULL)
     val fraDato: LocalDate? = null,
 ) {
@@ -17,12 +16,6 @@ data class BeregningPlan(
             "fraDato kan kun settes ved omfang ${Beregningsomfang.FRA_DATO}"
         }
     }
-
-    fun tilTypeVedtak(): TypeVedtak =
-        when (årsak) {
-            Beregningsårsak.OPPHØR -> TypeVedtak.OPPHØR
-            else -> TypeVedtak.INNVILGELSE
-        }
 
     fun beregnFra(): LocalDate? =
         when (omfang) {
@@ -36,12 +29,4 @@ enum class Beregningsomfang {
     ALLE_PERIODER,
     FRA_DATO,
     GJENBRUK_FORRIGE_RESULTAT,
-}
-
-enum class Beregningsårsak {
-    FØRSTEGANGS,
-    REVURDERING_MED_ENDRING,
-    REVURDERING_UTEN_ENDRING,
-    SATSJUSTERING,
-    OPPHØR,
 }

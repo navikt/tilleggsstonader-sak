@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
 import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsårsak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
@@ -101,7 +100,7 @@ fun lagDagligReiseInnvilgelseMedBeløp(
             beregningsresultat = beregningsresultat,
             rammevedtakPrivatBil = null,
             begrunnelse = "test",
-            beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER, Beregningsårsak.FØRSTEGANGS),
+            beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
         )
 
     val andel =

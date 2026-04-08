@@ -2,7 +2,6 @@
   "type": "OPPHØR_BOUTGIFTER",
   "beregningsplan": {
     "omfang": "FRA_DATO",
-    "årsak": "OPPHØR",
     "fraDato": "2025-01-01"
   },
   "vedtaksperioder": [

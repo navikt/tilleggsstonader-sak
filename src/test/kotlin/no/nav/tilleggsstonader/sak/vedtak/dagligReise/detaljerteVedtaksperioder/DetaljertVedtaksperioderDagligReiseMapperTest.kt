@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsårsak
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperioderDagligReiseMapper.finnDetaljerteVedtaksperioderDagligReise
@@ -45,7 +44,7 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                     vedtaksperioder = defaultVedtaksperioder,
                     beregningsresultat = defaultBeregningsresultat,
                     rammevedtakPrivatBil = null,
-                    beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER, Beregningsårsak.FØRSTEGANGS),
+                    beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
                 ),
             )
         val tsrVedtak =
@@ -54,7 +53,7 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                     vedtaksperioder = defaultVedtaksperioder,
                     beregningsresultat = defaultBeregningsresultat,
                     rammevedtakPrivatBil = null,
-                    beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER, Beregningsårsak.FØRSTEGANGS),
+                    beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
                 ),
             )
 
@@ -123,7 +122,7 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
             ),
         beregningsresultat = lagBeregningsresultatMedToPerioder(fom1, tom1, fom2, tom2),
         rammevedtakPrivatBil = null,
-        beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER, Beregningsårsak.FØRSTEGANGS),
+        beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
     )
 
     private fun lagBeregningsresultatMedToReiser(
@@ -206,7 +205,7 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
             vedtaksperioder = defaultVedtaksperioder,
             beregningsresultat = defaultBeregningsresultat,
             rammevedtakPrivatBil = null,
-            beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER, Beregningsårsak.FØRSTEGANGS),
+            beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
         )
 
     fun vedtaksperiode(

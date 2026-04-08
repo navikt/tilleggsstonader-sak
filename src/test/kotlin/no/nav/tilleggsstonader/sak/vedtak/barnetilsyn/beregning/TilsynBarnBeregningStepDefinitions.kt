@@ -28,7 +28,7 @@ import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsårsak
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.BarnIdTilTestIdHolder.barnIder
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
@@ -144,21 +144,19 @@ class TilsynBarnBeregningStepDefinitions {
         val plan =
             when {
                 behandling.forrigeIverksatteBehandlingId == null ->
-                    BeregningPlan(omfang = Beregningsomfang.ALLE_PERIODER, årsak = Beregningsårsak.FØRSTEGANGS)
+                    BeregningPlan(omfang = Beregningsomfang.ALLE_PERIODER)
                 tidligsteEndring != null ->
                     BeregningPlan(
                         omfang = Beregningsomfang.FRA_DATO,
-                        årsak = Beregningsårsak.REVURDERING_MED_ENDRING,
                         fraDato = tidligsteEndring,
                     )
                 else ->
                     BeregningPlan(
                         omfang = Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT,
-                        årsak = Beregningsårsak.REVURDERING_UTEN_ENDRING,
                     )
             }
         try {
-            beregningsresultat = service.beregn(vedtaksperioder, behandling, plan)
+            beregningsresultat = service.beregn(vedtaksperioder, behandling, plan, TypeVedtak.INNVILGELSE)
         } catch (e: Exception) {
             exception = e
         }

@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.domain
 
 import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsårsak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtakBeregningsresultat
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -45,7 +44,7 @@ class VedtakTilsynBarnTest {
                     årsaker = emptyList(),
                     begrunnelse = "begrunnelse",
                     vedtaksperioder = emptyList(),
-                    beregningsplan = BeregningPlan(Beregningsomfang.FRA_DATO, Beregningsårsak.OPPHØR, LocalDate.now()),
+                    beregningsplan = BeregningPlan(Beregningsomfang.FRA_DATO, LocalDate.now()),
                 )
             }.hasMessage("Må velge minst en årsak for opphør")
         }
@@ -58,7 +57,7 @@ class VedtakTilsynBarnTest {
                     årsaker = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
                     begrunnelse = "",
                     vedtaksperioder = emptyList(),
-                    beregningsplan = BeregningPlan(Beregningsomfang.FRA_DATO, Beregningsårsak.OPPHØR, LocalDate.now()),
+                    beregningsplan = BeregningPlan(Beregningsomfang.FRA_DATO, LocalDate.now()),
                 )
             }.hasMessage("Opphør må begrunnes")
         }
@@ -68,7 +67,7 @@ class VedtakTilsynBarnTest {
          */
         @Test
         fun `2 like opphør skal være like`() {
-            val plan = BeregningPlan(Beregningsomfang.FRA_DATO, Beregningsårsak.OPPHØR, LocalDate.now())
+            val plan = BeregningPlan(Beregningsomfang.FRA_DATO, LocalDate.now())
             val avslagTilsynBarn =
                 OpphørTilsynBarn(vedtakBeregningsresultat, listOf(ÅrsakOpphør.ENDRING_UTGIFTER), "asd", emptyList(), plan)
             val avslagTilsynBarn2 =

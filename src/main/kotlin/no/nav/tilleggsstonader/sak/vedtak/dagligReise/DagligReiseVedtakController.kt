@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
@@ -118,6 +119,7 @@ class DagligReiseVedtakController(
                 vedtaksperioder = vedtaksperioder,
                 behandling = behandling,
                 plan = plan,
+                typeVedtak = TypeVedtak.INNVILGELSE,
             )
 
         val vilkår = dagligReiseVilkårService.hentVilkårForBehandling(behandlingId)

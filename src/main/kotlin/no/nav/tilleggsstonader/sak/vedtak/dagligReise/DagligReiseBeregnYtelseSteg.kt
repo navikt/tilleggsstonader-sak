@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
@@ -80,6 +81,7 @@ class DagligReiseBeregnYtelseSteg(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 plan = plan,
+                typeVedtak = TypeVedtak.INNVILGELSE,
             )
         dagligReiseVedtakService.lagreInnvilgetVedtak(
             behandling = saksbehandling,
@@ -121,6 +123,7 @@ class DagligReiseBeregnYtelseSteg(
                 vedtaksperioder = avkortetVedtaksperioder,
                 behandling = saksbehandling,
                 plan = beregningsplan,
+                typeVedtak = TypeVedtak.OPPHØR,
             )
         opphørValideringService.validerIngenUtbetalingEtterOpphørsdatoDagligReise(
             beregningsresultat,

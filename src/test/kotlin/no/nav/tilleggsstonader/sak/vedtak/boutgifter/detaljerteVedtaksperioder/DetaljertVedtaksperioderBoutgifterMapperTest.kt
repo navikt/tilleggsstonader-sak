@@ -12,7 +12,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsårsak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -137,7 +136,7 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
                                     beregningsresultatFeb,
                                 ),
                         ),
-                    beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER, Beregningsårsak.FØRSTEGANGS),
+                    beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
                 )
 
             val res = vedtak.finnDetaljerteVedtaksperioder()
@@ -487,6 +486,6 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
         InnvilgelseBoutgifter(
             vedtaksperioder = emptyList(),
             beregningsresultat = BeregningsresultatBoutgifter(perioder = beregningsperioder),
-            beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER, Beregningsårsak.FØRSTEGANGS),
+            beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
         )
 }

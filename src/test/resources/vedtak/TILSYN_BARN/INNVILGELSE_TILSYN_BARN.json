@@ -1,8 +1,7 @@
 {
   "begrunnelse" : "Begrunnelse for vedtaksperiodene",
   "beregningsplan" : {
-    "omfang" : "ALLE_PERIODER",
-    "årsak" : "FØRSTEGANGS"
+    "omfang" : "ALLE_PERIODER"
   },
   "beregningsresultat": {
     "perioder" : [ {

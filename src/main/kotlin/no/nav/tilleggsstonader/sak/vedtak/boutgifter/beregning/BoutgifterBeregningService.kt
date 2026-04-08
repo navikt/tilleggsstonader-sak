@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.beregnStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.lagBeregningsgrunnlag
@@ -51,6 +52,7 @@ class BoutgifterBeregningService(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
         plan: BeregningPlan,
+        typeVedtak: TypeVedtak,
     ): BeregningsresultatBoutgifter {
         val forrigeVedtak = hentForrigeVedtak(behandling)
 
@@ -60,7 +62,6 @@ class BoutgifterBeregningService(
             }.beregningsresultat
         }
 
-        val typeVedtak = plan.tilTypeVedtak()
         val tidligsteEndring = plan.beregnFra()
 
         vedtaksperiodeValideringService.validerVedtaksperioder(

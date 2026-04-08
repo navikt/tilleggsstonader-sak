@@ -12,7 +12,6 @@ import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsårsak
 import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -22,7 +21,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
@@ -74,7 +72,7 @@ class LæremidlerBeregnYtelseSteg(
         logger.info("Lagrer vedtak for satsjustering for behandling=${saksbehandling.id}, satsjusteringFra=$satsjusteringFra")
 
         val innvilgelse = vedtak as InnvilgelseLæremidlerRequest
-        val plan = BeregningPlan(Beregningsomfang.FRA_DATO, Beregningsårsak.SATSJUSTERING, satsjusteringFra)
+        val plan = BeregningPlan(Beregningsomfang.FRA_DATO, satsjusteringFra)
         lagreInnvilgetVedtak(
             saksbehandling = saksbehandling,
             vedtaksperioder = innvilgelse.vedtaksperioder.tilDomene(),
@@ -113,6 +111,7 @@ class LæremidlerBeregnYtelseSteg(
                 behandling = saksbehandling,
                 vedtaksperioder = vedtaksperioder,
                 plan = plan,
+                typeVedtak = TypeVedtak.INNVILGELSE,
             )
 
         vedtakRepository.insert(

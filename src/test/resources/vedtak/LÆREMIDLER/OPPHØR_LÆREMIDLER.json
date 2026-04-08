@@ -2,7 +2,6 @@
   "type": "OPPHØR_LÆREMIDLER",
   "beregningsplan": {
     "omfang": "FRA_DATO",
-    "årsak": "OPPHØR",
     "fraDato": "2024-01-01"
   },
   "vedtaksperioder": [

@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkårDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsårsak
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
@@ -120,7 +119,6 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                     privatBil = null,
                     beregningsplan = BeregningsplanDto(
                         omfang = Beregningsomfang.ALLE_PERIODER,
-                        årsak = Beregningsårsak.FØRSTEGANGS,
                         fraDato = null,
                     ),
                 ),

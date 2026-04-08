@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsårsak
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.innvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagBeregningsresultatMåned
@@ -124,7 +124,8 @@ class BoutgifterBeregningLøpendeUtgifterToBoliger {
                 .beregn(
                     behandling = saksbehandling(),
                     vedtaksperioder = vedtaksperioderFørstegangsbehandling,
-                    plan = BeregningPlan(Beregningsomfang.ALLE_PERIODER, Beregningsårsak.FØRSTEGANGS),
+                    plan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
+                    typeVedtak = TypeVedtak.INNVILGELSE,
                 ).perioder
 
         assertThat(res).isEqualTo(beregningsresultatFørstegangsbehandlingLøpendeUtgifterToBoliger)
@@ -217,7 +218,8 @@ class BoutgifterBeregningLøpendeUtgifterToBoliger {
                 .beregn(
                     behandling = saksbehandling,
                     vedtaksperioder = vedtaksperioderRevurdering,
-                    plan = BeregningPlan(Beregningsomfang.FRA_DATO, Beregningsårsak.REVURDERING_MED_ENDRING, tidligsteEndring),
+                    plan = BeregningPlan(Beregningsomfang.FRA_DATO, tidligsteEndring),
+                    typeVedtak = TypeVedtak.INNVILGELSE,
                 ).perioder
 
         assertThat(res.size).isEqualTo(4)

@@ -27,7 +27,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatL
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsårsak
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
@@ -125,7 +125,8 @@ class LæremidlerBeregningStepDefinitions {
                 læremidlerBeregningService.beregn(
                     behandling,
                     vedtaksPerioder,
-                    plan = BeregningPlan(Beregningsomfang.ALLE_PERIODER, Beregningsårsak.FØRSTEGANGS),
+                    plan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
+                    typeVedtak = TypeVedtak.INNVILGELSE,
                 )
         } catch (e: Exception) {
             beregningException = e

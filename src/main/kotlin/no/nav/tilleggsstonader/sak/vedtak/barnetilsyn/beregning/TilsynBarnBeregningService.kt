@@ -60,11 +60,12 @@ class TilsynBarnBeregningService(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
         plan: BeregningPlan,
+        typeVedtak: TypeVedtak,
     ): BeregningsresultatTilsynBarn =
         if (plan.omfang == Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT) {
             hentForrigeBeregningsresultat(behandling)
         } else {
-            beregnFra(vedtaksperioder, behandling, plan.tilTypeVedtak(), plan.beregnFra())
+            beregnFra(vedtaksperioder, behandling, typeVedtak, plan.beregnFra())
         }
 
     private fun beregnFra(
