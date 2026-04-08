@@ -56,14 +56,12 @@ class VedtakDtoMapper(
     fun toDto(
         vedtak: Vedtak,
         forrigeIverksatteBehandlingId: BehandlingId?,
-    ): VedtakResponse {
-        val data = vedtak.data
-        return when (data) {
+    ): VedtakResponse =
+        when (val data = vedtak.data) {
             is VedtakTilsynBarn ->
                 mapVedtakTilsynBarn(
                     vedtak,
                     data,
-                    vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId,
                 )
 
@@ -92,23 +90,17 @@ class VedtakDtoMapper(
                     forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
                 )
         }
-    }
 
     private fun mapVedtakTilsynBarn(
         vedtak: Vedtak,
         data: VedtakTilsynBarn,
-        tidligsteEndring: LocalDate?,
         forrigeIverksatteBehandlingId: BehandlingId?,
     ): VedtakTilsynBarnResponse =
         when (data) {
             is InnvilgelseTilsynBarn -> {
                 val beregningsplan = data.beregningsplan.tilDto()
                 InnvilgelseTilsynBarnResponse(
-                    beregningsresultat =
-                        data.beregningsresultat.tilDto(
-                            tidligsteEndring = tidligsteEndring,
-                            beregningsplan = beregningsplan,
-                        ),
+                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = beregningsplan),
                     vedtaksperioder =
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
@@ -120,11 +112,7 @@ class VedtakDtoMapper(
             is OpphørTilsynBarn -> {
                 val beregningsplan = data.beregningsplan.tilDto()
                 OpphørTilsynBarnResponse(
-                    beregningsresultat =
-                        data.beregningsresultat.tilDto(
-                            tidligsteEndring = tidligsteEndring,
-                            beregningsplan = beregningsplan,
-                        ),
+                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = beregningsplan),
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
                     vedtaksperioder = data.vedtaksperioder.tilLagretVedtaksperiodeDto(null),
@@ -150,12 +138,10 @@ class VedtakDtoMapper(
                 val beregningsplan = data.beregningsplan.tilDto()
                 InnvilgelseLæremidlerResponse(
                     vedtaksperioder =
-                        data.vedtaksperioder
-                            .tilLagretVedtaksperiodeDto(hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId)),
-                    beregningsresultat = data.beregningsresultat.tilDto(
-                        tidligsteEndring = tidligsteEndring,
-                        beregningsplan = beregningsplan,
-                    ),
+                        data.vedtaksperioder.tilLagretVedtaksperiodeDto(
+                            hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
+                        ),
+                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = beregningsplan),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,
@@ -188,16 +174,12 @@ class VedtakDtoMapper(
     ): VedtakBoutgifterResponse =
         when (data) {
             is InnvilgelseBoutgifter -> {
-                val beregningsplan = data.beregningsplan.tilDto()
                 InnvilgelseBoutgifterResponse(
                     vedtaksperioder =
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
                         ),
-                    beregningsresultat = data.beregningsresultat.tilDto(
-                        tidligsteEndring = tidligsteEndring,
-                        beregningsplan = beregningsplan,
-                    ),
+                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan.tilDto()),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,

@@ -77,7 +77,7 @@ class LæremidlerBeregnYtelseSteg(
             saksbehandling = saksbehandling,
             vedtaksperioder = innvilgelse.vedtaksperioder.tilDomene(),
             begrunnelse = null,
-            plan = plan,
+            beregningsplan = plan,
         )
     }
 
@@ -86,12 +86,11 @@ class LæremidlerBeregnYtelseSteg(
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
     ) {
-        val plan = beregningsplanUtleder.utledForInnvilgelse(saksbehandling, vedtaksperioder)
         lagreInnvilgetVedtak(
             saksbehandling = saksbehandling,
             vedtaksperioder = vedtaksperioder,
             begrunnelse = begrunnelse,
-            plan = plan,
+            beregningsplan = beregningsplanUtleder.utledForInnvilgelse(saksbehandling, vedtaksperioder),
         )
     }
 
@@ -104,13 +103,13 @@ class LæremidlerBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
-        plan: Beregningsplan,
+        beregningsplan: Beregningsplan,
     ) {
         val beregningsresultat =
             beregningService.beregn(
                 behandling = saksbehandling,
                 vedtaksperioder = vedtaksperioder,
-                plan = plan,
+                plan = beregningsplan,
                 typeVedtak = TypeVedtak.INNVILGELSE,
             )
 
@@ -123,10 +122,10 @@ class LæremidlerBeregnYtelseSteg(
                         vedtaksperioder = vedtaksperioder,
                         beregningsresultat = BeregningsresultatLæremidler(beregningsresultat.perioder),
                         begrunnelse = begrunnelse,
-                        beregningsplan = plan,
+                        beregningsplan = beregningsplan,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                tidligsteEndring = plan.beregnFra(),
+                tidligsteEndring = beregningsplan.beregnFra(),
             ),
         )
         lagreAndeler(saksbehandling, beregningsresultat)

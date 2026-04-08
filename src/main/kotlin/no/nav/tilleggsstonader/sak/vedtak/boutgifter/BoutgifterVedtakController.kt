@@ -96,7 +96,7 @@ class BoutgifterVedtakController(
                 vedtaksperioder = vedtaksperioder,
                 plan = plan,
                 typeVedtak = TypeVedtak.INNVILGELSE,
-            ).tilDto(tidligsteEndring = plan.beregnFra(), beregningsplan = plan.tilDto())
+            ).tilDto(beregningsplan = plan.tilDto())
     }
 
     @GetMapping("{behandlingId}")

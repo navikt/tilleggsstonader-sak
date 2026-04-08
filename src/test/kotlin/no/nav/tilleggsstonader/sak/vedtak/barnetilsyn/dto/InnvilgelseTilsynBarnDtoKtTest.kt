@@ -31,7 +31,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
                             beløpsperioder = listOf(Beløpsperiode(LocalDate.of(2024, 1, 1), 20, NEDSATT_ARBEIDSEVNE)),
                         ),
                     ),
-            ).tilDto(null, BeregningsplanDto(Beregningsomfang.ALLE_PERIODER))
+            ).tilDto(BeregningsplanDto(Beregningsomfang.ALLE_PERIODER))
 
         assertThat(dto.perioder).containsExactlyInAnyOrder(
             BeregningsresultatForMånedDto(
@@ -67,7 +67,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
                                 ),
                         ),
                     ),
-            ).tilDto(null, BeregningsplanDto(Beregningsomfang.ALLE_PERIODER))
+            ).tilDto(BeregningsplanDto(Beregningsomfang.ALLE_PERIODER))
 
         assertThat(dto.gjelderFraOgMed).isEqualTo(LocalDate.of(2024, 1, 2))
         assertThat(dto.gjelderTilOgMed).isEqualTo(LocalDate.of(2024, 2, 4))
@@ -95,7 +95,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
                                     ),
                             ),
                         ),
-                ).tilDto(tidligsteEndring, BeregningsplanDto(Beregningsomfang.FRA_DATO, fraDato = tidligsteEndring))
+                ).tilDto(BeregningsplanDto(Beregningsomfang.FRA_DATO, fraDato = tidligsteEndring))
 
             assertThat(dto.perioder.single().månedsbeløp).isEqualTo(60)
         }
@@ -108,7 +108,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
         @Test
         fun `periode som overlapper skal bruke tidligsteEndring som startdato`() {
             val periode = vedtaksperiodeGrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 18))
-            val dto = resultatMedEnVedtaksperiode(periode).tilDto(tidligsteEndring, BeregningsplanDto(Beregningsomfang.FRA_DATO, fraDato = tidligsteEndring))
+            val dto = resultatMedEnVedtaksperiode(periode).tilDto(BeregningsplanDto(Beregningsomfang.FRA_DATO, fraDato = tidligsteEndring))
 
             assertThat(dto.gjelderFraOgMed).isEqualTo(tidligsteEndring)
             assertThat(dto.gjelderTilOgMed).isEqualTo(LocalDate.of(2024, 1, 18))
@@ -117,7 +117,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
         @Test
         fun `periode som begynner før tidligsteEndring skal ikke brukes til gjelderFra eller gjelderTil`() {
             val periode = vedtaksperiodeGrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 16))
-            val dto = resultatMedEnVedtaksperiode(periode).tilDto(tidligsteEndring, BeregningsplanDto(Beregningsomfang.FRA_DATO, fraDato = tidligsteEndring))
+            val dto = resultatMedEnVedtaksperiode(periode).tilDto(BeregningsplanDto(Beregningsomfang.FRA_DATO, fraDato = tidligsteEndring))
 
             assertThat(dto.gjelderFraOgMed).isNull()
             assertThat(dto.gjelderTilOgMed).isNull()
@@ -126,7 +126,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
         @Test
         fun `periode som begynner fra og med tidligsteEndring brukes til gjelderFra og gjelderTil`() {
             val periode = vedtaksperiodeGrunnlag(fom = LocalDate.of(2024, 1, 17), tom = LocalDate.of(2024, 1, 19))
-            val dto = resultatMedEnVedtaksperiode(periode).tilDto(tidligsteEndring, BeregningsplanDto(Beregningsomfang.FRA_DATO, fraDato = tidligsteEndring))
+            val dto = resultatMedEnVedtaksperiode(periode).tilDto(BeregningsplanDto(Beregningsomfang.FRA_DATO, fraDato = tidligsteEndring))
 
             assertThat(dto.gjelderFraOgMed).isEqualTo(LocalDate.of(2024, 1, 17))
             assertThat(dto.gjelderTilOgMed).isEqualTo(LocalDate.of(2024, 1, 19))

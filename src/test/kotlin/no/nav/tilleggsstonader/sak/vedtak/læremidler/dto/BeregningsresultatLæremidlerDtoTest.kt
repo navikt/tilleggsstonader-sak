@@ -30,7 +30,7 @@ class BeregningsresultatLæremidlerDtoTest {
                             LocalDate.of(2024, 5, 31),
                         ),
                     ),
-            ).tilDto(tidligsteEndring = null, beregningsplan = BeregningsplanDto(Beregningsomfang.ALLE_PERIODER))
+            ).tilDto(beregningsplan = BeregningsplanDto(Beregningsomfang.ALLE_PERIODER))
 
         assertThat(dto.perioder).containsExactlyInAnyOrder(
             beregningsresultatForPeriodeDto(

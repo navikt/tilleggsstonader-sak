@@ -48,26 +48,19 @@ data class BeregningsresultatForPeriodeDto(
             this.påfølgesAv(nestePeriode)
 }
 
-fun BeregningsresultatLæremidler.tilDto(
-    tidligsteEndring: LocalDate?,
-    beregningsplan: BeregningsplanDto,
-): BeregningsresultatLæremidlerDto {
-    val perioderDto =
-        this
-            .filtrerFraOgMed(tidligsteEndring)
-            .perioder
-            .map { it.tilDto() }
-    return BeregningsresultatLæremidlerDto(
+fun BeregningsresultatLæremidler.tilDto(beregningsplan: BeregningsplanDto) =
+    BeregningsresultatLæremidlerDto(
         perioder =
-            perioderDto
+            filtrerFraOgMed(beregningsplan.fraDato)
+                .perioder
+                .map { it.tilDto() }
                 .mergeSammenhengende(
                     skalMerges = { v1, v2 -> v1.kanSlåsSammen(v2) },
                     merge = { v1, v2 -> v1.slåSammen(v2) },
                 ),
-        tidligsteEndring = tidligsteEndring,
+        tidligsteEndring = beregningsplan.fraDato,
         beregningsplan = beregningsplan,
     )
-}
 
 fun BeregningsresultatForMåned.tilDto(): BeregningsresultatForPeriodeDto =
     BeregningsresultatForPeriodeDto(

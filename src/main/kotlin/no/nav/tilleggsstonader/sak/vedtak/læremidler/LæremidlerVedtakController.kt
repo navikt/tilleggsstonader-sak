@@ -96,7 +96,7 @@ class LæremidlerVedtakController(
                 vedtaksperioder.tilDomene(),
                 plan,
                 TypeVedtak.INNVILGELSE,
-            ).tilDto(tidligsteEndring = plan.beregnFra(), beregningsplan = plan.tilDto())
+            ).tilDto(beregningsplan = plan.tilDto())
     }
 
     @GetMapping("{behandlingId}")

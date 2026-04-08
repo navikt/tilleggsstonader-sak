@@ -44,17 +44,14 @@ data class UtgiftBoutgifterMedAndelTilUtbetalingDto(
     }
 }
 
-fun BeregningsresultatBoutgifter.tilDto(
-    tidligsteEndring: LocalDate?,
-    beregningsplan: BeregningsplanDto,
-): BeregningsresultatBoutgifterDto =
+fun BeregningsresultatBoutgifter.tilDto(beregningsplan: BeregningsplanDto) =
     BeregningsresultatBoutgifterDto(
         perioder =
-            filtrerFraOgMed(tidligsteEndring)
+            filtrerFraOgMed(beregningsplan.fraDato)
                 .perioder
-                .map { it.tilDto(tidligsteEndring) },
+                .map { it.tilDto(beregningsplan.fraDato) },
         inneholderUtgifterOvernatting = inneholderUtgifterOvernatting(),
-        tidligsteEndring = tidligsteEndring,
+        tidligsteEndring = beregningsplan.fraDato,
         beregningsplan = beregningsplan,
     )
 

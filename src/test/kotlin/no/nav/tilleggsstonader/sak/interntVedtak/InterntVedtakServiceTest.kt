@@ -236,7 +236,7 @@ class InterntVedtakServiceTest {
 
             val forventet =
                 InterntVedtakTestdata.Læremidler.beregningsresultat
-                    .tilDto(null, BeregningsplanDto(Beregningsomfang.ALLE_PERIODER))
+                    .tilDto(BeregningsplanDto(Beregningsomfang.ALLE_PERIODER))
                     .perioder
                     .single()
 

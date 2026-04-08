@@ -48,18 +48,13 @@ data class BeregningsgrunnlagDto(
  * Beregningsresultat inneholder perioder for nytt vedtak inklusive perioder som er kopiert fra forrige behandling
  * Men det er i de fleste tilfeller kun interessant å vise perioder fra og med tidligsteEndring.
  */
-fun BeregningsresultatTilsynBarn.tilDto(
-    tidligsteEndring: LocalDate?,
-    beregningsplan: BeregningsplanDto,
-): BeregningsresultatTilsynBarnDto {
-    val filtrertPerioder =
-        this.perioder
-            .filterNot { it.grunnlag.måned < (tidligsteEndring?.toYearMonth() ?: YEAR_MONTH_MIN) }
+fun BeregningsresultatTilsynBarn.tilDto(beregningsplan: BeregningsplanDto): BeregningsresultatTilsynBarnDto {
+    val filtrertPerioder = this.perioder.filterNot { it.grunnlag.måned < (beregningsplan.fraDato?.toYearMonth() ?: YEAR_MONTH_MIN) }
 
     val vedtaksperioder =
         VedtaksperiodeTilsynBarnMapper
             .mapTilVedtaksperiode(this.perioder)
-            .filtrerVedtaksperioderFra(tidligsteEndring)
+            .filtrerVedtaksperioderFra(beregningsplan.fraDato)
             .map { it.tilDto() }
 
     return BeregningsresultatTilsynBarnDto(

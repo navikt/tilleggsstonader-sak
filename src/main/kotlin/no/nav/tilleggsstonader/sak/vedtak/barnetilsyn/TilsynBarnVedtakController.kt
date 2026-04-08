@@ -93,7 +93,7 @@ class TilsynBarnVedtakController(
                 behandling = behandling,
                 plan = beregningsplan,
                 typeVedtak = TypeVedtak.INNVILGELSE,
-            ).tilDto(beregningsplan.fraDato, beregningsplan.tilDto())
+            ).tilDto(beregningsplan.tilDto())
     }
 
     @GetMapping("{behandlingId}")
