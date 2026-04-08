@@ -15,23 +15,23 @@ data class RammevedtakPrivatBil(
 data class RammeForReiseMedPrivatBil(
     val reiseId: ReiseId,
     val aktivitetsadresse: String?,
-    val grunnlag: BeregningsgrunnlagForReiseMedPrivatBil,
+    val grunnlag: RammeForReiseMedPrivatBilBeregningsgrunnlag,
 )
 
-data class BeregningsgrunnlagForReiseMedPrivatBil(
+data class RammeForReiseMedPrivatBilBeregningsgrunnlag(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val delPerioder: List<Delperiode>,
+    val delPerioder: List<RammeForReiseMedPrivatBilDelperiode>,
     val reiseavstandEnVei: BigDecimal,
     val vedtaksperioder: List<Vedtaksperiode>,
 ) : Periode<LocalDate> {
     fun vedtaksperiodeForPeriode(periode: Periode<LocalDate>) = vedtaksperioder.single { it.inneholder(periode) }
 }
 
-data class Delperiode(
+data class RammeForReiseMedPrivatBilDelperiode(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val ekstrakostnader: Ekstrakostnader,
+    val ekstrakostnader: RammeForReiseMedPrivatEkstrakostnader,
     val reisedagerPerUke: Int,
     val satsBekreftetVedVedtakstidspunkt: Boolean,
     val kilometersats: BigDecimal,
@@ -39,7 +39,7 @@ data class Delperiode(
 ) : Periode<LocalDate>
 
 // TODO: Finn ut om det finnes abbonnement på disse prisene og om det påvirker hvordan vi vil løse dette
-data class Ekstrakostnader(
+data class RammeForReiseMedPrivatEkstrakostnader(
     val bompengerPerDag: Int?,
     val fergekostnadPerDag: Int?,
 ) {

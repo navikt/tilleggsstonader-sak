@@ -15,8 +15,8 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UtfyltDagAutomatiskVu
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammevedtakPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Delperiode
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Ekstrakostnader
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
@@ -39,11 +39,11 @@ class PrivatBilBeregningsresultatServiceTest {
         val fomRammevedtak = 2 februar 2026 // Mandag
         val tomRammevedtak = 8 februar 2026
         val delperiode =
-            Delperiode(
+            RammeForReiseMedPrivatBilDelperiode(
                 fom = fomRammevedtak,
                 tom = tomRammevedtak,
                 ekstrakostnader =
-                    Ekstrakostnader(
+                    RammeForReiseMedPrivatEkstrakostnader(
                         bompengerPerDag = 40,
                         fergekostnadPerDag = null,
                     ),
@@ -111,11 +111,11 @@ class PrivatBilBeregningsresultatServiceTest {
         val fomRammevedtak = 2 februar 2026 // Mandag
         val tomRammevedtak = 15 februar 2026
         val delperiode =
-            Delperiode(
+            RammeForReiseMedPrivatBilDelperiode(
                 fom = fomRammevedtak,
                 tom = tomRammevedtak,
                 ekstrakostnader =
-                    Ekstrakostnader(
+                    RammeForReiseMedPrivatEkstrakostnader(
                         bompengerPerDag = 40,
                         fergekostnadPerDag = null,
                     ),
@@ -172,11 +172,11 @@ class PrivatBilBeregningsresultatServiceTest {
         val fomRammevedtak = 29 desember 2025 // Mandag
         val tomRammevedtak = 4 januar 2026
         val delperiode =
-            Delperiode(
+            RammeForReiseMedPrivatBilDelperiode(
                 fom = fomRammevedtak,
                 tom = 31 desember 2025,
                 ekstrakostnader =
-                    Ekstrakostnader(
+                    RammeForReiseMedPrivatEkstrakostnader(
                         bompengerPerDag = 40,
                         fergekostnadPerDag = null,
                     ),
@@ -244,11 +244,11 @@ class PrivatBilBeregningsresultatServiceTest {
         val fomRammevedtak = 2 februar 2026 // Mandag
         val tomRammevedtak = 22 februar 2026
         val delperiode =
-            Delperiode(
+            RammeForReiseMedPrivatBilDelperiode(
                 fom = fomRammevedtak,
                 tom = tomRammevedtak,
                 ekstrakostnader =
-                    Ekstrakostnader(
+                    RammeForReiseMedPrivatEkstrakostnader(
                         bompengerPerDag = 40,
                         fergekostnadPerDag = null,
                     ),
@@ -344,11 +344,11 @@ class PrivatBilBeregningsresultatServiceTest {
         val tomRammevedtak = 8 februar 2026
 
         val delperiode =
-            Delperiode(
+            RammeForReiseMedPrivatBilDelperiode(
                 fom = fomRammevedtak,
                 tom = tomRammevedtak,
                 ekstrakostnader =
-                    Ekstrakostnader(
+                    RammeForReiseMedPrivatEkstrakostnader(
                         bompengerPerDag = 40,
                         fergekostnadPerDag = null,
                     ),
@@ -418,11 +418,11 @@ class PrivatBilBeregningsresultatServiceTest {
         val tomRammevedtak = 8 februar 2026
 
         val delperiode =
-            Delperiode(
+            RammeForReiseMedPrivatBilDelperiode(
                 fom = fomRammevedtak,
                 tom = tomRammevedtak,
                 ekstrakostnader =
-                    Ekstrakostnader(
+                    RammeForReiseMedPrivatEkstrakostnader(
                         bompengerPerDag = 40,
                         fergekostnadPerDag = null,
                     ),
@@ -467,11 +467,11 @@ class PrivatBilBeregningsresultatServiceTest {
         val fomRammevedtak = 2 februar 2026 // Mandag
         val tomRammevedtak = 8 februar 2026
         val delperiode =
-            Delperiode(
+            RammeForReiseMedPrivatBilDelperiode(
                 fom = fomRammevedtak,
                 tom = tomRammevedtak,
                 ekstrakostnader =
-                    Ekstrakostnader(
+                    RammeForReiseMedPrivatEkstrakostnader(
                         bompengerPerDag = 40,
                         fergekostnadPerDag = null,
                     ),

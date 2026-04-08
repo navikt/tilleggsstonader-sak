@@ -1,9 +1,9 @@
 package no.nav.tilleggsstonader.sak.util
 
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForReiseMedPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Delperiode
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Ekstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
@@ -18,23 +18,23 @@ object RammevedtakPrivatBilUtil {
         tom: LocalDate = LocalDate.now().plusDays(7),
         reisedagerPerUke: Int = 5,
         reiseavstandEnVei: BigDecimal = 10.toBigDecimal(),
-        ekstrakostnader: Ekstrakostnader = Ekstrakostnader(null, null),
+        ekstrakostnader: RammeForReiseMedPrivatEkstrakostnader = RammeForReiseMedPrivatEkstrakostnader(null, null),
         satsBekreftetVedVedtakstidspunkt: Boolean = true,
         kilometersats: BigDecimal = 2.94.toBigDecimal(),
         dagsatsUtenParkering: BigDecimal = 100.toBigDecimal(),
         vedtaksperioder: List<Vedtaksperiode> = listOf(vedtaksperiode(fom, tom)),
-        delperioder: List<Delperiode>? = null,
+        delperioder: List<RammeForReiseMedPrivatBilDelperiode>? = null,
     ): RammeForReiseMedPrivatBil =
         RammeForReiseMedPrivatBil(
             reiseId = reiseId,
             aktivitetsadresse = "aktivitetsadresse",
             grunnlag =
-                BeregningsgrunnlagForReiseMedPrivatBil(
+                RammeForReiseMedPrivatBilBeregningsgrunnlag(
                     fom = fom,
                     tom = tom,
                     delPerioder =
                         delperioder ?: listOf(
-                            Delperiode(
+                            RammeForReiseMedPrivatBilDelperiode(
                                 fom = fom,
                                 tom = tom,
                                 reisedagerPerUke = reisedagerPerUke,
@@ -56,12 +56,12 @@ object RammevedtakPrivatBilUtil {
         tom: LocalDate = LocalDate.now().plusDays(7),
         reisedagerPerUke: Int = 5,
         reiseavstandEnVei: BigDecimal = 10.toBigDecimal(),
-        ekstrakostnader: Ekstrakostnader = Ekstrakostnader(null, null),
+        ekstrakostnader: RammeForReiseMedPrivatEkstrakostnader = RammeForReiseMedPrivatEkstrakostnader(null, null),
         satsBekreftetVedVedtakstidspunkt: Boolean = true,
         kilometersats: BigDecimal = 2.94.toBigDecimal(),
         dagsatsUtenParkering: BigDecimal = 100.toBigDecimal(),
         vedtaksperioder: List<Vedtaksperiode> = listOf(vedtaksperiode(fom, tom)),
-        delperioder: List<Delperiode>? = null,
+        delperioder: List<RammeForReiseMedPrivatBilDelperiode>? = null,
     ) = RammevedtakPrivatBil(
         reiser =
             listOf(

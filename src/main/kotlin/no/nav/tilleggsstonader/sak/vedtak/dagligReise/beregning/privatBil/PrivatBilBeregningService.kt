@@ -1,15 +1,14 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
-import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.allePerioderErSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnittMotListe
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForReiseMedPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Delperiode
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Ekstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
@@ -88,35 +87,37 @@ class PrivatBilBeregningService(
     private fun lagBeregningsgrunnlagForReise(
         reise: ReiseMedPrivatBil,
         vedtaksperioder: List<Vedtaksperiode>,
-    ): BeregningsgrunnlagForReiseMedPrivatBil {
-        val delperioder = reise.delPerioder.beregnSnittMotListe(satsDagligReisePrivatBilProvider.alleSatser)
-            .map { (delperiode, sats) ->
-                val dagsatsUtenParkering =
-                    beregnDagsatsUtenParkering(
-                        reiseavstandEnVei = reise.reiseavstandEnVei,
+    ): RammeForReiseMedPrivatBilBeregningsgrunnlag {
+        val delperioder =
+            reise.delPerioder
+                .beregnSnittMotListe(satsDagligReisePrivatBilProvider.alleSatser)
+                .map { (delperiode, sats) ->
+                    val dagsatsUtenParkering =
+                        beregnDagsatsUtenParkering(
+                            reiseavstandEnVei = reise.reiseavstandEnVei,
+                            ekstrakostnader =
+                                RammeForReiseMedPrivatEkstrakostnader(
+                                    bompengerPerDag = delperiode.bompengerPerDag,
+                                    fergekostnadPerDag = delperiode.fergekostnadPerDag,
+                                ),
+                            kilometersats = sats.beløp,
+                        )
+                    RammeForReiseMedPrivatBilDelperiode(
+                        fom = delperiode.fom,
+                        tom = delperiode.tom,
                         ekstrakostnader =
-                            Ekstrakostnader(
+                            RammeForReiseMedPrivatEkstrakostnader(
                                 bompengerPerDag = delperiode.bompengerPerDag,
                                 fergekostnadPerDag = delperiode.fergekostnadPerDag,
                             ),
+                        reisedagerPerUke = delperiode.reisedagerPerUke,
+                        satsBekreftetVedVedtakstidspunkt = sats.bekreftet,
                         kilometersats = sats.beløp,
+                        dagsatsUtenParkering = dagsatsUtenParkering,
                     )
-                Delperiode(
-                    fom = delperiode.fom,
-                    tom = delperiode.tom,
-                    ekstrakostnader =
-                        Ekstrakostnader(
-                            bompengerPerDag = delperiode.bompengerPerDag,
-                            fergekostnadPerDag = delperiode.fergekostnadPerDag,
-                        ),
-                    reisedagerPerUke = delperiode.reisedagerPerUke,
-                    satsBekreftetVedVedtakstidspunkt = sats.bekreftet,
-                    kilometersats = sats.beløp,
-                    dagsatsUtenParkering = dagsatsUtenParkering,
-                )
-            }
+                }
 
-        return BeregningsgrunnlagForReiseMedPrivatBil(
+        return RammeForReiseMedPrivatBilBeregningsgrunnlag(
             fom = reise.fom,
             tom = reise.tom,
             delPerioder = delperioder.sortedBy { it.fom },
@@ -127,7 +128,7 @@ class PrivatBilBeregningService(
 
     private fun beregnDagsatsUtenParkering(
         reiseavstandEnVei: BigDecimal,
-        ekstrakostnader: Ekstrakostnader,
+        ekstrakostnader: RammeForReiseMedPrivatEkstrakostnader,
         kilometersats: BigDecimal,
     ): BigDecimal {
         val kostnadKjøring =

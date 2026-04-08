@@ -30,7 +30,6 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgif
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
@@ -41,9 +40,10 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Delperiode
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Ekstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
@@ -722,17 +722,17 @@ object InterntVedtakTestdata {
                             reiseId = dummyReiseId,
                             aktivitetsadresse = "Testveien 1, 1234 Testby",
                             grunnlag =
-                                BeregningsgrunnlagForReiseMedPrivatBil(
+                                RammeForReiseMedPrivatBilBeregningsgrunnlag(
                                     fom = LocalDate.of(2024, 1, 1),
                                     tom = LocalDate.of(2024, 1, 31),
                                     delPerioder =
                                         listOf(
-                                            Delperiode(
+                                            RammeForReiseMedPrivatBilDelperiode(
                                                 fom = LocalDate.of(2024, 1, 1),
                                                 tom = LocalDate.of(2024, 1, 31),
                                                 reisedagerPerUke = 3,
                                                 ekstrakostnader =
-                                                    Ekstrakostnader(
+                                                    RammeForReiseMedPrivatEkstrakostnader(
                                                         bompengerPerDag = 40,
                                                         fergekostnadPerDag = 50,
                                                     ),
@@ -749,17 +749,17 @@ object InterntVedtakTestdata {
                             reiseId = dummyReiseId,
                             aktivitetsadresse = "Testveien 2, 1234 Testby",
                             grunnlag =
-                                BeregningsgrunnlagForReiseMedPrivatBil(
+                                RammeForReiseMedPrivatBilBeregningsgrunnlag(
                                     fom = LocalDate.of(2024, 1, 1),
                                     tom = LocalDate.of(2024, 1, 31),
                                     delPerioder =
                                         listOf(
-                                            Delperiode(
+                                            RammeForReiseMedPrivatBilDelperiode(
                                                 fom = LocalDate.of(2024, 1, 1),
                                                 tom = LocalDate.of(2024, 1, 31),
                                                 reisedagerPerUke = 3,
                                                 ekstrakostnader =
-                                                    Ekstrakostnader(
+                                                    RammeForReiseMedPrivatEkstrakostnader(
                                                         bompengerPerDag = 40,
                                                         fergekostnadPerDag = 50,
                                                     ),

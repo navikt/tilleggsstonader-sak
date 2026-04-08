@@ -10,8 +10,8 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Delperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -79,7 +79,7 @@ class PrivatBilBeregningsresultatService {
 
     private fun lagPerioderForDagerMedSammeSats(
         dager: List<AvklartKjørtDag>,
-        delperiode: Delperiode,
+        delperiode: RammeForReiseMedPrivatBilDelperiode,
         brukersNavKontor: String?,
     ): Collection<BeregningsresultatForReisePrivatBilPeriode> {
         // Grupper dager på uke, slik at alle dager innenfor en uke utbetales samme dag
@@ -113,6 +113,6 @@ class PrivatBilBeregningsresultatService {
     }
 }
 
-private fun List<Delperiode>.delperiodeForDato(dato: LocalDate) =
+private fun List<RammeForReiseMedPrivatBilDelperiode>.delperiodeForDato(dato: LocalDate) =
     singleOrNull { it.fom <= dato && dato <= it.tom }
         ?: error("Finner ingen delperiode i rammevedtak for dato $dato")

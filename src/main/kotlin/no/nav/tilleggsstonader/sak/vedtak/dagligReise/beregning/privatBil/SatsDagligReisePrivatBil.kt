@@ -13,15 +13,16 @@ data class SatsDagligReisePrivatBil(
     override val tom: LocalDate,
     val beløp: BigDecimal,
     val bekreftet: Boolean = true,
-) : Periode<LocalDate>, KopierPeriode<SatsDagligReisePrivatBil> {
+) : Periode<LocalDate>,
+    KopierPeriode<SatsDagligReisePrivatBil> {
     override fun medPeriode(
         fom: LocalDate,
-        tom: LocalDate
+        tom: LocalDate,
     ) = SatsDagligReisePrivatBil(
         fom = fom,
         tom = tom,
         beløp = beløp,
-        bekreftet = bekreftet
+        bekreftet = bekreftet,
     )
 }
 
@@ -71,8 +72,7 @@ class SatsDagligReisePrivatBilProvider {
         alleSatser.find { it.inneholder(periode) }
             ?: error("Kan ikke finne relevant kilometersats for $periode")
 
-    fun finnAlleSatserInnenforPeriode(periode: Periode<LocalDate>) =
-        alleSatser.filter { it.overlapper(periode) }
+    fun finnAlleSatserInnenforPeriode(periode: Periode<LocalDate>) = alleSatser.filter { it.overlapper(periode) }
 
     fun finnSatsForÅr(år: Int) =
         alleSatser.single {

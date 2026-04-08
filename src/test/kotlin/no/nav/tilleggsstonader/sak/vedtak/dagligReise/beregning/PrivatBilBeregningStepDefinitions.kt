@@ -106,19 +106,28 @@ class PrivatBilBeregningStepDefinitions {
 
     @Når("beregner for daglig reise privat bil")
     fun `beregner for daglig reise privat bil`() {
-        val oppfylteReisevilkår = reiserUtenDelperioder.map { (reiseNr, lagreDagligReise) ->
-            dagligReiseVilkårService.opprettNyttVilkår(
-                behandlingId = behandlingId,
-                nyttVilkår = lagreDagligReise.copy(
-                    fakta = (lagreDagligReise.fakta as FaktaPrivatBil).copy(
-                        faktaDelperioder = delperioderForReisenummer[reiseNr] ?: error("Må angi delperioder for reiseNr $reiseNr")
-                    )
-                ),
-            )
-        }
+        val oppfylteReisevilkår =
+            reiserUtenDelperioder.map { (reiseNr, lagreDagligReise) ->
+                dagligReiseVilkårService.opprettNyttVilkår(
+                    behandlingId = behandlingId,
+                    nyttVilkår =
+                        lagreDagligReise.copy(
+                            fakta =
+                                (lagreDagligReise.fakta as FaktaPrivatBil).copy(
+                                    faktaDelperioder =
+                                        delperioderForReisenummer[reiseNr]
+                                            ?: error("Må angi delperioder for reiseNr $reiseNr"),
+                                ),
+                        ),
+                )
+            }
 
         try {
-            rammevedtak = beregningService.beregnRammevedtak(vedtaksperioder, oppfylteReisevilkår)
+            rammevedtak =
+                beregningService.beregnRammevedtak(
+                    vedtaksperioder = vedtaksperioder,
+                    oppfylteVilkår = oppfylteReisevilkår,
+                )
         } catch (e: Exception) {
             feil = e
         }
@@ -239,7 +248,7 @@ class PrivatBilBeregningStepDefinitions {
                 dagsatsUtenParkering = parseBigDecimal(DomenenøkkelPrivatBil.DAGSATS_UTEN_PARKERING, rad),
                 kilometersats = parseBigDecimal(DomenenøkkelPrivatBil.KILOMETERSATS, rad),
                 satsBekreftetVedVedtakstidspunkt = parseBoolean(DomenenøkkelPrivatBil.SATS_BEKREFTET, rad),
-                reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE,rad)
+                reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, rad),
             )
         }
 
