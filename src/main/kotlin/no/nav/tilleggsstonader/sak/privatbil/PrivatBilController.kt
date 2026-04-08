@@ -88,7 +88,7 @@ class PrivatBilController(
 
         behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(behandlingId)
 
-        val oppdatertAvklartUke = avklartKjørelisteService.oppdaterAvklartUke(ukeId, avklarteDager)
+        val oppdatertAvklartUke = avklartKjørelisteService.oppdaterAvklartUke(behandlingId, ukeId, avklarteDager)
         val kjøreliste = kjørelisteService.hentKjøreliste(oppdatertAvklartUke.kjørelisteId)
 
         val uke =

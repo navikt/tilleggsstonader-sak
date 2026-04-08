@@ -1,12 +1,10 @@
 package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
-import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
@@ -34,7 +32,7 @@ class AvklartKjørelisteService(
         behandling: Behandling,
         kjøreliste: Kjøreliste,
     ) {
-        val rammeForReise = henteReiseFraVedtak(behandling, kjøreliste.data.reiseId)
+        val rammeForReise = henteReiseFraVedtak(behandling.id, kjøreliste.data.reiseId)
 
         validerAtAlleDagerIKjørelistaErInnenForRammevedtaket(rammeForReise, kjøreliste)
 
@@ -55,13 +53,22 @@ class AvklartKjørelisteService(
     }
 
     fun oppdaterAvklartUke(
+        behandlingId: BehandlingId,
         ukeId: UUID,
         request: List<EndreAvklartDagRequest>,
     ): AvklartKjørtUke {
         val eksisterendeUke = hentAvklartUke(ukeId)
         val oppdaterteDager = oppdaterAvklarteDager(eksisterendeUke.dager, request)
 
-        validerInnsendteDagerErInnenforUken(eksisterendeUke.fom, oppdaterteDager)
+        val rammevedtak = henteReiseFraVedtak(behandlingId, eksisterendeUke.reiseId)
+        val innsendteKjørelisteDager = kjørelisteService.hentKjøreliste(eksisterendeUke.kjørelisteId).data.reisedager
+
+        validerOppdatertAvklartKjørtUke(
+            oppdaterteDager = oppdaterteDager,
+            fomUkeSomSkalOppdateres = eksisterendeUke.fom,
+            rammevedtak = rammevedtak,
+            innsendteKjørelisteDager = innsendteKjørelisteDager,
+        )
 
         return avklartKjørtUkeRepository.update(
             eksisterendeUke.copy(
@@ -188,37 +195,19 @@ class AvklartKjørelisteService(
     // TODO: Bruk fra kontrakter
     private fun LocalDate.erHelg() = this.dayOfWeek == DayOfWeek.SATURDAY || this.dayOfWeek == DayOfWeek.SUNDAY
 
-    private fun validerAtAlleDagerIKjørelistaErInnenForRammevedtaket(
-        rammeForReise: RammeForReiseMedPrivatBil,
-        kjøreliste: Kjøreliste,
-    ) {
-        feilHvisIkke(rammeForReise.grunnlag.inneholder(kjøreliste.data)) {
-            "Kjøreliste er ikke innenfor rammevedtaket"
-        }
-    }
-
     private fun henteReiseFraVedtak(
-        behandling: Behandling,
+        behandlingId: BehandlingId,
         reiseId: ReiseId,
     ): RammeForReiseMedPrivatBil {
         val rammevedtak =
             vedtakService
-                .hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandling.id)
+                .hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandlingId)
                 .data
                 .rammevedtakPrivatBil
-                ?: error("Fant ikke rammevedtak for behandling med id ${behandling.id}")
+                ?: error("Fant ikke rammevedtak for behandling med id $behandlingId")
 
         return rammevedtak.reiser.singleOrNull { it.reiseId == reiseId }
             ?: error("Forventet å finne ramme for reise med id $reiseId")
-    }
-
-    private fun validerInnsendteDagerErInnenforUken(
-        fomUke: LocalDate,
-        oppdaterteDager: List<AvklartKjørtDag>,
-    ) {
-        feilHvis(oppdaterteDager.any { it.dato.tilUkeIÅr() != fomUke.tilUkeIÅr() }) {
-            "Alle dager må være innenfor uken som skal oppdateres"
-        }
     }
 
     fun nullstillOgGjenbrukAvklarteUker(
