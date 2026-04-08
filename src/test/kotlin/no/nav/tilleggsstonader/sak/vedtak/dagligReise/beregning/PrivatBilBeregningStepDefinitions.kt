@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseBigDecimal
 import no.nav.tilleggsstonader.sak.cucumber.parseBoolean
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
+import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
@@ -59,8 +60,8 @@ class PrivatBilBeregningStepDefinitions {
     val beregningService =
         PrivatBilBeregningService(satsDagligReisePrivatBilProvider)
 
-    var reiserUtenDelperioder: Map<String, LagreDagligReise> = emptyMap()
-    var delperioderForReisenummer: Map<String, List<FaktaDelperiodePrivatBil>> = emptyMap()
+    var reiserUtenDelperioder: Map<Int, LagreDagligReise> = emptyMap()
+    var delperioderForReisenummer: Map<Int, List<FaktaDelperiodePrivatBil>> = emptyMap()
 
     var vedtaksperioder: List<Vedtaksperiode> = emptyList()
 
@@ -86,7 +87,7 @@ class PrivatBilBeregningStepDefinitions {
         reiserUtenDelperioder =
             dataTable
                 .mapRad { rad ->
-                    rad["Vilkårnr"]!! to mapTilVilkårDagligReise(TypeDagligReise.PRIVAT_BIL, rad)
+                    parseInt(DomenenøkkelPrivatBil.REISENR, rad) to mapTilVilkårDagligReise(TypeDagligReise.PRIVAT_BIL, rad)
                 }.toMap()
     }
 
@@ -105,12 +106,12 @@ class PrivatBilBeregningStepDefinitions {
 
     @Når("beregner for daglig reise privat bil")
     fun `beregner for daglig reise privat bil`() {
-        val oppfylteReisevilkår = reiserUtenDelperioder.map { (vilkårNr, lagreDagligReise) ->
+        val oppfylteReisevilkår = reiserUtenDelperioder.map { (reiseNr, lagreDagligReise) ->
             dagligReiseVilkårService.opprettNyttVilkår(
                 behandlingId = behandlingId,
                 nyttVilkår = lagreDagligReise.copy(
                     fakta = (lagreDagligReise.fakta as FaktaPrivatBil).copy(
-                        faktaDelperioder = delperioderForReisenummer[vilkårNr] ?: error("Må angi delperioder for vilkårNr $vilkårNr")
+                        faktaDelperioder = delperioderForReisenummer[reiseNr] ?: error("Må angi delperioder for reiseNr $reiseNr")
                     )
                 ),
             )
@@ -155,8 +156,8 @@ class PrivatBilBeregningStepDefinitions {
 
     @Og("vi forventer følgende delperioder for rammevedtak")
     fun `vi forventer følgende delperioder for rammevedtak`(dataTable: DataTable) {
-        val forventedeSatserPerReise = mapDelperiodeCucumber(dataTable).groupBy { it.reiseNr }
-        forventedeSatserPerReise.forEach { (reiseNr, satserForReise) ->
+        val forventedeDelperioderPerReise = mapDelperiodeCucumber(dataTable).groupBy { it.reiseNr }
+        forventedeDelperioderPerReise.forEach { (reiseNr, satserForReise) ->
             val delPerioderIRammevedtak = rammevedtak!!.reiser[reiseNr - 1].grunnlag.delPerioder
             assertThat(delPerioderIRammevedtak).hasSameSizeAs(satserForReise)
             satserForReise.forEachIndexed { index, forventetSats ->
@@ -202,15 +203,15 @@ class PrivatBilBeregningStepDefinitions {
         assertThat(rammevedtak).isNull()
     }
 
-    private fun mapDelperioder(dataTable: DataTable): Map<String, List<FaktaDelperiodePrivatBil>> =
+    private fun mapDelperioder(dataTable: DataTable): Map<Int, List<FaktaDelperiodePrivatBil>> =
         dataTable
             .mapRad {
-                it["Vilkårnr"]!! to
+                parseInt(DomenenøkkelPrivatBil.REISENR, it) to
                     FaktaDelperiodePrivatBil(
                         fom = parseDato(DomenenøkkelFelles.FOM, it),
                         tom = parseDato(DomenenøkkelFelles.TOM, it),
-                        bompengerPerDag = parseInt(DomenenøkkelPrivatBil.BOMPENGER, it),
-                        fergekostnadPerDag = parseInt(DomenenøkkelPrivatBil.FERGEKOSTNAD, it),
+                        bompengerPerDag = parseValgfriInt(DomenenøkkelPrivatBil.BOMPENGER, it),
+                        fergekostnadPerDag = parseValgfriInt(DomenenøkkelPrivatBil.FERGEKOSTNAD, it),
                         reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, it),
                     )
             }.groupBy { it.first }

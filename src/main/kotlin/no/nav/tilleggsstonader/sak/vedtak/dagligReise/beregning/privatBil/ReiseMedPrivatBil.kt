@@ -30,7 +30,18 @@ data class Delperiode(
     val reisedagerPerUke: Int,
     val bompengerPerDag: Int?,
     val fergekostnadPerDag: Int?,
-) : Periode<LocalDate>
+) : Periode<LocalDate>, KopierPeriode<Delperiode> {
+    override fun medPeriode(
+        fom: LocalDate,
+        tom: LocalDate
+    ) = Delperiode(
+        fom = fom,
+        tom = tom,
+        reisedagerPerUke = reisedagerPerUke,
+        bompengerPerDag = bompengerPerDag,
+        fergekostnadPerDag = fergekostnadPerDag
+    )
+}
 
 fun VilkårDagligReise.tilReiserMedPrivatBil(): ReiseMedPrivatBil {
     feilHvis(this.fakta !is FaktaPrivatBil) {

@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.allePerioderErSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
+import no.nav.tilleggsstonader.kontrakter.periode.beregnSnittMotListe
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForReiseMedPrivatBil
@@ -88,10 +89,8 @@ class PrivatBilBeregningService(
         reise: ReiseMedPrivatBil,
         vedtaksperioder: List<Vedtaksperiode>,
     ): BeregningsgrunnlagForReiseMedPrivatBil {
-        val delPerioder =
-            reise.delPerioder.map { delperiode ->
-                val periode = Datoperiode(delperiode.fom, delperiode.tom)
-                val sats = satsDagligReisePrivatBilProvider.finnRelevantKilometerSatsForPeriode(periode)
+        val delperioder = reise.delPerioder.beregnSnittMotListe(satsDagligReisePrivatBilProvider.alleSatser)
+            .map { (delperiode, sats) ->
                 val dagsatsUtenParkering =
                     beregnDagsatsUtenParkering(
                         reiseavstandEnVei = reise.reiseavstandEnVei,
@@ -116,10 +115,11 @@ class PrivatBilBeregningService(
                     dagsatsUtenParkering = dagsatsUtenParkering,
                 )
             }
+
         return BeregningsgrunnlagForReiseMedPrivatBil(
             fom = reise.fom,
             tom = reise.tom,
-            delPerioder = delPerioder,
+            delPerioder = delperioder.sortedBy { it.fom },
             reiseavstandEnVei = reise.reiseavstandEnVei,
             vedtaksperioder = vedtaksperioder,
         )
