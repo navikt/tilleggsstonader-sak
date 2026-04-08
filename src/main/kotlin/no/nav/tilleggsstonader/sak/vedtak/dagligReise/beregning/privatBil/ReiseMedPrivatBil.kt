@@ -14,7 +14,7 @@ data class ReiseMedPrivatBil(
     override val tom: LocalDate,
     val reiseId: ReiseId,
     val aktivitetsadresse: String?,
-    val delPerioder: List<Delperiode>,
+    val delPerioder: List<ReiseMedPrivatBilDelperiode>,
     val reiseavstandEnVei: BigDecimal,
 ) : Periode<LocalDate>,
     KopierPeriode<ReiseMedPrivatBil> {
@@ -24,18 +24,18 @@ data class ReiseMedPrivatBil(
     ): ReiseMedPrivatBil = this.copy(fom = fom, tom = tom)
 }
 
-data class Delperiode(
+data class ReiseMedPrivatBilDelperiode(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val reisedagerPerUke: Int,
     val bompengerPerDag: Int?,
     val fergekostnadPerDag: Int?,
 ) : Periode<LocalDate>,
-    KopierPeriode<Delperiode> {
+    KopierPeriode<ReiseMedPrivatBilDelperiode> {
     override fun medPeriode(
         fom: LocalDate,
         tom: LocalDate,
-    ) = Delperiode(
+    ) = ReiseMedPrivatBilDelperiode(
         fom = fom,
         tom = tom,
         reisedagerPerUke = reisedagerPerUke,
@@ -57,7 +57,7 @@ fun VilkårDagligReise.tilReiserMedPrivatBil(): ReiseMedPrivatBil {
         reiseavstandEnVei = fakta.reiseavstandEnVei,
         delPerioder =
             fakta.faktaDelperioder.map { delperiode ->
-                Delperiode(
+                ReiseMedPrivatBilDelperiode(
                     fom = delperiode.fom,
                     tom = delperiode.tom,
                     reisedagerPerUke = delperiode.reisedagerPerUke,
