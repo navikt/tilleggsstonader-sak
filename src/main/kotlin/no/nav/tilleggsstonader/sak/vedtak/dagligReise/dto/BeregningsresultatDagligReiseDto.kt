@@ -29,6 +29,7 @@ data class BeregningsresultatDagligReiseDto(
     val offentligTransport: BeregningsresultatOffentligTransportDto?,
     val privatBil: BeregningsresultatPrivatBilDto?,
     val beregningsplan: BeregningsplanDto? = null,
+    val tidligsteEndring: LocalDate? = beregningsplan?.fraDato,
 )
 
 data class BeregningsresultatOffentligTransportDto(

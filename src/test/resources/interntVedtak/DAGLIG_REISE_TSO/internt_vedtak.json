@@ -319,7 +319,8 @@
       "beregningsplan" : {
         "omfang" : "ALLE_PERIODER",
         "fraDato" : null
-      }
+      },
+      "tidligsteEndring" : null
     }
   },
   "rammevedtakPrivatBil" : {
