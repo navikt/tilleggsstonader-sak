@@ -33,6 +33,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import java.util.UUID
 
 fun mapBeregningsresultatForPeriode(dataTable: DataTable) =
     dataTable.mapRad { rad ->
@@ -77,21 +78,23 @@ fun dummyBehandling(
 fun mapTilVilkårDagligReise(
     typeVilkår: TypeDagligReise,
     rad: Map<String, String>,
+    aktivitetId: UUID = UUID.randomUUID(),
 ): LagreDagligReise =
     LagreDagligReise(
         fom = parseDato(DomenenøkkelFelles.FOM, rad),
         tom = parseDato(DomenenøkkelFelles.TOM, rad),
         svar = oppfylteSvarOffentligtransport,
-        fakta = mapFakta(typeVilkår, rad),
+        fakta = mapFakta(typeVilkår, rad, aktivitetId),
     )
 
 private fun mapFakta(
     type: TypeDagligReise,
     rad: Map<String, String>,
+    aktivitetId: UUID = UUID.randomUUID(),
 ): FaktaDagligReise =
     when (type) {
         TypeDagligReise.OFFENTLIG_TRANSPORT -> mapFaktaOffentligTransport(rad)
-        TypeDagligReise.PRIVAT_BIL -> mapFaktaPrivatBil(rad)
+        TypeDagligReise.PRIVAT_BIL -> mapFaktaPrivatBil(rad, aktivitetId)
         else -> FaktaUbestemtType(reiseId = dummyReiseId, adresse = "Tiltaksveien 1")
     }
 
@@ -113,7 +116,10 @@ fun mapFaktaOffentligTransport(rad: Map<String, String>): FaktaOffentligTranspor
             ),
     )
 
-fun mapFaktaPrivatBil(rad: Map<String, String>): FaktaPrivatBil =
+fun mapFaktaPrivatBil(
+    rad: Map<String, String>,
+    aktivitetId: UUID = UUID.randomUUID(),
+): FaktaPrivatBil =
     FaktaPrivatBil(
         reiseId = dummyReiseId,
         adresse = "Tiltaksveien 1",
@@ -128,6 +134,7 @@ fun mapFaktaPrivatBil(rad: Map<String, String>): FaktaPrivatBil =
                     fergekostnadPerDag = parseValgfriInt(DomenenøkkelPrivatBil.FERGEKOSTNAD, rad),
                 ),
             ),
+        aktivitetId = aktivitetId,
     )
 
 fun mapAktiviteter(

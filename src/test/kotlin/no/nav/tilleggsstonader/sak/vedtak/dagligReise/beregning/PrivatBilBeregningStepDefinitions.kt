@@ -7,6 +7,7 @@ import io.cucumber.java.no.Og
 import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
@@ -31,9 +32,16 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.Optional
 import java.util.UUID
 
 @Suppress("unused", "ktlint:standard:function-naming")
@@ -42,6 +50,8 @@ class PrivatBilBeregningStepDefinitions {
     val vilkårServiceMock = mockk<VilkårService>()
     val vilkårRepositoryFake = VilkårRepositoryFake()
     val unleashServiceMock = mockk<UnleashService>()
+    val vilkårperiodeRepositoryMock = mockk<VilkårperiodeRepository>()
+    val vilkårperiodeService = mockk<VilkårperiodeService>()
 
     val dagligReiseVilkårService =
         DagligReiseVilkårService(
@@ -49,13 +59,17 @@ class PrivatBilBeregningStepDefinitions {
             vilkårService = vilkårServiceMock,
             behandlingService = behandlingServiceMock,
             unleashService = unleashServiceMock,
+            vilkårperiodeService = vilkårperiodeService,
         )
 
     val behandlingId = BehandlingId.random()
 
     val satsDagligReisePrivatBilProvider = SatsDagligReisePrivatBilProvider()
     val beregningService =
-        PrivatBilBeregningService(satsDagligReisePrivatBilProvider)
+        PrivatBilBeregningService(
+            satsDagligReisePrivatBilProvider = satsDagligReisePrivatBilProvider,
+            vilkårperiodeService = vilkårperiodeService,
+        )
 
     var reiser: List<VilkårDagligReise> = emptyList()
 
@@ -82,7 +96,22 @@ class PrivatBilBeregningStepDefinitions {
 
         reiser =
             dataTable.mapRad { rad ->
-                val nyttVilkår = mapTilVilkårDagligReise(TypeDagligReise.PRIVAT_BIL, rad)
+                val fom = parseDato(DomenenøkkelFelles.FOM, rad)
+                val tom = parseDato(DomenenøkkelFelles.TOM, rad)
+
+                val testAktivitet =
+                    aktivitet(
+                        behandlingId = behandlingId,
+                        fom = fom,
+                        tom = tom,
+                        faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
+                        resultat = ResultatVilkårperiode.OPPFYLT,
+                        typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                    )
+                every { vilkårperiodeRepositoryMock.findById(testAktivitet.id) } returns Optional.of(testAktivitet)
+                every { vilkårperiodeRepositoryMock.findAllById(any()) } returns listOf(testAktivitet)
+
+                val nyttVilkår = mapTilVilkårDagligReise(TypeDagligReise.PRIVAT_BIL, rad, aktivitetId = testAktivitet.id)
                 dagligReiseVilkårService.opprettNyttVilkår(behandlingId = behandlingId, nyttVilkår = nyttVilkår)
             }
     }

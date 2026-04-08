@@ -1,11 +1,13 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -14,6 +16,8 @@ data class ReiseMedPrivatBil(
     override val tom: LocalDate,
     val reiseId: ReiseId,
     val aktivitetsadresse: String?,
+    val aktivitetType: AktivitetType,
+    val typeAktivitet: TypeAktivitet?,
     val reisedagerPerUke: Int,
     val reiseavstandEnVei: BigDecimal,
     val bompengerPerDag: Int?,
@@ -26,7 +30,10 @@ data class ReiseMedPrivatBil(
     ): ReiseMedPrivatBil = this.copy(fom = fom, tom = tom)
 }
 
-fun VilkårDagligReise.tilReiseMedPrivatBil(): ReiseMedPrivatBil {
+fun VilkårDagligReise.tilReiseMedPrivatBil(
+    aktivitetType: AktivitetType,
+    typeAktivitet: TypeAktivitet?,
+): ReiseMedPrivatBil {
     feilHvis(this.fakta !is FaktaPrivatBil) {
         "Forventer kun å få inn vilkår med fakta som er av type privat bil ved beregning av privat bil"
     }
@@ -45,5 +52,7 @@ fun VilkårDagligReise.tilReiseMedPrivatBil(): ReiseMedPrivatBil {
         bompengerPerDag = periode.bompengerPerDag,
         fergekostnadPerDag = periode.fergekostnadPerDag,
         aktivitetsadresse = fakta.adresse,
+        aktivitetType = aktivitetType,
+        typeAktivitet = typeAktivitet,
     )
 }

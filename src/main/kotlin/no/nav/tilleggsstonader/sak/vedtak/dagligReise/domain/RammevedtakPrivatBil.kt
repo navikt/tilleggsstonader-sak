@@ -1,8 +1,10 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -15,6 +17,8 @@ data class RammevedtakPrivatBil(
 data class RammeForReiseMedPrivatBil(
     val reiseId: ReiseId,
     val aktivitetsadresse: String?,
+    val aktivitetType: AktivitetType = AktivitetType.TILTAK,
+    val typeAktivitet: TypeAktivitet? = null,
     val grunnlag: BeregningsgrunnlagForReiseMedPrivatBil,
 )
 

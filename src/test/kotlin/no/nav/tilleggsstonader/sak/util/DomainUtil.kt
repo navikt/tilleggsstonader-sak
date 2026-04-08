@@ -579,6 +579,7 @@ fun faktaPrivatBil(
     reiseavstandEnVei = reiseavstandEnVei,
     faktaDelperioder = reiseperioder,
     adresse = adresse,
+    aktivitetId = UUID.randomUUID(),
 )
 
 fun lagreVilkårperiodeMålgruppe(
@@ -680,6 +681,7 @@ fun lagreDagligReisePrivatBilDto(
             reiseavstandEnVei = reiseavstandEnVei,
             faktaDelperioder = reiseperioder,
             adresse = adresse,
+            aktivitetId = UUID.randomUUID(),
         ),
 ) = LagreDagligReiseDto(
     fom = fom,

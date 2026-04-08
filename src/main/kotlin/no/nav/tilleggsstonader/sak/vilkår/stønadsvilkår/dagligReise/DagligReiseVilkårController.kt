@@ -6,6 +6,8 @@ import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseDtoMapper.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårResultatDto
@@ -14,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.tilDa
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelstrukturDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggRegelstrukturFraVilkårregel.tilRegelstruktur
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegel
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -29,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController
 class DagligReiseVilkårController(
     private val tilgangService: TilgangService,
     private val dagligReiseVilkårService: DagligReiseVilkårService,
+    private val vilkårperiodeService: VilkårperiodeService,
 ) {
     @GetMapping("regler")
     fun regler(): RegelstrukturDto = DagligReiseRegel().tilRegelstruktur()
@@ -40,7 +44,9 @@ class DagligReiseVilkårController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerLesetilgangTilBehandling(behandlingId)
 
-        return dagligReiseVilkårService.hentVilkårForBehandling(behandlingId).map { it.tilDto() }
+        return dagligReiseVilkårService.hentVilkårForBehandling(behandlingId).map {
+            it.tilDtoMedAktivitetType()
+        }
     }
 
     @PostMapping("{behandlingId}")
@@ -56,7 +62,7 @@ class DagligReiseVilkårController(
             .opprettNyttVilkår(
                 nyttVilkår = lagreVilkårDto.tilDomain(),
                 behandlingId = behandlingId,
-            ).tilDto()
+            ).tilDtoMedAktivitetType()
     }
 
     @PutMapping("{behandlingId}/{vilkårId}")
@@ -74,7 +80,7 @@ class DagligReiseVilkårController(
                 nyttVilkår = lagreVilkårDto.tilDomain(),
                 vilkårId = vilkårId,
                 behandlingId = behandlingId,
-            ).tilDto()
+            ).tilDtoMedAktivitetType()
     }
 
     @DeleteMapping("{behandlingId}/{vilkårId}")
@@ -93,5 +99,13 @@ class DagligReiseVilkårController(
                 vilkårId = vilkårId,
                 slettetKommentar = slettVilkårRequestDto.kommentar,
             ).tilDagligreiseDto()
+    }
+
+    private fun VilkårDagligReise.tilDtoMedAktivitetType(): VilkårDagligReiseDto {
+        val aktivitetType =
+            (fakta as? FaktaPrivatBil)?.let {
+                vilkårperiodeService.hentAktivitetType(it.aktivitetId)
+            }
+        return tilDto(aktivitetType = aktivitetType?.name)
     }
 }

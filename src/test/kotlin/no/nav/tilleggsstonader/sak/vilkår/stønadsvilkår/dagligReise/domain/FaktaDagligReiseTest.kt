@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.UUID
 
 class FaktaDagligReiseTest {
     @Nested
@@ -157,6 +158,7 @@ class FaktaDagligReiseTest {
                                 ),
                             ),
                         reiseavstandEnVei = BigDecimal(10),
+                        aktivitetId = UUID.randomUUID(),
                     )
                 }
             assertThat(feil.message).isEqualTo("Bompengeprisen må være større enn 0")
@@ -180,6 +182,7 @@ class FaktaDagligReiseTest {
                                 ),
                             ),
                         reiseavstandEnVei = BigDecimal(10),
+                        aktivitetId = UUID.randomUUID(),
                     )
                 }
             assertThat(feil.message).isEqualTo("Fergekostnaden må være større enn 0")
@@ -203,6 +206,7 @@ class FaktaDagligReiseTest {
                                 ),
                             ),
                         reiseavstandEnVei = BigDecimal("-10"),
+                        aktivitetId = UUID.randomUUID(),
                     )
                 }
             assertThat(feil.message).isEqualTo("Reiseavstanden må være større enn 0")
@@ -226,6 +230,7 @@ class FaktaDagligReiseTest {
                                     fergekostnadPerDag = 0,
                                 ),
                             ),
+                        aktivitetId = UUID.randomUUID(),
                     )
                 }
             assertThat(feil.message).isEqualTo("Reisedager per uke må være større enn 0")
@@ -249,6 +254,7 @@ class FaktaDagligReiseTest {
                                     fergekostnadPerDag = 0,
                                 ),
                             ),
+                        aktivitetId = UUID.randomUUID(),
                     )
                 }
             assertThat(feil.message).isEqualTo("Reisedager per uke kan ikke være mer enn 7")

@@ -65,6 +65,7 @@ class OffentligTransportBeregningStepDefinitions {
             vilkårService = vilkårServiceMock,
             behandlingService = behandlingServiceMock,
             unleashService = unleashServiceMock,
+            vilkårperiodeService = vilkårperiodeServiceMock,
         )
 
     val vedtaksperiodeValideringService =

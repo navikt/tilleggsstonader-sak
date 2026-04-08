@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.util
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Ekstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
@@ -7,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBi
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.SatsForPeriodePrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -56,6 +58,8 @@ object RammevedtakPrivatBilUtil {
         RammeForReiseMedPrivatBil(
             reiseId = reiseId,
             aktivitetsadresse = "aktivitetsadresse",
+            aktivitetType = AktivitetType.TILTAK,
+            typeAktivitet = TypeAktivitet.GRUPPEAMO,
             grunnlag =
                 BeregningsgrunnlagForReiseMedPrivatBil(
                     fom = fom,

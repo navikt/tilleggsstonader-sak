@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Re
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.UUID
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -57,6 +58,7 @@ data class FaktaDagligReisePrivatBilDto(
     val reiseavstandEnVei: BigDecimal,
     val faktaDelperioder: List<FaktaDelperiodePrivatBilDto>,
     val adresse: String?,
+    val aktivitetId: UUID,
 ) : FaktaDagligReiseDto {
     override val type = TypeDagligReise.PRIVAT_BIL
 
@@ -77,6 +79,7 @@ data class FaktaDagligReisePrivatBilDto(
                 )
             },
         adresse = adresse,
+        aktivitetId = aktivitetId,
     )
 }
 

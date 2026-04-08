@@ -14,7 +14,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.Vilk�
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 
 object VilkårDagligReiseDtoMapper {
-    fun VilkårDagligReise.tilDto() =
+    fun VilkårDagligReise.tilDto(aktivitetType: String? = null) =
         VilkårDagligReiseDto(
             id = this.id,
             fom = this.fom,
@@ -26,6 +26,7 @@ object VilkårDagligReiseDtoMapper {
             delvilkårsett = this.delvilkårsett.map { it.tilDto() },
             fakta = this.fakta.tilDto(),
             slettetKommentar = this.slettetKommentar,
+            aktivitetType = aktivitetType,
         )
 
     private fun FaktaDagligReise.tilDto(): FaktaDagligReiseDto =
@@ -57,5 +58,6 @@ object VilkårDagligReiseDtoMapper {
                     )
                 },
             adresse = adresse,
+            aktivitetId = aktivitetId,
         )
 }

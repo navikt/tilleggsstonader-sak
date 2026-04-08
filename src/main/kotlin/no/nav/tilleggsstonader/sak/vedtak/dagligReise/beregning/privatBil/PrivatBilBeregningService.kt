@@ -12,7 +12,10 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPri
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.SatsForPeriodePrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 
@@ -22,23 +25,31 @@ import java.math.BigDecimal
 @Service
 class PrivatBilBeregningService(
     private val satsDagligReisePrivatBilProvider: SatsDagligReisePrivatBilProvider,
+    private val vilkårperiodeService: VilkårperiodeService,
 ) {
     fun beregnRammevedtak(
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkår: List<VilkårDagligReise>,
     ): RammevedtakPrivatBil? {
-        val reiseInformasjon = oppfylteVilkår.map { it.tilReiseMedPrivatBil() }
+        val reiser = mapVilkårTilReiser(oppfylteVilkår)
+
         val resultatForReiser =
-            reiseInformasjon.mapNotNull {
-                beregnForReise(it, vedtaksperioder)
-            }
+            reiser.mapNotNull { beregnForReise(it, vedtaksperioder) }
 
         if (resultatForReiser.isEmpty()) return null
 
-        return RammevedtakPrivatBil(
-            reiser = resultatForReiser,
-        )
+        return RammevedtakPrivatBil(reiser = resultatForReiser)
     }
+
+    private fun mapVilkårTilReiser(oppfylteVilkår: List<VilkårDagligReise>): List<ReiseMedPrivatBil> =
+        oppfylteVilkår.map { vilkår ->
+            val aktivitetId = (vilkår.fakta as FaktaPrivatBil).aktivitetId
+            val aktivitet = vilkårperiodeService.hentAktivitet(aktivitetId)
+            vilkår.tilReiseMedPrivatBil(
+                aktivitetType = aktivitet?.type as? AktivitetType ?: error("Forventet AktivitetType"),
+                typeAktivitet = aktivitet.typeAktivitet,
+            )
+        }
 
     private fun beregnForReise(
         reise: ReiseMedPrivatBil,
@@ -54,6 +65,8 @@ class PrivatBilBeregningService(
             RammeForReiseMedPrivatBil(
                 reiseId = reise.reiseId,
                 aktivitetsadresse = reise.aktivitetsadresse,
+                typeAktivitet = reise.typeAktivitet,
+                aktivitetType = reise.aktivitetType,
                 grunnlag =
                     lagBeregningsgrunnlagForReise(
                         justertReise,

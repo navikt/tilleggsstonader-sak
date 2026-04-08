@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligRei
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import java.math.BigDecimal
+import java.util.UUID
 
 sealed interface FaktaDagligReise {
     val type: TypeDagligReise
@@ -131,6 +132,7 @@ data class FaktaPrivatBil(
     val reiseavstandEnVei: BigDecimal,
     val faktaDelperioder: List<FaktaDelperiodePrivatBil>,
     override val adresse: String?,
+    val aktivitetId: UUID,
 ) : FaktaDagligReise {
     override val type = TypeDagligReise.PRIVAT_BIL
 
@@ -183,5 +185,6 @@ data class FaktaPrivatBil(
                     )
                 },
             adresse = adresse,
+            aktivitetId = aktivitetId,
         )
 }

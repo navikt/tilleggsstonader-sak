@@ -721,6 +721,8 @@ object InterntVedtakTestdata {
                         RammeForReiseMedPrivatBil(
                             reiseId = dummyReiseId,
                             aktivitetsadresse = "Testveien 1, 1234 Testby",
+                            aktivitetType = AktivitetType.TILTAK,
+                            typeAktivitet = TypeAktivitet.GRUPPEAMO,
                             grunnlag =
                                 BeregningsgrunnlagForReiseMedPrivatBil(
                                     fom = LocalDate.of(2024, 1, 1),
@@ -748,6 +750,8 @@ object InterntVedtakTestdata {
                         RammeForReiseMedPrivatBil(
                             reiseId = dummyReiseId,
                             aktivitetsadresse = "Testveien 2, 1234 Testby",
+                            aktivitetType = AktivitetType.TILTAK,
+                            typeAktivitet = TypeAktivitet.GRUPPEAMO,
                             grunnlag =
                                 BeregningsgrunnlagForReiseMedPrivatBil(
                                     fom = LocalDate.of(2024, 1, 1),
@@ -1022,6 +1026,7 @@ object InterntVedtakTestdata {
                                         fergekostnadPerDag = 30,
                                     ),
                                 ),
+                            aktivitetId = UUID.randomUUID(),
                         ),
                 ),
             )

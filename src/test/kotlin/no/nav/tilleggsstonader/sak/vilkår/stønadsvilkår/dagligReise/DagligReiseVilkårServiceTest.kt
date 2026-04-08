@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Sv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
 
@@ -28,6 +29,7 @@ class DagligReiseVilkårServiceTest {
     val vilkårService = mockk<VilkårService>()
     val behandlingService = mockk<BehandlingService>()
     val unleashService = mockk<UnleashService>()
+    val vilkårperiodeService = mockk<VilkårperiodeService>()
 
     val dagligReiseVilkårService =
         DagligReiseVilkårService(
@@ -35,6 +37,7 @@ class DagligReiseVilkårServiceTest {
             behandlingService = behandlingService,
             vilkårService = vilkårService,
             unleashService = unleashService,
+            vilkårperiodeService = vilkårperiodeService,
         )
 
     val svarOffentligTransport =
