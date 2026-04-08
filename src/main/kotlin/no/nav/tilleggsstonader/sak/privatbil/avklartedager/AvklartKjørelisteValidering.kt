@@ -65,26 +65,26 @@ private fun AvklartKjørtDag.validerGyldigeVerdier() {
     }
 }
 
-private fun AvklartKjørtDag.validerBegrunnelse(innsendtKjøreliste: KjørelisteDag?) {
+private fun AvklartKjørtDag.validerBegrunnelse(innsendtKjørelisteDag: KjørelisteDag?) {
     if (begrunnelse != null) return // Begrunnelse er oppgitt, ingen validering nødvendig
 
     brukerfeilHvis(parkeringsutgift != null && parkeringsutgift > 100) {
         "Må oppgi begrunnelse for parkeringsutgift over 100 for dag ${dato.norskFormat()}"
     }
 
-    brukerfeilHvis(innsendtKjøreliste == null) {
+    brukerfeilHvis(innsendtKjørelisteDag == null) {
         "Må oppgi begrunnelse for å endre dag ${dato.norskFormat()} når det ikke finnes en opprinnelig kjøreliste for dagen"
     }
 
-    brukerfeilHvis(godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.JA && !innsendtKjøreliste.harKjørt) {
+    brukerfeilHvis(godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.JA && !innsendtKjørelisteDag.harKjørt) {
         "Må oppgi begrunnelse for å godkjenne kjøring når bruker ikke har oppgitt å ha kjørt for dag ${dato.norskFormat()}"
     }
 
-    brukerfeilHvis(godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.NEI && innsendtKjøreliste.harKjørt) {
+    brukerfeilHvis(godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.NEI && innsendtKjørelisteDag.harKjørt) {
         "Må oppgi begrunnelse for å ikke godkjenne kjøring når bruker har oppgitt å ha kjørt for dag ${dato.norskFormat()}"
     }
 
-    brukerfeilHvis(parkeringsutgift != innsendtKjøreliste.parkeringsutgift) {
+    brukerfeilHvis(parkeringsutgift != innsendtKjørelisteDag.parkeringsutgift) {
         "Må oppgi begrunnelse for å endring av parkeringsutgift på dag ${dato.norskFormat()}"
     }
 
