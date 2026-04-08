@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak
 import com.fasterxml.jackson.annotation.JsonInclude
 import java.time.LocalDate
 
-data class BeregningPlan(
+data class Beregningsplan(
     val omfang: Beregningsomfang,
     @JsonInclude(JsonInclude.Include.NON_NULL)
     val fraDato: LocalDate? = null,

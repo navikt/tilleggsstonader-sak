@@ -7,8 +7,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
-import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.OffentligTransportBeregningRevurderingService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.OffentligTransportBeregningService
@@ -42,13 +42,14 @@ class DagligReiseBeregningService(
     fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
-        plan: BeregningPlan,
+        plan: Beregningsplan,
         typeVedtak: TypeVedtak,
     ): BeregningDagligReise {
-        val tidligsteEndring = when (plan.omfang) {
-            Beregningsomfang.FRA_DATO -> plan.fraDato
-            else -> null
-        }
+        val tidligsteEndring =
+            when (plan.omfang) {
+                Beregningsomfang.FRA_DATO -> plan.fraDato
+                else -> null
+            }
 
         dagligReiseVedtaksperioderValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,

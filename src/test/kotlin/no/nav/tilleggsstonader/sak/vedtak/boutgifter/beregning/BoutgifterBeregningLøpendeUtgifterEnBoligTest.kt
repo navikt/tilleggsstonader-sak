@@ -12,8 +12,8 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.innvilgelseBoutgifter
@@ -132,7 +132,7 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                 .beregn(
                     behandling = saksbehandling(),
                     vedtaksperioder = vedtaksperioderFørstegangsbehandling,
-                    plan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
+                    plan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                     typeVedtak = TypeVedtak.INNVILGELSE,
                 ).perioder
 
@@ -229,7 +229,7 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                 .beregn(
                     behandling = saksbehandling,
                     vedtaksperioder = vedtaksperioderRevurdering,
-                    plan = BeregningPlan(Beregningsomfang.FRA_DATO, tidligsteEndring),
+                    plan = Beregningsplan(Beregningsomfang.FRA_DATO, tidligsteEndring),
                     typeVedtak = TypeVedtak.INNVILGELSE,
                 ).perioder
 
@@ -293,7 +293,7 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                                 tom = 30 april 2026,
                             ),
                         ),
-                    plan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
+                    plan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                     typeVedtak = TypeVedtak.INNVILGELSE,
                 ).perioder
 

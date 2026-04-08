@@ -22,8 +22,8 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.totrinnskontroll
 import no.nav.tilleggsstonader.sak.util.vilkår
-import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtaksperiodeGrunnlag
@@ -287,7 +287,7 @@ object InterntVedtakTestdata {
                             listOf(
                                 vedtaksperiode,
                             ),
-                        beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
+                        beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = LocalDate.of(2024, 1, 1),
@@ -395,7 +395,7 @@ object InterntVedtakTestdata {
                         vedtaksperioder = vedtaksperioder,
                         beregningsresultat = beregningsresultat,
                         begrunnelse = "Sånn her vil en begrunnelse se ut",
-                        beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
+                        beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = LocalDate.of(2024, 1, 1),
@@ -589,7 +589,7 @@ object InterntVedtakTestdata {
                         vedtaksperioder = vedtaksperioder,
                         beregningsresultat = beregningsresultat,
                         begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
-                        beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
+                        beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
@@ -618,7 +618,7 @@ object InterntVedtakTestdata {
                         begrunnelse = "Begrunelse for avslag",
                         vedtaksperioder = vedtaksperioder,
                         beregningsresultat = beregningsresultat,
-                        beregningsplan = BeregningPlan(Beregningsomfang.FRA_DATO, LocalDate.of(2024, 12, 10)),
+                        beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, LocalDate.of(2024, 12, 10)),
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
@@ -964,7 +964,7 @@ object InterntVedtakTestdata {
                     beregningsresultat = beregningsresultatDagligReise,
                     rammevedtakPrivatBil = rammevedtakPrivatBil,
                     begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
-                    beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
+                    beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                 ),
             gitVersjon = Applikasjonsversjon.versjon,
             tidligsteEndring = null,

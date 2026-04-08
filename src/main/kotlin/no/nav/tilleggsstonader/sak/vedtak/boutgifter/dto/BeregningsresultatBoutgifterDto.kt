@@ -14,7 +14,7 @@ data class BeregningsresultatBoutgifterDto(
     val perioder: List<BeregningsresultatForPeriodeDto>,
     val inneholderUtgifterOvernatting: Boolean,
     val tidligsteEndring: LocalDate? = null,
-    val beregningsplan: BeregningsplanDto? = null,
+    val beregningsplan: BeregningsplanDto,
 )
 
 data class BeregningsresultatForPeriodeDto(
@@ -46,7 +46,7 @@ data class UtgiftBoutgifterMedAndelTilUtbetalingDto(
 
 fun BeregningsresultatBoutgifter.tilDto(
     tidligsteEndring: LocalDate?,
-    beregningsplan: BeregningsplanDto? = null,
+    beregningsplan: BeregningsplanDto,
 ): BeregningsresultatBoutgifterDto =
     BeregningsresultatBoutgifterDto(
         perioder =

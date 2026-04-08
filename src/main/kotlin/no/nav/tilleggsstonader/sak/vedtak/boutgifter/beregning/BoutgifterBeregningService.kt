@@ -7,8 +7,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
-import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.beregnStønadsbeløp
@@ -51,7 +51,7 @@ class BoutgifterBeregningService(
     fun beregn(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
-        plan: BeregningPlan,
+        plan: Beregningsplan,
         typeVedtak: TypeVedtak,
     ): BeregningsresultatBoutgifter {
         val forrigeVedtak = hentForrigeVedtak(behandling)

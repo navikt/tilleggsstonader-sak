@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder
 
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.finnMakssats
@@ -10,8 +12,6 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatFo
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
-import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -136,7 +136,7 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
                                     beregningsresultatFeb,
                                 ),
                         ),
-                    beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
+                    beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                 )
 
             val res = vedtak.finnDetaljerteVedtaksperioder()
@@ -486,6 +486,6 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
         InnvilgelseBoutgifter(
             vedtaksperioder = emptyList(),
             beregningsresultat = BeregningsresultatBoutgifter(perioder = beregningsperioder),
-            beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
+            beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
         )
 }

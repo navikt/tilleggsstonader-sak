@@ -8,8 +8,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.YEAR_MONTH_MIN
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.toYearMonth
-import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningValideringUtil.validerPerioderForInnvilgelse
@@ -59,7 +59,7 @@ class TilsynBarnBeregningService(
     fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
-        plan: BeregningPlan,
+        plan: Beregningsplan,
         typeVedtak: TypeVedtak,
     ): BeregningsresultatTilsynBarn =
         if (plan.omfang == Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT) {

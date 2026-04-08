@@ -9,11 +9,11 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
+import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
-import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
@@ -190,7 +190,7 @@ class TilsynBarnBeregnYtelseSteg(
         beregningsresultat: BeregningsresultatTilsynBarn,
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
-        beregningsplan: no.nav.tilleggsstonader.sak.vedtak.BeregningPlan,
+        beregningsplan: no.nav.tilleggsstonader.sak.vedtak.Beregningsplan,
     ): Vedtak =
         GeneriskVedtak(
             behandlingId = behandling.id,

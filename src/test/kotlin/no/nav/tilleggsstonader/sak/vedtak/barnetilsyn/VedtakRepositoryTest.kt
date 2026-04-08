@@ -3,8 +3,8 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
-import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
@@ -33,7 +33,7 @@ class VedtakRepositoryTest : CleanDatabaseIntegrationTest() {
                     InnvilgelseTilsynBarn(
                         beregningsresultat = beregningsresultat,
                         vedtaksperioder = emptyList(),
-                        beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
+                        beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                     ),
             ),
         )

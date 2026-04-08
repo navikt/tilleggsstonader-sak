@@ -10,8 +10,8 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
-import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -72,7 +72,7 @@ class LæremidlerBeregnYtelseSteg(
         logger.info("Lagrer vedtak for satsjustering for behandling=${saksbehandling.id}, satsjusteringFra=$satsjusteringFra")
 
         val innvilgelse = vedtak as InnvilgelseLæremidlerRequest
-        val plan = BeregningPlan(Beregningsomfang.FRA_DATO, satsjusteringFra)
+        val plan = Beregningsplan(Beregningsomfang.FRA_DATO, satsjusteringFra)
         lagreInnvilgetVedtak(
             saksbehandling = saksbehandling,
             vedtaksperioder = innvilgelse.vedtaksperioder.tilDomene(),
@@ -104,7 +104,7 @@ class LæremidlerBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
-        plan: BeregningPlan,
+        plan: Beregningsplan,
     ) {
         val beregningsresultat =
             beregningService.beregn(

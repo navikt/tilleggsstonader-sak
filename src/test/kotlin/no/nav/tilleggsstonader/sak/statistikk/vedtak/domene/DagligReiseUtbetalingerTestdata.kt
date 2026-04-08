@@ -5,9 +5,9 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
-import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Aktivitet
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
@@ -100,7 +100,7 @@ fun lagDagligReiseInnvilgelseMedBeløp(
             beregningsresultat = beregningsresultat,
             rammevedtakPrivatBil = null,
             begrunnelse = "test",
-            beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
+            beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
         )
 
     val andel =

@@ -21,7 +21,7 @@ data class BeregningsresultatTilsynBarnDto(
     val gjelderFraOgMed: LocalDate?,
     val gjelderTilOgMed: LocalDate?,
     val tidligsteEndring: LocalDate?,
-    val beregningsplan: BeregningsplanDto?,
+    val beregningsplan: BeregningsplanDto,
 )
 
 data class BeregningsresultatForMånedDto(
@@ -50,7 +50,7 @@ data class BeregningsgrunnlagDto(
  */
 fun BeregningsresultatTilsynBarn.tilDto(
     tidligsteEndring: LocalDate?,
-    beregningsplan: BeregningsplanDto? = null,
+    beregningsplan: BeregningsplanDto,
 ): BeregningsresultatTilsynBarnDto {
     val filtrertPerioder =
         this.perioder
@@ -67,8 +67,8 @@ fun BeregningsresultatTilsynBarn.tilDto(
         vedtaksperioder = vedtaksperioder,
         gjelderFraOgMed = vedtaksperioder.minOfOrNull { it.fom },
         gjelderTilOgMed = vedtaksperioder.maxOfOrNull { it.tom },
-        tidligsteEndring = tidligsteEndring,
         beregningsplan = beregningsplan,
+        tidligsteEndring = beregningsplan.fraDato,
     )
 }
 

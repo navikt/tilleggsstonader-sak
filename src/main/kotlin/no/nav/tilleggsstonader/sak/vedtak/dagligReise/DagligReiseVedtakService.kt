@@ -7,8 +7,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
-import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
@@ -38,7 +38,7 @@ class DagligReiseVedtakService(
         rammevedtakPrivatBil: RammevedtakPrivatBil?,
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
-        beregningsplan: BeregningPlan,
+        beregningsplan: Beregningsplan,
     ) {
         vedtakRepository.insert(
             GeneriskVedtak(
@@ -83,7 +83,7 @@ class DagligReiseVedtakService(
         rammevedtakPrivatBil: RammevedtakPrivatBil?,
         avkortetVedtaksperioder: List<Vedtaksperiode>,
         vedtak: OpphørDagligReiseRequest,
-        beregningsplan: BeregningPlan,
+        beregningsplan: Beregningsplan,
     ) {
         vedtakRepository.insert(
             GeneriskVedtak(

@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.BeregningDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
@@ -28,8 +28,8 @@ data class BeregningDagligReiseDto(
 data class BeregningsresultatDagligReiseDto(
     val offentligTransport: BeregningsresultatOffentligTransportDto?,
     val privatBil: BeregningsresultatPrivatBilDto?,
-    val beregningsplan: BeregningsplanDto? = null,
-    val tidligsteEndring: LocalDate? = beregningsplan?.fraDato,
+    val beregningsplan: BeregningsplanDto,
+    val tidligsteEndring: LocalDate? = beregningsplan.fraDato,
 )
 
 data class BeregningsresultatOffentligTransportDto(
@@ -87,7 +87,7 @@ data class BeregningsresultatForReisePrivatBilDagDto(
 )
 
 fun BeregningDagligReise.tilDto(
-    beregningsplan: BeregningPlan?,
+    beregningsplan: Beregningsplan,
     vilkår: List<VilkårDagligReise>,
 ): BeregningDagligReiseDto =
     BeregningDagligReiseDto(
@@ -96,13 +96,13 @@ fun BeregningDagligReise.tilDto(
     )
 
 fun BeregningsresultatDagligReise.tilDto(
-    beregningsplan: BeregningPlan?,
+    beregningsplan: Beregningsplan,
     vilkår: List<VilkårDagligReise>,
 ): BeregningsresultatDagligReiseDto =
     BeregningsresultatDagligReiseDto(
         offentligTransport = offentligTransport?.tilDto(vilkår),
         privatBil = privatBil?.tilDto(vilkår),
-        beregningsplan = beregningsplan?.tilDto(),
+        beregningsplan = beregningsplan.tilDto(),
     )
 
 fun BeregningsresultatOffentligTransport.tilDto(vilkår: List<VilkårDagligReise>): BeregningsresultatOffentligTransportDto =

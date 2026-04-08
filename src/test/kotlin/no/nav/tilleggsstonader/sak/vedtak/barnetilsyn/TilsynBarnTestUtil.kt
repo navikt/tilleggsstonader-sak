@@ -5,8 +5,8 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.behandling
-import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
@@ -85,7 +85,7 @@ object TilsynBarnTestUtil {
                         ),
                 ),
             vedtaksperioder = emptyList(),
-            beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
+            beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
         )
 
     val vedtakBeregningsresultat =
@@ -164,7 +164,7 @@ object TilsynBarnTestUtil {
         beregningsresultat: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
         vedtaksperioder: List<Vedtaksperiode> = emptyList(),
         tidligsteEndring: LocalDate? = null,
-        beregningsplan: BeregningPlan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
+        beregningsplan: Beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
     ) = GeneriskVedtak(
         behandlingId = behandlingId,
         type = TypeVedtak.INNVILGELSE,
@@ -214,7 +214,7 @@ object TilsynBarnTestUtil {
         beregningsresultat: BeregningsresultatTilsynBarn = vedtakBeregningsresultat,
         begrunnelse: String,
         opphørsdato: LocalDate = LocalDate.now(),
-        beregningsplan: BeregningPlan = BeregningPlan(Beregningsomfang.FRA_DATO, opphørsdato),
+        beregningsplan: Beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, opphørsdato),
     ) = GeneriskVedtak(
         behandlingId = behandlingId,
         type = TypeVedtak.OPPHØR,

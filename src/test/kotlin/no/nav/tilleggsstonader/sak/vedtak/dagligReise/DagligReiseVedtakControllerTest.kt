@@ -14,7 +14,6 @@ import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkårDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
@@ -117,10 +116,11 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                                 ),
                         ),
                     privatBil = null,
-                    beregningsplan = BeregningsplanDto(
-                        omfang = Beregningsomfang.ALLE_PERIODER,
-                        fraDato = null,
-                    ),
+                    beregningsplan =
+                        BeregningsplanDto(
+                            omfang = Beregningsomfang.ALLE_PERIODER,
+                            fraDato = null,
+                        ),
                 ),
             gjelderFraOgMed = dummyFom,
             gjelderTilOgMed = dummyTom,

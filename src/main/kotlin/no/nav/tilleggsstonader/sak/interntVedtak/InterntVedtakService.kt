@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
@@ -94,20 +95,29 @@ class InterntVedtakService(
             when (data) {
                 is InnvilgelseTilsynBarn ->
                     BeregningsresultatInterntVedtakDto(
-                        tilsynBarn = data.beregningsresultat.tilDto(vedtak.tidligsteEndring).perioder,
+                        tilsynBarn = data.beregningsresultat.tilDto(
+                            tidligsteEndring = vedtak.tidligsteEndring,
+                            beregningsplan = data.beregningsplan.tilDto(),
+                        ).perioder,
                     )
 
                 is InnvilgelseLæremidler ->
                     BeregningsresultatInterntVedtakDto(
                         læremidler =
                             data.beregningsresultat
-                                .tilDto(vedtak.tidligsteEndring)
+                                .tilDto(
+                                    tidligsteEndring = vedtak.tidligsteEndring,
+                                    beregningsplan = data.beregningsplan.tilDto(),
+                                )
                                 .perioder,
                     )
 
                 is InnvilgelseBoutgifter ->
                     BeregningsresultatInterntVedtakDto(
-                        boutgifter = data.beregningsresultat.tilDto(vedtak.tidligsteEndring).perioder,
+                        boutgifter = data.beregningsresultat.tilDto(
+                            tidligsteEndring = vedtak.tidligsteEndring,
+                            beregningsplan = data.beregningsplan.tilDto(),
+                        ).perioder,
                     )
 
                 is InnvilgelseDagligReise -> {

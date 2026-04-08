@@ -14,7 +14,7 @@ import java.time.LocalDate
 data class BeregningsresultatLæremidlerDto(
     val perioder: List<BeregningsresultatForPeriodeDto>,
     val tidligsteEndring: LocalDate? = null,
-    val beregningsplan: BeregningsplanDto? = null,
+    val beregningsplan: BeregningsplanDto,
 )
 
 data class BeregningsresultatForPeriodeDto(
@@ -50,7 +50,7 @@ data class BeregningsresultatForPeriodeDto(
 
 fun BeregningsresultatLæremidler.tilDto(
     tidligsteEndring: LocalDate?,
-    beregningsplan: BeregningsplanDto? = null,
+    beregningsplan: BeregningsplanDto,
 ): BeregningsresultatLæremidlerDto {
     val perioderDto =
         this

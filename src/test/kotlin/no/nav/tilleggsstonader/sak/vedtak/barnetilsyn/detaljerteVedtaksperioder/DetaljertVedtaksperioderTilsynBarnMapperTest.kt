@@ -2,8 +2,8 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.detaljerteVedtaksperioder
 
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.toYearMonth
-import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.detaljerteVedtaksperioder.DetaljertVedtaksperioderTilsynBarnMapper.finnDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
@@ -49,7 +49,7 @@ class DetaljertVedtaksperioderTilsynBarnMapperTest {
                             ),
                         ),
                 ),
-            beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
+            beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
         )
 
     @Test

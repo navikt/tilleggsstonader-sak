@@ -10,9 +10,9 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
-import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
-import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
+import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -56,7 +56,7 @@ class BoutgifterBeregnYtelseSteg(
 
         val innvilgelse = vedtak as InnvilgelseBoutgifterRequest
         val vedtaksperioder = innvilgelse.vedtaksperioder.tilDomene().sorted()
-        val beregningsplan = BeregningPlan(omfang = Beregningsomfang.FRA_DATO, fraDato = satsjusteringFra)
+        val beregningsplan = Beregningsplan(omfang = Beregningsomfang.FRA_DATO, fraDato = satsjusteringFra)
         val beregningsresultat =
             beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
@@ -178,7 +178,7 @@ class BoutgifterBeregnYtelseSteg(
         beregningsresultat: BeregningsresultatBoutgifter,
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
-        beregningsplan: BeregningPlan,
+        beregningsplan: Beregningsplan,
     ) {
         vedtakRepository.insert(
             GeneriskVedtak(
@@ -202,7 +202,7 @@ class BoutgifterBeregnYtelseSteg(
         avkortedeVedtaksperioder: List<Vedtaksperiode>,
         beregningsresultat: BeregningsresultatBoutgifter,
         vedtak: OpphørBoutgifterRequest,
-        beregningsplan: BeregningPlan,
+        beregningsplan: Beregningsplan,
     ) {
         vedtakRepository.insert(
             GeneriskVedtak(

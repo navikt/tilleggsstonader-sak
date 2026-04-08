@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder
 
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperioderLæremidlerMapper.finnDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
@@ -11,8 +13,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 
 class DetaljertVedtaksperioderLæremidlerMapperTest {
     private val defaultAktivitet = AktivitetType.UTDANNING
@@ -113,6 +113,6 @@ class DetaljertVedtaksperioderLæremidlerMapperTest {
                 BeregningsresultatLæremidler(
                     perioder = beregningsresulat,
                 ),
-            beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER),
+            beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
         )
 }

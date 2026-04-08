@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
-import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 
@@ -23,7 +23,7 @@ data class InnvilgelseTilsynBarn(
     override val beregningsresultat: BeregningsresultatTilsynBarn,
     override val vedtaksperioder: List<Vedtaksperiode>,
     val begrunnelse: String? = null,
-    val beregningsplan: BeregningPlan,
+    val beregningsplan: Beregningsplan,
 ) : InnvilgelseEllerOpphørTilsynBarn,
     Innvilgelse {
     override val type: TypeVedtaksdata = TypeVedtakTilsynBarn.INNVILGELSE_TILSYN_BARN
@@ -46,7 +46,7 @@ data class OpphørTilsynBarn(
     override val årsaker: List<ÅrsakOpphør>,
     override val begrunnelse: String,
     override val vedtaksperioder: List<Vedtaksperiode>,
-    val beregningsplan: BeregningPlan,
+    val beregningsplan: Beregningsplan,
 ) : InnvilgelseEllerOpphørTilsynBarn,
     Opphør {
     override val type: TypeVedtaksdata = TypeVedtakTilsynBarn.OPPHØR_TILSYN_BARN

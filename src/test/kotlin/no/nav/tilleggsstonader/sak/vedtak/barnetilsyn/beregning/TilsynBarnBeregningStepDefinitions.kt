@@ -26,8 +26,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.Vilkårperi
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.BarnIdTilTestIdHolder.barnIder
@@ -144,14 +144,14 @@ class TilsynBarnBeregningStepDefinitions {
         val plan =
             when {
                 behandling.forrigeIverksatteBehandlingId == null ->
-                    BeregningPlan(omfang = Beregningsomfang.ALLE_PERIODER)
+                    Beregningsplan(omfang = Beregningsomfang.ALLE_PERIODER)
                 tidligsteEndring != null ->
-                    BeregningPlan(
+                    Beregningsplan(
                         omfang = Beregningsomfang.FRA_DATO,
                         fraDato = tidligsteEndring,
                     )
                 else ->
-                    BeregningPlan(
+                    Beregningsplan(
                         omfang = Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT,
                     )
             }

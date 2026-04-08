@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dto
 
-import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import java.time.LocalDate
 
 data class BeregningsplanDto(
@@ -9,7 +9,7 @@ data class BeregningsplanDto(
     val fraDato: LocalDate? = null,
 )
 
-fun BeregningPlan.tilDto() =
+fun Beregningsplan.tilDto() =
     BeregningsplanDto(
         omfang = omfang,
         fraDato = fraDato,

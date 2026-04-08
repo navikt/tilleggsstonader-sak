@@ -10,6 +10,8 @@ import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTestdata.behandlin
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.dto.BeregningsplanDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
@@ -234,7 +236,7 @@ class InterntVedtakServiceTest {
 
             val forventet =
                 InterntVedtakTestdata.Læremidler.beregningsresultat
-                    .tilDto(null)
+                    .tilDto(null, BeregningsplanDto(Beregningsomfang.ALLE_PERIODER))
                     .perioder
                     .single()
 

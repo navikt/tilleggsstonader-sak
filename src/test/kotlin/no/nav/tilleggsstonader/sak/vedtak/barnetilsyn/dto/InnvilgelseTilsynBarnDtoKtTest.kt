@@ -1,12 +1,14 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto
 
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.dto.BeregningsplanDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -29,7 +31,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
                             beløpsperioder = listOf(Beløpsperiode(LocalDate.of(2024, 1, 1), 20, NEDSATT_ARBEIDSEVNE)),
                         ),
                     ),
-            ).tilDto(null)
+            ).tilDto(null, BeregningsplanDto(Beregningsomfang.ALLE_PERIODER))
 
         assertThat(dto.perioder).containsExactlyInAnyOrder(
             BeregningsresultatForMånedDto(
@@ -65,7 +67,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
                                 ),
                         ),
                     ),
-            ).tilDto(null)
+            ).tilDto(null, BeregningsplanDto(Beregningsomfang.ALLE_PERIODER))
 
         assertThat(dto.gjelderFraOgMed).isEqualTo(LocalDate.of(2024, 1, 2))
         assertThat(dto.gjelderTilOgMed).isEqualTo(LocalDate.of(2024, 2, 4))
@@ -93,7 +95,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
                                     ),
                             ),
                         ),
-                ).tilDto(tidligsteEndring)
+                ).tilDto(tidligsteEndring, BeregningsplanDto(Beregningsomfang.FRA_DATO, fraDato = tidligsteEndring))
 
             assertThat(dto.perioder.single().månedsbeløp).isEqualTo(60)
         }
@@ -106,7 +108,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
         @Test
         fun `periode som overlapper skal bruke tidligsteEndring som startdato`() {
             val periode = vedtaksperiodeGrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 18))
-            val dto = resultatMedEnVedtaksperiode(periode).tilDto(tidligsteEndring)
+            val dto = resultatMedEnVedtaksperiode(periode).tilDto(tidligsteEndring, BeregningsplanDto(Beregningsomfang.FRA_DATO, fraDato = tidligsteEndring))
 
             assertThat(dto.gjelderFraOgMed).isEqualTo(tidligsteEndring)
             assertThat(dto.gjelderTilOgMed).isEqualTo(LocalDate.of(2024, 1, 18))
@@ -115,7 +117,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
         @Test
         fun `periode som begynner før tidligsteEndring skal ikke brukes til gjelderFra eller gjelderTil`() {
             val periode = vedtaksperiodeGrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 16))
-            val dto = resultatMedEnVedtaksperiode(periode).tilDto(tidligsteEndring)
+            val dto = resultatMedEnVedtaksperiode(periode).tilDto(tidligsteEndring, BeregningsplanDto(Beregningsomfang.FRA_DATO, fraDato = tidligsteEndring))
 
             assertThat(dto.gjelderFraOgMed).isNull()
             assertThat(dto.gjelderTilOgMed).isNull()
@@ -124,7 +126,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
         @Test
         fun `periode som begynner fra og med tidligsteEndring brukes til gjelderFra og gjelderTil`() {
             val periode = vedtaksperiodeGrunnlag(fom = LocalDate.of(2024, 1, 17), tom = LocalDate.of(2024, 1, 19))
-            val dto = resultatMedEnVedtaksperiode(periode).tilDto(tidligsteEndring)
+            val dto = resultatMedEnVedtaksperiode(periode).tilDto(tidligsteEndring, BeregningsplanDto(Beregningsomfang.FRA_DATO, fraDato = tidligsteEndring))
 
             assertThat(dto.gjelderFraOgMed).isEqualTo(LocalDate.of(2024, 1, 17))
             assertThat(dto.gjelderTilOgMed).isEqualTo(LocalDate.of(2024, 1, 19))
