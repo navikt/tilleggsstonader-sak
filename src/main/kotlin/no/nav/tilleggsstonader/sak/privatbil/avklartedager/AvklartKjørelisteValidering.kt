@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
+import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
@@ -7,7 +8,6 @@ import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
-import java.time.LocalDate
 
 fun validerAtAlleDagerIKjørelistaErInnenForRammevedtaket(
     rammeForReise: RammeForReiseMedPrivatBil,
@@ -20,12 +20,12 @@ fun validerAtAlleDagerIKjørelistaErInnenForRammevedtaket(
 
 fun validerOppdatertAvklartKjørtUke(
     oppdaterteDager: List<AvklartKjørtDag>,
-    fomUkeSomSkalOppdateres: LocalDate,
+    ukeSomSkalOppdateres: UkeIÅr,
     rammevedtak: RammeForReiseMedPrivatBil,
     innsendteKjørelisteDager: List<KjørelisteDag>,
 ) {
     validerAntallDagerGodkjentInnenforRammevedtak(oppdaterteDager, rammevedtak)
-    validerInnsendteDagerErInnenforUken(fomUkeSomSkalOppdateres, oppdaterteDager)
+    validerInnsendteDagerErInnenforUken(ukeSomSkalOppdateres, oppdaterteDager)
 
     oppdaterteDager.forEach { oppdatertDag ->
         oppdatertDag.validerGyldigeVerdier()
@@ -47,10 +47,10 @@ private fun validerAntallDagerGodkjentInnenforRammevedtak(
 }
 
 private fun validerInnsendteDagerErInnenforUken(
-    fomUke: LocalDate,
+    uke: UkeIÅr,
     oppdaterteDager: List<AvklartKjørtDag>,
 ) {
-    brukerfeilHvis(oppdaterteDager.any { it.dato.tilUkeIÅr() != fomUke.tilUkeIÅr() }) {
+    brukerfeilHvis(oppdaterteDager.any { it.dato.tilUkeIÅr() != uke }) {
         "Alle dager må være innenfor uken som skal oppdateres"
     }
 }

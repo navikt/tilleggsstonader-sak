@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
@@ -93,7 +94,7 @@ class AvklartKjørelisteValideringTest {
             assertDoesNotThrow {
                 validerOppdatertAvklartKjørtUke(
                     oppdaterteDager = oppdaterteDager,
-                    fomUkeSomSkalOppdateres = mandag,
+                    ukeSomSkalOppdateres = mandag.tilUkeIÅr(),
                     rammevedtak = ramme,
                     innsendteKjørelisteDager = kjørelisteDager,
                 )
@@ -180,7 +181,7 @@ class AvklartKjørelisteValideringTest {
                 assertDoesNotThrow {
                     validerOppdatertAvklartKjørtUke(
                         oppdaterteDager = listOf(oppdatertDag),
-                        fomUkeSomSkalOppdateres = mandag,
+                        ukeSomSkalOppdateres = mandag.tilUkeIÅr(),
                         rammevedtak = rammeForReise(),
                         innsendteKjørelisteDager = listOf(kjørelisteDag),
                     )
@@ -292,7 +293,7 @@ class AvklartKjørelisteValideringTest {
         assertThatThrownBy {
             validerOppdatertAvklartKjørtUke(
                 oppdaterteDager = oppdaterteDager,
-                fomUkeSomSkalOppdateres = mandag,
+                ukeSomSkalOppdateres = mandag.tilUkeIÅr(),
                 rammevedtak = rammevedtak,
                 innsendteKjørelisteDager = kjøreliste,
             )

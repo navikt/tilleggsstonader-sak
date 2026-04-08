@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
+import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -65,7 +66,7 @@ class AvklartKjørelisteService(
 
         validerOppdatertAvklartKjørtUke(
             oppdaterteDager = oppdaterteDager,
-            fomUkeSomSkalOppdateres = eksisterendeUke.fom,
+            ukeSomSkalOppdateres = eksisterendeUke.fom.tilUkeIÅr(),
             rammevedtak = rammevedtak,
             innsendteKjørelisteDager = innsendteKjørelisteDager,
         )
