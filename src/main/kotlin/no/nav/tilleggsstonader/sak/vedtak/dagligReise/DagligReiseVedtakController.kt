@@ -4,10 +4,10 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
-import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
@@ -118,7 +118,7 @@ class DagligReiseVedtakController(
             beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 behandling = behandling,
-                plan = plan,
+                beregningsplan = plan,
                 typeVedtak = TypeVedtak.INNVILGELSE,
             )
 

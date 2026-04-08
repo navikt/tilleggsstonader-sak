@@ -4,12 +4,12 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
-import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
+import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.OpprettAndelerDagligReiseService
@@ -80,7 +80,7 @@ class DagligReiseBeregnYtelseSteg(
             beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
-                plan = plan,
+                beregningsplan = plan,
                 typeVedtak = TypeVedtak.INNVILGELSE,
             )
         dagligReiseVedtakService.lagreInnvilgetVedtak(
@@ -122,7 +122,7 @@ class DagligReiseBeregnYtelseSteg(
             beregningService.beregn(
                 vedtaksperioder = avkortetVedtaksperioder,
                 behandling = saksbehandling,
-                plan = beregningsplan,
+                beregningsplan = beregningsplan,
                 typeVedtak = TypeVedtak.OPPHØR,
             )
         opphørValideringService.validerIngenUtbetalingEtterOpphørsdatoDagligReise(

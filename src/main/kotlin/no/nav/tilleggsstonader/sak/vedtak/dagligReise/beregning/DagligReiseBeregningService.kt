@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.OffentligTransportBeregningRevurderingService
@@ -42,15 +41,9 @@ class DagligReiseBeregningService(
     fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
-        plan: Beregningsplan,
+        beregningsplan: Beregningsplan,
         typeVedtak: TypeVedtak,
     ): BeregningDagligReise {
-        val tidligsteEndring =
-            when (plan.omfang) {
-                Beregningsomfang.FRA_DATO -> plan.fraDato
-                else -> null
-            }
-
         dagligReiseVedtaksperioderValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
@@ -84,7 +77,7 @@ class DagligReiseBeregningService(
                             vedtaksperioder = vedtaksperioder,
                             behandling = behandling,
                             brukersNavKontor = brukersNavKontor,
-                            tidligsteEndring = tidligsteEndring,
+                            beregnFra = beregningsplan.beregnFra(),
                         ),
                     privatBil =
                         beregnPrivatBil(
@@ -102,7 +95,7 @@ class DagligReiseBeregningService(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
         brukersNavKontor: String?,
-        tidligsteEndring: LocalDate?,
+        beregnFra: LocalDate?,
     ): BeregningsresultatOffentligTransport? {
         val oppfylteVilkårOffentligTransport = oppfylteVilkårDagligReise.filter { it.fakta is FaktaOffentligTransport }
 
@@ -113,18 +106,18 @@ class DagligReiseBeregningService(
                 vedtaksperioder = vedtaksperioder,
                 oppfylteVilkår = oppfylteVilkårOffentligTransport,
                 brukersNavKontor = brukersNavKontor,
-            )?.flettMedForrigeVedtakHvisRevurdering(behandling, tidligsteEndring)
+            )?.flettMedForrigeVedtakHvisRevurdering(behandling, beregnFra)
             ?.sorterReiserOgPerioder()
     }
 
     private fun BeregningsresultatOffentligTransport.flettMedForrigeVedtakHvisRevurdering(
         behandling: Saksbehandling,
-        tidligsteEndring: LocalDate?,
+        beregnFra: LocalDate?,
     ) = offentligTransportBeregningRevurderingService
         .flettMedForrigeVedtakHvisRevurdering(
             nyttBeregningsresultat = this,
             behandling = behandling,
-            tidligsteEndring = tidligsteEndring,
+            beregnFra = beregnFra,
         )
 
     private fun beregnPrivatBil(
