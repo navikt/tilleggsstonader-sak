@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnU
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
+import no.nav.tilleggsstonader.sak.vedtak.dto.BeregningsplanDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 
@@ -13,6 +14,7 @@ data class BeregningsresultatBoutgifterDto(
     val perioder: List<BeregningsresultatForPeriodeDto>,
     val inneholderUtgifterOvernatting: Boolean,
     val tidligsteEndring: LocalDate? = null,
+    val beregningsplan: BeregningsplanDto? = null,
 )
 
 data class BeregningsresultatForPeriodeDto(
@@ -42,7 +44,10 @@ data class UtgiftBoutgifterMedAndelTilUtbetalingDto(
     }
 }
 
-fun BeregningsresultatBoutgifter.tilDto(tidligsteEndring: LocalDate?): BeregningsresultatBoutgifterDto =
+fun BeregningsresultatBoutgifter.tilDto(
+    tidligsteEndring: LocalDate?,
+    beregningsplan: BeregningsplanDto? = null,
+): BeregningsresultatBoutgifterDto =
     BeregningsresultatBoutgifterDto(
         perioder =
             filtrerFraOgMed(tidligsteEndring)
@@ -50,6 +55,7 @@ fun BeregningsresultatBoutgifter.tilDto(tidligsteEndring: LocalDate?): Beregning
                 .map { it.tilDto(tidligsteEndring) },
         inneholderUtgifterOvernatting = inneholderUtgifterOvernatting(),
         tidligsteEndring = tidligsteEndring,
+        beregningsplan = beregningsplan,
     )
 
 private fun BeregningsresultatBoutgifter.filtrerFraOgMed(dato: LocalDate?): BeregningsresultatBoutgifter {

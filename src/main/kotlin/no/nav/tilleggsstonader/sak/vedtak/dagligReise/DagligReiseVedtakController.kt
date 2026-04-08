@@ -4,10 +4,9 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
+import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
-import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
@@ -41,7 +40,7 @@ class DagligReiseVedtakController(
     private val vedtakService: VedtakService,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
-    private val utledTidligsteEndringService: UtledTidligsteEndringService,
+    private val beregningsplanUtleder: BeregningsplanUtleder,
     private val dagligReiseVilkårService: DagligReiseVilkårService,
 ) {
     @PostMapping("{behandlingId}/tso/innvilgelse")
@@ -113,22 +112,16 @@ class DagligReiseVedtakController(
     ): BeregningDagligReiseDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        val tidligsteEndring =
-            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
-                behandling.id,
-                vedtaksperioder,
-            )
+        val plan = beregningsplanUtleder.utledForInnvilgelse(behandling, vedtaksperioder)
         val beregningsresultat =
-            beregningService
-                .beregn(
-                    vedtaksperioder = vedtaksperioder,
-                    behandling = behandling,
-                    typeVedtak = TypeVedtak.INNVILGELSE,
-                    tidligsteEndring = tidligsteEndring,
-                )
+            beregningService.beregn(
+                vedtaksperioder = vedtaksperioder,
+                behandling = behandling,
+                plan = plan,
+            )
 
         val vilkår = dagligReiseVilkårService.hentVilkårForBehandling(behandlingId)
-        return beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring, vilkår)
+        return beregningsresultat.tilDto(beregningsplan = plan, vilkår)
     }
 
     private fun lagreVedtak(

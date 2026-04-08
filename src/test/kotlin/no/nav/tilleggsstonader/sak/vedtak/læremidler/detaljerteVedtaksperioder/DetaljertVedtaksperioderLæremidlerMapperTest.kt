@@ -11,6 +11,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsårsak
 
 class DetaljertVedtaksperioderLæremidlerMapperTest {
     private val defaultAktivitet = AktivitetType.UTDANNING
@@ -111,5 +114,6 @@ class DetaljertVedtaksperioderLæremidlerMapperTest {
                 BeregningsresultatLæremidler(
                     perioder = beregningsresulat,
                 ),
+            beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER, Beregningsårsak.FØRSTEGANGS),
         )
 }

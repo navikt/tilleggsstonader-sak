@@ -25,6 +25,9 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtak
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregnUtil.splittTilLøpendeMåneder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
+import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsårsak
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
@@ -122,7 +125,7 @@ class LæremidlerBeregningStepDefinitions {
                 læremidlerBeregningService.beregn(
                     behandling,
                     vedtaksPerioder,
-                    tidligsteEndring = null,
+                    plan = BeregningPlan(Beregningsomfang.ALLE_PERIODER, Beregningsårsak.FØRSTEGANGS),
                 )
         } catch (e: Exception) {
             beregningException = e

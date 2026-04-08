@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
+import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
@@ -32,6 +33,7 @@ data class InnvilgelseDagligReise(
     override val rammevedtakPrivatBil: RammevedtakPrivatBil?,
     override val vedtaksperioder: List<Vedtaksperiode>,
     val begrunnelse: String? = null,
+    val beregningsplan: BeregningPlan,
 ) : InnvilgelseEllerOpphørDagligReise,
     Innvilgelse {
     override val type: TypeVedtaksdata =
@@ -59,6 +61,7 @@ data class OpphørDagligReise(
     override val rammevedtakPrivatBil: RammevedtakPrivatBil?,
     override val årsaker: List<ÅrsakOpphør>,
     override val begrunnelse: String,
+    val beregningsplan: BeregningPlan,
 ) : InnvilgelseEllerOpphørDagligReise,
     Opphør {
     override val type: TypeVedtaksdata =

@@ -6,11 +6,14 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
+import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
+import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsårsak
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -35,7 +38,7 @@ import java.time.LocalDate
 class BoutgifterBeregnYtelseSteg(
     private val beregningService: BoutgifterBeregningService,
     private val opphørValideringService: OpphørValideringService,
-    private val utledTidligsteEndringService: UtledTidligsteEndringService,
+    private val beregningsplanUtleder: BeregningsplanUtleder,
     vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -54,20 +57,19 @@ class BoutgifterBeregnYtelseSteg(
 
         val innvilgelse = vedtak as InnvilgelseBoutgifterRequest
         val vedtaksperioder = innvilgelse.vedtaksperioder.tilDomene().sorted()
-        val tidligsteEndring = satsjusteringFra
+        val beregningsplan = BeregningPlan(omfang = Beregningsomfang.FRA_DATO, årsak = Beregningsårsak.SATSJUSTERING, fraDato = satsjusteringFra)
         val beregningsresultat =
             beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
-                typeVedtak = TypeVedtak.INNVILGELSE,
-                tidligsteEndring = tidligsteEndring,
+                plan = beregningsplan,
             )
         lagreInnvilgetVedtak(
             behandling = saksbehandling,
             beregningsresultat = beregningsresultat,
             vedtaksperioder = vedtaksperioder,
             begrunnelse = innvilgelse.begrunnelse,
-            tidligsteEndring = tidligsteEndring,
+            beregningsplan = beregningsplan,
         )
         lagreTilkjentYtelse(saksbehandling.id, beregningsresultat)
     }
@@ -88,24 +90,19 @@ class BoutgifterBeregnYtelseSteg(
         vedtak: InnvilgelseBoutgifterRequest,
     ) {
         val vedtaksperioder = vedtak.vedtaksperioder.tilDomene().sorted()
-        val tidligsteEndring =
-            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
-                saksbehandling.id,
-                vedtaksperioder,
-            )
+        val beregningsplan = beregningsplanUtleder.utledForInnvilgelse(saksbehandling, vedtaksperioder)
         val beregningsresultat =
             beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
-                typeVedtak = TypeVedtak.INNVILGELSE,
-                tidligsteEndring = tidligsteEndring,
+                plan = beregningsplan,
             )
         lagreInnvilgetVedtak(
             behandling = saksbehandling,
             beregningsresultat = beregningsresultat,
             vedtaksperioder = vedtaksperioder,
             begrunnelse = vedtak.begrunnelse,
-            tidligsteEndring = tidligsteEndring,
+            beregningsplan = beregningsplan,
         )
         lagreTilkjentYtelse(saksbehandling.id, beregningsresultat)
     }
@@ -133,15 +130,15 @@ class BoutgifterBeregnYtelseSteg(
 
         val avkortedeVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, opphørsdato)
 
+        val beregningsplan = beregningsplanUtleder.utledForOpphør(opphørsdato)
         val beregningsresultat =
             beregningService.beregn(
                 saksbehandling,
                 avkortedeVedtaksperioder,
-                TypeVedtak.OPPHØR,
-                opphørsdato,
+                beregningsplan,
             )
 
-        lagreOpphørsvedtak(saksbehandling, avkortedeVedtaksperioder, beregningsresultat, vedtak)
+        lagreOpphørsvedtak(saksbehandling, avkortedeVedtaksperioder, beregningsresultat, vedtak, beregningsplan)
         lagreTilkjentYtelse(saksbehandling.id, beregningsresultat)
     }
 
@@ -179,7 +176,7 @@ class BoutgifterBeregnYtelseSteg(
         beregningsresultat: BeregningsresultatBoutgifter,
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
-        tidligsteEndring: LocalDate?,
+        beregningsplan: BeregningPlan,
     ) {
         vedtakRepository.insert(
             GeneriskVedtak(
@@ -190,9 +187,10 @@ class BoutgifterBeregnYtelseSteg(
                         vedtaksperioder = vedtaksperioder,
                         begrunnelse = begrunnelse,
                         beregningsresultat = BeregningsresultatBoutgifter(beregningsresultat.perioder),
+                        beregningsplan = beregningsplan,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                tidligsteEndring = tidligsteEndring,
+                tidligsteEndring = beregningsplan.fraDato,
             ),
         )
     }
@@ -202,6 +200,7 @@ class BoutgifterBeregnYtelseSteg(
         avkortedeVedtaksperioder: List<Vedtaksperiode>,
         beregningsresultat: BeregningsresultatBoutgifter,
         vedtak: OpphørBoutgifterRequest,
+        beregningsplan: BeregningPlan,
     ) {
         vedtakRepository.insert(
             GeneriskVedtak(
@@ -213,6 +212,7 @@ class BoutgifterBeregnYtelseSteg(
                         beregningsresultat = beregningsresultat,
                         årsaker = vedtak.årsakerOpphør,
                         begrunnelse = vedtak.begrunnelse,
+                        beregningsplan = beregningsplan,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,

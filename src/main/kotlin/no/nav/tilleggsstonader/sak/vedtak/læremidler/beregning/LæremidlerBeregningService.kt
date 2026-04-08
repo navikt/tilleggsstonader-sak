@@ -9,6 +9,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.util.toYearMonth
+import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
@@ -43,12 +45,19 @@ class LæremidlerBeregningService(
     fun beregn(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
-        tidligsteEndring: LocalDate?,
+        plan: BeregningPlan,
     ): BeregningsresultatLæremidler {
+        if (plan.omfang == Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT) {
+            val forrigeVedtak = requireNotNull(hentForrigeVedtak(behandling))
+            return forrigeVedtak.beregningsresultat
+        }
+
+        val tidligsteEndring = plan.beregnFra()
+
         vedtaksperiodeValideringService.validerVedtaksperioderLæremidler(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
-            typeVedtak = TypeVedtak.INNVILGELSE,
+            typeVedtak = plan.tilTypeVedtak(),
         )
 
         val vedtaksperioderBeregningsgrunnlag = vedtaksperioder.tilBeregningsgrunnlag()
@@ -57,9 +66,6 @@ class LæremidlerBeregningService(
         val beregningsresultatForMåned = beregn(behandling, vedtaksperioderBeregningsgrunnlag)
 
         return if (forrigeVedtak != null) {
-            brukerfeilHvis(tidligsteEndring == null) {
-                "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
-            }
             settSammenGamleOgNyePerioder(beregningsresultatForMåned, forrigeVedtak, tidligsteEndring)
         } else {
             BeregningsresultatLæremidler(beregningsresultatForMåned)

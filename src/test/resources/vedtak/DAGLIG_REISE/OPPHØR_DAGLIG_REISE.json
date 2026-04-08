@@ -39,6 +39,11 @@
     "privatBil" : null
   },
   "rammevedtakPrivatBil": null,
+  "beregningsplan": {
+    "omfang": "FRA_DATO",
+    "årsak": "OPPHØR",
+    "fraDato": "2025-08-21"
+  },
   "type": "OPPHØR_DAGLIG_REISE",
   "vedtaksperioder": [
     {

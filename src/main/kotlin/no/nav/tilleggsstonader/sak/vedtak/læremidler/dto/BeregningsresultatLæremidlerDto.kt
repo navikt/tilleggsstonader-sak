@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.vedtak.dto.BeregningsplanDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
@@ -13,6 +14,7 @@ import java.time.LocalDate
 data class BeregningsresultatLæremidlerDto(
     val perioder: List<BeregningsresultatForPeriodeDto>,
     val tidligsteEndring: LocalDate? = null,
+    val beregningsplan: BeregningsplanDto? = null,
 )
 
 data class BeregningsresultatForPeriodeDto(
@@ -46,7 +48,10 @@ data class BeregningsresultatForPeriodeDto(
             this.påfølgesAv(nestePeriode)
 }
 
-fun BeregningsresultatLæremidler.tilDto(tidligsteEndring: LocalDate?): BeregningsresultatLæremidlerDto {
+fun BeregningsresultatLæremidler.tilDto(
+    tidligsteEndring: LocalDate?,
+    beregningsplan: BeregningsplanDto? = null,
+): BeregningsresultatLæremidlerDto {
     val perioderDto =
         this
             .filtrerFraOgMed(tidligsteEndring)
@@ -60,6 +65,7 @@ fun BeregningsresultatLæremidler.tilDto(tidligsteEndring: LocalDate?): Beregnin
                     merge = { v1, v2 -> v1.slåSammen(v2) },
                 ),
         tidligsteEndring = tidligsteEndring,
+        beregningsplan = beregningsplan,
     )
 }
 

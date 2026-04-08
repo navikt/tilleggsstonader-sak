@@ -7,7 +7,9 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsårsak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.innvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagBeregningsresultatMåned
@@ -122,8 +124,7 @@ class BoutgifterBeregningLøpendeUtgifterToBoliger {
                 .beregn(
                     behandling = saksbehandling(),
                     vedtaksperioder = vedtaksperioderFørstegangsbehandling,
-                    typeVedtak = TypeVedtak.INNVILGELSE,
-                    tidligsteEndring = null,
+                    plan = BeregningPlan(Beregningsomfang.ALLE_PERIODER, Beregningsårsak.FØRSTEGANGS),
                 ).perioder
 
         assertThat(res).isEqualTo(beregningsresultatFørstegangsbehandlingLøpendeUtgifterToBoliger)
@@ -216,8 +217,7 @@ class BoutgifterBeregningLøpendeUtgifterToBoliger {
                 .beregn(
                     behandling = saksbehandling,
                     vedtaksperioder = vedtaksperioderRevurdering,
-                    typeVedtak = TypeVedtak.INNVILGELSE,
-                    tidligsteEndring = tidligsteEndring,
+                    plan = BeregningPlan(Beregningsomfang.FRA_DATO, Beregningsårsak.REVURDERING_MED_ENDRING, tidligsteEndring),
                 ).perioder
 
         assertThat(res.size).isEqualTo(4)

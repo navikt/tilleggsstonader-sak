@@ -7,7 +7,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
-import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.beregnStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.lagBeregningsgrunnlag
@@ -49,10 +50,18 @@ class BoutgifterBeregningService(
     fun beregn(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
-        typeVedtak: TypeVedtak,
-        tidligsteEndring: LocalDate?,
+        plan: BeregningPlan,
     ): BeregningsresultatBoutgifter {
         val forrigeVedtak = hentForrigeVedtak(behandling)
+
+        if (plan.omfang == Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT) {
+            return requireNotNull(forrigeVedtak) {
+                "Kan ikke gjenbruke forrige beregningsresultat uten forrige iverksatt vedtak"
+            }.beregningsresultat
+        }
+
+        val typeVedtak = plan.tilTypeVedtak()
+        val tidligsteEndring = plan.beregnFra()
 
         vedtaksperiodeValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,
@@ -83,11 +92,8 @@ class BoutgifterBeregningService(
         val beregningsresultat = beregnAktuellePerioder(vedtaksperioderBeregning, utgifterPerVilkårtype)
 
         return if (forrigeVedtak != null) {
-            brukerfeilHvis(tidligsteEndring == null) {
-                "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
-            }
             settSammenGamleOgNyePerioder(
-                tidligsteEndring = tidligsteEndring,
+                tidligsteEndring = requireNotNull(tidligsteEndring),
                 nyttBeregningsresultat = beregningsresultat,
                 forrigeBeregningsresultat = forrigeVedtak.beregningsresultat,
             )

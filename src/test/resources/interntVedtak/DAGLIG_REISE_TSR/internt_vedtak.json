@@ -238,7 +238,11 @@
           } ]
         } ]
       },
-      "tidligsteEndring" : null
+      "beregningsplan" : {
+        "omfang" : "ALLE_PERIODER",
+        "årsak" : "FØRSTEGANGS",
+        "fraDato" : null
+      }
     }
   },
   "rammevedtakPrivatBil" : {

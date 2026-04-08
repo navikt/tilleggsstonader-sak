@@ -3,6 +3,9 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsårsak
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
@@ -44,6 +47,7 @@ object LæremidlerTestUtil {
         InnvilgelseLæremidler(
             vedtaksperioder = defaultVedtaksperioder,
             beregningsresultat = defaultBeregningsresultat,
+            beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER, Beregningsårsak.FØRSTEGANGS),
         )
 
     fun innvilgelse(data: InnvilgelseLæremidler = defaultInnvilgelseLæremidler) =
@@ -67,6 +71,7 @@ object LæremidlerTestUtil {
             InnvilgelseLæremidler(
                 vedtaksperioder = vedtaksperioder,
                 beregningsresultat = beregningsresultat,
+                beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER, Beregningsårsak.FØRSTEGANGS),
             ),
         gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = null,
@@ -106,6 +111,7 @@ object LæremidlerTestUtil {
                 beregningsresultat = beregningsresultat,
                 årsaker = årsaker,
                 begrunnelse = begrunnelse,
+                beregningsplan = BeregningPlan(Beregningsomfang.FRA_DATO, Beregningsårsak.OPPHØR, opphørsdato),
             ),
         gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = null,

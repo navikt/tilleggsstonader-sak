@@ -5,6 +5,9 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
+import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsårsak
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
@@ -42,6 +45,7 @@ object DagligReiseTestUtil {
             vedtaksperioder = defaultVedtaksperioder,
             rammevedtakPrivatBil = null,
             beregningsresultat = defaultBeregningsresultat,
+            beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER, Beregningsårsak.FØRSTEGANGS),
         )
 
     fun innvilgelse(data: InnvilgelseDagligReise = defaultInnvilgelseDagligReise) =
@@ -66,6 +70,7 @@ object DagligReiseTestUtil {
                 vedtaksperioder = vedtaksperioder,
                 beregningsresultat = beregningsresultat,
                 rammevedtakPrivatBil = null,
+                beregningsplan = BeregningPlan(Beregningsomfang.ALLE_PERIODER, Beregningsårsak.FØRSTEGANGS),
             ),
         gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = null,

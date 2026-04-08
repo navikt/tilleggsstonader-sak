@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler.dto
 
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
+import no.nav.tilleggsstonader.sak.vedtak.dto.BeregningsplanDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import java.time.LocalDate
 
@@ -10,6 +11,7 @@ data class OpphørLæremidlerResponse(
     val årsakerOpphør: List<ÅrsakOpphør>,
     val begrunnelse: String,
     val opphørsdato: LocalDate?,
+    val beregningsplan: BeregningsplanDto? = null,
 ) : VedtakLæremidlerDto(TypeVedtak.OPPHØR),
     VedtakLæremidlerResponse
 

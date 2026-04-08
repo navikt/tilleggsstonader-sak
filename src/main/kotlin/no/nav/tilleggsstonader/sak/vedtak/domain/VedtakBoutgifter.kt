@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
+import no.nav.tilleggsstonader.sak.vedtak.BeregningPlan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -47,6 +48,7 @@ data class InnvilgelseBoutgifter(
     override val beregningsresultat: BeregningsresultatBoutgifter,
     override val vedtaksperioder: List<Vedtaksperiode>,
     val begrunnelse: String? = null,
+    val beregningsplan: BeregningPlan,
 ) : InnvilgelseEllerOpphørBoutgifter,
     Innvilgelse {
     override val type: TypeVedtaksdata = TypeVedtakBoutgifter.INNVILGELSE_BOUTGIFTER
@@ -69,6 +71,7 @@ data class OpphørBoutgifter(
     override val beregningsresultat: BeregningsresultatBoutgifter,
     override val årsaker: List<ÅrsakOpphør>,
     override val begrunnelse: String,
+    val beregningsplan: BeregningPlan,
 ) : InnvilgelseEllerOpphørBoutgifter,
     Opphør {
     override val type: TypeVedtaksdata = TypeVedtakBoutgifter.OPPHØR_BOUTGIFTER

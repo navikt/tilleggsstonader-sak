@@ -147,11 +147,15 @@ class VedtakDtoMapper(
     ): VedtakLæremidlerResponse =
         when (data) {
             is InnvilgelseLæremidler -> {
+                val beregningsplan = data.beregningsplan.tilDto()
                 InnvilgelseLæremidlerResponse(
                     vedtaksperioder =
                         data.vedtaksperioder
                             .tilLagretVedtaksperiodeDto(hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId)),
-                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
+                    beregningsresultat = data.beregningsresultat.tilDto(
+                        tidligsteEndring = tidligsteEndring,
+                        beregningsplan = beregningsplan,
+                    ),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,
@@ -172,6 +176,7 @@ class VedtakDtoMapper(
                         data.vedtaksperioder
                             .tilLagretVedtaksperiodeDto(hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId)),
                     opphørsdato = vedtak.opphørsdato,
+                    beregningsplan = data.beregningsplan.tilDto(),
                 )
         }
 
@@ -183,12 +188,16 @@ class VedtakDtoMapper(
     ): VedtakBoutgifterResponse =
         when (data) {
             is InnvilgelseBoutgifter -> {
+                val beregningsplan = data.beregningsplan.tilDto()
                 InnvilgelseBoutgifterResponse(
                     vedtaksperioder =
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
                         ),
-                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
+                    beregningsresultat = data.beregningsresultat.tilDto(
+                        tidligsteEndring = tidligsteEndring,
+                        beregningsplan = beregningsplan,
+                    ),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,
@@ -210,6 +219,7 @@ class VedtakDtoMapper(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
                         ),
                     opphørsdato = vedtak.opphørsdato,
+                    beregningsplan = data.beregningsplan.tilDto(),
                 )
         }
 
@@ -227,7 +237,7 @@ class VedtakDtoMapper(
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
                         ),
-                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring, vilkår),
+                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan, vilkår),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,
@@ -238,7 +248,7 @@ class VedtakDtoMapper(
             is AvslagDagligReise -> AvslagDagligReiseDto(årsakerAvslag = data.årsaker, begrunnelse = data.begrunnelse)
             is OpphørDagligReise ->
                 OpphørDagligReiseResponse(
-                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring, vilkår),
+                    beregningsresultat = data.beregningsresultat.tilDto(data.beregningsplan, vilkår),
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
                     vedtaksperioder =

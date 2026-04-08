@@ -4,12 +4,11 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
+import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
-import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.OpprettAndelerDagligReiseService
@@ -23,7 +22,7 @@ import java.time.LocalDate
 @Service
 class DagligReiseBeregnYtelseSteg(
     private val beregningService: DagligReiseBeregningService,
-    private val utledTidligsteEndringService: UtledTidligsteEndringService,
+    private val beregningsplanUtleder: BeregningsplanUtleder,
     private val opphørValideringService: OpphørValideringService,
     private val dagligReiseVedtakService: DagligReiseVedtakService,
     private val opprettAndelerDagligReiseService: OpprettAndelerDagligReiseService,
@@ -75,18 +74,12 @@ class DagligReiseBeregnYtelseSteg(
         vedtak: InnvilgelseDagligReiseRequest,
     ) {
         val vedtaksperioder = vedtak.vedtaksperioder()
-
-        val tidligsteEndring =
-            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
-                saksbehandling.id,
-                vedtaksperioder,
-            )
+        val plan = beregningsplanUtleder.utledForInnvilgelse(saksbehandling, vedtaksperioder)
         val (beregningsresultat, rammevedtakPrivatBil) =
             beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
-                typeVedtak = TypeVedtak.INNVILGELSE,
-                tidligsteEndring = tidligsteEndring,
+                plan = plan,
             )
         dagligReiseVedtakService.lagreInnvilgetVedtak(
             behandling = saksbehandling,
@@ -94,7 +87,7 @@ class DagligReiseBeregnYtelseSteg(
             rammevedtakPrivatBil = rammevedtakPrivatBil,
             vedtaksperioder = vedtaksperioder,
             begrunnelse = vedtak.begrunnelse,
-            tidligsteEndring = tidligsteEndring,
+            beregningsplan = plan,
         )
 
         opprettAndelerDagligReiseService.lagreAndelerForBehandling(saksbehandling)
@@ -122,12 +115,12 @@ class DagligReiseBeregnYtelseSteg(
 
         val avkortetVedtaksperioder = dagligReiseVedtakService.avkortVedtaksperiodeVedOpphør(forrigeVedtak, opphørsdato)
 
+        val beregningsplan = beregningsplanUtleder.utledForOpphør(opphørsdato)
         val (beregningsresultat, _) =
             beregningService.beregn(
                 vedtaksperioder = avkortetVedtaksperioder,
                 behandling = saksbehandling,
-                typeVedtak = TypeVedtak.OPPHØR,
-                tidligsteEndring = opphørsdato,
+                plan = beregningsplan,
             )
         opphørValideringService.validerIngenUtbetalingEtterOpphørsdatoDagligReise(
             beregningsresultat,
@@ -140,6 +133,7 @@ class DagligReiseBeregnYtelseSteg(
             rammevedtakPrivatBil = null, // TODO: Håndter rammevedtak i opphør
             avkortetVedtaksperioder = avkortetVedtaksperioder,
             vedtak = vedtak,
+            beregningsplan = beregningsplan,
         )
 
         opprettAndelerDagligReiseService.lagreAndelerForBehandling(saksbehandling)

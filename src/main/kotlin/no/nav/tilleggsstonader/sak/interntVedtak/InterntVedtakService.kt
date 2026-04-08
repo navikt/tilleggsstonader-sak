@@ -113,7 +113,7 @@ class InterntVedtakService(
                 is InnvilgelseDagligReise -> {
                     val vilkårDagligReise = vilkår.map { it.mapTilVilkårDagligReise() }
                     BeregningsresultatInterntVedtakDto(
-                        dagligReise = data.beregningsresultat.tilDto(vedtak.tidligsteEndring, vilkårDagligReise),
+                        dagligReise = data.beregningsresultat.tilDto(data.beregningsplan, vilkårDagligReise),
                     )
                 }
 

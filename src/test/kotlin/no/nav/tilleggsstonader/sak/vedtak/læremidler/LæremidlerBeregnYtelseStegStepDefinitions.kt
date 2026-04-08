@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepos
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
+import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -81,6 +82,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         mockk<UtledTidligsteEndringService> {
             every { utledTidligsteEndringForBeregning(any(), any()) } returns null
         }
+    val beregningsplanUtleder = BeregningsplanUtleder(utledTidligsteEndringService)
     val vilkårperiodeService =
         mockk<VilkårperiodeService>().apply {
             val mock = this
@@ -115,7 +117,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             vedtakRepository = vedtakRepository,
             tilkjentYtelseService = TilkjentYtelseService(tilkjentYtelseRepository),
             simuleringService = simuleringService,
-            utledTidligsteEndringService = utledTidligsteEndringService,
+            beregningsplanUtleder = beregningsplanUtleder,
         )
     val vedtaksperiodeId: UUID = UUID.randomUUID()
 
