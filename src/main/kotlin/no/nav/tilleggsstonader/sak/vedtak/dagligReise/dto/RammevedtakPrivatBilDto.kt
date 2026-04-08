@@ -36,7 +36,6 @@ fun RammevedtakPrivatBil.tilDto() =
         reiser = reiser.map { it.tilDto() },
     )
 
-// TODO: Flytt splitting til beregning dersom vi vil beholde det
 fun RammeForReiseMedPrivatBil.tilDto(): RammeForReiseMedPrivatBilDto =
     RammeForReiseMedPrivatBilDto(
         reiseId = reiseId,

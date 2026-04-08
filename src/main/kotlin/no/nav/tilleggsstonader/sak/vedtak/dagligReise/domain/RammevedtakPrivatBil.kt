@@ -38,7 +38,6 @@ data class RammeForReiseMedPrivatBilDelperiode(
     val dagsatsUtenParkering: BigDecimal, // hva brukeren kan få dekt per dag. Inkluderer bompenger og ferge, men ikke parkering.
 ) : Periode<LocalDate>
 
-// TODO: Finn ut om det finnes abbonnement på disse prisene og om det påvirker hvordan vi vil løse dette
 data class RammeForReiseMedPrivatEkstrakostnader(
     val bompengerPerDag: Int?,
     val fergekostnadPerDag: Int?,
