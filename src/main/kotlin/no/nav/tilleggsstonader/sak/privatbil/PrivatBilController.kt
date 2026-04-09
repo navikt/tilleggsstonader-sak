@@ -67,7 +67,8 @@ class PrivatBilController(
                                 kjørelister.firstOrNull {
                                     it.data.reiseId == reise.reiseId && it.inneholderUkenummer(uke.ukenummer) // TODO ogå skille på år
                                 }
-                            val avklartUke = avklarteUker.singleOrNull { it.ukenummer == uke.ukenummer }
+                            val avklartUke =
+                                avklarteUker.singleOrNull { it.reiseId == reise.reiseId && it.ukenummer == uke.ukenummer }
                             lagUke(uke = uke, datoer = datoer, kjørelisteForUke = kjørelisteForUke, avklartUke = avklartUke)
                         },
                 // TODO: Håndter at rammen kan ha flere satser og blir delt opp i flere
