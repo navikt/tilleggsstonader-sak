@@ -1,10 +1,10 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.dto
 
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.dto.BeregningsplanDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.beregningsresultatForPeriodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.dto.BeregningsplanDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
