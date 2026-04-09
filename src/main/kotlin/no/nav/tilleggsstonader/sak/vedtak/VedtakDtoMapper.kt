@@ -98,28 +98,24 @@ class VedtakDtoMapper(
         forrigeIverksatteBehandlingId: BehandlingId?,
     ): VedtakTilsynBarnResponse =
         when (data) {
-            is InnvilgelseTilsynBarn -> {
-                val beregningsplan = data.beregningsplan.tilDto()
+            is InnvilgelseTilsynBarn ->
                 InnvilgelseTilsynBarnResponse(
-                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = beregningsplan),
+                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan.tilDto()),
                     vedtaksperioder =
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
                         ),
                     begrunnelse = data.begrunnelse,
                 )
-            }
 
-            is OpphørTilsynBarn -> {
-                val beregningsplan = data.beregningsplan.tilDto()
+            is OpphørTilsynBarn ->
                 OpphørTilsynBarnResponse(
-                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = beregningsplan),
+                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan.tilDto()),
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
                     vedtaksperioder = data.vedtaksperioder.tilLagretVedtaksperiodeDto(null),
                     opphørsdato = vedtak.opphørsdato,
                 )
-            }
 
             is AvslagTilsynBarn ->
                 AvslagTilsynBarnDto(
@@ -135,19 +131,17 @@ class VedtakDtoMapper(
         forrigeIverksatteBehandlingId: BehandlingId?,
     ): VedtakLæremidlerResponse =
         when (data) {
-            is InnvilgelseLæremidler -> {
-                val beregningsplan = data.beregningsplan.tilDto()
+            is InnvilgelseLæremidler ->
                 InnvilgelseLæremidlerResponse(
                     vedtaksperioder =
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
                         ),
-                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = beregningsplan),
+                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan.tilDto()),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,
                 )
-            }
 
             is AvslagLæremidler ->
                 AvslagLæremidlerDto(

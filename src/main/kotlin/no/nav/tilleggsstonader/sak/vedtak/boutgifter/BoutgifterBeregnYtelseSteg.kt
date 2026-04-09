@@ -131,7 +131,7 @@ class BoutgifterBeregnYtelseSteg(
 
         val avkortedeVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, opphørsdato)
 
-        val beregningsplan = beregningsplanUtleder.utledForOpphør(opphørsdato)
+        val beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, opphørsdato)
         val beregningsresultat =
             beregningService.beregn(
                 saksbehandling,

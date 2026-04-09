@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class BeregningsplanUtleder(
@@ -28,6 +27,4 @@ class BeregningsplanUtleder(
             Beregningsplan(omfang = Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT)
         }
     }
-
-    fun utledForOpphør(opphørsdato: LocalDate): Beregningsplan = Beregningsplan(omfang = Beregningsomfang.FRA_DATO, fraDato = opphørsdato)
 }
