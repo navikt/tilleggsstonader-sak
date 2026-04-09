@@ -167,7 +167,7 @@ class PrivatBilBeregningStepDefinitions {
     fun `vi forventer følgende delperioder for rammevedtak`(dataTable: DataTable) {
         val forventedeDelperioderPerReise = mapDelperiodeCucumber(dataTable).groupBy { it.reiseNr }
         forventedeDelperioderPerReise.forEach { (reiseNr, delperioderForReise) ->
-            val delPerioderIRammevedtak = rammevedtak!!.reiser[reiseNr - 1].grunnlag.delPerioder
+            val delPerioderIRammevedtak = rammevedtak!!.reiser[reiseNr - 1].grunnlag.delperioder
             assertThat(delPerioderIRammevedtak).hasSameSizeAs(delperioderForReise)
             delperioderForReise.forEachIndexed { index, forventetSats ->
                 val delperiode = delPerioderIRammevedtak[index]
@@ -182,7 +182,7 @@ class PrivatBilBeregningStepDefinitions {
     fun `vi forventer følgende satser for delperioder`(dataTable: DataTable) {
         val forventedeSatsDelperioderPerReise = mapSatsDelperiodeCucumber(dataTable).groupBy { it.reiseNr }
         forventedeSatsDelperioderPerReise.forEach { (reiseNr, forventedeDelperiodeSatserForReise) ->
-            val delperioderIRammevedtak = rammevedtak!!.reiser[reiseNr - 1].grunnlag.delPerioder
+            val delperioderIRammevedtak = rammevedtak!!.reiser[reiseNr - 1].grunnlag.delperioder
 
             val satserForDelperiode: Map<Int, List<SatsDelperiodeCucumber>> = forventedeDelperiodeSatserForReise.groupBy { it.delperiodeNr }
             satserForDelperiode.forEach { (delperiodeNr, forventedeSatserForDelperiode) ->

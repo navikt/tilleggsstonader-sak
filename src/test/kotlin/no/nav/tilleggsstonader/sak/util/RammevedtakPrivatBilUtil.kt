@@ -33,7 +33,7 @@ object RammevedtakPrivatBilUtil {
                 RammeForReiseMedPrivatBilBeregningsgrunnlag(
                     fom = fom,
                     tom = tom,
-                    delPerioder =
+                    delperioder =
                         delperioder ?: listOf(
                             RammeForReiseMedPrivatBilDelperiode(
                                 fom = fom,

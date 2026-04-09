@@ -22,18 +22,18 @@ data class RammeForReiseMedPrivatBil(
 data class RammeForReiseMedPrivatBilBeregningsgrunnlag(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val delPerioder: List<RammeForReiseMedPrivatBilDelperiode>,
+    val delperioder: List<RammeForReiseMedPrivatBilDelperiode>,
     val reiseavstandEnVei: BigDecimal,
     val vedtaksperioder: List<Vedtaksperiode>,
 ) : Periode<LocalDate> {
     init {
-        require(fom == delPerioder.minOf { it.fom }) {
-            "fom på rammevedtaket $fom er ulikt tidligste fom på delperioder ${delPerioder.minOf { it.fom }}"
+        require(fom == delperioder.minOf { it.fom }) {
+            "fom på rammevedtaket $fom er ulikt tidligste fom på delperioder ${delperioder.minOf { it.fom }}"
         }
-        require(tom == delPerioder.maxOf { it.tom }) {
-            "tom på rammevedtaket $tom er ulikt største tom på delperioder ${delPerioder.maxOf { it.tom }}"
+        require(tom == delperioder.maxOf { it.tom }) {
+            "tom på rammevedtaket $tom er ulikt største tom på delperioder ${delperioder.maxOf { it.tom }}"
         }
-        require(delPerioder.allePerioderErSammenhengende()) {
+        require(delperioder.allePerioderErSammenhengende()) {
             "Alle delperioder må være sammenhengende"
         }
     }

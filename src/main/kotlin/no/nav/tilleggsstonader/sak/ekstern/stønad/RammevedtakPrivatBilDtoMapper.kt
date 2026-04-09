@@ -18,7 +18,7 @@ fun RammevedtakPrivatBil.tilDto(kjørelister: Map<ReiseId, List<Kjøreliste>>): 
             fom = reise.grunnlag.fom,
             tom = reise.grunnlag.tom,
             reisedagerPerUke =
-                reise.grunnlag.delPerioder
+                reise.grunnlag.delperioder
                     .first()
                     .reisedagerPerUke,
             // TODO - vise delperioder ut i front-end

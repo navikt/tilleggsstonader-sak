@@ -41,7 +41,7 @@ class PrivatBilBeregningsresultatService {
     ): BeregningsresultatForReisePrivatBil {
         // Kaster feil om det finnes godkjente dager utenfor rammevedtak
         validerDagerErInnenforRammevedtak(rammeForReise, avklarteUkerForReise)
-        val delperioder = rammeForReise.grunnlag.delPerioder
+        val delperioder = rammeForReise.grunnlag.delperioder
 
         return BeregningsresultatForReisePrivatBil(
             reiseId = rammeForReise.reiseId,

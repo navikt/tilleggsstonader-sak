@@ -47,7 +47,7 @@ fun RammeForReiseMedPrivatBil.tilDto(): RammeForReiseMedPrivatBilDto =
         fom = grunnlag.fom,
         tom = grunnlag.tom,
         delperioder =
-            grunnlag.delPerioder.map { delperiode ->
+            grunnlag.delperioder.map { delperiode ->
                 DelperiodeDto(
                     fom = delperiode.fom,
                     tom = delperiode.tom,

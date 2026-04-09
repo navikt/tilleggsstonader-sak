@@ -140,7 +140,7 @@ class PrivatBilBeregningService(
         return RammeForReiseMedPrivatBilBeregningsgrunnlag(
             fom = reise.fom,
             tom = reise.tom,
-            delPerioder = delperioder.sortedBy { it.fom },
+            delperioder = delperioder.sortedBy { it.fom },
             reiseavstandEnVei = reise.reiseavstandEnVei,
             vedtaksperioder = vedtaksperioder,
         )
