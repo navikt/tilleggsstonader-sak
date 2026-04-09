@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.april
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.IntegrationTest
@@ -123,25 +124,30 @@ class InnvilgePrivatBilIntegrationTest : IntegrationTest() {
     fun `skal lagre og hente fakta med to perioder for privat bil`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
+        val fomDelperiode1 = 6 april 2026
+        val tomDelperiode1 = 12 april 2026
+        val fomDelperiode2 = 13 april 2026
+        val tomDelperiode2 = 19 april 2026
+
         val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
                 defaultDagligReisePrivatBilTsoTestdata(
-                    fom,
-                    tom,
+                    fomDelperiode1,
+                    tomDelperiode2,
                     delperioder =
                         listOf(
                             FaktaDelperiodePrivatBilDto(
-                                fom = fom,
-                                tom = tom,
+                                fom = fomDelperiode1,
+                                tom = tomDelperiode1,
                                 reisedagerPerUke = 5,
                                 bompengerPerDag = null,
                                 fergekostnadPerDag = null,
                             ),
                             FaktaDelperiodePrivatBilDto(
-                                fom = fom,
-                                tom = tom,
+                                fom = fomDelperiode2,
+                                tom = tomDelperiode2,
                                 reisedagerPerUke = 2,
                                 bompengerPerDag = 100,
                                 fergekostnadPerDag = 50,
@@ -159,14 +165,14 @@ class InnvilgePrivatBilIntegrationTest : IntegrationTest() {
         assertThat(fakta.reiseId).isNotNull
         assertThat(fakta.reiseavstandEnVei).isEqualTo(BigDecimal(10))
         assertThat(fakta.faktaDelperioder).hasSize(2)
-        assertThat(fakta.faktaDelperioder[0].fom).isEqualTo(fom)
-        assertThat(fakta.faktaDelperioder[0].tom).isEqualTo(tom)
+        assertThat(fakta.faktaDelperioder[0].fom).isEqualTo(fomDelperiode1)
+        assertThat(fakta.faktaDelperioder[0].tom).isEqualTo(tomDelperiode1)
         assertThat(fakta.faktaDelperioder[0].reisedagerPerUke).isEqualTo(5)
         assertThat(fakta.faktaDelperioder[0].bompengerPerDag).isNull()
         assertThat(fakta.faktaDelperioder[0].fergekostnadPerDag).isNull()
 
-        assertThat(fakta.faktaDelperioder[1].fom).isEqualTo(fom)
-        assertThat(fakta.faktaDelperioder[1].tom).isEqualTo(tom)
+        assertThat(fakta.faktaDelperioder[1].fom).isEqualTo(fomDelperiode2)
+        assertThat(fakta.faktaDelperioder[1].tom).isEqualTo(tomDelperiode2)
         assertThat(fakta.faktaDelperioder[1].reisedagerPerUke).isEqualTo(2)
         assertThat(fakta.faktaDelperioder[1].bompengerPerDag).isEqualTo(100)
         assertThat(fakta.faktaDelperioder[1].fergekostnadPerDag).isEqualTo(50)
