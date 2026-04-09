@@ -152,7 +152,7 @@ interface BehandlingRepository :
     // language=PostgreSQL
     @Query(
         """
-        SELECT b.id behandling_id, be.id ekstern_behandling_id, fe.id ekstern_fagsak_id
+        SELECT b.id, behandling_id, be.id ekstern_behandling_id, fe.id ekstern_fagsak_id
         FROM behandling b
             JOIN behandling_ekstern be ON b.id = be.behandling_id
             JOIN fagsak_ekstern fe ON b.fagsak_id = fe.fagsak_id 
@@ -160,21 +160,6 @@ interface BehandlingRepository :
         """,
     )
     fun finnEksterneIder(behandlingId: Set<BehandlingId>): Set<EksternId>
-
-    // language=PostgreSQL
-    @Query(
-        """
-        SELECT pi.ident AS first, gib.id AS second 
-        FROM gjeldende_iverksatte_behandlinger gib 
-            JOIN person_ident pi ON gib.fagsak_person_id=pi.fagsak_person_id
-        WHERE pi.ident IN (:personidenter)
-            AND gib.stonadstype=:stønadstype
-    """,
-    )
-    fun finnSisteIverksatteBehandlingerForPersonIdenter(
-        personidenter: Collection<String>,
-        stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
-    ): List<Pair<String, BehandlingId>>
 
     @Query(
         """
@@ -188,11 +173,6 @@ interface BehandlingRepository :
         stønadstyper: List<Stønadstype>,
     ): List<BehandlingId>
 
-    fun findAllByStatusAndResultatIn(
-        status: BehandlingStatus,
-        resultat: List<BehandlingResultat>,
-    ): List<Behandling>
-
     @Query(
         """
             SELECT b.*
@@ -200,7 +180,7 @@ interface BehandlingRepository :
             WHERE b.stonadstype = :stønadstype
         """,
     )
-    fun finnGjeldendeIverksatteBehandlinger(stønadstype: Stønadstype = Stønadstype.BARNETILSYN): List<Behandling>
+    fun finnGjeldendeIverksatteBehandlinger(stønadstype: Stønadstype): List<Behandling>
 
     @Query(
         """
@@ -209,7 +189,7 @@ interface BehandlingRepository :
             WHERE b.stonadstype = :stønadstype
         """,
     )
-    fun antallGjeldendeIverksatteBehandlinger(stønadstype: Stønadstype = Stønadstype.BARNETILSYN): Int
+    fun antallGjeldendeIverksatteBehandlinger(stønadstype: Stønadstype): Int
 
     @Query(
         """
@@ -224,17 +204,11 @@ interface BehandlingRepository :
 
     @Query(
         """
-            with siste_oppgave_per_behandling as (
-                select *, row_number() over (partition by behandling_id order by opprettet_tid desc) as rn from oppgave
-                )
-            select b.id from behandling b join siste_oppgave_per_behandling o on b.id = o.behandling_id
-            where b.status not in (:behandlingsstatuserHvorOppgaveIkkeSkalFinnes)
-              and o.rn = 1
-              and (o.status = 'FERDIGSTILT' or o.tildelt_enhetsnummer not in (:gyldigeEnheterForOppgave))            
+            select b.id from behandling b
+                                 left join oppgave o on o.behandling_id = b.id and o.status = 'ÅPEN'
+            where b.status not in ('IVERKSETTER_VEDTAK', 'FERDIGSTILT')
+            group by b.id having count(o) = 0;
         """,
     )
-    fun finnÅpneBehandlingerUtenOppgaveMedStatusOgTildeltEnhetsnummer(
-        behandlingsstatuserHvorOppgaveIkkeSkalFinnes: Collection<BehandlingStatus>,
-        gyldigeEnheterForOppgave: Collection<String>,
-    ): List<BehandlingId>
+    fun finnBehandlingerUtenÅpenOppgave(): List<BehandlingId>
 }

@@ -9,6 +9,7 @@ data class SimuleringDto(
     val perioder: List<OppsummeringForPeriodeDto>?,
     val ingenEndringIUtbetaling: Boolean,
     val oppsummering: SimuleringOppsummering?,
+    val varsel: String? = null,
 )
 
 data class SimuleringOppsummering(

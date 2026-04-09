@@ -87,7 +87,8 @@ class HåndterMottattKjørelisteService(
                                 KjørelisteDag(
                                     dato = reisedag.dato.verdi,
                                     harKjørt = reisedag.harKjørt,
-                                    parkeringsutgift = reisedag.parkeringsutgift.verdi?.toInt(),
+                                    // TODO: Hindre dette i søknaden fremfor her slik at det aldri kommer inn
+                                    parkeringsutgift = if (reisedag.harKjørt) reisedag.parkeringsutgift.verdi?.toInt() else null,
                                 )
                             }
                     },
