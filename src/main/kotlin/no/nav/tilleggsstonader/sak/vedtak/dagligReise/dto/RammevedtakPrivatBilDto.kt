@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import java.math.BigDecimal
@@ -26,10 +27,14 @@ data class DelperiodeDto(
     val reisedagerPerUke: Int,
     val bompengerPerDag: Int?,
     val fergekostnadPerDag: Int?,
+    val satser: List<RammeForReiseMedPrivatBilDelperiodeSatserDto>,
+) : Periode<LocalDate>
+
+data class RammeForReiseMedPrivatBilDelperiodeSatserDto(
     val satsBekreftetVedVedtakstidspunkt: Boolean,
     val kilometersats: BigDecimal,
-    val dagsatsUtenParkering: BigDecimal, // hva brukeren kan få dekt per dag. Inkluderer bompenger og ferge, men ikke parkering.
-) : Periode<LocalDate>
+    val dagsatsUtenParkering: BigDecimal,
+)
 
 fun RammevedtakPrivatBil.tilDto() =
     RammevedtakPrivatBilDto(
@@ -49,11 +54,16 @@ fun RammeForReiseMedPrivatBil.tilDto(): RammeForReiseMedPrivatBilDto =
                     bompengerPerDag = delperiode.ekstrakostnader.bompengerPerDag,
                     fergekostnadPerDag = delperiode.ekstrakostnader.fergekostnadPerDag,
                     reisedagerPerUke = delperiode.reisedagerPerUke,
-                    satsBekreftetVedVedtakstidspunkt = delperiode.satsBekreftetVedVedtakstidspunkt,
-                    kilometersats = delperiode.kilometersats,
-                    dagsatsUtenParkering = delperiode.dagsatsUtenParkering,
+                    satser = delperiode.satser.map { it.tilDto() },
                 )
             },
         reiseavstandEnVei = grunnlag.reiseavstandEnVei,
         aktivitetsadresse = aktivitetsadresse,
+    )
+
+fun RammeForReiseMedPrivatBilSatsForDelperiode.tilDto() =
+    RammeForReiseMedPrivatBilDelperiodeSatserDto(
+        satsBekreftetVedVedtakstidspunkt = satsBekreftetVedVedtakstidspunkt,
+        kilometersats = kilometersats,
+        dagsatsUtenParkering = dagsatsUtenParkering,
     )

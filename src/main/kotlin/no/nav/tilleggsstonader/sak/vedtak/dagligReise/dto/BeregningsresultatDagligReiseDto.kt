@@ -71,13 +71,13 @@ data class BeregningsresultatForPeriodePrivatBilDto(
 
 data class BeregningsresultatForReisePrivatBilGrunnlagDto(
     val dager: List<BeregningsresultatForReisePrivatBilDagDto>,
-    val dagsatsUtenParkering: BigDecimal,
 )
 
 data class BeregningsresultatForReisePrivatBilDagDto(
     val dato: LocalDate,
     val parkeringskostnad: Int,
     val stønadsbeløpForDag: BigDecimal,
+    val dagsatsUtenParkering: BigDecimal,
 )
 
 fun BeregningDagligReise.tilDto(
@@ -154,9 +154,9 @@ fun BeregningsresultatForReisePrivatBilPeriode.tilDto(): BeregningsresultatForPe
                             dato = it.dato,
                             parkeringskostnad = it.parkeringskostnad,
                             stønadsbeløpForDag = it.stønadsbeløpForDag,
+                            dagsatsUtenParkering = it.dagsatsUtenParkering,
                         )
                     },
-                dagsatsUtenParkering = grunnlag.dagsatsUtenParkering,
             ),
         stønadsbeløp = stønadsbeløp,
         brukersNavKontor = brukersNavKontor,

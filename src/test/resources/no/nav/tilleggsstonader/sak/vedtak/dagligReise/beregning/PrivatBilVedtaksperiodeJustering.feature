@@ -24,8 +24,12 @@ Egenskap: Beregning av privat bil og vedtaksperioder
         | 1       | 12.01.2026 | 15.01.2026 | 10           |
 
       Og vi forventer følgende delperioder for rammevedtak
-        | Reisenr | Fom        | Tom        | Dagsats uten parkering | Kilometersats | Sats bekreftet | Antall reisedager per uke |
-        | 1       | 12.01.2026 | 15.01.2026 | 58.80                  | 2.94          | Ja             | 5                         |
+        | Reisenr | Fom        | Tom        | Antall reisedager per uke |
+        | 1       | 12.01.2026 | 15.01.2026 | 5                         |
+
+      Og vi forventer følgende satser for delperioder
+        | Reisenr | DelperiodeNr | Fom        | Tom        | Dagsats uten parkering | Kilometersats | Sats bekreftet |
+        | 1       | 1            | 12.01.2026 | 15.01.2026 | 58.80                  | 2.94          | Ja             |
 
     Scenario: reisen er kortere enn vedtaksperioden
       Gitt følgende vedtaksperioder for daglig reise privat bil
@@ -33,8 +37,8 @@ Egenskap: Beregning av privat bil og vedtaksperioder
         | 01.01.2026 | 31.01.2026 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
       Gitt følgende vilkår for daglig reise med privat bil
-        | Reisenr | Fom        | Tom         | Reiseavstand |
-        | 1       | 12.01.2026 | 15.01.2026  | 10           |
+        | Reisenr | Fom        | Tom        | Reiseavstand |
+        | 1       | 12.01.2026 | 15.01.2026 | 10           |
 
       Gitt følgende delperioder for vilkår daglig reise med privat bil
         | Reisenr | Fom        | Tom        | Antall reisedager per uke |

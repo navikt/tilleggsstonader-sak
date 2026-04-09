@@ -23,8 +23,12 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
       | 1       | 06.01.2025 | 19.01.2025 | 10           |
 
     Og vi forventer følgende delperioder for rammevedtak
-      | Reisenr | Fom        | Tom        | Dagsats uten parkering | Kilometersats | Sats bekreftet | Antall reisedager per uke |
-      | 1       | 06.01.2025 | 19.01.2025 | 57.60                  | 2.88          | Ja             | 5                         |
+      | Reisenr | DelperiodeNr | Fom        | Tom        | Antall reisedager per uke |
+      | 1       | 1            | 06.01.2025 | 19.01.2025 | 5                         |
+
+    Og vi forventer følgende satser for delperioder
+      | Reisenr | DelperiodeNr | Fom        | Tom        | Dagsats uten parkering | Kilometersats | Sats bekreftet |
+      | 1       | 1            | 06.01.2025 | 19.01.2025 | 57.60                  | 2.88          | Ja             |
 
   Scenario: to reiser med bompenger og fergekostnader
     Gitt følgende vedtaksperioder for daglig reise privat bil
@@ -32,14 +36,14 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
       | 01.01.2026 | 31.01.2026 | NEDSATT_ARBEIDSEVNE | TILTAK    |
 
     Gitt følgende vilkår for daglig reise med privat bil
-      | Reisenr | Fom        | Tom        |  Reiseavstand |
-      | 1        | 01.01.2026 | 18.01.2026 |  10           |
-      | 2        | 11.01.2026 | 31.01.2026 | 8            |
+      | Reisenr | Fom        | Tom        | Reiseavstand |
+      | 1       | 01.01.2026 | 18.01.2026 | 10           |
+      | 2       | 11.01.2026 | 31.01.2026 | 8            |
 
     Gitt følgende delperioder for vilkår daglig reise med privat bil
       | Reisenr | Fom        | Tom        | Bompenger | Fergekostnad | Antall reisedager per uke |
-      | 1        | 01.01.2026 | 18.01.2026 | 50        | 80           | 5                         |
-      | 2        | 11.01.2026 | 31.01.2026 | 60        | 80           | 4                         |
+      | 1       | 01.01.2026 | 18.01.2026 | 50        | 80           | 5                         |
+      | 2       | 11.01.2026 | 31.01.2026 | 60        | 80           | 4                         |
 
     Når beregner for daglig reise privat bil
 
@@ -49,9 +53,14 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
       | 2       | 11.01.2026 | 31.01.2026 | 8            |
 
     Og vi forventer følgende delperioder for rammevedtak
-      | Reisenr | Fom        | Tom        | Dagsats uten parkering | Kilometersats | Sats bekreftet | Antall reisedager per uke |
-      | 1       | 01.01.2026 | 18.01.2026 | 188.80                 | 2.94          | Ja             | 5                          |
-      | 2       | 11.01.2026 | 31.01.2026 | 187.04                  | 2.94          | Ja            | 4                         |
+      | Reisenr | Fom        | Tom        | Antall reisedager per uke |
+      | 1       | 01.01.2026 | 18.01.2026 | 5                         |
+      | 2       | 11.01.2026 | 31.01.2026 | 4                         |
+
+    Og vi forventer følgende satser for delperioder
+      | Reisenr | DelperiodeNr | Fom        | Tom        | Dagsats uten parkering | Kilometersats | Sats bekreftet |
+      | 1       | 1            | 01.01.2026 | 18.01.2026 | 188.80                 | 2.94          | Ja             |
+      | 2       | 1            | 11.01.2026 | 31.01.2026 | 187.04                 | 2.94          | Ja             |
 
   Scenario: skal ikke få høyere sum dersom ekstrakostnader er 0 (ikke null)
     Gitt følgende vedtaksperioder for daglig reise privat bil
@@ -70,11 +79,16 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
 
     Så forventer vi rammevedtak for følgende periode
       | Reisenr | Fom        | Tom        | Reiseavstand |
-      | 1       | 06.01.2025 | 12.01.2025 | 10                         |
+      | 1       | 06.01.2025 | 12.01.2025 | 10           |
 
     Og vi forventer følgende delperioder for rammevedtak
-      | Reisenr | Fom        | Tom        | Dagsats uten parkering | Kilometersats | Sats bekreftet |Antall reisedager per uke |
-      | 1       | 06.01.2025 | 12.01.2025 | 57.60                  | 2.88          | Ja             |                         5 |
+      | Reisenr | Fom        | Tom        | Antall reisedager per uke |
+      | 1       | 06.01.2025 | 12.01.2025 | 5                         |
+
+    Og vi forventer følgende satser for delperioder
+      | Reisenr | DelperiodeNr | Fom        | Tom        | Dagsats uten parkering | Kilometersats | Sats bekreftet |
+      | 1       | 1            | 06.01.2025 | 12.01.2025 | 57.60                  | 2.88          | Ja             |
+
 
   Scenario: støtter ulike men sammenhengende vedtaksperioder innenfor reise
     Gitt følgende vedtaksperioder for daglig reise privat bil
@@ -141,9 +155,13 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
       | 1       | 01.12.2026 | 15.01.2027 | 10           |
 
     Og vi forventer følgende delperioder for rammevedtak
-      | Reisenr | Fom        | Tom        | Dagsats uten parkering | Kilometersats | Sats bekreftet | Antall reisedager per uke |
-      | 1       | 01.12.2026 | 31.12.2026 | 58.80                  | 2.94          | Ja             | 5                         |
-      | 1       | 01.01.2027 | 15.01.2027 | 58.80                  | 2.94          | Nei            | 5                         |
+      | Reisenr | Fom        | Tom        | Antall reisedager per uke |
+      | 1       | 01.12.2026 | 15.01.2027 | 5                         |
+
+    Og vi forventer følgende satser for delperioder
+      | Reisenr | DelperiodeNr | Fom        | Tom        | Dagsats uten parkering | Kilometersats | Sats bekreftet |
+      | 1       | 1            | 01.12.2026 | 31.12.2026 | 58.80                  | 2.94          | Ja             |
+      | 1       | 1            | 01.01.2027 | 15.01.2027 | 58.80                  | 2.94          | Nei            |
 
   Scenario: periode med flere delperioder og ulike satser
     Gitt følgende vedtaksperioder for daglig reise privat bil
@@ -168,10 +186,17 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
       | 1       | 01.12.2025 | 15.01.2027 | 10           |
 
     Og vi forventer følgende delperioder for rammevedtak
-      | Reisenr | Fom        | Tom        | Dagsats uten parkering | Kilometersats | Sats bekreftet | Antall reisedager per uke |
-      | 1       | 01.12.2025 | 21.12.2025 | 57.60                  | 2.88          | Ja             | 5                         |
-      | 1       | 22.12.2025 | 31.12.2025 | 57.60                  | 2.88          | Ja             | 2                         |
-      | 1       | 01.01.2026 | 04.01.2026 | 58.80                  | 2.94          | Ja             | 2                         |
-      | 1       | 05.01.2026 | 27.09.2026 | 58.80                  | 2.94          | Ja             | 5                         |
-      | 1       | 28.09.2026 | 31.12.2026 | 58.80                  | 2.94          | Ja             | 2                         |
-      | 1       | 01.01.2027 | 15.01.2027 | 58.80                  | 2.94          | Nei            | 2                         |
+      | Reisenr | Fom        | Tom        | Antall reisedager per uke |
+      | 1       | 01.12.2025 | 21.12.2025 | 5                         |
+      | 1       | 22.12.2025 | 04.01.2026 | 2                         |
+      | 1       | 05.01.2026 | 27.09.2026 | 5                         |
+      | 1       | 28.09.2026 | 15.01.2027 | 2                         |
+
+    Og vi forventer følgende satser for delperioder
+      | Reisenr | DelperiodeNr | Fom        | Tom        | Dagsats uten parkering | Kilometersats | Sats bekreftet |
+      | 1       | 1            | 01.12.2025 | 21.12.2025 | 57.60                  | 2.88          | Ja             |
+      | 1       | 2            | 22.12.2025 | 31.12.2025 | 57.60                  | 2.88          | Ja             |
+      | 1       | 2            | 01.01.2026 | 04.01.2026 | 58.80                  | 2.94          | Ja             |
+      | 1       | 3            | 05.01.2026 | 27.09.2026 | 58.80                  | 2.94          | Ja             |
+      | 1       | 4            | 28.09.2026 | 31.12.2026 | 58.80                  | 2.94          | Ja             |
+      | 1       | 4            | 01.01.2027 | 15.01.2027 | 58.80                  | 2.94          | Nei            |

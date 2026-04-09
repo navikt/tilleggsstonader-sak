@@ -46,9 +46,17 @@ data class RammeForReiseMedPrivatBilDelperiode(
     override val tom: LocalDate,
     val ekstrakostnader: RammeForReiseMedPrivatEkstrakostnader,
     val reisedagerPerUke: Int,
-    val satsBekreftetVedVedtakstidspunkt: Boolean,
+    val satser: List<RammeForReiseMedPrivatBilSatsForDelperiode>,
+) : Periode<LocalDate> {
+    fun finnSatsForDato(dato: LocalDate): RammeForReiseMedPrivatBilSatsForDelperiode = satser.single { it.inneholder(dato) }
+}
+
+data class RammeForReiseMedPrivatBilSatsForDelperiode(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
     val kilometersats: BigDecimal,
     val dagsatsUtenParkering: BigDecimal, // hva brukeren kan få dekt per dag. Inkluderer bompenger og ferge, men ikke parkering.
+    val satsBekreftetVedVedtakstidspunkt: Boolean,
 ) : Periode<LocalDate>
 
 data class RammeForReiseMedPrivatEkstrakostnader(

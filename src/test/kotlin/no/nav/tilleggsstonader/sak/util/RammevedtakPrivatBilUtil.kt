@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.util
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -39,9 +40,16 @@ object RammevedtakPrivatBilUtil {
                                 tom = tom,
                                 reisedagerPerUke = reisedagerPerUke,
                                 ekstrakostnader = ekstrakostnader,
-                                satsBekreftetVedVedtakstidspunkt = satsBekreftetVedVedtakstidspunkt,
-                                kilometersats = kilometersats,
-                                dagsatsUtenParkering = dagsatsUtenParkering,
+                                satser =
+                                    listOf(
+                                        RammeForReiseMedPrivatBilSatsForDelperiode(
+                                            fom = fom,
+                                            tom = tom,
+                                            satsBekreftetVedVedtakstidspunkt = satsBekreftetVedVedtakstidspunkt,
+                                            kilometersats = kilometersats,
+                                            dagsatsUtenParkering = dagsatsUtenParkering,
+                                        ),
+                                    ),
                             ),
                         ),
                     reiseavstandEnVei = reiseavstandEnVei,

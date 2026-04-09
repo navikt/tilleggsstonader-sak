@@ -553,11 +553,7 @@ class InterntVedtakServiceTest {
                     assertThat(faktiskDelperiode.tom).isEqualTo(forventetDelperiode.tom)
                     assertThat(faktiskDelperiode.reisedagerPerUke).isEqualTo(forventetDelperiode.reisedagerPerUke)
                     assertThat(faktiskDelperiode.ekstrakostnader).isEqualTo(forventetDelperiode.ekstrakostnader)
-                    assertThat(faktiskDelperiode.kilometersats).isEqualTo(forventetDelperiode.kilometersats)
-                    assertThat(faktiskDelperiode.dagsatsUtenParkering).isEqualTo(forventetDelperiode.dagsatsUtenParkering)
-                    assertThat(
-                        faktiskDelperiode.satsBekreftetVedVedtakstidspunkt,
-                    ).isEqualTo(forventetDelperiode.satsBekreftetVedVedtakstidspunkt)
+                    assertThat(faktiskDelperiode.satser).isEqualTo(forventetDelperiode.satser)
                 }
             }
         }

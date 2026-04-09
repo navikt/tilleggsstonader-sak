@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.util.KjørelisteUtil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
@@ -48,9 +49,16 @@ class PrivatBilBeregningsresultatServiceTest {
                         fergekostnadPerDag = null,
                     ),
                 reisedagerPerUke = 5,
-                satsBekreftetVedVedtakstidspunkt = true,
-                kilometersats = 2.94.toBigDecimal(),
-                dagsatsUtenParkering = 150.toBigDecimal(),
+                satser =
+                    listOf(
+                        RammeForReiseMedPrivatBilSatsForDelperiode(
+                            fom = fomRammevedtak,
+                            tom = tomRammevedtak,
+                            satsBekreftetVedVedtakstidspunkt = true,
+                            kilometersats = 2.94.toBigDecimal(),
+                            dagsatsUtenParkering = 150.toBigDecimal(),
+                        ),
+                    ),
             )
 
         val rammevedtakPrivatBil =
@@ -97,11 +105,16 @@ class PrivatBilBeregningsresultatServiceTest {
         val totaleParkeringsutgifter = reisedager.mapNotNull { it.parkeringsutgift }.sum().toBigDecimal()
         assertThat(
             beregningsresultatUke.stønadsbeløp,
-        ).isEqualTo(beregningsresultatUke.grunnlag.dagsatsUtenParkering * 3.toBigDecimal() + totaleParkeringsutgifter)
+        ).isEqualTo(
+            beregningsresultatUke.grunnlag.dager
+                .first()
+                .dagsatsUtenParkering * 3.toBigDecimal() + totaleParkeringsutgifter,
+        )
 
         assertThat(beregningsresultatUke.grunnlag.dager).hasSize(reisedager.size)
         beregningsresultatUke.grunnlag.dager.forEach { reisedag ->
             val reisedagFraKjøreliste = reisedager.single { it.dato == reisedag.dato }
+            assertThat(reisedagFraKjøreliste.parkeringsutgift).isEqualTo(reisedag.parkeringskostnad)
             assertThat(reisedagFraKjøreliste.parkeringsutgift).isEqualTo(reisedag.parkeringskostnad)
         }
     }
@@ -120,9 +133,16 @@ class PrivatBilBeregningsresultatServiceTest {
                         fergekostnadPerDag = null,
                     ),
                 reisedagerPerUke = 5,
-                satsBekreftetVedVedtakstidspunkt = true,
-                kilometersats = 2.94.toBigDecimal(),
-                dagsatsUtenParkering = 150.toBigDecimal(),
+                satser =
+                    listOf(
+                        RammeForReiseMedPrivatBilSatsForDelperiode(
+                            fom = fomRammevedtak,
+                            tom = tomRammevedtak,
+                            satsBekreftetVedVedtakstidspunkt = true,
+                            kilometersats = 2.94.toBigDecimal(),
+                            dagsatsUtenParkering = 150.toBigDecimal(),
+                        ),
+                    ),
             )
 
         val rammevedtakPrivatBil =
@@ -162,7 +182,13 @@ class PrivatBilBeregningsresultatServiceTest {
         val beregningsresultatUke = beregningsresultatForReise.perioder.single()
         assertThat(beregningsresultatUke.fom).isEqualTo(kjøreliste.data.fom)
         assertThat(beregningsresultatUke.tom).isEqualTo(kjøreliste.data.tom)
-        assertThat(beregningsresultatUke.stønadsbeløp).isEqualTo(beregningsresultatUke.grunnlag.dagsatsUtenParkering * 2.toBigDecimal())
+        assertThat(
+            beregningsresultatUke.stønadsbeløp,
+        ).isEqualTo(
+            beregningsresultatUke.grunnlag.dager
+                .first()
+                .dagsatsUtenParkering * 2.toBigDecimal(),
+        )
 
         assertThat(beregningsresultatUke.grunnlag.dager).hasSize(2).allMatch { it.parkeringskostnad == 0 }
     }
@@ -181,9 +207,16 @@ class PrivatBilBeregningsresultatServiceTest {
                         fergekostnadPerDag = null,
                     ),
                 reisedagerPerUke = 5,
-                satsBekreftetVedVedtakstidspunkt = true,
-                kilometersats = 2.94.toBigDecimal(),
-                dagsatsUtenParkering = 150.toBigDecimal(),
+                satser =
+                    listOf(
+                        RammeForReiseMedPrivatBilSatsForDelperiode(
+                            fom = fomRammevedtak,
+                            tom = 31 desember 2025,
+                            satsBekreftetVedVedtakstidspunkt = true,
+                            kilometersats = 2.94.toBigDecimal(),
+                            dagsatsUtenParkering = 150.toBigDecimal(),
+                        ),
+                    ),
             )
 
         val delperioder =
@@ -192,7 +225,14 @@ class PrivatBilBeregningsresultatServiceTest {
                 delperiode.copy(
                     fom = 1 januar 2026,
                     tom = tomRammevedtak,
-                    dagsatsUtenParkering = 175.toBigDecimal(),
+                    satser =
+                        listOf(
+                            delperiode.satser.single().copy(
+                                fom = 1 januar 2026,
+                                tom = tomRammevedtak,
+                                dagsatsUtenParkering = 175.toBigDecimal(),
+                            ),
+                        ),
                 ),
             )
 
@@ -231,11 +271,19 @@ class PrivatBilBeregningsresultatServiceTest {
         assertThat(beregningsresultatForReise.perioder).hasSize(2)
 
         val beregningsresultatUke1 = beregningsresultatForReise.perioder[0]
-        assertThat(beregningsresultatUke1.stønadsbeløp).isEqualTo(beregningsresultatUke1.grunnlag.dagsatsUtenParkering)
+        assertThat(beregningsresultatUke1.stønadsbeløp).isEqualTo(
+            beregningsresultatUke1.grunnlag.dager
+                .single()
+                .dagsatsUtenParkering,
+        )
         assertThat(beregningsresultatUke1.grunnlag.dager).hasSize(1)
 
         val beregningsresultatUke2 = beregningsresultatForReise.perioder[1]
-        assertThat(beregningsresultatUke2.stønadsbeløp).isEqualTo(beregningsresultatUke2.grunnlag.dagsatsUtenParkering)
+        assertThat(beregningsresultatUke2.stønadsbeløp).isEqualTo(
+            beregningsresultatUke2.grunnlag.dager
+                .single()
+                .dagsatsUtenParkering,
+        )
         assertThat(beregningsresultatUke2.grunnlag.dager).hasSize(1).allMatch { it.parkeringskostnad == 0 }
     }
 
@@ -252,10 +300,17 @@ class PrivatBilBeregningsresultatServiceTest {
                         bompengerPerDag = 40,
                         fergekostnadPerDag = null,
                     ),
+                satser =
+                    listOf(
+                        RammeForReiseMedPrivatBilSatsForDelperiode(
+                            fom = fomRammevedtak,
+                            tom = tomRammevedtak,
+                            satsBekreftetVedVedtakstidspunkt = true,
+                            kilometersats = 2.94.toBigDecimal(),
+                            dagsatsUtenParkering = 150.toBigDecimal(),
+                        ),
+                    ),
                 reisedagerPerUke = 5,
-                satsBekreftetVedVedtakstidspunkt = true,
-                kilometersats = 2.94.toBigDecimal(),
-                dagsatsUtenParkering = 150.toBigDecimal(),
             )
 
         val rammevedtakPrivatBil =
@@ -309,13 +364,21 @@ class PrivatBilBeregningsresultatServiceTest {
         val beregningsresultatUke1 = beregningsresultatForReise.perioder[0]
         assertThat(beregningsresultatUke1.fom).isEqualTo(kjøreliste1.data.fom)
         assertThat(beregningsresultatUke1.tom).isEqualTo(kjøreliste1.data.tom)
-        assertThat(beregningsresultatUke1.stønadsbeløp).isEqualTo(beregningsresultatUke1.grunnlag.dagsatsUtenParkering)
+        assertThat(beregningsresultatUke1.stønadsbeløp).isEqualTo(
+            beregningsresultatUke1.grunnlag.dager
+                .single()
+                .dagsatsUtenParkering,
+        )
         assertThat(beregningsresultatUke1.grunnlag.dager).hasSize(1).allMatch { it.parkeringskostnad == 0 }
 
         val beregningsresultatUke2 = beregningsresultatForReise.perioder[1]
         assertThat(beregningsresultatUke2.fom).isEqualTo(kjøreliste2.data.fom)
         assertThat(beregningsresultatUke2.tom).isEqualTo(kjøreliste2.data.tom)
-        assertThat(beregningsresultatUke2.stønadsbeløp).isEqualTo(beregningsresultatUke2.grunnlag.dagsatsUtenParkering)
+        assertThat(beregningsresultatUke2.stønadsbeløp).isEqualTo(
+            beregningsresultatUke2.grunnlag.dager
+                .single()
+                .dagsatsUtenParkering,
+        )
         assertThat(beregningsresultatUke2.grunnlag.dager).hasSize(1).allMatch { it.parkeringskostnad == 0 }
     }
 
@@ -352,10 +415,17 @@ class PrivatBilBeregningsresultatServiceTest {
                         bompengerPerDag = 40,
                         fergekostnadPerDag = null,
                     ),
+                satser =
+                    listOf(
+                        RammeForReiseMedPrivatBilSatsForDelperiode(
+                            fom = fomRammevedtak,
+                            tom = tomRammevedtak,
+                            satsBekreftetVedVedtakstidspunkt = true,
+                            kilometersats = 2.94.toBigDecimal(),
+                            dagsatsUtenParkering = 150.toBigDecimal(),
+                        ),
+                    ),
                 reisedagerPerUke = 5,
-                satsBekreftetVedVedtakstidspunkt = true,
-                kilometersats = 2.94.toBigDecimal(),
-                dagsatsUtenParkering = 150.toBigDecimal(),
             )
 
         val reiseId1 = ReiseId.random()
@@ -407,7 +477,7 @@ class PrivatBilBeregningsresultatServiceTest {
             val beregningsresultatUke1 = beregningsresultatForReise.perioder.single()
             assertThat(beregningsresultatUke1.fom).isEqualTo(fomRammevedtak)
             assertThat(beregningsresultatUke1.tom).isEqualTo(tomRammevedtak)
-            assertThat(beregningsresultatUke1.stønadsbeløp).isEqualTo(delperiode.dagsatsUtenParkering)
+            assertThat(beregningsresultatUke1.stønadsbeløp).isEqualTo(delperiode.satser.single().dagsatsUtenParkering)
             assertThat(beregningsresultatUke1.grunnlag.dager).hasSize(1).allMatch { it.parkeringskostnad == 0 }
         }
     }
@@ -426,10 +496,17 @@ class PrivatBilBeregningsresultatServiceTest {
                         bompengerPerDag = 40,
                         fergekostnadPerDag = null,
                     ),
+                satser =
+                    listOf(
+                        RammeForReiseMedPrivatBilSatsForDelperiode(
+                            fom = fomRammevedtak,
+                            tom = tomRammevedtak,
+                            satsBekreftetVedVedtakstidspunkt = true,
+                            kilometersats = 2.94.toBigDecimal(),
+                            dagsatsUtenParkering = 150.toBigDecimal(),
+                        ),
+                    ),
                 reisedagerPerUke = 5,
-                satsBekreftetVedVedtakstidspunkt = true,
-                kilometersats = 2.94.toBigDecimal(),
-                dagsatsUtenParkering = 150.toBigDecimal(),
             )
 
         val rammevedtakPrivatBil =
@@ -475,10 +552,17 @@ class PrivatBilBeregningsresultatServiceTest {
                         bompengerPerDag = 40,
                         fergekostnadPerDag = null,
                     ),
+                satser =
+                    listOf(
+                        RammeForReiseMedPrivatBilSatsForDelperiode(
+                            fom = fomRammevedtak,
+                            tom = tomRammevedtak,
+                            satsBekreftetVedVedtakstidspunkt = true,
+                            kilometersats = 2.94.toBigDecimal(),
+                            dagsatsUtenParkering = 150.toBigDecimal(),
+                        ),
+                    ),
                 reisedagerPerUke = 5,
-                satsBekreftetVedVedtakstidspunkt = true,
-                kilometersats = 2.94.toBigDecimal(),
-                dagsatsUtenParkering = 150.toBigDecimal(),
             )
 
         val rammevedtakPrivatBil =

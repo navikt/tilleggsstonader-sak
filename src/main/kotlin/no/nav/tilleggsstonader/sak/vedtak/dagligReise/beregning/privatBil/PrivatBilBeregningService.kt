@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomR
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -93,18 +94,36 @@ class PrivatBilBeregningService(
                 // Justerer delperioder i tilfelle rammevedtaket har blitt kortet ned mot vedtaksperioder
                 .beregnSnitt(listOf(Datoperiode(reise.fom, reise.tom)))
                 .map { it.first }
-                .beregnSnitt(satsDagligReisePrivatBilProvider.alleSatser)
-                .map { (delperiode, sats) ->
-                    val dagsatsUtenParkering =
-                        beregnDagsatsUtenParkering(
-                            reiseavstandEnVei = reise.reiseavstandEnVei,
-                            ekstrakostnader =
-                                RammeForReiseMedPrivatEkstrakostnader(
-                                    bompengerPerDag = delperiode.bompengerPerDag,
-                                    fergekostnadPerDag = delperiode.fergekostnadPerDag,
-                                ),
-                            kilometersats = sats.beløp,
-                        )
+                .map { delperiode ->
+                    val satser =
+                        satsDagligReisePrivatBilProvider
+                            .finnAlleSatserInnenforPeriode(delperiode)
+                            .map { sats ->
+                                val snitt =
+                                    delperiode.beregnSnitt(sats)
+                                        ?: error(
+                                            "Forventer at det skal finnes et snitt mellom delperiode ${delperiode.fom} - ${delperiode.tom} og sats ${sats.fom} - ${sats.tom}",
+                                        )
+                                val dagsatsUtenParkering =
+                                    beregnDagsatsUtenParkering(
+                                        reiseavstandEnVei = reise.reiseavstandEnVei,
+                                        ekstrakostnader =
+                                            RammeForReiseMedPrivatEkstrakostnader(
+                                                bompengerPerDag = delperiode.bompengerPerDag,
+                                                fergekostnadPerDag = delperiode.fergekostnadPerDag,
+                                            ),
+                                        kilometersats = sats.beløp,
+                                    )
+
+                                RammeForReiseMedPrivatBilSatsForDelperiode(
+                                    fom = snitt.fom,
+                                    tom = snitt.tom,
+                                    kilometersats = sats.beløp,
+                                    dagsatsUtenParkering = dagsatsUtenParkering,
+                                    satsBekreftetVedVedtakstidspunkt = sats.bekreftet,
+                                )
+                            }
+
                     RammeForReiseMedPrivatBilDelperiode(
                         fom = delperiode.fom,
                         tom = delperiode.tom,
@@ -114,9 +133,7 @@ class PrivatBilBeregningService(
                                 fergekostnadPerDag = delperiode.fergekostnadPerDag,
                             ),
                         reisedagerPerUke = delperiode.reisedagerPerUke,
-                        satsBekreftetVedVedtakstidspunkt = sats.bekreftet,
-                        kilometersats = sats.beløp,
-                        dagsatsUtenParkering = dagsatsUtenParkering,
+                        satser = satser.sorted(),
                     )
                 }
 

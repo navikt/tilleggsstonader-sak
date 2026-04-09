@@ -91,10 +91,12 @@ class PrivatBilBeregningsresultatService {
                         .filter { dag -> dag.godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.JA }
                         .map { dag ->
                             val parkeringsutgift = dag.parkeringsutgift ?: 0
+                            val dagsatsUtenParkering = delperiode.finnSatsForDato(dag.dato).dagsatsUtenParkering
                             BeregningsresultatForReisePrivatBilDag(
                                 dato = dag.dato,
                                 parkeringskostnad = parkeringsutgift,
-                                stønadsbeløpForDag = delperiode.dagsatsUtenParkering.plus(parkeringsutgift.toBigDecimal()),
+                                dagsatsUtenParkering = dagsatsUtenParkering,
+                                stønadsbeløpForDag = dagsatsUtenParkering.plus(parkeringsutgift.toBigDecimal()),
                             )
                         }
 
@@ -104,7 +106,6 @@ class PrivatBilBeregningsresultatService {
                     grunnlag =
                         BeregningsresultatForReisePrivatBilGrunnlag(
                             dager = beregnedeDager,
-                            dagsatsUtenParkering = delperiode.dagsatsUtenParkering,
                         ),
                     stønadsbeløp = beregnedeDager.sumOf { it.stønadsbeløpForDag },
                     brukersNavKontor = brukersNavKontor,
