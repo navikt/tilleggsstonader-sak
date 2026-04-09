@@ -801,7 +801,7 @@ object InterntVedtakTestdata {
                                                             dagsatsUtenParkering = BigDecimal.valueOf(100.0),
                                                         ),
                                                     ),
-                                            )
+                                            ),
                                         ),
                                     reiseavstandEnVei = BigDecimal.valueOf(60.0),
                                     vedtaksperioder = vedtaksperioder,
