@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnResponse
@@ -161,7 +162,7 @@ class VedtakDtoMapper(
                     vedtaksperioder =
                         data.vedtaksperioder
                             .tilLagretVedtaksperiodeDto(hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId)),
-                    opphørsdato = vedtak.opphørsdato,
+                    opphørsdato = vedtak.opphørsdato ?: feil("Opphørsdato er obligatorisk for opphør"),
                     beregningsplan = data.beregningsplan.tilDto(),
                 )
         }

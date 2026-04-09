@@ -10,14 +10,14 @@ data class OpphørLæremidlerResponse(
     val vedtaksperioder: List<LagretVedtaksperiodeDto>,
     val årsakerOpphør: List<ÅrsakOpphør>,
     val begrunnelse: String,
-    val opphørsdato: LocalDate?,
-    val beregningsplan: BeregningsplanDto? = null,
+    val opphørsdato: LocalDate,
+    val beregningsplan: BeregningsplanDto,
 ) : VedtakLæremidlerDto(TypeVedtak.OPPHØR),
     VedtakLæremidlerResponse
 
 data class OpphørLæremidlerRequest(
     val årsakerOpphør: List<ÅrsakOpphør>,
     val begrunnelse: String,
-    val opphørsdato: LocalDate?,
+    val opphørsdato: LocalDate,
 ) : VedtakLæremidlerDto(TypeVedtak.OPPHØR),
     VedtakLæremidlerRequest

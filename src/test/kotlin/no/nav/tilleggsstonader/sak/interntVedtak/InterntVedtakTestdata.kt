@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.interntVedtak
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
@@ -602,7 +603,7 @@ object InterntVedtakTestdata {
                 data =
                     AvslagBoutgifter(
                         årsaker = listOf(ÅrsakAvslag.MANGELFULL_DOKUMENTASJON, ÅrsakAvslag.RETT_TIL_BOSTØTTE),
-                        begrunnelse = "Begrunelse for avslag",
+                        begrunnelse = "Begrunnelse for avslag",
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
@@ -615,14 +616,14 @@ object InterntVedtakTestdata {
                 data =
                     OpphørBoutgifter(
                         årsaker = listOf(ÅrsakOpphør.ENDRING_UTGIFTER, ÅrsakOpphør.ENDRING_MÅLGRUPPE),
-                        begrunnelse = "Begrunelse for avslag",
+                        begrunnelse = "Begrunnelse for opphør",
                         vedtaksperioder = vedtaksperioder,
                         beregningsresultat = beregningsresultat,
-                        beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, LocalDate.of(2024, 12, 10)),
+                        beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, 10 desember 2024),
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
-                opphørsdato = null,
+                opphørsdato = 10 desember 2024,
             )
 
         private val aktivitetererBoutgifter =
