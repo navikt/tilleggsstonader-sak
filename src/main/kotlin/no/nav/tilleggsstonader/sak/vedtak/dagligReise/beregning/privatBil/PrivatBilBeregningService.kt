@@ -1,8 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.allePerioderErSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
-import no.nav.tilleggsstonader.kontrakter.periode.beregnSnittMotListe
+import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
@@ -89,7 +90,10 @@ class PrivatBilBeregningService(
     ): RammeForReiseMedPrivatBilBeregningsgrunnlag {
         val delperioder =
             reise.delPerioder
-                .beregnSnittMotListe(satsDagligReisePrivatBilProvider.alleSatser)
+                // Justerer delperioder i tilfelle rammevedtaket har blitt kortet ned mot vedtaksperioder
+                .beregnSnitt(listOf(Datoperiode(reise.fom, reise.tom)))
+                .map { it.first }
+                .beregnSnitt(satsDagligReisePrivatBilProvider.alleSatser)
                 .map { (delperiode, sats) ->
                     val dagsatsUtenParkering =
                         beregnDagsatsUtenParkering(

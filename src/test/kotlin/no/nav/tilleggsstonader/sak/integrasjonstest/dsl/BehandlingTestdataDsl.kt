@@ -69,8 +69,8 @@ class BehandlingTestdataDsl internal constructor() {
         delperioder: List<FaktaDelperiodePrivatBilDto> =
             listOf(
                 FaktaDelperiodePrivatBilDto(
-                    fom = defaultFom,
-                    tom = defaultTom,
+                    fom = fom,
+                    tom = tom,
                     reisedagerPerUke = 5,
                     bompengerPerDag = null,
                     fergekostnadPerDag = null,

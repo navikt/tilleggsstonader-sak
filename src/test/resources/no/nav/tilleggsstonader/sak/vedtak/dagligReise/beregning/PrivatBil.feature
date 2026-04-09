@@ -159,7 +159,7 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
       | 1       | 01.12.2025 | 21.12.2025 | 5                         |
       | 1       | 22.12.2025 | 04.01.2026 | 2                         |
       | 1       | 05.01.2026 | 27.09.2026 | 5                         |
-      | 1       | 28.09.2026 | 17.01.2027 | 2                         |
+      | 1       | 28.09.2026 | 15.01.2027 | 2                         |
 
     Når beregner for daglig reise privat bil
 
@@ -174,4 +174,4 @@ Egenskap: Beregning av rammevedtak for kjøring med privat bil daglig reise
       | 1       | 01.01.2026 | 04.01.2026 | 58.80                  | 2.94          | Ja             | 2                         |
       | 1       | 05.01.2026 | 27.09.2026 | 58.80                  | 2.94          | Ja             | 5                         |
       | 1       | 28.09.2026 | 31.12.2026 | 58.80                  | 2.94          | Ja             | 2                         |
-      | 1       | 01.01.2027 | 17.01.2027 | 58.80                  | 2.94          | Nei            | 2                         |
+      | 1       | 01.01.2027 | 15.01.2027 | 58.80                  | 2.94          | Nei            | 2                         |

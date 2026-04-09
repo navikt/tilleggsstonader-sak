@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.allePerioderErSammenhengende
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import java.math.BigDecimal
@@ -25,6 +26,18 @@ data class RammeForReiseMedPrivatBilBeregningsgrunnlag(
     val reiseavstandEnVei: BigDecimal,
     val vedtaksperioder: List<Vedtaksperiode>,
 ) : Periode<LocalDate> {
+    init {
+        require(fom == delPerioder.minOf { it.fom }) {
+            "fom på rammevedtaket $fom er ulikt tidligste fom på delperioder ${delPerioder.minOf { it.fom }}"
+        }
+        require(tom == delPerioder.maxOf { it.tom }) {
+            "tom på rammevedtaket $tom er ulikt største tom på delperioder ${delPerioder.maxOf { it.tom }}"
+        }
+        require(delPerioder.allePerioderErSammenhengende()) {
+            "Alle delperioder må være sammenhengende"
+        }
+    }
+
     fun vedtaksperiodeForPeriode(periode: Periode<LocalDate>) = vedtaksperioder.single { it.inneholder(periode) }
 }
 
