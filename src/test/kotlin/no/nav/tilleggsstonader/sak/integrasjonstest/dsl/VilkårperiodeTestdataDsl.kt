@@ -47,12 +47,12 @@ class VilkårperiodeTestdataDsl {
 
 @BehandlingTestdataDslMarker
 class OpprettVilkårperiodeDsl {
-    private data class vilkårMedVilkårperiodeRef(
+    private data class VilkårMedVilkårperiodeRef(
         val dto: (BehandlingId) -> LagreVilkårperiode,
         val ref: VilkårperiodeRef? = null,
     )
 
-    private val vilkårForOpprettelse = mutableListOf<vilkårMedVilkårperiodeRef>()
+    private val vilkårForOpprettelse = mutableListOf<VilkårMedVilkårperiodeRef>()
 
     fun målgruppeAAP(
         fom: LocalDate,
@@ -239,12 +239,12 @@ class OpprettVilkårperiodeDsl {
         }
 
     fun add(lagreVilkår: (BehandlingId) -> LagreVilkårperiode) {
-        vilkårForOpprettelse += vilkårMedVilkårperiodeRef(lagreVilkår)
+        vilkårForOpprettelse += VilkårMedVilkårperiodeRef(lagreVilkår)
     }
 
     private fun addMedRef(block: (BehandlingId) -> LagreVilkårperiode): VilkårperiodeRef {
         val ref = VilkårperiodeRef()
-        vilkårForOpprettelse += vilkårMedVilkårperiodeRef(block, ref)
+        vilkårForOpprettelse += VilkårMedVilkårperiodeRef(block, ref)
         return ref
     }
 

@@ -179,7 +179,7 @@ class DagligReiseVilkårService(
 
     private fun validerAktivitetForPrivatBil(nyttVilkår: LagreDagligReise) {
         val fakta = nyttVilkår.fakta as FaktaPrivatBil
-        val aktivitet = vilkårperiodeService.hentAktivitet(fakta.aktivitetId)
+        val aktivitet = fakta.aktivitetId?.let { vilkårperiodeService.hentAktivitet(it) }
         brukerfeilHvis(aktivitet == null) {
             "Aktiviteten finnes ikke"
         }

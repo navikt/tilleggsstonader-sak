@@ -58,7 +58,7 @@ data class FaktaDagligReisePrivatBilDto(
     val reiseavstandEnVei: BigDecimal,
     val faktaDelperioder: List<FaktaDelperiodePrivatBilDto>,
     val adresse: String?,
-    val aktivitetId: UUID,
+    val aktivitetId: UUID?,
 ) : FaktaDagligReiseDto {
     override val type = TypeDagligReise.PRIVAT_BIL
 

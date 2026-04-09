@@ -41,7 +41,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeR
 import org.assertj.core.api.Assertions.assertThat
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.util.Optional
 import java.util.UUID
 
 @Suppress("unused", "ktlint:standard:function-naming")

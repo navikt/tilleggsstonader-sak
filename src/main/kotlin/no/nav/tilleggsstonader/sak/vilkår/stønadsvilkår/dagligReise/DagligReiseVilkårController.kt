@@ -104,7 +104,7 @@ class DagligReiseVilkårController(
     private fun VilkårDagligReise.tilDtoMedAktivitetType(): VilkårDagligReiseDto {
         val aktivitetType =
             (fakta as? FaktaPrivatBil)?.let {
-                vilkårperiodeService.hentAktivitetType(it.aktivitetId)
+                it.aktivitetId?.let { id -> vilkårperiodeService.hentAktivitetType(id) }
             }
         return tilDto(aktivitetType = aktivitetType?.name)
     }
