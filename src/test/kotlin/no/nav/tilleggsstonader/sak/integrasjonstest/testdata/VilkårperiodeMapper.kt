@@ -44,6 +44,7 @@ private fun FaktaOgVurderingerDto.tilFaktaOgSvarDto(): FaktaOgSvarDto =
     when (this) {
         is AktivitetDagligReiseTsoFaktaOgVurderingerDto -> {
             FaktaOgSvarAktivitetDagligReiseTsoDto(
+                svarLønnet = this.lønnet?.svar,
                 svarHarUtgifter = this.harUtgifter?.svar,
                 aktivitetsdager = this.aktivitetsdager,
             )
