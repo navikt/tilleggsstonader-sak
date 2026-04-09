@@ -726,7 +726,7 @@ object InterntVedtakTestdata {
                                 RammeForReiseMedPrivatBilBeregningsgrunnlag(
                                     fom = LocalDate.of(2024, 1, 1),
                                     tom = LocalDate.of(2024, 1, 31),
-                                    delPerioder =
+                                    delperioder =
                                         listOf(
                                             RammeForReiseMedPrivatBilDelperiode(
                                                 fom = LocalDate.of(2024, 1, 1),
@@ -760,11 +760,11 @@ object InterntVedtakTestdata {
                                 RammeForReiseMedPrivatBilBeregningsgrunnlag(
                                     fom = LocalDate.of(2024, 1, 1),
                                     tom = LocalDate.of(2024, 1, 31),
-                                    delPerioder =
+                                    delperioder =
                                         listOf(
                                             RammeForReiseMedPrivatBilDelperiode(
                                                 fom = LocalDate.of(2024, 1, 1),
-                                                tom = LocalDate.of(2024, 1, 31),
+                                                tom = LocalDate.of(2024, 1, 10),
                                                 reisedagerPerUke = 3,
                                                 ekstrakostnader =
                                                     RammeForReiseMedPrivatEkstrakostnader(
@@ -775,13 +775,33 @@ object InterntVedtakTestdata {
                                                     listOf(
                                                         RammeForReiseMedPrivatBilSatsForDelperiode(
                                                             fom = LocalDate.of(2024, 1, 1),
-                                                            tom = LocalDate.of(2024, 1, 31),
+                                                            tom = LocalDate.of(2024, 1, 10),
                                                             satsBekreftetVedVedtakstidspunkt = true,
                                                             kilometersats = BigDecimal.valueOf(3.50),
                                                             dagsatsUtenParkering = BigDecimal.valueOf(100.0),
                                                         ),
                                                     ),
                                             ),
+                                            RammeForReiseMedPrivatBilDelperiode(
+                                                fom = LocalDate.of(2024, 1, 11),
+                                                tom = LocalDate.of(2024, 1, 31),
+                                                reisedagerPerUke = 5,
+                                                ekstrakostnader =
+                                                    RammeForReiseMedPrivatEkstrakostnader(
+                                                        bompengerPerDag = 40,
+                                                        fergekostnadPerDag = 50,
+                                                    ),
+                                                satser =
+                                                    listOf(
+                                                        RammeForReiseMedPrivatBilSatsForDelperiode(
+                                                            fom = LocalDate.of(2024, 1, 11),
+                                                            tom = LocalDate.of(2024, 1, 31),
+                                                            satsBekreftetVedVedtakstidspunkt = true,
+                                                            kilometersats = BigDecimal.valueOf(3.50),
+                                                            dagsatsUtenParkering = BigDecimal.valueOf(100.0),
+                                                        ),
+                                                    ),
+                                            )
                                         ),
                                     reiseavstandEnVei = BigDecimal.valueOf(60.0),
                                     vedtaksperioder = vedtaksperioder,

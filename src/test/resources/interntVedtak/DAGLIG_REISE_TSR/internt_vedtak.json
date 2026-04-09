@@ -196,41 +196,49 @@
               "dager" : [ {
                 "dato" : "2025-01-02",
                 "parkeringskostnad" : 100,
-                "stønadsbeløpForDag" : 195
+                "stønadsbeløpForDag" : 195,
+                "dagsatsUtenParkering" : 95
               }, {
                 "dato" : "2025-01-03",
                 "parkeringskostnad" : 100,
-                "stønadsbeløpForDag" : 195
+                "stønadsbeløpForDag" : 195,
+                "dagsatsUtenParkering" : 95
               }, {
                 "dato" : "2025-01-04",
                 "parkeringskostnad" : 100,
-                "stønadsbeløpForDag" : 195
+                "stønadsbeløpForDag" : 195,
+                "dagsatsUtenParkering" : 95
               }, {
                 "dato" : "2025-01-22",
                 "parkeringskostnad" : 100,
-                "stønadsbeløpForDag" : 195
+                "stønadsbeløpForDag" : 195,
+                "dagsatsUtenParkering" : 95
               }, {
                 "dato" : "2025-01-23",
                 "parkeringskostnad" : 100,
-                "stønadsbeløpForDag" : 195
+                "stønadsbeløpForDag" : 195,
+                "dagsatsUtenParkering" : 95
               }, {
                 "dato" : "2025-01-24",
                 "parkeringskostnad" : 100,
-                "stønadsbeløpForDag" : 195
+                "stønadsbeløpForDag" : 195,
+                "dagsatsUtenParkering" : 95
               }, {
                 "dato" : "2025-02-07",
                 "parkeringskostnad" : 100,
-                "stønadsbeløpForDag" : 195
+                "stønadsbeløpForDag" : 195,
+                "dagsatsUtenParkering" : 95
               }, {
                 "dato" : "2025-02-08",
                 "parkeringskostnad" : 100,
-                "stønadsbeløpForDag" : 195
+                "stønadsbeløpForDag" : 195,
+                "dagsatsUtenParkering" : 95
               }, {
                 "dato" : "2025-02-09",
                 "parkeringskostnad" : 100,
-                "stønadsbeløpForDag" : 195
-              } ],
-              "dagsatsUtenParkering" : 100
+                "stønadsbeløpForDag" : 195,
+                "dagsatsUtenParkering" : 95
+              } ]
             },
             "stønadsbeløp" : 500,
             "brukersNavKontor" : "1234"
@@ -247,7 +255,7 @@
       "grunnlag" : {
         "fom" : "2024-01-01",
         "tom" : "2024-01-31",
-        "delPerioder" : [ {
+        "delperioder" : [ {
           "fom" : "2024-01-01",
           "tom" : "2024-01-31",
           "ekstrakostnader" : {
@@ -255,9 +263,13 @@
             "fergekostnadPerDag" : 50
           },
           "reisedagerPerUke" : 3,
-          "satsBekreftetVedVedtakstidspunkt" : true,
-          "kilometersats" : 2.94,
-          "dagsatsUtenParkering" : 100.0
+          "satser" : [ {
+            "fom" : "2024-01-01",
+            "tom" : "2024-01-31",
+            "kilometersats" : 2.94,
+            "dagsatsUtenParkering" : 100.0,
+            "satsBekreftetVedVedtakstidspunkt" : true
+          } ]
         } ],
         "reiseavstandEnVei" : 40.0,
         "vedtaksperioder" : [ {
@@ -274,17 +286,36 @@
       "grunnlag" : {
         "fom" : "2024-01-01",
         "tom" : "2024-01-31",
-        "delPerioder" : [ {
+        "delperioder" : [ {
           "fom" : "2024-01-01",
-          "tom" : "2024-01-31",
+          "tom" : "2024-01-10",
           "ekstrakostnader" : {
             "bompengerPerDag" : 40,
             "fergekostnadPerDag" : 50
           },
           "reisedagerPerUke" : 3,
-          "satsBekreftetVedVedtakstidspunkt" : true,
-          "kilometersats" : 3.5,
-          "dagsatsUtenParkering" : 100.0
+          "satser" : [ {
+            "fom" : "2024-01-01",
+            "tom" : "2024-01-10",
+            "kilometersats" : 3.5,
+            "dagsatsUtenParkering" : 100.0,
+            "satsBekreftetVedVedtakstidspunkt" : true
+          } ]
+        }, {
+          "fom" : "2024-01-11",
+          "tom" : "2024-01-31",
+          "ekstrakostnader" : {
+            "bompengerPerDag" : 40,
+            "fergekostnadPerDag" : 50
+          },
+          "reisedagerPerUke" : 5,
+          "satser" : [ {
+            "fom" : "2024-01-11",
+            "tom" : "2024-01-31",
+            "kilometersats" : 3.5,
+            "dagsatsUtenParkering" : 100.0,
+            "satsBekreftetVedVedtakstidspunkt" : true
+          } ]
         } ],
         "reiseavstandEnVei" : 60.0,
         "vedtaksperioder" : [ {
