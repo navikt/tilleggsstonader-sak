@@ -19,6 +19,13 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import java.time.LocalDate
 import java.util.UUID
 
+class VilkårperiodeRef internal constructor() {
+    internal var resolvedId: UUID? = null
+
+    val id: UUID
+        get() = resolvedId ?: error("VilkårperiodeRef er ikke resolvt ennå. IDen er kun tilgjengelig etter at vilkårperioden er opprettet.")
+}
+
 @BehandlingTestdataDslMarker
 class VilkårperiodeTestdataDsl {
     internal val opprettScope = OpprettVilkårperiodeDsl()
@@ -40,7 +47,12 @@ class VilkårperiodeTestdataDsl {
 
 @BehandlingTestdataDslMarker
 class OpprettVilkårperiodeDsl {
-    private val dtoer = mutableListOf<(BehandlingId) -> LagreVilkårperiode>()
+    private data class vilkårMedVilkårperiodeRef(
+        val dto: (BehandlingId) -> LagreVilkårperiode,
+        val ref: VilkårperiodeRef? = null,
+    )
+
+    private val vilkårForOpprettelse = mutableListOf<vilkårMedVilkårperiodeRef>()
 
     fun målgruppeAAP(
         fom: LocalDate,
@@ -97,8 +109,8 @@ class OpprettVilkårperiodeDsl {
         fom: LocalDate,
         tom: LocalDate,
         aktivitetsdager: Int,
-    ) {
-        add { behandlingId ->
+    ): VilkårperiodeRef =
+        addMedRef { behandlingId ->
             lagreVilkårperiodeAktivitet(
                 behandlingId = behandlingId,
                 fom = fom,
@@ -110,13 +122,12 @@ class OpprettVilkårperiodeDsl {
                     ),
             )
         }
-    }
 
     fun aktivitetTiltakBoutgifter(
         fom: LocalDate,
         tom: LocalDate,
-    ) {
-        add { behandlingId ->
+    ): VilkårperiodeRef =
+        addMedRef { behandlingId ->
             lagreVilkårperiodeAktivitet(
                 behandlingId = behandlingId,
                 fom = fom,
@@ -127,13 +138,12 @@ class OpprettVilkårperiodeDsl {
                     ),
             )
         }
-    }
 
     fun aktivitetTiltakLæremidler(
         fom: LocalDate,
         tom: LocalDate,
-    ) {
-        add { behandlingId ->
+    ): VilkårperiodeRef =
+        addMedRef { behandlingId ->
             lagreVilkårperiodeAktivitet(
                 behandlingId = behandlingId,
                 fom = fom,
@@ -147,13 +157,12 @@ class OpprettVilkårperiodeDsl {
                     ),
             )
         }
-    }
 
     fun aktivitetTiltakTso(
         fom: LocalDate,
         tom: LocalDate,
-    ) {
-        add { behandlingId ->
+    ): VilkårperiodeRef =
+        addMedRef { behandlingId ->
             lagreVilkårperiodeAktivitet(
                 behandlingId = behandlingId,
                 fom = fom,
@@ -167,15 +176,14 @@ class OpprettVilkårperiodeDsl {
                     ),
             )
         }
-    }
 
     fun aktivitetTiltakTsr(
         fom: LocalDate,
         tom: LocalDate,
         typeAktivitet: TypeAktivitet,
         kildeId: String? = null,
-    ) {
-        add { behandlingId ->
+    ): VilkårperiodeRef =
+        addMedRef { behandlingId ->
             lagreVilkårperiodeAktivitet(
                 behandlingId = behandlingId,
                 fom = fom,
@@ -190,13 +198,12 @@ class OpprettVilkårperiodeDsl {
                 kildeId = kildeId,
             )
         }
-    }
 
     fun aktivitetUtdanningLæremidler(
         fom: LocalDate,
         tom: LocalDate,
-    ) {
-        add { behandlingId ->
+    ): VilkårperiodeRef =
+        addMedRef { behandlingId ->
             lagreVilkårperiodeAktivitet(
                 behandlingId = behandlingId,
                 aktivitetType = AktivitetType.UTDANNING,
@@ -211,13 +218,12 @@ class OpprettVilkårperiodeDsl {
                     ),
             )
         }
-    }
 
     fun aktivitetUtdanningDagligReiseTso(
         fom: LocalDate,
         tom: LocalDate,
-    ) {
-        add { behandlingId ->
+    ): VilkårperiodeRef =
+        addMedRef { behandlingId ->
             lagreVilkårperiodeAktivitet(
                 behandlingId = behandlingId,
                 aktivitetType = AktivitetType.UTDANNING,
@@ -231,11 +237,17 @@ class OpprettVilkårperiodeDsl {
                     ),
             )
         }
-    }
 
     fun add(lagreVilkår: (BehandlingId) -> LagreVilkårperiode) {
-        dtoer += lagreVilkår
+        vilkårForOpprettelse += vilkårMedVilkårperiodeRef(lagreVilkår)
     }
 
-    fun build(behandlingId: BehandlingId) = dtoer.map { it.invoke(behandlingId) }
+    private fun addMedRef(block: (BehandlingId) -> LagreVilkårperiode): VilkårperiodeRef {
+        val ref = VilkårperiodeRef()
+        vilkårForOpprettelse += vilkårMedVilkårperiodeRef(block, ref)
+        return ref
+    }
+
+    fun build(behandlingId: BehandlingId): List<Pair<LagreVilkårperiode, VilkårperiodeRef?>> =
+        vilkårForOpprettelse.map { it.dto(behandlingId) to it.ref }
 }

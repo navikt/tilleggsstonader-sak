@@ -74,6 +74,7 @@ class OpprettStønadsvilkårDsl {
         reisedagerPerUke: Int = 5,
         bompengerPerDag: Int? = null,
         fergekostnadPerDag: Int? = null,
+        aktivitetRef: VilkårperiodeRef,
     ) {
         dtoer += { _, _ ->
             lagreDagligReisePrivatBilDto(
@@ -91,6 +92,7 @@ class OpprettStønadsvilkårDsl {
                             fergekostnadPerDag = fergekostnadPerDag,
                         ),
                     ),
+                aktivitetId = aktivitetRef.id,
             )
         }
     }

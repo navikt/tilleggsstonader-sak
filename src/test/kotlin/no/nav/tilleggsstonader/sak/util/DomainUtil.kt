@@ -676,12 +676,13 @@ fun lagreDagligReisePrivatBilDto(
                 ),
             RegelId.KAN_KJØRE_MED_EGEN_BIL to SvarOgBegrunnelseDto(svar = SvarId.JA),
         ),
+    aktivitetId: UUID = UUID.randomUUID(),
     fakta: FaktaDagligReiseDto =
         FaktaDagligReisePrivatBilDto(
             reiseavstandEnVei = reiseavstandEnVei,
             faktaDelperioder = reiseperioder,
             adresse = adresse,
-            aktivitetId = UUID.randomUUID(),
+            aktivitetId = aktivitetId,
         ),
 ) = LagreDagligReiseDto(
     fom = fom,

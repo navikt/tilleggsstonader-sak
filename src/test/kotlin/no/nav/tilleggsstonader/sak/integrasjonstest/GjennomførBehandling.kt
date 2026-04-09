@@ -404,17 +404,19 @@ private fun IntegrationTest.gjennomførInngangsvilkårSteg(
     // Opprett aktiviteter
     testdataDsl.aktivitet.opprettScope
         .build(behandlingId)
-        .forEach { lagreVilkårperiode ->
-            kall.vilkårperiode
-                .opprett(lagreVilkårperiode)
-                .periode!!
-                .id
+        .forEach { (lagreVilkårperiode, ref) ->
+            val id =
+                kall.vilkårperiode
+                    .opprett(lagreVilkårperiode)
+                    .periode!!
+                    .id
+            ref?.resolvedId = id
         }
 
-    // Oppretter ålgrupper
+    // Oppretter målgrupper
     testdataDsl.målgruppe.opprettScope
         .build(behandlingId)
-        .forEach { lagreVilkårperiode ->
+        .forEach { (lagreVilkårperiode, _) ->
             kall.vilkårperiode
                 .opprett(lagreVilkårperiode)
                 .periode!!

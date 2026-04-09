@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.integrasjonstest.dsl.VilkårperiodeRef
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
@@ -62,15 +63,16 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
                     }
                 }
 
+                lateinit var aktivitetRef: VilkårperiodeRef
                 aktivitet {
                     opprett {
-                        aktivitetTiltakTso(fom, tom)
+                        aktivitetRef = aktivitetTiltakTso(fom, tom)
                     }
                 }
 
                 vilkår {
                     opprett {
-                        privatBil(fom, tom, reisedagerPerUke = 3, reiseavstandEnVei = reiseavstandEnVei)
+                        privatBil(fom, tom, reisedagerPerUke = 3, reiseavstandEnVei = reiseavstandEnVei, aktivitetRef = aktivitetRef)
                     }
                 }
 

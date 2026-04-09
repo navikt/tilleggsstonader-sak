@@ -67,9 +67,10 @@ class BehandlingTestdataDsl internal constructor() {
         tom: LocalDate = defaultTom,
         antallReisedager: Int = 5,
     ) {
+        lateinit var aktivitetRef: VilkårperiodeRef
         aktivitet {
             opprett {
-                aktivitetTiltakTso(fom, tom)
+                aktivitetRef = aktivitetTiltakTso(fom, tom)
             }
         }
         målgruppe {
@@ -79,7 +80,7 @@ class BehandlingTestdataDsl internal constructor() {
         }
         vilkår {
             opprett {
-                privatBil(fom, tom, reisedagerPerUke = antallReisedager)
+                privatBil(fom, tom, reisedagerPerUke = antallReisedager, aktivitetRef = aktivitetRef)
             }
         }
     }

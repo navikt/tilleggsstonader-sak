@@ -108,8 +108,7 @@ class PrivatBilBeregningStepDefinitions {
                         resultat = ResultatVilkårperiode.OPPFYLT,
                         typeAktivitet = TypeAktivitet.GRUPPEAMO,
                     )
-                every { vilkårperiodeRepositoryMock.findById(testAktivitet.id) } returns Optional.of(testAktivitet)
-                every { vilkårperiodeRepositoryMock.findAllById(any()) } returns listOf(testAktivitet)
+                every { vilkårperiodeService.hentAktivitet(testAktivitet.id) } returns testAktivitet
 
                 val nyttVilkår = mapTilVilkårDagligReise(TypeDagligReise.PRIVAT_BIL, rad, aktivitetId = testAktivitet.id)
                 dagligReiseVilkårService.opprettNyttVilkår(behandlingId = behandlingId, nyttVilkår = nyttVilkår)
