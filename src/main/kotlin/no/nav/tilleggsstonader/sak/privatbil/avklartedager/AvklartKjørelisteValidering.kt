@@ -40,9 +40,10 @@ private fun validerAntallDagerGodkjentInnenforRammevedtak(
     rammevedtak: RammeForReiseMedPrivatBil,
 ) {
     val antallDagerSomDekkes = oppdaterteDager.count { it.godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.JA }
+    val overskredetDelperioder = rammevedtak.grunnlag.delperioder.filter { antallDagerSomDekkes > it.reisedagerPerUke }
 
-    brukerfeilHvis(antallDagerSomDekkes > rammevedtak.grunnlag.reisedagerPerUke) {
-        "Antall godkjente reisedager kan ikke være høyere enn antall dager godkjent i rammevedtak"
+    brukerfeilHvis(overskredetDelperioder.isNotEmpty()) {
+        "Antall godkjente reisedager kan ikke være høyere enn antall dager godkjent i rammevedtak for en eller flere delperioder"
     }
 }
 
