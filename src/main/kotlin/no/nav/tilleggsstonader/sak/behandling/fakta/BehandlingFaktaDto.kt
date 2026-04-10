@@ -160,7 +160,7 @@ data class FaktaBarn(
 )
 
 data class FaktaReise(
-    val skalReiseFraFolkeregistrertAdresse: JaNei,
+    val skalReiseFraFolkeregistrertAdresse: JaNei?,
     val adresseDetSkalReisesFra: ReiseAdresse?,
     val reiseAdresse: ReiseAdresse?,
     val periode: Reiseperiode,
