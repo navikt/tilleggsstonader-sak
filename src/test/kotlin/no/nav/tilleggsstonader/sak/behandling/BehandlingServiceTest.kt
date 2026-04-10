@@ -234,7 +234,7 @@ internal class BehandlingServiceTest {
                     ),
                 )
 
-            assertThat(behandlingService.utledNesteBehandlingstypeV2(fagsak.id)).isEqualTo(BehandlingType.REVURDERING)
+            assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.REVURDERING)
         }
 
         @Test
@@ -244,7 +244,7 @@ internal class BehandlingServiceTest {
                 behandlingRepository.findByFagsakId(fagsak.id)
             } returns emptyList()
 
-            assertThat(behandlingService.utledNesteBehandlingstypeV2(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
+            assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
         }
 
         @Test
@@ -254,7 +254,7 @@ internal class BehandlingServiceTest {
                 behandlingRepository.findByFagsakId(fagsak.id)
             } returns listOf(henlagtBehandling(fagsak))
 
-            assertThat(behandlingService.utledNesteBehandlingstypeV2(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
+            assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
         }
 
         @Test
@@ -272,7 +272,7 @@ internal class BehandlingServiceTest {
                     ),
                 )
 
-            assertThat(behandlingService.utledNesteBehandlingstypeV2(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
+            assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
         }
 
         @Test
@@ -291,13 +291,13 @@ internal class BehandlingServiceTest {
                 )
 
             assertThat(
-                behandlingService.utledNesteBehandlingstypeV2(fagsak.id, behandlingÅrsak = BehandlingÅrsak.KJØRELISTE),
+                behandlingService.utledNesteBehandlingstype(fagsak.id, behandlingÅrsak = BehandlingÅrsak.KJØRELISTE),
             ).isEqualTo(BehandlingType.KJØRELISTE)
         }
     }
 }
 
-fun BehandlingService.utledNesteBehandlingstypeV2(
+fun BehandlingService.utledNesteBehandlingstype(
     fagsakId: FagsakId,
     behandlingÅrsak: BehandlingÅrsak = BehandlingÅrsak.SØKNAD,
 ): BehandlingType {

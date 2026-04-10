@@ -276,7 +276,7 @@ class BehandlingService(
         }
     }
 
-    fun gjørOmTilRevurdering(
+    fun oppdaterReferanseTilForrigeIverksatteBehandlingOgOppdaterType(
         behandling: Behandling,
         forrigeIverksatteBehandlingId: BehandlingId?,
     ): Behandling {
