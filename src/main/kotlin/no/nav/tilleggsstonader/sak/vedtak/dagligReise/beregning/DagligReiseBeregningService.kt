@@ -137,8 +137,6 @@ class DagligReiseBeregningService(
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkårDagligReise: List<VilkårDagligReise>,
     ): RammevedtakPrivatBil? {
-        if (false) return null
-
         val oppfylteVilkårPrivatBil = oppfylteVilkårDagligReise.filter { it.fakta is FaktaPrivatBil }
 
         if (oppfylteVilkårPrivatBil.isEmpty()) return null
