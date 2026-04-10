@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 import no.nav.tilleggsstonader.sak.behandling.vent.KanTaAvVentDto
 import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVentDto
 import no.nav.tilleggsstonader.sak.behandling.vent.StatusPåVentDto
+import no.nav.tilleggsstonader.sak.behandling.vent.TaAvVentDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 
@@ -16,6 +17,11 @@ class SettPåVentKall(
 
     fun kanTaAvVent(behandlingId: BehandlingId): KanTaAvVentDto = apiRespons.kanTaAvVent(behandlingId).expectOkWithBody()
 
+    fun taAvVent(
+        behandlingId: BehandlingId,
+        taAvVentDto: TaAvVentDto,
+    ) = apiRespons.taAvVent(behandlingId, taAvVentDto).expectOkEmpty()
+
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = SettPåVentApi()
 
@@ -26,5 +32,10 @@ class SettPåVentKall(
         ) = testklient.post("/api/sett-pa-vent/$behandlingId", settPåVentDto)
 
         fun kanTaAvVent(behandlingId: BehandlingId) = testklient.get("/api/sett-pa-vent/$behandlingId/kan-ta-av-vent")
+
+        fun taAvVent(
+            behandlingId: BehandlingId,
+            taAvVentDto: TaAvVentDto,
+        ) = testklient.delete("/api/sett-pa-vent/$behandlingId", taAvVentDto)
     }
 }

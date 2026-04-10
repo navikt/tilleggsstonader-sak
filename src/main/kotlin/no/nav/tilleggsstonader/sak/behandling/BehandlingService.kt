@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.behandling
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtakstidspunkt
+import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -12,7 +13,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.FERDIGSTIL
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.OPPRETTET
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.SATT_PÅ_VENT
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.UTREDES
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandlingsjournalpost
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingsjournalpostRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
@@ -285,10 +285,10 @@ class BehandlingService(
         ) {
             "Kan ikke gjøre om behandling til revurdering når den har status ${behandling.status.visningsnavn()}."
         }
+
         return behandlingRepository.update(
             behandling.copy(
-                type = BehandlingType.REVURDERING,
-                steg = StegType.INNGANGSVILKÅR,
+                type = utledBehandlingType(skalVæreRevurdering = true, behandlingÅrsak = behandling.årsak),
                 forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
             ),
         )

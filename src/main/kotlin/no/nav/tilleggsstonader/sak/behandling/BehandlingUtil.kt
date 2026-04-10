@@ -19,7 +19,14 @@ object BehandlingUtil {
                 val ikkeHenlagt = it.resultat != BehandlingResultat.HENLAGT
                 erFerdigstilt && ikkeHenlagt
             }
-        return if (skalVæreRevurdering) {
+        return utledBehandlingType(skalVæreRevurdering, behandlingÅrsak)
+    }
+
+    fun utledBehandlingType(
+        skalVæreRevurdering: Boolean,
+        behandlingÅrsak: BehandlingÅrsak,
+    ): BehandlingType =
+        if (skalVæreRevurdering) {
             if (behandlingÅrsak == BehandlingÅrsak.KJØRELISTE) {
                 BehandlingType.KJØRELISTE
             } else {
@@ -28,7 +35,6 @@ object BehandlingUtil {
         } else {
             BehandlingType.FØRSTEGANGSBEHANDLING
         }
-    }
 
     fun validerBehandlingIdErLik(
         behandlingIdParam: BehandlingId,
