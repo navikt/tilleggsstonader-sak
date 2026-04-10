@@ -63,12 +63,14 @@ class PrivatBilController(
                     reise.grunnlag
                         .alleDatoerGruppertPåUke()
                         .map { (uke, datoer) ->
-                            val kjørelisteForUke =
-                                kjørelister.firstOrNull {
-                                    it.data.reiseId == reise.reiseId && it.inneholderUkenummer(uke.ukenummer) // TODO ogå skille på år
-                                }
                             val avklartUke =
                                 avklarteUker.singleOrNull { it.reiseId == reise.reiseId && it.ukenummer == uke.ukenummer }
+
+                            val kjørelisteForUke =
+                                kjørelister.firstOrNull {
+                                    it.data.reiseId == avklartUke?.reiseId && it.inneholderUkenummer(uke.ukenummer) // TODO ogå skille på år
+                                }
+
                             lagUke(uke = uke, datoer = datoer, kjørelisteForUke = kjørelisteForUke, avklartUke = avklartUke)
                         },
                 // TODO: Håndter at rammen kan ha flere satser og blir delt opp i flere
