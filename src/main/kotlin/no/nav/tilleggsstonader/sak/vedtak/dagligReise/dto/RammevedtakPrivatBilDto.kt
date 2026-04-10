@@ -31,10 +31,12 @@ data class DelperiodeDto(
 ) : Periode<LocalDate>
 
 data class RammeForReiseMedPrivatBilDelperiodeSatserDto(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
     val satsBekreftetVedVedtakstidspunkt: Boolean,
     val kilometersats: BigDecimal,
     val dagsatsUtenParkering: BigDecimal,
-)
+) : Periode<LocalDate>
 
 fun RammevedtakPrivatBil.tilDto() =
     RammevedtakPrivatBilDto(
@@ -63,6 +65,8 @@ fun RammeForReiseMedPrivatBil.tilDto(): RammeForReiseMedPrivatBilDto =
 
 fun RammeForReiseMedPrivatBilSatsForDelperiode.tilDto() =
     RammeForReiseMedPrivatBilDelperiodeSatserDto(
+        fom = fom,
+        tom = tom,
         satsBekreftetVedVedtakstidspunkt = satsBekreftetVedVedtakstidspunkt,
         kilometersats = kilometersats,
         dagsatsUtenParkering = dagsatsUtenParkering,
