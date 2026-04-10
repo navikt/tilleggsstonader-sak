@@ -5,6 +5,10 @@
     "ENDRING_AKTIVITET"
   ],
   "begrunnelse": "En begrunnelse",
+  "beregningsplan" : {
+    "omfang" : "FRA_DATO",
+    "fraDato" : "2024-01-01"
+  },
   "beregningsresultat": {
     "perioder": [
       {

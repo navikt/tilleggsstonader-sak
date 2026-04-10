@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.beregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.vedtaksperiode
 import org.assertj.core.api.Assertions.assertThat
@@ -52,6 +54,7 @@ class VedtakBoutgifterTest {
                                 tom = førsteJan25,
                             ),
                         ),
+                    beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, førsteJan25),
                 )
             }.hasMessage("Må velge minst en årsak for opphør")
         }
@@ -70,6 +73,7 @@ class VedtakBoutgifterTest {
                                 tom = førsteJan25,
                             ),
                         ),
+                    beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, førsteJan25),
                 )
             }.hasMessage("Opphør må begrunnes")
         }
@@ -91,6 +95,7 @@ class VedtakBoutgifterTest {
                                 tom = førsteJan25,
                             ),
                         ),
+                    beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, førsteJan25),
                 )
 
             val avslagBoutgifter2 =
@@ -105,6 +110,7 @@ class VedtakBoutgifterTest {
                                 tom = førsteJan25,
                             ),
                         ),
+                    beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, førsteJan25),
                 )
 
             assertThat(avslagBoutgifter).isEqualTo(avslagBoutgifter2)

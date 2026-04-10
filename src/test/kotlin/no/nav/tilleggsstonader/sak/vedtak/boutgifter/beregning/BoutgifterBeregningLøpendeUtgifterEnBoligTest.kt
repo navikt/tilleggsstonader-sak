@@ -12,6 +12,8 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.innvilgelseBoutgifter
@@ -130,8 +132,8 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                 .beregn(
                     behandling = saksbehandling(),
                     vedtaksperioder = vedtaksperioderFørstegangsbehandling,
+                    plan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                     typeVedtak = TypeVedtak.INNVILGELSE,
-                    tidligsteEndring = null,
                 ).perioder
 
         assertThat(beregningsresultat).isEqualTo(beregningsresultatFørstegangsbehandlingLøpendeUtgifterEnBolig)
@@ -227,8 +229,8 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                 .beregn(
                     behandling = saksbehandling,
                     vedtaksperioder = vedtaksperioderRevurdering,
+                    plan = Beregningsplan(Beregningsomfang.FRA_DATO, tidligsteEndring),
                     typeVedtak = TypeVedtak.INNVILGELSE,
-                    tidligsteEndring = tidligsteEndring,
                 ).perioder
 
         assertThat(res.size).isEqualTo(4)
@@ -291,8 +293,8 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
                                 tom = 30 april 2026,
                             ),
                         ),
+                    plan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                     typeVedtak = TypeVedtak.INNVILGELSE,
-                    tidligsteEndring = null,
                 ).perioder
 
         assertThat(perioder).hasSize(3)

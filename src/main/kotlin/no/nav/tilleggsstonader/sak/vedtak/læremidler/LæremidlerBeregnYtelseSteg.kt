@@ -6,11 +6,13 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
+import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -19,7 +21,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
@@ -36,7 +37,7 @@ import java.time.LocalDate
 class LæremidlerBeregnYtelseSteg(
     private val beregningService: LæremidlerBeregningService,
     private val opphørValideringService: OpphørValideringService,
-    private val utledTidligsteEndringService: UtledTidligsteEndringService,
+    private val beregningsplanUtleder: BeregningsplanUtleder,
     vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -71,11 +72,12 @@ class LæremidlerBeregnYtelseSteg(
         logger.info("Lagrer vedtak for satsjustering for behandling=${saksbehandling.id}, satsjusteringFra=$satsjusteringFra")
 
         val innvilgelse = vedtak as InnvilgelseLæremidlerRequest
-        lagreVedtak(
+        val plan = Beregningsplan(Beregningsomfang.FRA_DATO, satsjusteringFra)
+        lagreInnvilgetVedtak(
             saksbehandling = saksbehandling,
             vedtaksperioder = innvilgelse.vedtaksperioder.tilDomene(),
             begrunnelse = null,
-            tidligsteEndring = satsjusteringFra,
+            beregningsplan = plan,
         )
     }
 
@@ -84,15 +86,11 @@ class LæremidlerBeregnYtelseSteg(
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
     ) {
-        lagreVedtak(
+        lagreInnvilgetVedtak(
             saksbehandling = saksbehandling,
             vedtaksperioder = vedtaksperioder,
             begrunnelse = begrunnelse,
-            tidligsteEndring =
-                utledTidligsteEndringService.utledTidligsteEndringForBeregning(
-                    saksbehandling.id,
-                    vedtaksperioder,
-                ),
+            beregningsplan = beregningsplanUtleder.utledForInnvilgelse(saksbehandling, vedtaksperioder),
         )
     }
 
@@ -101,26 +99,33 @@ class LæremidlerBeregnYtelseSteg(
             .findByIdOrThrow(behandlingId)
             .withTypeOrThrow<InnvilgelseEllerOpphørLæremidler>()
 
-    private fun lagreVedtak(
+    private fun lagreInnvilgetVedtak(
         saksbehandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
-        tidligsteEndring: LocalDate?,
+        beregningsplan: Beregningsplan,
     ) {
         val beregningsresultat =
             beregningService.beregn(
                 behandling = saksbehandling,
                 vedtaksperioder = vedtaksperioder,
-                tidligsteEndring = tidligsteEndring,
+                plan = beregningsplan,
+                typeVedtak = TypeVedtak.INNVILGELSE,
             )
 
         vedtakRepository.insert(
-            lagInnvilgetVedtak(
+            GeneriskVedtak(
                 behandlingId = saksbehandling.id,
-                vedtaksperioder = vedtaksperioder,
-                beregningsresultat = beregningsresultat,
-                begrunnelse = begrunnelse,
-                tidligsteEndring = tidligsteEndring,
+                type = TypeVedtak.INNVILGELSE,
+                data =
+                    InnvilgelseLæremidler(
+                        vedtaksperioder = vedtaksperioder,
+                        beregningsresultat = BeregningsresultatLæremidler(beregningsresultat.perioder),
+                        begrunnelse = begrunnelse,
+                        beregningsplan = beregningsplan,
+                    ),
+                gitVersjon = Applikasjonsversjon.versjon,
+                tidligsteEndring = beregningsplan.beregnFra(),
             ),
         )
         lagreAndeler(saksbehandling, beregningsresultat)
@@ -132,9 +137,6 @@ class LæremidlerBeregnYtelseSteg(
     ) {
         feilHvis(saksbehandling.forrigeIverksatteBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
-        }
-        feilHvis(vedtak.opphørsdato == null) {
-            "Opphørsdato er ikke satt"
         }
 
         val opphørsdato = vedtak.opphørsdato
@@ -148,7 +150,7 @@ class LæremidlerBeregnYtelseSteg(
         )
 
         val avkortetVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, opphørsdato)
-
+        val beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, opphørsdato)
         val beregningsresultat = beregningService.beregnForOpphør(saksbehandling, avkortetVedtaksperioder, opphørsdato)
 
         vedtakRepository.insert(
@@ -161,6 +163,7 @@ class LæremidlerBeregnYtelseSteg(
                         beregningsresultat = beregningsresultat,
                         årsaker = vedtak.årsakerOpphør,
                         begrunnelse = vedtak.begrunnelse,
+                        beregningsplan = beregningsplan,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
@@ -202,24 +205,4 @@ class LæremidlerBeregnYtelseSteg(
         val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling.id)
         tilkjentYtelseService.lagreTilkjentYtelse(saksbehandling.id, andeler)
     }
-
-    private fun lagInnvilgetVedtak(
-        behandlingId: BehandlingId,
-        vedtaksperioder: List<Vedtaksperiode>,
-        beregningsresultat: BeregningsresultatLæremidler,
-        begrunnelse: String?,
-        tidligsteEndring: LocalDate?,
-    ): Vedtak =
-        GeneriskVedtak(
-            behandlingId = behandlingId,
-            type = TypeVedtak.INNVILGELSE,
-            data =
-                InnvilgelseLæremidler(
-                    vedtaksperioder = vedtaksperioder,
-                    beregningsresultat = BeregningsresultatLæremidler(beregningsresultat.perioder),
-                    begrunnelse = begrunnelse,
-                ),
-            gitVersjon = Applikasjonsversjon.versjon,
-            tidligsteEndring = tidligsteEndring,
-        )
 }

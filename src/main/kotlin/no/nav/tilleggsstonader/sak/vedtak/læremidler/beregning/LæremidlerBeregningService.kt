@@ -4,11 +4,12 @@ import no.nav.tilleggsstonader.kontrakter.periode.AvkortResult
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.util.toYearMonth
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
@@ -43,12 +44,18 @@ class LæremidlerBeregningService(
     fun beregn(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
-        tidligsteEndring: LocalDate?,
+        plan: Beregningsplan,
+        typeVedtak: TypeVedtak,
     ): BeregningsresultatLæremidler {
+        if (plan.omfang == Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT) {
+            val forrigeVedtak = requireNotNull(hentForrigeVedtak(behandling))
+            return forrigeVedtak.beregningsresultat
+        }
+
         vedtaksperiodeValideringService.validerVedtaksperioderLæremidler(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
-            typeVedtak = TypeVedtak.INNVILGELSE,
+            typeVedtak = typeVedtak,
         )
 
         val vedtaksperioderBeregningsgrunnlag = vedtaksperioder.tilBeregningsgrunnlag()
@@ -57,10 +64,7 @@ class LæremidlerBeregningService(
         val beregningsresultatForMåned = beregn(behandling, vedtaksperioderBeregningsgrunnlag)
 
         return if (forrigeVedtak != null) {
-            brukerfeilHvis(tidligsteEndring == null) {
-                "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
-            }
-            settSammenGamleOgNyePerioder(beregningsresultatForMåned, forrigeVedtak, tidligsteEndring)
+            settSammenGamleOgNyePerioder(beregningsresultatForMåned, forrigeVedtak, plan.beregnFra())
         } else {
             BeregningsresultatLæremidler(beregningsresultatForMåned)
         }
@@ -159,26 +163,25 @@ class LæremidlerBeregningService(
 
     /**
      * Slår sammen perioder fra forrige og nytt vedtak.
-     * Beholder perioder fra forrige vedtak frem til og med tidligste endring
-     * Bruker reberegnede perioder fra og med tidligste endring dato
-     * Dette gjøres for at vi ikke skal reberegne perioder før tidligste endring datoet
-     * Men vi trenger å reberegne perioder som løper i tidligste endring datoet då en periode kan ha endrer % eller sats
+     * Beholder perioder fra forrige vedtak som starter før [beregnFra]
+     * Bruker reberegnede perioder som starter likt eller etter [beregnFra]
+     * Dette gjøres for at vi ikke skal reberegne mer enn nødvendig, i tilfelle kodeendringer utilsiktet påvirker gamle vedtak
      */
     private fun settSammenGamleOgNyePerioder(
         beregningsresultat: List<BeregningsresultatForMåned>,
         forrigeVedtak: InnvilgelseEllerOpphørLæremidler,
-        tidligsteEndring: LocalDate?,
+        beregnFra: LocalDate?,
     ): BeregningsresultatLæremidler {
         val forrigeBeregningsresultat = forrigeVedtak.beregningsresultat
 
         val perioderFraForrigeVedtakSomSkalBeholdes =
             forrigeBeregningsresultat
                 .perioder
-                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() < tidligsteEndring }
+                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() < beregnFra }
                 .map { it.markerSomDelAvTidligereUtbetaling(delAvTidligereUtbetaling = true) }
         val nyePerioder =
             beregningsresultat
-                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() >= tidligsteEndring }
+                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() >= beregnFra }
 
         val nyePerioderMedKorrigertUtbetalingsdato = korrigerUtbetalingsdato(nyePerioder, forrigeBeregningsresultat)
 

@@ -5,9 +5,10 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
@@ -38,7 +39,7 @@ class LæremidlerVedtakController(
     private val behandlingService: BehandlingService,
     private val stegService: StegService,
     private val steg: LæremidlerBeregnYtelseSteg,
-    private val utledTidligsteEndringService: UtledTidligsteEndringService,
+    private val beregningsplanUtleder: BeregningsplanUtleder,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
 ) {
@@ -87,17 +88,14 @@ class LæremidlerVedtakController(
     ): BeregningsresultatLæremidlerDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        val tidligsteEndring =
-            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
-                behandling.id,
-                vedtaksperioder.tilDomene(),
-            )
+        val plan = beregningsplanUtleder.utledForInnvilgelse(behandling, vedtaksperioder.tilDomene())
         return beregningService
             .beregn(
                 behandling,
                 vedtaksperioder.tilDomene(),
-                tidligsteEndring,
-            ).tilDto(tidligsteEndring = tidligsteEndring)
+                plan,
+                TypeVedtak.INNVILGELSE,
+            ).tilDto(beregningsplan = plan)
     }
 
     @GetMapping("{behandlingId}")
