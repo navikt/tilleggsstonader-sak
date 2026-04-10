@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 
 object BehandlingUtil {
-    fun utledBehandlingTypeV2(
+    fun utledBehandlingType(
         tidligereBehandlinger: List<Behandling>,
         behandlingÅrsak: BehandlingÅrsak,
     ): BehandlingType {

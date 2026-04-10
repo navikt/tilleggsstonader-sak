@@ -7,7 +7,7 @@ import io.mockk.mockkObject
 import io.mockk.slot
 import io.mockk.unmockkObject
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingTypeV2
+import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -302,5 +302,5 @@ fun BehandlingService.utledNesteBehandlingstypeV2(
     behandlingÅrsak: BehandlingÅrsak = BehandlingÅrsak.SØKNAD,
 ): BehandlingType {
     val behandlinger = hentBehandlinger(fagsakId)
-    return utledBehandlingTypeV2(behandlinger, behandlingÅrsak)
+    return utledBehandlingType(behandlinger, behandlingÅrsak)
 }
