@@ -57,6 +57,20 @@ object RammevedtakPrivatBilUtil {
                 ),
         )
 
+    fun rammeForReiseMedPrivatBilSatsForDelperiode(
+        fom: LocalDate = LocalDate.now(),
+        tom: LocalDate = LocalDate.now().plusDays(7),
+        satsBekreftetVedVedtakstidspunkt: Boolean = true,
+        kilometersats: BigDecimal = 2.94.toBigDecimal(),
+        dagsatsUtenParkering: BigDecimal = 100.toBigDecimal(),
+    ) = RammeForReiseMedPrivatBilSatsForDelperiode(
+        fom = fom,
+        tom = tom,
+        kilometersats = kilometersats,
+        dagsatsUtenParkering = dagsatsUtenParkering,
+        satsBekreftetVedVedtakstidspunkt = satsBekreftetVedVedtakstidspunkt,
+    )
+
     // Oppdatert rammevedtakPrivatBil for å støtte flere delperioder
     fun rammevedtakPrivatBil(
         reiseId: ReiseId = ReiseId.random(),

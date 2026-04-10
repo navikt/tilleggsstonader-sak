@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
@@ -8,8 +9,11 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBilSatsForDelperiode
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
@@ -119,6 +123,56 @@ class AvklartKjørelisteValideringTest {
                 oppdaterteDager = oppdaterteDager,
                 rammevedtak = ramme,
                 kjøreliste = kjørelisteDager,
+                forventetFeilmelding = "Antall godkjente reisedager kan ikke være høyere enn antall dager godkjent i rammevedtak",
+            )
+        }
+
+        @Test
+        fun `skal kaste feil dersom antall godkjente dager overskrider rammevedtaket ved flere delperioder`() {
+            val mandagUke1 = 5 januar 2026
+            val søndagUke1 = 11 januar 2026
+            val mandagUke2 = 12 januar 2026
+            val søndagUke2 = 18 januar 2026
+
+            val oppdaterteDager =
+                listOf(
+                    avklartKjørtDag(mandagUke2, GodkjentGjennomførtKjøring.JA),
+                    avklartKjørtDag(mandagUke2.plusDays(1), GodkjentGjennomførtKjøring.JA),
+                )
+            val kjørelisteDager =
+                listOf(
+                    kjørelisteDag(mandagUke2, harKjørt = true),
+                    kjørelisteDag(mandagUke2.plusDays(1), harKjørt = true),
+                )
+
+            val ramme =
+                rammeForReise(
+                    fom = mandagUke1,
+                    tom = søndagUke2,
+                    delperioder =
+                        listOf(
+                            RammeForReiseMedPrivatBilDelperiode(
+                                fom = mandagUke1,
+                                tom = søndagUke1,
+                                ekstrakostnader = RammeForReiseMedPrivatEkstrakostnader(null, null),
+                                reisedagerPerUke = 2,
+                                satser = listOf(rammeForReiseMedPrivatBilSatsForDelperiode(fom = mandagUke1, tom = søndagUke1)),
+                            ),
+                            RammeForReiseMedPrivatBilDelperiode(
+                                fom = mandagUke2,
+                                tom = søndagUke2,
+                                ekstrakostnader = RammeForReiseMedPrivatEkstrakostnader(null, null),
+                                reisedagerPerUke = 1,
+                                satser = listOf(rammeForReiseMedPrivatBilSatsForDelperiode(fom = mandagUke2, tom = søndagUke2)),
+                            ),
+                        ),
+                )
+
+            validerKasterFeilVedOppdatering(
+                oppdaterteDager = oppdaterteDager,
+                rammevedtak = ramme,
+                kjøreliste = kjørelisteDager,
+                ukeSomSkalOppdateres = mandagUke2.tilUkeIÅr(),
                 forventetFeilmelding = "Antall godkjente reisedager kan ikke være høyere enn antall dager godkjent i rammevedtak",
             )
         }
@@ -288,12 +342,13 @@ class AvklartKjørelisteValideringTest {
         oppdaterteDager: List<AvklartKjørtDag>,
         rammevedtak: RammeForReiseMedPrivatBil = rammeForReise(),
         kjøreliste: List<KjørelisteDag> = listOf(kjørelisteDag()),
+        ukeSomSkalOppdateres: UkeIÅr = mandag.tilUkeIÅr(),
         forventetFeilmelding: String,
     ) {
         assertThatThrownBy {
             validerOppdatertAvklartKjørtUke(
                 oppdaterteDager = oppdaterteDager,
-                ukeSomSkalOppdateres = mandag.tilUkeIÅr(),
+                ukeSomSkalOppdateres = ukeSomSkalOppdateres,
                 rammevedtak = rammevedtak,
                 innsendteKjørelisteDager = kjøreliste,
             )
@@ -325,4 +380,10 @@ class AvklartKjørelisteValideringTest {
         tom: LocalDate = mandag,
         reisedagerPerUke: Int = 5,
     ) = rammeForReiseMedPrivatBil(reiseId = reiseId, fom = fom, tom = tom, reisedagerPerUke = reisedagerPerUke)
+
+    private fun rammeForReise(
+        fom: LocalDate = mandag,
+        tom: LocalDate = mandag,
+        delperioder: List<RammeForReiseMedPrivatBilDelperiode>,
+    ) = rammeForReiseMedPrivatBil(reiseId = reiseId, fom = fom, tom = tom, delperioder = delperioder)
 }
