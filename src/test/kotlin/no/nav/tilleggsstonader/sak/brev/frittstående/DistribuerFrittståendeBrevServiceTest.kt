@@ -6,6 +6,8 @@ import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
 import no.nav.tilleggsstonader.kontrakter.dokdist.Distribusjonstype
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
 import no.nav.tilleggsstonader.libs.http.client.ProblemDetailException
+import no.nav.tilleggsstonader.sak.brev.DistribuerBrevService
+import no.nav.tilleggsstonader.sak.brev.ResultatDistribusjon
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerFrittståendeBrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPerson
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerFrittståendeBrev
@@ -27,9 +29,9 @@ class DistribuerFrittståendeBrevServiceTest {
 
     private val service =
         DistribuerFrittståendeBrevService(
-            journalpostClient = journalpostClient,
             brevmottakerFrittståendeBrevRepository = brevmottakerFrittståendeBrevRepository,
             transactionHandler = TransactionHandler(),
+            distribuerBrevService = DistribuerBrevService(journalpostClient),
         )
 
     private val journalpostId = "journalpostId123"
@@ -61,7 +63,7 @@ class DistribuerFrittståendeBrevServiceTest {
 
         val resultat = service.distribuerBrev(mottaker)
 
-        assertThat(resultat).isEqualTo(DistribuerFrittståendeBrevService.ResultatDistribusjon.BrevDistribuert)
+        assertThat(resultat).isEqualTo(ResultatDistribusjon.Distribuert)
 
         assertThat(utførteDistribusjoner).hasSize(1)
         with(utførteDistribusjoner[0]) {
@@ -84,7 +86,7 @@ class DistribuerFrittståendeBrevServiceTest {
         val resultat = service.distribuerBrev(mottaker)
 
         assertThat(resultat).isInstanceOf(
-            DistribuerFrittståendeBrevService.ResultatDistribusjon.FeiletFordiMottakerErDødOgManglerAdresse::class.java,
+            ResultatDistribusjon.FeiletFordiMottakerErDødOgManglerAdresse::class.java,
         )
     }
 

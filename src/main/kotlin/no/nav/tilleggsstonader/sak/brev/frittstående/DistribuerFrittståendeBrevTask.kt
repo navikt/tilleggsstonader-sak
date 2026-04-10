@@ -5,8 +5,8 @@ import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
+import no.nav.tilleggsstonader.sak.brev.ResultatDistribusjon
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerFrittståendeBrevRepository
-import no.nav.tilleggsstonader.sak.brev.frittstående.DistribuerFrittståendeBrevService.ResultatDistribusjon
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.stoppTaskOgRekjørSenere
