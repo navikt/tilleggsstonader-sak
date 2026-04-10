@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.ekstern.stønad
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.søknad.RammevedtakDto
 import no.nav.tilleggsstonader.kontrakter.søknad.RammevedtakUkeDto
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
@@ -17,11 +18,6 @@ fun RammevedtakPrivatBil.tilDto(kjørelister: Map<ReiseId, List<Kjøreliste>>): 
             reiseId = reise.reiseId.toString(),
             fom = reise.grunnlag.fom,
             tom = reise.grunnlag.tom,
-            reisedagerPerUke =
-                reise.grunnlag.delperioder
-                    .first()
-                    .reisedagerPerUke,
-            // TODO - vise delperioder ut i front-end
             aktivitetsadresse = reise.aktivitetsadresse ?: "Ukjent adresse",
             aktivitetsnavn = "Ukjent aktivitet",
             uker =
@@ -33,6 +29,7 @@ fun RammevedtakPrivatBil.tilDto(kjørelister: Map<ReiseId, List<Kjøreliste>>): 
                             fom = datoer.min(),
                             tom = datoer.max(),
                             ukeNummer = uke.ukenummer,
+                            reisedagerPerUke = reise.finnDelperiodeForPeriode(Datoperiode(datoer.min(), datoer.max())).reisedagerPerUke,
                             innsendtDato = kjørelisteForUke?.datoMottatt?.toLocalDate(),
                             kanSendeInnKjøreliste = uke.erFørNåværendeUke(),
                         )
