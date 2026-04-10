@@ -192,7 +192,7 @@ class TilsynBarnBeregnYtelseSteg(
         beregningsresultat: BeregningsresultatTilsynBarn,
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
-        beregningsplan: no.nav.tilleggsstonader.sak.vedtak.Beregningsplan,
+        beregningsplan: Beregningsplan,
     ): Vedtak =
         GeneriskVedtak(
             behandlingId = behandling.id,

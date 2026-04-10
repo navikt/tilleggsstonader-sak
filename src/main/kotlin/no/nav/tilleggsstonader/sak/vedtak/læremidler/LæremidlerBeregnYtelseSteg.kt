@@ -138,9 +138,6 @@ class LæremidlerBeregnYtelseSteg(
         feilHvis(saksbehandling.forrigeIverksatteBehandlingId == null) {
             "Opphør er et ugyldig vedtaksresultat fordi behandlingen er en førstegangsbehandling"
         }
-        feilHvis(vedtak.opphørsdato == null) {
-            "Opphørsdato er ikke satt"
-        }
 
         val opphørsdato = vedtak.opphørsdato
         val forrigeVedtak = hentVedtak(saksbehandling.forrigeIverksatteBehandlingId)

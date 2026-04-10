@@ -17,13 +17,14 @@ sealed interface VedtakLæremidler : Vedtaksdata
 sealed interface InnvilgelseEllerOpphørLæremidler : VedtakLæremidler {
     val vedtaksperioder: List<Vedtaksperiode>
     val beregningsresultat: BeregningsresultatLæremidler
+    val beregningsplan: Beregningsplan
 }
 
 data class InnvilgelseLæremidler(
     override val vedtaksperioder: List<Vedtaksperiode>,
     override val beregningsresultat: BeregningsresultatLæremidler,
+    override val beregningsplan: Beregningsplan,
     val begrunnelse: String? = null,
-    val beregningsplan: Beregningsplan,
 ) : InnvilgelseEllerOpphørLæremidler,
     Innvilgelse {
     override val type: TypeVedtaksdata = TypeVedtakLæremidler.INNVILGELSE_LÆREMIDLER
@@ -46,7 +47,7 @@ data class OpphørLæremidler(
     override val beregningsresultat: BeregningsresultatLæremidler,
     override val årsaker: List<ÅrsakOpphør>,
     override val begrunnelse: String,
-    val beregningsplan: Beregningsplan,
+    override val beregningsplan: Beregningsplan,
 ) : InnvilgelseEllerOpphørLæremidler,
     Opphør {
     override val type: TypeVedtaksdata = TypeVedtakLæremidler.OPPHØR_LÆREMIDLER

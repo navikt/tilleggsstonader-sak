@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.VedtakBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -96,7 +95,7 @@ class BoutgifterVedtakController(
                 vedtaksperioder = vedtaksperioder,
                 plan = plan,
                 typeVedtak = TypeVedtak.INNVILGELSE,
-            ).tilDto(beregningsplan = plan.tilDto())
+            ).tilDto(beregningsplan = plan)
     }
 
     @GetMapping("{behandlingId}")

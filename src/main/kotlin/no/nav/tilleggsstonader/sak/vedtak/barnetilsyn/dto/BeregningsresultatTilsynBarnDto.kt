@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.YEAR_MONTH_MIN
 import no.nav.tilleggsstonader.sak.util.toYearMonth
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
@@ -10,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatT
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarnMapper
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarnMapper.VedtaksperiodeTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.dto.BeregningsplanDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -48,7 +50,7 @@ data class BeregningsgrunnlagDto(
  * Beregningsresultat inneholder perioder for nytt vedtak inklusive perioder som er kopiert fra forrige behandling
  * Men det er i de fleste tilfeller kun interessant å vise perioder fra og med tidligsteEndring.
  */
-fun BeregningsresultatTilsynBarn.tilDto(beregningsplan: BeregningsplanDto): BeregningsresultatTilsynBarnDto {
+fun BeregningsresultatTilsynBarn.tilDto(beregningsplan: Beregningsplan): BeregningsresultatTilsynBarnDto {
     val filtrertPerioder = this.perioder.filterNot { it.grunnlag.måned < (beregningsplan.fraDato?.toYearMonth() ?: YEAR_MONTH_MIN) }
 
     val vedtaksperioder =
@@ -62,7 +64,7 @@ fun BeregningsresultatTilsynBarn.tilDto(beregningsplan: BeregningsplanDto): Bere
         vedtaksperioder = vedtaksperioder,
         gjelderFraOgMed = vedtaksperioder.minOfOrNull { it.fom },
         gjelderTilOgMed = vedtaksperioder.maxOfOrNull { it.tom },
-        beregningsplan = beregningsplan,
+        beregningsplan = beregningsplan.tilDto(),
         tidligsteEndring = beregningsplan.fraDato,
     )
 }

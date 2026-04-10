@@ -14,7 +14,6 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.LæremidlerBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatLæremidlerDto
@@ -96,7 +95,7 @@ class LæremidlerVedtakController(
                 vedtaksperioder.tilDomene(),
                 plan,
                 TypeVedtak.INNVILGELSE,
-            ).tilDto(beregningsplan = plan.tilDto())
+            ).tilDto(beregningsplan = plan)
     }
 
     @GetMapping("{behandlingId}")

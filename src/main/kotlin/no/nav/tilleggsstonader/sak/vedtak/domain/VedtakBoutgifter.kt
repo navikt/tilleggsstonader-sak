@@ -42,13 +42,14 @@ sealed interface VedtakBoutgifter : Vedtaksdata
 sealed interface InnvilgelseEllerOpphørBoutgifter : VedtakBoutgifter {
     val beregningsresultat: BeregningsresultatBoutgifter
     val vedtaksperioder: List<Vedtaksperiode>
+    val beregningsplan: Beregningsplan
 }
 
 data class InnvilgelseBoutgifter(
     override val beregningsresultat: BeregningsresultatBoutgifter,
     override val vedtaksperioder: List<Vedtaksperiode>,
+    override val beregningsplan: Beregningsplan,
     val begrunnelse: String? = null,
-    val beregningsplan: Beregningsplan,
 ) : InnvilgelseEllerOpphørBoutgifter,
     Innvilgelse {
     override val type: TypeVedtaksdata = TypeVedtakBoutgifter.INNVILGELSE_BOUTGIFTER
@@ -71,7 +72,7 @@ data class OpphørBoutgifter(
     override val beregningsresultat: BeregningsresultatBoutgifter,
     override val årsaker: List<ÅrsakOpphør>,
     override val begrunnelse: String,
-    val beregningsplan: Beregningsplan,
+    override val beregningsplan: Beregningsplan,
 ) : InnvilgelseEllerOpphørBoutgifter,
     Opphør {
     override val type: TypeVedtaksdata = TypeVedtakBoutgifter.OPPHØR_BOUTGIFTER

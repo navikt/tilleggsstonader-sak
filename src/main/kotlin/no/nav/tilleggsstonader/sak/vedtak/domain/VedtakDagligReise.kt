@@ -26,6 +26,7 @@ sealed interface InnvilgelseEllerOpphørDagligReise : VedtakDagligReise {
     val beregningsresultat: BeregningsresultatDagligReise
     val rammevedtakPrivatBil: RammevedtakPrivatBil?
     val vedtaksperioder: List<Vedtaksperiode>
+    val beregningsplan: Beregningsplan
 }
 
 data class InnvilgelseDagligReise(
@@ -33,7 +34,7 @@ data class InnvilgelseDagligReise(
     override val rammevedtakPrivatBil: RammevedtakPrivatBil?,
     override val vedtaksperioder: List<Vedtaksperiode>,
     val begrunnelse: String? = null,
-    val beregningsplan: Beregningsplan,
+    override val beregningsplan: Beregningsplan,
 ) : InnvilgelseEllerOpphørDagligReise,
     Innvilgelse {
     override val type: TypeVedtaksdata =
@@ -61,7 +62,7 @@ data class OpphørDagligReise(
     override val rammevedtakPrivatBil: RammevedtakPrivatBil?,
     override val årsaker: List<ÅrsakOpphør>,
     override val begrunnelse: String,
-    val beregningsplan: Beregningsplan,
+    override val beregningsplan: Beregningsplan,
 ) : InnvilgelseEllerOpphørDagligReise,
     Opphør {
     override val type: TypeVedtaksdata =

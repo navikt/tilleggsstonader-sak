@@ -100,7 +100,7 @@ class VedtakDtoMapper(
         when (data) {
             is InnvilgelseTilsynBarn ->
                 InnvilgelseTilsynBarnResponse(
-                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan.tilDto()),
+                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan),
                     vedtaksperioder =
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
@@ -110,11 +110,11 @@ class VedtakDtoMapper(
 
             is OpphørTilsynBarn ->
                 OpphørTilsynBarnResponse(
-                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan.tilDto()),
+                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan),
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
                     vedtaksperioder = data.vedtaksperioder.tilLagretVedtaksperiodeDto(null),
-                    opphørsdato = vedtak.opphørsdato,
+                    opphørsdato = vedtak.opphørsdato ?: feil("Opphørsdato er obligatorisk for opphør"),
                 )
 
             is AvslagTilsynBarn ->
@@ -137,7 +137,7 @@ class VedtakDtoMapper(
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
                         ),
-                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan.tilDto()),
+                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,
@@ -174,7 +174,7 @@ class VedtakDtoMapper(
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
                         ),
-                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan.tilDto()),
+                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,
@@ -195,7 +195,7 @@ class VedtakDtoMapper(
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
                         ),
-                    opphørsdato = vedtak.opphørsdato,
+                    opphørsdato = vedtak.opphørsdato ?: feil("Opphørsdato er obligatorisk for opphør"),
                     beregningsplan = data.beregningsplan.tilDto(),
                 )
         }
@@ -232,7 +232,7 @@ class VedtakDtoMapper(
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
                         ),
-                    opphørsdato = vedtak.opphørsdato,
+                    opphørsdato = vedtak.opphørsdato ?: feil("Opphørsdato er obligatorisk for opphør"),
                 )
         }
 

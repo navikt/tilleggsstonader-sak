@@ -2,11 +2,13 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.summerUtgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.dto.BeregningsplanDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 
@@ -44,7 +46,7 @@ data class UtgiftBoutgifterMedAndelTilUtbetalingDto(
     }
 }
 
-fun BeregningsresultatBoutgifter.tilDto(beregningsplan: BeregningsplanDto) =
+fun BeregningsresultatBoutgifter.tilDto(beregningsplan: Beregningsplan) =
     BeregningsresultatBoutgifterDto(
         perioder =
             filtrerFraOgMed(beregningsplan.fraDato)
@@ -52,7 +54,7 @@ fun BeregningsresultatBoutgifter.tilDto(beregningsplan: BeregningsplanDto) =
                 .map { it.tilDto(beregningsplan.fraDato) },
         inneholderUtgifterOvernatting = inneholderUtgifterOvernatting(),
         tidligsteEndring = beregningsplan.fraDato,
-        beregningsplan = beregningsplan,
+        beregningsplan = beregningsplan.tilDto(),
     )
 
 private fun BeregningsresultatBoutgifter.filtrerFraOgMed(dato: LocalDate?): BeregningsresultatBoutgifter {

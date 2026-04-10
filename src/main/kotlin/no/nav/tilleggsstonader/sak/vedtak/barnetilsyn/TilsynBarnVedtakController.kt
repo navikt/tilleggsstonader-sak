@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnReques
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -93,7 +92,7 @@ class TilsynBarnVedtakController(
                 behandling = behandling,
                 plan = beregningsplan,
                 typeVedtak = TypeVedtak.INNVILGELSE,
-            ).tilDto(beregningsplan.tilDto())
+            ).tilDto(beregningsplan)
     }
 
     @GetMapping("{behandlingId}")

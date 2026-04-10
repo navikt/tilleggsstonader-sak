@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
@@ -161,9 +162,9 @@ class DagligReiseBeregningService(
 
     private fun hentForrigeOffentligTransport(behandling: Saksbehandling): BeregningsresultatOffentligTransport? {
         val forrigeBehandlingId =
-            requireNotNull(behandling.forrigeIverksatteBehandlingId) {
-                "Kan ikke gjenbruke forrige beregningsresultat uten forrige iverksatt behandling"
-            }
+            behandling.forrigeIverksatteBehandlingId
+                ?: feil("Kan ikke gjenbruke forrige beregningsresultat uten forrige iverksatt behandling")
+
         return vedtakRepository
             .findByIdOrThrow(forrigeBehandlingId)
             .withTypeOrThrow<InnvilgelseEllerOpphørDagligReise>()

@@ -4,7 +4,9 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.dto.BeregningsplanDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
@@ -48,7 +50,7 @@ data class BeregningsresultatForPeriodeDto(
             this.påfølgesAv(nestePeriode)
 }
 
-fun BeregningsresultatLæremidler.tilDto(beregningsplan: BeregningsplanDto) =
+fun BeregningsresultatLæremidler.tilDto(beregningsplan: Beregningsplan) =
     BeregningsresultatLæremidlerDto(
         perioder =
             filtrerFraOgMed(beregningsplan.fraDato)
@@ -59,7 +61,7 @@ fun BeregningsresultatLæremidler.tilDto(beregningsplan: BeregningsplanDto) =
                     merge = { v1, v2 -> v1.slåSammen(v2) },
                 ),
         tidligsteEndring = beregningsplan.fraDato,
-        beregningsplan = beregningsplan,
+        beregningsplan = beregningsplan.tilDto(),
     )
 
 fun BeregningsresultatForMåned.tilDto(): BeregningsresultatForPeriodeDto =

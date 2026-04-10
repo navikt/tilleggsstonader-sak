@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.YEAR_MONTH_MIN
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
@@ -100,9 +101,7 @@ class TilsynBarnBeregningService(
 
     private fun hentForrigeBeregningsresultat(behandling: Saksbehandling): BeregningsresultatTilsynBarn {
         val forrigeBehandlingId =
-            requireNotNull(behandling.forrigeIverksatteBehandlingId) {
-                "Kan ikke hente forrige beregningsresultat uten forrige iverksatt behandling"
-            }
+            behandling.forrigeIverksatteBehandlingId ?: feil("Kan ikke hente forrige beregningsresultat uten forrige iverksatt behandling")
         return vedtakRepository
             .findByIdOrThrow(forrigeBehandlingId)
             .withTypeOrThrow<InnvilgelseEllerOpphørTilsynBarn>()

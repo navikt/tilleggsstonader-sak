@@ -10,8 +10,8 @@ data class OpphørBoutgifterResponse(
     val vedtaksperioder: List<LagretVedtaksperiodeDto>,
     val årsakerOpphør: List<ÅrsakOpphør>,
     val begrunnelse: String,
-    val opphørsdato: LocalDate?,
-    val beregningsplan: BeregningsplanDto? = null,
+    val opphørsdato: LocalDate,
+    val beregningsplan: BeregningsplanDto,
 ) : VedtakBoutgifterDto(TypeVedtak.OPPHØR),
     VedtakBoutgifterResponse
 
