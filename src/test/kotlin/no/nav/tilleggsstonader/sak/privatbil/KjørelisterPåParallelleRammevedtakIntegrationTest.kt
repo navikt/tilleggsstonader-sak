@@ -181,7 +181,6 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : IntegrationTest() {
         val reisevurderingBehandling1 = finnReisevurderinger(kjørelistebehandling1.id).ramme1!!
         val reisevurderingerBehandling2 = finnReisevurderinger(kjørelistebehandling2.id).ramme1!!
 
-
         // Kun første uken skal ha en kjøreliste og avklart uke i den første kjørelistebehandlingen
         val (uke1Behandling1, resterendeUkerBehandling1) = reisevurderingBehandling1.uker.first() to reisevurderingBehandling1.uker.drop(1)
         assertThat(uke1Behandling1.kjørelisteInnsendtDato).isNotNull
@@ -193,7 +192,9 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : IntegrationTest() {
         }
 
         // Kun andre og tredje uken skal ha en kjøreliste og avklart uke i den andre kjørelistebehandlingen
-        val (uke1Behandling2, resterendeUkerBehandling2) = reisevurderingerBehandling2.uker.first() to reisevurderingerBehandling2.uker.drop(1)
+        val (uke1Behandling2, resterendeUkerBehandling2) =
+            reisevurderingerBehandling2.uker.first() to
+                reisevurderingerBehandling2.uker.drop(1)
         assertThat(uke1Behandling2.kjørelisteInnsendtDato).isNull()
         assertThat(uke1Behandling2.avklartUkeId).isNull()
 
