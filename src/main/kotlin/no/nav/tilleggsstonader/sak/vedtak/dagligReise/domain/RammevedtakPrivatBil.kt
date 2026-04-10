@@ -17,8 +17,8 @@ data class RammevedtakPrivatBil(
 data class RammeForReiseMedPrivatBil(
     val reiseId: ReiseId,
     val aktivitetsadresse: String?,
-    val aktivitetType: AktivitetType = AktivitetType.TILTAK,
-    val typeAktivitet: TypeAktivitet? = null,
+    val aktivitetType: AktivitetType,
+    val typeAktivitet: TypeAktivitet?,
     val grunnlag: BeregningsgrunnlagForReiseMedPrivatBil,
 )
 
