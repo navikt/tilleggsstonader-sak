@@ -115,7 +115,6 @@ class PrivatBilBeregningsresultatServiceTest {
         beregningsresultatUke.grunnlag.dager.forEach { reisedag ->
             val reisedagFraKjøreliste = reisedager.single { it.dato == reisedag.dato }
             assertThat(reisedagFraKjøreliste.parkeringsutgift).isEqualTo(reisedag.parkeringskostnad)
-            assertThat(reisedagFraKjøreliste.parkeringsutgift).isEqualTo(reisedag.parkeringskostnad)
         }
     }
 

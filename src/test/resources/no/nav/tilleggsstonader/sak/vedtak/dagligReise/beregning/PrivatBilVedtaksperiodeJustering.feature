@@ -61,7 +61,7 @@ Egenskap: Beregning av privat bil og vedtaksperioder
 
       Gitt følgende delperioder for vilkår daglig reise med privat bil
         | Reisenr | Fom        | Tom        | Antall reisedager per uke |
-        | 1       | 12.01.2025 | 31.01.2025 | 5                         |
+        | 1       | 12.01.2026 | 31.01.2026 | 5                         |
 
       Når beregner for daglig reise privat bil
 

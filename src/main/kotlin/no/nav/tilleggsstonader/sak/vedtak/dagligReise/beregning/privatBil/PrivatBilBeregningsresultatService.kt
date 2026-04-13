@@ -113,7 +113,3 @@ class PrivatBilBeregningsresultatService {
             }
     }
 }
-
-private fun List<RammeForReiseMedPrivatBilDelperiode>.delperiodeForDato(dato: LocalDate) =
-    singleOrNull { it.fom <= dato && dato <= it.tom }
-        ?: error("Finner ingen delperiode i rammevedtak for dato $dato")
