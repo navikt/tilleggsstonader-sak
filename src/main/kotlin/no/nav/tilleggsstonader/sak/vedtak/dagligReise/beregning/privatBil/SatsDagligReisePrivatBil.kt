@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
+import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.libs.utils.dato.januar
@@ -12,7 +13,18 @@ data class SatsDagligReisePrivatBil(
     override val tom: LocalDate,
     val beløp: BigDecimal,
     val bekreftet: Boolean = true,
-) : Periode<LocalDate>
+) : Periode<LocalDate>,
+    KopierPeriode<SatsDagligReisePrivatBil> {
+    override fun medPeriode(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) = SatsDagligReisePrivatBil(
+        fom = fom,
+        tom = tom,
+        beløp = beløp,
+        bekreftet = bekreftet,
+    )
+}
 
 private val MAX = LocalDate.of(2099, 12, 31)
 
@@ -59,6 +71,8 @@ class SatsDagligReisePrivatBilProvider {
     fun finnRelevantKilometerSatsForPeriode(periode: Periode<LocalDate>): SatsDagligReisePrivatBil =
         alleSatser.find { it.inneholder(periode) }
             ?: error("Kan ikke finne relevant kilometersats for $periode")
+
+    fun finnAlleSatserInnenforPeriode(periode: Periode<LocalDate>) = alleSatser.filter { it.overlapper(periode) }
 
     fun finnSatsForÅr(år: Int) =
         alleSatser.single {

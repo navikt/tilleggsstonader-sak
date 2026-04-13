@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UtfyltDagAutomatiskVurdering
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -38,7 +39,20 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
-                defaultDagligReisePrivatBilTsoTestdata(1 januar 2026, 4 januar 2026, 2)
+                defaultDagligReisePrivatBilTsoTestdata(
+                    1 januar 2026,
+                    4 januar 2026,
+                    delperioder =
+                        listOf(
+                            FaktaDelperiodePrivatBilDto(
+                                fom = 1 januar 2026,
+                                tom = 4 januar 2026,
+                                reisedagerPerUke = 2,
+                                bompengerPerDag = null,
+                                fergekostnadPerDag = null,
+                            ),
+                        ),
+                )
 
                 sendInnKjøreliste {
                     periode = Datoperiode(1 januar 2026, 4 januar 2026)
@@ -94,7 +108,20 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
-                defaultDagligReisePrivatBilTsoTestdata(5 januar 2026, 31 januar 2026, 3)
+                defaultDagligReisePrivatBilTsoTestdata(
+                    5 januar 2026,
+                    31 januar 2026,
+                    delperioder =
+                        listOf(
+                            FaktaDelperiodePrivatBilDto(
+                                fom = 5 januar 2026,
+                                tom = 31 januar 2026,
+                                reisedagerPerUke = 3,
+                                bompengerPerDag = null,
+                                fergekostnadPerDag = null,
+                            ),
+                        ),
+                )
 
                 sendInnKjøreliste {
                     periode = Datoperiode(5 januar 2026, 11 januar 2026)
@@ -268,7 +295,20 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
-                defaultDagligReisePrivatBilTsoTestdata(5 januar 2026, 31 januar 2026, 3)
+                defaultDagligReisePrivatBilTsoTestdata(
+                    5 januar 2026,
+                    31 januar 2026,
+                    delperioder =
+                        listOf(
+                            FaktaDelperiodePrivatBilDto(
+                                fom = 5 januar 2026,
+                                tom = 31 januar 2026,
+                                reisedagerPerUke = 3,
+                                bompengerPerDag = null,
+                                fergekostnadPerDag = null,
+                            ),
+                        ),
+                )
 
                 sendInnKjøreliste {
                     periode = Datoperiode(5 januar 2026, 11 januar 2026)

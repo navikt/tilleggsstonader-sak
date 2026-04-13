@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -24,8 +25,8 @@ fun validerOppdatertAvklartKjørtUke(
     rammevedtak: RammeForReiseMedPrivatBil,
     innsendteKjørelisteDager: List<KjørelisteDag>,
 ) {
-    validerAntallDagerGodkjentInnenforRammevedtak(oppdaterteDager, rammevedtak)
     validerInnsendteDagerErInnenforUken(ukeSomSkalOppdateres, oppdaterteDager)
+    validerAntallDagerGodkjentInnenforRammevedtak(oppdaterteDager, rammevedtak)
 
     oppdaterteDager.forEach { oppdatertDag ->
         oppdatertDag.validerGyldigeVerdier()
@@ -40,8 +41,15 @@ private fun validerAntallDagerGodkjentInnenforRammevedtak(
     rammevedtak: RammeForReiseMedPrivatBil,
 ) {
     val antallDagerSomDekkes = oppdaterteDager.count { it.godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.JA }
+    val tilhørendeDelperiode =
+        rammevedtak.finnDelperiodeForPeriode(
+            Datoperiode(
+                oppdaterteDager.minOf { it.dato },
+                oppdaterteDager.maxOf { it.dato },
+            ),
+        )
 
-    brukerfeilHvis(antallDagerSomDekkes > rammevedtak.grunnlag.reisedagerPerUke) {
+    brukerfeilHvis(antallDagerSomDekkes > tilhørendeDelperiode.reisedagerPerUke) {
         "Antall godkjente reisedager kan ikke være høyere enn antall dager godkjent i rammevedtak"
     }
 }

@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto
 
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import java.math.BigDecimal
@@ -14,33 +16,58 @@ data class RammeForReiseMedPrivatBilDto(
     val reiseId: ReiseId,
     val fom: LocalDate,
     val tom: LocalDate,
-    val reisedagerPerUke: Int,
+    val delperioder: List<DelperiodeDto>,
     val reiseavstandEnVei: BigDecimal,
+    val aktivitetsadresse: String?,
+)
+
+data class DelperiodeDto(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val reisedagerPerUke: Int,
     val bompengerPerDag: Int?,
     val fergekostnadPerDag: Int?,
-    val aktivitetsadresse: String?,
+    val satser: List<RammeForReiseMedPrivatBilDelperiodeSatserDto>,
+) : Periode<LocalDate>
+
+data class RammeForReiseMedPrivatBilDelperiodeSatserDto(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val satsBekreftetVedVedtakstidspunkt: Boolean,
     val kilometersats: BigDecimal,
     val dagsatsUtenParkering: BigDecimal,
-)
+) : Periode<LocalDate>
 
 fun RammevedtakPrivatBil.tilDto() =
     RammevedtakPrivatBilDto(
-        reiser = reiser.flatMap { it.tilDto() },
+        reiser = reiser.map { it.tilDto() },
     )
 
-// TODO: Flytt splitting til beregning dersom vi vil beholde det
-fun RammeForReiseMedPrivatBil.tilDto(): List<RammeForReiseMedPrivatBilDto> =
-    grunnlag.satser.map {
-        RammeForReiseMedPrivatBilDto(
-            reiseId = reiseId,
-            fom = it.fom,
-            tom = it.tom,
-            reisedagerPerUke = grunnlag.reisedagerPerUke,
-            reiseavstandEnVei = grunnlag.reiseavstandEnVei,
-            bompengerPerDag = grunnlag.ekstrakostnader.bompengerPerDag,
-            kilometersats = it.kilometersats,
-            dagsatsUtenParkering = it.dagsatsUtenParkering,
-            fergekostnadPerDag = grunnlag.ekstrakostnader.fergekostnadPerDag,
-            aktivitetsadresse = this.aktivitetsadresse,
-        )
-    }
+fun RammeForReiseMedPrivatBil.tilDto(): RammeForReiseMedPrivatBilDto =
+    RammeForReiseMedPrivatBilDto(
+        reiseId = reiseId,
+        fom = grunnlag.fom,
+        tom = grunnlag.tom,
+        delperioder =
+            grunnlag.delperioder.map { delperiode ->
+                DelperiodeDto(
+                    fom = delperiode.fom,
+                    tom = delperiode.tom,
+                    bompengerPerDag = delperiode.ekstrakostnader.bompengerPerDag,
+                    fergekostnadPerDag = delperiode.ekstrakostnader.fergekostnadPerDag,
+                    reisedagerPerUke = delperiode.reisedagerPerUke,
+                    satser = delperiode.satser.map { it.tilDto() },
+                )
+            },
+        reiseavstandEnVei = grunnlag.reiseavstandEnVei,
+        aktivitetsadresse = aktivitetsadresse,
+    )
+
+fun RammeForReiseMedPrivatBilSatsForDelperiode.tilDto() =
+    RammeForReiseMedPrivatBilDelperiodeSatserDto(
+        fom = fom,
+        tom = tom,
+        satsBekreftetVedVedtakstidspunkt = satsBekreftetVedVedtakstidspunkt,
+        kilometersats = kilometersats,
+        dagsatsUtenParkering = dagsatsUtenParkering,
+    )

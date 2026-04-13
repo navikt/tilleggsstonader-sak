@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.BeregningsplanDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -63,7 +62,6 @@ data class BeregningsresultatPrivatBilDto(
 data class BeregningsresultatForReisePrivatBilDto(
     val reiseId: ReiseId,
     val adresse: String?,
-    val reisedagerPerUke: Int?,
     val perioder: List<BeregningsresultatForPeriodePrivatBilDto>,
 )
 
@@ -77,13 +75,13 @@ data class BeregningsresultatForPeriodePrivatBilDto(
 
 data class BeregningsresultatForReisePrivatBilGrunnlagDto(
     val dager: List<BeregningsresultatForReisePrivatBilDagDto>,
-    val dagsatsUtenParkering: BigDecimal,
 )
 
 data class BeregningsresultatForReisePrivatBilDagDto(
     val dato: LocalDate,
     val parkeringskostnad: Int,
     val stønadsbeløpForDag: BigDecimal,
+    val dagsatsUtenParkering: BigDecimal,
 )
 
 fun BeregningDagligReise.tilDto(
@@ -140,13 +138,10 @@ fun BeregningsresultatPrivatBil.tilDto(vilkår: List<VilkårDagligReise>): Bereg
 fun BeregningsresultatForReisePrivatBil.tilDto(vilkår: List<VilkårDagligReise>): BeregningsresultatForReisePrivatBilDto {
     val vilkårForReise =
         vilkår.filter { it.fakta.type == TypeDagligReise.PRIVAT_BIL }.firstOrNull { it.fakta.reiseId == reiseId }
-    val vilkårFakta = vilkårForReise?.fakta?.mapTilVilkårFakta() as? FaktaDagligReisePrivatBil
 
     return BeregningsresultatForReisePrivatBilDto(
         reiseId = reiseId,
         adresse = vilkårForReise?.fakta?.adresse,
-        // TODO Mappe om denne til delperioder
-        reisedagerPerUke = vilkårFakta?.faktaDelperioder?.single()?.reisedagerPerUke,
         perioder = perioder.map { it.tilDto() },
     )
 }
@@ -163,9 +158,9 @@ fun BeregningsresultatForReisePrivatBilPeriode.tilDto(): BeregningsresultatForPe
                             dato = it.dato,
                             parkeringskostnad = it.parkeringskostnad,
                             stønadsbeløpForDag = it.stønadsbeløpForDag,
+                            dagsatsUtenParkering = it.dagsatsUtenParkering,
                         )
                     },
-                dagsatsUtenParkering = grunnlag.dagsatsUtenParkering,
             ),
         stønadsbeløp = stønadsbeløp,
         brukersNavKontor = brukersNavKontor,

@@ -14,10 +14,8 @@ data class ReiseMedPrivatBil(
     override val tom: LocalDate,
     val reiseId: ReiseId,
     val aktivitetsadresse: String?,
-    val reisedagerPerUke: Int,
+    val delPerioder: List<ReiseMedPrivatBilDelperiode>,
     val reiseavstandEnVei: BigDecimal,
-    val bompengerPerDag: Int?,
-    val fergekostnadPerDag: Int?,
 ) : Periode<LocalDate>,
     KopierPeriode<ReiseMedPrivatBil> {
     override fun medPeriode(
@@ -26,24 +24,46 @@ data class ReiseMedPrivatBil(
     ): ReiseMedPrivatBil = this.copy(fom = fom, tom = tom)
 }
 
-fun VilkårDagligReise.tilReiseMedPrivatBil(): ReiseMedPrivatBil {
+data class ReiseMedPrivatBilDelperiode(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val reisedagerPerUke: Int,
+    val bompengerPerDag: Int?,
+    val fergekostnadPerDag: Int?,
+) : Periode<LocalDate>,
+    KopierPeriode<ReiseMedPrivatBilDelperiode> {
+    override fun medPeriode(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) = ReiseMedPrivatBilDelperiode(
+        fom = fom,
+        tom = tom,
+        reisedagerPerUke = reisedagerPerUke,
+        bompengerPerDag = bompengerPerDag,
+        fergekostnadPerDag = fergekostnadPerDag,
+    )
+}
+
+fun VilkårDagligReise.tilReiserMedPrivatBil(): ReiseMedPrivatBil {
     feilHvis(this.fakta !is FaktaPrivatBil) {
         "Forventer kun å få inn vilkår med fakta som er av type privat bil ved beregning av privat bil"
     }
 
-    val fakta = this.fakta
-    val periode = fakta.faktaDelperioder.single()
-
-    // TODO - her er jeg litt usikker på hva jeg skal gjøre og hvordan vi vil vise rammevedtaket dersom det er flere reiseperioder i perioden med rammevedtak.
-
     return ReiseMedPrivatBil(
         fom = this.fom,
         tom = this.tom,
-        reiseId = fakta.reiseId,
-        reisedagerPerUke = periode.reisedagerPerUke,
+        aktivitetsadresse = this.fakta.adresse,
+        reiseId = this.fakta.reiseId,
         reiseavstandEnVei = fakta.reiseavstandEnVei,
-        bompengerPerDag = periode.bompengerPerDag,
-        fergekostnadPerDag = periode.fergekostnadPerDag,
-        aktivitetsadresse = fakta.adresse,
+        delPerioder =
+            fakta.faktaDelperioder.map { delperiode ->
+                ReiseMedPrivatBilDelperiode(
+                    fom = delperiode.fom,
+                    tom = delperiode.tom,
+                    reisedagerPerUke = delperiode.reisedagerPerUke,
+                    bompengerPerDag = delperiode.bompengerPerDag,
+                    fergekostnadPerDag = delperiode.fergekostnadPerDag,
+                )
+            },
     )
 }

@@ -537,18 +537,25 @@ class InterntVedtakServiceTest {
         @Test
         fun `rammevedtak for privatBil skal bli riktig mappet`() {
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
-
             val forventet = InterntVedtakTestdata.DagligReise.rammevedtakPrivatBil.reiser
 
             interntVedtak.rammevedtakPrivatBil?.reiser?.forEachIndexed { index, reise ->
-                with(reise.grunnlag) {
-                    assertThat(this.fom).isEqualTo(forventet[index].grunnlag.fom)
-                    assertThat(this.tom).isEqualTo(forventet[index].grunnlag.tom)
-                    assertThat(this.vedtaksperioder).isEqualTo(forventet[index].grunnlag.vedtaksperioder)
-                    assertThat(this.reisedagerPerUke).isEqualTo(forventet[index].grunnlag.reisedagerPerUke)
-                    assertThat(this.reiseavstandEnVei).isEqualTo(forventet[index].grunnlag.reiseavstandEnVei)
-                    assertThat(this.satser).isEqualTo(forventet[index].grunnlag.satser)
-                    assertThat(this.ekstrakostnader).isEqualTo(forventet[index].grunnlag.ekstrakostnader)
+                val faktiskGrunnlag = reise.grunnlag
+                val forventetGrunnlag = forventet[index].grunnlag
+
+                assertThat(faktiskGrunnlag.fom).isEqualTo(forventetGrunnlag.fom)
+                assertThat(faktiskGrunnlag.tom).isEqualTo(forventetGrunnlag.tom)
+                assertThat(faktiskGrunnlag.vedtaksperioder).isEqualTo(forventetGrunnlag.vedtaksperioder)
+                assertThat(faktiskGrunnlag.reiseavstandEnVei).isEqualTo(forventetGrunnlag.reiseavstandEnVei)
+
+                assertThat(faktiskGrunnlag.delperioder).hasSameSizeAs(forventetGrunnlag.delperioder)
+                faktiskGrunnlag.delperioder.forEachIndexed { delIndex, faktiskDelperiode ->
+                    val forventetDelperiode = forventetGrunnlag.delperioder[delIndex]
+                    assertThat(faktiskDelperiode.fom).isEqualTo(forventetDelperiode.fom)
+                    assertThat(faktiskDelperiode.tom).isEqualTo(forventetDelperiode.tom)
+                    assertThat(faktiskDelperiode.reisedagerPerUke).isEqualTo(forventetDelperiode.reisedagerPerUke)
+                    assertThat(faktiskDelperiode.ekstrakostnader).isEqualTo(forventetDelperiode.ekstrakostnader)
+                    assertThat(faktiskDelperiode.satser).isEqualTo(forventetDelperiode.satser)
                 }
             }
         }
