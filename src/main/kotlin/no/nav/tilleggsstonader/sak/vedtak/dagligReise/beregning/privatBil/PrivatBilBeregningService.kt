@@ -44,10 +44,16 @@ class PrivatBilBeregningService(
 
     private fun mapVilkårTilReiser(oppfylteVilkår: List<VilkårDagligReise>): List<ReiseMedPrivatBil> =
         oppfylteVilkår.map { vilkår ->
-            val aktivitetId = (vilkår.fakta as FaktaPrivatBil).aktivitetId
-            val aktivitet = vilkårperiodeService.hentAktivitet(aktivitetId)
+            val fakta = vilkår.fakta as? FaktaPrivatBil
+            brukerfeilHvis(fakta == null) { "Forventet FaktaPrivatBil for daglig reise med privat bil" }
+            val aktivitet =
+                vilkårperiodeService.hentAktivitet(fakta.aktivitetId)
+                    ?: error("Fant ikke aktivitet for aktivitetId=${fakta.aktivitetId}")
+            val aktivitetType =
+                aktivitet.type as? AktivitetType
+                    ?: error("Forventet AktivitetType for aktivitetId=${fakta.aktivitetId}")
             vilkår.tilReiserMedPrivatBil(
-                aktivitetType = aktivitet?.type as? AktivitetType ?: error("Forventet AktivitetType"),
+                aktivitetType = aktivitetType,
                 typeAktivitet = aktivitet.typeAktivitet,
             )
         }
