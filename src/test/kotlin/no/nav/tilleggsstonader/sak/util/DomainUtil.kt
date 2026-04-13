@@ -683,6 +683,7 @@ fun lagreDagligReisePrivatBilDto(
             faktaDelperioder = reiseperioder,
             adresse = adresse,
             aktivitetId = aktivitetId,
+            aktivitetType = AktivitetType.TILTAK.name,
         ),
 ) = LagreDagligReiseDto(
     fom = fom,

@@ -59,6 +59,7 @@ data class FaktaDagligReisePrivatBilDto(
     val faktaDelperioder: List<FaktaDelperiodePrivatBilDto>,
     val aktivitetId: UUID,
     val adresse: String?,
+    val aktivitetType: String,
 ) : FaktaDagligReiseDto {
     override val type = TypeDagligReise.PRIVAT_BIL
 

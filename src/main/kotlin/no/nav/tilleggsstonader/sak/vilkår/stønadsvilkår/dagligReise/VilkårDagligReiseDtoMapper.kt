@@ -24,15 +24,14 @@ object VilkårDagligReiseDtoMapper {
             resultat = this.resultat,
             status = this.status,
             delvilkårsett = this.delvilkårsett.map { it.tilDto() },
-            fakta = this.fakta.tilDto(),
+            fakta = this.fakta.tilDto(aktivitetType = aktivitetType),
             slettetKommentar = this.slettetKommentar,
-            aktivitetType = aktivitetType,
         )
 
-    private fun FaktaDagligReise.tilDto(): FaktaDagligReiseDto =
+    private fun FaktaDagligReise.tilDto(aktivitetType: String? = null): FaktaDagligReiseDto =
         when (this) {
             is FaktaOffentligTransport -> this.tilDto()
-            is FaktaPrivatBil -> this.tilDto()
+            is FaktaPrivatBil -> this.tilDto(aktivitetType = aktivitetType ?: error("aktivitetType må være satt for privat bil"))
             is FaktaUbestemtType -> FaktaDagligReiseUbestemtDto
         }
 
@@ -44,7 +43,7 @@ object VilkårDagligReiseDtoMapper {
             prisTrettidagersbillett = prisTrettidagersbillett,
         )
 
-    private fun FaktaPrivatBil.tilDto() =
+    private fun FaktaPrivatBil.tilDto(aktivitetType: String) =
         FaktaDagligReisePrivatBilDto(
             reiseavstandEnVei = reiseavstandEnVei,
             faktaDelperioder =
@@ -59,5 +58,6 @@ object VilkårDagligReiseDtoMapper {
                 },
             adresse = adresse,
             aktivitetId = aktivitetId,
+            aktivitetType = aktivitetType,
         )
 }

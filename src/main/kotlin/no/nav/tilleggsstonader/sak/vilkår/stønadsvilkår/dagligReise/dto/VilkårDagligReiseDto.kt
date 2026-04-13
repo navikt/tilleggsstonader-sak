@@ -18,5 +18,4 @@ data class VilkårDagligReiseDto(
     val delvilkårsett: List<DelvilkårDto>,
     val fakta: FaktaDagligReiseDto,
     val slettetKommentar: String? = null,
-    val aktivitetType: String? = null,
 )
