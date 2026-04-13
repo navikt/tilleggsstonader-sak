@@ -84,6 +84,32 @@ class OpprettStønadsvilkårDsl {
         }
     }
 
+    fun privatBil(
+        fom: LocalDate,
+        tom: LocalDate,
+        reiseavstandEnVei: BigDecimal = BigDecimal(10),
+        reisedagerPerUke: Int = 5,
+    ) {
+        dtoer += { _, _ ->
+            lagreDagligReisePrivatBilDto(
+                fom = fom,
+                tom = tom,
+                reiseId = ReiseId.random(),
+                reiseavstandEnVei = reiseavstandEnVei,
+                delperioder =
+                    listOf(
+                        FaktaDelperiodePrivatBilDto(
+                            fom = fom,
+                            tom = tom,
+                            reisedagerPerUke = reisedagerPerUke,
+                            bompengerPerDag = null,
+                            fergekostnadPerDag = null,
+                        ),
+                    ),
+            )
+        }
+    }
+
     fun løpendeutgifterEnBolig(
         fom: LocalDate,
         tom: LocalDate,

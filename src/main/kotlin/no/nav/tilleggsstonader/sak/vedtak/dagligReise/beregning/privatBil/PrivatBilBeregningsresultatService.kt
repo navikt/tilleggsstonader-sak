@@ -14,7 +14,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPri
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class PrivatBilBeregningsresultatService {

@@ -34,6 +34,7 @@ object KjørelisteSkjemaUtil {
                 listOf(
                     UkeMedReisedager(
                         ukeLabel = "Uke 1",
+                        reisedagerLabel = "Ukentlige reisedager: 3",
                         spørsmål = "Harru kjørt",
                         reisedager = reisedager,
                     ),
