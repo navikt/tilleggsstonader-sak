@@ -70,6 +70,7 @@ class PrivatBilBeregningStepDefinitions {
         PrivatBilBeregningService(
             satsDagligReisePrivatBilProvider = satsDagligReisePrivatBilProvider,
             vilkårperiodeService = vilkårperiodeService,
+            behandlingService = behandlingServiceMock
         )
 
     var reiserUtenDelperioder: Map<Int, LagreDagligReise> = emptyMap()

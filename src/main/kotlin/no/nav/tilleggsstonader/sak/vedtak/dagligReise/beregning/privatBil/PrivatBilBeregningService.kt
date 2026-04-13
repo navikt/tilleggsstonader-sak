@@ -20,6 +20,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
+import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 
 // Begrensninger:
 // Håndterer ikke ulik kilometersats i årskifte dersom en uke går på tvers av to år.
@@ -28,6 +31,7 @@ import java.math.BigDecimal
 class PrivatBilBeregningService(
     private val satsDagligReisePrivatBilProvider: SatsDagligReisePrivatBilProvider,
     private val vilkårperiodeService: VilkårperiodeService,
+    private val behandlingService: BehandlingService
 ) {
     fun beregnRammevedtak(
         vedtaksperioder: List<Vedtaksperiode>,
@@ -57,9 +61,12 @@ class PrivatBilBeregningService(
             val aktivitetType =
                 aktivitet.type as? AktivitetType
                     ?: error("Forventet AktivitetType for aktivitetId=${fakta.aktivitetId}")
+            val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
+
             vilkår.tilReiserMedPrivatBil(
                 aktivitetType = aktivitetType,
                 typeAktivitet = aktivitet.typeAktivitet,
+                gjelderTiltaksenheten = saksbehandling.stønadstype.behandlendeEnhet() === Enhet.NAV_TILTAK_OSLO
             )
         }
 
