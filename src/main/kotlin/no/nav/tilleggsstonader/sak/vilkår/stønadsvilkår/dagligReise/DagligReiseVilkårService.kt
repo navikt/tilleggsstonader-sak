@@ -55,7 +55,7 @@ class DagligReiseVilkårService(
     ): VilkårDagligReise {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
-        validerKanBehandleVilkåret(nyttVilkår)
+        validerKanBehandleVilkåret(nyttVilkår, behandlingId)
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår)
         val lagretVilkår = vilkårRepository.insert(vilkår.mapTilVilkår())
@@ -71,7 +71,7 @@ class DagligReiseVilkårService(
     ): VilkårDagligReise {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
-        validerKanBehandleVilkåret(nyttVilkår)
+        validerKanBehandleVilkåret(nyttVilkår, behandlingId)
 
         val eksisterendeVilkår = vilkårRepository.findByIdOrThrow(vilkårId).mapTilVilkårDagligReise()
 
@@ -164,7 +164,10 @@ class DagligReiseVilkårService(
         behandling.status.validerKanBehandlingRedigeres()
     }
 
-    private fun validerKanBehandleVilkåret(nyttVilkår: LagreDagligReise) {
+    private fun validerKanBehandleVilkåret(
+        nyttVilkår: LagreDagligReise,
+        behandlingId: BehandlingId,
+    ) {
         val gjelderPrivatBil = nyttVilkår.fakta.type == TypeDagligReise.PRIVAT_BIL
         val kanBehandlePrivatBil = unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)
 
@@ -173,13 +176,16 @@ class DagligReiseVilkårService(
         }
 
         if (gjelderPrivatBil) {
-            validerAktivitetForPrivatBil(nyttVilkår)
+            validerAktivitetForPrivatBil(nyttVilkår, behandlingId)
         }
     }
 
-    private fun validerAktivitetForPrivatBil(nyttVilkår: LagreDagligReise) {
+    private fun validerAktivitetForPrivatBil(
+        nyttVilkår: LagreDagligReise,
+        behandlingId: BehandlingId,
+    ) {
         val fakta = nyttVilkår.fakta as FaktaPrivatBil
-        val aktivitet = fakta.aktivitetId?.let { vilkårperiodeService.hentAktivitet(it) }
+        val aktivitet = vilkårperiodeService.hentAktivitet(fakta.aktivitetId, behandlingId)
         brukerfeilHvis(aktivitet == null) {
             "Aktiviteten finnes ikke"
         }

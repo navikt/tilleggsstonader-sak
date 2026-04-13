@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
@@ -36,7 +37,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilDto
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -71,12 +71,22 @@ class VilkårperiodeService(
         )
     }
 
-    fun hentAktivitet(aktivitetId: UUID): VilkårperiodeAktivitet? =
-        vilkårperiodeRepository.findByIdOrNull(aktivitetId)?.takeIfType<AktivitetFaktaOgVurdering>()
+    fun hentAktivitet(
+        aktivitetGlobalId: VilkårperiodeGlobalId,
+        behandlingId: BehandlingId,
+    ): VilkårperiodeAktivitet? =
+        vilkårperiodeRepository
+            .findByBehandlingIdAndGlobalId(behandlingId, aktivitetGlobalId)
+            ?.takeIfType<AktivitetFaktaOgVurdering>()
 
-    fun hentAktivitetType(aktivitetId: UUID): AktivitetType {
-        val vilkårperiode = vilkårperiodeRepository.findByIdOrThrow(aktivitetId)
-        feilHvis(vilkårperiode.type !is AktivitetType) { "Vilkårperiode med id=$aktivitetId er ikke en aktivitet" }
+    fun hentAktivitetType(
+        aktivitetGlobalId: VilkårperiodeGlobalId,
+        behandlingId: BehandlingId,
+    ): AktivitetType {
+        val vilkårperiode =
+            vilkårperiodeRepository.findByBehandlingIdAndGlobalId(behandlingId, aktivitetGlobalId)
+                ?: error("Finner ikke vilkårperiode med globalId=$aktivitetGlobalId for behandling=$behandlingId")
+        feilHvis(vilkårperiode.type !is AktivitetType) { "Vilkårperiode med globalId=$aktivitetGlobalId er ikke en aktivitet" }
         return vilkårperiode.type
     }
 
@@ -183,7 +193,7 @@ class VilkårperiodeService(
         if (eksisterendeVilkårperiode.resultat == ResultatVilkårperiode.OPPFYLT && oppdatert.resultat != ResultatVilkårperiode.OPPFYLT) {
             validerAktivitetIkkeReferertAvDagligReiseVilkår(
                 eksisterendeVilkårperiode.behandlingId,
-                eksisterendeVilkårperiode.id,
+                eksisterendeVilkårperiode.globalId,
             )
         }
 
@@ -200,7 +210,7 @@ class VilkårperiodeService(
 
         val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
         validerBehandling(behandling)
-        validerAktivitetIkkeReferertAvDagligReiseVilkår(vilkårperiode.behandlingId, vilkårperiode.id)
+        validerAktivitetIkkeReferertAvDagligReiseVilkår(vilkårperiode.behandlingId, vilkårperiode.globalId)
 
         if (vilkårperiode.kanSlettesPermanent()) {
             vilkårperiodeRepository.deleteById(vilkårperiode.id)
@@ -268,13 +278,13 @@ class VilkårperiodeService(
 
     private fun validerAktivitetIkkeReferertAvDagligReiseVilkår(
         behandlingId: BehandlingId,
-        vilkårperiodeId: UUID,
+        globalId: VilkårperiodeGlobalId,
     ) {
         val erReferert =
             vilkårRepository
                 .findByBehandlingId(behandlingId)
                 .filter { it.type == VilkårType.DAGLIG_REISE }
-                .any { (it.fakta as? FaktaDagligReisePrivatBil)?.aktivitetId == vilkårperiodeId }
+                .any { (it.fakta as? FaktaDagligReisePrivatBil)?.aktivitetId == globalId }
 
         brukerfeilHvis(erReferert) {
             "Aktiviteten er knyttet til et vilkår for daglig reise og kan ikke slettes eller endres"

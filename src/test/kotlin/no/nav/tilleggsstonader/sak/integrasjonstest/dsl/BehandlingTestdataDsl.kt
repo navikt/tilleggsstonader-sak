@@ -1,12 +1,12 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.dsl
 
-import java.time.LocalDate
-import java.util.UUID
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
+import java.time.LocalDate
 
 @BehandlingTestdataDslMarker
 class BehandlingTestdataDsl internal constructor() {
@@ -79,7 +79,7 @@ class BehandlingTestdataDsl internal constructor() {
                     fergekostnadPerDag = null,
                 ),
             ),
-        hentAktivitetId: (List<VilkårperiodeDto>) -> UUID = { it.single().id },
+        hentAktivitetId: (List<VilkårperiodeDto>) -> VilkårperiodeGlobalId = { it.single().globalId },
     ) {
         aktivitet {
             opprett {
@@ -93,7 +93,7 @@ class BehandlingTestdataDsl internal constructor() {
         }
         vilkår {
             opprett {
-                privatBil(fom, tom, delperioder=delperioder, hentAktivitetId = hentAktivitetId)
+                privatBil(fom, tom, delperioder = delperioder, hentAktivitetId = hentAktivitetId)
             }
         }
     }

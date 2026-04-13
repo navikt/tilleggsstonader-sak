@@ -19,11 +19,11 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.Vilkårsvurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBolig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.UUID
 
 @BehandlingTestdataDslMarker
 class StønadsvilkårTestdataDsl {
@@ -74,7 +74,7 @@ class OpprettStønadsvilkårDsl {
         tom: LocalDate,
         reiseavstandEnVei: BigDecimal = BigDecimal(10),
         delperioder: List<FaktaDelperiodePrivatBilDto>,
-        hentAktivitetId: (List<VilkårperiodeDto>) -> UUID = { it.single().id },
+        hentAktivitetId: (List<VilkårperiodeDto>) -> VilkårperiodeGlobalId = { it.single().globalId },
     ) {
         dtoer += { _, _, aktiviteter ->
             lagreDagligReisePrivatBilDto(
@@ -93,7 +93,7 @@ class OpprettStønadsvilkårDsl {
         tom: LocalDate,
         reiseavstandEnVei: BigDecimal = BigDecimal(10),
         reisedagerPerUke: Int = 5,
-        hentAktivitetId: (List<VilkårperiodeDto>) -> UUID = { it.single().id },
+        hentAktivitetId: (List<VilkårperiodeDto>) -> VilkårperiodeGlobalId = { it.single().globalId },
     ) {
         dtoer += { _, _, aktiviteter ->
             lagreDagligReisePrivatBilDto(

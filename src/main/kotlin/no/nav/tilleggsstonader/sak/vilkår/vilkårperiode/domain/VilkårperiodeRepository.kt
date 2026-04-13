@@ -12,6 +12,11 @@ interface VilkårperiodeRepository :
     InsertUpdateRepository<Vilkårperiode> {
     fun findByBehandlingId(behandlingId: BehandlingId): List<Vilkårperiode>
 
+    fun findByBehandlingIdAndGlobalId(
+        behandlingId: BehandlingId,
+        globalId: VilkårperiodeGlobalId,
+    ): Vilkårperiode?
+
     fun findByBehandlingIdAndResultat(
         behandlingId: BehandlingId,
         resultat: ResultatVilkårperiode,

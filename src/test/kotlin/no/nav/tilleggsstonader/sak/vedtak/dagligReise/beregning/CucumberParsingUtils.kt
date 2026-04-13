@@ -33,8 +33,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
-import java.util.UUID
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.time.LocalDate
+import java.util.UUID
 
 fun mapBeregningsresultatForPeriode(dataTable: DataTable) =
     dataTable.mapRad { rad ->
@@ -79,7 +80,7 @@ fun dummyBehandling(
 fun mapTilVilkårDagligReise(
     typeVilkår: TypeDagligReise,
     rad: Map<String, String>,
-    aktivitetId: UUID = UUID.randomUUID(),
+    aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId(UUID.randomUUID()),
 ): LagreDagligReise =
     LagreDagligReise(
         fom = parseDato(DomenenøkkelFelles.FOM, rad),
@@ -91,7 +92,7 @@ fun mapTilVilkårDagligReise(
 private fun mapFakta(
     type: TypeDagligReise,
     rad: Map<String, String>,
-    aktivitetId: UUID = UUID.randomUUID(),
+    aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId(UUID.randomUUID()),
 ): FaktaDagligReise =
     when (type) {
         TypeDagligReise.OFFENTLIG_TRANSPORT -> mapFaktaOffentligTransport(rad)
@@ -119,14 +120,14 @@ fun mapFaktaOffentligTransport(rad: Map<String, String>): FaktaOffentligTranspor
 
 fun mapFaktaPrivatBil(
     rad: Map<String, String>,
-    aktivitetId: UUID = UUID.randomUUID(),
+    aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId(UUID.randomUUID()),
 ): FaktaPrivatBil =
     FaktaPrivatBil(
         reiseId = dummyReiseId,
         adresse = "Tiltaksveien 1",
         reiseavstandEnVei = parseBigDecimal(DomenenøkkelPrivatBil.REISEAVSTAND_EN_VEI, rad),
         faktaDelperioder = listOf(dummyDelperiode()),
-        aktivitetId = aktivitetId
+        aktivitetId = aktivitetId,
     )
 
 private fun dummyDelperiode() =

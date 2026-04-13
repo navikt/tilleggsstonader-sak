@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.faktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -158,7 +159,7 @@ class FaktaDagligReiseTest {
                                 ),
                             ),
                         reiseavstandEnVei = BigDecimal(10),
-                        aktivitetId = UUID.randomUUID(),
+                        aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
                     )
                 }
             assertThat(feil.message).isEqualTo("Bompengeprisen må være større enn 0")
@@ -182,7 +183,7 @@ class FaktaDagligReiseTest {
                                 ),
                             ),
                         reiseavstandEnVei = BigDecimal(10),
-                        aktivitetId = UUID.randomUUID(),
+                        aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
                     )
                 }
             assertThat(feil.message).isEqualTo("Fergekostnaden må være større enn 0")
@@ -206,7 +207,7 @@ class FaktaDagligReiseTest {
                                 ),
                             ),
                         reiseavstandEnVei = BigDecimal("-10"),
-                        aktivitetId = UUID.randomUUID(),
+                        aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
                     )
                 }
             assertThat(feil.message).isEqualTo("Reiseavstanden må være større enn 0")
@@ -230,7 +231,7 @@ class FaktaDagligReiseTest {
                                     fergekostnadPerDag = 0,
                                 ),
                             ),
-                        aktivitetId = UUID.randomUUID(),
+                        aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
                     )
                 }
             assertThat(feil.message).isEqualTo("Reisedager per uke må være større enn 0")
@@ -254,7 +255,7 @@ class FaktaDagligReiseTest {
                                     fergekostnadPerDag = 0,
                                 ),
                             ),
-                        aktivitetId = UUID.randomUUID(),
+                        aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
                     )
                 }
             assertThat(feil.message).isEqualTo("Reisedager per uke kan ikke være mer enn 7")

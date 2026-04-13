@@ -7,9 +7,6 @@ import io.cucumber.java.no.Og
 import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
-import java.math.BigDecimal
-import java.time.LocalDate
-import java.util.UUID
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
@@ -44,6 +41,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
+import java.math.BigDecimal
+import java.time.LocalDate
+import java.util.UUID
 
 @Suppress("unused", "ktlint:standard:function-naming")
 class PrivatBilBeregningStepDefinitions {
@@ -89,10 +89,10 @@ class PrivatBilBeregningStepDefinitions {
     @Gitt("følgende vilkår for daglig reise med privat bil")
     fun `følgende vilkår for daglig reise med privat bil`(dataTable: DataTable) {
         every { behandlingServiceMock.hentSaksbehandling(any<BehandlingId>()) } returns
-                dummyBehandling(
-                    behandlingId = behandlingId,
-                    steg = StegType.VILKÅR,
-                )
+            dummyBehandling(
+                behandlingId = behandlingId,
+                steg = StegType.VILKÅR,
+            )
 
         every { unleashServiceMock.isEnabled(any()) } returns true
 
@@ -111,23 +111,24 @@ class PrivatBilBeregningStepDefinitions {
                             resultat = ResultatVilkårperiode.OPPFYLT,
                             typeAktivitet = TypeAktivitet.GRUPPEAMO,
                         )
-                    every { vilkårperiodeService.hentAktivitet(testAktivitet.id) } returns testAktivitet
+                    every { vilkårperiodeService.hentAktivitet(testAktivitet.globalId, behandlingId) } returns testAktivitet
 
-                    parseInt(DomenenøkkelPrivatBil.REISENR, rad) to mapTilVilkårDagligReise(
-                        typeVilkår = TypeDagligReise.PRIVAT_BIL,
-                        rad = rad,
-                        aktivitetId = testAktivitet.id
-                    )
+                    parseInt(DomenenøkkelPrivatBil.REISENR, rad) to
+                        mapTilVilkårDagligReise(
+                            typeVilkår = TypeDagligReise.PRIVAT_BIL,
+                            rad = rad,
+                            aktivitetId = testAktivitet.globalId,
+                        )
                 }.toMap()
     }
 
     @Gitt("følgende delperioder for vilkår daglig reise med privat bil")
     fun `følgende delperioder for vilkår daglig reise med privat bil`(dataTable: DataTable) {
         every { behandlingServiceMock.hentSaksbehandling(any<BehandlingId>()) } returns
-                dummyBehandling(
-                    behandlingId = behandlingId,
-                    steg = StegType.VILKÅR,
-                )
+            dummyBehandling(
+                behandlingId = behandlingId,
+                steg = StegType.VILKÅR,
+            )
 
         every { unleashServiceMock.isEnabled(any()) } returns true
 
@@ -157,6 +158,7 @@ class PrivatBilBeregningStepDefinitions {
                 beregningService.beregnRammevedtak(
                     vedtaksperioder = vedtaksperioder,
                     oppfylteVilkår = oppfylteReisevilkår,
+                    behandlingId = behandlingId,
                 )
         } catch (e: Exception) {
             feil = e
@@ -269,13 +271,13 @@ class PrivatBilBeregningStepDefinitions {
         dataTable
             .mapRad {
                 parseInt(DomenenøkkelPrivatBil.REISENR, it) to
-                        FaktaDelperiodePrivatBil(
-                            fom = parseDato(DomenenøkkelFelles.FOM, it),
-                            tom = parseDato(DomenenøkkelFelles.TOM, it),
-                            bompengerPerDag = parseValgfriInt(DomenenøkkelPrivatBil.BOMPENGER, it),
-                            fergekostnadPerDag = parseValgfriInt(DomenenøkkelPrivatBil.FERGEKOSTNAD, it),
-                            reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, it),
-                        )
+                    FaktaDelperiodePrivatBil(
+                        fom = parseDato(DomenenøkkelFelles.FOM, it),
+                        tom = parseDato(DomenenøkkelFelles.TOM, it),
+                        bompengerPerDag = parseValgfriInt(DomenenøkkelPrivatBil.BOMPENGER, it),
+                        fergekostnadPerDag = parseValgfriInt(DomenenøkkelPrivatBil.FERGEKOSTNAD, it),
+                        reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, it),
+                    )
             }.groupBy { it.first }
             .mapValues { it.value.map { it.second } }
 
