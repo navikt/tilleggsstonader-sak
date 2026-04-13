@@ -24,7 +24,7 @@ class GjenbrukUkerIKjørelistebehandlingIntegrationTest : IntegrationTest() {
     private val førsteUkeFom = 5 januar 2026
     private val førsteUkeTom = 11 januar 2026
     private val andreUkeFom = 12 januar 2026
-    private val andreUkeTom = 18 januar 2026
+    private val tredjeUkeTom = 25 januar 2026
 
     lateinit var førstegangsbehandling: Behandling
     lateinit var førsteKjørelistebehandling: Behandling
@@ -46,7 +46,7 @@ class GjenbrukUkerIKjørelistebehandlingIntegrationTest : IntegrationTest() {
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
-                defaultDagligReisePrivatBilTsoTestdata(førsteUkeFom, andreUkeTom)
+                defaultDagligReisePrivatBilTsoTestdata(førsteUkeFom, tredjeUkeTom)
 
                 sendInnKjøreliste {
                     periode = Datoperiode(førsteUkeFom, førsteUkeTom)
@@ -78,15 +78,17 @@ class GjenbrukUkerIKjørelistebehandlingIntegrationTest : IntegrationTest() {
                 .single()
                 .reiseId
 
+        // Sender inn kjøreliste som dekker to uker, totalt sendt inn 3 uker
         sendInnKjøreliste(
             kjøreliste =
                 kjørelisteSkjema(
                     reiseId = reiseId,
-                    periode = Datoperiode(andreUkeFom, andreUkeTom),
+                    periode = Datoperiode(andreUkeFom, tredjeUkeTom),
                     dagerKjørt =
                         listOf(
                             KjørtDag(12 januar 2026, 50),
                             KjørtDag(13 januar 2026, 50),
+                            KjørtDag(20 januar 2026, 50),
                         ),
                 ),
             ident = førstegangsBehandlingContext.ident,
@@ -115,7 +117,7 @@ class GjenbrukUkerIKjørelistebehandlingIntegrationTest : IntegrationTest() {
         val reisevurderingForAndreKjørelistebehandling =
             kall.privatBil.hentReisevurderingForBehandling(andreKjørelistebehandling.id).single()
 
-        assertThat(reisevurderingForAndreKjørelistebehandling.uker).hasSize(2)
+        assertThat(reisevurderingForAndreKjørelistebehandling.uker).hasSize(3)
 
         val førsteUkeIAndreBehandling =
             reisevurderingForAndreKjørelistebehandling.uker.single { it.fraDato == førsteUkeFom }

@@ -229,6 +229,7 @@ class AvklartKjørelisteService(
             avklarteUkerNyBehandling
                 .map { it.kjørelisteId }
                 .filterNot { kjørelisterSomFinneIForrigeBehandling.contains(it) }
+                .distinct() // En kjøreliste kan dekke flere uker
                 .map { kjørelisteService.hentKjøreliste(it) }
 
         // Sletter evt eksisterende avklarte uker på ny behandling
