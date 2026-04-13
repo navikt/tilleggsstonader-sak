@@ -37,6 +37,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
@@ -467,12 +469,19 @@ class OppfølgingOpprettKontrollerServiceTest {
         val ignoreres =
             Kontrollert(saksbehandler = "saksbehandler", utfall = KontrollertUtfall.IGNORERES, kommentar = "")
 
-        @Test
-        fun `skal lagre ny hvis det finnes en fra før men som ikke er kontrollert`() {
+        @EnumSource(
+            value = KontrollertUtfall::class,
+        )
+        @ParameterizedTest
+        fun `skal ikke lagre ny hvis det finnes en aktiv fra før med samme data om behandling ikke er kontrollert`(
+            utfall: KontrollertUtfall,
+        ) {
             val førsteOppfølging = oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)
             assertThat(førsteOppfølging).isNotNull
 
-            assertThat(oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)).isNotNull
+            førsteOppfølging!!.kontroller(utfall)
+
+            assertThat(oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)).isNull()
         }
 
         @Test
@@ -518,8 +527,23 @@ class OppfølgingOpprettKontrollerServiceTest {
         fun `skal ikke lagre på nytt hvis forrige skal ignoreres og dataen ikke endret seg`() {
             val førsteOppfølging = oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)
             assertThat(førsteOppfølging).isNotNull
-            val oppfølgingMedFjernedePerioder = førsteOppfølging!!.copy(kontrollert = ignoreres)
-            oppfølgingRepository.update(oppfølgingMedFjernedePerioder)
+
+            førsteOppfølging!!.kontroller(KontrollertUtfall.IGNORERES)
+
+            assertThat(oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)).isNull()
+        }
+
+        @EnumSource(
+            value = KontrollertUtfall::class,
+            names = ["UNDER_ARBEID", "UTSETTES"],
+            mode = EnumSource.Mode.INCLUDE,
+        )
+        @ParameterizedTest
+        fun `skal ikke lagre ny oppfølging dersom utfall er under arbeid eller utsatt selv om data er endret`(utfall: KontrollertUtfall) {
+            val førsteOppfølging = oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)
+            assertThat(førsteOppfølging).isNotNull
+
+            førsteOppfølging!!.kontroller(utfall)
 
             assertThat(oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)).isNull()
         }
@@ -647,5 +671,18 @@ class OppfølgingOpprettKontrollerServiceTest {
         every {
             registerAktivitetService.hentAktiviteterForGrunnlagsdata(any(), any(), any())
         } returns perioder.toList()
+    }
+
+    private fun Oppfølging.kontroller(utfall: KontrollertUtfall) {
+        oppfølgingRepository.update(
+            this.copy(
+                kontrollert =
+                    Kontrollert(
+                        saksbehandler = "saksbehandler",
+                        utfall = utfall,
+                        kommentar = "Kommentar",
+                    ),
+            ),
+        )
     }
 }

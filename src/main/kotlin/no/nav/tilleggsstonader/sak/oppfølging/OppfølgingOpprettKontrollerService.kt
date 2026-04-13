@@ -78,30 +78,63 @@ class OppfølgingOpprettKontrollerService(
     }
 
     /**
-     * Oppretter oppfølging for behandlingId
+     * Oppretter oppfølging for behandlingId.
      *
-     * Hvis siste kontroll har utfall ignoreres og ny oppfølging er lik som sist opprettes ikke ny oppfølging
+     * Oppretter ikke ny oppfølging hvis:
+     * - sisteForFagsak ble ignorert og ny data er lik gammel data
+     * - det finnes en aktiv oppfølging på behandlingen med utfall UNDER_ARBEID eller UTSETTES
+     * - det finnes en aktiv oppfølging på behandlingen og data er uendret
+     *
+     * En aktiv oppfølging deaktiveres (erstattes) hvis den ikke er påstartet (kontrollert == null)
+     * eller har utfall HÅNDTERT eller IGNORERES.
+     *
+     * UTSETTES er inkludert som aktiv fordi saksbehandler kan ha oppdaget avviket og utsatt i påvente
+     * av svar fra bruker eller andre.
      */
+    @Transactional
     fun opprettOppfølging(behandlingId: BehandlingId): Oppfølging? {
         val behandling = behandlingRepository.findByIdOrThrow(behandlingId)
         val fagsakMetadata = fagsakService.hentMetadata(listOf(behandling.fagsakId)).values.single()
 
         val perioderForKontroll = hentPerioderForKontroll(behandling, fagsakMetadata)
-        if (perioderForKontroll.isNotEmpty()) {
-            val data = OppfølgingData(perioderTilKontroll = perioderForKontroll)
-            val sisteForFagsak = oppfølgingRepository.finnSisteForFagsak(behandlingId)
-            if (sisteForFagsak?.kontrollert?.utfall != KontrollertUtfall.IGNORERES || sisteForFagsak.data != data) {
-                return oppfølgingRepository.insert(
-                    Oppfølging(behandlingId = behandlingId, data = data, tema = fagsakMetadata.stønadstype.tilTema()),
-                )
-            } else {
-                logger.warn(
-                    "Ingen endring for behandling=$behandlingId siden oppfølging=${sisteForFagsak.id} " +
-                        "ble kontrollert forrige gang, oppretter ikke ny oppfølging",
-                )
-            }
+        if (perioderForKontroll.isEmpty()) return null
+
+        val data = OppfølgingData(perioderTilKontroll = perioderForKontroll)
+
+        val sisteForFagsak = oppfølgingRepository.finnSisteForFagsak(behandlingId)
+
+        if (sisteForFagsak?.kontrollert?.utfall == KontrollertUtfall.IGNORERES && sisteForFagsak.data == data) {
+            logger.warn(
+                "Ingen endring for behandling=$behandlingId siden oppfølging=${sisteForFagsak.id} " +
+                    "ble kontrollert forrige gang, oppretter ikke ny oppfølging",
+            )
+            return null
         }
-        return null
+
+        val aktivOppfølging = oppfølgingRepository.finnAktivForBehandling(behandlingId)
+
+        if (aktivOppfølging != null) {
+            val aktivUtfall = aktivOppfølging.kontrollert?.utfall
+            if (aktivUtfall == KontrollertUtfall.UNDER_ARBEID || aktivUtfall == KontrollertUtfall.UTSETTES) {
+                logger.warn(
+                    "Aktiv oppfølging=${aktivOppfølging.id} for behandling=$behandlingId er under arbeid " +
+                        "(utfall=$aktivUtfall), oppretter ikke ny oppfølging",
+                )
+                return null
+            }
+            if (aktivOppfølging.data == data) {
+                logger.warn(
+                    "Aktiv oppfølging=${aktivOppfølging.id} for behandling=$behandlingId har uendret data, " +
+                        "oppretter ikke ny oppfølging",
+                )
+                return null
+            }
+            oppfølgingRepository.markerAktivSomIkkeAktiv(behandlingId)
+        }
+
+        return oppfølgingRepository.insert(
+            Oppfølging(behandlingId = behandlingId, data = data, tema = fagsakMetadata.stønadstype.tilTema()),
+        )
     }
 
     private fun hentPerioderForKontroll(
