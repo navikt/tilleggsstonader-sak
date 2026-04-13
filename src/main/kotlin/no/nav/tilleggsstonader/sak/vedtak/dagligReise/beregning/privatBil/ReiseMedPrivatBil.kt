@@ -51,13 +51,13 @@ data class ReiseMedPrivatBilDelperiode(
 fun VilkårDagligReise.tilReiserMedPrivatBil(
     aktivitetType: AktivitetType,
     typeAktivitet: TypeAktivitet?,
-    gjelderTiltaksenheten: Boolean
+    gjelderTiltaksenheten: Boolean,
 ): ReiseMedPrivatBil {
     feilHvis(this.fakta !is FaktaPrivatBil) {
         "Forventer kun å få inn vilkår med fakta som er av type privat bil ved beregning av privat bil"
     }
 
-    feilHvis(gjelderTiltaksenheten && typeAktivitet == null){
+    feilHvis(gjelderTiltaksenheten && typeAktivitet == null) {
         "Foventer at typeAktivitet ikke er null når oppretter reise med privat bil for tiltaksenheten"
     }
 
