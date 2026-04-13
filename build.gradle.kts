@@ -2,7 +2,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 val javaVersion = JavaLanguageVersion.of(21)
-val familieProsesseringVersion = "2.20260306133947_d473c40"
+val familieProsesseringVersion = "2.20260331095424_89d92d2"
 val tilleggsstønaderLibsVersion = "2026.03.03-10.23.f286f5829acc"
 val tilleggsstønaderKontrakterVersion = "2026.04.10-15.53.9da59ac03512"
 val avroVersion = "1.12.1"
@@ -21,11 +21,11 @@ plugins {
     application
 
     kotlin("jvm") version "2.2.21"
-    id("com.diffplug.spotless") version "8.3.0"
+    id("com.diffplug.spotless") version "8.4.0"
     id("com.github.ben-manes.versions") version "0.53.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
 
-    id("org.springframework.boot") version "4.0.3"
+    id("org.springframework.boot") version "4.0.5"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.spring") version "2.2.21"
 }
