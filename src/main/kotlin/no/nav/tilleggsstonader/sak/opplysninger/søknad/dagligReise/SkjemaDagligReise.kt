@@ -47,7 +47,7 @@ data class Reiseperiode(
 )
 
 data class Reise(
-    val skalReiseFraFolkeregistrertAdresse: JaNei,
+    val skalReiseFraFolkeregistrertAdresse: JaNei?,
     val adresseDetSkalReisesFra: ReiseAdresse?,
     val adresse: ReiseAdresse,
     val periode: Reiseperiode,

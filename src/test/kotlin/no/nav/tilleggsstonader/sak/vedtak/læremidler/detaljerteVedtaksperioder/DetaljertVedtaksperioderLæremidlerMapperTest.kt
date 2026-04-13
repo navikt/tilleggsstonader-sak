@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder
 
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperioderLæremidlerMapper.finnDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
@@ -111,5 +113,6 @@ class DetaljertVedtaksperioderLæremidlerMapperTest {
                 BeregningsresultatLæremidler(
                     perioder = beregningsresulat,
                 ),
+            beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
         )
 }

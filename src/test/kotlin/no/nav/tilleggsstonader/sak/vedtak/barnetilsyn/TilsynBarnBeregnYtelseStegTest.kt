@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
@@ -58,11 +59,13 @@ class TilsynBarnBeregnYtelseStegTest {
             vedtaksperiodeValidingerService = tilsynBarnVedtaksperiodeValidingerService,
         )
 
+    val beregningsplanUtleder = BeregningsplanUtleder(utledTidligsteEndringService)
+
     val steg =
         TilsynBarnBeregnYtelseSteg(
             beregningService = tilsynBarnBeregningService,
             opphørValideringService = opphørValideringService,
-            utledTidligsteEndringService = utledTidligsteEndringService,
+            beregningsplanUtleder = beregningsplanUtleder,
             vedtakRepository = repository,
             tilkjentytelseService = tilkjentYtelseService,
             simuleringService = simuleringService,

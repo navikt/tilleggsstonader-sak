@@ -1,5 +1,9 @@
 {
   "type": "OPPHØR_LÆREMIDLER",
+  "beregningsplan": {
+    "omfang": "FRA_DATO",
+    "fraDato": "2024-01-01"
+  },
   "vedtaksperioder": [
     {
       "id": "550e8400-e29b-41d4-a716-446655440000",

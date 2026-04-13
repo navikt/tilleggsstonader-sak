@@ -24,8 +24,10 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.BarnIdTilTestIdHolder.barnIder
@@ -51,6 +53,8 @@ class TilsynBarnBeregningStepDefinitions {
     val tilsynBarnUtgiftService = mockk<TilsynBarnUtgiftService>()
     val repository = mockk<VedtakRepository>(relaxed = true)
     val vedtaksperiodeValidingerService = mockk<VedtaksperiodeValideringService>(relaxed = true)
+    val utledTidligsteEndringService = mockk<UtledTidligsteEndringService>()
+    val beregningsplanUtleder = BeregningsplanUtleder(utledTidligsteEndringService)
 
     val service =
         TilsynBarnBeregningService(
@@ -139,8 +143,10 @@ class TilsynBarnBeregningStepDefinitions {
         tidligsteEndring: LocalDate?,
     ) {
         every { tilsynBarnUtgiftService.hentUtgifterTilBeregning(any()) } returns utgifter
+        every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(any(), any()) } returns tidligsteEndring
+        val plan = beregningsplanUtleder.utledForInnvilgelse(behandling, vedtaksperioder)
         try {
-            beregningsresultat = service.beregn(vedtaksperioder, behandling, TypeVedtak.INNVILGELSE, tidligsteEndring)
+            beregningsresultat = service.beregn(vedtaksperioder, behandling, plan, TypeVedtak.INNVILGELSE)
         } catch (e: Exception) {
             exception = e
         }

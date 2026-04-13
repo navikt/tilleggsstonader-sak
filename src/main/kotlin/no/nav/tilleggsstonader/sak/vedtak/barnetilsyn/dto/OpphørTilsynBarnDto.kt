@@ -10,7 +10,7 @@ data class OpphørTilsynBarnResponse(
     val årsakerOpphør: List<ÅrsakOpphør>,
     val begrunnelse: String,
     val vedtaksperioder: List<LagretVedtaksperiodeDto>?,
-    val opphørsdato: LocalDate?,
+    val opphørsdato: LocalDate,
 ) : VedtakTilsynBarnDto(TypeVedtak.OPPHØR),
     VedtakTilsynBarnResponse
 

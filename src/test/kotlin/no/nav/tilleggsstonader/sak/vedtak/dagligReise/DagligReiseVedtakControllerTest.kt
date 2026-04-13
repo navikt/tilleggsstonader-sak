@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkårDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
@@ -24,6 +25,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatOffe
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseResponse
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsoRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.dto.BeregningsplanDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkår
@@ -114,6 +116,11 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                                 ),
                         ),
                     privatBil = null,
+                    beregningsplan =
+                        BeregningsplanDto(
+                            omfang = Beregningsomfang.ALLE_PERIODER,
+                            fraDato = null,
+                        ),
                 ),
             gjelderFraOgMed = dummyFom,
             gjelderTilOgMed = dummyTom,

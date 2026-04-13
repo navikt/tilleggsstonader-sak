@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.interntVedtak
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
@@ -22,6 +23,8 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.totrinnskontroll
 import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtaksperiodeGrunnlag
@@ -286,6 +289,7 @@ object InterntVedtakTestdata {
                             listOf(
                                 vedtaksperiode,
                             ),
+                        beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = LocalDate.of(2024, 1, 1),
@@ -393,6 +397,7 @@ object InterntVedtakTestdata {
                         vedtaksperioder = vedtaksperioder,
                         beregningsresultat = beregningsresultat,
                         begrunnelse = "Sånn her vil en begrunnelse se ut",
+                        beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = LocalDate.of(2024, 1, 1),
@@ -586,6 +591,7 @@ object InterntVedtakTestdata {
                         vedtaksperioder = vedtaksperioder,
                         beregningsresultat = beregningsresultat,
                         begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
+                        beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
@@ -598,7 +604,7 @@ object InterntVedtakTestdata {
                 data =
                     AvslagBoutgifter(
                         årsaker = listOf(ÅrsakAvslag.MANGELFULL_DOKUMENTASJON, ÅrsakAvslag.RETT_TIL_BOSTØTTE),
-                        begrunnelse = "Begrunelse for avslag",
+                        begrunnelse = "Begrunnelse for avslag",
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
@@ -611,13 +617,14 @@ object InterntVedtakTestdata {
                 data =
                     OpphørBoutgifter(
                         årsaker = listOf(ÅrsakOpphør.ENDRING_UTGIFTER, ÅrsakOpphør.ENDRING_MÅLGRUPPE),
-                        begrunnelse = "Begrunelse for avslag",
+                        begrunnelse = "Begrunnelse for opphør",
                         vedtaksperioder = vedtaksperioder,
                         beregningsresultat = beregningsresultat,
+                        beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, 10 desember 2024),
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
-                opphørsdato = null,
+                opphørsdato = 10 desember 2024,
             )
 
         private val aktivitetererBoutgifter =
@@ -1001,6 +1008,7 @@ object InterntVedtakTestdata {
                     beregningsresultat = beregningsresultatDagligReise,
                     rammevedtakPrivatBil = rammevedtakPrivatBil,
                     begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
+                    beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                 ),
             gitVersjon = Applikasjonsversjon.versjon,
             tidligsteEndring = null,

@@ -4,6 +4,9 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
+import no.nav.tilleggsstonader.sak.vedtak.dto.BeregningsplanDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
@@ -13,6 +16,7 @@ import java.time.LocalDate
 data class BeregningsresultatLæremidlerDto(
     val perioder: List<BeregningsresultatForPeriodeDto>,
     val tidligsteEndring: LocalDate? = null,
+    val beregningsplan: BeregningsplanDto,
 )
 
 data class BeregningsresultatForPeriodeDto(
@@ -46,22 +50,19 @@ data class BeregningsresultatForPeriodeDto(
             this.påfølgesAv(nestePeriode)
 }
 
-fun BeregningsresultatLæremidler.tilDto(tidligsteEndring: LocalDate?): BeregningsresultatLæremidlerDto {
-    val perioderDto =
-        this
-            .filtrerFraOgMed(tidligsteEndring)
-            .perioder
-            .map { it.tilDto() }
-    return BeregningsresultatLæremidlerDto(
+fun BeregningsresultatLæremidler.tilDto(beregningsplan: Beregningsplan) =
+    BeregningsresultatLæremidlerDto(
         perioder =
-            perioderDto
+            filtrerFraOgMed(beregningsplan.fraDato)
+                .perioder
+                .map { it.tilDto() }
                 .mergeSammenhengende(
                     skalMerges = { v1, v2 -> v1.kanSlåsSammen(v2) },
                     merge = { v1, v2 -> v1.slåSammen(v2) },
                 ),
-        tidligsteEndring = tidligsteEndring,
+        tidligsteEndring = beregningsplan.fraDato,
+        beregningsplan = beregningsplan.tilDto(),
     )
-}
 
 fun BeregningsresultatForMåned.tilDto(): BeregningsresultatForPeriodeDto =
     BeregningsresultatForPeriodeDto(

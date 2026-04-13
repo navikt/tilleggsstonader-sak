@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
@@ -44,6 +46,7 @@ object LæremidlerTestUtil {
         InnvilgelseLæremidler(
             vedtaksperioder = defaultVedtaksperioder,
             beregningsresultat = defaultBeregningsresultat,
+            beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
         )
 
     fun innvilgelse(data: InnvilgelseLæremidler = defaultInnvilgelseLæremidler) =
@@ -67,6 +70,7 @@ object LæremidlerTestUtil {
             InnvilgelseLæremidler(
                 vedtaksperioder = vedtaksperioder,
                 beregningsresultat = beregningsresultat,
+                beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
             ),
         gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = null,
@@ -106,6 +110,7 @@ object LæremidlerTestUtil {
                 beregningsresultat = beregningsresultat,
                 årsaker = årsaker,
                 begrunnelse = begrunnelse,
+                beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, opphørsdato),
             ),
         gitVersjon = Applikasjonsversjon.versjon,
         tidligsteEndring = null,

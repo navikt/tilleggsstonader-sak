@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder
 
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.finnMakssats
@@ -134,6 +136,7 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
                                     beregningsresultatFeb,
                                 ),
                         ),
+                    beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                 )
 
             val res = vedtak.finnDetaljerteVedtaksperioder()
@@ -483,5 +486,6 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
         InnvilgelseBoutgifter(
             vedtaksperioder = emptyList(),
             beregningsresultat = BeregningsresultatBoutgifter(perioder = beregningsperioder),
+            beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
         )
 }

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 
@@ -16,11 +17,13 @@ sealed interface VedtakLæremidler : Vedtaksdata
 sealed interface InnvilgelseEllerOpphørLæremidler : VedtakLæremidler {
     val vedtaksperioder: List<Vedtaksperiode>
     val beregningsresultat: BeregningsresultatLæremidler
+    val beregningsplan: Beregningsplan
 }
 
 data class InnvilgelseLæremidler(
     override val vedtaksperioder: List<Vedtaksperiode>,
     override val beregningsresultat: BeregningsresultatLæremidler,
+    override val beregningsplan: Beregningsplan,
     val begrunnelse: String? = null,
 ) : InnvilgelseEllerOpphørLæremidler,
     Innvilgelse {
@@ -44,6 +47,7 @@ data class OpphørLæremidler(
     override val beregningsresultat: BeregningsresultatLæremidler,
     override val årsaker: List<ÅrsakOpphør>,
     override val begrunnelse: String,
+    override val beregningsplan: Beregningsplan,
 ) : InnvilgelseEllerOpphørLæremidler,
     Opphør {
     override val type: TypeVedtaksdata = TypeVedtakLæremidler.OPPHØR_LÆREMIDLER
