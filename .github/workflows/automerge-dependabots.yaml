@@ -2,7 +2,7 @@ name: Automerge Dependabot PRs
 
 on:
   schedule:
-    - cron: '0 6 * * *'
+    - cron: '0 6 * * 1-5'
   workflow_dispatch:
 
 jobs:
@@ -18,4 +18,4 @@ jobs:
         uses: navikt/automerge-dependabot@5251eeb0334b52a273adce4d305b5ae579b7eb26 # v1.2.2
         with:
           token: ${{ github.token }}
-          minimum-age-of-pr: '3'
+          merge-method: squash
