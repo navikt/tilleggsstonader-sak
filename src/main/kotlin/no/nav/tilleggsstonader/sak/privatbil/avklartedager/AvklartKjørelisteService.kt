@@ -1,7 +1,8 @@
 package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
-import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -11,6 +12,7 @@ import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.springframework.stereotype.Service
@@ -37,13 +39,13 @@ class AvklartKjørelisteService(
 
         validerAtAlleDagerIKjørelistaErInnenForRammevedtaket(rammeForReise, kjøreliste)
 
-        val kjørelisteGruppertPåUker = kjøreliste.data.reisedager.groupBy { it.dato.ukenummer() }
+        val kjørelisteGruppertPåUker = kjøreliste.data.reisedager.groupBy { it.dato.tilUkeIÅr() }
 
         val avklarteUker =
-            kjørelisteGruppertPåUker.map { (ukenummer, reisedager) ->
+            kjørelisteGruppertPåUker.map { (ukeIÅr, reisedager) ->
                 utledAvklartUke(
                     behandlingId = behandling.id,
-                    ukenummer = ukenummer,
+                    ukeIÅr = ukeIÅr,
                     reisedager = reisedager,
                     kjørelisteId = kjøreliste.id,
                     rammevedtak = rammeForReise,
@@ -111,12 +113,16 @@ class AvklartKjørelisteService(
     private fun utledAvklartUke(
         behandlingId: BehandlingId,
         kjørelisteId: UUID,
-        ukenummer: Int,
+        ukeIÅr: UkeIÅr,
         reisedager: List<KjørelisteDag>,
         rammevedtak: RammeForReiseMedPrivatBil,
     ): AvklartKjørtUke {
+        val delperiodeForUke =
+            rammevedtak.finnDelperiodeForPeriode(
+                Datoperiode(reisedager.minOf { it.dato }, reisedager.maxOf { it.dato }),
+            )
         val avvikUke =
-            if (!vurderAntallDagerInnenforRamme(reisedager, rammevedtak)) {
+            if (!vurderAntallDagerInnenforRamme(reisedager, delperiodeForUke)) {
                 TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK
             } else {
                 null
@@ -130,7 +136,7 @@ class AvklartKjørelisteService(
             reiseId = rammevedtak.reiseId,
             fom = reisedager.minOf { it.dato },
             tom = reisedager.maxOf { it.dato },
-            ukenummer = ukenummer,
+            ukenummer = ukeIÅr.ukenummer,
             // Trengs denne? Kan lages i visningslogikk
             // Rart at den er avhengig av både ukeavvik og dagavvik
             status = utledAutomatiskStatusForUke(avklarteDager, avvikUke),
@@ -142,14 +148,11 @@ class AvklartKjørelisteService(
 
     private fun vurderAntallDagerInnenforRamme(
         dager: List<KjørelisteDag>,
-        rammevedtak: RammeForReiseMedPrivatBil,
+        delperiodeForUke: RammeForReiseMedPrivatBilDelperiode,
     ): Boolean {
         val antallDagerMedUtbetaling = dager.filter { it.harKjørt }.size
 
-        return antallDagerMedUtbetaling <=
-            rammevedtak.grunnlag.delperioder
-                .first()
-                .reisedagerPerUke
+        return antallDagerMedUtbetaling <= delperiodeForUke.reisedagerPerUke
     }
 
     private fun utledAutomatiskStatusForUke(
