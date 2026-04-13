@@ -488,13 +488,21 @@ private fun IntegrationTest.gjennomførVilkårSteg(
             ?.let { _ -> barnRepository.findByBehandlingId(behandlingId).map { it.id } }
             ?: emptyList()
 
-    testdataProvider.vilkår.opprettScope.build(behandlingId, barnIder).forEach {
-        if (stønadstype.gjelderDagligReise()) {
-            kall.vilkårDagligReise.opprettVilkår(behandlingId, it as LagreDagligReiseDto)
-        } else {
-            kall.vilkår.opprettVilkår(it as OpprettVilkårDto)
+    testdataProvider.vilkår.opprettScope
+        .build(
+            behandlingId,
+            barnIder,
+            aktiviteter =
+                kall.vilkårperiode
+                    .hentForBehandling(behandlingId)
+                    .vilkårperioder.aktiviteter,
+        ).forEach {
+            if (stønadstype.gjelderDagligReise()) {
+                kall.vilkårDagligReise.opprettVilkår(behandlingId, it as LagreDagligReiseDto)
+            } else {
+                kall.vilkår.opprettVilkår(it as OpprettVilkårDto)
+            }
         }
-    }
 
     if (stønadstype.gjelderDagligReise()) {
         testdataProvider.vilkår.updateDagligReise

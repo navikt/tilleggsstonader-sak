@@ -19,9 +19,11 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.Vilkårsvurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBolig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
+import java.util.UUID
 
 @BehandlingTestdataDslMarker
 class StønadsvilkårTestdataDsl {
@@ -56,13 +58,13 @@ class StønadsvilkårTestdataDsl {
 
 @BehandlingTestdataDslMarker
 class OpprettStønadsvilkårDsl {
-    private val dtoer = mutableListOf<(BehandlingId, Collection<BarnId>) -> LagreVilkår>()
+    private val dtoer = mutableListOf<(BehandlingId, Collection<BarnId>, List<VilkårperiodeDto>) -> LagreVilkår>()
 
     fun offentligTransport(
         fom: LocalDate,
         tom: LocalDate,
     ) {
-        dtoer += { _, _ ->
+        dtoer += { _, _, _ ->
             lagreDagligReiseDto(fom = fom, tom = tom)
         }
     }
@@ -74,9 +76,9 @@ class OpprettStønadsvilkårDsl {
         reisedagerPerUke: Int = 5,
         bompengerPerDag: Int? = null,
         fergekostnadPerDag: Int? = null,
-        aktivitetRef: VilkårperiodeRef,
+        hentAktivitetId: (List<VilkårperiodeDto>) -> UUID = { it.single().id },
     ) {
-        dtoer += { _, _ ->
+        dtoer += { _, _, aktiviteter ->
             lagreDagligReisePrivatBilDto(
                 fom = fom,
                 tom = tom,
@@ -92,7 +94,7 @@ class OpprettStønadsvilkårDsl {
                             fergekostnadPerDag = fergekostnadPerDag,
                         ),
                     ),
-                aktivitetId = aktivitetRef.id,
+                aktivitetId = hentAktivitetId(aktiviteter),
             )
         }
     }
@@ -137,7 +139,7 @@ class OpprettStønadsvilkårDsl {
     }
 
     fun add(block: (BehandlingId, Collection<BarnId>) -> LagreVilkår) {
-        dtoer += block
+        dtoer += { behandlingId, barnIder, _ -> block(behandlingId, barnIder) }
     }
 
     fun add(lagreVilkår: Collection<(BehandlingId, Collection<BarnId>) -> LagreVilkår>) {
@@ -147,5 +149,6 @@ class OpprettStønadsvilkårDsl {
     fun build(
         behandlingId: BehandlingId,
         barnIder: Collection<BarnId>,
-    ) = dtoer.map { it(behandlingId, barnIder) }
+        aktiviteter: List<VilkårperiodeDto> = emptyList(),
+    ) = dtoer.map { it(behandlingId, barnIder, aktiviteter) }
 }

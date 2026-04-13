@@ -65,8 +65,12 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
         opprettBehandlingOgGjennomførBehandlingsløp(
             stønadstype = Stønadstype.DAGLIG_REISE_TSO,
         ) {
-            defaultDagligReisePrivatBilTsoTestdata(fom1, tom1)
-            defaultDagligReisePrivatBilTsoTestdata(fom2, tom2)
+            defaultDagligReisePrivatBilTsoTestdata(fom1, tom1) { aktiviteter ->
+                aktiviteter.first { it.fom == fom1 }.id
+            }
+            defaultDagligReisePrivatBilTsoTestdata(fom2, tom2) { aktiviteter ->
+                aktiviteter.first { it.fom == fom2 }.id
+            }
             sendInnKjøreliste {
                 periode = Datoperiode(fom1, tom1)
                 kjørteDager =

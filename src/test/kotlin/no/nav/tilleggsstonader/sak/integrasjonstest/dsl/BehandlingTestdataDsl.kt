@@ -3,7 +3,9 @@ package no.nav.tilleggsstonader.sak.integrasjonstest.dsl
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.util.toYearMonth
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import java.time.LocalDate
+import java.util.UUID
 
 @BehandlingTestdataDslMarker
 class BehandlingTestdataDsl internal constructor() {
@@ -66,11 +68,11 @@ class BehandlingTestdataDsl internal constructor() {
         fom: LocalDate = defaultFom,
         tom: LocalDate = defaultTom,
         antallReisedager: Int = 5,
+        hentAktivitetId: (List<VilkårperiodeDto>) -> UUID = { it.single().id },
     ) {
-        lateinit var aktivitetRef: VilkårperiodeRef
         aktivitet {
             opprett {
-                aktivitetRef = aktivitetTiltakTso(fom, tom)
+                aktivitetTiltakTso(fom, tom)
             }
         }
         målgruppe {
@@ -80,7 +82,7 @@ class BehandlingTestdataDsl internal constructor() {
         }
         vilkår {
             opprett {
-                privatBil(fom, tom, reisedagerPerUke = antallReisedager, aktivitetRef = aktivitetRef)
+                privatBil(fom, tom, reisedagerPerUke = antallReisedager, hentAktivitetId = hentAktivitetId)
             }
         }
     }
