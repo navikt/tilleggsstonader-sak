@@ -7,6 +7,9 @@ import io.cucumber.java.no.Og
 import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
+import java.math.BigDecimal
+import java.time.LocalDate
+import java.util.UUID
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
@@ -34,7 +37,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligRei
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
@@ -42,10 +44,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
-import java.math.BigDecimal
-import java.time.LocalDate
-import java.util.UUID
-import kotlin.collections.emptyList
 
 @Suppress("unused", "ktlint:standard:function-naming")
 class PrivatBilBeregningStepDefinitions {
@@ -91,10 +89,10 @@ class PrivatBilBeregningStepDefinitions {
     @Gitt("følgende vilkår for daglig reise med privat bil")
     fun `følgende vilkår for daglig reise med privat bil`(dataTable: DataTable) {
         every { behandlingServiceMock.hentSaksbehandling(any<BehandlingId>()) } returns
-            dummyBehandling(
-                behandlingId = behandlingId,
-                steg = StegType.VILKÅR,
-            )
+                dummyBehandling(
+                    behandlingId = behandlingId,
+                    steg = StegType.VILKÅR,
+                )
 
         every { unleashServiceMock.isEnabled(any()) } returns true
 
@@ -126,10 +124,10 @@ class PrivatBilBeregningStepDefinitions {
     @Gitt("følgende delperioder for vilkår daglig reise med privat bil")
     fun `følgende delperioder for vilkår daglig reise med privat bil`(dataTable: DataTable) {
         every { behandlingServiceMock.hentSaksbehandling(any<BehandlingId>()) } returns
-            dummyBehandling(
-                behandlingId = behandlingId,
-                steg = StegType.VILKÅR,
-            )
+                dummyBehandling(
+                    behandlingId = behandlingId,
+                    steg = StegType.VILKÅR,
+                )
 
         every { unleashServiceMock.isEnabled(any()) } returns true
 
@@ -216,7 +214,8 @@ class PrivatBilBeregningStepDefinitions {
         forventedeSatsDelperioderPerReise.forEach { (reiseNr, forventedeDelperiodeSatserForReise) ->
             val delperioderIRammevedtak = rammevedtak!!.reiser[reiseNr - 1].grunnlag.delperioder
 
-            val satserForDelperiode: Map<Int, List<SatsDelperiodeCucumber>> = forventedeDelperiodeSatserForReise.groupBy { it.delperiodeNr }
+            val satserForDelperiode: Map<Int, List<SatsDelperiodeCucumber>> =
+                forventedeDelperiodeSatserForReise.groupBy { it.delperiodeNr }
             satserForDelperiode.forEach { (delperiodeNr, forventedeSatserForDelperiode) ->
                 val delperiodeIRammevedtak = delperioderIRammevedtak[delperiodeNr - 1]
                 assertThat(delperiodeIRammevedtak.satser).hasSameSizeAs(forventedeSatserForDelperiode)
@@ -270,13 +269,13 @@ class PrivatBilBeregningStepDefinitions {
         dataTable
             .mapRad {
                 parseInt(DomenenøkkelPrivatBil.REISENR, it) to
-                    FaktaDelperiodePrivatBil(
-                        fom = parseDato(DomenenøkkelFelles.FOM, it),
-                        tom = parseDato(DomenenøkkelFelles.TOM, it),
-                        bompengerPerDag = parseValgfriInt(DomenenøkkelPrivatBil.BOMPENGER, it),
-                        fergekostnadPerDag = parseValgfriInt(DomenenøkkelPrivatBil.FERGEKOSTNAD, it),
-                        reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, it),
-                    )
+                        FaktaDelperiodePrivatBil(
+                            fom = parseDato(DomenenøkkelFelles.FOM, it),
+                            tom = parseDato(DomenenøkkelFelles.TOM, it),
+                            bompengerPerDag = parseValgfriInt(DomenenøkkelPrivatBil.BOMPENGER, it),
+                            fergekostnadPerDag = parseValgfriInt(DomenenøkkelPrivatBil.FERGEKOSTNAD, it),
+                            reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, it),
+                        )
             }.groupBy { it.first }
             .mapValues { it.value.map { it.second } }
 
