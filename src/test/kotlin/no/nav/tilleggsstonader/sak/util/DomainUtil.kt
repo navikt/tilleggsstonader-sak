@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.util
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.AvsenderMottaker
@@ -96,7 +97,8 @@ fun oppgave(
     gsakOppgaveId: Long = 123,
     type: Oppgavetype = Oppgavetype.Journalføring,
     tilordnetSaksbehandler: String? = null,
-): OppgaveDomain = oppgave(behandling.id, gsakOppgaveId, type, status, tilordnetSaksbehandler)
+    tildeltEnhetsnr: String? = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr,
+): OppgaveDomain = oppgave(behandling.id, gsakOppgaveId, type, status, tilordnetSaksbehandler, tildeltEnhetsnr)
 
 fun oppgave(
     behandlingId: BehandlingId?,
@@ -104,7 +106,7 @@ fun oppgave(
     type: Oppgavetype = Oppgavetype.Journalføring,
     status: Oppgavestatus = Oppgavestatus.ÅPEN,
     tilordnetSaksbehandler: String? = null,
-    tildeltEnhetsnr: String? = "4462",
+    tildeltEnhetsnr: String? = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr,
     enhetsmappeId: Long? = null,
 ): OppgaveDomain =
     OppgaveDomain(
@@ -656,13 +658,13 @@ fun lagreDagligReisePrivatBilDto(
     adresse: String = "Tiltaksveien 1",
     reiseId: ReiseId = dummyReiseId,
     reiseavstandEnVei: BigDecimal = BigDecimal(10),
-    reiseperioder: List<FaktaDelperiodePrivatBilDto> =
+    delperioder: List<FaktaDelperiodePrivatBilDto> =
         listOf(
             FaktaDelperiodePrivatBilDto(
                 fom = fom,
                 tom = tom,
                 reisedagerPerUke = 5,
-                bompengerPerDag = 80,
+                bompengerPerDag = null,
                 fergekostnadPerDag = null,
             ),
         ),
@@ -680,7 +682,7 @@ fun lagreDagligReisePrivatBilDto(
     fakta: FaktaDagligReiseDto =
         FaktaDagligReisePrivatBilDto(
             reiseavstandEnVei = reiseavstandEnVei,
-            faktaDelperioder = reiseperioder,
+            faktaDelperioder = delperioder,
             adresse = adresse,
             aktivitetId = aktivitetId,
             aktivitetType = AktivitetType.TILTAK.name,

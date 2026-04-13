@@ -34,6 +34,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.util.UUID
+import java.time.LocalDate
 
 fun mapBeregningsresultatForPeriode(dataTable: DataTable) =
     dataTable.mapRad { rad ->
@@ -124,17 +125,17 @@ fun mapFaktaPrivatBil(
         reiseId = dummyReiseId,
         adresse = "Tiltaksveien 1",
         reiseavstandEnVei = parseBigDecimal(DomenenøkkelPrivatBil.REISEAVSTAND_EN_VEI, rad),
-        faktaDelperioder =
-            listOf(
-                FaktaDelperiodePrivatBil(
-                    fom = parseDato(DomenenøkkelFelles.FOM, rad),
-                    tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                    reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, rad),
-                    bompengerPerDag = parseValgfriInt(DomenenøkkelPrivatBil.BOMPENGER, rad),
-                    fergekostnadPerDag = parseValgfriInt(DomenenøkkelPrivatBil.FERGEKOSTNAD, rad),
-                ),
-            ),
-        aktivitetId = aktivitetId,
+        faktaDelperioder = listOf(dummyDelperiode()),
+        aktivitetId = aktivitetId
+    )
+
+private fun dummyDelperiode() =
+    FaktaDelperiodePrivatBil(
+        fom = LocalDate.now(),
+        tom = LocalDate.now(),
+        reisedagerPerUke = 1,
+        bompengerPerDag = null,
+        fergekostnadPerDag = null,
     )
 
 fun mapAktiviteter(

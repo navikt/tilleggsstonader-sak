@@ -73,9 +73,7 @@ class OpprettStønadsvilkårDsl {
         fom: LocalDate,
         tom: LocalDate,
         reiseavstandEnVei: BigDecimal = BigDecimal(10),
-        reisedagerPerUke: Int = 5,
-        bompengerPerDag: Int? = null,
-        fergekostnadPerDag: Int? = null,
+        delperioder: List<FaktaDelperiodePrivatBilDto>,
         hentAktivitetId: (List<VilkårperiodeDto>) -> UUID = { it.single().id },
     ) {
         dtoer += { _, _, aktiviteter ->
@@ -84,14 +82,33 @@ class OpprettStønadsvilkårDsl {
                 tom = tom,
                 reiseId = ReiseId.random(),
                 reiseavstandEnVei = reiseavstandEnVei,
-                reiseperioder =
+                delperioder = delperioder,
+                aktivitetId = hentAktivitetId(aktiviteter),
+            )
+        }
+    }
+
+    fun privatBil(
+        fom: LocalDate,
+        tom: LocalDate,
+        reiseavstandEnVei: BigDecimal = BigDecimal(10),
+        reisedagerPerUke: Int = 5,
+        hentAktivitetId: (List<VilkårperiodeDto>) -> UUID = { it.single().id },
+    ) {
+        dtoer += { _, _, aktiviteter ->
+            lagreDagligReisePrivatBilDto(
+                fom = fom,
+                tom = tom,
+                reiseId = ReiseId.random(),
+                reiseavstandEnVei = reiseavstandEnVei,
+                delperioder =
                     listOf(
                         FaktaDelperiodePrivatBilDto(
                             fom = fom,
                             tom = tom,
                             reisedagerPerUke = reisedagerPerUke,
-                            bompengerPerDag = bompengerPerDag,
-                            fergekostnadPerDag = fergekostnadPerDag,
+                            bompengerPerDag = null,
+                            fergekostnadPerDag = null,
                         ),
                     ),
                 aktivitetId = hentAktivitetId(aktiviteter),

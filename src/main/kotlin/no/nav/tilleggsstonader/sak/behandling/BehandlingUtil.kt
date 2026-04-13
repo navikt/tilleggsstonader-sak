@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 
 object BehandlingUtil {
-    fun utledBehandlingTypeV2(
+    fun utledBehandlingType(
         tidligereBehandlinger: List<Behandling>,
         behandlingÅrsak: BehandlingÅrsak,
     ): BehandlingType {
@@ -19,7 +19,14 @@ object BehandlingUtil {
                 val ikkeHenlagt = it.resultat != BehandlingResultat.HENLAGT
                 erFerdigstilt && ikkeHenlagt
             }
-        return if (skalVæreRevurdering) {
+        return utledBehandlingType(skalVæreRevurdering, behandlingÅrsak)
+    }
+
+    fun utledBehandlingType(
+        skalVæreRevurdering: Boolean,
+        behandlingÅrsak: BehandlingÅrsak,
+    ): BehandlingType =
+        if (skalVæreRevurdering) {
             if (behandlingÅrsak == BehandlingÅrsak.KJØRELISTE) {
                 BehandlingType.KJØRELISTE
             } else {
@@ -28,7 +35,6 @@ object BehandlingUtil {
         } else {
             BehandlingType.FØRSTEGANGSBEHANDLING
         }
-    }
 
     fun validerBehandlingIdErLik(
         behandlingIdParam: BehandlingId,

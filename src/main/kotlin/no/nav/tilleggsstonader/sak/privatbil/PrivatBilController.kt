@@ -63,15 +63,18 @@ class PrivatBilController(
                     reise.grunnlag
                         .alleDatoerGruppertPåUke()
                         .map { (uke, datoer) ->
+                            val avklartUke =
+                                avklarteUker.singleOrNull { it.reiseId == reise.reiseId && it.ukenummer == uke.ukenummer }
+
                             val kjørelisteForUke =
                                 kjørelister.firstOrNull {
-                                    it.data.reiseId == reise.reiseId && it.inneholderUkenummer(uke.ukenummer) // TODO ogå skille på år
+                                    it.data.reiseId == avklartUke?.reiseId && it.inneholderUkenummer(uke.ukenummer) // TODO ogå skille på år
                                 }
-                            val avklartUke = avklarteUker.singleOrNull { it.ukenummer == uke.ukenummer }
+
                             lagUke(uke = uke, datoer = datoer, kjørelisteForUke = kjørelisteForUke, avklartUke = avklartUke)
                         },
                 // TODO: Håndter at rammen kan ha flere satser og blir delt opp i flere
-                rammevedtak = reise.tilDto().first(),
+                rammevedtak = reise.tilDto(),
             )
         } ?: emptyList()
     }
@@ -88,7 +91,7 @@ class PrivatBilController(
 
         behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(behandlingId)
 
-        val oppdatertAvklartUke = avklartKjørelisteService.oppdaterAvklartUke(ukeId, avklarteDager)
+        val oppdatertAvklartUke = avklartKjørelisteService.oppdaterAvklartUke(behandlingId, ukeId, avklarteDager)
         val kjøreliste = kjørelisteService.hentKjøreliste(oppdatertAvklartUke.kjørelisteId)
 
         val uke =

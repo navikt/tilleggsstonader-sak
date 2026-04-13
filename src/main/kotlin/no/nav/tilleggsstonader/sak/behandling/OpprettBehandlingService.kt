@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.behandling
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
-import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingTypeV2
+import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingUtil.validerKanOppretteNyBehandling
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
@@ -56,7 +56,7 @@ class OpprettBehandlingService(
         val tidligereBehandlinger = behandlingRepository.findByFagsakId(request.fagsakId)
         val sisteIverksatteBehandlinger = behandlingRepository.finnSisteIverksatteBehandling(request.fagsakId)
         val forrigeBehandling = behandlingRepository.finnSisteIverksatteBehandling(request.fagsakId)
-        val behandlingType = utledBehandlingTypeV2(tidligereBehandlinger, behandlingÅrsak = request.behandlingsårsak)
+        val behandlingType = utledBehandlingType(tidligereBehandlinger, behandlingÅrsak = request.behandlingsårsak)
         val fagsak = fagsakService.hentFagsak(request.fagsakId)
 
         validerKanOppretteNyBehandling(

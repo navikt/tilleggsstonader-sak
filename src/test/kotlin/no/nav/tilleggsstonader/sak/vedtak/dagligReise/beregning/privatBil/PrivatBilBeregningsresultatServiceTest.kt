@@ -15,7 +15,9 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UtfyltDagAutomatiskVu
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammevedtakPrivatBil
-import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.satsForPeriodePrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
@@ -37,22 +39,34 @@ class PrivatBilBeregningsresultatServiceTest {
     fun `dager med parkeringsutgifter blir beregnet riktig`() {
         val fomRammevedtak = 2 februar 2026 // Mandag
         val tomRammevedtak = 8 februar 2026
-        val dagsatsUtenParkering = 150.toBigDecimal()
+        val delperiode =
+            RammeForReiseMedPrivatBilDelperiode(
+                fom = fomRammevedtak,
+                tom = tomRammevedtak,
+                ekstrakostnader =
+                    RammeForReiseMedPrivatEkstrakostnader(
+                        bompengerPerDag = 40,
+                        fergekostnadPerDag = null,
+                    ),
+                reisedagerPerUke = 5,
+                satser =
+                    listOf(
+                        RammeForReiseMedPrivatBilSatsForDelperiode(
+                            fom = fomRammevedtak,
+                            tom = tomRammevedtak,
+                            satsBekreftetVedVedtakstidspunkt = true,
+                            kilometersats = 2.94.toBigDecimal(),
+                            dagsatsUtenParkering = 150.toBigDecimal(),
+                        ),
+                    ),
+            )
 
         val rammevedtakPrivatBil =
             rammevedtakPrivatBil(
                 reiseId = reiseId,
                 fom = fomRammevedtak,
                 tom = tomRammevedtak,
-                satser =
-                    listOf(
-                        satsForPeriodePrivatBil(
-                            fomRammevedtak,
-                            tomRammevedtak,
-                            2.94.toBigDecimal(),
-                            dagsatsUtenParkering,
-                        ),
-                    ),
+                delperioder = listOf(delperiode),
             )
 
         val kjøreliste =
@@ -89,7 +103,13 @@ class PrivatBilBeregningsresultatServiceTest {
 
         val reisedager = kjøreliste.data.reisedager.filter { it.harKjørt }
         val totaleParkeringsutgifter = reisedager.mapNotNull { it.parkeringsutgift }.sum().toBigDecimal()
-        assertThat(beregningsresultatUke.stønadsbeløp).isEqualTo(dagsatsUtenParkering * 3.toBigDecimal() + totaleParkeringsutgifter)
+        assertThat(
+            beregningsresultatUke.stønadsbeløp,
+        ).isEqualTo(
+            beregningsresultatUke.grunnlag.dager
+                .first()
+                .dagsatsUtenParkering * 3.toBigDecimal() + totaleParkeringsutgifter,
+        )
 
         assertThat(beregningsresultatUke.grunnlag.dager).hasSize(reisedager.size)
         beregningsresultatUke.grunnlag.dager.forEach { reisedag ->
@@ -102,22 +122,34 @@ class PrivatBilBeregningsresultatServiceTest {
     fun `sendt inn kjøreliste for 1 av 2 uker med to kjørte dager, beregnes for kun en uke`() {
         val fomRammevedtak = 2 februar 2026 // Mandag
         val tomRammevedtak = 15 februar 2026
-        val dagsatsUtenParkering = 150.toBigDecimal()
+        val delperiode =
+            RammeForReiseMedPrivatBilDelperiode(
+                fom = fomRammevedtak,
+                tom = tomRammevedtak,
+                ekstrakostnader =
+                    RammeForReiseMedPrivatEkstrakostnader(
+                        bompengerPerDag = 40,
+                        fergekostnadPerDag = null,
+                    ),
+                reisedagerPerUke = 5,
+                satser =
+                    listOf(
+                        RammeForReiseMedPrivatBilSatsForDelperiode(
+                            fom = fomRammevedtak,
+                            tom = tomRammevedtak,
+                            satsBekreftetVedVedtakstidspunkt = true,
+                            kilometersats = 2.94.toBigDecimal(),
+                            dagsatsUtenParkering = 150.toBigDecimal(),
+                        ),
+                    ),
+            )
 
         val rammevedtakPrivatBil =
             rammevedtakPrivatBil(
                 reiseId = reiseId,
                 fom = fomRammevedtak,
                 tom = tomRammevedtak,
-                satser =
-                    listOf(
-                        satsForPeriodePrivatBil(
-                            fomRammevedtak,
-                            tomRammevedtak,
-                            2.94.toBigDecimal(),
-                            dagsatsUtenParkering,
-                        ),
-                    ),
+                delperioder = listOf(delperiode),
             )
 
         val kjøreliste =
@@ -149,7 +181,13 @@ class PrivatBilBeregningsresultatServiceTest {
         val beregningsresultatUke = beregningsresultatForReise.perioder.single()
         assertThat(beregningsresultatUke.fom).isEqualTo(kjøreliste.data.fom)
         assertThat(beregningsresultatUke.tom).isEqualTo(kjøreliste.data.tom)
-        assertThat(beregningsresultatUke.stønadsbeløp).isEqualTo(dagsatsUtenParkering * 2.toBigDecimal())
+        assertThat(
+            beregningsresultatUke.stønadsbeløp,
+        ).isEqualTo(
+            beregningsresultatUke.grunnlag.dager
+                .first()
+                .dagsatsUtenParkering * 2.toBigDecimal(),
+        )
 
         assertThat(beregningsresultatUke.grunnlag.dager).hasSize(2).allMatch { it.parkeringskostnad == 0 }
     }
@@ -158,23 +196,42 @@ class PrivatBilBeregningsresultatServiceTest {
     fun `sendt inn kjøreliste for en uke som går over to år, blir to beregnede perioder med samme utbetalingsdato`() {
         val fomRammevedtak = 29 desember 2025 // Mandag
         val tomRammevedtak = 4 januar 2026
-        val dagsats1UtenParkering = 150.toBigDecimal()
-        val dagsats2UtenParkering = 175.toBigDecimal()
-        val forventetUtbetalingsdato = 5 januar 2026
+        val delperiode =
+            RammeForReiseMedPrivatBilDelperiode(
+                fom = fomRammevedtak,
+                tom = 31 desember 2025,
+                ekstrakostnader =
+                    RammeForReiseMedPrivatEkstrakostnader(
+                        bompengerPerDag = 40,
+                        fergekostnadPerDag = null,
+                    ),
+                reisedagerPerUke = 5,
+                satser =
+                    listOf(
+                        RammeForReiseMedPrivatBilSatsForDelperiode(
+                            fom = fomRammevedtak,
+                            tom = 31 desember 2025,
+                            satsBekreftetVedVedtakstidspunkt = true,
+                            kilometersats = 2.94.toBigDecimal(),
+                            dagsatsUtenParkering = 150.toBigDecimal(),
+                        ),
+                    ),
+            )
 
-        val satser =
+        val delperioder =
             listOf(
-                satsForPeriodePrivatBil(
-                    fomRammevedtak,
-                    31 desember 2025,
-                    2.94.toBigDecimal(),
-                    dagsats1UtenParkering,
-                ),
-                satsForPeriodePrivatBil(
-                    1 januar 2026,
-                    tomRammevedtak,
-                    2.94.toBigDecimal(),
-                    dagsats2UtenParkering,
+                delperiode,
+                delperiode.copy(
+                    fom = 1 januar 2026,
+                    tom = tomRammevedtak,
+                    satser =
+                        listOf(
+                            delperiode.satser.single().copy(
+                                fom = 1 januar 2026,
+                                tom = tomRammevedtak,
+                                dagsatsUtenParkering = 175.toBigDecimal(),
+                            ),
+                        ),
                 ),
             )
 
@@ -183,7 +240,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 reiseId = reiseId,
                 fom = fomRammevedtak,
                 tom = tomRammevedtak,
-                satser = satser,
+                delperioder = delperioder,
             )
 
         val kjøreliste =
@@ -206,24 +263,26 @@ class PrivatBilBeregningsresultatServiceTest {
         val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
 
         assertThat(beregningsresultat).isNotNull
-        assertThat(beregningsresultat!!.reiser).hasSize(1)
+        assertThat(beregningsresultat.reiser).hasSize(1)
 
         val beregningsresultatForReise = beregningsresultat.reiser.single()
         assertThat(beregningsresultatForReise.reiseId).isEqualTo(reiseId)
         assertThat(beregningsresultatForReise.perioder).hasSize(2)
 
         val beregningsresultatUke1 = beregningsresultatForReise.perioder[0]
-        val sats1 = satser[0]
-        assertThat(beregningsresultatUke1.fom).isEqualTo(sats1.fom)
-        assertThat(beregningsresultatUke1.tom).isEqualTo(sats1.tom)
-        assertThat(beregningsresultatUke1.stønadsbeløp).isEqualTo(dagsats1UtenParkering)
+        assertThat(beregningsresultatUke1.stønadsbeløp).isEqualTo(
+            beregningsresultatUke1.grunnlag.dager
+                .single()
+                .dagsatsUtenParkering,
+        )
         assertThat(beregningsresultatUke1.grunnlag.dager).hasSize(1)
 
         val beregningsresultatUke2 = beregningsresultatForReise.perioder[1]
-        val sats2 = satser[1]
-        assertThat(beregningsresultatUke2.fom).isEqualTo(sats2.fom)
-        assertThat(beregningsresultatUke2.tom).isEqualTo(sats2.tom)
-        assertThat(beregningsresultatUke2.stønadsbeløp).isEqualTo(dagsats2UtenParkering)
+        assertThat(beregningsresultatUke2.stønadsbeløp).isEqualTo(
+            beregningsresultatUke2.grunnlag.dager
+                .single()
+                .dagsatsUtenParkering,
+        )
         assertThat(beregningsresultatUke2.grunnlag.dager).hasSize(1).allMatch { it.parkeringskostnad == 0 }
     }
 
@@ -231,22 +290,34 @@ class PrivatBilBeregningsresultatServiceTest {
     fun `sender inn rammevedtak for to uker med en ukes mellomrom, blir kun opprettet perioder for uker som er innsendt`() {
         val fomRammevedtak = 2 februar 2026 // Mandag
         val tomRammevedtak = 22 februar 2026
-        val dagsatsUtenParkering = 150.toBigDecimal()
+        val delperiode =
+            RammeForReiseMedPrivatBilDelperiode(
+                fom = fomRammevedtak,
+                tom = tomRammevedtak,
+                ekstrakostnader =
+                    RammeForReiseMedPrivatEkstrakostnader(
+                        bompengerPerDag = 40,
+                        fergekostnadPerDag = null,
+                    ),
+                satser =
+                    listOf(
+                        RammeForReiseMedPrivatBilSatsForDelperiode(
+                            fom = fomRammevedtak,
+                            tom = tomRammevedtak,
+                            satsBekreftetVedVedtakstidspunkt = true,
+                            kilometersats = 2.94.toBigDecimal(),
+                            dagsatsUtenParkering = 150.toBigDecimal(),
+                        ),
+                    ),
+                reisedagerPerUke = 5,
+            )
 
         val rammevedtakPrivatBil =
             rammevedtakPrivatBil(
                 reiseId = reiseId,
                 fom = fomRammevedtak,
                 tom = tomRammevedtak,
-                satser =
-                    listOf(
-                        satsForPeriodePrivatBil(
-                            fomRammevedtak,
-                            tomRammevedtak,
-                            2.94.toBigDecimal(),
-                            dagsatsUtenParkering,
-                        ),
-                    ),
+                delperioder = listOf(delperiode),
             )
 
         val kjøreliste1 =
@@ -292,13 +363,21 @@ class PrivatBilBeregningsresultatServiceTest {
         val beregningsresultatUke1 = beregningsresultatForReise.perioder[0]
         assertThat(beregningsresultatUke1.fom).isEqualTo(kjøreliste1.data.fom)
         assertThat(beregningsresultatUke1.tom).isEqualTo(kjøreliste1.data.tom)
-        assertThat(beregningsresultatUke1.stønadsbeløp).isEqualTo(dagsatsUtenParkering)
+        assertThat(beregningsresultatUke1.stønadsbeløp).isEqualTo(
+            beregningsresultatUke1.grunnlag.dager
+                .single()
+                .dagsatsUtenParkering,
+        )
         assertThat(beregningsresultatUke1.grunnlag.dager).hasSize(1).allMatch { it.parkeringskostnad == 0 }
 
         val beregningsresultatUke2 = beregningsresultatForReise.perioder[1]
         assertThat(beregningsresultatUke2.fom).isEqualTo(kjøreliste2.data.fom)
         assertThat(beregningsresultatUke2.tom).isEqualTo(kjøreliste2.data.tom)
-        assertThat(beregningsresultatUke2.stønadsbeløp).isEqualTo(dagsatsUtenParkering)
+        assertThat(beregningsresultatUke2.stønadsbeløp).isEqualTo(
+            beregningsresultatUke2.grunnlag.dager
+                .single()
+                .dagsatsUtenParkering,
+        )
         assertThat(beregningsresultatUke2.grunnlag.dager).hasSize(1).allMatch { it.parkeringskostnad == 0 }
     }
 
@@ -325,7 +404,28 @@ class PrivatBilBeregningsresultatServiceTest {
     fun `håndterer kjørelister sendt inn for samme perioder for forskjellige rammevedtak`() {
         val fomRammevedtak = 2 februar 2026 // Mandag
         val tomRammevedtak = 8 februar 2026
-        val dagsatsUtenParkering = 150.toBigDecimal()
+
+        val delperiode =
+            RammeForReiseMedPrivatBilDelperiode(
+                fom = fomRammevedtak,
+                tom = tomRammevedtak,
+                ekstrakostnader =
+                    RammeForReiseMedPrivatEkstrakostnader(
+                        bompengerPerDag = 40,
+                        fergekostnadPerDag = null,
+                    ),
+                satser =
+                    listOf(
+                        RammeForReiseMedPrivatBilSatsForDelperiode(
+                            fom = fomRammevedtak,
+                            tom = tomRammevedtak,
+                            satsBekreftetVedVedtakstidspunkt = true,
+                            kilometersats = 2.94.toBigDecimal(),
+                            dagsatsUtenParkering = 150.toBigDecimal(),
+                        ),
+                    ),
+                reisedagerPerUke = 5,
+            )
 
         val reiseId1 = ReiseId.random()
         val reiseId2 = ReiseId.random()
@@ -339,15 +439,7 @@ class PrivatBilBeregningsresultatServiceTest {
                             reiseId = it,
                             fom = fomRammevedtak,
                             tom = tomRammevedtak,
-                            satser =
-                                listOf(
-                                    satsForPeriodePrivatBil(
-                                        fomRammevedtak,
-                                        tomRammevedtak,
-                                        2.94.toBigDecimal(),
-                                        dagsatsUtenParkering,
-                                    ),
-                                ),
+                            delperioder = listOf(delperiode),
                         )
                     },
             )
@@ -384,7 +476,7 @@ class PrivatBilBeregningsresultatServiceTest {
             val beregningsresultatUke1 = beregningsresultatForReise.perioder.single()
             assertThat(beregningsresultatUke1.fom).isEqualTo(fomRammevedtak)
             assertThat(beregningsresultatUke1.tom).isEqualTo(tomRammevedtak)
-            assertThat(beregningsresultatUke1.stønadsbeløp).isEqualTo(dagsatsUtenParkering)
+            assertThat(beregningsresultatUke1.stønadsbeløp).isEqualTo(delperiode.satser.single().dagsatsUtenParkering)
             assertThat(beregningsresultatUke1.grunnlag.dager).hasSize(1).allMatch { it.parkeringskostnad == 0 }
         }
     }
@@ -393,22 +485,35 @@ class PrivatBilBeregningsresultatServiceTest {
     fun `kaster feil om det finnes avklarte dager med godkjentGjennomførtKjøring=true utenfor rammevedtaket`() {
         val fomRammevedtak = 2 februar 2026 // Mandag
         val tomRammevedtak = 8 februar 2026
-        val dagsatsUtenParkering = 150.toBigDecimal()
+
+        val delperiode =
+            RammeForReiseMedPrivatBilDelperiode(
+                fom = fomRammevedtak,
+                tom = tomRammevedtak,
+                ekstrakostnader =
+                    RammeForReiseMedPrivatEkstrakostnader(
+                        bompengerPerDag = 40,
+                        fergekostnadPerDag = null,
+                    ),
+                satser =
+                    listOf(
+                        RammeForReiseMedPrivatBilSatsForDelperiode(
+                            fom = fomRammevedtak,
+                            tom = tomRammevedtak,
+                            satsBekreftetVedVedtakstidspunkt = true,
+                            kilometersats = 2.94.toBigDecimal(),
+                            dagsatsUtenParkering = 150.toBigDecimal(),
+                        ),
+                    ),
+                reisedagerPerUke = 5,
+            )
 
         val rammevedtakPrivatBil =
             rammevedtakPrivatBil(
                 reiseId = reiseId,
                 fom = fomRammevedtak,
                 tom = tomRammevedtak,
-                satser =
-                    listOf(
-                        satsForPeriodePrivatBil(
-                            fomRammevedtak,
-                            tomRammevedtak,
-                            2.94.toBigDecimal(),
-                            dagsatsUtenParkering,
-                        ),
-                    ),
+                delperioder = listOf(delperiode),
             )
 
         val kjøreliste =
@@ -437,22 +542,34 @@ class PrivatBilBeregningsresultatServiceTest {
     fun `kaster ikke feil om det finnes avklarte dager med godkjentGjennomførtKjøring=false utenfor rammevedtaket`() {
         val fomRammevedtak = 2 februar 2026 // Mandag
         val tomRammevedtak = 8 februar 2026
-        val dagsatsUtenParkering = 150.toBigDecimal()
+        val delperiode =
+            RammeForReiseMedPrivatBilDelperiode(
+                fom = fomRammevedtak,
+                tom = tomRammevedtak,
+                ekstrakostnader =
+                    RammeForReiseMedPrivatEkstrakostnader(
+                        bompengerPerDag = 40,
+                        fergekostnadPerDag = null,
+                    ),
+                satser =
+                    listOf(
+                        RammeForReiseMedPrivatBilSatsForDelperiode(
+                            fom = fomRammevedtak,
+                            tom = tomRammevedtak,
+                            satsBekreftetVedVedtakstidspunkt = true,
+                            kilometersats = 2.94.toBigDecimal(),
+                            dagsatsUtenParkering = 150.toBigDecimal(),
+                        ),
+                    ),
+                reisedagerPerUke = 5,
+            )
 
         val rammevedtakPrivatBil =
             rammevedtakPrivatBil(
                 reiseId = reiseId,
                 fom = fomRammevedtak,
                 tom = tomRammevedtak,
-                satser =
-                    listOf(
-                        satsForPeriodePrivatBil(
-                            fomRammevedtak,
-                            tomRammevedtak,
-                            2.94.toBigDecimal(),
-                            dagsatsUtenParkering,
-                        ),
-                    ),
+                delperioder = listOf(delperiode),
             )
 
         val kjøreliste =

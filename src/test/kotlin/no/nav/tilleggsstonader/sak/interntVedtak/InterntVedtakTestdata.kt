@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.interntVedtak
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
@@ -22,6 +23,8 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.totrinnskontroll
 import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtaksperiodeGrunnlag
@@ -30,7 +33,6 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgif
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
@@ -41,10 +43,12 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.Ekstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.SatsForPeriodePrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
@@ -285,6 +289,7 @@ object InterntVedtakTestdata {
                             listOf(
                                 vedtaksperiode,
                             ),
+                        beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = LocalDate.of(2024, 1, 1),
@@ -392,6 +397,7 @@ object InterntVedtakTestdata {
                         vedtaksperioder = vedtaksperioder,
                         beregningsresultat = beregningsresultat,
                         begrunnelse = "Sånn her vil en begrunnelse se ut",
+                        beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = LocalDate.of(2024, 1, 1),
@@ -585,6 +591,7 @@ object InterntVedtakTestdata {
                         vedtaksperioder = vedtaksperioder,
                         beregningsresultat = beregningsresultat,
                         begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
+                        beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
@@ -597,7 +604,7 @@ object InterntVedtakTestdata {
                 data =
                     AvslagBoutgifter(
                         årsaker = listOf(ÅrsakAvslag.MANGELFULL_DOKUMENTASJON, ÅrsakAvslag.RETT_TIL_BOSTØTTE),
-                        begrunnelse = "Begrunelse for avslag",
+                        begrunnelse = "Begrunnelse for avslag",
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
@@ -610,13 +617,14 @@ object InterntVedtakTestdata {
                 data =
                     OpphørBoutgifter(
                         årsaker = listOf(ÅrsakOpphør.ENDRING_UTGIFTER, ÅrsakOpphør.ENDRING_MÅLGRUPPE),
-                        begrunnelse = "Begrunelse for avslag",
+                        begrunnelse = "Begrunnelse for opphør",
                         vedtaksperioder = vedtaksperioder,
                         beregningsresultat = beregningsresultat,
+                        beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, 10 desember 2024),
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,
-                opphørsdato = null,
+                opphørsdato = 10 desember 2024,
             )
 
         private val aktivitetererBoutgifter =
@@ -724,26 +732,33 @@ object InterntVedtakTestdata {
                             aktivitetType = AktivitetType.TILTAK,
                             typeAktivitet = TypeAktivitet.GRUPPEAMO,
                             grunnlag =
-                                BeregningsgrunnlagForReiseMedPrivatBil(
+                                RammeForReiseMedPrivatBilBeregningsgrunnlag(
                                     fom = LocalDate.of(2024, 1, 1),
                                     tom = LocalDate.of(2024, 1, 31),
-                                    reisedagerPerUke = 3,
-                                    ekstrakostnader =
-                                        Ekstrakostnader(
-                                            bompengerPerDag = 40,
-                                            fergekostnadPerDag = 50,
-                                        ),
-                                    reiseavstandEnVei = BigDecimal.valueOf(40.0),
-                                    satser =
+                                    delperioder =
                                         listOf(
-                                            SatsForPeriodePrivatBil(
+                                            RammeForReiseMedPrivatBilDelperiode(
                                                 fom = LocalDate.of(2024, 1, 1),
                                                 tom = LocalDate.of(2024, 1, 31),
-                                                satsBekreftetVedVedtakstidspunkt = true,
-                                                kilometersats = BigDecimal.valueOf(2.94),
-                                                dagsatsUtenParkering = BigDecimal.valueOf(100.0),
+                                                reisedagerPerUke = 3,
+                                                ekstrakostnader =
+                                                    RammeForReiseMedPrivatEkstrakostnader(
+                                                        bompengerPerDag = 40,
+                                                        fergekostnadPerDag = 50,
+                                                    ),
+                                                satser =
+                                                    listOf(
+                                                        RammeForReiseMedPrivatBilSatsForDelperiode(
+                                                            fom = LocalDate.of(2024, 1, 1),
+                                                            tom = LocalDate.of(2024, 1, 31),
+                                                            satsBekreftetVedVedtakstidspunkt = true,
+                                                            kilometersats = BigDecimal.valueOf(2.94),
+                                                            dagsatsUtenParkering = BigDecimal.valueOf(100.0),
+                                                        ),
+                                                    ),
                                             ),
                                         ),
+                                    reiseavstandEnVei = BigDecimal.valueOf(40.0),
                                     vedtaksperioder = vedtaksperioder,
                                 ),
                         ),
@@ -753,26 +768,53 @@ object InterntVedtakTestdata {
                             aktivitetType = AktivitetType.TILTAK,
                             typeAktivitet = TypeAktivitet.GRUPPEAMO,
                             grunnlag =
-                                BeregningsgrunnlagForReiseMedPrivatBil(
+                                RammeForReiseMedPrivatBilBeregningsgrunnlag(
                                     fom = LocalDate.of(2024, 1, 1),
                                     tom = LocalDate.of(2024, 1, 31),
-                                    reisedagerPerUke = 3,
-                                    ekstrakostnader =
-                                        Ekstrakostnader(
-                                            bompengerPerDag = 40,
-                                            fergekostnadPerDag = 50,
-                                        ),
-                                    reiseavstandEnVei = BigDecimal.valueOf(60.0),
-                                    satser =
+                                    delperioder =
                                         listOf(
-                                            SatsForPeriodePrivatBil(
+                                            RammeForReiseMedPrivatBilDelperiode(
                                                 fom = LocalDate.of(2024, 1, 1),
+                                                tom = LocalDate.of(2024, 1, 10),
+                                                reisedagerPerUke = 3,
+                                                ekstrakostnader =
+                                                    RammeForReiseMedPrivatEkstrakostnader(
+                                                        bompengerPerDag = 40,
+                                                        fergekostnadPerDag = 50,
+                                                    ),
+                                                satser =
+                                                    listOf(
+                                                        RammeForReiseMedPrivatBilSatsForDelperiode(
+                                                            fom = LocalDate.of(2024, 1, 1),
+                                                            tom = LocalDate.of(2024, 1, 10),
+                                                            satsBekreftetVedVedtakstidspunkt = true,
+                                                            kilometersats = BigDecimal.valueOf(3.50),
+                                                            dagsatsUtenParkering = BigDecimal.valueOf(100.0),
+                                                        ),
+                                                    ),
+                                            ),
+                                            RammeForReiseMedPrivatBilDelperiode(
+                                                fom = LocalDate.of(2024, 1, 11),
                                                 tom = LocalDate.of(2024, 1, 31),
-                                                satsBekreftetVedVedtakstidspunkt = true,
-                                                kilometersats = BigDecimal.valueOf(3.50),
-                                                dagsatsUtenParkering = BigDecimal.valueOf(100.0),
+                                                reisedagerPerUke = 5,
+                                                ekstrakostnader =
+                                                    RammeForReiseMedPrivatEkstrakostnader(
+                                                        bompengerPerDag = 40,
+                                                        fergekostnadPerDag = 50,
+                                                    ),
+                                                satser =
+                                                    listOf(
+                                                        RammeForReiseMedPrivatBilSatsForDelperiode(
+                                                            fom = LocalDate.of(2024, 1, 11),
+                                                            tom = LocalDate.of(2024, 1, 31),
+                                                            satsBekreftetVedVedtakstidspunkt = true,
+                                                            kilometersats = BigDecimal.valueOf(3.50),
+                                                            dagsatsUtenParkering = BigDecimal.valueOf(100.0),
+                                                        ),
+                                                    ),
                                             ),
                                         ),
+                                    reiseavstandEnVei = BigDecimal.valueOf(60.0),
                                     vedtaksperioder = vedtaksperioder,
                                 ),
                         ),
@@ -869,50 +911,58 @@ object InterntVedtakTestdata {
                                                                 BeregningsresultatForReisePrivatBilDag(
                                                                     dato = LocalDate.of(2025, 1, 2),
                                                                     parkeringskostnad = 100,
+                                                                    dagsatsUtenParkering = 95.toBigDecimal(),
                                                                     stønadsbeløpForDag = BigDecimal(195),
                                                                 ),
                                                                 BeregningsresultatForReisePrivatBilDag(
                                                                     dato = LocalDate.of(2025, 1, 3),
                                                                     parkeringskostnad = 100,
+                                                                    dagsatsUtenParkering = 95.toBigDecimal(),
                                                                     stønadsbeløpForDag = BigDecimal(195),
                                                                 ),
                                                                 BeregningsresultatForReisePrivatBilDag(
                                                                     dato = LocalDate.of(2025, 1, 4),
                                                                     parkeringskostnad = 100,
+                                                                    dagsatsUtenParkering = 95.toBigDecimal(),
                                                                     stønadsbeløpForDag = BigDecimal(195),
                                                                 ),
                                                                 BeregningsresultatForReisePrivatBilDag(
                                                                     dato = LocalDate.of(2025, 1, 22),
                                                                     parkeringskostnad = 100,
+                                                                    dagsatsUtenParkering = 95.toBigDecimal(),
                                                                     stønadsbeløpForDag = BigDecimal(195),
                                                                 ),
                                                                 BeregningsresultatForReisePrivatBilDag(
                                                                     dato = LocalDate.of(2025, 1, 23),
                                                                     parkeringskostnad = 100,
+                                                                    dagsatsUtenParkering = 95.toBigDecimal(),
                                                                     stønadsbeløpForDag = BigDecimal(195),
                                                                 ),
                                                                 BeregningsresultatForReisePrivatBilDag(
                                                                     dato = LocalDate.of(2025, 1, 24),
                                                                     parkeringskostnad = 100,
+                                                                    dagsatsUtenParkering = 95.toBigDecimal(),
                                                                     stønadsbeløpForDag = BigDecimal(195),
                                                                 ),
                                                                 BeregningsresultatForReisePrivatBilDag(
                                                                     dato = LocalDate.of(2025, 2, 7),
                                                                     parkeringskostnad = 100,
+                                                                    dagsatsUtenParkering = 95.toBigDecimal(),
                                                                     stønadsbeløpForDag = BigDecimal(195),
                                                                 ),
                                                                 BeregningsresultatForReisePrivatBilDag(
                                                                     dato = LocalDate.of(2025, 2, 8),
                                                                     parkeringskostnad = 100,
+                                                                    dagsatsUtenParkering = 95.toBigDecimal(),
                                                                     stønadsbeløpForDag = BigDecimal(195),
                                                                 ),
                                                                 BeregningsresultatForReisePrivatBilDag(
                                                                     dato = LocalDate.of(2025, 2, 9),
                                                                     parkeringskostnad = 100,
+                                                                    dagsatsUtenParkering = 95.toBigDecimal(),
                                                                     stønadsbeløpForDag = BigDecimal(195),
                                                                 ),
                                                             ),
-                                                        dagsatsUtenParkering = BigDecimal(100),
                                                     ),
                                                 stønadsbeløp = BigDecimal(500),
                                                 brukersNavKontor = brukersNavKontor,
@@ -962,6 +1012,7 @@ object InterntVedtakTestdata {
                     beregningsresultat = beregningsresultatDagligReise,
                     rammevedtakPrivatBil = rammevedtakPrivatBil,
                     begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
+                    beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                 ),
             gitVersjon = Applikasjonsversjon.versjon,
             tidligsteEndring = null,

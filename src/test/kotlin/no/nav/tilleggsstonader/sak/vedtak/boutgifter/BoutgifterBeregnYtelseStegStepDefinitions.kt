@@ -31,6 +31,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.innvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningService
@@ -84,6 +85,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         mockk<UtledTidligsteEndringService> {
             every { utledTidligsteEndringForBeregning(any(), any()) } returns null
         }
+    val beregningsplanUtleder = BeregningsplanUtleder(utledTidligsteEndringService)
     val vilkårperiodeServiceMock =
         mockk<VilkårperiodeService>().apply {
             every { hentVilkårperioder(any()) } answers {
@@ -129,7 +131,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             beregningService =
             beregningService,
             opphørValideringService = opphørValideringService,
-            utledTidligsteEndringService = utledTidligsteEndringService,
+            beregningsplanUtleder = beregningsplanUtleder,
             vedtakRepository = vedtakRepositoryFake,
             tilkjentYtelseService = TilkjentYtelseService(tilkjentYtelseRepositoryFake),
             simuleringService = simuleringServiceMock,
@@ -284,8 +286,6 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     ) {
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         val opphørsdato = parseDato(opphørsdatoStr)
-
-        every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandlingId, any()) } returns opphørsdato
 
         kjørMedFeilkontekst {
             steg.utførSteg(

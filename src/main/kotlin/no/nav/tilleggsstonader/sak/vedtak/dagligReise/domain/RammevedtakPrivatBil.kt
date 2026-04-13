@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.allePerioderErSammenhengende
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -19,23 +20,52 @@ data class RammeForReiseMedPrivatBil(
     val aktivitetsadresse: String?,
     val aktivitetType: AktivitetType,
     val typeAktivitet: TypeAktivitet?,
-    val grunnlag: BeregningsgrunnlagForReiseMedPrivatBil,
-)
+    val grunnlag: RammeForReiseMedPrivatBilBeregningsgrunnlag,
+) {
+    fun finnDelperiodeForPeriode(periode: Periode<LocalDate>) = grunnlag.delperioder.single { it.inneholder(periode) }
+}
 
-data class BeregningsgrunnlagForReiseMedPrivatBil(
+data class RammeForReiseMedPrivatBilBeregningsgrunnlag(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val reisedagerPerUke: Int,
+    val delperioder: List<RammeForReiseMedPrivatBilDelperiode>,
     val reiseavstandEnVei: BigDecimal,
-    val ekstrakostnader: Ekstrakostnader,
-    val satser: List<SatsForPeriodePrivatBil>,
     val vedtaksperioder: List<Vedtaksperiode>,
 ) : Periode<LocalDate> {
+    init {
+        require(fom == delperioder.minOf { it.fom }) {
+            "fom på rammevedtaket $fom er ulikt tidligste fom på delperioder ${delperioder.minOf { it.fom }}"
+        }
+        require(tom == delperioder.maxOf { it.tom }) {
+            "tom på rammevedtaket $tom er ulikt største tom på delperioder ${delperioder.maxOf { it.tom }}"
+        }
+        require(delperioder.allePerioderErSammenhengende()) {
+            "Alle delperioder må være sammenhengende"
+        }
+    }
+
     fun vedtaksperiodeForPeriode(periode: Periode<LocalDate>) = vedtaksperioder.single { it.inneholder(periode) }
 }
 
-// TODO: Finn ut om det finnes abbonnement på disse prisene og om det påvirker hvordan vi vil løse dette
-data class Ekstrakostnader(
+data class RammeForReiseMedPrivatBilDelperiode(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val ekstrakostnader: RammeForReiseMedPrivatEkstrakostnader,
+    val reisedagerPerUke: Int,
+    val satser: List<RammeForReiseMedPrivatBilSatsForDelperiode>,
+) : Periode<LocalDate> {
+    fun finnSatsForDato(dato: LocalDate): RammeForReiseMedPrivatBilSatsForDelperiode = satser.single { it.inneholder(dato) }
+}
+
+data class RammeForReiseMedPrivatBilSatsForDelperiode(
+    override val fom: LocalDate,
+    override val tom: LocalDate,
+    val kilometersats: BigDecimal,
+    val dagsatsUtenParkering: BigDecimal, // hva brukeren kan få dekt per dag. Inkluderer bompenger og ferge, men ikke parkering.
+    val satsBekreftetVedVedtakstidspunkt: Boolean,
+) : Periode<LocalDate>
+
+data class RammeForReiseMedPrivatEkstrakostnader(
     val bompengerPerDag: Int?,
     val fergekostnadPerDag: Int?,
 ) {
@@ -48,15 +78,3 @@ data class Ekstrakostnader(
         return sum.toBigDecimal()
     }
 }
-
-/**
- * dagsatsUtenParkering: hva brukeren kan få dekt per dag. Inkluderer bompenger og ferge, men ikke parkering.
- * maksBeløpSomKanDekkesFørParkering: maksimalt beløp bruker kan få dekt dersom hen kjører hver dag.
- */
-data class SatsForPeriodePrivatBil(
-    override val fom: LocalDate,
-    override val tom: LocalDate,
-    val satsBekreftetVedVedtakstidspunkt: Boolean,
-    val kilometersats: BigDecimal,
-    val dagsatsUtenParkering: BigDecimal,
-) : Periode<LocalDate>

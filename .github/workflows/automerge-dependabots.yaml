@@ -1,0 +1,21 @@
+name: Automerge Dependabot PRs
+
+on:
+  schedule:
+    - cron: '0 6 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write        # Required to perform the merge commit
+      pull-requests: write   # Required to merge PRs (and approve if auto-approve is enabled)
+      checks: read           # Required to read check runs (update-branch-before-merge)
+      statuses: read         # Required to read commit statuses (update-branch-before-merge)
+    steps:
+      - name: Automerge Dependabot PRs
+        uses: navikt/automerge-dependabot@5251eeb0334b52a273adce4d305b5ae579b7eb26 # v1.2.2
+        with:
+          token: ${{ github.token }}
+          merge-method: squash

@@ -94,26 +94,23 @@ class InterntVedtakService(
             when (data) {
                 is InnvilgelseTilsynBarn ->
                     BeregningsresultatInterntVedtakDto(
-                        tilsynBarn = data.beregningsresultat.tilDto(vedtak.tidligsteEndring).perioder,
+                        tilsynBarn = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan).perioder,
                     )
 
                 is InnvilgelseLæremidler ->
                     BeregningsresultatInterntVedtakDto(
-                        læremidler =
-                            data.beregningsresultat
-                                .tilDto(vedtak.tidligsteEndring)
-                                .perioder,
+                        læremidler = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan).perioder,
                     )
 
                 is InnvilgelseBoutgifter ->
                     BeregningsresultatInterntVedtakDto(
-                        boutgifter = data.beregningsresultat.tilDto(vedtak.tidligsteEndring).perioder,
+                        boutgifter = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan).perioder,
                     )
 
                 is InnvilgelseDagligReise -> {
                     val vilkårDagligReise = vilkår.map { it.mapTilVilkårDagligReise() }
                     BeregningsresultatInterntVedtakDto(
-                        dagligReise = data.beregningsresultat.tilDto(vedtak.tidligsteEndring, vilkårDagligReise),
+                        dagligReise = data.beregningsresultat.tilDto(data.beregningsplan, vilkårDagligReise),
                     )
                 }
 

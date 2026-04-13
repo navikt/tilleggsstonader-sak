@@ -7,6 +7,8 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.innvilgelseBoutgifter
@@ -101,8 +103,8 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 .beregn(
                     behandling = saksbehandling(),
                     vedtaksperioder = vedtaksperioder,
+                    plan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                     typeVedtak = TypeVedtak.INNVILGELSE,
-                    tidligsteEndring = null,
                 ).perioder
 
         assertThat(res).isEqualTo(beregningsresultatFørstegangsbehandlingMidlertidigOvernatting)
@@ -116,8 +118,8 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
             boutgifterBeregningService.beregn(
                 behandling = saksbehandling(),
                 vedtaksperioder = vedtaksperioder,
+                plan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                 typeVedtak = TypeVedtak.INNVILGELSE,
-                tidligsteEndring = null,
             )
         }.hasMessage("Det er ikke lagt inn noen oppfylte utgiftsperioder")
     }
@@ -142,8 +144,8 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
             boutgifterBeregningService.beregn(
                 behandling = saksbehandling(),
                 vedtaksperioder = vedtaksperioder,
+                plan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                 typeVedtak = TypeVedtak.INNVILGELSE,
-                tidligsteEndring = null,
             )
         }.hasMessage("Vedtaksperioden 01.01.2025–31.01.2025 mangler oppfylt utgift hele eller deler av perioden.")
     }
@@ -185,8 +187,8 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
             boutgifterBeregningService.beregn(
                 behandling = saksbehandling(),
                 vedtaksperioder = vedtaksperioder,
+                plan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                 typeVedtak = TypeVedtak.INNVILGELSE,
-                tidligsteEndring = null,
             )
         }.hasMessage(
             """
@@ -280,8 +282,8 @@ class BoutgifterBeregningMidlertidigUtgiftTest {
                 .beregn(
                     behandling = saksbehandling,
                     vedtaksperioder = vedtaksperioderRevurdering,
+                    plan = Beregningsplan(Beregningsomfang.FRA_DATO, tidligsteEndring),
                     typeVedtak = TypeVedtak.INNVILGELSE,
-                    tidligsteEndring = tidligsteEndring,
                 ).perioder
 
         assertThat(res.size).isEqualTo(2)

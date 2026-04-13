@@ -7,6 +7,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.beregnStønadsbeløp
@@ -49,10 +51,16 @@ class BoutgifterBeregningService(
     fun beregn(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
+        plan: Beregningsplan,
         typeVedtak: TypeVedtak,
-        tidligsteEndring: LocalDate?,
     ): BeregningsresultatBoutgifter {
         val forrigeVedtak = hentForrigeVedtak(behandling)
+
+        if (plan.omfang == Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT) {
+            return requireNotNull(forrigeVedtak) {
+                "Kan ikke gjenbruke forrige beregningsresultat uten forrige iverksatt vedtak"
+            }.beregningsresultat
+        }
 
         vedtaksperiodeValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,
@@ -61,7 +69,7 @@ class BoutgifterBeregningService(
         )
 
         val vedtaksperioderBeregning =
-            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFra(tidligsteEndring)
+            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFra(plan.beregnFra())
 
         val utgifterPerVilkårtype =
             boutgifterUtgiftService
@@ -83,11 +91,8 @@ class BoutgifterBeregningService(
         val beregningsresultat = beregnAktuellePerioder(vedtaksperioderBeregning, utgifterPerVilkårtype)
 
         return if (forrigeVedtak != null) {
-            brukerfeilHvis(tidligsteEndring == null) {
-                "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
-            }
             settSammenGamleOgNyePerioder(
-                tidligsteEndring = tidligsteEndring,
+                beregnFra = requireNotNull(plan.beregnFra()),
                 nyttBeregningsresultat = beregningsresultat,
                 forrigeBeregningsresultat = forrigeVedtak.beregningsresultat,
             )
@@ -122,25 +127,24 @@ class BoutgifterBeregningService(
 
     /**
      * Slår sammen perioder fra forrige og nytt vedtak.
-     * Beholder perioder fra forrige vedtak frem til tidligsteEndring-datoen.
-     * Bruker reberegnede perioder fra og med tidligsteEndring-datoen
-     * Dette gjøres for at vi ikke skal reberegne perioder som ikke er med i revurderingen, i tilfelle beregningskoden har endret seg siden sist.
-     * Vi trenger derimot å reberegne alle perioder som ligger etter tidligsteEndring-datoen, da utgiftene, antall samlinger osv kan ha endret seg.
+     * Beholder perioder fra forrige vedtak som starter før [beregnFra]
+     * Bruker reberegnede perioder som starter likt eller etter [beregnFra]
+     * Dette gjøres for at vi ikke skal reberegne mer enn nødvendig, i tilfelle kodeendringer utilsiktet påvirker gamle vedtak
      */
     private fun settSammenGamleOgNyePerioder(
-        tidligsteEndring: LocalDate,
+        beregnFra: LocalDate,
         nyttBeregningsresultat: List<BeregningsresultatForLøpendeMåned>,
         forrigeBeregningsresultat: BeregningsresultatBoutgifter,
     ): BeregningsresultatBoutgifter {
         val perioderFraForrigeVedtakSomSkalBeholdes =
             forrigeBeregningsresultat.perioder
-                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() < tidligsteEndring }
+                .filter { it.grunnlag.fom.sisteDagenILøpendeMåned() < beregnFra }
                 .markerSomDelAvTidligereUtbetaling()
 
         val reberegnedePerioder =
             nyttBeregningsresultat
                 .filter {
-                    it.fom.sisteDagenILøpendeMåned() >= tidligsteEndring
+                    it.fom.sisteDagenILøpendeMåned() >= beregnFra
                 }.markerSomDelAvTidligereUtbetaling(forrigeBeregningsresultat.perioder)
         return BeregningsresultatBoutgifter(perioderFraForrigeVedtakSomSkalBeholdes + reberegnedePerioder)
     }

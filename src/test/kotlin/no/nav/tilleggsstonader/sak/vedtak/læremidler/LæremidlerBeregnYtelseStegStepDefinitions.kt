@@ -38,6 +38,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtel
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
@@ -81,6 +82,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
         mockk<UtledTidligsteEndringService> {
             every { utledTidligsteEndringForBeregning(any(), any()) } returns null
         }
+    val beregningsplanUtleder = BeregningsplanUtleder(utledTidligsteEndringService)
     val vilkårperiodeService =
         mockk<VilkårperiodeService>().apply {
             val mock = this
@@ -115,7 +117,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             vedtakRepository = vedtakRepository,
             tilkjentYtelseService = TilkjentYtelseService(tilkjentYtelseRepository),
             simuleringService = simuleringService,
-            utledTidligsteEndringService = utledTidligsteEndringService,
+            beregningsplanUtleder = beregningsplanUtleder,
         )
     val vedtaksperiodeId: UUID = UUID.randomUUID()
 

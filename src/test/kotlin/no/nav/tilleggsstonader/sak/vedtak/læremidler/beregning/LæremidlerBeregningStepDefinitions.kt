@@ -19,6 +19,9 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepos
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningTestUtil.vedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
@@ -122,7 +125,8 @@ class LæremidlerBeregningStepDefinitions {
                 læremidlerBeregningService.beregn(
                     behandling,
                     vedtaksPerioder,
-                    tidligsteEndring = null,
+                    plan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+                    typeVedtak = TypeVedtak.INNVILGELSE,
                 )
         } catch (e: Exception) {
             beregningException = e

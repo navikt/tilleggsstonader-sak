@@ -7,7 +7,7 @@ import io.mockk.mockkObject
 import io.mockk.slot
 import io.mockk.unmockkObject
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingTypeV2
+import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -234,7 +234,7 @@ internal class BehandlingServiceTest {
                     ),
                 )
 
-            assertThat(behandlingService.utledNesteBehandlingstypeV2(fagsak.id)).isEqualTo(BehandlingType.REVURDERING)
+            assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.REVURDERING)
         }
 
         @Test
@@ -244,7 +244,7 @@ internal class BehandlingServiceTest {
                 behandlingRepository.findByFagsakId(fagsak.id)
             } returns emptyList()
 
-            assertThat(behandlingService.utledNesteBehandlingstypeV2(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
+            assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
         }
 
         @Test
@@ -254,7 +254,7 @@ internal class BehandlingServiceTest {
                 behandlingRepository.findByFagsakId(fagsak.id)
             } returns listOf(henlagtBehandling(fagsak))
 
-            assertThat(behandlingService.utledNesteBehandlingstypeV2(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
+            assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
         }
 
         @Test
@@ -272,7 +272,7 @@ internal class BehandlingServiceTest {
                     ),
                 )
 
-            assertThat(behandlingService.utledNesteBehandlingstypeV2(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
+            assertThat(behandlingService.utledNesteBehandlingstype(fagsak.id)).isEqualTo(BehandlingType.FØRSTEGANGSBEHANDLING)
         }
 
         @Test
@@ -291,16 +291,16 @@ internal class BehandlingServiceTest {
                 )
 
             assertThat(
-                behandlingService.utledNesteBehandlingstypeV2(fagsak.id, behandlingÅrsak = BehandlingÅrsak.KJØRELISTE),
+                behandlingService.utledNesteBehandlingstype(fagsak.id, behandlingÅrsak = BehandlingÅrsak.KJØRELISTE),
             ).isEqualTo(BehandlingType.KJØRELISTE)
         }
     }
 }
 
-fun BehandlingService.utledNesteBehandlingstypeV2(
+fun BehandlingService.utledNesteBehandlingstype(
     fagsakId: FagsakId,
     behandlingÅrsak: BehandlingÅrsak = BehandlingÅrsak.SØKNAD,
 ): BehandlingType {
     val behandlinger = hentBehandlinger(fagsakId)
-    return utledBehandlingTypeV2(behandlinger, behandlingÅrsak)
+    return utledBehandlingType(behandlinger, behandlingÅrsak)
 }

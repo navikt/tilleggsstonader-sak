@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -41,11 +42,13 @@ sealed interface VedtakBoutgifter : Vedtaksdata
 sealed interface InnvilgelseEllerOpphørBoutgifter : VedtakBoutgifter {
     val beregningsresultat: BeregningsresultatBoutgifter
     val vedtaksperioder: List<Vedtaksperiode>
+    val beregningsplan: Beregningsplan
 }
 
 data class InnvilgelseBoutgifter(
     override val beregningsresultat: BeregningsresultatBoutgifter,
     override val vedtaksperioder: List<Vedtaksperiode>,
+    override val beregningsplan: Beregningsplan,
     val begrunnelse: String? = null,
 ) : InnvilgelseEllerOpphørBoutgifter,
     Innvilgelse {
@@ -69,6 +72,7 @@ data class OpphørBoutgifter(
     override val beregningsresultat: BeregningsresultatBoutgifter,
     override val årsaker: List<ÅrsakOpphør>,
     override val begrunnelse: String,
+    override val beregningsplan: Beregningsplan,
 ) : InnvilgelseEllerOpphørBoutgifter,
     Opphør {
     override val type: TypeVedtaksdata = TypeVedtakBoutgifter.OPPHØR_BOUTGIFTER

@@ -204,17 +204,11 @@ interface BehandlingRepository :
 
     @Query(
         """
-            with siste_oppgave_per_behandling as (
-                select *, row_number() over (partition by behandling_id order by opprettet_tid desc) as rn from oppgave
-                )
-            select b.id from behandling b join siste_oppgave_per_behandling o on b.id = o.behandling_id
-            where b.status not in (:behandlingsstatuserHvorOppgaveIkkeSkalFinnes)
-              and o.rn = 1
-              and (o.status = 'FERDIGSTILT' or o.tildelt_enhetsnummer not in (:gyldigeEnheterForOppgave))            
+            select b.id from behandling b
+                                 left join oppgave o on o.behandling_id = b.id and o.status = 'ÅPEN'
+            where b.status not in ('IVERKSETTER_VEDTAK', 'FERDIGSTILT')
+            group by b.id having count(o) = 0;
         """,
     )
-    fun finnÅpneBehandlingerUtenOppgaveMedStatusOgTildeltEnhetsnummer(
-        behandlingsstatuserHvorOppgaveIkkeSkalFinnes: Collection<BehandlingStatus>,
-        gyldigeEnheterForOppgave: Collection<String>,
-    ): List<BehandlingId>
+    fun finnBehandlingerUtenÅpenOppgave(): List<BehandlingId>
 }

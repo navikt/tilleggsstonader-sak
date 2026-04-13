@@ -4,11 +4,13 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.YEAR_MONTH_MIN
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.toYearMonth
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningValideringUtil.validerPerioderForInnvilgelse
@@ -58,13 +60,26 @@ class TilsynBarnBeregningService(
     fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
+        plan: Beregningsplan,
         typeVedtak: TypeVedtak,
-        tidligsteEndring: LocalDate?,
     ): BeregningsresultatTilsynBarn {
         feilHvis(typeVedtak == TypeVedtak.AVSLAG) {
             "Skal ikke beregne for avslag"
         }
 
+        return if (plan.omfang == Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT) {
+            hentForrigeBeregningsresultat(behandling)
+        } else {
+            beregnFra(vedtaksperioder, behandling, typeVedtak, plan.beregnFra())
+        }
+    }
+
+    private fun beregnFra(
+        vedtaksperioder: List<Vedtaksperiode>,
+        behandling: Saksbehandling,
+        typeVedtak: TypeVedtak,
+        beregnFra: LocalDate?,
+    ): BeregningsresultatTilsynBarn {
         val utgifterPerBarn = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandling.id)
         validerUtgiftHeleVedtaksperioden(vedtaksperioder, utgifterPerBarn)
 
@@ -75,27 +90,30 @@ class TilsynBarnBeregningService(
         )
 
         val vedtaksperioderBeregning =
-            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFra(tidligsteEndring)
+            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFra(beregnFra)
 
-        val perioder = beregnAktuellePerioder(behandling, typeVedtak, vedtaksperioderBeregning, tidligsteEndring)
+        val perioder = beregnAktuellePerioder(behandling, typeVedtak, vedtaksperioderBeregning, beregnFra)
         val relevantePerioderFraForrigeVedtak =
-            finnRelevantePerioderFraForrigeVedtak(behandling, tidligsteEndring)
+            finnRelevantePerioderFraForrigeVedtak(behandling, beregnFra)
 
-        brukerfeilHvis(tidligsteEndring == null && behandling.forrigeIverksatteBehandlingId != null) {
-            "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen"
-        }
         return BeregningsresultatTilsynBarn(relevantePerioderFraForrigeVedtak + perioder)
     }
 
-    /**
-     * Dersom behandling er en revurdering beregnes perioder fra og med måneden for tidligsteEndring
-     * Ellers beregnes perioder for hele perioden som man har vedtaksperiode og utgifter
-     */
+    private fun hentForrigeBeregningsresultat(behandling: Saksbehandling): BeregningsresultatTilsynBarn {
+        val forrigeBehandlingId =
+            behandling.forrigeIverksatteBehandlingId ?: feil("Kan ikke hente forrige beregningsresultat uten forrige iverksatt behandling")
+        return vedtakRepository
+            .findByIdOrThrow(forrigeBehandlingId)
+            .withTypeOrThrow<InnvilgelseEllerOpphørTilsynBarn>()
+            .data
+            .beregningsresultat
+    }
+
     private fun beregnAktuellePerioder(
         behandling: Saksbehandling,
         typeVedtak: TypeVedtak,
         vedtaksperioder: List<VedtaksperiodeBeregning>,
-        tidligsteEndring: LocalDate?,
+        beregnFra: LocalDate?,
     ): List<BeregningsresultatForMåned> {
         val utgifterPerBarn = tilsynBarnUtgiftService.hentUtgifterTilBeregning(behandling.id)
 
@@ -105,24 +123,19 @@ class TilsynBarnBeregningService(
 
         val beregningsgrunnlag =
             lagBeregningsgrunnlagPerMåned(vedtaksperioder, aktiviteter, utgifterPerBarn)
-                .brukPerioderFraOgMedTidligsteEndring(tidligsteEndring)
+                .brukPerioderFraOgMedDato(beregnFra)
         return beregn(beregningsgrunnlag)
     }
 
     private fun finnRelevantePerioderFraForrigeVedtak(
         behandling: Saksbehandling,
-        tidligsteEndring: LocalDate?,
+        beregnFra: LocalDate?,
     ): List<BeregningsresultatForMåned> =
-        behandling.forrigeIverksatteBehandlingId?.let { forrigeIverksatteBehandlingId ->
-            val beregningsresultat =
-                vedtakRepository
-                    .findByIdOrThrow(forrigeIverksatteBehandlingId)
-                    .withTypeOrThrow<InnvilgelseEllerOpphørTilsynBarn>()
-                    .data
-                    .beregningsresultat
-            val tidligsteEndringMåned = tidligsteEndring?.toYearMonth() ?: YEAR_MONTH_MIN
+        behandling.forrigeIverksatteBehandlingId?.let {
+            val beregningsresultat = hentForrigeBeregningsresultat(behandling)
+            val beregnFraMåned = beregnFra?.toYearMonth() ?: YEAR_MONTH_MIN
 
-            beregningsresultat.perioder.filter { it.grunnlag.måned < tidligsteEndringMåned }
+            beregningsresultat.perioder.filter { it.grunnlag.måned < beregnFraMåned }
         } ?: emptyList()
 
     private fun beregn(beregningsgrunnlag: List<Beregningsgrunnlag>): List<BeregningsresultatForMåned> =
@@ -251,18 +264,23 @@ class TilsynBarnBeregningService(
     }
 
     /**
-     * Dersom revurdering så skal man kun beregne perioder fra og med måneden for tidligste endring
-     * Hvis vi eks innvilget 1000kr for 1-31 august, så mappes hele beløpet til 1 august.
-     * Dvs det lages en andel som har fom-tom 1-1 aug
-     * Når man revurderer fra midten på måneden og eks skal endre målgruppe eller aktivitetsdager,
-     * så har man allerede utbetalt 500kr for 1-14 august, men hele beløpet er ført på 1 aug.
-     * For at beregningen då skal bli riktig må man ha med grunnlaget til hele måneden og beregne det på nytt, sånn at man får en ny periode som er
-     * 1-14 aug, 500kr, 15-30 aug 700kr.
+     * Ved revurdering fra midt i en måned må hele den måneden beregnes på nytt, ikke bare fra beregn fra-datoen.
+     *
+     * Bakgrunn: En måneds støtte utbetales som én andel, der hele beløpet knyttes til 1. i måneden.
+     * Eksempel: Innvilgelse for august gir én andel: fom=1.aug, tom=1.aug, beløp=1000kr.
+     *
+     * Hvis man revurderer fra 15. august (f.eks. fordi målgruppe eller aktivitetsdager endres),
+     * og 500kr allerede er utbetalt for 1.–14. august, vil beregningen produsere to nye andeler:
+     *   - 1.–14. aug: 500kr  (det som allerede er utbetalt)
+     *   - 15.–31. aug: 700kr (det nye beløpet)
+     *
+     * For å få riktige andeler må beregningen starte fra begynnelsen av måneden,
+     * selv om revurderingen starter midt i måneden.
      */
-    private fun List<Beregningsgrunnlag>.brukPerioderFraOgMedTidligsteEndring(tidligsteEndring: LocalDate?): List<Beregningsgrunnlag> {
-        val tidligsteEndringMåned = tidligsteEndring?.toYearMonth() ?: return this
+    private fun List<Beregningsgrunnlag>.brukPerioderFraOgMedDato(fraOgMedDato: LocalDate?): List<Beregningsgrunnlag> {
+        val beregnFraMåned = fraOgMedDato?.toYearMonth() ?: return this
 
-        return this.filter { it.måned >= tidligsteEndringMåned }
+        return this.filter { it.måned >= beregnFraMåned }
     }
 
     private fun finnAktiviteter(behandlingId: BehandlingId): List<Aktivitet> =

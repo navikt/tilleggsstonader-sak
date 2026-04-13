@@ -18,7 +18,7 @@ class GooglePlaceDetailsClient(
     fun finnStedDetaljer(stedId: PlaceId): PlaceDetailsResponse? =
         restClient
             .get()
-            .uri("/places/{placesId}", stedId.value)
+            .uri("/places/{placesId}?regionCode={regionCode}&languageCode={languageCode}", stedId.value, "NO", "no")
             .headers { headers ->
                 headers.apply {
                     add("X-Goog-Api-Key", apiKey)

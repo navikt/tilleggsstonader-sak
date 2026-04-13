@@ -24,11 +24,11 @@ data class BeregningsresultatForReisePrivatBilPeriode(
 
 data class BeregningsresultatForReisePrivatBilGrunnlag(
     val dager: List<BeregningsresultatForReisePrivatBilDag>,
-    val dagsatsUtenParkering: BigDecimal,
 )
 
 data class BeregningsresultatForReisePrivatBilDag(
     val dato: LocalDate,
     val parkeringskostnad: Int,
+    val dagsatsUtenParkering: BigDecimal,
     val stønadsbeløpForDag: BigDecimal,
 )

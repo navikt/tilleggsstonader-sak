@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.domain
 
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.beregningsresultatForMåned
@@ -138,6 +140,7 @@ class BeregningsresultatLæremidlerTest {
                                 ),
                             ),
                     ),
+                beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
             )
 
         val forrigeVedtak = LæremidlerTestUtil.innvilgelse(innvilgelseLæremidlerMedLangPeriode)
@@ -287,6 +290,7 @@ class BeregningsresultatLæremidlerTest {
                                 ),
                             ),
                     ),
+                beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
             )
 
         val forrigeVedtak = LæremidlerTestUtil.innvilgelse(innvilgelseLæremidlerMedLangPeriode)

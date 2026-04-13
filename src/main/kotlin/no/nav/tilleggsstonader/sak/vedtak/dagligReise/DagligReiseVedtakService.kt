@@ -7,6 +7,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
@@ -36,7 +38,7 @@ class DagligReiseVedtakService(
         rammevedtakPrivatBil: RammevedtakPrivatBil?,
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
-        tidligsteEndring: LocalDate?,
+        beregningsplan: Beregningsplan,
     ) {
         vedtakRepository.insert(
             GeneriskVedtak(
@@ -48,9 +50,10 @@ class DagligReiseVedtakService(
                         begrunnelse = begrunnelse,
                         beregningsresultat = beregningsresultat,
                         rammevedtakPrivatBil = rammevedtakPrivatBil,
+                        beregningsplan = beregningsplan,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                tidligsteEndring = tidligsteEndring,
+                tidligsteEndring = if (beregningsplan.omfang == Beregningsomfang.FRA_DATO) beregningsplan.fraDato else null,
             ),
         )
     }
@@ -80,6 +83,7 @@ class DagligReiseVedtakService(
         rammevedtakPrivatBil: RammevedtakPrivatBil?,
         avkortetVedtaksperioder: List<Vedtaksperiode>,
         vedtak: OpphørDagligReiseRequest,
+        beregningsplan: Beregningsplan,
     ) {
         vedtakRepository.insert(
             GeneriskVedtak(
@@ -92,6 +96,7 @@ class DagligReiseVedtakService(
                         årsaker = vedtak.årsakerOpphør,
                         begrunnelse = vedtak.begrunnelse,
                         vedtaksperioder = avkortetVedtaksperioder,
+                        beregningsplan = beregningsplan,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
                 tidligsteEndring = null,

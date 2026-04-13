@@ -2,10 +2,13 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.summerUtgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
+import no.nav.tilleggsstonader.sak.vedtak.dto.BeregningsplanDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 
@@ -13,6 +16,7 @@ data class BeregningsresultatBoutgifterDto(
     val perioder: List<BeregningsresultatForPeriodeDto>,
     val inneholderUtgifterOvernatting: Boolean,
     val tidligsteEndring: LocalDate? = null,
+    val beregningsplan: BeregningsplanDto,
 )
 
 data class BeregningsresultatForPeriodeDto(
@@ -42,14 +46,15 @@ data class UtgiftBoutgifterMedAndelTilUtbetalingDto(
     }
 }
 
-fun BeregningsresultatBoutgifter.tilDto(tidligsteEndring: LocalDate?): BeregningsresultatBoutgifterDto =
+fun BeregningsresultatBoutgifter.tilDto(beregningsplan: Beregningsplan) =
     BeregningsresultatBoutgifterDto(
         perioder =
-            filtrerFraOgMed(tidligsteEndring)
+            filtrerFraOgMed(beregningsplan.fraDato)
                 .perioder
-                .map { it.tilDto(tidligsteEndring) },
+                .map { it.tilDto(beregningsplan.fraDato) },
         inneholderUtgifterOvernatting = inneholderUtgifterOvernatting(),
-        tidligsteEndring = tidligsteEndring,
+        tidligsteEndring = beregningsplan.fraDato,
+        beregningsplan = beregningsplan.tilDto(),
     )
 
 private fun BeregningsresultatBoutgifter.filtrerFraOgMed(dato: LocalDate?): BeregningsresultatBoutgifter {

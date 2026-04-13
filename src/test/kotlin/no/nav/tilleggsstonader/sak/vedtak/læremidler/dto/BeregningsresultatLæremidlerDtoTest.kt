@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler.dto
 
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.beregningsresultatForPeriodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
@@ -28,7 +30,7 @@ class BeregningsresultatLæremidlerDtoTest {
                             LocalDate.of(2024, 5, 31),
                         ),
                     ),
-            ).tilDto(tidligsteEndring = null)
+            ).tilDto(beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER))
 
         assertThat(dto.perioder).containsExactlyInAnyOrder(
             beregningsresultatForPeriodeDto(

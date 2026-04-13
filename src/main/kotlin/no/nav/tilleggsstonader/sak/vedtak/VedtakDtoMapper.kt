@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnResponse
@@ -36,6 +37,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerResponse
@@ -55,14 +57,12 @@ class VedtakDtoMapper(
     fun toDto(
         vedtak: Vedtak,
         forrigeIverksatteBehandlingId: BehandlingId?,
-    ): VedtakResponse {
-        val data = vedtak.data
-        return when (data) {
+    ): VedtakResponse =
+        when (val data = vedtak.data) {
             is VedtakTilsynBarn ->
                 mapVedtakTilsynBarn(
                     vedtak,
                     data,
-                    vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId,
                 )
 
@@ -91,33 +91,30 @@ class VedtakDtoMapper(
                     forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
                 )
         }
-    }
 
     private fun mapVedtakTilsynBarn(
         vedtak: Vedtak,
         data: VedtakTilsynBarn,
-        tidligsteEndring: LocalDate?,
         forrigeIverksatteBehandlingId: BehandlingId?,
     ): VedtakTilsynBarnResponse =
         when (data) {
-            is InnvilgelseTilsynBarn -> {
+            is InnvilgelseTilsynBarn ->
                 InnvilgelseTilsynBarnResponse(
-                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
+                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan),
                     vedtaksperioder =
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
                         ),
                     begrunnelse = data.begrunnelse,
                 )
-            }
 
             is OpphørTilsynBarn ->
                 OpphørTilsynBarnResponse(
-                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
+                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan),
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
                     vedtaksperioder = data.vedtaksperioder.tilLagretVedtaksperiodeDto(null),
-                    opphørsdato = vedtak.opphørsdato,
+                    opphørsdato = vedtak.opphørsdato ?: feil("Opphørsdato er obligatorisk for opphør"),
                 )
 
             is AvslagTilsynBarn ->
@@ -134,17 +131,17 @@ class VedtakDtoMapper(
         forrigeIverksatteBehandlingId: BehandlingId?,
     ): VedtakLæremidlerResponse =
         when (data) {
-            is InnvilgelseLæremidler -> {
+            is InnvilgelseLæremidler ->
                 InnvilgelseLæremidlerResponse(
                     vedtaksperioder =
-                        data.vedtaksperioder
-                            .tilLagretVedtaksperiodeDto(hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId)),
-                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
+                        data.vedtaksperioder.tilLagretVedtaksperiodeDto(
+                            hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
+                        ),
+                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,
                 )
-            }
 
             is AvslagLæremidler ->
                 AvslagLæremidlerDto(
@@ -159,7 +156,8 @@ class VedtakDtoMapper(
                     vedtaksperioder =
                         data.vedtaksperioder
                             .tilLagretVedtaksperiodeDto(hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId)),
-                    opphørsdato = vedtak.opphørsdato,
+                    opphørsdato = vedtak.opphørsdato ?: feil("Opphørsdato er obligatorisk for opphør"),
+                    beregningsplan = data.beregningsplan.tilDto(),
                 )
         }
 
@@ -176,7 +174,7 @@ class VedtakDtoMapper(
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
                         ),
-                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring),
+                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,
@@ -197,7 +195,8 @@ class VedtakDtoMapper(
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
                         ),
-                    opphørsdato = vedtak.opphørsdato,
+                    opphørsdato = vedtak.opphørsdato ?: feil("Opphørsdato er obligatorisk for opphør"),
+                    beregningsplan = data.beregningsplan.tilDto(),
                 )
         }
 
@@ -215,7 +214,7 @@ class VedtakDtoMapper(
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
                         ),
-                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring = tidligsteEndring, vilkår),
+                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan, vilkår),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,
@@ -226,14 +225,14 @@ class VedtakDtoMapper(
             is AvslagDagligReise -> AvslagDagligReiseDto(årsakerAvslag = data.årsaker, begrunnelse = data.begrunnelse)
             is OpphørDagligReise ->
                 OpphørDagligReiseResponse(
-                    beregningsresultat = data.beregningsresultat.tilDto(tidligsteEndring, vilkår),
+                    beregningsresultat = data.beregningsresultat.tilDto(data.beregningsplan, vilkår),
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
                     vedtaksperioder =
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
                         ),
-                    opphørsdato = vedtak.opphørsdato,
+                    opphørsdato = vedtak.opphørsdato ?: feil("Opphørsdato er obligatorisk for opphør"),
                 )
         }
 

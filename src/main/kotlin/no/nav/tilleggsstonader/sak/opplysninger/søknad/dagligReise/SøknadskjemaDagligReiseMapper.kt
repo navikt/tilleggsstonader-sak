@@ -86,8 +86,16 @@ class SøknadskjemaDagligReiseMapper(
         SkjemaDagligReise(
             personopplysninger = mapPersonopplysninger(opplysninger = søknadsdataDagligReise.data.dineOpplysninger),
             hovedytelse = mapHovedytelse(skjemaDagligReise = søknadsdataDagligReise.data),
-            aktivitet = mapAktivitet(aktiviteter = søknadsdataDagligReise.data.aktiviteter, metadata = søknadsdataDagligReise.metadata),
-            reiser = mapReiser(reiser = søknadsdataDagligReise.data.reise, dineOpplysninger = søknadsdataDagligReise.data.dineOpplysninger),
+            aktivitet =
+                mapAktivitet(
+                    aktiviteter = søknadsdataDagligReise.data.aktiviteter,
+                    metadata = søknadsdataDagligReise.metadata,
+                ),
+            reiser =
+                mapReiser(
+                    reiser = søknadsdataDagligReise.data.reise,
+                    dineOpplysninger = søknadsdataDagligReise.data.dineOpplysninger,
+                ),
             dokumentasjon = dokumentasjon,
         )
 
@@ -218,7 +226,7 @@ class SøknadskjemaDagligReiseMapper(
         reiser: List<ReiseKontrakt>,
         dineOpplysninger: DineOpplysninger,
     ): List<Reise> {
-        val skalReiseFraFolkeregistrertAdresse = mapJaNei(dineOpplysninger.reiseFraFolkeregistrertAdr)
+        val skalReiseFraFolkeregistrertAdresse = dineOpplysninger.reiseFraFolkeregistrertAdr?.let { mapJaNei(it) }
         val adresseDetSkalReisesFra =
             if (skalReiseFraFolkeregistrertAdresse === JaNei.JA) {
                 dineOpplysninger.adresse?.let {
