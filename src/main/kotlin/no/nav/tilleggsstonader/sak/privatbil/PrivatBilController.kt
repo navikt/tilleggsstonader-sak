@@ -67,8 +67,10 @@ class PrivatBilController(
                                 avklarteUker.singleOrNull { it.reiseId == reise.reiseId && it.ukenummer == uke.ukenummer }
 
                             val kjørelisteForUke =
-                                kjørelister.firstOrNull {
-                                    it.data.reiseId == avklartUke?.reiseId && it.inneholderUkenummer(uke.ukenummer) // TODO ogå skille på år
+                                avklartUke?.let {
+                                    kjørelister.firstOrNull {
+                                        it.id == avklartUke.kjørelisteId
+                                    }
                                 }
 
                             lagUke(uke = uke, datoer = datoer, kjørelisteForUke = kjørelisteForUke, avklartUke = avklartUke)
