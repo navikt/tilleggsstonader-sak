@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
+import java.math.BigDecimal
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.allePerioderErSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
@@ -17,7 +18,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Vi
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.springframework.stereotype.Service
-import java.math.BigDecimal
 
 // Begrensninger:
 // Håndterer ikke ulik kilometersats i årskifte dersom en uke går på tvers av to år.
@@ -43,9 +43,7 @@ class PrivatBilBeregningService(
 
     private fun mapVilkårTilReiser(oppfylteVilkår: List<VilkårDagligReise>): List<ReiseMedPrivatBil> =
         oppfylteVilkår.map { vilkår ->
-            val aktivitetId =
-                (vilkår.fakta as FaktaPrivatBil).aktivitetId
-                    ?: error("Aktivitet er ikke satt på vilkåret for privat bil")
+            val aktivitetId = (vilkår.fakta as FaktaPrivatBil).aktivitetId
             val aktivitet = vilkårperiodeService.hentAktivitet(aktivitetId)
             vilkår.tilReiseMedPrivatBil(
                 aktivitetType = aktivitet?.type as? AktivitetType ?: error("Forventet AktivitetType"),
