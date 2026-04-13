@@ -117,7 +117,10 @@ class TaAvVentService(
         val sisteIverksatteBehandlingId = behandlingService.finnSisteIverksatteBehandling(behandlingSomTasAvVent.fagsakId)
 
         nullstillBehandlingService.nullstillBehandling(behandlingSomTasAvVent)
-        behandlingService.gjørOmTilRevurdering(behandlingSomTasAvVent, sisteIverksatteBehandlingId?.id)
+        behandlingService.oppdaterReferanseTilForrigeIverksatteBehandlingOgOppdaterType(
+            behandlingSomTasAvVent,
+            sisteIverksatteBehandlingId?.id,
+        )
     }
 
     private fun opprettHistorikkInnslagTaAvVent(

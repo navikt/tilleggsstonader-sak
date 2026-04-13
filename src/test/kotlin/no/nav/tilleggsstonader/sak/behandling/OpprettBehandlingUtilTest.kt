@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingTypeV2
+import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingUtil.validerKanOppretteNyBehandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -27,7 +27,7 @@ internal class OpprettBehandlingUtilTest {
     inner class UtledBehandlingType {
         @Test
         fun `hvis man kun har henlagte så skal neste type være førstegangsbehandling`() {
-            assertThat(utledBehandlingTypeV2(listOf(henlagtBehandling()), BehandlingÅrsak.SØKNAD)).isEqualTo(
+            assertThat(utledBehandlingType(listOf(henlagtBehandling()), BehandlingÅrsak.SØKNAD)).isEqualTo(
                 BehandlingType.FØRSTEGANGSBEHANDLING,
             )
 
@@ -37,7 +37,7 @@ internal class OpprettBehandlingUtilTest {
                     henlagtBehandling(),
                 )
             assertThat(
-                utledBehandlingTypeV2(
+                utledBehandlingType(
                     henlangteBehandlinger,
                     BehandlingÅrsak.SØKNAD,
                 ),
@@ -47,7 +47,7 @@ internal class OpprettBehandlingUtilTest {
         @Test
         fun `hvis man har en ferdigstilt behandling som ikke er henlagt så blir neste behandling revurdering`() {
             assertThat(
-                utledBehandlingTypeV2(
+                utledBehandlingType(
                     tidligereBehandlinger =
                         listOf(
                             behandling(
@@ -59,7 +59,7 @@ internal class OpprettBehandlingUtilTest {
                 ),
             ).isEqualTo(BehandlingType.REVURDERING)
             assertThat(
-                utledBehandlingTypeV2(
+                utledBehandlingType(
                     tidligereBehandlinger =
                         listOf(
                             behandling(
@@ -71,7 +71,7 @@ internal class OpprettBehandlingUtilTest {
                 ),
             ).isEqualTo(BehandlingType.REVURDERING)
             assertThat(
-                utledBehandlingTypeV2(
+                utledBehandlingType(
                     listOf(
                         behandling(
                             resultat = BehandlingResultat.OPPHØRT,
@@ -86,7 +86,7 @@ internal class OpprettBehandlingUtilTest {
         @Test
         fun `hvis man har en innvilget og senere en henlagt behandling er det fortsatt revurdering`() {
             assertThat(
-                utledBehandlingTypeV2(
+                utledBehandlingType(
                     listOf(
                         behandling(
                             resultat = BehandlingResultat.INNVILGET,
