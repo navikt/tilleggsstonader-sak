@@ -1,7 +1,5 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.dsl
 
-import java.time.LocalDate
-import java.util.UUID
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
@@ -18,6 +16,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivit
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
+import java.time.LocalDate
+import java.util.UUID
 
 @BehandlingTestdataDslMarker
 class VilkårperiodeTestdataDsl {
@@ -93,7 +93,7 @@ class OpprettVilkårperiodeDsl {
                 behandlingId = behandlingId,
                 fom = fom,
                 tom = tom,
-                målgruppeType = MålgruppeType.OVERGANGSSTØNAD
+                målgruppeType = MålgruppeType.OVERGANGSSTØNAD,
             )
         }
     }

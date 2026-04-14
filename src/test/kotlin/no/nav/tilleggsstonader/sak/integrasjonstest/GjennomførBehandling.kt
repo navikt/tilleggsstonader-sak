@@ -1,8 +1,6 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest
 
 import io.mockk.every
-import java.time.LocalDate
-import java.util.UUID
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
@@ -53,6 +51,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.Vilkårsvurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import org.springframework.test.web.servlet.client.RestTestClient
+import java.time.LocalDate
+import java.util.UUID
 
 data class BehandlingContext(
     val behandlingId: BehandlingId,
@@ -118,7 +118,7 @@ private fun søknadForStønadstype(
     Stønadstype.BOUTGIFTER -> søknadBoutgifter(ident = ident)
     Stønadstype.DAGLIG_REISE_TSO,
     Stønadstype.DAGLIG_REISE_TSR,
-        -> søknadDagligReise(ident = ident)
+    -> søknadDagligReise(ident = ident)
 }
 
 fun IntegrationTest.gjennomførBehandlingsløp(
