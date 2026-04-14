@@ -104,7 +104,7 @@ class OppfølgingOpprettKontrollerService(
         val sisteForFagsak = oppfølgingRepository.finnSisteForFagsak(behandlingId)
 
         if (sisteForFagsak?.kontrollert?.utfall == KontrollertUtfall.IGNORERES && sisteForFagsak.data == data) {
-            logger.warn(
+            logger.info(
                 "Ingen endring for behandling=$behandlingId siden oppfølging=${sisteForFagsak.id} " +
                     "ble kontrollert forrige gang, oppretter ikke ny oppfølging",
             )
@@ -116,14 +116,14 @@ class OppfølgingOpprettKontrollerService(
         if (aktivOppfølging != null) {
             val aktivUtfall = aktivOppfølging.kontrollert?.utfall
             if (aktivUtfall == KontrollertUtfall.UNDER_ARBEID || aktivUtfall == KontrollertUtfall.UTSETTES) {
-                logger.warn(
+                logger.info(
                     "Aktiv oppfølging=${aktivOppfølging.id} for behandling=$behandlingId er under arbeid " +
                         "(utfall=$aktivUtfall), oppretter ikke ny oppfølging",
                 )
                 return null
             }
             if (aktivOppfølging.data == data) {
-                logger.warn(
+                logger.info(
                     "Aktiv oppfølging=${aktivOppfølging.id} for behandling=$behandlingId har uendret data, " +
                         "oppretter ikke ny oppfølging",
                 )
