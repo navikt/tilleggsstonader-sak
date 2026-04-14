@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.utbetaling.id
 
+import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
@@ -22,7 +24,7 @@ class FagsakUtbetalingIdRepositoryTest : IntegrationTest() {
 
     @BeforeAll
     fun opprettFagsak() {
-        behandling = testoppsettService.opprettBehandlingMedFagsak()
+        behandling = testoppsettService.opprettBehandlingMedFagsak(identer = setOf(PersonIdent(FnrGenerator.generer())))
     }
 
     @Test
