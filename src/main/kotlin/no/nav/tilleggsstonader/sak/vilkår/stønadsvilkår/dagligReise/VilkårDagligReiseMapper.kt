@@ -78,6 +78,7 @@ object VilkårDagligReiseMapper {
                     )
                 },
             adresse = this.adresse,
+            aktivitetId = this.aktivitetId,
         )
 
     private fun FaktaDagligReiseUbestemt.mapTilFakta() =

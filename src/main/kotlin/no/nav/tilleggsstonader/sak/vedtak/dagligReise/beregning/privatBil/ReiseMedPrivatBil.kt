@@ -1,11 +1,13 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -14,6 +16,8 @@ data class ReiseMedPrivatBil(
     override val tom: LocalDate,
     val reiseId: ReiseId,
     val aktivitetsadresse: String?,
+    val aktivitetType: AktivitetType,
+    val typeAktivitet: TypeAktivitet?,
     val delPerioder: List<ReiseMedPrivatBilDelperiode>,
     val reiseavstandEnVei: BigDecimal,
 ) : Periode<LocalDate>,
@@ -44,9 +48,17 @@ data class ReiseMedPrivatBilDelperiode(
     )
 }
 
-fun VilkårDagligReise.tilReiserMedPrivatBil(): ReiseMedPrivatBil {
+fun VilkårDagligReise.tilReiserMedPrivatBil(
+    aktivitetType: AktivitetType,
+    typeAktivitet: TypeAktivitet?,
+    gjelderTiltaksenheten: Boolean,
+): ReiseMedPrivatBil {
     feilHvis(this.fakta !is FaktaPrivatBil) {
         "Forventer kun å få inn vilkår med fakta som er av type privat bil ved beregning av privat bil"
+    }
+
+    feilHvis(gjelderTiltaksenheten && typeAktivitet == null) {
+        "Foventer at typeAktivitet ikke er null når oppretter reise med privat bil for tiltaksenheten"
     }
 
     return ReiseMedPrivatBil(
@@ -65,5 +77,7 @@ fun VilkårDagligReise.tilReiserMedPrivatBil(): ReiseMedPrivatBil {
                     fergekostnadPerDag = delperiode.fergekostnadPerDag,
                 )
             },
+        aktivitetType = aktivitetType,
+        typeAktivitet = typeAktivitet,
     )
 }

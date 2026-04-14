@@ -8,6 +8,8 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
@@ -28,6 +30,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårReque
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelEvaluering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggVilkårFraSvar
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegel
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -36,6 +40,7 @@ class DagligReiseVilkårService(
     private val vilkårRepository: VilkårRepository,
     private val behandlingService: BehandlingService,
     private val vilkårService: VilkårService,
+    private val vilkårperiodeService: VilkårperiodeService,
     private val unleashService: UnleashService,
 ) {
     fun hentVilkårForBehandling(behandlingId: BehandlingId): List<VilkårDagligReise> =
@@ -51,7 +56,7 @@ class DagligReiseVilkårService(
     ): VilkårDagligReise {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
-        validerKanBehandleVilkåret(nyttVilkår)
+        validerKanBehandleVilkåret(nyttVilkår, behandlingId)
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår)
         val lagretVilkår = vilkårRepository.insert(vilkår.mapTilVilkår())
@@ -67,7 +72,7 @@ class DagligReiseVilkårService(
     ): VilkårDagligReise {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
-        validerKanBehandleVilkåret(nyttVilkår)
+        validerKanBehandleVilkåret(nyttVilkår, behandlingId)
 
         val eksisterendeVilkår = vilkårRepository.findByIdOrThrow(vilkårId).mapTilVilkårDagligReise()
 
@@ -160,12 +165,36 @@ class DagligReiseVilkårService(
         behandling.status.validerKanBehandlingRedigeres()
     }
 
-    private fun validerKanBehandleVilkåret(nyttVilkår: LagreDagligReise) {
+    private fun validerKanBehandleVilkåret(
+        nyttVilkår: LagreDagligReise,
+        behandlingId: BehandlingId,
+    ) {
         val gjelderPrivatBil = nyttVilkår.fakta.type == TypeDagligReise.PRIVAT_BIL
         val kanBehandlePrivatBil = unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)
 
         feilHvis(gjelderPrivatBil && !kanBehandlePrivatBil) {
             "TS-sak støtter foreløpig ikke behandling av saker som gjelder privat bil"
+        }
+
+        if (gjelderPrivatBil) {
+            validerAktivitetForPrivatBil(nyttVilkår, behandlingId)
+        }
+    }
+
+    private fun validerAktivitetForPrivatBil(
+        nyttVilkår: LagreDagligReise,
+        behandlingId: BehandlingId,
+    ) {
+        val fakta = nyttVilkår.fakta as FaktaPrivatBil
+        val aktivitet = vilkårperiodeService.hentAktivitet(fakta.aktivitetId, behandlingId)
+        brukerfeilHvis(aktivitet == null) {
+            "Aktiviteten finnes ikke"
+        }
+        brukerfeilHvis(aktivitet.resultat != ResultatVilkårperiode.OPPFYLT) {
+            "Aktiviteten er ikke oppfylt"
+        }
+        brukerfeilHvisIkke(aktivitet.inneholder(nyttVilkår)) {
+            "Aktiviteten er ikke oppfylt hele vilkårperioden"
         }
     }
 }

@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Fa
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -56,7 +57,9 @@ data class FaktaDagligReiseOffentligTransportDto(
 data class FaktaDagligReisePrivatBilDto(
     val reiseavstandEnVei: BigDecimal,
     val faktaDelperioder: List<FaktaDelperiodePrivatBilDto>,
+    val aktivitetId: VilkårperiodeGlobalId,
     val adresse: String?,
+    val aktivitetType: String,
 ) : FaktaDagligReiseDto {
     override val type = TypeDagligReise.PRIVAT_BIL
 
@@ -77,6 +80,7 @@ data class FaktaDagligReisePrivatBilDto(
                 )
             },
         adresse = adresse,
+        aktivitetId = aktivitetId,
     )
 }
 

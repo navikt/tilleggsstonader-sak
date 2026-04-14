@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
@@ -73,6 +74,7 @@ class DagligReiseBeregningService(
             beregnRammePrivatBil(
                 oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
                 vedtaksperioder = vedtaksperioder,
+                behandlingId = behandling.id,
             )
 
         val offentligTransport =
@@ -151,13 +153,18 @@ class DagligReiseBeregningService(
     private fun beregnRammePrivatBil(
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkårDagligReise: List<VilkårDagligReise>,
+        behandlingId: BehandlingId,
     ): RammevedtakPrivatBil? {
         if (!unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)) return null
 
         val oppfylteVilkårPrivatBil = oppfylteVilkårDagligReise.filter { it.fakta is FaktaPrivatBil }
 
         if (oppfylteVilkårPrivatBil.isEmpty()) return null
-        return privatBilBeregningService.beregnRammevedtak(vedtaksperioder = vedtaksperioder, oppfylteVilkårPrivatBil)
+        return privatBilBeregningService.beregnRammevedtak(
+            vedtaksperioder = vedtaksperioder,
+            oppfylteVilkår = oppfylteVilkårPrivatBil,
+            behandlingId = behandlingId,
+        )
     }
 
     private fun hentForrigeOffentligTransport(behandling: Saksbehandling): BeregningsresultatOffentligTransport? {

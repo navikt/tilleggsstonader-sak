@@ -19,7 +19,7 @@ fun RammevedtakPrivatBil.tilDto(kjørelister: Map<ReiseId, List<Kjøreliste>>): 
             fom = reise.grunnlag.fom,
             tom = reise.grunnlag.tom,
             aktivitetsadresse = reise.aktivitetsadresse ?: "Ukjent adresse",
-            aktivitetsnavn = "Ukjent aktivitet",
+            aktivitetsnavn = reise.typeAktivitet?.beskrivelse ?: reise.aktivitetType.name,
             uker =
                 reise.grunnlag
                     .alleDatoerGruppertPåUke()
