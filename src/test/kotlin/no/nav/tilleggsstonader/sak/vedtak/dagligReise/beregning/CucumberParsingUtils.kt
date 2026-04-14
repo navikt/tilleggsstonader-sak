@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
 import io.cucumber.datatable.DataTable
+import java.time.LocalDate
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -34,8 +35,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
-import java.time.LocalDate
-import java.util.UUID
 
 fun mapBeregningsresultatForPeriode(dataTable: DataTable) =
     dataTable.mapRad { rad ->
@@ -56,11 +55,11 @@ fun mapBeregningsresultatForPeriode(dataTable: DataTable) =
             billettdetaljer =
                 mapOf(
                     Billettype.ENKELTBILLETT to
-                        (parseValgfriInt(DomenenøkkelFelles.ENKELTBILLETT_ANTALL, rad) ?: 0),
+                            (parseValgfriInt(DomenenøkkelFelles.ENKELTBILLETT_ANTALL, rad) ?: 0),
                     Billettype.SYVDAGERSBILLETT to
-                        (parseValgfriInt(DomenenøkkelFelles.SYVDAGERSBILLETT_ANTALL, rad) ?: 0),
+                            (parseValgfriInt(DomenenøkkelFelles.SYVDAGERSBILLETT_ANTALL, rad) ?: 0),
                     Billettype.TRETTIDAGERSBILLETT to
-                        (parseValgfriInt(DomenenøkkelFelles.TRETTIDAGERSBILLETT_ANTALL, rad) ?: 0),
+                            (parseValgfriInt(DomenenøkkelFelles.TRETTIDAGERSBILLETT_ANTALL, rad) ?: 0),
                 ).filterValues { it > 0 },
         )
     }
@@ -80,7 +79,7 @@ fun dummyBehandling(
 fun mapTilVilkårDagligReise(
     typeVilkår: TypeDagligReise,
     rad: Map<String, String>,
-    aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId(UUID.randomUUID()),
+    aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId.random(),
 ): LagreDagligReise =
     LagreDagligReise(
         fom = parseDato(DomenenøkkelFelles.FOM, rad),
@@ -92,7 +91,7 @@ fun mapTilVilkårDagligReise(
 private fun mapFakta(
     type: TypeDagligReise,
     rad: Map<String, String>,
-    aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId(UUID.randomUUID()),
+    aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId.random(),
 ): FaktaDagligReise =
     when (type) {
         TypeDagligReise.OFFENTLIG_TRANSPORT -> mapFaktaOffentligTransport(rad)
@@ -120,7 +119,7 @@ fun mapFaktaOffentligTransport(rad: Map<String, String>): FaktaOffentligTranspor
 
 fun mapFaktaPrivatBil(
     rad: Map<String, String>,
-    aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId(UUID.randomUUID()),
+    aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId.random(),
 ): FaktaPrivatBil =
     FaktaPrivatBil(
         reiseId = dummyReiseId,
