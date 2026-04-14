@@ -65,7 +65,7 @@ fun BeregningsresultatTilsynBarn.tilDto(beregningsplan: Beregningsplan): Beregni
         gjelderFraOgMed = vedtaksperioder.minOfOrNull { it.fom },
         gjelderTilOgMed = vedtaksperioder.maxOfOrNull { it.tom },
         beregningsplan = beregningsplan.tilDto(),
-        tidligsteEndring = beregningsplan.fraDato,
+        tidligsteEndring = beregningsplan.legacyTidligsteEndring(),
     )
 }
 

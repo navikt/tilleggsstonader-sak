@@ -1,24 +1,32 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingIdErLik
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.validerKanLeggeTilMålgruppeManuelt
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.takeIfType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
@@ -41,7 +49,7 @@ class VilkårperiodeService(
     private val vilkårperioderGrunnlagRepository: VilkårperioderGrunnlagRepository,
     private val vilkårperiodeGrunnlagService: VilkårperiodeGrunnlagService,
     private val faktaGrunnlagService: FaktaGrunnlagService,
-    private val unleashService: UnleashService,
+    private val vilkårRepository: VilkårRepository,
 ) {
     fun hentVilkårperioder(behandlingId: BehandlingId): Vilkårperioder {
         val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId).sorted()
@@ -64,6 +72,25 @@ class VilkårperiodeService(
         )
     }
 
+    fun hentAktivitet(
+        aktivitetGlobalId: VilkårperiodeGlobalId,
+        behandlingId: BehandlingId,
+    ): VilkårperiodeAktivitet? =
+        vilkårperiodeRepository
+            .findByBehandlingIdAndGlobalId(behandlingId, aktivitetGlobalId)
+            ?.takeIfType<AktivitetFaktaOgVurdering>()
+
+    fun hentAktivitetType(
+        aktivitetGlobalId: VilkårperiodeGlobalId,
+        behandlingId: BehandlingId,
+    ): AktivitetType {
+        val vilkårperiode =
+            vilkårperiodeRepository.findByBehandlingIdAndGlobalId(behandlingId, aktivitetGlobalId)
+                ?: error("Finner ikke vilkårperiode med globalId=$aktivitetGlobalId for behandling=$behandlingId")
+        feilHvis(vilkårperiode.type !is AktivitetType) { "Vilkårperiode med globalId=$aktivitetGlobalId er ikke en aktivitet" }
+        return vilkårperiode.type
+    }
+
     @Transactional
     fun opprettVilkårperiode(vilkårperiode: LagreVilkårperiode): Vilkårperiode {
         val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
@@ -80,7 +107,11 @@ class VilkårperiodeService(
             kildeId = vilkårperiode.kildeId,
         )
 
-        behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(behandling.id, behandling.status, behandling.steg)
+        behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(
+            behandling.id,
+            behandling.status,
+            behandling.steg,
+        )
 
         val fødselFaktaGrunnlag =
             faktaGrunnlagService
@@ -122,7 +153,11 @@ class VilkårperiodeService(
         validerBehandling(behandling)
         validerKildeIdOgType(vilkårperiode, eksisterendeVilkårperiode)
 
-        behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(behandling.id, behandling.status, behandling.steg)
+        behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(
+            behandling.id,
+            behandling.status,
+            behandling.steg,
+        )
 
         val fødselFaktaGrunnlag =
             faktaGrunnlagService
@@ -156,6 +191,13 @@ class VilkårperiodeService(
                     ),
             )
 
+        if (eksisterendeVilkårperiode.resultat == ResultatVilkårperiode.OPPFYLT && oppdatert.resultat != ResultatVilkårperiode.OPPFYLT) {
+            validerAktivitetIkkeReferertAvDagligReiseVilkår(
+                eksisterendeVilkårperiode.behandlingId,
+                eksisterendeVilkårperiode.globalId,
+            )
+        }
+
         return vilkårperiodeRepository.update(oppdatert)
     }
 
@@ -169,6 +211,7 @@ class VilkårperiodeService(
 
         val behandling = behandlingService.hentSaksbehandling(vilkårperiode.behandlingId)
         validerBehandling(behandling)
+        validerAktivitetIkkeReferertAvDagligReiseVilkår(vilkårperiode.behandlingId, vilkårperiode.globalId)
 
         if (vilkårperiode.kanSlettesPermanent()) {
             vilkårperiodeRepository.deleteById(vilkårperiode.id)
@@ -231,6 +274,22 @@ class VilkårperiodeService(
 
         feilHvis(eksisterendeVilkårperiode.type != vilkårperiode.type) {
             "Kan ikke endre type på en eksisterende periode. Kontakt utviklingsteamet"
+        }
+    }
+
+    private fun validerAktivitetIkkeReferertAvDagligReiseVilkår(
+        behandlingId: BehandlingId,
+        globalId: VilkårperiodeGlobalId,
+    ) {
+        val erReferert =
+            vilkårRepository
+                .findByBehandlingId(behandlingId)
+                .filter { it.type == VilkårType.DAGLIG_REISE }
+                .filter { it.status != VilkårStatus.SLETTET }
+                .any { (it.fakta as? FaktaDagligReisePrivatBil)?.aktivitetId == globalId }
+
+        brukerfeilHvis(erReferert) {
+            "Aktiviteten er knyttet til et vilkår for daglig reise og kan ikke slettes eller endres"
         }
     }
 }

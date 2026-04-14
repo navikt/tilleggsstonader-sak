@@ -1,10 +1,15 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.allePerioderErSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilBeregningsgrunnlag
@@ -13,7 +18,10 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPri
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 
@@ -23,23 +31,45 @@ import java.math.BigDecimal
 @Service
 class PrivatBilBeregningService(
     private val satsDagligReisePrivatBilProvider: SatsDagligReisePrivatBilProvider,
+    private val vilkårperiodeService: VilkårperiodeService,
+    private val behandlingService: BehandlingService,
 ) {
     fun beregnRammevedtak(
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkår: List<VilkårDagligReise>,
+        behandlingId: BehandlingId,
     ): RammevedtakPrivatBil? {
-        val reiseInformasjon = oppfylteVilkår.map { it.tilReiserMedPrivatBil() }
+        val reiser = mapVilkårTilReiser(oppfylteVilkår, behandlingId)
+
         val resultatForReiser =
-            reiseInformasjon.mapNotNull {
-                beregnForReise(it, vedtaksperioder)
-            }
+            reiser.mapNotNull { beregnForReise(it, vedtaksperioder) }
 
         if (resultatForReiser.isEmpty()) return null
 
-        return RammevedtakPrivatBil(
-            reiser = resultatForReiser,
-        )
+        return RammevedtakPrivatBil(reiser = resultatForReiser)
     }
+
+    private fun mapVilkårTilReiser(
+        oppfylteVilkår: List<VilkårDagligReise>,
+        behandlingId: BehandlingId,
+    ): List<ReiseMedPrivatBil> =
+        oppfylteVilkår.map { vilkår ->
+            val fakta = vilkår.fakta as? FaktaPrivatBil
+            feilHvis(fakta == null) { "Forventet FaktaPrivatBil for daglig reise med privat bil" }
+            val aktivitet =
+                vilkårperiodeService.hentAktivitet(fakta.aktivitetId, behandlingId)
+                    ?: error("Fant ikke aktivitet for aktivitetId=${fakta.aktivitetId}")
+            val aktivitetType =
+                aktivitet.type as? AktivitetType
+                    ?: error("Forventet AktivitetType for aktivitetId=${fakta.aktivitetId}")
+            val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
+
+            vilkår.tilReiserMedPrivatBil(
+                aktivitetType = aktivitetType,
+                typeAktivitet = aktivitet.typeAktivitet,
+                gjelderTiltaksenheten = saksbehandling.stønadstype.behandlendeEnhet() === Enhet.NAV_TILTAK_OSLO,
+            )
+        }
 
     private fun beregnForReise(
         reise: ReiseMedPrivatBil,
@@ -55,6 +85,8 @@ class PrivatBilBeregningService(
             RammeForReiseMedPrivatBil(
                 reiseId = reise.reiseId,
                 aktivitetsadresse = reise.aktivitetsadresse,
+                typeAktivitet = reise.typeAktivitet,
+                aktivitetType = reise.aktivitetType,
                 grunnlag =
                     lagBeregningsgrunnlagForReise(
                         justertReise,

@@ -80,6 +80,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarDto
@@ -351,6 +352,7 @@ fun vilkår(
     utgift: Int? = 100,
     erFremtidigUtgift: Boolean = false,
     fakta: VilkårFakta? = null,
+    slettetKommentar: String? = null,
 ): Vilkår =
     Vilkår(
         behandlingId = behandlingId,
@@ -366,6 +368,7 @@ fun vilkår(
         erFremtidigUtgift = erFremtidigUtgift,
         gitVersjon = Applikasjonsversjon.versjon,
         fakta = fakta,
+        slettetKommentar = slettetKommentar,
     )
 
 fun vilkårDagligReise(
@@ -581,6 +584,7 @@ fun faktaPrivatBil(
     reiseavstandEnVei = reiseavstandEnVei,
     faktaDelperioder = reiseperioder,
     adresse = adresse,
+    aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
 )
 
 fun lagreVilkårperiodeMålgruppe(
@@ -677,11 +681,14 @@ fun lagreDagligReisePrivatBilDto(
                 ),
             RegelId.KAN_KJØRE_MED_EGEN_BIL to SvarOgBegrunnelseDto(svar = SvarId.JA),
         ),
+    aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId(UUID.randomUUID()),
     fakta: FaktaDagligReiseDto =
         FaktaDagligReisePrivatBilDto(
             reiseavstandEnVei = reiseavstandEnVei,
             faktaDelperioder = delperioder,
             adresse = adresse,
+            aktivitetId = aktivitetId,
+            aktivitetType = AktivitetType.TILTAK.name,
         ),
 ) = LagreDagligReiseDto(
     fom = fom,

@@ -33,6 +33,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.time.LocalDate
 
 fun mapBeregningsresultatForPeriode(dataTable: DataTable) =
@@ -78,21 +79,23 @@ fun dummyBehandling(
 fun mapTilVilkårDagligReise(
     typeVilkår: TypeDagligReise,
     rad: Map<String, String>,
+    aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId.random(),
 ): LagreDagligReise =
     LagreDagligReise(
         fom = parseDato(DomenenøkkelFelles.FOM, rad),
         tom = parseDato(DomenenøkkelFelles.TOM, rad),
         svar = oppfylteSvarOffentligtransport,
-        fakta = mapFakta(typeVilkår, rad),
+        fakta = mapFakta(typeVilkår, rad, aktivitetId),
     )
 
 private fun mapFakta(
     type: TypeDagligReise,
     rad: Map<String, String>,
+    aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId.random(),
 ): FaktaDagligReise =
     when (type) {
         TypeDagligReise.OFFENTLIG_TRANSPORT -> mapFaktaOffentligTransport(rad)
-        TypeDagligReise.PRIVAT_BIL -> mapFaktaPrivatBil(rad)
+        TypeDagligReise.PRIVAT_BIL -> mapFaktaPrivatBil(rad, aktivitetId)
         else -> FaktaUbestemtType(reiseId = dummyReiseId, adresse = "Tiltaksveien 1")
     }
 
@@ -114,12 +117,16 @@ fun mapFaktaOffentligTransport(rad: Map<String, String>): FaktaOffentligTranspor
             ),
     )
 
-fun mapFaktaPrivatBil(rad: Map<String, String>): FaktaPrivatBil =
+fun mapFaktaPrivatBil(
+    rad: Map<String, String>,
+    aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId.random(),
+): FaktaPrivatBil =
     FaktaPrivatBil(
         reiseId = dummyReiseId,
         adresse = "Tiltaksveien 1",
         reiseavstandEnVei = parseBigDecimal(DomenenøkkelPrivatBil.REISEAVSTAND_EN_VEI, rad),
         faktaDelperioder = listOf(dummyDelperiode()),
+        aktivitetId = aktivitetId,
     )
 
 private fun dummyDelperiode() =

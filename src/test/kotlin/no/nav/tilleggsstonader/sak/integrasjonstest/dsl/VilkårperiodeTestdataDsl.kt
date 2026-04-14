@@ -89,7 +89,12 @@ class OpprettVilkårperiodeDsl {
         tom: LocalDate,
     ) {
         add { behandlingId ->
-            lagreVilkårperiodeMålgruppe(behandlingId = behandlingId, fom = fom, tom = tom, målgruppeType = MålgruppeType.OVERGANGSSTØNAD)
+            lagreVilkårperiodeMålgruppe(
+                behandlingId = behandlingId,
+                fom = fom,
+                tom = tom,
+                målgruppeType = MålgruppeType.OVERGANGSSTØNAD,
+            )
         }
     }
 

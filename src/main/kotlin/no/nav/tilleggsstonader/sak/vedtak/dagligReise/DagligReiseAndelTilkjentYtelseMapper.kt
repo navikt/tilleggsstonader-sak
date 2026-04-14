@@ -62,17 +62,9 @@ fun BeregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(
                 rammevedtakForReise.grunnlag.vedtaksperioder
                     .map { it.målgruppe }
                     .toSet()
-            val typeAktivitet =
-                rammevedtakForReise.grunnlag.vedtaksperioder
-                    .map { it.typeAktivitet }
-                    .toSet()
 
             require(målgrupper.size == 1) {
                 "Forventer kun én målgruppe, men fikk ${målgrupper.size}: $målgrupper"
-            }
-
-            require(typeAktivitet.size == 1) {
-                "Forventer kun én typeAktivitet, men fikk ${typeAktivitet.size}: $typeAktivitet"
             }
 
             reise.perioder
@@ -85,7 +77,7 @@ fun BeregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(
                         fomUkedag = fom.iDagHvisMandagEllerForrigeMandag(),
                         beløp = periode.stønadsbeløp.toInt(),
                         målgruppe = vedtaksperiode.målgruppe,
-                        typeAktivitet = vedtaksperiode.typeAktivitet,
+                        typeAktivitet = rammevedtakForReise.typeAktivitet,
                         brukersNavKontor = periode.brukersNavKontor,
                     )
                 }

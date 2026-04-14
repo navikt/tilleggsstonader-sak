@@ -93,6 +93,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
@@ -729,6 +730,8 @@ object InterntVedtakTestdata {
                         RammeForReiseMedPrivatBil(
                             reiseId = dummyReiseId,
                             aktivitetsadresse = "Testveien 1, 1234 Testby",
+                            aktivitetType = AktivitetType.TILTAK,
+                            typeAktivitet = TypeAktivitet.GRUPPEAMO,
                             grunnlag =
                                 RammeForReiseMedPrivatBilBeregningsgrunnlag(
                                     fom = LocalDate.of(2024, 1, 1),
@@ -763,6 +766,8 @@ object InterntVedtakTestdata {
                         RammeForReiseMedPrivatBil(
                             reiseId = dummyReiseId,
                             aktivitetsadresse = "Testveien 2, 1234 Testby",
+                            aktivitetType = AktivitetType.TILTAK,
+                            typeAktivitet = TypeAktivitet.GRUPPEAMO,
                             grunnlag =
                                 RammeForReiseMedPrivatBilBeregningsgrunnlag(
                                     fom = LocalDate.of(2024, 1, 1),
@@ -1073,6 +1078,7 @@ object InterntVedtakTestdata {
                                         fergekostnadPerDag = 30,
                                     ),
                                 ),
+                            aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
                         ),
                 ),
             )

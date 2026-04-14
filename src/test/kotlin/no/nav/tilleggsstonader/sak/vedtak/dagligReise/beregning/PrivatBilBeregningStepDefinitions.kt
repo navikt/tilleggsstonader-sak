@@ -7,6 +7,7 @@ import io.cucumber.java.no.Og
 import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
@@ -33,11 +34,16 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligRei
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.UUID
-import kotlin.collections.emptyList
 
 @Suppress("unused", "ktlint:standard:function-naming")
 class PrivatBilBeregningStepDefinitions {
@@ -45,6 +51,8 @@ class PrivatBilBeregningStepDefinitions {
     val vilkårServiceMock = mockk<VilkårService>()
     val vilkårRepositoryFake = VilkårRepositoryFake()
     val unleashServiceMock = mockk<UnleashService>()
+    val vilkårperiodeRepositoryMock = mockk<VilkårperiodeRepository>()
+    val vilkårperiodeService = mockk<VilkårperiodeService>()
 
     val dagligReiseVilkårService =
         DagligReiseVilkårService(
@@ -52,13 +60,18 @@ class PrivatBilBeregningStepDefinitions {
             vilkårService = vilkårServiceMock,
             behandlingService = behandlingServiceMock,
             unleashService = unleashServiceMock,
+            vilkårperiodeService = vilkårperiodeService,
         )
 
     val behandlingId = BehandlingId.random()
 
     val satsDagligReisePrivatBilProvider = SatsDagligReisePrivatBilProvider()
     val beregningService =
-        PrivatBilBeregningService(satsDagligReisePrivatBilProvider)
+        PrivatBilBeregningService(
+            satsDagligReisePrivatBilProvider = satsDagligReisePrivatBilProvider,
+            vilkårperiodeService = vilkårperiodeService,
+            behandlingService = behandlingServiceMock,
+        )
 
     var reiserUtenDelperioder: Map<Int, LagreDagligReise> = emptyMap()
     var delperioderForReisenummer: Map<Int, List<FaktaDelperiodePrivatBil>> = emptyMap()
@@ -87,7 +100,26 @@ class PrivatBilBeregningStepDefinitions {
         reiserUtenDelperioder =
             dataTable
                 .mapRad { rad ->
-                    parseInt(DomenenøkkelPrivatBil.REISENR, rad) to mapTilVilkårDagligReise(TypeDagligReise.PRIVAT_BIL, rad)
+                    val fom = parseDato(DomenenøkkelFelles.FOM, rad)
+                    val tom = parseDato(DomenenøkkelFelles.TOM, rad)
+
+                    val testAktivitet =
+                        aktivitet(
+                            behandlingId = behandlingId,
+                            fom = fom,
+                            tom = tom,
+                            faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
+                            resultat = ResultatVilkårperiode.OPPFYLT,
+                            typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                        )
+                    every { vilkårperiodeService.hentAktivitet(testAktivitet.globalId, behandlingId) } returns testAktivitet
+
+                    parseInt(DomenenøkkelPrivatBil.REISENR, rad) to
+                        mapTilVilkårDagligReise(
+                            typeVilkår = TypeDagligReise.PRIVAT_BIL,
+                            rad = rad,
+                            aktivitetId = testAktivitet.globalId,
+                        )
                 }.toMap()
     }
 
@@ -127,6 +159,7 @@ class PrivatBilBeregningStepDefinitions {
                 beregningService.beregnRammevedtak(
                     vedtaksperioder = vedtaksperioder,
                     oppfylteVilkår = oppfylteReisevilkår,
+                    behandlingId = behandlingId,
                 )
         } catch (e: Exception) {
             feil = e
@@ -184,7 +217,8 @@ class PrivatBilBeregningStepDefinitions {
         forventedeSatsDelperioderPerReise.forEach { (reiseNr, forventedeDelperiodeSatserForReise) ->
             val delperioderIRammevedtak = rammevedtak!!.reiser[reiseNr - 1].grunnlag.delperioder
 
-            val satserForDelperiode: Map<Int, List<SatsDelperiodeCucumber>> = forventedeDelperiodeSatserForReise.groupBy { it.delperiodeNr }
+            val satserForDelperiode: Map<Int, List<SatsDelperiodeCucumber>> =
+                forventedeDelperiodeSatserForReise.groupBy { it.delperiodeNr }
             satserForDelperiode.forEach { (delperiodeNr, forventedeSatserForDelperiode) ->
                 val delperiodeIRammevedtak = delperioderIRammevedtak[delperiodeNr - 1]
                 assertThat(delperiodeIRammevedtak.satser).hasSameSizeAs(forventedeSatserForDelperiode)
