@@ -190,7 +190,11 @@ class UtbetalingV3Mapper(
                 .hentForBehandling(behandling.forrigeIverksatteBehandlingId)
                 .andelerTilkjentYtelse
 
-        val typeAndelerOgReiseIdNåværendeBehandling = andelerTilkjentYtelse.map { TypeAndelOgReiseId(it.type, it.reiseId) }
+        val typeAndelerOgReiseIdNåværendeBehandling =
+            andelerTilkjentYtelse
+                .map { TypeAndelOgReiseId(it.type, it.reiseId) }
+                .toSet()
+
         return andelerForrigeBehandling
             .filter { it.type != TypeAndel.UGYLDIG }
             .map { TypeAndelOgReiseId(it.type, it.reiseId) }
