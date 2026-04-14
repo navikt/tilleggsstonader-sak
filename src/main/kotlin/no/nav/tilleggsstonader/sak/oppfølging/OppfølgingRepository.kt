@@ -29,6 +29,13 @@ interface OppfølgingRepository :
     @Query("update oppfolging SET aktiv = false, version=version + 1 WHERE aktiv = true AND tema = :tema")
     fun markerAlleAktiveSomIkkeAktive(tema: Tema)
 
+    @Query("SELECT * FROM oppfolging WHERE aktiv = true AND behandling_id = :behandlingId")
+    fun finnAktivForBehandling(behandlingId: BehandlingId): Oppfølging?
+
+    @Modifying
+    @Query("UPDATE oppfolging SET aktiv = false, version = version + 1 WHERE aktiv = true AND behandling_id = :behandlingId")
+    fun markerAktivSomIkkeAktiv(behandlingId: BehandlingId)
+
     @Query(
         """
         SELECT o.* 

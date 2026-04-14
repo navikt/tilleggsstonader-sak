@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.oppfølging.Behandlingsdetaljer
 import no.nav.tilleggsstonader.sak.oppfølging.Oppfølging
 import no.nav.tilleggsstonader.sak.oppfølging.OppfølgingMedDetaljer
@@ -14,8 +15,22 @@ import java.util.UUID
 class OppfølgingRepositoryFake :
     DummyRepository<Oppfølging, UUID>({ it.id }),
     OppfølgingRepository {
+    override fun insert(t: Oppfølging): Oppfølging {
+        feilHvis(findAll().any { it.behandlingId == t.behandlingId && it.aktiv }) {
+            "Kan bare ha en aktiv oppfølging per behandling"
+        }
+        return super.insert(t)
+    }
+
     override fun markerAlleAktiveSomIkkeAktive(tema: Tema) {
         updateAll(findAll().filter { it.tema == tema }.map { it.copy(aktiv = false) })
+    }
+
+    override fun finnAktivForBehandling(behandlingId: BehandlingId): Oppfølging? =
+        findAll().singleOrNull { it.behandlingId == behandlingId && it.aktiv }
+
+    override fun markerAktivSomIkkeAktiv(behandlingId: BehandlingId) {
+        update(findAll().single { it.behandlingId == behandlingId && it.aktiv }.copy(aktiv = false))
     }
 
     /**
