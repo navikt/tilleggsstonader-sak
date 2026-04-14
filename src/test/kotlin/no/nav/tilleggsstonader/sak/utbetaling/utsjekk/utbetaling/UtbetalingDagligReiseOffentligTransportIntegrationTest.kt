@@ -5,18 +5,24 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.august
 import no.nav.tilleggsstonader.libs.utils.dato.oktober
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.finnPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdRepository
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.YearMonth
 
 class UtbetalingDagligReiseOffentligTransportIntegrationTest : IntegrationTest() {
+    @Autowired
+    lateinit var fagsakUtbetalingIdRepository: FagsakUtbetalingIdRepository
+
     private val nå = LocalDate.now()
     private val fom = nå.minusMonths(3)
     private val tom = nå.plusMonths(3)
@@ -68,6 +74,8 @@ class UtbetalingDagligReiseOffentligTransportIntegrationTest : IntegrationTest()
                 assertThat(fom).isEqualTo(tom).isEqualTo(reiseperiode2.fom.datoEllerNesteMandagHvisLørdagEllerSøndag())
             }
         }
+
+        assertUtbetalingIderErUtenReiseId(behandlingContext.fagsakId)
     }
 
     @Test
@@ -75,26 +83,27 @@ class UtbetalingDagligReiseOffentligTransportIntegrationTest : IntegrationTest()
         val reiseperiode1 = Datoperiode(nå.minusDays(5), tom = nå)
         val reiseperiode2 = Datoperiode(nå.plusWeeks(1), tom = nå.plusWeeks(2))
 
-        opprettBehandlingOgGjennomførBehandlingsløp(
-            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-        ) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTso(fom = fom, tom = tom)
+        val behandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTso(fom = fom, tom = tom)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(fom = fom, tom = tom)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        offentligTransport(reiseperiode1.fom, reiseperiode1.tom)
+                        offentligTransport(reiseperiode2.fom, reiseperiode2.tom)
+                    }
                 }
             }
-            målgruppe {
-                opprett {
-                    målgruppeAAP(fom = fom, tom = tom)
-                }
-            }
-            vilkår {
-                opprett {
-                    offentligTransport(reiseperiode1.fom, reiseperiode1.tom)
-                    offentligTransport(reiseperiode2.fom, reiseperiode2.tom)
-                }
-            }
-        }
 
         val utbetaling =
             KafkaFake
@@ -116,6 +125,8 @@ class UtbetalingDagligReiseOffentligTransportIntegrationTest : IntegrationTest()
         ) {
             assertThat(fom).isEqualTo(tom).isEqualTo(forventetUtbetalingsdato)
         }
+
+        assertUtbetalingIderErUtenReiseId(behandlingContext.fagsakId)
     }
 
     @Test
@@ -174,5 +185,15 @@ class UtbetalingDagligReiseOffentligTransportIntegrationTest : IntegrationTest()
                 .isEqualTo(perioder.single().fom)
                 .isEqualTo(reiseperiode2.fom.datoEllerNesteMandagHvisLørdagEllerSøndag())
         }
+
+        assertUtbetalingIderErUtenReiseId(behandlingContext.fagsakId)
+    }
+
+    private fun assertUtbetalingIderErUtenReiseId(fagsakId: FagsakId) {
+        fagsakUtbetalingIdRepository
+            .findByFagsakId(fagsakId)
+            .forEach {
+                assertThat(it.reiseId).isNull()
+            }
     }
 }
