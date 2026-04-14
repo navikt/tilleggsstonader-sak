@@ -221,13 +221,23 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
 
         gjennomførKjørelisteBehandling(andreKjørelistebehandling)
 
-        val sendteUtbetalinger =
+        val sendteIverksettinger =
             KafkaFake
                 .sendteMeldinger()
                 .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 2)
                 .map { it.verdiEllerFeil<IverksettingDto>() }
 
-        println(sendteUtbetalinger)
+        assertThat(sendteIverksettinger).hasSize(2)
+        val iverksettingFørsteKjørelistebehandling = sendteIverksettinger.minBy { it.vedtakstidspunkt }
+        val iverksettingAndreKjørelistebehandling = sendteIverksettinger.maxBy { it.vedtakstidspunkt }
+
+        assertThat(iverksettingFørsteKjørelistebehandling.utbetalinger).hasSize(1)
+        assertThat(iverksettingAndreKjørelistebehandling.utbetalinger).hasSize(2)
+
+        // Verifiserer at utbetalingen fra første behandling er med i iverksetting for den andre behandlingen
+        assertThat(
+            iverksettingAndreKjørelistebehandling.utbetalinger,
+        ).contains(iverksettingFørsteKjørelistebehandling.utbetalinger.single())
     }
 
     private fun assertAndelOpprettet(
