@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
+import java.math.BigDecimal
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.allePerioderErSammenhengende
@@ -9,6 +10,7 @@ import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilBeregningsgrunnlag
@@ -22,7 +24,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Vi
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.springframework.stereotype.Service
-import java.math.BigDecimal
 
 // Begrensninger:
 // Håndterer ikke ulik kilometersats i årskifte dersom en uke går på tvers av to år.
@@ -54,7 +55,7 @@ class PrivatBilBeregningService(
     ): List<ReiseMedPrivatBil> =
         oppfylteVilkår.map { vilkår ->
             val fakta = vilkår.fakta as? FaktaPrivatBil
-            brukerfeilHvis(fakta == null) { "Forventet FaktaPrivatBil for daglig reise med privat bil" }
+            feilHvis(fakta == null) { "Forventet FaktaPrivatBil for daglig reise med privat bil" }
             val aktivitet =
                 vilkårperiodeService.hentAktivitet(fakta.aktivitetId, behandlingId)
                     ?: error("Fant ikke aktivitet for aktivitetId=${fakta.aktivitetId}")
