@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
+import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
+import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 import java.util.UUID
@@ -17,6 +19,8 @@ data class AvklartKjørtDag(
     val avvik: List<TypeAvvikDag>,
     val begrunnelse: String? = null,
     val parkeringsutgift: Int? = null,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
+    val sporbar: Sporbar = Sporbar(),
 )
 
 enum class GodkjentGjennomførtKjøring {
