@@ -23,6 +23,13 @@ data class Beregningsplan(
             Beregningsomfang.FRA_DATO -> fraDato
             Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT -> error("beregnFra-dato er ikke relevant for $omfang")
         }
+
+    fun legacyTidligsteEndring(): LocalDate? =
+        when (omfang) {
+            Beregningsomfang.ALLE_PERIODER -> null
+            Beregningsomfang.FRA_DATO -> fraDato
+            Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT -> null
+        }
 }
 
 enum class Beregningsomfang {

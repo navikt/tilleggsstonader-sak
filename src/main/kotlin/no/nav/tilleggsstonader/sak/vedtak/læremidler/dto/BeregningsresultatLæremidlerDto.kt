@@ -60,7 +60,7 @@ fun BeregningsresultatLæremidler.tilDto(beregningsplan: Beregningsplan) =
                     skalMerges = { v1, v2 -> v1.kanSlåsSammen(v2) },
                     merge = { v1, v2 -> v1.slåSammen(v2) },
                 ),
-        tidligsteEndring = beregningsplan.fraDato,
+        tidligsteEndring = beregningsplan.legacyTidligsteEndring(),
         beregningsplan = beregningsplan.tilDto(),
     )
 

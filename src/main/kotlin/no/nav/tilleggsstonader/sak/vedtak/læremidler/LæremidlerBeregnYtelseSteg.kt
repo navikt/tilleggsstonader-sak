@@ -125,7 +125,7 @@ class LæremidlerBeregnYtelseSteg(
                         beregningsplan = beregningsplan,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                tidligsteEndring = beregningsplan.beregnFra(),
+                tidligsteEndring = beregningsplan.legacyTidligsteEndring(),
             ),
         )
         lagreAndeler(saksbehandling, beregningsresultat)

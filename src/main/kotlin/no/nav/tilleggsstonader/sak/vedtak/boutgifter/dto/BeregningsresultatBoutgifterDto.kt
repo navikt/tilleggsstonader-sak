@@ -53,7 +53,7 @@ fun BeregningsresultatBoutgifter.tilDto(beregningsplan: Beregningsplan) =
                 .perioder
                 .map { it.tilDto(beregningsplan.fraDato) },
         inneholderUtgifterOvernatting = inneholderUtgifterOvernatting(),
-        tidligsteEndring = beregningsplan.fraDato,
+        tidligsteEndring = beregningsplan.legacyTidligsteEndring(),
         beregningsplan = beregningsplan.tilDto(),
     )
 

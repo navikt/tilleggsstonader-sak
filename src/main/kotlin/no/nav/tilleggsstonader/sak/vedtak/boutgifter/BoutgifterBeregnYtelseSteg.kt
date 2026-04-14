@@ -192,7 +192,7 @@ class BoutgifterBeregnYtelseSteg(
                         beregningsplan = beregningsplan,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                tidligsteEndring = beregningsplan.fraDato,
+                tidligsteEndring = beregningsplan.legacyTidligsteEndring(),
             ),
         )
     }
