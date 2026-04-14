@@ -26,6 +26,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.migrering.routing.SkjemaRouting
 import no.nav.tilleggsstonader.sak.migrering.routing.SkjemaRoutingRepository
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtakBeregningsresultat
@@ -57,6 +59,7 @@ class TestoppsettService(
     private val vedtakRepository: VedtakRepository,
     private val skjemaRoutingRepository: SkjemaRoutingRepository,
     private val totrinnskontrollRepository: TotrinnskontrollRepository,
+    private val tilkjentYtelseRepository: TilkjentYtelseRepository,
 ) {
     fun hentFagsak(fagsakId: FagsakId) = fagsakService.hentFagsak(fagsakId)
 
@@ -234,4 +237,17 @@ class TestoppsettService(
         )
 
     fun hentPersonidentForBehandlingId(behandlingId: BehandlingId) = behandlingRepository.finnAktivIdent(behandlingId)
+
+    fun settAndelerTilOkForBehandling(behandling: Behandling) {
+        val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!
+        tilkjentYtelseRepository.update(
+            tilkjentYtelse.copy(
+                andelerTilkjentYtelse =
+                    tilkjentYtelse.andelerTilkjentYtelse
+                        .map {
+                            it.copy(statusIverksetting = StatusIverksetting.OK)
+                        }.toSet(),
+            ),
+        )
+    }
 }

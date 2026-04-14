@@ -4,6 +4,7 @@ import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.februar
+import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -16,11 +17,13 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeld
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.SatsDagligReisePrivatBilProvider
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import org.assertj.core.api.Assertions.assertThat
@@ -145,6 +148,88 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
             .doesNotContain(førstegangsBehandling.id)
     }
 
+    @Test
+    fun `sak med to overlappende reiser, begge utbetales med samme typeAndel, grupperes på reise til økonomi`() {
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
+
+        val fom = 2 mars 2026
+        val tom = 15 mars 2026
+
+        val førstegangsBehandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(fom, tom)
+                    }
+                }
+
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTso(fom, tom)
+                    }
+                }
+
+                vilkår {
+                    opprett {
+                        privatBil(fom, tom, reiseavstandEnVei = 10.toBigDecimal())
+                        privatBil(fom, tom, reiseavstandEnVei = 100.toBigDecimal())
+                    }
+                }
+            }
+
+        val alleRammevedtak = kall.privatBil.hentRammevedtak(førstegangsBehandlingContext.ident)
+        assertThat(alleRammevedtak).hasSize(2)
+        val rammevedtak1 = alleRammevedtak[0]
+        val rammevedtak2 = alleRammevedtak[1]
+
+        // Sender inn kjøreliste for første rammevedtak
+        sendInnKjøreliste(
+            kjøreliste =
+                KjørelisteSkjemaUtil.kjørelisteSkjema(
+                    rammevedtak1.reiseId,
+                    periode = Datoperiode(fom, tom),
+                    dagerKjørt = listOf(KjørelisteSkjemaUtil.KjørtDag(fom)),
+                ),
+            ident = førstegangsBehandlingContext.ident,
+        )
+
+        val førsteKjørelistebehandling =
+            testoppsettService
+                .hentBehandlinger(førstegangsBehandlingContext.fagsakId)
+                .single { it.type == BehandlingType.KJØRELISTE }
+
+        gjennomførKjørelisteBehandling(førsteKjørelistebehandling)
+        testoppsettService.settAndelerTilOkForBehandling(førsteKjørelistebehandling)
+
+        // Sender inn kjøreliste for andre rammevedtak
+        sendInnKjøreliste(
+            kjøreliste =
+                KjørelisteSkjemaUtil.kjørelisteSkjema(
+                    rammevedtak2.reiseId,
+                    periode = Datoperiode(fom, tom),
+                    dagerKjørt = listOf(KjørelisteSkjemaUtil.KjørtDag(fom)),
+                ),
+            ident = førstegangsBehandlingContext.ident,
+        )
+
+        val andreKjørelistebehandling =
+            testoppsettService
+                .hentBehandlinger(førstegangsBehandlingContext.fagsakId)
+                .single { it.type == BehandlingType.KJØRELISTE && it.id != førsteKjørelistebehandling.id }
+
+        gjennomførKjørelisteBehandling(andreKjørelistebehandling)
+
+        val sendteUtbetalinger =
+            KafkaFake
+                .sendteMeldinger()
+                .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 2)
+                .map { it.verdiEllerFeil<IverksettingDto>() }
+
+        println(sendteUtbetalinger)
+    }
+
     private fun assertAndelOpprettet(
         andelerForKjørelistebehandling: Set<AndelTilkjentYtelse>?,
         forventetBeløp: Int,
@@ -155,6 +240,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
         val andel = andelerForKjørelistebehandling!!.single()
         assertThat(andel.type).isEqualTo(forventetTypeAndel)
         assertThat(andel.beløp).isEqualTo(forventetBeløp)
+        assertThat(andel.reiseId).isNotNull
     }
 
     private fun List<Pair<LocalDate, Int>>.kalkulerForventetBeløp(reiseavstandEnVei: BigDecimal): Int =

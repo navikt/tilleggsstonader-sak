@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -64,8 +65,8 @@ class UtbetalingV3Mapper(
     ): List<UtbetalingDto> =
         andelerTilkjentYtelse
             .filterNot { it.erNullandel() }
-            .groupBy { it.type }
-            .map { (type, andelerAvType) -> lagUtbetaling(behandling, type, andelerAvType) }
+            .groupBy { TypeAndelOgReiseId(it.type, it.reiseId) }
+            .map { (typeAndelOgReiseId, andelerAvType) -> lagUtbetaling(behandling, typeAndelOgReiseId, andelerAvType) }
             .let { utbetalinger ->
                 if (erFørsteIverksettingForBehandling) {
                     utbetalinger + lagUtbetalingDtoForAnnulering(behandling, andelerTilkjentYtelse)
@@ -79,13 +80,18 @@ class UtbetalingV3Mapper(
 
     private fun lagUtbetaling(
         behandling: Saksbehandling,
-        type: TypeAndel,
+        typeAndelOgReiseId: TypeAndelOgReiseId,
         andeler: Collection<AndelTilkjentYtelse>,
     ): UtbetalingDto {
-        val utbetalingId = fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(behandling.fagsakId, type)
+        val utbetalingId =
+            fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(
+                fagsakId = behandling.fagsakId,
+                typeAndel = typeAndelOgReiseId.typeAndel,
+                reiseId = typeAndelOgReiseId.reiseId,
+            )
         return UtbetalingDto(
             id = utbetalingId.utbetalingId,
-            stønad = mapTilStønadUtbetaling(type),
+            stønad = mapTilStønadUtbetaling(typeAndelOgReiseId.typeAndel),
             perioder = grupperPåDagOgMapTilPerioder(andeler),
             brukFagområdeTillst = behandling.stønadstype.skalBrukeGamleFagområder(),
         )
@@ -99,7 +105,7 @@ class UtbetalingV3Mapper(
             .map { typeAndel ->
                 lagUtbetaling(
                     behandling = behandling,
-                    type = typeAndel,
+                    typeAndelOgReiseId = typeAndel,
                     andeler = emptyList(), // periodene skal annuleres 💥
                 )
             }
@@ -122,6 +128,11 @@ class UtbetalingV3Mapper(
     private data class UtbetalingsDatoOgEnhet(
         val utbetalingsperiodeFom: LocalDate,
         val betalendeEnhet: String?,
+    )
+
+    private data class TypeAndelOgReiseId(
+        val typeAndel: TypeAndel,
+        val reiseId: ReiseId?,
     )
 
     private fun mapTilStønadUtbetaling(typeAndel: TypeAndel): StønadUtbetaling =
@@ -170,7 +181,7 @@ class UtbetalingV3Mapper(
     private fun finnTypeAndelerSomSkalAnnulleres(
         behandling: Saksbehandling,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
-    ): Set<TypeAndel> {
+    ): Set<TypeAndelOgReiseId> {
         if (behandling.forrigeIverksatteBehandlingId == null) {
             return emptySet()
         }
@@ -179,11 +190,11 @@ class UtbetalingV3Mapper(
                 .hentForBehandling(behandling.forrigeIverksatteBehandlingId)
                 .andelerTilkjentYtelse
 
-        val typeAndelerNåværendeBehandling = andelerTilkjentYtelse.map { it.type }
+        val typeAndelerOgReiseIdNåværendeBehandling = andelerTilkjentYtelse.map { TypeAndelOgReiseId(it.type, it.reiseId) }
         return andelerForrigeBehandling
-            .filter { it.type !in typeAndelerNåværendeBehandling }
-            .map { it.type }
-            .filter { it != TypeAndel.UGYLDIG }
+            .filter { it.type != TypeAndel.UGYLDIG }
+            .map { TypeAndelOgReiseId(it.type, it.reiseId) }
+            .filter { it !in typeAndelerOgReiseIdNåværendeBehandling }
             .toSet()
     }
 }

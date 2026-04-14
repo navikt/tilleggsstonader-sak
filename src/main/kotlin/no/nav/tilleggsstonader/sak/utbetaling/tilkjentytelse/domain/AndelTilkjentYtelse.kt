@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.erLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.toYearMonth
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.annotation.Version
@@ -51,6 +52,7 @@ data class AndelTilkjentYtelse(
     val endretTid: LocalDateTime = SporbarUtils.now(),
     val utbetalingsdato: LocalDate,
     val brukersNavKontor: String? = null,
+    val reiseId: ReiseId? = null,
 ) : Periode<LocalDate> {
     init {
         feilHvis(YearMonth.from(fom) != YearMonth.from(tom)) {

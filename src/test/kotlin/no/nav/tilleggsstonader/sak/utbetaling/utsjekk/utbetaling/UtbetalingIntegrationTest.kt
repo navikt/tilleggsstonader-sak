@@ -67,7 +67,7 @@ class UtbetalingIntegrationTest : IntegrationTest() {
 
         val førstegangsbehandling = behandlingService.hentBehandling(førstegangsbehandlingContext.behandlingId)
         val finnesUtbetalingIdEtterFørstegangsbehandling =
-            fagsakUtbetalingIdService.finnesUtbetalingsId(førstegangsbehandling.fagsakId, TypeAndel.LÆREMIDLER_AAP)
+            fagsakUtbetalingIdService.finnesUtbetalingsId(førstegangsbehandling.fagsakId, TypeAndel.LÆREMIDLER_AAP, null)
 
         Assertions.assertThat(finnesUtbetalingIdEtterFørstegangsbehandling).isTrue
         verify(exactly = 1) { simuleringClient.simuler(any()) }
@@ -98,7 +98,7 @@ class UtbetalingIntegrationTest : IntegrationTest() {
 
         val revurdering = behandlingService.hentBehandling(revurderingId)
         val finnesUtbetalingIdEtterRevurdering =
-            fagsakUtbetalingIdService.finnesUtbetalingsId(revurdering.fagsakId, TypeAndel.LÆREMIDLER_AAP)
+            fagsakUtbetalingIdService.finnesUtbetalingsId(revurdering.fagsakId, TypeAndel.LÆREMIDLER_AAP, null)
 
         Assertions.assertThat(finnesUtbetalingIdEtterRevurdering).isTrue
         verify(exactly = 2) { simuleringClient.simuler(any()) }
