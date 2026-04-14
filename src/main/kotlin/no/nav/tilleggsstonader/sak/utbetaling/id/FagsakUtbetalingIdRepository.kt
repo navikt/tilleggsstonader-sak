@@ -20,6 +20,8 @@ interface FagsakUtbetalingIdRepository :
     ): FagsakUtbetalingId?
 
     fun findByFagsakId(fagsakId: FagsakId): List<FagsakUtbetalingId>
+
+    fun deleteByFagsakId(fagsakId: FagsakId)
 }
 
 data class FagsakUtbetalingId(
