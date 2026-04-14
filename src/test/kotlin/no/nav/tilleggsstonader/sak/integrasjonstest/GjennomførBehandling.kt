@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientMockConfig
 import no.nav.tilleggsstonader.sak.integrasjonstest.dsl.BehandlingTestdataDsl
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
@@ -56,6 +57,7 @@ import java.util.UUID
 
 data class BehandlingContext(
     val behandlingId: BehandlingId,
+    val fagsakId: FagsakId,
     val ident: String,
 )
 
@@ -77,14 +79,19 @@ fun IntegrationTest.opprettBehandlingOgGjennomførBehandlingsløp(
 ): BehandlingContext {
     val journalpostSøknadForStønadstype = journalpostSøknadForStønadstype(stønadstype, ident)
     mockStrukturertSøknadForJournalpost(journalpostSøknadForStønadstype, stønadstype)
-    val behandlingId = håndterSøknadService.håndterSøknad(journalpostSøknadForStønadstype)!!.id
+    val behandling = håndterSøknadService.håndterSøknad(journalpostSøknadForStønadstype)!!
     gjennomførBehandlingsløp(
-        behandlingId = behandlingId,
+        behandlingId = behandling.id,
         ident = ident,
         tilSteg = tilSteg,
         testdataProvider = testdataProvider,
     )
-    return BehandlingContext(behandlingId, ident)
+
+    return BehandlingContext(
+        behandlingId = behandling.id,
+        fagsakId = behandling.fagsakId,
+        ident = ident,
+    )
 }
 
 private fun IntegrationTest.mockStrukturertSøknadForJournalpost(

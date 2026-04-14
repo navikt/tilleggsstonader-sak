@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.id
 
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.springframework.stereotype.Service
 
 @Service
@@ -11,8 +12,9 @@ class FagsakUtbetalingIdService(
     fun hentEllerOpprettUtbetalingId(
         fagsakId: FagsakId,
         typeAndel: TypeAndel,
+        reiseId: ReiseId?,
     ): FagsakUtbetalingId {
-        val eksisterende = fagsakUtbetalingIdRepository.findByFagsakIdAndTypeAndel(fagsakId, typeAndel)
+        val eksisterende = fagsakUtbetalingIdRepository.findByFagsakIdAndTypeAndelAndReiseId(fagsakId, typeAndel, reiseId)
         if (eksisterende != null) {
             return eksisterende
         }
@@ -21,6 +23,7 @@ class FagsakUtbetalingIdService(
             FagsakUtbetalingId(
                 fagsakId = fagsakId,
                 typeAndel = typeAndel,
+                reiseId = reiseId,
             ),
         )
     }
@@ -28,7 +31,8 @@ class FagsakUtbetalingIdService(
     fun finnesUtbetalingsId(
         fagsakId: FagsakId,
         typeAndel: TypeAndel,
-    ): Boolean = fagsakUtbetalingIdRepository.findByFagsakIdAndTypeAndel(fagsakId, typeAndel) != null
+        reiseId: ReiseId?,
+    ): Boolean = fagsakUtbetalingIdRepository.findByFagsakIdAndTypeAndelAndReiseId(fagsakId, typeAndel, reiseId) != null
 
     fun hentUtbetalingIderForFagsakId(fagsakId: FagsakId): List<FagsakUtbetalingId> = fagsakUtbetalingIdRepository.findByFagsakId(fagsakId)
 }

@@ -69,8 +69,8 @@ internal class SimuleringServiceTest {
         every { fagsakService.fagsakMedOppdatertPersonIdent(any()) } returns fagsak
         every { tilgangService.validerHarSaksbehandlerrolle() } just Runs
         every { tilgangService.harTilgangTilRolle(any()) } returns true
-        every { fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(any(), any()) } answers {
-            FagsakUtbetalingId(fagsakId = FagsakId(firstArg()), typeAndel = secondArg())
+        every { fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(any(), any(), any()) } answers {
+            FagsakUtbetalingId(fagsakId = FagsakId(firstArg()), typeAndel = secondArg(), reiseId = thirdArg())
         }
     }
 

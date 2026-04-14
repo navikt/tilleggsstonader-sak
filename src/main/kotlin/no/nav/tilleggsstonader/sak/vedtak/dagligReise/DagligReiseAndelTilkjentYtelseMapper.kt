@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatD
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import java.time.LocalDate
 
 fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandling: Saksbehandling): List<AndelTilkjentYtelse> =
@@ -47,6 +48,7 @@ fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandlin
                         målgruppe = målgrupper.first(),
                         typeAktivitet = typeAktivitet.firstOrNull(),
                         brukersNavKontor = brukersNavKontor,
+                        reiseId = null, // Skal kun opprette andeler for privat-bil med reiseId
                     )
                 }
         }
@@ -79,6 +81,7 @@ fun BeregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(
                         målgruppe = vedtaksperiode.målgruppe,
                         typeAktivitet = rammevedtakForReise.typeAktivitet,
                         brukersNavKontor = periode.brukersNavKontor,
+                        reiseId = reise.reiseId, // Skal kun opprette andeler for privat-bil med reiseId
                     )
                 }
         }.filterNot { it.beløp == 0 }
@@ -90,6 +93,7 @@ private fun lagAndelForDagligReise(
     målgruppe: FaktiskMålgruppe,
     typeAktivitet: TypeAktivitet?,
     brukersNavKontor: String?,
+    reiseId: ReiseId?,
 ): AndelTilkjentYtelse {
     val typeAndel =
         when (saksbehandling.stønadstype) {
@@ -120,6 +124,7 @@ private fun lagAndelForDagligReise(
         kildeBehandlingId = saksbehandling.id,
         utbetalingsdato = fomUkedag,
         brukersNavKontor = brukersNavKontor,
+        reiseId = reiseId,
     )
 }
 
