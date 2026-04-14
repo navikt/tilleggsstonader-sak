@@ -466,8 +466,34 @@ class OppfølgingOpprettKontrollerServiceTest {
 
     @Nested
     inner class HarLagretOppfølgingFraFør {
-        val ignoreres =
-            Kontrollert(saksbehandler = "saksbehandler", utfall = KontrollertUtfall.IGNORERES, kommentar = "")
+        @Test
+        fun `skal lagre på nytt hvis dataen endret seg og aktiv oppfølging ikke er kontrollert`() {
+            val førsteOppfølging = oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)
+            assertThat(førsteOppfølging).isNotNull
+
+            førsteOppfølging!!.fjernPerioderTilKontroll()
+
+            assertThat(oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)).isNotNull
+        }
+
+        @EnumSource(
+            value = KontrollertUtfall::class,
+            names = ["HÅNDTERT", "IGNORERES"],
+            mode = EnumSource.Mode.INCLUDE,
+        )
+        @ParameterizedTest
+        fun `skal lagre ny oppfølging dersom aktiv oppfølging er håndtert eller ignorert om data er endret`(utfall: KontrollertUtfall) {
+            val førsteOppfølging = oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)
+            assertThat(førsteOppfølging).isNotNull
+
+            // Skal ikke opprette dersom data er lik
+            førsteOppfølging!!.kontroller(utfall)
+            assertThat(oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)).isNull()
+
+            // Skal opprette dersom data er ulik
+            førsteOppfølging.fjernPerioderTilKontroll()
+            assertThat(oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)).isNotNull()
+        }
 
         @EnumSource(
             value = KontrollertUtfall::class,
@@ -482,55 +508,8 @@ class OppfølgingOpprettKontrollerServiceTest {
             førsteOppfølging!!.kontroller(utfall)
 
             assertThat(oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)).isNull()
-        }
 
-        @Test
-        fun `skal lagre på nytt hvis dataen endret seg`() {
-            val førsteOppfølging = oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)
-            assertThat(førsteOppfølging).isNotNull
-            val oppfølgingMedFjernedePerioder =
-                førsteOppfølging!!.copy(data = førsteOppfølging.data.copy(perioderTilKontroll = emptyList()))
-            oppfølgingRepository.update(oppfølgingMedFjernedePerioder)
-
-            assertThat(oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)).isNotNull
-        }
-
-        @Test
-        fun `skal lagre på nytt hvis forrige ble håndtert og dataen endret seg`() {
-            val førsteOppfølging = oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)
-            assertThat(førsteOppfølging).isNotNull
-            val oppfølgingMedFjernedePerioder =
-                førsteOppfølging!!.copy(
-                    kontrollert = ignoreres.copy(utfall = KontrollertUtfall.HÅNDTERT),
-                    data = førsteOppfølging.data.copy(perioderTilKontroll = emptyList()),
-                )
-            oppfølgingRepository.update(oppfølgingMedFjernedePerioder)
-
-            assertThat(oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)).isNotNull()
-        }
-
-        @Test
-        fun `skal lagre på nytt hvis forrige skal ignoreres og dataen endret seg`() {
-            val førsteOppfølging = oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)
-            assertThat(førsteOppfølging).isNotNull
-            val oppfølgingMedFjernedePerioder =
-                førsteOppfølging!!.copy(
-                    kontrollert = ignoreres,
-                    data = førsteOppfølging.data.copy(perioderTilKontroll = emptyList()),
-                )
-            oppfølgingRepository.update(oppfølgingMedFjernedePerioder)
-
-            assertThat(oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)).isNotNull()
-        }
-
-        @Test
-        fun `skal ikke lagre på nytt hvis forrige skal ignoreres og dataen ikke endret seg`() {
-            val førsteOppfølging = oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)
-            assertThat(førsteOppfølging).isNotNull
-
-            førsteOppfølging!!.kontroller(KontrollertUtfall.IGNORERES)
-
-            assertThat(oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)).isNull()
+            oppfølgingRepository.update(førsteOppfølging.copy(data = førsteOppfølging.data.copy(perioderTilKontroll = emptyList())))
         }
 
         @EnumSource(
@@ -543,7 +522,23 @@ class OppfølgingOpprettKontrollerServiceTest {
             val førsteOppfølging = oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)
             assertThat(førsteOppfølging).isNotNull
 
-            førsteOppfølging!!.kontroller(utfall)
+            // Skal ikke opprette dersom data er lik
+            val kontrollertOppfølging = førsteOppfølging!!.kontroller(utfall)
+            assertThat(oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)).isNull()
+
+            // Skal ikke opprette dersom data er ulik
+            kontrollertOppfølging.fjernPerioderTilKontroll()
+            assertThat(oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)).isNull()
+        }
+
+        @Test
+        fun `skal ikke lagre på nytt hvis forrige skal ignoreres og dataen ikke endret seg`() {
+            val førsteOppfølging = oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)
+
+            assertThat(førsteOppfølging).isNotNull
+
+            førsteOppfølging!!.kontroller(KontrollertUtfall.IGNORERES)
+            oppfølgingRepository.markerAktivSomIkkeAktiv(behandling.id)
 
             assertThat(oppfølgingOpprettKontrollerService.opprettOppfølging(behandling.id)).isNull()
         }
@@ -673,7 +668,7 @@ class OppfølgingOpprettKontrollerServiceTest {
         } returns perioder.toList()
     }
 
-    private fun Oppfølging.kontroller(utfall: KontrollertUtfall) {
+    private fun Oppfølging.kontroller(utfall: KontrollertUtfall) =
         oppfølgingRepository.update(
             this.copy(
                 kontrollert =
@@ -682,6 +677,13 @@ class OppfølgingOpprettKontrollerServiceTest {
                         utfall = utfall,
                         kommentar = "Kommentar",
                     ),
+            ),
+        )
+
+    private fun Oppfølging.fjernPerioderTilKontroll() {
+        oppfølgingRepository.update(
+            this.copy(
+                data = this.data.copy(perioderTilKontroll = emptyList()),
             ),
         )
     }
