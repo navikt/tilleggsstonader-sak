@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.assertj.core.api.Assertions.assertThatNoException
 import org.junit.jupiter.api.AfterEach
@@ -62,6 +63,36 @@ class FagsakUtbetalingIdRepositoryTest : IntegrationTest() {
                 FagsakUtbetalingId(fagsakId = behandling.fagsakId, typeAndel = TypeAndel.DAGLIG_REISE_AAP, reiseId = null),
             )
         }
+    }
+
+    @Test
+    fun `finner ikke utbetalingid med reiseid når reiseid er lagret med null`() {
+        fagsakUtbetalingIdRepository.insert(
+            FagsakUtbetalingId(fagsakId = behandling.fagsakId, typeAndel = TypeAndel.DAGLIG_REISE_AAP, reiseId = null),
+        )
+
+        assertThat(
+            fagsakUtbetalingIdRepository.findByFagsakIdAndTypeAndelAndReiseId(
+                fagsakId = behandling.fagsakId,
+                typeAndel = TypeAndel.DAGLIG_REISE_AAP,
+                reiseId = ReiseId.random(),
+            ),
+        ).isNull()
+    }
+
+    @Test
+    fun `finner ikke utbetalingid uten reiseid når reiseid er lagret med verdi`() {
+        fagsakUtbetalingIdRepository.insert(
+            FagsakUtbetalingId(fagsakId = behandling.fagsakId, typeAndel = TypeAndel.DAGLIG_REISE_AAP, reiseId = ReiseId.random()),
+        )
+
+        assertThat(
+            fagsakUtbetalingIdRepository.findByFagsakIdAndTypeAndelAndReiseId(
+                fagsakId = behandling.fagsakId,
+                typeAndel = TypeAndel.DAGLIG_REISE_AAP,
+                reiseId = null,
+            ),
+        ).isNull()
     }
 
     @AfterEach
