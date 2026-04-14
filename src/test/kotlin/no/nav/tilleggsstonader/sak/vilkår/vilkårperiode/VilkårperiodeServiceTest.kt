@@ -10,12 +10,20 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.tilOppdatering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
@@ -26,6 +34,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.math.BigDecimal
+import java.time.LocalDate
 import java.util.UUID
 
 class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
@@ -37,6 +47,9 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
 
     @Autowired
     lateinit var vilkårperiodeRepository: VilkårperiodeRepository
+
+    @Autowired
+    lateinit var vilkårRepository: VilkårRepository
 
     @Autowired
     lateinit var behandlingshistorikkService: BehandlingshistorikkService
@@ -250,5 +263,80 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
 
         assertThat(test.steg).isEqualTo(StegType.INNGANGSVILKÅR)
         assertThat(test.utfall).isEqualTo(StegUtfall.UTREDNING_PÅBEGYNT)
+    }
+
+    @Nested
+    inner class ValiderAktivitetIkkeReferertAvDagligReiseVilkår {
+        private lateinit var lagretAktivitet: Vilkårperiode
+
+        @BeforeEach
+        fun setUp() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.UTREDES))
+            lagretAktivitet =
+                vilkårperiodeRepository.insert(
+                    aktivitet(behandlingId = behandling.id, resultat = ResultatVilkårperiode.OPPFYLT, begrunnelse = "begrunnelse"),
+                )
+        }
+
+        private fun lagDagligReiseVilkår(
+            aktivitetGlobalId: VilkårperiodeGlobalId,
+            status: VilkårStatus = VilkårStatus.NY,
+        ) {
+            vilkårRepository.insert(
+                vilkår(
+                    behandlingId = lagretAktivitet.behandlingId,
+                    type = VilkårType.DAGLIG_REISE,
+                    status = status,
+                    slettetKommentar = if (status == VilkårStatus.SLETTET) "kommentar" else null,
+                    fakta =
+                        FaktaDagligReisePrivatBil(
+                            reiseId = ReiseId.random(),
+                            reiseavstandEnVei = BigDecimal(10),
+                            faktaDelperioder =
+                                listOf(
+                                    FaktaDelperiodePrivatBil(
+                                        fom = LocalDate.now(),
+                                        tom = LocalDate.now().plusDays(10),
+                                        reisedagerPerUke = 5,
+                                        bompengerPerDag = null,
+                                        fergekostnadPerDag = null,
+                                    ),
+                                ),
+                            adresse = "Tiltaksveien 1",
+                            aktivitetId = aktivitetGlobalId,
+                        ),
+                ),
+            )
+        }
+
+        @Test
+        fun `skal kaste feil hvis aktivitet er referert av et aktivt dagligReise-vilkår`() {
+            lagDagligReiseVilkår(lagretAktivitet.globalId)
+
+            assertThatThrownBy {
+                vilkårperiodeService.slettVilkårperiode(
+                    lagretAktivitet.id,
+                    SlettVikårperiode(lagretAktivitet.behandlingId, kommentar = "kommentar"),
+                )
+            }.hasMessageContaining("Aktiviteten er knyttet til et vilkår for daglig reise")
+        }
+
+        @Test
+        fun `skal tillate sletting av aktivitet hvis refererende dagligReise-vilkår er slettet`() {
+            lagDagligReiseVilkår(lagretAktivitet.globalId, status = VilkårStatus.SLETTET)
+
+            vilkårperiodeService.slettVilkårperiode(
+                lagretAktivitet.id,
+                SlettVikårperiode(lagretAktivitet.behandlingId, kommentar = "kommentar"),
+            )
+        }
+
+        @Test
+        fun `skal tillate sletting av aktivitet hvis ingen dagligReise-vilkår refererer den`() {
+            vilkårperiodeService.slettVilkårperiode(
+                lagretAktivitet.id,
+                SlettVikårperiode(lagretAktivitet.behandlingId, kommentar = "kommentar"),
+            )
+        }
     }
 }

@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFa
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.validerKanLeggeTilMålgruppeManuelt
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -284,6 +285,7 @@ class VilkårperiodeService(
             vilkårRepository
                 .findByBehandlingId(behandlingId)
                 .filter { it.type == VilkårType.DAGLIG_REISE }
+                .filter { it.status != VilkårStatus.SLETTET }
                 .any { (it.fakta as? FaktaDagligReisePrivatBil)?.aktivitetId == globalId }
 
         brukerfeilHvis(erReferert) {

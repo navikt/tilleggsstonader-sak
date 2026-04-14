@@ -352,6 +352,7 @@ fun vilkår(
     utgift: Int? = 100,
     erFremtidigUtgift: Boolean = false,
     fakta: VilkårFakta? = null,
+    slettetKommentar: String? = null,
 ): Vilkår =
     Vilkår(
         behandlingId = behandlingId,
@@ -367,6 +368,7 @@ fun vilkår(
         erFremtidigUtgift = erFremtidigUtgift,
         gitVersjon = Applikasjonsversjon.versjon,
         fakta = fakta,
+        slettetKommentar = slettetKommentar,
     )
 
 fun vilkårDagligReise(
