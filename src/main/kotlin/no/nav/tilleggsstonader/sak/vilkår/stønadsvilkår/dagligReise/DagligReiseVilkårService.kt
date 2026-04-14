@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
@@ -192,7 +193,7 @@ class DagligReiseVilkårService(
         brukerfeilHvis(aktivitet.resultat != ResultatVilkårperiode.OPPFYLT) {
             "Aktiviteten er ikke oppfylt"
         }
-        brukerfeilHvis(aktivitet.fom.isAfter(nyttVilkår.fom) || aktivitet.tom.isBefore(nyttVilkår.tom)) {
+        brukerfeilHvisIkke(aktivitet.inneholder(nyttVilkår)) {
             "Aktiviteten er ikke oppfylt hele vilkårperioden"
         }
     }
