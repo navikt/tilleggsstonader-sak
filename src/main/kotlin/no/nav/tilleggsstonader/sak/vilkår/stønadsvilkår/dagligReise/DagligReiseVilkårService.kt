@@ -8,9 +8,11 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.SlettetVilkårResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
@@ -52,6 +54,7 @@ class DagligReiseVilkårService(
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
         validerKanBehandleVilkåret(nyttVilkår)
+        validerDelperiodeFomOgTomMotNyttVilkår(nyttVilkår)
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår)
         val lagretVilkår = vilkårRepository.insert(vilkår.mapTilVilkår())
@@ -68,6 +71,7 @@ class DagligReiseVilkårService(
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
         validerKanBehandleVilkåret(nyttVilkår)
+        validerDelperiodeFomOgTomMotNyttVilkår(nyttVilkår)
 
         val eksisterendeVilkår = vilkårRepository.findByIdOrThrow(vilkårId).mapTilVilkårDagligReise()
 
@@ -158,6 +162,22 @@ class DagligReiseVilkårService(
 
     private fun validerErRedigerbar(behandling: Saksbehandling) {
         behandling.status.validerKanBehandlingRedigeres()
+    }
+
+    private fun validerDelperiodeFomOgTomMotNyttVilkår(nyttVilkår: LagreDagligReise) {
+        if (nyttVilkår.fakta is FaktaPrivatBil) {
+            val fom = nyttVilkår.fom
+            val tom = nyttVilkår.tom
+            val delperiodeFom = nyttVilkår.fakta.faktaDelperioder.minOfOrNull { it.fom }
+            val delperiodeTom = nyttVilkår.fakta.faktaDelperioder.maxOfOrNull { it.tom }
+
+            brukerfeilHvisIkke(fom == delperiodeFom) {
+                "Delperioden sin fom ${delperiodeFom?.norskFormat()} er ikke den samme som reiseperioden sin fom ${fom.norskFormat()}"
+            }
+            brukerfeilHvisIkke(tom == delperiodeTom) {
+                "Delperioden sin tom ${delperiodeTom?.norskFormat()} er ikke den samme som reiseperioden sin tom ${tom.norskFormat()}"
+            }
+        }
     }
 
     private fun validerKanBehandleVilkåret(nyttVilkår: LagreDagligReise) {

@@ -2,6 +2,9 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.allePerioderErSammenhengende
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
+import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import java.math.BigDecimal
@@ -29,14 +32,21 @@ data class RammeForReiseMedPrivatBilBeregningsgrunnlag(
     val vedtaksperioder: List<Vedtaksperiode>,
 ) : Periode<LocalDate> {
     init {
-        require(fom == delperioder.minOf { it.fom }) {
-            "fom på rammevedtaket $fom er ulikt tidligste fom på delperioder ${delperioder.minOf { it.fom }}"
+        brukerfeilHvis(fom != delperioder.minOf { it.fom }) {
+            "Rammevedtaket sin fom ${fom.norskFormat()} er ikke lik den tidligste delperioden sin fom ${delperioder.minOf {
+                it.fom
+                    .norskFormat()
+            }}"
         }
-        require(tom == delperioder.maxOf { it.tom }) {
-            "tom på rammevedtaket $tom er ulikt største tom på delperioder ${delperioder.maxOf { it.tom }}"
+        brukerfeilHvis(tom != delperioder.maxOf { it.tom }) {
+            "Rammevedtaket sin tom ${tom.norskFormat()} er ikke lik den tidligste delperioden sin tom ${delperioder.maxOf {
+                it.tom
+                    .norskFormat()
+            }}"
         }
-        require(delperioder.allePerioderErSammenhengende()) {
-            "Alle delperioder må være sammenhengende"
+        brukerfeilHvisIkke(delperioder.allePerioderErSammenhengende()) {
+            "Alle delperioder må være sammenhengende: " +
+                delperioder.joinToString(", ") { "${it.fom.norskFormat()} - ${it.tom.norskFormat()}" }
         }
     }
 
