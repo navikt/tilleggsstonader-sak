@@ -1,8 +1,13 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto
 
+import no.nav.tilleggsstonader.libs.utils.dato.februar
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -13,17 +18,32 @@ import java.time.LocalDate
 
 class BeregningsresultatBoutgifterDtoTest {
     @Test
+    fun `skal ikke filtrere perioder ved gjenbruk av forrige resultat`() {
+        val dto =
+            BeregningsresultatBoutgifter(
+                perioder =
+                    listOf(
+                        beregningsresultatForLøpendeMåned(1 januar 2023, 31 januar 2023, 3000),
+                        beregningsresultatForLøpendeMåned(1 februar 2023, 28 februar 2023, 4000),
+                    ),
+            ).tilDto(Beregningsplan(Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT))
+
+        assertEquals(listOf(1 januar 2023, 1 februar 2023), dto.perioder.map { it.fom })
+        assertEquals(null, dto.tidligsteEndring)
+    }
+
+    @Test
     fun `finnUtgifterMedAndelTilUtbetaling skal finne andel til utbetaling når utgifter ikke avkortes mot makssats`() {
         val utgift =
             listOf(
                 lagUtgiftBeregningBoutgifter(
-                    fom = LocalDate.of(2023, 1, 1),
-                    tom = LocalDate.of(2023, 1, 5),
+                    fom = 1 januar 2023,
+                    tom = 5 januar 2023,
                     utgift = 1000,
                 ),
                 lagUtgiftBeregningBoutgifter(
-                    fom = LocalDate.of(2023, 1, 11),
-                    tom = LocalDate.of(2023, 1, 16),
+                    fom = 11 januar 2023,
+                    tom = 16 januar 2023,
                     utgift = 2000,
                 ),
             )
@@ -32,8 +52,8 @@ class BeregningsresultatBoutgifterDtoTest {
             BeregningsresultatForLøpendeMåned(
                 grunnlag =
                     Beregningsgrunnlag(
-                        fom = LocalDate.of(2023, 1, 1),
-                        tom = LocalDate.of(2023, 1, 31),
+                        fom = 1 januar 2023,
+                        tom = 31 januar 2023,
                         utgifter = mapOf(TypeBoutgift.UTGIFTER_OVERNATTING to utgift),
                         makssats = 4953,
                         makssatsBekreftet = true,
@@ -46,16 +66,16 @@ class BeregningsresultatBoutgifterDtoTest {
         val forventetResultat =
             listOf(
                 UtgiftBoutgifterMedAndelTilUtbetalingDto(
-                    fom = LocalDate.of(2023, 1, 1),
-                    tom = LocalDate.of(2023, 1, 5),
+                    fom = 1 januar 2023,
+                    tom = 5 januar 2023,
                     utgift = 1000,
                     tilUtbetaling = 1000,
                     erFørTidligsteEndring = false,
                     skalFåDekketFaktiskeUtgifter = false,
                 ),
                 UtgiftBoutgifterMedAndelTilUtbetalingDto(
-                    fom = LocalDate.of(2023, 1, 11),
-                    tom = LocalDate.of(2023, 1, 16),
+                    fom = 11 januar 2023,
+                    tom = 16 januar 2023,
                     utgift = 2000,
                     tilUtbetaling = 2000,
                     erFørTidligsteEndring = false,
@@ -74,13 +94,13 @@ class BeregningsresultatBoutgifterDtoTest {
         val utgift =
             listOf(
                 lagUtgiftBeregningBoutgifter(
-                    fom = LocalDate.of(2023, 1, 1),
-                    tom = LocalDate.of(2023, 1, 5),
+                    fom = 1 januar 2023,
+                    tom = 5 januar 2023,
                     utgift = 4000,
                 ),
                 lagUtgiftBeregningBoutgifter(
-                    fom = LocalDate.of(2023, 1, 11),
-                    tom = LocalDate.of(2023, 1, 16),
+                    fom = 11 januar 2023,
+                    tom = 16 januar 2023,
                     utgift = 2000,
                 ),
             )
@@ -89,8 +109,8 @@ class BeregningsresultatBoutgifterDtoTest {
             BeregningsresultatForLøpendeMåned(
                 grunnlag =
                     Beregningsgrunnlag(
-                        fom = LocalDate.of(2023, 1, 1),
-                        tom = LocalDate.of(2023, 1, 31),
+                        fom = 1 januar 2023,
+                        tom = 31 januar 2023,
                         utgifter = mapOf(TypeBoutgift.UTGIFTER_OVERNATTING to utgift),
                         makssats = 4953,
                         makssatsBekreftet = true,
@@ -103,16 +123,16 @@ class BeregningsresultatBoutgifterDtoTest {
         val forventetResultat =
             listOf(
                 UtgiftBoutgifterMedAndelTilUtbetalingDto(
-                    fom = LocalDate.of(2023, 1, 1),
-                    tom = LocalDate.of(2023, 1, 5),
+                    fom = 1 januar 2023,
+                    tom = 5 januar 2023,
                     utgift = 4000,
                     tilUtbetaling = 4000,
                     erFørTidligsteEndring = false,
                     skalFåDekketFaktiskeUtgifter = false,
                 ),
                 UtgiftBoutgifterMedAndelTilUtbetalingDto(
-                    fom = LocalDate.of(2023, 1, 11),
-                    tom = LocalDate.of(2023, 1, 16),
+                    fom = 11 januar 2023,
+                    tom = 16 januar 2023,
                     utgift = 2000,
                     tilUtbetaling = 953,
                     erFørTidligsteEndring = false,
@@ -131,13 +151,13 @@ class BeregningsresultatBoutgifterDtoTest {
         val utgift =
             listOf(
                 lagUtgiftBeregningBoutgifter(
-                    fom = LocalDate.of(2023, 1, 1),
-                    tom = LocalDate.of(2023, 1, 5),
+                    fom = 1 januar 2023,
+                    tom = 5 januar 2023,
                     utgift = 1000,
                 ),
                 lagUtgiftBeregningBoutgifter(
-                    fom = LocalDate.of(2023, 1, 11),
-                    tom = LocalDate.of(2023, 1, 16),
+                    fom = 11 januar 2023,
+                    tom = 16 januar 2023,
                     utgift = 2000,
                 ),
             )
@@ -146,8 +166,8 @@ class BeregningsresultatBoutgifterDtoTest {
             BeregningsresultatForLøpendeMåned(
                 grunnlag =
                     Beregningsgrunnlag(
-                        fom = LocalDate.of(2023, 1, 1),
-                        tom = LocalDate.of(2023, 1, 31),
+                        fom = 1 januar 2023,
+                        tom = 31 januar 2023,
                         utgifter = mapOf(TypeBoutgift.UTGIFTER_OVERNATTING to utgift),
                         makssats = 4953,
                         makssatsBekreftet = true,
@@ -160,16 +180,16 @@ class BeregningsresultatBoutgifterDtoTest {
         val forventetResultat =
             listOf(
                 UtgiftBoutgifterMedAndelTilUtbetalingDto(
-                    fom = LocalDate.of(2023, 1, 1),
-                    tom = LocalDate.of(2023, 1, 5),
+                    fom = 1 januar 2023,
+                    tom = 5 januar 2023,
                     utgift = 1000,
                     tilUtbetaling = 1000,
                     erFørTidligsteEndring = true,
                     skalFåDekketFaktiskeUtgifter = false,
                 ),
                 UtgiftBoutgifterMedAndelTilUtbetalingDto(
-                    fom = LocalDate.of(2023, 1, 11),
-                    tom = LocalDate.of(2023, 1, 16),
+                    fom = 11 januar 2023,
+                    tom = 16 januar 2023,
                     utgift = 2000,
                     tilUtbetaling = 2000,
                     erFørTidligsteEndring = false,
@@ -177,7 +197,7 @@ class BeregningsresultatBoutgifterDtoTest {
                 ),
             )
 
-        val tidligsteEndring = LocalDate.of(2023, 1, 10)
+        val tidligsteEndring = 10 januar 2023
 
         val result =
             beregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(tidligsteEndring)
@@ -190,8 +210,8 @@ class BeregningsresultatBoutgifterDtoTest {
         val utgift =
             listOf(
                 lagUtgiftBeregningBoutgifter(
-                    fom = LocalDate.of(2023, 1, 1),
-                    tom = LocalDate.of(2023, 1, 5),
+                    fom = 1 januar 2023,
+                    tom = 5 januar 2023,
                     utgift = 20_000,
                     skalFåDekketFaktiskeUtgifter = true,
                 ),
@@ -201,8 +221,8 @@ class BeregningsresultatBoutgifterDtoTest {
             BeregningsresultatForLøpendeMåned(
                 grunnlag =
                     Beregningsgrunnlag(
-                        fom = LocalDate.of(2023, 1, 1),
-                        tom = LocalDate.of(2023, 1, 31),
+                        fom = 1 januar 2023,
+                        tom = 31 januar 2023,
                         utgifter = mapOf(TypeBoutgift.UTGIFTER_OVERNATTING to utgift),
                         makssats = 4953,
                         makssatsBekreftet = true,
@@ -215,8 +235,8 @@ class BeregningsresultatBoutgifterDtoTest {
         val forventetResultat =
             listOf(
                 UtgiftBoutgifterMedAndelTilUtbetalingDto(
-                    fom = LocalDate.of(2023, 1, 1),
-                    tom = LocalDate.of(2023, 1, 5),
+                    fom = 1 januar 2023,
+                    tom = 5 januar 2023,
                     utgift = 20_000,
                     tilUtbetaling = 20_000,
                     erFørTidligsteEndring = true,
@@ -224,7 +244,7 @@ class BeregningsresultatBoutgifterDtoTest {
                 ),
             )
 
-        val tidligsteEndring = LocalDate.of(2023, 1, 10)
+        val tidligsteEndring = 10 januar 2023
 
         val result =
             beregningsresultatForLøpendeMåned.finnUtgifterMedAndelTilUtbetaling(tidligsteEndring)
@@ -239,8 +259,8 @@ class BeregningsresultatBoutgifterDtoTest {
             val utgiftOvernatting =
                 listOf(
                     lagUtgiftBeregningBoutgifter(
-                        fom = LocalDate.of(2023, 1, 1),
-                        tom = LocalDate.of(2023, 1, 5),
+                        fom = 1 januar 2023,
+                        tom = 5 januar 2023,
                         utgift = 3000,
                         skalFåDekketFaktiskeUtgifter = false,
                     ),
@@ -250,8 +270,8 @@ class BeregningsresultatBoutgifterDtoTest {
                 BeregningsresultatForLøpendeMåned(
                     grunnlag =
                         Beregningsgrunnlag(
-                            fom = LocalDate.of(2023, 1, 1),
-                            tom = LocalDate.of(2023, 1, 31),
+                            fom = 1 januar 2023,
+                            tom = 31 januar 2023,
                             utgifter = mapOf(TypeBoutgift.UTGIFTER_OVERNATTING to utgiftOvernatting),
                             makssats = 4953,
                             makssatsBekreftet = true,
@@ -263,14 +283,14 @@ class BeregningsresultatBoutgifterDtoTest {
 
             val forventetResultat =
                 BeregningsresultatForPeriodeDto(
-                    fom = LocalDate.of(2023, 1, 1),
-                    tom = LocalDate.of(2023, 1, 31),
+                    fom = 1 januar 2023,
+                    tom = 31 januar 2023,
                     stønadsbeløp = 3000,
                     utgifter =
                         listOf(
                             UtgiftBoutgifterMedAndelTilUtbetalingDto(
-                                fom = LocalDate.of(2023, 1, 1),
-                                tom = LocalDate.of(2023, 1, 5),
+                                fom = 1 januar 2023,
+                                tom = 5 januar 2023,
                                 utgift = 3000,
                                 tilUtbetaling = 3000,
                                 erFørTidligsteEndring = true,
@@ -286,7 +306,7 @@ class BeregningsresultatBoutgifterDtoTest {
                     inneholderUtgifterOvernatting = true,
                 )
 
-            val tidligsteEndring = LocalDate.of(2023, 1, 10)
+            val tidligsteEndring = 10 januar 2023
 
             val result =
                 beregningsresultatForLøpendeMåned.tilDto(tidligsteEndring)
@@ -299,8 +319,8 @@ class BeregningsresultatBoutgifterDtoTest {
             val utgift =
                 listOf(
                     lagUtgiftBeregningBoutgifter(
-                        fom = LocalDate.of(2023, 1, 1),
-                        tom = LocalDate.of(2023, 1, 31),
+                        fom = 1 januar 2023,
+                        tom = 31 januar 2023,
                         utgift = 3000,
                         skalFåDekketFaktiskeUtgifter = false,
                     ),
@@ -310,8 +330,8 @@ class BeregningsresultatBoutgifterDtoTest {
                 BeregningsresultatForLøpendeMåned(
                     grunnlag =
                         Beregningsgrunnlag(
-                            fom = LocalDate.of(2023, 1, 1),
-                            tom = LocalDate.of(2023, 1, 31),
+                            fom = 1 januar 2023,
+                            tom = 31 januar 2023,
                             utgifter =
                                 mapOf(
                                     TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to utgift,
@@ -327,14 +347,14 @@ class BeregningsresultatBoutgifterDtoTest {
 
             val forventetResultat =
                 BeregningsresultatForPeriodeDto(
-                    fom = LocalDate.of(2023, 1, 1),
-                    tom = LocalDate.of(2023, 1, 31),
+                    fom = 1 januar 2023,
+                    tom = 31 januar 2023,
                     stønadsbeløp = 3000,
                     utgifter =
                         listOf(
                             UtgiftBoutgifterMedAndelTilUtbetalingDto(
-                                fom = LocalDate.of(2023, 1, 1),
-                                tom = LocalDate.of(2023, 1, 31),
+                                fom = 1 januar 2023,
+                                tom = 31 januar 2023,
                                 utgift = 3000,
                                 tilUtbetaling = 3000,
                                 erFørTidligsteEndring = false,
@@ -350,7 +370,7 @@ class BeregningsresultatBoutgifterDtoTest {
                     inneholderUtgifterOvernatting = false,
                 )
 
-            val tidligsteEndring = LocalDate.of(2023, 1, 10)
+            val tidligsteEndring = 10 januar 2023
 
             val result =
                 beregningsresultatForLøpendeMåned.tilDto(tidligsteEndring)
@@ -358,4 +378,22 @@ class BeregningsresultatBoutgifterDtoTest {
             assertEquals(forventetResultat, result)
         }
     }
+
+    private fun beregningsresultatForLøpendeMåned(
+        fom: LocalDate,
+        tom: LocalDate,
+        stønadsbeløp: Int,
+    ) = BeregningsresultatForLøpendeMåned(
+        grunnlag =
+            Beregningsgrunnlag(
+                fom = fom,
+                tom = tom,
+                utgifter = mapOf(TypeBoutgift.UTGIFTER_OVERNATTING to emptyList()),
+                makssats = 4953,
+                makssatsBekreftet = true,
+                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                aktivitet = AktivitetType.TILTAK,
+            ),
+        stønadsbeløp = stønadsbeløp,
+    )
 }

@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto
 
+import no.nav.tilleggsstonader.libs.utils.dato.februar
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
@@ -26,9 +28,9 @@ class InnvilgelseTilsynBarnDtoKtTest {
                         beregningsresultatForMåned(
                             vedtaksperiodeGrunnlag =
                                 listOf(
-                                    vedtaksperiodeGrunnlag(LocalDate.of(2024, 1, 2), LocalDate.of(2024, 1, 4)),
+                                    vedtaksperiodeGrunnlag(2 januar 2024, 4 januar 2024),
                                 ),
-                            beløpsperioder = listOf(Beløpsperiode(LocalDate.of(2024, 1, 1), 20, NEDSATT_ARBEIDSEVNE)),
+                            beløpsperioder = listOf(Beløpsperiode(1 januar 2024, 20, NEDSATT_ARBEIDSEVNE)),
                         ),
                     ),
             ).tilDto(Beregningsplan(Beregningsomfang.ALLE_PERIODER))
@@ -56,21 +58,50 @@ class InnvilgelseTilsynBarnDtoKtTest {
                         beregningsresultatForMåned(
                             vedtaksperiodeGrunnlag =
                                 listOf(
-                                    vedtaksperiodeGrunnlag(LocalDate.of(2024, 1, 2), LocalDate.of(2024, 1, 4)),
-                                    vedtaksperiodeGrunnlag(LocalDate.of(2024, 1, 15), LocalDate.of(2024, 1, 16)),
+                                    vedtaksperiodeGrunnlag(2 januar 2024, 4 januar 2024),
+                                    vedtaksperiodeGrunnlag(15 januar 2024, 16 januar 2024),
                                 ),
                         ),
                         beregningsresultatForMåned(
                             vedtaksperiodeGrunnlag =
                                 listOf(
-                                    vedtaksperiodeGrunnlag(LocalDate.of(2024, 2, 3), LocalDate.of(2024, 2, 4)),
+                                    vedtaksperiodeGrunnlag(3 februar 2024, 4 februar 2024),
                                 ),
                         ),
                     ),
             ).tilDto(Beregningsplan(Beregningsomfang.ALLE_PERIODER))
 
-        assertThat(dto.gjelderFraOgMed).isEqualTo(LocalDate.of(2024, 1, 2))
-        assertThat(dto.gjelderTilOgMed).isEqualTo(LocalDate.of(2024, 2, 4))
+        assertThat(dto.gjelderFraOgMed).isEqualTo(2 januar 2024)
+        assertThat(dto.gjelderTilOgMed).isEqualTo(4 februar 2024)
+    }
+
+    @Test
+    fun `skal ikke filtrere perioder ved gjenbruk av forrige resultat`() {
+        val dto =
+            BeregningsresultatTilsynBarn(
+                perioder =
+                    listOf(
+                        beregningsresultatForMåned(
+                            januar2024 = YearMonth.of(2024, 1),
+                            vedtaksperiodeGrunnlag =
+                                listOf(
+                                    vedtaksperiodeGrunnlag(2 januar 2024, 4 januar 2024),
+                                ),
+                        ),
+                        beregningsresultatForMåned(
+                            januar2024 = YearMonth.of(2024, 2),
+                            vedtaksperiodeGrunnlag =
+                                listOf(
+                                    vedtaksperiodeGrunnlag(3 februar 2024, 4 februar 2024),
+                                ),
+                        ),
+                    ),
+            ).tilDto(Beregningsplan(Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT))
+
+        assertThat(dto.perioder.map { it.grunnlag.måned }).containsExactly(YearMonth.of(2024, 1), YearMonth.of(2024, 2))
+        assertThat(dto.gjelderFraOgMed).isEqualTo(2 januar 2024)
+        assertThat(dto.gjelderTilOgMed).isEqualTo(4 februar 2024)
+        assertThat(dto.tidligsteEndring).isNull()
     }
 
     @Nested
@@ -81,7 +112,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
          */
         @Test
         fun `skal mappe beløp fra hele måneden når tidligste endring er satt`() {
-            val tidligsteEndring = LocalDate.of(2024, 1, 17)
+            val tidligsteEndring = 17 januar 2024
             val dto =
                 BeregningsresultatTilsynBarn(
                     perioder =
@@ -103,20 +134,20 @@ class InnvilgelseTilsynBarnDtoKtTest {
 
     @Nested
     inner class TidligsteEndringGjelderFraOgTil {
-        val tidligsteEndring = LocalDate.of(2024, 1, 17)
+        val tidligsteEndring = 17 januar 2024
 
         @Test
         fun `periode som overlapper skal bruke tidligsteEndring som startdato`() {
-            val periode = vedtaksperiodeGrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 18))
+            val periode = vedtaksperiodeGrunnlag(fom = 2 januar 2024, tom = 18 januar 2024)
             val dto = resultatMedEnVedtaksperiode(periode).tilDto(Beregningsplan(Beregningsomfang.FRA_DATO, fraDato = tidligsteEndring))
 
             assertThat(dto.gjelderFraOgMed).isEqualTo(tidligsteEndring)
-            assertThat(dto.gjelderTilOgMed).isEqualTo(LocalDate.of(2024, 1, 18))
+            assertThat(dto.gjelderTilOgMed).isEqualTo(18 januar 2024)
         }
 
         @Test
         fun `periode som begynner før tidligsteEndring skal ikke brukes til gjelderFra eller gjelderTil`() {
-            val periode = vedtaksperiodeGrunnlag(fom = LocalDate.of(2024, 1, 2), tom = LocalDate.of(2024, 1, 16))
+            val periode = vedtaksperiodeGrunnlag(fom = 2 januar 2024, tom = 16 januar 2024)
             val dto = resultatMedEnVedtaksperiode(periode).tilDto(Beregningsplan(Beregningsomfang.FRA_DATO, fraDato = tidligsteEndring))
 
             assertThat(dto.gjelderFraOgMed).isNull()
@@ -125,11 +156,11 @@ class InnvilgelseTilsynBarnDtoKtTest {
 
         @Test
         fun `periode som begynner fra og med tidligsteEndring brukes til gjelderFra og gjelderTil`() {
-            val periode = vedtaksperiodeGrunnlag(fom = LocalDate.of(2024, 1, 17), tom = LocalDate.of(2024, 1, 19))
+            val periode = vedtaksperiodeGrunnlag(fom = 17 januar 2024, tom = 19 januar 2024)
             val dto = resultatMedEnVedtaksperiode(periode).tilDto(Beregningsplan(Beregningsomfang.FRA_DATO, fraDato = tidligsteEndring))
 
-            assertThat(dto.gjelderFraOgMed).isEqualTo(LocalDate.of(2024, 1, 17))
-            assertThat(dto.gjelderTilOgMed).isEqualTo(LocalDate.of(2024, 1, 19))
+            assertThat(dto.gjelderFraOgMed).isEqualTo(17 januar 2024)
+            assertThat(dto.gjelderTilOgMed).isEqualTo(19 januar 2024)
         }
 
         private fun resultatMedEnVedtaksperiode(vedtaksperiodeGrunnlag: VedtaksperiodeGrunnlag) =
@@ -142,6 +173,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
     }
 
     private fun beregningsresultatForMåned(
+        januar2024: YearMonth = YearMonth.of(2024, 1),
         vedtaksperiodeGrunnlag: List<VedtaksperiodeGrunnlag> = emptyList(),
         beløpsperioder: List<Beløpsperiode> = emptyList(),
     ) = BeregningsresultatForMåned(
@@ -149,7 +181,7 @@ class InnvilgelseTilsynBarnDtoKtTest {
         månedsbeløp = 100,
         grunnlag =
             Beregningsgrunnlag(
-                måned = YearMonth.of(2024, 1),
+                måned = januar2024,
                 makssats = 1000,
                 vedtaksperiodeGrunnlag = vedtaksperiodeGrunnlag,
                 utgifter = emptyList(),

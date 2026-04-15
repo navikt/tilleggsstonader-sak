@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -41,6 +42,27 @@ class VedtakRepositoryTest : CleanDatabaseIntegrationTest() {
         val lagretVedtak = vedtakRepository.findByIdOrThrow(behandling.id).withTypeOrThrow<InnvilgelseTilsynBarn>()
         assertThat(lagretVedtak.type).isEqualTo(TypeVedtak.INNVILGELSE)
         assertThat(lagretVedtak.data.beregningsresultat).isEqualTo(beregningsresultat)
+    }
+
+    @Test
+    fun `skal bevare beregningsplan med fraDato`() {
+        val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
+        val fraDato = 10 januar 2025
+
+        vedtakRepository.insert(
+            innvilgetVedtak(
+                behandlingId = behandling.id,
+                vedtak =
+                    InnvilgelseTilsynBarn(
+                        beregningsresultat = BeregningsresultatTilsynBarn(emptyList()),
+                        vedtaksperioder = emptyList(),
+                        beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, fraDato),
+                    ),
+            ),
+        )
+
+        val lagretVedtak = vedtakRepository.findByIdOrThrow(behandling.id).withTypeOrThrow<InnvilgelseTilsynBarn>()
+        assertThat(lagretVedtak.data.beregningsplan.beregnFra()).isEqualTo(fraDato)
     }
 
     @Nested
