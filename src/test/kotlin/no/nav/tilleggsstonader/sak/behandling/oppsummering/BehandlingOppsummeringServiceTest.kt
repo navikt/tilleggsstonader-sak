@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.oppsummering
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
@@ -368,6 +369,74 @@ class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
             val oppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
             assertThat(oppsummering.finnesDataÅOppsummere()).isTrue()
             assertThat(oppsummering.vilkår[0].vilkår[0].fom).isEqualTo(LocalDate.of(2025, 1, 1))
+        }
+
+        @Test
+        fun `skal ikke slå sammen når aktivitet er subset av en annen periode`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
+
+            vilkårperiodeRepository.insertAll(
+                listOf(
+                    aktivitet(
+                        behandlingId = behandling.id,
+                        fom = LocalDate.of(2025, 1, 1),
+                        tom = LocalDate.of(2025, 1, 10),
+                        resultat = ResultatVilkårperiode.OPPFYLT,
+                    ),
+                    aktivitet(
+                        behandlingId = behandling.id,
+                        fom = LocalDate.of(2025, 1, 3),
+                        tom = LocalDate.of(2025, 1, 10),
+                        resultat = ResultatVilkårperiode.OPPFYLT,
+                    ),
+                ),
+            )
+
+            val oppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
+
+            val perioder = oppsummering.aktiviteter
+            assertThat(perioder).hasSize(2)
+
+            assertThat(perioder.map { it.fom })
+                .containsExactlyInAnyOrder(
+                    LocalDate.of(2025, 1, 1),
+                    LocalDate.of(2025, 1, 3),
+                )
+        }
+
+        @Test
+        fun `skal ikke slå sammen når aktivitet type er ulyke men PåfølgesAv`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
+
+            vilkårperiodeRepository.insertAll(
+                listOf(
+                    aktivitet(
+                        behandlingId = behandling.id,
+                        fom = LocalDate.of(2025, 1, 1),
+                        tom = LocalDate.of(2025, 1, 10),
+                        typeAktivitet = TypeAktivitet.TEST,
+                        resultat = ResultatVilkårperiode.OPPFYLT,
+                    ),
+                    aktivitet(
+                        behandlingId = behandling.id,
+                        fom = LocalDate.of(2025, 1, 11),
+                        tom = LocalDate.of(2025, 1, 21),
+                        typeAktivitet = TypeAktivitet.TEKNTILR,
+                        resultat = ResultatVilkårperiode.OPPFYLT,
+                    ),
+                ),
+            )
+
+            val oppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
+
+            val perioder = oppsummering.aktiviteter
+            assertThat(perioder).hasSize(2)
+
+            assertThat(perioder.map { it.fom })
+                .containsExactlyInAnyOrder(
+                    LocalDate.of(2025, 1, 1),
+                    LocalDate.of(2025, 1, 11),
+                )
         }
     }
 }
