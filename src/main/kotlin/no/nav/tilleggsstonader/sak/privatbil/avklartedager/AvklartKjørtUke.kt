@@ -3,9 +3,11 @@ package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
+import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
@@ -28,6 +30,8 @@ data class AvklartKjørtUke(
     val behandletDato: LocalDate? = null,
     @MappedCollection(idColumn = "avklart_kjort_uke_id")
     val dager: Set<AvklartKjørtDag>,
+    @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
+    val sporbar: Sporbar = Sporbar(),
 ) : Periode<LocalDate> {
     init {
         require(dager.all { inneholder(it.dato) }) { "Alle dager må være innenfor perioden til uken" }
