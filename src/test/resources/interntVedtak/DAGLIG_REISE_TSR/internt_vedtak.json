@@ -246,8 +246,7 @@
         } ]
       },
       "beregningsplan" : {
-        "omfang" : "ALLE_PERIODER",
-        "fraDato" : null
+        "omfang" : "ALLE_PERIODER"
       },
       "tidligsteEndring" : null
     }

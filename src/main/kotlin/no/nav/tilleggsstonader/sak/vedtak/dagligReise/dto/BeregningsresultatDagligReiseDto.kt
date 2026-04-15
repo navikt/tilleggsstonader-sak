@@ -12,8 +12,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.dto.BeregningsplanDto
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import java.math.BigDecimal
@@ -27,8 +25,8 @@ data class BeregningDagligReiseDto(
 data class BeregningsresultatDagligReiseDto(
     val offentligTransport: BeregningsresultatOffentligTransportDto?,
     val privatBil: BeregningsresultatPrivatBilDto?,
-    val beregningsplan: BeregningsplanDto,
-    val tidligsteEndring: LocalDate? = beregningsplan.fraDato,
+    val beregningsplan: Beregningsplan,
+    val tidligsteEndring: LocalDate? = beregningsplan.legacyTidligsteEndring(),
 )
 
 data class BeregningsresultatOffentligTransportDto(
@@ -100,7 +98,7 @@ fun BeregningsresultatDagligReise.tilDto(
     BeregningsresultatDagligReiseDto(
         offentligTransport = offentligTransport?.tilDto(vilkår),
         privatBil = privatBil?.tilDto(vilkår),
-        beregningsplan = beregningsplan.tilDto(),
+        beregningsplan = beregningsplan,
     )
 
 fun BeregningsresultatOffentligTransport.tilDto(vilkår: List<VilkårDagligReise>): BeregningsresultatOffentligTransportDto =
