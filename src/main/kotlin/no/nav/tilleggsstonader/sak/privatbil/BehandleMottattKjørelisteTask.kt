@@ -5,7 +5,6 @@ import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import org.springframework.stereotype.Service
 import java.util.Properties
-import java.util.UUID
 
 @Service
 @TaskStepBeskrivelse(
@@ -20,7 +19,7 @@ class BehandleMottattKjørelisteTask(
     private val opprettKjørelisteBehandlingService: BehandleMottattKjørelisteService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
-        val kjøreliste = kjørelisteService.hentKjøreliste(UUID.fromString(task.payload))
+        val kjøreliste = kjørelisteService.hentKjøreliste(KjørelisteId.fromString(task.payload))
 
         opprettKjørelisteBehandlingService.behandleMottattKjøreliste(kjøreliste)
     }
@@ -28,7 +27,7 @@ class BehandleMottattKjørelisteTask(
     companion object {
         const val TYPE = "behandleMottattKjørelisteTask"
 
-        fun opprettTask(kjørelisteId: UUID): Task =
+        fun opprettTask(kjørelisteId: KjørelisteId): Task =
             Task(
                 type = TYPE,
                 payload = kjørelisteId.toString(),

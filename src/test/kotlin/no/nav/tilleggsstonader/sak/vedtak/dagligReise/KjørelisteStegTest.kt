@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
+import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
@@ -21,7 +22,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
-import java.util.UUID
 
 class KjørelisteStegTest {
     private val behandlingService = mockk<BehandlingService>(relaxed = true)
@@ -102,7 +102,7 @@ class KjørelisteStegTest {
 
         return AvklartKjørtUke(
             behandlingId = saksbehandling.id,
-            kjørelisteId = UUID.randomUUID(),
+            kjørelisteId = KjørelisteId.random(),
             reiseId = dummyReiseId,
             fom = fom,
             tom = tom,

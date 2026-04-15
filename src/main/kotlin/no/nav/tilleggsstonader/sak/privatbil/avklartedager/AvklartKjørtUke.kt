@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
+import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
@@ -20,7 +21,7 @@ data class AvklartKjørtUke(
     @Column("behandling_id")
     val behandlingId: BehandlingId,
     @Column("kjoreliste_id")
-    val kjørelisteId: UUID,
+    val kjørelisteId: KjørelisteId,
     val reiseId: ReiseId,
     override val fom: LocalDate,
     override val tom: LocalDate,
