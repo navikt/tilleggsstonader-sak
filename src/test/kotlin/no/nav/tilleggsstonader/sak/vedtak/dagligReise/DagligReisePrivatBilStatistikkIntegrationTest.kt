@@ -15,17 +15,12 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.finnPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
-import no.nav.tilleggsstonader.sak.statistikk.vedtak.VedtaksstatistikkRepositoryV2
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import java.util.UUID
 
 // Bruker for å teste litt "side-effekter" som kommer ut av behandlingsløp. Behandlingsstatistikk, vedtaksstatistikk og internt vedtak
 class DagligReisePrivatBilStatistikkIntegrationTest : IntegrationTest() {
-    @Autowired
-    lateinit var vedtaksstatistikkRepositoryV2: VedtaksstatistikkRepositoryV2
-
     @Test
     fun `blir produsert vedtaksstatistikk for rammevedtakbehandling og kjørelistebehandling`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
