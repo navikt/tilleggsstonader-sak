@@ -51,7 +51,7 @@ class BehandlingOppsummeringService(
                         v1.overlapperEllerPåfølgesAv(
                             v2,
                         ) &&
-                        !(v1.inneholder(v2) || v2.inneholder(v1))
+                        !v1.inneholder(v2)
                 },
                 merge = { v1, v2 -> v1.copy(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
             )
