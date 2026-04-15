@@ -405,7 +405,7 @@ class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
         }
 
         @Test
-        fun `skal ikke slå sammen når aktivitet type er ulyke men PåfølgesAv`() {
+        fun `skal ikke slå sammen når aktivitet type er ulike men PåfølgesAv`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
 
             vilkårperiodeRepository.insertAll(
