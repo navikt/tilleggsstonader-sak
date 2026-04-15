@@ -59,16 +59,12 @@ object OppgaveUtil {
         oppgavetype: Oppgavetype,
     ): Boolean {
         return when (oppgavetype) {
-            Oppgavetype.BehandleSak -> {
+            Oppgavetype.BehandleSak, Oppgavetype.BehandleUnderkjentVedtak, Oppgavetype.BehandleKjøreliste -> {
                 saksbehandling.status.behandlingErLåstForVidereRedigering()
             }
 
             Oppgavetype.GodkjenneVedtak -> {
                 saksbehandling.status != BehandlingStatus.FATTER_VEDTAK
-            }
-
-            Oppgavetype.BehandleUnderkjentVedtak -> {
-                saksbehandling.status.behandlingErLåstForVidereRedigering()
             }
 
             else -> {
