@@ -398,7 +398,7 @@ class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
             assertThat(perioder).hasSize(2)
 
             assertThat(perioder.map { it.fom })
-                .containsExactlyInAnyOrder(
+                .containsExactly(
                     LocalDate.of(2025, 1, 1),
                     LocalDate.of(2025, 1, 3),
                 )
@@ -433,7 +433,7 @@ class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
             assertThat(perioder).hasSize(2)
 
             assertThat(perioder.map { it.fom })
-                .containsExactlyInAnyOrder(
+                .containsExactly(
                     LocalDate.of(2025, 1, 1),
                     LocalDate.of(2025, 1, 11),
                 )
