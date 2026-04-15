@@ -110,7 +110,6 @@ class VedtakDtoMapper(
 
             is OpphørTilsynBarn ->
                 OpphørTilsynBarnResponse(
-                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan),
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
                     vedtaksperioder = data.vedtaksperioder.tilLagretVedtaksperiodeDto(null),
@@ -225,7 +224,6 @@ class VedtakDtoMapper(
             is AvslagDagligReise -> AvslagDagligReiseDto(årsakerAvslag = data.årsaker, begrunnelse = data.begrunnelse)
             is OpphørDagligReise ->
                 OpphørDagligReiseResponse(
-                    beregningsresultat = data.beregningsresultat.tilDto(data.beregningsplan, vilkår),
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
                     vedtaksperioder =

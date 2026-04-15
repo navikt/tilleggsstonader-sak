@@ -3,12 +3,20 @@ package no.nav.tilleggsstonader.sak.vedtak
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.avslagVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørVedtak
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnResponse
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnResponse
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseResponse
+import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerResponse
@@ -82,6 +90,24 @@ class VedtakDtoMapperTest {
             assertThat(dto.begrunnelse).isEqualTo(vedtak.data.begrunnelse)
             assertThat(dto.type).isEqualTo(vedtak.type)
         }
+
+        @Test
+        fun `skal mappe opphørt vedtak til dto`() {
+            val opphørsdato = LocalDate.of(2024, 1, 15)
+            val vedtak =
+                opphørVedtak(
+                    årsaker = listOf(ÅrsakOpphør.ENDRING_UTGIFTER),
+                    begrunnelse = "begrunnelse",
+                    opphørsdato = opphørsdato,
+                )
+
+            val dto = vedtakDtoMapper.toDto(vedtak, forrigeIverksatteBehandlingId = null) as OpphørTilsynBarnResponse
+
+            assertThat(dto.årsakerOpphør).isEqualTo(vedtak.data.årsaker)
+            assertThat(dto.begrunnelse).isEqualTo(vedtak.data.begrunnelse)
+            assertThat(dto.opphørsdato).isEqualTo(opphørsdato)
+            assertThat(dto.type).isEqualTo(TypeVedtak.OPPHØR)
+        }
     }
 
     @Nested
@@ -110,6 +136,38 @@ class VedtakDtoMapperTest {
             val innvilgetDto = dto as InnvilgelseLæremidlerResponse
             assertThat(innvilgetDto.gjelderFraOgMed).isEqualTo(LocalDate.of(2024, 1, 3))
             assertThat(innvilgetDto.gjelderTilOgMed).isEqualTo(LocalDate.of(2024, 1, 7))
+        }
+    }
+
+    @Nested
+    inner class DagligReise {
+        @Test
+        fun `skal mappe opphørt vedtak til dto`() {
+            val opphørsdato = LocalDate.of(2024, 1, 15)
+            val vedtak =
+                GeneriskVedtak(
+                    behandlingId = BehandlingId.random(),
+                    type = TypeVedtak.OPPHØR,
+                    data =
+                        OpphørDagligReise(
+                            vedtaksperioder = DagligReiseTestUtil.defaultVedtaksperioder,
+                            beregningsresultat = DagligReiseTestUtil.defaultBeregningsresultat,
+                            rammevedtakPrivatBil = null,
+                            årsaker = listOf(ÅrsakOpphør.ANNET),
+                            begrunnelse = "begrunnelse",
+                            beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, opphørsdato),
+                        ),
+                    gitVersjon = Applikasjonsversjon.versjon,
+                    tidligsteEndring = null,
+                    opphørsdato = opphørsdato,
+                )
+
+            val dto = vedtakDtoMapper.toDto(vedtak, forrigeIverksatteBehandlingId = null) as OpphørDagligReiseResponse
+
+            assertThat(dto.årsakerOpphør).isEqualTo(vedtak.data.årsaker)
+            assertThat(dto.begrunnelse).isEqualTo(vedtak.data.begrunnelse)
+            assertThat(dto.opphørsdato).isEqualTo(opphørsdato)
+            assertThat(dto.type).isEqualTo(TypeVedtak.OPPHØR)
         }
     }
 }
