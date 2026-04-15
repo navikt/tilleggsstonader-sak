@@ -74,6 +74,7 @@ class StegService(
         behandlingId: BehandlingId,
         steg: StegType,
     ): Behandling {
+        behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(behandlingId)
         val behandling = behandlingService.hentBehandling(behandlingId)
 
         feilHvis(behandling.steg != steg) {
