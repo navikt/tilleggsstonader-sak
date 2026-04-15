@@ -379,14 +379,14 @@ class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
                 listOf(
                     aktivitet(
                         behandlingId = behandling.id,
-                        fom = LocalDate.of(2025, 1, 1),
-                        tom = LocalDate.of(2025, 1, 10),
+                        fom = LocalDate.of(2026, 1, 1),
+                        tom = LocalDate.of(2026, 1, 10),
                         resultat = ResultatVilkårperiode.OPPFYLT,
                     ),
                     aktivitet(
                         behandlingId = behandling.id,
-                        fom = LocalDate.of(2025, 1, 3),
-                        tom = LocalDate.of(2025, 1, 10),
+                        fom = LocalDate.of(2026, 1, 3),
+                        tom = LocalDate.of(2026, 1, 10),
                         resultat = ResultatVilkårperiode.OPPFYLT,
                     ),
                 ),
@@ -399,8 +399,8 @@ class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
 
             assertThat(perioder.map { it.fom })
                 .containsExactly(
-                    LocalDate.of(2025, 1, 1),
-                    LocalDate.of(2025, 1, 3),
+                    LocalDate.of(2026, 1, 1),
+                    LocalDate.of(2026, 1, 3),
                 )
         }
 
@@ -412,15 +412,15 @@ class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
                 listOf(
                     aktivitet(
                         behandlingId = behandling.id,
-                        fom = LocalDate.of(2025, 1, 1),
-                        tom = LocalDate.of(2025, 1, 10),
+                        fom = LocalDate.of(2026, 1, 1),
+                        tom = LocalDate.of(2026, 1, 10),
                         typeAktivitet = TypeAktivitet.TEST,
                         resultat = ResultatVilkårperiode.OPPFYLT,
                     ),
                     aktivitet(
                         behandlingId = behandling.id,
-                        fom = LocalDate.of(2025, 1, 11),
-                        tom = LocalDate.of(2025, 1, 21),
+                        fom = LocalDate.of(2026, 1, 11),
+                        tom = LocalDate.of(2026, 1, 21),
                         typeAktivitet = TypeAktivitet.TEKNTILR,
                         resultat = ResultatVilkårperiode.OPPFYLT,
                     ),
@@ -434,8 +434,8 @@ class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
 
             assertThat(perioder.map { it.fom })
                 .containsExactly(
-                    LocalDate.of(2025, 1, 1),
-                    LocalDate.of(2025, 1, 11),
+                    LocalDate.of(2026, 1, 1),
+                    LocalDate.of(2026, 1, 11),
                 )
         }
     }
