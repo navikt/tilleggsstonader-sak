@@ -73,14 +73,14 @@ class DagligReisePrivatBilStatistikkIntegrationTest : IntegrationTest() {
     }
 
     private fun verifiserFinnesBehandlingstatistikkForBehandling(behandlingId: BehandlingId) {
-        val behandlingsstatiskkMeldinger =
+        val behandlingsstatistikkMeldinger =
             KafkaFake
                 .sendteMeldinger()
                 .finnPåTopic(kafkaTopics.dvhBehandling)
                 .map { it.verdiEllerFeil<BehandlingDVH>() }
                 .filter { it.behandlingUuid == behandlingId.toString() }
 
-        assertThat(behandlingsstatiskkMeldinger).isNotEmpty
+        assertThat(behandlingsstatistikkMeldinger).isNotEmpty
     }
 
     private fun verifiserVedtaksstatistikkFinnesForBehandling(behandlingId: BehandlingId) {
