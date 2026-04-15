@@ -192,6 +192,7 @@ class JournalpostClientMockConfig {
 
         private fun resetJournalposter() {
             journalposter.clear()
+            opprettedeJournalposter.clear()
             journalposter[journalpost.journalpostId.toLong()] = journalpost
         }
 
