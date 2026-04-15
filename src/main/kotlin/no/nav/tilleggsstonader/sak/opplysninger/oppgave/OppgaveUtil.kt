@@ -27,6 +27,7 @@ object OppgaveUtil {
             Oppgavetype.BehandleSak,
             Oppgavetype.BehandleUnderkjentVedtak,
             Oppgavetype.GodkjenneVedtak,
+            Oppgavetype.BehandleKjøreliste,
             -> "tilleggsstonader-sak"
 
             Oppgavetype.VurderLivshendelse -> null
@@ -40,6 +41,7 @@ object OppgaveUtil {
             Oppgavetype.BehandleSak,
             Oppgavetype.BehandleUnderkjentVedtak,
             Oppgavetype.GodkjenneVedtak,
+            Oppgavetype.BehandleKjøreliste,
             -> true
 
             Oppgavetype.VurderLivshendelse -> false
