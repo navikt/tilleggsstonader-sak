@@ -72,6 +72,8 @@ fun gyldigeAvslagsårsaker(
                     )
                 Avslagskategori.GENERELL -> generelleÅrsaker
             }
+
+        Stønadstype.REISE_TIL_SAMLING_TSO -> TODO("hva er gyldige avslagsårsaker for reise til samling TSO?  Lag oppgave")
     }
 }
 

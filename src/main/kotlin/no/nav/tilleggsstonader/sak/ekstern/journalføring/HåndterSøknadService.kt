@@ -89,6 +89,7 @@ class HåndterSøknadService(
                     finnStønadstypeForDagligReise(journalpost),
                     Stønadstype.entries.filter { it.gjelderDagligReise() },
                 )
+            Skjematype.SØKNAD_REISE_TIL_SAMLING -> ValgbareStønadstyperForJournalpost(Stønadstype.REISE_TIL_SAMLING_TSO)
 
             Skjematype.DAGLIG_REISE_KJØRELISTE ->
                 error("Skal ikke behandle kjøreliste")

@@ -19,4 +19,6 @@ enum class Toggle(
     OPPRETT_OPPGAVE_TILBAKEKREVING("sak.opprett-oppgave-tilbakekreving"),
 
     KAN_BEHANDLE_PRIVAT_BIL("sak.daglig-reise-privat-bil"),
+
+    SØKNAD_ROUTING_REISE_TIL_SAMLING("sak.soknad-routing.reise-til-samling"),
 }

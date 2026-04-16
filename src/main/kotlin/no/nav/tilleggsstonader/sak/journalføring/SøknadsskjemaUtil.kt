@@ -38,6 +38,7 @@ object SøknadsskjemaUtil {
             Stønadstype.BOUTGIFTER -> håndterBoutgifter(data, mottattTidspunkt)
             Stønadstype.DAGLIG_REISE_TSO -> håndterDagligReise(data, mottattTidspunkt)
             Stønadstype.DAGLIG_REISE_TSR -> håndterDagligReise(data, mottattTidspunkt)
+            Stønadstype.REISE_TIL_SAMLING_TSO -> TODO()
         }
 
     private fun håndterBoutgifter(

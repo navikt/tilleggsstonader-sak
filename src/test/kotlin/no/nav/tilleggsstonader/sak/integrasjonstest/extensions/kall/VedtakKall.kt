@@ -140,6 +140,7 @@ private fun Stønadstype.tilPath(): String =
         Stønadstype.BOUTGIFTER -> "boutgifter"
         Stønadstype.DAGLIG_REISE_TSO -> "daglig-reise"
         Stønadstype.DAGLIG_REISE_TSR -> "daglig-reise"
+        Stønadstype.REISE_TIL_SAMLING_TSO -> "reise-til-samling"
     }
 
 private fun Enhet.tilPath(): String =

@@ -39,6 +39,7 @@ fun vilkårsreglerForStønad(stønadstype: Stønadstype): List<Vilkårsregel> =
 
         Stønadstype.DAGLIG_REISE_TSO -> listOf(DagligReiseRegel())
         Stønadstype.DAGLIG_REISE_TSR -> listOf(DagligReiseRegel())
+        Stønadstype.REISE_TIL_SAMLING_TSO -> TODO("lage regler for reise til samling")
     }
 
 private val vilkårstyperPerStønad: Map<Stønadstype, Set<VilkårType>> =

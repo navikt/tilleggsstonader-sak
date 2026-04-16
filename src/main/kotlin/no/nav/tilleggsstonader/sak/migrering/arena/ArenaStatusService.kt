@@ -71,6 +71,7 @@ class ArenaStatusService(
             Stønadstype.BOUTGIFTER -> true
             Stønadstype.DAGLIG_REISE_TSO -> false
             Stønadstype.DAGLIG_REISE_TSR -> false
+            Stønadstype.REISE_TIL_SAMLING_TSO -> false
         }
 
     private fun harBehandlingSomIkkeErHenlagt(fagsak: Fagsak): Boolean {

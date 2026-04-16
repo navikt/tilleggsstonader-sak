@@ -15,6 +15,8 @@ object YtelserUtil {
                     TypeYtelsePeriode.ENSLIG_FORSØRGER,
                     TypeYtelsePeriode.OMSTILLINGSSTØNAD,
                 )
+            Stønadstype.REISE_TIL_SAMLING_TSO,
+            -> TODO("hvilke ytelser er relevant for reise til samlingsTSO?")
 
             Stønadstype.DAGLIG_REISE_TSO,
             Stønadstype.DAGLIG_REISE_TSR,

@@ -56,6 +56,7 @@ class ForeslåVedtaksperiodeService(
             Stønadstype.BOUTGIFTER -> true
             Stønadstype.DAGLIG_REISE_TSO -> true
             Stønadstype.DAGLIG_REISE_TSR -> true
+            Stønadstype.REISE_TIL_SAMLING_TSO -> true
         }
 
     private fun Stønadstype.skalVedtaksperioderTaHøydeForTypeAktivitet(): Boolean =
@@ -66,6 +67,7 @@ class ForeslåVedtaksperiodeService(
             Stønadstype.LÆREMIDLER,
             Stønadstype.BOUTGIFTER,
             Stønadstype.DAGLIG_REISE_TSO,
+            Stønadstype.REISE_TIL_SAMLING_TSO,
             -> false
         }
 }

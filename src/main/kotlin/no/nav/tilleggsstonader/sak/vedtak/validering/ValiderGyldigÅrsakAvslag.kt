@@ -102,4 +102,5 @@ fun Stønadstype.visningsnavnStønadsvilkår() =
         Stønadstype.DAGLIG_REISE_TSO -> "daglige reiser"
         Stønadstype.DAGLIG_REISE_TSR -> "daglige reiser"
         Stønadstype.LÆREMIDLER -> error("læremidler har ikke stønadsvilkår")
+        Stønadstype.REISE_TIL_SAMLING_TSO -> "reise til samling"
     }
