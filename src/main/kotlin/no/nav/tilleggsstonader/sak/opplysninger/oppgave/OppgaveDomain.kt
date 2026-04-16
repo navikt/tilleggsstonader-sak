@@ -40,6 +40,7 @@ data class OppgaveDomain(
                 Oppgavetype.BehandleSak,
                 Oppgavetype.BehandleUnderkjentVedtak,
                 Oppgavetype.GodkjenneVedtak,
+                Oppgavetype.BehandleKjøreliste,
             )
 
     fun erTilbakekrevingsoppgave() = tilbakekrevingBehandlingId != null

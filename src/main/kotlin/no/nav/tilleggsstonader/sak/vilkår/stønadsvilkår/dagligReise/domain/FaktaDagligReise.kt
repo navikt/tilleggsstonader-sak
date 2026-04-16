@@ -138,35 +138,11 @@ data class FaktaPrivatBil(
 
     init {
         validerIngenNegativReiseavstand()
-        validerDelperioder()
     }
 
     private fun validerIngenNegativReiseavstand() {
         brukerfeilHvis(reiseavstandEnVei <= BigDecimal.ZERO) {
             "Reiseavstanden må være større enn 0"
-        }
-    }
-
-    private fun validerDelperioder() {
-        brukerfeilHvis(faktaDelperioder.isEmpty()) {
-            "Minst én reiseperiode må være satt"
-        }
-        faktaDelperioder.forEach { periode ->
-            brukerfeilHvis(periode.reisedagerPerUke <= 0) {
-                "Reisedager per uke må være større enn 0"
-            }
-            brukerfeilHvis(periode.reisedagerPerUke > 7) {
-                "Reisedager per uke kan ikke være mer enn 7"
-            }
-            brukerfeilHvis(periode.bompengerPerDag != null && periode.bompengerPerDag < 0) {
-                "Bompengeprisen må være større enn 0"
-            }
-            brukerfeilHvis(periode.fergekostnadPerDag != null && periode.fergekostnadPerDag < 0) {
-                "Fergekostnaden må være større enn 0"
-            }
-            brukerfeilHvis(periode.fom.isAfter(periode.tom)) {
-                "Periode: tom kan ikke være før fom"
-            }
         }
     }
 

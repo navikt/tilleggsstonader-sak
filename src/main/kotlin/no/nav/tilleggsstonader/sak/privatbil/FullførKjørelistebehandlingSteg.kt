@@ -42,7 +42,7 @@ class FullførKjørelistebehandlingSteg(
     }
 
     private fun ferdigstillOppgave(saksbehandling: Saksbehandling): Long? {
-        val oppgavetype = Oppgavetype.BehandleSak
+        val oppgavetype = Oppgavetype.BehandleKjøreliste
         return oppgaveService.hentOppgaveDomainSomIkkeErFerdigstilt(saksbehandling.id, oppgavetype)?.let {
             taskService.save(
                 FerdigstillOppgaveTask.opprettTask(

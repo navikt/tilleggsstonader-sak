@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -53,7 +52,7 @@ class DagligReiseVedtakService(
                         beregningsplan = beregningsplan,
                     ),
                 gitVersjon = Applikasjonsversjon.versjon,
-                tidligsteEndring = if (beregningsplan.omfang == Beregningsomfang.FRA_DATO) beregningsplan.fraDato else null,
+                tidligsteEndring = beregningsplan.legacyTidligsteEndring(),
             ),
         )
     }

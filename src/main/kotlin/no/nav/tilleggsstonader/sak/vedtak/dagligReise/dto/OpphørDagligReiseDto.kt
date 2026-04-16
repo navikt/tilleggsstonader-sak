@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import java.time.LocalDate
 
 data class OpphørDagligReiseResponse(
-    val beregningsresultat: BeregningsresultatDagligReiseDto,
     val årsakerOpphør: List<ÅrsakOpphør>,
     val begrunnelse: String,
     val vedtaksperioder: List<LagretVedtaksperiodeDto>?,

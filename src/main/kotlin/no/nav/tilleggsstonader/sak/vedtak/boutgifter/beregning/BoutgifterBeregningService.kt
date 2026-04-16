@@ -54,7 +54,7 @@ class BoutgifterBeregningService(
         plan: Beregningsplan,
         typeVedtak: TypeVedtak,
     ): BeregningsresultatBoutgifter {
-        val forrigeVedtak = hentForrigeVedtak(behandling)
+        val forrigeVedtak = hentForrigeIverksatteVedtak(behandling)
 
         if (plan.omfang == Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT) {
             return requireNotNull(forrigeVedtak) {
@@ -149,7 +149,7 @@ class BoutgifterBeregningService(
         return BeregningsresultatBoutgifter(perioderFraForrigeVedtakSomSkalBeholdes + reberegnedePerioder)
     }
 
-    private fun hentForrigeVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørBoutgifter? =
+    private fun hentForrigeIverksatteVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørBoutgifter? =
         behandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it) }?.data
 
     private fun hentVedtak(behandlingId: BehandlingId) =

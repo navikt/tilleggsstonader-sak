@@ -48,7 +48,7 @@ class LæremidlerBeregningService(
         typeVedtak: TypeVedtak,
     ): BeregningsresultatLæremidler {
         if (plan.omfang == Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT) {
-            val forrigeVedtak = requireNotNull(hentForrigeVedtak(behandling))
+            val forrigeVedtak = requireNotNull(hentForrigeIverksatteVedtak(behandling))
             return forrigeVedtak.beregningsresultat
         }
 
@@ -59,7 +59,7 @@ class LæremidlerBeregningService(
         )
 
         val vedtaksperioderBeregningsgrunnlag = vedtaksperioder.tilBeregningsgrunnlag()
-        val forrigeVedtak = hentForrigeVedtak(behandling)
+        val forrigeVedtak = hentForrigeIverksatteVedtak(behandling)
 
         val beregningsresultatForMåned = beregn(behandling, vedtaksperioderBeregningsgrunnlag)
 
@@ -212,7 +212,7 @@ class LæremidlerBeregningService(
             }
     }
 
-    private fun hentForrigeVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørLæremidler? =
+    private fun hentForrigeIverksatteVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørLæremidler? =
         behandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it) }?.data
 
     private fun hentVedtak(behandlingId: BehandlingId) =

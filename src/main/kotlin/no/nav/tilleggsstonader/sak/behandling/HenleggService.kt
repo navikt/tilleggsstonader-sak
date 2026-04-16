@@ -48,5 +48,10 @@ class HenleggService(
             endretAvEnhetsnr = endretAvEnhetsnr,
             Oppgavetype.BehandleUnderkjentVedtak,
         )
+        oppgaveService.ferdigstillOppgaveOgsåHvisFeilregistrert(
+            behandlingId = behandling.id,
+            endretAvEnhetsnr = endretAvEnhetsnr,
+            Oppgavetype.BehandleKjøreliste,
+        )
     }
 }

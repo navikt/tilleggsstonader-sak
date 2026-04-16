@@ -76,6 +76,18 @@ val id = BehandlingId.random()
 val id = BehandlingId.fromString(uuidString)
 ```
 
+### Dato-notasjon
+
+I ny Kotlin-kode og nye tester skal datoer alltid skrives med infix-funksjonene fra `no.nav.tilleggsstonader.libs.utils.dato`, med fulle månedsnavn:
+
+```kotlin
+import no.nav.tilleggsstonader.libs.utils.dato.januar
+
+val fom = 1 januar 2026
+```
+
+Bruk ikke `LocalDate.of(2026, 1, 1)` når infix-notasjonen kan brukes.
+
 ### Feilhåndtering
 
 Bruk hjelpefunksjonene fra `infrastruktur/exception/Feil.kt`:

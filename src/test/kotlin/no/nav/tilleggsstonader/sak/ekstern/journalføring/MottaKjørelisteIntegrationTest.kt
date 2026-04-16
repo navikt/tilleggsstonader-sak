@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.ekstern.journalføring
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.søknad.KjørelisteSkjema
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.IntegrationTest
@@ -74,7 +75,9 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
 
         val behandlingerPåFagsak = behandlingRepository.findByFagsakId(saksbehandling.fagsakId)
         val kjørelisteBehandling = behandlingerPåFagsak.single { it.årsak == BehandlingÅrsak.KJØRELISTE }
-        assertThat(oppgaveRepository.findByBehandlingId(kjørelisteBehandling.id)).hasSize(1)
+        val oppgaver = oppgaveRepository.findByBehandlingId(kjørelisteBehandling.id)
+        assertThat(oppgaver).hasSize(1)
+        assertThat(oppgaver.single().type).isEqualTo(Oppgavetype.BehandleKjøreliste)
     }
 
     private fun assertLagretKjørelisteInneholderDager(

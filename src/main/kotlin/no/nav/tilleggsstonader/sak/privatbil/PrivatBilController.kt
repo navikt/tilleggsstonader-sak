@@ -194,7 +194,7 @@ data class UkeVurderingDto(
     val avvik: AvvikUke?,
     val behandletDato: LocalDate?,
     val kjørelisteInnsendtDato: LocalDate?, // null hvis kjøreliste ikke er mottatt
-    val kjørelisteId: UUID?, // null hvis kjøreliste ikke er mottatt
+    val kjørelisteId: KjørelisteId?, // null hvis kjøreliste ikke er mottatt
     val avklartUkeId: UUID?,
     val dager: List<DagDto>,
 )

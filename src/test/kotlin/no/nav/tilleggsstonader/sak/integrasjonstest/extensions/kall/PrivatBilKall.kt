@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingPrivatBilDto
 import no.nav.tilleggsstonader.sak.privatbil.UkeVurderingDto
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagRequest
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.PrivatBilOppsummertBeregningDto
 import java.util.UUID
 
 class PrivatBilKall(
@@ -23,6 +24,9 @@ class PrivatBilKall(
     ) = apiRespons.oppdaterUke(behandlingId, avklartUkeId, avklarteDager).expectOkWithBody<UkeVurderingDto>()
 
     fun fullførKjørelisteBehandling(behandlingId: BehandlingId) = apiRespons.fullførKjørelisteBehandling(behandlingId).expectStatus().isOk
+
+    fun hentOppsummertBeregning(behandlingId: BehandlingId) =
+        apiRespons.hentOppsummertBeregning(behandlingId).expectOkWithBody<PrivatBilOppsummertBeregningDto>()
 
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = PrivatBilApi()
@@ -64,6 +68,15 @@ class PrivatBilKall(
                 restTestClient
                     .post()
                     .uri("/api/behandling/$behandlingId/fullfør-kjørelistebehandling")
+                    .medOnBehalfOfToken()
+                    .exchange()
+            }
+
+        fun hentOppsummertBeregning(behandlingId: BehandlingId) =
+            with(testklient.testkontekst) {
+                restTestClient
+                    .get()
+                    .uri("/api/vedtak/daglig-reise/$behandlingId/privat-bil/oppsummer-beregning")
                     .medOnBehalfOfToken()
                     .exchange()
             }

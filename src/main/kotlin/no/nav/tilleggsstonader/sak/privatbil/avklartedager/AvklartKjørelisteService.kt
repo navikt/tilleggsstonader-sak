@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
+import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
@@ -112,7 +113,7 @@ class AvklartKjørelisteService(
 
     private fun utledAvklartUke(
         behandlingId: BehandlingId,
-        kjørelisteId: UUID,
+        kjørelisteId: KjørelisteId,
         ukeIÅr: UkeIÅr,
         reisedager: List<KjørelisteDag>,
         rammevedtak: RammeForReiseMedPrivatBil,

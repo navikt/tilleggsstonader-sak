@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
+import java.math.BigDecimal
 import java.time.LocalDate
 
 @BehandlingTestdataDslMarker
@@ -68,7 +69,7 @@ class BehandlingTestdataDsl internal constructor() {
     fun defaultDagligReisePrivatBilTsoTestdata(
         fom: LocalDate = defaultFom,
         tom: LocalDate = defaultTom,
-        antallReisedager: Int = 5,
+        reiseavstandEnVei: BigDecimal = 10.toBigDecimal(),
         delperioder: List<FaktaDelperiodePrivatBilDto> =
             listOf(
                 FaktaDelperiodePrivatBilDto(
@@ -93,7 +94,7 @@ class BehandlingTestdataDsl internal constructor() {
         }
         vilkår {
             opprett {
-                privatBil(fom, tom, delperioder = delperioder, hentAktivitetId = hentAktivitetId)
+                privatBil(fom, tom, delperioder = delperioder, hentAktivitetId = hentAktivitetId, reiseavstandEnVei = reiseavstandEnVei)
             }
         }
     }

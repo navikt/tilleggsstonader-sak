@@ -23,7 +23,7 @@ class OffentligTransportBeregningRevurderingService(
         beregnFra: LocalDate?,
     ): BeregningsresultatOffentligTransport {
         val forrigeIverksatte =
-            hentForrigeVedtak(behandling)?.beregningsresultat?.offentligTransport ?: return nyttBeregningsresultat
+            hentForrigeIverksatteVedtak(behandling)?.beregningsresultat?.offentligTransport ?: return nyttBeregningsresultat
 
         brukerfeilHvis(beregnFra == null) { "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen" }
 
@@ -76,7 +76,7 @@ class OffentligTransportBeregningRevurderingService(
         )
     }
 
-    private fun hentForrigeVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørDagligReise? =
+    private fun hentForrigeIverksatteVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørDagligReise? =
         behandling.forrigeIverksatteBehandlingId
             ?.let {
                 vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(it)
