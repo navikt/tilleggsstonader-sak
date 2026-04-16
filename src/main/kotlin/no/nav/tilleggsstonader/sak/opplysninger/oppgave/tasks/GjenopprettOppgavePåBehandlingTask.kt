@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
@@ -79,10 +80,14 @@ class GjenopprettOppgavePåBehandlingTask(
         )
     }
 
-    private fun finnOppgavetype(behandling: Behandling) =
-        when (behandling.status) {
-            BehandlingStatus.FATTER_VEDTAK -> Oppgavetype.GodkjenneVedtak
-            else -> Oppgavetype.BehandleSak
+    private fun finnOppgavetype(behandling: Behandling): Oppgavetype =
+        if (behandling.type == BehandlingType.KJØRELISTE) {
+            Oppgavetype.BehandleKjøreliste
+        } else {
+            when (behandling.status) {
+                BehandlingStatus.FATTER_VEDTAK -> Oppgavetype.GodkjenneVedtak
+                else -> Oppgavetype.BehandleSak
+            }
         }
 
     companion object {

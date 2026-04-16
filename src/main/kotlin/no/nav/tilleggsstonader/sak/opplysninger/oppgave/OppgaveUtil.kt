@@ -27,6 +27,7 @@ object OppgaveUtil {
             Oppgavetype.BehandleSak,
             Oppgavetype.BehandleUnderkjentVedtak,
             Oppgavetype.GodkjenneVedtak,
+            Oppgavetype.BehandleKjøreliste,
             -> "tilleggsstonader-sak"
 
             Oppgavetype.VurderLivshendelse -> null
@@ -40,6 +41,7 @@ object OppgaveUtil {
             Oppgavetype.BehandleSak,
             Oppgavetype.BehandleUnderkjentVedtak,
             Oppgavetype.GodkjenneVedtak,
+            Oppgavetype.BehandleKjøreliste,
             -> true
 
             Oppgavetype.VurderLivshendelse -> false
@@ -57,16 +59,12 @@ object OppgaveUtil {
         oppgavetype: Oppgavetype,
     ): Boolean {
         return when (oppgavetype) {
-            Oppgavetype.BehandleSak -> {
+            Oppgavetype.BehandleSak, Oppgavetype.BehandleUnderkjentVedtak, Oppgavetype.BehandleKjøreliste -> {
                 saksbehandling.status.behandlingErLåstForVidereRedigering()
             }
 
             Oppgavetype.GodkjenneVedtak -> {
                 saksbehandling.status != BehandlingStatus.FATTER_VEDTAK
-            }
-
-            Oppgavetype.BehandleUnderkjentVedtak -> {
-                saksbehandling.status.behandlingErLåstForVidereRedigering()
             }
 
             else -> {
