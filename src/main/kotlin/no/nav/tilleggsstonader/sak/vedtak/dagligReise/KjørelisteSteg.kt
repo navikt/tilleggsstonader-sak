@@ -34,12 +34,6 @@ class KjørelisteSteg(
         saksbehandling: Saksbehandling,
         data: Void?,
     ) {
-        behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(
-            behandlingId = saksbehandling.id,
-            behandlingSteg = saksbehandling.steg,
-            behandlingStatus = saksbehandling.status,
-        )
-
         val brukersNavKontor =
             if (saksbehandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
                 arbeidsfordelingService.hentBrukersNavKontor(saksbehandling.ident, saksbehandling.stønadstype)

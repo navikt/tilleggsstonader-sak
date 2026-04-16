@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentRequest
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.OppdaterJournalpostResponse
 import no.nav.tilleggsstonader.kontrakter.felles.BrukerIdType
@@ -50,7 +51,10 @@ class JournalpostClientMockConfig {
                     any(),
                     any(),
                 )
-            } returns ArkiverDokumentResponse(journalpostId = "journalpostId", ferdigstilt = true)
+            } answers {
+                opprettedeJournalposter.add(firstArg())
+                ArkiverDokumentResponse(journalpostId = "journalpostId", ferdigstilt = true)
+            }
             every { journalpostClient.hentDokument(any(), any(), eq(Dokumentvariantformat.ARKIV)) } returns dummyPdf
             every { journalpostClient.oppdaterJournalpost(any(), any(), any()) } answers {
                 val journalpostId = secondArg<String>()
@@ -159,6 +163,7 @@ class JournalpostClientMockConfig {
         }
 
         val journalposter = mutableMapOf<Long, Journalpost>()
+        val opprettedeJournalposter = mutableListOf<ArkiverDokumentRequest>()
 
         const val JOURNALPOST_ID_MED_FEIL = "journalpostIdMedFeil"
 
@@ -187,6 +192,7 @@ class JournalpostClientMockConfig {
 
         private fun resetJournalposter() {
             journalposter.clear()
+            opprettedeJournalposter.clear()
             journalposter[journalpost.journalpostId.toLong()] = journalpost
         }
 
