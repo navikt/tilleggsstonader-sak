@@ -69,7 +69,7 @@ class AvklartKjørelisteService(
 
         validerOppdatertAvklartKjørtUke(
             oppdaterteDager = oppdaterteDager,
-            ukeSomSkalOppdateres = eksisterendeUke.fom.tilUkeIÅr(),
+            ukeSomSkalOppdateres = eksisterendeUke.uke,
             rammevedtak = rammevedtak,
             innsendteKjørelisteDager = innsendteKjørelisteDager,
         )
