@@ -4,6 +4,7 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
@@ -18,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
@@ -106,6 +108,24 @@ class DagligReiseVedtakController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseDagligReiseTsrRequest,
     ): BeregningDagligReiseDto = beregnVedtak(behandlingId, vedtak.vedtaksperioder())
+
+    @GetMapping("{behandlingId}/privat-bil/oppsummer-beregning")
+    fun hentOppsummertBeregning(
+        @PathVariable behandlingId: BehandlingId,
+    ): PrivatBilOppsummertBeregningDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
+
+        val vedtaksdata = vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandlingId).data
+        val beregningsresultatPrivatBil = vedtaksdata.beregningsresultat.privatBil
+        val rammevedtak = vedtaksdata.rammevedtakPrivatBil
+
+        feilHvis(beregningsresultatPrivatBil == null || rammevedtak == null) {
+            "Det finnes ingen beregningsresultat for privat bil eller rammevedtak for privat bil for behandling $behandlingId"
+        }
+
+        return oppsummerBeregningPrivatBil(beregningsresultatPrivatBil, rammevedtak)
+    }
 
     private fun beregnVedtak(
         behandlingId: BehandlingId,

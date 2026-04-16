@@ -1,14 +1,22 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
+import io.mockk.every
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.desember
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkEmpty
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -30,6 +38,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
@@ -40,6 +49,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.math.BigDecimal
 import java.time.LocalDate
 
 class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
@@ -191,4 +201,160 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
             assertThat(lagretDto.type).isEqualTo(TypeVedtak.AVSLAG)
         }
     }
+
+    @Nested
+    inner class BeregningOppsummering {
+        val fom = 29 desember 2025
+        val tom = 18 januar 2026
+
+        val delperioder =
+            listOf(
+                FaktaDelperiodePrivatBilDto(
+                    fom = fom,
+                    tom = 4 januar 2026,
+                    reisedagerPerUke = 2,
+                    bompengerPerDag = 50,
+                    fergekostnadPerDag = null,
+                ),
+                FaktaDelperiodePrivatBilDto(
+                    fom = 5 januar 2026,
+                    tom = 11 januar 2026,
+                    reisedagerPerUke = 3,
+                    bompengerPerDag = 50,
+                    fergekostnadPerDag = null,
+                ),
+                FaktaDelperiodePrivatBilDto(
+                    fom = 12 januar 2026,
+                    tom = 18 januar 2026,
+                    reisedagerPerUke = 3,
+                    bompengerPerDag = null,
+                    fergekostnadPerDag = 100,
+                ),
+            )
+
+        val innsendteKjørteDager =
+            listOf(
+                29 desember 2025 to 50,
+                1 januar 2026 to 100,
+                5 januar 2026 to null,
+                6 januar 2026 to null,
+                12 januar 2026 to null,
+                13 januar 2026 to 60,
+                14 januar 2026 to null,
+            )
+
+        @Test
+        fun `skal oppsummere rammevedtak og beregningsresultat for privat bil i kjørelistebehandling`() {
+            every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
+
+            val førstegangsBehandlingContext =
+                opprettBehandlingOgGjennomførBehandlingsløp(
+                    stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+                ) {
+                    defaultDagligReisePrivatBilTsoTestdata(
+                        fom,
+                        tom,
+                        reiseavstandEnVei = 10.toBigDecimal(),
+                        delperioder = delperioder,
+                    )
+
+                    sendInnKjøreliste {
+                        periode = Datoperiode(fom, tom)
+                        kjørteDager = innsendteKjørteDager
+                    }
+                }
+
+            val førstegangsBehandling = testoppsettService.hentBehandling(førstegangsBehandlingContext.behandlingId)
+
+            val kjørelisteBehandling =
+                testoppsettService
+                    .hentBehandlinger(førstegangsBehandling.fagsakId)
+                    .single { it.type == BehandlingType.KJØRELISTE }
+
+            gjennomførKjørelisteBehandling(kjørelisteBehandling, tilSteg = StegType.BEREGNING)
+
+            val oppsummertBeregning = kall.privatBil.hentOppsummertBeregning(kjørelisteBehandling.id)
+
+            assertThat(oppsummertBeregning.reiser).hasSize(1)
+
+            val oppsummertReise = oppsummertBeregning.reiser.single()
+            assertThat(oppsummertReise.reiseavstandEnVei).isEqualTo(10.toBigDecimal())
+            assertThat(oppsummertReise.perioder).hasSize(3)
+
+            validerOppsummertUke(
+                oppsummertUke = oppsummertReise.perioder[0],
+                forventetUke =
+                    ForventetOppsummertUke(
+                        fom = fom,
+                        tom = 4 januar 2026,
+                        antallGodkjenteReisedager = 2,
+                        bompengerPerDag = 50,
+                        fergekostnadPerDag = null,
+                        satserSize = 2,
+                        totalParkeringskostnad = 150,
+                        ukenummer = 1,
+                        stønadsbeløp = BigDecimal("366.40"),
+                    ),
+            )
+
+            validerOppsummertUke(
+                oppsummertUke = oppsummertReise.perioder[1],
+                forventetUke =
+                    ForventetOppsummertUke(
+                        fom = 5 januar 2026,
+                        tom = 11 januar 2026,
+                        antallGodkjenteReisedager = 2,
+                        bompengerPerDag = 50,
+                        fergekostnadPerDag = null,
+                        satserSize = 1,
+                        totalParkeringskostnad = 0,
+                        ukenummer = 2,
+                        stønadsbeløp = BigDecimal("217.60"),
+                    ),
+            )
+
+            validerOppsummertUke(
+                oppsummertUke = oppsummertReise.perioder[2],
+                forventetUke =
+                    ForventetOppsummertUke(
+                        fom = 12 januar 2026,
+                        tom = tom,
+                        antallGodkjenteReisedager = 3,
+                        bompengerPerDag = null,
+                        fergekostnadPerDag = 100,
+                        satserSize = 1,
+                        totalParkeringskostnad = 60,
+                        ukenummer = 3,
+                        stønadsbeløp = BigDecimal("536.40"),
+                    ),
+            )
+        }
+
+        private fun validerOppsummertUke(
+            oppsummertUke: OppsummertBeregningForPeriodeDto,
+            forventetUke: ForventetOppsummertUke,
+        ) {
+            assertThat(oppsummertUke.fom).isEqualTo(forventetUke.fom)
+            assertThat(oppsummertUke.tom).isEqualTo(forventetUke.tom)
+            assertThat(oppsummertUke.antallGodkjenteReisedager).isEqualTo(forventetUke.antallGodkjenteReisedager)
+            assertThat(oppsummertUke.bompengerPerDag).isEqualTo(forventetUke.bompengerPerDag)
+            assertThat(oppsummertUke.fergekostnadPerDag).isEqualTo(forventetUke.fergekostnadPerDag)
+            assertThat(oppsummertUke.satser).hasSize(forventetUke.satserSize)
+            assertThat(oppsummertUke.totalParkeringskostnad).isEqualTo(forventetUke.totalParkeringskostnad)
+            assertThat(oppsummertUke.ukenummer).isEqualTo(forventetUke.ukenummer)
+            assertThat(oppsummertUke.stønadsbeløp).isEqualTo(forventetUke.stønadsbeløp)
+        }
+    }
+
+    data class ForventetOppsummertUke(
+        val fom: LocalDate,
+        val tom: LocalDate,
+        val antallGodkjenteReisedager: Int,
+        val bompengerPerDag: Int?,
+        val fergekostnadPerDag: Int?,
+        val satserSize: Int,
+        val totalParkeringskostnad: Int,
+        val ukenummer: Int,
+        val stønadsbeløp: BigDecimal,
+    )
 }
