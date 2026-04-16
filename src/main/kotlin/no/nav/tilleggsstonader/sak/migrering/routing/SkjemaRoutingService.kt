@@ -112,10 +112,11 @@ class SkjemaRoutingService(
         ident: String,
         skjematype: Skjematype,
     ): Boolean {
+        val personIdenter = personService.hentFolkeregisterIdenter(ident).identer()
         val harVedtakMedPrivatBil =
             skjematype
                 .tilStønadstyper()
-                .mapNotNull { fagsakService.finnFagsak(personIdenter = setOf(ident), stønadstype = it) }
+                .mapNotNull { fagsakService.finnFagsak(personIdenter = personIdenter, stønadstype = it) }
                 .flatMap { behandlingService.hentBehandlinger(fagsakId = it.id) }
                 .mapNotNull { vedtakService.hentVedtak(it.id) }
                 .any { (it.data as? InnvilgelseEllerOpphørDagligReise)?.rammevedtakPrivatBil != null }
