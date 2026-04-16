@@ -16,7 +16,10 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.UnleashUtil.getVariantW
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
+import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -30,6 +33,7 @@ class SkjemaRoutingService(
     private val ytelseService: YtelseService,
     private val personService: PersonService,
     private val advisoryLockService: AdvisoryLockService,
+    private val vedtakService: VedtakService,
 ) {
     private fun harLagretRouting(
         ident: String,
@@ -51,6 +55,10 @@ class SkjemaRoutingService(
 
                 is RoutingStrategi.SendEnkelteBrukereTilNyLøsning -> {
                     skalBrukerRoutesTilNyLøsning(ident, skjematype, routingStrategi)
+                }
+
+                RoutingStrategi.KjørelisteRouting -> {
+                    skalBrukerRoutesTilNyKjørelisteLøsning(ident, skjematype)
                 }
             }.also { loggRoutingResultatet(skjematype, it) }
         }
@@ -84,6 +92,38 @@ class SkjemaRoutingService(
 
         lagreRouting(ident, skjematype, mapOf("skalTilNyLøsning" to true))
         return true
+    }
+
+    private fun skalBrukerRoutesTilNyKjørelisteLøsning(
+        ident: String,
+        skjematype: Skjematype,
+    ): Boolean {
+        if (harLagretRouting(ident, skjematype)) {
+            logger.info("routing - skjematype=$skjematype harLagretRouting=true")
+            return true
+        }
+        if (harVedtakMedPrivatBil(ident, skjematype)) {
+            lagreRouting(ident, skjematype, mapOf("harVedtakMedPrivatBil" to true))
+            return true
+        }
+        return false
+    }
+
+    private fun harVedtakMedPrivatBil(
+        ident: String,
+        skjematype: Skjematype,
+    ): Boolean {
+        val personIdenter = personService.hentFolkeregisterIdenter(ident).identer()
+        val harVedtakMedPrivatBil =
+            skjematype
+                .tilStønadstyper()
+                .mapNotNull { fagsakService.finnFagsak(personIdenter = personIdenter, stønadstype = it) }
+                .flatMap { behandlingService.hentBehandlinger(fagsakId = it.id) }
+                .mapNotNull { vedtakService.hentVedtak(it.id) }
+                .any { (it.data as? InnvilgelseEllerOpphørDagligReise)?.rammevedtakPrivatBil != null }
+
+        logger.info("routing - skjematype=$skjematype harVedtakMedPrivatBil=$harVedtakMedPrivatBil")
+        return harVedtakMedPrivatBil
     }
 
     private fun harFortroligEllerStrengtFortroligAdresse(ident: String): Boolean =
