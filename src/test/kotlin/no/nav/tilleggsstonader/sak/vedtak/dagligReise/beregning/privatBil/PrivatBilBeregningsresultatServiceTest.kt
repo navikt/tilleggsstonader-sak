@@ -591,7 +591,7 @@ class PrivatBilBeregningsresultatServiceTest {
                     reiseId = kjøreliste.data.reiseId,
                     fom = dager.minOf { it.dato },
                     tom = dager.maxOf { it.dato },
-                    ukenummer = uke.ukenummer,
+                    uke = uke,
                     status = UkeStatus.OK_AUTOMATISK,
                     behandletDato = LocalDate.now(),
                     dager =

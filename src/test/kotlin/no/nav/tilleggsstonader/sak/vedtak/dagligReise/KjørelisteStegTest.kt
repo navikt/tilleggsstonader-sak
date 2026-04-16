@@ -5,7 +5,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.libs.utils.dato.januar
-import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
+import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -106,7 +106,7 @@ class KjørelisteStegTest {
             reiseId = dummyReiseId,
             fom = fom,
             tom = tom,
-            ukenummer = fom.ukenummer(),
+            uke = fom.tilUkeIÅr(),
             status = status,
             dager = emptySet(),
         )

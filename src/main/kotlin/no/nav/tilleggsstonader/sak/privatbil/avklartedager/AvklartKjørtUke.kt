@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
@@ -25,7 +26,8 @@ data class AvklartKjørtUke(
     val reiseId: ReiseId,
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val ukenummer: Int,
+    @Column("uke")
+    val uke: UkeIÅr,
     val status: UkeStatus,
     val typeAvvik: TypeAvvikUke? = null,
     val behandletDato: LocalDate? = null,
@@ -37,7 +39,7 @@ data class AvklartKjørtUke(
     init {
         require(dager.all { inneholder(it.dato) }) { "Alle dager må være innenfor perioden til uken" }
         require(fom.ukenummer() == tom.ukenummer()) { "Fom og tom må være i samme uke" }
-        require(fom.ukenummer() == ukenummer) { "Ukenummer $ukenummer stemmer ikke med perioden" }
+        require(fom.ukenummer() == uke.ukenummer) { "Ukenummer $uke stemmer ikke med perioden" }
     }
 
     fun kopierTilNyBehandling(nyBehandlingId: BehandlingId): AvklartKjørtUke =

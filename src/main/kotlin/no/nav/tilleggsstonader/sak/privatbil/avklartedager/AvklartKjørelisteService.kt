@@ -137,7 +137,7 @@ class AvklartKjørelisteService(
             reiseId = rammevedtak.reiseId,
             fom = reisedager.minOf { it.dato },
             tom = reisedager.maxOf { it.dato },
-            ukenummer = ukeIÅr.ukenummer,
+            uke = ukeIÅr,
             // Trengs denne? Kan lages i visningslogikk
             // Rart at den er avhengig av både ukeavvik og dagavvik
             status = utledAutomatiskStatusForUke(avklarteDager, avvikUke),

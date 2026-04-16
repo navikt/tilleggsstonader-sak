@@ -96,14 +96,8 @@ class PrivatBilController(
         val oppdatertAvklartUke = avklartKjørelisteService.oppdaterAvklartUke(behandlingId, ukeId, avklarteDager)
         val kjøreliste = kjørelisteService.hentKjøreliste(oppdatertAvklartUke.kjørelisteId)
 
-        val uke =
-            UkeIÅr(
-                ukenummer = oppdatertAvklartUke.ukenummer,
-                år = oppdatertAvklartUke.fom.year,
-            )
-
         return lagUke(
-            uke = uke,
+            uke = oppdatertAvklartUke.uke,
             datoer = oppdatertAvklartUke.alleDatoer(),
             kjørelisteForUke = kjøreliste,
             avklartUke = oppdatertAvklartUke,
