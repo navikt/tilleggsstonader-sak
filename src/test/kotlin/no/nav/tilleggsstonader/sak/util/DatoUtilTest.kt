@@ -1,9 +1,13 @@
 package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.libs.utils.dato.februar
+import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -198,6 +202,98 @@ class DatoUtilTest {
                 assertThat(LocalDate.of(2024, 1, 29).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2024, 2, 28))
                 assertThat(LocalDate.of(2024, 1, 30).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2024, 2, 28))
                 assertThat(LocalDate.of(2024, 1, 31).sisteDagenILøpendeMåned()).isEqualTo(LocalDate.of(2024, 2, 28))
+            }
+        }
+
+        @Nested
+        inner class ValiderUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode {
+            @Test
+            fun `skal ikke kaste feil når delperioder er mandag til søndag`() {
+                val overordnetPeriode = Datoperiode(5 januar 2026, 1 februar 2026)
+                val delperioder =
+                    listOf(
+                        Datoperiode(5 januar 2026, 11 januar 2026),
+                        Datoperiode(12 januar 2026, 18 januar 2026),
+                        Datoperiode(19 januar 2026, 25 januar 2026),
+                        Datoperiode(26 januar 2026, 1 februar 2026),
+                    )
+
+                validerUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode(overordnetPeriode, delperioder)
+            }
+
+            @Test
+            fun `skal ikke kaste feil når delperiodene er ukentlige og sammenhengende`() {
+                val overordnetPeriode = Datoperiode(7 januar 2026, 29 januar 2026)
+                val delperioder =
+                    listOf(
+                        Datoperiode(7 januar 2026, 11 januar 2026),
+                        Datoperiode(12 januar 2026, 18 januar 2026),
+                        Datoperiode(19 januar 2026, 25 januar 2026),
+                        Datoperiode(26 januar 2026, 29 januar 2026),
+                    )
+
+                validerUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode(overordnetPeriode, delperioder)
+            }
+
+            @Test
+            fun `skal kaste feil ved overlappende delperioder`() {
+                val overordnetPeriode = Datoperiode(5 januar 2026, 18 januar 2026)
+                val delperioder =
+                    listOf(
+                        Datoperiode(5 januar 2026, 12 januar 2026),
+                        Datoperiode(12 januar 2026, 18 januar 2026),
+                    )
+
+                val feil =
+                    assertThrows<ApiFeil> {
+                        validerUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode(
+                            overordnetPeriode,
+                            delperioder,
+                        )
+                    }
+
+                assertThat(feil.message).contains("Delperioder kan ikke overlappe")
+            }
+
+            @Test
+            fun `skal kaste feil ved opphold mellom delperioder`() {
+                val overordnetPeriode = Datoperiode(5 januar 2026, 19 januar 2026)
+                val delperioder =
+                    listOf(
+                        Datoperiode(5 januar 2026, 11 januar 2026),
+                        Datoperiode(13 januar 2026, 19 januar 2026),
+                    )
+
+                val feil =
+                    assertThrows<ApiFeil> {
+                        validerUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode(
+                            overordnetPeriode,
+                            delperioder,
+                        )
+                    }
+
+                assertThat(feil.message).contains("Det er opphold mellom delperiodene")
+            }
+
+            @Test
+            fun `skal kaste feil når en mellomperiode ikke slutter på søndag`() {
+                val overordnetPeriode = Datoperiode(5 januar 2026, 25 januar 2026)
+                val delperioder =
+                    listOf(
+                        Datoperiode(5 januar 2026, 11 januar 2026),
+                        Datoperiode(12 januar 2026, 17 januar 2026),
+                        Datoperiode(18 januar 2026, 25 januar 2026),
+                    )
+
+                val feil =
+                    assertThrows<ApiFeil> {
+                        validerUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode(
+                            overordnetPeriode,
+                            delperioder,
+                        )
+                    }
+
+                assertThat(feil.message).contains("må slutte på en søndag")
             }
         }
     }

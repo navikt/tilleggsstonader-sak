@@ -776,7 +776,7 @@ object InterntVedtakTestdata {
                                         listOf(
                                             RammeForReiseMedPrivatBilDelperiode(
                                                 fom = LocalDate.of(2024, 1, 1),
-                                                tom = LocalDate.of(2024, 1, 10),
+                                                tom = LocalDate.of(2024, 1, 7),
                                                 reisedagerPerUke = 3,
                                                 ekstrakostnader =
                                                     RammeForReiseMedPrivatEkstrakostnader(
@@ -787,7 +787,7 @@ object InterntVedtakTestdata {
                                                     listOf(
                                                         RammeForReiseMedPrivatBilSatsForDelperiode(
                                                             fom = LocalDate.of(2024, 1, 1),
-                                                            tom = LocalDate.of(2024, 1, 10),
+                                                            tom = LocalDate.of(2024, 1, 7),
                                                             satsBekreftetVedVedtakstidspunkt = true,
                                                             kilometersats = BigDecimal.valueOf(3.50),
                                                             dagsatsUtenParkering = BigDecimal.valueOf(100.0),
@@ -795,7 +795,7 @@ object InterntVedtakTestdata {
                                                     ),
                                             ),
                                             RammeForReiseMedPrivatBilDelperiode(
-                                                fom = LocalDate.of(2024, 1, 11),
+                                                fom = LocalDate.of(2024, 1, 8),
                                                 tom = LocalDate.of(2024, 1, 31),
                                                 reisedagerPerUke = 5,
                                                 ekstrakostnader =
@@ -806,7 +806,7 @@ object InterntVedtakTestdata {
                                                 satser =
                                                     listOf(
                                                         RammeForReiseMedPrivatBilSatsForDelperiode(
-                                                            fom = LocalDate.of(2024, 1, 11),
+                                                            fom = LocalDate.of(2024, 1, 8),
                                                             tom = LocalDate.of(2024, 1, 31),
                                                             satsBekreftetVedVedtakstidspunkt = true,
                                                             kilometersats = BigDecimal.valueOf(3.50),

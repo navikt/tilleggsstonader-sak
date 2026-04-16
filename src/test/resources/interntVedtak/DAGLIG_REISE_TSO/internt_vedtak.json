@@ -373,7 +373,7 @@
         "tom" : "2024-01-31",
         "delperioder" : [ {
           "fom" : "2024-01-01",
-          "tom" : "2024-01-10",
+          "tom" : "2024-01-07",
           "ekstrakostnader" : {
             "bompengerPerDag" : 40,
             "fergekostnadPerDag" : 50
@@ -381,13 +381,13 @@
           "reisedagerPerUke" : 3,
           "satser" : [ {
             "fom" : "2024-01-01",
-            "tom" : "2024-01-10",
+            "tom" : "2024-01-07",
             "kilometersats" : 3.5,
             "dagsatsUtenParkering" : 100.0,
             "satsBekreftetVedVedtakstidspunkt" : true
           } ]
         }, {
-          "fom" : "2024-01-11",
+          "fom" : "2024-01-08",
           "tom" : "2024-01-31",
           "ekstrakostnader" : {
             "bompengerPerDag" : 40,
@@ -395,7 +395,7 @@
           },
           "reisedagerPerUke" : 5,
           "satser" : [ {
-            "fom" : "2024-01-11",
+            "fom" : "2024-01-08",
             "tom" : "2024-01-31",
             "kilometersats" : 3.5,
             "dagsatsUtenParkering" : 100.0,

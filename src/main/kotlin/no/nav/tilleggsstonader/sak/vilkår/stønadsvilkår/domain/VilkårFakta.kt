@@ -2,6 +2,8 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
@@ -46,12 +48,28 @@ data class FaktaDagligReisePrivatBil(
 ) : VilkårFakta
 
 data class FaktaDelperiodePrivatBil(
-    val fom: LocalDate,
-    val tom: LocalDate,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
     val reisedagerPerUke: Int,
     val bompengerPerDag: Int?,
     val fergekostnadPerDag: Int?,
-)
+) : Periode<LocalDate> {
+    init {
+        validatePeriode()
+        brukerfeilHvis(reisedagerPerUke <= 0) {
+            "Reisedager per uke må være større enn 0"
+        }
+        brukerfeilHvis(reisedagerPerUke > 7) {
+            "Reisedager per uke kan ikke være mer enn 7"
+        }
+        brukerfeilHvis(bompengerPerDag != null && bompengerPerDag < 0) {
+            "Bompengeprisen må være større enn 0"
+        }
+        brukerfeilHvis(fergekostnadPerDag != null && fergekostnadPerDag < 0) {
+            "Fergekostnaden må være større enn 0"
+        }
+    }
+}
 
 enum class TypeVilkårFakta {
     DAGLIG_REISE_OFFENTLIG_TRANSPORT,

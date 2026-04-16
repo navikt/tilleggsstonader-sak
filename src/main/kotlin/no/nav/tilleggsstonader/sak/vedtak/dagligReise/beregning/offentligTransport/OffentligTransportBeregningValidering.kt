@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -97,6 +98,7 @@ private fun finnesReiseHeleVedtaksperioden(
     val sammenslåtteReiser =
         vilkår
             .sorted()
+            .map { Datoperiode(it.fom, it.tom) }
             .mergeSammenhengende { p1, p2 -> p1.overlapperEllerPåfølgesAv(p2) }
 
     return vedtaksperioder.all { vedtaksperiode ->

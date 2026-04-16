@@ -193,13 +193,13 @@ class PrivatBilBeregningsresultatServiceTest {
     }
 
     @Test
-    fun `sendt inn kjøreliste for en uke som går over to år, blir to beregnede perioder med samme utbetalingsdato`() {
+    fun `sendt inn kjøreliste for en uke som går over to år, dager blir beregnet med forskjellig sats`() {
         val fomRammevedtak = 29 desember 2025 // Mandag
         val tomRammevedtak = 4 januar 2026
         val delperiode =
             RammeForReiseMedPrivatBilDelperiode(
                 fom = fomRammevedtak,
-                tom = 31 desember 2025,
+                tom = tomRammevedtak,
                 ekstrakostnader =
                     RammeForReiseMedPrivatEkstrakostnader(
                         bompengerPerDag = 40,
@@ -215,24 +215,14 @@ class PrivatBilBeregningsresultatServiceTest {
                             kilometersats = 2.94.toBigDecimal(),
                             dagsatsUtenParkering = 150.toBigDecimal(),
                         ),
-                    ),
-            )
-
-        val delperioder =
-            listOf(
-                delperiode,
-                delperiode.copy(
-                    fom = 1 januar 2026,
-                    tom = tomRammevedtak,
-                    satser =
-                        listOf(
-                            delperiode.satser.single().copy(
-                                fom = 1 januar 2026,
-                                tom = tomRammevedtak,
-                                dagsatsUtenParkering = 175.toBigDecimal(),
-                            ),
+                        RammeForReiseMedPrivatBilSatsForDelperiode(
+                            fom = 1 januar 2026,
+                            tom = tomRammevedtak,
+                            satsBekreftetVedVedtakstidspunkt = true,
+                            kilometersats = 2.99.toBigDecimal(),
+                            dagsatsUtenParkering = 160.toBigDecimal(),
                         ),
-                ),
+                    ),
             )
 
         val rammevedtakPrivatBil =
@@ -240,7 +230,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 reiseId = reiseId,
                 fom = fomRammevedtak,
                 tom = tomRammevedtak,
-                delperioder = delperioder,
+                delperioder = listOf(delperiode),
             )
 
         val kjøreliste =
@@ -267,23 +257,21 @@ class PrivatBilBeregningsresultatServiceTest {
 
         val beregningsresultatForReise = beregningsresultat.reiser.single()
         assertThat(beregningsresultatForReise.reiseId).isEqualTo(reiseId)
-        assertThat(beregningsresultatForReise.perioder).hasSize(2)
+        assertThat(beregningsresultatForReise.perioder).hasSize(1)
 
-        val beregningsresultatUke1 = beregningsresultatForReise.perioder[0]
-        assertThat(beregningsresultatUke1.stønadsbeløp).isEqualTo(
-            beregningsresultatUke1.grunnlag.dager
-                .single()
-                .dagsatsUtenParkering,
-        )
-        assertThat(beregningsresultatUke1.grunnlag.dager).hasSize(1)
+        val beregningsresultatUke = beregningsresultatForReise.perioder.single()
 
-        val beregningsresultatUke2 = beregningsresultatForReise.perioder[1]
-        assertThat(beregningsresultatUke2.stønadsbeløp).isEqualTo(
-            beregningsresultatUke2.grunnlag.dager
-                .single()
-                .dagsatsUtenParkering,
-        )
-        assertThat(beregningsresultatUke2.grunnlag.dager).hasSize(1).allMatch { it.parkeringskostnad == 0 }
+        val dagI2025 = beregningsresultatUke.grunnlag.dager.first { it.dato.year == 2025 }
+        val dagI2026 = beregningsresultatUke.grunnlag.dager.first { it.dato.year == 2026 }
+
+        assertThat(dagI2025.parkeringskostnad).isZero
+        assertThat(dagI2025.dagsatsUtenParkering).isEqualTo(dagI2025.stønadsbeløpForDag)
+        assertThat(dagI2026.parkeringskostnad).isZero
+        assertThat(dagI2026.dagsatsUtenParkering).isEqualTo(dagI2026.stønadsbeløpForDag)
+
+        assertThat(dagI2025.stønadsbeløpForDag).isNotEqualTo(dagI2026.stønadsbeløpForDag)
+
+        assertThat(beregningsresultatUke.stønadsbeløp).isEqualTo(beregningsresultatUke.grunnlag.dager.sumOf { it.stønadsbeløpForDag })
     }
 
     @Test
