@@ -42,14 +42,16 @@ private fun BeregningsresultatForReisePrivatBilPeriode.oppsummerPeriode(
             .filter { it.overlapper(this) }
             .map { it.tilDto() }
 
+    val antallGodkjenteReisedager = this.grunnlag.dager.count()
+
     return OppsummertBeregningForPeriodeDto(
         fom = this.fom,
         tom = this.tom,
-        antallGodkjenteReisedager = this.grunnlag.dager.count(),
-        bompengerPerDag = relevantDelperiode.ekstrakostnader.bompengerPerDag,
-        fergekostnadPerDag = relevantDelperiode.ekstrakostnader.fergekostnadPerDag,
+        antallGodkjenteReisedager = antallGodkjenteReisedager,
+        bompengerTotalt = relevantDelperiode.ekstrakostnader.bompengerPerDag?.times(antallGodkjenteReisedager),
+        fergekostnadTotalt = relevantDelperiode.ekstrakostnader.fergekostnadPerDag?.times(antallGodkjenteReisedager),
         satser = relevanteSatser,
-        totalParkeringskostnad = this.grunnlag.dager.sumOf { it.parkeringskostnad },
+        parkeringskostnadTotalt = this.grunnlag.dager.sumOf { it.parkeringskostnad },
         stønadsbeløp = this.stønadsbeløp,
     )
 }
@@ -71,10 +73,10 @@ data class OppsummertBeregningForPeriodeDto(
     val fom: LocalDate,
     val tom: LocalDate,
     val antallGodkjenteReisedager: Int,
-    val bompengerPerDag: Int?,
-    val fergekostnadPerDag: Int?,
+    val bompengerTotalt: Int?,
+    val fergekostnadTotalt: Int?,
     val satser: List<RammeForReiseMedPrivatBilDelperiodeSatserDto>,
-    val totalParkeringskostnad: Int,
+    val parkeringskostnadTotalt: Int,
     val stønadsbeløp: BigDecimal,
 ) {
     val ukenummer = fom.ukenummer()

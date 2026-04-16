@@ -288,8 +288,8 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                         fom = fom,
                         tom = 4 januar 2026,
                         antallGodkjenteReisedager = 2,
-                        bompengerPerDag = 50,
-                        fergekostnadPerDag = null,
+                        bompengerTotalt = 100,
+                        fergekostnadTotalt = null,
                         satserSize = 2,
                         totalParkeringskostnad = 150,
                         ukenummer = 1,
@@ -304,8 +304,8 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                         fom = 5 januar 2026,
                         tom = 11 januar 2026,
                         antallGodkjenteReisedager = 2,
-                        bompengerPerDag = 50,
-                        fergekostnadPerDag = null,
+                        bompengerTotalt = 100,
+                        fergekostnadTotalt = null,
                         satserSize = 1,
                         totalParkeringskostnad = 0,
                         ukenummer = 2,
@@ -320,8 +320,8 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                         fom = 12 januar 2026,
                         tom = tom,
                         antallGodkjenteReisedager = 3,
-                        bompengerPerDag = null,
-                        fergekostnadPerDag = 100,
+                        bompengerTotalt = null,
+                        fergekostnadTotalt = 300,
                         satserSize = 1,
                         totalParkeringskostnad = 60,
                         ukenummer = 3,
@@ -337,10 +337,10 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
             assertThat(oppsummertUke.fom).isEqualTo(forventetUke.fom)
             assertThat(oppsummertUke.tom).isEqualTo(forventetUke.tom)
             assertThat(oppsummertUke.antallGodkjenteReisedager).isEqualTo(forventetUke.antallGodkjenteReisedager)
-            assertThat(oppsummertUke.bompengerPerDag).isEqualTo(forventetUke.bompengerPerDag)
-            assertThat(oppsummertUke.fergekostnadPerDag).isEqualTo(forventetUke.fergekostnadPerDag)
+            assertThat(oppsummertUke.bompengerTotalt).isEqualTo(forventetUke.bompengerTotalt)
+            assertThat(oppsummertUke.fergekostnadTotalt).isEqualTo(forventetUke.fergekostnadTotalt)
             assertThat(oppsummertUke.satser).hasSize(forventetUke.satserSize)
-            assertThat(oppsummertUke.totalParkeringskostnad).isEqualTo(forventetUke.totalParkeringskostnad)
+            assertThat(oppsummertUke.parkeringskostnadTotalt).isEqualTo(forventetUke.totalParkeringskostnad)
             assertThat(oppsummertUke.ukenummer).isEqualTo(forventetUke.ukenummer)
             assertThat(oppsummertUke.stønadsbeløp).isEqualTo(forventetUke.stønadsbeløp)
         }
@@ -350,8 +350,8 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
         val fom: LocalDate,
         val tom: LocalDate,
         val antallGodkjenteReisedager: Int,
-        val bompengerPerDag: Int?,
-        val fergekostnadPerDag: Int?,
+        val bompengerTotalt: Int?,
+        val fergekostnadTotalt: Int?,
         val satserSize: Int,
         val totalParkeringskostnad: Int,
         val ukenummer: Int,
