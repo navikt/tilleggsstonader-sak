@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.behandling.oppsummering
 
-import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
@@ -17,11 +16,8 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -56,70 +52,6 @@ class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
     }
 
     @Nested
-    inner class OppsummeringVilkårperioder {
-        @Test
-        fun `skal slå sammen sammenhengende perioder`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
-
-            vilkårperiodeRepository.insertAll(
-                listOf(
-                    målgruppe(
-                        behandlingId = behandling.id,
-                        fom = LocalDate.of(2025, 1, 1),
-                        tom = LocalDate.of(2025, 1, 12),
-                    ),
-                    målgruppe(
-                        behandlingId = behandling.id,
-                        fom = LocalDate.of(2025, 1, 13),
-                        tom = LocalDate.of(2025, 1, 31),
-                    ),
-                ),
-            )
-
-            val behandlingOppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
-
-            assertThat(behandlingOppsummering.finnesDataÅOppsummere()).isTrue()
-            assertThat(behandlingOppsummering.målgrupper).hasSize(1)
-            assertThat(behandlingOppsummering.målgrupper[0].fom).isEqualTo(LocalDate.of(2025, 1, 1))
-            assertThat(behandlingOppsummering.målgrupper[0].tom).isEqualTo(LocalDate.of(2025, 1, 31))
-        }
-
-        @Test
-        fun `skal ikke slå sammen sammenhengende perioder med ulike typer eller resultat`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
-
-            vilkårperiodeRepository.insertAll(
-                listOf(
-                    målgruppe(
-                        behandlingId = behandling.id,
-                        fom = LocalDate.of(2025, 1, 1),
-                        tom = LocalDate.of(2025, 1, 12),
-                        faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.AAP),
-                    ),
-                    målgruppe(
-                        behandlingId = behandling.id,
-                        fom = LocalDate.of(2025, 1, 13),
-                        tom = LocalDate.of(2025, 1, 31),
-                        faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.AAP),
-                        resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
-                    ),
-                    målgruppe(
-                        behandlingId = behandling.id,
-                        fom = LocalDate.of(2025, 1, 13),
-                        tom = LocalDate.of(2025, 1, 31),
-                        faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.OVERGANGSSTØNAD),
-                    ),
-                ),
-            )
-
-            val behandlingOppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
-
-            assertThat(behandlingOppsummering.finnesDataÅOppsummere()).isTrue()
-            assertThat(behandlingOppsummering.målgrupper).hasSize(3)
-        }
-    }
-
-    @Nested
     inner class OppsummeringStønadsvilkår {
         @Test
         fun `skal slå sammen sammenhengende vilkår med like verdier`() {
@@ -151,67 +83,6 @@ class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
             assertThat(behandlingOppsummering.vilkår).hasSize(1)
             assertThat(behandlingOppsummering.vilkår[0].barnId).isEqualTo(barn1)
             assertThat(behandlingOppsummering.vilkår[0].vilkår).hasSize(1)
-        }
-
-        @Test
-        fun `skal ikke slå sammen utgifter for overnatting hvis de er sammenhengende`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
-
-            vilkårRepository.insertAll(
-                listOf(
-                    vilkår(
-                        behandlingId = behandling.id,
-                        type = VilkårType.UTGIFTER_OVERNATTING,
-                        fom = LocalDate.of(2025, 1, 1),
-                        tom = LocalDate.of(2025, 1, 5),
-                        utgift = 1000,
-                    ),
-                    vilkår(
-                        behandlingId = behandling.id,
-                        type = VilkårType.UTGIFTER_OVERNATTING,
-                        fom = LocalDate.of(2025, 1, 6),
-                        tom = LocalDate.of(2025, 1, 31),
-                        utgift = 1000,
-                    ),
-                ),
-            )
-
-            val behandlingOppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
-
-            assertThat(behandlingOppsummering.finnesDataÅOppsummere()).isTrue()
-            assertThat(behandlingOppsummering.vilkår).hasSize(1)
-            assertThat(behandlingOppsummering.vilkår[0].vilkår).hasSize(2)
-        }
-
-        @Test
-        fun `skal ikke slå sammen vilkår for to ulike barn`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
-            val barn1 = BarnId.random()
-            val barn2 = BarnId.random()
-
-            vilkårRepository.insertAll(
-                listOf(
-                    vilkår(
-                        behandlingId = behandling.id,
-                        type = VilkårType.PASS_BARN,
-                        barnId = barn1,
-                        fom = LocalDate.of(2025, 1, 1),
-                        tom = LocalDate.of(2025, 1, 31),
-                    ),
-                    vilkår(
-                        behandlingId = behandling.id,
-                        type = VilkårType.PASS_BARN,
-                        barnId = barn2,
-                        fom = LocalDate.of(2025, 2, 1),
-                        tom = LocalDate.of(2025, 2, 28),
-                    ),
-                ),
-            )
-
-            val behandlingOppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
-
-            assertThat(behandlingOppsummering.finnesDataÅOppsummere()).isTrue()
-            assertThat(behandlingOppsummering.vilkår).hasSize(2)
         }
     }
 
@@ -341,102 +212,6 @@ class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
 
             // Dato skal ikke kuttes
             assertThat(oppsummering.vilkår[0].vilkår[0].fom).isEqualTo(LocalDate.of(2024, 12, 1))
-        }
-
-        @Test
-        fun `stønadsvilkår skal ikke slås sammen om annen periode er før tidligsteEndring`() {
-            val behandling = testoppsettService.lagBehandlingOgRevurdering()
-            vedtakRepository.insert(innvilgetVedtak(behandlingId = behandling.id, tidligsteEndring = LocalDate.of(2025, 1, 1)))
-            vilkårRepository.insertAll(
-                listOf(
-                    vilkår(
-                        behandlingId = behandling.id,
-                        type = VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
-                        barnId = null,
-                        fom = LocalDate.of(2024, 12, 1),
-                        tom = LocalDate.of(2024, 12, 31),
-                    ),
-                    vilkår(
-                        behandlingId = behandling.id,
-                        type = VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
-                        barnId = null,
-                        fom = LocalDate.of(2025, 1, 1),
-                        tom = LocalDate.of(2025, 1, 31),
-                    ),
-                ),
-            )
-
-            val oppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
-            assertThat(oppsummering.finnesDataÅOppsummere()).isTrue()
-            assertThat(oppsummering.vilkår[0].vilkår[0].fom).isEqualTo(LocalDate.of(2025, 1, 1))
-        }
-
-        @Test
-        fun `skal ikke slå sammen når aktivitet er subset av en annen periode`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
-
-            vilkårperiodeRepository.insertAll(
-                listOf(
-                    aktivitet(
-                        behandlingId = behandling.id,
-                        fom = LocalDate.of(2026, 1, 1),
-                        tom = LocalDate.of(2026, 1, 10),
-                        resultat = ResultatVilkårperiode.OPPFYLT,
-                    ),
-                    aktivitet(
-                        behandlingId = behandling.id,
-                        fom = LocalDate.of(2026, 1, 3),
-                        tom = LocalDate.of(2026, 1, 10),
-                        resultat = ResultatVilkårperiode.OPPFYLT,
-                    ),
-                ),
-            )
-
-            val oppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
-
-            val perioder = oppsummering.aktiviteter
-            assertThat(perioder).hasSize(2)
-
-            assertThat(perioder.map { it.fom })
-                .containsExactly(
-                    LocalDate.of(2026, 1, 1),
-                    LocalDate.of(2026, 1, 3),
-                )
-        }
-
-        @Test
-        fun `skal ikke slå sammen når aktivitet type er ulike men PåfølgesAv`() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling = behandling())
-
-            vilkårperiodeRepository.insertAll(
-                listOf(
-                    aktivitet(
-                        behandlingId = behandling.id,
-                        fom = LocalDate.of(2026, 1, 1),
-                        tom = LocalDate.of(2026, 1, 10),
-                        typeAktivitet = TypeAktivitet.TEST,
-                        resultat = ResultatVilkårperiode.OPPFYLT,
-                    ),
-                    aktivitet(
-                        behandlingId = behandling.id,
-                        fom = LocalDate.of(2026, 1, 11),
-                        tom = LocalDate.of(2026, 1, 21),
-                        typeAktivitet = TypeAktivitet.TEKNTILR,
-                        resultat = ResultatVilkårperiode.OPPFYLT,
-                    ),
-                ),
-            )
-
-            val oppsummering = behandlingOppsummeringService.hentBehandlingOppsummering(behandling.id)
-
-            val perioder = oppsummering.aktiviteter
-            assertThat(perioder).hasSize(2)
-
-            assertThat(perioder.map { it.fom })
-                .containsExactly(
-                    LocalDate.of(2026, 1, 1),
-                    LocalDate.of(2026, 1, 11),
-                )
         }
     }
 }

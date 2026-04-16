@@ -1,7 +1,5 @@
 package no.nav.tilleggsstonader.sak.behandling.oppsummering
 
-import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
-import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
@@ -43,18 +41,6 @@ class BehandlingOppsummeringService(
             .map { it.tilOppsummertVilkårperiode() }
             .sortedBy { it.fom }
             .filter { tomLikEllerEtterDatoForTidligsteEndring(tidligsteEndring = tidligsteEndring, tom = it.tom) }
-            .mergeSammenhengende(
-                skalMerges = { v1, v2 ->
-                    v1.type == v2.type &&
-                        v1.resultat == v2.resultat &&
-                        v1.varient == v2.varient &&
-                        v1.overlapperEllerPåfølgesAv(
-                            v2,
-                        ) &&
-                        !v1.inneholder(v2)
-                },
-                merge = { v1, v2 -> v1.copy(fom = minOf(v1.fom, v2.fom), tom = maxOf(v1.tom, v2.tom)) },
-            )
 
     private fun oppsummerStønadsvilkår(
         behandlingId: BehandlingId,
