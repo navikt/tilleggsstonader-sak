@@ -8,12 +8,11 @@ import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
-import java.util.UUID
 
 @Table("kjoreliste")
 data class Kjøreliste(
     @Id
-    val id: UUID = UUID.randomUUID(),
+    val id: KjørelisteId = KjørelisteId.random(),
     @Column("journalpost_id")
     val journalpostId: String,
     val fagsakId: FagsakId,
