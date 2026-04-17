@@ -55,7 +55,6 @@ data class FaktaDelperiodePrivatBil(
     val fergekostnadPerDag: Int?,
 ) : Periode<LocalDate> {
     init {
-        validatePeriode()
         brukerfeilHvis(reisedagerPerUke <= 0) {
             "Reisedager per uke må være større enn 0"
         }

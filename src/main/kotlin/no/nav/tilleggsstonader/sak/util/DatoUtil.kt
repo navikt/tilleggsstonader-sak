@@ -140,6 +140,10 @@ fun validerUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode(
     }
 
     sortertePerioder.forEachIndexed { index, periode ->
+        brukerfeilHvis(periode.tom < periode.fom) {
+            "Tom ${periode.tom.norskFormat()} for delperioden er før fom ${periode.fom.norskFormat()}"
+        }
+
         if (index == 0) {
             brukerfeilHvis(periode.fom != overordnetPeriode.fom) {
                 "Delperioden sin fom ${periode.fom.norskFormat()} må være lik reiseperioden sin fom"
