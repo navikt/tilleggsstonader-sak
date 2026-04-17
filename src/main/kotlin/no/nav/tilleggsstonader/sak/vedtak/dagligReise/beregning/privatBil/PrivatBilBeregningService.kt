@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 // Begrensninger:
 // Håndterer ikke ulik kilometersats i årskifte dersom en uke går på tvers av to år.
@@ -187,6 +188,7 @@ class PrivatBilBeregningService(
             reiseavstandEnVei
                 .multiply(BigDecimal.valueOf(2))
                 .multiply(kilometersats)
+                .setScale(2, RoundingMode.HALF_UP)
 
         val sumEkstrakostnader = ekstrakostnader.beregnTotalEkstrakostnadForEnDag()
 
