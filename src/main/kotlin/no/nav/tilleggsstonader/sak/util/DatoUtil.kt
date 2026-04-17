@@ -182,6 +182,8 @@ fun Periode<LocalDate>.inneholderUkedag() = this.alleDatoer().any { !it.lørdagE
 
 fun LocalDate.finnMandagNesteUke(): LocalDate = this.with(TemporalAdjusters.next(DayOfWeek.MONDAY))
 
+fun LocalDate.finnNesteSøndag(): LocalDate = this.with(TemporalAdjusters.next(DayOfWeek.SUNDAY))
+
 fun LocalDate.forrigeVirkedag(): LocalDate =
     when (this.dayOfWeek) {
         DayOfWeek.MONDAY -> this.minusDays(3)
