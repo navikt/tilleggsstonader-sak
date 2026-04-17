@@ -7,14 +7,18 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørAlleTaskMedSenererTriggertid
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteRepository
+import no.nav.tilleggsstonader.sak.util.finnNesteSøndag
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -180,6 +184,44 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
 
         val tasks = taskService.finnAlleTaskerMedType(SendKjorelistevarselTask.TYPE)
         assertThat(tasks.filter { it.status == Status.FERDIG }).hasSize(1)
+        assertThat(tasks.filter { it.status == Status.UBEHANDLET }).hasSize(1)
+    }
+
+    @Test
+    fun `skal kun sende ett varsel etter det er blitt behandlet kjørelistebehandling`() {
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
+
+        val fom = 2 mars 2026
+        val tom = 29 mars 2026
+
+        val behandlingcontext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                defaultDagligReisePrivatBilTsoTestdata(fom, tom)
+                sendInnKjøreliste {
+                    periode = Datoperiode(fom, fom.finnNesteSøndag())
+                    kjørteDager =
+                        listOf(
+                            fom to 50,
+                        )
+                }
+            }
+
+        val kjørelistebehandling =
+            testoppsettService
+                .hentBehandlinger(behandlingcontext.fagsakId)
+                .single { it.type == BehandlingType.KJØRELISTE }
+        gjennomførKjørelisteBehandling(kjørelistebehandling)
+
+        kjørAlleTaskMedSenererTriggertid()
+        KafkaFake
+            .sendteMeldinger()
+            .forventAntallMeldingerPåTopic(kafkaTopics.dittnav, 1)
+
+        val tasks = taskService.finnAlleTaskerMedType(SendKjorelistevarselTask.TYPE)
+        // 1 for rammevedtak-behandling. Denne skal ikke ha produsert varsel, og en for kjørelistebehandling som skal ha produsert varsel
+        assertThat(tasks.filter { it.status == Status.FERDIG }).hasSize(2)
         assertThat(tasks.filter { it.status == Status.UBEHANDLET }).hasSize(1)
     }
 }

@@ -293,4 +293,7 @@ class BehandlingService(
             ),
         )
     }
+
+    fun finnGjeldendeIverksatteBehandlingForFagsak(fagsakId: FagsakId): Behandling? =
+        behandlingRepository.finnGjeldendeIverksatteBehandlingForFagsak(fagsakId)
 }

@@ -184,6 +184,15 @@ interface BehandlingRepository :
 
     @Query(
         """
+            SELECT b.*
+            FROM gjeldende_iverksatte_behandlinger b
+            WHERE b.fagsak_id = :fagsakId
+        """,
+    )
+    fun finnGjeldendeIverksatteBehandlingForFagsak(fagsakId: FagsakId): Behandling?
+
+    @Query(
+        """
             SELECT COUNT(*)
             FROM gjeldende_iverksatte_behandlinger b
             WHERE b.stonadstype = :stønadstype
