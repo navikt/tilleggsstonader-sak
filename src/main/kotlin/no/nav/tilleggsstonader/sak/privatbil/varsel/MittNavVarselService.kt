@@ -54,7 +54,7 @@ class MittNavVarselService(
             (behandling.resultat == BehandlingResultat.INNVILGET || behandling.resultat == BehandlingResultat.OPPHØRT)
 
     private fun erGjeldendeIverksatteBehandling(behandling: Saksbehandling) =
-        behandlingService.finnGjeldendeIverksatteBehandlingForFagsak(behandling.fagsakId)?.id == behandling.id
+        behandlingService.finnSisteIverksatteBehandling(behandling.fagsakId)?.id == behandling.id
 
     private fun finnRammevedtakPrivatBil(behandling: Saksbehandling): RammevedtakPrivatBil? =
         vedtakService
