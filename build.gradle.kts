@@ -9,11 +9,11 @@ val tilleggsstønaderKontrakterVersion = "2026.04.15-21.48.778bd4a8f583"
 val avroVersion = "1.12.1"
 val confluentVersion = "8.0.1"
 val joarkHendelseVersion = "1.1.8"
-val tokenSupportVersion = "6.0.3"
+val tokenSupportVersion = "6.0.5"
 val wiremockVersion = "3.13.2"
 val mockkVersion = "1.14.9"
 val testcontainerVersion = "1.21.4"
-val springDocVersion = "3.0.2"
+val springDocVersion = "3.0.3"
 
 val jacksonVersion = "3.1.2"
 
