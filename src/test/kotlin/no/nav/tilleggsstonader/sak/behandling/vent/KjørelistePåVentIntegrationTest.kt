@@ -77,6 +77,9 @@ class KjørelistePåVentIntegrationTest : IntegrationTest() {
                 .hentBehandlinger(førstegangsbehandling.fagsakId)
                 .single { it.type == BehandlingType.KJØRELISTE }
 
+        // Påbegynt behandling skal ikke gjenbrukes når ny kjøreliste kommer inn.
+        tilordneÅpenBehandlingOppgaveForBehandling(kjørelisteBehandling1.id)
+
         // Sender inn en ny kjøreliste hvor behandlingen blir satt på vent
         sendInnKjøreliste(
             kjørelisteSkjema(

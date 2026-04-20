@@ -7,10 +7,13 @@ import no.nav.tilleggsstonader.sak.behandling.OpprettBehandling
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingOppgaveMetadata
 import no.nav.tilleggsstonader.sak.behandling.OpprettBehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -19,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class BehandleMottattKjørelisteService(
     private val opprettBehandlingService: OpprettBehandlingService,
+    private val behandlingRepository: BehandlingRepository,
+    private val oppgaveService: OppgaveService,
     private val gjenbrukDataRevurderingService: GjenbrukDataRevurderingService,
     private val avklartKjørelisteService: AvklartKjørelisteService,
     private val taskService: TaskService,
@@ -27,39 +32,66 @@ class BehandleMottattKjørelisteService(
 
     @Transactional
     fun behandleMottattKjøreliste(kjøreliste: Kjøreliste) {
-        val behandling = opprettKjørelisteBehandling(kjøreliste)
-
-        gjenbrukData(behandling)
+        val behandling = finnKjørelistebehandlingSomKanGjenbrukes(kjøreliste) ?: opprettKjørelisteBehandling(kjøreliste)
 
         avklartKjørelisteService.avklarUkerFraKjøreliste(
             behandling = behandling,
             kjøreliste = kjøreliste,
         )
+    }
 
-        taskService.save(
-            OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
-                OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
-                    behandlingId = behandling.id,
-                    beskrivelse = "Skal behandles i TS-Sak",
-                    prioritet = OppgavePrioritet.NORM,
-                ),
-            ),
-        )
+    private fun finnKjørelistebehandlingSomKanGjenbrukes(kjøreliste: Kjøreliste): Behandling? {
+        val sisteKjørelistebehandlingSomIkkeErPåbegynt =
+            behandlingRepository
+                .findByFagsakId(kjøreliste.fagsakId)
+                .filter { it.type == BehandlingType.KJØRELISTE && it.status == BehandlingStatus.OPPRETTET }
+                .sortedByDescending { it.sporbar.opprettetTid }
+                .firstOrNull { !erPåbegynt(it) }
+
+        sisteKjørelistebehandlingSomIkkeErPåbegynt?.let {
+            logger.info("Gjenbruker eksisterende kjørelistebehandling=${it.id} for fagsak=${kjøreliste.fagsakId}")
+        }
+
+        return sisteKjørelistebehandlingSomIkkeErPåbegynt
+    }
+
+    private fun erPåbegynt(behandling: Behandling): Boolean {
+        if (behandling.status != BehandlingStatus.OPPRETTET) {
+            return true
+        }
+
+        val åpenBehandlingsoppgave = oppgaveService.hentÅpenBehandlingsoppgave(behandling.id) ?: return true
+
+        return åpenBehandlingsoppgave.tilordnetSaksbehandler != null
     }
 
     private fun opprettKjørelisteBehandling(kjøreliste: Kjøreliste): Behandling {
         logger.info("Oppretter kjørelistebehandling for fagsak=${kjøreliste.fagsakId}")
 
-        return opprettBehandlingService.opprettBehandling(
-            OpprettBehandling(
-                fagsakId = kjøreliste.fagsakId,
-                status = BehandlingStatus.OPPRETTET,
-                stegType = StegType.KJØRELISTE,
-                behandlingsårsak = BehandlingÅrsak.KJØRELISTE,
-                kravMottatt = kjøreliste.datoMottatt.toLocalDate(),
-                oppgaveMetadata = OpprettBehandlingOppgaveMetadata.UtenOppgave,
+        val kjørelistebehandling =
+            opprettBehandlingService.opprettBehandling(
+                OpprettBehandling(
+                    fagsakId = kjøreliste.fagsakId,
+                    status = BehandlingStatus.OPPRETTET,
+                    stegType = StegType.KJØRELISTE,
+                    behandlingsårsak = BehandlingÅrsak.KJØRELISTE,
+                    kravMottatt = kjøreliste.datoMottatt.toLocalDate(),
+                    oppgaveMetadata = OpprettBehandlingOppgaveMetadata.UtenOppgave,
+                ),
+            )
+
+        gjenbrukData(kjørelistebehandling)
+        taskService.save(
+            OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
+                OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
+                    behandlingId = kjørelistebehandling.id,
+                    beskrivelse = "Skal behandles i TS-Sak",
+                    prioritet = OppgavePrioritet.NORM,
+                ),
             ),
         )
+
+        return kjørelistebehandling
     }
 
     private fun gjenbrukData(behandling: Behandling) {
