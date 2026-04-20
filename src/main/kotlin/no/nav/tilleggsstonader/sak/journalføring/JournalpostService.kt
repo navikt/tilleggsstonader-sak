@@ -209,5 +209,5 @@ private fun Stønadstype.tilDokumentBrevkode(): DokumentBrevkode =
         Stønadstype.DAGLIG_REISE_TSR,
         -> DokumentBrevkode.DAGLIG_REISE
 
-        Stønadstype.REISE_TIL_SAMLING_TSO -> TODO("fikses når kontrakter blir oppdatert")
+        Stønadstype.REISE_TIL_SAMLING_TSO -> DokumentBrevkode.REISE_TIL_SAMLING
     }

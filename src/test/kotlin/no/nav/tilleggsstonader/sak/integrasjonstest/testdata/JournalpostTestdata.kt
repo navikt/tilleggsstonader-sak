@@ -57,5 +57,5 @@ private fun brevkodeForStønadstype(stønadstype: Stønadstype) =
         Stønadstype.LÆREMIDLER -> DokumentBrevkode.LÆREMIDLER
         Stønadstype.BOUTGIFTER -> DokumentBrevkode.BOUTGIFTER
         Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR -> DokumentBrevkode.DAGLIG_REISE
-        Stønadstype.REISE_TIL_SAMLING_TSO -> TODO("fikses når endring i kontrakter blir gjort")
+        Stønadstype.REISE_TIL_SAMLING_TSO -> DokumentBrevkode.REISE_TIL_SAMLING
     }
