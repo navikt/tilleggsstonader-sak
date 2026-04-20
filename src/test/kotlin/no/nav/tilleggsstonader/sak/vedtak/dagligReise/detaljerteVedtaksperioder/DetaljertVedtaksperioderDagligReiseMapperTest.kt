@@ -71,8 +71,8 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                 detaljertBeregningsperioder =
                     listOf(
                         DetaljertBeregningsperioder(
-                            fom = førsteJanuar,
-                            tom = sisteJanuar,
+                            fom = førsteFeb,
+                            tom = sisteFeb,
                             prisEnkeltbillett = 50,
                             prisSyvdagersbillett = 300,
                             pris30dagersbillett = 1000,
@@ -82,8 +82,8 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                             antallReisedagerPerUke = 5,
                         ),
                         DetaljertBeregningsperioder(
-                            fom = førsteFeb,
-                            tom = sisteFeb,
+                            fom = førsteJanuar,
+                            tom = sisteJanuar,
                             prisEnkeltbillett = 50,
                             prisSyvdagersbillett = 300,
                             pris30dagersbillett = 1000,

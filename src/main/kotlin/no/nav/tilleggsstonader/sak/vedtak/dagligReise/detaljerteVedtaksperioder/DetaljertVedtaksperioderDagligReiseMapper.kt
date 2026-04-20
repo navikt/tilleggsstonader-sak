@@ -37,7 +37,7 @@ object DetaljertVedtaksperioderDagligReiseMapper {
         adresse: String?,
     ): List<DetaljertVedtaksperiodeDagligReise> {
         val detaljertBeregningsperioder =
-            this.sortedBy { it.grunnlag.fom }.map { beregningsresultatForPeriode ->
+            this.sortedByDescending { it.grunnlag.fom }.map { beregningsresultatForPeriode ->
                 DetaljertBeregningsperioder(
                     fom = beregningsresultatForPeriode.grunnlag.fom,
                     tom = beregningsresultatForPeriode.grunnlag.tom,

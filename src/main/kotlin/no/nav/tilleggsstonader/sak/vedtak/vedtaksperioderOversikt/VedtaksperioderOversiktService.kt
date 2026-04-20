@@ -120,7 +120,7 @@ class VedtaksperioderOversiktService(
             hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørTilsynBarn>(fagsakId)
                 ?: return emptyList()
 
-        return vedtakForSisteIverksatteBehandling.finnDetaljerteVedtaksperioder()
+        return vedtakForSisteIverksatteBehandling.finnDetaljerteVedtaksperioder().sortedByDescending { it.fom }
     }
 
     private fun oppsummerVedtaksperioderLæremidler(fagsakId: FagsakId): List<DetaljertVedtaksperiodeLæremidler> {
@@ -128,7 +128,7 @@ class VedtaksperioderOversiktService(
             hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørLæremidler>(fagsakId)
                 ?: return emptyList()
 
-        return vedtakForSisteIverksatteBehandling.finnDetaljerteVedtaksperioder()
+        return vedtakForSisteIverksatteBehandling.finnDetaljerteVedtaksperioder().sortedByDescending { it.fom }
     }
 
     private fun oppsummerVedtaksperioderBoutgifter(fagsakId: FagsakId): List<DetaljertVedtaksperiodeBoutgifter> {
@@ -136,7 +136,7 @@ class VedtaksperioderOversiktService(
             hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørBoutgifter>(fagsakId)
                 ?: return emptyList()
 
-        return vedtakForSisteIverksatteBehandling.finnDetaljerteVedtaksperioder()
+        return vedtakForSisteIverksatteBehandling.finnDetaljerteVedtaksperioder().sortedByDescending { it.fom }
     }
 
     private fun oppsummerVedtaksperioderDagligReiseTso(fagsakId: FagsakId): List<DetaljertVedtaksperiodeDagligReise> {

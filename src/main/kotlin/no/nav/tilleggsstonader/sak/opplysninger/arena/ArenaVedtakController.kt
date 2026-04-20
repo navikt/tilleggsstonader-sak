@@ -22,6 +22,7 @@ class ArenaVedtakController(
         @PathVariable fagsakPersonId: FagsakPersonId,
     ): ArenaSakOgVedtakDto {
         tilgangService.validerTilgangTilFagsakPerson(fagsakPersonId, AuditLoggerEvent.ACCESS)
-        return arenaService.hentVedtak(fagsakPersonId)
+        val response = arenaService.hentVedtak(fagsakPersonId)
+        return response.copy(vedtak = response.vedtak.sortedByDescending { it.fom })
     }
 }
