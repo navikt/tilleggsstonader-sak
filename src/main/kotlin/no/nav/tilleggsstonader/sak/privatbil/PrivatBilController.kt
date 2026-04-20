@@ -4,7 +4,6 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
-import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.ekstern.stønad.DagligReisePrivatBilService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -65,7 +64,7 @@ class PrivatBilController(
                         .alleDatoerGruppertPåUke()
                         .map { (uke, datoer) ->
                             val avklartUke =
-                                avklarteUker.singleOrNull { it.reiseId == reise.reiseId && it.fom.tilUkeIÅr() == uke }
+                                avklarteUker.singleOrNull { it.reiseId == reise.reiseId && it.uke == uke }
 
                             val kjørelisteForUke =
                                 avklartUke?.let {
@@ -96,14 +95,8 @@ class PrivatBilController(
         val oppdatertAvklartUke = avklartKjørelisteService.oppdaterAvklartUke(behandlingId, ukeId, avklarteDager)
         val kjøreliste = kjørelisteService.hentKjøreliste(oppdatertAvklartUke.kjørelisteId)
 
-        val uke =
-            UkeIÅr(
-                ukenummer = oppdatertAvklartUke.ukenummer,
-                år = oppdatertAvklartUke.fom.year,
-            )
-
         return lagUke(
-            uke = uke,
+            uke = oppdatertAvklartUke.uke,
             datoer = oppdatertAvklartUke.alleDatoer(),
             kjørelisteForUke = kjøreliste,
             avklartUke = oppdatertAvklartUke,
