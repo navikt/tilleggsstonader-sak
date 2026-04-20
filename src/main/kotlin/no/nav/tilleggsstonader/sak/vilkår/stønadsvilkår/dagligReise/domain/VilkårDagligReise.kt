@@ -25,6 +25,7 @@ data class VilkårDagligReise(
 ) : Periode<LocalDate>,
     Mergeable<LocalDate, VilkårDagligReise> {
     init {
+        validatePeriode()
         validerFaktaErForventetType()
         validerSammenhengendeDelperioderPrivatBil()
     }
