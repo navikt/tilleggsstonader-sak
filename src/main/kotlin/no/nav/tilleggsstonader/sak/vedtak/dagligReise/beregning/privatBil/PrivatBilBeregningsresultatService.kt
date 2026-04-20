@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPri
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import org.springframework.stereotype.Service
+import java.math.RoundingMode
 
 @Service
 class PrivatBilBeregningsresultatService {
@@ -94,8 +95,11 @@ class PrivatBilBeregningsresultatService {
                             BeregningsresultatForReisePrivatBilDag(
                                 dato = dag.dato,
                                 parkeringskostnad = parkeringsutgift,
-                                dagsatsUtenParkering = dagsatsUtenParkering,
-                                stønadsbeløpForDag = dagsatsUtenParkering.plus(parkeringsutgift.toBigDecimal()),
+                                dagsatsUtenParkering = dagsatsUtenParkering.setScale(2),
+                                stønadsbeløpForDag =
+                                    dagsatsUtenParkering
+                                        .plus(parkeringsutgift.toBigDecimal())
+                                        .setScale(0, RoundingMode.HALF_UP),
                             )
                         }
 

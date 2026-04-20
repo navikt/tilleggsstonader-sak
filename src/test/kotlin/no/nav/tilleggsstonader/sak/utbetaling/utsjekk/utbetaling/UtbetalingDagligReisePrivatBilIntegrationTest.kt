@@ -30,6 +30,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.LocalDate
 
 class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
@@ -261,5 +262,6 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
                 .multiply(reiseavstandEnVei)
                 .multiply(2.toBigDecimal())
                 .plus(parkeringskostnader.toBigDecimal())
+                .setScale(0, RoundingMode.HALF_UP)
         }.toInt()
 }

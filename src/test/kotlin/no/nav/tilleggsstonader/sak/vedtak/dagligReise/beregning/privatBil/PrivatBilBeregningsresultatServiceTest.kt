@@ -24,6 +24,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatException
 import org.assertj.core.api.Assertions.assertThatNoException
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
@@ -108,7 +110,7 @@ class PrivatBilBeregningsresultatServiceTest {
         ).isEqualTo(
             beregningsresultatUke.grunnlag.dager
                 .first()
-                .dagsatsUtenParkering * 3.toBigDecimal() + totaleParkeringsutgifter,
+                .dagsatsUtenParkering * 3.toBigDecimal() + totaleParkeringsutgifter.avrundetStønadsbeløp(),
         )
 
         assertThat(beregningsresultatUke.grunnlag.dager).hasSize(reisedager.size)
@@ -186,7 +188,7 @@ class PrivatBilBeregningsresultatServiceTest {
         ).isEqualTo(
             beregningsresultatUke.grunnlag.dager
                 .first()
-                .dagsatsUtenParkering * 2.toBigDecimal(),
+                .dagsatsUtenParkering * 2.toBigDecimal().avrundetStønadsbeløp(),
         )
 
         assertThat(beregningsresultatUke.grunnlag.dager).hasSize(2).allMatch { it.parkeringskostnad == 0 }
@@ -265,9 +267,9 @@ class PrivatBilBeregningsresultatServiceTest {
         val dagI2026 = beregningsresultatUke.grunnlag.dager.first { it.dato.year == 2026 }
 
         assertThat(dagI2025.parkeringskostnad).isZero
-        assertThat(dagI2025.dagsatsUtenParkering).isEqualTo(dagI2025.stønadsbeløpForDag)
+        assertThat(dagI2025.stønadsbeløpForDag).isEqualTo(dagI2025.dagsatsUtenParkering.avrundetStønadsbeløp())
         assertThat(dagI2026.parkeringskostnad).isZero
-        assertThat(dagI2026.dagsatsUtenParkering).isEqualTo(dagI2026.stønadsbeløpForDag)
+        assertThat(dagI2026.stønadsbeløpForDag).isEqualTo(dagI2026.dagsatsUtenParkering.avrundetStønadsbeløp())
 
         assertThat(dagI2025.stønadsbeløpForDag).isNotEqualTo(dagI2026.stønadsbeløpForDag)
 
@@ -354,7 +356,8 @@ class PrivatBilBeregningsresultatServiceTest {
         assertThat(beregningsresultatUke1.stønadsbeløp).isEqualTo(
             beregningsresultatUke1.grunnlag.dager
                 .single()
-                .dagsatsUtenParkering,
+                .dagsatsUtenParkering
+                .avrundetStønadsbeløp(),
         )
         assertThat(beregningsresultatUke1.grunnlag.dager).hasSize(1).allMatch { it.parkeringskostnad == 0 }
 
@@ -364,7 +367,8 @@ class PrivatBilBeregningsresultatServiceTest {
         assertThat(beregningsresultatUke2.stønadsbeløp).isEqualTo(
             beregningsresultatUke2.grunnlag.dager
                 .single()
-                .dagsatsUtenParkering,
+                .dagsatsUtenParkering
+                .avrundetStønadsbeløp(),
         )
         assertThat(beregningsresultatUke2.grunnlag.dager).hasSize(1).allMatch { it.parkeringskostnad == 0 }
     }
@@ -464,7 +468,14 @@ class PrivatBilBeregningsresultatServiceTest {
             val beregningsresultatUke1 = beregningsresultatForReise.perioder.single()
             assertThat(beregningsresultatUke1.fom).isEqualTo(fomRammevedtak)
             assertThat(beregningsresultatUke1.tom).isEqualTo(tomRammevedtak)
-            assertThat(beregningsresultatUke1.stønadsbeløp).isEqualTo(delperiode.satser.single().dagsatsUtenParkering)
+            assertThat(
+                beregningsresultatUke1.stønadsbeløp,
+            ).isEqualTo(
+                delperiode.satser
+                    .single()
+                    .dagsatsUtenParkering
+                    .avrundetStønadsbeløp(),
+            )
             assertThat(beregningsresultatUke1.grunnlag.dager).hasSize(1).allMatch { it.parkeringskostnad == 0 }
         }
     }
@@ -612,4 +623,6 @@ class PrivatBilBeregningsresultatServiceTest {
                             }.toSet(),
                 )
             }
+
+    private fun BigDecimal.avrundetStønadsbeløp(): BigDecimal = setScale(0, RoundingMode.HALF_UP)
 }
