@@ -110,7 +110,10 @@ class PrivatBilBeregningsresultatServiceTest {
         ).isEqualTo(
             beregningsresultatUke.grunnlag.dager
                 .first()
-                .dagsatsUtenParkering * 3.toBigDecimal() + totaleParkeringsutgifter.avrundetStønadsbeløp(),
+                .dagsatsUtenParkering
+                .multiply(3.toBigDecimal())
+                .add(totaleParkeringsutgifter)
+                .avrundetStønadsbeløp(),
         )
 
         assertThat(beregningsresultatUke.grunnlag.dager).hasSize(reisedager.size)
@@ -188,7 +191,9 @@ class PrivatBilBeregningsresultatServiceTest {
         ).isEqualTo(
             beregningsresultatUke.grunnlag.dager
                 .first()
-                .dagsatsUtenParkering * 2.toBigDecimal().avrundetStønadsbeløp(),
+                .dagsatsUtenParkering
+                .multiply(2.toBigDecimal())
+                .avrundetStønadsbeløp(),
         )
 
         assertThat(beregningsresultatUke.grunnlag.dager).hasSize(2).allMatch { it.parkeringskostnad == 0 }
