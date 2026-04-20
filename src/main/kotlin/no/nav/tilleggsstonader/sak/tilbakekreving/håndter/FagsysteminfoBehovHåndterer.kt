@@ -144,6 +144,7 @@ class FagsysteminfoBehovHåndterer(
             BehandlingÅrsak.KORRIGERING_UTEN_BREV,
             BehandlingÅrsak.MANUELT_OPPRETTET,
             BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV,
+            BehandlingÅrsak.OMGJØRING_ETTER_KLAGE,
             -> TilbakekrevingRevurderingÅrsak.KORRIGERING
 
             BehandlingÅrsak.SØKNAD,

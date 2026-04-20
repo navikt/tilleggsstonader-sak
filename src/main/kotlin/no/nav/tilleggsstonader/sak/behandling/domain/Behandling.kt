@@ -81,6 +81,7 @@ enum class BehandlingÅrsak {
     SATSENDRING,
     MANUELT_OPPRETTET,
     MANUELT_OPPRETTET_UTEN_BREV,
+    OMGJØRING_ETTER_KLAGE,
     ;
 
     fun erSøknadEllerPapirsøknad() = this == SØKNAD || this == PAPIRSØKNAD

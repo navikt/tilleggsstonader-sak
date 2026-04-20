@@ -12,6 +12,7 @@ enum class BehandlingÅrsakDvh {
     MANUELT_OPPRETTET_UTEN_BREV,
     KORRIGERING_UTEN_BREV,
     SATSENDRING,
+    OMGJØRING_ETTER_KLAGE,
     ;
 
     companion object {
@@ -26,6 +27,7 @@ enum class BehandlingÅrsakDvh {
                 BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV -> MANUELT_OPPRETTET_UTEN_BREV
                 BehandlingÅrsak.KORRIGERING_UTEN_BREV -> KORRIGERING_UTEN_BREV
                 BehandlingÅrsak.SATSENDRING -> SATSENDRING
+                BehandlingÅrsak.OMGJØRING_ETTER_KLAGE -> OMGJØRING_ETTER_KLAGE
             }
     }
 }
