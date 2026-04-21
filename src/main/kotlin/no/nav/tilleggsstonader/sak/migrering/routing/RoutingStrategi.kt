@@ -12,6 +12,7 @@ sealed interface RoutingStrategi {
         val kreverAtSøkerErUtenAktivtVedtakIArena: Boolean,
         val kreverAktivtAapVedtak: Boolean,
         val kreverUgradertAdresse: Boolean,
+        val alleMedAAPVedtakTilNyLøsning: Boolean,
     ) : RoutingStrategi
 
     data object KjørelisteRouting : RoutingStrategi
@@ -24,10 +25,11 @@ fun bestemRoutingStrategi(skjematype: Skjematype): RoutingStrategi =
         Skjematype.SØKNAD_BOUTGIFTER -> RoutingStrategi.SendAlleBrukereTilNyLøsning
         Skjematype.SØKNAD_DAGLIG_REISE ->
             RoutingStrategi.SendEnkelteBrukereTilNyLøsning(
-                featureToggleMaksAntallForStønad = Toggle.SØKNAD_ROUTING_DAGLIG_REISE,
+                featureToggleMaksAntallForStønad = Toggle.SØKNAD_ROUTING_PRIVAT_BIL,
                 kreverAtSøkerErUtenAktivtVedtakIArena = true,
                 kreverAktivtAapVedtak = false,
                 kreverUgradertAdresse = true,
+                alleMedAAPVedtakTilNyLøsning = true,
             )
 
         Skjematype.DAGLIG_REISE_KJØRELISTE -> RoutingStrategi.KjørelisteRouting

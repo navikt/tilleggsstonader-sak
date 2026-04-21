@@ -79,9 +79,6 @@ class SkjemaRoutingService(
             lagreRouting(ident, skjematype, mapOf("harBehandling" to true))
             return true
         }
-        if (maksAntallErNådd(skjematype, toggleId = kontekst.featureToggleMaksAntallForStønad)) {
-            return false
-        }
         if (kontekst.kreverAtSøkerErUtenAktivtVedtakIArena && harAktivtVedtakIArena(skjematype, ident)) {
             return false
         }
@@ -89,9 +86,17 @@ class SkjemaRoutingService(
             lagreRouting(ident, skjematype, mapOf("harAktivAAP" to true))
             return true
         }
+        if (kontekst.alleMedAAPVedtakTilNyLøsning && harAktivtAapVedtak(ident) &&
+            !maksAntallErNådd(
+                skjematype,
+                toggleId = kontekst.featureToggleMaksAntallForStønad,
+            )
+        ) {
+            lagreRouting(ident, skjematype, mapOf("aktivAAP" to true))
+            return true
+        }
 
-        lagreRouting(ident, skjematype, mapOf("skalTilNyLøsning" to true))
-        return true
+        return false
     }
 
     private fun skalBrukerRoutesTilNyKjørelisteLøsning(
