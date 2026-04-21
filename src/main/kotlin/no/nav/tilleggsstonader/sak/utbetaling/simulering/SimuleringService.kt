@@ -94,7 +94,7 @@ class SimuleringService(
 
             Stønadstype.REISE_TIL_SAMLING_TSO ->
                 håndterVarselForStønaderMedEgetFagområde(
-                    listOfNotNull(alleFagsaker.dagligReiseTso, alleFagsaker.dagligReiseTso),
+                    listOfNotNull(alleFagsaker.reiseTilSamlingTso),
                 )
 
             Stønadstype.BOUTGIFTER, Stønadstype.LÆREMIDLER, Stønadstype.BARNETILSYN ->

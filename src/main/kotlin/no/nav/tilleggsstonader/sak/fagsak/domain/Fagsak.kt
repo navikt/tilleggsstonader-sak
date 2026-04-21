@@ -15,6 +15,7 @@ data class Fagsaker(
     val boutgifter: Fagsak?,
     val dagligReiseTso: Fagsak?,
     val dagligReiseTsr: Fagsak?,
+    val reiseTilSamlingTso: Fagsak?,
 )
 
 data class Fagsak(
