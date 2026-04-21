@@ -65,6 +65,7 @@ object VilkårUtil {
                 VilkårType.LØPENDE_UTGIFTER_EN_BOLIG -> true
                 VilkårType.LØPENDE_UTGIFTER_TO_BOLIGER -> true
                 VilkårType.DAGLIG_REISE -> true
+                VilkårType.REISE_TIL_SAMLING -> false // TODO: Sjekk om dette er riktig
                 VilkårType.EKSEMPEL2 -> false
                 VilkårType.EKSEMPEL -> false
             }

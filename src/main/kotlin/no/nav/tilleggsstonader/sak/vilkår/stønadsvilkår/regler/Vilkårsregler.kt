@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.Daglig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.LøpendeUtgifterEnBoligRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.LøpendeUtgifterToBoligerRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.UtgifterOvernattingRegel
 
 /**
@@ -39,7 +40,7 @@ fun vilkårsreglerForStønad(stønadstype: Stønadstype): List<Vilkårsregel> =
 
         Stønadstype.DAGLIG_REISE_TSO -> listOf(DagligReiseRegel())
         Stønadstype.DAGLIG_REISE_TSR -> listOf(DagligReiseRegel())
-        Stønadstype.REISE_TIL_SAMLING_TSO -> TODO("lage regler for reise til samling")
+        Stønadstype.REISE_TIL_SAMLING_TSO -> listOf(ReiseTilSamlingRegel())
     }
 
 private val vilkårstyperPerStønad: Map<Stønadstype, Set<VilkårType>> =

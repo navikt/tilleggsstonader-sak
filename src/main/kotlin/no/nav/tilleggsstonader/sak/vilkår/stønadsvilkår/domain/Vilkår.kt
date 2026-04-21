@@ -258,6 +258,12 @@ enum class VilkårType(
         "Daglige reiser",
         listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
     ),
+
+    // Reise til samling
+    REISE_TIL_SAMLING(
+        "Reise til samling",
+        listOf(Stønadstype.REISE_TIL_SAMLING_TSO),
+    ),
     ;
 
     fun gjelderFlereBarn(): Boolean = this == PASS_BARN
