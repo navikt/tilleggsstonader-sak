@@ -35,7 +35,9 @@ data class Strekning(
 
 data class KollektivDetaljer(
     val startHoldeplass: String,
+    val startHoldeplassLokasjon: Lokasjon,
     val sluttHoldeplass: String,
+    val sluttHoldeplassLokasjon: Lokasjon,
     val linjeNavn: String?,
     val linjeType: LinjeType,
     val operatør: List<Operatør>,
@@ -96,7 +98,9 @@ fun List<Leg>.tilDomene(): List<Strekning> {
 private fun TransitDetails.tilDomene(): KollektivDetaljer =
     KollektivDetaljer(
         startHoldeplass = stopDetails.departureStop.name,
+        startHoldeplassLokasjon = stopDetails.departureStop.location.tilDomene(),
         sluttHoldeplass = stopDetails.arrivalStop.name,
+        sluttHoldeplassLokasjon = stopDetails.arrivalStop.location.tilDomene(),
         linjeNavn = transitLine.name,
         linjeType = transitLine.vehicle.type,
         operatør = transitLine.agencies.map { it.tilDomene() },
