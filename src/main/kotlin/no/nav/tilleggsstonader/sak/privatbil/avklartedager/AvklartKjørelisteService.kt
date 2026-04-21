@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
+import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
@@ -68,7 +69,7 @@ class AvklartKjørelisteService(
 
         validerOppdatertAvklartKjørtUke(
             oppdaterteDager = oppdaterteDager,
-            ukeSomSkalOppdateres = eksisterendeUke.fom.tilUkeIÅr(),
+            ukeSomSkalOppdateres = eksisterendeUke.uke,
             rammevedtak = rammevedtak,
             innsendteKjørelisteDager = innsendteKjørelisteDager,
         )
@@ -112,7 +113,7 @@ class AvklartKjørelisteService(
 
     private fun utledAvklartUke(
         behandlingId: BehandlingId,
-        kjørelisteId: UUID,
+        kjørelisteId: KjørelisteId,
         ukeIÅr: UkeIÅr,
         reisedager: List<KjørelisteDag>,
         rammevedtak: RammeForReiseMedPrivatBil,
@@ -136,7 +137,7 @@ class AvklartKjørelisteService(
             reiseId = rammevedtak.reiseId,
             fom = reisedager.minOf { it.dato },
             tom = reisedager.maxOf { it.dato },
-            ukenummer = ukeIÅr.ukenummer,
+            uke = ukeIÅr,
             // Trengs denne? Kan lages i visningslogikk
             // Rart at den er avhengig av både ukeavvik og dagavvik
             status = utledAutomatiskStatusForUke(avklarteDager, avvikUke),

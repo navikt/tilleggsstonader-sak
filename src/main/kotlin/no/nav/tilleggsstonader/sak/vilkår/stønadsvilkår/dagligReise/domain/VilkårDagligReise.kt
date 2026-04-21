@@ -4,6 +4,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.util.validerUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -25,6 +27,7 @@ data class VilkårDagligReise(
     init {
         validatePeriode()
         validerFaktaErForventetType()
+        validerSammenhengendeDelperioderPrivatBil()
     }
 
     override fun merge(other: VilkårDagligReise): VilkårDagligReise =
@@ -37,5 +40,15 @@ data class VilkårDagligReise(
         return require(this.fakta.type == TypeDagligReise.OFFENTLIG_TRANSPORT || this.fakta.type == TypeDagligReise.PRIVAT_BIL) {
             "Innsendtfakta har ikke gyldig type: ${this.fakta.type}. Forventet type er ${TypeDagligReise.OFFENTLIG_TRANSPORT} eller ${TypeDagligReise.PRIVAT_BIL}"
         }
+    }
+
+    private fun validerSammenhengendeDelperioderPrivatBil() {
+        if (fakta !is FaktaPrivatBil) return
+
+        brukerfeilHvis(fakta.faktaDelperioder.isEmpty()) {
+            "Minst én reiseperiode må være satt"
+        }
+
+        validerUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode(this, fakta.faktaDelperioder)
     }
 }

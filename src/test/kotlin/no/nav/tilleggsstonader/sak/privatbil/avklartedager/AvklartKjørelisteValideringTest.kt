@@ -315,7 +315,7 @@ class AvklartKjørelisteValideringTest {
                 validerKasterFeilVedOppdatering(
                     oppdaterteDager = listOf(oppdatertDag),
                     kjøreliste = listOf(kjørelisteDag),
-                    forventetFeilmelding = "Må oppgi begrunnelse for å endring av parkeringsutgift",
+                    forventetFeilmelding = "Må oppgi begrunnelse for å endre parkeringsutgift",
                 )
             }
 
@@ -332,7 +332,7 @@ class AvklartKjørelisteValideringTest {
                 validerKasterFeilVedOppdatering(
                     oppdaterteDager = listOf(dag),
                     kjøreliste = listOf(kjørelisteDag),
-                    forventetFeilmelding = "Må oppgi begrunnelse for å endring av parkeringsutgift",
+                    forventetFeilmelding = "Må oppgi begrunnelse for å endre parkeringsutgift",
                 )
             }
         }

@@ -2,10 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.kontrakter.felles.allePerioderErSammenhengende
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
-import no.nav.tilleggsstonader.sak.util.norskFormat
+import no.nav.tilleggsstonader.sak.util.validerUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -36,22 +33,10 @@ data class RammeForReiseMedPrivatBilBeregningsgrunnlag(
     val vedtaksperioder: List<Vedtaksperiode>,
 ) : Periode<LocalDate> {
     init {
-        brukerfeilHvis(fom != delperioder.minOf { it.fom }) {
-            "Rammevedtaket sin fom ${fom.norskFormat()} er ikke lik den tidligste delperioden sin fom ${delperioder.minOf {
-                it.fom
-                    .norskFormat()
-            }}"
-        }
-        brukerfeilHvis(tom != delperioder.maxOf { it.tom }) {
-            "Rammevedtaket sin tom ${tom.norskFormat()} er ikke lik den tidligste delperioden sin tom ${delperioder.maxOf {
-                it.tom
-                    .norskFormat()
-            }}"
-        }
-        brukerfeilHvisIkke(delperioder.allePerioderErSammenhengende()) {
-            "Alle delperioder må være sammenhengende: " +
-                delperioder.joinToString(", ") { "${it.fom.norskFormat()} - ${it.tom.norskFormat()}" }
-        }
+        validerUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode(
+            overordnetPeriode = this,
+            delperioder = delperioder,
+        )
     }
 
     fun vedtaksperiodeForPeriode(periode: Periode<LocalDate>) = vedtaksperioder.single { it.inneholder(periode) }

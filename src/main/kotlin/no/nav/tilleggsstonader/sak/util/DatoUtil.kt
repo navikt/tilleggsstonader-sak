@@ -2,8 +2,12 @@ package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
+import no.nav.tilleggsstonader.kontrakter.felles.førsteOverlappendePeriode
+import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.util.DatoFormat.DATE_FORMAT_NORSK
 import no.nav.tilleggsstonader.sak.util.DatoUtil.dagensDato
 import no.nav.tilleggsstonader.sak.util.DatoUtil.dagensDatoMedTid
@@ -117,6 +121,51 @@ fun LocalDate.datoEllerNesteMandagHvisLørdagEllerSøndag() =
         this
     }
 
+fun validerUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode(
+    overordnetPeriode: Periode<LocalDate>,
+    delperioder: List<Periode<LocalDate>>,
+) {
+    val sortertePerioder = delperioder.sortedBy { it.fom }
+
+    sortertePerioder.førsteOverlappendePeriode()?.let { (a, b) ->
+        brukerfeil(
+            "Delperioder kan ikke overlappe: ${a.fom.norskFormat()} - ${a.tom.norskFormat()} overlapper med ${b.fom.norskFormat()} - ${b.tom.norskFormat()}",
+        )
+    }
+
+    sortertePerioder.zipWithNext().firstOrNull { (a, b) -> !a.påfølgesAv(b) }?.let { (a, b) ->
+        brukerfeil(
+            "Det er opphold mellom delperiodene ${a.tom.norskFormat()} og ${b.fom.norskFormat()}. Delperiodene må være sammenhengende.",
+        )
+    }
+
+    sortertePerioder.forEachIndexed { index, periode ->
+        brukerfeilHvis(periode.tom < periode.fom) {
+            "Tom ${periode.tom.norskFormat()} for delperioden er før fom ${periode.fom.norskFormat()}"
+        }
+
+        if (index == 0) {
+            brukerfeilHvis(periode.fom != overordnetPeriode.fom) {
+                "Delperioden sin fom ${periode.fom.norskFormat()} må være lik reiseperioden sin fom"
+            }
+        } else {
+            brukerfeilHvis(periode.fom.dayOfWeek != DayOfWeek.MONDAY) {
+                "Delperiode fom ${periode.fom.norskFormat()} må starte på en mandag"
+            }
+        }
+
+        if (index == sortertePerioder.lastIndex) {
+            brukerfeilHvis(periode.tom != overordnetPeriode.tom) {
+                "Delperioden sin tom ${periode.tom.norskFormat()} må være lik reiseperioden sin tom "
+            }
+        } else {
+            brukerfeilHvis(periode.tom.dayOfWeek != DayOfWeek.SUNDAY) {
+                "Delperiode tom ${periode.tom.norskFormat()} må slutte på en søndag "
+            }
+        }
+    }
+}
+
 fun LocalDate.toYearMonth(): YearMonth = YearMonth.from(this)
 
 fun LocalDate.erFørsteDagIMåneden() = this.dayOfMonth == 1
@@ -136,6 +185,8 @@ fun Periode<LocalDate>.formatertPeriodeNorskFormat() = "${this.fom.norskFormat()
 fun Periode<LocalDate>.inneholderUkedag() = this.alleDatoer().any { !it.lørdagEllerSøndag() }
 
 fun LocalDate.finnMandagNesteUke(): LocalDate = this.with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+
+fun LocalDate.finnNesteSøndag(): LocalDate = this.with(TemporalAdjusters.next(DayOfWeek.SUNDAY))
 
 fun LocalDate.forrigeVirkedag(): LocalDate =
     when (this.dayOfWeek) {

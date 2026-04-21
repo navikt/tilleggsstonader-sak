@@ -23,8 +23,17 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.kildeResultatAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.periodeAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDto
+import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil
+import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -37,6 +46,7 @@ import java.util.concurrent.CompletableFuture
 class SkjemaRoutingIntegrationTest(
     @Autowired private val arenaClient: ArenaClient,
     @Autowired private val pdlClient: PdlClient,
+    @Autowired private val vedtakRepository: VedtakRepository,
 ) : CleanDatabaseIntegrationTest() {
     val jonasIdent = "12345678910"
     val ernaIdent = "10987654321"
@@ -269,4 +279,95 @@ class SkjemaRoutingIntegrationTest(
         skjematype: Skjematype = Skjematype.SØKNAD_DAGLIG_REISE,
         ident: String = jonasIdent,
     ) = testoppsettService.hentSøknadRouting(ident, skjematype) != null
+
+    @Nested
+    inner class DagligReiseKjøreliste {
+        val kjørelisteRoutingRequest =
+            IdentSkjematype(
+                ident = jonasIdent,
+                skjematype = Skjematype.DAGLIG_REISE_KJØRELISTE,
+            )
+
+        @Test
+        fun `skal route til ny løsning hvis person har vedtak med privat bil`() {
+            opprettBehandlingMedVedtakForPrivatBil(Stønadstype.DAGLIG_REISE_TSO)
+
+            val routingSjekk = kall.skjemaRouting.sjekk(kjørelisteRoutingRequest)
+
+            assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
+            assertThat(routingHarBlittLagret(Skjematype.DAGLIG_REISE_KJØRELISTE)).isTrue()
+        }
+
+        @Test
+        fun `skal route til gammel løsning hvis person ikke har vedtak`() {
+            val routingSjekk = kall.skjemaRouting.sjekk(kjørelisteRoutingRequest)
+
+            assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
+            assertThat(routingHarBlittLagret(Skjematype.DAGLIG_REISE_KJØRELISTE)).isFalse()
+        }
+
+        @Test
+        fun `skal route til gammel løsning hvis person har vedtak uten privat bil`() {
+            opprettBehandlingMedVedtakUtenPrivatBil(Stønadstype.DAGLIG_REISE_TSO)
+
+            val routingSjekk = kall.skjemaRouting.sjekk(kjørelisteRoutingRequest)
+
+            assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
+            assertThat(routingHarBlittLagret(Skjematype.DAGLIG_REISE_KJØRELISTE)).isFalse()
+        }
+
+        @Test
+        fun `skal alltid svare ja hvis personen har blitt routet til ny løsning tidligere`() {
+            testoppsettService.lagreSøknadRouting(
+                SkjemaRouting(
+                    ident = jonasIdent,
+                    type = Skjematype.DAGLIG_REISE_KJØRELISTE,
+                    detaljer = JsonWrapper("{}"),
+                ),
+            )
+
+            val routingSjekk = kall.skjemaRouting.sjekk(kjørelisteRoutingRequest)
+
+            assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
+        }
+
+        private fun opprettBehandlingMedVedtakForPrivatBil(stønadstype: Stønadstype) {
+            val fagsak = fagsak(identer = setOf(PersonIdent(jonasIdent)), stønadstype = stønadstype)
+            val dagligReiseBehandling = behandling(fagsak)
+
+            testoppsettService.lagreFagsak(fagsak)
+            testoppsettService.lagre(behandling = dagligReiseBehandling, opprettGrunnlagsdata = false)
+
+            val vedtak =
+                GeneriskVedtak(
+                    behandlingId = dagligReiseBehandling.id,
+                    type = TypeVedtak.INNVILGELSE,
+                    data =
+                        InnvilgelseDagligReise(
+                            vedtaksperioder = DagligReiseTestUtil.defaultVedtaksperioder,
+                            beregningsresultat = DagligReiseTestUtil.defaultBeregningsresultat,
+                            rammevedtakPrivatBil = RammevedtakPrivatBilUtil.rammevedtakPrivatBil(),
+                            beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+                        ),
+                    gitVersjon = Applikasjonsversjon.versjon,
+                    tidligsteEndring = null,
+                    opphørsdato = null,
+                )
+            vedtakRepository.insert(vedtak)
+        }
+
+        private fun opprettBehandlingMedVedtakUtenPrivatBil(stønadstype: Stønadstype) {
+            val fagsak = fagsak(identer = setOf(PersonIdent(jonasIdent)), stønadstype = stønadstype)
+            val dagligReiseBehandling = behandling(fagsak)
+
+            testoppsettService.lagreFagsak(fagsak)
+            testoppsettService.lagre(behandling = dagligReiseBehandling, opprettGrunnlagsdata = false)
+
+            val vedtak =
+                DagligReiseTestUtil.innvilgelse(
+                    behandlingId = dagligReiseBehandling.id,
+                )
+            vedtakRepository.insert(vedtak)
+        }
+    }
 }

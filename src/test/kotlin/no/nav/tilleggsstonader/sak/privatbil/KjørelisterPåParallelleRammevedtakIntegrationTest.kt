@@ -69,8 +69,8 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
             kall.privatBil
                 .hentRammevedtak(førstegangsBehandlingContext.ident)
 
-        reiseIdRamme1 = rammevedtak.first().reiseId
-        reiseIdRamme2 = rammevedtak.last().reiseId
+        reiseIdRamme1 = rammevedtak.single { it.fom == fomRamme1 }.reiseId
+        reiseIdRamme2 = rammevedtak.single { it.fom == fomRamme2 }.reiseId
         brukerident = førstegangsBehandlingContext.ident
 
         førstegangsbehandling = testoppsettService.hentBehandling(førstegangsBehandlingContext.behandlingId)

@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
-import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
+import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -353,7 +353,7 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
                 reiseId = ReiseId.random(),
                 fom = LocalDate.now(),
                 tom = LocalDate.now(),
-                ukenummer = LocalDate.now().ukenummer(),
+                uke = LocalDate.now().tilUkeIÅr(),
                 status = UkeStatus.OK_AUTOMATISK,
                 dager =
                     setOf(

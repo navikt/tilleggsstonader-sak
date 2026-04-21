@@ -270,7 +270,7 @@ class OppgaveService(
         oppgaveRepository.findByBehandlingIdAndStatusAndTypeIn(
             behandlingId = behandlingId,
             status = Oppgavestatus.ÅPEN,
-            oppgavetype = setOf(Oppgavetype.BehandleSak, Oppgavetype.BehandleUnderkjentVedtak),
+            oppgavetype = setOf(Oppgavetype.BehandleSak, Oppgavetype.BehandleUnderkjentVedtak, Oppgavetype.BehandleKjøreliste),
         )
 
     fun hentOppgave(gsakOppgaveId: Long): Oppgave = oppgaveClient.finnOppgaveMedId(gsakOppgaveId)

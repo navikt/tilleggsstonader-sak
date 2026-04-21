@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur.database
 import no.nav.familie.prosessering.PropertiesWrapperTilStringConverter
 import no.nav.familie.prosessering.StringTilPropertiesWrapperConverter
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
+import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.IdConverters.alleValueClassConverters
 import no.nav.tilleggsstonader.sak.oppfølging.OppfølgingData
@@ -128,6 +129,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
             TilbakekrevingJsonDataWriter(),
             InnsendtKjørelisteReader(),
             InnsendtKjørelisteWriter(),
+            TilUkeIÅrConverter(),
+            UkeIÅrTilStringConverter(),
         ) + alleVedtaksstatistikkJsonConverters +
             alleValueClassConverters
 
@@ -194,6 +197,16 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     @WritingConverter
     class VilkårperiodeTypeTilStringConverter : Converter<VilkårperiodeType, String> {
         override fun convert(data: VilkårperiodeType): String = data.tilDbType()
+    }
+
+    @ReadingConverter
+    class TilUkeIÅrConverter : Converter<String, UkeIÅr> {
+        override fun convert(type: String): UkeIÅr = UkeIÅr.fraString(type)
+    }
+
+    @WritingConverter
+    class UkeIÅrTilStringConverter : Converter<UkeIÅr, String> {
+        override fun convert(data: UkeIÅr): String = data.toString()
     }
 
     class SimuleringResponseWriter : JsonWriter<SimuleringJson>()

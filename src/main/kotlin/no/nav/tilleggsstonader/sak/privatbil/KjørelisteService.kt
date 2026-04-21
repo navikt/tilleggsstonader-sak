@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class KjørelisteService(
@@ -27,5 +26,5 @@ class KjørelisteService(
 
     fun hentForFagsakId(fagsakId: FagsakId): List<Kjøreliste> = repository.findByFagsakId(fagsakId)
 
-    fun hentKjøreliste(kjørelisteId: UUID): Kjøreliste = repository.findByIdOrThrow(kjørelisteId)
+    fun hentKjøreliste(kjørelisteId: KjørelisteId): Kjøreliste = repository.findByIdOrThrow(kjørelisteId)
 }

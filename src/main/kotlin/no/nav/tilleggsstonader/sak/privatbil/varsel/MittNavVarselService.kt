@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.privatbil.varsel
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
@@ -20,9 +21,10 @@ import java.util.UUID
 class MittNavVarselService(
     private val kjørelisteService: KjørelisteService,
     private val vedtakService: VedtakService,
+    private val behandlingService: BehandlingService,
 ) {
     fun skalSendeKjørelisteVarsel(behandling: Saksbehandling): Boolean {
-        if (!erBehandlingInnvilgelseEllerOpphørDagligReise(behandling)) return false
+        if (!erBehandlingInnvilgelseEllerOpphørDagligReise(behandling) || !erGjeldendeIverksatteBehandling(behandling)) return false
 
         val rammevedtak = finnRammevedtakPrivatBil(behandling) ?: return false
         val innsendtKjørelisteMap = finnInnsendtKjørelisteMap(behandling)
@@ -36,7 +38,7 @@ class MittNavVarselService(
     }
 
     fun skalSendeKjørelisteForNesteUke(behandling: Saksbehandling): Boolean {
-        if (!erBehandlingInnvilgelseEllerOpphørDagligReise(behandling)) return false
+        if (!erBehandlingInnvilgelseEllerOpphørDagligReise(behandling) || !erGjeldendeIverksatteBehandling(behandling)) return false
 
         val rammevedtak = finnRammevedtakPrivatBil(behandling) ?: return false
         val innsendtKjørelisteMap = finnInnsendtKjørelisteMap(behandling)
@@ -50,6 +52,9 @@ class MittNavVarselService(
     private fun erBehandlingInnvilgelseEllerOpphørDagligReise(behandling: Saksbehandling) =
         behandling.stønadstype.gjelderDagligReise() &&
             (behandling.resultat == BehandlingResultat.INNVILGET || behandling.resultat == BehandlingResultat.OPPHØRT)
+
+    private fun erGjeldendeIverksatteBehandling(behandling: Saksbehandling) =
+        behandlingService.finnSisteIverksatteBehandling(behandling.fagsakId)?.id == behandling.id
 
     private fun finnRammevedtakPrivatBil(behandling: Saksbehandling): RammevedtakPrivatBil? =
         vedtakService

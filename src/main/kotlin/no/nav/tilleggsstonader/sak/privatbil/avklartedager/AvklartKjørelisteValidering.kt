@@ -92,8 +92,11 @@ private fun AvklartKjørtDag.validerBegrunnelse(innsendtKjørelisteDag: Kjøreli
         "Må oppgi begrunnelse for å ikke godkjenne kjøring når bruker har oppgitt å ha kjørt for dag ${dato.norskFormat()}"
     }
 
-    brukerfeilHvis(parkeringsutgift != innsendtKjørelisteDag.parkeringsutgift) {
-        "Må oppgi begrunnelse for å endring av parkeringsutgift på dag ${dato.norskFormat()}"
+    val parkeringsutgiftAvklartDag = parkeringsutgift ?: 0
+    val parkeringsutgiftKjøreliste = innsendtKjørelisteDag.parkeringsutgift ?: 0
+
+    brukerfeilHvis(parkeringsutgiftAvklartDag != parkeringsutgiftKjøreliste) {
+        "Må oppgi begrunnelse for å endre parkeringsutgift på dag ${dato.norskFormat()}"
     }
 
     brukerfeilHvis(godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.JA && avvik.isNotEmpty()) {

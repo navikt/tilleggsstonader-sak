@@ -5,14 +5,17 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
+import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 
@@ -83,8 +86,45 @@ internal class OpprettOppgaveForOpprettetBehandlingTaskTest {
         verify(exactly = 0) { oppgaveService.opprettOppgave(any(), any()) }
     }
 
-    private fun mockBehandling(status: BehandlingStatus): Saksbehandling {
-        val behandling = saksbehandling(status = status)
+    @Test
+    internal fun `Skal opprette oppgave med type BehandleKjøreliste for kjørelistebehandlinger`() {
+        val behandling = mockBehandling(status = BehandlingStatus.OPPRETTET, type = BehandlingType.KJØRELISTE)
+
+        opprettOppgaveForOpprettetBehandlingTask.doTask(
+            OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
+                OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
+                    behandling.id,
+                    "",
+                ),
+            ),
+        )
+
+        verify(exactly = 1) { oppgaveService.opprettOppgave(any(), capture(opprettOppgaveSlot)) }
+        assertThat(opprettOppgaveSlot.captured.oppgavetype).isEqualTo(Oppgavetype.BehandleKjøreliste)
+    }
+
+    @Test
+    internal fun `Skal opprette oppgave med type BehandleSak for ikke-kjørelistebehandlinger`() {
+        val behandling = mockBehandling(status = BehandlingStatus.OPPRETTET, type = BehandlingType.FØRSTEGANGSBEHANDLING)
+
+        opprettOppgaveForOpprettetBehandlingTask.doTask(
+            OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
+                OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
+                    behandling.id,
+                    "",
+                ),
+            ),
+        )
+
+        verify(exactly = 1) { oppgaveService.opprettOppgave(any(), capture(opprettOppgaveSlot)) }
+        assertThat(opprettOppgaveSlot.captured.oppgavetype).isEqualTo(Oppgavetype.BehandleSak)
+    }
+
+    private fun mockBehandling(
+        status: BehandlingStatus,
+        type: BehandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
+    ): Saksbehandling {
+        val behandling = saksbehandling(status = status, type = type)
         every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
         return behandling
     }

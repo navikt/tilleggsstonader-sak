@@ -6,14 +6,14 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.privatbil.InnsendtKjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
+import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
 
 object KjørelisteUtil {
     fun kjøreliste(
-        id: UUID = UUID.randomUUID(),
+        id: KjørelisteId = KjørelisteId.random(),
         journalpostId: String = "12345678",
         fagsakId: FagsakId = FagsakId.random(),
         datoMottatt: LocalDateTime = LocalDateTime.now(),

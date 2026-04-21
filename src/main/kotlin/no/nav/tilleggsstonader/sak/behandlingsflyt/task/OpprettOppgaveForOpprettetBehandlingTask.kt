@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.OPPRETTET
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.SATT_PÅ_VENT
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.UTREDES
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
@@ -50,6 +51,7 @@ class OpprettOppgaveForOpprettetBehandlingTask(
         task: Task,
     ): Long? {
         val behandling = behandlingService.hentSaksbehandling(data.behandlingId)
+        val oppgavetype = if (behandling.type == BehandlingType.KJØRELISTE) Oppgavetype.BehandleKjøreliste else Oppgavetype.BehandleSak
         if (behandling.status in listOf(OPPRETTET, UTREDES, SATT_PÅ_VENT)) {
             val tilordnetNavIdent =
                 if (data.saksbehandler == SikkerhetContext.SYSTEM_FORKORTELSE) null else data.saksbehandler
@@ -58,7 +60,7 @@ class OpprettOppgaveForOpprettetBehandlingTask(
                     behandlingId = data.behandlingId,
                     oppgave =
                         OpprettOppgave(
-                            oppgavetype = Oppgavetype.BehandleSak,
+                            oppgavetype = oppgavetype,
                             tilordnetNavIdent = tilordnetNavIdent,
                             beskrivelse = data.beskrivelse,
                             prioritet = data.prioritet,
