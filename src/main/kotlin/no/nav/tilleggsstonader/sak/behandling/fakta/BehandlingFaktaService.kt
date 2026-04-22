@@ -65,7 +65,12 @@ class BehandlingFaktaService(
             Stønadstype.BOUTGIFTER -> hentFaktaDtoForBoutgifter(behandlingId)
             Stønadstype.DAGLIG_REISE_TSO -> hentFaktaDtoForDagligReise(behandlingId)
             Stønadstype.DAGLIG_REISE_TSR -> hentFaktaDtoForDagligReise(behandlingId)
+            Stønadstype.REISE_TIL_SAMLING_TSO -> hentFaktaDtoForReiseTilSamling(behandlingId)
         }
+    }
+
+    private fun hentFaktaDtoForReiseTilSamling(behandlingId: BehandlingId): BehandlingFaktaDto {
+        TODO("Lag oppgave")
     }
 
     fun hentFaktaDtoForBarneTilsyn(behandlingId: BehandlingId): BehandlingFaktaTilsynBarnDto {

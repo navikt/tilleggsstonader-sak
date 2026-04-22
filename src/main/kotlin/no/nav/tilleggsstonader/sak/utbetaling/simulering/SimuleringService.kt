@@ -85,18 +85,26 @@ class SimuleringService(
                 .finnFagsakerForFagsakPersonId(fagsak.fagsakPersonId)
         return when (fagsak.stønadstype) {
             Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR ->
-                håndterDagligReiseVarsel(alleFagsaker)
+                håndterVarselForStønaderMedEgetFagområde(
+                    listOfNotNull(
+                        alleFagsaker.dagligReiseTso,
+                        alleFagsaker.dagligReiseTso,
+                    ),
+                )
+
+            Stønadstype.REISE_TIL_SAMLING_TSO ->
+                håndterVarselForStønaderMedEgetFagområde(
+                    listOfNotNull(alleFagsaker.reiseTilSamlingTso),
+                )
 
             Stønadstype.BOUTGIFTER, Stønadstype.LÆREMIDLER, Stønadstype.BARNETILSYN ->
                 håndterTilsynbarnLæremidlerBoutgifterVarsel(alleFagsaker)
         }
     }
 
-    fun håndterDagligReiseVarsel(alleFagsaker: Fagsaker): String? {
+    fun håndterVarselForStønaderMedEgetFagområde(relevanteFagsaker: List<Fagsak>): String? {
         val dagensDato = LocalDate.now()
-        val relevanteFagsaker =
-            listOfNotNull(alleFagsaker.dagligReiseTso, alleFagsaker.dagligReiseTsr)
-        return if (erVarselRelevantForDagligReise(relevanteFagsaker, dagensDato)) {
+        return if (erVarselRelevant(relevanteFagsaker, dagensDato)) {
             "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
         } else {
             null
@@ -114,7 +122,7 @@ class SimuleringService(
         }
     }
 
-    private fun erVarselRelevantForDagligReise(
+    private fun erVarselRelevant(
         fagsaker: List<Fagsak>,
         dagensDato: LocalDate,
     ): Boolean {

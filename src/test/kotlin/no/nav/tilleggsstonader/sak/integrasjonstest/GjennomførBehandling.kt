@@ -126,6 +126,7 @@ private fun søknadForStønadstype(
     Stønadstype.DAGLIG_REISE_TSO,
     Stønadstype.DAGLIG_REISE_TSR,
     -> søknadDagligReise(ident = ident)
+    Stønadstype.REISE_TIL_SAMLING_TSO -> TODO("lage søgnadskjema for reise til samling")
 }
 
 fun IntegrationTest.gjennomførBehandlingsløp(
@@ -340,6 +341,7 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                                 InnvilgelseDagligReiseTsrRequest(
                                     vedtaksperioder = vedtaksperioder.tilVedtaksperiodeDagligReiseDto(),
                                 )
+                            Stønadstype.REISE_TIL_SAMLING_TSO -> TODO("InnvilgelseReiseTilSamlingTsoRequest")
                         },
                 )
         }
@@ -379,6 +381,7 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                                     begrunnelse = opprettVedtak.begrunnelse,
                                     opphørsdato = opprettVedtak.opphørsdato,
                                 )
+                            Stønadstype.REISE_TIL_SAMLING_TSO -> TODO("OpphørReiseTilSamlingTsoRequest")
                         },
                 )
     }

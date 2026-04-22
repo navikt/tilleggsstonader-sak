@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Skjematype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseTilSamling
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
@@ -89,6 +90,11 @@ class HåndterSøknadService(
                     finnStønadstypeForDagligReise(journalpost),
                     Stønadstype.entries.filter { it.gjelderDagligReise() },
                 )
+            Skjematype.SØKNAD_REISE_TIL_SAMLING ->
+                ValgbareStønadstyperForJournalpost(
+                    finnStønadstypeForReiseTilSamling(journalpost),
+                    Stønadstype.entries.filter { it.gjelderReiseTilSamling() },
+                )
 
             Skjematype.DAGLIG_REISE_KJØRELISTE ->
                 error("Skal ikke behandle kjøreliste")
@@ -99,6 +105,18 @@ class HåndterSøknadService(
                     valgbareStønadstyper = Stønadstype.entries,
                 )
         }
+    }
+
+    private fun finnStønadstypeForReiseTilSamling(journalpost: Journalpost): Stønadstype {
+        if (!journalpost.harStrukturertSøknad()) {
+            return if (journalpost.tema == Tema.TSO.name) {
+                Stønadstype.REISE_TIL_SAMLING_TSO
+            } else {
+                TODO("Lage Stønadstype for REISE_TIL_SAMLING_TSR")
+            }
+        }
+
+        TODO("Lag ferdig denne funksjonen")
     }
 
     private fun finnStønadstypeForDagligReise(journalpost: Journalpost): Stønadstype {

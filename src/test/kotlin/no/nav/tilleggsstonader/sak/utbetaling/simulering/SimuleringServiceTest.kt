@@ -175,6 +175,7 @@ internal class SimuleringServiceTest {
                 boutgifter = null,
                 dagligReiseTso = fagsakDagligReiseTso,
                 dagligReiseTsr = fagsakDagligReiseTsr,
+                reiseTilSamlingTso = null,
             )
         val idag = LocalDate.now()
 
@@ -220,6 +221,7 @@ internal class SimuleringServiceTest {
                 boutgifter = null,
                 dagligReiseTso = fagsakDagligReiseTso,
                 dagligReiseTsr = fagsakDagligReiseTsr,
+                reiseTilSamlingTso = null,
             )
         val idag = LocalDate.now()
 
@@ -266,6 +268,7 @@ internal class SimuleringServiceTest {
                 boutgifter = null,
                 dagligReiseTso = null,
                 dagligReiseTsr = null,
+                reiseTilSamlingTso = null,
             )
         val varselTekst = "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
 
@@ -312,6 +315,7 @@ internal class SimuleringServiceTest {
                 boutgifter = null,
                 dagligReiseTso = null,
                 dagligReiseTsr = null,
+                reiseTilSamlingTso = null,
             )
 
         every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakTilsynbarn

@@ -164,7 +164,15 @@ class OpprettTestBehandlingController(
             Stønadstype.BOUTGIFTER -> opprettSøknadBoutgifter(fagsak, behandling)
             Stønadstype.DAGLIG_REISE_TSO -> opprettSøknadDagligeReise(fagsak, behandling)
             Stønadstype.DAGLIG_REISE_TSR -> opprettSøknadDagligeReise(fagsak, behandling)
+            Stønadstype.REISE_TIL_SAMLING_TSO -> opprettSøknadReiseTilSamling(fagsak, behandling)
         }
+    }
+
+    private fun opprettSøknadReiseTilSamling(
+        fagsak: Fagsak,
+        behandling: Behandling,
+    ) {
+        TODO("kommer tilbake hit")
     }
 
     private fun opprettSøknadBarnetilsyn(

@@ -145,6 +145,7 @@ internal class KlageServiceTest {
                     null,
                     null,
                     null,
+                    null,
                 )
 
             val klager = klageService.hentBehandlinger(fagsakPersonId)
@@ -280,7 +281,7 @@ internal class KlageServiceTest {
             )
         }
 
-        private fun fagsaker() = Fagsaker(fagsak, null, null, null, null)
+        private fun fagsaker() = Fagsaker(fagsak, null, null, null, null, null)
 
         private fun klageBehandlingDto(
             resultat: BehandlingResultat? = null,

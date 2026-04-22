@@ -99,7 +99,7 @@ enum class MålgruppeType(
                         INGEN_MÅLGRUPPE,
                     )
 
-            Stønadstype.DAGLIG_REISE_TSO ->
+            Stønadstype.DAGLIG_REISE_TSO, Stønadstype.REISE_TIL_SAMLING_TSO ->
                 this in
                     listOf(
                         AAP,

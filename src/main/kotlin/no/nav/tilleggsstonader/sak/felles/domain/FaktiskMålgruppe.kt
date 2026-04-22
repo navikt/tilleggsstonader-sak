@@ -70,6 +70,10 @@ enum class FaktiskMålgruppe(
                 }
             }
 
+            Stønadstype.REISE_TIL_SAMLING_TSO -> {
+                TODO("Hvilke typeandel skal brukes her?")
+            }
+
             Stønadstype.DAGLIG_REISE_TSR -> error("Kan ikke utlede Typeandel for Daglige reiser TSR fra FaktiskMålgruppe")
         }
 }

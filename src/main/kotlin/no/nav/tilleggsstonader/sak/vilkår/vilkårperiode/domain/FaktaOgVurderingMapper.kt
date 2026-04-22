@@ -145,6 +145,8 @@ private fun mapAktiviteter(
             require(faktaOgSvar is FaktaOgSvarAktivitetDagligReiseTsrDto)
             return mapAktiviteterDagligReiseTsr(type, faktaOgSvar)
         }
+
+        Stønadstype.REISE_TIL_SAMLING_TSO -> TODO()
     }
 }
 
@@ -179,6 +181,8 @@ private fun mapMålgruppe(
         Stønadstype.DAGLIG_REISE_TSR -> {
             mapMålgruppeDagligReiseTsr(type)
         }
+
+        Stønadstype.REISE_TIL_SAMLING_TSO -> TODO()
     }
 }
 
