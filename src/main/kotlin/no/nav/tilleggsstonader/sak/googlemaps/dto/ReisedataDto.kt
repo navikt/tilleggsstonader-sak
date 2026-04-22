@@ -92,7 +92,7 @@ fun KollektivDetaljer.tilDto() =
         operatør = operatør.map { it.tilDto(startHoldeplass, startHoldeplassLokasjon, sluttHoldeplass, sluttHoldeplassLokasjon) },
     )
 
-fun Operatør.tilDto(
+private fun Operatør.tilDto(
     startHoldeplass: String,
     startLokasjon: Lokasjon,
     sluttHoldeplass: String,
