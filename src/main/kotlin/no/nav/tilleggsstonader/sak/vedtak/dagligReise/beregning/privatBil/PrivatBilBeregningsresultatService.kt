@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.avrundetStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilDag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilGrunnlag
@@ -14,7 +15,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPri
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import org.springframework.stereotype.Service
-import java.math.RoundingMode
 
 @Service
 class PrivatBilBeregningsresultatService {
@@ -99,7 +99,7 @@ class PrivatBilBeregningsresultatService {
                                 stønadsbeløpForDag =
                                     dagsatsUtenParkering
                                         .plus(parkeringsutgift.toBigDecimal())
-                                        .setScale(0, RoundingMode.HALF_UP),
+                                        .setScale(2),
                             )
                         }
 
@@ -110,7 +110,7 @@ class PrivatBilBeregningsresultatService {
                         BeregningsresultatForReisePrivatBilGrunnlag(
                             dager = beregnedeDager,
                         ),
-                    stønadsbeløp = beregnedeDager.sumOf { it.stønadsbeløpForDag },
+                    stønadsbeløp = beregnedeDager.sumOf { it.stønadsbeløpForDag }.avrundetStønadsbeløp(),
                     brukersNavKontor = brukersNavKontor,
                 )
             }

@@ -293,7 +293,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                         satserSize = 2,
                         totalParkeringskostnad = 150,
                         ukenummer = 1,
-                        stønadsbeløp = BigDecimal("367"),
+                        stønadsbeløp = BigDecimal("366"),
                     ),
             )
 
@@ -325,7 +325,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                         satserSize = 1,
                         totalParkeringskostnad = 60,
                         ukenummer = 3,
-                        stønadsbeløp = BigDecimal("537"),
+                        stønadsbeløp = BigDecimal("536"),
                     ),
             )
         }

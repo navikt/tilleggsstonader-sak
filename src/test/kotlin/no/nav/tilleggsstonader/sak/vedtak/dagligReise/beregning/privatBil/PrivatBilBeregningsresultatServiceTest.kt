@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UtfyltDagAutomatiskVu
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammevedtakPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.avrundetStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
@@ -24,8 +25,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatException
 import org.assertj.core.api.Assertions.assertThatNoException
 import org.junit.jupiter.api.Test
-import java.math.BigDecimal
-import java.math.RoundingMode
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
@@ -272,13 +271,15 @@ class PrivatBilBeregningsresultatServiceTest {
         val dagI2026 = beregningsresultatUke.grunnlag.dager.first { it.dato.year == 2026 }
 
         assertThat(dagI2025.parkeringskostnad).isZero
-        assertThat(dagI2025.stønadsbeløpForDag).isEqualTo(dagI2025.dagsatsUtenParkering.avrundetStønadsbeløp())
+        assertThat(dagI2025.stønadsbeløpForDag).isEqualTo(dagI2025.dagsatsUtenParkering)
         assertThat(dagI2026.parkeringskostnad).isZero
-        assertThat(dagI2026.stønadsbeløpForDag).isEqualTo(dagI2026.dagsatsUtenParkering.avrundetStønadsbeløp())
+        assertThat(dagI2026.stønadsbeløpForDag).isEqualTo(dagI2026.dagsatsUtenParkering)
 
         assertThat(dagI2025.stønadsbeløpForDag).isNotEqualTo(dagI2026.stønadsbeløpForDag)
 
-        assertThat(beregningsresultatUke.stønadsbeløp).isEqualTo(beregningsresultatUke.grunnlag.dager.sumOf { it.stønadsbeløpForDag })
+        assertThat(
+            beregningsresultatUke.stønadsbeløp.setScale(2),
+        ).isEqualTo(beregningsresultatUke.grunnlag.dager.sumOf { it.stønadsbeløpForDag })
     }
 
     @Test
@@ -628,6 +629,4 @@ class PrivatBilBeregningsresultatServiceTest {
                             }.toSet(),
                 )
             }
-
-    private fun BigDecimal.avrundetStønadsbeløp(): BigDecimal = setScale(0, RoundingMode.HALF_UP)
 }
