@@ -27,6 +27,6 @@ class SkjemaRoutingController(
         feilHvisIkke(kallKommerFra(eksternApplikasjon.soknadApi), HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
         }
-        return with(request) { SkjemaRoutingResponse(skjemaRoutingService.skalRoutesTilNyLøsning(ident, skjematype)) }
+        return with(request) { SkjemaRoutingResponse(skjemaRoutingService.bestemRoutingAksjon(ident, skjematype)) }
     }
 }

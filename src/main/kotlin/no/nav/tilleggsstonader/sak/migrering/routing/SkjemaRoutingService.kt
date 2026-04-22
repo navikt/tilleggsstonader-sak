@@ -42,7 +42,7 @@ class SkjemaRoutingService(
     ) = routingRepository.findByIdentAndType(ident, skjematype) != null
 
     @Transactional
-    fun skalRoutesTilNyLøsning(
+    fun bestemRoutingAksjon(
         ident: String,
         skjematype: Skjematype,
     ): SkjemaRoutingAksjon =
