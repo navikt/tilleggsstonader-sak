@@ -79,7 +79,7 @@ class VedtaksperioderOversiktService(
         return when (vedtaksdata) {
             is InnvilgelseEllerOpphørTilsynBarn -> vedtaksdata.finnDetaljerteVedtaksperioder()
             is InnvilgelseEllerOpphørLæremidler -> vedtaksdata.finnDetaljerteVedtaksperioder()
-            is InnvilgelseEllerOpphørBoutgifter -> vedtaksdata.finnDetaljerteVedtaksperioder()
+            is InnvilgelseEllerOpphørBoutgifter -> vedtaksdata.finnDetaljerteVedtaksperioder().sortedByDescending { it.fom }
             null -> emptyList()
             else -> error("Vi støtter ikke å hente detaljertevedtaksperioder innenfor samme enhet for ${vedtaksdata::class.java}")
         }

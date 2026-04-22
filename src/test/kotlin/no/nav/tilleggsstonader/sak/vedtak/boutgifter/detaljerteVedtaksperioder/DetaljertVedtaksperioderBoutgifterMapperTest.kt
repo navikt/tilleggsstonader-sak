@@ -71,22 +71,22 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
             val forventetUtgiftRes =
                 listOf(
                     UtgiftTilOvernatting(
-                        fom = LocalDate.of(2024, 1, 3),
-                        tom = LocalDate.of(2024, 1, 4),
-                        utgift = 4000,
-                        beløpSomDekkes = 4000,
+                        fom = LocalDate.of(2024, 1, 10),
+                        tom = LocalDate.of(2024, 1, 11),
+                        utgift = 1000,
+                        beløpSomDekkes = 1000,
                     ),
                     UtgiftTilOvernatting(
                         fom = LocalDate.of(2024, 1, 7),
                         tom = LocalDate.of(2024, 1, 8),
                         utgift = 1000,
-                        beløpSomDekkes = 809,
+                        beløpSomDekkes = 1000,
                     ),
                     UtgiftTilOvernatting(
-                        fom = LocalDate.of(2024, 1, 10),
-                        tom = LocalDate.of(2024, 1, 11),
-                        utgift = 1000,
-                        beløpSomDekkes = 0,
+                        fom = LocalDate.of(2024, 1, 3),
+                        tom = LocalDate.of(2024, 1, 4),
+                        utgift = 4000,
+                        beløpSomDekkes = 2809,
                     ),
                 )
 
@@ -190,8 +190,8 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
 
             val utgifter = res.first().utgifterTilOvernatting!!
 
-            assertThat(utgifter[0].fom).isEqualTo(LocalDate.of(2024, 1, 3))
-            assertThat(utgifter[1].fom).isEqualTo(LocalDate.of(2024, 1, 7))
+            assertThat(utgifter[0].fom).isEqualTo(LocalDate.of(2024, 1, 7))
+            assertThat(utgifter[1].fom).isEqualTo(LocalDate.of(2024, 1, 3))
         }
     }
 
