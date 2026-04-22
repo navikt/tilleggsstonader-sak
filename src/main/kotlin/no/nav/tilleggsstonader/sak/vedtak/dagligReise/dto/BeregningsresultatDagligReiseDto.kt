@@ -110,7 +110,7 @@ fun BeregningsresultatForReise.tilDto(vilkår: List<VilkårDagligReise>): Beregn
     BeregningsresultatForReiseDto(
         reiseId = reiseId,
         adresse = vilkår.firstOrNull { it.fakta.reiseId == reiseId }?.fakta?.adresse,
-        perioder = perioder.map { it.tilDto() },
+        perioder = perioder.map { it.tilDto() }.sortedByDescending { it.fom },
     )
 
 fun BeregningsresultatForPeriode.tilDto(): BeregningsresultatForPeriodeDto =

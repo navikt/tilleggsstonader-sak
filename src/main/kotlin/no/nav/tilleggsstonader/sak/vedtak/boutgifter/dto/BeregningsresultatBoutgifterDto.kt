@@ -51,7 +51,8 @@ fun BeregningsresultatBoutgifter.tilDto(beregningsplan: Beregningsplan) =
         perioder =
             filtrerFraOgMed(beregningsplan.fraDato)
                 .perioder
-                .map { it.tilDto(beregningsplan.fraDato) },
+                .map { it.tilDto(beregningsplan.fraDato) }
+                .sortedByDescending { it.fom },
         inneholderUtgifterOvernatting = inneholderUtgifterOvernatting(),
         tidligsteEndring = beregningsplan.legacyTidligsteEndring(),
         beregningsplan = beregningsplan.tilDto(),
