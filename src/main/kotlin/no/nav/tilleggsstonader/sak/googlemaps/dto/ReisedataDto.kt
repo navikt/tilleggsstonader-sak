@@ -55,6 +55,11 @@ data class KollektivDetaljerDto(
     val operatør: List<OperatørDto>,
 )
 
+private const val RUTER_NAVN = "Ruter"
+private const val RUTER_BASE_URL = "https://reise.ruter.no/"
+private const val RUTER_STOP_TYPE = "STOP_PLACE"
+private const val RUTER_MAP_ZOOM = 13
+
 data class OperatørDto(
     val navn: String,
     val url: String,
@@ -84,11 +89,41 @@ fun KollektivDetaljer.tilDto() =
         sluttHoldeplass = sluttHoldeplass,
         linjeNavn = linjeNavn,
         linjeType = linjeType,
-        operatør = operatør.map { it.tilDto() },
+        operatør = operatør.map { it.tilDto(startHoldeplass, startHoldeplassLokasjon, sluttHoldeplass, sluttHoldeplassLokasjon) },
     )
 
-fun `Operatør`.tilDto() =
-    OperatørDto(
-        navn = navn,
-        url = url,
-    )
+private fun Operatør.tilDto(
+    startHoldeplass: String,
+    startLokasjon: Lokasjon,
+    sluttHoldeplass: String,
+    sluttLokasjon: Lokasjon,
+) = OperatørDto(
+    navn = navn,
+    url = if (navn == RUTER_NAVN) byggRuterUrl(startHoldeplass, startLokasjon, sluttHoldeplass, sluttLokasjon) else url,
+)
+
+private fun byggRuterUrl(
+    startHoldeplass: String,
+    startLokasjon: Lokasjon,
+    sluttHoldeplass: String,
+    sluttLokasjon: Lokasjon,
+): String {
+    val mapLat = (startLokasjon.lat + sluttLokasjon.lat) / 2
+    val mapLng = (startLokasjon.lng + sluttLokasjon.lng) / 2
+    return buildString {
+        append(RUTER_BASE_URL)
+        append("?fromName=__").append(startHoldeplass.urlEncode()).append("__")
+        append("&fromLatitude=").append(startLokasjon.lat)
+        append("&fromLongitude=").append(startLokasjon.lng)
+        append("&toName=__").append(sluttHoldeplass.urlEncode()).append("__")
+        append("&toLatitude=").append(sluttLokasjon.lat)
+        append("&toLongitude=").append(sluttLokasjon.lng)
+        append("&mapLatitude=").append(mapLat)
+        append("&mapLongitude=").append(mapLng)
+        append("&fromType=__").append(RUTER_STOP_TYPE).append("__")
+        append("&toType=__").append(RUTER_STOP_TYPE).append("__")
+        append("&mapZoom=").append(RUTER_MAP_ZOOM)
+    }
+}
+
+private fun String.urlEncode(): String = java.net.URLEncoder.encode(this, Charsets.UTF_8)
