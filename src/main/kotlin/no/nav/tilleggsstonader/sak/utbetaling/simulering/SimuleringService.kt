@@ -88,7 +88,7 @@ class SimuleringService(
                 håndterVarselForStønaderMedEgetFagområde(
                     listOfNotNull(
                         alleFagsaker.dagligReiseTso,
-                        alleFagsaker.dagligReiseTso,
+                        alleFagsaker.dagligReiseTsr,
                     ),
                 )
 
