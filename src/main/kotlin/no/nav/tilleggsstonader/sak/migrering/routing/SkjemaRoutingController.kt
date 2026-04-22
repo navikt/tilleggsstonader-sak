@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.migrering.routing
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.IdentSkjematype
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.SkjemaRoutingResponse
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext.kallKommerFra
@@ -22,10 +23,10 @@ class SkjemaRoutingController(
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
     fun sjekkRoutingForPerson(
         @RequestBody request: IdentSkjematype,
-    ): SøknadRoutingResponse {
+    ): SkjemaRoutingResponse {
         feilHvisIkke(kallKommerFra(eksternApplikasjon.soknadApi), HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
         }
-        return with(request) { SøknadRoutingResponse(skjemaRoutingService.skalRoutesTilNyLøsning(ident, skjematype)) }
+        return with(request) { SkjemaRoutingResponse(skjemaRoutingService.skalRoutesTilNyLøsning(ident, skjematype)) }
     }
 }

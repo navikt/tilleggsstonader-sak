@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.arena.SakStatus
 import no.nav.tilleggsstonader.kontrakter.felles.IdentSkjematype
 import no.nav.tilleggsstonader.kontrakter.felles.Skjematype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.SkjemaRoutingAksjon
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
@@ -198,7 +199,14 @@ class SkjemaRoutingIntegrationTest(
             val routingKall =
                 (1..5).map {
                     CompletableFuture.supplyAsync {
-                        kall.skjemaRouting.apiRespons.sjekk((IdentSkjematype(jonasIdent, Skjematype.SØKNAD_DAGLIG_REISE)))
+                        kall.skjemaRouting.apiRespons.sjekk(
+                            (
+                                IdentSkjematype(
+                                    jonasIdent,
+                                    Skjematype.SØKNAD_DAGLIG_REISE,
+                                )
+                            ),
+                        )
                     }
                 }
 

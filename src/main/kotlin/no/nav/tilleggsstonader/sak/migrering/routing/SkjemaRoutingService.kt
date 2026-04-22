@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.arena.ArenaStatusDto
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Skjematype
 import no.nav.tilleggsstonader.kontrakter.felles.tilStønadstyper
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.SkjemaRoutingAksjon
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.libs.unleash.ToggleId
@@ -134,7 +135,7 @@ class SkjemaRoutingService(
     private fun harFortroligEllerStrengtFortroligAdresse(ident: String): Boolean =
         personService.hentAdressebeskyttelse(ident).søker.adressebeskyttelse.let { adressebeskyttelse ->
             adressebeskyttelse == AdressebeskyttelseGradering.FORTROLIG ||
-                    adressebeskyttelse == AdressebeskyttelseGradering.STRENGT_FORTROLIG
+                adressebeskyttelse == AdressebeskyttelseGradering.STRENGT_FORTROLIG
         }
 
     private fun maksAntallErNådd(
@@ -191,8 +192,8 @@ class SkjemaRoutingService(
     ) {
         logger.info(
             "routing - " +
-                    "stønadstype=$skjematype " +
-                    "aksjon=$aksjon",
+                "stønadstype=$skjematype " +
+                "aksjon=$aksjon",
         )
     }
 
@@ -219,11 +220,11 @@ class SkjemaRoutingService(
         with(arenaStatus) {
             logger.info(
                 "routing - skjematype=$skjematype harGyldigStatusArena=$harGyldigStatus " +
-                        "harAktivSakUtenVedtak=${sak.harAktivSakUtenVedtak} " +
-                        "harVedtak=${vedtak.harVedtak} " +
-                        "harAktivtVedtak=${vedtak.harAktivtVedtak} " +
-                        "harVedtakUtenUtfall=${vedtak.harVedtakUtenUtfall} " +
-                        "vedtakTom=${vedtak.vedtakTom}",
+                    "harAktivSakUtenVedtak=${sak.harAktivSakUtenVedtak} " +
+                    "harVedtak=${vedtak.harVedtak} " +
+                    "harAktivtVedtak=${vedtak.harAktivtVedtak} " +
+                    "harVedtakUtenUtfall=${vedtak.harVedtakUtenUtfall} " +
+                    "vedtakTom=${vedtak.vedtakTom}",
             )
         }
     }

@@ -1,13 +1,13 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
 import no.nav.tilleggsstonader.kontrakter.felles.IdentSkjematype
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.SkjemaRoutingResponse
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
-import no.nav.tilleggsstonader.sak.migrering.routing.SøknadRoutingResponse
 
 class SkjemaRoutingKall(
     private val testklient: Testklient,
 ) {
-    fun sjekk(identSkjematype: IdentSkjematype): SøknadRoutingResponse = apiRespons.sjekk(identSkjematype).expectOkWithBody()
+    fun sjekk(identSkjematype: IdentSkjematype): SkjemaRoutingResponse = apiRespons.sjekk(identSkjematype).expectOkWithBody()
 
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = SøknadRoutingApi()
