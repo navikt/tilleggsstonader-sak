@@ -180,6 +180,18 @@ class SkjemaRoutingIntegrationTest(
         }
 
         @Test
+        fun `skal svare avsjekk hvis person ikke har AAP-vedtak selv om maks antall ikke er nådd`() {
+            mockMaksAntallSomKanRoutesPrivatBil(maksAntall = 10)
+            mockDagligReiseVedtakIArena(erAktivt = false)
+            mockAapVedtak(erAktivt = false)
+
+            val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
+
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK)
+            assertThat(routingHarBlittLagret()).isFalse()
+        }
+
+        @Test
         fun `skal håndtere samtidige kall og ikke kaste feil`() {
             mockMaksAntallSomKanRoutesPrivatBil(maksAntall = 1)
             mockDagligReiseVedtakIArena(erAktivt = false)
