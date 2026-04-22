@@ -44,13 +44,13 @@ class SkjemaRoutingService(
     fun skalRoutesTilNyLøsning(
         ident: String,
         skjematype: Skjematype,
-    ): Boolean =
+    ): SkjemaRoutingAksjon =
         advisoryLockService.lockForTransaction(lock = ident) {
             val routingStrategi = bestemRoutingStrategi(skjematype)
 
             when (routingStrategi) {
                 RoutingStrategi.SendAlleBrukereTilNyLøsning -> {
-                    true
+                    SkjemaRoutingAksjon.NY_LØSNING
                 }
 
                 is RoutingStrategi.SendEnkelteBrukereTilNyLøsning -> {
@@ -67,24 +67,24 @@ class SkjemaRoutingService(
         ident: String,
         skjematype: Skjematype,
         kontekst: RoutingStrategi.SendEnkelteBrukereTilNyLøsning,
-    ): Boolean {
+    ): SkjemaRoutingAksjon {
         if (kontekst.kreverUgradertAdresse && harFortroligEllerStrengtFortroligAdresse(ident)) {
-            return false
+            return SkjemaRoutingAksjon.GAMMEL_LØSNING
         }
         if (harLagretRouting(ident, skjematype)) {
             logger.info("routing - skjematype=$skjematype harLagretRouting=true")
-            return true
+            return SkjemaRoutingAksjon.NY_LØSNING
         }
         if (harBehandling(ident, skjematype)) {
             lagreRouting(ident, skjematype, mapOf("harBehandling" to true))
-            return true
+            return SkjemaRoutingAksjon.NY_LØSNING
         }
         if (kontekst.kreverAtSøkerErUtenAktivtVedtakIArena && harAktivtVedtakIArena(skjematype, ident)) {
-            return false
+            return SkjemaRoutingAksjon.GAMMEL_LØSNING
         }
         if (kontekst.kreverAktivtAapVedtak && harAktivtAapVedtak(ident)) {
             lagreRouting(ident, skjematype, mapOf("harAktivAAP" to true))
-            return true
+            return SkjemaRoutingAksjon.NY_LØSNING
         }
         if (kontekst.alleMedAAPVedtakTilNyLøsning && harAktivtAapVedtak(ident) &&
             !maksAntallErNådd(
@@ -93,25 +93,25 @@ class SkjemaRoutingService(
             )
         ) {
             lagreRouting(ident, skjematype, mapOf("aktivAAP" to true))
-            return true
+            return SkjemaRoutingAksjon.NY_LØSNING
         }
 
-        return false
+        return SkjemaRoutingAksjon.AVSJEKK
     }
 
     private fun skalBrukerRoutesTilNyKjørelisteLøsning(
         ident: String,
         skjematype: Skjematype,
-    ): Boolean {
+    ): SkjemaRoutingAksjon {
         if (harLagretRouting(ident, skjematype)) {
             logger.info("routing - skjematype=$skjematype harLagretRouting=true")
-            return true
+            return SkjemaRoutingAksjon.NY_LØSNING
         }
         if (harVedtakMedPrivatBil(ident, skjematype)) {
             lagreRouting(ident, skjematype, mapOf("harVedtakMedPrivatBil" to true))
-            return true
+            return SkjemaRoutingAksjon.NY_LØSNING
         }
-        return false
+        return SkjemaRoutingAksjon.GAMMEL_LØSNING
     }
 
     private fun harVedtakMedPrivatBil(
@@ -134,7 +134,7 @@ class SkjemaRoutingService(
     private fun harFortroligEllerStrengtFortroligAdresse(ident: String): Boolean =
         personService.hentAdressebeskyttelse(ident).søker.adressebeskyttelse.let { adressebeskyttelse ->
             adressebeskyttelse == AdressebeskyttelseGradering.FORTROLIG ||
-                adressebeskyttelse == AdressebeskyttelseGradering.STRENGT_FORTROLIG
+                    adressebeskyttelse == AdressebeskyttelseGradering.STRENGT_FORTROLIG
         }
 
     private fun maksAntallErNådd(
@@ -187,12 +187,12 @@ class SkjemaRoutingService(
 
     private fun loggRoutingResultatet(
         skjematype: Skjematype,
-        skalBehandlesINyLøsning: Boolean,
+        aksjon: SkjemaRoutingAksjon,
     ) {
         logger.info(
             "routing - " +
-                "stønadstype=$skjematype " +
-                "skalBehandlesINyLøsning=$skalBehandlesINyLøsning",
+                    "stønadstype=$skjematype " +
+                    "aksjon=$aksjon",
         )
     }
 
@@ -219,11 +219,11 @@ class SkjemaRoutingService(
         with(arenaStatus) {
             logger.info(
                 "routing - skjematype=$skjematype harGyldigStatusArena=$harGyldigStatus " +
-                    "harAktivSakUtenVedtak=${sak.harAktivSakUtenVedtak} " +
-                    "harVedtak=${vedtak.harVedtak} " +
-                    "harAktivtVedtak=${vedtak.harAktivtVedtak} " +
-                    "harVedtakUtenUtfall=${vedtak.harVedtakUtenUtfall} " +
-                    "vedtakTom=${vedtak.vedtakTom}",
+                        "harAktivSakUtenVedtak=${sak.harAktivSakUtenVedtak} " +
+                        "harVedtak=${vedtak.harVedtak} " +
+                        "harAktivtVedtak=${vedtak.harAktivtVedtak} " +
+                        "harVedtakUtenUtfall=${vedtak.harVedtakUtenUtfall} " +
+                        "vedtakTom=${vedtak.vedtakTom}",
             )
         }
     }

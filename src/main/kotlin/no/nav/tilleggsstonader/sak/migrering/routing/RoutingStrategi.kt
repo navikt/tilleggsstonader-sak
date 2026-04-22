@@ -39,5 +39,6 @@ fun bestemRoutingStrategi(skjematype: Skjematype): RoutingStrategi =
                 kreverAtSøkerErUtenAktivtVedtakIArena = true,
                 kreverAktivtAapVedtak = false,
                 kreverUgradertAdresse = true,
+                alleMedAAPVedtakTilNyLøsning = false,
             )
     }

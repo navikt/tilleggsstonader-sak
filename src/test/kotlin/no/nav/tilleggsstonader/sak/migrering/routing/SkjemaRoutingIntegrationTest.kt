@@ -59,7 +59,7 @@ class SkjemaRoutingIntegrationTest(
     fun `visse stønadstyper skal alltid routes til ny løsning`(skjematype: Skjematype) {
         val routingSjekk = kall.skjemaRouting.sjekk(IdentSkjematype(jonasIdent, skjematype))
 
-        assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
+        assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
         assertThat(routingHarBlittLagret(skjematype)).isFalse()
     }
 
@@ -83,7 +83,7 @@ class SkjemaRoutingIntegrationTest(
 
             val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
-            assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
         }
 
         @ParameterizedTest
@@ -100,7 +100,7 @@ class SkjemaRoutingIntegrationTest(
 
             val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
-            assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
             assertThat(routingHarBlittLagret()).isTrue()
         }
 
@@ -111,7 +111,7 @@ class SkjemaRoutingIntegrationTest(
 
             val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
-            assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.GAMMEL_LØSNING)
             assertThat(routingHarBlittLagret()).isFalse()
         }
 
@@ -123,7 +123,7 @@ class SkjemaRoutingIntegrationTest(
 
             val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
-            assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.GAMMEL_LØSNING)
             assertThat(routingHarBlittLagret()).isFalse()
         }
 
@@ -135,17 +135,18 @@ class SkjemaRoutingIntegrationTest(
 
             val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
-            assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.GAMMEL_LØSNING)
             assertThat(routingHarBlittLagret()).isFalse()
         }
 
         @Test
-        fun `skal svare nei hvis feature toggle sier at ingen skal slippe gjennom`() {
+        fun `skal svare avsjekk hvis feature toggle sier at ingen skal slippe gjennom`() {
+            mockAapVedtak(erAktivt = true)
             mockMaksAntallSomKanRoutesPrivatBil(0)
 
             val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
-            assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK)
             assertThat(routingHarBlittLagret()).isFalse()
         }
 
@@ -156,7 +157,7 @@ class SkjemaRoutingIntegrationTest(
             mockAapVedtak(erAktivt = true)
 
             val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
-            assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
             assertThat(routingHarBlittLagret()).isTrue()
         }
 
@@ -171,9 +172,9 @@ class SkjemaRoutingIntegrationTest(
             val routingSjekkAndreRouting =
                 kall.skjemaRouting.sjekk(IdentSkjematype(ernaIdent, Skjematype.SØKNAD_DAGLIG_REISE))
 
-            assertThat(routingSjekkFørsteRouting.skalBehandlesINyLøsning).isTrue()
+            assertThat(routingSjekkFørsteRouting.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
             assertThat(routingHarBlittLagret(ident = jonasIdent)).isTrue()
-            assertThat(routingSjekkAndreRouting.skalBehandlesINyLøsning).isFalse()
+            assertThat(routingSjekkAndreRouting.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK)
             assertThat(routingHarBlittLagret(ident = ernaIdent)).isFalse()
         }
 
@@ -209,6 +210,13 @@ class SkjemaRoutingIntegrationTest(
         private fun mockMaksAntallSomKanRoutesPrivatBil(maksAntall: Int) {
             unleashService.mockGetVariant(
                 Toggle.SØKNAD_ROUTING_PRIVAT_BIL,
+                Variant("antall", maksAntall.toString(), true),
+            )
+        }
+
+        private fun mockMaksAntallSomKanRouteSamling(maksAntall: Int) {
+            unleashService.mockGetVariant(
+                Toggle.SØKNAD_ROUTING_REISE_TIL_SAMLING,
                 Variant("antall", maksAntall.toString(), true),
             )
         }
@@ -294,7 +302,7 @@ class SkjemaRoutingIntegrationTest(
 
             val routingSjekk = kall.skjemaRouting.sjekk(kjørelisteRoutingRequest)
 
-            assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
             assertThat(routingHarBlittLagret(Skjematype.DAGLIG_REISE_KJØRELISTE)).isTrue()
         }
 
@@ -302,7 +310,7 @@ class SkjemaRoutingIntegrationTest(
         fun `skal route til gammel løsning hvis person ikke har vedtak`() {
             val routingSjekk = kall.skjemaRouting.sjekk(kjørelisteRoutingRequest)
 
-            assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.GAMMEL_LØSNING)
             assertThat(routingHarBlittLagret(Skjematype.DAGLIG_REISE_KJØRELISTE)).isFalse()
         }
 
@@ -312,7 +320,7 @@ class SkjemaRoutingIntegrationTest(
 
             val routingSjekk = kall.skjemaRouting.sjekk(kjørelisteRoutingRequest)
 
-            assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.GAMMEL_LØSNING)
             assertThat(routingHarBlittLagret(Skjematype.DAGLIG_REISE_KJØRELISTE)).isFalse()
         }
 
@@ -328,7 +336,7 @@ class SkjemaRoutingIntegrationTest(
 
             val routingSjekk = kall.skjemaRouting.sjekk(kjørelisteRoutingRequest)
 
-            assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
         }
 
         private fun opprettBehandlingMedVedtakForPrivatBil(stønadstype: Stønadstype) {

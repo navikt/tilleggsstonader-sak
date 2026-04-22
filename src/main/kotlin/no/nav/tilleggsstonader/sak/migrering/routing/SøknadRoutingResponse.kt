@@ -1,5 +1,11 @@
 package no.nav.tilleggsstonader.sak.migrering.routing
 
+enum class SkjemaRoutingAksjon {
+    NY_LØSNING,
+    GAMMEL_LØSNING,
+    AVSJEKK,
+}
+
 data class SøknadRoutingResponse(
-    val skalBehandlesINyLøsning: Boolean,
+    val aksjon: SkjemaRoutingAksjon,
 )
