@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.brev.DistribuerBrevService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPerson
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
@@ -46,9 +47,9 @@ class DistribuerVedtaksbrevTaskTest {
 
     val distribuerVedtaksbrevService =
         DistribuerVedtaksbrevService(
-            journalpostClient = journalpostClient,
             brevmottakerVedtaksbrevRepository = brevmottakerVedtaksbrevRepository,
             transactionHandler = TransactionHandler(),
+            distribuerBrevService = DistribuerBrevService(journalpostClient),
         )
 
     val saksbehandling = saksbehandling(steg = StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)

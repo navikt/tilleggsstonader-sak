@@ -10,6 +10,7 @@ import no.nav.familie.prosessering.error.TaskExceptionUtenStackTrace
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
+import no.nav.tilleggsstonader.sak.brev.ResultatDistribusjon
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerFrittståendeBrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPerson
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerFrittståendeBrev
@@ -69,7 +70,7 @@ class DistribuerFrittståendeBrevTaskTest {
     fun `skal distribuere brev via service`() {
         every {
             distribuerFrittståendeBrevService.distribuerBrev(brevmottaker)
-        } returns DistribuerFrittståendeBrevService.ResultatDistribusjon.BrevDistribuert
+        } returns ResultatDistribusjon.Distribuert
 
         distribuerFrittståendeBrevTask.doTask(task)
     }
@@ -80,7 +81,7 @@ class DistribuerFrittståendeBrevTaskTest {
         fun `skal rekjøre senere hvis mottaker er død og mangler adresse`() {
             every {
                 distribuerFrittståendeBrevService.distribuerBrev(brevmottaker)
-            } returns DistribuerFrittståendeBrevService.ResultatDistribusjon.FeiletFordiMottakerErDødOgManglerAdresse("Gone")
+            } returns ResultatDistribusjon.FeiletFordiMottakerErDødOgManglerAdresse("Gone")
 
             val rekjørSenereException =
                 catchThrowableOfType<RekjørSenereException> { distribuerFrittståendeBrevTask.doTask(task) }
@@ -94,7 +95,7 @@ class DistribuerFrittståendeBrevTaskTest {
         fun `skal feile hvis tasken har kjørt over 26 ganger`() {
             every {
                 distribuerFrittståendeBrevService.distribuerBrev(brevmottaker)
-            } returns DistribuerFrittståendeBrevService.ResultatDistribusjon.FeiletFordiMottakerErDødOgManglerAdresse("Gone")
+            } returns ResultatDistribusjon.FeiletFordiMottakerErDødOgManglerAdresse("Gone")
 
             val taskLogg =
                 (1..27).map { TaskLogg(taskId = task.id, type = Loggtype.KLAR_TIL_PLUKK, melding = "Mottaker er død") }

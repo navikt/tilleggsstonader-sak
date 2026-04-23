@@ -4,8 +4,8 @@ import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.sak.brev.ResultatDistribusjon
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
-import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.DistribuerVedtaksbrevService.ResultatBrevutsendelse
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.util.stoppTaskOgRekjørSenere
@@ -46,8 +46,8 @@ class DistribuerVedtaksbrevTask(
             .håndterRekjøringSenereHvisMottakerErDød(task)
     }
 
-    private fun List<ResultatBrevutsendelse>.håndterRekjøringSenereHvisMottakerErDød(task: Task) {
-        filterIsInstance<ResultatBrevutsendelse.FeiletFordiMottakerErDødOgManglerAdresse>()
+    private fun List<ResultatDistribusjon>.håndterRekjøringSenereHvisMottakerErDød(task: Task) {
+        filterIsInstance<ResultatDistribusjon.FeiletFordiMottakerErDødOgManglerAdresse>()
             .firstOrNull()
             ?.let { taskService.stoppTaskOgRekjørSenere(task, årsak = "Mottaker er død", melding = it.feilmelding) }
     }
