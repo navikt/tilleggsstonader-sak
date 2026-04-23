@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.KjørelisteBehandlingBrevRequest
 import no.nav.tilleggsstonader.sak.interntVedtak.HtmlifyClient
 import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtak
 import org.springframework.context.annotation.Bean
@@ -21,6 +22,8 @@ class HtmlifyClientMockConfig {
         fun resetTilDefault(client: HtmlifyClient) {
             clearMocks(client)
             every { client.generateHtml(any<InterntVedtak>()) } returns "<body>body</body>"
+            every { client.genererKjørelisteBehandlingBrev(any<KjørelisteBehandlingBrevRequest>()) } returns
+                "<body>Brev som tilhører kjørelistebehandling</body>"
         }
     }
 }
