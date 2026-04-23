@@ -96,7 +96,7 @@ class SkjemaRoutingService(
             ) &&
             !maksAntallErNådd(
                 skjematype,
-                toggleId = kontekst.featureToggleMaksAntallForPrivatBil!!,
+                toggleId = kontekst.featureToggleMaksAntallForPrivatBil,
             )
         ) {
             lagreRouting(ident, skjematype, mapOf("aktivAAP" to true))
