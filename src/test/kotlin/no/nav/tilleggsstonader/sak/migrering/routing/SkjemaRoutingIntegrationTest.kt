@@ -64,6 +64,18 @@ class SkjemaRoutingIntegrationTest(
         assertThat(routingHarBlittLagret(skjematype)).isFalse()
     }
 
+    @ParameterizedTest
+    @EnumSource(
+        value = Skjematype::class,
+        names = ["SØKNAD_BARNETILSYN", "SØKNAD_LÆREMIDLER", "SØKNAD_BOUTGIFTER"],
+    )
+    fun `V1 - visse stønadstyper skal alltid routes til ny løsning`(skjematype: Skjematype) {
+        val routingSjekk = kall.skjemaRouting.sjekkV1(IdentSkjematype(jonasIdent, skjematype))
+
+        assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
+        assertThat(routingHarBlittLagret(skjematype)).isFalse()
+    }
+
     @Nested
     inner class DagligReise {
         val skjemaRoutingDagligReise =
@@ -211,7 +223,7 @@ class SkjemaRoutingIntegrationTest(
             val routingKall =
                 (1..5).map {
                     CompletableFuture.supplyAsync {
-                        kall.skjemaRouting.apiRespons.sjekk(
+                        kall.skjemaRouting.apiRespons.sjekkV2(
                             (
                                 IdentSkjematype(
                                     jonasIdent,
@@ -307,6 +319,104 @@ class SkjemaRoutingIntegrationTest(
         skjematype: Skjematype = Skjematype.SØKNAD_DAGLIG_REISE,
         ident: String = jonasIdent,
     ) = testoppsettService.hentSøknadRouting(ident, skjematype) != null
+
+    @Nested
+    inner class DagligReiseV1 {
+        val dagligReiseRoutingRequest =
+            IdentSkjematype(
+                ident = jonasIdent,
+                skjematype = Skjematype.SØKNAD_DAGLIG_REISE,
+            )
+
+        @Test
+        fun `V1 - skal route til gammel løsning hvis person har aktivt vedtak i Arena`() {
+            mockMaksAntallSomKanRoutesPrivatBil(maksAntall = 10)
+            mockDagligReiseVedtakIArena(erAktivt = true)
+
+            val routingSjekk = kall.skjemaRouting.sjekkV1(dagligReiseRoutingRequest)
+
+            assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
+        }
+
+        @Test
+        fun `V1 - brukere med aktiv AAP skal bli routet til ny løsning`() {
+            mockMaksAntallSomKanRoutesPrivatBil(maksAntall = 10)
+            mockDagligReiseVedtakIArena(erAktivt = false)
+            mockAapVedtak(erAktivt = true)
+
+            val routingSjekk = kall.skjemaRouting.sjekkV1(dagligReiseRoutingRequest)
+
+            assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
+        }
+
+        @Test
+        fun `V1 - AVSJEKK mappes til skalBehandlesINyLøsning true`() {
+            mockMaksAntallSomKanRoutesPrivatBil(maksAntall = 10)
+            mockDagligReiseVedtakIArena(erAktivt = false)
+            mockAapVedtak(erAktivt = false)
+
+            val routingSjekk = kall.skjemaRouting.sjekkV1(dagligReiseRoutingRequest)
+
+            assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
+        }
+
+        private fun mockMaksAntallSomKanRoutesPrivatBil(maksAntall: Int) {
+            unleashService.mockGetVariant(
+                Toggle.SØKNAD_ROUTING_PRIVAT_BIL,
+                Variant("antall", maksAntall.toString(), true),
+            )
+        }
+
+        private fun mockDagligReiseVedtakIArena(erAktivt: Boolean) {
+            val arenaVedtak =
+                ArenaStatusDtoUtil
+                    .vedtakStatus(harVedtak = true, harAktivtVedtak = erAktivt, harVedtakUtenUtfall = false)
+            val statusFraArena =
+                ArenaStatusDto(
+                    sak = SakStatus(harAktivSakUtenVedtak = false),
+                    vedtak = arenaVedtak,
+                )
+            every { arenaClient.hentStatus(any()) } returns statusFraArena
+            mockHentIdenterFraPdl()
+        }
+
+        private fun mockAapVedtak(erAktivt: Boolean) {
+            val pågåendePeriode =
+                periodeAAP(
+                    fom = LocalDate.now().minusDays(1),
+                    tom = LocalDate.now().plusDays(1),
+                )
+            every {
+                ytelseClient.hentYtelser(
+                    match {
+                        it.typer ==
+                            listOf(
+                                TypeYtelsePeriode.AAP,
+                            )
+                    },
+                )
+            } returns
+                ytelsePerioderDto(
+                    perioder = if (erAktivt) listOf(pågåendePeriode) else emptyList(),
+                    kildeResultat = listOf(kildeResultatAAP()),
+                )
+        }
+
+        private fun mockHentIdenterFraPdl() {
+            every { pdlClient.hentPersonidenterMedSluttbrukerSinContext(any()) } answers
+                {
+                    PdlIdenter(
+                        listOf(
+                            PdlIdent(
+                                ident = firstArg(),
+                                historisk = false,
+                                gruppe = "FOLKEREGISTERIDENT",
+                            ),
+                        ),
+                    )
+                }
+        }
+    }
 
     @Nested
     inner class DagligReiseKjøreliste {
