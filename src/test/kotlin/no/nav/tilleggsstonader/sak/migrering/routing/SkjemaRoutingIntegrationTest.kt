@@ -119,6 +119,7 @@ class SkjemaRoutingIntegrationTest(
 
         @Test
         fun `skal route til gammel løsning hvis person har aktivt vedtak i Arena`() {
+            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
             mockMaksAntallSomKanRoutesPrivatBil(maksAntall = 10)
             mockDagligReiseVedtakIArena(erAktivt = true)
 
@@ -130,6 +131,7 @@ class SkjemaRoutingIntegrationTest(
 
         @Test
         fun `skal route til gammel løsning hvis person har AAP men fortrolig adresse`() {
+            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
             mockMaksAntallSomKanRoutesPrivatBil(maksAntall = 10)
             mockAapVedtak(erAktivt = true)
             mockPersonMedAdressebeskyttelse(AdressebeskyttelseGradering.FORTROLIG)
@@ -142,6 +144,7 @@ class SkjemaRoutingIntegrationTest(
 
         @Test
         fun `skal route til gammel løsning hvis person har AAP men strengt fortrolig adresse`() {
+            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
             mockMaksAntallSomKanRoutesPrivatBil(maksAntall = 10)
             mockAapVedtak(erAktivt = true)
             mockPersonMedAdressebeskyttelse(AdressebeskyttelseGradering.STRENGT_FORTROLIG)
@@ -154,6 +157,7 @@ class SkjemaRoutingIntegrationTest(
 
         @Test
         fun `skal svare avsjekk hvis feature toggle sier at ingen skal slippe gjennom`() {
+            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
             mockAapVedtak(erAktivt = true)
             mockMaksAntallSomKanRoutesPrivatBil(0)
 
@@ -165,6 +169,7 @@ class SkjemaRoutingIntegrationTest(
 
         @Test
         fun `brukere med aktiv AAP skal bli routet til ny løsning`() {
+            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
             mockMaksAntallSomKanRoutesPrivatBil(maksAntall = 10)
             mockDagligReiseVedtakIArena(erAktivt = false)
             mockAapVedtak(erAktivt = true)
@@ -176,6 +181,7 @@ class SkjemaRoutingIntegrationTest(
 
         @Test
         fun `skal slippe gjennom personer til ny løsning, men bare til maks antall er nådd`() {
+            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
             mockMaksAntallSomKanRoutesPrivatBil(maksAntall = 1)
             mockDagligReiseVedtakIArena(erAktivt = false)
             mockAapVedtak(erAktivt = true)
@@ -193,6 +199,7 @@ class SkjemaRoutingIntegrationTest(
 
         @Test
         fun `skal svare avsjekk hvis person ikke har AAP-vedtak selv om maks antall ikke er nådd`() {
+            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
             mockMaksAntallSomKanRoutesPrivatBil(maksAntall = 10)
             mockDagligReiseVedtakIArena(erAktivt = false)
             mockAapVedtak(erAktivt = false)
@@ -205,6 +212,7 @@ class SkjemaRoutingIntegrationTest(
 
         @Test
         fun `skal håndtere samtidige kall og ikke kaste feil`() {
+            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
             mockMaksAntallSomKanRoutesPrivatBil(maksAntall = 1)
             mockDagligReiseVedtakIArena(erAktivt = false)
 
@@ -237,6 +245,13 @@ class SkjemaRoutingIntegrationTest(
             routingKall.forEach {
                 it.get().expectStatus().isOk
             }
+        }
+
+        private fun mockMaksAntallSomKanRoutesPåDagligReise(maksAntall: Int) {
+            unleashService.mockGetVariant(
+                Toggle.SØKNAD_ROUTING_DAGLIG_REISE,
+                Variant("antall", maksAntall.toString(), true),
+            )
         }
 
         private fun mockMaksAntallSomKanRoutesPrivatBil(maksAntall: Int) {
@@ -323,6 +338,7 @@ class SkjemaRoutingIntegrationTest(
 
         @Test
         fun `V1 - skal route til gammel løsning hvis person har aktivt vedtak i Arena`() {
+            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
             mockMaksAntallSomKanRoutesPrivatBil(maksAntall = 10)
             mockDagligReiseVedtakIArena(erAktivt = true)
 
@@ -333,6 +349,7 @@ class SkjemaRoutingIntegrationTest(
 
         @Test
         fun `V1 - brukere med aktiv AAP skal bli routet til ny løsning`() {
+            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
             mockMaksAntallSomKanRoutesPrivatBil(maksAntall = 10)
             mockDagligReiseVedtakIArena(erAktivt = false)
             mockAapVedtak(erAktivt = true)
@@ -344,6 +361,7 @@ class SkjemaRoutingIntegrationTest(
 
         @Test
         fun `V1 - AVSJEKK mappes til skalBehandlesINyLøsning true`() {
+            mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
             mockMaksAntallSomKanRoutesPrivatBil(maksAntall = 10)
             mockDagligReiseVedtakIArena(erAktivt = false)
             mockAapVedtak(erAktivt = false)
@@ -351,6 +369,13 @@ class SkjemaRoutingIntegrationTest(
             val routingSjekk = kall.skjemaRouting.sjekkV1(dagligReiseRoutingRequest)
 
             assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
+        }
+
+        private fun mockMaksAntallSomKanRoutesPåDagligReise(maksAntall: Int) {
+            unleashService.mockGetVariant(
+                Toggle.SØKNAD_ROUTING_DAGLIG_REISE,
+                Variant("antall", maksAntall.toString(), true),
+            )
         }
 
         private fun mockMaksAntallSomKanRoutesPrivatBil(maksAntall: Int) {

@@ -80,6 +80,9 @@ class SkjemaRoutingService(
             lagreRouting(ident, skjematype, mapOf("harBehandling" to true))
             return SkjemaRoutingAksjon.NY_LØSNING
         }
+        if (maksAntallErNådd(skjematype, toggleId = kontekst.featureToggleMaksAntallForStønad)) {
+            return SkjemaRoutingAksjon.GAMMEL_LØSNING
+        }
         if (kontekst.kreverAtSøkerErUtenAktivtVedtakIArena && harAktivtVedtakIArena(skjematype, ident)) {
             return SkjemaRoutingAksjon.GAMMEL_LØSNING
         }
@@ -87,10 +90,13 @@ class SkjemaRoutingService(
             lagreRouting(ident, skjematype, mapOf("harAktivAAP" to true))
             return SkjemaRoutingAksjon.NY_LØSNING
         }
-        if (kontekst.alleMedAAPVedtakTilNyLøsning && harAktivtAapVedtak(ident) &&
+        if (kontekst.featureToggleMaksAntallForPrivatBil != null && kontekst.alleMedAAPVedtakTilNyLøsning &&
+            harAktivtAapVedtak(
+                ident,
+            ) &&
             !maksAntallErNådd(
                 skjematype,
-                toggleId = kontekst.featureToggleMaksAntallForStønad,
+                toggleId = kontekst.featureToggleMaksAntallForPrivatBil!!,
             )
         ) {
             lagreRouting(ident, skjematype, mapOf("aktivAAP" to true))
