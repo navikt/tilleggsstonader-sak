@@ -74,19 +74,19 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
                         fom = LocalDate.of(2024, 1, 10),
                         tom = LocalDate.of(2024, 1, 11),
                         utgift = 1000,
-                        beløpSomDekkes = 1000,
+                        beløpSomDekkes = 0,
                     ),
                     UtgiftTilOvernatting(
                         fom = LocalDate.of(2024, 1, 7),
                         tom = LocalDate.of(2024, 1, 8),
                         utgift = 1000,
-                        beløpSomDekkes = 1000,
+                        beløpSomDekkes = 809,
                     ),
                     UtgiftTilOvernatting(
                         fom = LocalDate.of(2024, 1, 3),
                         tom = LocalDate.of(2024, 1, 4),
                         utgift = 4000,
-                        beløpSomDekkes = 2809,
+                        beløpSomDekkes = 4000,
                     ),
                 )
 

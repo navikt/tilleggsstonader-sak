@@ -109,7 +109,7 @@ object DetaljertVedtaksperioderBoutgifterMapper {
         var alleredeSummerteUtgifter = sumLøpendeUtgifter
 
         return utgifterOvernatting
-            .sortedByDescending { it.fom }
+            .sorted()
             .map { utgift ->
                 val beløpSomDekkes = minOf(utgift.utgift, makssats - alleredeSummerteUtgifter)
                 alleredeSummerteUtgifter += beløpSomDekkes
@@ -120,7 +120,7 @@ object DetaljertVedtaksperioderBoutgifterMapper {
                     utgift = utgift.utgift,
                     beløpSomDekkes = beløpSomDekkes,
                 )
-            }
+            }.sortedByDescending { it.fom }
     }
 
     private fun summerLøpendeUtgifterBo(utgifter: BoutgifterPerUtgiftstype): Int =
