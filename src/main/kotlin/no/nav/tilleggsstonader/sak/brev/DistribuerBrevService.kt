@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.dokdist.Distribusjonstype
 import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
 import no.nav.tilleggsstonader.libs.http.client.ProblemDetailException
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.logger
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.client.HttpClientErrorException
@@ -14,6 +14,8 @@ import org.springframework.web.client.HttpClientErrorException
 class DistribuerBrevService(
     val journalpostClient: JournalpostClient,
 ) {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     @Transactional
     fun distribuerOgHåndterDødsbo(
         journalpostId: String,
