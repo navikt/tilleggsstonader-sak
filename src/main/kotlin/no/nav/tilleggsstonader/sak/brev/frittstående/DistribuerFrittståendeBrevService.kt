@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.brev.DistribuerBrevService
 import no.nav.tilleggsstonader.sak.brev.ResultatDistribusjon
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerFrittståendeBrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerFrittståendeBrev
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import org.springframework.stereotype.Service
 
@@ -16,7 +17,7 @@ class DistribuerFrittståendeBrevService(
 ) {
     fun distribuerBrev(mottaker: BrevmottakerFrittståendeBrev): ResultatDistribusjon =
         distribuerBrevService.distribuerOgHåndterDødsbo(
-            journalpostId = mottaker.journalpostId ?: error("journalpostId er påkrevd"),
+            journalpostId = mottaker.journalpostId ?: feil("journalpostId er påkrevd"),
             distribusjonstype = Distribusjonstype.VIKTIG,
             brevtype = "frittstående brev",
         ) { bestillingId -> mottaker.lagreDistribusjonGjennomført(bestillingId) }
