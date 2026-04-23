@@ -3,13 +3,13 @@ package no.nav.tilleggsstonader.sak.brev.frittstående
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.tilleggsstonader.kontrakter.dokdist.DistribuerJournalpostRequest
-import no.nav.tilleggsstonader.kontrakter.dokdist.Distribusjonstype
-import no.nav.tilleggsstonader.kontrakter.felles.Fagsystem
+import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakereFrittståendeBrevService
+import no.nav.tilleggsstonader.sak.brev.ResultatDistribusjon
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerFrittståendeBrevRepository
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
-import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.util.stoppTaskOgRekjørSenere
 import org.springframework.stereotype.Service
 import java.util.Properties
 import java.util.UUID
@@ -23,25 +23,24 @@ import java.util.UUID
     beskrivelse = "Distribuerer frittstående brev etter journalføring",
 )
 class DistribuerFrittståendeBrevTask(
-    private val journalpostClient: JournalpostClient,
-    private val brevmottakereFrittståendeBrevService: BrevmottakereFrittståendeBrevService,
+    private val brevmottakerFrittståendeBrevRepository: BrevmottakerFrittståendeBrevRepository,
+    private val distribuerFrittståendeBrevService: DistribuerFrittståendeBrevService,
+    private val taskService: TaskService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
         val payload = jsonMapper.readValue(task.payload, DistribuerFrittståendeBrevPayload::class.java)
 
-        val bestillingId =
-            journalpostClient.distribuerJournalpost(
-                DistribuerJournalpostRequest(
-                    journalpostId = payload.journalpostId,
-                    bestillendeFagsystem = Fagsystem.TILLEGGSSTONADER,
-                    dokumentProdApp = "TILLEGGSSTONADER-SAK",
-                    distribusjonstype = Distribusjonstype.VIKTIG,
-                ),
-            )
-        brevmottakereFrittståendeBrevService
-            .hentBrevmottakere(payload.mottakerId)
-            .copy(bestillingId = bestillingId)
-            .let { brevmottakereFrittståendeBrevService.oppdaterBrevmottaker(it) }
+        val mottaker = brevmottakerFrittståendeBrevRepository.findByIdOrThrow(payload.mottakerId)
+
+        distribuerFrittståendeBrevService
+            .distribuerBrev(mottaker)
+            .håndterRekjøringSenereHvisMottakerErDød(task)
+    }
+
+    private fun ResultatDistribusjon.håndterRekjøringSenereHvisMottakerErDød(task: Task) {
+        if (this is ResultatDistribusjon.FeiletFordiMottakerErDødOgManglerAdresse) {
+            taskService.stoppTaskOgRekjørSenere(task, årsak = "Mottaker er død", melding = feilmelding)
+        }
     }
 
     companion object {
