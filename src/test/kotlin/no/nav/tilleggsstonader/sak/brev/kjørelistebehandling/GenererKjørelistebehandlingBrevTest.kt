@@ -32,7 +32,7 @@ import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter
 import java.net.URI
 import java.time.LocalDate
 
-class SendBrevTest : CleanDatabaseIntegrationTest() {
+class GenererKjørelistebehandlingBrevTest : CleanDatabaseIntegrationTest() {
     val fom = 29 desember 2025
     val tom = 18 januar 2026
 
