@@ -523,7 +523,6 @@ class OpprettTestBehandlingController(
                 data =
                     DagligReiseFyllUtSendInnData(
                         SkjemaDagligReise(
-                            jegSokerPaVegneAvMegSelv = true,
                             dineOpplysninger = dineOpplysninger,
                             hovedytelse =
                                 mapOf(

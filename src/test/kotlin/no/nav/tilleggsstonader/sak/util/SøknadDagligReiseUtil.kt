@@ -33,7 +33,6 @@ object SøknadDagligReiseUtil {
     ): SøknadsskjemaDagligReiseFyllUtSendInn {
         val skjemaDagligReise =
             SkjemaDagligReise(
-                jegSokerPaVegneAvMegSelv = true,
                 dineOpplysninger = dineOpplysninger(ident),
                 hovedytelse = hovedytelse,
                 aktiviteter = aktiviteter(),
