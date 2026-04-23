@@ -12,7 +12,7 @@ import org.springframework.web.client.HttpClientErrorException
 
 @Service
 class DistribuerBrevService(
-    val journalpostClient: JournalpostClient,
+    private val journalpostClient: JournalpostClient,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
