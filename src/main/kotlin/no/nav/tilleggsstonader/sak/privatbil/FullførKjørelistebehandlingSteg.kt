@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
-import no.nav.tilleggsstonader.sak.behandlingsflyt.FerdigstillBehandlingTask
+import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.JournalførKjørelisteBehandlingBrevTask
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
@@ -36,7 +36,7 @@ class FullførKjørelistebehandlingSteg(
 
         behandlingService.oppdaterResultatPåBehandling(saksbehandling.id, BehandlingResultat.INNVILGET)
         behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.IVERKSETTER_VEDTAK)
-        taskService.save(FerdigstillBehandlingTask.opprettTask(saksbehandling))
+        taskService.save(JournalførKjørelisteBehandlingBrevTask.opprettTask(saksbehandling.id))
         ferdigstillOppgave(saksbehandling)
         iverksettService.iverksettBehandlingFørsteGang(saksbehandling.id)
     }

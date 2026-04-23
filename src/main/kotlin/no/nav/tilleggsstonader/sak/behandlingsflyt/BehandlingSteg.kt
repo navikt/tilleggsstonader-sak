@@ -103,13 +103,18 @@ enum class StegType(
         tillattFor = BehandlerRolle.SYSTEM,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
     ),
-    FERDIGSTILLE_BEHANDLING(
+    JOURNALFØR_OG_DISTRIBUER_KJØRELISTEBREV(
         rekkefølge = 11,
         tillattFor = BehandlerRolle.SYSTEM,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
     ),
-    BEHANDLING_FERDIGSTILT(
+    FERDIGSTILLE_BEHANDLING(
         rekkefølge = 12,
+        tillattFor = BehandlerRolle.SYSTEM,
+        gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
+    ),
+    BEHANDLING_FERDIGSTILT(
+        rekkefølge = 13,
         tillattFor = BehandlerRolle.SYSTEM,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.FERDIGSTILT),
     ),
@@ -147,7 +152,8 @@ enum class StegType(
             KJØRELISTE -> BEREGNING
             BEREGNING -> SIMULERING
             SIMULERING -> FULLFØR_KJØRELISTE
-            FULLFØR_KJØRELISTE -> FERDIGSTILLE_BEHANDLING
+            FULLFØR_KJØRELISTE -> JOURNALFØR_OG_DISTRIBUER_KJØRELISTEBREV
+            JOURNALFØR_OG_DISTRIBUER_KJØRELISTEBREV -> FERDIGSTILLE_BEHANDLING
             FERDIGSTILLE_BEHANDLING -> BEHANDLING_FERDIGSTILT
             BEHANDLING_FERDIGSTILT -> BEHANDLING_FERDIGSTILT
             else -> error("Steg ${this.visningsnavn()} er ikke et gyldig steg for en kjørelistebehandling")
