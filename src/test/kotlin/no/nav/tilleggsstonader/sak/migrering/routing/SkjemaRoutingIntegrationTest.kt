@@ -246,13 +246,6 @@ class SkjemaRoutingIntegrationTest(
             )
         }
 
-        private fun mockMaksAntallSomKanRouteSamling(maksAntall: Int) {
-            unleashService.mockGetVariant(
-                Toggle.SØKNAD_ROUTING_REISE_TIL_SAMLING,
-                Variant("antall", maksAntall.toString(), true),
-            )
-        }
-
         private fun mockDagligReiseVedtakIArena(erAktivt: Boolean) {
             val arenaVedtak =
                 ArenaStatusDtoUtil
