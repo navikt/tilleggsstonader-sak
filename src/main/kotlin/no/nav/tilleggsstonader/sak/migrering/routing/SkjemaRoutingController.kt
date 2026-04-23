@@ -2,6 +2,8 @@ package no.nav.tilleggsstonader.sak.migrering.routing
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.IdentSkjematype
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.SkjemaRoutingAksjon
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.SkjemaRoutingResponse
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext.kallKommerFra
@@ -26,6 +28,18 @@ class SkjemaRoutingController(
         feilHvisIkke(kallKommerFra(eksternApplikasjon.soknadApi), HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
         }
-        return with(request) { SøknadRoutingResponse(skjemaRoutingService.skalRoutesTilNyLøsning(ident, skjematype)) }
+        val aksjon = with(request) { skjemaRoutingService.bestemRoutingAksjon(ident, skjematype) }
+        return SøknadRoutingResponse(skalBehandlesINyLøsning = aksjon != SkjemaRoutingAksjon.GAMMEL_LØSNING)
+    }
+
+    @PostMapping("/v2")
+    @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
+    fun sjekkRoutingForPersonV2(
+        @RequestBody request: IdentSkjematype,
+    ): SkjemaRoutingResponse {
+        feilHvisIkke(kallKommerFra(eksternApplikasjon.soknadApi), HttpStatus.UNAUTHORIZED) {
+            "Kallet utføres ikke av en autorisert klient"
+        }
+        return with(request) { SkjemaRoutingResponse(skjemaRoutingService.bestemRoutingAksjon(ident, skjematype)) }
     }
 }

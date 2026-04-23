@@ -15,6 +15,7 @@ enum class Toggle(
     SKAL_VALIDERE_ÅRSAK_TIL_AVSLAG("sak.skal-validere-arsak-til-avslag"),
 
     SØKNAD_ROUTING_DAGLIG_REISE("sak.soknad-routing.daglig-reise"),
+    SØKNAD_ROUTING_PRIVAT_BIL("sak.soknad-routing.privat-bil"),
 
     OPPRETT_OPPGAVE_TILBAKEKREVING("sak.opprett-oppgave-tilbakekreving"),
 
