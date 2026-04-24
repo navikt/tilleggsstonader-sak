@@ -29,15 +29,4 @@ class SkjemaRoutingController(
         }
         return with(request) { SkjemaRoutingResponse(skjemaRoutingService.bestemRoutingAksjon(ident, skjematype)) }
     }
-
-    @PostMapping("/v2")
-    @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
-    fun sjekkRoutingForPersonV2(
-        @RequestBody request: IdentSkjematype,
-    ): SkjemaRoutingResponse {
-        feilHvisIkke(kallKommerFra(eksternApplikasjon.soknadApi), HttpStatus.UNAUTHORIZED) {
-            "Kallet utføres ikke av en autorisert klient"
-        }
-        return with(request) { SkjemaRoutingResponse(skjemaRoutingService.bestemRoutingAksjon(ident, skjematype)) }
-    }
 }

@@ -70,7 +70,7 @@ class SkjemaRoutingIntegrationTest(
         names = ["SØKNAD_BARNETILSYN", "SØKNAD_LÆREMIDLER", "SØKNAD_BOUTGIFTER"],
     )
     fun `V1 - visse stønadstyper skal alltid routes til ny løsning`(skjematype: Skjematype) {
-        val routingSjekk = kall.skjemaRouting.sjekkV1(IdentSkjematype(jonasIdent, skjematype))
+        val routingSjekk = kall.skjemaRouting.sjekk(IdentSkjematype(jonasIdent, skjematype))
 
         assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
         assertThat(routingHarBlittLagret(skjematype)).isFalse()
@@ -231,7 +231,7 @@ class SkjemaRoutingIntegrationTest(
             val routingKall =
                 (1..5).map {
                     CompletableFuture.supplyAsync {
-                        kall.skjemaRouting.apiRespons.sjekkV2(
+                        kall.skjemaRouting.apiRespons.sjekk(
                             (
                                 IdentSkjematype(
                                     jonasIdent,
@@ -342,7 +342,7 @@ class SkjemaRoutingIntegrationTest(
             mockMaksAntallSomKanRoutesPrivatBil(maksAntall = 10)
             mockDagligReiseVedtakIArena(erAktivt = true)
 
-            val routingSjekk = kall.skjemaRouting.sjekkV1(dagligReiseRoutingRequest)
+            val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
             assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.GAMMEL_LØSNING)
         }
@@ -354,7 +354,7 @@ class SkjemaRoutingIntegrationTest(
             mockDagligReiseVedtakIArena(erAktivt = false)
             mockAapVedtak(erAktivt = true)
 
-            val routingSjekk = kall.skjemaRouting.sjekkV1(dagligReiseRoutingRequest)
+            val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
             assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
         }
@@ -366,7 +366,7 @@ class SkjemaRoutingIntegrationTest(
             mockDagligReiseVedtakIArena(erAktivt = false)
             mockAapVedtak(erAktivt = false)
 
-            val routingSjekk = kall.skjemaRouting.sjekkV1(dagligReiseRoutingRequest)
+            val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
             assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK)
         }

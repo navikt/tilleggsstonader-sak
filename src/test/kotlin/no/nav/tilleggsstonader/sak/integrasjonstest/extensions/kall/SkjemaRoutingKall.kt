@@ -7,11 +7,9 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 class SkjemaRoutingKall(
     private val testklient: Testklient,
 ) {
-    fun sjekk(identSkjematype: IdentSkjematype): SkjemaRoutingResponse = apiRespons.sjekkV2(identSkjematype).expectOkWithBody()
+    fun sjekk(identSkjematype: IdentSkjematype): SkjemaRoutingResponse = apiRespons.sjekk(identSkjematype).expectOkWithBody()
 
-    fun sjekkV1(identSkjematype: IdentSkjematype): SkjemaRoutingResponse = apiRespons.sjekk(identSkjematype).expectOkWithBody()
-
-    // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
+    // Gir tilgang til "rå"-endepunktet slik at tester kan skrive egne assertions på responsen.
     val apiRespons = SøknadRoutingApi()
 
     inner class SøknadRoutingApi {
@@ -20,18 +18,6 @@ class SkjemaRoutingKall(
                 restTestClient
                     .post()
                     .uri("/api/ekstern/skjema-routing")
-                    .body(identSkjematype)
-                    .medClientCredentials(
-                        clientId = eksternApplikasjon.soknadApi,
-                        accessAsApplication = true,
-                    ).exchange()
-            }
-
-        fun sjekkV2(identSkjematype: IdentSkjematype) =
-            with(testklient.testkontekst) {
-                restTestClient
-                    .post()
-                    .uri("/api/ekstern/skjema-routing/v2")
                     .body(identSkjematype)
                     .medClientCredentials(
                         clientId = eksternApplikasjon.soknadApi,
