@@ -72,7 +72,7 @@ class SkjemaRoutingIntegrationTest(
     fun `V1 - visse stønadstyper skal alltid routes til ny løsning`(skjematype: Skjematype) {
         val routingSjekk = kall.skjemaRouting.sjekkV1(IdentSkjematype(jonasIdent, skjematype))
 
-        assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
+        assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
         assertThat(routingHarBlittLagret(skjematype)).isFalse()
     }
 
@@ -344,7 +344,7 @@ class SkjemaRoutingIntegrationTest(
 
             val routingSjekk = kall.skjemaRouting.sjekkV1(dagligReiseRoutingRequest)
 
-            assertThat(routingSjekk.skalBehandlesINyLøsning).isFalse()
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.GAMMEL_LØSNING)
         }
 
         @Test
@@ -356,7 +356,7 @@ class SkjemaRoutingIntegrationTest(
 
             val routingSjekk = kall.skjemaRouting.sjekkV1(dagligReiseRoutingRequest)
 
-            assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
         }
 
         @Test
@@ -368,7 +368,7 @@ class SkjemaRoutingIntegrationTest(
 
             val routingSjekk = kall.skjemaRouting.sjekkV1(dagligReiseRoutingRequest)
 
-            assertThat(routingSjekk.skalBehandlesINyLøsning).isTrue()
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK)
         }
 
         private fun mockMaksAntallSomKanRoutesPåDagligReise(maksAntall: Int) {
