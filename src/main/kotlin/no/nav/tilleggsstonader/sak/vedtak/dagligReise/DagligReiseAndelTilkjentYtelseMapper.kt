@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.iDagHvisMandagEllerForrigeMandag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.avrundetStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
@@ -77,7 +78,7 @@ fun BeregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(
                     lagAndelForDagligReise(
                         saksbehandling = saksbehandling,
                         fomUkedag = fom.iDagHvisMandagEllerForrigeMandag(),
-                        beløp = periode.stønadsbeløp.toInt(),
+                        beløp = periode.stønadsbeløp.avrundetStønadsbeløp().toInt(),
                         målgruppe = vedtaksperiode.målgruppe,
                         typeAktivitet = rammevedtakForReise.typeAktivitet,
                         brukersNavKontor = periode.brukersNavKontor,

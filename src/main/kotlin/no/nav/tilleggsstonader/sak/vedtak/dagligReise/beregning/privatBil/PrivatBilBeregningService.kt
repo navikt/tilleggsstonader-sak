@@ -145,13 +145,13 @@ class PrivatBilBeregningService(
                                                 bompengerPerDag = delperiode.bompengerPerDag,
                                                 fergekostnadPerDag = delperiode.fergekostnadPerDag,
                                             ),
-                                        kilometersats = sats.beløp,
+                                        kilometersats = sats.beløp.setScale(2),
                                     )
 
                                 RammeForReiseMedPrivatBilSatsForDelperiode(
                                     fom = snitt.fom,
                                     tom = snitt.tom,
-                                    kilometersats = sats.beløp,
+                                    kilometersats = sats.beløp.setScale(2),
                                     dagsatsUtenParkering = dagsatsUtenParkering,
                                     satsBekreftetVedVedtakstidspunkt = sats.bekreftet,
                                 )

@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.avrundetStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.SatsDagligReisePrivatBilProvider
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import org.assertj.core.api.Assertions.assertThat
@@ -48,7 +49,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
 
         val fom = 2 februar 2026
         val tom = 22 februar 2026
-        val reiseavstandEnVei = BigDecimal(10)
+        val reiseavstandEnVei = BigDecimal(7.9)
         val kjørteDager =
             listOf(
                 2 februar 2026 to 50,
@@ -146,6 +147,9 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
         assertThat(gjeldendeIverksatteBehandlinger.map { it.id })
             .contains(kjørelisteBehandling.id)
             .doesNotContain(førstegangsBehandling.id)
+
+        val andelsBeløp = tilkjentYtelseRepository.findByBehandlingId(kjørelisteBehandling.id)!!.andelerTilkjentYtelse.sumOf { it.beløp }
+        assertThat(andelsBeløp).isEqualTo(forventetBeløp)
     }
 
     @Test
@@ -261,5 +265,6 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
                 .multiply(reiseavstandEnVei)
                 .multiply(2.toBigDecimal())
                 .plus(parkeringskostnader.toBigDecimal())
-        }.toInt()
+        }.avrundetStønadsbeløp()
+            .toInt()
 }

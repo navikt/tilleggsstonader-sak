@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UtfyltDagAutomatiskVu
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammevedtakPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.avrundetStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
@@ -108,7 +109,10 @@ class PrivatBilBeregningsresultatServiceTest {
         ).isEqualTo(
             beregningsresultatUke.grunnlag.dager
                 .first()
-                .dagsatsUtenParkering * 3.toBigDecimal() + totaleParkeringsutgifter,
+                .dagsatsUtenParkering
+                .multiply(3.toBigDecimal())
+                .add(totaleParkeringsutgifter)
+                .avrundetStønadsbeløp(),
         )
 
         assertThat(beregningsresultatUke.grunnlag.dager).hasSize(reisedager.size)
@@ -186,7 +190,9 @@ class PrivatBilBeregningsresultatServiceTest {
         ).isEqualTo(
             beregningsresultatUke.grunnlag.dager
                 .first()
-                .dagsatsUtenParkering * 2.toBigDecimal(),
+                .dagsatsUtenParkering
+                .multiply(2.toBigDecimal())
+                .avrundetStønadsbeløp(),
         )
 
         assertThat(beregningsresultatUke.grunnlag.dager).hasSize(2).allMatch { it.parkeringskostnad == 0 }
@@ -265,13 +271,15 @@ class PrivatBilBeregningsresultatServiceTest {
         val dagI2026 = beregningsresultatUke.grunnlag.dager.first { it.dato.year == 2026 }
 
         assertThat(dagI2025.parkeringskostnad).isZero
-        assertThat(dagI2025.dagsatsUtenParkering).isEqualTo(dagI2025.stønadsbeløpForDag)
+        assertThat(dagI2025.stønadsbeløpForDag).isEqualTo(dagI2025.dagsatsUtenParkering)
         assertThat(dagI2026.parkeringskostnad).isZero
-        assertThat(dagI2026.dagsatsUtenParkering).isEqualTo(dagI2026.stønadsbeløpForDag)
+        assertThat(dagI2026.stønadsbeløpForDag).isEqualTo(dagI2026.dagsatsUtenParkering)
 
         assertThat(dagI2025.stønadsbeløpForDag).isNotEqualTo(dagI2026.stønadsbeløpForDag)
 
-        assertThat(beregningsresultatUke.stønadsbeløp).isEqualTo(beregningsresultatUke.grunnlag.dager.sumOf { it.stønadsbeløpForDag })
+        assertThat(
+            beregningsresultatUke.stønadsbeløp.setScale(2),
+        ).isEqualTo(beregningsresultatUke.grunnlag.dager.sumOf { it.stønadsbeløpForDag })
     }
 
     @Test
@@ -354,7 +362,8 @@ class PrivatBilBeregningsresultatServiceTest {
         assertThat(beregningsresultatUke1.stønadsbeløp).isEqualTo(
             beregningsresultatUke1.grunnlag.dager
                 .single()
-                .dagsatsUtenParkering,
+                .dagsatsUtenParkering
+                .avrundetStønadsbeløp(),
         )
         assertThat(beregningsresultatUke1.grunnlag.dager).hasSize(1).allMatch { it.parkeringskostnad == 0 }
 
@@ -364,7 +373,8 @@ class PrivatBilBeregningsresultatServiceTest {
         assertThat(beregningsresultatUke2.stønadsbeløp).isEqualTo(
             beregningsresultatUke2.grunnlag.dager
                 .single()
-                .dagsatsUtenParkering,
+                .dagsatsUtenParkering
+                .avrundetStønadsbeløp(),
         )
         assertThat(beregningsresultatUke2.grunnlag.dager).hasSize(1).allMatch { it.parkeringskostnad == 0 }
     }
@@ -464,7 +474,14 @@ class PrivatBilBeregningsresultatServiceTest {
             val beregningsresultatUke1 = beregningsresultatForReise.perioder.single()
             assertThat(beregningsresultatUke1.fom).isEqualTo(fomRammevedtak)
             assertThat(beregningsresultatUke1.tom).isEqualTo(tomRammevedtak)
-            assertThat(beregningsresultatUke1.stønadsbeløp).isEqualTo(delperiode.satser.single().dagsatsUtenParkering)
+            assertThat(
+                beregningsresultatUke1.stønadsbeløp,
+            ).isEqualTo(
+                delperiode.satser
+                    .single()
+                    .dagsatsUtenParkering
+                    .avrundetStønadsbeløp(),
+            )
             assertThat(beregningsresultatUke1.grunnlag.dager).hasSize(1).allMatch { it.parkeringskostnad == 0 }
         }
     }
