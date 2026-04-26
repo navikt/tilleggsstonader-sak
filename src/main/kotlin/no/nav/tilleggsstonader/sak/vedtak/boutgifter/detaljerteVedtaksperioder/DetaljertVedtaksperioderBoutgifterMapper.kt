@@ -10,7 +10,7 @@ object DetaljertVedtaksperioderBoutgifterMapper {
         val overnatting = finnVedtaksperioderMedOvernattingUtgifter(this)
         val løpende = finnVedtaksperioderMedLøpendeUtgifter(this)
 
-        return (overnatting + løpende).sorted()
+        return (overnatting + løpende).sortedByDescending { it.fom }
     }
 
     private fun finnVedtaksperioderMedOvernattingUtgifter(

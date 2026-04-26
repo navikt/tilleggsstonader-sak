@@ -143,8 +143,8 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
 
             assertThat(res).hasSize(2)
 
-            val resJan = res.first()
-            val resFeb = res.last()
+            val resFeb = res.first()
+            val resJan = res.last()
 
             assertThat(resJan.fom).isEqualTo(førsteJan)
             assertThat(resJan.tom).isEqualTo(sisteJan)
@@ -160,7 +160,7 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
         }
 
         @Test
-        fun `skal sortere utgifter til overnatting kronologisk`() {
+        fun `skal sortere utgifter til overnatting nyest til eldst`() {
             val beregningsresultatJan =
                 BoutgifterTestUtil.lagBeregningsresultatMåned(
                     fom = førsteJan,

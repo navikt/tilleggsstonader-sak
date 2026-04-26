@@ -77,9 +77,9 @@ class VedtaksperioderOversiktService(
     private fun finnDetaljerteVedtaksperioderInnenforSammeEnhet(behandling: Saksbehandling?): List<DetaljertVedtaksperiode> {
         val vedtaksdata = behandling?.forrigeIverksatteBehandlingId?.let { vedtakService.hentVedtak(it)?.data }
         return when (vedtaksdata) {
-            is InnvilgelseEllerOpphørTilsynBarn -> vedtaksdata.finnDetaljerteVedtaksperioder().sortedByDescending { it.fom }
-            is InnvilgelseEllerOpphørLæremidler -> vedtaksdata.finnDetaljerteVedtaksperioder().sortedByDescending { it.fom }
-            is InnvilgelseEllerOpphørBoutgifter -> vedtaksdata.finnDetaljerteVedtaksperioder().sortedByDescending { it.fom }
+            is InnvilgelseEllerOpphørTilsynBarn -> vedtaksdata.finnDetaljerteVedtaksperioder()
+            is InnvilgelseEllerOpphørLæremidler -> vedtaksdata.finnDetaljerteVedtaksperioder()
+            is InnvilgelseEllerOpphørBoutgifter -> vedtaksdata.finnDetaljerteVedtaksperioder()
             null -> emptyList()
             else -> error("Vi støtter ikke å hente detaljertevedtaksperioder innenfor samme enhet for ${vedtaksdata::class.java}")
         }
