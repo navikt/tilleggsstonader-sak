@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakereService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerUtil.tilAvsenderMottaker
@@ -119,7 +118,7 @@ class JournalførKjørelisteBehandlingBrevTask(
         return response
     }
 
-    // TODO - hva skal tittel være? Bør være forskjellig
+    // TODO - hva skal tittel være? Bør være forskjellig fra rammevedtak-brev
     private fun utledBrevtittel(saksbehandling: Saksbehandling) = "Vedtak om ${saksbehandling.stønadstype.visningsnavn}"
 
     override fun onCompletion(task: Task) {
