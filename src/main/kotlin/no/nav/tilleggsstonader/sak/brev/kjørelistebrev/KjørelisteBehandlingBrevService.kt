@@ -71,13 +71,12 @@ class KjørelisteBehandlingBrevService(
         return htmlifyClient.genererKjørelisteBehandlingBrev(request)
     }
 
-    private fun utledBehandlendeEnhet(stønadstype: Stønadstype): String {
-        if (stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
-            return "Nav Tiltak Oslo"
+    private fun utledBehandlendeEnhet(stønadstype: Stønadstype): String =
+        when (stønadstype) {
+            Stønadstype.DAGLIG_REISE_TSR -> "Nav Tiltak Oslo"
+            Stønadstype.DAGLIG_REISE_TSO -> "Nav Arbeid og ytelser"
+            else -> error("Uforventet stønadstype $stønadstype i en kjørelistebehandling")
         }
-
-        return "Nav Arbeid og ytelser"
-    }
 
     private fun lagreEllerOppdaterBrev(
         saksbehandling: Saksbehandling,
