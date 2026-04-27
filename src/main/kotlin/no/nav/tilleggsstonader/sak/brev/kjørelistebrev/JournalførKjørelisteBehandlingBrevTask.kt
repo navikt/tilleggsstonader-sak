@@ -7,8 +7,6 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.brev.JournalførVedtaksbrevService
-import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakereService
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.DistribuerVedtaksbrevTask
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
