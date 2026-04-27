@@ -1,0 +1,12 @@
+{
+  "data": {
+    "oppfolgingsEnhet": {
+      "enhet": {
+        "id": "1234",
+        "navn": "NAV Test",
+        "kilde": "NORG"
+      }
+    }
+  }
+}
+

@@ -21,5 +21,7 @@ enum class Toggle(
 
     KAN_BEHANDLE_PRIVAT_BIL("sak.daglig-reise-privat-bil"),
 
+    BRUK_OPPFOLGINGSENHET_FOR_UTBETALING("sak.bruk-oppfolgingsenhet-for-utbetaling"),
+
     SØKNAD_ROUTING_REISE_TIL_SAMLING("sak.soknad-routing.reise-til-samling"),
 }
