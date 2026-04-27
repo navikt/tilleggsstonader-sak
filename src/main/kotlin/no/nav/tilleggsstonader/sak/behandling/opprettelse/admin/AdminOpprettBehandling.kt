@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.behandling.admin
+package no.nav.tilleggsstonader.sak.behandling.opprettelse.admin
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import java.time.LocalDate

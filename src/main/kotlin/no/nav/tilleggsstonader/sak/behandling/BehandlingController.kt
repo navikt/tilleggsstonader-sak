@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingsoversiktDto
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
+import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettRevurderingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId

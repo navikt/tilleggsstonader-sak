@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.behandling
+package no.nav.tilleggsstonader.sak.behandling.opprettelse
 
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
@@ -364,7 +364,7 @@ class OpprettTestBehandlingController(
                             ),
                     ),
                 samling = Samling(periodeForSamling = listOf(periodeForSamling, periodeForSamling2)),
-                harSaerligStoreUtgifterPaGrunnAvFunksjonsnedsettelse = JaNeiType.nei,
+                harSaerligStoreUtgifterPaGrunnAvFunksjonsnedsettelse = JaNeiType.ja,
             )
         val skjemaBoutgifter =
             SøknadsskjemaBoutgifterFyllUtSendInn(

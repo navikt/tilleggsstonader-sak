@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.behandling.admin
+package no.nav.tilleggsstonader.sak.behandling.opprettelse.admin
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
