@@ -34,15 +34,15 @@ class BrevmottakereService(
     }
 
     @Transactional
-    fun hentEllerOpprettBrevmottakere(behandlingId: BehandlingId): BrevmottakereDto =
+    fun hentEllerOpprettBrevmottakere(behandlingId: BehandlingId): List<BrevmottakerVedtaksbrev> =
         if (brevmottakereRepository.existsByBehandlingId(behandlingId)) {
-            brevmottakereRepository.findByBehandlingId(behandlingId).tilBrevmottakereDto()
+            brevmottakereRepository.findByBehandlingId(behandlingId)
         } else {
             validerBehandlingKanRedigeres(behandlingId)
 
             val brevmottaker = opprettInitiellBrevmottakerForBehandling(behandlingId)
 
-            listOf(brevmottaker).tilBrevmottakereDto()
+            listOf(brevmottaker)
         }
 
     private fun fjernMottakereIkkeIDto(

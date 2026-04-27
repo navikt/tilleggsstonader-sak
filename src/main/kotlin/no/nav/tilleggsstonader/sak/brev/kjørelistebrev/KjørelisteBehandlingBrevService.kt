@@ -25,26 +25,24 @@ class KjørelisteBehandlingBrevService(
     private val vedtakService: VedtakService,
     private val behandlingService: BehandlingService,
 ) {
-    fun genererOgLagreBrev(behandlingId: BehandlingId): ByteArray {
+    fun genererOgLagreBrev(behandlingId: BehandlingId): KjørelisteBehandlingBrev {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         saksbehandling.status.validerKanBehandlingRedigeres()
 
         val html = genererHtml(saksbehandling)
         val pdf = familieDokumentClient.genererPdf(html)
 
-        lagreEllerOppdaterBrev(saksbehandling, html, pdf)
-
-        return pdf
+        return lagreEllerOppdaterBrev(saksbehandling, html, pdf)
     }
 
-    fun hentBrev(behandlingId: BehandlingId): ByteArray {
+    fun hentBrev(behandlingId: BehandlingId): KjørelisteBehandlingBrev {
         val brev = kjørelisteBehandlingBrevRepository.findByBehandlingId(behandlingId)
 
         brukerfeilHvis(brev == null) {
             "Finner ikke kjørelistebrev for behandlingId=$behandlingId. Det er nok fordi et brev ikke har blitt laget enda."
         }
 
-        return brev.pdf.bytes
+        return brev
     }
 
     private fun genererHtml(saksbehandling: Saksbehandling): String {
@@ -82,7 +80,7 @@ class KjørelisteBehandlingBrevService(
         saksbehandling: Saksbehandling,
         html: String,
         pdf: ByteArray,
-    ) {
+    ): KjørelisteBehandlingBrev {
         val brev =
             KjørelisteBehandlingBrev(
                 behandlingId = saksbehandling.id,
@@ -96,5 +94,7 @@ class KjørelisteBehandlingBrevService(
         } else {
             kjørelisteBehandlingBrevRepository.insert(brev)
         }
+
+        return brev
     }
 }

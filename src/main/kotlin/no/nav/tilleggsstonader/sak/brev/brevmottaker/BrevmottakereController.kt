@@ -27,7 +27,7 @@ class BrevmottakereController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerLesetilgangTilBehandling(behandlingId)
 
-        return brevmottakereService.hentEllerOpprettBrevmottakere(behandlingId)
+        return brevmottakereService.hentEllerOpprettBrevmottakere(behandlingId).tilBrevmottakereDto()
     }
 
     @PostMapping("/{behandlingId}")
