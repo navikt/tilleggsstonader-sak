@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.behandling.opprettelse
 
-import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
@@ -28,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class OpprettRevurderingService(
-    private val taskService: TaskService,
     private val opprettBehandlingService: OpprettBehandlingService,
     private val barnService: BarnService,
     private val unleashService: UnleashService,

@@ -11,8 +11,8 @@ import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettTestBehandlingController
-import no.nav.tilleggsstonader.sak.behandling.opprettelse.TestBehandlingRequest
+import no.nav.tilleggsstonader.sak.behandling.opprettelse.dummy.OpprettDummyBehandlingController
+import no.nav.tilleggsstonader.sak.behandling.opprettelse.dummy.TestBehandlingRequest
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPerson
@@ -61,7 +61,7 @@ class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
     lateinit var barnService: BarnService
 
     @Autowired
-    lateinit var opprettTestBehandlingController: OpprettTestBehandlingController
+    lateinit var opprettDummyBehandlingController: OpprettDummyBehandlingController
 
     @Autowired
     lateinit var vilkårController: VilkårController
@@ -315,7 +315,7 @@ class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
         stønadstype: Stønadstype = Stønadstype.BARNETILSYN,
     ): BehandlingId {
         val behandlingId =
-            opprettTestBehandlingController.opprettBehandling(
+            opprettDummyBehandlingController.opprettBehandling(
                 TestBehandlingRequest(
                     personIdent,
                     stønadstype = stønadstype,
