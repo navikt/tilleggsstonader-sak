@@ -147,7 +147,7 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
     @Test
     fun `skal håndtere innsending av flere kjørelister på samme rammevedtak`() {
         // Sender inn kjøreliste for første uke
-        val kjørelistebehandling1 =
+        val kjørelistebehandling =
             sendInnKjøreliste(
                 indeksKjørelistebehandling = 0,
                 kjøreliste =
@@ -162,9 +162,9 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
             )
 
         // sender inn kjøreliste for andre og tredje uke før første kjørelistebehandling er ferdigbehandlet
-        val kjørelistebehandling2 =
+        val kjørelistebehandlinEtterAndreInnsending =
             sendInnKjøreliste(
-                indeksKjørelistebehandling = 1,
+                indeksKjørelistebehandling = 0,
                 kjøreliste =
                     kjørelisteSkjema(
                         reiseId = reiseIdRamme1,
@@ -177,31 +177,20 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
                     ),
             )
 
+        // Skal kun opprettes en behandling, som tar for seg begge kjørelister
+        assertThat(kjørelistebehandling).isEqualTo(kjørelistebehandlinEtterAndreInnsending)
+
         // Henter reisevurderinger for begge behandlingene
-        val reisevurderingBehandling1 = finnReisevurderinger(kjørelistebehandling1.id).ramme1!!
-        val reisevurderingerBehandling2 = finnReisevurderinger(kjørelistebehandling2.id).ramme1!!
+        val (ramme1, ramme2) = finnReisevurderinger(kjørelistebehandling.id)
+        assertThat(ramme1).isNotNull
+        assertThat(ramme2).isNotNull
 
-        // Kun første uken skal ha en kjøreliste og avklart uke i den første kjørelistebehandlingen
-        val (uke1Behandling1, resterendeUkerBehandling1) = reisevurderingBehandling1.uker.first() to reisevurderingBehandling1.uker.drop(1)
-        assertThat(uke1Behandling1.kjørelisteInnsendtDato).isNotNull
-        assertThat(uke1Behandling1.avklartUkeId).isNotNull
+        // Verifiser at begge uker finnes på ramme1 for behandlingen
+        val ukerHvorDetFinnesAvklarteUker = ramme1!!.uker.filter { it.kjørelisteInnsendtDato != null && it.avklartUkeId != null }
+        assertThat(ukerHvorDetFinnesAvklarteUker).hasSameSizeAs(ramme1.uker)
 
-        resterendeUkerBehandling1.forEach {
-            assertThat(it.kjørelisteInnsendtDato).isNull()
-            assertThat(it.avklartUkeId).isNull()
-        }
-
-        // Kun andre og tredje uken skal ha en kjøreliste og avklart uke i den andre kjørelistebehandlingen
-        val (uke1Behandling2, resterendeUkerBehandling2) =
-            reisevurderingerBehandling2.uker.first() to
-                reisevurderingerBehandling2.uker.drop(1)
-        assertThat(uke1Behandling2.kjørelisteInnsendtDato).isNull()
-        assertThat(uke1Behandling2.avklartUkeId).isNull()
-
-        resterendeUkerBehandling2.forEach {
-            assertThat(it.kjørelisteInnsendtDato).isNotNull
-            assertThat(it.avklartUkeId).isNotNull()
-        }
+        // Verifiser ingen uker på ramme2
+        assertThat(ramme2!!.uker.filter { it.kjørelisteInnsendtDato != null && it.avklartUkeId != null }).isEmpty()
     }
 
     private fun sendInnKjøreliste(

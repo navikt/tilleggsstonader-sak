@@ -42,6 +42,10 @@ fun IntegrationTest.tilordneÅpenBehandlingOppgaveForBehandling(
     mockClients.oppgaveClient.fordelOppgave(oppgave.id, tilordneTilSaksbehandler, oppgave.versjon, null)
 }
 
+fun IntegrationTest.fjernTilordningPåÅpenBehandlingOppgaveForBehandling(behandlingId: BehandlingId) {
+    tilordneÅpenBehandlingOppgaveForBehandling(behandlingId, null)
+}
+
 fun IntegrationTest.opprettJournalføringsoppgave(
     tema: Tema = Tema.TSO,
     behandlingstema: String = "ab0300",
