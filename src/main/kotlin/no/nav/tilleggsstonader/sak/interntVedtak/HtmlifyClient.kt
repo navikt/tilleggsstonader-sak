@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.interntVedtak
 
 import no.nav.tilleggsstonader.libs.http.client.postForEntity
+import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.KjørelisteBehandlingBrevRequest
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
@@ -19,6 +20,13 @@ class HtmlifyClient(
         restTemplate.postForEntity<String>(
             UriComponentsBuilder.fromUri(uri).pathSegment("api", "internt-vedtak").toUriString(),
             interntVedtak,
+            httpHeaders = HttpHeaders(),
+        )
+
+    fun genererKjørelisteBehandlingBrev(request: KjørelisteBehandlingBrevRequest): String =
+        restTemplate.postForEntity<String>(
+            UriComponentsBuilder.fromUri(uri).pathSegment("api", "kjoreliste-behandling-brev").toUriString(),
+            request,
             httpHeaders = HttpHeaders(),
         )
 }
