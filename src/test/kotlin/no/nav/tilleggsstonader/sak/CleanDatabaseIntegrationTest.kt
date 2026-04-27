@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVent
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerFrittståendeBrev
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.frittstående.FrittståendeBrev
+import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.KjørelisteBehandlingBrev
 import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagretBrev
 import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagretFrittståendeBrev
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.Vedtaksbrev
@@ -83,6 +84,7 @@ abstract class CleanDatabaseIntegrationTest : IntegrationTest() {
             AvklartKjørtDag::class,
             AvklartKjørtUke::class,
             Kjøreliste::class,
+            KjørelisteBehandlingBrev::class,
             Behandling::class,
             EksternFagsakId::class,
             FagsakDomain::class,
