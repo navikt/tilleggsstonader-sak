@@ -28,6 +28,7 @@ fun IntegrationTest.gjennomførKjørelisteBehandling(
 
     if (tilSteg == StegType.SIMULERING) return
     gjennomførSimuleringSteg(behandling.id)
+    kall.privatBil.genererKjørelisteVedtaksbrev(behandling.id)
     kall.privatBil.fullførKjørelisteBehandling(behandling.id)
 
     if (tilSteg in setOf(StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV, StegType.FERDIGSTILLE_BEHANDLING)) return

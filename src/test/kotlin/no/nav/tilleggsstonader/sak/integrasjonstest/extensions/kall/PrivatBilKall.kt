@@ -28,6 +28,9 @@ class PrivatBilKall(
     fun hentOppsummertBeregning(behandlingId: BehandlingId) =
         apiRespons.hentOppsummertBeregning(behandlingId).expectOkWithBody<PrivatBilOppsummertBeregningDto>()
 
+    fun genererKjørelisteVedtaksbrev(behandlingId: BehandlingId) =
+        apiRespons.genererKjørelisteVedtaksbrev(behandlingId).expectOkWithBody<ByteArray>()
+
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = PrivatBilApi()
 
@@ -77,6 +80,15 @@ class PrivatBilKall(
                 restTestClient
                     .get()
                     .uri("/api/vedtak/daglig-reise/$behandlingId/privat-bil/oppsummer-beregning")
+                    .medOnBehalfOfToken()
+                    .exchange()
+            }
+
+        fun genererKjørelisteVedtaksbrev(behandlingId: BehandlingId) =
+            with(testklient.testkontekst) {
+                restTestClient
+                    .post()
+                    .uri("/api/kjorelistebrev/$behandlingId")
                     .medOnBehalfOfToken()
                     .exchange()
             }

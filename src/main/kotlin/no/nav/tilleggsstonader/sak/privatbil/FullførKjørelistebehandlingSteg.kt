@@ -10,6 +10,9 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.FerdigstillBehandlingTask
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakereService
+import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.JournalførKjørelisteBehandlingBrevTask
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
@@ -22,6 +25,7 @@ class FullførKjørelistebehandlingSteg(
     private val iverksettService: IverksettService,
     private val taskService: TaskService,
     private val oppgaveService: OppgaveService,
+    private val brevmottakereService: BrevmottakereService,
 ) : BehandlingSteg<Void?> {
     override fun utførSteg(
         saksbehandling: Saksbehandling,
@@ -34,11 +38,19 @@ class FullførKjørelistebehandlingSteg(
             "Kan ikke fullføre behandling=${saksbehandling.id} fordi den ikke er en kjørelistebehandling."
         }
 
+        opprettTaskForSendingAvVedtaksbrev(behandlingId = saksbehandling.id)
         behandlingService.oppdaterResultatPåBehandling(saksbehandling.id, BehandlingResultat.INNVILGET)
         behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.IVERKSETTER_VEDTAK)
         taskService.save(FerdigstillBehandlingTask.opprettTask(saksbehandling))
+
         ferdigstillOppgave(saksbehandling)
         iverksettService.iverksettBehandlingFørsteGang(saksbehandling.id)
+    }
+
+    private fun opprettTaskForSendingAvVedtaksbrev(behandlingId: BehandlingId) {
+        // For å opprette brevmottakere for kjøreliste-brev da det ikke gjøres fra frontend
+        brevmottakereService.hentEllerOpprettBrevmottakere(behandlingId)
+        taskService.save(JournalførKjørelisteBehandlingBrevTask.opprettTask(behandlingId))
     }
 
     private fun ferdigstillOppgave(saksbehandling: Saksbehandling): Long? {

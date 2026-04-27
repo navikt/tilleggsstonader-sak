@@ -1,46 +1,50 @@
-package no.nav.tilleggsstonader.sak.brev.vedtaksbrev
+package no.nav.tilleggsstonader.sak.brev.kjørelistebrev
 
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.brev.JournalførVedtaksbrevService
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakereService
+import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.DistribuerVedtaksbrevTask
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import org.springframework.stereotype.Service
 import java.util.Properties
 
 @Service
 @TaskStepBeskrivelse(
-    taskStepType = JournalførVedtaksbrevTask.TYPE,
+    taskStepType = JournalførKjørelisteBehandlingBrevTask.TYPE,
     maxAntallFeil = 50,
     settTilManuellOppfølgning = true,
     triggerTidVedFeilISekunder = 31L,
-    beskrivelse = "Journalfører vedtaksbrev",
+    beskrivelse = "Journalfører vedtaksbrev for kjørelistebehandling",
 )
-class JournalførVedtaksbrevTask(
+class JournalførKjørelisteBehandlingBrevTask(
     private val taskService: TaskService,
     private val behandlingService: BehandlingService,
-    private val brevService: BrevService,
-    private val brevmottakerVedtaksbrevRepository: BrevmottakerVedtaksbrevRepository,
-    private val stegService: StegService,
+    private val kjørelisteBehandlingBrevService: KjørelisteBehandlingBrevService,
+    private val brevmottakereService: BrevmottakereService,
     private val journalførVedtaksbrevService: JournalførVedtaksbrevService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
         val behandlingId = BehandlingId.fromString(task.payload)
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-        val vedtaksbrev = brevService.hentBesluttetBrev(saksbehandling.id)
+        feilHvisIkke(saksbehandling.type == BehandlingType.KJØRELISTE) {
+            "Forventer at behandlingstype skal være ${BehandlingType.KJØRELISTE}"
+        }
+
+        val brev = kjørelisteBehandlingBrevService.hentBrev(behandlingId)
 
         journalførVedtaksbrevService.journalførForAlleMottakere(
-            pdfBytes = vedtaksbrev.beslutterPdf?.bytes ?: error("Mangler beslutterpdf"),
+            pdfBytes = brev.pdf.bytes,
             saksbehandling = saksbehandling,
-            brevmottakere = brevmottakerVedtaksbrevRepository.findByBehandlingId(behandlingId),
+            brevmottakere = brevmottakereService.hentEllerOpprettBrevmottakere(behandlingId),
+            // TODO - hva skal tittel være? Bør være forskjellig fra rammevedtak-brev
             brevtittel = "Vedtak om ${saksbehandling.stønadstype.visningsnavn}",
         )
-        stegService.håndterSteg(behandlingId, StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV)
     }
 
     override fun onCompletion(task: Task) {
@@ -58,6 +62,6 @@ class JournalførVedtaksbrevTask(
                     },
             )
 
-        const val TYPE = "journalførVedtaksbrev"
+        const val TYPE = "journalførKjørelisteBehandlingBrev"
     }
 }

@@ -211,7 +211,7 @@ class BrevmottakereServiceTest {
         every { brevmottakereRepository.existsByBehandlingId(behandlingID) } returns true
         every { brevmottakereRepository.findByBehandlingId(behandlingID) } returns listOf(brevmottakerTestObjekt)
 
-        val brevmottakere: BrevmottakereDto = brevmottakereService.hentEllerOpprettBrevmottakere(behandlingID)
+        val brevmottakere: BrevmottakereDto = brevmottakereService.hentEllerOpprettBrevmottakere(behandlingID).tilBrevmottakereDto()
 
         assertThat(brevmottakere).isEqualTo(brevmottakereDtoFasit)
     }

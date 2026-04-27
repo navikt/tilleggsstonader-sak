@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
 import no.nav.tilleggsstonader.libs.utils.dato.april
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.JournalpostClientMockConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
@@ -17,10 +18,14 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehand
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 import java.util.UUID
 
 // Bruker for å teste litt "side-effekter" som kommer ut av behandlingsløp. Behandlingsstatistikk, vedtaksstatistikk og internt vedtak
 class DagligReisePrivatBilStatistikkIntegrationTest : IntegrationTest() {
+    @Autowired
+    lateinit var brevmottakerVedtaksbrevRepository: BrevmottakerVedtaksbrevRepository
+
     @Test
     fun `blir produsert vedtaksstatistikk for rammevedtakbehandling og kjørelistebehandling`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
@@ -68,8 +73,15 @@ class DagligReisePrivatBilStatistikkIntegrationTest : IntegrationTest() {
         verifiserVedtaksstatistikkFinnesForBehandling(kjørelisteBehandling.id)
         verifiserFinnesBehandlingstatistikkForBehandling(kjørelisteBehandling.id)
         verifiserHarBlittProdusertInterntVedtakForBehandling(kjørelisteBehandling.id)
+        verifiserHarBlittProdusertVedtaksbrevForKjørelistebehandling(kjørelisteBehandling.id)
 
         // TODO - også verifisere at statistikk og internt vedtak blir produsert av en automatisk kjørelistebehandling
+    }
+
+    private fun verifiserHarBlittProdusertVedtaksbrevForKjørelistebehandling(behandlingId: BehandlingId) {
+        val brevmottakereVedtaksbrev = brevmottakerVedtaksbrevRepository.findByBehandlingId(behandlingId)
+        assertThat(brevmottakereVedtaksbrev).hasSize(1)
+        assertThat(brevmottakereVedtaksbrev.single().bestillingId).isNotNull
     }
 
     private fun verifiserFinnesBehandlingstatistikkForBehandling(behandlingId: BehandlingId) {

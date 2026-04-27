@@ -26,7 +26,7 @@ class KjørelisteBehandlingBrevController(
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return Base64.getEncoder().encode(kjørelisteBehandlingBrevService.genererOgLagreBrev(behandlingId))
+        return Base64.getEncoder().encode(kjørelisteBehandlingBrevService.genererOgLagreBrev(behandlingId).pdf.bytes)
     }
 
     @GetMapping("/{behandlingId}")
@@ -36,6 +36,6 @@ class KjørelisteBehandlingBrevController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerLesetilgangTilBehandling(behandlingId)
 
-        return Base64.getEncoder().encode(kjørelisteBehandlingBrevService.hentBrev(behandlingId))
+        return Base64.getEncoder().encode(kjørelisteBehandlingBrevService.hentBrev(behandlingId).pdf.bytes)
     }
 }
