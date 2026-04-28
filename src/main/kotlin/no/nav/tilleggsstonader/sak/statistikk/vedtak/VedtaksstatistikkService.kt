@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AdressebeskyttelseDvh
@@ -32,10 +31,17 @@ class VedtaksstatistikkService(
     private val vedtakService: VedtakService,
     private val barnRepository: BarnRepository,
 ) {
-    fun lagreVedtaksstatistikkV2(
-        behandlingId: BehandlingId,
-        fagsakId: FagsakId,
-    ) {
+    fun lagreVedtaksstatistikkV2(behandlingId: BehandlingId) {
+        val vedtaksstatistikkV2 = mapTilVedtaksstatistikkV2(behandlingId)
+        vedtaksstatistikkRepositoryV2.insert(vedtaksstatistikkV2)
+    }
+
+    fun oppdaterVedtaksstatistikkV2(behandlingId: BehandlingId) {
+        val vedtaksstatistikkV2 = mapTilVedtaksstatistikkV2(behandlingId)
+        vedtaksstatistikkRepositoryV2.update(vedtaksstatistikkV2)
+    }
+
+    private fun mapTilVedtaksstatistikkV2(behandlingId: BehandlingId): VedtaksstatistikkV2 {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val vedtak =
             vedtakService.hentVedtak(behandlingId)
@@ -47,25 +53,23 @@ class VedtaksstatistikkService(
         val andelTilkjentYtelse = iverksettService.hentAndelTilkjentYtelse(behandlingId)
         val barn = barnRepository.findByBehandlingId(behandlingId)
 
-        vedtaksstatistikkRepositoryV2.insert(
-            VedtaksstatistikkV2(
-                fagsakId = fagsakId,
-                stønadstype = StønadstypeDvh.fraDomene(behandling.stønadstype),
-                behandlingId = behandlingId,
-                eksternFagsakId = behandling.eksternFagsakId,
-                eksternBehandlingId = behandling.eksternId,
-                relatertBehandlingId = hentRelatertBehandlingId(behandling),
-                adressebeskyttelse = hentAdressebeskyttelse(søkerIdent),
-                tidspunktVedtak = vedtakstidspunkt,
-                søkerIdent = søkerIdent,
-                behandlingType = BehandlingTypeDvh.fraDomene(behandling.type),
-                behandlingÅrsak = BehandlingÅrsakDvh.fraDomene(behandling.årsak),
-                vedtakResultat = VedtakResultatDvh.fraDomene(behandling.resultat),
-                vedtaksperioder = VedtaksperioderDvh.fraDomene(vedtak, barn),
-                utbetalinger = UtbetalingerDvh.fraDomene(andelTilkjentYtelse, vedtak),
-                årsakerAvslag = ÅrsakAvslagDvh.fraDomene(vedtak.takeIfType<Avslag>()?.data?.årsaker),
-                årsakerOpphør = ÅrsakOpphørDvh.fraDomene(vedtak.takeIfType<Opphør>()?.data?.årsaker),
-            ),
+        return VedtaksstatistikkV2(
+            fagsakId = behandling.fagsakId,
+            stønadstype = StønadstypeDvh.fraDomene(behandling.stønadstype),
+            behandlingId = behandlingId,
+            eksternFagsakId = behandling.eksternFagsakId,
+            eksternBehandlingId = behandling.eksternId,
+            relatertBehandlingId = hentRelatertBehandlingId(behandling),
+            adressebeskyttelse = hentAdressebeskyttelse(søkerIdent),
+            tidspunktVedtak = vedtakstidspunkt,
+            søkerIdent = søkerIdent,
+            behandlingType = BehandlingTypeDvh.fraDomene(behandling.type),
+            behandlingÅrsak = BehandlingÅrsakDvh.fraDomene(behandling.årsak),
+            vedtakResultat = VedtakResultatDvh.fraDomene(behandling.resultat),
+            vedtaksperioder = VedtaksperioderDvh.fraDomene(vedtak, barn),
+            utbetalinger = UtbetalingerDvh.fraDomene(andelTilkjentYtelse, vedtak),
+            årsakerAvslag = ÅrsakAvslagDvh.fraDomene(vedtak.takeIfType<Avslag>()?.data?.årsaker),
+            årsakerOpphør = ÅrsakOpphørDvh.fraDomene(vedtak.takeIfType<Opphør>()?.data?.årsaker),
         )
     }
 

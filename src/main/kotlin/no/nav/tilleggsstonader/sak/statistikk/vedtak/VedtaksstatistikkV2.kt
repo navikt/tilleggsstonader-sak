@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtakResultatDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
+import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.relational.core.mapping.Column
@@ -43,6 +44,7 @@ data class VedtaksstatistikkV2(
     val årsakerAvslag: ÅrsakAvslagDvh.JsonWrapper?,
     @Column("arsaker_opphor")
     val årsakerOpphør: ÅrsakOpphørDvh.JsonWrapper?,
+    @CreatedDate
     val opprettetTid: LocalDateTime = LocalDateTime.now(),
     @LastModifiedDate
     val endretTid: LocalDateTime = opprettetTid,
