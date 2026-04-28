@@ -72,7 +72,7 @@ data class BehandlingFaktaDagligReiseDto(
     override val hovedytelse: FaktaHovedytelse? = null,
     override val dokumentasjon: FaktaDokumentasjon? = null,
     override val arena: ArenaFakta? = null,
-    val aktiviteter: FaktaAktivtetDagligReise,
+    val aktiviteter: FaktaAktivitetDagligReise,
     val reiser: List<FaktaReise>?,
     val personopplysninger: FaktaPersonopplysninger,
 ) : BehandlingFaktaDto
@@ -161,7 +161,7 @@ data class FaktaAktivitet(
     val søknadsgrunnlag: SøknadsgrunnlagAktivitet?,
 )
 
-data class FaktaAktivtetDagligReise(
+data class FaktaAktivitetDagligReise(
     val aktivitet: FaktaAktivitet,
 )
 

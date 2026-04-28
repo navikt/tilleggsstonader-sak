@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 @Service
-class OpprettDummyBehandlingReiseTilSamling(
+class OpprettDummySøknadReiseTilSamling(
     private val søknadService: SøknadService,
 ) {
     fun opprettDummy(

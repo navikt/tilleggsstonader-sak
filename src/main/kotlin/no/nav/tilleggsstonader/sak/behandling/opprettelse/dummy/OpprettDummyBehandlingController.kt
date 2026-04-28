@@ -33,7 +33,7 @@ class OpprettDummyBehandlingController(
     private val opprettDummySøknadLæremidler: OpprettDummySøknadLæremidler,
     private val opprettDummySøknadBoutgifter: OpprettDummySøknadBoutgifter,
     private val opprettDummySøknadDagligReise: OpprettDummySøknadDagligReise,
-    private val opprettDummyBehandlingReiseTilSamling: OpprettDummyBehandlingReiseTilSamling,
+    private val opprettDummySøknadReiseTilSamling: OpprettDummySøknadReiseTilSamling,
 ) {
     @Transactional
     @PostMapping
@@ -77,7 +77,7 @@ class OpprettDummyBehandlingController(
             Stønadstype.BOUTGIFTER -> opprettDummySøknadBoutgifter.opprettDummy(fagsak, behandling)
             Stønadstype.DAGLIG_REISE_TSO -> opprettDummySøknadDagligReise.opprettDummy(fagsak, behandling)
             Stønadstype.DAGLIG_REISE_TSR -> opprettDummySøknadDagligReise.opprettDummy(fagsak, behandling)
-            Stønadstype.REISE_TIL_SAMLING_TSO -> opprettDummyBehandlingReiseTilSamling.opprettDummy(fagsak, behandling)
+            Stønadstype.REISE_TIL_SAMLING_TSO -> opprettDummySøknadReiseTilSamling.opprettDummy(fagsak, behandling)
         }
     }
 

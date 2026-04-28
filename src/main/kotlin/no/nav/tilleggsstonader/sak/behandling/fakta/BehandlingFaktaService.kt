@@ -174,7 +174,7 @@ class BehandlingFaktaService(
         )
 
     private fun mapAktivitetForDagligReise(aktivitet: AktivitetDagligReiseAvsnitt?) =
-        FaktaAktivtetDagligReise(
+        FaktaAktivitetDagligReise(
             aktivitet =
                 FaktaAktivitet(
                     søknadsgrunnlag =
