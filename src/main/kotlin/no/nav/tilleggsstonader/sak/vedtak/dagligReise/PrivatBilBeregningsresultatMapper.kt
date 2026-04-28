@@ -96,7 +96,7 @@ data class OppsummertBeregningForPeriodeDto(
     val ukenummer = fom.ukenummer()
 }
 
-fun List<OppsummertBeregningForPeriodeDto>.mergeSammenhengende(): List<Datoperiode> =
+private fun List<OppsummertBeregningForPeriodeDto>.mergeSammenhengende(): List<Datoperiode> =
     this
         .map { Datoperiode(it.fom, it.tom) }
         .sorted()
