@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.brev.kjørelistebrev
 
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.PrivatBilOppsummertBeregningDto
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.SatsDagligReisePrivatBil
 import java.time.LocalDate
 
 data class KjørelisteBehandlingBrevRequest(
@@ -10,4 +11,5 @@ data class KjørelisteBehandlingBrevRequest(
     val behandlendeEnhet: String,
     val saksbehandlerSignatur: String? = null,
     val beregning: PrivatBilOppsummertBeregningDto,
+    val satser: List<SatsDagligReisePrivatBil>,
 )
