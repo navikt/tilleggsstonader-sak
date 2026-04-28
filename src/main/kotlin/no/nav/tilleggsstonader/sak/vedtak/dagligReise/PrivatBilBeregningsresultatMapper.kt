@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
-import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
-import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
@@ -85,23 +84,20 @@ data class OppsummertBeregningForReiseDto(
 }
 
 data class OppsummertBeregningForPeriodeDto(
-    override val fom: LocalDate,
-    override val tom: LocalDate,
+    val fom: LocalDate,
+    val tom: LocalDate,
     val antallGodkjenteReisedager: Int,
     val bompengerTotalt: Int?,
     val fergekostnadTotalt: Int?,
     val satser: List<RammeForReiseMedPrivatBilDelperiodeSatserDto>,
     val parkeringskostnadTotalt: Int,
     val stønadsbeløp: BigDecimal,
-) : Periode<LocalDate>,
-    Mergeable<LocalDate, OppsummertBeregningForPeriodeDto> {
+) {
     val ukenummer = fom.ukenummer()
-
-    override fun merge(other: OppsummertBeregningForPeriodeDto): OppsummertBeregningForPeriodeDto =
-        this.copy(fom = minOf(this.fom, other.fom), tom = maxOf(this.tom, other.tom))
 }
 
-fun List<OppsummertBeregningForPeriodeDto>.mergeSammenhengende() =
+fun List<OppsummertBeregningForPeriodeDto>.mergeSammenhengende(): List<Datoperiode> =
     this
+        .map { Datoperiode(it.fom, it.tom) }
         .sorted()
         .mergeSammenhengende { v1, v2 -> v1.påfølgesAv(v2) }
