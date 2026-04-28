@@ -11,10 +11,12 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandling
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingOppgaveMetadata
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingService
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.finnesUkerMedAvvik
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -27,32 +29,56 @@ class BehandleMottattKjørelisteService(
     private val gjenbrukDataRevurderingService: GjenbrukDataRevurderingService,
     private val avklartKjørelisteService: AvklartKjørelisteService,
     private val taskService: TaskService,
+    private val stegService: StegService,
+    private val fullførKjørelisteBehandlingSteg: FullførKjørelistebehandlingSteg,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
     fun behandleMottattKjøreliste(kjøreliste: Kjøreliste) {
-        val behandling = finnKjørelistebehandlingSomKanGjenbrukes(kjøreliste) ?: opprettKjørelisteBehandling(kjøreliste)
+        val gjenbrukBehandling = finnKjørelistebehandlingSomKanGjenbrukes(kjøreliste)
+        val behandling = gjenbrukBehandling ?: opprettKjørelisteBehandling(kjøreliste)
 
         avklartKjørelisteService.avklarUkerFraKjøreliste(
             behandling = behandling,
             kjøreliste = kjøreliste,
         )
+
+        val avklarteUker = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandling.id)
+        if (avklarteUker.finnesUkerMedAvvik()) {
+            // Gjenbrukt behandling har allerede en oppgave-task fra da den ble opprettet
+            if (gjenbrukBehandling == null) {
+                taskService.save(
+                    OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
+                        OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
+                            behandlingId = behandling.id,
+                            beskrivelse = "Skal behandles i TS-Sak",
+                            prioritet = OppgavePrioritet.NORM,
+                        ),
+                    ),
+                )
+            }
+        } else {
+            logger.info("Ingen avvik funnet for behandling=${behandling.id}. Fullfører kjørelistebehandling automatisk")
+            fullførKjørelistebehandlingAutomatisk(behandling)
+        }
     }
 
-    private fun finnKjørelistebehandlingSomKanGjenbrukes(kjøreliste: Kjøreliste): Behandling? {
-        val sisteKjørelistebehandlingSomIkkeErPåbegynt =
-            behandlingRepository
-                .findByFagsakId(kjøreliste.fagsakId)
-                .filter { it.type == BehandlingType.KJØRELISTE && it.status == BehandlingStatus.OPPRETTET }
-                .sortedByDescending { it.sporbar.opprettetTid }
-                .firstOrNull { !erPåbegynt(it) }
+    private fun finnKjørelistebehandlingSomKanGjenbrukes(kjøreliste: Kjøreliste): Behandling? =
+        behandlingRepository
+            .findByFagsakId(kjøreliste.fagsakId)
+            .filter { it.type == BehandlingType.KJØRELISTE && it.status == BehandlingStatus.OPPRETTET }
+            .sortedByDescending { it.sporbar.opprettetTid }
+            .firstOrNull { !erPåbegynt(it) }
+            ?.also { logger.info("Gjenbruker eksisterende kjørelistebehandling=${it.id} for fagsak=${kjøreliste.fagsakId}") }
 
-        sisteKjørelistebehandlingSomIkkeErPåbegynt?.let {
-            logger.info("Gjenbruker eksisterende kjørelistebehandling=${it.id} for fagsak=${kjøreliste.fagsakId}")
-        }
-
-        return sisteKjørelistebehandlingSomIkkeErPåbegynt
+    // TODO - trekke dette ut i en oppgave
+    private fun fullførKjørelistebehandlingAutomatisk(behandling: Behandling) {
+        stegService.håndterSteg(behandling.id, StegType.KJØRELISTE)
+        stegService.håndterSteg(behandling.id, StegType.BEREGNING)
+        // TODO - trrenger vi å kalle på simulering? Kan føre til en del feil da simulering ofter har nedetid
+        stegService.håndterSteg(behandling.id, StegType.SIMULERING)
+        stegService.håndterSteg(behandling.id, fullførKjørelisteBehandlingSteg)
     }
 
     private fun erPåbegynt(behandling: Behandling): Boolean {
@@ -81,15 +107,6 @@ class BehandleMottattKjørelisteService(
             )
 
         gjenbrukData(kjørelistebehandling)
-        taskService.save(
-            OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
-                OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
-                    behandlingId = kjørelistebehandling.id,
-                    beskrivelse = "Skal behandles i TS-Sak",
-                    prioritet = OppgavePrioritet.NORM,
-                ),
-            ),
-        )
 
         return kjørelistebehandling
     }
