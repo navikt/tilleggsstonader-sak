@@ -68,6 +68,7 @@ class SatsjusteringLæremidlerTest : CleanDatabaseIntegrationTest() {
     @Test
     fun `skal justere sats i revurderinger som har tilkjent ytelse som venter på satsjustering`() {
         val behandling = opprettBehandlingMedAndelerTilSatsjustering()
+        assertThat(behandling.behandlingMetode).isEqualTo(BehandlingMetode.MANUELL)
 
         mockSatser()
 
@@ -83,6 +84,7 @@ class SatsjusteringLæremidlerTest : CleanDatabaseIntegrationTest() {
         val sistIverksatteBehandling = behandlingRepository.finnSisteIverksatteBehandling(behandling.fagsakId)!!
         assertThat(behandling.id).isNotEqualTo(sistIverksatteBehandling.id)
         assertThat(sistIverksatteBehandling.forrigeIverksatteBehandlingId).isEqualTo(behandling.id)
+        assertThat(sistIverksatteBehandling.behandlingMetode).isEqualTo(BehandlingMetode.BATCH)
 
         val tilkjentYtelseRevurdering = tilkjentYtelseRepository.findByBehandlingId(sistIverksatteBehandling.id)!!
 

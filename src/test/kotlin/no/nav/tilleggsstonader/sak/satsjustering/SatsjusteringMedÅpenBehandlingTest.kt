@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
@@ -76,10 +77,12 @@ class SatsjusteringMedÅpenBehandlingTest : CleanDatabaseIntegrationTest() {
     @Test
     fun `satsjustering setter åpen behandling i status OPPRETTET med ufordelt oppgave på vent og tar den av vent etterpå`() {
         val førstegangsbehandling = opprettFørstegangsbehandlingMedAndelerTilSatsjustering()
+        assertThat(førstegangsbehandling.behandlingMetode).isEqualTo(BehandlingMetode.MANUELL)
         val fagsakId = førstegangsbehandling.fagsakId
 
         // Opprett en ny behandling i status OPPRETTET (uten å tilordne oppgaven)
         val nyÅpenBehandling = opprettNyBehandlingIStatusOpprettet(fagsakId)
+        assertThat(nyÅpenBehandling.behandlingMetode).isEqualTo(BehandlingMetode.MANUELL)
         val oppgave = oppgaveRepository.findByBehandlingId(nyÅpenBehandling.id).single()
         assertThat(oppgave.tilordnetSaksbehandler).isNull()
 
@@ -94,11 +97,13 @@ class SatsjusteringMedÅpenBehandlingTest : CleanDatabaseIntegrationTest() {
         // Verifiser at satsjusteringen er gjennomført
         val sisteIverksatteBehandling = behandlingRepository.finnSisteIverksatteBehandling(fagsakId)!!
         assertThat(sisteIverksatteBehandling.årsak).isEqualTo(BehandlingÅrsak.SATSENDRING)
+        assertThat(sisteIverksatteBehandling.behandlingMetode).isEqualTo(BehandlingMetode.BATCH)
 
         // Verifiser at den åpne behandlingen ikke lenger er på vent og er nullstilt
         val oppdatertÅpenBehandling = behandlingRepository.findById(nyÅpenBehandling.id).get()
         assertThat(oppdatertÅpenBehandling.status).isEqualTo(BehandlingStatus.OPPRETTET)
         assertThat(oppdatertÅpenBehandling.forrigeIverksatteBehandlingId).isEqualTo(sisteIverksatteBehandling.id)
+        assertThat(oppdatertÅpenBehandling.behandlingMetode).isEqualTo(BehandlingMetode.MANUELL)
 
         // Verifiser at settPåVent er inaktiv
         val settPåVent = settPåVentRepository.findByBehandlingIdAndAktivIsTrue(nyÅpenBehandling.id)
@@ -140,6 +145,8 @@ class SatsjusteringMedÅpenBehandlingTest : CleanDatabaseIntegrationTest() {
         medBrukercontext(roller = listOf(rolleConfig.utvikler)) {
             kall.satsjustering.satsjustering(Stønadstype.LÆREMIDLER)
         }
+
+        kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 
         // Verifiser at behandlingen fortsatt er i UTREDES status
         val etterSatsjustering = behandlingRepository.findById(oppdatertBehandling.id).get()

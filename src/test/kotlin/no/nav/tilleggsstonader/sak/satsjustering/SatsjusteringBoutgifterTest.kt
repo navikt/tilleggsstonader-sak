@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.august
 import no.nav.tilleggsstonader.libs.utils.dato.juni
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
@@ -73,6 +74,7 @@ class SatsjusteringBoutgifterTest(
     @Test
     fun `skal justere sats i revurderinger som har tilkjent ytelse som venter på satsjustering`() {
         val behandling = opprettBehandlingMedAndelerTilSatsjustering()
+        assertThat(behandling.behandlingMetode).isEqualTo(BehandlingMetode.MANUELL)
 
         mockSatser()
 
@@ -88,6 +90,7 @@ class SatsjusteringBoutgifterTest(
         val satsjusteringBehandling = behandlingRepository.finnSisteIverksatteBehandling(behandling.fagsakId)!!
         assertThat(behandling.id).isNotEqualTo(satsjusteringBehandling.id)
         assertThat(satsjusteringBehandling.forrigeIverksatteBehandlingId).isEqualTo(behandling.id)
+        assertThat(satsjusteringBehandling.behandlingMetode).isEqualTo(BehandlingMetode.BATCH)
         kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 
         validerHarKopiertOverFaktagrunnlagFraForrigeBehandling(satsjusteringBehandling)
