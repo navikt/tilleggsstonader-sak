@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.opprettelse.dummy
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.libs.log.IdUtils
 import no.nav.tilleggsstonader.libs.log.mdc.MDCConstants
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
@@ -11,6 +12,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadLæremidler
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.AfterEach
@@ -86,5 +88,19 @@ class OpprettDummyBehandlingControllerTest : IntegrationTest() {
         val søknad = søknadService.hentSøknadDagligReise(behandlingId)!!
         Assertions.assertThat(søknad).isNotNull
         Assertions.assertThat(søknad).isInstanceOf(SøknadDagligReise::class.java)
+    }
+
+    @Test
+    fun `skal kunne opprette en behandling for reise til samling`() {
+        val ident = FnrGenerator.generer(1 januar 2000)
+        val behandlingId = controller.opprettBehandling(TestBehandlingRequest(ident, stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
+
+        Assertions.assertThat(behandlingRepository.findByIdOrNull(behandlingId)).isNotNull
+        val søknad = søknadService.hentSøknadReiseTilSamling(behandlingId)!!
+        Assertions.assertThat(søknad).isNotNull
+        Assertions.assertThat(søknad).isInstanceOf(SøknadReiseTilSamling::class.java)
+        Assertions.assertThat(søknad.data.samlinger).hasSize(2)
+        Assertions.assertThat(søknad.data.oppmøteadresse?.poststed).isEqualTo("Nyborg")
+        Assertions.assertThat(søknad.data.kanBenytteDrosje).isEqualTo(JaNei.JA)
     }
 }
