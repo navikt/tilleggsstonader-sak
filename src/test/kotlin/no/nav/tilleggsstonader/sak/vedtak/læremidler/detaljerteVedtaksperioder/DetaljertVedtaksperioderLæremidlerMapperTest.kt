@@ -59,8 +59,8 @@ class DetaljertVedtaksperioderLæremidlerMapperTest {
 
         val forventetRes =
             listOf(
-                detaljertVedtaksperiodeLæremidler(fom = førsteFeb, tom = sisteFeb),
                 detaljertVedtaksperiodeLæremidler(fom = førsteApril, tom = sisteApril),
+                detaljertVedtaksperiodeLæremidler(fom = førsteFeb, tom = sisteFeb),
             )
 
         assertThat(res).isEqualTo(forventetRes)
