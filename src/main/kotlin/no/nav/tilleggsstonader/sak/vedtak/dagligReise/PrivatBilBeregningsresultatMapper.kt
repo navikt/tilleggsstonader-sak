@@ -1,6 +1,12 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
+import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.SatsDagligReisePrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.satser
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
@@ -56,6 +62,15 @@ private fun BeregningsresultatForReisePrivatBilPeriode.oppsummerPeriode(
     )
 }
 
+fun PrivatBilOppsummertBeregningDto.finnSatserBruktIBeregning(): List<SatsDagligReisePrivatBil> =
+    reiser
+        .flatMap { reise ->
+            reise.perioder.mergeSammenhengende().flatMap { periode ->
+                satser.filter { it.overlapper(periode) }
+            }
+        }.distinct()
+        .sorted()
+
 data class PrivatBilOppsummertBeregningDto(
     val reiser: List<OppsummertBeregningForReiseDto>,
 )
@@ -70,14 +85,23 @@ data class OppsummertBeregningForReiseDto(
 }
 
 data class OppsummertBeregningForPeriodeDto(
-    val fom: LocalDate,
-    val tom: LocalDate,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
     val antallGodkjenteReisedager: Int,
     val bompengerTotalt: Int?,
     val fergekostnadTotalt: Int?,
     val satser: List<RammeForReiseMedPrivatBilDelperiodeSatserDto>,
     val parkeringskostnadTotalt: Int,
     val stønadsbeløp: BigDecimal,
-) {
+) : Periode<LocalDate>,
+    Mergeable<LocalDate, OppsummertBeregningForPeriodeDto> {
     val ukenummer = fom.ukenummer()
+
+    override fun merge(other: OppsummertBeregningForPeriodeDto): OppsummertBeregningForPeriodeDto =
+        this.copy(fom = minOf(this.fom, other.fom), tom = maxOf(this.tom, other.tom))
 }
+
+fun List<OppsummertBeregningForPeriodeDto>.mergeSammenhengende() =
+    this
+        .sorted()
+        .mergeSammenhengende { v1, v2 -> v1.påfølgesAv(v2) }
