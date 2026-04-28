@@ -71,10 +71,10 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
             val forventetUtgiftRes =
                 listOf(
                     UtgiftTilOvernatting(
-                        fom = LocalDate.of(2024, 1, 3),
-                        tom = LocalDate.of(2024, 1, 4),
-                        utgift = 4000,
-                        beløpSomDekkes = 4000,
+                        fom = LocalDate.of(2024, 1, 10),
+                        tom = LocalDate.of(2024, 1, 11),
+                        utgift = 1000,
+                        beløpSomDekkes = 0,
                     ),
                     UtgiftTilOvernatting(
                         fom = LocalDate.of(2024, 1, 7),
@@ -83,10 +83,10 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
                         beløpSomDekkes = 809,
                     ),
                     UtgiftTilOvernatting(
-                        fom = LocalDate.of(2024, 1, 10),
-                        tom = LocalDate.of(2024, 1, 11),
-                        utgift = 1000,
-                        beløpSomDekkes = 0,
+                        fom = LocalDate.of(2024, 1, 3),
+                        tom = LocalDate.of(2024, 1, 4),
+                        utgift = 4000,
+                        beløpSomDekkes = 4000,
                     ),
                 )
 
@@ -143,8 +143,8 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
 
             assertThat(res).hasSize(2)
 
-            val resJan = res.first()
-            val resFeb = res.last()
+            val resFeb = res.first()
+            val resJan = res.last()
 
             assertThat(resJan.fom).isEqualTo(førsteJan)
             assertThat(resJan.tom).isEqualTo(sisteJan)
@@ -160,7 +160,7 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
         }
 
         @Test
-        fun `skal sortere utgifter til overnatting kronologisk`() {
+        fun `skal sortere utgifter til overnatting nyest til eldst`() {
             val beregningsresultatJan =
                 BoutgifterTestUtil.lagBeregningsresultatMåned(
                     fom = førsteJan,
@@ -190,8 +190,8 @@ class DetaljertVedtaksperioderBoutgifterMapperTest {
 
             val utgifter = res.first().utgifterTilOvernatting!!
 
-            assertThat(utgifter[0].fom).isEqualTo(LocalDate.of(2024, 1, 3))
-            assertThat(utgifter[1].fom).isEqualTo(LocalDate.of(2024, 1, 7))
+            assertThat(utgifter[0].fom).isEqualTo(LocalDate.of(2024, 1, 7))
+            assertThat(utgifter[1].fom).isEqualTo(LocalDate.of(2024, 1, 3))
         }
     }
 

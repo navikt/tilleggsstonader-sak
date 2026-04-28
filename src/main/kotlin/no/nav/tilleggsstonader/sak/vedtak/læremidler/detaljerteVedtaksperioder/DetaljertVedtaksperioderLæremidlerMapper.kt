@@ -18,6 +18,6 @@ object DetaljertVedtaksperioderLæremidlerMapper {
                 )
             }
 
-        return vedtaksperioderFraBeregningsresultat.sorterOgMergeSammenhengende()
+        return vedtaksperioderFraBeregningsresultat.sorterOgMergeSammenhengende().sortedByDescending { it.fom }
     }
 }
