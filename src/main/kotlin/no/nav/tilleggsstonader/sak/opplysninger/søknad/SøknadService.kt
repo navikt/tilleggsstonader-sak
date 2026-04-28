@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaReiseTilSamling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -20,8 +21,10 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadLæremidler
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadskjemaLæremidlerMapper
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaBarnetilsynMapper
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SøknadsskjemaReiseTilSamlingMapper
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -36,6 +39,7 @@ class SøknadService(
     private val søknadskjemaBoutgifterMapper: SøknadskjemaBoutgifterMapper,
     private val søknadsskjemaDagligReiseMapper: SøknadskjemaDagligReiseMapper,
     private val søknadDagligReiseRepository: SøknadDagligReiseRepository,
+    private val søknadReiseTilSamlingRepository: SøknadReiseTilSamlingRepository,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -61,6 +65,11 @@ class SøknadService(
             .findByIdOrNull(behandlingId)
             ?.let { søknadDagligReiseRepository.findByIdOrThrow(it.søknadId) }
 
+    fun hentSøknadReiseTilSamling(behandlingId: BehandlingId): SøknadReiseTilSamling? =
+        søknadBehandlingRepository
+            .findByIdOrNull(behandlingId)
+            ?.let { søknadReiseTilSamlingRepository.findByIdOrThrow(it.søknadId) }
+
     fun lagreSøknad(
         behandlingId: BehandlingId,
         journalpost: Journalpost,
@@ -73,6 +82,7 @@ class SøknadService(
                 is SøknadLæremidler -> søknadLæremidlerRepository.insert(søknad)
                 is SøknadBoutgifter -> søknadBoutgifterRepository.insert(søknad)
                 is SøknadDagligReise -> søknadDagligReiseRepository.insert(søknad)
+                is SøknadReiseTilSamling -> søknadReiseTilSamlingRepository.insert(søknad)
             }
         søknadBehandlingRepository.insert(SøknadBehandling(behandlingId, søknad.id))
         return lagretSøknad
@@ -93,6 +103,14 @@ class SøknadService(
 
             is SøknadsskjemaLæremidler ->
                 SøknadskjemaLæremidlerMapper.map(
+                    skjema.mottattTidspunkt,
+                    skjema.språk,
+                    journalpost,
+                    søknadsskjema,
+                )
+
+            is SøknadsskjemaReiseTilSamling ->
+                SøknadsskjemaReiseTilSamlingMapper.map(
                     skjema.mottattTidspunkt,
                     skjema.språk,
                     journalpost,
