@@ -14,6 +14,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.springframework.web.client.RestClient
+import java.net.URI
 
 class OppfolgingsenhetClientTest {
     companion object {
@@ -29,7 +30,7 @@ class OppfolgingsenhetClientTest {
         fun initClass() {
             wiremockServerItem = WireMockServer(wireMockConfig().dynamicPort())
             wiremockServerItem.start()
-            client = OppfolgingsenhetClient(wiremockServerItem.baseUrl(), "tilleggsstonader-sak", restClient)
+            client = OppfolgingsenhetClient(URI(wiremockServerItem.baseUrl()), "tilleggsstonader-sak", restClient)
         }
 
         @AfterAll

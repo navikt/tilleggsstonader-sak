@@ -7,11 +7,12 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
+import java.net.URI
 
 @Component
 class OppfolgingsenhetClient(
     @Value("\${clients.veilarboppfolging.uri}")
-    private val veilarboppfolgingUri: String,
+    private val veilarboppfolgingUri: URI,
     @Value("\${NAIS_APP_NAME}")
     private val navConsumerId: String,
     @Qualifier("restClientAzure") private val restClient: RestClient,
