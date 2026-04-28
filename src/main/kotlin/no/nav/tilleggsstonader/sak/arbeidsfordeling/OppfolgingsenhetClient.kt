@@ -17,6 +17,16 @@ class OppfolgingsenhetClient(
     private val navConsumerId: String,
     @Qualifier("restClientAzure") private val restClient: RestClient,
 ) {
+    /**
+     * Henter ut oppfølgingsenhet fra https://github.com/navikt/veilarboppfolging
+     * veilarboppfolging gir oss hvilket kontor som har oppfølging for en bruker.
+     * Om en bruker går på et tiltaks vil de som oftest også ha et NAV-kontor.
+     *
+     * Vil som oftest returnere NAV-kontor til bruker sin geografiske tilknytning.
+     * Kontoret kan også overstyres (i Arena?), noe som kan være nødvendig om bruker har utenlandsk adresse
+     *
+     * Bruker oppfølgingsenhet til å knytte utbetalinger til et NAV-kontor for tiltaksenheten.
+     */
     fun hentOppfølgingsenhet(fnr: String): String? {
         val request =
             OppfolgingsenhetRequest(
