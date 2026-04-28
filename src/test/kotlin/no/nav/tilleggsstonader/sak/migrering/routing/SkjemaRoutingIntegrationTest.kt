@@ -156,31 +156,31 @@ class SkjemaRoutingIntegrationTest(
         }
 
         @Test
-        fun `skal svare avsjekk hvis feature toggle sier at ingen skal slippe gjennom`() {
+        fun `skal svare avsjekk offentlig transport hvis feature toggle sier at ingen skal slippe gjennom`() {
             mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
             mockAapVedtak(erAktivt = true)
             mockMaksAntallSomKanRoutesPrivatBil(0)
 
             val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
-            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK)
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK_OFFENTLIG_TRANSPORT)
             assertThat(routingHarBlittLagret()).isFalse()
         }
 
         @Test
-        fun `brukere med aktiv AAP skal bli routet til ny løsning`() {
+        fun `brukere med aktiv AAP skal bli routet til avsjekk taxi`() {
             mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
             mockMaksAntallSomKanRoutesPrivatBil(maksAntall = 10)
             mockDagligReiseVedtakIArena(erAktivt = false)
             mockAapVedtak(erAktivt = true)
 
             val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
-            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK_TAXI)
             assertThat(routingHarBlittLagret()).isTrue()
         }
 
         @Test
-        fun `skal slippe gjennom personer til ny løsning, men bare til maks antall er nådd`() {
+        fun `skal slippe gjennom personer til avsjekk taxi, men bare til maks antall er nådd`() {
             mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
             mockMaksAntallSomKanRoutesPrivatBil(maksAntall = 1)
             mockDagligReiseVedtakIArena(erAktivt = false)
@@ -191,14 +191,14 @@ class SkjemaRoutingIntegrationTest(
             val routingSjekkAndreRouting =
                 kall.skjemaRouting.sjekk(IdentSkjematype(ernaIdent, Skjematype.SØKNAD_DAGLIG_REISE))
 
-            assertThat(routingSjekkFørsteRouting.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
+            assertThat(routingSjekkFørsteRouting.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK_TAXI)
             assertThat(routingHarBlittLagret(ident = jonasIdent)).isTrue()
-            assertThat(routingSjekkAndreRouting.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK)
+            assertThat(routingSjekkAndreRouting.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK_OFFENTLIG_TRANSPORT)
             assertThat(routingHarBlittLagret(ident = ernaIdent)).isFalse()
         }
 
         @Test
-        fun `skal svare avsjekk hvis person ikke har AAP-vedtak selv om maks antall ikke er nådd`() {
+        fun `skal svare avsjekk offentlig transport hvis person ikke har AAP-vedtak selv om maks antall ikke er nådd`() {
             mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
             mockMaksAntallSomKanRoutesPrivatBil(maksAntall = 10)
             mockDagligReiseVedtakIArena(erAktivt = false)
@@ -206,7 +206,7 @@ class SkjemaRoutingIntegrationTest(
 
             val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
-            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK)
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK_OFFENTLIG_TRANSPORT)
             assertThat(routingHarBlittLagret()).isFalse()
         }
 
@@ -348,7 +348,7 @@ class SkjemaRoutingIntegrationTest(
         }
 
         @Test
-        fun `V1 - brukere med aktiv AAP skal bli routet til ny løsning`() {
+        fun `V1 - brukere med aktiv AAP skal bli routet til avsjekk taxi`() {
             mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
             mockMaksAntallSomKanRoutesPrivatBil(maksAntall = 10)
             mockDagligReiseVedtakIArena(erAktivt = false)
@@ -356,11 +356,11 @@ class SkjemaRoutingIntegrationTest(
 
             val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
-            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK_TAXI)
         }
 
         @Test
-        fun `V1 - AVSJEKK mappes til skalBehandlesINyLøsning true`() {
+        fun `V1 - AVSJEKK_OFFENTLIG_TRANSPORT mappes til skalBehandlesINyLøsning true`() {
             mockMaksAntallSomKanRoutesPåDagligReise(maksAntall = 10)
             mockMaksAntallSomKanRoutesPrivatBil(maksAntall = 10)
             mockDagligReiseVedtakIArena(erAktivt = false)
@@ -368,7 +368,7 @@ class SkjemaRoutingIntegrationTest(
 
             val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
-            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK)
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK_OFFENTLIG_TRANSPORT)
         }
 
         private fun mockMaksAntallSomKanRoutesPåDagligReise(maksAntall: Int) {

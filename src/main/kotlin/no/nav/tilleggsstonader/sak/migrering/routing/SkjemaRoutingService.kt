@@ -90,20 +90,18 @@ class SkjemaRoutingService(
             lagreRouting(ident, skjematype, mapOf("harAktivAAP" to true))
             return SkjemaRoutingAksjon.NY_LØSNING
         }
-        if (kontekst.featureToggleMaksAntallForPrivatBil != null && kontekst.alleMedAAPVedtakTilNyLøsning &&
-            harAktivtAapVedtak(
-                ident,
-            ) &&
-            !maksAntallErNådd(
-                skjematype,
-                toggleId = kontekst.featureToggleMaksAntallForPrivatBil,
-            )
+        if (kontekst.featureToggleMaksAntallForPrivatBil != null &&
+            kontekst.alleMedAAPVedtakTilNyLøsning &&
+            harAktivtAapVedtak(ident) &&
+            !maksAntallErNådd(skjematype, toggleId = kontekst.featureToggleMaksAntallForPrivatBil)
         ) {
-            lagreRouting(ident, skjematype, mapOf("aktivAAP" to true))
-            return SkjemaRoutingAksjon.NY_LØSNING
+            return SkjemaRoutingAksjon.AVSJEKK_TAXI
+        }
+        if (skjematype == Skjematype.SØKNAD_DAGLIG_REISE) {
+            return SkjemaRoutingAksjon.AVSJEKK_OFFENTLIG_TRANSPORT
         }
 
-        return SkjemaRoutingAksjon.AVSJEKK
+        return SkjemaRoutingAksjon.GAMMEL_LØSNING
     }
 
     private fun skalBrukerRoutesTilNyKjørelisteLøsning(
