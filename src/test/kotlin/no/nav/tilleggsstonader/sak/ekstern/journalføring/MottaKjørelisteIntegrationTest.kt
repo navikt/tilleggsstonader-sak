@@ -61,7 +61,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
                 KjørtDag(1 januar 2026, 50),
                 KjørtDag(4 januar 2026, 70),
                 KjørtDag(9 januar 2026, 40),
-                KjørtDag(11 januar 2026, 90),
+                KjørtDag(11 januar 2026, 120),
             )
         val kjøreliste =
             kjørelisteSkjema(
@@ -101,7 +101,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
 
                 sendInnKjøreliste {
                     periode = Datoperiode(fom, 8 mars 2026)
-                    kjørteDager = listOf(fom to 50)
+                    kjørteDager = listOf(fom to 120)
                 }
             }
 
@@ -157,7 +157,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
 
                 sendInnKjøreliste {
                     periode = Datoperiode(fom, 8 mars 2026)
-                    kjørteDager = listOf(fom to 50)
+                    kjørteDager = listOf(fom to 120)
                 }
             }
 
@@ -179,7 +179,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
                     periode = Datoperiode(9 mars 2026, tom),
                     dagerKjørt =
                         listOf(
-                            KjørtDag(9 mars 2026, 50),
+                            KjørtDag(9 mars 2026, 120),
                         ),
                 ),
             ident = behandlingContext.ident,
@@ -206,7 +206,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
 
                 sendInnKjøreliste {
                     periode = Datoperiode(fom, 8 mars 2026)
-                    kjørteDager = listOf(fom to 50)
+                    kjørteDager = listOf(fom to 120)
                 }
             }
 
@@ -262,7 +262,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
                     periode = Datoperiode(9 mars 2026, tom),
                     dagerKjørt =
                         listOf(
-                            KjørtDag(9 mars 2026, 50),
+                            KjørtDag(9 mars 2026, 120),
                         ),
                 ),
             ident = behandlingContext.ident,

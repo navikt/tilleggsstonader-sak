@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.KjørelisteBehandlingBre
 import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.KjørelisteBehandlingBrevService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandlingManuelt
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.interntVedtak.HtmlifyClient
 import no.nav.tilleggsstonader.sak.util.FileUtil
@@ -125,7 +125,7 @@ class GenererKjørelistebehandlingBrevTest : CleanDatabaseIntegrationTest() {
                 .hentBehandlinger(førstegangsBehandling.fagsakId)
                 .single { it.type == BehandlingType.KJØRELISTE }
 
-        gjennomførKjørelisteBehandling(kjørelisteBehandling, tilSteg = StegType.SIMULERING)
+        gjennomførKjørelisteBehandlingManuelt(kjørelisteBehandling, tilSteg = StegType.SIMULERING)
 
         return kjørelisteBehandling.id
     }

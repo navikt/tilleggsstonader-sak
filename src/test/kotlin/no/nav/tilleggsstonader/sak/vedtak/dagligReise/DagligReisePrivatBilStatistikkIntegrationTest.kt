@@ -14,7 +14,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.finnPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandlingManuelt
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -55,7 +55,7 @@ class DagligReisePrivatBilStatistikkIntegrationTest : IntegrationTest() {
 
                 sendInnKjøreliste {
                     periode = Datoperiode(fom, tom)
-                    kjørteDager = listOf(fom to 50)
+                    kjørteDager = listOf(fom to 120)
                 }
             }
 
@@ -68,7 +68,7 @@ class DagligReisePrivatBilStatistikkIntegrationTest : IntegrationTest() {
                 it.type ==
                     BehandlingType.KJØRELISTE
             }
-        gjennomførKjørelisteBehandling(kjørelisteBehandling)
+        gjennomførKjørelisteBehandlingManuelt(kjørelisteBehandling)
 
         verifiserVedtaksstatistikkFinnesForBehandling(kjørelisteBehandling.id)
         verifiserFinnesBehandlingstatistikkForBehandling(kjørelisteBehandling.id)

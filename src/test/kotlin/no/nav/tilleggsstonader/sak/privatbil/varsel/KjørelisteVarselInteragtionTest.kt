@@ -15,7 +15,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørAlleTaskMedSenererTriggertid
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandlingAutomatisk
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteRepository
 import no.nav.tilleggsstonader.sak.util.finnNesteSøndag
@@ -79,7 +79,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
                 periode = Datoperiode(fom1, tom1)
                 kjørteDager =
                     listOf(
-                        fom1 to 50,
+                        fom1 to 150,
                     )
                 reiseIdProvider = { it.first().reiseId }
             }
@@ -141,7 +141,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
                 periode = Datoperiode(fom, tomKjoreliste)
                 kjørteDager =
                     listOf(
-                        fom to 50,
+                        fom to 120,
                     )
             }
         }
@@ -172,7 +172,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
                 periode = Datoperiode(fom, tomKjoreliste)
                 kjørteDager =
                     listOf(
-                        fom to 50,
+                        fom to 120,
                     )
             }
         }
@@ -212,7 +212,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
             testoppsettService
                 .hentBehandlinger(behandlingcontext.fagsakId)
                 .single { it.type == BehandlingType.KJØRELISTE }
-        gjennomførKjørelisteBehandling(kjørelistebehandling)
+        gjennomførKjørelisteBehandlingAutomatisk(kjørelistebehandling)
 
         kjørAlleTaskMedSenererTriggertid()
         KafkaFake

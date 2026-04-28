@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandlingAutomatisk
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.KjørtDag
@@ -80,7 +80,6 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
     fun `innsending av kjøreliste på ulike rammevedtak skal ikke påvirke hverandre`() {
         val kjørelistebehandling1 =
             sendInnKjøreliste(
-                indeksKjørelistebehandling = 0,
                 kjøreliste =
                     kjørelisteSkjema(
                         reiseId = reiseIdRamme1,
@@ -108,12 +107,11 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
             assertThat(it.avklartUkeId).isNull()
         }
 
-        gjennomførKjørelisteBehandling(kjørelistebehandling1)
+        gjennomførKjørelisteBehandlingAutomatisk(kjørelistebehandling1)
 
         // Sender inn kjøreliste for nytt rammevedtak
         val kjørelistebehandling2 =
             sendInnKjøreliste(
-                indeksKjørelistebehandling = 1,
                 kjøreliste =
                     kjørelisteSkjema(
                         reiseId = reiseIdRamme2,
@@ -122,7 +120,7 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
                             listOf(
                                 KjørtDag(12 januar 2026, 50),
                                 KjørtDag(19 januar 2026, 50),
-                                KjørtDag(26 januar 2026, 50),
+                                KjørtDag(26 januar 2026, 120),
                             ),
                     ),
             )
@@ -149,22 +147,20 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
         // Sender inn kjøreliste for første uke
         val kjørelistebehandling =
             sendInnKjøreliste(
-                indeksKjørelistebehandling = 0,
                 kjøreliste =
                     kjørelisteSkjema(
                         reiseId = reiseIdRamme1,
                         periode = Datoperiode(fomRamme1, 11 januar 2026),
                         dagerKjørt =
                             listOf(
-                                KjørtDag(5 januar 2026, 50),
+                                KjørtDag(5 januar 2026, 120),
                             ),
                     ),
             )
 
         // sender inn kjøreliste for andre og tredje uke før første kjørelistebehandling er ferdigbehandlet
-        val kjørelistebehandlinEtterAndreInnsending =
+        val kjørelistebehandlingEtterAndreInnsending =
             sendInnKjøreliste(
-                indeksKjørelistebehandling = 0,
                 kjøreliste =
                     kjørelisteSkjema(
                         reiseId = reiseIdRamme1,
@@ -178,7 +174,7 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
             )
 
         // Skal kun opprettes en behandling, som tar for seg begge kjørelister
-        assertThat(kjørelistebehandling).isEqualTo(kjørelistebehandlinEtterAndreInnsending)
+        assertThat(kjørelistebehandling).isEqualTo(kjørelistebehandlingEtterAndreInnsending)
 
         // Henter reisevurderinger for begge behandlingene
         val (ramme1, ramme2) = finnReisevurderinger(kjørelistebehandling.id)
@@ -193,18 +189,37 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
         assertThat(ramme2!!.uker.filter { it.kjørelisteInnsendtDato != null && it.avklartUkeId != null }).isEmpty()
     }
 
-    private fun sendInnKjøreliste(
-        kjøreliste: KjørelisteSkjema,
-        indeksKjørelistebehandling: Int = 0,
-    ): Behandling {
+    private fun sendInnKjøreliste(kjøreliste: KjørelisteSkjema): Behandling {
+        // Hent eksisterende kjørelistebehandlinger før innsendingen
+        val eksisterendeBehandlinger =
+            testoppsettService
+                .hentBehandlinger(førstegangsbehandling.fagsakId)
+                .filter { it.type == BehandlingType.KJØRELISTE }
+                .map { it.id }
+                .toSet()
+
         sendInnKjøreliste(
             kjøreliste = kjøreliste,
             ident = brukerident,
         )
 
-        return testoppsettService
-            .hentBehandlinger(førstegangsbehandling.fagsakId)
-            .filter { it.type == BehandlingType.KJØRELISTE }[indeksKjørelistebehandling]
+        val kjørelistebehandlingerEtterInnsending =
+            testoppsettService
+                .hentBehandlinger(førstegangsbehandling.fagsakId)
+                .filter { it.type == BehandlingType.KJØRELISTE }
+
+        // Dersom innsendingen oppretter ny behandling returnerer vi den.
+        val nyBehandling = kjørelistebehandlingerEtterInnsending.firstOrNull { it.id !in eksisterendeBehandlinger }
+        if (nyBehandling != null) return nyBehandling
+
+        // Ved ny innsending på en ikke-ferdigstilt kjørelistebehandling gjenbrukes eksisterende behandling.
+        val aktivEksisterendeBehandling =
+            kjørelistebehandlingerEtterInnsending
+                .filter { it.id in eksisterendeBehandlinger }
+                .singleOrNull { it.erAktiv() }
+
+        return aktivEksisterendeBehandling
+            ?: throw AssertionError("Ingen ny kjørelistebehandling ble opprettet, og fant heller ingen aktiv eksisterende behandling")
     }
 
     data class Reisevurderinger(

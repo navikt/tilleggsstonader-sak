@@ -11,9 +11,11 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandlingManuelt
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagRequest
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
 import org.assertj.core.api.Assertions.assertThat
@@ -54,7 +56,7 @@ class KjørelistePåVentIntegrationTest : IntegrationTest() {
                     periode = Datoperiode(fomUke1, tomUke1)
                     kjørteDager =
                         listOf(
-                            5 januar 2026 to 50,
+                            5 januar 2026 to 120,
                         )
                 }
             }
@@ -87,7 +89,7 @@ class KjørelistePåVentIntegrationTest : IntegrationTest() {
                 periode = Datoperiode(fomUke2, tomUke2),
                 dagerKjørt =
                     listOf(
-                        KjørtDag(12 januar 2026, 50),
+                        KjørtDag(12 januar 2026, 120),
                     ),
             ),
             ident = brukerident,
@@ -96,12 +98,38 @@ class KjørelistePåVentIntegrationTest : IntegrationTest() {
         val kjørelisteBehandling2 =
             testoppsettService
                 .hentBehandlinger(førstegangsbehandling.fagsakId)
-                .last { it.type == BehandlingType.KJØRELISTE }
+                .single { it.type == BehandlingType.KJØRELISTE && it.id != kjørelisteBehandling1.id }
 
         assertThat(kjørelisteBehandling2.status).isEqualTo(BehandlingStatus.SATT_PÅ_VENT)
 
+        val avklartUkeForFørsteKjørelistebehandling =
+            kall.privatBil
+                .hentReisevurderingForBehandling(kjørelisteBehandling1.id)
+                .single()
+                .uker
+                .first { it.fraDato == fomUke1 }
+
+        tilordneÅpenBehandlingOppgaveForBehandling(kjørelisteBehandling1.id)
+        kall.privatBil.oppdaterUke(
+            behandlingId = kjørelisteBehandling1.id,
+            avklartUkeId = avklartUkeForFørsteKjørelistebehandling.avklartUkeId!!,
+            avklarteDager =
+                avklartUkeForFørsteKjørelistebehandling.dager.map { dag ->
+                    EndreAvklartDagRequest(
+                        dato = dag.dato,
+                        godkjentGjennomførtKjøring =
+                            when {
+                                dag.kjørelisteDag?.harKjørt == true -> GodkjentGjennomførtKjøring.JA
+                                else -> GodkjentGjennomførtKjøring.NEI
+                            },
+                        parkeringsutgift = dag.kjørelisteDag?.parkeringsutgift,
+                        begrunnelse = "Avklart i test",
+                    )
+                },
+        )
+
         // Fullfører første kjørelistebehandling
-        gjennomførKjørelisteBehandling(kjørelisteBehandling1)
+        gjennomførKjørelisteBehandlingManuelt(kjørelisteBehandling1)
 
         // Ny kjørelistebehandling tas av vent og skal nullstilles
         tilordneÅpenBehandlingOppgaveForBehandling(kjørelisteBehandling2.id)

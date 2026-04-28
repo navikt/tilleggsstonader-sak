@@ -4,6 +4,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.OppgaveClientMockConfig.Companion.journalføringsoppgaveRequest
@@ -35,8 +37,22 @@ fun IntegrationTest.tilordneÅpenBehandlingOppgaveForBehandling(
     val oppgaveDomain =
         oppgaveRepository
             .findByBehandlingId(behandlingId)
-            .single { it.erÅpen() && it.erBehandlingsoppgave() }
-            .also { oppgaveRepository.update(it.copy(tilordnetSaksbehandler = tilordneTilSaksbehandler)) }
+            .firstOrNull { it.erÅpen() && it.erBehandlingsoppgave() }
+
+    if (oppgaveDomain == null) {
+        val behandling = testoppsettService.hentBehandling(behandlingId)
+        if (behandling.type == BehandlingType.KJØRELISTE && behandling.status == BehandlingStatus.FERDIGSTILT) {
+            return
+        }
+
+        val oppgaverPåBehandling = oppgaveRepository.findByBehandlingId(behandlingId)
+        error(
+            "Fant ingen åpen behandlingsoppgave for behandling=$behandlingId " +
+                "(status=${behandling.status}, type=${behandling.type}, oppgaver=${oppgaverPåBehandling.map { it.status to it.type }})",
+        )
+    }
+
+    oppgaveRepository.update(oppgaveDomain.copy(tilordnetSaksbehandler = tilordneTilSaksbehandler))
 
     val oppgave = mockClients.oppgaveClient.finnOppgaveMedId(oppgaveDomain.gsakOppgaveId)
     mockClients.oppgaveClient.fordelOppgave(oppgave.id, tilordneTilSaksbehandler, oppgave.versjon, null)

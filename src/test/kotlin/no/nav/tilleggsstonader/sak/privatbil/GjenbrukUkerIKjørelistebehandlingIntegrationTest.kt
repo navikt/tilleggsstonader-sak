@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandlingAutomatisk
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagRequest
@@ -70,7 +70,7 @@ class GjenbrukUkerIKjørelistebehandlingIntegrationTest : IntegrationTest() {
                 .hentReisevurderingForBehandling(førsteKjørelistebehandling.id)
                 .single()
 
-        gjennomførKjørelisteBehandling(førsteKjørelistebehandling)
+        gjennomførKjørelisteBehandlingAutomatisk(førsteKjørelistebehandling)
 
         val reiseId =
             kall.privatBil
@@ -88,7 +88,7 @@ class GjenbrukUkerIKjørelistebehandlingIntegrationTest : IntegrationTest() {
                         listOf(
                             KjørtDag(12 januar 2026, 50),
                             KjørtDag(13 januar 2026, 50),
-                            KjørtDag(20 januar 2026, 50),
+                            KjørtDag(20 januar 2026, 101),
                         ),
                 ),
             ident = førstegangsBehandlingContext.ident,

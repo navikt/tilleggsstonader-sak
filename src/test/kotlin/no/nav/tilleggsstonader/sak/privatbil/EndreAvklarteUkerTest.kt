@@ -210,6 +210,13 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
     private fun opprettBehandlingOgSendInnKjøreliste(dagerKjørt: List<Pair<LocalDate, Int>>): Saksbehandling {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
+        val dagerKjørtMedAvvik =
+            if (dagerKjørt.any { it.second > 100 || it.first.datoErHelg() }) {
+                dagerKjørt
+            } else {
+                dagerKjørt + (10 januar 2026 to 50)
+            }
+
         val rammebehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
@@ -218,7 +225,7 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
 
                 sendInnKjøreliste {
                     periode = Datoperiode(fom, tom)
-                    kjørteDager = dagerKjørt
+                    kjørteDager = dagerKjørtMedAvvik
                 }
             }
 
@@ -245,4 +252,6 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
         val opppgave = oppgaveService.hentAktivBehandleSakOppgave(behandlingId)
         oppgaveService.fordelOppgave(opppgave.id, testBrukerkontekst.bruker, opppgave.versjon)
     }
+
+    private fun LocalDate.datoErHelg() = dayOfWeek.value >= 6
 }

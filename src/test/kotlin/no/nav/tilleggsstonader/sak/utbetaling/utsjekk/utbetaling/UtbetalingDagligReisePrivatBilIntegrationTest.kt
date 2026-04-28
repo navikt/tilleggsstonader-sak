@@ -15,7 +15,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandlingManuelt
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
@@ -105,7 +105,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
                 .hentBehandlinger(førstegangsBehandling.fagsakId)
                 .single { it.type == BehandlingType.KJØRELISTE }
 
-        gjennomførKjørelisteBehandling(kjørelisteBehandling)
+        gjennomførKjørelisteBehandlingManuelt(kjørelisteBehandling)
 
         val forventetBeløp = kjørteDager.kalkulerForventetBeløp(reiseavstandEnVei)
         assertAndelOpprettet(
@@ -121,7 +121,15 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
                 .single()
                 .verdiEllerFeil<IverksettingDto>()
 
-        assertThat(iverksettingDto.saksbehandler).isEqualTo(testBrukerkontekst.bruker)
+        val oppgaverPåKjørelisteBehandling = oppgaveRepository.findByBehandlingId(kjørelisteBehandling.id)
+        if (oppgaverPåKjørelisteBehandling.isEmpty()) {
+            // Automatisk kjørelistebehandling kjøres uten oppgave og blir dermed systembehandlet.
+            assertThat(iverksettingDto.saksbehandler).isEqualTo(SikkerhetContext.SYSTEM_FORKORTELSE)
+        } else {
+            assertThat(iverksettingDto.saksbehandler).isEqualTo(testBrukerkontekst.bruker)
+            assertThat(oppgaverPåKjørelisteBehandling).hasSize(1)
+            assertThat(oppgaverPåKjørelisteBehandling.single().status).isEqualTo(Oppgavestatus.FERDIGSTILT)
+        }
         assertThat(iverksettingDto.beslutter).isEqualTo(SikkerhetContext.SYSTEM_FORKORTELSE)
         assertThat(iverksettingDto.utbetalinger).hasSize(1)
         val utbetaling = iverksettingDto.utbetalinger.single()
@@ -137,10 +145,6 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
         assertThat(ferdigstiltKjørelistebehandling.resultat).isEqualTo(BehandlingResultat.INNVILGET)
         assertThat(ferdigstiltKjørelistebehandling.status).isEqualTo(BehandlingStatus.FERDIGSTILT)
         assertThat(ferdigstiltKjørelistebehandling.steg).isEqualTo(StegType.BEHANDLING_FERDIGSTILT)
-
-        val oppgaverPåKjørelisteBehandling = oppgaveRepository.findByBehandlingId(kjørelisteBehandling.id)
-        assertThat(oppgaverPåKjørelisteBehandling).hasSize(1)
-        assertThat(oppgaverPåKjørelisteBehandling.single().status).isEqualTo(Oppgavestatus.FERDIGSTILT)
 
         val gjeldendeIverksatteBehandlinger =
             testoppsettService.hentGjeldendeIverksatteBehandlinger(Stønadstype.DAGLIG_REISE_TSO)
@@ -204,7 +208,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
                 .hentBehandlinger(førstegangsBehandlingContext.fagsakId)
                 .single { it.type == BehandlingType.KJØRELISTE }
 
-        gjennomførKjørelisteBehandling(førsteKjørelistebehandling)
+        gjennomførKjørelisteBehandlingManuelt(førsteKjørelistebehandling)
         testoppsettService.settAndelerTilOkForBehandling(førsteKjørelistebehandling)
 
         // Sender inn kjøreliste for andre rammevedtak
@@ -223,7 +227,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
                 .hentBehandlinger(førstegangsBehandlingContext.fagsakId)
                 .single { it.type == BehandlingType.KJØRELISTE && it.id != førsteKjørelistebehandling.id }
 
-        gjennomførKjørelisteBehandling(andreKjørelistebehandling)
+        gjennomførKjørelisteBehandlingManuelt(andreKjørelistebehandling)
 
         val sendteIverksettinger =
             KafkaFake
