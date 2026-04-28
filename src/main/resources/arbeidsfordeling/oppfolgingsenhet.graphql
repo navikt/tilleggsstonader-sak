@@ -1,0 +1,10 @@
+query($fnr: String!){
+  oppfolgingsEnhet(fnr: $fnr) {
+    enhet {
+      id
+      navn
+      kilde
+    }
+  }
+}
+
