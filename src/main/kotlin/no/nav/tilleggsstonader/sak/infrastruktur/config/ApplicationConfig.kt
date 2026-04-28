@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur.config
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import no.nav.tilleggsstonader.libs.http.config.RestTemplateConfiguration
+import no.nav.tilleggsstonader.libs.http.config.RestclientConfiguration
 import no.nav.tilleggsstonader.libs.log.filter.LogFilterConfiguration
 import no.nav.tilleggsstonader.libs.unleash.UnleashConfiguration
 import no.nav.tilleggsstonader.sak.infrastruktur.filter.NAVIdentFilter
@@ -20,6 +21,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @EnableOAuth2Client(cacheEnabled = true)
 @Import(
     RestTemplateConfiguration::class,
+    RestclientConfiguration::class,
     LogFilterConfiguration::class,
     UnleashConfiguration::class,
 )
