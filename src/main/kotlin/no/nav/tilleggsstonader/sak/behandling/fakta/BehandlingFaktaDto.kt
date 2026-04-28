@@ -83,7 +83,6 @@ data class BehandlingFaktaReiseTilSamlingDto(
     override val dokumentasjon: FaktaDokumentasjon? = null,
     override val arena: ArenaFakta? = null,
     val aktiviteter: FaktaAktivitet,
-    val personopplysninger: FaktaPersonopplysninger,
     val samlinger: List<FaktaSamling>,
     val oppmøteadresse: FaktaOppmøteadresse?,
     val kanReiseKollektivt: JaNei?,

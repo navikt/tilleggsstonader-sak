@@ -139,7 +139,6 @@ class BehandlingFaktaService(
             hovedytelse = søknad?.data?.hovedytelse.let { mapHovedytelse(it) },
             dokumentasjon = søknad?.let { mapDokumentasjon(it.data.dokumentasjon, it.journalpostId, grunnlagsdata) },
             arena = arenaFakta(grunnlagsdata),
-            personopplysninger = mapPersonopplysninger(null),
             samlinger = mapSamlinger(søknad?.data?.samlinger),
             oppmøteadresse = mapOppmøteadresse(søknad?.data?.oppmøteadresse),
             kanReiseKollektivt = søknad?.data?.kanReiseKollektivt,

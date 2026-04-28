@@ -339,7 +339,6 @@ internal class BehandlingFaktaServiceTest {
 
         val fakta = service.hentFakta(behandlingId) as BehandlingFaktaReiseTilSamlingDto
 
-        assertThat(fakta.personopplysninger.søknadsgrunnlag).isNull()
         assertThat(fakta.samlinger).hasSize(2)
         assertThat(fakta.samlinger.first().fom).isEqualTo(12 februar 2026)
         assertThat(fakta.oppmøteadresse?.gateadresse).isEqualTo("Mimes vei 1")
