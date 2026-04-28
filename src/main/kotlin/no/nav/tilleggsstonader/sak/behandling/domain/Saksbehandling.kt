@@ -18,6 +18,8 @@ data class Saksbehandling(
     val eksternId: Long,
     val forrigeIverksatteBehandlingId: BehandlingId? = null,
     val type: BehandlingType,
+    @Column("behandling_metode")
+    val behandlingMetode: BehandlingMetode,
     val status: BehandlingStatus,
     val steg: StegType,
     val kategori: BehandlingKategori,

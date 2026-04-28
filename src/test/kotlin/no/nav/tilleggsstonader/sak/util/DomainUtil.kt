@@ -236,6 +236,7 @@ fun saksbehandling(
         eksternId = EksternBehandlingId(behandlingId = behandling.id).id,
         forrigeIverksatteBehandlingId = behandling.forrigeIverksatteBehandlingId,
         type = behandling.type,
+        behandlingMetode = behandling.behandlingMetode,
         status = behandling.status,
         steg = behandling.steg,
         kategori = behandling.kategori,

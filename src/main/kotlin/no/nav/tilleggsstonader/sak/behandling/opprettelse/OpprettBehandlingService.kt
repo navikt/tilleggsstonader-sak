@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -74,6 +75,7 @@ class OpprettBehandlingService(
                     fagsakId = request.fagsakId,
                     forrigeIverksatteBehandlingId = forrigeBehandling?.id,
                     type = behandlingType,
+                    behandlingMetode = request.behandlingMetode,
                     steg = request.stegType,
                     status = behandlingStatus,
                     resultat = BehandlingResultat.IKKE_SATT,
@@ -142,6 +144,7 @@ data class OpprettBehandling(
     val status: BehandlingStatus = BehandlingStatus.OPPRETTET,
     val stegType: StegType = StegType.INNGANGSVILKÅR,
     val behandlingsårsak: BehandlingÅrsak,
+    val behandlingMetode: BehandlingMetode = BehandlingMetode.MANUELL,
     val kravMottatt: LocalDate? = null,
     val nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
     val oppgaveMetadata: OpprettBehandlingOppgaveMetadata,

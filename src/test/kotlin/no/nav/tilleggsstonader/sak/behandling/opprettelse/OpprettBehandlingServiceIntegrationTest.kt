@@ -16,7 +16,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeld
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.assertFinnesTaskMedType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
-import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
+import no.nav.tilleggsstonader.sak.statistikk.behandling.Hendelse
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
