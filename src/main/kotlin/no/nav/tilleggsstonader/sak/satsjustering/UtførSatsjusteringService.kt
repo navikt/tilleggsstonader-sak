@@ -4,6 +4,7 @@ import no.nav.familie.prosessering.error.RekjørSenereException
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
@@ -186,6 +187,7 @@ class UtførSatsjusteringService(
                     nyeOpplysningerMetadata = null,
                     kravMottatt = null,
                     skalOppretteOppgave = false,
+                    behandlingMetode = BehandlingMetode.BATCH,
                 ),
             )
         // Gjenbruker grunnlag fra forrige behandling ved satsjustering
