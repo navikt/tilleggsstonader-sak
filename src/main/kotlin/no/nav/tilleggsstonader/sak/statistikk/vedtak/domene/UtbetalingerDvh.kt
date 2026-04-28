@@ -20,10 +20,16 @@ data class UtbetalingerDvh(
 
     companion object {
         fun fraDomene(
-            ytelser: List<AndelTilkjentYtelse>,
+            andelerTilkjentYtelse: List<AndelTilkjentYtelse>,
             vedtak: Vedtak,
         ): JsonWrapper {
-            val gyldigeAndeler = ytelser.filterNot { it.type == TypeAndel.UGYLDIG }
+            val gyldigeAndeler =
+                andelerTilkjentYtelse
+                    .filterNot { it.type == TypeAndel.UGYLDIG }
+                    // Finnes andeler med 0 i beløp som ikke har type UGYLDIG. Disse sender vi uansett ikke til økonomi så filtreres vekk her
+                    .filterNot { it.beløp == 0 }
+                    .sortedBy { it.fom }
+
             return JsonWrapper(
                 utbetalinger =
                     gyldigeAndeler.map {
