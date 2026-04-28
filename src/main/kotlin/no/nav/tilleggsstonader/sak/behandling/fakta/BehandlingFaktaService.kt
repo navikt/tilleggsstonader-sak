@@ -32,7 +32,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.UtgifterNyBol
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.AktivitetDagligReiseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.DokumentasjonDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
@@ -48,6 +47,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Utgif
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterNyBolig as UtgifterNyBoligKontrakt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.DekkesUtgiftenAvAndre as DekkesUtgiftenAvAndreKontrakt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.Reise as ReiseDagligReise
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon as SøknadDokumentasjon
 
 /**
  * Denne klassen håndterer henting av VilkårGrunnlagDto
@@ -419,7 +419,7 @@ class BehandlingFaktaService(
     }
 
     private fun mapDokumentasjon(
-        dokumentasjonListe: List<Dokumentasjon>,
+        dokumentasjonListe: List<SøknadDokumentasjon>,
         journalpostId: String,
         grunnlagsdata: Grunnlag,
     ): FaktaDokumentasjon {

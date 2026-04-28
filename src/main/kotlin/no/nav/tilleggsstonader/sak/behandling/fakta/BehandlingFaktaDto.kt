@@ -105,7 +105,7 @@ data class FaktaSamling(
     val tom: LocalDate,
 )
 
-class FaktaHovedytelse(
+data class FaktaHovedytelse(
     val søknadsgrunnlag: SøknadsgrunnlagHovedytelse?,
 )
 
