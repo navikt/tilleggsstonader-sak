@@ -32,10 +32,13 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.UtgifterNyBol
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.AktivitetDagligReiseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.DokumentasjonDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.UtdanningAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Oppmøteadresse
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SamlingPeriode
 import no.nav.tilleggsstonader.sak.util.antallÅrSiden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelUtil.harFullførtFjerdetrinn
 import org.springframework.stereotype.Service
@@ -67,10 +70,6 @@ class BehandlingFaktaService(
             Stønadstype.DAGLIG_REISE_TSR -> hentFaktaDtoForDagligReise(behandlingId)
             Stønadstype.REISE_TIL_SAMLING_TSO -> hentFaktaDtoForReiseTilSamling(behandlingId)
         }
-    }
-
-    private fun hentFaktaDtoForReiseTilSamling(behandlingId: BehandlingId): BehandlingFaktaDto {
-        TODO("Lag oppgave")
     }
 
     fun hentFaktaDtoForBarneTilsyn(behandlingId: BehandlingId): BehandlingFaktaTilsynBarnDto {
@@ -131,6 +130,27 @@ class BehandlingFaktaService(
         )
     }
 
+    private fun hentFaktaDtoForReiseTilSamling(behandlingId: BehandlingId): BehandlingFaktaReiseTilSamlingDto {
+        val søknad = søknadService.hentSøknadReiseTilSamling(behandlingId)
+        val grunnlagsdata = faktaGrunnlagService.hentGrunnlagsdata(behandlingId)
+        return BehandlingFaktaReiseTilSamlingDto(
+            søknadMottattTidspunkt = søknad?.mottattTidspunkt,
+            aktiviteter = mapAktivitet(søknad?.data?.aktivitet),
+            hovedytelse = søknad?.data?.hovedytelse.let { mapHovedytelse(it) },
+            dokumentasjon = søknad?.let { mapDokumentasjon(it.data.dokumentasjon, it.journalpostId, grunnlagsdata) },
+            arena = arenaFakta(grunnlagsdata),
+            personopplysninger = mapPersonopplysninger(null),
+            samlinger = mapSamlinger(søknad?.data?.samlinger),
+            oppmøteadresse = mapOppmøteadresse(søknad?.data?.oppmøteadresse),
+            kanReiseKollektivt = søknad?.data?.kanReiseKollektivt,
+            totalbeløpKollektivt = søknad?.data?.totalbeløpKollektivt,
+            årsakIkkeKollektivt = søknad?.data?.årsakIkkeKollektivt,
+            kanBenytteEgenBil = søknad?.data?.kanBenytteEgenBil,
+            årsakIkkeEgenBil = søknad?.data?.årsakIkkeEgenBil,
+            kanBenytteDrosje = søknad?.data?.kanBenytteDrosje,
+        )
+    }
+
     private fun arenaFakta(grunnlagsdata: Grunnlag): ArenaFakta? =
         grunnlagsdata.arenaVedtak?.let {
             ArenaFakta(
@@ -139,7 +159,7 @@ class BehandlingFaktaService(
         }
 
     private fun mapAktivitet(aktivitet: AktivitetAvsnitt?) =
-        FaktaAktivtet(
+        FaktaAktivitet(
             søknadsgrunnlag =
                 aktivitet?.let {
                     SøknadsgrunnlagAktivitet(
@@ -156,7 +176,7 @@ class BehandlingFaktaService(
     private fun mapAktivitetForDagligReise(aktivitet: AktivitetDagligReiseAvsnitt?) =
         FaktaAktivtetDagligReise(
             aktivitet =
-                FaktaAktivtet(
+                FaktaAktivitet(
                     søknadsgrunnlag =
                         aktivitet?.let {
                             SøknadsgrunnlagAktivitet(
@@ -200,6 +220,18 @@ class BehandlingFaktaService(
                 kanReiseMedOffentligTransport = reise.kanReiseMedOffentligTransport,
                 offentligTransport = reise.offentligTransport,
                 privatTransport = reise.privatTransport,
+            )
+        }
+
+    private fun mapSamlinger(samlinger: List<SamlingPeriode>?): List<FaktaSamling> =
+        samlinger?.map { FaktaSamling(fom = it.fom, tom = it.tom) } ?: emptyList()
+
+    private fun mapOppmøteadresse(oppmøteadresse: Oppmøteadresse?): FaktaOppmøteadresse? =
+        oppmøteadresse?.let {
+            FaktaOppmøteadresse(
+                gateadresse = it.gateadresse,
+                postnummer = it.postnummer,
+                poststed = it.poststed,
             )
         }
 
@@ -387,7 +419,7 @@ class BehandlingFaktaService(
     }
 
     private fun mapDokumentasjon(
-        dokumentasjonListe: List<no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon>,
+        dokumentasjonListe: List<Dokumentasjon>,
         journalpostId: String,
         grunnlagsdata: Grunnlag,
     ): FaktaDokumentasjon {

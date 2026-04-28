@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaReiseTilSamling
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
@@ -53,12 +52,10 @@ object SøknadsskjemaReiseTilSamlingMapper {
                 ?: emptyList(),
         oppmøteadresse =
             skjema.oppmøteadresse?.let {
-                Adresse(
-                    gyldigFraOgMed = null,
-                    adresse = it.gateadresse.verdi,
+                Oppmøteadresse(
+                    gateadresse = it.gateadresse.verdi,
                     postnummer = it.postnummer.verdi.toString(),
                     poststed = it.poststed.verdi,
-                    landkode = null,
                 )
             },
         kanReiseKollektivt = skjema.kanReiseKollektivt?.verdi,
