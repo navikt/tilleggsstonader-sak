@@ -11,12 +11,12 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandling
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingOppgaveMetadata
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingService
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.finnesUkerMedAvvik
+import no.nav.tilleggsstonader.sak.privatbil.task.AutomatiskKjørelisteBehandlingTask
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -29,8 +29,6 @@ class BehandleMottattKjørelisteService(
     private val gjenbrukDataRevurderingService: GjenbrukDataRevurderingService,
     private val avklartKjørelisteService: AvklartKjørelisteService,
     private val taskService: TaskService,
-    private val stegService: StegService,
-    private val fullførKjørelisteBehandlingSteg: FullførKjørelistebehandlingSteg,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -59,8 +57,8 @@ class BehandleMottattKjørelisteService(
                 )
             }
         } else {
-            logger.info("Ingen avvik funnet for behandling=${behandling.id}. Fullfører kjørelistebehandling automatisk")
-            fullførKjørelistebehandlingAutomatisk(behandling)
+            logger.info("Ingen avvik funnet for behandling=${behandling.id}. Oppretter task for automatisk kjørelistebehandling")
+            taskService.save(AutomatiskKjørelisteBehandlingTask.opprettTask(behandling.id))
         }
     }
 
@@ -71,15 +69,6 @@ class BehandleMottattKjørelisteService(
             .sortedByDescending { it.sporbar.opprettetTid }
             .firstOrNull { !erPåbegynt(it) }
             ?.also { logger.info("Gjenbruker eksisterende kjørelistebehandling=${it.id} for fagsak=${kjøreliste.fagsakId}") }
-
-    // TODO - trekke dette ut i en oppgave
-    private fun fullførKjørelistebehandlingAutomatisk(behandling: Behandling) {
-        stegService.håndterSteg(behandling.id, StegType.KJØRELISTE)
-        stegService.håndterSteg(behandling.id, StegType.BEREGNING)
-        // TODO - trrenger vi å kalle på simulering? Kan føre til en del feil da simulering ofter har nedetid
-        stegService.håndterSteg(behandling.id, StegType.SIMULERING)
-        stegService.håndterSteg(behandling.id, fullførKjørelisteBehandlingSteg)
-    }
 
     private fun erPåbegynt(behandling: Behandling): Boolean {
         if (behandling.status != BehandlingStatus.OPPRETTET) {
