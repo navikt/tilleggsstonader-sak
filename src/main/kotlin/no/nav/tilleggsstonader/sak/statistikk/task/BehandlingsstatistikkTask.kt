@@ -6,6 +6,9 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.error.RekjørSenereException
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
@@ -34,7 +37,7 @@ class BehandlingsstatistikkTask(
 
         // Vil aldri opprettes oppgave for satsendringer
         if (!saksbehandling.erSatsendring) {
-            kastFeilOmOppgaveIkkeHarBlittOpprettet(behandlingId)
+            kastFeilOmOppgaveIkkeHarBlittOpprettet(saksbehandling)
         }
 
         behandlingsstatistikkService.sendBehandlingstatistikk(
@@ -46,15 +49,19 @@ class BehandlingsstatistikkTask(
     }
 
     // Vi sender med ansvarligEnhet til DVH, som hentes ut fra oppgave. Venter på at oppgave skal opprettes
-    private fun kastFeilOmOppgaveIkkeHarBlittOpprettet(behandlingId: BehandlingId) {
-        val oppgaverForBehandling = oppgaveService.finnAlleOppgaveDomainForBehandling(behandlingId)
-        if (oppgaverForBehandling.isEmpty()) {
+    private fun kastFeilOmOppgaveIkkeHarBlittOpprettet(saksbehandling: Saksbehandling) {
+        val oppgaverForBehandling = oppgaveService.finnAlleOppgaveDomainForBehandling(saksbehandling.id)
+        if (oppgaverForBehandling.isEmpty() && !kanSendesTilDvhUtenOppgave(saksbehandling)) {
             throw RekjørSenereException(
-                "Vent med å sende MOTTATT-status til DVH til oppgave er opprettet for behandling=$behandlingId",
+                "Vent med å sende MOTTATT-status til DVH til oppgave er opprettet for behandling=${saksbehandling.id}",
                 triggerTid = LocalDateTime.now().plusSeconds(5),
             )
         }
     }
+
+    private fun kanSendesTilDvhUtenOppgave(saksbehandling: Saksbehandling): Boolean =
+        saksbehandling.type == BehandlingType.KJØRELISTE &&
+            saksbehandling.status in setOf(BehandlingStatus.IVERKSETTER_VEDTAK, BehandlingStatus.FERDIGSTILT)
 
     companion object {
         fun opprettMottattTask(
