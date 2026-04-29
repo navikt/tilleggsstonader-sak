@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.KjørelisteSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.Reisedag
 import no.nav.tilleggsstonader.kontrakter.søknad.UkeMedReisedager
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
-import java.time.LocalDate
+import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 
 object KjørelisteSkjemaUtil {
     fun kjørelisteSkjema(
@@ -42,9 +42,4 @@ object KjørelisteSkjemaUtil {
             dokumentasjon = listOf(),
         )
     }
-
-    data class KjørtDag(
-        val dato: LocalDate,
-        val parkeringsutgift: Int? = null,
-    )
 }

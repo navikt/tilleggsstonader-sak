@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.finnPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -55,7 +56,7 @@ class DagligReisePrivatBilStatistikkIntegrationTest : IntegrationTest() {
 
                 sendInnKjøreliste {
                     periode = Datoperiode(fom, tom)
-                    kjørteDager = listOf(fom to 50)
+                    kjørteDager = listOf(KjørtDag(dato = fom, parkeringsutgift = 50))
                 }
             }
 
