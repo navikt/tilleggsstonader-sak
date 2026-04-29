@@ -194,11 +194,8 @@ fun finnPeriodeFraAndel(
         error("Finner ingen reiseperiode fra andel med fom ${andelTilkjentYtelse.fom}")
     }
 
-    if (reiseperiodeMedSammeDatoSomAndel.size > 1) {
-        error("Finner flere reiseperioder fra andel med fom ${andelTilkjentYtelse.fom}")
-    }
-
-    return reiseperiodeMedSammeDatoSomAndel.single().grunnlag.let {
-        Datoperiode(it.fom, it.tom)
-    }
+    return Datoperiode(
+        fom = reiseperiodeMedSammeDatoSomAndel.minOf { it.grunnlag.fom },
+        tom = reiseperiodeMedSammeDatoSomAndel.maxOf { it.grunnlag.tom },
+    )
 }

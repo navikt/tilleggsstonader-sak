@@ -4,6 +4,7 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandling
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingOppgaveMetadata
@@ -33,6 +34,7 @@ class OpprettDummyBehandlingController(
     private val opprettDummySøknadLæremidler: OpprettDummySøknadLæremidler,
     private val opprettDummySøknadBoutgifter: OpprettDummySøknadBoutgifter,
     private val opprettDummySøknadDagligReise: OpprettDummySøknadDagligReise,
+    private val opprettDummySøknadReiseTilSamling: OpprettDummySøknadReiseTilSamling,
 ) {
     @Transactional
     @PostMapping
@@ -57,6 +59,7 @@ class OpprettDummyBehandlingController(
             OpprettBehandling(
                 fagsakId = fagsak.id,
                 behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                behandlingMetode = BehandlingMetode.MANUELL,
                 oppgaveMetadata =
                     OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                         tilordneSaksbehandler = SikkerhetContext.hentSaksbehandler(),
@@ -76,7 +79,7 @@ class OpprettDummyBehandlingController(
             Stønadstype.BOUTGIFTER -> opprettDummySøknadBoutgifter.opprettDummy(fagsak, behandling)
             Stønadstype.DAGLIG_REISE_TSO -> opprettDummySøknadDagligReise.opprettDummy(fagsak, behandling)
             Stønadstype.DAGLIG_REISE_TSR -> opprettDummySøknadDagligReise.opprettDummy(fagsak, behandling)
-            Stønadstype.REISE_TIL_SAMLING_TSO -> TODO()
+            Stønadstype.REISE_TIL_SAMLING_TSO -> opprettDummySøknadReiseTilSamling.opprettDummy(fagsak, behandling)
         }
     }
 

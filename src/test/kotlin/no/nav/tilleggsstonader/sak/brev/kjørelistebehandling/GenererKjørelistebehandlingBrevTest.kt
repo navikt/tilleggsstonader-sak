@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomf�
 import no.nav.tilleggsstonader.sak.interntVedtak.HtmlifyClient
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseVedtakService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.finnSatserBruktIBeregning
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.oppsummerBeregningPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import org.junit.jupiter.api.Test
@@ -51,17 +52,20 @@ class GenererKjørelistebehandlingBrevTest : CleanDatabaseIntegrationTest() {
         val kjørelisteBehandlingId = gjennomførBehandlingsløp()
         val vedtaksdata = dagligReiseVedtakService.hentInnvilgelseEllerOpphørVedtak(kjørelisteBehandlingId).data
 
+        val oppsummertBeregningsresultat =
+            oppsummerBeregningPrivatBil(
+                beregningsresultatPrivatBil = vedtaksdata.beregningsresultat.privatBil!!,
+                rammevedtak = vedtaksdata.rammevedtakPrivatBil!!,
+            )
+
         val req =
             KjørelisteBehandlingBrevRequest(
-                beregning =
-                    oppsummerBeregningPrivatBil(
-                        beregningsresultatPrivatBil = vedtaksdata.beregningsresultat.privatBil!!,
-                        rammevedtak = vedtaksdata.rammevedtakPrivatBil!!,
-                    ),
+                beregning = oppsummertBeregningsresultat,
                 navn = "Navn",
                 ident = "Ident",
                 behandlendeEnhet = "NAV Arbeid og ytelser",
                 behandletDato = LocalDate.now(),
+                satser = oppsummertBeregningsresultat.finnSatserBruktIBeregning(),
             )
 
         val html = lagHtmlifyClient().genererKjørelisteBehandlingBrev(req)

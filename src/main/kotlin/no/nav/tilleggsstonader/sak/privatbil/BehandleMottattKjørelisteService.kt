@@ -4,6 +4,7 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.sak.behandling.GjenbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -90,6 +91,7 @@ class BehandleMottattKjørelisteService(
                     status = BehandlingStatus.OPPRETTET,
                     stegType = StegType.KJØRELISTE,
                     behandlingsårsak = BehandlingÅrsak.KJØRELISTE,
+                    behandlingMetode = BehandlingMetode.MANUELL,
                     kravMottatt = kjøreliste.datoMottatt.toLocalDate(),
                     oppgaveMetadata = OpprettBehandlingOppgaveMetadata.UtenOppgave,
                 ),

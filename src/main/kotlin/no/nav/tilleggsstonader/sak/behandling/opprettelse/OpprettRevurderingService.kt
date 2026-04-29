@@ -66,6 +66,7 @@ class OpprettRevurderingService(
             OpprettBehandling(
                 fagsakId = opprettRevurdering.fagsakId,
                 behandlingsårsak = opprettRevurdering.årsak,
+                behandlingMetode = opprettRevurdering.behandlingMetode,
                 kravMottatt = opprettRevurdering.kravMottatt,
                 nyeOpplysningerMetadata = opprettRevurdering.nyeOpplysningerMetadata,
                 oppgaveMetadata =
@@ -79,6 +80,7 @@ class OpprettRevurderingService(
             OpprettBehandling(
                 fagsakId = opprettRevurdering.fagsakId,
                 behandlingsårsak = opprettRevurdering.årsak,
+                behandlingMetode = opprettRevurdering.behandlingMetode,
                 kravMottatt = opprettRevurdering.kravMottatt,
                 nyeOpplysningerMetadata = opprettRevurdering.nyeOpplysningerMetadata,
                 oppgaveMetadata = OpprettBehandlingOppgaveMetadata.UtenOppgave,

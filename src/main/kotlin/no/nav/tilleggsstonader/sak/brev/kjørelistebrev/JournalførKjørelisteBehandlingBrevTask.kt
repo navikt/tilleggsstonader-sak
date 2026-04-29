@@ -42,8 +42,7 @@ class JournalførKjørelisteBehandlingBrevTask(
             pdfBytes = brev.pdf.bytes,
             saksbehandling = saksbehandling,
             brevmottakere = brevmottakereService.hentEllerOpprettBrevmottakere(behandlingId),
-            // TODO - hva skal tittel være? Bør være forskjellig fra rammevedtak-brev
-            brevtittel = "Vedtak om ${saksbehandling.stønadstype.visningsnavn}",
+            brevtittel = "Vedtak om utbetaling av daglige reiser med bil",
         )
     }
 

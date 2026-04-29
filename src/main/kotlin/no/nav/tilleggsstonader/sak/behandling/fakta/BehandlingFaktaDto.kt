@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaReiseTilSamling
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
@@ -29,6 +30,7 @@ import java.time.LocalDateTime
     JsonSubTypes.Type(BehandlingFaktaBoutgifterDto::class, name = "BOUTGIFTER"),
     JsonSubTypes.Type(BehandlingFaktaDagligReiseDto::class, name = "DAGLIG_REISE_TSO"),
     JsonSubTypes.Type(BehandlingFaktaDagligReiseDto::class, name = "DAGLIG_REISE_TSR"),
+    JsonSubTypes.Type(BehandlingFaktaReiseTilSamlingDto::class, name = "REISE_TIL_SAMLING_TSO"),
 )
 sealed interface BehandlingFaktaDto {
     val søknadMottattTidspunkt: LocalDateTime?
@@ -42,7 +44,7 @@ data class BehandlingFaktaTilsynBarnDto(
     override val hovedytelse: FaktaHovedytelse,
     override val dokumentasjon: FaktaDokumentasjon?,
     override val arena: ArenaFakta?,
-    val aktivitet: FaktaAktivtet,
+    val aktivitet: FaktaAktivitet,
     val barn: List<FaktaBarn>,
 ) : BehandlingFaktaDto
 
@@ -60,7 +62,7 @@ data class BehandlingFaktaBoutgifterDto(
     override val hovedytelse: FaktaHovedytelse? = null,
     override val dokumentasjon: FaktaDokumentasjon? = null,
     override val arena: ArenaFakta?,
-    val aktiviteter: FaktaAktivtet,
+    val aktiviteter: FaktaAktivitet,
     val personopplysninger: FaktaPersonopplysninger,
     val boligEllerOvernatting: FaktaBoligEllerOvernatting?,
 ) : BehandlingFaktaDto
@@ -70,10 +72,37 @@ data class BehandlingFaktaDagligReiseDto(
     override val hovedytelse: FaktaHovedytelse? = null,
     override val dokumentasjon: FaktaDokumentasjon? = null,
     override val arena: ArenaFakta? = null,
-    val aktiviteter: FaktaAktivtetDagligReise,
+    val aktiviteter: FaktaAktivitetDagligReise,
     val reiser: List<FaktaReise>?,
     val personopplysninger: FaktaPersonopplysninger,
 ) : BehandlingFaktaDto
+
+data class BehandlingFaktaReiseTilSamlingDto(
+    override val søknadMottattTidspunkt: LocalDateTime? = LocalDateTime.now(),
+    override val hovedytelse: FaktaHovedytelse? = null,
+    override val dokumentasjon: FaktaDokumentasjon? = null,
+    override val arena: ArenaFakta? = null,
+    val aktiviteter: FaktaAktivitet,
+    val samlinger: List<FaktaSamling>,
+    val oppmøteadresse: FaktaOppmøteadresse?,
+    val kanReiseKollektivt: JaNei?,
+    val totalbeløpKollektivt: Int?,
+    val årsakIkkeKollektivt: SøknadsskjemaReiseTilSamling.ÅrsakIkkeKollektivt?,
+    val kanBenytteEgenBil: JaNei?,
+    val årsakIkkeEgenBil: SøknadsskjemaReiseTilSamling.ÅrsakIkkeEgenBil?,
+    val kanBenytteDrosje: JaNei?,
+) : BehandlingFaktaDto
+
+data class FaktaOppmøteadresse(
+    val gateadresse: String?,
+    val postnummer: String?,
+    val poststed: String?,
+)
+
+data class FaktaSamling(
+    val fom: LocalDate,
+    val tom: LocalDate,
+)
 
 data class FaktaHovedytelse(
     val søknadsgrunnlag: SøknadsgrunnlagHovedytelse?,
@@ -127,12 +156,12 @@ data class FaktaOppholdUtenforNorge(
     val tom: LocalDate,
 )
 
-data class FaktaAktivtet(
+data class FaktaAktivitet(
     val søknadsgrunnlag: SøknadsgrunnlagAktivitet?,
 )
 
-data class FaktaAktivtetDagligReise(
-    val aktivitet: FaktaAktivtet,
+data class FaktaAktivitetDagligReise(
+    val aktivitet: FaktaAktivitet,
 )
 
 data class SøknadsgrunnlagAktivitet(

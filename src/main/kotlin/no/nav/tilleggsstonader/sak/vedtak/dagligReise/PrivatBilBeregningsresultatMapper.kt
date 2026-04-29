@@ -1,6 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.SatsDagligReisePrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.satser
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
@@ -56,6 +61,15 @@ private fun BeregningsresultatForReisePrivatBilPeriode.oppsummerPeriode(
     )
 }
 
+fun PrivatBilOppsummertBeregningDto.finnSatserBruktIBeregning(): List<SatsDagligReisePrivatBil> =
+    reiser
+        .flatMap { reise ->
+            reise.perioder.mergeSammenhengende().flatMap { periode ->
+                satser.filter { it.overlapper(periode) }
+            }
+        }.distinct()
+        .sorted()
+
 data class PrivatBilOppsummertBeregningDto(
     val reiser: List<OppsummertBeregningForReiseDto>,
 )
@@ -81,3 +95,9 @@ data class OppsummertBeregningForPeriodeDto(
 ) {
     val ukenummer = fom.ukenummer()
 }
+
+private fun List<OppsummertBeregningForPeriodeDto>.mergeSammenhengende(): List<Datoperiode> =
+    this
+        .map { Datoperiode(it.fom, it.tom) }
+        .sorted()
+        .mergeSammenhengende { v1, v2 -> v1.påfølgesAv(v2) }

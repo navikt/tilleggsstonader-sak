@@ -2,16 +2,29 @@ package no.nav.tilleggsstonader.sak.behandling.fakta
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaReiseTilSamling
+import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
+import no.nav.tilleggsstonader.libs.utils.dato.februar
+import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KodeverkServiceUtil.mockedKodeverkService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GeneriskFaktaGrunnlagTestUtil
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Oppmøteadresse
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SamlingPeriode
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SkjemaReiseTilSamling
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagFaktaGrunnlagPersonopplysninger
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
@@ -275,5 +288,66 @@ internal class BehandlingFaktaServiceTest {
                 assertThat(identBarn).isEqualTo("1")
             }
         }
+    }
+
+    @Test
+    fun `skal mappe fakta for reise til samling`() {
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns lagGrunnlagsdata()
+        every { søknadService.hentSøknadReiseTilSamling(behandlingId) } returns
+            SøknadReiseTilSamling(
+                journalpostId = "journalpostId",
+                mottattTidspunkt = java.time.LocalDateTime.now(),
+                språk = no.nav.tilleggsstonader.kontrakter.felles.Språkkode.NB,
+                sporbar = Sporbar(),
+                data =
+                    SkjemaReiseTilSamling(
+                        hovedytelse =
+                            HovedytelseAvsnitt(
+                                hovedytelse = listOf(Hovedytelse.AAP),
+                                harNedsattArbeidsevne = null,
+                                arbeidOgOpphold = null,
+                            ),
+                        aktivitet =
+                            AktivitetAvsnitt(
+                                aktiviteter = listOf(ValgtAktivitet(id = "1", label = "Tiltak")),
+                                annenAktivitet = AnnenAktivitetType.TILTAK,
+                                lønnetAktivitet = JaNei.NEI,
+                            ),
+                        samlinger =
+                            listOf(
+                                SamlingPeriode(fom = 12 februar 2026, tom = 14 februar 2026),
+                                SamlingPeriode(fom = 10 mars 2026, tom = 12 mars 2026),
+                            ),
+                        oppmøteadresse =
+                            Oppmøteadresse(
+                                gateadresse = "Mimes vei 1",
+                                postnummer = "5132",
+                                poststed = "Nyborg",
+                            ),
+                        kanReiseKollektivt = JaNei.NEI,
+                        totalbeløpKollektivt = null,
+                        årsakIkkeKollektivt = SøknadsskjemaReiseTilSamling.ÅrsakIkkeKollektivt.DÅRLIG_TRANSPORTTILBUD,
+                        kanBenytteEgenBil = JaNei.NEI,
+                        årsakIkkeEgenBil = SøknadsskjemaReiseTilSamling.ÅrsakIkkeEgenBil.DISPONERER_IKKE_BIL,
+                        kanBenytteDrosje = JaNei.JA,
+                        dokumentasjon = emptyList(),
+                    ),
+            )
+
+        every { fagsakService.hentFagsakForBehandling(behandlingId) } returns
+            fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO)
+
+        val fakta = service.hentFakta(behandlingId) as BehandlingFaktaReiseTilSamlingDto
+
+        assertThat(fakta.samlinger).hasSize(2)
+        assertThat(fakta.samlinger.first().fom).isEqualTo(12 februar 2026)
+        assertThat(fakta.oppmøteadresse?.gateadresse).isEqualTo("Mimes vei 1")
+        assertThat(fakta.oppmøteadresse?.postnummer).isEqualTo("5132")
+        assertThat(fakta.oppmøteadresse?.poststed).isEqualTo("Nyborg")
+        assertThat(fakta.kanReiseKollektivt).isEqualTo(JaNei.NEI)
+        assertThat(fakta.årsakIkkeKollektivt).isEqualTo(SøknadsskjemaReiseTilSamling.ÅrsakIkkeKollektivt.DÅRLIG_TRANSPORTTILBUD)
+        assertThat(fakta.kanBenytteEgenBil).isEqualTo(JaNei.NEI)
+        assertThat(fakta.årsakIkkeEgenBil).isEqualTo(SøknadsskjemaReiseTilSamling.ÅrsakIkkeEgenBil.DISPONERER_IKKE_BIL)
+        assertThat(fakta.kanBenytteDrosje).isEqualTo(JaNei.JA)
     }
 }

@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.statistikk.behandling.BehandlingsstatistikkService
-import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
+import no.nav.tilleggsstonader.sak.statistikk.behandling.Hendelse
 import org.springframework.stereotype.Service
 import tools.jackson.module.kotlin.readValue
 import java.time.LocalDateTime

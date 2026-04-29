@@ -6,7 +6,6 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import org.springframework.stereotype.Service
 import tools.jackson.module.kotlin.readValue
 import java.time.LocalDateTime
@@ -21,18 +20,14 @@ class VedtaksstatistikkTask(
     private val vedtaksstatistikkService: VedtaksstatistikkService,
 ) : AsyncTaskStep {
     override fun doTask(task: Task) {
-        val (behandlingId, fagsakId) = jsonMapper.readValue<VedtaksstatistikkTaskPayload>(task.payload)
+        val (behandlingId) = jsonMapper.readValue<VedtaksstatistikkTaskPayload>(task.payload)
 
-        vedtaksstatistikkService.lagreVedtaksstatistikkV2(
-            behandlingId,
-            fagsakId,
-        )
+        vedtaksstatistikkService.lagreVedtaksstatistikkV2(behandlingId)
     }
 
     companion object {
         fun opprettVedtaksstatistikkTask(
             behandlingId: BehandlingId,
-            fagsakId: FagsakId,
             hendelseTidspunkt: LocalDateTime = LocalDateTime.now(),
             stønadstype: Stønadstype,
         ): Task =
@@ -42,13 +37,11 @@ class VedtaksstatistikkTask(
                     jsonMapper.writeValueAsString(
                         VedtaksstatistikkTaskPayload(
                             behandlingId = behandlingId,
-                            fagsakId = fagsakId,
                         ),
                     ),
                 properties =
                     Properties().apply {
                         this["behandlingId"] = behandlingId.toString()
-                        this["fagsakId"] = fagsakId.toString()
                         this["hendelseTidspunkt"] = hendelseTidspunkt.toString()
                         this["stønadstype"] = stønadstype.toString()
                     },
@@ -59,6 +52,5 @@ class VedtaksstatistikkTask(
 
     data class VedtaksstatistikkTaskPayload(
         val behandlingId: BehandlingId,
-        val fagsakId: FagsakId,
     )
 }

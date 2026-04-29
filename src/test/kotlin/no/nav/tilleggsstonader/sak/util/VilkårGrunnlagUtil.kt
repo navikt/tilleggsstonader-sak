@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaTilsynBarnDto
-import no.nav.tilleggsstonader.sak.behandling.fakta.FaktaAktivtet
+import no.nav.tilleggsstonader.sak.behandling.fakta.FaktaAktivitet
 import no.nav.tilleggsstonader.sak.behandling.fakta.FaktaBarn
 import no.nav.tilleggsstonader.sak.behandling.fakta.FaktaHovedytelse
 import no.nav.tilleggsstonader.sak.behandling.fakta.RegistergrunnlagBarn
@@ -18,7 +18,7 @@ object VilkårGrunnlagUtil {
                     søknadsgrunnlag = null,
                 ),
             aktivitet =
-                FaktaAktivtet(
+                FaktaAktivitet(
                     søknadsgrunnlag = null,
                 ),
             barn = barn,

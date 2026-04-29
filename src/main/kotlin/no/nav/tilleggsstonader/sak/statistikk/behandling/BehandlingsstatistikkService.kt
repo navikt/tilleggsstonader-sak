@@ -15,8 +15,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
-import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.BehandlingMetode
-import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
@@ -82,7 +80,11 @@ class BehandlingsstatistikkService(
         saksbehandling.forrigeIverksatteBehandlingId?.let { behandlingService.hentEksternBehandlingId(it).id.toString() }
 
     private fun finnSisteOppgaveForBehandlingen(behandlingId: BehandlingId): Oppgave? =
-        oppgaveService.finnSisteBehandlingsoppgaveForBehandling(behandlingId)?.gsakOppgaveId?.let { oppgaveService.hentOppgave(it) }
+        oppgaveService.finnSisteBehandlingsoppgaveForBehandling(behandlingId)?.gsakOppgaveId?.let {
+            oppgaveService.hentOppgave(
+                it,
+            )
+        }
 
     private fun finnSaksbehandler(
         hendelse: Hendelse,
@@ -168,7 +170,7 @@ class BehandlingsstatistikkService(
                     erStrengtFortrolig = søkerHarStrengtFortroligAdresse,
                     verdi = sisteOppgaveForBehandling?.tildeltEnhetsnr ?: MASKINELL_JOURNALFOERENDE_ENHET,
                 ),
-            behandlingMetode = utledBehandlingsMetode(saksbehandling),
+            behandlingMetode = saksbehandling.behandlingMetode.name,
             behandlingÅrsak = saksbehandling.årsak.name,
             avsender = "Nav Tilleggstønader",
             behandlingType = saksbehandling.type.name,
@@ -189,12 +191,6 @@ class BehandlingsstatistikkService(
             venteAarsak = null,
             papirSøknad = null,
         )
-
-        private fun utledBehandlingsMetode(saksbehandling: Saksbehandling): String =
-            when {
-                saksbehandling.erSatsendring -> BehandlingMetode.BATCH.name
-                else -> BehandlingMetode.MANUELL.name
-            }
 
         private fun finnAnsvarligBeslutter(
             beslutterId: String?,
