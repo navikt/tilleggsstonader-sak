@@ -144,7 +144,7 @@ data class OpprettBehandling(
     val status: BehandlingStatus = BehandlingStatus.OPPRETTET,
     val stegType: StegType = StegType.INNGANGSVILKÅR,
     val behandlingsårsak: BehandlingÅrsak,
-    val behandlingMetode: BehandlingMetode = BehandlingMetode.MANUELL,
+    val behandlingMetode: BehandlingMetode,
     val kravMottatt: LocalDate? = null,
     val nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
     val oppgaveMetadata: OpprettBehandlingOppgaveMetadata,

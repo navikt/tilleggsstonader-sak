@@ -25,7 +25,7 @@ data class Behandling(
     val versjon: Int = 0,
     val type: BehandlingType,
     @Column("behandling_metode")
-    val behandlingMetode: BehandlingMetode = BehandlingMetode.MANUELL,
+    val behandlingMetode: BehandlingMetode,
     val status: BehandlingStatus,
     val steg: StegType,
     val kategori: BehandlingKategori,
