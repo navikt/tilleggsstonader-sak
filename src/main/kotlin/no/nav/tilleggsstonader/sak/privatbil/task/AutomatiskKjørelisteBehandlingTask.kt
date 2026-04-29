@@ -8,7 +8,9 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
+import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.KjørelisteBehandlingBrevService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.privatbil.FullførKjørelistebehandlingSteg
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -24,15 +26,19 @@ class AutomatiskKjørelisteBehandlingTask(
     private val stegService: StegService,
     private val taskService: TaskService,
     private val fullførKjørelisteBehandlingSteg: FullførKjørelistebehandlingSteg,
+    private val kjørelisteBehandlingBrevService: KjørelisteBehandlingBrevService,
+    private val faktaGrunnlagService: FaktaGrunnlagService,
 ) : AsyncTaskStep {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     override fun doTask(task: Task) {
         val behandlingId = BehandlingId.fromString(task.payload)
         try {
+            faktaGrunnlagService.opprettGrunnlagHvisDetIkkeEksisterer(behandlingId)
             stegService.håndterSteg(behandlingId, StegType.KJØRELISTE)
             stegService.håndterSteg(behandlingId, StegType.BEREGNING)
             stegService.håndterSteg(behandlingId, StegType.SIMULERING)
+            kjørelisteBehandlingBrevService.genererOgLagreBrev(behandlingId)
             stegService.håndterSteg(behandlingId, fullførKjørelisteBehandlingSteg)
         } catch (e: Exception) {
             logger.warn(

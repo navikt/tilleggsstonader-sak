@@ -66,10 +66,14 @@ class BehandleMottattKjørelisteTest : CleanDatabaseIntegrationTest() {
 
         assertThat(kjørelistebehandling).isNotNull()
         assertThat(kjørelistebehandling.forrigeIverksatteBehandlingId).isEqualTo(behandling.id)
-        assertThat(kjørelistebehandling.steg).isIn(StegType.FERDIGSTILLE_BEHANDLING, StegType.BEHANDLING_FERDIGSTILT)
+        assertThat(kjørelistebehandling.steg).isIn(
+            StegType.FULLFØR_KJØRELISTE,
+            StegType.FERDIGSTILLE_BEHANDLING,
+            StegType.BEHANDLING_FERDIGSTILT,
+        )
         assertThat(kjørelistebehandling.type).isEqualTo(BehandlingType.KJØRELISTE)
         assertThat(kjørelistebehandling.årsak).isEqualTo(BehandlingÅrsak.KJØRELISTE)
-        assertThat(kjørelistebehandling.behandlingMetode).isEqualTo(BehandlingMetode.MANUELL)
+        assertThat(kjørelistebehandling.behandlingMetode).isEqualTo(BehandlingMetode.AUTOMATISK)
         assertThat(oppgaveService.finnAlleOppgaveDomainForBehandling(kjørelistebehandling.id)).isEmpty()
 
         val vedtakForrigeBehandling = vedtakService.hentInnvilgelseEllerOpphørVedtak(behandlingContext.behandlingId)

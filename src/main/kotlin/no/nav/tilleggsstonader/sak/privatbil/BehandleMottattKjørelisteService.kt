@@ -36,7 +36,7 @@ class BehandleMottattKjørelisteService(
     @Transactional
     fun behandleMottattKjøreliste(kjøreliste: Kjøreliste) {
         val gjenbrukBehandling = finnKjørelistebehandlingSomKanGjenbrukes(kjøreliste)
-        val behandling = gjenbrukBehandling ?: opprettKjørelisteBehandling(kjøreliste)
+        var behandling = gjenbrukBehandling ?: opprettKjørelisteBehandling(kjøreliste)
 
         avklartKjørelisteService.avklarUkerFraKjøreliste(
             behandling = behandling,
@@ -44,7 +44,14 @@ class BehandleMottattKjørelisteService(
         )
 
         val avklarteUker = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandling.id)
-        if (avklarteUker.finnesUkerMedAvvik()) {
+        val harAvvik = avklarteUker.finnesUkerMedAvvik()
+
+        if (gjenbrukBehandling == null && !harAvvik && behandling.behandlingMetode != BehandlingMetode.AUTOMATISK) {
+            behandling = behandling.copy(behandlingMetode = BehandlingMetode.AUTOMATISK)
+            behandlingRepository.update(behandling)
+        }
+
+        if (harAvvik) {
             // Gjenbrukt behandling har allerede en oppgave-task fra da den ble opprettet
             if (gjenbrukBehandling == null) {
                 taskService.save(
