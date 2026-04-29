@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -21,7 +22,9 @@ class VedtaksstatistikkForvaltningController(
 ) {
     @PostMapping("/oppdater/{behandlingId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun oppdaterVedtaksstatistikk(behandlingId: BehandlingId) {
+    fun oppdaterVedtaksstatistikk(
+        @PathVariable behandlingId: BehandlingId,
+    ) {
         tilgangService.validerHarUtviklerrolle()
         logger.info("Oppdaterer vedtaksstatistikk for behandling $behandlingId")
         vedtaksstatistikkService.oppdaterVedtaksstatistikkV2(behandlingId)
