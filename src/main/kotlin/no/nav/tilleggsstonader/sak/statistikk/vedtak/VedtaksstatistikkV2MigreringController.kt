@@ -70,7 +70,7 @@ class VedtaksstatistikkV2MigreringController(
         behandinger
             .sortertEtterVedtakstidspunkt()
             .forEach { behandling ->
-                vedtaksstatistikkService.lagreVedtaksstatistikkV2(behandling.id, behandling.fagsakId)
+                vedtaksstatistikkService.lagreVedtaksstatistikkV2(behandling.id)
             }
 
         logger.info("vedtaksstatistikk-migrasjon ferdig 🚀")

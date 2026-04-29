@@ -12,8 +12,8 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
 import org.springframework.data.annotation.Id
-import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.relational.core.mapping.Column
+import org.springframework.data.relational.core.mapping.InsertOnlyProperty
 import java.time.LocalDateTime
 
 /**
@@ -43,7 +43,7 @@ data class VedtaksstatistikkV2(
     val årsakerAvslag: ÅrsakAvslagDvh.JsonWrapper?,
     @Column("arsaker_opphor")
     val årsakerOpphør: ÅrsakOpphørDvh.JsonWrapper?,
+    @InsertOnlyProperty
     val opprettetTid: LocalDateTime = LocalDateTime.now(),
-    @LastModifiedDate
     val endretTid: LocalDateTime = opprettetTid,
 )
