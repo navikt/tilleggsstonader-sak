@@ -202,7 +202,7 @@ class LæremidlerBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         beregningsresultat: BeregningsresultatLæremidler,
     ) {
-        val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling.id)
+        val andeler = beregningsresultat.mapTilAndelTilkjentYtelse()
         tilkjentYtelseService.lagreTilkjentYtelse(saksbehandling.id, andeler)
     }
 }

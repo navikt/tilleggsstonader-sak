@@ -39,7 +39,7 @@ class AndelTilkjentYtelseTilPeriodeServiceTest {
                 behandlingId = behandlingId,
                 andeler =
                     vedtak.data.beregningsresultat
-                        .mapTilAndelTilkjentYtelse(behandlingId)
+                        .mapTilAndelTilkjentYtelse()
                         .toTypedArray(),
             )
         every { vedtakservice.hentVedtak(behandlingId) } returns vedtak

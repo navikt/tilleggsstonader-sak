@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
@@ -98,7 +97,6 @@ fun lagTilsynBarnInnvilgelseMedBeløp(
             satstype = Satstype.DAG,
             utbetalingsdato = fom,
             type = TypeAndel.TILSYN_BARN_AAP,
-            kildeBehandlingId = BehandlingId.random(),
         )
 
     return vedtaksdata to andel
