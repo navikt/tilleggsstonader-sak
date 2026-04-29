@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -156,6 +157,7 @@ fun behandling(
                 ?: if (resultat != BehandlingResultat.IKKE_SATT) SporbarUtils.now() else null,
         kravMottatt = kravMottatt,
         nyeOpplysningerMetadata = nyeOpplysningerMetadata,
+        behandlingMetode = BehandlingMetode.MANUELL,
     )
 
 fun henlagtBehandling(
@@ -192,6 +194,7 @@ fun henlagtBehandling(
             ?: if (resultat != BehandlingResultat.IKKE_SATT) SporbarUtils.now() else null,
     kravMottatt = kravMottatt,
     nyeOpplysningerMetadata = nyeOpplysningerMetadata,
+    behandlingMetode = BehandlingMetode.MANUELL,
 )
 
 fun saksbehandling(
@@ -224,6 +227,7 @@ fun saksbehandling(
             kravMottatt = kravMottatt,
             kategori = BehandlingKategori.NASJONAL,
             vedtakstidspunkt = vedtakstidspunkt,
+            behandlingMetode = BehandlingMetode.MANUELL,
         ),
     )
 
