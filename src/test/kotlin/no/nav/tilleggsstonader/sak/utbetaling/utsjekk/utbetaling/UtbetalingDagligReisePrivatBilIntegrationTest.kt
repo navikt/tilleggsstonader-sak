@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil
+import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.avrundetStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.SatsDagligReisePrivatBilProvider
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
@@ -31,7 +32,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.math.BigDecimal
-import java.time.LocalDate
 
 class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
     @Autowired
@@ -52,9 +52,9 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
         val reiseavstandEnVei = BigDecimal(7.9)
         val kjørteDager =
             listOf(
-                2 februar 2026 to 50,
-                4 februar 2026 to 50,
-                5 februar 2026 to 50,
+                KjørtDag(dato = 2 februar 2026, parkeringsutgift = 50),
+                KjørtDag(dato = 4 februar 2026, parkeringsutgift = 50),
+                KjørtDag(dato = 5 februar 2026, parkeringsutgift = 50),
             )
         val delperioder =
             listOf(
@@ -194,7 +194,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
                 KjørelisteSkjemaUtil.kjørelisteSkjema(
                     rammevedtak1.reiseId,
                     periode = Datoperiode(fom, tom),
-                    dagerKjørt = listOf(KjørelisteSkjemaUtil.KjørtDag(fom)),
+                    dagerKjørt = listOf(KjørtDag(dato = fom)),
                 ),
             ident = førstegangsBehandlingContext.ident,
         )
@@ -213,7 +213,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
                 KjørelisteSkjemaUtil.kjørelisteSkjema(
                     rammevedtak2.reiseId,
                     periode = Datoperiode(fom, tom),
-                    dagerKjørt = listOf(KjørelisteSkjemaUtil.KjørtDag(fom)),
+                    dagerKjørt = listOf(KjørtDag(dato = fom)),
                 ),
             ident = førstegangsBehandlingContext.ident,
         )
@@ -257,14 +257,14 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
         assertThat(andel.reiseId).isNotNull
     }
 
-    private fun List<Pair<LocalDate, Int>>.kalkulerForventetBeløp(reiseavstandEnVei: BigDecimal): Int =
-        sumOf { (dato, parkeringskostnader) ->
+    private fun List<KjørtDag>.kalkulerForventetBeløp(reiseavstandEnVei: BigDecimal): Int =
+        sumOf { kjørtDag ->
             satsDagligReisePrivatBilProvider
-                .finnSatsForÅr(dato.year)
+                .finnSatsForÅr(kjørtDag.dato.year)
                 .beløp
                 .multiply(reiseavstandEnVei)
                 .multiply(2.toBigDecimal())
-                .plus(parkeringskostnader.toBigDecimal())
+                .plus(kjørtDag.parkeringsutgift!!.toBigDecimal())
         }.avrundetStønadsbeløp()
             .toInt()
 }

@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørAlleTa
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteRepository
+import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.util.finnNesteSøndag
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -79,7 +80,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
                 periode = Datoperiode(fom1, tom1)
                 kjørteDager =
                     listOf(
-                        fom1 to 50,
+                        KjørtDag(dato = fom1, parkeringsutgift = 50),
                     )
                 reiseIdProvider = { it.first().reiseId }
             }
@@ -110,7 +111,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
                 periode = Datoperiode(fom, tom)
                 kjørteDager =
                     listOf(
-                        fom to 50,
+                        KjørtDag(dato = fom, parkeringsutgift = 50),
                     )
             }
         }
@@ -141,7 +142,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
                 periode = Datoperiode(fom, tomKjoreliste)
                 kjørteDager =
                     listOf(
-                        fom to 50,
+                        KjørtDag(dato = fom, parkeringsutgift = 50),
                     )
             }
         }
@@ -172,7 +173,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
                 periode = Datoperiode(fom, tomKjoreliste)
                 kjørteDager =
                     listOf(
-                        fom to 50,
+                        KjørtDag(dato = fom, parkeringsutgift = 50),
                     )
             }
         }
@@ -203,7 +204,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
                     periode = Datoperiode(fom, fom.finnNesteSøndag())
                     kjørteDager =
                         listOf(
-                            fom to 50,
+                            KjørtDag(dato = fom, parkeringsutgift = 50),
                         )
                 }
             }

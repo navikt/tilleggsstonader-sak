@@ -14,8 +14,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
-import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
+import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -87,9 +87,9 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
                         periode = Datoperiode(fomRamme1, tomRamme1),
                         dagerKjørt =
                             listOf(
-                                KjørtDag(5 januar 2026, 50),
-                                KjørtDag(12 januar 2026, 50),
-                                KjørtDag(19 januar 2026, 50),
+                                KjørtDag(dato = 5 januar 2026, parkeringsutgift = 50),
+                                KjørtDag(dato = 12 januar 2026, parkeringsutgift = 50),
+                                KjørtDag(dato = 19 januar 2026, parkeringsutgift = 50),
                             ),
                     ),
             )
@@ -120,9 +120,9 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
                         periode = Datoperiode(fomRamme2, tomRamme2),
                         dagerKjørt =
                             listOf(
-                                KjørtDag(12 januar 2026, 50),
-                                KjørtDag(19 januar 2026, 50),
-                                KjørtDag(26 januar 2026, 50),
+                                KjørtDag(dato = 12 januar 2026, parkeringsutgift = 50),
+                                KjørtDag(dato = 19 januar 2026, parkeringsutgift = 50),
+                                KjørtDag(dato = 26 januar 2026, parkeringsutgift = 50),
                             ),
                     ),
             )
@@ -156,7 +156,7 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
                         periode = Datoperiode(fomRamme1, 11 januar 2026),
                         dagerKjørt =
                             listOf(
-                                KjørtDag(5 januar 2026, 50),
+                                KjørtDag(dato = 5 januar 2026, parkeringsutgift = 50),
                             ),
                     ),
             )
@@ -171,8 +171,8 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
                         periode = Datoperiode(12 januar 2026, tomRamme1),
                         dagerKjørt =
                             listOf(
-                                KjørtDag(12 januar 2026, 50),
-                                KjørtDag(19 januar 2026, 50),
+                                KjørtDag(dato = 12 januar 2026, parkeringsutgift = 50),
+                                KjørtDag(dato = 19 januar 2026, parkeringsutgift = 50),
                             ),
                     ),
             )
