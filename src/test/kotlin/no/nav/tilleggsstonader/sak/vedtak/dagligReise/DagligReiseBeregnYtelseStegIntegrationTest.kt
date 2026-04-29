@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
-import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
 import org.assertj.core.api.Assertions.assertThat
@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired
 
 class DagligReiseBeregnYtelseStegIntegrationTest(
     @Autowired private val vedtakService: VedtakService,
-    @Autowired private val iverksettService: IverksettService,
+    @Autowired private val tilkjentYtelseService: TilkjentYtelseService,
 ) : IntegrationTest() {
     @Test
     fun `skal kunne opphøre`() {
@@ -44,8 +44,12 @@ class DagligReiseBeregnYtelseStegIntegrationTest(
                 .grunnlag.tom,
         ).isEqualTo(14 mars 2025)
 
-        val andelerFørstegangsbehandling = iverksettService.hentAndelTilkjentYtelse(førstegangsbehandlingContext.behandlingId)
-        val andelerOpphør = iverksettService.hentAndelTilkjentYtelse(revurderingId)
+        val andelerFørstegangsbehandling =
+            tilkjentYtelseService
+                .hentForBehandling(
+                    førstegangsbehandlingContext.behandlingId,
+                ).andelerTilkjentYtelse
+        val andelerOpphør = tilkjentYtelseService.hentForBehandling(revurderingId).andelerTilkjentYtelse
 
         assertThat(andelerOpphør.size).isNotEqualTo(andelerFørstegangsbehandling.size)
         assertThat(andelerOpphør.maxByOrNull { it.tom }!!.tom).isBeforeOrEqualTo(14 mars 2025)
