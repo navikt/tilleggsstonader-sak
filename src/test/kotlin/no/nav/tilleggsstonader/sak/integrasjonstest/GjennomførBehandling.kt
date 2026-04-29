@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
@@ -126,6 +127,7 @@ private fun søknadForStønadstype(
     Stønadstype.DAGLIG_REISE_TSO,
     Stønadstype.DAGLIG_REISE_TSR,
     -> søknadDagligReise(ident = ident)
+
     Stønadstype.REISE_TIL_SAMLING_TSO -> TODO("lage søgnadskjema for reise til samling")
 }
 
@@ -230,6 +232,7 @@ fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
                 årsak = BehandlingÅrsak.SØKNAD,
                 kravMottatt = LocalDate.now(),
                 nyeOpplysningerMetadata = null,
+                behandlingMetode = BehandlingMetode.MANUELL,
             ),
         tilSteg = tilSteg,
         testdataProvider = testdataProvider,

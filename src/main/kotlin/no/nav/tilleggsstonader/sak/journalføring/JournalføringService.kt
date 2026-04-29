@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.behandling.GjenbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.Journalposttype
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandling
@@ -253,6 +254,7 @@ class JournalføringService(
                     fagsakId = fagsak.id,
                     behandlingsårsak = behandlingÅrsak,
                     kravMottatt = journalpost.datoMottatt?.toLocalDate(),
+                    behandlingMetode = BehandlingMetode.MANUELL,
                     oppgaveMetadata =
                         OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                             tilordneSaksbehandler = null, // Behandle sak oppgaven skal være ufordelt

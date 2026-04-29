@@ -24,6 +24,8 @@ data class Behandling(
     // @Version ?
     val versjon: Int = 0,
     val type: BehandlingType,
+    @Column("behandling_metode")
+    val behandlingMetode: BehandlingMetode,
     val status: BehandlingStatus,
     val steg: StegType,
     val kategori: BehandlingKategori,
@@ -107,6 +109,12 @@ enum class BehandlingResultat(
     AVSLÅTT(displayName = "Avslått"),
     IKKE_SATT(displayName = "Ikke satt"),
     HENLAGT(displayName = "Henlagt"),
+}
+
+enum class BehandlingMetode {
+    MANUELL,
+    AUTOMATISK,
+    BATCH,
 }
 
 enum class BehandlingStatus {

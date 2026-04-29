@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.SakYtelseDvh
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -16,7 +17,6 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
-import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -484,6 +484,7 @@ class BehandlingsstatistikkMappingTest {
         eksternId = eksternId,
         forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
         type = type,
+        behandlingMetode = BehandlingMetode.MANUELL,
         status = status,
         steg = StegType.INNGANGSVILKÅR,
         kategori = kategori,

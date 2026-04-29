@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.behandling.dto
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -31,6 +32,7 @@ data class BehandlingDto(
     val opprettet: LocalDateTime,
     val opprettetAv: String,
     val behandlingsårsak: BehandlingÅrsak,
+    val behandlingMetode: BehandlingMetode,
     val stønadstype: Stønadstype,
     val vedtaksdato: LocalDateTime?,
     val henlagtÅrsak: HenlagtÅrsak?,
@@ -54,6 +56,7 @@ fun Saksbehandling.tilDto(tilordnetSaksbehandler: TilordnetSaksbehandlerDto): Be
         opprettet = this.opprettetTid,
         opprettetAv = this.opprettetAv,
         behandlingsårsak = this.årsak,
+        behandlingMetode = this.behandlingMetode,
         henlagtÅrsak = this.henlagtÅrsak,
         henlagtBegrunnelse = this.henlagtBegrunnelse,
         stønadstype = stønadstype,
