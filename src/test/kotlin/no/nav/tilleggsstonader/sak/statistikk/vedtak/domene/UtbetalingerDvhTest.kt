@@ -163,4 +163,20 @@ class UtbetalingerDvhTest {
 
         assertThat(resultat).isEqualTo(forventetResultat)
     }
+
+    // Se kommentar i UtbetalingerDvh.fraDomene
+    @Test
+    fun `gyldige andeler med beløp 0 blir fjernet`() {
+        val innvilgelse = LæremidlerTestUtil.innvilgelse()
+        val andlelerTilkjentYtelse = listOf(andelTilkjentYtelse(fom = 1 januar 2024, beløp = 0))
+
+        val resultat = UtbetalingerDvh.fraDomene(andlelerTilkjentYtelse, innvilgelse)
+
+        val forventetResultat =
+            UtbetalingerDvh.JsonWrapper(
+                utbetalinger = emptyList(),
+            )
+
+        assertThat(resultat).isEqualTo(forventetResultat)
+    }
 }
