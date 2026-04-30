@@ -48,7 +48,7 @@ class BehandleMottattKjørelisteService(
 
         val avklarteUker = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandling.id)
         val harAvvik = avklarteUker.finnesUkerMedAvvik()
-        val skalOppretteAutomatiskTask = harAvvik && unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE)
+        val skalOppretteAutomatiskTask = !harAvvik && unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE)
         val ønsketBehandlingMetode =
             if (skalOppretteAutomatiskTask) BehandlingMetode.AUTOMATISK else BehandlingMetode.MANUELL
 
@@ -59,7 +59,7 @@ class BehandleMottattKjørelisteService(
 
         if (skalOppretteAutomatiskTask) {
             logger.info(
-                "Avvik funnet for behandling=${behandling.id} og toggle er aktiv. Oppretter task for automatisk kjørelistebehandling",
+                "Ingen avvik funnet for behandling=${behandling.id} og toggle er aktiv. Oppretter task for automatisk kjørelistebehandling",
             )
             taskService.save(AutomatiskKjørelisteBehandlingTask.opprettTask(behandling.id))
         } else if (gjenbrukBehandling == null) {
