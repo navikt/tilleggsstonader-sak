@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.privatbil
 
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.GjenbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
@@ -14,6 +15,7 @@ import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingOppga
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.finnesUkerMedAvvik
@@ -30,6 +32,7 @@ class BehandleMottattKjørelisteService(
     private val gjenbrukDataRevurderingService: GjenbrukDataRevurderingService,
     private val avklartKjørelisteService: AvklartKjørelisteService,
     private val taskService: TaskService,
+    private val unleashService: UnleashService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -45,28 +48,32 @@ class BehandleMottattKjørelisteService(
 
         val avklarteUker = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandling.id)
         val harAvvik = avklarteUker.finnesUkerMedAvvik()
+        val skalOppretteAutomatiskTask = harAvvik && unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE)
+        val ønsketBehandlingMetode =
+            if (skalOppretteAutomatiskTask) BehandlingMetode.AUTOMATISK else BehandlingMetode.MANUELL
 
-        if (gjenbrukBehandling == null && !harAvvik && behandling.behandlingMetode != BehandlingMetode.AUTOMATISK) {
-            behandling = behandling.copy(behandlingMetode = BehandlingMetode.AUTOMATISK)
+        if (behandling.behandlingMetode != ønsketBehandlingMetode) {
+            behandling = behandling.copy(behandlingMetode = ønsketBehandlingMetode)
             behandlingRepository.update(behandling)
         }
 
-        if (harAvvik) {
-            // Gjenbrukt behandling har allerede en oppgave-task fra da den ble opprettet
-            if (gjenbrukBehandling == null) {
-                taskService.save(
-                    OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
-                        OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
-                            behandlingId = behandling.id,
-                            beskrivelse = "Skal behandles i TS-Sak",
-                            prioritet = OppgavePrioritet.NORM,
-                        ),
-                    ),
-                )
-            }
-        } else {
-            logger.info("Ingen avvik funnet for behandling=${behandling.id}. Oppretter task for automatisk kjørelistebehandling")
+        if (skalOppretteAutomatiskTask) {
+            logger.info(
+                "Avvik funnet for behandling=${behandling.id} og toggle er aktiv. Oppretter task for automatisk kjørelistebehandling",
+            )
             taskService.save(AutomatiskKjørelisteBehandlingTask.opprettTask(behandling.id))
+        } else if (gjenbrukBehandling == null) {
+            // Gjenbrukt behandling har allerede en oppgave-task fra da den ble opprettet.
+            logger.info("Oppretter manuell behandling for behandling=${behandling.id}")
+            taskService.save(
+                OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
+                    OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
+                        behandlingId = behandling.id,
+                        beskrivelse = "Skal behandles i TS-Sak",
+                        prioritet = OppgavePrioritet.NORM,
+                    ),
+                ),
+            )
         }
     }
 

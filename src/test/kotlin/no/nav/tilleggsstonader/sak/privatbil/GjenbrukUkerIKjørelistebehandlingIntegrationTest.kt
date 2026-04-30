@@ -41,6 +41,7 @@ class GjenbrukUkerIKjørelistebehandlingIntegrationTest : IntegrationTest() {
             )
 
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
+        every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns false
 
         val førstegangsBehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
@@ -154,7 +155,8 @@ class GjenbrukUkerIKjørelistebehandlingIntegrationTest : IntegrationTest() {
         )
         kall.behandling.nullstill(andreKjørelistebehandling.id)
 
-        val reisevurderingEtterNullstilling = kall.privatBil.hentReisevurderingForBehandling(andreKjørelistebehandling.id).single()
+        val reisevurderingEtterNullstilling =
+            kall.privatBil.hentReisevurderingForBehandling(andreKjørelistebehandling.id).single()
         assertThat(reisevurderingEtterNullstilling.uker).hasSameSizeAs(reisevurderingForAndreKjørelistebehandling.uker)
 
         reisevurderingForAndreKjørelistebehandling.uker

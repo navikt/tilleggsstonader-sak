@@ -43,8 +43,10 @@ class BehandleMottattKjørelisteTest : CleanDatabaseIntegrationTest() {
     val tom: LocalDate = 31 januar 2026
 
     @Test
-    fun `ta i mot kjøreliste uten avvik og ferdigstill behandling automatisk uten oppgave`() {
+    fun `ta i mot kjøreliste uten avvik og opprett manuell behandling`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
+        every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns true
+
         val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
@@ -67,15 +69,14 @@ class BehandleMottattKjørelisteTest : CleanDatabaseIntegrationTest() {
 
         assertThat(kjørelistebehandling).isNotNull()
         assertThat(kjørelistebehandling.forrigeIverksatteBehandlingId).isEqualTo(behandling.id)
-        assertThat(kjørelistebehandling.steg).isIn(
-            StegType.FULLFØR_KJØRELISTE,
-            StegType.FERDIGSTILLE_BEHANDLING,
-            StegType.BEHANDLING_FERDIGSTILT,
-        )
+        assertThat(kjørelistebehandling.steg).isEqualTo(StegType.KJØRELISTE)
         assertThat(kjørelistebehandling.type).isEqualTo(BehandlingType.KJØRELISTE)
         assertThat(kjørelistebehandling.årsak).isEqualTo(BehandlingÅrsak.KJØRELISTE)
-        assertThat(kjørelistebehandling.behandlingMetode).isEqualTo(BehandlingMetode.AUTOMATISK)
-        assertThat(oppgaveService.finnAlleOppgaveDomainForBehandling(kjørelistebehandling.id)).isEmpty()
+        assertThat(kjørelistebehandling.behandlingMetode).isEqualTo(BehandlingMetode.MANUELL)
+
+        val kjørelisteoppgaver = oppgaveService.finnAlleOppgaveDomainForBehandling(kjørelistebehandling.id)
+        assertThat(kjørelisteoppgaver).hasSize(1)
+        assertThat(kjørelisteoppgaver.single().status).isEqualTo(Oppgavestatus.ÅPEN)
 
         val vedtakForrigeBehandling = vedtakService.hentInnvilgelseEllerOpphørVedtak(behandlingContext.behandlingId)
         val vedtakKjørelistebehandling = vedtakService.hentInnvilgelseEllerOpphørVedtak(kjørelistebehandling.id)
@@ -99,6 +100,7 @@ class BehandleMottattKjørelisteTest : CleanDatabaseIntegrationTest() {
     @Test
     fun `ta i mot kjøreliste med parkeringsutgift 101 kroner og krev manuell behandling`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
+        every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns false
         val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
@@ -122,6 +124,7 @@ class BehandleMottattKjørelisteTest : CleanDatabaseIntegrationTest() {
         assertThat(kjørelistebehandling.steg).isEqualTo(StegType.KJØRELISTE)
         assertThat(kjørelistebehandling.type).isEqualTo(BehandlingType.KJØRELISTE)
         assertThat(kjørelistebehandling.årsak).isEqualTo(BehandlingÅrsak.KJØRELISTE)
+        assertThat(kjørelistebehandling.behandlingMetode).isEqualTo(BehandlingMetode.MANUELL)
 
         val kjørelisteoppgaver = oppgaveService.finnAlleOppgaveDomainForBehandling(kjørelistebehandling.id)
         assertThat(kjørelisteoppgaver).hasSize(1)

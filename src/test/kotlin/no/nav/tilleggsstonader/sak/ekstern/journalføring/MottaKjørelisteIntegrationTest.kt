@@ -37,6 +37,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
     @Test
     fun `daglig-reise tso sak med innvilget rammevedtak, mottar kjøreliste, verifiser blir journalført og lagret`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
+        every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns false
 
         val fom = 1 januar 2026
         val tom = 14 januar 2026
@@ -90,6 +91,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
     @Test
     fun `skal kun opprettes en kjørelistebehandling om det kommer inn to kjørelister etter hverandre`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
+        every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns false
 
         val fom = 2 mars 2026
         val tom = 15 mars 2026
@@ -146,6 +148,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
     @Test
     fun `skal opprette to kjørelistebehandlinger om den første ikke er ferdigstilt men er påbegynt`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
+        every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns false
 
         val fom = 2 mars 2026
         val tom = 15 mars 2026
@@ -195,6 +198,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
     @Test
     fun `skal opprette ny kjørelistebehandling når første er manuelt endret og ikke lenger tilordnet`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
+        every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns false
 
         val fom = 2 mars 2026
         val tom = 15 mars 2026
