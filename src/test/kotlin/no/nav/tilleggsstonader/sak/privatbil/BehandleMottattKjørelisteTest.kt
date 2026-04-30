@@ -12,9 +12,9 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
-import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
+import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseVedtakService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -109,8 +109,8 @@ class BehandleMottattKjørelisteTest : CleanDatabaseIntegrationTest() {
                     periode = Datoperiode(fom, 2 januar 2026)
                     kjørteDager =
                         listOf(
-                            1 januar 2026 to 101,
-                            2 januar 2026 to 50,
+                            KjørtDag(dato = 1 januar 2026, parkeringsutgift = 101),
+                            KjørtDag(dato = 2 januar 2026, parkeringsutgift = 50),
                         )
                 }
             }

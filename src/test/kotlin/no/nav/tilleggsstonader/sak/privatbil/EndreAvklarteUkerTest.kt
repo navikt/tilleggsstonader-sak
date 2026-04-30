@@ -211,11 +211,11 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
     private fun opprettBehandlingOgSendInnKjøreliste(dagerKjørt: List<KjørtDag>): Saksbehandling {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
-        val dagerKjørtMedAvvik =
-            if (dagerKjørt.any { it.second > 100 || it.first.datoErHelg() }) {
+        val dagerKjørtMedAvvik: List<KjørtDag> =
+            if (dagerKjørt.any { it.parkeringsutgift!! > 100 || it.dato.datoErHelg() }) {
                 dagerKjørt
             } else {
-                dagerKjørt + (10 januar 2026 to 50)
+                dagerKjørt + listOf(KjørtDag(dato = 10 januar 2026, parkeringsutgift = 50))
             }
 
         val rammebehandlingContext =

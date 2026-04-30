@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomf�
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagRequest
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
-import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import org.assertj.core.api.Assertions.assertThat
