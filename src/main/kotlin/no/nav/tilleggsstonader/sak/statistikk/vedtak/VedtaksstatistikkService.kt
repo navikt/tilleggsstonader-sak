@@ -50,7 +50,9 @@ class VedtaksstatistikkService(
             behandling.vedtakstidspunkt
                 ?: throw IllegalStateException("Behandlingen må ha et vedtakstidspunkt for å sende vedtaksstatistikk")
         val søkerIdent = behandlingService.hentAktivIdent(behandlingId)
-        val andelTilkjentYtelse = tilkjentYtelseService.hentForBehandling(behandlingId).andelerTilkjentYtelse
+        val andelTilkjentYtelse =
+            tilkjentYtelseService.hentForBehandlingEllerNull(behandlingId)?.andelerTilkjentYtelse
+                ?: emptySet()
         val barn = barnRepository.findByBehandlingId(behandlingId)
 
         return VedtaksstatistikkV2(
