@@ -7,7 +7,9 @@ import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningDto
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningType
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.spring.cache.getValue
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.felles.domain.gjelderBarn
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPerson
@@ -23,8 +25,10 @@ class ArbeidsfordelingService(
     @Qualifier("shortCache")
     private val cacheManager: CacheManager,
     private val arbeidsfordelingClient: ArbeidsfordelingClient,
+    private val oppfolgingsenhetClient: OppfolgingsenhetClient,
     private val personService: PersonService,
     private val egenAnsattService: EgenAnsattService,
+    private val unleashService: UnleashService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -84,6 +88,11 @@ class ArbeidsfordelingService(
         personIdent: String,
         stønadstype: Stønadstype,
     ): String {
+        if (unleashService.isEnabled(Toggle.BRUK_OPPFOLGINGSENHET_FOR_UTBETALING)) {
+            return oppfolgingsenhetClient.hentOppfølgingsenhet(personIdent)
+                ?: error("Finner ikke oppfølgingsenhet for person")
+        }
+
         val adressebeskyttelseForPerson = hentAdressebeskyttelse(personIdent, stønadstype)
         // TODO - OK med default til Oslo her og?
         val geografiskTilknytning =

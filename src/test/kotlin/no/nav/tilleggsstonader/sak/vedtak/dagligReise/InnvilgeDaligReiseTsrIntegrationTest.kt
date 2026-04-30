@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -116,10 +117,12 @@ class InnvilgeDaligReiseTsrIntegrationTest : IntegrationTest() {
                         årsak = BehandlingÅrsak.SØKNAD,
                         nyeOpplysningerMetadata = null,
                         kravMottatt = fom,
+                        behandlingMetode = BehandlingMetode.MANUELL,
                     ),
             )
 
-        val vilkårsperioderFørstegangsbehandling = vilkårperiodeService.hentVilkårperioder(førstegangsbehandlingContext.behandlingId)
+        val vilkårsperioderFørstegangsbehandling =
+            vilkårperiodeService.hentVilkårperioder(førstegangsbehandlingContext.behandlingId)
         val vilkårsperioderRevurdering = vilkårperiodeService.hentVilkårperioder(revurderingId)
         validerErInngangsvilkårLike(
             vilkårsperioderFørstegangsbehandling = vilkårsperioderFørstegangsbehandling,

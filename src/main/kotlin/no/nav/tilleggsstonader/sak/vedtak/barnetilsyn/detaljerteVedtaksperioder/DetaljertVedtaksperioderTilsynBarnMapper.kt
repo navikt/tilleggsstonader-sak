@@ -8,7 +8,7 @@ object DetaljertVedtaksperioderTilsynBarnMapper {
         val vedtaksperioderFraBeregningsresultat =
             finnVedtaksperioderFraBeregningsresultatTilsynBarn(this.beregningsresultat)
 
-        return vedtaksperioderFraBeregningsresultat.sorterOgMergeSammenhengende()
+        return vedtaksperioderFraBeregningsresultat.sorterOgMergeSammenhengende().sortedByDescending { it.fom }
     }
 
     private fun finnVedtaksperioderFraBeregningsresultatTilsynBarn(beregningsresultatTilsynBarn: BeregningsresultatTilsynBarn) =

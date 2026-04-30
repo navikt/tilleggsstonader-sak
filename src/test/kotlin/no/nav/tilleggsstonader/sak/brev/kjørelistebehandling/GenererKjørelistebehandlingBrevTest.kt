@@ -17,7 +17,9 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehand
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.interntVedtak.HtmlifyClient
 import no.nav.tilleggsstonader.sak.util.FileUtil
+import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseVedtakService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.finnSatserBruktIBeregning
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.oppsummerBeregningPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import org.junit.jupiter.api.Test
@@ -51,17 +53,20 @@ class GenererKjørelistebehandlingBrevTest : CleanDatabaseIntegrationTest() {
         val kjørelisteBehandlingId = gjennomførBehandlingsløp()
         val vedtaksdata = dagligReiseVedtakService.hentInnvilgelseEllerOpphørVedtak(kjørelisteBehandlingId).data
 
+        val oppsummertBeregningsresultat =
+            oppsummerBeregningPrivatBil(
+                beregningsresultatPrivatBil = vedtaksdata.beregningsresultat.privatBil!!,
+                rammevedtak = vedtaksdata.rammevedtakPrivatBil!!,
+            )
+
         val req =
             KjørelisteBehandlingBrevRequest(
-                beregning =
-                    oppsummerBeregningPrivatBil(
-                        beregningsresultatPrivatBil = vedtaksdata.beregningsresultat.privatBil!!,
-                        rammevedtak = vedtaksdata.rammevedtakPrivatBil!!,
-                    ),
+                beregning = oppsummertBeregningsresultat,
                 navn = "Navn",
                 ident = "Ident",
                 behandlendeEnhet = "NAV Arbeid og ytelser",
                 behandletDato = LocalDate.now(),
+                satser = oppsummertBeregningsresultat.finnSatserBruktIBeregning(),
             )
 
         val html = lagHtmlifyClient().genererKjørelisteBehandlingBrev(req)
@@ -107,13 +112,13 @@ class GenererKjørelistebehandlingBrevTest : CleanDatabaseIntegrationTest() {
                     periode = Datoperiode(fom, tom)
                     kjørteDager =
                         listOf(
-                            29 desember 2025 to 50,
-                            30 desember 2025 to 50,
-                            2 januar 2026 to 50,
-                            5 januar 2026 to 80,
-                            6 januar 2026 to 80,
-                            12 januar 2026 to 20,
-                            13 januar 2026 to 20,
+                            KjørtDag(dato = 29 desember 2025, parkeringsutgift = 50),
+                            KjørtDag(dato = 30 desember 2025, parkeringsutgift = 50),
+                            KjørtDag(dato = 2 januar 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 5 januar 2026, parkeringsutgift = 80),
+                            KjørtDag(dato = 6 januar 2026, parkeringsutgift = 80),
+                            KjørtDag(dato = 12 januar 2026, parkeringsutgift = 20),
+                            KjørtDag(dato = 13 januar 2026, parkeringsutgift = 20),
                         )
                 }
             }

@@ -23,8 +23,8 @@ import no.nav.tilleggsstonader.sak.hendelser.journalføring.JournalhendelseKafka
 import no.nav.tilleggsstonader.sak.hendelser.journalføring.JournalpostHendelseType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettJournalpost
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
-import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
+import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.util.dokumentInfo
 import no.nav.tilleggsstonader.sak.util.dokumentvariant
 import no.nav.tilleggsstonader.sak.util.journalpost
@@ -61,7 +61,7 @@ class SendInnKjørelisteTestController(
             kjørelisteSkjema(
                 reiseId = sendInnKjøreliste.reiseId.toString(),
                 periode = Datoperiode(sendInnKjøreliste.fom, sendInnKjøreliste.tom),
-                dagerKjørt = sendInnKjøreliste.kjørteDager.map { KjørtDag(it.dato, it.parkeringsutgift) },
+                dagerKjørt = sendInnKjøreliste.kjørteDager.map { KjørtDag(dato = it.dato, parkeringsutgift = it.parkeringsutgift) },
             )
 
         val fagsak = fagsakService.hentFagsakPåEksternId(sendInnKjøreliste.fagsakEksternId)

@@ -113,6 +113,8 @@ spec:
           namespace: helved
         - application: logging
           namespace: nais-system
+        - application: veilarboppfolging
+          namespace: poao
       external:
         - host: pdl-api.dev-fss-pub.nais.io
         - host: tilleggsstonader-arena.dev-fss-pub.nais.io

@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.behandling.opprettelse
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
@@ -16,7 +17,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeld
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.assertFinnesTaskMedType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
-import no.nav.tilleggsstonader.sak.statistikk.behandling.dto.Hendelse
+import no.nav.tilleggsstonader.sak.statistikk.behandling.Hendelse
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -35,6 +36,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
     private lateinit var settPåVentService: SettPåVentService
 
     private val behandlingÅrsak = BehandlingÅrsak.SØKNAD
+    val behandlingMetode = BehandlingMetode.MANUELL
 
     private val opprettBehandlingOppgaveMetadata =
         OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
@@ -56,6 +58,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                         behandlingsårsak = BehandlingÅrsak.PAPIRSØKNAD,
                         kravMottatt = LocalDate.now().plusDays(1),
                         oppgaveMetadata = opprettBehandlingOppgaveMetadata,
+                        behandlingMetode = behandlingMetode,
                     ),
                 )
             }.withMessage("Kan ikke sette krav mottattdato frem i tid")
@@ -73,6 +76,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                     OpprettBehandling(
                         fagsak.id,
                         behandlingsårsak = behandlingÅrsak,
+                        behandlingMetode = behandlingMetode,
                         oppgaveMetadata = opprettBehandlingOppgaveMetadata,
                     ),
                 )
@@ -92,6 +96,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                     OpprettBehandling(
                         fagsak.id,
                         behandlingsårsak = behandlingÅrsak,
+                        behandlingMetode = behandlingMetode,
                         oppgaveMetadata = opprettBehandlingOppgaveMetadata,
                     ),
                 )
@@ -113,13 +118,20 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
             val førstegangsbehandling = testoppsettService.lagre(behandling(fagsak))
             testoppsettService.ferdigstillBehandling(førstegangsbehandling)
 
-            testoppsettService.lagre(behandling(fagsak, BehandlingStatus.SATT_PÅ_VENT, type = BehandlingType.REVURDERING))
+            testoppsettService.lagre(
+                behandling(
+                    fagsak,
+                    BehandlingStatus.SATT_PÅ_VENT,
+                    type = BehandlingType.REVURDERING,
+                ),
+            )
 
             val nyBehandling =
                 opprettBehandlingService.opprettBehandling(
                     OpprettBehandling(
                         fagsak.id,
                         behandlingsårsak = behandlingÅrsak,
+                        behandlingMetode = behandlingMetode,
                         oppgaveMetadata = opprettBehandlingOppgaveMetadata,
                     ),
                 )
@@ -144,6 +156,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                     OpprettBehandling(
                         fagsak.id,
                         behandlingsårsak = behandlingÅrsak,
+                        behandlingMetode = behandlingMetode,
                         oppgaveMetadata = opprettBehandlingOppgaveMetadata,
                     ),
                 )
@@ -174,6 +187,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                 OpprettBehandling(
                     fagsak.id,
                     behandlingsårsak = behandlingÅrsak,
+                    behandlingMetode = behandlingMetode,
                     oppgaveMetadata = opprettBehandlingOppgaveMetadata,
                 ),
             )
@@ -191,6 +205,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
             OpprettBehandling(
                 fagsak.id,
                 behandlingsårsak = behandlingÅrsak,
+                behandlingMetode = behandlingMetode,
                 oppgaveMetadata = OpprettBehandlingOppgaveMetadata.UtenOppgave,
             ),
         )
@@ -210,7 +225,9 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                 .map { it.verdiEllerFeil<BehandlingDVH>() }
                 .sortedBy { it.endretTid }
 
-        assertThat(behandlingsstatistikkRecords.map { it.behandlingUuid }.toSet()).containsExactlyInAnyOrder(behandlingId.toString())
+        assertThat(behandlingsstatistikkRecords.map { it.behandlingUuid }.toSet()).containsExactlyInAnyOrder(
+            behandlingId.toString(),
+        )
         assertThat(behandlingsstatistikkRecords.first().behandlingStatus).isEqualTo(Hendelse.MOTTATT.name)
         assertThat(behandlingsstatistikkRecords.last().behandlingStatus).isEqualTo(Hendelse.VENTER.name)
     }

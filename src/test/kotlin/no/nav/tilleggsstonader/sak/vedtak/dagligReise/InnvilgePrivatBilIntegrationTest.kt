@@ -17,8 +17,8 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomf�
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteRepository
 import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingPrivatBilDto
-import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
+import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
@@ -66,9 +66,9 @@ class InnvilgePrivatBilIntegrationTest : IntegrationTest() {
 
         val dagerKjørt =
             listOf(
-                KjørelisteSkjemaUtil.KjørtDag(1 februar 2026),
-                KjørelisteSkjemaUtil.KjørtDag(9 februar 2026),
-                KjørelisteSkjemaUtil.KjørtDag(22 februar 2026),
+                KjørtDag(dato = 1 februar 2026),
+                KjørtDag(dato = 9 februar 2026),
+                KjørtDag(dato = 22 februar 2026),
             )
         val kjøreliste =
             kjørelisteSkjema(

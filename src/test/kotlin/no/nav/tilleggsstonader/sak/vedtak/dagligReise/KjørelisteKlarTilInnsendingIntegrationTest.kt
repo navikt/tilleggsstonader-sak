@@ -12,8 +12,8 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeld
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteRepository
-import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
+import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -52,9 +52,9 @@ class KjørelisteKlarTilInnsendingIntegrationTest : IntegrationTest() {
 
         val dagerKjørt =
             listOf(
-                KjørelisteSkjemaUtil.KjørtDag(dagensDato.minusWeeks(2)),
-                KjørelisteSkjemaUtil.KjørtDag(dagensDato.minusWeeks(1)),
-                KjørelisteSkjemaUtil.KjørtDag(dagensDato.minusDays(2)),
+                KjørtDag(dato = dagensDato.minusWeeks(2)),
+                KjørtDag(dato = dagensDato.minusWeeks(1)),
+                KjørtDag(dato = dagensDato.minusDays(2)),
             )
         val kjøreliste =
             kjørelisteSkjema(

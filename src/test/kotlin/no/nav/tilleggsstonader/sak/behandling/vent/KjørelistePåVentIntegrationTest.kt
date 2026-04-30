@@ -14,8 +14,8 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBeha
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
-import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
+import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -54,7 +54,7 @@ class KjørelistePåVentIntegrationTest : IntegrationTest() {
                     periode = Datoperiode(fomUke1, tomUke1)
                     kjørteDager =
                         listOf(
-                            5 januar 2026 to 50,
+                            KjørtDag(dato = 5 januar 2026, parkeringsutgift = 50),
                         )
                 }
             }
@@ -87,7 +87,7 @@ class KjørelistePåVentIntegrationTest : IntegrationTest() {
                 periode = Datoperiode(fomUke2, tomUke2),
                 dagerKjørt =
                     listOf(
-                        KjørtDag(12 januar 2026, 50),
+                        KjørtDag(dato = 12 januar 2026, parkeringsutgift = 50),
                     ),
             ),
             ident = brukerident,

@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandling
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingOppgaveMetadata
@@ -57,6 +58,7 @@ class AdminOpprettBehandlingService(
                     fagsakId = fagsak.id,
                     behandlingsårsak = behandlingsårsak,
                     kravMottatt = kravMottatt,
+                    behandlingMetode = BehandlingMetode.MANUELL,
                     oppgaveMetadata =
                         OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                             tilordneSaksbehandler = SikkerhetContext.hentSaksbehandler(),

@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.statistikk.behandling.dto
+package no.nav.tilleggsstonader.sak.statistikk.behandling
 
 enum class Hendelse {
     MOTTATT,
@@ -9,10 +9,4 @@ enum class Hendelse {
     UNDERKJENT_BESLUTTER,
     BESLUTTET,
     FERDIG,
-}
-
-enum class BehandlingMetode {
-    MANUELL,
-    AUTOMATISK,
-    BATCH,
 }

@@ -81,9 +81,9 @@ class PrivatBilBeregningsresultatServiceTest {
                 // Mandag til søndag
                 kjørteDager =
                     listOf(
-                        KjørelisteUtil.KjørtDag(2 februar 2026, 50),
-                        KjørelisteUtil.KjørtDag(3 februar 2026, 120),
-                        KjørelisteUtil.KjørtDag(4 februar 2026, 3),
+                        KjørelisteUtil.KjørtDag(dato = 2 februar 2026, parkeringsutgift = 50),
+                        KjørelisteUtil.KjørtDag(dato = 3 februar 2026, parkeringsutgift = 120),
+                        KjørelisteUtil.KjørtDag(dato = 4 februar 2026, parkeringsutgift = 3),
                     ),
             )
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)
@@ -167,8 +167,8 @@ class PrivatBilBeregningsresultatServiceTest {
                 // Mandag til søndag
                 kjørteDager =
                     listOf(
-                        KjørelisteUtil.KjørtDag(2 februar 2026),
-                        KjørelisteUtil.KjørtDag(3 februar 2026),
+                        KjørelisteUtil.KjørtDag(dato = 2 februar 2026),
+                        KjørelisteUtil.KjørtDag(dato = 3 februar 2026),
                     ),
             )
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)
@@ -250,8 +250,8 @@ class PrivatBilBeregningsresultatServiceTest {
                 // Mandag til søndag
                 kjørteDager =
                     listOf(
-                        KjørelisteUtil.KjørtDag(30 desember 2025),
-                        KjørelisteUtil.KjørtDag(2 januar 2026),
+                        KjørelisteUtil.KjørtDag(dato = 30 desember 2025),
+                        KjørelisteUtil.KjørtDag(dato = 2 januar 2026),
                     ),
             )
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)
@@ -327,7 +327,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 // Mandag til søndag
                 kjørteDager =
                     listOf(
-                        KjørelisteUtil.KjørtDag(fomRammevedtak),
+                        KjørelisteUtil.KjørtDag(dato = fomRammevedtak),
                     ),
             )
 
@@ -342,7 +342,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 // Mandag til søndag
                 kjørteDager =
                     listOf(
-                        KjørelisteUtil.KjørtDag(tomRammevedtak),
+                        KjørelisteUtil.KjørtDag(dato = tomRammevedtak),
                     ),
             )
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste1) + avklarUkerFraKjøreliste(kjøreliste2)
@@ -454,7 +454,7 @@ class PrivatBilBeregningsresultatServiceTest {
                     // Mandag til søndag
                     kjørteDager =
                         listOf(
-                            KjørelisteUtil.KjørtDag(fomRammevedtak),
+                            KjørelisteUtil.KjørtDag(dato = fomRammevedtak),
                         ),
                 )
             }
@@ -532,7 +532,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 // Mandag til søndag
                 kjørteDager =
                     listOf(
-                        KjørelisteUtil.KjørtDag(fomRammevedtak.plusDays(7)),
+                        KjørelisteUtil.KjørtDag(dato = fomRammevedtak.plusDays(7)),
                     ),
             )
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)
@@ -588,7 +588,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 // Mandag til søndag
                 kjørteDager =
                     listOf(
-                        KjørelisteUtil.KjørtDag(fomRammevedtak),
+                        KjørelisteUtil.KjørtDag(dato = fomRammevedtak),
                     ),
             )
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)

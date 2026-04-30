@@ -14,8 +14,8 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomf�
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagRequest
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
-import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
+import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -52,8 +52,8 @@ class GjenbrukUkerIKjørelistebehandlingIntegrationTest : IntegrationTest() {
                     periode = Datoperiode(førsteUkeFom, førsteUkeTom)
                     kjørteDager =
                         listOf(
-                            5 januar 2026 to 50,
-                            6 januar 2026 to 50,
+                            KjørtDag(dato = 5 januar 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 6 januar 2026, parkeringsutgift = 50),
                         )
                 }
             }
@@ -86,9 +86,9 @@ class GjenbrukUkerIKjørelistebehandlingIntegrationTest : IntegrationTest() {
                     periode = Datoperiode(andreUkeFom, tredjeUkeTom),
                     dagerKjørt =
                         listOf(
-                            KjørtDag(12 januar 2026, 50),
-                            KjørtDag(13 januar 2026, 50),
-                            KjørtDag(20 januar 2026, 50),
+                            KjørtDag(dato = 12 januar 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 13 januar 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 20 januar 2026, parkeringsutgift = 50),
                         ),
                 ),
             ident = førstegangsBehandlingContext.ident,

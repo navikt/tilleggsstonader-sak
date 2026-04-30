@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.GjenbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
@@ -114,7 +115,7 @@ class JournalføringServiceTest {
             versjon = 1,
             tildeltEnhetsnr = Enhet.NAV_TILTAK_OSLO.enhetsnr,
         )
-
+    val behandlingMetode = BehandlingMetode.MANUELL
     val nyAvsenderSlot = slot<AvsenderMottaker?>()
 
     @BeforeEach
@@ -172,6 +173,7 @@ class JournalføringServiceTest {
                 OpprettBehandling(
                     fagsakId = fagsak.id,
                     behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                    behandlingMetode = behandlingMetode,
                     oppgaveMetadata =
                         OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                             tilordneSaksbehandler = null,
@@ -196,6 +198,7 @@ class JournalføringServiceTest {
                 OpprettBehandling(
                     fagsakId = fagsak.id,
                     behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                    behandlingMetode = behandlingMetode,
                     oppgaveMetadata =
                         OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                             tilordneSaksbehandler = null,
@@ -431,6 +434,7 @@ class JournalføringServiceTest {
                     OpprettBehandling(
                         fagsakId = fagsak.id,
                         behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                        behandlingMetode = behandlingMetode,
                         oppgaveMetadata =
                             OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                                 tilordneSaksbehandler = null,
@@ -455,6 +459,7 @@ class JournalføringServiceTest {
                     OpprettBehandling(
                         fagsakId = fagsak.id,
                         behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                        behandlingMetode = behandlingMetode,
                         oppgaveMetadata =
                             OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                                 tilordneSaksbehandler = null,

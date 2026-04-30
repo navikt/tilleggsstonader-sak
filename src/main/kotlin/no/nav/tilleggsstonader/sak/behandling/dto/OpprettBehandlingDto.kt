@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.dto
 
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndring
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerKilde
@@ -14,6 +15,7 @@ data class OpprettBehandlingDto(
     val nyeOpplysningerMetadata: NyeOpplysningerMetadataDto?,
     val valgteBarn: Set<String> = emptySet(),
     val kravMottatt: LocalDate?,
+    val behandlingMetode: BehandlingMetode,
 ) {
     fun tilDomene() =
         OpprettRevurdering(
@@ -23,6 +25,7 @@ data class OpprettBehandlingDto(
             valgteBarn = valgteBarn,
             kravMottatt = kravMottatt,
             skalOppretteOppgave = true,
+            behandlingMetode = behandlingMetode,
         )
 }
 

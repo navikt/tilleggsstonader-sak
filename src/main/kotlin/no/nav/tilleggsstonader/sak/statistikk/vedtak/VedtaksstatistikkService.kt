@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AdressebeskyttelseDvh
@@ -16,7 +15,7 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtakResultatDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
-import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
@@ -28,14 +27,21 @@ class VedtaksstatistikkService(
     private val vedtaksstatistikkRepositoryV2: VedtaksstatistikkRepositoryV2,
     private val behandlingService: BehandlingService,
     private val personService: PersonService,
-    private val iverksettService: IverksettService,
     private val vedtakService: VedtakService,
     private val barnRepository: BarnRepository,
+    private val tilkjentYtelseService: TilkjentYtelseService,
 ) {
-    fun lagreVedtaksstatistikkV2(
-        behandlingId: BehandlingId,
-        fagsakId: FagsakId,
-    ) {
+    fun lagreVedtaksstatistikkV2(behandlingId: BehandlingId) {
+        val vedtaksstatistikkV2 = mapTilVedtaksstatistikkV2(behandlingId)
+        vedtaksstatistikkRepositoryV2.insert(vedtaksstatistikkV2)
+    }
+
+    fun oppdaterVedtaksstatistikkV2(behandlingId: BehandlingId) {
+        val vedtaksstatistikkV2 = mapTilVedtaksstatistikkV2(behandlingId)
+        vedtaksstatistikkRepositoryV2.update(vedtaksstatistikkV2)
+    }
+
+    private fun mapTilVedtaksstatistikkV2(behandlingId: BehandlingId): VedtaksstatistikkV2 {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val vedtak =
             vedtakService.hentVedtak(behandlingId)
@@ -44,28 +50,26 @@ class VedtaksstatistikkService(
             behandling.vedtakstidspunkt
                 ?: throw IllegalStateException("Behandlingen må ha et vedtakstidspunkt for å sende vedtaksstatistikk")
         val søkerIdent = behandlingService.hentAktivIdent(behandlingId)
-        val andelTilkjentYtelse = iverksettService.hentAndelTilkjentYtelse(behandlingId)
+        val andelTilkjentYtelse = tilkjentYtelseService.hentForBehandling(behandlingId).andelerTilkjentYtelse
         val barn = barnRepository.findByBehandlingId(behandlingId)
 
-        vedtaksstatistikkRepositoryV2.insert(
-            VedtaksstatistikkV2(
-                fagsakId = fagsakId,
-                stønadstype = StønadstypeDvh.fraDomene(behandling.stønadstype),
-                behandlingId = behandlingId,
-                eksternFagsakId = behandling.eksternFagsakId,
-                eksternBehandlingId = behandling.eksternId,
-                relatertBehandlingId = hentRelatertBehandlingId(behandling),
-                adressebeskyttelse = hentAdressebeskyttelse(søkerIdent),
-                tidspunktVedtak = vedtakstidspunkt,
-                søkerIdent = søkerIdent,
-                behandlingType = BehandlingTypeDvh.fraDomene(behandling.type),
-                behandlingÅrsak = BehandlingÅrsakDvh.fraDomene(behandling.årsak),
-                vedtakResultat = VedtakResultatDvh.fraDomene(behandling.resultat),
-                vedtaksperioder = VedtaksperioderDvh.fraDomene(vedtak, barn),
-                utbetalinger = UtbetalingerDvh.fraDomene(andelTilkjentYtelse, vedtak),
-                årsakerAvslag = ÅrsakAvslagDvh.fraDomene(vedtak.takeIfType<Avslag>()?.data?.årsaker),
-                årsakerOpphør = ÅrsakOpphørDvh.fraDomene(vedtak.takeIfType<Opphør>()?.data?.årsaker),
-            ),
+        return VedtaksstatistikkV2(
+            fagsakId = behandling.fagsakId,
+            stønadstype = StønadstypeDvh.fraDomene(behandling.stønadstype),
+            behandlingId = behandlingId,
+            eksternFagsakId = behandling.eksternFagsakId,
+            eksternBehandlingId = behandling.eksternId,
+            relatertBehandlingId = hentRelatertBehandlingId(behandling),
+            adressebeskyttelse = hentAdressebeskyttelse(søkerIdent),
+            tidspunktVedtak = vedtakstidspunkt,
+            søkerIdent = søkerIdent,
+            behandlingType = BehandlingTypeDvh.fraDomene(behandling.type),
+            behandlingÅrsak = BehandlingÅrsakDvh.fraDomene(behandling.årsak),
+            vedtakResultat = VedtakResultatDvh.fraDomene(behandling.resultat),
+            vedtaksperioder = VedtaksperioderDvh.fraDomene(vedtak, barn),
+            utbetalinger = UtbetalingerDvh.fraDomene(andelTilkjentYtelse, vedtak),
+            årsakerAvslag = ÅrsakAvslagDvh.fraDomene(vedtak.takeIfType<Avslag>()?.data?.årsaker),
+            årsakerOpphør = ÅrsakOpphørDvh.fraDomene(vedtak.takeIfType<Opphør>()?.data?.årsaker),
         )
     }
 

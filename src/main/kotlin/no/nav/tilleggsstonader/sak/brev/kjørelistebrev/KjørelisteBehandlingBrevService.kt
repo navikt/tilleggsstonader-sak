@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.interntVedtak.HtmlifyClient
 import no.nav.tilleggsstonader.sak.journalføring.FamilieDokumentClient
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.finnSatserBruktIBeregning
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.oppsummerBeregningPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import org.springframework.stereotype.Service
@@ -56,6 +57,7 @@ class KjørelisteBehandlingBrevService(
 
         val saksbehandlersignatur = SikkerhetContext.hentSaksbehandlerNavn(strict = true)
 
+        val oppsummertBeregning = oppsummerBeregningPrivatBil(beregningsresultatPrivatBil, rammevedtak)
         val request =
             KjørelisteBehandlingBrevRequest(
                 navn = personService.hentVisningsnavnForPerson(saksbehandling.ident),
@@ -63,7 +65,8 @@ class KjørelisteBehandlingBrevService(
                 behandletDato = LocalDate.now(),
                 saksbehandlerSignatur = saksbehandlersignatur,
                 behandlendeEnhet = utledBehandlendeEnhet(saksbehandling.stønadstype),
-                beregning = oppsummerBeregningPrivatBil(beregningsresultatPrivatBil, rammevedtak),
+                beregning = oppsummertBeregning,
+                satser = oppsummertBeregning.finnSatserBruktIBeregning(),
             )
 
         return htmlifyClient.genererKjørelisteBehandlingBrev(request)

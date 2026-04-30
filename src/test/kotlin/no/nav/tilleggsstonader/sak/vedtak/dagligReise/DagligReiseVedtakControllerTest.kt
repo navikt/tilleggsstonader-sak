@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWith
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -234,13 +235,13 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
 
         val innsendteKjørteDager =
             listOf(
-                29 desember 2025 to 50,
-                1 januar 2026 to 100,
-                5 januar 2026 to null,
-                6 januar 2026 to null,
-                12 januar 2026 to null,
-                13 januar 2026 to 60,
-                14 januar 2026 to null,
+                KjørtDag(dato = 29 desember 2025, parkeringsutgift = 50),
+                KjørtDag(dato = 1 januar 2026, parkeringsutgift = 100),
+                KjørtDag(dato = 5 januar 2026),
+                KjørtDag(dato = 6 januar 2026),
+                KjørtDag(dato = 12 januar 2026),
+                KjørtDag(dato = 13 januar 2026, parkeringsutgift = 60),
+                KjørtDag(dato = 14 januar 2026),
             )
 
         @Test

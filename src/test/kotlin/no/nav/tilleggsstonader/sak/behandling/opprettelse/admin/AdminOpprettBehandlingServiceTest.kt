@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandling
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingOppgaveMetadata
@@ -63,6 +64,7 @@ class AdminOpprettBehandlingServiceTest {
 
     val saksbehandler = "mrsaksbehandler"
 
+    val behandlingMetode = BehandlingMetode.MANUELL
     val forventetOppgaveMetadata =
         OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
             tilordneSaksbehandler = saksbehandler,
@@ -115,6 +117,7 @@ class AdminOpprettBehandlingServiceTest {
                     behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET,
                     kravMottatt = LocalDate.now(),
                     oppgaveMetadata = forventetOppgaveMetadata,
+                    behandlingMetode = behandlingMetode,
                 ),
             )
         }
@@ -141,6 +144,7 @@ class AdminOpprettBehandlingServiceTest {
                     behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV,
                     kravMottatt = LocalDate.now(),
                     oppgaveMetadata = forventetOppgaveMetadata,
+                    behandlingMetode = behandlingMetode,
                 ),
             )
         }
@@ -164,6 +168,7 @@ class AdminOpprettBehandlingServiceTest {
                     behandlingsårsak = BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV,
                     kravMottatt = LocalDate.now(),
                     oppgaveMetadata = forventetOppgaveMetadata,
+                    behandlingMetode = behandlingMetode,
                 ),
             )
         }

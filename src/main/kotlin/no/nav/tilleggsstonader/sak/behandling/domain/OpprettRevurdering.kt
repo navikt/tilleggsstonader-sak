@@ -10,4 +10,5 @@ data class OpprettRevurdering(
     val valgteBarn: Set<String>,
     val kravMottatt: LocalDate?,
     val skalOppretteOppgave: Boolean,
+    val behandlingMetode: BehandlingMetode,
 )
