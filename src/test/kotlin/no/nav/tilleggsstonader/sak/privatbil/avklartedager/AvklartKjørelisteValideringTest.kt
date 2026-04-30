@@ -38,7 +38,7 @@ class AvklartKjørelisteValideringTest {
                 KjørelisteUtil.kjøreliste(
                     reiseId = reiseId,
                     periode = Datoperiode(mandag, tirsdag),
-                    kjørteDager = listOf(KjørelisteUtil.KjørtDag(mandag, null)),
+                    kjørteDager = listOf(KjørelisteUtil.KjørtDag(dato = mandag, parkeringsutgift = null)),
                 )
 
             assertDoesNotThrow {
@@ -53,7 +53,7 @@ class AvklartKjørelisteValideringTest {
                 KjørelisteUtil.kjøreliste(
                     reiseId = reiseId,
                     periode = Datoperiode(mandag, tirsdag),
-                    kjørteDager = listOf(KjørelisteUtil.KjørtDag(mandag, null)),
+                    kjørteDager = listOf(KjørelisteUtil.KjørtDag(dato = mandag, parkeringsutgift = null)),
                 )
 
             assertThatThrownBy {
@@ -68,7 +68,7 @@ class AvklartKjørelisteValideringTest {
                 KjørelisteUtil.kjøreliste(
                     reiseId = reiseId,
                     periode = Datoperiode(mandag, lørdag),
-                    kjørteDager = listOf(KjørelisteUtil.KjørtDag(mandag, null)),
+                    kjørteDager = listOf(KjørelisteUtil.KjørtDag(dato = mandag, parkeringsutgift = null)),
                 )
 
             assertThatThrownBy {

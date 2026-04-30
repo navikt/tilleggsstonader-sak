@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
@@ -232,7 +231,6 @@ fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
                 årsak = BehandlingÅrsak.SØKNAD,
                 kravMottatt = LocalDate.now(),
                 nyeOpplysningerMetadata = null,
-                behandlingMetode = BehandlingMetode.MANUELL,
             ),
         tilSteg = tilSteg,
         testdataProvider = testdataProvider,

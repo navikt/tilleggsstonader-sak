@@ -20,8 +20,8 @@ import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteRepository
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagRequest
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
-import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
+import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -58,10 +58,10 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
 
         val dagerKjørt =
             listOf(
-                KjørtDag(1 januar 2026, 50),
-                KjørtDag(4 januar 2026, 70),
-                KjørtDag(9 januar 2026, 40),
-                KjørtDag(11 januar 2026, 120),
+                KjørtDag(dato = 1 januar 2026, parkeringsutgift = 50),
+                KjørtDag(dato = 4 januar 2026, parkeringsutgift = 70),
+                KjørtDag(dato = 9 januar 2026, parkeringsutgift = 40),
+                KjørtDag(dato = 11 januar 2026, parkeringsutgift = 120),
             )
         val kjøreliste =
             kjørelisteSkjema(
@@ -101,7 +101,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
 
                 sendInnKjøreliste {
                     periode = Datoperiode(fom, 8 mars 2026)
-                    kjørteDager = listOf(fom to 120)
+                    kjørteDager = listOf(KjørtDag(dato = fom, parkeringsutgift = 120))
                 }
             }
 
@@ -121,7 +121,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
                     periode = Datoperiode(9 mars 2026, tom),
                     dagerKjørt =
                         listOf(
-                            KjørtDag(9 mars 2026, 50),
+                            KjørtDag(dato = 9 mars 2026, parkeringsutgift = 50),
                         ),
                 ),
             ident = behandlingContext.ident,
@@ -157,7 +157,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
 
                 sendInnKjøreliste {
                     periode = Datoperiode(fom, 8 mars 2026)
-                    kjørteDager = listOf(fom to 120)
+                    kjørteDager = listOf(KjørtDag(dato = fom, parkeringsutgift = 120))
                 }
             }
 
@@ -179,7 +179,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
                     periode = Datoperiode(9 mars 2026, tom),
                     dagerKjørt =
                         listOf(
-                            KjørtDag(9 mars 2026, 120),
+                            KjørtDag(dato = 9 mars 2026, parkeringsutgift = 120),
                         ),
                 ),
             ident = behandlingContext.ident,
@@ -206,7 +206,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
 
                 sendInnKjøreliste {
                     periode = Datoperiode(fom, 8 mars 2026)
-                    kjørteDager = listOf(fom to 120)
+                    kjørteDager = listOf(KjørtDag(dato = fom, parkeringsutgift = 120))
                 }
             }
 
@@ -262,7 +262,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
                     periode = Datoperiode(9 mars 2026, tom),
                     dagerKjørt =
                         listOf(
-                            KjørtDag(9 mars 2026, 120),
+                            KjørtDag(dato = 9 mars 2026, parkeringsutgift = 120),
                         ),
                 ),
             ident = behandlingContext.ident,

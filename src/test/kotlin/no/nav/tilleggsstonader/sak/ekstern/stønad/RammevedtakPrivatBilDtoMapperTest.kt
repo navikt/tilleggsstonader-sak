@@ -28,7 +28,7 @@ class RammevedtakPrivatBilDtoMapperTest {
                 reiseId = reiseId,
                 datoMottatt = datoMottatt,
                 periode = Datoperiode(6 januar 2025, 12 januar 2025), // kun uke 2
-                kjørteDager = listOf(KjørtDag(6 januar 2025)),
+                kjørteDager = listOf(KjørtDag(dato = 6 januar 2025)),
             )
 
         val kjørelister = listOf(kjøreliste).groupBy { it.data.reiseId }
@@ -60,14 +60,14 @@ class RammevedtakPrivatBilDtoMapperTest {
                 reiseId = reiseId,
                 datoMottatt = datoMottattUke2,
                 periode = Datoperiode(6 januar 2025, 12 januar 2025),
-                kjørteDager = listOf(KjørtDag(6 januar 2025)),
+                kjørteDager = listOf(KjørtDag(dato = 6 januar 2025)),
             )
         val kjørelisteUke3 =
             kjøreliste(
                 reiseId = reiseId,
                 datoMottatt = datoMottattUke3,
                 periode = Datoperiode(13 januar 2025, 19 januar 2025),
-                kjørteDager = listOf(KjørtDag(13 januar 2025)),
+                kjørteDager = listOf(KjørtDag(dato = 13 januar 2025)),
             )
 
         val kjørelister = listOf(kjørelisteUke2, kjørelisteUke3).groupBy { it.data.reiseId }

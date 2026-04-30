@@ -15,7 +15,6 @@ data class OpprettBehandlingDto(
     val nyeOpplysningerMetadata: NyeOpplysningerMetadataDto?,
     val valgteBarn: Set<String> = emptySet(),
     val kravMottatt: LocalDate?,
-    val behandlingMetode: BehandlingMetode,
 ) {
     fun tilDomene() =
         OpprettRevurdering(
@@ -25,7 +24,7 @@ data class OpprettBehandlingDto(
             valgteBarn = valgteBarn,
             kravMottatt = kravMottatt,
             skalOppretteOppgave = true,
-            behandlingMetode = behandlingMetode,
+            behandlingMetode = BehandlingMetode.MANUELL,
         )
 }
 

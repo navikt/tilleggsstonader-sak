@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UtfyltDagAutomatiskVurdering
+import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -58,8 +59,8 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
                     periode = Datoperiode(1 januar 2026, 4 januar 2026)
                     kjørteDager =
                         listOf(
-                            1 januar 2026 to 50,
-                            2 januar 2026 to 50,
+                            KjørtDag(dato = 1 januar 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 2 januar 2026, parkeringsutgift = 50),
                         )
                 }
             }
@@ -127,10 +128,10 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
                     periode = Datoperiode(5 januar 2026, 11 januar 2026)
                     kjørteDager =
                         listOf(
-                            5 januar 2026 to 50,
-                            6 januar 2026 to 50,
-                            7 januar 2026 to 50,
-                            8 januar 2026 to 50,
+                            KjørtDag(dato = 5 januar 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 6 januar 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 7 januar 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 8 januar 2026, parkeringsutgift = 50),
                         )
                 }
             }
@@ -196,8 +197,8 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
                     periode = Datoperiode(1 januar 2026, 2 januar 2026)
                     kjørteDager =
                         listOf(
-                            1 januar 2026 to 50,
-                            2 januar 2026 to 150,
+                            KjørtDag(dato = 1 januar 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 2 januar 2026, parkeringsutgift = 150),
                         )
                 }
             }
@@ -241,10 +242,10 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
                     periode = Datoperiode(1 januar 2026, 4 januar 2026)
                     kjørteDager =
                         listOf(
-                            1 januar 2026 to 50,
-                            2 januar 2026 to 50,
-                            3 januar 2026 to 50,
-                            4 januar 2026 to 50,
+                            KjørtDag(dato = 1 januar 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 2 januar 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 3 januar 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 4 januar 2026, parkeringsutgift = 50),
                         )
                 }
             }
@@ -314,10 +315,10 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
                     periode = Datoperiode(5 januar 2026, 11 januar 2026)
                     kjørteDager =
                         listOf(
-                            5 januar 2026 to 50,
-                            6 januar 2026 to 50,
-                            7 januar 2026 to 50,
-                            8 januar 2026 to 50,
+                            KjørtDag(dato = 5 januar 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 6 januar 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 7 januar 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 8 januar 2026, parkeringsutgift = 50),
                         )
                 }
             }

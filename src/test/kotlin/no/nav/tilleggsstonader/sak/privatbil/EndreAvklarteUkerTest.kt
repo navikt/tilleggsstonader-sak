@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagReques
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
+import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -37,13 +38,13 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
             opprettBehandlingOgSendInnKjøreliste(
                 dagerKjørt =
                     listOf(
-                        5 januar 2026 to 50,
-                        6 januar 2026 to 50,
-                        7 januar 2026 to 50,
-                        8 januar 2026 to 50,
-                        9 januar 2026 to 50,
-                        10 januar 2026 to 50,
-                        11 januar 2026 to 50,
+                        KjørtDag(dato = 5 januar 2026, parkeringsutgift = 50),
+                        KjørtDag(dato = 6 januar 2026, parkeringsutgift = 50),
+                        KjørtDag(dato = 7 januar 2026, parkeringsutgift = 50),
+                        KjørtDag(dato = 8 januar 2026, parkeringsutgift = 50),
+                        KjørtDag(dato = 9 januar 2026, parkeringsutgift = 50),
+                        KjørtDag(dato = 10 januar 2026, parkeringsutgift = 50),
+                        KjørtDag(dato = 11 januar 2026, parkeringsutgift = 50),
                     ),
             )
 
@@ -119,9 +120,9 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
             opprettBehandlingOgSendInnKjøreliste(
                 dagerKjørt =
                     listOf(
-                        5 januar 2026 to 50,
-                        6 januar 2026 to 50,
-                        7 januar 2026 to 50,
+                        KjørtDag(dato = 5 januar 2026, parkeringsutgift = 50),
+                        KjørtDag(dato = 6 januar 2026, parkeringsutgift = 50),
+                        KjørtDag(dato = 7 januar 2026, parkeringsutgift = 50),
                     ),
             )
 
@@ -171,9 +172,9 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
             opprettBehandlingOgSendInnKjøreliste(
                 dagerKjørt =
                     listOf(
-                        5 januar 2026 to 50,
-                        6 januar 2026 to 50,
-                        7 januar 2026 to 50,
+                        KjørtDag(dato = 5 januar 2026, parkeringsutgift = 50),
+                        KjørtDag(dato = 6 januar 2026, parkeringsutgift = 50),
+                        KjørtDag(dato = 7 januar 2026, parkeringsutgift = 50),
                     ),
             )
 
@@ -207,7 +208,7 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
             .isEqualTo("Alle dager i uke må sendes inn")
     }
 
-    private fun opprettBehandlingOgSendInnKjøreliste(dagerKjørt: List<Pair<LocalDate, Int>>): Saksbehandling {
+    private fun opprettBehandlingOgSendInnKjøreliste(dagerKjørt: List<KjørtDag>): Saksbehandling {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
         val dagerKjørtMedAvvik =
