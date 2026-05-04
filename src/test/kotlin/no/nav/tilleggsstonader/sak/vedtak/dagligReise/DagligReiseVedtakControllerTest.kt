@@ -15,7 +15,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkEmpty
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandlingAutomatisk
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -272,7 +272,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                     .hentBehandlinger(førstegangsBehandling.fagsakId)
                     .single { it.type == BehandlingType.KJØRELISTE }
 
-            gjennomførKjørelisteBehandlingAutomatisk(kjørelisteBehandling, tilSteg = StegType.BEREGNING)
+            gjennomførKjørelisteBehandling(kjørelisteBehandling, tilSteg = StegType.BEREGNING)
 
             val oppsummertBeregning = kall.privatBil.hentOppsummertBeregning(kjørelisteBehandling.id)
 

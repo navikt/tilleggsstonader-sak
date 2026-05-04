@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandlingManuelt
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagRequest
@@ -129,7 +129,7 @@ class KjørelistePåVentIntegrationTest : IntegrationTest() {
         )
 
         // Fullfører første kjørelistebehandling
-        gjennomførKjørelisteBehandlingManuelt(kjørelisteBehandling1)
+        gjennomførKjørelisteBehandling(kjørelisteBehandling1)
 
         // Ny kjørelistebehandling tas av vent og skal nullstilles
         tilordneÅpenBehandlingOppgaveForBehandling(kjørelisteBehandling2.id)

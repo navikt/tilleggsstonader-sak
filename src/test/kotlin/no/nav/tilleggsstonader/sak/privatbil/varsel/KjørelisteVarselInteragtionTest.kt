@@ -15,7 +15,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørAlleTaskMedSenererTriggertid
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandlingAutomatisk
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteRepository
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
@@ -213,7 +213,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
             testoppsettService
                 .hentBehandlinger(behandlingcontext.fagsakId)
                 .single { it.type == BehandlingType.KJØRELISTE }
-        gjennomførKjørelisteBehandlingAutomatisk(kjørelistebehandling)
+        gjennomførKjørelisteBehandling(kjørelistebehandling)
 
         kjørAlleTaskMedSenererTriggertid()
         KafkaFake

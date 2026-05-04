@@ -15,7 +15,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandlingManuelt
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
@@ -105,7 +105,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
                 .hentBehandlinger(førstegangsBehandling.fagsakId)
                 .single { it.type == BehandlingType.KJØRELISTE }
 
-        gjennomførKjørelisteBehandlingManuelt(kjørelisteBehandling)
+        gjennomførKjørelisteBehandling(kjørelisteBehandling)
 
         val forventetBeløp = kjørteDager.kalkulerForventetBeløp(reiseavstandEnVei)
         assertAndelOpprettet(
@@ -208,7 +208,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
                 .hentBehandlinger(førstegangsBehandlingContext.fagsakId)
                 .single { it.type == BehandlingType.KJØRELISTE }
 
-        gjennomførKjørelisteBehandlingManuelt(førsteKjørelistebehandling)
+        gjennomførKjørelisteBehandling(førsteKjørelistebehandling)
         testoppsettService.settAndelerTilOkForBehandling(førsteKjørelistebehandling)
 
         // Sender inn kjøreliste for andre rammevedtak
@@ -227,7 +227,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
                 .hentBehandlinger(førstegangsBehandlingContext.fagsakId)
                 .single { it.type == BehandlingType.KJØRELISTE && it.id != førsteKjørelistebehandling.id }
 
-        gjennomførKjørelisteBehandlingManuelt(andreKjørelistebehandling)
+        gjennomførKjørelisteBehandling(andreKjørelistebehandling)
 
         val sendteIverksettinger =
             KafkaFake

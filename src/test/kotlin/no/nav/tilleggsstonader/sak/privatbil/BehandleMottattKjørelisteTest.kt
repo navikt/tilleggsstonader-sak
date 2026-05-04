@@ -43,9 +43,8 @@ class BehandleMottattKjørelisteTest : CleanDatabaseIntegrationTest() {
     val tom: LocalDate = 31 januar 2026
 
     @Test
-    fun `ta i mot kjøreliste uten avvik og opprett automatisk behandling`() {
+    fun `ta i mot kjøreliste uten avvik og opprett manuell behandling`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-        every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns true
 
         val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
@@ -69,17 +68,14 @@ class BehandleMottattKjørelisteTest : CleanDatabaseIntegrationTest() {
 
         assertThat(kjørelistebehandling).isNotNull()
         assertThat(kjørelistebehandling.forrigeIverksatteBehandlingId).isEqualTo(behandling.id)
-        assertThat(kjørelistebehandling.steg).isIn(
-            StegType.FULLFØR_KJØRELISTE,
-            StegType.FERDIGSTILLE_BEHANDLING,
-            StegType.BEHANDLING_FERDIGSTILT,
-        )
+        assertThat(kjørelistebehandling.steg).isEqualTo(StegType.KJØRELISTE)
         assertThat(kjørelistebehandling.type).isEqualTo(BehandlingType.KJØRELISTE)
         assertThat(kjørelistebehandling.årsak).isEqualTo(BehandlingÅrsak.KJØRELISTE)
-        assertThat(kjørelistebehandling.behandlingMetode).isEqualTo(BehandlingMetode.AUTOMATISK)
+        assertThat(kjørelistebehandling.behandlingMetode).isEqualTo(BehandlingMetode.MANUELL)
 
         val kjørelisteoppgaver = oppgaveService.finnAlleOppgaveDomainForBehandling(kjørelistebehandling.id)
-        assertThat(kjørelisteoppgaver).isEmpty()
+        assertThat(kjørelisteoppgaver).hasSize(1)
+        assertThat(kjørelisteoppgaver.single().status).isEqualTo(Oppgavestatus.ÅPEN)
 
         val vedtakForrigeBehandling = vedtakService.hentInnvilgelseEllerOpphørVedtak(behandlingContext.behandlingId)
         val vedtakKjørelistebehandling = vedtakService.hentInnvilgelseEllerOpphørVedtak(kjørelistebehandling.id)
@@ -98,73 +94,5 @@ class BehandleMottattKjørelisteTest : CleanDatabaseIntegrationTest() {
         val vilkårKjørelistebehandling = vilkårService.hentVilkårForBehandling(kjørelistebehandling.id)
 
         assertThat(vilkårKjørelistebehandling).hasSameSizeAs(vilkårForrigeBehandling)
-    }
-
-    @Test
-    fun `ta i mot kjøreliste uten avvik og ikke opprett automatisk behandling når bryter er false`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-
-        val behandlingContext =
-            opprettBehandlingOgGjennomførBehandlingsløp(
-                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-            ) {
-                defaultDagligReisePrivatBilTsoTestdata(fom, tom)
-
-                sendInnKjøreliste {
-                    periode = Datoperiode(fom, 2 januar 2026)
-                    kjørteDager =
-                        listOf(
-                            KjørtDag(dato = 1 januar 2026, parkeringsutgift = 100),
-                            KjørtDag(dato = 2 januar 2026, parkeringsutgift = 50),
-                        )
-                }
-            }
-
-        val behandling = behandlingService.hentSaksbehandling(behandlingContext.behandlingId)
-        val alleBehandlinger = behandlingService.hentBehandlinger(behandling.fagsakId)
-
-        val kjørelistebehandling = alleBehandlinger.first { it.type == BehandlingType.KJØRELISTE }
-
-        assertThat(kjørelistebehandling.steg).isEqualTo(StegType.KJØRELISTE)
-        assertThat(kjørelistebehandling.type).isEqualTo(BehandlingType.KJØRELISTE)
-        assertThat(kjørelistebehandling.årsak).isEqualTo(BehandlingÅrsak.KJØRELISTE)
-        assertThat(kjørelistebehandling.behandlingMetode).isEqualTo(BehandlingMetode.MANUELL)
-
-        val kjørelisteoppgaver = oppgaveService.finnAlleOppgaveDomainForBehandling(kjørelistebehandling.id)
-        assertThat(kjørelisteoppgaver).hasSize(1)
-        assertThat(kjørelisteoppgaver.single().status).isEqualTo(Oppgavestatus.ÅPEN)
-    }
-
-    @Test
-    fun `ta i mot kjøreliste med parkeringsutgift 101 kroner og krev manuell behandling`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-        val behandlingContext =
-            opprettBehandlingOgGjennomførBehandlingsløp(
-                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-            ) {
-                defaultDagligReisePrivatBilTsoTestdata(fom, tom)
-
-                sendInnKjøreliste {
-                    periode = Datoperiode(fom, 2 januar 2026)
-                    kjørteDager =
-                        listOf(
-                            KjørtDag(dato = 1 januar 2026, parkeringsutgift = 101),
-                            KjørtDag(dato = 2 januar 2026, parkeringsutgift = 50),
-                        )
-                }
-            }
-        val behandling = behandlingService.hentSaksbehandling(behandlingContext.behandlingId)
-        val alleBehandlinger = behandlingService.hentBehandlinger(behandling.fagsakId)
-
-        val kjørelistebehandling = alleBehandlinger.first { it.type == BehandlingType.KJØRELISTE }
-
-        assertThat(kjørelistebehandling.steg).isEqualTo(StegType.KJØRELISTE)
-        assertThat(kjørelistebehandling.type).isEqualTo(BehandlingType.KJØRELISTE)
-        assertThat(kjørelistebehandling.årsak).isEqualTo(BehandlingÅrsak.KJØRELISTE)
-        assertThat(kjørelistebehandling.behandlingMetode).isEqualTo(BehandlingMetode.MANUELL)
-
-        val kjørelisteoppgaver = oppgaveService.finnAlleOppgaveDomainForBehandling(kjørelistebehandling.id)
-        assertThat(kjørelisteoppgaver).hasSize(1)
-        assertThat(kjørelisteoppgaver.single().status).isEqualTo(Oppgavestatus.ÅPEN)
     }
 }

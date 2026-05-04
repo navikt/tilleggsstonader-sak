@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.privatbil
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.GjenbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
@@ -15,6 +16,7 @@ import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingOppga
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional
 class BehandleMottattKjørelisteService(
     private val opprettBehandlingService: OpprettBehandlingService,
     private val behandlingRepository: BehandlingRepository,
+    private val behandlingService: BehandlingService,
     private val oppgaveService: OppgaveService,
     private val gjenbrukDataRevurderingService: GjenbrukDataRevurderingService,
     private val avklartKjørelisteService: AvklartKjørelisteService,
@@ -39,36 +42,39 @@ class BehandleMottattKjørelisteService(
     @Transactional
     fun behandleMottattKjøreliste(kjøreliste: Kjøreliste) {
         val gjenbrukBehandling = finnKjørelistebehandlingSomKanGjenbrukes(kjøreliste)
-        var behandling = gjenbrukBehandling ?: opprettKjørelisteBehandling(kjøreliste)
 
-        avklartKjørelisteService.avklarUkerFraKjøreliste(
-            behandling = behandling,
-            kjøreliste = kjøreliste,
-        )
-
-        val avklarteUker = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandling.id)
-        val harAvvik = avklarteUker.finnesUkerMedAvvik()
-        val skalOppretteAutomatiskTask = !harAvvik && unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE)
-        val ønsketBehandlingMetode =
-            if (skalOppretteAutomatiskTask) BehandlingMetode.AUTOMATISK else BehandlingMetode.MANUELL
-
-        if (behandling.behandlingMetode != ønsketBehandlingMetode) {
-            behandling = behandling.copy(behandlingMetode = ønsketBehandlingMetode)
-            behandlingRepository.update(behandling)
+        if (gjenbrukBehandling != null) {
+            // Gjenbrukt behandling har allerede en oppgave-task fra da den ble opprettet.
+            logger.info("Legger til kjøreliste=${kjøreliste.id} i behandling=${gjenbrukBehandling.id}")
+            avklartKjørelisteService.avklarUkerFraKjøreliste(
+                behandling = gjenbrukBehandling,
+                kjøreliste = kjøreliste,
+            )
+        } else {
+            opprettBehandlingFraKjøreliste(kjøreliste)
         }
+    }
+
+    private fun opprettBehandlingFraKjøreliste(kjøreliste: Kjøreliste) {
+        val nyBehandling = opprettKjørelisteBehandling(kjøreliste)
+
+        val skalOppretteAutomatiskTask = kanAutomatiskBehandles(nyBehandling.id)
 
         if (skalOppretteAutomatiskTask) {
             logger.info(
-                "Ingen avvik funnet for behandling=${behandling.id} og toggle er aktiv. Oppretter task for automatisk kjørelistebehandling",
+                "Ingen avvik funnet for behandling=${nyBehandling.id} og toggle er aktiv. Oppretter task for automatisk kjørelistebehandling",
             )
-            taskService.save(AutomatiskKjørelisteBehandlingTask.opprettTask(behandling.id))
-        } else if (gjenbrukBehandling == null) {
-            // Gjenbrukt behandling har allerede en oppgave-task fra da den ble opprettet.
-            logger.info("Oppretter manuell behandling for behandling=${behandling.id}")
+            behandlingService.oppdaterBehandlingMetode(
+                nyBehandling.id,
+                behandlingMetode = BehandlingMetode.AUTOMATISK,
+            )
+            taskService.save(AutomatiskKjørelisteBehandlingTask.opprettTask(nyBehandling.id))
+        } else {
+            logger.info("Oppretter manuell behandling for behandling=${nyBehandling.id}")
             taskService.save(
                 OpprettOppgaveForOpprettetBehandlingTask.opprettTask(
                     OpprettOppgaveForOpprettetBehandlingTask.OpprettOppgaveTaskData(
-                        behandlingId = behandling.id,
+                        behandlingId = nyBehandling.id,
                         beskrivelse = "Skal behandles i TS-Sak",
                         prioritet = OppgavePrioritet.NORM,
                     ),
@@ -113,6 +119,10 @@ class BehandleMottattKjørelisteService(
 
         gjenbrukData(kjørelistebehandling)
 
+        avklartKjørelisteService.avklarUkerFraKjøreliste(
+            behandling = kjørelistebehandling,
+            kjøreliste = kjøreliste,
+        )
         return kjørelistebehandling
     }
 
@@ -120,6 +130,19 @@ class BehandleMottattKjørelisteService(
         val behandlingIdForGjenbruk = gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling.fagsakId)
         behandlingIdForGjenbruk?.let {
             gjenbrukDataRevurderingService.gjenbrukData(behandling, it)
+        }
+    }
+
+    private fun kanAutomatiskBehandles(behandlingId: BehandlingId): Boolean {
+        val avklarteUker = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandlingId)
+        val harAvvik = avklarteUker.finnesUkerMedAvvik()
+        val skalOppretteAutomatiskTask =
+            !harAvvik && unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE)
+
+        if (skalOppretteAutomatiskTask) {
+            return true
+        } else {
+            return false
         }
     }
 }

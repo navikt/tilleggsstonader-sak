@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandlingAutomatisk
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
@@ -107,7 +107,7 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
             assertThat(it.avklartUkeId).isNull()
         }
 
-        gjennomførKjørelisteBehandlingAutomatisk(kjørelistebehandling1)
+        gjennomførKjørelisteBehandling(kjørelistebehandling1)
 
         // Sender inn kjøreliste for nytt rammevedtak
         val kjørelistebehandling2 =
@@ -182,7 +182,8 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
         assertThat(ramme2).isNotNull
 
         // Verifiser at begge uker finnes på ramme1 for behandlingen
-        val ukerHvorDetFinnesAvklarteUker = ramme1!!.uker.filter { it.kjørelisteInnsendtDato != null && it.avklartUkeId != null }
+        val ukerHvorDetFinnesAvklarteUker =
+            ramme1!!.uker.filter { it.kjørelisteInnsendtDato != null && it.avklartUkeId != null }
         assertThat(ukerHvorDetFinnesAvklarteUker).hasSameSizeAs(ramme1.uker)
 
         // Verifiser ingen uker på ramme2
