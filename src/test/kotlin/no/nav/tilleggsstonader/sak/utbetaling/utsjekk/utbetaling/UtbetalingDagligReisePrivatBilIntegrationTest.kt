@@ -130,6 +130,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
             assertThat(oppgaverPåKjørelisteBehandling).hasSize(1)
             assertThat(oppgaverPåKjørelisteBehandling.single().status).isEqualTo(Oppgavestatus.FERDIGSTILT)
         }
+
         assertThat(iverksettingDto.beslutter).isEqualTo(SikkerhetContext.SYSTEM_FORKORTELSE)
         assertThat(iverksettingDto.utbetalinger).hasSize(1)
         val utbetaling = iverksettingDto.utbetalinger.single()
