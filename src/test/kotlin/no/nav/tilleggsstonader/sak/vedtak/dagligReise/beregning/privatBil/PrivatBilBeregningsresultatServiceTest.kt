@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UtfyltDagAutomatiskVurdering
@@ -597,6 +598,251 @@ class PrivatBilBeregningsresultatServiceTest {
             beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
         }
     }
+
+    @Test
+    fun `UENDRET uke gjenbrukes fra forrige beregningsresultat med fraTidligereVedtak=true`() {
+        val fomRammevedtak = 2 februar 2026 // Mandag
+        val tomRammevedtak = 15 februar 2026
+        val delperiode = lagDelperiode(fomRammevedtak, tomRammevedtak)
+        val rammevedtakPrivatBil =
+            rammevedtakPrivatBil(reiseId = reiseId, fom = fomRammevedtak, tom = tomRammevedtak, delperioder = listOf(delperiode))
+
+        val kjøreliste1 =
+            KjørelisteUtil.kjøreliste(
+                reiseId = reiseId,
+                periode = Datoperiode(2 februar 2026, 8 februar 2026),
+                kjørteDager =
+                    listOf(
+                        KjørelisteUtil.KjørtDag(2 februar 2026),
+                    ),
+            )
+        val kjøreliste2 =
+            KjørelisteUtil.kjøreliste(
+                reiseId = reiseId,
+                periode = Datoperiode(9 februar 2026, 15 februar 2026),
+                kjørteDager =
+                    listOf(
+                        KjørelisteUtil.KjørtDag(9 februar 2026),
+                    ),
+            )
+
+        val uke1 = avklarUkerFraKjøreliste(kjøreliste1).single()
+        val uke2 = avklarUkerFraKjøreliste(kjøreliste2).single()
+
+        val forrigeBeregningsresultat = beregningService.beregn(rammevedtakPrivatBil, listOf(uke1, uke2), brukersNavKontor)
+
+        val uke1MedUendretStatus = uke1.copy(avklartKjørtUkeStatus = AvklartKjørtUkeStatus.UENDRET)
+        val uke2MedUendretStatus = uke2.copy(avklartKjørtUkeStatus = AvklartKjørtUkeStatus.UENDRET)
+
+        val beregningsresultat =
+            beregningService.beregn(
+                rammevedtakPrivatBil,
+                listOf(uke1MedUendretStatus, uke2MedUendretStatus),
+                brukersNavKontor,
+                forrigeBeregningsresultat,
+            )
+
+        val perioder = beregningsresultat.reiser.single().perioder
+        assertThat(perioder).hasSize(2)
+        assertThat(perioder).allMatch { it.fraTidligereVedtak }
+    }
+
+    @Test
+    fun `NY uke beregnes og markeres ikke som fraTidligereVedtak`() {
+        val fomRammevedtak = 2 februar 2026 // Mandag
+        val tomRammevedtak = 15 februar 2026
+        val delperiode = lagDelperiode(fomRammevedtak, tomRammevedtak)
+        val rammevedtakPrivatBil =
+            rammevedtakPrivatBil(reiseId = reiseId, fom = fomRammevedtak, tom = tomRammevedtak, delperioder = listOf(delperiode))
+
+        val kjøreliste1 =
+            KjørelisteUtil.kjøreliste(
+                reiseId = reiseId,
+                periode = Datoperiode(2 februar 2026, 8 februar 2026),
+                kjørteDager =
+                    listOf(
+                        KjørelisteUtil.KjørtDag(2 februar 2026),
+                    ),
+            )
+        val kjøreliste2 =
+            KjørelisteUtil.kjøreliste(
+                reiseId = reiseId,
+                periode = Datoperiode(9 februar 2026, 15 februar 2026),
+                kjørteDager =
+                    listOf(
+                        KjørelisteUtil.KjørtDag(9 februar 2026),
+                    ),
+            )
+
+        val uke1 = avklarUkerFraKjøreliste(kjøreliste1).single()
+        val uke2 = avklarUkerFraKjøreliste(kjøreliste2).single()
+
+        // Uke 1 var i forrige behandling (UENDRET), uke 2 er ny
+        val forrigeBeregningsresultat = beregningService.beregn(rammevedtakPrivatBil, listOf(uke1), brukersNavKontor)
+
+        val uke1MedUendretStatus = uke1.copy(avklartKjørtUkeStatus = AvklartKjørtUkeStatus.UENDRET)
+        // uke2 har default NY status
+
+        val beregningsresultat =
+            beregningService.beregn(
+                rammevedtakPrivatBil,
+                listOf(uke1MedUendretStatus, uke2),
+                brukersNavKontor,
+                forrigeBeregningsresultat,
+            )
+
+        val perioder = beregningsresultat.reiser.single().perioder
+        assertThat(perioder).hasSize(2)
+
+        val uke1Resultat = perioder.single { it.fom.tilUkeIÅr() == (2 februar 2026).tilUkeIÅr() }
+        val uke2Resultat = perioder.single { it.fom.tilUkeIÅr() == (9 februar 2026).tilUkeIÅr() }
+
+        assertThat(uke1Resultat.fraTidligereVedtak).isTrue()
+        assertThat(uke2Resultat.fraTidligereVedtak).isFalse()
+    }
+
+    @Test
+    fun `ENDRET uke reberegnes og markeres ikke som fraTidligereVedtak`() {
+        val fomRammevedtak = 2 februar 2026 // Mandag
+        val tomRammevedtak = 8 februar 2026
+        val delperiode = lagDelperiode(fomRammevedtak, tomRammevedtak)
+        val rammevedtakPrivatBil =
+            rammevedtakPrivatBil(reiseId = reiseId, fom = fomRammevedtak, tom = tomRammevedtak, delperioder = listOf(delperiode))
+
+        val kjøreliste =
+            KjørelisteUtil.kjøreliste(
+                reiseId = reiseId,
+                periode = Datoperiode(fomRammevedtak, tomRammevedtak),
+                kjørteDager = listOf(KjørelisteUtil.KjørtDag(fomRammevedtak)),
+            )
+        val uke = avklarUkerFraKjøreliste(kjøreliste).single()
+
+        val forrigeBeregningsresultat = beregningService.beregn(rammevedtakPrivatBil, listOf(uke), brukersNavKontor)
+
+        val ukeMedEndretStatus = uke.copy(avklartKjørtUkeStatus = AvklartKjørtUkeStatus.ENDRET)
+
+        val beregningsresultat =
+            beregningService.beregn(
+                rammevedtakPrivatBil,
+                listOf(ukeMedEndretStatus),
+                brukersNavKontor,
+                forrigeBeregningsresultat,
+            )
+
+        val perioder = beregningsresultat.reiser.single().perioder
+        assertThat(perioder).hasSize(1)
+        assertThat(perioder.single().fraTidligereVedtak).isFalse()
+    }
+
+    @Test
+    fun `ny reise som ikke finnes i forrige vedtak beregner alle uker uavhengig av status`() {
+        val fomRammevedtak = 2 februar 2026 // Mandag
+        val tomRammevedtak = 8 februar 2026
+        val delperiode = lagDelperiode(fomRammevedtak, tomRammevedtak)
+
+        val nyReiseId = ReiseId.random()
+        val gammelReiseId = ReiseId.random()
+
+        val rammevedtakPrivatBil =
+            RammevedtakPrivatBil(
+                reiser =
+                    listOf(
+                        rammeForReiseMedPrivatBil(
+                            reiseId = nyReiseId,
+                            fom = fomRammevedtak,
+                            tom = tomRammevedtak,
+                            delperioder = listOf(delperiode),
+                        ),
+                    ),
+            )
+
+        val kjøreliste =
+            KjørelisteUtil.kjøreliste(
+                reiseId = nyReiseId,
+                periode = Datoperiode(fomRammevedtak, tomRammevedtak),
+                kjørteDager = listOf(KjørelisteUtil.KjørtDag(fomRammevedtak)),
+            )
+        val uke = avklarUkerFraKjøreliste(kjøreliste).single()
+
+        // Forrige vedtak inneholder kun gammelReiseId – nyReiseId er ny
+        val forrigeRammevedtak =
+            RammevedtakPrivatBil(
+                reiser =
+                    listOf(
+                        rammeForReiseMedPrivatBil(
+                            reiseId = gammelReiseId,
+                            fom = fomRammevedtak,
+                            tom = tomRammevedtak,
+                            delperioder = listOf(delperiode),
+                        ),
+                    ),
+            )
+        val forrigeBeregningsresultat = beregningService.beregn(forrigeRammevedtak, emptyList(), brukersNavKontor)
+
+        val ukeMedUendretStatus = uke.copy(avklartKjørtUkeStatus = AvklartKjørtUkeStatus.UENDRET)
+
+        val beregningsresultat =
+            beregningService.beregn(
+                rammevedtakPrivatBil,
+                listOf(ukeMedUendretStatus),
+                brukersNavKontor,
+                forrigeBeregningsresultat,
+            )
+
+        val perioder = beregningsresultat.reiser.single().perioder
+        assertThat(perioder).hasSize(1)
+        // Selv om uken er UENDRET er reisen ny, så perioden skal ikke hentes fra forrige vedtak
+        assertThat(perioder.single().fraTidligereVedtak).isFalse()
+    }
+
+    @Test
+    fun `uten forrigeBeregningsresultat beregnes alle uker uavhengig av status`() {
+        val fomRammevedtak = 2 februar 2026 // Mandag
+        val tomRammevedtak = 8 februar 2026
+        val delperiode = lagDelperiode(fomRammevedtak, tomRammevedtak)
+        val rammevedtakPrivatBil =
+            rammevedtakPrivatBil(reiseId = reiseId, fom = fomRammevedtak, tom = tomRammevedtak, delperioder = listOf(delperiode))
+
+        val kjøreliste =
+            KjørelisteUtil.kjøreliste(
+                reiseId = reiseId,
+                periode = Datoperiode(fomRammevedtak, tomRammevedtak),
+                kjørteDager = listOf(KjørelisteUtil.KjørtDag(fomRammevedtak)),
+            )
+        val ukeMedUendretStatus = avklarUkerFraKjøreliste(kjøreliste).single().copy(avklartKjørtUkeStatus = AvklartKjørtUkeStatus.UENDRET)
+
+        val beregningsresultat =
+            beregningService.beregn(
+                rammevedtakPrivatBil,
+                listOf(ukeMedUendretStatus),
+                brukersNavKontor,
+                forrigeBeregningsresultat = null,
+            )
+
+        val perioder = beregningsresultat.reiser.single().perioder
+        assertThat(perioder).hasSize(1)
+        assertThat(perioder.single().fraTidligereVedtak).isFalse()
+    }
+
+    private fun lagDelperiode(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) = RammeForReiseMedPrivatBilDelperiode(
+        fom = fom,
+        tom = tom,
+        ekstrakostnader = RammeForReiseMedPrivatEkstrakostnader(bompengerPerDag = 40, fergekostnadPerDag = null),
+        reisedagerPerUke = 5,
+        satser =
+            listOf(
+                RammeForReiseMedPrivatBilSatsForDelperiode(
+                    fom = fom,
+                    tom = tom,
+                    satsBekreftetVedVedtakstidspunkt = true,
+                    kilometersats = 2.94.toBigDecimal(),
+                    dagsatsUtenParkering = 150.toBigDecimal(),
+                ),
+            ),
+    )
 
     private fun avklarUkerFraKjøreliste(kjøreliste: Kjøreliste): List<AvklartKjørtUke> =
         kjøreliste.data.reisedager

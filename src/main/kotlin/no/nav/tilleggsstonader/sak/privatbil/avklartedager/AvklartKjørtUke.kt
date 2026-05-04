@@ -35,6 +35,8 @@ data class AvklartKjørtUke(
     val dager: Set<AvklartKjørtDag>,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
+    @Column("avklart_kjort_uke_status")
+    val avklartKjørtUkeStatus: AvklartKjørtUkeStatus = AvklartKjørtUkeStatus.NY,
 ) : Periode<LocalDate> {
     init {
         require(dager.all { inneholder(it.dato) }) { "Alle dager må være innenfor perioden til uken" }
@@ -47,6 +49,7 @@ data class AvklartKjørtUke(
             id = UUID.randomUUID(),
             behandlingId = nyBehandlingId,
             dager = dager.map { it.copy(id = UUID.randomUUID()) }.toSet(),
+            avklartKjørtUkeStatus = AvklartKjørtUkeStatus.UENDRET,
         )
 }
 
@@ -59,6 +62,12 @@ enum class UkeStatus {
 
 enum class TypeAvvikUke {
     FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK,
+}
+
+enum class AvklartKjørtUkeStatus {
+    NY, // Uke finnes ikke i forrige behandling
+    ENDRET, // Uke finnes i forrige behandling, men er endret av saksbehandler (inkl. tømt innhold → gir 0 kr)
+    UENDRET, // Uke er kopiert uendret fra forrige behandling
 }
 
 fun Collection<AvklartKjørtUke>.finnesUkerMedAvvik() = this.any { uke -> uke.status == UkeStatus.AVVIK }
