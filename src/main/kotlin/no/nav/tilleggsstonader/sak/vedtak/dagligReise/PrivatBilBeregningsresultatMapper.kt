@@ -58,6 +58,7 @@ private fun BeregningsresultatForReisePrivatBilPeriode.oppsummerPeriode(
         satser = relevanteSatser,
         parkeringskostnadTotalt = this.grunnlag.dager.sumOf { it.parkeringskostnad },
         stønadsbeløp = this.stønadsbeløp,
+        fraTidligereVedtak = this.fraTidligereVedtak,
     )
 }
 
@@ -92,6 +93,7 @@ data class OppsummertBeregningForPeriodeDto(
     val satser: List<RammeForReiseMedPrivatBilDelperiodeSatserDto>,
     val parkeringskostnadTotalt: Int,
     val stønadsbeløp: BigDecimal,
+    val fraTidligereVedtak: Boolean,
 ) {
     val ukenummer = fom.ukenummer()
 }
