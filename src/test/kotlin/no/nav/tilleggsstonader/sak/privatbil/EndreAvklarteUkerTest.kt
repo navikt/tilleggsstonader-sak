@@ -246,6 +246,4 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
         val opppgave = oppgaveService.hentAktivBehandleSakOppgave(behandlingId)
         oppgaveService.fordelOppgave(opppgave.id, testBrukerkontekst.bruker, opppgave.versjon)
     }
-
-    private fun LocalDate.datoErHelg() = dayOfWeek.value >= 6
 }

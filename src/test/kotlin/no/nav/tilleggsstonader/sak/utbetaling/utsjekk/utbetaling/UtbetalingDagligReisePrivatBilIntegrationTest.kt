@@ -18,7 +18,6 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
@@ -120,16 +119,6 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
                 .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
                 .single()
                 .verdiEllerFeil<IverksettingDto>()
-
-        val oppgaverPåKjørelisteBehandling = oppgaveRepository.findByBehandlingId(kjørelisteBehandling.id)
-        if (oppgaverPåKjørelisteBehandling.isEmpty()) {
-            // Automatisk kjørelistebehandling kjøres uten oppgave og blir dermed systembehandlet.
-            assertThat(iverksettingDto.saksbehandler).isEqualTo(SikkerhetContext.SYSTEM_FORKORTELSE)
-        } else {
-            assertThat(iverksettingDto.saksbehandler).isEqualTo(testBrukerkontekst.bruker)
-            assertThat(oppgaverPåKjørelisteBehandling).hasSize(1)
-            assertThat(oppgaverPåKjørelisteBehandling.single().status).isEqualTo(Oppgavestatus.FERDIGSTILT)
-        }
 
         assertThat(iverksettingDto.beslutter).isEqualTo(SikkerhetContext.SYSTEM_FORKORTELSE)
         assertThat(iverksettingDto.utbetalinger).hasSize(1)

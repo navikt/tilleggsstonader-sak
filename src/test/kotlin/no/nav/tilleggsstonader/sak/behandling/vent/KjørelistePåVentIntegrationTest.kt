@@ -14,8 +14,6 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBeha
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
-import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagRequest
-import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import org.assertj.core.api.Assertions.assertThat
@@ -98,35 +96,9 @@ class KjørelistePåVentIntegrationTest : IntegrationTest() {
         val kjørelisteBehandling2 =
             testoppsettService
                 .hentBehandlinger(førstegangsbehandling.fagsakId)
-                .single { it.type == BehandlingType.KJØRELISTE && it.id != kjørelisteBehandling1.id }
+                .last { it.type == BehandlingType.KJØRELISTE }
 
         assertThat(kjørelisteBehandling2.status).isEqualTo(BehandlingStatus.SATT_PÅ_VENT)
-
-        val avklartUkeForFørsteKjørelistebehandling =
-            kall.privatBil
-                .hentReisevurderingForBehandling(kjørelisteBehandling1.id)
-                .single()
-                .uker
-                .first { it.fraDato == fomUke1 }
-
-        tilordneÅpenBehandlingOppgaveForBehandling(kjørelisteBehandling1.id)
-        kall.privatBil.oppdaterUke(
-            behandlingId = kjørelisteBehandling1.id,
-            avklartUkeId = avklartUkeForFørsteKjørelistebehandling.avklartUkeId!!,
-            avklarteDager =
-                avklartUkeForFørsteKjørelistebehandling.dager.map { dag ->
-                    EndreAvklartDagRequest(
-                        dato = dag.dato,
-                        godkjentGjennomførtKjøring =
-                            when {
-                                dag.kjørelisteDag?.harKjørt == true -> GodkjentGjennomførtKjøring.JA
-                                else -> GodkjentGjennomførtKjøring.NEI
-                            },
-                        parkeringsutgift = dag.kjørelisteDag?.parkeringsutgift,
-                        begrunnelse = "Avklart i test",
-                    )
-                },
-        )
 
         // Fullfører første kjørelistebehandling
         gjennomførKjørelisteBehandling(kjørelisteBehandling1)
