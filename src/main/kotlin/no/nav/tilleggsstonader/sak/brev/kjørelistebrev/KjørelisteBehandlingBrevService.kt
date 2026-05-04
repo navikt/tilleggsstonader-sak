@@ -58,7 +58,7 @@ class KjørelisteBehandlingBrevService(
 
         val saksbehandlersignatur =
             if (saksbehandling.behandlingMetode == BehandlingMetode.AUTOMATISK) {
-                SikkerhetContext.hentSaksbehandlerNavn(strict = false)
+                null
             } else {
                 SikkerhetContext.hentSaksbehandlerNavn(strict = true)
             }
