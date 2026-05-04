@@ -5,6 +5,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.familie.prosessering.error.RekjørSenereException
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
@@ -38,11 +39,12 @@ class BehandlingsstatistikkTaskTest {
     }
 
     @Test
-    fun `skal sende statistikk for ferdigstilt kjøreliste uten oppgave`() {
+    fun `skal sende statistikk for automatisk behandling uten oppgave`() {
         val saksbehandling =
             saksbehandling(
                 type = BehandlingType.KJØRELISTE,
                 status = BehandlingStatus.FERDIGSTILT,
+                behandlingMetode = BehandlingMetode.AUTOMATISK,
             )
         val task = BehandlingsstatistikkTask.opprettMottattTask(saksbehandling.id, saksbehandling.opprettetTid)
 
