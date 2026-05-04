@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
@@ -12,7 +11,7 @@ import java.time.LocalDate
 import kotlin.collections.component1
 import kotlin.collections.component2
 
-fun BeregningsresultatLæremidler.mapTilAndelTilkjentYtelse(behandlingId: BehandlingId): List<AndelTilkjentYtelse> =
+fun BeregningsresultatLæremidler.mapTilAndelTilkjentYtelse(): List<AndelTilkjentYtelse> =
     perioder
         .groupBy { it.grunnlag.utbetalingsdato }
         .entries
@@ -25,13 +24,12 @@ fun BeregningsresultatLæremidler.mapTilAndelTilkjentYtelse(behandlingId: Behand
                 "Alle perioder for et utbetalingsdato må være bekreftet eller ikke bekreftet"
             }
 
-            mapTilYtelse(perioderMedSammeUtbetalingsdato, utbetalingsdato, behandlingId, satsBekreftet)
+            mapTilYtelse(perioderMedSammeUtbetalingsdato, utbetalingsdato, satsBekreftet)
         }
 
 private fun mapTilYtelse(
     perioder: List<BeregningsresultatForMåned>,
     utbetalingsdato: LocalDate,
-    behandlingId: BehandlingId,
     satsBekreftet: Boolean,
 ): List<AndelTilkjentYtelse> =
     perioder
@@ -43,7 +41,6 @@ private fun mapTilYtelse(
                 tom = utbetalingsdato,
                 satstype = Satstype.DAG,
                 type = typeAndel,
-                kildeBehandlingId = behandlingId,
                 statusIverksetting = StatusIverksetting.fraSatsBekreftet(satsBekreftet),
                 utbetalingsdato = utbetalingsdato,
             )

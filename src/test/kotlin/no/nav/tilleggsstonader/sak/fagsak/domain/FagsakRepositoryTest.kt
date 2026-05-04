@@ -54,7 +54,6 @@ class FagsakRepositoryTest : CleanDatabaseIntegrationTest() {
             )
         val andel =
             andelTilkjentYtelse(
-                behandling.id,
                 fom = LocalDate.now().datoEllerNesteMandagHvisLørdagEllerSøndag(),
                 tom = LocalDate.now().datoEllerNesteMandagHvisLørdagEllerSøndag(),
             )
@@ -80,7 +79,6 @@ class FagsakRepositoryTest : CleanDatabaseIntegrationTest() {
             tilkjentYtelse(
                 behandling.id,
                 andelTilkjentYtelse(
-                    kildeBehandlingId = behandling.id,
                     fom = LocalDate.now().datoEllerNesteMandagHvisLørdagEllerSøndag(),
                 ),
             ),
@@ -89,7 +87,6 @@ class FagsakRepositoryTest : CleanDatabaseIntegrationTest() {
             tilkjentYtelse(
                 behandling.id,
                 andelTilkjentYtelse(
-                    kildeBehandlingId = behandling.id,
                     fom = LocalDate.now().datoEllerNesteMandagHvisLørdagEllerSøndag(),
                 ),
             ),

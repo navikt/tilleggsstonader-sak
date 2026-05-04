@@ -28,7 +28,6 @@ fun BeregningsresultatTilsynBarn.mapTilAndelTilkjentYtelse(saksbehandling: Saksb
                 tom = beløpsperiode.dato,
                 satstype = satstype,
                 type = beløpsperiode.målgruppe.tilTypeAndel(Stønadstype.BARNETILSYN),
-                kildeBehandlingId = saksbehandling.id,
                 utbetalingsdato = førsteHverdagIMåneden,
             )
         }
