@@ -71,15 +71,15 @@ class OpprettDummySøknadDagligReise(
         val aktiviteter =
             Aktiviteter(
                 aktiviteterOgMaalgruppe = mapOf("134124111" to true, "134125430" to true, "annet" to true),
-                arbeidsrettetAktivitet = ArbeidsrettetAktivitetType.tiltakArbeidsrettetUtredning,
+                arbeidsrettetAktivitet = ArbeidsrettetAktivitetType.utdanningGodkjentAvNav,
                 faktiskeUtgifter =
                     FaktiskeUtgifter(
-                        garDuPaVideregaendeEllerGrunnskole = GarDuPaVideregaendeEllerGrunnskoleType.annetTiltak,
-                        erDuLaerling = null,
-                        arbeidsgiverDekkerUtgift = null,
-                        under25 = null,
-                        betalerForReisenTilSkolenSelv = null,
-                        lonnGjennomTiltak = null,
+                        garDuPaVideregaendeEllerGrunnskole = GarDuPaVideregaendeEllerGrunnskoleType.opplaeringForVoksne,
+                        erDuLaerling = JaNeiType.nei,
+                        arbeidsgiverDekkerUtgift = JaNeiType.nei,
+                        under25 = JaNeiType.nei,
+                        betalerForReisenTilSkolenSelv = JaNeiType.nei,
+                        lonnGjennomTiltak = JaNeiType.ja,
                     ),
             )
 
