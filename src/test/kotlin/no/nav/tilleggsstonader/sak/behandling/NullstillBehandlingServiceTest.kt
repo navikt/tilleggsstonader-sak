@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.privatbil.KjørelisteRepository
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeRepository
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
@@ -305,9 +306,10 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
 
         assertThat(gjenbruktAvklartKjørtUke)
             .usingRecursiveComparison()
-            .ignoringFields("id", "sporbar", "behandlingId", "dager")
+            .ignoringFields("id", "sporbar", "behandlingId", "dager", "avklartKjørtUkeStatus")
             .isEqualTo(avklartKjørtUke)
         assertThat(gjenbruktAvklartKjørtUke.id).isNotEqualTo(avklartKjørtUke.id)
+        assertThat(gjenbruktAvklartKjørtUke.avklartKjørtUkeStatus).isEqualTo(AvklartKjørtUkeStatus.UENDRET)
 
         val avklartKjørtDag = avklartKjørtUke.dager.single()
         val gjenbruktAvklartKjørtDag = gjenbruktAvklartKjørtUke.dager.single()
