@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprett
 import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.KjørelisteBehandlingBrevService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
-import no.nav.tilleggsstonader.sak.privatbil.FullførKjørelistebehandlingSteg
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.Properties
@@ -25,7 +24,6 @@ import java.util.Properties
 class AutomatiskKjørelisteBehandlingTask(
     private val stegService: StegService,
     private val taskService: TaskService,
-    private val fullførKjørelisteBehandlingSteg: FullførKjørelistebehandlingSteg,
     private val kjørelisteBehandlingBrevService: KjørelisteBehandlingBrevService,
     private val faktaGrunnlagService: FaktaGrunnlagService,
 ) : AsyncTaskStep {
@@ -39,7 +37,7 @@ class AutomatiskKjørelisteBehandlingTask(
             stegService.håndterSteg(behandlingId, StegType.BEREGNING)
             stegService.håndterSteg(behandlingId, StegType.SIMULERING)
             kjørelisteBehandlingBrevService.genererOgLagreBrev(behandlingId)
-            stegService.håndterSteg(behandlingId, fullførKjørelisteBehandlingSteg)
+            stegService.håndterSteg(behandlingId, StegType.FULLFØR_KJØRELISTE)
         } catch (e: Exception) {
             logger.warn(
                 "Automatisk kjørelistebehandling feilet for behandling=$behandlingId. Oppretter oppgave for manuell behandling.",

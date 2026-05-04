@@ -23,7 +23,6 @@ import tools.jackson.module.kotlin.readValue
 class AutomatiskKjørelisteBehandlingTask {
     private val stegService = mockk<StegService>(relaxed = true)
     private val taskService = mockk<TaskService>(relaxed = true)
-    private val fullførKjørelisteBehandlingSteg = mockk<FullførKjørelistebehandlingSteg>()
     private val kjørelisteBehandlingBrevService = mockk<KjørelisteBehandlingBrevService>()
     private val faktaGrunnlagService = mockk<FaktaGrunnlagService>(relaxed = true)
 
@@ -31,7 +30,6 @@ class AutomatiskKjørelisteBehandlingTask {
         AutomatiskKjørelisteBehandlingTask(
             stegService,
             taskService,
-            fullførKjørelisteBehandlingSteg,
             kjørelisteBehandlingBrevService,
             faktaGrunnlagService,
         )
@@ -49,7 +47,7 @@ class AutomatiskKjørelisteBehandlingTask {
             stegService.håndterSteg(behandlingId, StegType.BEREGNING)
             stegService.håndterSteg(behandlingId, StegType.SIMULERING)
             kjørelisteBehandlingBrevService.genererOgLagreBrev(behandlingId)
-            stegService.håndterSteg(behandlingId, fullførKjørelisteBehandlingSteg)
+            stegService.håndterSteg(behandlingId, StegType.FULLFØR_KJØRELISTE)
         }
         verify(exactly = 0) { taskService.save(any()) }
     }
