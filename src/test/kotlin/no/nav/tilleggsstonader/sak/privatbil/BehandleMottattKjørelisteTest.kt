@@ -103,7 +103,6 @@ class BehandleMottattKjørelisteTest : CleanDatabaseIntegrationTest() {
     @Test
     fun `ta i mot kjøreliste uten avvik og ikke opprett automatisk behandling når bryter er false`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-        every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns false
 
         val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
@@ -139,7 +138,6 @@ class BehandleMottattKjørelisteTest : CleanDatabaseIntegrationTest() {
     @Test
     fun `ta i mot kjøreliste med parkeringsutgift 101 kroner og krev manuell behandling`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-        every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns false
         val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,

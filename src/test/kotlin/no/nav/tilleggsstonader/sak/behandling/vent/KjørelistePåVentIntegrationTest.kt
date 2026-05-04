@@ -45,7 +45,6 @@ class KjørelistePåVentIntegrationTest : IntegrationTest() {
             )
 
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-        every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns false
 
         val førstegangsBehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
@@ -57,7 +56,7 @@ class KjørelistePåVentIntegrationTest : IntegrationTest() {
                     periode = Datoperiode(fomUke1, tomUke1)
                     kjørteDager =
                         listOf(
-                            KjørtDag(dato = 5 januar 2026, parkeringsutgift = 120),
+                            KjørtDag(dato = 5 januar 2026, parkeringsutgift = 50),
                         )
                 }
             }
@@ -90,7 +89,7 @@ class KjørelistePåVentIntegrationTest : IntegrationTest() {
                 periode = Datoperiode(fomUke2, tomUke2),
                 dagerKjørt =
                     listOf(
-                        KjørtDag(dato = 12 januar 2026, parkeringsutgift = 120),
+                        KjørtDag(dato = 12 januar 2026, parkeringsutgift = 50),
                     ),
             ),
             ident = brukerident,

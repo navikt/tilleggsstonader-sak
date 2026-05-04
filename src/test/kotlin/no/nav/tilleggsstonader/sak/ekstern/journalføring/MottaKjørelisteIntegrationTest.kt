@@ -37,7 +37,6 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
     @Test
     fun `daglig-reise tso sak med innvilget rammevedtak, mottar kjøreliste, verifiser blir journalført og lagret`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-        every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns false
 
         val fom = 1 januar 2026
         val tom = 14 januar 2026
@@ -62,7 +61,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
                 KjørtDag(dato = 1 januar 2026, parkeringsutgift = 50),
                 KjørtDag(dato = 4 januar 2026, parkeringsutgift = 70),
                 KjørtDag(dato = 9 januar 2026, parkeringsutgift = 40),
-                KjørtDag(dato = 11 januar 2026, parkeringsutgift = 120),
+                KjørtDag(dato = 11 januar 2026, parkeringsutgift = 90),
             )
         val kjøreliste =
             kjørelisteSkjema(
@@ -91,7 +90,6 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
     @Test
     fun `skal kun opprettes en kjørelistebehandling om det kommer inn to kjørelister etter hverandre`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-        every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns false
 
         val fom = 2 mars 2026
         val tom = 15 mars 2026
@@ -103,7 +101,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
 
                 sendInnKjøreliste {
                     periode = Datoperiode(fom, 8 mars 2026)
-                    kjørteDager = listOf(KjørtDag(dato = fom, parkeringsutgift = 120))
+                    kjørteDager = listOf(KjørtDag(dato = fom, parkeringsutgift = 50))
                 }
             }
 
@@ -148,7 +146,6 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
     @Test
     fun `skal opprette to kjørelistebehandlinger om den første ikke er ferdigstilt men er påbegynt`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-        every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns false
 
         val fom = 2 mars 2026
         val tom = 15 mars 2026
@@ -160,7 +157,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
 
                 sendInnKjøreliste {
                     periode = Datoperiode(fom, 8 mars 2026)
-                    kjørteDager = listOf(KjørtDag(dato = fom, parkeringsutgift = 120))
+                    kjørteDager = listOf(KjørtDag(dato = fom, parkeringsutgift = 50))
                 }
             }
 
@@ -182,7 +179,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
                     periode = Datoperiode(9 mars 2026, tom),
                     dagerKjørt =
                         listOf(
-                            KjørtDag(dato = 9 mars 2026, parkeringsutgift = 120),
+                            KjørtDag(dato = 9 mars 2026, parkeringsutgift = 50),
                         ),
                 ),
             ident = behandlingContext.ident,
@@ -198,7 +195,6 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
     @Test
     fun `skal opprette ny kjørelistebehandling når første er manuelt endret og ikke lenger tilordnet`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-        every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns false
 
         val fom = 2 mars 2026
         val tom = 15 mars 2026
@@ -210,7 +206,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
 
                 sendInnKjøreliste {
                     periode = Datoperiode(fom, 8 mars 2026)
-                    kjørteDager = listOf(KjørtDag(dato = fom, parkeringsutgift = 120))
+                    kjørteDager = listOf(KjørtDag(dato = fom, parkeringsutgift = 50))
                 }
             }
 
@@ -218,7 +214,9 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
         val reiseId = rammevedtak.single().reiseId
 
         val førsteKjørelistebehandling =
-            testoppsettService.hentBehandlinger(fagsakId = behandlingContext.fagsakId).single { it.type == BehandlingType.KJØRELISTE }
+            testoppsettService
+                .hentBehandlinger(fagsakId = behandlingContext.fagsakId)
+                .single { it.type == BehandlingType.KJØRELISTE }
 
         tilordneÅpenBehandlingOppgaveForBehandling(førsteKjørelistebehandling.id)
 
@@ -266,7 +264,7 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
                     periode = Datoperiode(9 mars 2026, tom),
                     dagerKjørt =
                         listOf(
-                            KjørtDag(dato = 9 mars 2026, parkeringsutgift = 120),
+                            KjørtDag(dato = 9 mars 2026, parkeringsutgift = 50),
                         ),
                 ),
             ident = behandlingContext.ident,

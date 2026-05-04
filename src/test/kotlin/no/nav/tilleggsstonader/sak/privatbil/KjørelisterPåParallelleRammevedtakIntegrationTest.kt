@@ -42,7 +42,6 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
             )
 
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-        every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns false
 
         val førstegangsBehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
@@ -121,7 +120,7 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
                             listOf(
                                 KjørtDag(dato = 12 januar 2026, parkeringsutgift = 50),
                                 KjørtDag(dato = 19 januar 2026, parkeringsutgift = 50),
-                                KjørtDag(dato = 26 januar 2026, parkeringsutgift = 120),
+                                KjørtDag(dato = 26 januar 2026, parkeringsutgift = 50),
                             ),
                     ),
             )
@@ -154,7 +153,7 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
                         periode = Datoperiode(fomRamme1, 11 januar 2026),
                         dagerKjørt =
                             listOf(
-                                KjørtDag(dato = 5 januar 2026, parkeringsutgift = 120),
+                                KjørtDag(dato = 5 januar 2026, parkeringsutgift = 50),
                             ),
                     ),
             )

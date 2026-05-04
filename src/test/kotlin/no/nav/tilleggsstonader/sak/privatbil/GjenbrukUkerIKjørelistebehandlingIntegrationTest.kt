@@ -41,7 +41,6 @@ class GjenbrukUkerIKjørelistebehandlingIntegrationTest : IntegrationTest() {
             )
 
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-        every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns false
 
         val førstegangsBehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
@@ -89,7 +88,7 @@ class GjenbrukUkerIKjørelistebehandlingIntegrationTest : IntegrationTest() {
                         listOf(
                             KjørtDag(dato = 12 januar 2026, parkeringsutgift = 50),
                             KjørtDag(dato = 13 januar 2026, parkeringsutgift = 50),
-                            KjørtDag(dato = 20 januar 2026, parkeringsutgift = 101),
+                            KjørtDag(dato = 20 januar 2026, parkeringsutgift = 50),
                         ),
                 ),
             ident = førstegangsBehandlingContext.ident,

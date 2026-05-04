@@ -210,7 +210,6 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
 
     private fun opprettBehandlingOgSendInnKjøreliste(dagerKjørt: List<KjørtDag>): Saksbehandling {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-        every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns false
 
         val dagerKjørtMedAvvik: List<KjørtDag> =
             if (dagerKjørt.any { it.parkeringsutgift!! > 100 || it.dato.datoErHelg() }) {

@@ -82,7 +82,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 kjørteDager =
                     listOf(
                         KjørelisteUtil.KjørtDag(dato = 2 februar 2026, parkeringsutgift = 50),
-                        KjørelisteUtil.KjørtDag(dato = 3 februar 2026, parkeringsutgift = 120),
+                        KjørelisteUtil.KjørtDag(dato = 3 februar 2026, parkeringsutgift = 50),
                         KjørelisteUtil.KjørtDag(dato = 4 februar 2026, parkeringsutgift = 3),
                     ),
             )

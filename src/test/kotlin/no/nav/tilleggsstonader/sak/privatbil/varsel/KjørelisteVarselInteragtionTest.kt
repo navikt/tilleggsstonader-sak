@@ -80,7 +80,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
                 periode = Datoperiode(fom1, tom1)
                 kjørteDager =
                     listOf(
-                        KjørtDag(dato = fom1, parkeringsutgift = 120),
+                        KjørtDag(dato = fom1, parkeringsutgift = 50),
                     )
                 reiseIdProvider = { it.first().reiseId }
             }
@@ -142,7 +142,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
                 periode = Datoperiode(fom, tomKjoreliste)
                 kjørteDager =
                     listOf(
-                        KjørtDag(dato = fom, parkeringsutgift = 120),
+                        KjørtDag(dato = fom, parkeringsutgift = 50),
                     )
             }
         }
@@ -173,7 +173,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
                 periode = Datoperiode(fom, tomKjoreliste)
                 kjørteDager =
                     listOf(
-                        KjørtDag(dato = fom, parkeringsutgift = 120),
+                        KjørtDag(dato = fom, parkeringsutgift = 50),
                     )
             }
         }
