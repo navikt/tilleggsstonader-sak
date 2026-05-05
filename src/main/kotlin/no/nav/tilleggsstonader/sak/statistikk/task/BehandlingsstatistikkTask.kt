@@ -6,6 +6,8 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.error.RekjørSenereException
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
@@ -32,9 +34,8 @@ class BehandlingsstatistikkTask(
 
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
 
-        // Vil aldri opprettes oppgave for satsendringer
-        if (!saksbehandling.erSatsendring) {
-            kastFeilOmOppgaveIkkeHarBlittOpprettet(behandlingId)
+        if (saksbehandling.behandlingMetode == BehandlingMetode.MANUELL) {
+            kastFeilOmOppgaveIkkeHarBlittOpprettet(saksbehandling)
         }
 
         behandlingsstatistikkService.sendBehandlingstatistikk(
@@ -46,11 +47,11 @@ class BehandlingsstatistikkTask(
     }
 
     // Vi sender med ansvarligEnhet til DVH, som hentes ut fra oppgave. Venter på at oppgave skal opprettes
-    private fun kastFeilOmOppgaveIkkeHarBlittOpprettet(behandlingId: BehandlingId) {
-        val oppgaverForBehandling = oppgaveService.finnAlleOppgaveDomainForBehandling(behandlingId)
+    private fun kastFeilOmOppgaveIkkeHarBlittOpprettet(saksbehandling: Saksbehandling) {
+        val oppgaverForBehandling = oppgaveService.finnAlleOppgaveDomainForBehandling(saksbehandling.id)
         if (oppgaverForBehandling.isEmpty()) {
             throw RekjørSenereException(
-                "Vent med å sende MOTTATT-status til DVH til oppgave er opprettet for behandling=$behandlingId",
+                "Vent med å sende MOTTATT-status til DVH til oppgave er opprettet for behandling=${saksbehandling.id}",
                 triggerTid = LocalDateTime.now().plusSeconds(5),
             )
         }

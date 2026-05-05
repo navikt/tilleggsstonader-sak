@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtaks
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -292,5 +293,13 @@ class BehandlingService(
                 forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
             ),
         )
+    }
+
+    fun oppdaterBehandlingMetode(
+        behandlingId: BehandlingId,
+        behandlingMetode: BehandlingMetode,
+    ) {
+        val behandling = hentBehandling(behandlingId)
+        behandlingRepository.update(behandling.copy(behandlingMetode = behandlingMetode))
     }
 }
