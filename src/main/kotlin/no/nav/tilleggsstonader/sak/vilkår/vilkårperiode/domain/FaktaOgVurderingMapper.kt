@@ -22,7 +22,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetReiseTilSamlingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetBoutgifter
@@ -357,13 +356,11 @@ private fun mapAktiviteterReiseTilSamlingTso(
                         harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
                         erAktivitetenObligatorisk = VurderingErAktivitetenObligatorisk(faktaOgSvar.svarErAktivitetenObligatorisk),
                     ),
-                fakta = FaktaAktivitetReiseTilSamlingTso(aktivitetsdager = faktaOgSvar.aktivitetsdager),
             )
         }
 
         AktivitetType.UTDANNING ->
             UtdanningReiseTilSamlingTso(
-                fakta = FaktaAktivitetReiseTilSamlingTso(aktivitetsdager = faktaOgSvar.aktivitetsdager),
                 vurderinger =
                     VurderingUtdanningReiseTilSamlingTso(
                         harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),

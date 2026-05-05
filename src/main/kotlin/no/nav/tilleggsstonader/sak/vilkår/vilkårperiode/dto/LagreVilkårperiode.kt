@@ -88,7 +88,6 @@ data class FaktaOgSvarAktivitetDagligReiseTsrDto(
 data class FaktaOgSvarAktivitetReiseTilSamlingTsoDto(
     val svarLønnet: SvarJaNei? = null,
     val svarHarUtgifter: SvarJaNei? = null,
-    val aktivitetsdager: Int? = null, // TODO kan kanskje fjernes
     val svarErAktivitetenObligatorisk: SvarJaNei? = null,
 ) : FaktaOgSvarDto()
 
@@ -180,7 +179,6 @@ fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
                         .takeIfVurderinger<HarUtgifterVurdering>()
                         ?.harUtgifter
                         ?.svar,
-                aktivitetsdager = this.fakta.takeIfFakta<FaktaAktivitetsdagerNullable>()?.aktivitetsdager,
                 svarErAktivitetenObligatorisk =
                     this.vurderinger
                         .takeIfVurderinger<ErAktivitetenObligatoriskVurdering>()

@@ -150,7 +150,6 @@ data class AktivitetDagligReiseTsrFaktaOgVurderingerDto(
 data class AktivitetReiseTilSamlingTsoFaktaOgVurderingerDto(
     val lønnet: VurderingDto? = null,
     val harUtgifter: VurderingDto? = null,
-    val aktivitetsdager: Int? = null, // TODO kan kanskje fjernes
     val erAktivitetenObligatorisk: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
@@ -233,7 +232,6 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                     AktivitetReiseTilSamlingTsoFaktaOgVurderingerDto(
                         lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
                         harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
-                        aktivitetsdager = fakta.takeIfFakta<FaktaAktivitetsdagerNullable>()?.aktivitetsdager,
                         erAktivitetenObligatorisk =
                             vurderinger
                                 .takeIfVurderinger<ErAktivitetenObligatoriskVurdering>()

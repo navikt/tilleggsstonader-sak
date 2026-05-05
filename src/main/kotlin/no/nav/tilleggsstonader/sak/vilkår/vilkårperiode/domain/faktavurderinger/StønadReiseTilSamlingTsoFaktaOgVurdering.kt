@@ -61,16 +61,16 @@ data object IngenMålgruppeReiseTilSamlingTso : MålgruppeReiseTilSamlingTso {
 
 data class TiltakReiseTilSamlingTso(
     override val vurderinger: VurderingTiltakReiseTilSamlingTso,
-    override val fakta: FaktaAktivitetReiseTilSamlingTso,
 ) : AktivitetReiseTilSamlingTso {
     override val type: AktivitetReiseTilSamlingTsoType = AktivitetReiseTilSamlingTsoType.TILTAK_REISE_TIL_SAMLING_TSO
+    override val fakta: IngenFakta = IngenFakta
 }
 
 data class UtdanningReiseTilSamlingTso(
-    override val fakta: FaktaAktivitetReiseTilSamlingTso,
     override val vurderinger: VurderingUtdanningReiseTilSamlingTso,
 ) : AktivitetReiseTilSamlingTso {
     override val type: AktivitetReiseTilSamlingTsoType = AktivitetReiseTilSamlingTsoType.UTDANNING_REISE_TIL_SAMLING_TSO
+    override val fakta: IngenFakta = IngenFakta
 }
 
 data object IngenAktivitetReiseTilSamlingTso : AktivitetReiseTilSamlingTso {
@@ -92,11 +92,6 @@ data class VurderingUtdanningReiseTilSamlingTso(
     override val erAktivitetenObligatorisk: VurderingErAktivitetenObligatorisk,
 ) : HarUtgifterVurdering,
     ErAktivitetenObligatoriskVurdering
-
-data class FaktaAktivitetReiseTilSamlingTso(
-    override val aktivitetsdager: Int? = null, // TODO høre om denne skal fjernes
-) : Fakta,
-    FaktaAktivitetsdagerNullable
 
 sealed interface TypeFaktaOgVurderingReiseTilSamlingTso : TypeFaktaOgVurdering
 
