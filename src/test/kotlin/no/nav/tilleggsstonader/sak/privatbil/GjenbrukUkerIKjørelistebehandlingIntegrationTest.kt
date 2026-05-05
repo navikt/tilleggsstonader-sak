@@ -154,7 +154,8 @@ class GjenbrukUkerIKjørelistebehandlingIntegrationTest : IntegrationTest() {
         )
         kall.behandling.nullstill(andreKjørelistebehandling.id)
 
-        val reisevurderingEtterNullstilling = kall.privatBil.hentReisevurderingForBehandling(andreKjørelistebehandling.id).single()
+        val reisevurderingEtterNullstilling =
+            kall.privatBil.hentReisevurderingForBehandling(andreKjørelistebehandling.id).single()
         assertThat(reisevurderingEtterNullstilling.uker).hasSameSizeAs(reisevurderingForAndreKjørelistebehandling.uker)
 
         reisevurderingForAndreKjørelistebehandling.uker

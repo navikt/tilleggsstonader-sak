@@ -30,7 +30,7 @@ class UtbetalingerDvhTest {
             )
 
         val innvilgelseTilsynBarn = TilsynBarnTestUtil.innvilgelse(vedtaksdata)
-        val resultat = UtbetalingerDvh.fraDomene(listOf(andelTilkjentYtelse), innvilgelseTilsynBarn)
+        val resultat = UtbetalingerDvh.fraDomene(setOf(andelTilkjentYtelse), innvilgelseTilsynBarn)
 
         val forventetResultat =
             UtbetalingerDvh.JsonWrapper(
@@ -53,7 +53,7 @@ class UtbetalingerDvhTest {
     @Test
     fun `mappes riktig for læremidler`() {
         val innvilgelse = LæremidlerTestUtil.innvilgelse()
-        val andlelerTilkjentYtelse = listOf(andelTilkjentYtelse(fom = 1 januar 2024))
+        val andlelerTilkjentYtelse = setOf(andelTilkjentYtelse(fom = 1 januar 2024))
 
         val resultat = UtbetalingerDvh.fraDomene(andlelerTilkjentYtelse, innvilgelse)
 
@@ -99,7 +99,7 @@ class UtbetalingerDvhTest {
                 opphørsdato = null,
             )
 
-        val resultat = UtbetalingerDvh.fraDomene(listOf(andelTilkjentYtelse), innvilgelseDagligReise)
+        val resultat = UtbetalingerDvh.fraDomene(setOf(andelTilkjentYtelse), innvilgelseDagligReise)
 
         val forventetResultat =
             UtbetalingerDvh.JsonWrapper(
@@ -144,7 +144,7 @@ class UtbetalingerDvhTest {
                 opphørsdato = null,
             )
 
-        val resultat = UtbetalingerDvh.fraDomene(listOf(andelTilkjentYtelse), innvilgelse)
+        val resultat = UtbetalingerDvh.fraDomene(setOf(andelTilkjentYtelse), innvilgelse)
 
         val forventetResultat =
             UtbetalingerDvh.JsonWrapper(
@@ -168,7 +168,7 @@ class UtbetalingerDvhTest {
     @Test
     fun `gyldige andeler med beløp 0 blir fjernet`() {
         val innvilgelse = LæremidlerTestUtil.innvilgelse()
-        val andlelerTilkjentYtelse = listOf(andelTilkjentYtelse(fom = 1 januar 2024, beløp = 0))
+        val andlelerTilkjentYtelse = setOf(andelTilkjentYtelse(fom = 1 januar 2024, beløp = 0))
 
         val resultat = UtbetalingerDvh.fraDomene(andlelerTilkjentYtelse, innvilgelse)
 

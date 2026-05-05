@@ -3,13 +3,13 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 val javaVersion = JavaLanguageVersion.of(21)
 val tomcatVersion = "11.0.21"
-val familieProsesseringVersion = "2.20260331095424_89d92d2"
+val familieProsesseringVersion = "2.20260420122910_8bfca04"
 val tilleggsstønaderLibsVersion = "2026.04.16-14.35.49734215fe02"
 val tilleggsstønaderKontrakterVersion = "2026.04.28-09.57.57d795d1d348"
 val avroVersion = "1.12.1"
 val confluentVersion = "8.0.1"
-val joarkHendelseVersion = "1.1.8"
-val tokenSupportVersion = "6.0.5"
+val joarkHendelseVersion = "1.1.10"
+val tokenSupportVersion = "6.0.6"
 val wiremockVersion = "3.13.2"
 val mockkVersion = "1.14.9"
 val testcontainerVersion = "1.21.4"
@@ -25,10 +25,10 @@ plugins {
 
     kotlin("jvm") version "2.2.21"
     id("com.diffplug.spotless") version "8.4.0"
-    id("com.github.ben-manes.versions") version "0.53.0"
+    id("com.github.ben-manes.versions") version "0.54.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
 
-    id("org.springframework.boot") version "4.0.5"
+    id("org.springframework.boot") version "4.0.6"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.spring") version "2.2.21"
 }
@@ -91,6 +91,7 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")
 
     implementation("no.nav.familie:prosessering-core:$familieProsesseringVersion")
+    implementation("no.nav.familie:prosessering-web-nav-token-support:$familieProsesseringVersion")
 
     // Tillegggsstønader libs
     implementation("no.nav.tilleggsstonader-libs:util:$tilleggsstønaderLibsVersion")

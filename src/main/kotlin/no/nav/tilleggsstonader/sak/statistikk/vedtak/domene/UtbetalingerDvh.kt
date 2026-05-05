@@ -20,7 +20,7 @@ data class UtbetalingerDvh(
 
     companion object {
         fun fraDomene(
-            andelerTilkjentYtelse: List<AndelTilkjentYtelse>,
+            andelerTilkjentYtelse: Set<AndelTilkjentYtelse>,
             vedtak: Vedtak,
         ): JsonWrapper {
             val gyldigeAndeler =

@@ -214,7 +214,9 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
         val reiseId = rammevedtak.single().reiseId
 
         val førsteKjørelistebehandling =
-            testoppsettService.hentBehandlinger(fagsakId = behandlingContext.fagsakId).single { it.type == BehandlingType.KJØRELISTE }
+            testoppsettService
+                .hentBehandlinger(fagsakId = behandlingContext.fagsakId)
+                .single { it.type == BehandlingType.KJØRELISTE }
 
         tilordneÅpenBehandlingOppgaveForBehandling(førsteKjørelistebehandling.id)
 

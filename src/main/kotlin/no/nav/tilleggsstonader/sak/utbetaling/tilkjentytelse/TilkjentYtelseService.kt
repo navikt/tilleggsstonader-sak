@@ -74,7 +74,6 @@ class TilkjentYtelseService(
                 tom = måned.atDay(1),
                 satstype = Satstype.UGYLDIG,
                 type = TypeAndel.UGYLDIG,
-                kildeBehandlingId = tilkjentYtelse.behandlingId,
                 iverksetting = iverksetting,
                 statusIverksetting = StatusIverksetting.SENDT,
                 utbetalingsdato = måned.atDay(1),

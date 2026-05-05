@@ -8,19 +8,16 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.AdresseJegSkalReiseFra
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.AktivitetMetadata
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Aktiviteter
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.AktiviteterMetadata
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.AktiviteterOgMålgruppeMetadata
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArbeidOgOpphold
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArsakOppholdUtenforNorgeType
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArbeidsrettetAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DagligReiseFyllUtSendInnData
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DataFetcher
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DineOpplysninger
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.FaktiskeUtgifter
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.GarDuPaVideregaendeEllerGrunnskoleType
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HarPengestotteAnnetLandType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HovedytelseType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaSlagsTypeBillettMaDuKjopeType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Identitet
@@ -28,18 +25,17 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.JaNe
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Landvelger
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.MetadataDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.NavAdresse
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.OppholdUtenforNorge
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Periode
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Reise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.SkjemaDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Valgfelt
+import no.nav.tilleggsstonader.libs.utils.dato.april
+import no.nav.tilleggsstonader.libs.utils.dato.august
 import no.nav.tilleggsstonader.libs.utils.dato.januar
-import no.nav.tilleggsstonader.libs.utils.dato.november
+import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Service
@@ -58,40 +54,36 @@ class OpprettDummySøknadDagligReise(
                     Identitet(identitetsnummer = "11111122222"),
                 adresse =
                     NavAdresse(
-                        gyldigFraOgMed = LocalDate.of(2025, 1, 1),
-                        adresse = "Nisseveien 3",
-                        postnummer = "0011",
-                        bySted = "OSLO",
-                        landkode = "NO",
+                        gyldigFraOgMed = 8 august 2001,
+                        adresse = "Repsetvegen 100",
+                        postnummer = "2230",
+                        bySted = "SKOTTERUD",
+                        landkode = "NORGE",
                         land =
                             Landvelger(
                                 value = "Norge",
-                                label = "NO",
+                                label = "NORGE",
                             ),
                     ),
-                reiseFraFolkeregistrertAdr = JaNeiType.nei,
-                adresseJegSkalReiseFra =
-                    AdresseJegSkalReiseFra(
-                        gateadresse = "Annen vei 3",
-                        postnr = "0482",
-                        poststed = "Oslo",
-                    ),
+                reiseFraFolkeregistrertAdr = JaNeiType.ja,
+                adresseJegSkalReiseFra = null,
             )
         val aktiviteter =
             Aktiviteter(
-                aktiviteterOgMaalgruppe = mapOf("134124111" to false, "134125430" to true, "annet" to false),
-                arbeidsrettetAktivitet = null,
+                aktiviteterOgMaalgruppe = mapOf("134124111" to true, "134125430" to true, "annet" to true),
+                arbeidsrettetAktivitet = ArbeidsrettetAktivitetType.utdanningGodkjentAvNav,
                 faktiskeUtgifter =
                     FaktiskeUtgifter(
-                        garDuPaVideregaendeEllerGrunnskole = GarDuPaVideregaendeEllerGrunnskoleType.annetTiltak,
-                        erDuLaerling = JaNeiType.ja,
-                        arbeidsgiverDekkerUtgift = JaNeiType.ja,
+                        garDuPaVideregaendeEllerGrunnskole = GarDuPaVideregaendeEllerGrunnskoleType.opplaeringForVoksne,
+                        erDuLaerling = JaNeiType.nei,
+                        arbeidsgiverDekkerUtgift = JaNeiType.nei,
                         under25 = JaNeiType.nei,
-                        betalerForReisenTilSkolenSelv = JaNeiType.ja,
+                        betalerForReisenTilSkolenSelv = JaNeiType.nei,
                         lonnGjennomTiltak = JaNeiType.ja,
                     ),
             )
-        val reise =
+
+        val reise1 =
             Reise(
                 gateadresse = "Nisseveien 3",
                 postnr = "0011",
@@ -110,11 +102,43 @@ class OpprettDummySøknadDagligReise(
                         HvaSlagsTypeBillettMaDuKjopeType.manedskort to true,
                     ),
                 enkeltbillett = 44,
-                syvdagersbillett = 280,
-                manedskort = 740,
+                syvdagersbillett = null,
+                manedskort = null,
                 hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport = null,
                 kanKjoreMedEgenBil = null,
                 skalDuBetaleForReisenSelv = JaNeiType.nei,
+                mottarDuGrunnstonadFraNav = null,
+                hvorforIkkeBil = null,
+                reiseMedTaxi = null,
+                ttKort = null,
+                parkering = null,
+                bompenger = null,
+                ferge = null,
+                piggdekkavgift = null,
+            )
+
+        val reise2 =
+            Reise(
+                gateadresse = "Adressen 1",
+                postnr = "1100",
+                poststed = "Oslo",
+                fom = 1 mars 2026,
+                tom = 30 april 2026,
+                hvorMangeDagerIUkenSkalDuMoteOppPaAktivitetstedet = Valgfelt("dager", "3"),
+                harDu6KmReisevei = JaNeiType.ja,
+                harDuAvMedisinskeArsakerBehovForTransportUavhengigAvReisensLengde = null,
+                hvorLangErReiseveienDin = 9.0,
+                kanDuReiseMedOffentligTransport = JaNeiType.ja,
+                hvaSlagsTypeBillettMaDuKjope =
+                    mapOf(
+                        HvaSlagsTypeBillettMaDuKjopeType.manedskort to true,
+                    ),
+                enkeltbillett = null,
+                syvdagersbillett = null,
+                manedskort = 1200,
+                hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport = null,
+                kanKjoreMedEgenBil = null,
+                skalDuBetaleForReisenSelv = null,
                 mottarDuGrunnstonadFraNav = null,
                 hvorforIkkeBil = null,
                 reiseMedTaxi = null,
@@ -137,18 +161,13 @@ class OpprettDummySøknadDagligReise(
                                             listOf(
                                                 AktivitetMetadata(
                                                     value = "134125430",
-                                                    label = "Høyere utdanning: 10. september 2025 - 30. juni 2026",
+                                                    label = "Praksisplass i Indre Syltedalen: 10. september 2025 - 30. juni 2026",
                                                     type = "TILTAK",
                                                 ),
                                                 AktivitetMetadata(
                                                     value = "134124111",
                                                     label = "Arbeidstrening: 16. juni 2025 - 31. juli 2025",
                                                     type = "TILTAK",
-                                                ),
-                                                AktivitetMetadata(
-                                                    value = "annet",
-                                                    label = "Annet",
-                                                    type = null,
                                                 ),
                                             ),
                                     ),
@@ -168,9 +187,9 @@ class OpprettDummySøknadDagligReise(
                                     HovedytelseType.arbeidsavklaringspenger to
                                         true,
                                 ),
-                            arbeidOgOpphold = arbeidOgOpphold(),
+                            arbeidOgOpphold = null,
                             aktiviteter = aktiviteter,
-                            reise = listOf(reise),
+                            reise = listOf(reise1, reise2),
                         ),
                         metadata = metadata,
                     ),
@@ -213,34 +232,3 @@ class OpprettDummySøknadDagligReise(
         søknadService.lagreSøknad(behandling.id, journalpost, skjemaDagligReise)
     }
 }
-
-private fun arbeidOgOpphold() =
-    ArbeidOgOpphold(
-        jobberIAnnetLand = JaNeiType.ja,
-        jobbAnnetLand =
-            Landvelger("SWE", "Sverige"),
-        harPengestotteAnnetLand =
-            mapOf(
-                HarPengestotteAnnetLandType.sykepenger to true,
-            ),
-        pengestotteAnnetLand =
-            Landvelger("SWE", "Sverige"),
-        harOppholdUtenforNorgeSiste12mnd = JaNeiType.ja,
-        oppholdUtenforNorgeSiste12mnd =
-            OppholdUtenforNorge(
-                Landvelger("SWE", "Sverige"),
-                mapOf(
-                    ArsakOppholdUtenforNorgeType.besokteFamilie to true,
-                ),
-                Periode(1 januar 2024, 10 januar 2024),
-            ),
-        harOppholdUtenforNorgeNeste12mnd = JaNeiType.ja,
-        oppholdUtenforNorgeNeste12mnd =
-            OppholdUtenforNorge(
-                Landvelger("SWE", "Sverige"),
-                mapOf(
-                    ArsakOppholdUtenforNorgeType.besokteFamilie to true,
-                ),
-                Periode(1 januar 2024, 30 november 2024),
-            ),
-    )

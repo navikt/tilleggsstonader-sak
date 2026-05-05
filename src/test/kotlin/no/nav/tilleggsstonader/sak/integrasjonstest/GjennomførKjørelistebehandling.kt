@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBeha
 
 fun IntegrationTest.gjennomførKjørelisteBehandling(
     behandling: Behandling,
-    tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
+    tilSteg: StegType? = StegType.FULLFØR_KJØRELISTE,
 ) {
     require(behandling.type == BehandlingType.KJØRELISTE) {
         "Behandling er ikke en kjøreliste-behandling"

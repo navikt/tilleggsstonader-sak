@@ -111,8 +111,8 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
                 forrigeIverksatteBehandlingId = behandling.id,
             )
 
-        val tilkjentYtelse = tilkjentYtelse(behandlingId = behandling.id, andeler = lagAndeler(behandling))
-        val tilkjentYtelse2 = tilkjentYtelse(behandlingId = behandling2.id, andeler = lagAndeler(behandling2))
+        val tilkjentYtelse = tilkjentYtelse(behandlingId = behandling.id, andeler = lagAndeler())
+        val tilkjentYtelse2 = tilkjentYtelse(behandlingId = behandling2.id, andeler = lagAndeler())
 
         @BeforeEach
         fun setUp() {
@@ -284,7 +284,7 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             tilkjentYtelseRepository.insert(
                 tilkjentYtelse(
                     behandling2.id,
-                    lagAndel(behandling2, forrigeMåned, beløp = 0),
+                    lagAndel(forrigeMåned, beløp = 0),
                 ),
             )
             testoppsettService.lagreTotrinnskontroll(totrinnskontroll(behandling2.id))
@@ -319,7 +319,7 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             tilkjentYtelseRepository.insert(
                 tilkjentYtelse(
                     behandling2.id,
-                    lagAndel(behandling2, forrigeMåned, beløp = 100),
+                    lagAndel(forrigeMåned, beløp = 100),
                 ),
             )
             testoppsettService.lagreTotrinnskontroll(totrinnskontroll(behandling2.id))
@@ -350,7 +350,6 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
                     andelerTilkjentYtelse =
                         tilkjentYtelse.andelerTilkjentYtelse.plus(
                             lagAndel(
-                                behandling,
                                 treMndFrem,
                                 statusIverksetting = StatusIverksetting.VENTER_PÅ_SATS_ENDRING,
                             ),
@@ -362,7 +361,7 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             tilkjentYtelseRepository.insert(
                 tilkjentYtelse(
                     behandling2.id,
-                    lagAndel(behandling2, forrigeMåned, beløp = 100),
+                    lagAndel(forrigeMåned, beløp = 100),
                 ),
             )
             testoppsettService.lagreTotrinnskontroll(totrinnskontroll(behandling2.id))
@@ -371,9 +370,6 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
             val andeler = hentAndeler(behandling)
 
             andeler.forMåned(forrigeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
-            andeler.forMåned(nesteMåned).assertHarStatusOgId(StatusIverksetting.UAKTUELL)
-            andeler.forMåned(nestNesteMåned).assertHarStatusOgId(StatusIverksetting.UAKTUELL)
-            andeler.forMåned(treMndFrem).assertHarStatusOgId(StatusIverksetting.UAKTUELL)
 
             if (!erHelgOgFørsteEllerAndreDagIMåned()) {
                 andeler.forMåned(nåværendeMåned).assertHarStatusOgId(StatusIverksetting.OK, behandling.id)
@@ -408,20 +404,17 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
         fun `Skal kun iverksette andeler innenfor en måned som gjelder for gitt utbetalingsdato`() {
             val andel1 =
                 andelTilkjentYtelse(
-                    kildeBehandlingId = behandling.id,
                     fom = nåværendeMåned.atDay(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
                     utbetalingsdato = nåværendeMåned.atDay(1),
                     type = TypeAndel.LÆREMIDLER_AAP,
                 )
             val andel2 =
                 andelTilkjentYtelse(
-                    kildeBehandlingId = behandling.id,
                     fom = nesteMåned.atDay(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
                     type = TypeAndel.LÆREMIDLER_AAP,
                 )
             val andel3 =
                 andelTilkjentYtelse(
-                    kildeBehandlingId = behandling.id,
                     fom = nesteMåned.atDay(15).datoEllerNesteMandagHvisLørdagEllerSøndag(),
                     type = TypeAndel.LÆREMIDLER_AAP,
                 )
@@ -466,17 +459,14 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
                 tilkjentYtelse(
                     behandlingId = behandling.id,
                     lagAndel(
-                        behandling = behandling,
                         måned = forrigeMåned,
                         type = TypeAndel.LÆREMIDLER_AAP,
                     ),
                     lagAndel(
-                        behandling = behandling,
                         måned = nesteMåned,
                         type = TypeAndel.LÆREMIDLER_AAP,
                     ),
                     lagAndel(
-                        behandling = behandling,
                         måned = nestNesteMåned,
                         type = TypeAndel.LÆREMIDLER_AAP,
                         statusIverksetting = StatusIverksetting.VENTER_PÅ_SATS_ENDRING,
@@ -507,7 +497,6 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
                 tilkjentYtelse(
                     behandlingId = behandling.id,
                     lagAndel(
-                        behandling = behandling,
                         måned = forrigeMåned,
                         statusIverksetting = StatusIverksetting.VENTER_PÅ_SATS_ENDRING,
                         type = TypeAndel.LÆREMIDLER_AAP,
@@ -568,16 +557,15 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
         andelTilkjentYtelseRepository.updateAll(oppdaterteAndeler)
     }
 
-    private fun lagAndeler(behandling: Behandling) =
+    private fun lagAndeler() =
         arrayOf(
-            lagAndel(behandling, forrigeMåned),
-            lagAndel(behandling, nåværendeMåned),
-            lagAndel(behandling, nesteMåned),
-            lagAndel(behandling, nestNesteMåned),
+            lagAndel(forrigeMåned),
+            lagAndel(nåværendeMåned),
+            lagAndel(nesteMåned),
+            lagAndel(nestNesteMåned),
         )
 
     private fun lagAndel(
-        behandling: Behandling,
         måned: YearMonth,
         beløp: Int = 10,
         statusIverksetting: StatusIverksetting = StatusIverksetting.UBEHANDLET,
@@ -585,7 +573,6 @@ class IverksettServiceTest : CleanDatabaseIntegrationTest() {
     ): AndelTilkjentYtelse {
         val fom = måned.atDay(1).datoEllerNesteMandagHvisLørdagEllerSøndag()
         return andelTilkjentYtelse(
-            kildeBehandlingId = behandling.id,
             fom = fom,
             tom = fom,
             beløp = beløp,

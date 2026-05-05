@@ -173,8 +173,8 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
 
     @Test
     fun `skal slette tilkjent ytelse`() {
-        tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id, andelTilkjentYtelse(behandling.id)))
-        tilkjentYtelseRepository.insert(tilkjentYtelse(revurdering.id, andelTilkjentYtelse(revurdering.id)))
+        tilkjentYtelseRepository.insert(tilkjentYtelse(behandling.id, andelTilkjentYtelse()))
+        tilkjentYtelseRepository.insert(tilkjentYtelse(revurdering.id, andelTilkjentYtelse()))
 
         nullstillBehandlingService.nullstillBehandling(revurdering)
 

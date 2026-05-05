@@ -45,7 +45,7 @@ internal class TilkjentYtelseRepositoryTest : CleanDatabaseIntegrationTest() {
     @Test
     fun `Opprett og hent andeler tilkjent ytelse`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-        val andeler = arrayOf(andelTilkjentYtelse(behandling.id), andelTilkjentYtelse(behandling.id))
+        val andeler = arrayOf(andelTilkjentYtelse(), andelTilkjentYtelse())
         val tilkjentYtelse = tilkjentYtelse(behandling.id, *andeler)
 
         val tilkjentYtelseId = repository.insert(tilkjentYtelse).id
@@ -81,7 +81,7 @@ internal class TilkjentYtelseRepositoryTest : CleanDatabaseIntegrationTest() {
                     val tilkjentYtelse = repository.findByBehandlingIdForUpdate(behandling.id)!!
                     latch.countDown() // sier ifra at job1 startet
                     Thread.sleep(500)
-                    val andel = andelTilkjentYtelse(kildeBehandlingId = behandling.id, beløp = beløpJob1)
+                    val andel = andelTilkjentYtelse(beløp = beløpJob1)
                     repository.update(tilkjentYtelse.copy(andelerTilkjentYtelse = setOf(andel)))
                 }
             }
@@ -90,7 +90,7 @@ internal class TilkjentYtelseRepositoryTest : CleanDatabaseIntegrationTest() {
                 latch.await() // venter på at job1 har startet
                 transactionHandler.runInNewTransaction {
                     val tilkjentYtelse = repository.findByBehandlingIdForUpdate(behandling.id)!!
-                    val andel = andelTilkjentYtelse(kildeBehandlingId = behandling.id, beløp = beløpJob2)
+                    val andel = andelTilkjentYtelse(beløp = beløpJob2)
                     repository.update(tilkjentYtelse.copy(andelerTilkjentYtelse = setOf(andel)))
                 }
             }

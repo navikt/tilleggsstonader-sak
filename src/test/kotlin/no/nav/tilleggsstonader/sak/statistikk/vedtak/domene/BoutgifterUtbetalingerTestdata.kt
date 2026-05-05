@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
@@ -82,7 +81,6 @@ fun lagBoutgifterInnvilgelseMedBeløp(
             beløp = månedsbeløp,
             satstype = Satstype.DAG,
             type = TypeAndel.BOUTGIFTER_AAP,
-            kildeBehandlingId = BehandlingId.random(),
             utbetalingsdato = fom,
         )
 

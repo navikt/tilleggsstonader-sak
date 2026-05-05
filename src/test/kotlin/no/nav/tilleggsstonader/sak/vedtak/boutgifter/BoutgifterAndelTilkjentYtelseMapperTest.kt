@@ -1,16 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.februar
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
-import no.nav.tilleggsstonader.sak.util.behandling
-import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.beregnStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.Beregningsgrunnlag
@@ -183,7 +178,7 @@ class BoutgifterAndelTilkjentYtelseMapperTest {
                     perioder = beregningsgrunnlag.map { BeregningsresultatForLøpendeMåned(it, it.beregnStønadsbeløp()) },
                 )
 
-            val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(BehandlingId.random())
+            val andeler = beregningsresultat.mapTilAndelTilkjentYtelse()
 
             andeler.forEachIndexed { index, andel ->
                 val periodeFraAndel = finnPeriodeFraAndel(beregningsresultat, andel)
@@ -195,9 +190,6 @@ class BoutgifterAndelTilkjentYtelseMapperTest {
 }
 
 private fun finnAndelTilkjentYtelse(vararg beregningsgrunnlag: Beregningsgrunnlag): List<AndelTilkjentYtelse> {
-    val fagsak = fagsak(stønadstype = Stønadstype.BOUTGIFTER)
-    val behandling = behandling(fagsak = fagsak, steg = StegType.BEREGNE_YTELSE)
-
     val beregningsresultat =
         BeregningsresultatBoutgifter(
             perioder =
@@ -205,7 +197,7 @@ private fun finnAndelTilkjentYtelse(vararg beregningsgrunnlag: Beregningsgrunnla
                     BeregningsresultatForLøpendeMåned(grunnlag = it, stønadsbeløp = it.beregnStønadsbeløp())
                 },
         )
-    return beregningsresultat.mapTilAndelTilkjentYtelse(behandling.id)
+    return beregningsresultat.mapTilAndelTilkjentYtelse()
 }
 
 private fun lagBeregningsgrunnlagMedEnkeltutgift(

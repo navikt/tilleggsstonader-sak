@@ -15,7 +15,7 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtakResultatDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
-import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
@@ -27,9 +27,9 @@ class VedtaksstatistikkService(
     private val vedtaksstatistikkRepositoryV2: VedtaksstatistikkRepositoryV2,
     private val behandlingService: BehandlingService,
     private val personService: PersonService,
-    private val iverksettService: IverksettService,
     private val vedtakService: VedtakService,
     private val barnRepository: BarnRepository,
+    private val tilkjentYtelseService: TilkjentYtelseService,
 ) {
     fun lagreVedtaksstatistikkV2(behandlingId: BehandlingId) {
         val vedtaksstatistikkV2 = mapTilVedtaksstatistikkV2(behandlingId)
@@ -50,7 +50,9 @@ class VedtaksstatistikkService(
             behandling.vedtakstidspunkt
                 ?: throw IllegalStateException("Behandlingen må ha et vedtakstidspunkt for å sende vedtaksstatistikk")
         val søkerIdent = behandlingService.hentAktivIdent(behandlingId)
-        val andelTilkjentYtelse = iverksettService.hentAndelTilkjentYtelse(behandlingId)
+        val andelTilkjentYtelse =
+            tilkjentYtelseService.hentForBehandlingEllerNull(behandlingId)?.andelerTilkjentYtelse
+                ?: emptySet()
         val barn = barnRepository.findByBehandlingId(behandlingId)
 
         return VedtaksstatistikkV2(

@@ -80,7 +80,6 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
     fun `innsending av kjøreliste på ulike rammevedtak skal ikke påvirke hverandre`() {
         val kjørelistebehandling1 =
             sendInnKjøreliste(
-                indeksKjørelistebehandling = 0,
                 kjøreliste =
                     kjørelisteSkjema(
                         reiseId = reiseIdRamme1,
@@ -113,7 +112,6 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
         // Sender inn kjøreliste for nytt rammevedtak
         val kjørelistebehandling2 =
             sendInnKjøreliste(
-                indeksKjørelistebehandling = 1,
                 kjøreliste =
                     kjørelisteSkjema(
                         reiseId = reiseIdRamme2,
@@ -149,7 +147,6 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
         // Sender inn kjøreliste for første uke
         val kjørelistebehandling =
             sendInnKjøreliste(
-                indeksKjørelistebehandling = 0,
                 kjøreliste =
                     kjørelisteSkjema(
                         reiseId = reiseIdRamme1,
@@ -162,9 +159,8 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
             )
 
         // sender inn kjøreliste for andre og tredje uke før første kjørelistebehandling er ferdigbehandlet
-        val kjørelistebehandlinEtterAndreInnsending =
+        val kjørelistebehandlingEtterAndreInnsending =
             sendInnKjøreliste(
-                indeksKjørelistebehandling = 0,
                 kjøreliste =
                     kjørelisteSkjema(
                         reiseId = reiseIdRamme1,
@@ -178,7 +174,7 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
             )
 
         // Skal kun opprettes en behandling, som tar for seg begge kjørelister
-        assertThat(kjørelistebehandling).isEqualTo(kjørelistebehandlinEtterAndreInnsending)
+        assertThat(kjørelistebehandling).isEqualTo(kjørelistebehandlingEtterAndreInnsending)
 
         // Henter reisevurderinger for begge behandlingene
         val (ramme1, ramme2) = finnReisevurderinger(kjørelistebehandling.id)
@@ -186,25 +182,45 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
         assertThat(ramme2).isNotNull
 
         // Verifiser at begge uker finnes på ramme1 for behandlingen
-        val ukerHvorDetFinnesAvklarteUker = ramme1!!.uker.filter { it.kjørelisteInnsendtDato != null && it.avklartUkeId != null }
+        val ukerHvorDetFinnesAvklarteUker =
+            ramme1!!.uker.filter { it.kjørelisteInnsendtDato != null && it.avklartUkeId != null }
         assertThat(ukerHvorDetFinnesAvklarteUker).hasSameSizeAs(ramme1.uker)
 
         // Verifiser ingen uker på ramme2
         assertThat(ramme2!!.uker.filter { it.kjørelisteInnsendtDato != null && it.avklartUkeId != null }).isEmpty()
     }
 
-    private fun sendInnKjøreliste(
-        kjøreliste: KjørelisteSkjema,
-        indeksKjørelistebehandling: Int = 0,
-    ): Behandling {
+    private fun sendInnKjøreliste(kjøreliste: KjørelisteSkjema): Behandling {
+        // Hent eksisterende kjørelistebehandlinger før innsendingen
+        val eksisterendeBehandlinger =
+            testoppsettService
+                .hentBehandlinger(førstegangsbehandling.fagsakId)
+                .filter { it.type == BehandlingType.KJØRELISTE }
+                .map { it.id }
+                .toSet()
+
         sendInnKjøreliste(
             kjøreliste = kjøreliste,
             ident = brukerident,
         )
 
-        return testoppsettService
-            .hentBehandlinger(førstegangsbehandling.fagsakId)
-            .filter { it.type == BehandlingType.KJØRELISTE }[indeksKjørelistebehandling]
+        val kjørelistebehandlingerEtterInnsending =
+            testoppsettService
+                .hentBehandlinger(førstegangsbehandling.fagsakId)
+                .filter { it.type == BehandlingType.KJØRELISTE }
+
+        // Dersom innsendingen oppretter ny behandling returnerer vi den.
+        val nyBehandling = kjørelistebehandlingerEtterInnsending.firstOrNull { it.id !in eksisterendeBehandlinger }
+        if (nyBehandling != null) return nyBehandling
+
+        // Ved ny innsending på en ikke-ferdigstilt kjørelistebehandling gjenbrukes eksisterende behandling.
+        val aktivEksisterendeBehandling =
+            kjørelistebehandlingerEtterInnsending
+                .filter { it.id in eksisterendeBehandlinger }
+                .singleOrNull { it.erAktiv() }
+
+        return aktivEksisterendeBehandling
+            ?: throw AssertionError("Ingen ny kjørelistebehandling ble opprettet, og fant heller ingen aktiv eksisterende behandling")
     }
 
     data class Reisevurderinger(
