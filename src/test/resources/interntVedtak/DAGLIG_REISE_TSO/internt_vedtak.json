@@ -319,7 +319,8 @@
               } ]
             },
             "stønadsbeløp" : 500,
-            "brukersNavKontor" : null
+            "brukersNavKontor" : null,
+            "fraTidligereVedtak" : false
           } ]
         } ]
       },
