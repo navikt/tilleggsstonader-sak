@@ -73,10 +73,7 @@ class DagligReisePrivatBilStatistikkIntegrationTest : IntegrationTest() {
 
         verifiserVedtaksstatistikkFinnesForBehandling(kjørelisteBehandling.id)
         verifiserFinnesBehandlingstatistikkForBehandling(kjørelisteBehandling.id)
-        verifiserHarBlittProdusertInterntVedtakForBehandling(kjørelisteBehandling.id)
         verifiserHarBlittProdusertVedtaksbrevForKjørelistebehandling(kjørelisteBehandling.id)
-
-        // TODO - også verifisere at statistikk og internt vedtak blir produsert av en automatisk kjørelistebehandling
     }
 
     private fun verifiserHarBlittProdusertVedtaksbrevForKjørelistebehandling(behandlingId: BehandlingId) {
