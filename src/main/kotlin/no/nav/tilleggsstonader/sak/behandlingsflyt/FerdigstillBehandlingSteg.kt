@@ -29,7 +29,9 @@ class FerdigstillBehandlingSteg(
         behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.FERDIGSTILT)
         behandlingService.fjernFritekstFraBehandlingshistorikk(saksbehandling.id)
 
-        taskService.save(InterntVedtakTask.lagTask(saksbehandling.id))
+        if (!saksbehandling.erKjørelisteBehandling()) {
+            taskService.save(InterntVedtakTask.lagTask(saksbehandling.id))
+        }
 
         taskService.save(BehandlingsstatistikkTask.opprettFerdigTask(behandlingId = saksbehandling.id))
 
