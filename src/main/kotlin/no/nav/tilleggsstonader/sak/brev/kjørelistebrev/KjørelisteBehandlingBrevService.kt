@@ -27,15 +27,30 @@ class KjørelisteBehandlingBrevService(
     private val vedtakService: VedtakService,
     private val behandlingService: BehandlingService,
 ) {
-    fun genererOgLagreBrev(behandlingId: BehandlingId): KjørelisteBehandlingBrev {
+    fun genererOgLagreBrev(
+        behandlingId: BehandlingId,
+        genererKjørelistebrevDto: GenererKjørelistebrevDto,
+    ): KjørelisteBehandlingBrev {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         saksbehandling.status.validerKanBehandlingRedigeres()
 
-        val html = genererHtml(saksbehandling)
+        val begrunnelse = utledBegrunnelse(genererKjørelistebrevDto.begrunnelse, behandlingId)
+
+        val html = genererHtml(saksbehandling, begrunnelse)
         val pdf = familieDokumentClient.genererPdf(html)
 
-        return lagreEllerOppdaterBrev(saksbehandling, html, pdf)
+        return lagreEllerOppdaterBrev(saksbehandling, html, pdf, begrunnelse)
     }
+
+    fun utledBegrunnelse(
+        nyBegrunnelse: String?,
+        behandlingId: BehandlingId,
+    ): String? =
+        when {
+            nyBegrunnelse == null -> kjørelisteBehandlingBrevRepository.findByBehandlingId(behandlingId)?.begrunnelse
+            nyBegrunnelse.isBlank() -> null
+            else -> nyBegrunnelse
+        }
 
     fun hentBrev(behandlingId: BehandlingId): KjørelisteBehandlingBrev {
         val brev = kjørelisteBehandlingBrevRepository.findByBehandlingId(behandlingId)
@@ -47,7 +62,10 @@ class KjørelisteBehandlingBrevService(
         return brev
     }
 
-    private fun genererHtml(saksbehandling: Saksbehandling): String {
+    private fun genererHtml(
+        saksbehandling: Saksbehandling,
+        begrunnelse: String?,
+    ): String {
         val vedtaksdata = vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(saksbehandling.id).data
         val beregningsresultatPrivatBil = vedtaksdata.beregningsresultat.privatBil
         val rammevedtak = vedtaksdata.rammevedtakPrivatBil
@@ -73,6 +91,7 @@ class KjørelisteBehandlingBrevService(
                 behandlendeEnhet = utledBehandlendeEnhet(saksbehandling.stønadstype),
                 beregning = oppsummertBeregning,
                 satser = oppsummertBeregning.finnSatserBruktIBeregning(),
+                begrunnelse = begrunnelse,
             )
 
         return htmlifyClient.genererKjørelisteBehandlingBrev(request)
@@ -89,6 +108,7 @@ class KjørelisteBehandlingBrevService(
         saksbehandling: Saksbehandling,
         html: String,
         pdf: ByteArray,
+        begrunnelse: String?,
     ): KjørelisteBehandlingBrev {
         val brev =
             KjørelisteBehandlingBrev(
@@ -96,6 +116,7 @@ class KjørelisteBehandlingBrevService(
                 saksbehandlerHtml = html,
                 pdf = Fil(pdf),
                 saksbehandlerIdent = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
+                begrunnelse = begrunnelse,
             )
 
         if (kjørelisteBehandlingBrevRepository.existsById(saksbehandling.id)) {

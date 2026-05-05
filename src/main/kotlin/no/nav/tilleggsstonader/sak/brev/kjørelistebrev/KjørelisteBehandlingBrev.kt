@@ -14,5 +14,6 @@ data class KjørelisteBehandlingBrev(
     val saksbehandlerHtml: String,
     val pdf: Fil,
     val saksbehandlerIdent: String,
+    val begrunnelse: String? = null,
     val opprettetTid: LocalDateTime = SporbarUtils.now(),
 )

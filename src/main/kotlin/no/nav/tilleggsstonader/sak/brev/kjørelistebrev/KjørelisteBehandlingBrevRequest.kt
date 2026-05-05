@@ -12,4 +12,5 @@ data class KjørelisteBehandlingBrevRequest(
     val saksbehandlerSignatur: String? = null,
     val beregning: PrivatBilOppsummertBeregningDto,
     val satser: List<SatsDagligReisePrivatBil>,
+    val begrunnelse: String? = null,
 )
