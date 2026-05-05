@@ -68,10 +68,11 @@ class PrivatBilBeregningsresultatService {
             ).perioder
 
         val gjenbruktePerioder =
-            ukerSomSkalGjenbrukes.mapNotNull { uke ->
-                forrigeReise.perioder
-                    .find { it.fom.tilUkeIÅr() == uke.uke }
-                    ?.copy(fraTidligereVedtak = true)
+            ukerSomSkalGjenbrukes.map { uke ->
+                val periode =
+                    forrigeReise.perioder.find { it.fom.tilUkeIÅr() == uke.uke }
+                        ?: error("Fant ikke periode for uke ${uke.uke} i forrige vedtak, men uke har status UENDRET")
+                periode.copy(fraTidligereVedtak = true)
             }
 
         return BeregningsresultatForReisePrivatBil(
