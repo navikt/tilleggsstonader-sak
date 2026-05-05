@@ -42,12 +42,15 @@ class KjørelisteBehandlingBrevService(
         return lagreEllerOppdaterBrev(saksbehandling, html, pdf, begrunnelse)
     }
 
+    fun hentBegrunnelse(behandlingId: BehandlingId): String? =
+        kjørelisteBehandlingBrevRepository.findByBehandlingId(behandlingId)?.begrunnelse
+
     fun utledBegrunnelse(
         nyBegrunnelse: String?,
         behandlingId: BehandlingId,
     ): String? =
         when {
-            nyBegrunnelse == null -> kjørelisteBehandlingBrevRepository.findByBehandlingId(behandlingId)?.begrunnelse
+            nyBegrunnelse == null -> hentBegrunnelse(behandlingId)
             nyBegrunnelse.isBlank() -> null
             else -> nyBegrunnelse
         }

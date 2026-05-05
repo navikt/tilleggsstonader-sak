@@ -33,6 +33,15 @@ class KjørelisteBehandlingBrevController(
         )
     }
 
+    @GetMapping("/{behandlingId}/begrunnelse")
+    fun hentBegrunnelse(
+        @PathVariable behandlingId: BehandlingId,
+    ): BegrunnelseDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
+        return BegrunnelseDto(begrunnelse = kjørelisteBehandlingBrevService.hentBegrunnelse(behandlingId))
+    }
+
     @GetMapping("/{behandlingId}")
     fun hentBrev(
         @PathVariable behandlingId: BehandlingId,
