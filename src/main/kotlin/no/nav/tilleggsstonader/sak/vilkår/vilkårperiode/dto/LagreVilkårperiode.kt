@@ -10,8 +10,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetLæremidler
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetReiseTilSamlingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ErAktivitetenObligatoriskVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdagerNullable
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
@@ -81,6 +83,13 @@ data class FaktaOgSvarAktivitetDagligReiseTsoDto(
 data class FaktaOgSvarAktivitetDagligReiseTsrDto(
     val svarHarUtgifter: SvarJaNei? = null,
     val aktivitetsdager: Int? = null,
+) : FaktaOgSvarDto()
+
+data class FaktaOgSvarAktivitetReiseTilSamlingTsoDto(
+    val svarLønnet: SvarJaNei? = null,
+    val svarHarUtgifter: SvarJaNei? = null,
+    val aktivitetsdager: Int? = null, // TODO kan kanskje fjernes
+    val svarErAktivitetenObligatorisk: SvarJaNei? = null,
 ) : FaktaOgSvarDto()
 
 fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
@@ -157,5 +166,25 @@ fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
                         ?.harUtgifter
                         ?.svar,
                 aktivitetsdager = this.fakta.takeIfFakta<FaktaAktivitetsdagerNullable>()?.aktivitetsdager,
+            )
+
+        is AktivitetReiseTilSamlingTso ->
+            FaktaOgSvarAktivitetReiseTilSamlingTsoDto(
+                svarLønnet =
+                    this.vurderinger
+                        .takeIfVurderinger<LønnetVurdering>()
+                        ?.lønnet
+                        ?.svar,
+                svarHarUtgifter =
+                    this.vurderinger
+                        .takeIfVurderinger<HarUtgifterVurdering>()
+                        ?.harUtgifter
+                        ?.svar,
+                aktivitetsdager = this.fakta.takeIfFakta<FaktaAktivitetsdagerNullable>()?.aktivitetsdager,
+                svarErAktivitetenObligatorisk =
+                    this.vurderinger
+                        .takeIfVurderinger<ErAktivitetenObligatoriskVurdering>()
+                        ?.erAktivitetenObligatorisk
+                        ?.svar,
             )
     }

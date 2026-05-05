@@ -13,3 +13,7 @@ sealed interface HarUtgifterVurdering : VurderingerAktivitet {
 sealed interface HarRettTilUtstyrsstipendVurdering : VurderingerAktivitet {
     val harRettTilUtstyrsstipend: VurderingHarRettTilUtstyrsstipend
 }
+
+sealed interface ErAktivitetenObligatoriskVurdering : VurderingerAktivitet {
+    val erAktivitetenObligatorisk: VurderingErAktivitetenObligatorisk
+}
