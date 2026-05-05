@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.brev.kjørelistebrev
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
@@ -55,7 +56,12 @@ class KjørelisteBehandlingBrevService(
             "Finner ikke beregningsresultat for privat bil for behandling ${saksbehandling.id}"
         }
 
-        val saksbehandlersignatur = SikkerhetContext.hentSaksbehandlerNavn(strict = true)
+        val saksbehandlersignatur =
+            if (saksbehandling.behandlingMetode == BehandlingMetode.AUTOMATISK) {
+                null
+            } else {
+                SikkerhetContext.hentSaksbehandlerNavn(strict = true)
+            }
 
         val oppsummertBeregning = oppsummerBeregningPrivatBil(beregningsresultatPrivatBil, rammevedtak)
         val request =
@@ -89,7 +95,7 @@ class KjørelisteBehandlingBrevService(
                 behandlingId = saksbehandling.id,
                 saksbehandlerHtml = html,
                 pdf = Fil(pdf),
-                saksbehandlerIdent = SikkerhetContext.hentSaksbehandler(),
+                saksbehandlerIdent = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
             )
 
         if (kjørelisteBehandlingBrevRepository.existsById(saksbehandling.id)) {

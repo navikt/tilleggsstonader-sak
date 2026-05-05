@@ -229,7 +229,7 @@ class BoutgifterBeregnYtelseSteg(
     ) {
         tilkjentYtelseService.lagreTilkjentYtelse(
             behandlingId = behandlingId,
-            andeler = beregningsresultat.mapTilAndelTilkjentYtelse(behandlingId),
+            andeler = beregningsresultat.mapTilAndelTilkjentYtelse(),
         )
     }
 }

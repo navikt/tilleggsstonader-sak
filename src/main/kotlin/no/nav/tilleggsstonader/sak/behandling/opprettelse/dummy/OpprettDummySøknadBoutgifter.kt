@@ -33,6 +33,8 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Skjem
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.TypeUtgifterType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterFlereSteder
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterNyBolig
+import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.november
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
@@ -168,13 +170,13 @@ private fun arbeidOgOppholdBoutgifter() =
             OppholdUtenforNorge(
                 Landvelger("SWE", "Sverige"),
                 mapOf(ArsakOppholdUtenforNorgeType.besokteFamilie to true),
-                Periode(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 1, 1)),
+                Periode(1 januar 2024, 10 januar 2024),
             ),
         harOppholdUtenforNorgeNeste12mnd = JaNeiType.ja,
         oppholdUtenforNorgeNeste12mnd =
             OppholdUtenforNorge(
                 Landvelger("SWE", "Sverige"),
                 mapOf(ArsakOppholdUtenforNorgeType.besokteFamilie to true),
-                Periode(LocalDate.of(2024, 1, 1), LocalDate.of(2024, 1, 1)),
+                Periode(1 januar 2024, 30 november 2024),
             ),
     )

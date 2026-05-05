@@ -12,7 +12,7 @@ import java.time.LocalDate
 object TilkjentYtelseUtil {
     fun tilkjentYtelse(
         behandlingId: BehandlingId,
-        vararg andeler: AndelTilkjentYtelse = arrayOf(andelTilkjentYtelse(kildeBehandlingId = behandlingId)),
+        vararg andeler: AndelTilkjentYtelse = arrayOf(andelTilkjentYtelse()),
     ): TilkjentYtelse =
         TilkjentYtelse(
             behandlingId = behandlingId,
@@ -20,7 +20,6 @@ object TilkjentYtelseUtil {
         )
 
     fun andelTilkjentYtelse(
-        kildeBehandlingId: BehandlingId = BehandlingId.random(),
         beløp: Int = 11554,
         fom: LocalDate = LocalDate.of(2021, 1, 1),
         tom: LocalDate = fom,
@@ -35,14 +34,12 @@ object TilkjentYtelseUtil {
         tom = tom,
         satstype = satstype,
         type = type,
-        kildeBehandlingId = kildeBehandlingId,
         statusIverksetting = statusIverksetting,
         iverksetting = iverksetting,
         utbetalingsdato = utbetalingsdato,
     )
 
     fun nullAndel(
-        kildeBehandlingId: BehandlingId = BehandlingId.random(),
         fom: LocalDate = LocalDate.now(),
         tom: LocalDate = fom,
         statusIverksetting: StatusIverksetting = StatusIverksetting.SENDT,
@@ -54,7 +51,6 @@ object TilkjentYtelseUtil {
         tom = tom,
         satstype = Satstype.UGYLDIG,
         type = TypeAndel.UGYLDIG,
-        kildeBehandlingId = kildeBehandlingId,
         statusIverksetting = statusIverksetting,
         iverksetting = iverksetting,
         utbetalingsdato = utbetalingsdato,

@@ -30,14 +30,12 @@ class AndelTilkjentYtelseRepositoryTest : CleanDatabaseIntegrationTest() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
         val andel1 =
             andelTilkjentYtelse(
-                kildeBehandlingId = behandling.id,
                 beløp = 100,
                 fom = LocalDate.of(2023, 1, 2),
                 tom = LocalDate.of(2023, 1, 2),
             )
         val andel2 =
             andelTilkjentYtelse(
-                kildeBehandlingId = behandling.id,
                 beløp = 200,
                 fom = LocalDate.of(2023, 1, 2),
                 tom = LocalDate.of(2023, 1, 2),
@@ -73,7 +71,6 @@ class AndelTilkjentYtelseRepositoryTest : CleanDatabaseIntegrationTest() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
         val andel1 =
             andelTilkjentYtelse(
-                kildeBehandlingId = behandling.id,
                 beløp = 100,
                 fom = LocalDate.of(2023, 1, 2),
                 tom = LocalDate.of(2023, 1, 2),
@@ -154,7 +151,6 @@ class AndelTilkjentYtelseRepositoryTest : CleanDatabaseIntegrationTest() {
         ) {
             val andel1 =
                 andelTilkjentYtelse(
-                    kildeBehandlingId = behandling.id,
                     beløp = 100,
                     fom = LocalDate.of(2023, 1, 2),
                     tom = LocalDate.of(2023, 1, 2),

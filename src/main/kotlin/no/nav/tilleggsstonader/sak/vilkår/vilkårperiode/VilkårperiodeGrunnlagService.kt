@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.Vilkårperiod
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.VilkårperioderGrunnlagRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilYtelseSubtype
 import org.slf4j.LoggerFactory
+import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -89,7 +90,12 @@ class VilkårperiodeGrunnlagService(
         return if (behandling.status.behandlingErLåstForVidereRedigering()) {
             null
         } else {
-            opprettGrunnlagsdata(behandling, vilkårperioder).grunnlag
+            try {
+                opprettGrunnlagsdata(behandling, vilkårperioder).grunnlag
+            } catch (_: DuplicateKeyException) {
+                logger.info("Grunnlag finnes allerede behandling=$behandlingId (mulig race condition). Henter eksisterende.")
+                vilkårperioderGrunnlagRepository.findByBehandlingId(behandlingId)?.grunnlag
+            }
         }
     }
 

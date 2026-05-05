@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.libs.log.logger
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -42,7 +41,6 @@ data class AndelTilkjentYtelse(
     override val tom: LocalDate,
     val satstype: Satstype,
     val type: TypeAndel,
-    val kildeBehandlingId: BehandlingId,
     @Version
     val version: Int = 0,
     val statusIverksetting: StatusIverksetting = StatusIverksetting.UBEHANDLET,

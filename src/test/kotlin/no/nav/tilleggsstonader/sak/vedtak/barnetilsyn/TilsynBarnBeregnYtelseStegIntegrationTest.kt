@@ -159,43 +159,36 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
             val forventedeAndeler =
                 listOf(
                     andelTilkjentYtelse(
-                        kildeBehandlingId = behandling.id,
                         fom = vedtaksperiode1.fom,
                         beløp = finnTotalbeløp(dagsatsForUtgift100, 5),
                         utbetalingsdato = januar.atDay(2),
                     ),
                     andelTilkjentYtelse(
-                        kildeBehandlingId = behandling.id,
                         fom = vedtaksperiode2.fom,
                         beløp = finnTotalbeløp(dagsatsForUtgift100, 2),
                         utbetalingsdato = januar.atDay(2),
                     ),
                     andelTilkjentYtelse(
-                        kildeBehandlingId = behandling.id,
                         fom = vedtaksperiode3.fom,
                         beløp = finnTotalbeløp(dagsatsForUtgift100, 6),
                         utbetalingsdato = januar.atDay(2),
                     ),
                     andelTilkjentYtelse(
-                        kildeBehandlingId = behandling.id,
                         fom = februar.atDay(1),
                         beløp = finnTotalbeløp(dagsatsForUtgift100, 3),
                         utbetalingsdato = februar.atDay(1),
                     ),
                     andelTilkjentYtelse(
-                        kildeBehandlingId = behandling.id,
                         fom = vedtaksperiode4.fom,
                         beløp = finnTotalbeløp(dagsatsForUtgift100, 1),
                         utbetalingsdato = februar.atDay(1),
                     ),
                     andelTilkjentYtelse(
-                        kildeBehandlingId = behandling.id,
                         fom = mars.atDay(1),
                         beløp = finnTotalbeløp(dagsatsForUtgift200, 23),
                         utbetalingsdato = mars.atDay(1),
                     ),
                     andelTilkjentYtelse(
-                        kildeBehandlingId = behandling.id,
                         fom = april.atDay(3),
                         beløp = finnTotalbeløp(dagsatsForUtgift200, 1),
                         utbetalingsdato = april.atDay(3),
@@ -546,7 +539,6 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
                         fom = it.fom,
                         tom = it.fom,
                         beløp = beløp1DagUtgift100,
-                        kildeBehandlingId = behandling.id,
                         type = TypeAndel.TILSYN_BARN_AAP,
                     )
                 }
@@ -593,7 +585,6 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
                     fom = vedtaksperiode.fom,
                     tom = vedtaksperiode.fom,
                     beløp = beløp1DagUtgift100,
-                    kildeBehandlingId = behandling.id,
                     type = TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER,
                 )
             assertThat(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList())
@@ -637,7 +628,6 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
                     fom = vedtaksperiode.fom,
                     tom = vedtaksperiode.fom,
                     beløp = beløp1DagUtgift100,
-                    kildeBehandlingId = behandling.id,
                     type = TypeAndel.TILSYN_BARN_ETTERLATTE,
                 )
             assertThat(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList())

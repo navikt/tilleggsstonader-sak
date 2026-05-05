@@ -210,7 +210,6 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
                         tom = it.tom,
                         satstype = it.satstype,
                         type = it.type,
-                        kildeBehandlingId = behandlingId,
                         utbetalingsdato = it.utbetalingsdato,
                     )
                 }.toSet()

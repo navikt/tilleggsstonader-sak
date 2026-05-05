@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
@@ -31,7 +30,6 @@ class TilkjentYtelseServiceTest {
         internal fun `skal returnere true hvis det finnes andel med sluttdato etter idag`() {
             val andelTilkjentYtelse =
                 andelTilkjentYtelse(
-                    kildeBehandlingId = BehandlingId.random(),
                     beløp = 1,
                     fom = LocalDate.now().plusDays(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
                     tom = LocalDate.now().plusDays(1).datoEllerNesteMandagHvisLørdagEllerSøndag(),
@@ -47,7 +45,6 @@ class TilkjentYtelseServiceTest {
         internal fun `skal returnere false hvis det finnes andel med sluttdato før idag`() {
             val andelTilkjentYtelse =
                 andelTilkjentYtelse(
-                    kildeBehandlingId = BehandlingId.random(),
                     beløp = 1,
                     fom = LocalDate.now().minusDays(10).datoEllerNesteMandagHvisLørdagEllerSøndag(),
                     tom = LocalDate.now().minusDays(10).datoEllerNesteMandagHvisLørdagEllerSøndag(),

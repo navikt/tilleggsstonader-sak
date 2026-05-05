@@ -12,6 +12,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseVedtakService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
@@ -34,12 +36,16 @@ class BehandleMottattKjørelisteTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var vilkårService: DagligReiseVilkårService
 
+    @Autowired
+    private lateinit var oppgaveService: OppgaveService
+
     val fom: LocalDate = 1 januar 2026
     val tom: LocalDate = 31 januar 2026
 
     @Test
-    fun `ta i mot kjøreliste og opprett behandling med kopierte verdier`() {
+    fun `ta i mot kjøreliste uten avvik og opprett manuell behandling`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
+
         val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
@@ -50,7 +56,7 @@ class BehandleMottattKjørelisteTest : CleanDatabaseIntegrationTest() {
                     periode = Datoperiode(fom, 2 januar 2026)
                     kjørteDager =
                         listOf(
-                            KjørtDag(dato = 1 januar 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 1 januar 2026, parkeringsutgift = 100),
                             KjørtDag(dato = 2 januar 2026, parkeringsutgift = 50),
                         )
                 }
@@ -67,11 +73,16 @@ class BehandleMottattKjørelisteTest : CleanDatabaseIntegrationTest() {
         assertThat(kjørelistebehandling.årsak).isEqualTo(BehandlingÅrsak.KJØRELISTE)
         assertThat(kjørelistebehandling.behandlingMetode).isEqualTo(BehandlingMetode.MANUELL)
 
+        val kjørelisteoppgaver = oppgaveService.finnAlleOppgaveDomainForBehandling(kjørelistebehandling.id)
+        assertThat(kjørelisteoppgaver).hasSize(1)
+        assertThat(kjørelisteoppgaver.single().status).isEqualTo(Oppgavestatus.ÅPEN)
+
         val vedtakForrigeBehandling = vedtakService.hentInnvilgelseEllerOpphørVedtak(behandlingContext.behandlingId)
         val vedtakKjørelistebehandling = vedtakService.hentInnvilgelseEllerOpphørVedtak(kjørelistebehandling.id)
 
         assertThat(vedtakKjørelistebehandling.type).isEqualTo(vedtakForrigeBehandling.type)
-        assertThat(vedtakKjørelistebehandling.data).isEqualTo(vedtakForrigeBehandling.data)
+        assertThat(vedtakKjørelistebehandling.data.rammevedtakPrivatBil).isEqualTo(vedtakForrigeBehandling.data.rammevedtakPrivatBil)
+        assertThat(vedtakKjørelistebehandling.data.vedtaksperioder).isEqualTo(vedtakForrigeBehandling.data.vedtaksperioder)
 
         val vilkårperioderForrigeBehandling = vilkårperiodeService.hentVilkårperioder(behandling.id)
         val vilkårperioderKjørelistebehandling = vilkårperiodeService.hentVilkårperioder(kjørelistebehandling.id)

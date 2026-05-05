@@ -68,9 +68,6 @@ class IverksettService(
         )
     }
 
-    fun hentAndelTilkjentYtelse(behandlingId: BehandlingId) =
-        andelTilkjentYtelseRepository.findAndelTilkjentYtelsesByKildeBehandlingId(behandlingId)
-
     private fun andelerForFørsteIverksettingAvBehandling(
         behandling: Saksbehandling,
         tilkjentYtelse: TilkjentYtelse,

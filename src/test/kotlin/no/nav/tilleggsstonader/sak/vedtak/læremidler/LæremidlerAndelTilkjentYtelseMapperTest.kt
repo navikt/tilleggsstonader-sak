@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.november
 import no.nav.tilleggsstonader.libs.utils.dato.oktober
 import no.nav.tilleggsstonader.libs.utils.dato.september
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import org.assertj.core.api.Assertions.assertThat
@@ -47,7 +46,7 @@ class LæremidlerAndelTilkjentYtelseMapperTest {
                     ),
             )
 
-        val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(behandlingId = BehandlingId.random())
+        val andeler = beregningsresultat.mapTilAndelTilkjentYtelse()
 
         assertThat(andeler).hasSize(2)
         with(andeler[0]) {

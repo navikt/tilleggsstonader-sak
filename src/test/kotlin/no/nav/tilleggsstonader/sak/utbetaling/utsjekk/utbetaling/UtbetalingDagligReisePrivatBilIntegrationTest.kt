@@ -121,7 +121,6 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
                 .single()
                 .verdiEllerFeil<IverksettingDto>()
 
-        assertThat(iverksettingDto.saksbehandler).isEqualTo(testBrukerkontekst.bruker)
         assertThat(iverksettingDto.beslutter).isEqualTo(SikkerhetContext.SYSTEM_FORKORTELSE)
         assertThat(iverksettingDto.utbetalinger).hasSize(1)
         val utbetaling = iverksettingDto.utbetalinger.single()

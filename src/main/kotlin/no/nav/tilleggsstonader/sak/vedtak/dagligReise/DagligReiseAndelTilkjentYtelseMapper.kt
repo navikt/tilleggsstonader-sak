@@ -122,7 +122,6 @@ private fun lagAndelForDagligReise(
         tom = fomUkedag,
         satstype = Satstype.DAG,
         type = typeAndel,
-        kildeBehandlingId = saksbehandling.id,
         utbetalingsdato = fomUkedag,
         brukersNavKontor = brukersNavKontor,
         reiseId = reiseId,
