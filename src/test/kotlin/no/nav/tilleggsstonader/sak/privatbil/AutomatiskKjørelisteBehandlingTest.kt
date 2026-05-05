@@ -9,7 +9,9 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
@@ -71,6 +73,9 @@ class AutomatiskKjørelisteBehandlingTest : CleanDatabaseIntegrationTest() {
         assertThat(behandlinger).hasSize(2)
         assertThat(kjørelistebehandling.behandlingMetode).isEqualTo(BehandlingMetode.AUTOMATISK)
         assertThat(kjørelistebehandling.status).isEqualTo(BehandlingStatus.FERDIGSTILT)
+        KafkaFake
+            .sendteMeldinger()
+            .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 1)
     }
 
     @Test
