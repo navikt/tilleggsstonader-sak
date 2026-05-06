@@ -180,7 +180,7 @@ object PostgresDataSourceBuilder {
     val dataSource by lazy {
         HikariDataSource().apply {
             jdbcUrl = getOrThrow(DB_URL_KEY)
-            maximumPoolSize = 40
+            maximumPoolSize = 5 // Start low in K8s; scale up if needed
             minimumIdle = 1
         }
     }
