@@ -67,13 +67,14 @@ class DagligReisePrivatBilStatistikkIntegrationTest : IntegrationTest() {
         val kjørelisteBehandling =
             testoppsettService.hentBehandlinger(behandlingContext.fagsakId).single {
                 it.type ==
-                    BehandlingType.KJØRELISTE
+                        BehandlingType.KJØRELISTE
             }
         gjennomførKjørelisteBehandling(kjørelisteBehandling)
 
         verifiserVedtaksstatistikkFinnesForBehandling(kjørelisteBehandling.id)
         verifiserFinnesBehandlingstatistikkForBehandling(kjørelisteBehandling.id)
         verifiserHarBlittProdusertVedtaksbrevForKjørelistebehandling(kjørelisteBehandling.id)
+        verifiserIkkeHarBlittProdusertInterntVedtakForBehandling(kjørelisteBehandling.id)
     }
 
     private fun verifiserHarBlittProdusertVedtaksbrevForKjørelistebehandling(behandlingId: BehandlingId) {
@@ -110,5 +111,12 @@ class DagligReisePrivatBilStatistikkIntegrationTest : IntegrationTest() {
             JournalpostClientMockConfig.opprettedeJournalposter
                 .filter { it.eksternReferanseId == "$behandlingId-blankett" }, // Settes i InterntVedtakTask ved opprettelse av journalpost
         ).hasSize(1)
+    }
+
+    private fun verifiserIkkeHarBlittProdusertInterntVedtakForBehandling(behandlingId: BehandlingId) {
+        assertThat(
+            JournalpostClientMockConfig.opprettedeJournalposter
+                .filter { it.eksternReferanseId == "$behandlingId-blankett" },
+        ).isEmpty()
     }
 }
