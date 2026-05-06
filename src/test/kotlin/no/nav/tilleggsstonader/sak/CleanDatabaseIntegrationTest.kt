@@ -96,7 +96,6 @@ abstract class CleanDatabaseIntegrationTest : IntegrationTest() {
 
     @BeforeEach
     fun togglePrivatBil() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns false
         every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns false
     }
 }
