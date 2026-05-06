@@ -87,6 +87,9 @@ sealed interface Vurderinger {
         if (this is MottarSykepengerForFulltidsstillingVurdering) {
             vurderinger.add(mottarSykepengerForFulltidsstilling)
         }
+        if (this is ErAktivitetenObligatoriskVurdering) {
+            vurderinger.add(erAktivitetenObligatorisk)
+        }
         return vurderinger
     }
 

@@ -1,0 +1,10 @@
+{
+  "type": "OVERGANGSSTØNAD_REISE_TIL_SAMLING_TSO",
+  "fakta": {},
+  "vurderinger": {
+    "medlemskap": {
+      "svar": "JA_IMPLISITT",
+      "resultat": "OPPFYLT"
+    }
+  }
+}

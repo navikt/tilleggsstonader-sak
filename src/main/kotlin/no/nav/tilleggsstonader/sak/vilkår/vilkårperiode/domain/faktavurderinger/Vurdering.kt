@@ -62,6 +62,26 @@ data class VurderingHarUtgifter(
     }
 }
 
+data class VurderingErAktivitetenObligatorisk(
+    override val svar: SvarJaNei?,
+) : Vurdering {
+    override val resultat: ResultatDelvilkårperiode = utledResultat(svar)
+
+    companion object {
+        private fun utledResultat(svar: SvarJaNei?): ResultatDelvilkårperiode =
+            when (svar) {
+                null -> ResultatDelvilkårperiode.IKKE_VURDERT
+                SvarJaNei.JA -> ResultatDelvilkårperiode.OPPFYLT
+                SvarJaNei.NEI -> ResultatDelvilkårperiode.IKKE_OPPFYLT
+                SvarJaNei.JA_IMPLISITT, SvarJaNei.NEI_IMPLISITT ->
+                    error(
+                        "$svar er ugyldig for ${VurderingErAktivitetenObligatorisk::class.simpleName}",
+                    )
+                SvarJaNei.GAMMEL_MANGLER_DATA -> error("$svar er ugyldig for ${VurderingErAktivitetenObligatorisk::class.simpleName}")
+            }
+    }
+}
+
 data class VurderingHarRettTilUtstyrsstipend(
     override val svar: SvarJaNei?,
 ) : Vurdering {

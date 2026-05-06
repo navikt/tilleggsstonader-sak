@@ -157,6 +157,8 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
             return forventetTypeDagligReiseTso(type)
         } else if (type is TypeFaktaOgVurderingDagligReiseTsr) {
             return forventetTypeDagligReiseTsr(type)
+        } else if (type is TypeFaktaOgVurderingReiseTilSamlingTso) {
+            return forventetTypeReiseTilSamlingTso(type)
         }
 
         error("Ukjent type")
@@ -269,6 +271,30 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
                 when (type) {
                     AktivitetDagligReiseTsrType.TILTAK_DAGLIG_REISE_TSR -> TiltakDagligReiseTsr::class
                     AktivitetDagligReiseTsrType.INGEN_AKTIVITET_DAGLIG_REISE_TSR -> IngenAktivitetDagligReiseTsr::class
+                }
+            }
+        }.java
+
+    private fun forventetTypeReiseTilSamlingTso(
+        type: TypeFaktaOgVurderingReiseTilSamlingTso,
+    ): Class<out FaktaOgVurderingReiseTilSamlingTso> =
+        when (type) {
+            is MålgruppeReiseTilSamlingTsoType -> {
+                when (type) {
+                    MålgruppeReiseTilSamlingTsoType.AAP_REISE_TIL_SAMLING_TSO -> AAPReiseTilSamlingTso::class
+                    MålgruppeReiseTilSamlingTsoType.UFØRETRYGD_REISE_TIL_SAMLING_TSO -> UføretrygdReiseTilSamlingTso::class
+                    MålgruppeReiseTilSamlingTsoType.NEDSATT_ARBEIDSEVNE_REISE_TIL_SAMLING_TSO -> NedsattArbeidsevneReiseTilSamlingTso::class
+                    MålgruppeReiseTilSamlingTsoType.OMSTILLINGSSTØNAD_REISE_TIL_SAMLING_TSO -> OmstillingsstønadReiseTilSamlingTso::class
+                    MålgruppeReiseTilSamlingTsoType.OVERGANGSSTØNAD_REISE_TIL_SAMLING_TSO -> OvergangssstønadReiseTilSamlingTso::class
+                    MålgruppeReiseTilSamlingTsoType.INGEN_MÅLGRUPPE_REISE_TIL_SAMLING_TSO -> IngenMålgruppeReiseTilSamlingTso::class
+                }
+            }
+
+            is AktivitetReiseTilSamlingTsoType -> {
+                when (type) {
+                    AktivitetReiseTilSamlingTsoType.TILTAK_REISE_TIL_SAMLING_TSO -> TiltakReiseTilSamlingTso::class
+                    AktivitetReiseTilSamlingTsoType.UTDANNING_REISE_TIL_SAMLING_TSO -> UtdanningReiseTilSamlingTso::class
+                    AktivitetReiseTilSamlingTsoType.INGEN_AKTIVITET_REISE_TIL_SAMLING_TSO -> IngenAktivitetReiseTilSamlingTso::class
                 }
             }
         }.java
