@@ -1,0 +1,109 @@
+package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
+
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingAldersVilkår
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMedlemskap
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingMottarSykepengerForFulltidsstilling
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+
+class FaktaOgVurderingMålgruppeReiseTilSamlingTest {
+    @Nested
+    inner class ResultatForTypeInngangsvilkår {
+        @Test
+        fun `resultatet skal ikke være oppfylt hvis ikke typen målgruppen gir rett på stønaden`() {
+            listOf(IngenMålgruppeReiseTilSamlingTso).forEach { faktaOgVurdering ->
+                assertThat(faktaOgVurdering.utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
+            }
+        }
+    }
+
+    @Nested
+    inner class ResultatForInngangsvilkårMedVurderinger {
+        val medlemskapIkkeVurdert = vurderingMedlemskap(svar = null)
+        val medlemskapIkkeOppfylt = vurderingMedlemskap(svar = SvarJaNei.NEI)
+        val medlemskapOppfylt = vurderingMedlemskap()
+
+        val dekketAvAnnetRegelverkIkkeVurdert = vurderingDekketAvAnnetRegelverk(svar = null)
+        val dekketAvAnnetRegelverkIkkeOppfylt = vurderingDekketAvAnnetRegelverk(svar = SvarJaNei.JA)
+        val dekketAvAnnetRegelverkOppfylt = vurderingDekketAvAnnetRegelverk()
+
+        val aldersvilkårOppfylt = vurderingAldersVilkår()
+
+        val mottarSykepengerOppfylt = vurderingMottarSykepengerForFulltidsstilling(svar = SvarJaNei.NEI)
+        val mottarSykepengerIkkeOppfylt = vurderingMottarSykepengerForFulltidsstilling(svar = SvarJaNei.JA)
+
+        @Test
+        fun `resultat er IKKE_VURDERT hvis en vurdering ikke er vurdert og resten er oppfylt`() {
+            val inngangsvilkår =
+                NedsattArbeidsevneReiseTilSamlingTso(
+                    vurderinger =
+                        VurderingNedsattArbeidsevne(
+                            medlemskap = medlemskapIkkeVurdert,
+                            dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
+                            aldersvilkår = aldersvilkårOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
+                        ),
+                )
+
+            assertThat(inngangsvilkår.utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_VURDERT)
+        }
+
+        @Test
+        fun `resultat er IKKE_VURDERT hvis en vurdering ikke er vurdert og resten er ikke oppfylt`() {
+            val inngangsvilkår =
+                NedsattArbeidsevneReiseTilSamlingTso(
+                    vurderinger =
+                        VurderingNedsattArbeidsevne(
+                            medlemskap = medlemskapIkkeOppfylt,
+                            dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeVurdert,
+                            aldersvilkår = aldersvilkårOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerIkkeOppfylt,
+                        ),
+                )
+
+            assertThat(inngangsvilkår.utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_VURDERT)
+        }
+
+        @Test
+        fun `resultat er IKKE_OPPFYLT hvis minst en vurdering er ikke oppfylt`() {
+            val inngangsvilkår =
+                NedsattArbeidsevneReiseTilSamlingTso(
+                    vurderinger =
+                        VurderingNedsattArbeidsevne(
+                            medlemskap = medlemskapOppfylt,
+                            dekketAvAnnetRegelverk = dekketAvAnnetRegelverkIkkeOppfylt,
+                            aldersvilkår = aldersvilkårOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerIkkeOppfylt,
+                        ),
+                )
+
+            assertThat(inngangsvilkår.utledResultat()).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
+        }
+
+        @Test
+        fun `resultat er OPPFYLT hvis alle vurderinger har resultat oppfylt`() {
+            val inngangsvilkår =
+                NedsattArbeidsevneReiseTilSamlingTso(
+                    vurderinger =
+                        VurderingNedsattArbeidsevne(
+                            medlemskap = medlemskapOppfylt,
+                            dekketAvAnnetRegelverk = dekketAvAnnetRegelverkOppfylt,
+                            aldersvilkår = aldersvilkårOppfylt,
+                            mottarSykepengerForFulltidsstilling = mottarSykepengerOppfylt,
+                        ),
+                )
+
+            assertThat(inngangsvilkår.utledResultat()).isEqualTo(ResultatVilkårperiode.OPPFYLT)
+        }
+
+        @Test
+        fun `resultat er OPPFYLT hvis det ikke finnes noen vurderinger som trengs`() {
+            val inngangsvilkår = OvergangssstønadReiseTilSamlingTso
+
+            assertThat(inngangsvilkår.utledResultat()).isEqualTo(ResultatVilkårperiode.OPPFYLT)
+        }
+    }
+}
