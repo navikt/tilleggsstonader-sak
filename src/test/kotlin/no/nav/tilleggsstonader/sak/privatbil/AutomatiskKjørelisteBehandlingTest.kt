@@ -12,8 +12,11 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
+import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseVedtakService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
@@ -128,5 +131,67 @@ class AutomatiskKjørelisteBehandlingTest : CleanDatabaseIntegrationTest() {
         assertThat(behandlinger).hasSize(2)
         assertThat(kjørelistebehandling.behandlingMetode).isEqualTo(BehandlingMetode.MANUELL)
         assertThat(kjørelistebehandling.status).isEqualTo(BehandlingStatus.OPPRETTET)
+    }
+
+    @Test
+    fun `skal opprette manuell behandling og sette på vent selv uten avvik når det utredes en behandling med avvik`() {
+        val behandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                defaultDagligReisePrivatBilTsoTestdata(fom, tom)
+
+                // Avvik i parkeringsutgifter gir manuell kjørelistebehandling
+                sendInnKjøreliste {
+                    periode = Datoperiode(fom, 2 januar 2026)
+                    kjørteDager =
+                        listOf(
+                            KjørtDag(dato = 1 januar 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 2 januar 2026, parkeringsutgift = 250),
+                        )
+                }
+            }
+
+        val førsteKjørelistebehandling =
+            behandlingService
+                .hentBehandlinger(behandlingContext.fagsakId)
+                .single { it.type == BehandlingType.KJØRELISTE }
+
+        // Påbegynt behandling skal ikke gjenbrukes når ny kjøreliste kommer inn.
+        tilordneÅpenBehandlingOppgaveForBehandling(førsteKjørelistebehandling.id)
+
+        val reiseId =
+            kall.privatBil
+                .hentRammevedtak(behandlingContext.ident)
+                .single()
+                .reiseId
+
+        sendInnKjøreliste(
+            kjøreliste =
+                kjørelisteSkjema(
+                    reiseId = reiseId,
+                    periode = Datoperiode(3 januar 2026, 4 januar 2026),
+                    dagerKjørt =
+                        listOf(
+                            KjørtDag(dato = 3 januar 2026, parkeringsutgift = 50),
+                        ),
+                ),
+            ident = behandlingContext.ident,
+        )
+
+        val kjørelistebehandlinger =
+            behandlingService
+                .hentBehandlinger(behandlingContext.fagsakId)
+                .filter { it.type == BehandlingType.KJØRELISTE }
+
+        assertThat(kjørelistebehandlinger).hasSize(2)
+        assertThat(kjørelistebehandlinger).allMatch { it.behandlingMetode == BehandlingMetode.MANUELL }
+
+        val oppdatertFørsteKjørelistebehandling =
+            kjørelistebehandlinger.single { it.id == førsteKjørelistebehandling.id }
+        assertThat(oppdatertFørsteKjørelistebehandling.status).isEqualTo(BehandlingStatus.OPPRETTET)
+
+        val andreKjørelistebehandling = kjørelistebehandlinger.single { it.id != førsteKjørelistebehandling.id }
+        assertThat(andreKjørelistebehandling.status).isEqualTo(BehandlingStatus.SATT_PÅ_VENT)
     }
 }

@@ -58,7 +58,8 @@ class BehandleMottattKjørelisteService(
     private fun opprettBehandlingFraKjøreliste(kjøreliste: Kjøreliste) {
         val nyBehandling = opprettKjørelisteBehandling(kjøreliste)
 
-        val skalOppretteAutomatiskTask = kanAutomatiskBehandles(nyBehandling.id)
+        val skalOppretteAutomatiskTask =
+            nyBehandling.status != BehandlingStatus.SATT_PÅ_VENT && kanAutomatiskBehandles(nyBehandling.id)
 
         if (skalOppretteAutomatiskTask) {
             logger.info(
