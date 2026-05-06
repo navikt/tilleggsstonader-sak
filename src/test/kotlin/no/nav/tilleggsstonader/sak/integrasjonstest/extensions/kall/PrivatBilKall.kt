@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
 import no.nav.tilleggsstonader.kontrakter.søknad.RammevedtakDto
+import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.GenererKjørelistebrevDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingPrivatBilDto
@@ -89,6 +90,7 @@ class PrivatBilKall(
                 restTestClient
                     .post()
                     .uri("/api/kjorelistebrev/$behandlingId")
+                    .body(GenererKjørelistebrevDto(begrunnelse = null))
                     .medOnBehalfOfToken()
                     .exchange()
             }
