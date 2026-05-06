@@ -50,7 +50,7 @@ class KjørelisteBehandlingBrevService(
         when {
             nyBegrunnelse == null -> eksisterendeBegrunnelse
             nyBegrunnelse.isBlank() -> null
-            else -> nyBegrunnelse
+            else -> nyBegrunnelse.trim()
         }
 
     fun hentBrev(behandlingId: BehandlingId): KjørelisteBehandlingBrev {
