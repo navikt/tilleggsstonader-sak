@@ -197,6 +197,7 @@ class AvklartKjørelisteService(
             typeAvvik = avvikUke,
             behandletDato = null,
             dager = avklarteDager.toSet(),
+            avklartKjørtUkeStatus = AvklartKjørtUkeStatus.NY,
         )
     }
 

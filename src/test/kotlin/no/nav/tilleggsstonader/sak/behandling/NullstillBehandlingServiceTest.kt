@@ -357,6 +357,7 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
                 tom = LocalDate.now(),
                 uke = LocalDate.now().tilUkeIÅr(),
                 status = UkeStatus.OK_AUTOMATISK,
+                avklartKjørtUkeStatus = AvklartKjørtUkeStatus.NY,
                 dager =
                     setOf(
                         AvklartKjørtDag(

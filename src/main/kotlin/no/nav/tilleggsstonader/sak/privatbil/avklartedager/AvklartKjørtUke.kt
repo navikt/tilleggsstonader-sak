@@ -36,7 +36,7 @@ data class AvklartKjørtUke(
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
     @Column("avklart_kjort_uke_status")
-    val avklartKjørtUkeStatus: AvklartKjørtUkeStatus = AvklartKjørtUkeStatus.NY,
+    val avklartKjørtUkeStatus: AvklartKjørtUkeStatus,
 ) : Periode<LocalDate> {
     init {
         require(dager.all { inneholder(it.dato) }) { "Alle dager må være innenfor perioden til uken" }

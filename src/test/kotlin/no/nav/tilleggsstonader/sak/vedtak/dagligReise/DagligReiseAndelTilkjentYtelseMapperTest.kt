@@ -368,6 +368,7 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
                 ),
             stønadsbeløp = stønadsbeløp.toBigDecimal(),
             brukersNavKontor = null,
+            fraTidligereVedtak = false,
         )
 
         private fun lagRammevedtakPrivatBil(

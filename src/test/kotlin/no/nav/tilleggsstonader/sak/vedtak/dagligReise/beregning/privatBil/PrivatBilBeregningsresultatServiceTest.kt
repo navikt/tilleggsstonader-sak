@@ -857,6 +857,7 @@ class PrivatBilBeregningsresultatServiceTest {
                     uke = uke,
                     status = UkeStatus.OK_AUTOMATISK,
                     behandletDato = LocalDate.now(),
+                    avklartKjørtUkeStatus = AvklartKjørtUkeStatus.NY,
                     dager =
                         dager
                             .map {

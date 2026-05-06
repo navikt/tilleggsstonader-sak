@@ -159,6 +159,7 @@ class PrivatBilBeregningsresultatService {
                         ),
                     stønadsbeløp = beregnedeDager.sumOf { it.stønadsbeløpForDag }.avrundetStønadsbeløp(),
                     brukersNavKontor = brukersNavKontor,
+                    fraTidligereVedtak = false,
                 )
             }
     }

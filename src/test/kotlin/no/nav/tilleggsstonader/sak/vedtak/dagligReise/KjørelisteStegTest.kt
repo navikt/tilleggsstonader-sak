@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -108,6 +109,7 @@ class KjørelisteStegTest {
             tom = tom,
             uke = fom.tilUkeIÅr(),
             status = status,
+            avklartKjørtUkeStatus = AvklartKjørtUkeStatus.NY,
             dager = emptySet(),
         )
     }
