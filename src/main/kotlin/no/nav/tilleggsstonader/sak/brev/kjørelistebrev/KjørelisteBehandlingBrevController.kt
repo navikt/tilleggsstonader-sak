@@ -23,13 +23,15 @@ class KjørelisteBehandlingBrevController(
     fun genererOgLagreBrev(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody genererKjørelistebrevDto: GenererKjørelistebrevDto,
-    ): ByteArray {
+    ): KjørelistebrevResponseDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return Base64.getEncoder().encode(
-            kjørelisteBehandlingBrevService.genererOgLagreBrev(behandlingId, genererKjørelistebrevDto).pdf.bytes,
+        val brev = kjørelisteBehandlingBrevService.genererOgLagreBrev(behandlingId, genererKjørelistebrevDto)
+        return KjørelistebrevResponseDto(
+            pdf = Base64.getEncoder().encodeToString(brev.pdf.bytes),
+            begrunnelse = brev.begrunnelse,
         )
     }
 
