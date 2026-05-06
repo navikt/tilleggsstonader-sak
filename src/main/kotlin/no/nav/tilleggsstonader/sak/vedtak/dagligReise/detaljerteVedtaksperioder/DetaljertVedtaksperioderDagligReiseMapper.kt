@@ -33,13 +33,13 @@ object DetaljertVedtaksperioderDagligReiseMapper {
         this.orEmpty().map { reise ->
             reise.tilDetaljertBeregningsperiode(
                 stønadstype = stønadstype,
-                adresse = adresser[reise.reiseId] ?: "adresse mangler",
+                adresse = adresser[reise.reiseId],
             )
         }
 
     private fun BeregningsresultatForReise.tilDetaljertBeregningsperiode(
         stønadstype: Stønadstype,
-        adresse: String,
+        adresse: String?,
     ): DetaljertVedtaksperiodeDagligReise {
         val detaljertBeregningsperioder =
             perioder
