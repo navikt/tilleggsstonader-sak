@@ -6,6 +6,7 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.GenererKjørelistebrevDto
 import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.KjørelisteBehandlingBrevService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
@@ -35,7 +36,7 @@ class AutomatiskKjørelisteBehandlingTask(
         stegService.håndterSteg(behandlingId, StegType.KJØRELISTE)
         stegService.håndterSteg(behandlingId, StegType.BEREGNING)
         stegService.håndterSteg(behandlingId, StegType.SIMULERING)
-        kjørelisteBehandlingBrevService.genererOgLagreBrev(behandlingId)
+        kjørelisteBehandlingBrevService.genererOgLagreBrev(behandlingId, GenererKjørelistebrevDto(begrunnelse = null))
         stegService.håndterSteg(behandlingId, fullførKjørelistebehandlingSteg)
     }
 
