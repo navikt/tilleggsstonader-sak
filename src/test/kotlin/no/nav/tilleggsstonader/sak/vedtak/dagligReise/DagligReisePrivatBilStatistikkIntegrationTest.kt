@@ -73,10 +73,8 @@ class DagligReisePrivatBilStatistikkIntegrationTest : IntegrationTest() {
 
         verifiserVedtaksstatistikkFinnesForBehandling(kjørelisteBehandling.id)
         verifiserFinnesBehandlingstatistikkForBehandling(kjørelisteBehandling.id)
-        verifiserHarBlittProdusertInterntVedtakForBehandling(kjørelisteBehandling.id)
         verifiserHarBlittProdusertVedtaksbrevForKjørelistebehandling(kjørelisteBehandling.id)
-
-        // TODO - også verifisere at statistikk og internt vedtak blir produsert av en automatisk kjørelistebehandling
+        verifiserIkkeHarBlittProdusertInterntVedtakForBehandling(kjørelisteBehandling.id)
     }
 
     private fun verifiserHarBlittProdusertVedtaksbrevForKjørelistebehandling(behandlingId: BehandlingId) {
@@ -113,5 +111,12 @@ class DagligReisePrivatBilStatistikkIntegrationTest : IntegrationTest() {
             JournalpostClientMockConfig.opprettedeJournalposter
                 .filter { it.eksternReferanseId == "$behandlingId-blankett" }, // Settes i InterntVedtakTask ved opprettelse av journalpost
         ).hasSize(1)
+    }
+
+    private fun verifiserIkkeHarBlittProdusertInterntVedtakForBehandling(behandlingId: BehandlingId) {
+        assertThat(
+            JournalpostClientMockConfig.opprettedeJournalposter
+                .filter { it.eksternReferanseId == "$behandlingId-blankett" },
+        ).isEmpty()
     }
 }

@@ -51,6 +51,16 @@ class FerdigstillBehandlingStegTest {
     }
 
     @Test
+    fun `skal ikke opprette task for internt vedtak for kjørelistebehandling`() {
+        val kjørelistebehandling = saksbehandling(fagsak, behandling(fagsak, type = BehandlingType.KJØRELISTE))
+
+        steg.utførSteg(kjørelistebehandling, null)
+
+        val tasks = taskSlot.filter { it.type == InterntVedtakTask.TYPE }
+        assertThat(tasks).isEmpty()
+    }
+
+    @Test
     fun `skal opprette task for å lage varsel til mitt nav når det finnes tilgjengelige kjørelister`() {
         every { varselService.skalSendeKjørelisteVarsel(any()) } returns true
         steg.utførSteg(behandling, null)
