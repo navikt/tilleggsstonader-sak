@@ -22,7 +22,7 @@ class KjørelisteBehandlingBrevController(
     @PostMapping("/{behandlingId}")
     fun genererOgLagreBrev(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody(required = false) genererKjørelistebrevDto: GenererKjørelistebrevDto = GenererKjørelistebrevDto(begrunnelse = null),
+        @RequestBody genererKjørelistebrevDto: GenererKjørelistebrevDto,
     ): KjørelistebrevResponseDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
