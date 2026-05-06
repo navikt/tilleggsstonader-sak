@@ -275,7 +275,9 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
             }
         }.java
 
-    private fun forventetTypeReiseTilSamlingTso(type: TypeFaktaOgVurderingReiseTilSamlingTso): Class<out FaktaOgVurderingReiseTilSamlingTso> =
+    private fun forventetTypeReiseTilSamlingTso(
+        type: TypeFaktaOgVurderingReiseTilSamlingTso,
+    ): Class<out FaktaOgVurderingReiseTilSamlingTso> =
         when (type) {
             is MålgruppeReiseTilSamlingTsoType -> {
                 when (type) {
