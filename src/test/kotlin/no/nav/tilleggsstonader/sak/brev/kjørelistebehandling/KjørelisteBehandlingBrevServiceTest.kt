@@ -20,37 +20,37 @@ class KjørelisteBehandlingBrevServiceTest {
     inner class UtledBegrunnelse {
         @Test
         fun `null i request bevarer eksisterende begrunnelse`() {
-            val resultat = service.utledBegrunnelse(nyBegrunnelse = null, eksisterendeBegrunnelse = "eksisterende tekst")
+            val resultat = service.bevarEllerOppdaterBegrunnelse(nyBegrunnelse = null, eksisterendeBegrunnelse = "eksisterende tekst")
             assertThat(resultat).isEqualTo("eksisterende tekst")
         }
 
         @Test
         fun `null i request returnerer null når det ikke finnes eksisterende begrunnelse`() {
-            val resultat = service.utledBegrunnelse(nyBegrunnelse = null, eksisterendeBegrunnelse = null)
+            val resultat = service.bevarEllerOppdaterBegrunnelse(nyBegrunnelse = null, eksisterendeBegrunnelse = null)
             assertThat(resultat).isNull()
         }
 
         @Test
         fun `tom streng fjerner begrunnelsen`() {
-            val resultat = service.utledBegrunnelse(nyBegrunnelse = "", eksisterendeBegrunnelse = "eksisterende tekst")
+            val resultat = service.bevarEllerOppdaterBegrunnelse(nyBegrunnelse = "", eksisterendeBegrunnelse = "eksisterende tekst")
             assertThat(resultat).isNull()
         }
 
         @Test
         fun `streng med kun whitespace fjerner begrunnelsen`() {
-            val resultat = service.utledBegrunnelse(nyBegrunnelse = "   ", eksisterendeBegrunnelse = "eksisterende tekst")
+            val resultat = service.bevarEllerOppdaterBegrunnelse(nyBegrunnelse = "   ", eksisterendeBegrunnelse = "eksisterende tekst")
             assertThat(resultat).isNull()
         }
 
         @Test
         fun `eksplisitt tekst overskriver eksisterende begrunnelse`() {
-            val resultat = service.utledBegrunnelse(nyBegrunnelse = "ny tekst", eksisterendeBegrunnelse = "gammel tekst")
+            val resultat = service.bevarEllerOppdaterBegrunnelse(nyBegrunnelse = "ny tekst", eksisterendeBegrunnelse = "gammel tekst")
             assertThat(resultat).isEqualTo("ny tekst")
         }
 
         @Test
         fun `eksplisitt tekst lagres selv om det ikke finnes noen eksisterende`() {
-            val resultat = service.utledBegrunnelse(nyBegrunnelse = "ny tekst", eksisterendeBegrunnelse = null)
+            val resultat = service.bevarEllerOppdaterBegrunnelse(nyBegrunnelse = "ny tekst", eksisterendeBegrunnelse = null)
             assertThat(resultat).isEqualTo("ny tekst")
         }
     }
