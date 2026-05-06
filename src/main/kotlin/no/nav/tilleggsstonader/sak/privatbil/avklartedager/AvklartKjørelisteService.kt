@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -26,6 +27,7 @@ class AvklartKjørelisteService(
     private val vedtakService: VedtakService,
     private val avklartKjørtUkeRepository: AvklartKjørtUkeRepository,
     private val kjørelisteService: KjørelisteService,
+    private val behandlingService: BehandlingService,
 ) {
     fun hentAvklarteUkerForBehandling(behandlingId: BehandlingId): List<AvklartKjørtUke> =
         avklartKjørtUkeRepository.findByBehandlingId(behandlingId)
@@ -74,13 +76,64 @@ class AvklartKjørelisteService(
             innsendteKjørelisteDager = innsendteKjørelisteDager,
         )
 
+        val nyAvklartKjørtUkeStatus = beregnNyStatus(behandlingId, eksisterendeUke, oppdaterteDager)
+
         return avklartKjørtUkeRepository.update(
             eksisterendeUke.copy(
                 status = UkeStatus.OK_MANUELT,
                 behandletDato = LocalDate.now(),
                 dager = oppdaterteDager.toSet(),
+                avklartKjørtUkeStatus = nyAvklartKjørtUkeStatus,
             ),
         )
+    }
+
+    private fun beregnNyStatus(
+        behandlingId: BehandlingId,
+        eksisterendeUke: AvklartKjørtUke,
+        oppdaterteDager: Collection<AvklartKjørtDag>,
+    ): AvklartKjørtUkeStatus =
+        when (eksisterendeUke.avklartKjørtUkeStatus) {
+            AvklartKjørtUkeStatus.UENDRET ->
+                if (erDagerEndret(eksisterendeUke.dager, oppdaterteDager)) {
+                    AvklartKjørtUkeStatus.ENDRET
+                } else {
+                    AvklartKjørtUkeStatus.UENDRET
+                }
+            AvklartKjørtUkeStatus.ENDRET -> {
+                val forrigeUke = hentForrigeBehandlingsUke(behandlingId, eksisterendeUke)
+                if (forrigeUke != null && !erDagerEndret(forrigeUke.dager, oppdaterteDager)) {
+                    AvklartKjørtUkeStatus.UENDRET
+                } else {
+                    AvklartKjørtUkeStatus.ENDRET
+                }
+            }
+            AvklartKjørtUkeStatus.NY -> AvklartKjørtUkeStatus.NY
+        }
+
+    private fun erDagerEndret(
+        eksisterendeDager: Collection<AvklartKjørtDag>,
+        oppdaterteDager: Collection<AvklartKjørtDag>,
+    ): Boolean {
+        val eksisterendePerDato = eksisterendeDager.associateBy { it.dato }
+        return oppdaterteDager.any { oppdatert ->
+            val eksisterende = eksisterendePerDato[oppdatert.dato]
+            eksisterende == null ||
+                eksisterende.godkjentGjennomførtKjøring != oppdatert.godkjentGjennomførtKjøring ||
+                eksisterende.parkeringsutgift != oppdatert.parkeringsutgift ||
+                eksisterende.begrunnelse != oppdatert.begrunnelse
+        }
+    }
+
+    private fun hentForrigeBehandlingsUke(
+        behandlingId: BehandlingId,
+        uke: AvklartKjørtUke,
+    ): AvklartKjørtUke? {
+        val forrigeBehandlingId =
+            behandlingService.hentBehandling(behandlingId).forrigeIverksatteBehandlingId
+                ?: return null
+        return hentAvklarteUkerForBehandling(forrigeBehandlingId)
+            .find { it.uke == uke.uke && it.reiseId == uke.reiseId }
     }
 
     private fun oppdaterAvklarteDager(
@@ -144,6 +197,7 @@ class AvklartKjørelisteService(
             typeAvvik = avvikUke,
             behandletDato = null,
             dager = avklarteDager.toSet(),
+            avklartKjørtUkeStatus = AvklartKjørtUkeStatus.NY,
         )
     }
 
