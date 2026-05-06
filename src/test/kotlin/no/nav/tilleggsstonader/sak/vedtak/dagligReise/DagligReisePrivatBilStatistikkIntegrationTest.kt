@@ -67,7 +67,7 @@ class DagligReisePrivatBilStatistikkIntegrationTest : IntegrationTest() {
         val kjørelisteBehandling =
             testoppsettService.hentBehandlinger(behandlingContext.fagsakId).single {
                 it.type ==
-                        BehandlingType.KJØRELISTE
+                    BehandlingType.KJØRELISTE
             }
         gjennomførKjørelisteBehandling(kjørelisteBehandling)
 
