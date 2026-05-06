@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.brev.kjørelistebrev
 
-import java.time.LocalDate
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
@@ -17,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.finnSatserBruktIBeregning
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.oppsummerBeregningPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class KjørelisteBehandlingBrevService(
