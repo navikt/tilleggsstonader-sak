@@ -49,6 +49,7 @@ data class LagreVilkårperiode(
     JsonSubTypes.Type(FaktaOgSvarAktivitetBoutgifterDto::class, name = "AKTIVITET_BOUTGIFTER"),
     JsonSubTypes.Type(FaktaOgSvarAktivitetDagligReiseTsoDto::class, name = "AKTIVITET_DAGLIG_REISE_TSO"),
     JsonSubTypes.Type(FaktaOgSvarAktivitetDagligReiseTsrDto::class, name = "AKTIVITET_DAGLIG_REISE_TSR"),
+    JsonSubTypes.Type(FaktaOgSvarAktivitetReiseTilSamlingTsoDto::class, name = "AKTIVITET_REISE_TIL_SAMLING_TSO"),
 )
 sealed class FaktaOgSvarDto
 
