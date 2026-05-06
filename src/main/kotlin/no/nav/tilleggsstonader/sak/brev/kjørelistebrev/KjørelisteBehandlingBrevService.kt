@@ -35,7 +35,7 @@ class KjørelisteBehandlingBrevService(
         saksbehandling.status.validerKanBehandlingRedigeres()
 
         val eksisterendeBrev = kjørelisteBehandlingBrevRepository.findByBehandlingId(behandlingId)
-        val begrunnelse = utledBegrunnelse(genererKjørelistebrevDto.begrunnelse, eksisterendeBrev?.begrunnelse)
+        val begrunnelse = bevarEllerOppdaterBegrunnelse(genererKjørelistebrevDto.begrunnelse, eksisterendeBrev?.begrunnelse)
 
         val html = genererHtml(saksbehandling, begrunnelse)
         val pdf = familieDokumentClient.genererPdf(html)
@@ -43,7 +43,10 @@ class KjørelisteBehandlingBrevService(
         return lagreEllerOppdaterBrev(saksbehandling, html, pdf, begrunnelse, eksisterendeBrev)
     }
 
-    fun utledBegrunnelse(
+    // null betyr at frontend ikke har sendt en ny begrunnelse, f.eks. når saksbehandler
+    // beveger seg mellom faner og brevet regenereres uten at begrunnelsen er kjent i frontend.
+    // I slike tilfeller ønsker vi å bevare den eksisterende begrunnelsen fra databasen.
+    internal fun bevarEllerOppdaterBegrunnelse(
         nyBegrunnelse: String?,
         eksisterendeBegrunnelse: String?,
     ): String? =
