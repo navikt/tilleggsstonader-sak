@@ -34,12 +34,13 @@ class KjørelisteBehandlingBrevService(
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         saksbehandling.status.validerKanBehandlingRedigeres()
 
-        val begrunnelse = utledBegrunnelse(genererKjørelistebrevDto.begrunnelse, behandlingId)
+        val eksisterendeBrev = kjørelisteBehandlingBrevRepository.findByBehandlingId(behandlingId)
+        val begrunnelse = utledBegrunnelse(genererKjørelistebrevDto.begrunnelse, eksisterendeBrev?.begrunnelse)
 
         val html = genererHtml(saksbehandling, begrunnelse)
         val pdf = familieDokumentClient.genererPdf(html)
 
-        return lagreEllerOppdaterBrev(saksbehandling, html, pdf, begrunnelse)
+        return lagreEllerOppdaterBrev(saksbehandling, html, pdf, begrunnelse, eksisterendeBrev)
     }
 
     fun hentBegrunnelse(behandlingId: BehandlingId): String? =
@@ -47,10 +48,10 @@ class KjørelisteBehandlingBrevService(
 
     fun utledBegrunnelse(
         nyBegrunnelse: String?,
-        behandlingId: BehandlingId,
+        eksisterendeBegrunnelse: String?,
     ): String? =
         when {
-            nyBegrunnelse == null -> hentBegrunnelse(behandlingId)
+            nyBegrunnelse == null -> eksisterendeBegrunnelse
             nyBegrunnelse.isBlank() -> null
             else -> nyBegrunnelse
         }
@@ -112,6 +113,7 @@ class KjørelisteBehandlingBrevService(
         html: String,
         pdf: ByteArray,
         begrunnelse: String?,
+        eksisterendeBrev: KjørelisteBehandlingBrev?,
     ): KjørelisteBehandlingBrev {
         val brev =
             KjørelisteBehandlingBrev(
@@ -122,7 +124,7 @@ class KjørelisteBehandlingBrevService(
                 begrunnelse = begrunnelse,
             )
 
-        if (kjørelisteBehandlingBrevRepository.existsById(saksbehandling.id)) {
+        if (eksisterendeBrev != null) {
             kjørelisteBehandlingBrevRepository.update(brev)
         } else {
             kjørelisteBehandlingBrevRepository.insert(brev)
