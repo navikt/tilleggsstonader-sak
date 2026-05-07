@@ -14,8 +14,8 @@ object DetaljertVedtaksperioderDagligReiseMapper {
         adresserTso: Map<ReiseId, String>,
         adresserTsr: Map<ReiseId, String>,
     ): List<DetaljertVedtaksperiodeDagligReise> {
-        val reiserTso = vedtaksdataTso?.tilReiser()
-        val reiserTsr = vedtaksdataTsr?.tilReiser()
+        val reiserTso = vedtaksdataTso?.hentUtOffentligTransport()
+        val reiserTsr = vedtaksdataTsr?.hentUtOffentligTransport()
 
         return listOf(
             reiserTso.tilDetaljerteVedtaksperioder(Stønadstype.DAGLIG_REISE_TSO, adresserTso),
@@ -23,7 +23,7 @@ object DetaljertVedtaksperioderDagligReiseMapper {
         ).flatten()
     }
 
-    private fun InnvilgelseEllerOpphørDagligReise.tilReiser(): List<BeregningsresultatForReise> =
+    private fun InnvilgelseEllerOpphørDagligReise.hentUtOffentligTransport(): List<BeregningsresultatForReise> =
         beregningsresultat.offentligTransport?.reiser.orEmpty()
 
     private fun List<BeregningsresultatForReise>?.tilDetaljerteVedtaksperioder(
