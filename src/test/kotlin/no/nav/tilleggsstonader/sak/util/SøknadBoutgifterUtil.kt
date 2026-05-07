@@ -39,6 +39,7 @@ object SøknadBoutgifterUtil {
             language = "nb-NO",
             data = BoutgifterFyllUtSendInnData(data = skjemaBoutgifter),
             dokumentasjon = emptyList(),
+            formRevision = 1,
         )
     }
 
