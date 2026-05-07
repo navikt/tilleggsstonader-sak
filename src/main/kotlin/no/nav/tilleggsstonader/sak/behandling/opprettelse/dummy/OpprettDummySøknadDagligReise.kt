@@ -194,6 +194,7 @@ class OpprettDummySøknadDagligReise(
                         metadata = metadata,
                     ),
                 dokumentasjon = emptyList(),
+                formRevision = 1,
             )
 
         val skjemaDagligReise =

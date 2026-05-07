@@ -53,6 +53,7 @@ object SøknadDagligReiseUtil {
             language = "nb-NO",
             data = DagligReiseFyllUtSendInnData(skjemaDagligReise, metadata()),
             dokumentasjon = emptyList(),
+            formRevision = 1,
         )
     }
 
