@@ -81,9 +81,6 @@ data class OppsummertBeregningForReiseDto(
     val aktivitetsadresse: String?,
     val perioder: List<OppsummertBeregningForPeriodeDto>,
 ) {
-    /** Beholdes for bakoverkompatibilitet. Tilsvarer [totaltStønadsbeløpMedPerioderFraForrigeVedtak]. */
-    @Deprecated("Bruk totaltStønadsbeløpMedPerioderFraForrigeVedtak eller totaltStønadsbeløpUtenPerioderFraForrigeVedtak")
-    val totaltStønadsbeløp = perioder.sumOf { it.stønadsbeløp }
     val totaltStønadsbeløpMedPerioderFraForrigeVedtak = perioder.sumOf { it.stønadsbeløp }
     val totaltStønadsbeløpUtenPerioderFraForrigeVedtak = perioder.filter { !it.fraTidligereVedtak }.sumOf { it.stønadsbeløp }
 }
