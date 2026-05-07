@@ -967,6 +967,7 @@ object InterntVedtakTestdata {
                                                     ),
                                                 stønadsbeløp = BigDecimal(500),
                                                 brukersNavKontor = brukersNavKontor,
+                                                fraTidligereVedtak = false,
                                             ),
                                         ),
                                 ),

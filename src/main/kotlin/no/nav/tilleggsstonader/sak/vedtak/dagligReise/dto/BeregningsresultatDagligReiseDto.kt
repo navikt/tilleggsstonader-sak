@@ -69,6 +69,7 @@ data class BeregningsresultatForPeriodePrivatBilDto(
     val grunnlag: BeregningsresultatForReisePrivatBilGrunnlagDto,
     val stønadsbeløp: BigDecimal,
     val brukersNavKontor: String?,
+    val fraTidligereVedtak: Boolean,
 )
 
 data class BeregningsresultatForReisePrivatBilGrunnlagDto(
@@ -162,4 +163,5 @@ fun BeregningsresultatForReisePrivatBilPeriode.tilDto(): BeregningsresultatForPe
             ),
         stønadsbeløp = stønadsbeløp,
         brukersNavKontor = brukersNavKontor,
+        fraTidligereVedtak = fraTidligereVedtak,
     )

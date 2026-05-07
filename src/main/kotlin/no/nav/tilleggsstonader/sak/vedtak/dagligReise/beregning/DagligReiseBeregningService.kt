@@ -147,8 +147,20 @@ class DagligReiseBeregningService(
                 rammevedtak = rammevedtak,
                 avklarteUkerForBehandling = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandling.id),
                 brukersNavKontor = brukersNavKontor,
+                forrigeBeregningsresultat = hentForrigePrivatBilBeregningsresultat(behandling),
             )
         }
+
+    private fun hentForrigePrivatBilBeregningsresultat(behandling: Saksbehandling): BeregningsresultatPrivatBil? =
+        behandling.forrigeIverksatteBehandlingId
+            ?.let { forrigeBehandlingId ->
+                vedtakRepository
+                    .findByIdOrThrow(forrigeBehandlingId)
+                    .withTypeOrThrow<InnvilgelseEllerOpphørDagligReise>()
+                    .data
+                    .beregningsresultat
+                    .privatBil
+            }
 
     private fun beregnRammePrivatBil(
         vedtaksperioder: List<Vedtaksperiode>,

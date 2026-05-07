@@ -11,7 +11,9 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteSer
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.finnesUkerMedAvvik
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningsresultatService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import org.springframework.stereotype.Service
 
 @Service
@@ -49,6 +51,7 @@ class KjørelisteSteg(
                 rammevedtak = eksisterendeRammevedtak,
                 avklarteUkerForBehandling = avklartKjørelisteService.hentAvklarteUkerForBehandling(saksbehandling.id),
                 brukersNavKontor = brukersNavKontor,
+                forrigeBeregningsresultat = hentForrigePrivatBilBeregningsresultat(saksbehandling),
             )
 
         dagligReiseVedtakService.oppdaterVedtakMedBeregningPrivatBil(
@@ -56,6 +59,16 @@ class KjørelisteSteg(
             beregningsresultatPrivatBil = beregningsresultatPrivatBil,
         )
     }
+
+    private fun hentForrigePrivatBilBeregningsresultat(saksbehandling: Saksbehandling): BeregningsresultatPrivatBil? =
+        saksbehandling.forrigeIverksatteBehandlingId
+            ?.let { forrigeBehandlingId ->
+                vedtakService
+                    .hentVedtak<InnvilgelseEllerOpphørDagligReise>(forrigeBehandlingId)
+                    .data
+                    .beregningsresultat
+                    .privatBil
+            }
 
     override fun stegType(): StegType = StegType.KJØRELISTE
 }

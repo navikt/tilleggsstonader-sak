@@ -241,7 +241,8 @@
               } ]
             },
             "stønadsbeløp" : 500,
-            "brukersNavKontor" : "1234"
+            "brukersNavKontor" : "1234",
+            "fraTidligereVedtak" : false
           } ]
         } ]
       },
