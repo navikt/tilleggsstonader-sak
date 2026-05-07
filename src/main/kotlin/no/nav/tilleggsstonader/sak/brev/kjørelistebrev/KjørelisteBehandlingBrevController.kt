@@ -20,7 +20,7 @@ class KjørelisteBehandlingBrevController(
     private val kjørelisteBehandlingBrevService: KjørelisteBehandlingBrevService,
 ) {
     @PostMapping("/{behandlingId}")
-    fun genererOgLagreBrev(
+    fun oppdaterBegrunnelseOgGenererBrev(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody genererKjørelistebrevDto: GenererKjørelistebrevDto,
     ): KjørelistebrevResponseDto {
@@ -28,7 +28,11 @@ class KjørelisteBehandlingBrevController(
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        val brev = kjørelisteBehandlingBrevService.genererOgLagreBrev(behandlingId, genererKjørelistebrevDto)
+        val brev =
+            kjørelisteBehandlingBrevService.oppdaterBegrunnelseOgGenererBrev(
+                behandlingId = behandlingId,
+                begrunnelseFraRequest = genererKjørelistebrevDto.begrunnelse,
+            )
         return KjørelistebrevResponseDto(
             pdf = Base64.getEncoder().encodeToString(brev.pdf.bytes),
             begrunnelse = brev.begrunnelse,
@@ -38,10 +42,14 @@ class KjørelisteBehandlingBrevController(
     @GetMapping("/{behandlingId}")
     fun hentBrev(
         @PathVariable behandlingId: BehandlingId,
-    ): ByteArray {
+    ): KjørelistebrevResponseDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerLesetilgangTilBehandling(behandlingId)
+        val brev = kjørelisteBehandlingBrevService.hentEllerGenererBrev(behandlingId)
 
-        return Base64.getEncoder().encode(kjørelisteBehandlingBrevService.hentBrev(behandlingId).pdf.bytes)
+        return KjørelistebrevResponseDto(
+            pdf = Base64.getEncoder().encodeToString(brev.pdf.bytes),
+            begrunnelse = brev.begrunnelse,
+        )
     }
 }

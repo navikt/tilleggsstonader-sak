@@ -27,36 +27,39 @@ class KjørelisteBehandlingBrevService(
     private val vedtakService: VedtakService,
     private val behandlingService: BehandlingService,
 ) {
-    fun genererOgLagreBrev(
+    fun hentEllerGenererBrev(behandlingId: BehandlingId): KjørelisteBehandlingBrev {
+        val eksisterendeBrev = kjørelisteBehandlingBrevRepository.findByBehandlingId(behandlingId)
+        if (eksisterendeBrev != null) {
+            return eksisterendeBrev
+        }
+
+        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
+        return lagreBrev(saksbehandling, begrunnelse = null, eksisterendeBrev = null)
+    }
+
+    fun oppdaterBegrunnelseOgGenererBrev(
         behandlingId: BehandlingId,
-        genererKjørelistebrevDto: GenererKjørelistebrevDto,
+        begrunnelseFraRequest: String,
     ): KjørelisteBehandlingBrev {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         saksbehandling.status.validerKanBehandlingRedigeres()
-
         val eksisterendeBrev = kjørelisteBehandlingBrevRepository.findByBehandlingId(behandlingId)
-        val begrunnelse =
-            bevarEllerOppdaterBegrunnelse(genererKjørelistebrevDto.begrunnelse, eksisterendeBrev?.begrunnelse)
+        val begrunnelse = normaliserBegrunnelseFraRequest(begrunnelseFraRequest)
+        return lagreBrev(saksbehandling, begrunnelse, eksisterendeBrev)
+    }
 
+    private fun lagreBrev(
+        saksbehandling: Saksbehandling,
+        begrunnelse: String?,
+        eksisterendeBrev: KjørelisteBehandlingBrev?,
+    ): KjørelisteBehandlingBrev {
         val html = genererHtml(saksbehandling, begrunnelse)
         val pdf = familieDokumentClient.genererPdf(html)
-
         return lagreEllerOppdaterBrev(saksbehandling, html, pdf, begrunnelse, eksisterendeBrev)
     }
 
-    // null betyr at frontend ikke har sendt en ny begrunnelse, f.eks. når saksbehandler
-    // beveger seg mellom faner og brevet regenereres uten at begrunnelsen er kjent i frontend.
-    // I slike tilfeller ønsker vi å bevare den eksisterende begrunnelsen fra databasen.
-    // Hvis ny begrunnelse er blank/tom streng fra frontend skal eksisterende begrunnelse fjernes.
-    fun bevarEllerOppdaterBegrunnelse(
-        nyBegrunnelse: String?,
-        eksisterendeBegrunnelse: String?,
-    ): String? =
-        when {
-            nyBegrunnelse == null -> eksisterendeBegrunnelse
-            nyBegrunnelse.isBlank() -> null
-            else -> nyBegrunnelse.trim()
-        }
+    private fun normaliserBegrunnelseFraRequest(begrunnelseFraRequest: String): String? =
+        begrunnelseFraRequest.takeIf { it.isNotBlank() }?.trim()
 
     fun hentBrev(behandlingId: BehandlingId): KjørelisteBehandlingBrev {
         val brev = kjørelisteBehandlingBrevRepository.findByBehandlingId(behandlingId)
