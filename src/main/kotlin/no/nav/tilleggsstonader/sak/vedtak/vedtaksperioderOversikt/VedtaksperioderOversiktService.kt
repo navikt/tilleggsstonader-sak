@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperiodeLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperioderLæremidlerMapper.finnDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.springframework.stereotype.Service
 
 @Service
@@ -66,9 +67,7 @@ class VedtaksperioderOversiktService(
             Stønadstype.DAGLIG_REISE_TSR,
             Stønadstype.DAGLIG_REISE_TSO,
             ->
-                finnDetaljerteVedtaksperioderForDagligReise(
-                    behandling = behandling,
-                )
+                finnDetaljerteVedtaksperioderForDagligReise(behandling = behandling)
 
             Stønadstype.REISE_TIL_SAMLING_TSO -> TODO()
         }
@@ -106,14 +105,14 @@ class VedtaksperioderOversiktService(
             fagsakIdDagligReiseTsr?.let {
                 behandlingService.finnSisteIverksatteBehandling(fagsakIdDagligReiseTsr)?.id
             }
-        val adresseTso = behandlingIdDagligReiseTso?.let { hentAdresse(it) }
-        val adresseTsr = behandlingIdDagligReiseTsr?.let { hentAdresse(it) }
+        val adresserTso = behandlingIdDagligReiseTso?.let { hentAdresser(it) }.orEmpty()
+        val adresserTsr = behandlingIdDagligReiseTsr?.let { hentAdresser(it) }.orEmpty()
 
         return finnDetaljerteVedtaksperioderDagligReise(
             vedtaksdataTso = vedtaksdataTso,
             vedtaksdataTsr = vedtaksdataTsr,
-            adresseTso = adresseTso,
-            adresseTsr = adresseTsr,
+            adresserTso = adresserTso,
+            adresserTsr = adresserTsr,
         )
     }
 
@@ -143,7 +142,7 @@ class VedtaksperioderOversiktService(
 
     private fun oppsummerVedtaksperioderDagligReiseTso(fagsakId: FagsakId): List<DetaljertVedtaksperiodeDagligReise> {
         val behandlingId = behandlingService.finnSisteIverksatteBehandling(fagsakId)?.id
-        val adresseTso = hentAdresse(behandlingId)
+        val adresserTso = hentAdresser(behandlingId)
         val vedtakForSisteIverksatteBehandling =
             hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørDagligReise>(fagsakId)
                 ?: return emptyList()
@@ -151,14 +150,14 @@ class VedtaksperioderOversiktService(
         return finnDetaljerteVedtaksperioderDagligReise(
             vedtaksdataTso = vedtakForSisteIverksatteBehandling,
             vedtaksdataTsr = null,
-            adresseTso = adresseTso,
-            adresseTsr = null,
+            adresserTso = adresserTso,
+            adresserTsr = emptyMap(),
         )
     }
 
     private fun oppsummerVedtaksperioderDagligReiseTsr(fagsakId: FagsakId): List<DetaljertVedtaksperiodeDagligReise> {
         val behandlingId = behandlingService.finnSisteIverksatteBehandling(fagsakId)?.id
-        val adresseTsr = hentAdresse(behandlingId)
+        val adresserTsr = hentAdresser(behandlingId)
         val vedtakForSisteIverksatteBehandling =
             hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørDagligReise>(fagsakId)
                 ?: return emptyList()
@@ -166,8 +165,8 @@ class VedtaksperioderOversiktService(
         return finnDetaljerteVedtaksperioderDagligReise(
             vedtaksdataTso = null,
             vedtaksdataTsr = vedtakForSisteIverksatteBehandling,
-            adresseTso = null,
-            adresseTsr = adresseTsr,
+            adresserTso = emptyMap(),
+            adresserTsr = adresserTsr,
         )
     }
 
@@ -176,10 +175,13 @@ class VedtaksperioderOversiktService(
             vedtakService.hentVedtak<T>(it.id).data
         }
 
-    private fun hentAdresse(behandlingId: BehandlingId?): String? =
+    private fun hentAdresser(behandlingId: BehandlingId?): Map<ReiseId, String> =
         behandlingId
             ?.let { vilkårService.hentVilkår(it) }
-            ?.firstOrNull()
-            ?.fakta
-            ?.adresse
+            ?.mapNotNull { vilkår ->
+                vilkår.fakta?.let { fakta ->
+                    fakta.reiseId to (fakta.adresse ?: "adresse mangler")
+                }
+            }?.toMap()
+            .orEmpty()
 }

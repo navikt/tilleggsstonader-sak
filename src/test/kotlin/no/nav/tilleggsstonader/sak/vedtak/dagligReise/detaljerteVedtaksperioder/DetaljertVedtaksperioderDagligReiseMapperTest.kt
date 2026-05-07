@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
@@ -61,8 +62,8 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
             finnDetaljerteVedtaksperioderDagligReise(
                 vedtaksdataTso = tsoVedtak.data,
                 vedtaksdataTsr = tsrVedtak.data,
-                adresseTso = "adresseTso",
-                adresseTsr = "adresseTsr",
+                adresserTso = mapOf(dummyReiseId to "adresseTso"),
+                adresserTsr = mapOf(dummyReiseId to "adresseTsr"),
             )
         val forventetTso =
             DetaljertVedtaksperiodeDagligReise(
@@ -99,6 +100,42 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
         assertThat(resultat).containsExactly(forventetTso, forventetTsr)
     }
 
+    @Test
+    fun `skal opprette en detaljert vedtaksperiode for hver adresse`() {
+        val førsteReiseId = ReiseId.random()
+        val andreReiseId = ReiseId.random()
+        val tsoVedtak =
+            innvilgelse(
+                InnvilgelseDagligReise(
+                    vedtaksperioder = defaultVedtaksperioder,
+                    beregningsresultat =
+                        lagBeregningsresultatMedToReiser(
+                            førsteReiseId = førsteReiseId,
+                            andreReiseId = andreReiseId,
+                            fom = førsteJanuar,
+                            tom = sisteJanuar,
+                        ),
+                    rammevedtakPrivatBil = null,
+                    beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+                ),
+            )
+
+        val resultat =
+            finnDetaljerteVedtaksperioderDagligReise(
+                vedtaksdataTso = tsoVedtak.data,
+                vedtaksdataTsr = null,
+                adresserTso =
+                    mapOf(
+                        førsteReiseId to "adresse 1",
+                        andreReiseId to "adresse 2",
+                    ),
+                adresserTsr = emptyMap(),
+            )
+
+        assertThat(resultat).hasSize(2)
+        assertThat(resultat.map { it.adresse }).containsExactly("adresse 1", "adresse 2")
+    }
+
     private fun innvilgelse(data: InnvilgelseDagligReise = defaultInnvilgelseDagligReise) =
         GeneriskVedtak(
             behandlingId = BehandlingId.random(),
@@ -109,23 +146,9 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
             opphørsdato = null,
         )
 
-    private fun toVedtaksperioder(
-        fom1: LocalDate,
-        tom1: LocalDate,
-        fom2: LocalDate,
-        tom2: LocalDate,
-    ) = InnvilgelseDagligReise(
-        vedtaksperioder =
-            listOf(
-                vedtaksperiode(fom = fom1, tom = tom1),
-                vedtaksperiode(fom = fom2, tom = tom2),
-            ),
-        beregningsresultat = lagBeregningsresultatMedToPerioder(fom1, tom1, fom2, tom2),
-        rammevedtakPrivatBil = null,
-        beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
-    )
-
     private fun lagBeregningsresultatMedToReiser(
+        førsteReiseId: ReiseId = dummyReiseId,
+        andreReiseId: ReiseId = ReiseId.random(),
         fom: LocalDate,
         tom: LocalDate,
     ) = BeregningsresultatDagligReise(
@@ -134,14 +157,14 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                 reiser =
                     listOf(
                         BeregningsresultatForReise(
-                            reiseId = dummyReiseId,
+                            reiseId = førsteReiseId,
                             perioder =
                                 listOf(
                                     beregningsresultatForPeriode(fom, tom),
                                 ),
                         ),
                         BeregningsresultatForReise(
-                            reiseId = dummyReiseId,
+                            reiseId = andreReiseId,
                             perioder =
                                 listOf(
                                     beregningsresultatForPeriode(fom, tom),
@@ -150,29 +173,6 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                     ),
             ),
         privatBil = null, // TODO
-    )
-
-    private fun lagBeregningsresultatMedToPerioder(
-        fom1: LocalDate,
-        tom1: LocalDate,
-        fom2: LocalDate,
-        tom2: LocalDate,
-    ) = BeregningsresultatDagligReise(
-        offentligTransport =
-            BeregningsresultatOffentligTransport(
-                reiser =
-                    listOf(
-                        BeregningsresultatForReise(
-                            reiseId = dummyReiseId,
-                            perioder =
-                                listOf(
-                                    beregningsresultatForPeriode(fom1, tom1),
-                                    beregningsresultatForPeriode(fom2, tom2),
-                                ),
-                        ),
-                    ),
-            ),
-        privatBil = null,
     )
 
     val defaultVedtaksperioder =
