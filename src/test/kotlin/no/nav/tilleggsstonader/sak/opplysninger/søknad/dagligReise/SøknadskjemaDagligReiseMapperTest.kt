@@ -62,6 +62,6 @@ class SøknadskjemaDagligReiseMapperTest {
     private fun mapSkjemadata(skjemaJsonFil: String): SøknadsskjemaDagligReiseFyllUtSendInn {
         val json = FileUtil.readFile(skjemaJsonFil)
         val dagligReise = SøknadsskjemaUtil.jsonMapperMedCustomDeserializerForDagligReise.readValue<DagligReiseFyllUtSendInnData>(json)
-        return SøknadsskjemaDagligReiseFyllUtSendInn("nb-NO", dagligReise)
+        return SøknadsskjemaDagligReiseFyllUtSendInn("nb-NO", dagligReise, emptyList(), 1)
     }
 }
