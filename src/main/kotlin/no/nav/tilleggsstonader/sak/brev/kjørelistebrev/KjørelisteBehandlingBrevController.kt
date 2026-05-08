@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.Base64
@@ -19,23 +20,36 @@ class KjørelisteBehandlingBrevController(
     private val kjørelisteBehandlingBrevService: KjørelisteBehandlingBrevService,
 ) {
     @PostMapping("/{behandlingId}")
-    fun genererOgLagreBrev(
+    fun oppdaterBegrunnelseOgGenererBrev(
         @PathVariable behandlingId: BehandlingId,
-    ): ByteArray {
+        @RequestBody genererKjørelistebrevDto: GenererKjørelistebrevDto,
+    ): KjørelistebrevResponseDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return Base64.getEncoder().encode(kjørelisteBehandlingBrevService.genererOgLagreBrev(behandlingId).pdf.bytes)
+        val brev =
+            kjørelisteBehandlingBrevService.oppdaterBegrunnelseOgGenererBrev(
+                behandlingId = behandlingId,
+                begrunnelseFraRequest = genererKjørelistebrevDto.begrunnelse,
+            )
+        return KjørelistebrevResponseDto(
+            pdf = Base64.getEncoder().encodeToString(brev.pdf.bytes),
+            begrunnelse = brev.begrunnelse,
+        )
     }
 
     @GetMapping("/{behandlingId}")
     fun hentBrev(
         @PathVariable behandlingId: BehandlingId,
-    ): ByteArray {
+    ): KjørelistebrevResponseDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerLesetilgangTilBehandling(behandlingId)
+        val brev = kjørelisteBehandlingBrevService.hentEllerGenererBrev(behandlingId)
 
-        return Base64.getEncoder().encode(kjørelisteBehandlingBrevService.hentBrev(behandlingId).pdf.bytes)
+        return KjørelistebrevResponseDto(
+            pdf = Base64.getEncoder().encodeToString(brev.pdf.bytes),
+            begrunnelse = brev.begrunnelse,
+        )
     }
 }

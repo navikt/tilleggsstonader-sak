@@ -69,7 +69,7 @@ class KjørelisteBehandlingBrevServiceTest {
         every { behandlingService.hentSaksbehandling(saksbehandling.id) } returns saksbehandling
         every { personService.hentVisningsnavnForPerson(any()) } returns "Test Person"
         every { familieDokumentClient.genererPdf(any()) } returns ByteArray(0)
-        every { kjørelisteBehandlingBrevRepository.existsById(saksbehandling.id) } returns false
+        every { kjørelisteBehandlingBrevRepository.findByBehandlingId(saksbehandling.id) } returns null
         every { kjørelisteBehandlingBrevRepository.insert(any()) } answers { firstArg() }
     }
 
@@ -82,7 +82,7 @@ class KjørelisteBehandlingBrevServiceTest {
         every { htmlifyClient.genererKjørelisteBehandlingBrev(capture(slot)) } returns "<html/>"
 
         mockVedtak(listOf(periodeFraTidligereVedtak, nyPeriode))
-        service.genererOgLagreBrev(saksbehandling.id)
+        service.hentEllerGenererBrev(saksbehandling.id)
 
         val perioder =
             slot.captured.beregning.reiser
@@ -102,7 +102,7 @@ class KjørelisteBehandlingBrevServiceTest {
         every { htmlifyClient.genererKjørelisteBehandlingBrev(capture(slot)) } returns "<html/>"
 
         mockVedtak(listOf(periode1, periode2))
-        service.genererOgLagreBrev(saksbehandling.id)
+        service.hentEllerGenererBrev(saksbehandling.id)
 
         val perioder =
             slot.captured.beregning.reiser
@@ -121,7 +121,7 @@ class KjørelisteBehandlingBrevServiceTest {
         every { htmlifyClient.genererKjørelisteBehandlingBrev(capture(slot)) } returns "<html/>"
 
         mockVedtak(listOf(periode1, periode2))
-        service.genererOgLagreBrev(saksbehandling.id)
+        service.hentEllerGenererBrev(saksbehandling.id)
 
         assertThat(slot.captured.beregning.reiser).isEmpty()
     }
@@ -135,7 +135,7 @@ class KjørelisteBehandlingBrevServiceTest {
         every { htmlifyClient.genererKjørelisteBehandlingBrev(capture(slot)) } returns "<html/>"
 
         mockVedtak(listOf(periode1, periode2))
-        service.genererOgLagreBrev(saksbehandling.id)
+        service.hentEllerGenererBrev(saksbehandling.id)
 
         assertThat(slot.captured.satser).isEmpty()
     }

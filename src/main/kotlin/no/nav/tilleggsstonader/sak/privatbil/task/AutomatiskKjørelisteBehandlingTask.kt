@@ -35,7 +35,7 @@ class AutomatiskKjørelisteBehandlingTask(
         stegService.håndterSteg(behandlingId, StegType.KJØRELISTE)
         stegService.håndterSteg(behandlingId, StegType.BEREGNING)
         stegService.håndterSteg(behandlingId, StegType.SIMULERING)
-        kjørelisteBehandlingBrevService.genererOgLagreBrev(behandlingId)
+        kjørelisteBehandlingBrevService.hentEllerGenererBrev(behandlingId)
         stegService.håndterSteg(behandlingId, fullførKjørelistebehandlingSteg)
     }
 

@@ -28,15 +28,40 @@ class KjørelisteBehandlingBrevService(
     private val vedtakService: VedtakService,
     private val behandlingService: BehandlingService,
 ) {
-    fun genererOgLagreBrev(behandlingId: BehandlingId): KjørelisteBehandlingBrev {
+    fun hentEllerGenererBrev(behandlingId: BehandlingId): KjørelisteBehandlingBrev {
+        val eksisterendeBrev = kjørelisteBehandlingBrevRepository.findByBehandlingId(behandlingId)
+        if (eksisterendeBrev != null) {
+            return eksisterendeBrev
+        }
+
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         saksbehandling.status.validerKanBehandlingRedigeres()
-
-        val html = genererHtml(saksbehandling)
-        val pdf = familieDokumentClient.genererPdf(html)
-
-        return lagreEllerOppdaterBrev(saksbehandling, html, pdf)
+        return lagreBrev(saksbehandling, begrunnelse = null, eksisterendeBrev = null)
     }
+
+    fun oppdaterBegrunnelseOgGenererBrev(
+        behandlingId: BehandlingId,
+        begrunnelseFraRequest: String,
+    ): KjørelisteBehandlingBrev {
+        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
+        saksbehandling.status.validerKanBehandlingRedigeres()
+        val eksisterendeBrev = kjørelisteBehandlingBrevRepository.findByBehandlingId(behandlingId)
+        val begrunnelse = normaliserBegrunnelseFraRequest(begrunnelseFraRequest)
+        return lagreBrev(saksbehandling, begrunnelse, eksisterendeBrev)
+    }
+
+    private fun lagreBrev(
+        saksbehandling: Saksbehandling,
+        begrunnelse: String?,
+        eksisterendeBrev: KjørelisteBehandlingBrev?,
+    ): KjørelisteBehandlingBrev {
+        val html = genererHtml(saksbehandling, begrunnelse)
+        val pdf = familieDokumentClient.genererPdf(html)
+        return lagreEllerOppdaterBrev(saksbehandling, html, pdf, begrunnelse, eksisterendeBrev)
+    }
+
+    private fun normaliserBegrunnelseFraRequest(begrunnelseFraRequest: String): String? =
+        begrunnelseFraRequest.takeIf { it.isNotBlank() }?.trim()
 
     fun hentBrev(behandlingId: BehandlingId): KjørelisteBehandlingBrev {
         val brev = kjørelisteBehandlingBrevRepository.findByBehandlingId(behandlingId)
@@ -48,7 +73,10 @@ class KjørelisteBehandlingBrevService(
         return brev
     }
 
-    private fun genererHtml(saksbehandling: Saksbehandling): String {
+    private fun genererHtml(
+        saksbehandling: Saksbehandling,
+        begrunnelse: String?,
+    ): String {
         val vedtaksdata = vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(saksbehandling.id).data
         val beregningsresultatPrivatBil = vedtaksdata.beregningsresultat.privatBil
         val rammevedtak = vedtaksdata.rammevedtakPrivatBil
@@ -76,6 +104,7 @@ class KjørelisteBehandlingBrevService(
                 behandlendeEnhet = utledBehandlendeEnhet(saksbehandling.stønadstype),
                 beregning = oppsummertBeregning,
                 satser = oppsummertBeregning.finnSatserBruktIBeregning(),
+                begrunnelse = begrunnelse,
             )
 
         return htmlifyClient.genererKjørelisteBehandlingBrev(request)
@@ -100,6 +129,8 @@ class KjørelisteBehandlingBrevService(
         saksbehandling: Saksbehandling,
         html: String,
         pdf: ByteArray,
+        begrunnelse: String?,
+        eksisterendeBrev: KjørelisteBehandlingBrev?,
     ): KjørelisteBehandlingBrev {
         val brev =
             KjørelisteBehandlingBrev(
@@ -107,9 +138,10 @@ class KjørelisteBehandlingBrevService(
                 saksbehandlerHtml = html,
                 pdf = Fil(pdf),
                 saksbehandlerIdent = SikkerhetContext.hentSaksbehandlerEllerSystembruker(),
+                begrunnelse = begrunnelse,
             )
 
-        if (kjørelisteBehandlingBrevRepository.existsById(saksbehandling.id)) {
+        if (eksisterendeBrev != null) {
             kjørelisteBehandlingBrevRepository.update(brev)
         } else {
             kjørelisteBehandlingBrevRepository.insert(brev)
