@@ -23,7 +23,7 @@ import java.util.UUID
 class VilkårperiodeTestdataDsl {
     internal val opprettScope = OpprettVilkårperiodeDsl()
     internal val update = mutableListOf<(List<VilkårperiodeDto>, BehandlingId) -> Pair<UUID, LagreVilkårperiode>>()
-    internal val delete = mutableListOf<(List<VilkårperiodeDto>) -> Pair<UUID, SlettVikårperiode>>()
+    internal val delete = mutableListOf<(List<VilkårperiodeDto>, BehandlingId) -> Pair<UUID, SlettVikårperiode>>()
 
     fun opprett(builder: OpprettVilkårperiodeDsl.() -> Unit) {
         opprettScope.apply(builder)
@@ -33,7 +33,7 @@ class VilkårperiodeTestdataDsl {
         update += builder
     }
 
-    fun slett(builder: (List<VilkårperiodeDto>) -> Pair<UUID, SlettVikårperiode>) {
+    fun slett(builder: (List<VilkårperiodeDto>, BehandlingId) -> Pair<UUID, SlettVikårperiode>) {
         delete += builder
     }
 }

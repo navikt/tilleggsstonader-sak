@@ -443,7 +443,7 @@ private fun IntegrationTest.gjennomførInngangsvilkårSteg(
 
     // Slett aktiviteter
     testdataDsl.aktivitet.delete.forEach { del ->
-        val idOgRequest: Pair<UUID, SlettVikårperiode> = del(vilkårperioder.aktiviteter)
+        val idOgRequest: Pair<UUID, SlettVikårperiode> = del(vilkårperioder.aktiviteter, behandlingId)
         kall.vilkårperiode.apiRespons.slett(
             vilkårperiodeId = idOgRequest.first,
             slettVikårperiode = idOgRequest.second,
@@ -461,7 +461,7 @@ private fun IntegrationTest.gjennomførInngangsvilkårSteg(
 
     // Slett målgruppeer
     testdataDsl.målgruppe.delete.forEach { del ->
-        val idOgRequest: Pair<UUID, SlettVikårperiode> = del(vilkårperioder.målgrupper)
+        val idOgRequest: Pair<UUID, SlettVikårperiode> = del(vilkårperioder.målgrupper, behandlingId)
         kall.vilkårperiode.apiRespons.slett(
             vilkårperiodeId = idOgRequest.first,
             slettVikårperiode = idOgRequest.second,

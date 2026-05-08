@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.libs.utils.dato.februar
@@ -12,11 +13,14 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWith
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreDagligReiseDto
+import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatForReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseResponse
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -195,6 +199,195 @@ class OffentligTransportBeregningRevurderingServiceTest : CleanDatabaseIntegrati
 
     private fun lagreMålgruppe(behandlingId: BehandlingId): LagreVilkårperiode =
         lagreVilkårperiodeMålgruppe(behandlingId, fom = 1 januar 2024, tom = 30 mars 2026)
+
+    @Test
+    fun `ved endring av målgruppeType fra dagpenger til tiltakspenger skal perioden ikke markeres som fraTidligereVedtak`() {
+        val fom = 1 januar 2025
+        val tom = 31 januar 2025
+
+        val behandlingId = gjennomførEnTsrFørstegangsbehandling(reiseFom = fom, reiseTom = tom)
+
+        val revurderingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = behandlingId,
+                tilSteg = StegType.SIMULERING,
+            ) {
+                målgruppe {
+                    slett { målgrupper, behandlingId ->
+                        val dagpenger = målgrupper.single { it.type == MålgruppeType.DAGPENGER }
+                        dagpenger.id to SlettVikårperiode(behandlingId = behandlingId, kommentar = "Endret til tiltakspenger")
+                    }
+                    opprett {
+                        målgruppeTiltakspenger(fom, tom)
+                    }
+                }
+            }
+
+        with(hentBeregnedeReiserTsr(revurderingId).single().perioder) {
+            assertThat(all { it.fraTidligereVedtak }).isFalse()
+        }
+    }
+
+    @Test
+    fun `ved uendret målgruppeType skal perioden markeres som fraTidligereVedtak`() {
+        val fom = 1 januar 2025
+        val tom = 31 januar 2025
+        val forlengetTom = 28 februar 2025
+
+        val behandlingId = gjennomførEnTsrFørstegangsbehandling(reiseFom = fom, reiseTom = tom)
+
+        val revurderingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = behandlingId,
+                tilSteg = StegType.SIMULERING,
+            ) {
+                vilkår {
+                    oppdaterDagligReise { vilkårDagligReise ->
+                        with(vilkårDagligReise.single()) {
+                            id to tilLagreDagligReiseDto().copy(tom = forlengetTom)
+                        }
+                    }
+                }
+            }
+
+        with(hentBeregnedeReiserTsr(revurderingId).single().perioder) {
+            assertThat(all { it.fraTidligereVedtak }).isTrue()
+        }
+    }
+
+    @Test
+    fun `ved tillegg av ny målgruppeType uten at eksisterende fjernes skal perioden markeres som fraTidligereVedtak`() {
+        val fom = 1 januar 2025
+        val tom = 31 januar 2025
+        val forlengetTom = 28 februar 2025
+
+        val behandlingId = gjennomførEnTsrFørstegangsbehandling(reiseFom = fom, reiseTom = tom)
+
+        val revurderingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = behandlingId,
+                tilSteg = StegType.SIMULERING,
+            ) {
+                // Forlenger reisen for å sikre at beregnFra settes
+                vilkår {
+                    oppdaterDagligReise { vilkårDagligReise ->
+                        with(vilkårDagligReise.single()) {
+                            id to tilLagreDagligReiseDto().copy(tom = forlengetTom)
+                        }
+                    }
+                }
+                // Legger til tiltakspenger uten å fjerne dagpenger
+                målgruppe {
+                    opprett {
+                        målgruppeTiltakspenger(fom, tom)
+                    }
+                }
+            }
+
+        with(hentBeregnedeReiserTsr(revurderingId).single().perioder) {
+            assertThat(size).isEqualTo(2)
+            assertThat(first().fraTidligereVedtak).isTrue()
+            assertThat(last().fraTidligereVedtak).isFalse()
+        }
+    }
+
+    @Test
+    fun `ved tillegg av ny målgruppeType kombinert med endring av eksisterende skal perioden markeres som fraTidligereVedtak`() {
+        val fom = 1 januar 2025
+        val tom = 31 januar 2025
+
+        val behandlingId = gjennomførEnTsrFørstegangsbehandling(reiseFom = fom, reiseTom = tom)
+
+        val revurderingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = behandlingId,
+                tilSteg = StegType.SIMULERING,
+            ) {
+                målgruppe {
+                    // Endrer eksisterende dagpenger (forlenger utover reiseperioden) og legger til tiltakspenger
+                    // DAGPENGER dekker fortsatt reiseperioden fullt ut → ingen endring i dekning → fraTidligereVedtak = true
+                    oppdater { målgrupper, behandlingId ->
+                        val dagpenger = målgrupper.single { it.type == MålgruppeType.DAGPENGER }
+                        dagpenger.id to dagpenger.tilLagreVilkårperiodeMålgruppe(behandlingId).copy(tom = 28 februar 2025)
+                    }
+                    opprett {
+                        målgruppeTiltakspenger(fom, tom)
+                    }
+                }
+            }
+
+        with(hentBeregnedeReiserTsr(revurderingId).single().perioder) {
+            assertThat(all { it.fraTidligereVedtak }).isTrue()
+        }
+    }
+
+    @Test
+    fun `ved endring av datointervall for eksisterende målgruppeType skal perioden ikke markeres som fraTidligereVedtak`() {
+        val fom = 1 januar 2025
+        val tom = 31 januar 2025
+
+        val behandlingId = gjennomførEnTsrFørstegangsbehandling(reiseFom = fom, reiseTom = tom)
+
+        val revurderingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = behandlingId,
+                tilSteg = StegType.SIMULERING,
+            ) {
+                målgruppe {
+                    // Korter ned dagpenger – datointervallet endres fra Jan 1-31 til Jan 1-15
+                    oppdater { målgrupper, behandlingId ->
+                        val dagpenger = målgrupper.single { it.type == MålgruppeType.DAGPENGER }
+                        dagpenger.id to dagpenger.tilLagreVilkårperiodeMålgruppe(behandlingId).copy(tom = 15 januar 2025)
+                    }
+                    // Legger til tiltakspenger for resten av perioden
+                    opprett {
+                        målgruppeTiltakspenger(fom, tom)
+                    }
+                }
+            }
+
+        with(hentBeregnedeReiserTsr(revurderingId).single().perioder) {
+            assertThat(all { it.fraTidligereVedtak }).isFalse()
+        }
+    }
+
+    private fun hentBeregnedeReiserTsr(revurderingId: BehandlingId): List<BeregningsresultatForReiseDto> =
+        kall.vedtak
+            .hentVedtak(
+                Stønadstype.DAGLIG_REISE_TSR,
+                revurderingId,
+            ).expectOkWithBody<InnvilgelseDagligReiseResponse>()
+            .beregningsresultat
+            .offentligTransport!!
+            .reiser
+
+    private fun gjennomførEnTsrFørstegangsbehandling(
+        reiseFom: LocalDate,
+        reiseTom: LocalDate,
+    ): BehandlingId =
+        opprettBehandlingOgGjennomførBehandlingsløp(
+            stønadstype = Stønadstype.DAGLIG_REISE_TSR,
+        ) {
+            aktivitet {
+                opprett {
+                    aktivitetTiltakTsr(
+                        fom = reiseFom,
+                        tom = reiseTom,
+                        typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                    )
+                }
+            }
+            målgruppe {
+                opprett {
+                    målgruppeDagpenger(reiseFom, reiseTom)
+                }
+            }
+            vilkår {
+                opprett {
+                    offentligTransport(fom = reiseFom, tom = reiseTom)
+                }
+            }
+        }.behandlingId
 
     private fun endreAlleBeløpTilNoeHeltTulleteStort() {
         jdbcTemplate.update(
