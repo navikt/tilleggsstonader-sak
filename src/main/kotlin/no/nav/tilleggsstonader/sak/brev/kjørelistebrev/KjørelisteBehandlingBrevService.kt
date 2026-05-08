@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.interntVedtak.HtmlifyClient
 import no.nav.tilleggsstonader.sak.journalføring.FamilieDokumentClient
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.PrivatBilOppsummertBeregningDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.finnSatserBruktIBeregning
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.oppsummerBeregningPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
@@ -63,7 +64,9 @@ class KjørelisteBehandlingBrevService(
                 SikkerhetContext.hentSaksbehandlerNavn(strict = true)
             }
 
-        val oppsummertBeregning = oppsummerBeregningPrivatBil(beregningsresultatPrivatBil, rammevedtak)
+        val oppsummertBeregning =
+            oppsummerBeregningPrivatBil(beregningsresultatPrivatBil, rammevedtak)
+                .filtrerBortPerioderFraTidligereVedtak()
         val request =
             KjørelisteBehandlingBrevRequest(
                 navn = personService.hentVisningsnavnForPerson(saksbehandling.ident),
@@ -84,6 +87,14 @@ class KjørelisteBehandlingBrevService(
             Stønadstype.DAGLIG_REISE_TSO -> "Nav Arbeid og ytelser"
             else -> error("Uforventet stønadstype $stønadstype i en kjørelistebehandling")
         }
+
+    private fun PrivatBilOppsummertBeregningDto.filtrerBortPerioderFraTidligereVedtak() =
+        copy(
+            reiser =
+                reiser
+                    .map { reise -> reise.copy(perioder = reise.perioder.filter { !it.fraTidligereVedtak }) }
+                    .filter { it.perioder.isNotEmpty() },
+        )
 
     private fun lagreEllerOppdaterBrev(
         saksbehandling: Saksbehandling,
