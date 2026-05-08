@@ -31,7 +31,8 @@ class SøknadskjemaBoutgifterMapperTest {
     fun `skal kunne mappe skjema-eksempel som inneholder alle felter`() {
         val json = FileUtil.readFile("søknad/boutgifter/eksempel1/skjema-eksempel.json")
         val boutgifter = jsonMapperFailOnUnknownProperties.readValue<SkjemaBoutgifter>(json)
-        val skjema = SøknadsskjemaBoutgifterFyllUtSendInn("nb-NO", BoutgifterFyllUtSendInnData(boutgifter))
+        val skjema =
+            SøknadsskjemaBoutgifterFyllUtSendInn("nb-NO", BoutgifterFyllUtSendInnData(boutgifter), emptyList(), 1)
         val mappetSkjema = mapper.mapSkjema(skjema, emptyList())
 
         val mappetJson = jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(mappetSkjema)

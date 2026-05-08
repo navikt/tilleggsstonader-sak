@@ -132,6 +132,7 @@ class OpprettDummySøknadBoutgifter(
                         ),
                     ),
                 dokumentasjon = emptyList(),
+                formRevision = 1,
             )
 
         val skjema =
