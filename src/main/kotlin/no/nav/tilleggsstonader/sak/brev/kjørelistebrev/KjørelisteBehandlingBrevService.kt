@@ -34,6 +34,7 @@ class KjørelisteBehandlingBrevService(
         }
 
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
+        saksbehandling.status.validerKanBehandlingRedigeres()
         return lagreBrev(saksbehandling, begrunnelse = null, eksisterendeBrev = null)
     }
 
