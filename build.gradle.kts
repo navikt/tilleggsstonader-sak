@@ -15,7 +15,7 @@ val mockkVersion = "1.14.9"
 val testcontainerVersion = "1.21.4"
 val springDocVersion = "3.0.3"
 
-val jacksonVersion = "3.1.2"
+val jacksonVersion = "3.1.3"
 
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
