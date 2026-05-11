@@ -1,18 +1,14 @@
 package no.nav.tilleggsstonader.sak.ekstern.journalføring
 
-import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.finnAlleTaskerMedType
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførHenleggelse
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.defaultJournalpost
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import tools.jackson.module.kotlin.readValue
 
 class HåndterSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
     @Test
@@ -23,20 +19,16 @@ class HåndterSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `skal opprette journalføringsoppgave hvis det allerede finnes aktiv behandling`() {
+    fun `skal opprette ny behandling satt på vent hvis det allerede finnes aktiv behandling`() {
         // Første journalføring vil føre til at det opprettes behandling
-        val journalpostId = "1"
-        håndterSøknadService.håndterSøknad(defaultJournalpost.copy(journalpostId = journalpostId))
+        håndterSøknadService.håndterSøknad(defaultJournalpost)
         kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 
-        // Andre journalføring skal føre til journalføringsoppgave
-        håndterSøknadService.håndterSøknad(defaultJournalpost)
+        // Andre journalføring skal føre til ny behandling satt på vent
+        val nyBehandling = håndterSøknadService.håndterSøknad(defaultJournalpost)
 
-        val oppgaveTask = finnAlleTaskerMedType(OpprettOppgaveTask.TYPE).single()
-        val payload = jsonMapper.readValue<OpprettOppgaveTask.OpprettOppgaveTaskData>(oppgaveTask.payload)
-
-        assertThat(payload.oppgave.journalpostId).isEqualTo(journalpostId)
-        assertThat(payload.oppgave.oppgavetype).isEqualTo(Oppgavetype.Journalføring)
+        assertThat(nyBehandling).isNotNull()
+        assertThat(nyBehandling!!.status).isEqualTo(BehandlingStatus.SATT_PÅ_VENT)
     }
 
     @Test
