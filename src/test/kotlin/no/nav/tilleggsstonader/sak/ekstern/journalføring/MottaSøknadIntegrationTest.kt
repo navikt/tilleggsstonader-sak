@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingsjournalpostRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakRepository
@@ -97,6 +98,58 @@ class MottaSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
+    fun `mottar flere boutgifter-søknader fra kafka, journalføres og oppretter sak`() {
+        val hendelse1 = journalfoeringHendelseRecord()
+        val hendelse2 = journalfoeringHendelseRecord()
+        val hendelse3 = journalfoeringHendelseRecord()
+
+        // Søknad 1 — ingen aktiv behandling, skal opprette behandling og journalføre
+        journalhendelseKafkaListener.listen(
+            ConsumerRecordUtil.lagConsumerRecord("key1", hendelse1),
+            mockk<Acknowledgment>(relaxed = true),
+        )
+        assertThat(hendelseRepository.findByTypeAndId(TypeHendelse.JOURNALPOST, hendelse1.hendelsesId)).isNotNull
+        mockJournalpost(brevkode = DokumentBrevkode.BOUTGIFTER, søknad = søknadBoutgifter(ident = ident))
+        kjørTasksKlareForProsessering()
+
+        // Søknad 2 — aktiv behandling finnes, ønsket atferd: ny behandling settes på vent
+        journalhendelseKafkaListener.listen(
+            ConsumerRecordUtil.lagConsumerRecord("key2", hendelse2),
+            mockk<Acknowledgment>(relaxed = true),
+        )
+        assertThat(hendelseRepository.findByTypeAndId(TypeHendelse.JOURNALPOST, hendelse2.hendelsesId)).isNotNull
+        mockJournalpost(brevkode = DokumentBrevkode.BOUTGIFTER, søknad = søknadBoutgifter(ident = ident))
+        kjørTasksKlareForProsessering()
+
+        // Søknad 3 — aktiv behandling finnes, ønsket atferd: ny behandling settes på vent
+        journalhendelseKafkaListener.listen(
+            ConsumerRecordUtil.lagConsumerRecord("key3", hendelse3),
+            mockk<Acknowledgment>(relaxed = true),
+        )
+        assertThat(hendelseRepository.findByTypeAndId(TypeHendelse.JOURNALPOST, hendelse3.hendelsesId)).isNotNull
+        mockJournalpost(brevkode = DokumentBrevkode.BOUTGIFTER, søknad = søknadBoutgifter(ident = ident))
+        kjørTasksKlareForProsessering()
+
+        val fagsak = fagsakRepository.findBySøkerIdent(setOf(ident)).single()
+        assertThat(fagsak.stønadstype).isEqualTo(Stønadstype.BOUTGIFTER)
+
+        val behandlinger = behandlingRepository.findByFagsakId(fagsak.id)
+
+        // Ønsket atferd: 3 søknader → 3 behandlinger, der søknad 2 og 3 er satt på vent
+        // Faktisk atferd (bug): kun 1 behandling opprettes — søknad 2 og 3 blir journalføringsoppgaver og mister koblingen til en behandling
+        assertThat(behandlinger).hasSize(3)
+
+        val førsteSøknadBehandling = behandlinger.minByOrNull { it.sporbar.opprettetTid }!!
+        assertThat(førsteSøknadBehandling.status).isEqualTo(BehandlingStatus.OPPRETTET)
+
+        val øvrigeBehandlinger = behandlinger.filter { it.id != førsteSøknadBehandling.id }
+        assertThat(øvrigeBehandlinger).allSatisfy { behandling ->
+            assertThat(behandling.status).isEqualTo(BehandlingStatus.SATT_PÅ_VENT)
+            assertThat(behandling.årsak).isEqualTo(BehandlingÅrsak.SØKNAD)
+        }
+    }
+
+    @Test
     fun `mottar barnetilsyn-søknad fra kafka, journalføres og oppretter sak`() {
         val hendelse = journalfoeringHendelseRecord()
 
@@ -139,7 +192,7 @@ class MottaSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `mottar to læremidler-søknad på samme bruker fra kafka, journalføres og oppretter sak og en jfr-oppgave`() {
+    fun `mottar to læremidler-søknad på samme bruker fra kafka, journalføres og oppretter to behandlinger hvor siste settes på vent`() {
         val hendelse1 = journalfoeringHendelseRecord(journalpostId = 67)
         val hendelse2 = journalfoeringHendelseRecord(journalpostId = 6767)
 
@@ -167,19 +220,21 @@ class MottaSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
         )
         kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 
-        validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(
-            ident,
-            Stønadstype.LÆREMIDLER,
-            hendelse1.journalpostId.toString(),
-        )
+        val fagsak = fagsakRepository.findBySøkerIdent(setOf(ident)).single()
+        assertThat(fagsak.stønadstype).isEqualTo(Stønadstype.LÆREMIDLER)
 
-        // Verifiserer at det har blitt opprettet jfr-oppgave for den andre søknaden
-        assertThat(
-            oppgavelager.alleOppgaver().filter {
-                it.journalpostId?.toLong() == hendelse2.journalpostId &&
-                    it.oppgavetype == "JFR"
-            },
-        ).hasSize(1)
+        val behandlinger = behandlingRepository.findByFagsakId(fagsak.id)
+        assertThat(behandlinger).hasSize(2)
+
+        val behandlingSortertPåTid = behandlinger.sortedBy { it.sporbar.opprettetTid }
+        assertThat(behandlingSortertPåTid.first().status).isEqualTo(BehandlingStatus.OPPRETTET)
+        assertThat(behandlingSortertPåTid.last().status).isEqualTo(BehandlingStatus.SATT_PÅ_VENT)
+
+        val førsteBehandlingJournalposter = behandlingsjournalpostRepository.findAllByBehandlingId(behandlingSortertPåTid.first().id)
+        assertThat(førsteBehandlingJournalposter.map { it.journalpostId }).contains(hendelse1.journalpostId.toString())
+
+        val andreBehandlingJournalposter = behandlingsjournalpostRepository.findAllByBehandlingId(behandlingSortertPåTid.last().id)
+        assertThat(andreBehandlingJournalposter.map { it.journalpostId }).contains(hendelse2.journalpostId.toString())
     }
 
     @Test
