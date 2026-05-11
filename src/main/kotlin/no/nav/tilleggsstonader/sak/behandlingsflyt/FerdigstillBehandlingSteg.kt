@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTask
 import no.nav.tilleggsstonader.sak.privatbil.varsel.MittNavVarselService
-import no.nav.tilleggsstonader.sak.privatbil.varsel.SendKjorelistevarselTask
+import no.nav.tilleggsstonader.sak.privatbil.varsel.SendKjorelistevarselTilBrukerTask
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.VedtaksstatistikkTask
 import org.slf4j.Logger
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service
 class FerdigstillBehandlingSteg(
     private val behandlingService: BehandlingService,
     private val taskService: TaskService,
-    private val varselService: MittNavVarselService,
+    private val mittNavVarselService: MittNavVarselService,
 ) : BehandlingSteg<Void?> {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -35,13 +35,10 @@ class FerdigstillBehandlingSteg(
 
         taskService.save(BehandlingsstatistikkTask.opprettFerdigTask(behandlingId = saksbehandling.id))
 
-        val varselTilMittNav = varselService.skalSendeKjørelisteVarsel(saksbehandling)
-        if (varselTilMittNav) {
+        // Varsling om kjørelister sendes nå via scheduled jobb (KjørelisteVarselScheduledService) som kjører mandag kl 10
+        if (mittNavVarselService.skalSendeKjørelistevarselVedFerdigstillingAvBehandling(saksbehandling.id)) {
             taskService.save(
-                task =
-                    SendKjorelistevarselTask.opprettTask(
-                        behandlingId = saksbehandling.id,
-                    ),
+                SendKjorelistevarselTilBrukerTask.opprett(saksbehandling.fagsakPersonId),
             )
         }
 
