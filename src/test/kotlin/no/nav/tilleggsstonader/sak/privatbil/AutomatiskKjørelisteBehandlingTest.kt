@@ -61,10 +61,9 @@ class AutomatiskKjørelisteBehandlingTest : CleanDatabaseIntegrationTest() {
                 defaultDagligReisePrivatBilTsoTestdata(fom, tom)
 
                 sendInnKjøreliste {
-                    periode = Datoperiode(fom, 2 januar 2026)
+                    periode = Datoperiode(fom, 4 januar 2026)
                     kjørteDager =
                         listOf(
-                            KjørtDag(dato = 1 januar 2026, parkeringsutgift = 100),
                             KjørtDag(dato = 2 januar 2026, parkeringsutgift = 50),
                         )
                 }

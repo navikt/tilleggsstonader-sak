@@ -56,7 +56,7 @@ class DagligReisePrivatBilStatistikkIntegrationTest : IntegrationTest() {
 
                 sendInnKjøreliste {
                     periode = Datoperiode(fom, tom)
-                    kjørteDager = listOf(KjørtDag(dato = fom, parkeringsutgift = 50))
+                    kjørteDager = listOf(KjørtDag(dato = 7 april 2026, parkeringsutgift = 50))
                 }
             }
 

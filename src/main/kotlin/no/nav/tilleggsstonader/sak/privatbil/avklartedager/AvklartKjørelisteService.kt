@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
+import io.github.mikaojk.holiday.getNorwegianHolidays
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
@@ -251,11 +252,13 @@ class AvklartKjørelisteService(
     private fun utledAvvik(kjørelisteDag: KjørelisteDag): List<TypeAvvikDag> =
         listOfNotNull(
             TypeAvvikDag.FOR_HØY_PARKERINGSUTGIFT.takeIf { kjørelisteDag.parkeringsutgift != null && kjørelisteDag.parkeringsutgift > 100 },
-            TypeAvvikDag.HELLIDAG_ELLER_HELG.takeIf { kjørelisteDag.harKjørt && kjørelisteDag.dato.erHelg() },
+            TypeAvvikDag.HELLIDAG_ELLER_HELG.takeIf { kjørelisteDag.harKjørt && kjørelisteDag.dato.erHelgEllerHelligdag() },
         )
 
-    // TODO: Bruk fra kontrakter
-    private fun LocalDate.erHelg() = this.dayOfWeek == DayOfWeek.SATURDAY || this.dayOfWeek == DayOfWeek.SUNDAY
+    private fun LocalDate.erHelgEllerHelligdag() =
+        this.dayOfWeek == DayOfWeek.SATURDAY ||
+            this.dayOfWeek == DayOfWeek.SUNDAY ||
+            getNorwegianHolidays(year).map { it.date }.contains(this)
 
     private fun henteReiseFraVedtak(
         behandlingId: BehandlingId,
