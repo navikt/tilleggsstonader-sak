@@ -3,7 +3,9 @@ package no.nav.tilleggsstonader.sak.privatbil
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.april
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -285,6 +287,83 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
                     parkeringsutgift = null,
                     automatiskVurdering = UtfyltDagAutomatiskVurdering.AVVIK,
                     avvik = listOf(TypeAvvikDag.HELLIDAG_ELLER_HELG),
+                ),
+            )
+
+        sammenlignDager(faktiskeDager = innsendtUke.dager, forventedeDager = forventedeDager)
+    }
+
+    @Test
+    fun `skal melde avvik på dag dersom det er kjørt skjærtorsdag og langfredag`() {
+        val rammebehandlingId =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                defaultDagligReisePrivatBilTsoTestdata(30 mars 2026, 5 april 2026)
+
+                sendInnKjøreliste {
+                    periode = Datoperiode(30 mars 2026, 5 april 2026)
+                    kjørteDager =
+                        listOf(
+                            KjørtDag(dato = 1 april 2026),
+                            KjørtDag(dato = 2 april 2026),
+                            KjørtDag(dato = 3 april 2026),
+                        )
+                }
+            }
+
+        val innsendtUke = finnInnsendtUkeIKjørelistebehandling(rammebehandlingId)
+
+        assertThat(innsendtUke.avvik).isNull()
+        assertThat(innsendtUke.status).isEqualTo(UkeStatus.AVVIK)
+        assertThat(innsendtUke.avklartUkeId).isNotNull()
+        assertThat(innsendtUke.behandletDato).isNull()
+
+        val forventedeDager =
+            listOf(
+                avklartKjørtDag(
+                    30 mars 2026,
+                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.NEI,
+                    automatiskVurdering = UtfyltDagAutomatiskVurdering.OK,
+                    parkeringsutgift = null,
+                ),
+                avklartKjørtDag(
+                    31 mars 2026,
+                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.NEI,
+                    automatiskVurdering = UtfyltDagAutomatiskVurdering.OK,
+                    parkeringsutgift = null,
+                ),
+                avklartKjørtDag(
+                    1 april 2026,
+                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
+                    automatiskVurdering = UtfyltDagAutomatiskVurdering.OK,
+                    parkeringsutgift = null,
+                ),
+                avklartKjørtDag(
+                    2 april 2026,
+                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.IKKE_VURDERT,
+                    automatiskVurdering = UtfyltDagAutomatiskVurdering.AVVIK,
+                    parkeringsutgift = null,
+                    avvik = listOf(TypeAvvikDag.HELLIDAG_ELLER_HELG),
+                ),
+                avklartKjørtDag(
+                    3 april 2026,
+                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.IKKE_VURDERT,
+                    parkeringsutgift = null,
+                    automatiskVurdering = UtfyltDagAutomatiskVurdering.AVVIK,
+                    avvik = listOf(TypeAvvikDag.HELLIDAG_ELLER_HELG),
+                ),
+                avklartKjørtDag(
+                    4 april 2026,
+                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.NEI,
+                    automatiskVurdering = UtfyltDagAutomatiskVurdering.OK,
+                    parkeringsutgift = null,
+                ),
+                avklartKjørtDag(
+                    4 april 2026,
+                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.NEI,
+                    automatiskVurdering = UtfyltDagAutomatiskVurdering.OK,
+                    parkeringsutgift = null,
                 ),
             )
 
