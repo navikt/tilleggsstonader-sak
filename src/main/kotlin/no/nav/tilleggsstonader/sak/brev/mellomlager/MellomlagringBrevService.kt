@@ -24,14 +24,12 @@ class MellomlagringBrevService(
         feilHvis(behandlingService.behandlingErLåstForVidereRedigering(behandlingId)) {
             "Kan ikke mellomlagre brev for behandling=$behandlingId når behandlingen er låst."
         }
-        slettMellomlagringHvisFinnes(behandlingId)
-        val mellomlagretBrev =
-            MellomlagretBrev(
-                behandlingId,
-                brevverdier,
-                brevmal,
-            )
-        return mellomlagerBrevRepository.insert(mellomlagretBrev).behandlingId
+        val eksisterende = mellomlagerBrevRepository.findByIdOrNull(behandlingId)
+        return if (eksisterende == null) {
+            mellomlagerBrevRepository.insert(MellomlagretBrev(behandlingId, brevverdier, brevmal))
+        } else {
+            mellomlagerBrevRepository.update(eksisterende.copy(brevverdier = brevverdier, brevmal = brevmal))
+        }.behandlingId
     }
 
     @Transactional
@@ -61,10 +59,6 @@ class MellomlagringBrevService(
         mellomlagerBrevRepository.findByIdOrNull(behhandlingId)?.let {
             MellomlagreBrevDto(it.brevverdier, it.brevmal)
         }
-
-    fun slettMellomlagringHvisFinnes(behandlingId: BehandlingId) {
-        mellomlagerBrevRepository.deleteById(behandlingId)
-    }
 
     fun slettMellomlagretFrittståendeBrev(
         fagsakId: FagsakId,
