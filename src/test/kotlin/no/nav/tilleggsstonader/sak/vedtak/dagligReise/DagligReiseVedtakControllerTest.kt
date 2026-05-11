@@ -236,7 +236,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
         val innsendteKjørteDager =
             listOf(
                 KjørtDag(dato = 29 desember 2025, parkeringsutgift = 50),
-                KjørtDag(dato = 1 januar 2026, parkeringsutgift = 100),
+                KjørtDag(dato = 2 januar 2026, parkeringsutgift = 100),
                 KjørtDag(dato = 5 januar 2026),
                 KjørtDag(dato = 6 januar 2026),
                 KjørtDag(dato = 12 januar 2026),

@@ -41,13 +41,13 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
                 defaultDagligReisePrivatBilTsoTestdata(
-                    1 januar 2026,
-                    4 januar 2026,
+                    5 januar 2026,
+                    8 januar 2026,
                     delperioder =
                         listOf(
                             FaktaDelperiodePrivatBilDto(
-                                fom = 1 januar 2026,
-                                tom = 4 januar 2026,
+                                fom = 5 januar 2026,
+                                tom = 8 januar 2026,
                                 reisedagerPerUke = 2,
                                 bompengerPerDag = null,
                                 fergekostnadPerDag = null,
@@ -56,11 +56,11 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
                 )
 
                 sendInnKjøreliste {
-                    periode = Datoperiode(1 januar 2026, 4 januar 2026)
+                    periode = Datoperiode(5 januar 2026, 8 januar 2026)
                     kjørteDager =
                         listOf(
-                            KjørtDag(dato = 1 januar 2026, parkeringsutgift = 50),
-                            KjørtDag(dato = 2 januar 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 5 januar 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 6 januar 2026, parkeringsutgift = 50),
                         )
                 }
             }
@@ -75,25 +75,25 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
         val forventedeDager =
             listOf(
                 avklartKjørtDag(
-                    1 januar 2026,
+                    5 januar 2026,
                     godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
                     automatiskVurdering = UtfyltDagAutomatiskVurdering.OK,
                     parkeringsutgift = 50,
                 ),
                 avklartKjørtDag(
-                    2 januar 2026,
+                    6 januar 2026,
                     godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
                     automatiskVurdering = UtfyltDagAutomatiskVurdering.OK,
                     parkeringsutgift = 50,
                 ),
                 avklartKjørtDag(
-                    3 januar 2026,
+                    7 januar 2026,
                     godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.NEI,
                     automatiskVurdering = UtfyltDagAutomatiskVurdering.OK,
                     parkeringsutgift = null,
                 ),
                 avklartKjørtDag(
-                    4 januar 2026,
+                    8 januar 2026,
                     godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.NEI,
                     automatiskVurdering = UtfyltDagAutomatiskVurdering.OK,
                     parkeringsutgift = null,
@@ -191,14 +191,14 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
-                defaultDagligReisePrivatBilTsoTestdata(1 januar 2026, 2 januar 2026)
+                defaultDagligReisePrivatBilTsoTestdata(5 januar 2026, 6 januar 2026)
 
                 sendInnKjøreliste {
-                    periode = Datoperiode(1 januar 2026, 2 januar 2026)
+                    periode = Datoperiode(5 januar 2026, 6 januar 2026)
                     kjørteDager =
                         listOf(
-                            KjørtDag(dato = 1 januar 2026, parkeringsutgift = 50),
-                            KjørtDag(dato = 2 januar 2026, parkeringsutgift = 150),
+                            KjørtDag(dato = 5 januar 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 6 januar 2026, parkeringsutgift = 150),
                         )
                 }
             }
@@ -213,13 +213,13 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
         val forventedeDager =
             listOf(
                 avklartKjørtDag(
-                    1 januar 2026,
+                    5 januar 2026,
                     godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
                     automatiskVurdering = UtfyltDagAutomatiskVurdering.OK,
                     parkeringsutgift = 50,
                 ),
                 avklartKjørtDag(
-                    2 januar 2026,
+                    6 januar 2026,
                     godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.IKKE_VURDERT,
                     automatiskVurdering = UtfyltDagAutomatiskVurdering.AVVIK,
                     avvik = listOf(TypeAvvikDag.FOR_HØY_PARKERINGSUTGIFT),
@@ -231,7 +231,7 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `skal melde avvik på dag dersom det er en helgedag`() {
+    fun `skal melde avvik på dag dersom det er en helg eller helligdag`() {
         val rammebehandlingId =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
@@ -261,9 +261,10 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
             listOf(
                 avklartKjørtDag(
                     1 januar 2026,
-                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
-                    automatiskVurdering = UtfyltDagAutomatiskVurdering.OK,
-                    parkeringsutgift = 50,
+                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.IKKE_VURDERT,
+                    automatiskVurdering = UtfyltDagAutomatiskVurdering.AVVIK,
+                    parkeringsutgift = null,
+                    avvik = listOf(TypeAvvikDag.HELLIDAG_ELLER_HELG),
                 ),
                 avklartKjørtDag(
                     2 januar 2026,
