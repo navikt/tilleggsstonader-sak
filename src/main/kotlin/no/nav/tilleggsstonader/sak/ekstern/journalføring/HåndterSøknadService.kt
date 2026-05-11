@@ -11,12 +11,9 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
-import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.journalføring.JournalføringService
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
@@ -25,8 +22,6 @@ import no.nav.tilleggsstonader.sak.journalføring.gjelderKanalNavNo
 import no.nav.tilleggsstonader.sak.journalføring.harStrukturertSøknad
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
-import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.Reise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
@@ -40,14 +35,10 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class HåndterSøknadService(
-    private val personService: PersonService,
     private val journalpostService: JournalpostService,
     private val taskService: TaskService,
     private val journalføringService: JournalføringService,
-    private val fagsakService: FagsakService,
-    private val behandlingService: BehandlingService,
     private val søknadService: SøknadService,
-    private val unleashService: UnleashService,
     private val ytelseService: YtelseService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -59,7 +50,7 @@ class HåndterSøknadService(
             finnStønadstyperSomKanOpprettesFraJournalpost(journalpost).defaultStønadstype
                 ?: error("Fant ikke dokument brevkode for journalpost")
 
-        if (kanAutomatiskJournalføre(personIdent, stønadstype, journalpost)) {
+        if (kanAutomatiskJournalføre(journalpost)) {
             return journalføringService.journalførTilNyBehandling(
                 journalpost = journalpost,
                 personIdent = personIdent,
@@ -90,6 +81,7 @@ class HåndterSøknadService(
                     finnStønadstypeForDagligReise(journalpost),
                     Stønadstype.entries.filter { it.gjelderDagligReise() },
                 )
+
             Skjematype.SØKNAD_REISE_TIL_SAMLING ->
                 ValgbareStønadstyperForJournalpost(
                     finnStønadstypeForReiseTilSamling(journalpost),
@@ -191,27 +183,15 @@ class HåndterSøknadService(
 
     private fun List<Reise>.finnSenesteDato() = flatMap { listOf(it.periode.fom, it.periode.tom) }.max()
 
-    fun kanAutomatiskJournalføre(
-        personIdent: String,
-        stønadstype: Stønadstype,
-        journalpost: Journalpost,
-    ): Boolean {
+    fun kanAutomatiskJournalføre(journalpost: Journalpost): Boolean {
         if (!journalpost.gjelderKanalNavNo()) {
             logger.info("Journalpost=${journalpost.journalpostId} kan ikke automatisk journalføres pga kanal=${journalpost.kanal}")
             return false
         }
-        val allePersonIdenter = personService.hentFolkeregisterIdenter(personIdent).identer()
-        val fagsak = fagsakService.finnFagsak(allePersonIdenter, stønadstype)
-
-        return if (fagsak == null) {
-            true
-        } else {
-            val behandlinger = behandlingService.hentBehandlinger(fagsak.id)
-            !harÅpenBehandling(behandlinger)
-        }
+        // NAV_NO-søknader skal journalføres automatisk.
+        // Hvis det finnes aktiv behandling, blir ny behandling satt på vent i OpprettBehandlingService.
+        return true
     }
-
-    private fun harÅpenBehandling(behandlinger: List<Behandling>): Boolean = behandlinger.any { !it.erFerdigstilt() }
 
     private fun håndterSøknadSomIkkeKanAutomatiskJournalføres(
         personIdent: String,
