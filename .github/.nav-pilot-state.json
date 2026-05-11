@@ -1,7 +1,7 @@
 {
   "collection": "kotlin-backend",
   "version": "2026.04.30-090824-bb25c0e",
-  "source_sha": "bb25c0e",
+  "source_sha": "14b480c",
   "installed_at": "2026-04-13T13:37:44Z",
   "files": [
     {
@@ -131,6 +131,10 @@
     {
       "path": ".github/prompts/nais-manifest.prompt.md",
       "hash": "a7564098ae008cce"
+    },
+    {
+      "path": ".github/skills/observability-debugging/",
+      "hash": "cc94b1e7bfe7626c"
     }
   ]
 }
