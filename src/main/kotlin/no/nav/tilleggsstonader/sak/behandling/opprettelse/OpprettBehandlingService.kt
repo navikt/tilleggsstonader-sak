@@ -59,10 +59,10 @@ class OpprettBehandlingService(
         val sisteIverksatteBehandlinger = behandlingRepository.finnSisteIverksatteBehandling(request.fagsakId)
         val forrigeBehandling = behandlingRepository.finnSisteIverksatteBehandling(request.fagsakId)
         val behandlingType =
-            when (request.opprettForenkletBehandlingsType) {
-                OpprettForenkletBehandlingsType.ORDINAER_BEHANDLING ->
+            when (request.forenkletBehandlingsType) {
+                ForenkletBehandlingsType.ORDINAER_BEHANDLING ->
                     utledBehandlingType(tidligereBehandlinger, behandlingÅrsak = request.behandlingsårsak)
-                OpprettForenkletBehandlingsType.KJØRELISTE -> BehandlingType.KJØRELISTE
+                ForenkletBehandlingsType.KJØRELISTE -> BehandlingType.KJØRELISTE
             }
         val behandlingSteg =
             when (behandlingType) {
@@ -159,10 +159,10 @@ data class OpprettBehandling(
     val kravMottatt: LocalDate? = null,
     val nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
     val oppgaveMetadata: OpprettBehandlingOppgaveMetadata,
-    val opprettForenkletBehandlingsType: OpprettForenkletBehandlingsType = OpprettForenkletBehandlingsType.ORDINAER_BEHANDLING,
+    val forenkletBehandlingsType: ForenkletBehandlingsType = ForenkletBehandlingsType.ORDINAER_BEHANDLING,
 )
 
-enum class OpprettForenkletBehandlingsType {
+enum class ForenkletBehandlingsType {
     ORDINAER_BEHANDLING,
     KJØRELISTE,
 }

@@ -12,7 +12,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
-import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettForenkletBehandlingsType
+import no.nav.tilleggsstonader.sak.behandling.opprettelse.ForenkletBehandlingsType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegController
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
@@ -232,7 +232,7 @@ fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
                 årsak = BehandlingÅrsak.SØKNAD,
                 kravMottatt = LocalDate.now(),
                 nyeOpplysningerMetadata = null,
-                opprettForenkletBehandlingsType = OpprettForenkletBehandlingsType.ORDINAER_BEHANDLING,
+                opprettForenkletBehandlingsType = ForenkletBehandlingsType.ORDINAER_BEHANDLING,
             ),
         tilSteg = tilSteg,
         testdataProvider = testdataProvider,

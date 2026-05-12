@@ -445,7 +445,7 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
         nyeOpplysningerMetadata = if (årsak == BehandlingÅrsak.NYE_OPPLYSNINGER) opprettNyeOpplysningerMetadata() else null,
         skalOppretteOppgave = skalOppretteOppgave,
         behandlingMetode = BehandlingMetode.MANUELL,
-        opprettForenkletBehandlingsType = OpprettForenkletBehandlingsType.ORDINAER_BEHANDLING,
+        opprettForenkletBehandlingsType = ForenkletBehandlingsType.ORDINAER_BEHANDLING,
     )
 
     private fun opprettNyeOpplysningerMetadata() =

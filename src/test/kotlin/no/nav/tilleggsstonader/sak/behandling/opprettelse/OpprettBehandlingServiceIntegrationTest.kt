@@ -61,7 +61,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                         kravMottatt = LocalDate.now().plusDays(1),
                         oppgaveMetadata = opprettBehandlingOppgaveMetadata,
                         behandlingMetode = behandlingMetode,
-                        opprettForenkletBehandlingsType = OpprettForenkletBehandlingsType.ORDINAER_BEHANDLING,
+                        forenkletBehandlingsType = ForenkletBehandlingsType.ORDINAER_BEHANDLING,
                     ),
                 )
             }.withMessage("Kan ikke sette krav mottattdato frem i tid")
@@ -81,7 +81,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                         behandlingsårsak = behandlingÅrsak,
                         behandlingMetode = behandlingMetode,
                         oppgaveMetadata = opprettBehandlingOppgaveMetadata,
-                        opprettForenkletBehandlingsType = OpprettForenkletBehandlingsType.ORDINAER_BEHANDLING,
+                        forenkletBehandlingsType = ForenkletBehandlingsType.ORDINAER_BEHANDLING,
                     ),
                 )
 
@@ -102,7 +102,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                         behandlingsårsak = behandlingÅrsak,
                         behandlingMetode = behandlingMetode,
                         oppgaveMetadata = opprettBehandlingOppgaveMetadata,
-                        opprettForenkletBehandlingsType = OpprettForenkletBehandlingsType.ORDINAER_BEHANDLING,
+                        forenkletBehandlingsType = ForenkletBehandlingsType.ORDINAER_BEHANDLING,
                     ),
                 )
 
@@ -138,7 +138,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                         behandlingsårsak = behandlingÅrsak,
                         behandlingMetode = behandlingMetode,
                         oppgaveMetadata = opprettBehandlingOppgaveMetadata,
-                        opprettForenkletBehandlingsType = OpprettForenkletBehandlingsType.ORDINAER_BEHANDLING,
+                        forenkletBehandlingsType = ForenkletBehandlingsType.ORDINAER_BEHANDLING,
                     ),
                 )
 
@@ -164,7 +164,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                         behandlingsårsak = behandlingÅrsak,
                         behandlingMetode = behandlingMetode,
                         oppgaveMetadata = opprettBehandlingOppgaveMetadata,
-                        opprettForenkletBehandlingsType = OpprettForenkletBehandlingsType.ORDINAER_BEHANDLING,
+                        forenkletBehandlingsType = ForenkletBehandlingsType.ORDINAER_BEHANDLING,
                     ),
                 )
 
@@ -196,7 +196,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                     behandlingsårsak = behandlingÅrsak,
                     behandlingMetode = behandlingMetode,
                     oppgaveMetadata = opprettBehandlingOppgaveMetadata,
-                    opprettForenkletBehandlingsType = OpprettForenkletBehandlingsType.ORDINAER_BEHANDLING,
+                    forenkletBehandlingsType = ForenkletBehandlingsType.ORDINAER_BEHANDLING,
                 ),
             )
 
@@ -215,7 +215,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                 behandlingsårsak = behandlingÅrsak,
                 behandlingMetode = behandlingMetode,
                 oppgaveMetadata = OpprettBehandlingOppgaveMetadata.UtenOppgave,
-                opprettForenkletBehandlingsType = OpprettForenkletBehandlingsType.ORDINAER_BEHANDLING,
+                forenkletBehandlingsType = ForenkletBehandlingsType.ORDINAER_BEHANDLING,
             ),
         )
 
@@ -241,7 +241,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                     behandlingsårsak = BehandlingÅrsak.SØKNAD,
                     behandlingMetode = behandlingMetode,
                     oppgaveMetadata = OpprettBehandlingOppgaveMetadata.UtenOppgave,
-                    opprettForenkletBehandlingsType = OpprettForenkletBehandlingsType.KJØRELISTE,
+                    forenkletBehandlingsType = ForenkletBehandlingsType.KJØRELISTE,
                 ),
             )
 
