@@ -14,6 +14,7 @@ val wiremockVersion = "3.13.2"
 val mockkVersion = "1.14.9"
 val testcontainerVersion = "1.21.4"
 val springDocVersion = "3.0.3"
+val shedlockVersion = "7.7.0"
 
 val jacksonVersion = "3.1.3"
 
@@ -106,6 +107,10 @@ dependencies {
     implementation("no.nav.tilleggsstonader.kontrakter:pdl-personhendelser-avro:$tilleggsstønaderKontrakterVersion")
 
     implementation("io.github.mikaojk:norwegian-holidays:1.0.13")
+
+    // Shedlock – hindrer at schedulede jobber kjøres på tvers av replicas
+    implementation("net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion")
 
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test") {

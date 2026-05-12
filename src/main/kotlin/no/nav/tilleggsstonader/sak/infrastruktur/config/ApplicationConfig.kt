@@ -1,5 +1,8 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.config
 
+import net.javacrumbs.shedlock.core.LockProvider
+import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider
+import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client
 import no.nav.security.token.support.spring.api.EnableJwtTokenValidation
 import no.nav.tilleggsstonader.libs.http.config.RestTemplateConfiguration
@@ -14,6 +17,7 @@ import org.springframework.boot.SpringBootConfiguration
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.scheduling.annotation.EnableScheduling
 
 @SpringBootConfiguration
@@ -26,12 +30,16 @@ import org.springframework.scheduling.annotation.EnableScheduling
     UnleashConfiguration::class,
 )
 @EnableScheduling
+@EnableSchedulerLock(defaultLockAtMostFor = "10m")
 class ApplicationConfig {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     init {
         logger.info("Starter versjon=${Applikasjonsversjon.versjon}")
     }
+
+    @Bean
+    fun lockProvider(jdbcTemplate: JdbcTemplate): LockProvider = JdbcTemplateLockProvider(jdbcTemplate)
 
     @Bean
     fun behandlingLoggingFilter(): FilterRegistrationBean<BehandlingLogFilter> {

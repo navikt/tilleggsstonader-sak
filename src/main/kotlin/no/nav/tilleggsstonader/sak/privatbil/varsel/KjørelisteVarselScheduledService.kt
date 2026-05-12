@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.privatbil.varsel
 
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.log.mdc.MDCConstants
@@ -31,6 +32,7 @@ class KjørelisteVarselScheduledService(
      */
     @Transactional
     @Scheduled(cron = "0 10 0 * * MON")
+    @SchedulerLock(name = "sendVarselOmKjørelister", lockAtMostFor = "10m", lockAtLeastFor = "1m")
     fun sendVarselOmKjørelister() {
         try {
             MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
