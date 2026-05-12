@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
@@ -108,6 +109,7 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
         }
 
         gjennomførKjørelisteBehandling(kjørelistebehandling1)
+        ventTilBehandlingErFerdigstilt(kjørelistebehandling1.id)
 
         // Sender inn kjøreliste for nytt rammevedtak
         val kjørelistebehandling2 =
@@ -235,5 +237,15 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
         val vurderingRamme2 = reisevurdering.singleOrNull { it.reiseId == ReiseId.fromString(reiseIdRamme2) }
 
         return Reisevurderinger(ramme1 = vurderingRamme1, ramme2 = vurderingRamme2)
+    }
+
+    private fun ventTilBehandlingErFerdigstilt(behandlingId: BehandlingId) {
+        repeat(5) {
+            if (!testoppsettService.hentBehandling(behandlingId).erAktiv()) {
+                return
+            }
+            kjørTasksKlareForProsesseringTilIngenTasksIgjen()
+        }
+        throw AssertionError("Kjørelistebehandling=$behandlingId ble ikke ferdigstilt i tide")
     }
 }
