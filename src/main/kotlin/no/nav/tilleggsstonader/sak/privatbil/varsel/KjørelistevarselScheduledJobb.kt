@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
  * Kjører mandag kl 10 og varsler brukere som har rammevedtak gjeldende for forrige kalenderuke.
  */
 @Service
-class KjørelisteVarselScheduledService(
+class KjørelistevarselScheduledJobb(
     private val kjørelistevarselService: KjørelistevarselService,
 ) {
     /**

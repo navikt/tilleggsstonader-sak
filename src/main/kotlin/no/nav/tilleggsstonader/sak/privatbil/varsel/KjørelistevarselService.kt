@@ -26,8 +26,6 @@ class KjørelistevarselService(
             MDC.put(MDCConstants.MDC_CALL_ID, UUID.randomUUID().toString())
             logger.info("Starter scheduled jobb for sending av kjøreliste-varsler")
 
-            // Optimalisert databasespørring: henter kun behandlinger med aktuelle rammevedtak
-            // Dato-validering gjøres i applikasjonslaget for fleksibilitet
             val behandlingerMedRammevedtak =
                 behandlingRepository.finnGjeldendeIverksatteBehandlingerMedRammevedtakPrivatBil(
                     stønadstyper = listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
