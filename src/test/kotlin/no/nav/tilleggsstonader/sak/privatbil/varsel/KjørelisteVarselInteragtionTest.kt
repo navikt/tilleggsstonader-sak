@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.privatbil.varsel
 
 import io.mockk.every
-import net.javacrumbs.shedlock.core.LockAssert
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
@@ -14,7 +13,6 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksK
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteRepository
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
@@ -27,17 +25,12 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
     lateinit var behandlingRepository: BehandlingRepository
 
     @Autowired
-    lateinit var kjørelisteVarselScheduledService: KjørelisteVarselScheduledService
+    lateinit var kjørelistevarselService: KjørelistevarselService
 
     val dagensDato = LocalDate.now()
     val denneUka = dagensDato.tilUkeIÅr()
     val enUkeTilbake = dagensDato.minusWeeks(1).tilUkeIÅr()
     val toUkerTilbake = dagensDato.minusWeeks(2).tilUkeIÅr()
-
-    @BeforeEach
-    fun `ikke lås shedlock`() {
-        LockAssert.TestHelper.makeAllAssertsPass(true)
-    }
 
     @Test
     fun `skal sende kjørelistevarsel hvis ingen uker er sendt inn`() {
@@ -169,7 +162,7 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
     }
 
     private fun kjørKjørelistevarselJobb() {
-        kjørelisteVarselScheduledService.sendVarselOmKjørelister()
+        kjørelistevarselService.sendUkentligVarselOmKjørelister()
         kjørTasksKlareForProsessering()
     }
 
