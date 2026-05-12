@@ -56,7 +56,14 @@ class OpprettRevurderingService(
         validerValgteBarn(opprettRevurdering, behandlingIdForGjenbruk)
 
         behandlingIdForGjenbruk?.let { gjenbrukDataRevurderingService.gjenbrukData(behandling, it) }
-        barnService.opprettBarn(opprettRevurdering.valgteBarn.map { BehandlingBarn(behandlingId = behandling.id, ident = it) })
+        barnService.opprettBarn(
+            opprettRevurdering.valgteBarn.map {
+                BehandlingBarn(
+                    behandlingId = behandling.id,
+                    ident = it,
+                )
+            },
+        )
 
         return behandling.id
     }
@@ -75,6 +82,7 @@ class OpprettRevurderingService(
                         beskrivelse = "Skal behandles i TS-Sak",
                         prioritet = OppgavePrioritet.NORM,
                     ),
+                opprettForenkletBehandlingsType = opprettRevurdering.opprettForenkletBehandlingsType,
             )
         } else {
             OpprettBehandling(
@@ -84,6 +92,7 @@ class OpprettRevurderingService(
                 kravMottatt = opprettRevurdering.kravMottatt,
                 nyeOpplysningerMetadata = opprettRevurdering.nyeOpplysningerMetadata,
                 oppgaveMetadata = OpprettBehandlingOppgaveMetadata.UtenOppgave,
+                opprettForenkletBehandlingsType = OpprettForenkletBehandlingsType.ORDINAER_BEHANDLING,
             )
         }
 

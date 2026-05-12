@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
@@ -57,7 +58,17 @@ class OpprettBehandlingService(
         val tidligereBehandlinger = behandlingRepository.findByFagsakId(request.fagsakId)
         val sisteIverksatteBehandlinger = behandlingRepository.finnSisteIverksatteBehandling(request.fagsakId)
         val forrigeBehandling = behandlingRepository.finnSisteIverksatteBehandling(request.fagsakId)
-        val behandlingType = utledBehandlingType(tidligereBehandlinger, behandlingÅrsak = request.behandlingsårsak)
+        val behandlingType =
+            when (request.opprettForenkletBehandlingsType) {
+                OpprettForenkletBehandlingsType.ORDINAER_BEHANDLING ->
+                    utledBehandlingType(tidligereBehandlinger, behandlingÅrsak = request.behandlingsårsak)
+                OpprettForenkletBehandlingsType.KJØRELISTE -> BehandlingType.KJØRELISTE
+            }
+        val behandlingSteg =
+            when (behandlingType) {
+                BehandlingType.KJØRELISTE -> StegType.KJØRELISTE
+                else -> request.stegType
+            }
         val fagsak = fagsakService.hentFagsak(request.fagsakId)
 
         validerKanOppretteNyBehandling(
@@ -76,7 +87,7 @@ class OpprettBehandlingService(
                     forrigeIverksatteBehandlingId = forrigeBehandling?.id,
                     type = behandlingType,
                     behandlingMetode = request.behandlingMetode,
-                    steg = request.stegType,
+                    steg = behandlingSteg,
                     status = behandlingStatus,
                     resultat = BehandlingResultat.IKKE_SATT,
                     årsak = request.behandlingsårsak,
@@ -91,7 +102,7 @@ class OpprettBehandlingService(
             behandlingshistorikk =
                 Behandlingshistorikk(
                     behandlingId = behandling.id,
-                    steg = request.stegType,
+                    steg = behandlingSteg,
                     gitVersjon = Applikasjonsversjon.versjon,
                 ),
         )
@@ -148,7 +159,13 @@ data class OpprettBehandling(
     val kravMottatt: LocalDate? = null,
     val nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
     val oppgaveMetadata: OpprettBehandlingOppgaveMetadata,
+    val opprettForenkletBehandlingsType: OpprettForenkletBehandlingsType = OpprettForenkletBehandlingsType.ORDINAER_BEHANDLING,
 )
+
+enum class OpprettForenkletBehandlingsType {
+    ORDINAER_BEHANDLING,
+    KJØRELISTE,
+}
 
 sealed interface OpprettBehandlingOppgaveMetadata {
     data class OppgaveMetadata(

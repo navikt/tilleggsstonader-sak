@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandling
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingOppgaveMetadata
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingService
+import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettForenkletBehandlingsType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
@@ -118,6 +119,7 @@ class AdminOpprettBehandlingServiceTest {
                     kravMottatt = LocalDate.now(),
                     oppgaveMetadata = forventetOppgaveMetadata,
                     behandlingMetode = behandlingMetode,
+                    opprettForenkletBehandlingsType = OpprettForenkletBehandlingsType.ORDINAER_BEHANDLING,
                 ),
             )
         }
@@ -145,6 +147,7 @@ class AdminOpprettBehandlingServiceTest {
                     kravMottatt = LocalDate.now(),
                     oppgaveMetadata = forventetOppgaveMetadata,
                     behandlingMetode = behandlingMetode,
+                    opprettForenkletBehandlingsType = OpprettForenkletBehandlingsType.ORDINAER_BEHANDLING,
                 ),
             )
         }
@@ -169,6 +172,7 @@ class AdminOpprettBehandlingServiceTest {
                     kravMottatt = LocalDate.now(),
                     oppgaveMetadata = forventetOppgaveMetadata,
                     behandlingMetode = behandlingMetode,
+                    opprettForenkletBehandlingsType = OpprettForenkletBehandlingsType.ORDINAER_BEHANDLING,
                 ),
             )
         }

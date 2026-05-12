@@ -33,6 +33,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandling
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingOppgaveMetadata
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingService
+import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettForenkletBehandlingsType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -180,6 +181,7 @@ class JournalføringServiceTest {
                             beskrivelse = oppgaveBeskrivelse,
                             prioritet = OppgavePrioritet.NORM,
                         ),
+                    opprettForenkletBehandlingsType = OpprettForenkletBehandlingsType.ORDINAER_BEHANDLING,
                 ),
             )
         } returns behandling(fagsak = fagsak)
@@ -205,6 +207,7 @@ class JournalføringServiceTest {
                             beskrivelse = oppgaveBeskrivelse,
                             prioritet = OppgavePrioritet.NORM,
                         ),
+                    opprettForenkletBehandlingsType = OpprettForenkletBehandlingsType.ORDINAER_BEHANDLING,
                 ),
             )
         }
@@ -441,6 +444,7 @@ class JournalføringServiceTest {
                                 beskrivelse = oppgaveBeskrivelse,
                                 prioritet = OppgavePrioritet.NORM,
                             ),
+                        opprettForenkletBehandlingsType = OpprettForenkletBehandlingsType.ORDINAER_BEHANDLING,
                     ),
                 )
             } returns behandling(fagsak = fagsak)
@@ -466,6 +470,7 @@ class JournalføringServiceTest {
                                 beskrivelse = oppgaveBeskrivelse,
                                 prioritet = OppgavePrioritet.NORM,
                             ),
+                        opprettForenkletBehandlingsType = OpprettForenkletBehandlingsType.ORDINAER_BEHANDLING,
                     ),
                 )
             }
