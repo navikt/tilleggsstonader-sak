@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 )
 class SendKjorelistevarselTask : AsyncTaskStep {
     override fun doTask(task: Task) {
-        // Slett etter alle tasker har kjørt?
+        // TODO - kan slettes når alle sendKjorelistevarselTask er ferdigkjørt
     }
 
     companion object {

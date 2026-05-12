@@ -31,7 +31,7 @@ class KjørelisteVarselScheduledService(
      * Cron format: <sekund> <minutt> <time> <dag i måned> <måned> <dag i uke>
      */
     @Transactional
-    @Scheduled(cron = "0 10 0 * * MON")
+    @Scheduled(cron = "0 0 10 * * MON") // kl. 10:00
     @SchedulerLock(name = "sendVarselOmKjørelister", lockAtMostFor = "10m", lockAtLeastFor = "1m")
     fun sendVarselOmKjørelister() {
         try {
