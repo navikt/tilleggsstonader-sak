@@ -21,7 +21,6 @@ class SendKjorelistevarselTilBrukerTask(
     private val varselDittNavKafkaProducer: VarselDittNavKafkaProducer,
     private val fagsakPersonService: FagsakPersonService,
 ) : AsyncTaskStep {
-
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     data class SendKjørelistevarselTilBrukerTaskData(

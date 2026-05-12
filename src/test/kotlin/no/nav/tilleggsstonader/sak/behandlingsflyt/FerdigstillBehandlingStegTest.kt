@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTask
-import no.nav.tilleggsstonader.sak.privatbil.varsel.MittNavVarselService
+import no.nav.tilleggsstonader.sak.privatbil.varsel.KjørelistevarselService
 import no.nav.tilleggsstonader.sak.privatbil.varsel.SendKjorelistevarselTilBrukerTask
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -23,9 +23,9 @@ import tools.jackson.module.kotlin.readValue
 class FerdigstillBehandlingStegTest {
     private val behandlingService = mockk<BehandlingService>(relaxed = true)
     private val taskService = mockk<TaskService>()
-    private val varselService = mockk<MittNavVarselService>()
+    private val kjørelistevarselService = mockk<KjørelistevarselService>()
 
-    private val steg = FerdigstillBehandlingSteg(behandlingService, taskService, varselService)
+    private val steg = FerdigstillBehandlingSteg(behandlingService, taskService, kjørelistevarselService)
 
     private val taskSlot = mutableListOf<Task>()
     private val fagsak = fagsak()
@@ -35,7 +35,7 @@ class FerdigstillBehandlingStegTest {
     internal fun setUp() {
         taskSlot.clear()
         every { taskService.save(capture(taskSlot)) } answers { firstArg() }
-        every { varselService.skalSendeKjørelistevarselVedFerdigstillingAvBehandling(any()) } returns false
+        every { kjørelistevarselService.skalSendeKjørelistevarselVedFerdigstillingAvBehandling(any()) } returns false
     }
 
     @Test
@@ -64,7 +64,7 @@ class FerdigstillBehandlingStegTest {
 
     @Test
     fun `skal opprette task for å lage varsel til mitt nav når det finnes tilgjengelige kjørelister`() {
-        every { varselService.skalSendeKjørelistevarselVedFerdigstillingAvBehandling(any()) } returns true
+        every { kjørelistevarselService.skalSendeKjørelistevarselVedFerdigstillingAvBehandling(any()) } returns true
         steg.utførSteg(behandling, null)
 
         val tasks = taskSlot.filter { it.type == SendKjorelistevarselTilBrukerTask.TYPE }

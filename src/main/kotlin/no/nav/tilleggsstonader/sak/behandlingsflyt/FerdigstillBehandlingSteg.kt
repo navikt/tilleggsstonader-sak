@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTask
-import no.nav.tilleggsstonader.sak.privatbil.varsel.MittNavVarselService
+import no.nav.tilleggsstonader.sak.privatbil.varsel.KjørelistevarselService
 import no.nav.tilleggsstonader.sak.privatbil.varsel.SendKjorelistevarselTilBrukerTask
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.VedtaksstatistikkTask
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service
 class FerdigstillBehandlingSteg(
     private val behandlingService: BehandlingService,
     private val taskService: TaskService,
-    private val mittNavVarselService: MittNavVarselService,
+    private val kjørelistevarselService: KjørelistevarselService,
 ) : BehandlingSteg<Void?> {
     private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -36,7 +36,7 @@ class FerdigstillBehandlingSteg(
         taskService.save(BehandlingsstatistikkTask.opprettFerdigTask(behandlingId = saksbehandling.id))
 
         // Varsling om kjørelister sendes nå via scheduled jobb (KjørelisteVarselScheduledService) som kjører mandag kl 10
-        if (mittNavVarselService.skalSendeKjørelistevarselVedFerdigstillingAvBehandling(saksbehandling.id)) {
+        if (kjørelistevarselService.skalSendeKjørelistevarselVedFerdigstillingAvBehandling(saksbehandling.id)) {
             taskService.save(
                 SendKjorelistevarselTilBrukerTask.opprett(saksbehandling.fagsakPersonId),
             )
