@@ -23,6 +23,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegrationTest() {
+    companion object {
+        private const val MAKS_ANTALL_FORSØK_VENT_PÅ_FERDIGSTILT = 5
+    }
+
     private val fomRamme1 = 5 januar 2026
     private val tomRamme1 = 25 januar 2026
 
@@ -240,12 +244,14 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
     }
 
     private fun ventTilBehandlingErFerdigstilt(behandlingId: BehandlingId) {
-        repeat(5) {
+        repeat(MAKS_ANTALL_FORSØK_VENT_PÅ_FERDIGSTILT) {
             if (!testoppsettService.hentBehandling(behandlingId).erAktiv()) {
                 return
             }
             kjørTasksKlareForProsesseringTilIngenTasksIgjen()
         }
-        throw AssertionError("Kjørelistebehandling=$behandlingId ble ikke ferdigstilt i tide")
+        throw AssertionError(
+            "Kjørelistebehandling=$behandlingId ble ikke ferdigstilt etter $MAKS_ANTALL_FORSØK_VENT_PÅ_FERDIGSTILT forsøk",
+        )
     }
 }
