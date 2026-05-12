@@ -1,18 +1,23 @@
 package no.nav.tilleggsstonader.sak.brev.mellomlager
 
+import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
+import io.mockk.slot
 import io.mockk.unmockkObject
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.springframework.dao.DuplicateKeyException
 import org.springframework.data.repository.findByIdOrNull
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -25,17 +30,76 @@ class MellomlagringBrevServiceTest {
             behandlingService = behandlingService,
             mellomlagerBrevRepository = mellomlagerBrevRepository,
             mellomlagerFrittståendeBrevRepository = mellomlagerFrittståendeBrevRepository,
+            transactionHandler = TransactionHandler(),
         )
 
     @BeforeAll
     fun setUp() {
         mockkObject(SikkerhetContext)
         every { SikkerhetContext.hentSaksbehandler() } returns "bob"
+        every { SikkerhetContext.hentSaksbehandlerEllerSystembruker() } returns "bob"
     }
 
     @AfterAll
     fun tearDown() {
         unmockkObject(SikkerhetContext)
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        clearMocks(behandlingService, mellomlagerBrevRepository, mellomlagerFrittståendeBrevRepository)
+        every { behandlingService.behandlingErLåstForVidereRedigering(any()) } returns false
+    }
+
+    @Test
+    fun `mellomlagreBrev skal insert når brev ikke finnes`() {
+        val nyttBrev = slot<MellomlagretBrev>()
+        every { mellomlagerBrevRepository.findByIdOrNull(behandlingId) } returns null
+        every { mellomlagerBrevRepository.insert(capture(nyttBrev)) } answers { nyttBrev.captured }
+
+        val resultat = mellomlagringBrevService.mellomlagreBrev(behandlingId, brevverdier, brevmal)
+
+        assertThat(resultat).isEqualTo(behandlingId)
+        assertThat(nyttBrev.captured.behandlingId).isEqualTo(behandlingId)
+        assertThat(nyttBrev.captured.brevverdier).isEqualTo(brevverdier)
+        assertThat(nyttBrev.captured.brevmal).isEqualTo(brevmal)
+    }
+
+    @Test
+    fun `mellomlagreBrev skal update når brev finnes`() {
+        val oppdatertBrev = slot<MellomlagretBrev>()
+        val eksisterendeBrev = MellomlagretBrev(behandlingId, "gammelVerdi", "gammelMal")
+        every { mellomlagerBrevRepository.findByIdOrNull(behandlingId) } returns eksisterendeBrev
+        every { mellomlagerBrevRepository.update(capture(oppdatertBrev)) } answers { oppdatertBrev.captured }
+
+        val resultat = mellomlagringBrevService.mellomlagreBrev(behandlingId, brevverdier, brevmal)
+
+        assertThat(resultat).isEqualTo(behandlingId)
+        assertThat(oppdatertBrev.captured).isEqualTo(
+            eksisterendeBrev.copy(
+                brevverdier = brevverdier,
+                brevmal = brevmal,
+            ),
+        )
+    }
+
+    @Test
+    fun `mellomlagreBrev skal håndtere duplikat ved insert ved å oppdatere eksisterende brev`() {
+        val oppdatertBrev = slot<MellomlagretBrev>()
+        val eksisterendeBrev = MellomlagretBrev(behandlingId, "annenVerdi", "annenMal")
+        every { mellomlagerBrevRepository.findByIdOrNull(behandlingId) } returns null andThen eksisterendeBrev
+        every { mellomlagerBrevRepository.insert(any()) } throws DuplicateKeyException("duplikat")
+        every { mellomlagerBrevRepository.update(capture(oppdatertBrev)) } answers { oppdatertBrev.captured }
+
+        val resultat = mellomlagringBrevService.mellomlagreBrev(behandlingId, brevverdier, brevmal)
+
+        assertThat(resultat).isEqualTo(behandlingId)
+        assertThat(oppdatertBrev.captured).isEqualTo(
+            eksisterendeBrev.copy(
+                brevverdier = brevverdier,
+                brevmal = brevmal,
+            ),
+        )
     }
 
     @Test
