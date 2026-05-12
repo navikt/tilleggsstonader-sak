@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehand
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
@@ -137,8 +138,10 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
         reisevurderingerBehandling2.ramme1!!.uker.forEachIndexed { index, uke ->
             assertThat(uke)
                 .usingRecursiveComparison()
-                .ignoringFields("avklartUkeId") // AvklartUkeId vil være forskjellig siden de kopieres over
+                .ignoringFields("avklartUkeId", "avklartKjørtUkeStatus") // AvklartUkeId vil være forskjellig siden de kopieres over
                 .isEqualTo(reisevurderingerBehandling1.ramme1.uker[index])
+
+            assertThat(uke.avklartKjørtUkeStatus).isEqualTo(AvklartKjørtUkeStatus.UENDRET)
         }
 
         // Data skal være innsendt og vurdert for rammevedtak 2
