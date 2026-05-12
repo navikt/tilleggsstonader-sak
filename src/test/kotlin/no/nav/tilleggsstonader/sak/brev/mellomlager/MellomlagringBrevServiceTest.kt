@@ -6,10 +6,11 @@ import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.slot
 import io.mockk.unmockkObject
+import io.mockk.verify
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
-import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
+import no.nav.tilleggsstonader.sak.infrastruktur.database.AdvisoryLockService
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import org.assertj.core.api.AssertionsForClassTypes.assertThat
 import org.junit.jupiter.api.AfterAll
@@ -17,12 +18,12 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.springframework.dao.DuplicateKeyException
 import org.springframework.data.repository.findByIdOrNull
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MellomlagringBrevServiceTest {
     private val behandlingService = mockk<BehandlingService>()
+    private val advisoryLockService = mockk<AdvisoryLockService>()
     private val mellomlagerBrevRepository = mockk<MellomlagerBrevRepository>()
     private val mellomlagerFrittståendeBrevRepository = mockk<MellomlagerFrittståendeBrevRepository>()
     private val mellomlagringBrevService =
@@ -30,7 +31,7 @@ class MellomlagringBrevServiceTest {
             behandlingService = behandlingService,
             mellomlagerBrevRepository = mellomlagerBrevRepository,
             mellomlagerFrittståendeBrevRepository = mellomlagerFrittståendeBrevRepository,
-            transactionHandler = TransactionHandler(),
+            advisoryLockService = advisoryLockService,
         )
 
     @BeforeAll
@@ -47,8 +48,11 @@ class MellomlagringBrevServiceTest {
 
     @BeforeEach
     fun resetMocks() {
-        clearMocks(behandlingService, mellomlagerBrevRepository, mellomlagerFrittståendeBrevRepository)
+        clearMocks(behandlingService, advisoryLockService, mellomlagerBrevRepository, mellomlagerFrittståendeBrevRepository)
         every { behandlingService.behandlingErLåstForVidereRedigering(any()) } returns false
+        every { advisoryLockService.lockForTransaction(any(), any<() -> MellomlagretBrev>()) } answers {
+            secondArg<() -> MellomlagretBrev>().invoke()
+        }
     }
 
     @Test
@@ -63,6 +67,9 @@ class MellomlagringBrevServiceTest {
         assertThat(nyttBrev.captured.behandlingId).isEqualTo(behandlingId)
         assertThat(nyttBrev.captured.brevverdier).isEqualTo(brevverdier)
         assertThat(nyttBrev.captured.brevmal).isEqualTo(brevmal)
+        verify(exactly = 1) {
+            advisoryLockService.lockForTransaction(behandlingId, any<() -> MellomlagretBrev>())
+        }
     }
 
     @Test
@@ -81,25 +88,9 @@ class MellomlagringBrevServiceTest {
                 brevmal = brevmal,
             ),
         )
-    }
-
-    @Test
-    fun `mellomlagreBrev skal håndtere duplikat ved insert ved å oppdatere eksisterende brev`() {
-        val oppdatertBrev = slot<MellomlagretBrev>()
-        val eksisterendeBrev = MellomlagretBrev(behandlingId, "annenVerdi", "annenMal")
-        every { mellomlagerBrevRepository.findByIdOrNull(behandlingId) } returns null andThen eksisterendeBrev
-        every { mellomlagerBrevRepository.insert(any()) } throws DuplicateKeyException("duplikat")
-        every { mellomlagerBrevRepository.update(capture(oppdatertBrev)) } answers { oppdatertBrev.captured }
-
-        val resultat = mellomlagringBrevService.mellomlagreBrev(behandlingId, brevverdier, brevmal)
-
-        assertThat(resultat).isEqualTo(behandlingId)
-        assertThat(oppdatertBrev.captured).isEqualTo(
-            eksisterendeBrev.copy(
-                brevverdier = brevverdier,
-                brevmal = brevmal,
-            ),
-        )
+        verify(exactly = 1) {
+            advisoryLockService.lockForTransaction(behandlingId, any<() -> MellomlagretBrev>())
+        }
     }
 
     @Test
