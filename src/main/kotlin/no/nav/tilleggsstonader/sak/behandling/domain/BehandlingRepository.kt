@@ -214,10 +214,6 @@ interface BehandlingRepository :
     )
     fun finnBehandlingerUtenÅpenOppgave(): List<BehandlingId>
 
-    /**
-     * Henter behandlinger med rammevedtak privat bil - optimalisert for varsel-sending.
-     * Filtererer kun på type, ikke datoperiode - dato-validering gjøres i applikasjonslaget.
-     */
     @Query(
         """
             select distinct b.*, be.id as eksternid_id
