@@ -50,8 +50,8 @@ class MellomlagringBrevServiceTest {
     fun resetMocks() {
         clearMocks(behandlingService, advisoryLockService, mellomlagerBrevRepository, mellomlagerFrittståendeBrevRepository)
         every { behandlingService.behandlingErLåstForVidereRedigering(any()) } returns false
-        every { advisoryLockService.lockForTransaction(any(), any<() -> MellomlagretBrev>()) } answers {
-            secondArg<() -> MellomlagretBrev>().invoke()
+        every { advisoryLockService.lockForTransaction(any(), any<Function0<Any?>>()) } answers {
+            secondArg<Function0<Any?>>().invoke()
         }
     }
 
@@ -68,7 +68,7 @@ class MellomlagringBrevServiceTest {
         assertThat(nyttBrev.captured.brevverdier).isEqualTo(brevverdier)
         assertThat(nyttBrev.captured.brevmal).isEqualTo(brevmal)
         verify(exactly = 1) {
-            advisoryLockService.lockForTransaction(behandlingId, any<() -> MellomlagretBrev>())
+            advisoryLockService.lockForTransaction(behandlingId, any<Function0<Any?>>())
         }
     }
 
@@ -89,7 +89,7 @@ class MellomlagringBrevServiceTest {
             ),
         )
         verify(exactly = 1) {
-            advisoryLockService.lockForTransaction(behandlingId, any<() -> MellomlagretBrev>())
+            advisoryLockService.lockForTransaction(behandlingId, any<Function0<Any?>>())
         }
     }
 
@@ -107,6 +107,55 @@ class MellomlagringBrevServiceTest {
                 brevverdier = mellomlagretBrev.brevverdier,
             ),
         )
+    }
+
+    @Test
+    fun `mellomLagreFrittståendeSanitybrev skal insert når brev ikke finnes`() {
+        val fagsakId = FagsakId.random()
+        val nyttBrev = slot<MellomlagretFrittståendeBrev>()
+        every {
+            mellomlagerFrittståendeBrevRepository.findByFagsakIdAndSporbarOpprettetAv(fagsakId, "bob")
+        } returns null
+        every { mellomlagerFrittståendeBrevRepository.insert(capture(nyttBrev)) } answers { nyttBrev.captured }
+
+        val resultat = mellomlagringBrevService.mellomLagreFrittståendeSanitybrev(fagsakId, brevverdier, brevmal)
+
+        assertThat(resultat).isEqualTo(fagsakId)
+        assertThat(nyttBrev.captured.fagsakId).isEqualTo(fagsakId)
+        assertThat(nyttBrev.captured.brevverdier).isEqualTo(brevverdier)
+        assertThat(nyttBrev.captured.brevmal).isEqualTo(brevmal)
+        verify(exactly = 1) {
+            advisoryLockService.lockForTransaction(fagsakId to "bob", any<Function0<Any?>>())
+        }
+    }
+
+    @Test
+    fun `mellomLagreFrittståendeSanitybrev skal update når brev finnes`() {
+        val fagsakId = FagsakId.random()
+        val oppdatertBrev = slot<MellomlagretFrittståendeBrev>()
+        val eksisterendeBrev =
+            MellomlagretFrittståendeBrev(
+                fagsakId = fagsakId,
+                brevverdier = "gammelVerdi",
+                brevmal = "gammelMal",
+            )
+        every {
+            mellomlagerFrittståendeBrevRepository.findByFagsakIdAndSporbarOpprettetAv(fagsakId, "bob")
+        } returns eksisterendeBrev
+        every { mellomlagerFrittståendeBrevRepository.update(capture(oppdatertBrev)) } answers { oppdatertBrev.captured }
+
+        val resultat = mellomlagringBrevService.mellomLagreFrittståendeSanitybrev(fagsakId, brevverdier, brevmal)
+
+        assertThat(resultat).isEqualTo(fagsakId)
+        assertThat(oppdatertBrev.captured).isEqualTo(
+            eksisterendeBrev.copy(
+                brevverdier = brevverdier,
+                brevmal = brevmal,
+            ),
+        )
+        verify(exactly = 1) {
+            advisoryLockService.lockForTransaction(fagsakId to "bob", any<Function0<Any?>>())
+        }
     }
 
     @Test
@@ -130,6 +179,25 @@ class MellomlagringBrevServiceTest {
                 brevverdier = mellomlagretBrev.brevverdier,
             ),
         )
+    }
+
+    @Test
+    fun `slettMellomlagretFrittståendeBrev skal slette eksisterende brev`() {
+        val fagsakId = FagsakId.random()
+        val brev = MellomlagretFrittståendeBrev(fagsakId = fagsakId, brevverdier = brevverdier, brevmal = brevmal)
+        every {
+            mellomlagerFrittståendeBrevRepository.findByFagsakIdAndSporbarOpprettetAv(fagsakId, "bob")
+        } returns brev
+        every { mellomlagerFrittståendeBrevRepository.deleteById(brev.id) } returns Unit
+
+        mellomlagringBrevService.slettMellomlagretFrittståendeBrev(fagsakId, "bob")
+
+        verify(exactly = 1) {
+            mellomlagerFrittståendeBrevRepository.findByFagsakIdAndSporbarOpprettetAv(fagsakId, "bob")
+        }
+        verify(exactly = 1) {
+            mellomlagerFrittståendeBrevRepository.deleteById(brev.id)
+        }
     }
 
     private val behandlingId = BehandlingId.random()

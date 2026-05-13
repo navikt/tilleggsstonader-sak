@@ -26,9 +26,10 @@ class MellomlagringBrevService(
         feilHvis(behandlingService.behandlingErLåstForVidereRedigering(behandlingId)) {
             "Kan ikke mellomlagre brev for behandling=$behandlingId når behandlingen er låst."
         }
-        return advisoryLockService.lockForTransaction(behandlingId) {
-            lagreMellomlagretBrev(behandlingId, brevverdier, brevmal)
-        }.behandlingId
+        return advisoryLockService
+            .lockForTransaction(behandlingId) {
+                lagreMellomlagretBrev(behandlingId, brevverdier, brevmal)
+            }.behandlingId
     }
 
     private fun lagreMellomlagretBrev(
@@ -50,8 +51,7 @@ class MellomlagringBrevService(
         eksisterende: MellomlagretBrev,
         brevverdier: String,
         brevmal: String,
-    ): MellomlagretBrev =
-        mellomlagerBrevRepository.update(eksisterende.copy(brevverdier = brevverdier, brevmal = brevmal))
+    ): MellomlagretBrev = mellomlagerBrevRepository.update(eksisterende.copy(brevverdier = brevverdier, brevmal = brevmal))
 
     @Transactional
     fun mellomLagreFrittståendeSanitybrev(
@@ -59,15 +59,42 @@ class MellomlagringBrevService(
         brevverdier: String,
         brevmal: String,
     ): FagsakId {
-        slettMellomlagretFrittståendeBrev(fagsakId, SikkerhetContext.hentSaksbehandler())
-        val mellomlagretBrev =
+        val saksbehandlerIdent = SikkerhetContext.hentSaksbehandler()
+        return advisoryLockService
+            .lockForTransaction(fagsakId to saksbehandlerIdent) {
+                lagreMellomlagretFrittståendeBrev(fagsakId, brevverdier, brevmal, saksbehandlerIdent)
+            }.fagsakId
+    }
+
+    private fun lagreMellomlagretFrittståendeBrev(
+        fagsakId: FagsakId,
+        brevverdier: String,
+        brevmal: String,
+        saksbehandlerIdent: String,
+    ): MellomlagretFrittståendeBrev =
+        mellomlagerFrittståendeBrevRepository.findByFagsakIdAndSporbarOpprettetAv(fagsakId, saksbehandlerIdent)?.let {
+            oppdaterMellomlagretFrittståendeBrev(it, brevverdier, brevmal)
+        } ?: opprettMellomlagretFrittståendeBrev(fagsakId, brevverdier, brevmal)
+
+    private fun opprettMellomlagretFrittståendeBrev(
+        fagsakId: FagsakId,
+        brevverdier: String,
+        brevmal: String,
+    ): MellomlagretFrittståendeBrev =
+        mellomlagerFrittståendeBrevRepository.insert(
             MellomlagretFrittståendeBrev(
                 fagsakId = fagsakId,
                 brevverdier = brevverdier,
                 brevmal = brevmal,
-            )
-        return mellomlagerFrittståendeBrevRepository.insert(mellomlagretBrev).fagsakId
-    }
+            ),
+        )
+
+    private fun oppdaterMellomlagretFrittståendeBrev(
+        eksisterende: MellomlagretFrittståendeBrev,
+        brevverdier: String,
+        brevmal: String,
+    ): MellomlagretFrittståendeBrev =
+        mellomlagerFrittståendeBrevRepository.update(eksisterende.copy(brevverdier = brevverdier, brevmal = brevmal))
 
     fun hentMellomlagretFrittståendeSanitybrev(fagsakId: FagsakId): MellomlagreBrevDto? =
         mellomlagerFrittståendeBrevRepository
