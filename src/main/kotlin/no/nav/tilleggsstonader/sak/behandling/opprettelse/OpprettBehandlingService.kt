@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.opprettelse
 
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
@@ -160,10 +160,7 @@ class OpprettBehandlingService(
         fagsak: Fagsak,
     ): Boolean {
         if (sisteIverksatteBehandling == null ||
-            (
-                fagsak.stønadstype != Stønadstype.DAGLIG_REISE_TSO &&
-                    fagsak.stønadstype != Stønadstype.DAGLIG_REISE_TSR
-            )
+            (!fagsak.stønadstype.gjelderDagligReise())
         ) {
             return false
         }
