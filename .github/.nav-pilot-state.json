@@ -1,7 +1,7 @@
 {
   "collection": "kotlin-backend",
-  "version": "2026.04.30-090824-bb25c0e",
-  "source_sha": "14b480c",
+  "version": "2026.05.08-074522-0bbf582",
+  "source_sha": "0bbf582",
   "installed_at": "2026-04-13T13:37:44Z",
   "files": [
     {
@@ -46,7 +46,7 @@
     },
     {
       "path": ".github/agents/nav-pilot.agent.md",
-      "hash": "8384742b958b4b84"
+      "hash": "71eaa207ac601d66"
     },
     {
       "path": ".github/agents/nav-pilot.metadata.json",
@@ -82,7 +82,7 @@
     },
     {
       "path": ".github/skills/nav-deep-interview/",
-      "hash": "42e9aab52e591ef0"
+      "hash": "eeb3399ecd4e352c"
     },
     {
       "path": ".github/skills/nav-architecture-review/",
