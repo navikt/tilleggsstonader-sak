@@ -117,7 +117,7 @@ class InnvilgeDaligReiseTsrIntegrationTest : IntegrationTest() {
                         årsak = BehandlingÅrsak.SØKNAD,
                         nyeOpplysningerMetadata = null,
                         kravMottatt = fom,
-                        opprettForenkletBehandlingsType = ForenkletBehandlingsType.ORDINAER_BEHANDLING,
+                        forenkletBehandlingsType = ForenkletBehandlingsType.ORDINAER_BEHANDLING,
                     ),
             )
 

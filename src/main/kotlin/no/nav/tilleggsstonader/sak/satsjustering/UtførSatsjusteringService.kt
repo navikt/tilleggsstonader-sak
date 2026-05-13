@@ -189,7 +189,7 @@ class UtførSatsjusteringService(
                     kravMottatt = null,
                     skalOppretteOppgave = false,
                     behandlingMetode = BehandlingMetode.BATCH,
-                    opprettForenkletBehandlingsType = ForenkletBehandlingsType.ORDINAER_BEHANDLING,
+                    forenkletBehandlingsType = ForenkletBehandlingsType.ORDINAER_BEHANDLING,
                 ),
             )
         // Gjenbruker grunnlag fra forrige behandling ved satsjustering

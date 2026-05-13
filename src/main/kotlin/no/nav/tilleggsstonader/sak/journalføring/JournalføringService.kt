@@ -20,10 +20,10 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.Journalposttype
+import no.nav.tilleggsstonader.sak.behandling.opprettelse.ForenkletBehandlingsType
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandling
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingOppgaveMetadata
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingService
-import no.nav.tilleggsstonader.sak.behandling.opprettelse.ForenkletBehandlingsType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId

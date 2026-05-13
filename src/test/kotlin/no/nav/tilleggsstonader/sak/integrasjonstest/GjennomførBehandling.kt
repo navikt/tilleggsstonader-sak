@@ -232,7 +232,7 @@ fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
                 årsak = BehandlingÅrsak.SØKNAD,
                 kravMottatt = LocalDate.now(),
                 nyeOpplysningerMetadata = null,
-                opprettForenkletBehandlingsType = ForenkletBehandlingsType.ORDINAER_BEHANDLING,
+                forenkletBehandlingsType = ForenkletBehandlingsType.ORDINAER_BEHANDLING,
             ),
         tilSteg = tilSteg,
         testdataProvider = testdataProvider,

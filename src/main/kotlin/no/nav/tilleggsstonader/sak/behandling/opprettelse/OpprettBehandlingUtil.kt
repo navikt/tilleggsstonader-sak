@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType.FØRSTEGANGSBEHANDLING
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType.KJØRELISTE
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType.REVURDERING
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -19,7 +20,8 @@ object OpprettBehandlingUtil {
         stønadstype: Stønadstype,
         behandlingType: BehandlingType,
         tidligereBehandlinger: List<Behandling>,
-        sisteIverksatteBehandlinger: Behandling?,
+        sisteIverksatteBehandling: Behandling?,
+        sisteIverksatteBehandlingHarRammevedtakForPrivatBil: Boolean? = null,
     ) {
         val sisteFerdigstilteBehandling =
             tidligereBehandlinger
@@ -29,7 +31,13 @@ object OpprettBehandlingUtil {
         when (behandlingType) {
             FØRSTEGANGSBEHANDLING -> validerKanOppretteFørstegangsbehandling(sisteFerdigstilteBehandling)
             REVURDERING -> validerKanOppretteRevurdering(sisteFerdigstilteBehandling)
-            BehandlingType.KJØRELISTE -> validerKanOppretteKjørelisteBehandling(sisteIverksatteBehandlinger, stønadstype)
+            KJØRELISTE ->
+                validerKanOppretteKjørelisteBehandling(
+                    sisteIverksatteBehandling = sisteIverksatteBehandling,
+                    stønadstype = stønadstype,
+                    sisteIverksatteBehandlingHarRammevedtakForPrivatBil =
+                    sisteIverksatteBehandlingHarRammevedtakForPrivatBil,
+                )
         }
     }
 
@@ -51,15 +59,26 @@ object OpprettBehandlingUtil {
 
     // TODO: Bør det valideres noe mer? F.eks. at det finnes en kjøreliste på forrige behandling?
     private fun validerKanOppretteKjørelisteBehandling(
-        sisteIverksatteBehandlinger: Behandling?,
+        sisteIverksatteBehandling: Behandling?,
         stønadstype: Stønadstype,
+        sisteIverksatteBehandlingHarRammevedtakForPrivatBil: Boolean?,
     ) {
         if (stønadstype != Stønadstype.DAGLIG_REISE_TSO && stønadstype != Stønadstype.DAGLIG_REISE_TSR) {
-            throw ApiFeil("Det er ikke lov å opprette en kjørelistebehandling på stønadstype $stønadstype", HttpStatus.BAD_REQUEST)
+            throw ApiFeil(
+                "Det er ikke lov å opprette en kjørelistebehandling på stønadstype $stønadstype",
+                HttpStatus.BAD_REQUEST,
+            )
         }
 
-        if (sisteIverksatteBehandlinger == null) {
+        if (sisteIverksatteBehandling == null) {
             throw ApiFeil("Det finnes ikke en tidligere iverksatt behandling på fagsaken", HttpStatus.BAD_REQUEST)
+        }
+
+        if (sisteIverksatteBehandlingHarRammevedtakForPrivatBil == false) {
+            throw ApiFeil(
+                "Siste iverksatte behandling mangler rammevedtak for privat bil",
+                HttpStatus.BAD_REQUEST,
+            )
         }
     }
 }

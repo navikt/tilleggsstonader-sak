@@ -12,5 +12,5 @@ data class OpprettRevurdering(
     val kravMottatt: LocalDate?,
     val skalOppretteOppgave: Boolean,
     val behandlingMetode: BehandlingMetode,
-    val opprettForenkletBehandlingsType: ForenkletBehandlingsType,
+    val forenkletBehandlingsType: ForenkletBehandlingsType,
 )

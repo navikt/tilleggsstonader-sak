@@ -16,7 +16,7 @@ data class OpprettBehandlingDto(
     val nyeOpplysningerMetadata: NyeOpplysningerMetadataDto?,
     val valgteBarn: Set<String> = emptySet(),
     val kravMottatt: LocalDate?,
-    val opprettForenkletBehandlingsType: ForenkletBehandlingsType,
+    val forenkletBehandlingsType: ForenkletBehandlingsType,
 ) {
     fun tilDomene() =
         OpprettRevurdering(
@@ -27,7 +27,7 @@ data class OpprettBehandlingDto(
             kravMottatt = kravMottatt,
             skalOppretteOppgave = true,
             behandlingMetode = BehandlingMetode.MANUELL,
-            opprettForenkletBehandlingsType = opprettForenkletBehandlingsType,
+            forenkletBehandlingsType = forenkletBehandlingsType,
         )
 }
 

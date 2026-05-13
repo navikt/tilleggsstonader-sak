@@ -21,8 +21,11 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksK
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.statistikk.behandling.Hendelse
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
+import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Nested
@@ -36,6 +39,9 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
 
     @Autowired
     private lateinit var settPåVentService: SettPåVentService
+
+    @Autowired
+    private lateinit var vedtakRepository: VedtakRepository
 
     private val behandlingÅrsak = BehandlingÅrsak.SØKNAD
     val behandlingMetode = BehandlingMetode.MANUELL
@@ -226,13 +232,24 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
     @Test
     internal fun `opprettBehandling bruker eksplisitt kjøreliste-type når den er satt i request`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO))
-        testoppsettService.lagre(
-            behandling(
-                fagsak,
-                status = BehandlingStatus.FERDIGSTILT,
-                resultat = BehandlingResultat.INNVILGET,
-            ),
-        )
+        testoppsettService
+            .lagre(
+                behandling(
+                    fagsak,
+                    status = BehandlingStatus.FERDIGSTILT,
+                    resultat = BehandlingResultat.INNVILGET,
+                ),
+            ).also { forrigeBehandling ->
+                val vedtak = DagligReiseTestUtil.innvilgelse(behandlingId = forrigeBehandling.id)
+                vedtakRepository.insert(
+                    vedtak.copy(
+                        data =
+                            vedtak.data.copy(
+                                rammevedtakPrivatBil = RammevedtakPrivatBilUtil.rammevedtakPrivatBil(),
+                            ),
+                    ),
+                )
+            }
 
         val nyBehandling =
             opprettBehandlingService.opprettBehandling(

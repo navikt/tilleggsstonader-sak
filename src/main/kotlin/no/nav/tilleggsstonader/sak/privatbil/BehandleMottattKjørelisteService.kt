@@ -11,10 +11,10 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.behandling.opprettelse.ForenkletBehandlingsType
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandling
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingOppgaveMetadata
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingService
-import no.nav.tilleggsstonader.sak.behandling.opprettelse.ForenkletBehandlingsType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId

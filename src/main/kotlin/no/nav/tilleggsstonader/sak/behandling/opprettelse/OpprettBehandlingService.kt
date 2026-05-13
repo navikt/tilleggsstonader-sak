@@ -31,6 +31,8 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -45,6 +47,7 @@ class OpprettBehandlingService(
     private val settPåVentService: SettPåVentService,
     private val taskService: TaskService,
     private val fagsakService: FagsakService,
+    private val vedtakService: VedtakService,
 ) {
     @Transactional
     fun opprettBehandling(request: OpprettBehandling): Behandling {
@@ -56,18 +59,14 @@ class OpprettBehandlingService(
         }
 
         val tidligereBehandlinger = behandlingRepository.findByFagsakId(request.fagsakId)
-        val sisteIverksatteBehandlinger = behandlingRepository.finnSisteIverksatteBehandling(request.fagsakId)
-        val forrigeBehandling = behandlingRepository.finnSisteIverksatteBehandling(request.fagsakId)
+        val sisteIverksatteBehandling = behandlingRepository.finnSisteIverksatteBehandling(request.fagsakId)
+        val forrigeBehandling = sisteIverksatteBehandling
         val behandlingType =
             when (request.forenkletBehandlingsType) {
                 ForenkletBehandlingsType.ORDINAER_BEHANDLING ->
                     utledBehandlingType(tidligereBehandlinger, behandlingÅrsak = request.behandlingsårsak)
+
                 ForenkletBehandlingsType.KJØRELISTE -> BehandlingType.KJØRELISTE
-            }
-        val behandlingSteg =
-            when (behandlingType) {
-                BehandlingType.KJØRELISTE -> StegType.KJØRELISTE
-                else -> request.stegType
             }
         val fagsak = fagsakService.hentFagsak(request.fagsakId)
 
@@ -75,7 +74,8 @@ class OpprettBehandlingService(
             stønadstype = fagsak.stønadstype,
             behandlingType = behandlingType,
             tidligereBehandlinger = tidligereBehandlinger,
-            sisteIverksatteBehandlinger = sisteIverksatteBehandlinger,
+            sisteIverksatteBehandling = sisteIverksatteBehandling,
+            sisteIverksatteBehandlingHarRammevedtakForPrivatBil = utredRammevedtak(sisteIverksatteBehandling),
         )
 
         val behandlingStatus = utledBehandlingStatus(tidligereBehandlinger)
@@ -87,7 +87,7 @@ class OpprettBehandlingService(
                     forrigeIverksatteBehandlingId = forrigeBehandling?.id,
                     type = behandlingType,
                     behandlingMetode = request.behandlingMetode,
-                    steg = behandlingSteg,
+                    steg = utledBehandlingStegFraBehandlingsType(behandlingType),
                     status = behandlingStatus,
                     resultat = BehandlingResultat.IKKE_SATT,
                     årsak = request.behandlingsårsak,
@@ -102,7 +102,7 @@ class OpprettBehandlingService(
             behandlingshistorikk =
                 Behandlingshistorikk(
                     behandlingId = behandling.id,
-                    steg = behandlingSteg,
+                    steg = utledBehandlingStegFraBehandlingsType(behandlingType),
                     gitVersjon = Applikasjonsversjon.versjon,
                 ),
         )
@@ -147,6 +147,26 @@ class OpprettBehandlingService(
             BehandlingStatus.SATT_PÅ_VENT
         } else {
             BehandlingStatus.OPPRETTET
+        }
+
+    private fun utredRammevedtak(sisteIverksatteBehandling: Behandling?): Boolean {
+        if (sisteIverksatteBehandling == null) {
+            return false
+        }
+        return try {
+            sisteIverksatteBehandling
+                .let { vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(it.id) }
+                .data
+                .rammevedtakPrivatBil != null
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    private fun utledBehandlingStegFraBehandlingsType(behandlingType: BehandlingType): StegType =
+        when (behandlingType) {
+            BehandlingType.KJØRELISTE -> StegType.KJØRELISTE
+            else -> StegType.INNGANGSVILKÅR
         }
 }
 

@@ -82,7 +82,7 @@ class OpprettRevurderingService(
                         beskrivelse = "Skal behandles i TS-Sak",
                         prioritet = OppgavePrioritet.NORM,
                     ),
-                forenkletBehandlingsType = opprettRevurdering.opprettForenkletBehandlingsType,
+                forenkletBehandlingsType = opprettRevurdering.forenkletBehandlingsType,
             )
         } else {
             OpprettBehandling(
