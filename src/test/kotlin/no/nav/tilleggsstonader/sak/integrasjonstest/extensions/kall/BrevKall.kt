@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
 import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagreBrevDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 
 class BrevKall(
@@ -18,6 +19,11 @@ class BrevKall(
         dto: MellomlagreBrevDto,
     ) = apiRespons.mellomlagre(behandlingId, dto).expectOkWithBody<BehandlingId>()
 
+    fun mellomlagreFrittstående(
+        fagsakId: FagsakId,
+        dto: MellomlagreBrevDto,
+    ) = apiRespons.mellomlagreFrittstående(fagsakId, dto).expectOkWithBody<FagsakId>()
+
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = BrevApi()
 
@@ -31,5 +37,10 @@ class BrevKall(
             behandlingId: BehandlingId,
             dto: MellomlagreBrevDto,
         ) = testklient.post("/api/brev/mellomlager/$behandlingId", dto)
+
+        fun mellomlagreFrittstående(
+            fagsakId: FagsakId,
+            dto: MellomlagreBrevDto,
+        ) = testklient.post("/api/brev/mellomlager/fagsak/$fagsakId", dto)
     }
 }

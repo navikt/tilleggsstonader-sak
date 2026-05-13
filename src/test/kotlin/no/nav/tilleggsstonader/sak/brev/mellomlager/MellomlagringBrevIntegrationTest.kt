@@ -4,19 +4,88 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.util.fagsak
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import java.util.concurrent.CompletableFuture
 
 class MellomlagringBrevIntegrationTest : IntegrationTest() {
+    @Autowired
+    lateinit var mellomlagerBrevRepository: MellomlagerBrevRepository
+
+    @Autowired
+    lateinit var mellomlagerFrittståendeBrevRepository: MellomlagerFrittståendeBrevRepository
+
+    @AfterEach
+    fun cleanUp() {
+        mellomlagerBrevRepository.deleteAll()
+    }
+
+    @Test
+    fun `skal mellomlagre og oppdatere vedtaksbrev for behandling`() {
+        val behandlingContext = opprettOgTaBehandlingTilBrevsteg()
+        val førsteMellomlagring = MellomlagreBrevDto(brevverdier = "første-utkast", brevmal = "mal-1")
+        val oppdatertMellomlagring = MellomlagreBrevDto(brevverdier = "oppdatert-utkast", brevmal = "mal-2")
+
+        // Første mellomlagring
+        kall.brev.mellomlagre(behandlingContext.behandlingId, førsteMellomlagring)
+
+        val lagretBrev = mellomlagerBrevRepository.findByIdOrNull(behandlingContext.behandlingId)
+        assertThat(lagretBrev).isNotNull
+        assertThat(lagretBrev!!.brevverdier).isEqualTo(førsteMellomlagring.brevverdier)
+        assertThat(lagretBrev.brevmal).isEqualTo(førsteMellomlagring.brevmal)
+
+        // Oppdatert mellomlagring
+        kall.brev.mellomlagre(behandlingContext.behandlingId, oppdatertMellomlagring)
+        assertThat(mellomlagerBrevRepository.findAll().toList()).hasSize(1)
+
+        val oppdatertBrev = mellomlagerBrevRepository.findByIdOrNull(behandlingContext.behandlingId)
+        assertThat(oppdatertBrev).isNotNull
+        assertThat(oppdatertBrev!!.brevverdier).isEqualTo(oppdatertMellomlagring.brevverdier)
+        assertThat(oppdatertBrev.brevmal).isEqualTo(oppdatertMellomlagring.brevmal)
+    }
+
+    @Test
+    fun `skal mellomlagre og oppdatere frittstående brev for innlogget saksbehandler`() {
+        val fagsak = fagsak()
+        val førsteMellomlagring = MellomlagreBrevDto(brevverdier = "første-frittstående-utkast", brevmal = "fritt-mal-1")
+        val oppdatertMellomlagring = MellomlagreBrevDto(brevverdier = "oppdatert-frittstående-utkast", brevmal = "fritt-mal-2")
+        testoppsettService.lagreFagsak(fagsak)
+
+        // Første mellomlagring
+        kall.brev.mellomlagreFrittstående(fagsak.id, førsteMellomlagring)
+
+        val lagretFrittståendeBrev =
+            mellomlagerFrittståendeBrevRepository.findByFagsakIdAndSporbarOpprettetAv(
+                fagsak.id,
+                testBrukerkontekst.defaultBruker,
+            )
+
+        assertThat(lagretFrittståendeBrev).isNotNull
+        assertThat(lagretFrittståendeBrev!!.brevverdier).isEqualTo(førsteMellomlagring.brevverdier)
+        assertThat(lagretFrittståendeBrev.brevmal).isEqualTo(førsteMellomlagring.brevmal)
+
+        // Oppdatert mellomalgring
+        kall.brev.mellomlagreFrittstående(fagsak.id, oppdatertMellomlagring)
+
+        assertThat(mellomlagerFrittståendeBrevRepository.findAll().toList()).hasSize(1)
+        val oppdatertFrittståendeBrev =
+            mellomlagerFrittståendeBrevRepository.findByFagsakIdAndSporbarOpprettetAv(
+                fagsak.id,
+                testBrukerkontekst.defaultBruker,
+            )
+
+        assertThat(oppdatertFrittståendeBrev).isNotNull
+        assertThat(oppdatertFrittståendeBrev!!.brevverdier).isEqualTo(oppdatertMellomlagring.brevverdier)
+        assertThat(oppdatertFrittståendeBrev.brevmal).isEqualTo(oppdatertMellomlagring.brevmal)
+    }
+
     @Test
     fun `samtidige kall skal ikke kaste feil pga race-condition`() {
-        val behandlingContext =
-            opprettBehandlingOgGjennomførBehandlingsløp(
-                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-                tilSteg = StegType.SEND_TIL_BESLUTTER,
-            ) {
-                defaultDagligReiseTsoTestdata()
-            }
+        val behandlingContext = opprettOgTaBehandlingTilBrevsteg()
 
         val routingKall =
             (1..5).map {
@@ -35,4 +104,12 @@ class MellomlagringBrevIntegrationTest : IntegrationTest() {
             it.get().expectStatus().isOk
         }
     }
+
+    private fun opprettOgTaBehandlingTilBrevsteg() =
+        opprettBehandlingOgGjennomførBehandlingsløp(
+            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            tilSteg = StegType.SEND_TIL_BESLUTTER,
+        ) {
+            defaultDagligReiseTsoTestdata()
+        }
 }
