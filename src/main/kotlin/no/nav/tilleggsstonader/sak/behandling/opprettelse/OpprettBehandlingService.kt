@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.opprettelse
 
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
@@ -25,6 +26,7 @@ import no.nav.tilleggsstonader.sak.behandling.vent.ÅrsakSettPåVent
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
@@ -75,7 +77,11 @@ class OpprettBehandlingService(
             behandlingType = behandlingType,
             tidligereBehandlinger = tidligereBehandlinger,
             sisteIverksatteBehandling = sisteIverksatteBehandling,
-            sisteIverksatteBehandlingHarRammevedtakForPrivatBil = harBehandlingRammevedtakForPrivatBil(sisteIverksatteBehandling),
+            sisteIverksatteBehandlingHarRammevedtakForPrivatBil =
+                harBehandlingRammevedtakForPrivatBil(
+                    sisteIverksatteBehandling,
+                    fagsak,
+                ),
         )
 
         val behandlingStatus = utledBehandlingStatus(tidligereBehandlinger)
@@ -149,18 +155,23 @@ class OpprettBehandlingService(
             BehandlingStatus.OPPRETTET
         }
 
-    private fun harBehandlingRammevedtakForPrivatBil(sisteIverksatteBehandling: Behandling?): Boolean {
-        if (sisteIverksatteBehandling == null) {
+    private fun harBehandlingRammevedtakForPrivatBil(
+        sisteIverksatteBehandling: Behandling?,
+        fagsak: Fagsak,
+    ): Boolean {
+        if (sisteIverksatteBehandling == null ||
+            (
+                fagsak.stønadstype != Stønadstype.DAGLIG_REISE_TSO &&
+                    fagsak.stønadstype != Stønadstype.DAGLIG_REISE_TSR
+            )
+        ) {
             return false
         }
-        return try {
-            sisteIverksatteBehandling
-                .let { vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(it.id) }
-                .data
-                .rammevedtakPrivatBil != null
-        } catch (e: Exception) {
-            false
-        }
+
+        return vedtakService
+            .hentVedtak<InnvilgelseEllerOpphørDagligReise>(sisteIverksatteBehandling.id)
+            .data
+            .rammevedtakPrivatBil != null
     }
 
     private fun utledBehandlingStegFraBehandlingsType(behandlingType: BehandlingType): StegType =
