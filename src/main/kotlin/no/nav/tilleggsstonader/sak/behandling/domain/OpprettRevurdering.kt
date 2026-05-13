@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.behandling.domain
 
-import no.nav.tilleggsstonader.sak.behandling.opprettelse.ForenkletBehandlingsType
+import no.nav.tilleggsstonader.sak.behandling.opprettelse.ForenkletBehandlingstype
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import java.time.LocalDate
 
@@ -12,5 +12,5 @@ data class OpprettRevurdering(
     val kravMottatt: LocalDate?,
     val skalOppretteOppgave: Boolean,
     val behandlingMetode: BehandlingMetode,
-    val forenkletBehandlingsType: ForenkletBehandlingsType,
+    val forenkletBehandlingstype: ForenkletBehandlingstype,
 )

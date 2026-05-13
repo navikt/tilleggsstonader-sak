@@ -63,22 +63,16 @@ object OpprettBehandlingUtil {
         stønadstype: Stønadstype,
         sisteIverksatteBehandlingHarRammevedtakForPrivatBil: Boolean?,
     ) {
-        if (stønadstype != Stønadstype.DAGLIG_REISE_TSO && stønadstype != Stønadstype.DAGLIG_REISE_TSR) {
-            throw ApiFeil(
-                "Det er ikke lov å opprette en kjørelistebehandling på stønadstype $stønadstype",
-                HttpStatus.BAD_REQUEST,
-            )
+        brukerfeilHvis(stønadstype != Stønadstype.DAGLIG_REISE_TSO && stønadstype != Stønadstype.DAGLIG_REISE_TSR) {
+            "Det er ikke lov å opprette en kjørelistebehandling på stønadstype $stønadstype"
         }
 
-        if (sisteIverksatteBehandling == null) {
-            throw ApiFeil("Det finnes ikke en tidligere iverksatt behandling på fagsaken", HttpStatus.BAD_REQUEST)
+        brukerfeilHvis(sisteIverksatteBehandling == null) {
+            "Det finnes ikke en tidligere iverksatt behandling på fagsaken"
         }
 
-        if (sisteIverksatteBehandlingHarRammevedtakForPrivatBil == false) {
-            throw ApiFeil(
-                "Siste iverksatte behandling mangler rammevedtak for privat bil",
-                HttpStatus.BAD_REQUEST,
-            )
+        brukerfeilHvis(sisteIverksatteBehandlingHarRammevedtakForPrivatBil == false) {
+            "Siste iverksatte behandling mangler rammevedtak for privat bil"
         }
     }
 }

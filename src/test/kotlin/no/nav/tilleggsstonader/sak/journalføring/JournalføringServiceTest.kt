@@ -30,7 +30,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.behandling.opprettelse.ForenkletBehandlingsType
+import no.nav.tilleggsstonader.sak.behandling.opprettelse.ForenkletBehandlingstype
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandling
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingOppgaveMetadata
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingService
@@ -181,7 +181,7 @@ class JournalføringServiceTest {
                             beskrivelse = oppgaveBeskrivelse,
                             prioritet = OppgavePrioritet.NORM,
                         ),
-                    forenkletBehandlingsType = ForenkletBehandlingsType.ORDINAER_BEHANDLING,
+                    forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
                 ),
             )
         } returns behandling(fagsak = fagsak)
@@ -207,7 +207,7 @@ class JournalføringServiceTest {
                             beskrivelse = oppgaveBeskrivelse,
                             prioritet = OppgavePrioritet.NORM,
                         ),
-                    forenkletBehandlingsType = ForenkletBehandlingsType.ORDINAER_BEHANDLING,
+                    forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
                 ),
             )
         }
@@ -444,7 +444,7 @@ class JournalføringServiceTest {
                                 beskrivelse = oppgaveBeskrivelse,
                                 prioritet = OppgavePrioritet.NORM,
                             ),
-                        forenkletBehandlingsType = ForenkletBehandlingsType.ORDINAER_BEHANDLING,
+                        forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
                     ),
                 )
             } returns behandling(fagsak = fagsak)
@@ -470,7 +470,7 @@ class JournalføringServiceTest {
                                 beskrivelse = oppgaveBeskrivelse,
                                 prioritet = OppgavePrioritet.NORM,
                             ),
-                        forenkletBehandlingsType = ForenkletBehandlingsType.ORDINAER_BEHANDLING,
+                        forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
                     ),
                 )
             }

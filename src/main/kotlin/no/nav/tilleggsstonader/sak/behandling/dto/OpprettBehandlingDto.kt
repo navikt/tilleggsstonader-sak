@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndring
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerKilde
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
 import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
-import no.nav.tilleggsstonader.sak.behandling.opprettelse.ForenkletBehandlingsType
+import no.nav.tilleggsstonader.sak.behandling.opprettelse.ForenkletBehandlingstype
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import java.time.LocalDate
 
@@ -16,7 +16,7 @@ data class OpprettBehandlingDto(
     val nyeOpplysningerMetadata: NyeOpplysningerMetadataDto?,
     val valgteBarn: Set<String> = emptySet(),
     val kravMottatt: LocalDate?,
-    val forenkletBehandlingsType: ForenkletBehandlingsType,
+    val forenkletBehandlingstype: ForenkletBehandlingstype,
 ) {
     fun tilDomene() =
         OpprettRevurdering(
@@ -27,7 +27,7 @@ data class OpprettBehandlingDto(
             kravMottatt = kravMottatt,
             skalOppretteOppgave = true,
             behandlingMetode = BehandlingMetode.MANUELL,
-            forenkletBehandlingsType = forenkletBehandlingsType,
+            forenkletBehandlingstype = forenkletBehandlingstype,
         )
 }
 

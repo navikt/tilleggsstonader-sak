@@ -62,11 +62,11 @@ class OpprettBehandlingService(
         val sisteIverksatteBehandling = behandlingRepository.finnSisteIverksatteBehandling(request.fagsakId)
         val forrigeBehandling = sisteIverksatteBehandling
         val behandlingType =
-            when (request.forenkletBehandlingsType) {
-                ForenkletBehandlingsType.ORDINAER_BEHANDLING ->
+            when (request.forenkletBehandlingstype) {
+                ForenkletBehandlingstype.ORDINAER_BEHANDLING ->
                     utledBehandlingType(tidligereBehandlinger, behandlingÅrsak = request.behandlingsårsak)
 
-                ForenkletBehandlingsType.KJØRELISTE -> BehandlingType.KJØRELISTE
+                ForenkletBehandlingstype.KJØRELISTE -> BehandlingType.KJØRELISTE
             }
         val fagsak = fagsakService.hentFagsak(request.fagsakId)
 
@@ -75,7 +75,7 @@ class OpprettBehandlingService(
             behandlingType = behandlingType,
             tidligereBehandlinger = tidligereBehandlinger,
             sisteIverksatteBehandling = sisteIverksatteBehandling,
-            sisteIverksatteBehandlingHarRammevedtakForPrivatBil = utredRammevedtak(sisteIverksatteBehandling),
+            sisteIverksatteBehandlingHarRammevedtakForPrivatBil = harBehandlingRammevedtakForPrivatBil(sisteIverksatteBehandling),
         )
 
         val behandlingStatus = utledBehandlingStatus(tidligereBehandlinger)
@@ -149,7 +149,7 @@ class OpprettBehandlingService(
             BehandlingStatus.OPPRETTET
         }
 
-    private fun utredRammevedtak(sisteIverksatteBehandling: Behandling?): Boolean {
+    private fun harBehandlingRammevedtakForPrivatBil(sisteIverksatteBehandling: Behandling?): Boolean {
         if (sisteIverksatteBehandling == null) {
             return false
         }
@@ -179,10 +179,10 @@ data class OpprettBehandling(
     val kravMottatt: LocalDate? = null,
     val nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
     val oppgaveMetadata: OpprettBehandlingOppgaveMetadata,
-    val forenkletBehandlingsType: ForenkletBehandlingsType = ForenkletBehandlingsType.ORDINAER_BEHANDLING,
+    val forenkletBehandlingstype: ForenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
 )
 
-enum class ForenkletBehandlingsType {
+enum class ForenkletBehandlingstype {
     ORDINAER_BEHANDLING,
     KJØRELISTE,
 }
