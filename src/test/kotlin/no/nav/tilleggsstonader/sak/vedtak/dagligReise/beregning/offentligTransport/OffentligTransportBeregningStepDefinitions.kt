@@ -7,6 +7,7 @@ import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
@@ -97,6 +98,9 @@ class OffentligTransportBeregningStepDefinitions {
             )
 
         every { unleashServiceMock.isEnabled(any()) } returns true
+        every {
+            unleashServiceMock.isEnabled(Toggle.KAN_KNYTTE_OFFENTLIG_TRANSPORT_TIL_AKTIVITET)
+        } returns false
 
         vilkår =
             utgiftData.mapRad { rad ->
