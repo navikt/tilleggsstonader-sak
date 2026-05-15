@@ -39,7 +39,14 @@ class ApplicationConfig {
     }
 
     @Bean
-    fun lockProvider(jdbcTemplate: JdbcTemplate): LockProvider = JdbcTemplateLockProvider(jdbcTemplate)
+    fun lockProvider(jdbcTemplate: JdbcTemplate): LockProvider =
+        JdbcTemplateLockProvider(
+            JdbcTemplateLockProvider.Configuration
+                .builder()
+                .withJdbcTemplate(jdbcTemplate)
+                .usingDbTime()
+                .build(),
+        )
 
     @Bean
     fun behandlingLoggingFilter(): FilterRegistrationBean<BehandlingLogFilter> {
