@@ -61,13 +61,17 @@ data class VedtaksperiodeGrunnlag(
     val typeAktivitet: TypeAktivitet?,
     val antallReisedagerIVedtaksperioden: Int,
 ) {
-    constructor(vedtaksperiode: Vedtaksperiode, antallReisedager: Int) : this(
+    constructor(
+        vedtaksperiode: Vedtaksperiode,
+        antallReisedager: Int,
+        typeAktivitet: TypeAktivitet? = vedtaksperiode.typeAktivitet,
+    ) : this(
         id = vedtaksperiode.id,
         fom = vedtaksperiode.fom,
         tom = vedtaksperiode.tom,
         målgruppe = vedtaksperiode.målgruppe,
         aktivitet = vedtaksperiode.aktivitet,
-        typeAktivitet = vedtaksperiode.typeAktivitet,
+        typeAktivitet = typeAktivitet,
         antallReisedagerIVedtaksperioden = antallReisedager,
     )
 }

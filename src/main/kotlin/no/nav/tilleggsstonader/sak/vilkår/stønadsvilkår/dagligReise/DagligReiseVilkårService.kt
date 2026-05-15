@@ -173,7 +173,9 @@ class DagligReiseVilkårService(
         behandlingId: BehandlingId,
     ) {
         val gjelderPrivatBil = nyttVilkår.fakta.type == TypeDagligReise.PRIVAT_BIL
+        val gjelderOffentligTransport = nyttVilkår.fakta.type == TypeDagligReise.OFFENTLIG_TRANSPORT
         val kanBehandlePrivatBil = unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)
+        val skalKnytteOffentligTransportTilAktivitet = unleashService.isEnabled(Toggle.KAN_KNYTTE_OFFENTLIG_TRANSPORT_TIL_AKTIVITET)
 
         feilHvis(gjelderPrivatBil && !kanBehandlePrivatBil) {
             "TS-sak støtter foreløpig ikke behandling av saker som gjelder privat bil"
@@ -181,6 +183,10 @@ class DagligReiseVilkårService(
 
         if (gjelderPrivatBil) {
             validerAktivitetForPrivatBil(nyttVilkår, behandlingId)
+        }
+
+        if (gjelderOffentligTransport && skalKnytteOffentligTransportTilAktivitet) {
+            validerAktivitetForOffentligTransport(nyttVilkår, behandlingId)
         }
     }
 
@@ -205,6 +211,26 @@ class DagligReiseVilkårService(
         behandlingId: BehandlingId,
     ) {
         val fakta = nyttVilkår.fakta as FaktaPrivatBil
+        val aktivitet = vilkårperiodeService.hentAktivitet(fakta.aktivitetId, behandlingId)
+        brukerfeilHvis(aktivitet == null) {
+            "Aktiviteten finnes ikke"
+        }
+        brukerfeilHvis(aktivitet.resultat != ResultatVilkårperiode.OPPFYLT) {
+            "Aktiviteten er ikke oppfylt"
+        }
+        brukerfeilHvisIkke(aktivitet.inneholder(nyttVilkår)) {
+            "Aktiviteten er ikke oppfylt hele vilkårperioden"
+        }
+    }
+
+    private fun validerAktivitetForOffentligTransport(
+        nyttVilkår: LagreDagligReise,
+        behandlingId: BehandlingId,
+    ) {
+        val fakta = nyttVilkår.fakta as FaktaOffentligTransport
+        brukerfeilHvis(fakta.aktivitetId == null) {
+            "Aktivitet må velges for offentlig transport"
+        }
         val aktivitet = vilkårperiodeService.hentAktivitet(fakta.aktivitetId, behandlingId)
         brukerfeilHvis(aktivitet == null) {
             "Aktiviteten finnes ikke"

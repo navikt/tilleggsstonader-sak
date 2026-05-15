@@ -37,6 +37,7 @@ data class FaktaDagligReiseOffentligTransport(
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int?,
     override val adresse: String?,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
 ) : VilkårFakta
 
 data class FaktaDagligReisePrivatBil(

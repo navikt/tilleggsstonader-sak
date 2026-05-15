@@ -21,6 +21,8 @@ enum class Toggle(
 
     KAN_BEHANDLE_PRIVAT_BIL("sak.daglig-reise-privat-bil"),
 
+    KAN_KNYTTE_OFFENTLIG_TRANSPORT_TIL_AKTIVITET("sak.daglig-reise-offentlig-transport-aktivitet"),
+
     KAN_AUTOMATISK_BEHANDLE_KJØRELISTE("sak.automatisk-behandling-kjoreliste"),
 
     BRUK_OPPFOLGINGSENHET_FOR_UTBETALING("sak.bruk-oppfolgingsenhet-for-utbetaling"),

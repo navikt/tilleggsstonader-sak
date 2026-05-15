@@ -41,6 +41,7 @@ data class FaktaOffentligTransport(
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int?,
     val periode: Datoperiode? = null,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
 ) : FaktaDagligReise {
     override val type = TypeDagligReise.OFFENTLIG_TRANSPORT
 
@@ -124,6 +125,7 @@ data class FaktaOffentligTransport(
             prisSyvdagersbillett = prisSyvdagersbillett,
             prisTrettidagersbillett = prisTrettidagersbillett,
             adresse = adresse,
+            aktivitetId = aktivitetId,
         )
 }
 

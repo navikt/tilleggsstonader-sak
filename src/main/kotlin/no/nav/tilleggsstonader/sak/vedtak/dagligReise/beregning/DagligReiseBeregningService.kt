@@ -116,13 +116,28 @@ class DagligReiseBeregningService(
 
         if (oppfylteVilkårOffentligTransport.isEmpty()) return null
 
+        validerAktivitetIdForOffentligTransportVilkår(oppfylteVilkårOffentligTransport)
+
         return offentligTransportBeregningService
             .beregn(
                 vedtaksperioder = vedtaksperioder,
                 oppfylteVilkår = oppfylteVilkårOffentligTransport,
                 brukersNavKontor = brukersNavKontor,
+                behandlingId = behandling.id,
             )?.flettMedForrigeVedtakHvisRevurdering(behandling, beregnFra)
             ?.sorterReiserOgPerioder()
+    }
+
+    private fun validerAktivitetIdForOffentligTransportVilkår(vilkår: List<VilkårDagligReise>) {
+        if (!unleashService.isEnabled(Toggle.KAN_KNYTTE_OFFENTLIG_TRANSPORT_TIL_AKTIVITET)) return
+
+        val vilkårUtenAktivitetId =
+            vilkår.filter { (it.fakta as? FaktaOffentligTransport)?.aktivitetId == null }
+
+        brukerfeilHvis(vilkårUtenAktivitetId.isNotEmpty()) {
+            "Alle reiser med offentlig transport må knyttes til en aktivitet. " +
+                "${vilkårUtenAktivitetId.size} reise(r) mangler aktivitetstilknytning."
+        }
     }
 
     private fun BeregningsresultatOffentligTransport.flettMedForrigeVedtakHvisRevurdering(
