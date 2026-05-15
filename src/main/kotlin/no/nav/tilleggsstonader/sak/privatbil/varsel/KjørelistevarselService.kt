@@ -46,7 +46,7 @@ class KjørelistevarselService(
 
             val behandlingerMedRammevedtak = behandlingService.finnGjeldendeIverksatteBehandlingerMedRammevedtakPrivatBil()
 
-            logger.info("Fant ${behandlingerMedRammevedtak.size} behandlinger med aktuelle rammevedtak for kjørelister")
+            logger.info("Fant ${behandlingerMedRammevedtak.size} behandlinger med rammevedtak for privat bil")
 
             val varselTasker =
                 behandlingerMedRammevedtak

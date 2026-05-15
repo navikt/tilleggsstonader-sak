@@ -35,7 +35,6 @@ class FerdigstillBehandlingSteg(
 
         taskService.save(BehandlingsstatistikkTask.opprettFerdigTask(behandlingId = saksbehandling.id))
 
-        // Varsling om kjørelister sendes nå via scheduled jobb (KjørelisteVarselScheduledService) som kjører mandag kl 10
         if (kjørelistevarselService.skalSendeKjørelistevarselVedFerdigstillingAvBehandling(saksbehandling.id)) {
             taskService.save(
                 SendKjorelistevarselTilBrukerTask.opprett(saksbehandling.fagsakPersonId),
