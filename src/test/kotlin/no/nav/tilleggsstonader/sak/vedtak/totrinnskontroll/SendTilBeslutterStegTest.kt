@@ -52,13 +52,19 @@ class SendTilBeslutterStegTest {
     private val oppgaveService = mockk<OppgaveService>()
     private val totrinnskontrollService = mockk<TotrinnskontrollService>(relaxed = true)
 
+    private val kjørelisteBehandlingBrevRepository =
+        mockk<no.nav.tilleggsstonader.sak.brev.kjørelistebrev.KjørelisteBehandlingBrevRepository>(relaxed = true)
+    private val brevmottakereService = mockk<no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakereService>(relaxed = true)
+
     private val beslutteVedtakSteg =
         SendTilBeslutterSteg(
             taskService,
             behandlingService,
             vedtaksbrevRepository,
+            kjørelisteBehandlingBrevRepository,
             oppgaveService,
             totrinnskontrollService,
+            brevmottakereService,
         )
 
     private val fagsak =

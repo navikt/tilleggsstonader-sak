@@ -38,6 +38,22 @@ class FullførKjørelistebehandlingSteg(
             "Kan ikke fullføre behandling=${saksbehandling.id} fordi den ikke er en kjørelistebehandling."
         }
 
+        fullførKjørelistebehandling(saksbehandling)
+    }
+
+    /**
+     * Kalles fra BeslutteVedtakSteg etter godkjent totrinnskontroll for manuell kjørelistebehandling.
+     * Statusvalidering hoppes over siden TotrinnskontrollService allerede har satt IVERKSETTER_VEDTAK.
+     * Resultat og status settes ikke her siden BeslutteVedtakSteg/TotrinnskontrollService allerede har gjort det.
+     */
+    fun fullførEtterTotrinnskontroll(saksbehandling: Saksbehandling) {
+        taskService.save(JournalførKjørelisteBehandlingBrevTask.opprettTask(saksbehandling.id))
+        taskService.save(FerdigstillBehandlingTask.opprettTask(saksbehandling))
+        ferdigstillOppgave(saksbehandling)
+        iverksettService.iverksettBehandlingFørsteGang(saksbehandling.id)
+    }
+
+    private fun fullførKjørelistebehandling(saksbehandling: Saksbehandling) {
         opprettTaskForSendingAvVedtaksbrev(behandlingId = saksbehandling.id)
         behandlingService.oppdaterResultatPåBehandling(saksbehandling.id, BehandlingResultat.INNVILGET)
         behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.IVERKSETTER_VEDTAK)

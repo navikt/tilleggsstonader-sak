@@ -58,6 +58,9 @@ class BeslutteVedtakStegTest {
     private val behandlingService = mockk<BehandlingService>()
     private val iverksettService = mockk<IverksettService>(relaxed = true)
 
+    private val fullførKjørelistebehandlingSteg =
+        mockk<no.nav.tilleggsstonader.sak.privatbil.FullførKjørelistebehandlingSteg>(relaxed = true)
+
     private val beslutteVedtakSteg =
         BeslutteVedtakSteg(
             taskService = taskService,
@@ -68,6 +71,7 @@ class BeslutteVedtakStegTest {
             vedtakService = vedtakService,
             brevService = brevService,
             iverksettService = iverksettService,
+            fullførKjørelistebehandlingSteg = fullførKjørelistebehandlingSteg,
         )
 
     private val innloggetBeslutter = "sign2"

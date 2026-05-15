@@ -28,8 +28,23 @@ fun IntegrationTest.gjennomførKjørelisteBehandling(
 
     if (tilSteg == StegType.SIMULERING) return
     gjennomførSimuleringSteg(behandling.id)
-    kall.privatBil.genererKjørelisteVedtaksbrev(behandling.id)
-    kall.privatBil.fullførKjørelisteBehandling(behandling.id)
+
+    // Sjekk faktisk steg etter simulering — avhenger av toggle for totrinnskontroll
+    val stegEtterSimulering = kall.behandling.hent(behandling.id).steg
+
+    if (stegEtterSimulering == StegType.SEND_TIL_BESLUTTER) {
+        if (tilSteg == StegType.SEND_TIL_BESLUTTER) return
+        kall.privatBil.genererKjørelisteVedtaksbrev(behandling.id)
+        kall.totrinnskontroll.sendTilBeslutter(behandling.id)
+
+        if (tilSteg == StegType.BESLUTTE_VEDTAK) return
+        // BeslutteVedtakSteg tar seg av resten når vedtaket besluttes
+        gjennomførBeslutteVedtakSteg(behandling.id)
+    } else {
+        if (tilSteg in setOf(StegType.SEND_TIL_BESLUTTER, StegType.BESLUTTE_VEDTAK)) return
+        // if (tilSteg == StegType.FULLFØR_KJØRELISTE) return
+        kall.privatBil.fullførKjørelisteBehandling(behandling.id)
+    }
 
     if (tilSteg in setOf(StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV, StegType.FERDIGSTILLE_BEHANDLING)) return
     kjørTasksKlareForProsesseringTilIngenTasksIgjen()
