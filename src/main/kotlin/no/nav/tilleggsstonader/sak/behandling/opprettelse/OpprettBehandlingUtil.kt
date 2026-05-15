@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.opprettelse
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sisteFerdigstilteBehandling
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -63,7 +64,7 @@ object OpprettBehandlingUtil {
         stønadstype: Stønadstype,
         sisteIverksatteBehandlingHarRammevedtakForPrivatBil: Boolean?,
     ) {
-        brukerfeilHvis(stønadstype != Stønadstype.DAGLIG_REISE_TSO && stønadstype != Stønadstype.DAGLIG_REISE_TSR) {
+        brukerfeilHvis(!stønadstype.gjelderDagligReise()) {
             "Det er ikke lov å opprette en kjørelistebehandling på stønadstype $stønadstype"
         }
 
