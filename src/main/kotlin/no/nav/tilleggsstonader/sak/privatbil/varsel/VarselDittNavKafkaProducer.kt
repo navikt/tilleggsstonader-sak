@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.privatbil.varsel
 
-import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tms.varsel.action.EksternKanal
 import no.nav.tms.varsel.action.Produsent
 import no.nav.tms.varsel.action.Sensitivitet
@@ -31,41 +30,40 @@ class VarselDittNavKafkaProducer(
     @Value("\${NAIS_APP_NAME}")
     private lateinit var appName: String
 
-    fun sendToKafka(
+    fun sendVarselOmKjørelisterTilgjengelig(
         fnr: String,
-        melding: String,
-        eventId: String,
-    ): String {
-        val kafkaBeskjedJson =
-            VarselActionBuilder.opprett {
-                type = Varseltype.Beskjed
-                varselId = eventId
-                sensitivitet = Sensitivitet.Substantial
-                ident = fnr
-                tekster +=
-                    Tekst(
-                        spraakkode = "nb",
-                        tekst = melding,
-                        default = true,
-                    )
-                link = kjørelisteSkjemaUrl
-                eksternVarsling { preferertKanal = EksternKanal.SMS }
-                produsent =
-                    Produsent(
-                        cluster = cluster,
-                        namespace = namespace,
-                        appnavn = appName,
-                    )
-            }
+        varselId: String,
+    ) {
+        val kafkaBeskjedJson = lagKafkaBeskjedJson(fnr = fnr, varselId = varselId)
+        val producerRecord = ProducerRecord(topic, varselId, kafkaBeskjedJson)
+        kafkaTemplate.send(producerRecord).get()
+    }
 
-        runCatching {
-            val producerRecord = ProducerRecord(topic, eventId, kafkaBeskjedJson)
-            kafkaTemplate.send(producerRecord).get()
-        }.onFailure {
-            val errorMessage = "Could not send kjoreliste to DittNav Kafka. Check secure logs for more information."
-            secureLogger.error("Could not send kjoreliste to DittNav Kafka melding=$kafkaBeskjedJson", it)
-            throw RuntimeException(errorMessage)
-        }
-        return kafkaBeskjedJson
+    private fun lagKafkaBeskjedJson(
+        fnr: String,
+        varselId: String,
+    ) = VarselActionBuilder.opprett {
+        type = Varseltype.Beskjed
+        this.varselId = varselId
+        sensitivitet = Sensitivitet.Substantial
+        ident = fnr
+        tekster +=
+            Tekst(
+                spraakkode = "nb",
+                tekst = KJØRELISTE_TILGJENGELIG_MELDING,
+                default = true,
+            )
+        link = kjørelisteSkjemaUrl
+        eksternVarsling { preferertKanal = EksternKanal.SMS }
+        produsent =
+            Produsent(
+                cluster = cluster,
+                namespace = namespace,
+                appnavn = appName,
+            )
+    }
+
+    companion object {
+        const val KJØRELISTE_TILGJENGELIG_MELDING = "Du har én eller flere kjørelister tilgjengelige for utfylling."
     }
 }
