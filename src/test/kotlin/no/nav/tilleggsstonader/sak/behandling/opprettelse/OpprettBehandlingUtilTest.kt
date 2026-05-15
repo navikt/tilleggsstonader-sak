@@ -155,7 +155,7 @@ internal class OpprettBehandlingUtilTest {
                     stønadstype = Stønadstype.BARNETILSYN,
                     behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
                     tidligereBehandlinger = listOf(behandling),
-                    sisteIverksatteBehandlinger = null,
+                    sisteIverksatteBehandling = null,
                 )
             }.hasMessage("Kan ikke opprette en førstegangsbehandling når siste behandling ikke er henlagt")
         }
@@ -174,7 +174,7 @@ internal class OpprettBehandlingUtilTest {
                     stønadstype = Stønadstype.BARNETILSYN,
                     behandlingType = BehandlingType.FØRSTEGANGSBEHANDLING,
                     tidligereBehandlinger = listOf(behandling),
-                    sisteIverksatteBehandlinger = null,
+                    sisteIverksatteBehandling = null,
                 )
             }
         }
@@ -194,7 +194,7 @@ internal class OpprettBehandlingUtilTest {
                 stønadstype = Stønadstype.BARNETILSYN,
                 behandlingType = BehandlingType.REVURDERING,
                 tidligereBehandlinger = listOf(behandling),
-                sisteIverksatteBehandlinger = null,
+                sisteIverksatteBehandling = null,
             )
         }
 
@@ -205,7 +205,7 @@ internal class OpprettBehandlingUtilTest {
                     stønadstype = Stønadstype.BARNETILSYN,
                     behandlingType = BehandlingType.REVURDERING,
                     tidligereBehandlinger = listOf(henlagtBehandling(fagsak = fagsak)),
-                    sisteIverksatteBehandlinger = null,
+                    sisteIverksatteBehandling = null,
                 )
             }.hasMessage("Det finnes ikke en tidligere behandling på fagsaken")
         }
@@ -217,7 +217,7 @@ internal class OpprettBehandlingUtilTest {
                     stønadstype = Stønadstype.BARNETILSYN,
                     behandlingType = BehandlingType.REVURDERING,
                     tidligereBehandlinger = listOf(),
-                    sisteIverksatteBehandlinger = null,
+                    sisteIverksatteBehandling = null,
                 )
             }.hasMessage("Det finnes ikke en tidligere behandling på fagsaken")
         }
@@ -239,7 +239,7 @@ internal class OpprettBehandlingUtilTest {
                     stønadstype = Stønadstype.DAGLIG_REISE_TSO,
                     behandlingType = BehandlingType.KJØRELISTE,
                     tidligereBehandlinger = listOf(behandling),
-                    sisteIverksatteBehandlinger = behandling,
+                    sisteIverksatteBehandling = behandling,
                 )
             }
 
@@ -248,7 +248,7 @@ internal class OpprettBehandlingUtilTest {
                     stønadstype = Stønadstype.DAGLIG_REISE_TSR,
                     behandlingType = BehandlingType.KJØRELISTE,
                     tidligereBehandlinger = listOf(behandling),
-                    sisteIverksatteBehandlinger = behandling,
+                    sisteIverksatteBehandling = behandling,
                 )
             }
         }
@@ -260,9 +260,29 @@ internal class OpprettBehandlingUtilTest {
                     stønadstype = Stønadstype.DAGLIG_REISE_TSO,
                     behandlingType = BehandlingType.KJØRELISTE,
                     tidligereBehandlinger = listOf(),
-                    sisteIverksatteBehandlinger = null,
+                    sisteIverksatteBehandling = null,
                 )
             }.hasMessage("Det finnes ikke en tidligere iverksatt behandling på fagsaken")
+        }
+
+        @Test
+        fun `ikke opprette kjørelistebehandling hvis siste iverksatte behandling mangler rammevedtak for privat bil`() {
+            val behandling =
+                behandling(
+                    fagsak = fagsak,
+                    resultat = BehandlingResultat.INNVILGET,
+                    status = BehandlingStatus.FERDIGSTILT,
+                )
+
+            assertThatThrownBy {
+                validerKanOppretteNyBehandling(
+                    stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+                    behandlingType = BehandlingType.KJØRELISTE,
+                    tidligereBehandlinger = listOf(behandling),
+                    sisteIverksatteBehandling = behandling,
+                    sisteIverksatteBehandlingHarRammevedtakForPrivatBil = false,
+                )
+            }.hasMessage("Siste iverksatte behandling mangler rammevedtak for privat bil")
         }
 
         @ParameterizedTest
@@ -284,7 +304,7 @@ internal class OpprettBehandlingUtilTest {
                     stønadstype = stønadstype,
                     behandlingType = BehandlingType.KJØRELISTE,
                     tidligereBehandlinger = listOf(behandling),
-                    sisteIverksatteBehandlinger = behandling,
+                    sisteIverksatteBehandling = behandling,
                 )
             }.hasMessage("Det er ikke lov å opprette en kjørelistebehandling på stønadstype $stønadstype")
         }

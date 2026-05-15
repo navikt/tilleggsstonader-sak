@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtakstidspunkt
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
@@ -302,4 +303,9 @@ class BehandlingService(
         val behandling = hentBehandling(behandlingId)
         behandlingRepository.update(behandling.copy(behandlingMetode = behandlingMetode))
     }
+
+    fun finnGjeldendeIverksatteBehandlingerMedRammevedtakPrivatBil() =
+        behandlingRepository.finnGjeldendeIverksatteBehandlingerMedRammevedtakPrivatBil(
+            stønadstyper = listOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR),
+        )
 }

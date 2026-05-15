@@ -41,6 +41,7 @@ class OpprettOppgaveConfig(
             Oppgavetype.BehandleSak,
             Oppgavetype.GodkjenneVedtak,
             Oppgavetype.BehandleUnderkjentVedtak,
+            Oppgavetype.BehandleKjøreliste,
         )
 
     init {
@@ -90,6 +91,7 @@ class OpprettOppgaveConfig(
             Oppgavetype.BehandleSak -> "Behandle sak (opprettet når applikasjonen starter)"
             Oppgavetype.GodkjenneVedtak -> "Godkjenn vedtak (opprettet når applikasjonen starter)"
             Oppgavetype.BehandleUnderkjentVedtak -> "Behandle underkjent vedtak (opprettet når applikasjonen starter)"
+            Oppgavetype.BehandleKjøreliste -> "Behandle kjøreliste (opprettet når applikasjonen starter)"
             else -> error("Har ikke mappet $oppgavetype")
         }
 }
