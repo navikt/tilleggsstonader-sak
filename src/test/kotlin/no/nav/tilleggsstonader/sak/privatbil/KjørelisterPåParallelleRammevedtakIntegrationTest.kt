@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
@@ -23,6 +24,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegrationTest() {
+    companion object {
+        private const val MAKS_ANTALL_FORSØK_VENT_PÅ_FERDIGSTILT = 5
+    }
+
     private val fomRamme1 = 5 januar 2026
     private val tomRamme1 = 25 januar 2026
 
@@ -109,6 +114,7 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
         }
 
         gjennomførKjørelisteBehandling(kjørelistebehandling1)
+        ventTilBehandlingErFerdigstilt(kjørelistebehandling1.id)
 
         // Sender inn kjøreliste for nytt rammevedtak
         val kjørelistebehandling2 =
@@ -238,5 +244,17 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
         val vurderingRamme2 = reisevurdering.singleOrNull { it.reiseId == ReiseId.fromString(reiseIdRamme2) }
 
         return Reisevurderinger(ramme1 = vurderingRamme1, ramme2 = vurderingRamme2)
+    }
+
+    private fun ventTilBehandlingErFerdigstilt(behandlingId: BehandlingId) {
+        repeat(MAKS_ANTALL_FORSØK_VENT_PÅ_FERDIGSTILT) {
+            if (!testoppsettService.hentBehandling(behandlingId).erAktiv()) {
+                return
+            }
+            kjørTasksKlareForProsesseringTilIngenTasksIgjen()
+        }
+        throw AssertionError(
+            "Kjørelistebehandling=$behandlingId ble ikke ferdigstilt etter $MAKS_ANTALL_FORSØK_VENT_PÅ_FERDIGSTILT forsøk",
+        )
     }
 }
