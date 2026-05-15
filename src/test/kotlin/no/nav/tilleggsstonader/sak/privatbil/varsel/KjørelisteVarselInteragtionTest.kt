@@ -144,6 +144,40 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
+    fun `skal kun sende ett kjørelistevarsel to rammevedtak mangler kjøreliste forrige uke`() {
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
+
+        val fom = enUkeTilbake.mandag()
+        val tom = enUkeTilbake.søndag()
+
+        opprettBehandlingOgGjennomførBehandlingsløp(
+            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+        ) {
+            aktivitet {
+                opprett {
+                    aktivitetTiltakTso(fom, tom)
+                }
+            }
+            målgruppe {
+                opprett {
+                    målgruppeAAP(fom, tom)
+                }
+            }
+            vilkår {
+                opprett {
+                    // To rammevedtak
+                    privatBil(fom, tom)
+                    privatBil(fom, tom)
+                }
+            }
+        }
+
+        assertAntallVarslingerErSendt(1)
+        kjørKjørelistevarselJobb()
+        assertAntallVarslingerErSendt(2)
+    }
+
+    @Test
     fun `skal ikke sende kjørelistevarsel hvis ikke har rammevedtak forrige uke`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
 
