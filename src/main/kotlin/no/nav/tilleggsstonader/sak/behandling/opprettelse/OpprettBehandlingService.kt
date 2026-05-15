@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.opprettelse
 
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
@@ -10,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
@@ -24,12 +26,15 @@ import no.nav.tilleggsstonader.sak.behandling.vent.ÅrsakSettPåVent
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
+import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
@@ -44,6 +49,7 @@ class OpprettBehandlingService(
     private val settPåVentService: SettPåVentService,
     private val taskService: TaskService,
     private val fagsakService: FagsakService,
+    private val vedtakService: VedtakService,
 ) {
     @Transactional
     fun opprettBehandling(request: OpprettBehandling): Behandling {
@@ -55,16 +61,27 @@ class OpprettBehandlingService(
         }
 
         val tidligereBehandlinger = behandlingRepository.findByFagsakId(request.fagsakId)
-        val sisteIverksatteBehandlinger = behandlingRepository.finnSisteIverksatteBehandling(request.fagsakId)
-        val forrigeBehandling = behandlingRepository.finnSisteIverksatteBehandling(request.fagsakId)
-        val behandlingType = utledBehandlingType(tidligereBehandlinger, behandlingÅrsak = request.behandlingsårsak)
+        val sisteIverksatteBehandling = behandlingRepository.finnSisteIverksatteBehandling(request.fagsakId)
+        val forrigeBehandling = sisteIverksatteBehandling
+        val behandlingType =
+            when (request.forenkletBehandlingstype) {
+                ForenkletBehandlingstype.ORDINAER_BEHANDLING ->
+                    utledBehandlingType(tidligereBehandlinger, behandlingÅrsak = request.behandlingsårsak)
+
+                ForenkletBehandlingstype.KJØRELISTE -> BehandlingType.KJØRELISTE
+            }
         val fagsak = fagsakService.hentFagsak(request.fagsakId)
 
         validerKanOppretteNyBehandling(
             stønadstype = fagsak.stønadstype,
             behandlingType = behandlingType,
             tidligereBehandlinger = tidligereBehandlinger,
-            sisteIverksatteBehandlinger = sisteIverksatteBehandlinger,
+            sisteIverksatteBehandling = sisteIverksatteBehandling,
+            sisteIverksatteBehandlingHarRammevedtakForPrivatBil =
+                harBehandlingRammevedtakForPrivatBil(
+                    sisteIverksatteBehandling,
+                    fagsak,
+                ),
         )
 
         val behandlingStatus = utledBehandlingStatus(tidligereBehandlinger)
@@ -76,7 +93,7 @@ class OpprettBehandlingService(
                     forrigeIverksatteBehandlingId = forrigeBehandling?.id,
                     type = behandlingType,
                     behandlingMetode = request.behandlingMetode,
-                    steg = request.stegType,
+                    steg = utledBehandlingStegFraBehandlingsType(behandlingType),
                     status = behandlingStatus,
                     resultat = BehandlingResultat.IKKE_SATT,
                     årsak = request.behandlingsårsak,
@@ -91,7 +108,7 @@ class OpprettBehandlingService(
             behandlingshistorikk =
                 Behandlingshistorikk(
                     behandlingId = behandling.id,
-                    steg = request.stegType,
+                    steg = utledBehandlingStegFraBehandlingsType(behandlingType),
                     gitVersjon = Applikasjonsversjon.versjon,
                 ),
         )
@@ -137,6 +154,28 @@ class OpprettBehandlingService(
         } else {
             BehandlingStatus.OPPRETTET
         }
+
+    private fun harBehandlingRammevedtakForPrivatBil(
+        sisteIverksatteBehandling: Behandling?,
+        fagsak: Fagsak,
+    ): Boolean {
+        if (sisteIverksatteBehandling == null ||
+            (!fagsak.stønadstype.gjelderDagligReise())
+        ) {
+            return false
+        }
+
+        return vedtakService
+            .hentVedtak<InnvilgelseEllerOpphørDagligReise>(sisteIverksatteBehandling.id)
+            .data
+            .rammevedtakPrivatBil != null
+    }
+
+    private fun utledBehandlingStegFraBehandlingsType(behandlingType: BehandlingType): StegType =
+        when (behandlingType) {
+            BehandlingType.KJØRELISTE -> StegType.KJØRELISTE
+            else -> StegType.INNGANGSVILKÅR
+        }
 }
 
 data class OpprettBehandling(
@@ -148,7 +187,13 @@ data class OpprettBehandling(
     val kravMottatt: LocalDate? = null,
     val nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
     val oppgaveMetadata: OpprettBehandlingOppgaveMetadata,
+    val forenkletBehandlingstype: ForenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
 )
+
+enum class ForenkletBehandlingstype {
+    ORDINAER_BEHANDLING,
+    KJØRELISTE,
+}
 
 sealed interface OpprettBehandlingOppgaveMetadata {
     data class OppgaveMetadata(

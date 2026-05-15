@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.behandling.opprettelse.ForenkletBehandlingstype
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandling
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingOppgaveMetadata
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingService
@@ -66,6 +67,7 @@ class OpprettDummyBehandlingController(
                         beskrivelse = "Testbehandling (ikke lagd med en ekte søknad)",
                         prioritet = OppgavePrioritet.NORM,
                     ),
+                forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
             ),
         )
 

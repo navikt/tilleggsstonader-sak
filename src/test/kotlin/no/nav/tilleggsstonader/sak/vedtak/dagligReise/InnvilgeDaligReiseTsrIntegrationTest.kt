@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
+import no.nav.tilleggsstonader.sak.behandling.opprettelse.ForenkletBehandlingstype
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
@@ -116,6 +117,7 @@ class InnvilgeDaligReiseTsrIntegrationTest : IntegrationTest() {
                         årsak = BehandlingÅrsak.SØKNAD,
                         nyeOpplysningerMetadata = null,
                         kravMottatt = fom,
+                        forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
                     ),
             )
 

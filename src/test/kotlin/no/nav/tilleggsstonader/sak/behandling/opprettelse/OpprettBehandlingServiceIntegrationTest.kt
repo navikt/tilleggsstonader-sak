@@ -1,9 +1,11 @@
 package no.nav.tilleggsstonader.sak.behandling.opprettelse
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.saksstatistikk.BehandlingDVH
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
@@ -19,8 +21,11 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksK
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.statistikk.behandling.Hendelse
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
+import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Nested
@@ -34,6 +39,9 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
 
     @Autowired
     private lateinit var settPåVentService: SettPåVentService
+
+    @Autowired
+    private lateinit var vedtakRepository: VedtakRepository
 
     private val behandlingÅrsak = BehandlingÅrsak.SØKNAD
     val behandlingMetode = BehandlingMetode.MANUELL
@@ -59,6 +67,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                         kravMottatt = LocalDate.now().plusDays(1),
                         oppgaveMetadata = opprettBehandlingOppgaveMetadata,
                         behandlingMetode = behandlingMetode,
+                        forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
                     ),
                 )
             }.withMessage("Kan ikke sette krav mottattdato frem i tid")
@@ -78,6 +87,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                         behandlingsårsak = behandlingÅrsak,
                         behandlingMetode = behandlingMetode,
                         oppgaveMetadata = opprettBehandlingOppgaveMetadata,
+                        forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
                     ),
                 )
 
@@ -98,6 +108,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                         behandlingsårsak = behandlingÅrsak,
                         behandlingMetode = behandlingMetode,
                         oppgaveMetadata = opprettBehandlingOppgaveMetadata,
+                        forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
                     ),
                 )
 
@@ -133,6 +144,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                         behandlingsårsak = behandlingÅrsak,
                         behandlingMetode = behandlingMetode,
                         oppgaveMetadata = opprettBehandlingOppgaveMetadata,
+                        forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
                     ),
                 )
 
@@ -158,6 +170,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                         behandlingsårsak = behandlingÅrsak,
                         behandlingMetode = behandlingMetode,
                         oppgaveMetadata = opprettBehandlingOppgaveMetadata,
+                        forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
                     ),
                 )
 
@@ -189,6 +202,7 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                     behandlingsårsak = behandlingÅrsak,
                     behandlingMetode = behandlingMetode,
                     oppgaveMetadata = opprettBehandlingOppgaveMetadata,
+                    forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
                 ),
             )
 
@@ -207,11 +221,49 @@ class OpprettBehandlingServiceIntegrationTest : CleanDatabaseIntegrationTest() {
                 behandlingsårsak = behandlingÅrsak,
                 behandlingMetode = behandlingMetode,
                 oppgaveMetadata = OpprettBehandlingOppgaveMetadata.UtenOppgave,
+                forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
             ),
         )
 
         assertFinnesTaskMedType(OpprettOppgaveForOpprettetBehandlingTask.TYPE, antall = 0)
         assertFinnesTaskMedType(BehandlingsstatistikkTask.TYPE)
+    }
+
+    @Test
+    internal fun `opprettBehandling bruker eksplisitt kjøreliste-type når den er satt i request`() {
+        val fagsak = testoppsettService.lagreFagsak(fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO))
+        testoppsettService
+            .lagre(
+                behandling(
+                    fagsak,
+                    status = BehandlingStatus.FERDIGSTILT,
+                    resultat = BehandlingResultat.INNVILGET,
+                ),
+            ).also { forrigeBehandling ->
+                val vedtak = DagligReiseTestUtil.innvilgelse(behandlingId = forrigeBehandling.id)
+                vedtakRepository.insert(
+                    vedtak.copy(
+                        data =
+                            vedtak.data.copy(
+                                rammevedtakPrivatBil = RammevedtakPrivatBilUtil.rammevedtakPrivatBil(),
+                            ),
+                    ),
+                )
+            }
+
+        val nyBehandling =
+            opprettBehandlingService.opprettBehandling(
+                OpprettBehandling(
+                    fagsak.id,
+                    behandlingsårsak = BehandlingÅrsak.SØKNAD,
+                    behandlingMetode = behandlingMetode,
+                    oppgaveMetadata = OpprettBehandlingOppgaveMetadata.UtenOppgave,
+                    forenkletBehandlingstype = ForenkletBehandlingstype.KJØRELISTE,
+                ),
+            )
+
+        assertThat(nyBehandling.type).isEqualTo(BehandlingType.KJØRELISTE)
+        assertThat(nyBehandling.steg).isEqualTo(StegType.KJØRELISTE)
     }
 
     /*

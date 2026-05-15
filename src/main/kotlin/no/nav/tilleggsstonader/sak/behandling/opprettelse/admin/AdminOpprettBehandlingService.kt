@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.behandling.opprettelse.ForenkletBehandlingstype
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandling
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingOppgaveMetadata
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingService
@@ -65,6 +66,7 @@ class AdminOpprettBehandlingService(
                             beskrivelse = "Manuelt opprettet sak fra journalpost. Skal saksbehandles i ny løsning.",
                             prioritet = OppgavePrioritet.NORM,
                         ),
+                    forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
                 ),
             )
 
