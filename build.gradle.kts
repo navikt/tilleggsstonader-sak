@@ -4,7 +4,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 val javaVersion = JavaLanguageVersion.of(21)
 val tomcatVersion = "11.0.21"
 val familieProsesseringVersion = "2.20260420122910_8bfca04"
-val tilleggsstønaderLibsVersion = "2026.05.06-12.26.7cb4f43fb62a"
+val tilleggsstønaderLibsVersion = "2026.05.14-21.16.acdbe034efef"
 val tilleggsstønaderKontrakterVersion = "2026.05.07-15.38.1e977dd2af22"
 val avroVersion = "1.12.1"
 val confluentVersion = "8.0.1"
@@ -14,6 +14,7 @@ val wiremockVersion = "3.13.2"
 val mockkVersion = "1.14.9"
 val testcontainerVersion = "1.21.4"
 val springDocVersion = "3.0.3"
+val shedlockVersion = "7.7.0"
 
 val jacksonVersion = "3.1.3"
 
@@ -106,6 +107,10 @@ dependencies {
     implementation("no.nav.tilleggsstonader.kontrakter:pdl-personhendelser-avro:$tilleggsstønaderKontrakterVersion")
 
     implementation("io.github.mikaojk:norwegian-holidays:1.0.13")
+
+    // Shedlock – hindrer at schedulede jobber kjøres på tvers av replicas
+    implementation("net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion")
 
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test") {

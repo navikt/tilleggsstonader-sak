@@ -213,4 +213,17 @@ interface BehandlingRepository :
         """,
     )
     fun finnBehandlingerUtenÅpenOppgave(): List<BehandlingId>
+
+    @Query(
+        """
+            select distinct b.*, be.id as eksternid_id
+            from gjeldende_iverksatte_behandlinger b
+                     join vedtak v on b.id = v.behandling_id
+                     join behandling_ekstern be on b.id = be.behandling_id
+            where b.stonadstype in (:stønadstyper)
+              and v.data ->> 'type' = 'INNVILGELSE_DAGLIG_REISE'
+              and jsonb_path_exists(v.data, '$.rammevedtakPrivatBil.reiser')
+        """,
+    )
+    fun finnGjeldendeIverksatteBehandlingerMedRammevedtakPrivatBil(stønadstyper: List<Stønadstype>): List<Behandling>
 }
