@@ -1,12 +1,12 @@
 {
   "collection": "kotlin-backend",
-  "version": "2026.05.13-095031-5b8fd31",
-  "source_sha": "5b8fd31",
+  "version": "2026.05.15-102310-d655529",
+  "source_sha": "d655529",
   "installed_at": "2026-04-13T13:37:44Z",
   "files": [
     {
       "path": ".github/agents/auth.agent.md",
-      "hash": "93f6ccd0feb67964"
+      "hash": "0cbbc9dc638e0d8b"
     },
     {
       "path": ".github/agents/auth.metadata.json",
@@ -30,7 +30,7 @@
     },
     {
       "path": ".github/agents/observability.agent.md",
-      "hash": "29814d262472524e"
+      "hash": "2f81e4bdefd65474"
     },
     {
       "path": ".github/agents/observability.metadata.json",
@@ -38,7 +38,7 @@
     },
     {
       "path": ".github/agents/security-champion.agent.md",
-      "hash": "a42ca95f2a459fbb"
+      "hash": "5ccba48b66938fd0"
     },
     {
       "path": ".github/agents/security-champion.metadata.json",
@@ -46,7 +46,7 @@
     },
     {
       "path": ".github/agents/nav-pilot.agent.md",
-      "hash": "6ce36d8afc80f70f"
+      "hash": "e50baf495f28613f"
     },
     {
       "path": ".github/agents/nav-pilot.metadata.json",
