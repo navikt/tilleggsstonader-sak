@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandling.opprettelse.ForenkletBehandlingstype
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.vent.SettBehandlingPåVent
 import no.nav.tilleggsstonader.sak.behandling.vent.SettBehandlingPåVentOppgaveMetadata
@@ -188,6 +189,7 @@ class UtførSatsjusteringService(
                     kravMottatt = null,
                     skalOppretteOppgave = false,
                     behandlingMetode = BehandlingMetode.BATCH,
+                    forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
                 ),
             )
         // Gjenbruker grunnlag fra forrige behandling ved satsjustering
