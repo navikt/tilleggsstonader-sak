@@ -9,7 +9,7 @@ val tilleggsstønaderKontrakterVersion = "2026.05.07-15.38.1e977dd2af22"
 val avroVersion = "1.12.1"
 val confluentVersion = "8.0.1"
 val joarkHendelseVersion = "1.1.10"
-val tokenSupportVersion = "6.0.6"
+val tokenSupportVersion = "6.0.7"
 val wiremockVersion = "3.13.2"
 val mockkVersion = "1.14.9"
 val testcontainerVersion = "1.21.4"
@@ -106,7 +106,7 @@ dependencies {
     implementation("no.nav.tilleggsstonader.kontrakter:kontrakter-felles:$tilleggsstønaderKontrakterVersion")
     implementation("no.nav.tilleggsstonader.kontrakter:pdl-personhendelser-avro:$tilleggsstønaderKontrakterVersion")
 
-    implementation("io.github.mikaojk:norwegian-holidays:1.0.13")
+    implementation("io.github.mikaojk:norwegian-holidays:1.0.22")
 
     // Shedlock – hindrer at schedulede jobber kjøres på tvers av replicas
     implementation("net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion")
