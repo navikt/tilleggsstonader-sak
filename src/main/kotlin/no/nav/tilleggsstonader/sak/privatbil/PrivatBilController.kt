@@ -8,19 +8,12 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.ekstern.stønad.DagligReisePrivatBilService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
-import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagRequest
-import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
-import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikDag
-import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
-import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UtfyltDagAutomatiskVurdering
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.RammeForReiseMedPrivatBilDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PutMapping
@@ -131,6 +124,7 @@ class PrivatBilController(
             kjørelisteId = kjørelisteForUke?.id,
             avklartUkeId = avklartUke?.id,
             dager = dager,
+            avklartKjørtUkeStatus = avklartUke?.avklartKjørtUkeStatus,
         )
     }
 
@@ -163,56 +157,3 @@ class PrivatBilController(
         )
     }
 }
-
-private fun AvklartKjørtDag.tilDto() =
-    AvklartDag(
-        godkjentGjennomførtKjøring = this.godkjentGjennomførtKjøring,
-        automatiskVurdering = this.automatiskVurdering,
-        avvik = this.avvik,
-        begrunnelse = this.begrunnelse,
-        parkeringsutgift = this.parkeringsutgift,
-    )
-
-data class ReisevurderingPrivatBilDto(
-    val reiseId: ReiseId,
-    val rammevedtak: RammeForReiseMedPrivatBilDto,
-    val uker: List<UkeVurderingDto>,
-)
-
-data class UkeVurderingDto(
-    val ukenummer: Int,
-    val fraDato: LocalDate,
-    val tilDato: LocalDate,
-    val status: UkeStatus,
-    val avvik: AvvikUke?,
-    val behandletDato: LocalDate?,
-    val kjørelisteInnsendtDato: LocalDate?, // null hvis kjøreliste ikke er mottatt
-    val kjørelisteId: KjørelisteId?, // null hvis kjøreliste ikke er mottatt
-    val avklartUkeId: UUID?,
-    val dager: List<DagDto>,
-)
-
-data class AvvikUke(
-    val typeAvvik: TypeAvvikUke,
-    val avviksMelding: String,
-)
-
-data class DagDto(
-    val dato: LocalDate,
-    val ukedag: String, // avklar om faktisk trenger, eller om frontend skal mappe ut fra dag
-    val kjørelisteDag: KjørelisteDagDto?,
-    val avklartDag: AvklartDag?,
-)
-
-data class KjørelisteDagDto(
-    val harKjørt: Boolean,
-    val parkeringsutgift: Int?,
-)
-
-data class AvklartDag(
-    val godkjentGjennomførtKjøring: GodkjentGjennomførtKjøring,
-    val automatiskVurdering: UtfyltDagAutomatiskVurdering,
-    val avvik: List<TypeAvvikDag>,
-    val begrunnelse: String?, // må fylles ut om avvik?
-    val parkeringsutgift: Int?,
-)
