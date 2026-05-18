@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.RammeForReiseMedPrivatBilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.DetaljertVedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import java.time.LocalDate
@@ -12,6 +13,7 @@ data class DetaljertVedtaksperiodeDagligReise(
     val typeDagligReise: TypeDagligReise,
     val detaljertBeregningsperioder: List<DetaljertBeregningsperioder>?,
     val adresse: String?,
+    val rammevedtakPrivatBil: RammeForReiseMedPrivatBilDto?,
 ) : DetaljertVedtaksperiode
 
 data class DetaljertBeregningsperioder(
