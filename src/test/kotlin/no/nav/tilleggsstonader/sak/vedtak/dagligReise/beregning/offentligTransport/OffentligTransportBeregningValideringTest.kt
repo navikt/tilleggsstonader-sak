@@ -1,14 +1,23 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport
 
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
+import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkårDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.assertj.core.api.Assertions.assertThatNoException
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.util.UUID.randomUUID
 
 class OffentligTransportBeregningValideringTest {
     val førsteJanuar = LocalDate.of(2025, 1, 1)
@@ -85,5 +94,104 @@ class OffentligTransportBeregningValideringTest {
                 .isThrownBy { validerReiser(vilkår, vedtaksperioder) }
                 .withMessage(forventetFeilmeldingIkkeVilkårForAlleVedtaksperioder)
         }
+    }
+
+    @Nested
+    inner class ValiderEndringAvAlleredeUtbetaltPeriode {
+        private val januar2026 = LocalDate.of(2026, 1, 1)
+        private val mars2026 = LocalDate.of(2026, 3, 31)
+        private val dagensDato = LocalDate.now()
+
+        @Test
+        fun `skal varsle hvis allerede utbetalt periode endres fra enkeltbilletter til månedskort`() {
+            val førstegangsbehandling =
+                offentligTransportReise(fom = januar2026, tom = mars2026, beløp = 1500, antallDager = 20)
+            val revurdering =
+                BeregningsresultatOffentligTransport(
+                    reiser =
+                        listOf(
+                            offentligTransportReise(
+                                fom = januar2026,
+                                tom = dagensDato,
+                                beløp = 1806,
+                                antallDager = 60,
+                            ),
+                        ),
+                )
+
+            assertThatExceptionOfType(ApiFeil::class.java)
+                .isThrownBy { validerEndringAvAlleredeUtbetaltPeriode(revurdering, listOf(førstegangsbehandling)) }
+                .withMessageContaining("allerede utbetalt periode med enkeltbilletter")
+        }
+
+        @Test
+        fun `skal ikke varsle hvis revurdering ikke endrer billetttype for utbetalt periode`() {
+            val førstegangsbehandling =
+                offentligTransportReise(fom = januar2026, tom = mars2026, beløp = 1500, antallDager = 20)
+            val revurdering =
+                BeregningsresultatOffentligTransport(
+                    reiser =
+                        listOf(
+                            offentligTransportReise(
+                                fom = januar2026,
+                                tom = dagensDato,
+                                beløp = 1500,
+                                antallDager = 50,
+                            ),
+                        ),
+                )
+
+            assertThatNoException()
+                .isThrownBy { validerEndringAvAlleredeUtbetaltPeriode(revurdering, listOf(førstegangsbehandling)) }
+        }
+
+        private fun offentligTransportReise(
+            fom: LocalDate,
+            tom: LocalDate,
+            beløp: Int,
+            antallDager: Int,
+        ) = BeregningsresultatForReise(
+            reiseId = dummyReiseId,
+            perioder =
+                listOf(
+                    BeregningsresultatForPeriode(
+                        grunnlag =
+                            BeregningsgrunnlagOffentligTransport(
+                                fom = fom,
+                                tom = tom,
+                                prisEnkeltbillett = 75,
+                                prisSyvdagersbillett = 662,
+                                pris30dagersbillett = 1806,
+                                antallReisedagerPerUke = 5,
+                                vedtaksperioder =
+                                    listOf(
+                                        vedtaksperiodeGrunnlag(
+                                            fom = fom,
+                                            tom = tom,
+                                            antallDager = antallDager,
+                                        ),
+                                    ),
+                                antallReisedager = antallDager,
+                                brukersNavKontor = null,
+                            ),
+                        beløp = beløp,
+                        billettdetaljer = emptyMap(),
+                    ),
+                ),
+        )
+
+        private fun vedtaksperiodeGrunnlag(
+            fom: LocalDate,
+            tom: LocalDate,
+            antallDager: Int,
+        ) = VedtaksperiodeGrunnlag(
+            id = randomUUID(),
+            fom = fom,
+            tom = tom,
+            aktivitet = AktivitetType.TILTAK,
+            typeAktivitet = null,
+            målgruppe = MålgruppeType.AAP.faktiskMålgruppe(),
+            antallReisedagerIVedtaksperioden = antallDager,
+        )
     }
 }
