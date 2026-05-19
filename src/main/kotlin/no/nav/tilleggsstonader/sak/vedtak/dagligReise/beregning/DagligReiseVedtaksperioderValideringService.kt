@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
@@ -9,8 +8,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -32,7 +29,6 @@ class DagligReiseVedtaksperioderValideringService(
     private val vedtakService: VedtakService,
     private val vilkårperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
-    private val unleashService: UnleashService,
 ) {
     fun validerVedtaksperioder(
         vedtaksperioder: List<Vedtaksperiode>,
@@ -90,18 +86,6 @@ class DagligReiseVedtaksperioderValideringService(
         vedtaksperioder: List<Vedtaksperiode>,
     ) {
         if (behandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
-            // Når toggle er PÅ utledes typeAktivitet fra vilkårets aktivitetstilknytning i beregningen,
-            // og vedtaksperioder vil ikke lenger ha typeAktivitet satt fra DTO.
-            if (!unleashService.isEnabled(Toggle.KAN_KNYTTE_OFFENTLIG_TRANSPORT_TIL_AKTIVITET)) {
-                feilHvis(
-                    finnesVedtaksperiodeUtenTypeAktivitet(
-                        vedtaksperioder,
-                    ),
-                ) {
-                    "Fant ikke tiltaksvariant. Ta kontakt med utviklerteamet"
-                }
-            }
-
             validerFinnesAktivitetMedTypeAktivitetForHeleVedtaksperioden(
                 behandlingId = behandling.id,
                 vedtaksperioder = vedtaksperioder,
@@ -128,9 +112,6 @@ class DagligReiseVedtaksperioderValideringService(
                 )
         }
     }
-
-    private fun finnesVedtaksperiodeUtenTypeAktivitet(vedtaksperioder: List<Vedtaksperiode>) =
-        vedtaksperioder.any { it.typeAktivitet == null }
 
     private fun harOverlappendeVedtaksperioderPåTversAvEnheter(
         vedtaksperioderDenneEnhenten: List<Vedtaksperiode>,

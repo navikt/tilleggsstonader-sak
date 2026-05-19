@@ -1,11 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
@@ -16,23 +12,18 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
 
 @Service
-class OffentligTransportBeregningService(
-    private val vilkårperiodeService: VilkårperiodeService,
-    private val unleashService: UnleashService,
-) {
+class OffentligTransportBeregningService {
     fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkår: List<VilkårDagligReise>,
         brukersNavKontor: String?,
-        behandlingId: BehandlingId,
     ): BeregningsresultatOffentligTransport? {
         val utgifter =
             oppfylteVilkår
-                .map { it.tilUtgiftOffentligTransport(behandlingId) }
+                .map { it.tilUtgiftOffentligTransport() }
 
         val resultatForReiser =
             utgifter.mapNotNull { reise ->
@@ -112,12 +103,12 @@ class OffentligTransportBeregningService(
         )
     }
 
-    private fun VilkårDagligReise.tilUtgiftOffentligTransport(behandlingId: BehandlingId): UtgiftOffentligTransport {
+    private fun VilkårDagligReise.tilUtgiftOffentligTransport(): UtgiftOffentligTransport {
         feilHvis(this.fakta !is FaktaOffentligTransport) {
             "Forventer kun å få inn vilkår med fakta som er av type offentlig transport ved beregning av offentlig transport"
         }
 
-        val typeAktivitet = hentTypeAktivitetForVilkår(this.fakta, behandlingId)
+        val typeAktivitet = hentTypeAktivitetForVilkår(this.fakta)
 
         return UtgiftOffentligTransport(
             reiseId = this.fakta.reiseId,
@@ -131,21 +122,5 @@ class OffentligTransportBeregningService(
         )
     }
 
-    private fun hentTypeAktivitetForVilkår(
-        fakta: FaktaOffentligTransport,
-        behandlingId: BehandlingId,
-    ): TypeAktivitet? {
-        if (!unleashService.isEnabled(Toggle.KAN_KNYTTE_OFFENTLIG_TRANSPORT_TIL_AKTIVITET)) return null
-
-        val aktivitetId =
-            fakta.aktivitetId
-                ?: feil("Vilkår for offentlig transport mangler aktivitetId. Alle vilkår må knyttes til en aktivitet.")
-
-        val aktivitet =
-            vilkårperiodeService.hentAktivitet(aktivitetId, behandlingId)
-                ?: feil("Fant ikke aktivitet med id=$aktivitetId for behandling=$behandlingId")
-
-        return aktivitet.typeAktivitet
-            ?: feil("Aktivitet med id=$aktivitetId har ikke typeAktivitet satt")
-    }
+    private fun hentTypeAktivitetForVilkår(fakta: FaktaOffentligTransport): TypeAktivitet? = fakta.typeAktivitet
 }

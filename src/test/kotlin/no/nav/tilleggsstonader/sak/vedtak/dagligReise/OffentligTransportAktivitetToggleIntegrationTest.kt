@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.oktober
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.IntegrationTest
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreDagligReiseDto
@@ -35,10 +34,9 @@ class OffentligTransportAktivitetToggleIntegrationTest : IntegrationTest() {
     lateinit var utbetalingStatusHåndterer: UtbetalingStatusHåndterer
 
     @Test
-    fun `innvilge uten aktivitetId (toggle=AV), revurder og knytt til aktivitet (toggle=PÅ)`() {
+    fun `innvilge med typeAktivitet, revurder og verifiser korrekt TypeAndel`() {
         every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoTiltakspengerTpsak()
 
-        // 1. Førstegangsbehandling — toggle=AV (default), OT-vilkåret har ingen aktivitetId
         val fgbContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSR,
@@ -55,7 +53,7 @@ class OffentligTransportAktivitetToggleIntegrationTest : IntegrationTest() {
                 }
                 vilkår {
                     opprett {
-                        offentligTransport(fom, tom)
+                        offentligTransport(fom, tom, typeAktivitet = TypeAktivitet.GRUPPEAMO)
                     }
                 }
             }
@@ -76,10 +74,6 @@ class OffentligTransportAktivitetToggleIntegrationTest : IntegrationTest() {
             utbetalingGjelderFagsystem = UtbetalingStatusHåndterer.FAGSYSTEM_TILLEGGSSTØNADER,
         )
 
-        // 2. Slå på toggle
-        every { unleashService.isEnabled(Toggle.KAN_KNYTTE_OFFENTLIG_TRANSPORT_TIL_AKTIVITET) } returns true
-
-        // 3. Revurdering — knytt OT-vilkåret til aktiviteten, typeAktivitet utledes fra aktiviteten
         val revurderingId =
             opprettRevurderingOgGjennomførBehandlingsløp(
                 fraBehandlingId = fgbContext.behandlingId,
@@ -99,22 +93,20 @@ class OffentligTransportAktivitetToggleIntegrationTest : IntegrationTest() {
                     }
                 }
                 vilkår {
-                    // Knytt OT-vilkåret til aktiviteten — aktivitetId settes, periode utvides
-                    oppdaterDagligReise { vilkår, aktiviteter ->
+                    oppdaterDagligReise { vilkår, _ ->
                         with(vilkår.single()) {
                             id to
                                 tilLagreDagligReiseDto().copy(
                                     tom = tomRevurdering,
                                     fakta =
                                         (fakta as FaktaDagligReiseOffentligTransportDto)
-                                            .copy(aktivitetId = aktiviteter.single().globalId),
+                                            .copy(typeAktivitet = TypeAktivitet.GRUPPEAMO),
                                 )
                         }
                     }
                 }
             }
 
-        // 4. Verifiser at typeAktivitet er utledet fra aktiviteten, ikke fra vedtaksperioden
         val andelerRevurdering =
             tilkjentYtelseRepository.findByBehandlingId(revurderingId)!!.andelerTilkjentYtelse
         assertThat(andelerRevurdering).isNotEmpty()

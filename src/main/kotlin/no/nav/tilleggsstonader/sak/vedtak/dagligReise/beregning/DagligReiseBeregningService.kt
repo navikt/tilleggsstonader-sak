@@ -116,27 +116,26 @@ class DagligReiseBeregningService(
 
         if (oppfylteVilkårOffentligTransport.isEmpty()) return null
 
-        validerAktivitetIdForOffentligTransportVilkår(oppfylteVilkårOffentligTransport)
+        if (behandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
+            validerTypeAktivitetForOffentligTransportVilkår(oppfylteVilkårOffentligTransport)
+        }
 
         return offentligTransportBeregningService
             .beregn(
                 vedtaksperioder = vedtaksperioder,
                 oppfylteVilkår = oppfylteVilkårOffentligTransport,
                 brukersNavKontor = brukersNavKontor,
-                behandlingId = behandling.id,
             )?.flettMedForrigeVedtakHvisRevurdering(behandling, beregnFra)
             ?.sorterReiserOgPerioder()
     }
 
-    private fun validerAktivitetIdForOffentligTransportVilkår(vilkår: List<VilkårDagligReise>) {
-        if (!unleashService.isEnabled(Toggle.KAN_KNYTTE_OFFENTLIG_TRANSPORT_TIL_AKTIVITET)) return
+    private fun validerTypeAktivitetForOffentligTransportVilkår(vilkår: List<VilkårDagligReise>) {
+        val vilkårUtenTypeAktivitet =
+            vilkår.filter { (it.fakta as? FaktaOffentligTransport)?.typeAktivitet == null }
 
-        val vilkårUtenAktivitetId =
-            vilkår.filter { (it.fakta as? FaktaOffentligTransport)?.aktivitetId == null }
-
-        brukerfeilHvis(vilkårUtenAktivitetId.isNotEmpty()) {
-            "Alle reiser med offentlig transport må knyttes til en aktivitet. " +
-                "${vilkårUtenAktivitetId.size} reise(r) mangler aktivitetstilknytning."
+        brukerfeilHvis(vilkårUtenTypeAktivitet.isNotEmpty()) {
+            "Alle reiser med offentlig transport må ha typeAktivitet satt. " +
+                "${vilkårUtenTypeAktivitet.size} reise(r) mangler typeAktivitet."
         }
     }
 

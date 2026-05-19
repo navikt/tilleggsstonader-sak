@@ -41,7 +41,7 @@ object VilkårDagligReiseDtoMapper {
             prisEnkelbillett = prisEnkelbillett,
             prisSyvdagersbillett = prisSyvdagersbillett,
             prisTrettidagersbillett = prisTrettidagersbillett,
-            aktivitetId = aktivitetId,
+            typeAktivitet = typeAktivitet,
         )
 
     private fun FaktaPrivatBil.tilDto(aktivitetType: String) =

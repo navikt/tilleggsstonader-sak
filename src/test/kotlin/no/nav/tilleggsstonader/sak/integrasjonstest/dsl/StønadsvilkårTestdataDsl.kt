@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.dsl
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
@@ -65,9 +66,10 @@ class OpprettStønadsvilkårDsl {
     fun offentligTransport(
         fom: LocalDate,
         tom: LocalDate,
+        typeAktivitet: TypeAktivitet = TypeAktivitet.GRUPPEAMO,
     ) {
         dtoer += { _, _, _ ->
-            lagreDagligReiseDto(fom = fom, tom = tom)
+            lagreDagligReiseDto(fom = fom, tom = tom, typeAktivitet = typeAktivitet)
         }
     }
 

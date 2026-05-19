@@ -638,6 +638,7 @@ fun lagreDagligReiseDto(
     tom: LocalDate = 31 januar 2025,
     adresse: String = "Tiltaksveien 1",
     reiseId: ReiseId = dummyReiseId,
+    typeAktivitet: TypeAktivitet = TypeAktivitet.GRUPPEAMO,
     svar: Map<RegelId, SvarOgBegrunnelseDto> =
         mapOf(
             RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
@@ -646,6 +647,7 @@ fun lagreDagligReiseDto(
     fakta: FaktaDagligReiseDto =
         faktaOffentligTransport(adresse = adresse, reiseId = reiseId).run {
             FaktaDagligReiseOffentligTransportDto(
+                typeAktivitet = typeAktivitet,
                 prisEnkelbillett = prisEnkelbillett,
                 prisSyvdagersbillett = prisSyvdagersbillett,
                 prisTrettidagersbillett = prisTrettidagersbillett,

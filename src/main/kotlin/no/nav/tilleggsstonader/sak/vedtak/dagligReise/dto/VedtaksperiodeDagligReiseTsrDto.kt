@@ -12,8 +12,6 @@ data class VedtaksperiodeDagligReiseTsrDto(
     val id: UUID = UUID.randomUUID(),
     val fom: LocalDate,
     val tom: LocalDate,
-    // Nullable for fremtidig kompatibilitet: når KAN_KNYTTE_OFFENTLIG_TRANSPORT_TIL_AKTIVITET er PÅ
-    // utledes typeAktivitet fra vilkårets aktivitetstilknytning i beregningen, og er ikke lenger nødvendig i DTO.
     val typeAktivitet: TypeAktivitetDto? = null,
 ) {
     fun tilDomene() =
