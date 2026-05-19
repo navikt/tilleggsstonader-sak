@@ -86,6 +86,9 @@ class SkjemaRoutingService(
         if (maksAntallErNådd(skjematype, toggleId = kontekst.featureToggleMaksAntallForStønad)) {
             return SkjemaRoutingAksjon.GAMMEL_LØSNING
         }
+        if (kontekst.kreverAtSøkerErUtenAktivtVedtakIArena && harAktivtVedtakIArena(skjematype, ident)) {
+            return SkjemaRoutingAksjon.GAMMEL_LØSNING
+        }
         if (kontekst.kreverAktivtAapVedtak && harAktivtAapVedtak(ident)) {
             lagreRouting(ident, skjematype, mapOf("harAktivAAP" to true))
             return SkjemaRoutingAksjon.NY_LØSNING
