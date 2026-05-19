@@ -109,7 +109,7 @@ class SkjemaRoutingService(
 
         val togglePrivatBil = unleashService.isEnabled(Toggle.SØKNAD_ROUTING_PRIVAT_BIL)
 
-        if (togglePrivatBil || harVedtakMedPrivatBil(ident)) {
+        if (togglePrivatBil || harVedtakMedPrivatBil(ident, skjematype)) {
             return SkjemaRoutingAksjon.NY_LØSNING
         }
 
@@ -133,11 +133,11 @@ class SkjemaRoutingService(
 
     private fun harVedtakMedPrivatBil(
         ident: String,
-        skjematype: Skjematype = Skjematype.DAGLIG_REISE_KJØRELISTE,
+        skjematype: Skjematype,
     ): Boolean {
         val personIdenter = personService.hentFolkeregisterIdenter(ident).identer()
         val harVedtakMedPrivatBil =
-            Skjematype.DAGLIG_REISE_KJØRELISTE
+            skjematype
                 .tilStønadstyper()
                 .mapNotNull { fagsakService.finnFagsak(personIdenter = personIdenter, stønadstype = it) }
                 .flatMap { behandlingService.hentBehandlinger(fagsakId = it.id) }
