@@ -16,6 +16,8 @@ sealed interface RoutingStrategi {
         val featureToggleMaksAntallForPrivatBil: ToggleId?,
     ) : RoutingStrategi
 
+    data object DagligReise : RoutingStrategi
+
     data object KjørelisteRouting : RoutingStrategi
 }
 
@@ -25,14 +27,7 @@ fun bestemRoutingStrategi(skjematype: Skjematype): RoutingStrategi =
         Skjematype.SØKNAD_LÆREMIDLER -> RoutingStrategi.SendAlleBrukereTilNyLøsning
         Skjematype.SØKNAD_BOUTGIFTER -> RoutingStrategi.SendAlleBrukereTilNyLøsning
         Skjematype.SØKNAD_DAGLIG_REISE ->
-            RoutingStrategi.SendEnkelteBrukereTilNyLøsning(
-                featureToggleMaksAntallForStønad = Toggle.SØKNAD_ROUTING_DAGLIG_REISE,
-                kreverAtSøkerErUtenAktivtVedtakIArena = true,
-                kreverAktivtAapVedtak = false,
-                kreverUgradertAdresse = true,
-                alleMedAAPVedtakTilNyLøsning = true,
-                featureToggleMaksAntallForPrivatBil = Toggle.SØKNAD_ROUTING_PRIVAT_BIL,
-            )
+            RoutingStrategi.DagligReise
 
         Skjematype.DAGLIG_REISE_KJØRELISTE -> RoutingStrategi.KjørelisteRouting
         Skjematype.SØKNAD_REISE_TIL_SAMLING ->
