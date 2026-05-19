@@ -1,5 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport
 
+import no.nav.tilleggsstonader.libs.utils.dato.februar
+import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
@@ -20,11 +23,11 @@ import java.time.LocalDate
 import java.util.UUID.randomUUID
 
 class OffentligTransportBeregningValideringTest {
-    val førsteJanuar = LocalDate.of(2025, 1, 1)
-    val sisteJanuar = LocalDate.of(2025, 1, 31)
+    val førsteJanuar = 1 januar 2025
+    val sisteJanuar = 31 januar 2025
 
-    val førsteFebruar = LocalDate.of(2025, 2, 1)
-    val sisteFebruar = LocalDate.of(2025, 2, 28)
+    val førsteFebruar = 1 februar 2025
+    val sisteFebruar = 28 februar 2025
 
     val vedtaksperiodeJanFeb = listOf(vedtaksperiode(fom = førsteJanuar, tom = sisteFebruar))
     val vedtaksperioderJanFebMedSplitt =
@@ -98,8 +101,8 @@ class OffentligTransportBeregningValideringTest {
 
     @Nested
     inner class ValiderEndringAvAlleredeUtbetaltPeriode {
-        private val januar2026 = LocalDate.of(2026, 1, 1)
-        private val mars2026 = LocalDate.of(2026, 3, 31)
+        private val januar2026 = 1 januar 2026
+        private val mars2026 = 31 mars 2026
         private val dagensDato = LocalDate.now()
 
         @Test
