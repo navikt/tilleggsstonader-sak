@@ -110,10 +110,6 @@ class SkjemaRoutingService(
             return SkjemaRoutingAksjon.NY_LØSNING
         }
 
-        if (harBehandling(ident, skjematype)) {
-            return SkjemaRoutingAksjon.AVSJEKK
-        }
-
         return SkjemaRoutingAksjon.AVSJEKK
     }
 
