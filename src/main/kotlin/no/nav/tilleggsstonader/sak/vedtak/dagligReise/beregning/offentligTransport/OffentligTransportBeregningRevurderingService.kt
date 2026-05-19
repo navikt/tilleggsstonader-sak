@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
@@ -25,7 +25,7 @@ class OffentligTransportBeregningRevurderingService(
         val forrigeIverksatte =
             hentForrigeIverksatteVedtak(behandling)?.beregningsresultat?.offentligTransport ?: return nyttBeregningsresultat
 
-        brukerfeilHvis(beregnFra == null) { "Kan ikke beregne ytelse når beregnFra mangler" }
+        feilHvis(beregnFra == null) { "Vi mangler beregnFra-dato for å flette sammen nytt og gammelt vedtak." }
 
         validerEndringAvAlleredeUtbetaltPeriode(
             nyttBeregningsresultat = nyttBeregningsresultat,
