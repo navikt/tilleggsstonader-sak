@@ -138,7 +138,9 @@ class SkjemaRoutingIntegrationTest(
                 value = Stønadstype::class,
                 names = ["DAGLIG_REISE_TSO", "DAGLIG_REISE_TSR"],
             )
-            fun `skal lagre routing og svare AVSJEKK hvis det finnes en daglig reise-behandling på personen`(stønadstype: Stønadstype) {
+            fun `skal svare AVSJEKK hvis det finnes en daglig reise-behandling på personen og privat bil ikke er skrudd på`(
+                stønadstype: Stønadstype,
+            ) {
                 val dagligReiseFagsak = fagsak(identer = setOf(PersonIdent(jonasIdent)), stønadstype = stønadstype)
                 val dagligReiseBehandling = behandling(dagligReiseFagsak)
 
@@ -150,7 +152,6 @@ class SkjemaRoutingIntegrationTest(
                 val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
                 assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK)
-                assertThat(routingHarBlittLagret()).isTrue()
             }
         }
 
@@ -164,7 +165,6 @@ class SkjemaRoutingIntegrationTest(
                 val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
                 assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
-                assertThat(routingHarBlittLagret()).isTrue()
             }
 
             @Test
@@ -174,7 +174,6 @@ class SkjemaRoutingIntegrationTest(
                 val routingSjekk = kall.skjemaRouting.sjekk(dagligReiseRoutingRequest)
 
                 assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
-                assertThat(routingHarBlittLagret()).isTrue()
             }
         }
 

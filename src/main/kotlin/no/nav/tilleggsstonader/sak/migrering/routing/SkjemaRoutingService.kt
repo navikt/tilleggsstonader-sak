@@ -107,12 +107,10 @@ class SkjemaRoutingService(
         val togglePrivatBil = unleashService.isEnabled(Toggle.SØKNAD_ROUTING_PRIVAT_BIL)
 
         if (togglePrivatBil || harVedtakMedPrivatBil(ident)) {
-            lagreRouting(ident, skjematype, mapOf("harAktivAAP" to true))
             return SkjemaRoutingAksjon.NY_LØSNING
         }
 
         if (harBehandling(ident, skjematype)) {
-            lagreRouting(ident, skjematype, mapOf("harBehandling" to true))
             return SkjemaRoutingAksjon.AVSJEKK
         }
 
