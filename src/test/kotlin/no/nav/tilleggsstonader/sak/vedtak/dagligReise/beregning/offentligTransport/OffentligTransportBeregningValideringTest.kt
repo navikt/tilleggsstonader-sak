@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport
 
+import no.nav.tilleggsstonader.libs.utils.dato.april
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
@@ -103,7 +104,7 @@ class OffentligTransportBeregningValideringTest {
     inner class ValiderEndringAvAlleredeUtbetaltPeriode {
         private val januar2026 = 1 januar 2026
         private val mars2026 = 31 mars 2026
-        private val dagensDato = LocalDate.now()
+        private val april2026 = 1 april 2026
 
         @Test
         fun `skal varsle hvis allerede utbetalt periode endres fra enkeltbilletter til månedskort`() {
@@ -115,7 +116,7 @@ class OffentligTransportBeregningValideringTest {
                         listOf(
                             offentligTransportReise(
                                 fom = januar2026,
-                                tom = dagensDato,
+                                tom = april2026,
                                 beløp = 1806,
                                 antallDager = 60,
                             ),
@@ -137,7 +138,7 @@ class OffentligTransportBeregningValideringTest {
                         listOf(
                             offentligTransportReise(
                                 fom = januar2026,
-                                tom = dagensDato,
+                                tom = april2026,
                                 beløp = 1500,
                                 antallDager = 50,
                             ),

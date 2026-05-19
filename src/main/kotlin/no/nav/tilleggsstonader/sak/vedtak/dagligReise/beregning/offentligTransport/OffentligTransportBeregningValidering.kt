@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransp
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
+import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
@@ -42,10 +43,16 @@ fun validerEndringAvAlleredeUtbetaltPeriode(
                 .filter { it.grunnlag.tom <= dagensDato }
 
         for (utbetaltPeriode in alleredeUtbetaltePerioder) {
-            val overlappendePeriodeIRevurdering =
-                reise.perioder.firstOrNull {
-                    it.grunnlag.tom >= utbetaltPeriode.grunnlag.fom
+            val overlappendePerioderIRevurdering =
+                reise.perioder.filter {
+                    it.grunnlag.overlapper(utbetaltPeriode.grunnlag)
                 }
+
+            brukerfeilHvis(overlappendePerioderIRevurdering.size > 1) {
+                "Fant flere overlappende revurderingsperioder for samme utbetalte periode"
+            }
+
+            val overlappendePeriodeIRevurdering = overlappendePerioderIRevurdering.singleOrNull()
 
             if (overlappendePeriodeIRevurdering != null) {
                 val endrerFraEnkeltbilletterTilMånedskort =
