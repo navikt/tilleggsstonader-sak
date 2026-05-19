@@ -45,6 +45,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligRei
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFaktaReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgVurderingDto
@@ -360,6 +361,8 @@ class InterntVedtakService(
                     reiseId = fakta.reiseId,
                     adresse = fakta.adresse,
                 )
+
+            is VilkårFaktaReiseTilSamling -> TODO()
 
             null -> null
         }

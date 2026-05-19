@@ -96,6 +96,10 @@ data class Vilkår(
                 // Dette er kun for tester foreløpig
             }
 
+            VilkårType.REISE_TIL_SAMLING -> {
+                // TODO skal det være noe her?
+            }
+
             VilkårType.EKSEMPEL -> {
                 // Dette er kun for tester foreløpig
             }
