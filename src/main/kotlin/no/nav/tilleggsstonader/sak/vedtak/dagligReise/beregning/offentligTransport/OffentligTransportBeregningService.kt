@@ -54,6 +54,7 @@ class OffentligTransportBeregningService {
 
         return BeregningsresultatForReise(
             reiseId = reise.reiseId,
+            typeAktivitet = reise.typeAktivitet,
             perioder =
                 trettidagerReisePerioder.map { trettidagerReiseperiode ->
                     beregnForTrettiDagersPeriode(trettidagerReiseperiode, justerteVedtaksperioder, brukersNavKontor)
@@ -77,8 +78,6 @@ class OffentligTransportBeregningService {
                                 vedtaksperiode,
                                 trettidagerReisePeriode.antallReisedagerPerUke,
                             ),
-                        // Toggle ON: typeAktivitet fra vilkårets aktivitetstilknytning (ikke-null)
-                        // Toggle OFF: fall tilbake til typeAktivitet fra vedtaksperioden (gammelt mønster)
                         typeAktivitet = trettidagerReisePeriode.typeAktivitet ?: vedtaksperiode.typeAktivitet,
                     )
                 }
