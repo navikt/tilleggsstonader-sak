@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
@@ -25,7 +25,7 @@ class OffentligTransportBeregningRevurderingService(
         val forrigeIverksatte =
             hentForrigeIverksatteVedtak(behandling)?.beregningsresultat?.offentligTransport ?: return nyttBeregningsresultat
 
-        brukerfeilHvis(beregnFra == null) { "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen" }
+        feilHvis(beregnFra == null) { "Vi mangler beregnFra-dato for å flette sammen nytt og gammelt vedtak." }
 
         validerEndringAvAlleredeUtbetaltPeriode(
             nyttBeregningsresultat = nyttBeregningsresultat,
@@ -41,11 +41,7 @@ class OffentligTransportBeregningRevurderingService(
     }
 
     /**
-     * Beholder alle perioder fra forrige vedtak som er starter tidligere enn 30 dager unna [beregnFra]-datoen.
-     *
-     * Dette gjøres for ikke å reberegne mer enn vi trenger å gjøre, men vi er samtidig nødt til å reberegne enkelte perioder som er f.eks.
-     * 25 dager unna [beregnFra]-datoen, ettersom det kan skje at denne perioden etter revurderingen skulle vært en 30-dagersperiode
-     * i stedet.
+     * Beholder alle perioder fra forrige vedtak som starter før [beregnFra]-datoen.
      */
     private fun slåSammenNyeOgGamlePerioder(
         nyBeregningForReise: BeregningsresultatForReise,
@@ -57,15 +53,16 @@ class OffentligTransportBeregningRevurderingService(
             forrigeBeregning.reiser.find { it.reiseId == nyBeregningForReise.reiseId }?.perioder
                 ?: return nyBeregningForReise
 
-        // Alle perioder som er tidligere enn 30 dager fra endringsdatoen skal kopieres fra tidligere vedtak
+        // Alle perioder som er tidligere beregn fra-datoen skal kopieres fra tidligere vedtak
         val bevarteGamlePerioder =
             reisenIForrigeVedtak
-                .filter { it.grunnlag.fom.plusDays(30L) <= beregnFra }
+                .filter { it.grunnlag.fom < beregnFra }
                 .map { it.copy(fraTidligereVedtak = true) }
 
+        // Perioder som har identisk grunnlag som forrige vedtak skal ikke reberegnes
         val nyeEllerOppdatertePerioder =
             nyBeregningForReise.perioder
-                .filter { it.grunnlag.fom.plusDays(30L) > beregnFra }
+                .filter { it.grunnlag.fom >= beregnFra }
                 .map { nyPeriode ->
                     val tilsvarendePeriodeIForrigeVedtak = reisenIForrigeVedtak.singleOrNull { it.grunnlag == nyPeriode.grunnlag }
                     tilsvarendePeriodeIForrigeVedtak?.copy(fraTidligereVedtak = true) ?: nyPeriode.copy(fraTidligereVedtak = false)
