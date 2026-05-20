@@ -22,37 +22,26 @@ import java.time.LocalDate
 
 fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandling: Saksbehandling): List<AndelTilkjentYtelse> =
     reiser
-        .flatMap { it.perioder }
-        .groupBy { it.grunnlag.fom }
-        .flatMap { (fom, reiseperioder) ->
-            val målgrupper = reiseperioder.flatMap { it.grunnlag.vedtaksperioder }.map { it.målgruppe }
-            val typeAktivitet = reiseperioder.flatMap { it.grunnlag.vedtaksperioder }.map { it.typeAktivitet }
+        .flatMap { reise ->
+            reise.perioder.map { periode ->
+                val målgrupper = periode.grunnlag.vedtaksperioder.map { it.målgruppe }
 
-            brukerfeilHvisIkke(målgrupper.distinct().size == 1) {
-                "Vi støtter foreløpig ikke ulike målgrupper på samme utbetaling. Ta kontakt med utvikler teamet hvis du trenger å gjøre dette."
-            }
-
-            if (saksbehandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
-                brukerfeilHvisIkke(typeAktivitet.distinct().size == 1) {
-                    "Vi støtter foreløpig ikke ulike aktivitetsvarianter på samme utbetaling. Ta kontakt med utvikler teamet hvis du trenger å gjøre dette/"
+                brukerfeilHvisIkke(målgrupper.distinct().size == 1) {
+                    "Vi støtter foreløpig ikke ulike målgrupper på samme utbetaling. Ta kontakt med utvikler teamet hvis du trenger å gjøre dette."
                 }
-            }
 
-            // Grupperer på brukersNavKontor for å ta høyde for at de kan ha ulike kontorer
-            reiseperioder
-                .groupBy { it.grunnlag.brukersNavKontor }
-                .map { (brukersNavKontor, reiseperioderMedSammeBrukersNavKontor) ->
-                    lagAndelForDagligReise(
-                        saksbehandling = saksbehandling,
-                        fomUkedag = fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
-                        beløp = reiseperioderMedSammeBrukersNavKontor.sumOf { it.beløp },
-                        målgruppe = målgrupper.first(),
-                        typeAktivitet = typeAktivitet.firstOrNull(),
-                        brukersNavKontor = brukersNavKontor,
-                        reiseId = null, // Skal kun opprette andeler for privat-bil med reiseId
-                    )
-                }
-        }
+                lagAndelForDagligReise(
+                    saksbehandling = saksbehandling,
+                    fomUkedag = periode.grunnlag.fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                    beløp = periode.beløp,
+                    målgruppe = målgrupper.first(),
+                    typeAktivitet = reise.typeAktivitet,
+                    brukersNavKontor = periode.grunnlag.brukersNavKontor,
+                    reiseId = null,
+                )
+            }
+        }.groupBy { it.type to it.fom }
+        .map { (_, andeler) -> andeler.first().copy(beløp = andeler.sumOf { it.beløp }) }
 
 fun BeregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(
     saksbehandling: Saksbehandling,
