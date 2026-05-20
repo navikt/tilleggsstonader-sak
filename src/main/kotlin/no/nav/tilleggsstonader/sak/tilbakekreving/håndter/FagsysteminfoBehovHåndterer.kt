@@ -92,6 +92,7 @@ class FagsysteminfoBehovHåndterer(
                     eksternFagsakId = fagsystemBehovMelding.eksternFagsakId,
                     hendelseOpprettet = LocalDateTime.now(),
                     mottaker = TilbakekrevingMottaker(ident = behandling.ident),
+                    stønadstype = behandling.stønadstype,
                     revurdering = mapRevurderinginformsjon(saksbehandling = behandling, eksternBehandlingId = referanse),
                     utvidPerioder = mapUtvidedePerioder(behandling.forrigeIverksatteBehandlingId),
                     behandlendeEnhet = finnBehandlendeEnhet(behandling),

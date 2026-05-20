@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.tilbakekreving.hendelse
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -9,6 +10,7 @@ data class TilbakekrevingFagsysteminfoSvar(
     override val eksternFagsakId: String,
     val hendelseOpprettet: LocalDateTime,
     val mottaker: TilbakekrevingMottaker,
+    val stønadstype: Stønadstype,
     val revurdering: TilbakekrevingFagsysteminfoSvarRevurdering,
     val utvidPerioder: List<UtvidetPeriode>,
     val behandlendeEnhet: String?,

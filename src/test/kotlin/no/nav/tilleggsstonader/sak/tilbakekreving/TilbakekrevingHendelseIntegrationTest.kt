@@ -183,6 +183,7 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
             val tilbakekrevingFagsysteminfoSvar = jsonMapper.readValue<TilbakekrevingFagsysteminfoSvar>(publisertHendelse.value())
             assertThat(tilbakekrevingFagsysteminfoSvar.utvidPerioder).isNotEmpty
             assertThat(tilbakekrevingFagsysteminfoSvar.behandlendeEnhet).isNotNull
+            assertThat(tilbakekrevingFagsysteminfoSvar.stønadstype).isEqualTo(Stønadstype.LÆREMIDLER)
         }
     }
 
