@@ -41,7 +41,7 @@ class OffentligTransportBeregningRevurderingService(
     }
 
     /**
-     * Beholder alle perioder fra forrige vedtak som er starter tidligere [beregnFra]-datoen.
+     * Beholder alle perioder fra forrige vedtak som starter før [beregnFra]-datoen.
      */
     private fun slåSammenNyeOgGamlePerioder(
         nyBeregningForReise: BeregningsresultatForReise,
