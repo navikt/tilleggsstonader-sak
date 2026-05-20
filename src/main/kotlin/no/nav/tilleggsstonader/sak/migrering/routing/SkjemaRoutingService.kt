@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.AdvisoryLockService
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.UnleashUtil.getVariantWithNameOrDefault
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -58,6 +59,8 @@ class SkjemaRoutingService(
                     skalBrukerRoutesTilNyLøsning(ident, skjematype, routingStrategi)
                 }
 
+                RoutingStrategi.DagligReise -> skalBrukerRoutesTilNyLøsningDagligReise(ident)
+
                 RoutingStrategi.KjørelisteRouting -> {
                     skalBrukerRoutesTilNyKjørelisteLøsning(ident, skjematype)
                 }
@@ -90,16 +93,23 @@ class SkjemaRoutingService(
             lagreRouting(ident, skjematype, mapOf("harAktivAAP" to true))
             return SkjemaRoutingAksjon.NY_LØSNING
         }
-        if (kontekst.featureToggleMaksAntallForPrivatBil != null && kontekst.alleMedAAPVedtakTilNyLøsning &&
-            harAktivtAapVedtak(
-                ident,
-            ) &&
-            !maksAntallErNådd(
-                skjematype,
-                toggleId = kontekst.featureToggleMaksAntallForPrivatBil,
-            )
-        ) {
-            lagreRouting(ident, skjematype, mapOf("aktivAAP" to true))
+
+        return SkjemaRoutingAksjon.AVSJEKK
+    }
+
+    private fun skalBrukerRoutesTilNyLøsningDagligReise(ident: String): SkjemaRoutingAksjon {
+        val skjematype = Skjematype.SØKNAD_DAGLIG_REISE
+
+        if (harFortroligEllerStrengtFortroligAdresse(ident)) {
+            return SkjemaRoutingAksjon.GAMMEL_LØSNING
+        }
+        if (harAktivtVedtakIArena(skjematype, ident)) {
+            return SkjemaRoutingAksjon.GAMMEL_LØSNING
+        }
+
+        val togglePrivatBil = unleashService.isEnabled(Toggle.SØKNAD_ROUTING_PRIVAT_BIL)
+
+        if (togglePrivatBil || harVedtakMedPrivatBil(ident, skjematype)) {
             return SkjemaRoutingAksjon.NY_LØSNING
         }
 

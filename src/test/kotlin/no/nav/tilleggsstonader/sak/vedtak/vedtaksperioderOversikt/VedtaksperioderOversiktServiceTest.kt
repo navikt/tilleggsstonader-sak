@@ -11,7 +11,9 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
+import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil
@@ -100,12 +102,43 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
                             ),
                         ),
                     adresse = "Tiltaksveien 1",
+                    rammevedtakPrivatBil = null,
                 ),
             )
 
         assertThat(vedtaksperioderOversiktService.hentDetaljerteVedtaksperioderForBehandling(behandlingContext.behandlingId)).isEqualTo(
             forventetDetaljertVedtaksperiodeTsr,
         )
+    }
+
+    @Test
+    fun `skal inkludere rammevedtak for privat bil i fullstendig oversikt`() {
+        val fagsakPerson = testoppsettService.opprettPerson("123")
+
+        val behandling =
+            testoppsettService.opprettBehandlingMedFagsak(
+                behandling = behandling(status = BehandlingStatus.FERDIGSTILT, resultat = BehandlingResultat.INNVILGET),
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+                identer = fagsakPerson.identer,
+            )
+
+        val vedtakMedPrivatBil =
+            DagligReiseTestUtil
+                .innvilgelse(
+                    data =
+                        DagligReiseTestUtil.defaultInnvilgelseDagligReise.copy(
+                            rammevedtakPrivatBil = RammevedtakPrivatBilUtil.rammevedtakPrivatBil(reiseId = dummyReiseId),
+                        ),
+                ).copy(behandlingId = behandling.id)
+
+        vedtakRepository.insert(vedtakMedPrivatBil)
+
+        val oversikt = vedtaksperioderOversiktService.hentVedtaksperioderOversikt(fagsakPerson.id)
+
+        val privatBil = oversikt.dagligReiseTso.firstOrNull { it.typeDagligReise == TypeDagligReise.PRIVAT_BIL }
+        assertThat(privatBil).isNotNull
+        assertThat(privatBil?.rammevedtakPrivatBil).isNotNull
+        assertThat(privatBil?.rammevedtakPrivatBil?.reiseId).isEqualTo(dummyReiseId)
     }
 
     private fun opprettBehandlingOgVedtakTilsynBarn(fagsakPerson: FagsakPerson) {
