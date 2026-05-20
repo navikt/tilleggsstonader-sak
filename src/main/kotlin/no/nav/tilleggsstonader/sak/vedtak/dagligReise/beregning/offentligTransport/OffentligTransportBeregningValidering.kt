@@ -2,10 +2,10 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransp
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
-import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
+import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
@@ -40,7 +40,7 @@ fun validerEndringAvAlleredeUtbetaltPeriode(
         val alleredeUtbetaltePerioder =
             reiseIForrigeBeregningsresultat
                 .flatMap { it.perioder }
-                .filter { it.grunnlag.tom <= dagensDato }
+                .filter { it.grunnlag.fom.datoEllerNesteMandagHvisLørdagEllerSøndag() <= dagensDato }
 
         for (utbetaltPeriode in alleredeUtbetaltePerioder) {
             val overlappendePerioderIRevurdering =

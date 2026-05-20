@@ -149,6 +149,55 @@ class OffentligTransportBeregningValideringTest {
                 .isThrownBy { validerEndringAvAlleredeUtbetaltPeriode(revurdering, listOf(førstegangsbehandling)) }
         }
 
+        @Test
+        fun `skal varsle for periode der fom er passert men tom er i fremtiden`() {
+            val fomPassert = LocalDate.now().minusWeeks(2)
+            val tomFremtid = LocalDate.now().plusMonths(2)
+
+            val førstegangsbehandling =
+                offentligTransportReise(fom = fomPassert, tom = tomFremtid, beløp = 1500, antallDager = 20)
+            val revurdering =
+                BeregningsresultatOffentligTransport(
+                    reiser =
+                        listOf(
+                            offentligTransportReise(
+                                fom = fomPassert,
+                                tom = tomFremtid,
+                                beløp = 1806,
+                                antallDager = 60,
+                            ),
+                        ),
+                )
+
+            assertThatExceptionOfType(ApiFeil::class.java)
+                .isThrownBy { validerEndringAvAlleredeUtbetaltPeriode(revurdering, listOf(førstegangsbehandling)) }
+                .withMessageContaining("allerede utbetalt periode med enkeltbilletter")
+        }
+
+        @Test
+        fun `skal ikke varsle for periode der fom ikke er passert ennå`() {
+            val fomFremtid = LocalDate.now().plusWeeks(2)
+            val tomFremtid = LocalDate.now().plusMonths(2)
+
+            val førstegangsbehandling =
+                offentligTransportReise(fom = fomFremtid, tom = tomFremtid, beløp = 1500, antallDager = 20)
+            val revurdering =
+                BeregningsresultatOffentligTransport(
+                    reiser =
+                        listOf(
+                            offentligTransportReise(
+                                fom = fomFremtid,
+                                tom = tomFremtid,
+                                beløp = 1806,
+                                antallDager = 60,
+                            ),
+                        ),
+                )
+
+            assertThatNoException()
+                .isThrownBy { validerEndringAvAlleredeUtbetaltPeriode(revurdering, listOf(førstegangsbehandling)) }
+        }
+
         private fun offentligTransportReise(
             fom: LocalDate,
             tom: LocalDate,
