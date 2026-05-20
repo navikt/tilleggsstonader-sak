@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.februar
@@ -10,7 +11,9 @@ import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningStegKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsoRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
@@ -69,6 +72,43 @@ class DagligReiseBeregningValideringIntegrationTest : CleanDatabaseIntegrationTe
             .jsonPath("$.detail")
             .isEqualTo(
                 "Kan ikke innvilge for valgte perioder fordi det ikke finnes vilkår for reise for alle vedtaksperioder.",
+            )
+    }
+
+    @Test
+    fun `kaster feil om offentlig transport-vilkår har en variant som ingen aktiviteter har`() {
+        val fom = 1 januar 2026
+        val tom = 1 juni 2026
+
+        val behandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSR,
+                tilSteg = StegType.BEREGNE_YTELSE,
+            ) {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTsr(fom, tom, typeAktivitet = TypeAktivitet.GRUPPEAMO)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeTiltakspenger(fom, tom)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        offentligTransport(fom, tom, typeAktivitet = TypeAktivitet.ENKELAMO)
+                    }
+                }
+            }
+
+        gjennomførBeregningStegKall(behandlingContext.behandlingId, Stønadstype.DAGLIG_REISE_TSR)
+            .expectStatus()
+            .isBadRequest
+            .expectBody()
+            .jsonPath("$.detail")
+            .isEqualTo(
+                "Det finnes ingen aktiviteter med variant \"${TypeAktivitet.ENKELAMO.beskrivelse}\" innenfor perioden ${fom.norskFormat()} - ${tom.norskFormat()}",
             )
     }
 }

@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
+import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -30,6 +31,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDa
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -45,6 +47,7 @@ class DagligReiseBeregningService(
     private val unleashService: UnleashService,
     private val avklartKjørelisteService: AvklartKjørelisteService,
     private val vedtakRepository: VedtakRepository,
+    private val vilkårperiodeService: VilkårperiodeService,
 ) {
     fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
@@ -117,7 +120,7 @@ class DagligReiseBeregningService(
         if (oppfylteVilkårOffentligTransport.isEmpty()) return null
 
         if (behandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
-            validerTypeAktivitetForOffentligTransportVilkår(oppfylteVilkårOffentligTransport)
+            validerTypeAktivitetForOffentligTransportVilkår(oppfylteVilkårOffentligTransport, behandling.id)
         }
 
         return offentligTransportBeregningService
@@ -129,13 +132,25 @@ class DagligReiseBeregningService(
             ?.sorterReiserOgPerioder()
     }
 
-    private fun validerTypeAktivitetForOffentligTransportVilkår(vilkår: List<VilkårDagligReise>) {
-        val vilkårUtenTypeAktivitet =
-            vilkår.filter { (it.fakta as? FaktaOffentligTransport)?.typeAktivitet == null }
+    private fun validerTypeAktivitetForOffentligTransportVilkår(
+        vilkår: List<VilkårDagligReise>,
+        behandlingId: BehandlingId,
+    ) {
+        val offentligTransportVilkår = vilkår.filter { it.fakta is FaktaOffentligTransport }
+        val vilkårUtenTypeAktivitet = offentligTransportVilkår.filter { (it.fakta as FaktaOffentligTransport).typeAktivitet == null }
 
         brukerfeilHvis(vilkårUtenTypeAktivitet.isNotEmpty()) {
             "Alle reiser med offentlig transport må ha typeAktivitet satt. " +
                 "${vilkårUtenTypeAktivitet.size} reise(r) mangler typeAktivitet."
+        }
+
+        val aktiviteter = vilkårperiodeService.hentVilkårperioder(behandlingId).aktiviteter
+        offentligTransportVilkår.forEach { vilkår ->
+            val vilkåretsTypeAktivtet = (vilkår.fakta as FaktaOffentligTransport).typeAktivitet!!
+            val aktiviteterMedSammeTypeAktivitet = aktiviteter.filter { it.typeAktivitet == vilkåretsTypeAktivtet }
+            brukerfeilHvis(aktiviteterMedSammeTypeAktivitet.none { it.overlapper(vilkår) }) {
+                "Det finnes ingen aktiviteter med variant \"${vilkåretsTypeAktivtet.beskrivelse}\" innenfor perioden ${vilkår.fom.norskFormat()} - ${vilkår.tom.norskFormat()}"
+            }
         }
     }
 
