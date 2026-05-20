@@ -40,7 +40,7 @@ fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandlin
                     reiseId = null,
                 )
             }
-        }.groupBy { it.type to it.fom }
+        }.groupBy { Triple(it.type, it.fom, it.brukersNavKontor) }
         .map { (_, andeler) -> andeler.first().copy(beløp = andeler.sumOf { it.beløp }) }
 
 fun BeregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(
