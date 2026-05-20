@@ -14,6 +14,8 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomf
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatForReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
@@ -156,15 +158,74 @@ class OffentligTransportBeregningRevurderingServiceTest : CleanDatabaseIntegrati
         }
     }
 
+    @Test
+    fun `vedtaksperiode fra tidligere vedtak som krysser beregnFra skal reberegnes`() {
+        // Reise med to 30-dagersperioder: [1 jan - 30 jan] og [31 jan - 28 feb]
+        val reiseFom = 1 januar 2025
+        val reiseOpprinneligTom = 28 februar 2025
+
+        val behandlingId = gjennomførEnFørstegangsbehandling(reiseFom, reiseOpprinneligTom)
+
+        endreAlleBeløpTilNoeHeltTulleteStort()
+
+        // Forlenger reisen til 30 mars → tidligsteEndring = 1 mars, beregnFra = 31 januar
+        val reiseForlengetTom = 30 mars 2025
+
+        val revurderingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = behandlingId,
+                tilSteg = StegType.SIMULERING,
+            ) {
+                vilkår {
+                    oppdaterDagligReise { vilkår ->
+                        with(vilkår.single()) {
+                            id to tilLagreDagligReiseDto().copy(tom = reiseForlengetTom)
+                        }
+                    }
+                }
+            }
+
+        val beregningsresultat = hentBeregningsresultat(revurderingId)
+
+        // Verifiser at beregnFra-datoen er forskjøvet 29 dager tilbake
+        assertThat(beregningsresultat.beregningsplan.omfang).isEqualTo(Beregningsomfang.FRA_DATO)
+        assertThat(beregningsresultat.beregningsplan.fraDato).isEqualTo(31 januar 2025)
+
+        with(
+            beregningsresultat.offentligTransport!!
+                .reiser
+                .single()
+                .perioder,
+        ) {
+            assertThat(size).isEqualTo(3)
+
+            // Første periode [1 jan - 30 jan]: fom (1 jan) < beregnFra (31 jan) → beholdes fra gammelt vedtak
+            assertThat(first().fom).isEqualTo(1 januar 2025)
+            assertThat(first().beløp).isEqualTo(999999999)
+            assertThat(first().fraTidligereVedtak).isTrue()
+
+            // Andre periode [31 jan - 28 feb]: fom (31 jan) ≥ beregnFra (31 jan) → reberegnes pga 29-dagersforskyvningen
+            assertThat(get(1).fom).isEqualTo(31 januar 2025)
+            assertThat(get(1).beløp).isEqualTo(800)
+
+            // Tredje periode er ny i revurderingen → reberegnes
+            assertThat(last().fom).isEqualTo(2 mars 2025)
+            assertThat(last().beløp).isEqualTo(800)
+        }
+    }
+
     private fun hentBeregnedeReiser(revurderingId: BehandlingId): List<BeregningsresultatForReiseDto> =
+        hentBeregningsresultat(revurderingId)
+            .offentligTransport!!
+            .reiser
+
+    private fun hentBeregningsresultat(behandlingId: BehandlingId): BeregningsresultatDagligReiseDto =
         kall.vedtak
             .hentVedtak(
                 Stønadstype.DAGLIG_REISE_TSO,
-                revurderingId,
+                behandlingId,
             ).expectOkWithBody<InnvilgelseDagligReiseResponse>()
             .beregningsresultat
-            .offentligTransport!!
-            .reiser
 
     private fun gjennomførEnFørstegangsbehandling(
         reiseFom: LocalDate,
