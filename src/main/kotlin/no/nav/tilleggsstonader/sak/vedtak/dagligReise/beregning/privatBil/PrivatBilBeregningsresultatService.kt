@@ -17,7 +17,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatP
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import org.springframework.stereotype.Service
 
 @Service
@@ -28,7 +27,7 @@ class PrivatBilBeregningsresultatService(
         behandling: Saksbehandling,
         rammevedtak: RammevedtakPrivatBil?,
         brukersNavKontor: String?,
-        forrigeVedtak: InnvilgelseEllerOpphørDagligReise?,
+        forrigeBeregningsresultat: BeregningsresultatPrivatBil?,
     ): BeregningsresultatPrivatBil? {
         if (rammevedtak == null) return null
 
@@ -38,7 +37,7 @@ class PrivatBilBeregningsresultatService(
             rammevedtak = rammevedtak,
             avklarteUkerForBehandling = avklarteUkerForBehandling,
             brukersNavKontor = brukersNavKontor,
-            forrigeBeregningsresultat = forrigeVedtak?.beregningsresultat?.privatBil,
+            forrigeBeregningsresultat = forrigeBeregningsresultat,
         )
     }
 

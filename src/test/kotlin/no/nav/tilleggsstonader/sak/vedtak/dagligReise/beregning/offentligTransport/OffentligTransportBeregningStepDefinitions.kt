@@ -100,7 +100,7 @@ class OffentligTransportBeregningStepDefinitions {
             offentligTransportBeregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
                 oppfylteVilkårDagligReise = vilkår,
-                forrigeVedtak = null,
+                forrigeBeregningsresultat = null,
                 brukersNavKontor = null,
                 beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
             )

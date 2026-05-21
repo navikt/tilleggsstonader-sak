@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.UtgiftOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
@@ -24,12 +23,12 @@ class OffentligTransportBeregningService(
     fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkårDagligReise: List<VilkårDagligReise>,
-        forrigeVedtak: InnvilgelseEllerOpphørDagligReise?,
+        forrigeBeregningsresultat: BeregningsresultatOffentligTransport?,
         brukersNavKontor: String?,
         beregningsplan: Beregningsplan,
     ): BeregningsresultatOffentligTransport? {
         if (beregningsplan.omfang == Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT) {
-            return forrigeVedtak?.beregningsresultat?.offentligTransport
+            return forrigeBeregningsresultat
                 ?: feil("Kan ikke gjenbruke forrige beregningsresultat uten forrige iverksatt behandling")
         }
 
@@ -46,7 +45,7 @@ class OffentligTransportBeregningService(
         return offentligTransportBeregningRevurderingService
             .flettMedForrigeVedtakHvisRevurdering(
                 nyttBeregningsresultat = nyttBeregningsresultat,
-                forrigeOffentligTransport = forrigeVedtak?.beregningsresultat?.offentligTransport,
+                forrigeOffentligTransport = forrigeBeregningsresultat,
                 beregnFra = beregningsplan.beregnFra(),
             ).sorterReiserOgPerioder()
     }

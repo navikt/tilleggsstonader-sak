@@ -57,6 +57,15 @@ class DagligReiseBeregningService(
             behandling.forrigeIverksatteBehandlingId
                 ?.let { vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(it).data }
 
+        val offentligTransport =
+            offentligTransportBeregningService.beregn(
+                vedtaksperioder = vedtaksperioder,
+                oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
+                forrigeBeregningsresultat = forrigeVedtak?.beregningsresultat?.offentligTransport,
+                brukersNavKontor = brukersNavKontor,
+                beregningsplan = beregningsplan,
+            )
+
         val rammevedtakPrivatBil =
             privatBilBeregningService.beregnRammevedtak(
                 vedtaksperioder = vedtaksperioder,
@@ -64,26 +73,19 @@ class DagligReiseBeregningService(
                 behandlingId = behandling.id,
             )
 
-        val offentligTransport =
-            offentligTransportBeregningService.beregn(
-                vedtaksperioder = vedtaksperioder,
-                oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
-                forrigeVedtak = forrigeVedtak,
+        val beregningsresultatPrivatBil =
+            privatBilBeregningsresultatService.beregn(
+                behandling = behandling,
+                rammevedtak = rammevedtakPrivatBil,
                 brukersNavKontor = brukersNavKontor,
-                beregningsplan = beregningsplan,
+                forrigeBeregningsresultat = forrigeVedtak?.beregningsresultat?.privatBil,
             )
 
         return BeregningDagligReise(
             beregningsresultatDagligReise =
                 BeregningsresultatDagligReise(
                     offentligTransport = offentligTransport,
-                    privatBil =
-                        privatBilBeregningsresultatService.beregn(
-                            behandling = behandling,
-                            rammevedtak = rammevedtakPrivatBil,
-                            brukersNavKontor = brukersNavKontor,
-                            forrigeVedtak = forrigeVedtak,
-                        ),
+                    privatBil = beregningsresultatPrivatBil,
                 ),
             rammevedtakPrivatBil = rammevedtakPrivatBil,
         )
