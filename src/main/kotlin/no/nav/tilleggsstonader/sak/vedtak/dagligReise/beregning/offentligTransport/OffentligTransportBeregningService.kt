@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport
 
-import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.norskFormat
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -125,7 +125,7 @@ class OffentligTransportBeregningService(
                                 vedtaksperiode,
                                 trettidagerReisePeriode.antallReisedagerPerUke,
                             ),
-                        typeAktivitet = trettidagerReisePeriode.typeAktivitet ?: vedtaksperiode.typeAktivitet,
+                        typeAktivitet = trettidagerReisePeriode.typeAktivitet,
                     )
                 }
 
@@ -154,8 +154,6 @@ class OffentligTransportBeregningService(
             "Forventer kun å få inn vilkår med fakta som er av type offentlig transport ved beregning av offentlig transport"
         }
 
-        val typeAktivitet = hentTypeAktivitetForVilkår(this.fakta)
-
         return UtgiftOffentligTransport(
             reiseId = this.fakta.reiseId,
             fom = this.fom,
@@ -164,29 +162,26 @@ class OffentligTransportBeregningService(
             prisEnkelbillett = this.fakta.prisEnkelbillett,
             prisSyvdagersbillett = this.fakta.prisSyvdagersbillett,
             pris30dagersbillett = this.fakta.prisTrettidagersbillett,
-            typeAktivitet = typeAktivitet,
+            typeAktivitet = this.fakta.typeAktivitet,
         )
     }
-
-    private fun hentTypeAktivitetForVilkår(fakta: FaktaOffentligTransport): TypeAktivitet? = fakta.typeAktivitet
 
     private fun validerTypeAktivitetForOffentligTransportVilkår(
         vilkår: List<VilkårDagligReise>,
         behandlingId: BehandlingId,
     ) {
         val offentligTransportVilkår = vilkår.filter { it.fakta is FaktaOffentligTransport }
-        val vilkårUtenTypeAktivitet =
-            offentligTransportVilkår.filter { (it.fakta as FaktaOffentligTransport).typeAktivitet == null }
-
-        brukerfeilHvis(vilkårUtenTypeAktivitet.isNotEmpty()) {
-            "Alle reiser med offentlig transport må ha typeAktivitet satt. " +
-                "${vilkårUtenTypeAktivitet.size} reise(r) mangler typeAktivitet."
-        }
 
         offentligTransportVilkår.forEach { vilkår ->
-            val vilkåretsTypeAktivtet = (vilkår.fakta as FaktaOffentligTransport).typeAktivitet!!
+            val fakta = vilkår.fakta as FaktaOffentligTransport
+            brukerfeilHvis(fakta.typeAktivitet == null) {
+                "Alle reiser med offentlig transport må ha typeAktivitet satt. " +
+                    "Reise mellom ${vilkår.fom.norskFormat()} - ${vilkår.tom.norskFormat()} mangler typeAktivitet."
+            }
+
+            val vilkåretsTypeAktivitet = fakta.typeAktivitet
             vilkårperiodeService.validerAktivitetMedTypeAktivitetInnenforPeriode(
-                typeAktivitet = vilkåretsTypeAktivtet,
+                typeAktivitet = vilkåretsTypeAktivitet,
                 periode = Datoperiode(fom = vilkår.fom, tom = vilkår.tom),
                 behandlingId = behandlingId,
             )

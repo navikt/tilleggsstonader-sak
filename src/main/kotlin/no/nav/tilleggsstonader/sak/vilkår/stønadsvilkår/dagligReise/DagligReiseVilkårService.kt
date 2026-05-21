@@ -233,7 +233,7 @@ class DagligReiseVilkårService(
             "Aktivitet må velges for offentlig transport"
         }
         vilkårperiodeService.validerAktivitetMedTypeAktivitetInnenforPeriode(
-            typeAktivitet = fakta.typeAktivitet!!,
+            typeAktivitet = fakta.typeAktivitet,
             periode = Datoperiode(fom = nyttVilkår.fom, tom = nyttVilkår.tom),
             behandlingId = behandlingId,
         )
