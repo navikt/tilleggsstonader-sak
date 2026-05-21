@@ -33,7 +33,6 @@ data class UkeVurderingDto(
 
 data class AvvikUke(
     val typeAvvik: TypeAvvikUke,
-    val avviksMelding: String,
 )
 
 data class DagDto(

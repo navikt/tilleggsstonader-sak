@@ -42,13 +42,7 @@ object ReisevurderingPrivatBilMapper {
             fraDato = datoer.min(),
             tilDato = datoer.max(),
             status = avklartUke?.status ?: UkeStatus.IKKE_MOTTATT_KJØRELISTE,
-            avvik =
-                avklartUke?.typeAvvik?.let {
-                    AvvikUke(
-                        typeAvvik = it,
-                        avviksMelding = "Dette er egentlig ikke et avvik, bare en test",
-                    )
-                },
+            avvik = avklartUke?.typeAvvik?.let { AvvikUke(typeAvvik = it) },
             behandletDato = avklartUke?.behandletDato,
             kjørelisteInnsendtDato = kjøreliste?.datoMottatt?.toLocalDate(),
             kjørelisteId = kjøreliste?.id,
