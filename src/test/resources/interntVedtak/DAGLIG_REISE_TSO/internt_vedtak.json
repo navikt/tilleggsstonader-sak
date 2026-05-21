@@ -95,7 +95,7 @@
     "fom" : "2024-02-05",
     "tom" : "2024-02-10",
     "faktaOgVurderinger" : {
-      "@type" : "AktivitetDagligReiseTsoFaktaOgVurderingerDto",
+      "@type" : "AKTIVITET_DAGLIG_REISE_TSO",
       "lønnet" : {
         "svar" : "NEI",
         "resultat" : "OPPFYLT"
@@ -116,7 +116,7 @@
     "fom" : "2024-02-05",
     "tom" : "2024-02-10",
     "faktaOgVurderinger" : {
-      "@type" : "AktivitetDagligReiseTsoFaktaOgVurderingerDto",
+      "@type" : "AKTIVITET_DAGLIG_REISE_TSO",
       "lønnet" : null,
       "harUtgifter" : null,
       "aktivitetsdager" : 3

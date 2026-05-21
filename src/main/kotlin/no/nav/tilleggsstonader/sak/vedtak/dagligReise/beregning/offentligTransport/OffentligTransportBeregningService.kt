@@ -1,7 +1,15 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
@@ -12,11 +20,50 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
 
 @Service
-class OffentligTransportBeregningService {
+class OffentligTransportBeregningService(
+    private val offentligTransportBeregningRevurderingService: OffentligTransportBeregningRevurderingService,
+    private val vilkårperiodeService: VilkårperiodeService,
+) {
     fun beregn(
+        vedtaksperioder: List<Vedtaksperiode>,
+        oppfylteVilkårDagligReise: List<VilkårDagligReise>,
+        forrigeBeregningsresultat: BeregningsresultatOffentligTransport?,
+        brukersNavKontor: String?,
+        beregningsplan: Beregningsplan,
+        behandling: Saksbehandling,
+    ): BeregningsresultatOffentligTransport? {
+        if (beregningsplan.omfang == Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT) {
+            return forrigeBeregningsresultat
+                ?: feil("Kan ikke gjenbruke forrige beregningsresultat uten forrige iverksatt behandling")
+        }
+
+        if (behandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
+            validerTypeAktivitetForOffentligTransportVilkår(oppfylteVilkårDagligReise, behandling.id)
+        }
+
+        val oppfylteVilkårOffentligTransport = oppfylteVilkårDagligReise.filter { it.fakta is FaktaOffentligTransport }
+        if (oppfylteVilkårOffentligTransport.isEmpty()) return null
+
+        val nyttBeregningsresultat =
+            beregn(
+                vedtaksperioder = vedtaksperioder,
+                oppfylteVilkår = oppfylteVilkårOffentligTransport,
+                brukersNavKontor = brukersNavKontor,
+            ) ?: return null
+
+        return offentligTransportBeregningRevurderingService
+            .flettMedForrigeVedtakHvisRevurdering(
+                nyttBeregningsresultat = nyttBeregningsresultat,
+                forrigeOffentligTransport = forrigeBeregningsresultat,
+                beregnFra = beregningsplan.beregnFra(),
+            ).sorterReiserOgPerioder()
+    }
+
+    private fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkår: List<VilkårDagligReise>,
         brukersNavKontor: String?,
@@ -122,4 +169,27 @@ class OffentligTransportBeregningService {
     }
 
     private fun hentTypeAktivitetForVilkår(fakta: FaktaOffentligTransport): TypeAktivitet? = fakta.typeAktivitet
+
+    private fun validerTypeAktivitetForOffentligTransportVilkår(
+        vilkår: List<VilkårDagligReise>,
+        behandlingId: BehandlingId,
+    ) {
+        val offentligTransportVilkår = vilkår.filter { it.fakta is FaktaOffentligTransport }
+        val vilkårUtenTypeAktivitet =
+            offentligTransportVilkår.filter { (it.fakta as FaktaOffentligTransport).typeAktivitet == null }
+
+        brukerfeilHvis(vilkårUtenTypeAktivitet.isNotEmpty()) {
+            "Alle reiser med offentlig transport må ha typeAktivitet satt. " +
+                "${vilkårUtenTypeAktivitet.size} reise(r) mangler typeAktivitet."
+        }
+
+        offentligTransportVilkår.forEach { vilkår ->
+            val vilkåretsTypeAktivtet = (vilkår.fakta as FaktaOffentligTransport).typeAktivitet!!
+            vilkårperiodeService.validerAktivitetMedTypeAktivitetInnenforPeriode(
+                typeAktivitet = vilkåretsTypeAktivtet,
+                periode = Datoperiode(fom = vilkår.fom, tom = vilkår.tom),
+                behandlingId = behandlingId,
+            )
+        }
+    }
 }
