@@ -155,7 +155,7 @@ class InnvilgeDaligReiseTsrIntegrationTest : IntegrationTest() {
                 }
             }
             vilkår {
-                oppdaterDagligReise { vilkår ->
+                oppdaterDagligReise { vilkår, _ ->
                     with(vilkår.single()) {
                         id to this.tilLagreDagligReiseDto().copy(tom = 28 februar 2026)
                     }

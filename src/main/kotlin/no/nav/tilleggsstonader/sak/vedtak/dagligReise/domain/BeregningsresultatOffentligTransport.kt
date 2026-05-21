@@ -25,9 +25,12 @@ data class BeregningsresultatOffentligTransport(
         )
 }
 
+// Legger på Include.NON_NULL for å unngå å serialisere typeAktivitet: null i JSON for TSO
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class BeregningsresultatForReise(
     val reiseId: ReiseId,
     val perioder: List<BeregningsresultatForPeriode>,
+    val typeAktivitet: TypeAktivitet? = null,
 )
 
 data class BeregningsresultatForPeriode(
@@ -61,13 +64,17 @@ data class VedtaksperiodeGrunnlag(
     val typeAktivitet: TypeAktivitet?,
     val antallReisedagerIVedtaksperioden: Int,
 ) {
-    constructor(vedtaksperiode: Vedtaksperiode, antallReisedager: Int) : this(
+    constructor(
+        vedtaksperiode: Vedtaksperiode,
+        antallReisedager: Int,
+        typeAktivitet: TypeAktivitet? = vedtaksperiode.typeAktivitet,
+    ) : this(
         id = vedtaksperiode.id,
         fom = vedtaksperiode.fom,
         tom = vedtaksperiode.tom,
         målgruppe = vedtaksperiode.målgruppe,
         aktivitet = vedtaksperiode.aktivitet,
-        typeAktivitet = vedtaksperiode.typeAktivitet,
+        typeAktivitet = typeAktivitet,
         antallReisedagerIVedtaksperioden = antallReisedager,
     )
 }

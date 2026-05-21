@@ -2,6 +2,10 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -11,12 +15,14 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
+import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.SvarOgBegrunnelse
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
@@ -29,7 +35,7 @@ class DagligReiseVilkårServiceTest {
     val vilkårService = mockk<VilkårService>()
     val behandlingService = mockk<BehandlingService>()
     val unleashService = mockk<UnleashService>()
-    val vilkårperiodeService = mockk<VilkårperiodeService>()
+    val vilkårperiodeService = mockk<VilkårperiodeService>(relaxed = true)
 
     val dagligReiseVilkårService =
         DagligReiseVilkårService(
@@ -42,8 +48,8 @@ class DagligReiseVilkårServiceTest {
 
     val svarOffentligTransport =
         mapOf(
-            RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelse(svar = SvarId.JA),
-            RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelse(svar = SvarId.JA),
+            RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelse(svar = SvarId.JA, begrunnelse = "begrunnelse"),
+            RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelse(svar = SvarId.JA, begrunnelse = "begrunnelse"),
         )
 
     val nyttVilkår =
@@ -95,6 +101,41 @@ class DagligReiseVilkårServiceTest {
                     behandlingId = BehandlingId.random(),
                 )
             }.withMessage("Kan ikke oppdatere vilkår når behandling er på steg=INNGANGSVILKÅR.")
+    }
+
+    @Test
+    fun `skal validere aktivitet for offentlig transport ved opprettelse`() {
+        val behandling = saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSR))
+        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
+        every { unleashService.isEnabled(any()) } returns true
+        every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
+
+        val vilkår =
+            nyttVilkår.copy(
+                fakta =
+                    FaktaOffentligTransport(
+                        reiseId = dummyReiseId,
+                        adresse = "Tiltaksveien 1",
+                        reisedagerPerUke = 5,
+                        prisEnkelbillett = 40,
+                        prisSyvdagersbillett = null,
+                        prisTrettidagersbillett = 800,
+                        typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                    ),
+            )
+
+        dagligReiseVilkårService.opprettNyttVilkår(
+            nyttVilkår = vilkår,
+            behandlingId = behandling.id,
+        )
+
+        verify {
+            vilkårperiodeService.validerAktivitetMedTypeAktivitetInnenforPeriode(
+                typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                periode = Datoperiode(fom = 1 januar 2025, tom = 31 januar 2025),
+                behandlingId = behandling.id,
+            )
+        }
     }
 
     @Test

@@ -61,6 +61,7 @@ object VilkårDagligReiseMapper {
             prisSyvdagersbillett = this.prisSyvdagersbillett,
             prisTrettidagersbillett = this.prisTrettidagersbillett,
             adresse = this.adresse,
+            typeAktivitet = this.typeAktivitet,
         )
 
     private fun FaktaDagligReisePrivatBil.mapTilFakta() =

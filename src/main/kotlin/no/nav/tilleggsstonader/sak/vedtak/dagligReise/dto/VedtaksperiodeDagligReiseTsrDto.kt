@@ -12,7 +12,7 @@ data class VedtaksperiodeDagligReiseTsrDto(
     val id: UUID = UUID.randomUUID(),
     val fom: LocalDate,
     val tom: LocalDate,
-    val typeAktivitet: TypeAktivitetDto,
+    val typeAktivitet: TypeAktivitetDto? = null,
 ) {
     fun tilDomene() =
         Vedtaksperiode(
@@ -21,7 +21,7 @@ data class VedtaksperiodeDagligReiseTsrDto(
             tom = tom,
             målgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
             aktivitet = AktivitetType.TILTAK,
-            typeAktivitet = typeAktivitet.tilDomene(),
+            typeAktivitet = typeAktivitet?.tilDomene(),
         )
 }
 

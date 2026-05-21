@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
@@ -37,6 +38,7 @@ data class FaktaDagligReiseOffentligTransport(
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int?,
     override val adresse: String?,
+    val typeAktivitet: TypeAktivitet? = null,
 ) : VilkårFakta
 
 data class FaktaDagligReisePrivatBil(

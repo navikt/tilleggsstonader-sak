@@ -1,5 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.norskFormat
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
@@ -14,11 +20,13 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
 
 @Service
 class OffentligTransportBeregningService(
     private val offentligTransportBeregningRevurderingService: OffentligTransportBeregningRevurderingService,
+    private val vilkårperiodeService: VilkårperiodeService,
 ) {
     fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
@@ -26,10 +34,15 @@ class OffentligTransportBeregningService(
         forrigeBeregningsresultat: BeregningsresultatOffentligTransport?,
         brukersNavKontor: String?,
         beregningsplan: Beregningsplan,
+        behandling: Saksbehandling,
     ): BeregningsresultatOffentligTransport? {
         if (beregningsplan.omfang == Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT) {
             return forrigeBeregningsresultat
                 ?: feil("Kan ikke gjenbruke forrige beregningsresultat uten forrige iverksatt behandling")
+        }
+
+        if (behandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
+            validerTypeAktivitetForOffentligTransportVilkår(oppfylteVilkårDagligReise, behandling.id)
         }
 
         val oppfylteVilkårOffentligTransport = oppfylteVilkårDagligReise.filter { it.fakta is FaktaOffentligTransport }
@@ -88,6 +101,7 @@ class OffentligTransportBeregningService(
 
         return BeregningsresultatForReise(
             reiseId = reise.reiseId,
+            typeAktivitet = reise.typeAktivitet,
             perioder =
                 trettidagerReisePerioder.map { trettidagerReiseperiode ->
                     beregnForTrettiDagersPeriode(trettidagerReiseperiode, justerteVedtaksperioder, brukersNavKontor)
@@ -111,6 +125,7 @@ class OffentligTransportBeregningService(
                                 vedtaksperiode,
                                 trettidagerReisePeriode.antallReisedagerPerUke,
                             ),
+                        typeAktivitet = trettidagerReisePeriode.typeAktivitet,
                     )
                 }
 
@@ -147,6 +162,29 @@ class OffentligTransportBeregningService(
             prisEnkelbillett = this.fakta.prisEnkelbillett,
             prisSyvdagersbillett = this.fakta.prisSyvdagersbillett,
             pris30dagersbillett = this.fakta.prisTrettidagersbillett,
+            typeAktivitet = this.fakta.typeAktivitet,
         )
+    }
+
+    private fun validerTypeAktivitetForOffentligTransportVilkår(
+        vilkår: List<VilkårDagligReise>,
+        behandlingId: BehandlingId,
+    ) {
+        val offentligTransportVilkår = vilkår.filter { it.fakta is FaktaOffentligTransport }
+
+        offentligTransportVilkår.forEach { vilkår ->
+            val fakta = vilkår.fakta as FaktaOffentligTransport
+            brukerfeilHvis(fakta.typeAktivitet == null) {
+                "Alle reiser med offentlig transport må ha typeAktivitet satt. " +
+                    "Reise mellom ${vilkår.fom.norskFormat()} - ${vilkår.tom.norskFormat()} mangler typeAktivitet."
+            }
+
+            val vilkåretsTypeAktivitet = fakta.typeAktivitet
+            vilkårperiodeService.validerAktivitetMedTypeAktivitetInnenforPeriode(
+                typeAktivitet = vilkåretsTypeAktivitet,
+                periode = Datoperiode(fom = vilkår.fom, tom = vilkår.tom),
+                behandlingId = behandlingId,
+            )
+        }
     }
 }

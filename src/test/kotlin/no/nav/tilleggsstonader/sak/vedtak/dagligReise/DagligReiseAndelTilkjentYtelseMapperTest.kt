@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Re
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 
 class DagligReiseAndelTilkjentYtelseMapperTest {
@@ -86,7 +85,7 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
         }
 
         @Test
-        fun `to reiser som starter på ulike helgedager, skal begge utbetales mandagen etter`() {
+        fun `to reiser som starter på ulike helgedager, skal begge utbetales mandagen etter og summeres`() {
             val lørdag = 6 september 2025
             val søndag = 7 september 2025
             val mandag = 8 september 2025
@@ -97,23 +96,17 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
 
             val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling)
 
-            assertThat(andeler).hasSize(2)
-            with(andeler.first()) {
+            assertThat(andeler).hasSize(1)
+            with(andeler.single()) {
                 assertThat(fom).isEqualTo(mandag)
                 assertThat(tom).isEqualTo(mandag)
-                assertThat(beløp).isEqualTo(100)
-                assertThat(utbetalingsdato).isEqualTo(mandag)
-            }
-            with(andeler.last()) {
-                assertThat(fom).isEqualTo(mandag)
-                assertThat(tom).isEqualTo(mandag)
-                assertThat(beløp).isEqualTo(100)
+                assertThat(beløp).isEqualTo(200)
                 assertThat(utbetalingsdato).isEqualTo(mandag)
             }
         }
 
         @Test
-        fun `to ulike målgrupper på samme dag er ikke støttet enda, og skal derfor feile`() {
+        fun `to ulike målgrupper på samme dag gir to andeler med ulike typeAndel`() {
             val fredag = 5 september 2025
             val vedtaksperiodeEnsligForsørger =
                 listOf(lagVedtaksperiodeGrunnlag(fredag, målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER))
@@ -144,12 +137,11 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
                         ),
                 )
 
-            val message =
-                assertThrows<ApiFeil> { beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling) }.message
-            assertThat(
-                message,
-            ).isEqualTo(
-                "Vi støtter foreløpig ikke ulike målgrupper på samme utbetaling. Ta kontakt med utvikler teamet hvis du trenger å gjøre dette.",
+            val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling)
+            assertThat(andeler).hasSize(2)
+            assertThat(andeler.map { it.type }).containsExactlyInAnyOrder(
+                TypeAndel.DAGLIG_REISE_ENSLIG_FORSØRGER,
+                TypeAndel.DAGLIG_REISE_AAP,
             )
         }
 

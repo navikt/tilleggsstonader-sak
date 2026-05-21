@@ -6,6 +6,7 @@ import io.cucumber.java.no.Når
 import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -15,6 +16,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
+import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
@@ -66,6 +68,7 @@ class OffentligTransportBeregningStepDefinitions {
     val offentligTransportBeregningService =
         OffentligTransportBeregningService(
             offentligTransportBeregningRevurderingService = OffentligTransportBeregningRevurderingService(),
+            vilkårperiodeService = vilkårperiodeServiceMock,
         )
 
     var beregningsResultat: BeregningsresultatOffentligTransport? = null
@@ -103,6 +106,7 @@ class OffentligTransportBeregningStepDefinitions {
                 forrigeBeregningsresultat = null,
                 brukersNavKontor = null,
                 beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+                saksbehandling().copy(stønadstype = Stønadstype.DAGLIG_REISE_TSO),
             )
     }
 

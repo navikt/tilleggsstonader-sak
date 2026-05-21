@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import io.mockk.every
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.desember
@@ -75,6 +76,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
         FaktaOffentligTransport(
             reiseId = dummyReiseId,
             adresse = "Tiltaksveien 1",
+            typeAktivitet = TypeAktivitet.GRUPPEAMO,
             reisedagerPerUke = 4,
             prisEnkelbillett = 44,
             prisSyvdagersbillett = null,

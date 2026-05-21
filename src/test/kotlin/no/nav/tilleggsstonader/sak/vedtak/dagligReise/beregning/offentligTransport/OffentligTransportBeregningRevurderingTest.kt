@@ -59,7 +59,7 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
                 tilSteg = StegType.BEREGNE_YTELSE,
             ) {
                 vilkår {
-                    oppdaterDagligReise { vilkårDagligReise ->
+                    oppdaterDagligReise { vilkårDagligReise, _ ->
                         // Utvider tom og antall reisedager
                         vilkårDagligReise.single().id to
                             reiser.copy(
@@ -133,7 +133,7 @@ class OffentligTransportBeregningRevurderingTest : CleanDatabaseIntegrationTest(
                 tilSteg = StegType.BEREGNE_YTELSE,
             ) {
                 vilkår {
-                    oppdaterDagligReise { vilkårDagligReise ->
+                    oppdaterDagligReise { vilkårDagligReise, _ ->
                         // Utvider tom og antall reisedager
                         vilkårDagligReise.single().id to
                             reiser.copy(

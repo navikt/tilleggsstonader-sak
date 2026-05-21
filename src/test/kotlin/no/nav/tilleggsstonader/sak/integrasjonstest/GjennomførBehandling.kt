@@ -518,8 +518,12 @@ private fun IntegrationTest.gjennomførVilkårSteg(
         }
 
     if (stønadstype.gjelderDagligReise()) {
+        val aktiviteter =
+            kall.vilkårperiode
+                .hentForBehandling(behandlingId)
+                .vilkårperioder.aktiviteter
         testdataProvider.vilkår.updateDagligReise
-            .map { it(vilkårDagligReise) }
+            .map { it(vilkårDagligReise, aktiviteter) }
             .forEach { (vilkårId, dto) -> kall.vilkårDagligReise.oppdaterVilkår(dto, vilkårId, behandlingId) }
 
         testdataProvider.vilkår.deleteDagligReise

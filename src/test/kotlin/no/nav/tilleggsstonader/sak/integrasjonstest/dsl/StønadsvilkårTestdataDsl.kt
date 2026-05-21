@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.dsl
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
@@ -30,7 +31,7 @@ class StønadsvilkårTestdataDsl {
     internal val opprettScope = OpprettStønadsvilkårDsl()
     internal val update = mutableListOf<(VilkårsvurderingDto) -> SvarPåVilkårDto>()
     internal val updateDagligReise =
-        mutableListOf<(List<VilkårDagligReiseDto>) -> Pair<VilkårId, LagreDagligReiseDto>>()
+        mutableListOf<(List<VilkårDagligReiseDto>, List<VilkårperiodeDto>) -> Pair<VilkårId, LagreDagligReiseDto>>()
     internal val delete = mutableListOf<(VilkårsvurderingDto) -> SlettVilkårRequest>()
     internal val deleteDagligReise =
         mutableListOf<(List<VilkårDagligReiseDto>) -> Pair<VilkårId, SlettVilkårRequestDto>>()
@@ -43,7 +44,9 @@ class StønadsvilkårTestdataDsl {
         update += block
     }
 
-    fun oppdaterDagligReise(block: (vilkårDagligReise: List<VilkårDagligReiseDto>) -> Pair<VilkårId, LagreDagligReiseDto>) {
+    fun oppdaterDagligReise(
+        block: (vilkårDagligReise: List<VilkårDagligReiseDto>, aktiviteter: List<VilkårperiodeDto>) -> Pair<VilkårId, LagreDagligReiseDto>,
+    ) {
         updateDagligReise += block
     }
 
@@ -63,9 +66,10 @@ class OpprettStønadsvilkårDsl {
     fun offentligTransport(
         fom: LocalDate,
         tom: LocalDate,
+        typeAktivitet: TypeAktivitet = TypeAktivitet.GRUPPEAMO,
     ) {
         dtoer += { _, _, _ ->
-            lagreDagligReiseDto(fom = fom, tom = tom)
+            lagreDagligReiseDto(fom = fom, tom = tom, typeAktivitet = typeAktivitet)
         }
     }
 

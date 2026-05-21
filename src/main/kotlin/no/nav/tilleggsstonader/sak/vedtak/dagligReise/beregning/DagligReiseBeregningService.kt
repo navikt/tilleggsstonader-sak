@@ -64,6 +64,7 @@ class DagligReiseBeregningService(
                 forrigeBeregningsresultat = forrigeVedtak?.beregningsresultat?.offentligTransport,
                 brukersNavKontor = brukersNavKontor,
                 beregningsplan = beregningsplan,
+                behandling = behandling,
             )
 
         val rammevedtakPrivatBil =

@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
 import io.cucumber.datatable.DataTable
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -103,6 +104,7 @@ fun mapFaktaOffentligTransport(rad: Map<String, String>): FaktaOffentligTranspor
     FaktaOffentligTransport(
         reiseId = dummyReiseId,
         adresse = "Tiltaksveien 1",
+        typeAktivitet = TypeAktivitet.GRUPPEAMO,
         reisedagerPerUke =
             parseInt(
                 DomenenøkkelOffentligtransport.ANTALL_REISEDAGER_PER_UKE,
