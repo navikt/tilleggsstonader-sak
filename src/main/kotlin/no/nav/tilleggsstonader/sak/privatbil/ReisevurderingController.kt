@@ -4,8 +4,8 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.ekstern.stønad.DagligReisePrivatBilService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingMapper.tilReisevurderingDto
-import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingMapper.tilUkeVurderingDto
+import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingPrivatBilMapper.tilReisevurderingDto
+import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingPrivatBilMapper.tilUkeVurderingDto
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagRequest
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
