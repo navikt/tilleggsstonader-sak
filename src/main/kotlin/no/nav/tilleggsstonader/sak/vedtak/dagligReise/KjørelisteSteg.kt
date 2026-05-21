@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.finnesUkerMedAvvik
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -51,7 +52,7 @@ class KjørelisteSteg(
                 rammevedtak = eksisterendeRammevedtak,
                 brukersNavKontor = brukersNavKontor,
                 forrigeBeregningsresultat = hentForrigePrivatBilBeregningsresultat(saksbehandling),
-            ) ?: error("Fikk ikke beregningsresultat for privat bil i kjøreliste-steg for behandling ${saksbehandling.id}")
+            ) ?: feil("Fikk ikke beregningsresultat for privat bil i kjøreliste-steg for behandling ${saksbehandling.id}")
 
         dagligReiseVedtakService.oppdaterVedtakMedBeregningPrivatBil(
             behandlingId = saksbehandling.id,

@@ -41,7 +41,7 @@ class PrivatBilBeregningsresultatService(
         )
     }
 
-    fun beregn(
+    private fun beregn(
         rammevedtak: RammevedtakPrivatBil,
         avklarteUkerForBehandling: Collection<AvklartKjørtUke>,
         brukersNavKontor: String?,
