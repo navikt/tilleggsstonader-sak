@@ -1,10 +1,11 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.ekstern.stønad.DagligReisePrivatBilService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingMapper.tilReisevurderingDto
+import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingMapper.tilUkeVurderingDto
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagRequest
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
@@ -44,11 +45,7 @@ class ReisevurderingController(
         val avklarteUker = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandlingId)
 
         return reiserIRammevedtak?.map { reise ->
-            ReisevurderingPrivatBilDto(
-                reise = reise,
-                avklarteUker = avklarteUker,
-                kjørelister = kjørelister,
-            )
+            reise.tilReisevurderingDto(avklarteUker = avklarteUker, kjørelister = kjørelister)
         } ?: emptyList()
     }
 
@@ -67,11 +64,6 @@ class ReisevurderingController(
         val oppdatertAvklartUke = avklartKjørelisteService.oppdaterAvklartUke(behandlingId, ukeId, avklarteDager)
         val kjøreliste = kjørelisteService.hentKjøreliste(oppdatertAvklartUke.kjørelisteId)
 
-        return UkeVurderingDto(
-            uke = oppdatertAvklartUke.uke,
-            datoer = oppdatertAvklartUke.alleDatoer(),
-            avklartUke = oppdatertAvklartUke,
-            kjøreliste = kjøreliste,
-        )
+        return oppdatertAvklartUke.tilUkeVurderingDto(kjøreliste = kjøreliste)
     }
 }
