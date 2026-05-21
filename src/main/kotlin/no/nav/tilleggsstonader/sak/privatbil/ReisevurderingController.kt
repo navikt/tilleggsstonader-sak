@@ -66,6 +66,6 @@ class ReisevurderingController(
         val oppdatertAvklartUke = avklartKjørelisteService.oppdaterAvklartUke(behandlingId, ukeId, avklarteDager)
         val kjøreliste = kjørelisteService.hentKjøreliste(oppdatertAvklartUke.kjørelisteId)
 
-        return UkeVurderingDto.fraAvklartUke(avklartUke = oppdatertAvklartUke, kjøreliste = kjøreliste)
+        return UkeVurderingDto(avklartUke = oppdatertAvklartUke, kjøreliste = kjøreliste)
     }
 }
