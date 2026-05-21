@@ -12,18 +12,18 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
-import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.OffentligTransportBeregningRevurderingService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.OffentligTransportBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
@@ -39,14 +39,9 @@ class OffentligTransportBeregningStepDefinitions {
     val behandlingServiceMock = mockk<BehandlingService>()
     val vilkårServiceMock = mockk<VilkårService>()
     val vilkårRepositoryFake = VilkårRepositoryFake()
-    val vedtakRepositoryFake = VedtakRepositoryFake()
     val unleashServiceMock = mockk<UnleashService>()
     val vilkårperiodeRepositoryFake = VilkårperiodeRepositoryFake()
     val behandlingId = BehandlingId.random()
-    val utledTidligsteEndringService =
-        mockk<UtledTidligsteEndringService> {
-            every { utledTidligsteEndringForBeregning(any(), any()) } returns null
-        }
     val vilkårperiodeServiceMock =
         mockk<VilkårperiodeService>().apply {
             every { hentVilkårperioder(any()) } answers {
@@ -68,15 +63,13 @@ class OffentligTransportBeregningStepDefinitions {
             vilkårperiodeService = vilkårperiodeServiceMock,
         )
 
-    val vedtaksperiodeValideringService =
-        VedtaksperiodeValideringService(vilkårperiodeService = vilkårperiodeServiceMock)
-
-    val offentligTransportBeregningService = OffentligTransportBeregningService()
+    val offentligTransportBeregningService =
+        OffentligTransportBeregningService(
+            offentligTransportBeregningRevurderingService = OffentligTransportBeregningRevurderingService(),
+        )
 
     var beregningsResultat: BeregningsresultatOffentligTransport? = null
-    var forventetBeregningsresultat: BeregningsresultatOffentligTransport? = null
     var vedtaksperioder: List<Vedtaksperiode> = emptyList()
-    var vilkårperioder: List<Vilkårperioder> = emptyList()
     var vilkår: List<VilkårDagligReise> = emptyList()
 
     @Gitt("følgende vedtaksperioder for daglig reise offentlig transport")
@@ -106,8 +99,10 @@ class OffentligTransportBeregningStepDefinitions {
         beregningsResultat =
             offentligTransportBeregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
-                oppfylteVilkår = vilkår,
+                oppfylteVilkårDagligReise = vilkår,
+                forrigeVedtak = null,
                 brukersNavKontor = null,
+                beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
             )
     }
 

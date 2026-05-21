@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
-import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
@@ -25,7 +24,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 
 class KjørelisteStegTest {
-    private val behandlingService = mockk<BehandlingService>(relaxed = true)
     private val privatBilBeregningsresultatService = mockk<PrivatBilBeregningsresultatService>(relaxed = true)
     private val vedtakService = mockk<VedtakService>(relaxed = true)
     private val arbeidsfordelingService = mockk<ArbeidsfordelingService>(relaxed = true)
@@ -34,7 +32,6 @@ class KjørelisteStegTest {
 
     private val steg =
         KjørelisteSteg(
-            behandlingService = behandlingService,
             privatBilBeregningsresultatService = privatBilBeregningsresultatService,
             vedtakService = vedtakService,
             arbeidsfordelingService = arbeidsfordelingService,

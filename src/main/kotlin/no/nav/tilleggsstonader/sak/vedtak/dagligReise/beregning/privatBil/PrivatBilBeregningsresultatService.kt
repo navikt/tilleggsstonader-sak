@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
@@ -15,10 +17,31 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatP
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import org.springframework.stereotype.Service
 
 @Service
-class PrivatBilBeregningsresultatService {
+class PrivatBilBeregningsresultatService(
+    private val avklartKjørelisteService: AvklartKjørelisteService,
+) {
+    fun beregn(
+        behandling: Saksbehandling,
+        rammevedtak: RammevedtakPrivatBil?,
+        brukersNavKontor: String?,
+        forrigeVedtak: InnvilgelseEllerOpphørDagligReise?,
+    ): BeregningsresultatPrivatBil? {
+        if (rammevedtak == null) return null
+
+        val avklarteUkerForBehandling = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandling.id)
+
+        return beregn(
+            rammevedtak = rammevedtak,
+            avklarteUkerForBehandling = avklarteUkerForBehandling,
+            brukersNavKontor = brukersNavKontor,
+            forrigeBeregningsresultat = forrigeVedtak?.beregningsresultat?.privatBil,
+        )
+    }
+
     fun beregn(
         rammevedtak: RammevedtakPrivatBil,
         avklarteUkerForBehandling: Collection<AvklartKjørtUke>,

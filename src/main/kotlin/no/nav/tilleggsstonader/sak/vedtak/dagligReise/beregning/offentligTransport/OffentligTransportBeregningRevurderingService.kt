@@ -1,29 +1,23 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport
 
-import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-class OffentligTransportBeregningRevurderingService(
-    private val vedtakService: VedtakService,
-) {
+class OffentligTransportBeregningRevurderingService {
     /**
      * Beholder de reisene og perioder fra forrige iverksatte behandling som er berørt av revurderingen, slik at vi ikke risikerer at gamle
      * vedtak blir reberegnet med et annet resultat, fordi vi eksempelvis har gjort endringer i beregningskoden siden sist.
      */
     fun flettMedForrigeVedtakHvisRevurdering(
         nyttBeregningsresultat: BeregningsresultatOffentligTransport,
-        behandling: Saksbehandling,
+        forrigeOffentligTransport: BeregningsresultatOffentligTransport?,
         beregnFra: LocalDate?,
     ): BeregningsresultatOffentligTransport {
-        val forrigeIverksatte =
-            hentForrigeIverksatteVedtak(behandling)?.beregningsresultat?.offentligTransport ?: return nyttBeregningsresultat
+        val forrigeIverksatte = forrigeOffentligTransport ?: return nyttBeregningsresultat
 
         brukerfeilHvis(beregnFra == null) { "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen" }
 
@@ -75,10 +69,4 @@ class OffentligTransportBeregningRevurderingService(
             perioder = (bevarteGamlePerioder + nyeEllerOppdatertePerioder).sortedBy { it.grunnlag.fom },
         )
     }
-
-    private fun hentForrigeIverksatteVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørDagligReise? =
-        behandling.forrigeIverksatteBehandlingId
-            ?.let {
-                vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(it)
-            }?.data
 }

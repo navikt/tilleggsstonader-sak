@@ -39,7 +39,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -51,7 +50,6 @@ class PrivatBilBeregningStepDefinitions {
     val vilkårServiceMock = mockk<VilkårService>()
     val vilkårRepositoryFake = VilkårRepositoryFake()
     val unleashServiceMock = mockk<UnleashService>()
-    val vilkårperiodeRepositoryMock = mockk<VilkårperiodeRepository>()
     val vilkårperiodeService = mockk<VilkårperiodeService>()
 
     val dagligReiseVilkårService =
@@ -71,6 +69,7 @@ class PrivatBilBeregningStepDefinitions {
             satsDagligReisePrivatBilProvider = satsDagligReisePrivatBilProvider,
             vilkårperiodeService = vilkårperiodeService,
             behandlingService = behandlingServiceMock,
+            unleashService = unleashServiceMock,
         )
 
     var reiserUtenDelperioder: Map<Int, LagreDagligReise> = emptyMap()
@@ -79,7 +78,6 @@ class PrivatBilBeregningStepDefinitions {
     var vedtaksperioder: List<Vedtaksperiode> = emptyList()
 
     var rammevedtak: RammevedtakPrivatBil? = null
-    var forventetBeregningsresultat: List<BeregningsresultatUkeCucumber> = emptyList()
     var feil: Exception? = null
 
     @Gitt("følgende vedtaksperioder for daglig reise privat bil")
@@ -158,7 +156,7 @@ class PrivatBilBeregningStepDefinitions {
             rammevedtak =
                 beregningService.beregnRammevedtak(
                     vedtaksperioder = vedtaksperioder,
-                    oppfylteVilkår = oppfylteReisevilkår,
+                    oppfylteVilkårDagligReise = oppfylteReisevilkår,
                     behandlingId = behandlingId,
                 )
         } catch (e: Exception) {

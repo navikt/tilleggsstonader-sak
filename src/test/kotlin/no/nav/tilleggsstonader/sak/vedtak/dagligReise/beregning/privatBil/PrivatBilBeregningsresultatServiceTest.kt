@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
+import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.libs.utils.dato.februar
@@ -7,6 +8,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
@@ -35,7 +37,10 @@ class PrivatBilBeregningsresultatServiceTest {
     private val reiseId = ReiseId.random()
     private val brukersNavKontor = "6767"
 
-    val beregningService = PrivatBilBeregningsresultatService()
+    val beregningService =
+        PrivatBilBeregningsresultatService(
+            avklartKjørelisteService = mockk<AvklartKjørelisteService>(),
+        )
 
     @Test
     fun `dager med parkeringsutgifter blir beregnet riktig`() {

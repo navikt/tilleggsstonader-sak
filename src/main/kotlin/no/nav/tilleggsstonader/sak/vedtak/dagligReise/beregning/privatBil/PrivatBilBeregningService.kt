@@ -6,10 +6,12 @@ import no.nav.tilleggsstonader.kontrakter.felles.allePerioderErSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilBeregningsgrunnlag
@@ -34,27 +36,32 @@ class PrivatBilBeregningService(
     private val satsDagligReisePrivatBilProvider: SatsDagligReisePrivatBilProvider,
     private val vilkårperiodeService: VilkårperiodeService,
     private val behandlingService: BehandlingService,
+    private val unleashService: UnleashService,
 ) {
     fun beregnRammevedtak(
         vedtaksperioder: List<Vedtaksperiode>,
-        oppfylteVilkår: List<VilkårDagligReise>,
+        oppfylteVilkårDagligReise: List<VilkårDagligReise>,
         behandlingId: BehandlingId,
     ): RammevedtakPrivatBil? {
-        val reiser = mapVilkårTilReiser(oppfylteVilkår, behandlingId)
+        if (!unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)) return null
+
+        val reiserMedBil =
+            oppfylteVilkårDagligReise
+                .filter { it.fakta is FaktaPrivatBil }
+                .mapTilReiser(behandlingId)
+
+        if (reiserMedBil.isEmpty()) return null
 
         val resultatForReiser =
-            reiser.mapNotNull { beregnForReise(it, vedtaksperioder) }
+            reiserMedBil.mapNotNull { beregnForReise(it, vedtaksperioder) }
 
         if (resultatForReiser.isEmpty()) return null
 
         return RammevedtakPrivatBil(reiser = resultatForReiser)
     }
 
-    private fun mapVilkårTilReiser(
-        oppfylteVilkår: List<VilkårDagligReise>,
-        behandlingId: BehandlingId,
-    ): List<ReiseMedPrivatBil> =
-        oppfylteVilkår.map { vilkår ->
+    private fun List<VilkårDagligReise>.mapTilReiser(behandlingId: BehandlingId): List<ReiseMedPrivatBil> =
+        this.map { vilkår ->
             val fakta = vilkår.fakta as? FaktaPrivatBil
             feilHvis(fakta == null) { "Forventet FaktaPrivatBil for daglig reise med privat bil" }
             val aktivitet =
