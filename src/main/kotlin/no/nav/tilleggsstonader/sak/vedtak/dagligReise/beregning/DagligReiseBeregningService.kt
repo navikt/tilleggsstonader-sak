@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.OffentligTransportBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningsresultatService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilRammevedtakBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
@@ -24,8 +24,8 @@ class DagligReiseBeregningService(
     private val vilkårService: VilkårService,
     private val dagligReiseVedtaksperioderValideringService: DagligReiseVedtaksperioderValideringService,
     private val offentligTransportBeregningService: OffentligTransportBeregningService,
+    private val privatBilRammevedtakBeregningService: PrivatBilRammevedtakBeregningService,
     private val privatBilBeregningService: PrivatBilBeregningService,
-    private val privatBilBeregningsresultatService: PrivatBilBeregningsresultatService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val vedtakService: VedtakService,
 ) {
@@ -67,14 +67,14 @@ class DagligReiseBeregningService(
             )
 
         val rammevedtakPrivatBil =
-            privatBilBeregningService.beregnRammevedtak(
+            privatBilRammevedtakBeregningService.beregnRammevedtak(
                 vedtaksperioder = vedtaksperioder,
                 oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
                 behandlingId = behandling.id,
             )
 
         val beregningsresultatPrivatBil =
-            privatBilBeregningsresultatService.beregn(
+            privatBilBeregningService.beregn(
                 behandling = behandling,
                 rammevedtak = rammevedtakPrivatBil,
                 brukersNavKontor = brukersNavKontor,

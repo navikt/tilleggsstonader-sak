@@ -1,204 +1,188 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
-import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
-import no.nav.tilleggsstonader.kontrakter.felles.Enhet
-import no.nav.tilleggsstonader.kontrakter.felles.allePerioderErSammenhengende
-import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
-import no.nav.tilleggsstonader.kontrakter.felles.overlapper
-import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
-import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.avrundetStønadsbeløp
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilDag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilPeriode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.springframework.stereotype.Service
-import java.math.BigDecimal
-import java.math.RoundingMode
-
-// Begrensninger:
-// Håndterer ikke ulik kilometersats i årskifte dersom en uke går på tvers av to år.
 
 @Service
 class PrivatBilBeregningService(
-    private val satsDagligReisePrivatBilProvider: SatsDagligReisePrivatBilProvider,
-    private val vilkårperiodeService: VilkårperiodeService,
-    private val behandlingService: BehandlingService,
-    private val unleashService: UnleashService,
+    private val avklartKjørelisteService: AvklartKjørelisteService,
 ) {
-    fun beregnRammevedtak(
-        vedtaksperioder: List<Vedtaksperiode>,
-        oppfylteVilkårDagligReise: List<VilkårDagligReise>,
-        behandlingId: BehandlingId,
-    ): RammevedtakPrivatBil? {
-        if (!unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)) return null
+    fun beregn(
+        behandling: Saksbehandling,
+        rammevedtak: RammevedtakPrivatBil?,
+        brukersNavKontor: String?,
+        forrigeBeregningsresultat: BeregningsresultatPrivatBil?,
+    ): BeregningsresultatPrivatBil? {
+        if (rammevedtak == null) return null
 
-        val reiserMedBil =
-            oppfylteVilkårDagligReise
-                .filter { it.fakta is FaktaPrivatBil }
-                .mapTilReiser(behandlingId)
+        val avklarteUkerForBehandling = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandling.id)
 
-        if (reiserMedBil.isEmpty()) return null
-
-        val resultatForReiser =
-            reiserMedBil.mapNotNull { beregnForReise(it, vedtaksperioder) }
-
-        if (resultatForReiser.isEmpty()) return null
-
-        return RammevedtakPrivatBil(reiser = resultatForReiser)
-    }
-
-    private fun List<VilkårDagligReise>.mapTilReiser(behandlingId: BehandlingId): List<ReiseMedPrivatBil> =
-        this.map { vilkår ->
-            val fakta = vilkår.fakta as? FaktaPrivatBil
-            feilHvis(fakta == null) { "Forventet FaktaPrivatBil for daglig reise med privat bil" }
-            val aktivitet =
-                vilkårperiodeService.hentAktivitet(fakta.aktivitetId, behandlingId)
-                    ?: error("Fant ikke aktivitet for aktivitetId=${fakta.aktivitetId}")
-            val aktivitetType =
-                aktivitet.type as? AktivitetType
-                    ?: error("Forventet AktivitetType for aktivitetId=${fakta.aktivitetId}")
-            val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-
-            vilkår.tilReiserMedPrivatBil(
-                aktivitetType = aktivitetType,
-                typeAktivitet = aktivitet.typeAktivitet,
-                gjelderTiltaksenheten = saksbehandling.stønadstype.behandlendeEnhet() === Enhet.NAV_TILTAK_OSLO,
-            )
-        }
-
-    private fun beregnForReise(
-        reise: ReiseMedPrivatBil,
-        vedtaksperioder: List<Vedtaksperiode>,
-    ): RammeForReiseMedPrivatBil? {
-        val reiseOgVedtaksperioderSnitt = finnSnittMellomReiseOgVedtaksperioder(reise, vedtaksperioder)
-
-        return reiseOgVedtaksperioderSnitt.justertReiseperiode?.let { justertReise ->
-            validerVedtaksperioderErSammenhengendeInnenforReise(
-                justertReise,
-                reiseOgVedtaksperioderSnitt.justerteVedtaksperioder,
-            )
-            RammeForReiseMedPrivatBil(
-                reiseId = reise.reiseId,
-                aktivitetsadresse = reise.aktivitetsadresse,
-                typeAktivitet = reise.typeAktivitet,
-                aktivitetType = reise.aktivitetType,
-                grunnlag =
-                    lagBeregningsgrunnlagForReise(
-                        justertReise,
-                        reiseOgVedtaksperioderSnitt.justerteVedtaksperioder,
-                    ),
-            )
-        }
-    }
-
-    private fun validerVedtaksperioderErSammenhengendeInnenforReise(
-        justertReise: ReiseMedPrivatBil,
-        justerteVedtaksperioder: List<Vedtaksperiode>,
-    ) {
-        require(justertReise.fom == justerteVedtaksperioder.minOf { it.fom }) {
-            "Fom på reise er ulik tidligste fom på vedtaksperiodene"
-        }
-
-        require(justertReise.tom == justerteVedtaksperioder.maxOf { it.tom }) {
-            "Tom på reise ulik største tom på vedtaksperiodene"
-        }
-
-        require(!justerteVedtaksperioder.overlapper()) {
-            "Vedtaksperioder innenfor en reise kan ikke overlappe"
-        }
-
-        brukerfeilHvis(!justerteVedtaksperioder.allePerioderErSammenhengende()) {
-            "Alle vedtaksperioder må være sammenhengende innenfor en reise"
-        }
-    }
-
-    private fun lagBeregningsgrunnlagForReise(
-        reise: ReiseMedPrivatBil,
-        vedtaksperioder: List<Vedtaksperiode>,
-    ): RammeForReiseMedPrivatBilBeregningsgrunnlag {
-        val delperioder =
-            reise.delPerioder
-                // Justerer delperioder i tilfelle rammevedtaket har blitt kortet ned mot vedtaksperioder
-                .beregnSnitt(listOf(Datoperiode(reise.fom, reise.tom)))
-                .map { it.first }
-                .map { delperiode ->
-                    val satser =
-                        satsDagligReisePrivatBilProvider
-                            .finnAlleSatserInnenforPeriode(delperiode)
-                            .map { sats ->
-                                val snitt =
-                                    delperiode.beregnSnitt(sats)
-                                        ?: error(
-                                            "Forventer at det skal finnes et snitt mellom delperiode ${delperiode.fom} - ${delperiode.tom} og sats ${sats.fom} - ${sats.tom}",
-                                        )
-                                val dagsatsUtenParkering =
-                                    beregnDagsatsUtenParkering(
-                                        reiseavstandEnVei = reise.reiseavstandEnVei,
-                                        ekstrakostnader =
-                                            RammeForReiseMedPrivatEkstrakostnader(
-                                                bompengerPerDag = delperiode.bompengerPerDag,
-                                                fergekostnadPerDag = delperiode.fergekostnadPerDag,
-                                            ),
-                                        kilometersats = sats.beløp.setScale(2),
-                                    )
-
-                                RammeForReiseMedPrivatBilSatsForDelperiode(
-                                    fom = snitt.fom,
-                                    tom = snitt.tom,
-                                    kilometersats = sats.beløp.setScale(2),
-                                    dagsatsUtenParkering = dagsatsUtenParkering,
-                                    satsBekreftetVedVedtakstidspunkt = sats.bekreftet,
-                                )
-                            }
-
-                    RammeForReiseMedPrivatBilDelperiode(
-                        fom = delperiode.fom,
-                        tom = delperiode.tom,
-                        ekstrakostnader =
-                            RammeForReiseMedPrivatEkstrakostnader(
-                                bompengerPerDag = delperiode.bompengerPerDag,
-                                fergekostnadPerDag = delperiode.fergekostnadPerDag,
-                            ),
-                        reisedagerPerUke = delperiode.reisedagerPerUke,
-                        satser = satser.sorted(),
-                    )
-                }
-
-        return RammeForReiseMedPrivatBilBeregningsgrunnlag(
-            fom = reise.fom,
-            tom = reise.tom,
-            delperioder = delperioder.sortedBy { it.fom },
-            reiseavstandEnVei = reise.reiseavstandEnVei,
-            vedtaksperioder = vedtaksperioder,
+        return beregn(
+            rammevedtak = rammevedtak,
+            avklarteUkerForBehandling = avklarteUkerForBehandling,
+            brukersNavKontor = brukersNavKontor,
+            forrigeBeregningsresultat = forrigeBeregningsresultat,
         )
     }
 
-    private fun beregnDagsatsUtenParkering(
-        reiseavstandEnVei: BigDecimal,
-        ekstrakostnader: RammeForReiseMedPrivatEkstrakostnader,
-        kilometersats: BigDecimal,
-    ): BigDecimal {
-        val kostnadKjøring =
-            reiseavstandEnVei
-                .multiply(BigDecimal.valueOf(2))
-                .multiply(kilometersats)
-                .setScale(2, RoundingMode.HALF_UP)
+    private fun beregn(
+        rammevedtak: RammevedtakPrivatBil,
+        avklarteUkerForBehandling: Collection<AvklartKjørtUke>,
+        brukersNavKontor: String?,
+        forrigeBeregningsresultat: BeregningsresultatPrivatBil? = null,
+    ): BeregningsresultatPrivatBil =
+        BeregningsresultatPrivatBil(
+            reiser =
+                rammevedtak.reiser.map { reise ->
+                    val avklarteUkerForReise = avklarteUkerForBehandling.filter { it.reiseId == reise.reiseId }
+                    val forrigeReise = forrigeBeregningsresultat?.reiser?.find { it.reiseId == reise.reiseId }
 
-        val sumEkstrakostnader = ekstrakostnader.beregnTotalEkstrakostnadForEnDag()
+                    if (forrigeReise == null) {
+                        lagBeregningsresultatForReise(
+                            rammeForReise = reise,
+                            avklarteUkerForReise = avklarteUkerForReise,
+                            brukersNavKontor = brukersNavKontor,
+                        )
+                    } else {
+                        lagBeregningsresultatForReiseVedRevurdering(
+                            rammeForReise = reise,
+                            avklarteUkerForReise = avklarteUkerForReise,
+                            brukersNavKontor = brukersNavKontor,
+                            forrigeReise = forrigeReise,
+                        )
+                    }
+                },
+        )
 
-        return kostnadKjøring + sumEkstrakostnader
+    private fun lagBeregningsresultatForReiseVedRevurdering(
+        rammeForReise: RammeForReiseMedPrivatBil,
+        avklarteUkerForReise: List<AvklartKjørtUke>,
+        brukersNavKontor: String?,
+        forrigeReise: BeregningsresultatForReisePrivatBil,
+    ): BeregningsresultatForReisePrivatBil {
+        val ukerSomSkalBeregnes = avklarteUkerForReise.filter { it.avklartKjørtUkeStatus != AvklartKjørtUkeStatus.UENDRET }
+        val ukerSomSkalGjenbrukes =
+            avklarteUkerForReise.filter {
+                it.avklartKjørtUkeStatus == AvklartKjørtUkeStatus.UENDRET
+            }
+
+        val nyBeregnedePerioder =
+            lagBeregningsresultatForReise(
+                rammeForReise = rammeForReise,
+                avklarteUkerForReise = ukerSomSkalBeregnes,
+                brukersNavKontor = brukersNavKontor,
+            ).perioder
+
+        val gjenbruktePerioder =
+            ukerSomSkalGjenbrukes.map { uke ->
+                val periode =
+                    forrigeReise.perioder.find { it.fom.tilUkeIÅr() == uke.uke }
+                        ?: error("Fant ikke periode for uke ${uke.uke} i forrige vedtak, men uke har status UENDRET")
+                periode.copy(fraTidligereVedtak = true)
+            }
+
+        return BeregningsresultatForReisePrivatBil(
+            reiseId = rammeForReise.reiseId,
+            perioder = (nyBeregnedePerioder + gjenbruktePerioder).sortedBy { it.fom },
+        )
+    }
+
+    private fun lagBeregningsresultatForReise(
+        rammeForReise: RammeForReiseMedPrivatBil,
+        avklarteUkerForReise: List<AvklartKjørtUke>,
+        brukersNavKontor: String?,
+    ): BeregningsresultatForReisePrivatBil {
+        // Kaster feil om det finnes godkjente dager utenfor rammevedtak
+        validerDagerErInnenforRammevedtak(rammeForReise, avklarteUkerForReise)
+        val delperioder = rammeForReise.grunnlag.delperioder
+
+        return BeregningsresultatForReisePrivatBil(
+            reiseId = rammeForReise.reiseId,
+            perioder =
+                delperioder.flatMap { delperiode ->
+                    val dagerForDelperiode =
+                        avklarteUkerForReise
+                            .flatMap { it.dager }
+                            .filter { dag ->
+                                rammeForReise.grunnlag.inneholder(dag.dato) &&
+                                    delperiode.fom <= dag.dato && dag.dato <= delperiode.tom
+                            }
+                    lagPerioderForDagerMedSammeSats(
+                        dagerForDelperiode,
+                        delperiode,
+                        brukersNavKontor,
+                    )
+                },
+        )
+    }
+
+    private fun validerDagerErInnenforRammevedtak(
+        rammeForReise: RammeForReiseMedPrivatBil,
+        avklarteUkerForReise: List<AvklartKjørtUke>,
+    ) {
+        avklarteUkerForReise
+            .flatMap { it.dager }
+            .filter { it.godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.JA }
+            .forEach {
+                feilHvis(!rammeForReise.grunnlag.inneholder(it.dato)) {
+                    "Dag ${it.dato} er ikke innenfor rammevedtak (${rammeForReise.grunnlag.fom} - ${rammeForReise.grunnlag.tom})"
+                }
+            }
+    }
+
+    private fun lagPerioderForDagerMedSammeSats(
+        dager: List<AvklartKjørtDag>,
+        delperiode: RammeForReiseMedPrivatBilDelperiode,
+        brukersNavKontor: String?,
+    ): Collection<BeregningsresultatForReisePrivatBilPeriode> {
+        // Grupper dager på uke, slik at alle dager innenfor en uke utbetales samme dag
+        return dager
+            .groupBy { it.dato.tilUkeIÅr() }
+            .map { (_, dager) ->
+                val beregnedeDager =
+                    dager
+                        .filter { dag -> dag.godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.JA }
+                        .map { dag ->
+                            val parkeringsutgift = dag.parkeringsutgift ?: 0
+                            val dagsatsUtenParkering = delperiode.finnSatsForDato(dag.dato).dagsatsUtenParkering
+                            BeregningsresultatForReisePrivatBilDag(
+                                dato = dag.dato,
+                                parkeringskostnad = parkeringsutgift,
+                                dagsatsUtenParkering = dagsatsUtenParkering.setScale(2),
+                                stønadsbeløpForDag =
+                                    dagsatsUtenParkering
+                                        .plus(parkeringsutgift.toBigDecimal())
+                                        .setScale(2),
+                            )
+                        }
+
+                BeregningsresultatForReisePrivatBilPeriode(
+                    fom = dager.minOf { it.dato },
+                    tom = dager.maxOf { it.dato },
+                    grunnlag =
+                        BeregningsresultatForReisePrivatBilGrunnlag(
+                            dager = beregnedeDager,
+                        ),
+                    stønadsbeløp = beregnedeDager.sumOf { it.stønadsbeløpForDag }.avrundetStønadsbeløp(),
+                    brukersNavKontor = brukersNavKontor,
+                    fraTidligereVedtak = false,
+                )
+            }
     }
 }

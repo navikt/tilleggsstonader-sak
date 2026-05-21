@@ -17,14 +17,14 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningsresultatService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 
 class KjørelisteStegTest {
-    private val privatBilBeregningsresultatService = mockk<PrivatBilBeregningsresultatService>(relaxed = true)
+    private val privatBilBeregningService = mockk<PrivatBilBeregningService>(relaxed = true)
     private val vedtakService = mockk<VedtakService>(relaxed = true)
     private val arbeidsfordelingService = mockk<ArbeidsfordelingService>(relaxed = true)
     private val dagligReiseVedtakService = mockk<DagligReiseVedtakService>(relaxed = true)
@@ -32,7 +32,7 @@ class KjørelisteStegTest {
 
     private val steg =
         KjørelisteSteg(
-            privatBilBeregningsresultatService = privatBilBeregningsresultatService,
+            privatBilBeregningService = privatBilBeregningService,
             vedtakService = vedtakService,
             arbeidsfordelingService = arbeidsfordelingService,
             dagligReiseVedtakService = dagligReiseVedtakService,

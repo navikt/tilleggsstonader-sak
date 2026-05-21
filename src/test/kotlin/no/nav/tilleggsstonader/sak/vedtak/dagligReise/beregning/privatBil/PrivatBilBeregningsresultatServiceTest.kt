@@ -44,7 +44,7 @@ class PrivatBilBeregningsresultatServiceTest {
     private val behandling = saksbehandling(id = behandlingId)
 
     val beregningService =
-        PrivatBilBeregningsresultatService(
+        PrivatBilBeregningService(
             avklartKjørelisteService = avklartKjørelisteService,
         )
 

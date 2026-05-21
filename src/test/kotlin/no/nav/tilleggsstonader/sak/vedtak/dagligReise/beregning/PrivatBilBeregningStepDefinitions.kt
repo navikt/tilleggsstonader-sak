@@ -24,7 +24,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilRammevedtakBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.SatsDagligReisePrivatBilProvider
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
@@ -65,7 +65,7 @@ class PrivatBilBeregningStepDefinitions {
 
     val satsDagligReisePrivatBilProvider = SatsDagligReisePrivatBilProvider()
     val beregningService =
-        PrivatBilBeregningService(
+        PrivatBilRammevedtakBeregningService(
             satsDagligReisePrivatBilProvider = satsDagligReisePrivatBilProvider,
             vilkårperiodeService = vilkårperiodeService,
             behandlingService = behandlingServiceMock,
