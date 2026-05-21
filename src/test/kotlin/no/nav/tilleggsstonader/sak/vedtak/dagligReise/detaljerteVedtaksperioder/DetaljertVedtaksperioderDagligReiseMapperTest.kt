@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
@@ -95,9 +96,11 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                         ),
                     ),
                 adresse = "adresseTso",
+                rammevedtakPrivatBil = null,
             )
         val forventetTsr = forventetTso.copy(stønadstype = Stønadstype.DAGLIG_REISE_TSR, adresse = "adresseTsr")
         assertThat(resultat).containsExactly(forventetTso, forventetTsr)
+        assertThat(resultat.map { it.rammevedtakPrivatBil }).containsOnlyNulls()
     }
 
     @Test
@@ -134,6 +137,57 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
 
         assertThat(resultat).hasSize(2)
         assertThat(resultat.map { it.adresse }).containsExactly("adresse 1", "adresse 2")
+        assertThat(resultat.map { it.rammevedtakPrivatBil }).containsOnlyNulls()
+    }
+
+    @Test
+    fun `skal inkludere to reiser med en offentlig transport og en privat bil`() {
+        val offentligTransportReiseId = ReiseId.random()
+        val privatBilReiseId = ReiseId.random()
+
+        val vedtakMedPrivatBil =
+            InnvilgelseDagligReise(
+                vedtaksperioder = defaultVedtaksperioder,
+                beregningsresultat =
+                    BeregningsresultatDagligReise(
+                        offentligTransport =
+                            BeregningsresultatOffentligTransport(
+                                reiser =
+                                    listOf(
+                                        BeregningsresultatForReise(
+                                            reiseId = offentligTransportReiseId,
+                                            perioder = listOf(beregningsresultatForPeriode(førsteJanuar, sisteJanuar)),
+                                        ),
+                                    ),
+                            ),
+                        privatBil = null,
+                    ),
+                rammevedtakPrivatBil = RammevedtakPrivatBilUtil.rammevedtakPrivatBil(reiseId = privatBilReiseId),
+                beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+            )
+
+        val resultat =
+            finnDetaljerteVedtaksperioderDagligReise(
+                vedtaksdataTso = vedtakMedPrivatBil,
+                vedtaksdataTsr = null,
+                adresserTso = mapOf(offentligTransportReiseId to "Testveien 1", privatBilReiseId to "Testveien 2"),
+                adresserTsr = emptyMap(),
+            )
+
+        assertThat(resultat.map { it.typeDagligReise }).containsExactly(
+            TypeDagligReise.OFFENTLIG_TRANSPORT,
+            TypeDagligReise.PRIVAT_BIL,
+        )
+
+        val offentligTransport = resultat.first { it.typeDagligReise == TypeDagligReise.OFFENTLIG_TRANSPORT }
+        assertThat(offentligTransport.rammevedtakPrivatBil).isNull()
+        assertThat(offentligTransport.adresse).isEqualTo("Testveien 1")
+
+        val privatBil = resultat.first { it.typeDagligReise == TypeDagligReise.PRIVAT_BIL }
+        assertThat(privatBil.rammevedtakPrivatBil).isNotNull
+        assertThat(privatBil.rammevedtakPrivatBil?.reiseId).isEqualTo(privatBilReiseId)
+        assertThat(privatBil.adresse).isEqualTo("Testveien 2")
+        assertThat(privatBil.detaljertBeregningsperioder).isNull()
     }
 
     private fun innvilgelse(data: InnvilgelseDagligReise = defaultInnvilgelseDagligReise) =

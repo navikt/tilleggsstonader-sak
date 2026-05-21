@@ -3,14 +3,14 @@ package no.nav.tilleggsstonader.sak.tilbakekreving.hendelse
 import no.nav.tilleggsstonader.sak.tilbakekreving.domene.Tilbakekrevingsstatus
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 
 const val TILBAKEKREVING_TYPE_BEHANDLING_ENDRET = "behandling_endret"
 
 data class TilbakekrevingBehandlingEndret(
     override val versjon: Int,
     override val eksternFagsakId: String,
-    val hendelseOpprettet: LocalDateTime,
+    val hendelseOpprettet: OffsetDateTime,
     val eksternBehandlingId: String?,
     val tilbakekreving: TilbakekrevingInfo,
 ) : TilbakekrevinghendelseRecord {
@@ -24,8 +24,8 @@ data class TilbakekrevingBehandlingEndret(
 
     fun tilDomene() =
         Tilbakekrevingsstatus(
-            hendelseOpprettet = hendelseOpprettet,
-            sakOpprettet = tilbakekreving.sakOpprettet,
+            hendelseOpprettet = hendelseOpprettet.toLocalDateTime(),
+            sakOpprettet = tilbakekreving.sakOpprettet.toLocalDateTime(),
             varselSendtTidspunkt = tilbakekreving.varselSendt,
             behandlingstatus = tilbakekreving.behandlingsstatus,
             totaltFeilutbetaltBeløp = tilbakekreving.totaltFeilutbetaltBeløp,
@@ -43,7 +43,7 @@ data class TilbakekrevingBehandlingEndret(
 
 data class TilbakekrevingInfo(
     val behandlingId: String,
-    val sakOpprettet: LocalDateTime,
+    val sakOpprettet: OffsetDateTime,
     val varselSendt: LocalDate?,
     val behandlingsstatus: String,
     val totaltFeilutbetaltBeløp: BigDecimal,

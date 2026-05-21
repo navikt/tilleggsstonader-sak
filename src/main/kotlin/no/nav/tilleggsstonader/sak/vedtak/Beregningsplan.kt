@@ -3,7 +3,8 @@ package no.nav.tilleggsstonader.sak.vedtak
 import com.fasterxml.jackson.annotation.JsonInclude
 import java.time.LocalDate
 
-data class Beregningsplan(
+@ConsistentCopyVisibility
+data class Beregningsplan internal constructor(
     val omfang: Beregningsomfang,
     @JsonInclude(JsonInclude.Include.NON_NULL)
     val fraDato: LocalDate? = null,

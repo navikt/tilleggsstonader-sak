@@ -43,6 +43,7 @@ import org.springframework.kafka.core.KafkaTemplate
 import tools.jackson.module.kotlin.readValue
 import java.math.BigDecimal
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 import kotlin.random.Random
@@ -193,12 +194,12 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
             val tilbakekrevingBehandlingEndret =
                 TilbakekrevingBehandlingEndret(
                     eksternFagsakId = UUID.randomUUID().toString(),
-                    hendelseOpprettet = LocalDateTime.now(),
+                    hendelseOpprettet = OffsetDateTime.now(),
                     eksternBehandlingId = UUID.randomUUID().toString(),
                     tilbakekreving =
                         TilbakekrevingInfo(
                             behandlingId = UUID.randomUUID().toString(),
-                            sakOpprettet = LocalDateTime.now(),
+                            sakOpprettet = OffsetDateTime.now(),
                             varselSendt = null,
                             behandlingsstatus = TilbakekrevingBehandlingEndret.STATUS_TIL_BEHANDLING,
                             totaltFeilutbetaltBeløp = BigDecimal("10000"),
@@ -222,12 +223,12 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
             val tilbakekrevingBehandlingEndret =
                 TilbakekrevingBehandlingEndret(
                     eksternFagsakId = fagsak.eksternId.toString(),
-                    hendelseOpprettet = LocalDateTime.now(),
+                    hendelseOpprettet = OffsetDateTime.now(),
                     eksternBehandlingId = null,
                     tilbakekreving =
                         TilbakekrevingInfo(
                             behandlingId = UUID.randomUUID().toString(),
-                            sakOpprettet = LocalDateTime.now(),
+                            sakOpprettet = OffsetDateTime.now(),
                             varselSendt = null,
                             behandlingsstatus = TilbakekrevingBehandlingEndret.STATUS_TIL_BEHANDLING,
                             totaltFeilutbetaltBeløp = BigDecimal("10000"),
@@ -252,12 +253,12 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
             val payload =
                 TilbakekrevingBehandlingEndret(
                     eksternFagsakId = behandling.eksternFagsakId.toString(),
-                    hendelseOpprettet = LocalDateTime.now(),
+                    hendelseOpprettet = OffsetDateTime.now(),
                     eksternBehandlingId = behandling.eksternId.toString(),
                     tilbakekreving =
                         TilbakekrevingInfo(
                             behandlingId = UUID.randomUUID().toString(),
-                            sakOpprettet = LocalDateTime.now(),
+                            sakOpprettet = OffsetDateTime.now(),
                             varselSendt = null,
                             behandlingsstatus = TilbakekrevingBehandlingEndret.STATUS_TIL_BEHANDLING,
                             totaltFeilutbetaltBeløp = BigDecimal("10000"),
