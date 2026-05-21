@@ -104,6 +104,8 @@ fun Vurdering.tilDto() = VurderingDto(svar = svar, resultat = resultat)
     JsonSubTypes.Type(AktivitetBarnetilsynFaktaOgVurderingerDto::class, name = "AKTIVITET_BARNETILSYN"),
     JsonSubTypes.Type(AktivitetLæremidlerFaktaOgVurderingerDto::class, name = "AKTIVITET_LÆREMIDLER"),
     JsonSubTypes.Type(AktivitetBoutgifterFaktaOgVurderingerDto::class, name = "AKTIVITET_BOUTGIFTER"),
+    JsonSubTypes.Type(AktivitetDagligReiseTsoFaktaOgVurderingerDto::class, name = "AKTIVITET_DAGLIG_REISE_TSO"),
+    JsonSubTypes.Type(AktivitetDagligReiseTsrFaktaOgVurderingerDto::class, name = "AKTIVITET_DAGLIG_REISE_TSR"),
 )
 sealed class FaktaOgVurderingerDto
 
