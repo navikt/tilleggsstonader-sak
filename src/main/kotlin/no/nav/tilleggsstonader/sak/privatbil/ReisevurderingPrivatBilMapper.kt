@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPri
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import java.time.LocalDate
 
-object ReisevurderingMapper {
+object ReisevurderingPrivatBilMapper {
     fun RammeForReiseMedPrivatBil.tilReisevurderingDto(
         avklarteUker: List<AvklartKjørtUke>,
         kjørelister: List<Kjøreliste>,
