@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
@@ -10,7 +11,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
-import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -144,13 +144,13 @@ class DagligReiseBeregningService(
                 "${vilkårUtenTypeAktivitet.size} reise(r) mangler typeAktivitet."
         }
 
-        val aktiviteter = vilkårperiodeService.hentVilkårperioder(behandlingId).aktiviteter
         offentligTransportVilkår.forEach { vilkår ->
             val vilkåretsTypeAktivtet = (vilkår.fakta as FaktaOffentligTransport).typeAktivitet!!
-            val aktiviteterMedSammeTypeAktivitet = aktiviteter.filter { it.typeAktivitet == vilkåretsTypeAktivtet }
-            brukerfeilHvis(aktiviteterMedSammeTypeAktivitet.none { it.overlapper(vilkår) }) {
-                "Det finnes ingen aktiviteter med variant \"${vilkåretsTypeAktivtet.beskrivelse}\" innenfor perioden ${vilkår.fom.norskFormat()} - ${vilkår.tom.norskFormat()}"
-            }
+            vilkårperiodeService.validerAktivitetMedTypeAktivitetInnenforPeriode(
+                typeAktivitet = vilkåretsTypeAktivtet,
+                periode = Datoperiode(fom = vilkår.fom, tom = vilkår.tom),
+                behandlingId = behandlingId,
+            )
         }
     }
 

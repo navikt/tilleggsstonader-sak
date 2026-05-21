@@ -187,7 +187,7 @@ class DagligReiseVilkårService(
         }
 
         if (gjelderOffentligTransport && behandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
-            validerAktivitetForOffentligTransport(nyttVilkår)
+            validerAktivitetForOffentligTransport(nyttVilkår, behandling.id)
         }
     }
 
@@ -224,10 +224,18 @@ class DagligReiseVilkårService(
         }
     }
 
-    private fun validerAktivitetForOffentligTransport(nyttVilkår: LagreDagligReise) {
+    private fun validerAktivitetForOffentligTransport(
+        nyttVilkår: LagreDagligReise,
+        behandlingId: BehandlingId,
+    ) {
         val fakta = nyttVilkår.fakta as FaktaOffentligTransport
         brukerfeilHvis(fakta.typeAktivitet == null) {
             "Aktivitet må velges for offentlig transport"
         }
+        vilkårperiodeService.validerAktivitetMedTypeAktivitetInnenforPeriode(
+            typeAktivitet = fakta.typeAktivitet!!,
+            periode = Datoperiode(fom = nyttVilkår.fom, tom = nyttVilkår.tom),
+            behandlingId = behandlingId,
+        )
     }
 }

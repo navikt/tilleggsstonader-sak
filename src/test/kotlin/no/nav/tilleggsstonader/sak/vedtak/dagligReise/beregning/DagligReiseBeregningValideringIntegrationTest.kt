@@ -18,9 +18,13 @@ import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsoRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 
-class DagligReiseBeregningValideringIntegrationTest : CleanDatabaseIntegrationTest() {
+class DagligReiseBeregningValideringIntegrationTest(
+    @Autowired private val vilkårperiodeRepository: VilkårperiodeRepository,
+) : CleanDatabaseIntegrationTest() {
     @Test
     fun `Kaster feil hvis validering ikke blir gjort`() {
         val fom = 1 januar 2026
@@ -87,7 +91,7 @@ class DagligReiseBeregningValideringIntegrationTest : CleanDatabaseIntegrationTe
             ) {
                 aktivitet {
                     opprett {
-                        aktivitetTiltakTsr(fom, tom, typeAktivitet = TypeAktivitet.GRUPPEAMO)
+                        aktivitetTiltakTsr(fom, tom, typeAktivitet = TypeAktivitet.ENKELAMO)
                     }
                 }
                 målgruppe {
@@ -102,13 +106,22 @@ class DagligReiseBeregningValideringIntegrationTest : CleanDatabaseIntegrationTe
                 }
             }
 
+        val aktivitet =
+            vilkårperiodeRepository
+                .findByBehandlingId(
+                    behandlingContext.behandlingId,
+                ).single { it.type == AktivitetType.TILTAK }
+        vilkårperiodeRepository.update(
+            aktivitet.copy(typeAktivitet = TypeAktivitet.GRUPPEAMO),
+        )
+
         gjennomførBeregningStegKall(behandlingContext.behandlingId, Stønadstype.DAGLIG_REISE_TSR)
             .expectStatus()
             .isBadRequest
             .expectBody()
             .jsonPath("$.detail")
             .isEqualTo(
-                "Det finnes ingen aktiviteter med variant \"${TypeAktivitet.ENKELAMO.beskrivelse}\" innenfor perioden ${fom.norskFormat()} - ${tom.norskFormat()}",
+                "Det finnes ingen aktiviteter med variant \"${TypeAktivitet.ENKELAMO.beskrivelse}\" i perioden ${fom.norskFormat()} - ${tom.norskFormat()}",
             )
     }
 }
