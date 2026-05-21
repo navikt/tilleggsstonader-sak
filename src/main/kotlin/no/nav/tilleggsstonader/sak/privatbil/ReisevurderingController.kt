@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.ekstern.stønad.DagligReisePrivatBilService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -66,6 +67,11 @@ class ReisevurderingController(
         val oppdatertAvklartUke = avklartKjørelisteService.oppdaterAvklartUke(behandlingId, ukeId, avklarteDager)
         val kjøreliste = kjørelisteService.hentKjøreliste(oppdatertAvklartUke.kjørelisteId)
 
-        return UkeVurderingDto(avklartUke = oppdatertAvklartUke, kjøreliste = kjøreliste)
+        return UkeVurderingDto(
+            uke = oppdatertAvklartUke.uke,
+            datoer = oppdatertAvklartUke.alleDatoer(),
+            avklartUke = oppdatertAvklartUke,
+            kjøreliste = kjøreliste,
+        )
     }
 }

@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
-import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
+import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
@@ -35,23 +35,7 @@ data class ReisevurderingPrivatBilDto(
                 .map { (uke, datoer) ->
                     val avklartUke = avklarteUker.singleOrNull { it.reiseId == reise.reiseId && it.uke == uke }
                     val kjørelisteForUke = avklartUke?.let { kjørelister.firstOrNull { it.id == avklartUke.kjørelisteId } }
-                    if (avklartUke != null) {
-                        UkeVurderingDto(avklartUke = avklartUke, kjøreliste = kjørelisteForUke)
-                    } else {
-                        UkeVurderingDto(
-                            ukenummer = uke.ukenummer,
-                            fraDato = datoer.min(),
-                            tilDato = datoer.max(),
-                            status = UkeStatus.IKKE_MOTTATT_KJØRELISTE,
-                            avvik = null,
-                            behandletDato = null,
-                            kjørelisteInnsendtDato = null,
-                            kjørelisteId = null,
-                            avklartUkeId = null,
-                            avklartKjørtUkeStatus = null,
-                            dager = datoer.map { dato -> DagDto(dato = dato, kjørelisteForUke = null, avklartUke = null) },
-                        )
-                    }
+                    UkeVurderingDto(uke = uke, datoer = datoer, avklartUke = avklartUke, kjøreliste = kjørelisteForUke)
                 },
     )
 }
@@ -70,26 +54,28 @@ data class UkeVurderingDto(
     val dager: List<DagDto>,
 ) {
     constructor(
-        avklartUke: AvklartKjørtUke,
+        uke: UkeIÅr,
+        datoer: List<LocalDate>,
+        avklartUke: AvklartKjørtUke?,
         kjøreliste: Kjøreliste?,
     ) : this(
-        ukenummer = avklartUke.uke.ukenummer,
-        fraDato = avklartUke.fom,
-        tilDato = avklartUke.tom,
-        status = avklartUke.status,
+        ukenummer = uke.ukenummer,
+        fraDato = datoer.min(),
+        tilDato = datoer.max(),
+        status = avklartUke?.status ?: UkeStatus.IKKE_MOTTATT_KJØRELISTE,
         avvik =
-            avklartUke.typeAvvik?.let {
+            avklartUke?.typeAvvik?.let {
                 AvvikUke(
                     typeAvvik = it,
                     avviksMelding = "Dette er egentlig ikke et avvik, bare en test",
                 )
             },
-        behandletDato = avklartUke.behandletDato,
+        behandletDato = avklartUke?.behandletDato,
         kjørelisteInnsendtDato = kjøreliste?.datoMottatt?.toLocalDate(),
         kjørelisteId = kjøreliste?.id,
-        avklartUkeId = avklartUke.id,
-        avklartKjørtUkeStatus = avklartUke.avklartKjørtUkeStatus,
-        dager = avklartUke.alleDatoer().map { dato -> DagDto(dato = dato, kjørelisteForUke = kjøreliste, avklartUke = avklartUke) },
+        avklartUkeId = avklartUke?.id,
+        avklartKjørtUkeStatus = avklartUke?.avklartKjørtUkeStatus,
+        dager = datoer.map { dato -> DagDto(dato = dato, kjørelisteForUke = kjøreliste, avklartUke = avklartUke) },
     )
 }
 
