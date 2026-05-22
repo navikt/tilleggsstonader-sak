@@ -191,7 +191,7 @@ class InterntVedtakService(
             VedtaksperiodeInterntVedtak(
                 målgruppe = it.målgruppe,
                 aktivitet = it.aktivitet,
-                tiltaksvariant = it.typeAktivitet?.beskrivelse,
+                tiltaksvariant = null,
                 fom = it.fom,
                 tom = it.tom,
             )

@@ -54,7 +54,7 @@
     "tom" : "2024-02-29",
     "målgruppe" : "ARBEIDSSØKER",
     "aktivitet" : "TILTAK",
-    "tiltaksvariant" : "Gruppe AMO"
+    "tiltaksvariant" : null
   } ],
   "vilkår" : [ {
     "type" : "DAGLIG_REISE",

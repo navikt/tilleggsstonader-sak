@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.cucumberUtils
 
 import io.cucumber.datatable.DataTable
-import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
@@ -22,6 +21,5 @@ fun mapVedtaksperioder(dataTable: DataTable) =
             aktivitet =
                 parseValgfriEnum<AktivitetType>(BeregningNøkler.AKTIVITET, rad)
                     ?: AktivitetType.TILTAK,
-            typeAktivitet = parseValgfriEnum<TypeAktivitet>(BeregningNøkler.TYPE_AKTIVITET, rad),
         )
     }
