@@ -68,6 +68,7 @@ enum class AvklartKjørtUkeStatus {
     NY, // Uke finnes ikke i forrige behandling
     ENDRET, // Uke finnes i forrige behandling, men er endret av saksbehandler (inkl. tømt innhold → gir 0 kr)
     UENDRET, // Uke er kopiert uendret fra forrige behandling
+    SLETTET, // Uken er utenfor avkortet rammevedtak
 }
 
 fun Collection<AvklartKjørtUke>.finnesUkerMedAvvik() = this.any { uke -> uke.status == UkeStatus.AVVIK }

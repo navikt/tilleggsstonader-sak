@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
@@ -20,6 +21,7 @@ import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
@@ -27,6 +29,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Re
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 import java.util.UUID
 
 class AvklartKjørelisteServiceTest {
@@ -71,7 +74,11 @@ class AvklartKjørelisteServiceTest {
         @Test
         fun `UENDRET skal forbli UENDRET når data ikke endres`() {
             val eksisterendeUke =
-                lagUke(status = AvklartKjørtUkeStatus.UENDRET, parkeringPåMandag = 50, begrunnelsePåMandag = "endret i test")
+                lagUke(
+                    status = AvklartKjørtUkeStatus.UENDRET,
+                    parkeringPåMandag = 50,
+                    begrunnelsePåMandag = "endret i test",
+                )
             val oppdatertSlot = slot<AvklartKjørtUke>()
 
             settOppMocks(eksisterendeUke)
@@ -88,7 +95,12 @@ class AvklartKjørelisteServiceTest {
 
         @Test
         fun `ENDRET skal bli UENDRET når data endres tilbake til å matche forrige behandling`() {
-            val forrigeUke = lagUke(status = AvklartKjørtUkeStatus.UENDRET, behandlingId = forrigeBehandlingId, parkeringPåMandag = null)
+            val forrigeUke =
+                lagUke(
+                    status = AvklartKjørtUkeStatus.UENDRET,
+                    behandlingId = forrigeBehandlingId,
+                    parkeringPåMandag = null,
+                )
             val eksisterendeUke = lagUke(status = AvklartKjørtUkeStatus.ENDRET, parkeringPåMandag = 50)
             val oppdatertSlot = slot<AvklartKjørtUke>()
 
@@ -107,7 +119,12 @@ class AvklartKjørelisteServiceTest {
 
         @Test
         fun `ENDRET skal forbli ENDRET når data fortsatt avviker fra forrige behandling`() {
-            val forrigeUke = lagUke(status = AvklartKjørtUkeStatus.UENDRET, behandlingId = forrigeBehandlingId, parkeringPåMandag = null)
+            val forrigeUke =
+                lagUke(
+                    status = AvklartKjørtUkeStatus.UENDRET,
+                    behandlingId = forrigeBehandlingId,
+                    parkeringPåMandag = null,
+                )
             val eksisterendeUke = lagUke(status = AvklartKjørtUkeStatus.ENDRET, parkeringPåMandag = 50)
             val oppdatertSlot = slot<AvklartKjørtUke>()
 
@@ -177,8 +194,14 @@ class AvklartKjørelisteServiceTest {
 
         @Test
         fun `ENDRET skal bli UENDRET når begrunnelse endres tilbake til å matche forrige behandling`() {
-            val forrigeUke = lagUke(status = AvklartKjørtUkeStatus.UENDRET, behandlingId = forrigeBehandlingId, begrunnelsePåMandag = null)
-            val eksisterendeUke = lagUke(status = AvklartKjørtUkeStatus.ENDRET, begrunnelsePåMandag = "endret begrunnelse")
+            val forrigeUke =
+                lagUke(
+                    status = AvklartKjørtUkeStatus.UENDRET,
+                    behandlingId = forrigeBehandlingId,
+                    begrunnelsePåMandag = null,
+                )
+            val eksisterendeUke =
+                lagUke(status = AvklartKjørtUkeStatus.ENDRET, begrunnelsePåMandag = "endret begrunnelse")
             val oppdatertSlot = slot<AvklartKjørtUke>()
 
             settOppMocks(eksisterendeUke, forrigeUke = forrigeUke)
@@ -289,4 +312,198 @@ class AvklartKjørelisteServiceTest {
             begrunnelse = begrunnelse ?: if (parkering != null) "endret i test" else null,
         )
     }
+
+    @Nested
+    inner class SletteMarkerUkerUtenforAvkortetRammevedtak {
+        @Test
+        fun `uker etter siste dato i reisen markeres SLETTET`() {
+            val mandagUke1 = 5 januar 2026
+            val mandagUke2 = 12 januar 2026
+            val mandagUke3 = 19 januar 2026
+            val sisteDagIAvkortetRammevedtak = 15 januar 2026
+
+            val uker =
+                listOf(
+                    lagUke(fom = mandagUke1, tom = mandagUke1.plusDays(4), status = AvklartKjørtUkeStatus.UENDRET),
+                    lagUke(fom = mandagUke2, tom = mandagUke2.plusDays(4), status = AvklartKjørtUkeStatus.UENDRET),
+                    lagUke(fom = mandagUke3, tom = mandagUke3.plusDays(4), status = AvklartKjørtUkeStatus.UENDRET),
+                )
+
+            val rammevedtak =
+                RammevedtakPrivatBil(
+                    reiser =
+                        listOf(
+                            lagRammeForReise(
+                                reiseId = reiseId,
+                                fom = mandagUke1,
+                                tom = sisteDagIAvkortetRammevedtak,
+                            ),
+                        ),
+                )
+
+            val updateSlot = slot<List<AvklartKjørtUke>>()
+
+            every { avklartKjørtUkeRepository.findByBehandlingId(behandlingId) } returns uker
+            every { avklartKjørtUkeRepository.updateAll(capture(updateSlot)) } answers { updateSlot.captured }
+
+            service.sletteMarkerUkerUtenforAvkortetRammevedtak(behandlingId, rammevedtak)
+
+            assertThat(updateSlot.captured).hasSize(1)
+            assertThat(updateSlot.captured[0].fom).isEqualTo(mandagUke3)
+            assertThat(updateSlot.captured[0].avklartKjørtUkeStatus).isEqualTo(AvklartKjørtUkeStatus.SLETTET)
+        }
+
+        @Test
+        fun `uker på eller før siste dato berøres ikke`() {
+            val mandagUke1 = 5 januar 2026
+            val mandagUke2 = 12 januar 2026
+            val sisteDagIAvkortetRammevedtak = mandagUke2.plusDays(2) // onsdag i uke 2
+
+            val uker =
+                listOf(
+                    lagUke(fom = mandagUke1, tom = mandagUke1.plusDays(4), status = AvklartKjørtUkeStatus.UENDRET),
+                    lagUke(fom = mandagUke2, tom = mandagUke2.plusDays(4), status = AvklartKjørtUkeStatus.UENDRET),
+                )
+
+            val rammevedtak =
+                RammevedtakPrivatBil(
+                    reiser =
+                        listOf(
+                            lagRammeForReise(
+                                reiseId = reiseId,
+                                fom = mandagUke1,
+                                tom = sisteDagIAvkortetRammevedtak,
+                            ),
+                        ),
+                )
+
+            every { avklartKjørtUkeRepository.findByBehandlingId(behandlingId) } returns uker
+
+            service.sletteMarkerUkerUtenforAvkortetRammevedtak(behandlingId, rammevedtak)
+
+            verify(exactly = 0) { avklartKjørtUkeRepository.updateAll(any()) }
+        }
+
+        @Test
+        fun `uker som tilhører reise som ikke finnes i rammevedtaket hoppes over`() {
+            val reise2 = ReiseId.random()
+            val mandagUke1 = 5 januar 2026
+            val mandagUke2 = 12 januar 2026
+            val mandagUke3 = 19 januar 2026
+
+            val uker =
+                listOf(
+                    lagUke(
+                        fom = mandagUke1,
+                        tom = mandagUke1.plusDays(4),
+                        reiseId = reiseId,
+                        status = AvklartKjørtUkeStatus.UENDRET,
+                    ),
+                    lagUke(
+                        fom = mandagUke2,
+                        tom = mandagUke2.plusDays(4),
+                        reiseId = reiseId,
+                        status = AvklartKjørtUkeStatus.UENDRET,
+                    ),
+                    lagUke(
+                        fom = mandagUke3,
+                        tom = mandagUke3.plusDays(4),
+                        reiseId = reise2,
+                        status = AvklartKjørtUkeStatus.UENDRET,
+                    ),
+                )
+
+            val rammevedtak =
+                RammevedtakPrivatBil(
+                    reiser =
+                        listOf(
+                            lagRammeForReise(
+                                reiseId = reiseId,
+                                fom = mandagUke1,
+                                tom = 11 januar 2026,
+                            ),
+                        ),
+                )
+
+            val updateSlot = slot<List<AvklartKjørtUke>>()
+
+            every { avklartKjørtUkeRepository.findByBehandlingId(behandlingId) } returns uker
+            every { avklartKjørtUkeRepository.updateAll(capture(updateSlot)) } answers { updateSlot.captured }
+
+            service.sletteMarkerUkerUtenforAvkortetRammevedtak(behandlingId, rammevedtak)
+
+            // Uke 1 (reiseId) er innenfor rammevedtak, Uke 2 (reiseId) er etter, skal slettes
+            // Uke 3 (reise2) finnes ikke i rammevedtak, hoppes over
+            assertThat(updateSlot.captured).hasSize(1)
+            assertThat(updateSlot.captured[0].fom).isEqualTo(mandagUke2)
+            assertThat(updateSlot.captured[0].reiseId).isEqualTo(reiseId)
+        }
+
+        @Test
+        fun `ingen forandring på status når ingen uker skal slettes`() {
+            val mandagUke1 = 5 januar 2026
+            val uker =
+                listOf(lagUke(fom = mandagUke1, tom = mandagUke1.plusDays(4), status = AvklartKjørtUkeStatus.UENDRET))
+
+            val rammevedtak =
+                RammevedtakPrivatBil(
+                    reiser =
+                        listOf(
+                            lagRammeForReise(
+                                reiseId = reiseId,
+                                fom = mandagUke1,
+                                tom = mandagUke1.plusDays(10),
+                            ),
+                        ),
+                )
+
+            every { avklartKjørtUkeRepository.findByBehandlingId(behandlingId) } returns uker
+
+            service.sletteMarkerUkerUtenforAvkortetRammevedtak(behandlingId, rammevedtak)
+
+            verify(exactly = 0) { avklartKjørtUkeRepository.updateAll(any()) }
+        }
+    }
+
+    private fun lagRammeForReise(
+        reiseId: ReiseId,
+        fom: LocalDate,
+        tom: LocalDate,
+    ): RammeForReiseMedPrivatBil =
+        rammeForReiseMedPrivatBil(
+            reiseId = reiseId,
+            fom = fom,
+            tom = tom,
+        )
+
+    private fun lagUke(
+        fom: LocalDate,
+        tom: LocalDate,
+        reiseId: ReiseId = this.reiseId,
+        status: AvklartKjørtUkeStatus = AvklartKjørtUkeStatus.UENDRET,
+    ): AvklartKjørtUke =
+        AvklartKjørtUke(
+            id = UUID.randomUUID(),
+            behandlingId = behandlingId,
+            kjørelisteId = KjørelisteId.random(),
+            reiseId = reiseId,
+            fom = fom,
+            tom = tom,
+            uke = fom.tilUkeIÅr(),
+            status = UkeStatus.OK_AUTOMATISK,
+            avklartKjørtUkeStatus = status,
+            dager =
+                (0..4)
+                    .map { dagOffset ->
+                        val dato = fom.plusDays(dagOffset.toLong())
+                        AvklartKjørtDag(
+                            dato = dato,
+                            godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
+                            automatiskVurdering = UtfyltDagAutomatiskVurdering.OK,
+                            avvik = emptyList(),
+                            parkeringsutgift = null,
+                            begrunnelse = null,
+                        )
+                    }.toSet(),
+        )
 }
