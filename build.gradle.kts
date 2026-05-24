@@ -8,7 +8,7 @@ val tilleggsstønaderLibsVersion = "2026.05.14-21.16.acdbe034efef"
 val tilleggsstønaderKontrakterVersion = "2026.05.07-15.38.1e977dd2af22"
 val avroVersion = "1.12.1"
 val confluentVersion = "8.0.1"
-val joarkHendelseVersion = "1.1.10"
+val joarkHendelseVersion = "1.1.11"
 val tokenSupportVersion = "6.0.6"
 val wiremockVersion = "3.13.2"
 val mockkVersion = "1.14.9"
@@ -25,7 +25,7 @@ plugins {
     application
 
     kotlin("jvm") version "2.3.21"
-    id("com.diffplug.spotless") version "8.4.0"
+    id("com.diffplug.spotless") version "8.5.1"
     id("com.github.ben-manes.versions") version "0.54.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
 
@@ -106,7 +106,7 @@ dependencies {
     implementation("no.nav.tilleggsstonader.kontrakter:kontrakter-felles:$tilleggsstønaderKontrakterVersion")
     implementation("no.nav.tilleggsstonader.kontrakter:pdl-personhendelser-avro:$tilleggsstønaderKontrakterVersion")
 
-    implementation("io.github.mikaojk:norwegian-holidays:1.0.13")
+    implementation("io.github.mikaojk:norwegian-holidays:1.0.22")
 
     // Shedlock – hindrer at schedulede jobber kjøres på tvers av replicas
     implementation("net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion")
