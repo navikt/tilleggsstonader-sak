@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -27,7 +26,6 @@ class FullførKjørelistebehandlingSteg(
         }
 
         fullførKjørelistebehandlingService.fullførKjørelistebehandling(saksbehandling)
-        behandlingService.oppdaterResultatPåBehandling(saksbehandling.id, BehandlingResultat.INNVILGET)
         behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.IVERKSETTER_VEDTAK)
     }
 

@@ -70,14 +70,13 @@ class BeslutteVedtakSteg(
 
         return if (data.godkjent) {
             val typeVedtak = vedtakService.hentVedtaksresultat(saksbehandling)
-            oppdaterResultatPåBehandling(saksbehandling, typeVedtak)
             vedtakCounter(saksbehandling.stønadstype, typeVedtak).increment()
 
             if (erManuellKjørelistebehandling(saksbehandling)) {
-                behandlingService.oppdaterStegPåBehandling(saksbehandling.id, StegType.FULLFØR_KJØRELISTE)
                 fullførKjørelistebehandlingService.fullførKjørelistebehandling(saksbehandling)
                 StegType.FERDIGSTILLE_BEHANDLING
             } else {
+                oppdaterResultatPåBehandling(saksbehandling, typeVedtak)
                 iverksettService.iverksettBehandlingFørsteGang(saksbehandling.id)
                 if (!saksbehandling.skalIkkeSendeBrev) {
                     brevService.lagEndeligBeslutterbrev(saksbehandling)
