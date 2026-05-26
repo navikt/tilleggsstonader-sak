@@ -19,7 +19,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
-import no.nav.tilleggsstonader.sak.privatbil.FullførKjørelistebehandlingSteg
+import no.nav.tilleggsstonader.sak.privatbil.FullførKjørelistebehandlingService
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -47,7 +47,7 @@ class BeslutteVedtakSteg(
     private val vedtakService: VedtakService,
     private val brevService: BrevService,
     private val iverksettService: IverksettService,
-    private val fullførKjørelistebehandlingSteg: FullførKjørelistebehandlingSteg,
+    private val fullførKjørelistebehandlingService: FullførKjørelistebehandlingService,
 ) : BehandlingSteg<BeslutteVedtakDto> {
     override fun validerSteg(saksbehandling: Saksbehandling) {
         brukerfeilHvis(saksbehandling.steg.kommerEtter(stegType())) {
@@ -75,7 +75,7 @@ class BeslutteVedtakSteg(
 
             if (erManuellKjørelistebehandling(saksbehandling)) {
                 behandlingService.oppdaterStegPåBehandling(saksbehandling.id, StegType.FULLFØR_KJØRELISTE)
-                fullførKjørelistebehandlingSteg.fullførEtterTotrinnskontroll(saksbehandling)
+                fullførKjørelistebehandlingService.fullførKjørelistebehandling(saksbehandling)
                 StegType.FERDIGSTILLE_BEHANDLING
             } else {
                 iverksettService.iverksettBehandlingFørsteGang(saksbehandling.id)
