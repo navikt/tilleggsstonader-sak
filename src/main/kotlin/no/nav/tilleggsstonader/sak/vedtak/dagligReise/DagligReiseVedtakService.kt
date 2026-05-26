@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.takeIfType
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import org.springframework.stereotype.Service
@@ -156,8 +157,10 @@ class DagligReiseVedtakService(
         )
     }
 
-    fun forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(forrigeIverksatteBehandlingId: BehandlingId?): Boolean {
-        val forrigeVedtak = forrigeIverksatteBehandlingId?.let { hentInnvilgelseEllerOpphørVedtak(it) }
-        return forrigeVedtak?.data?.rammevedtakPrivatBil != null
-    }
+    fun harRammevedtakForPrivatBil(behandlingId: BehandlingId): Boolean =
+        vedtakRepository
+            .findByIdOrThrow(behandlingId)
+            .takeIfType<InnvilgelseEllerOpphørDagligReise>()
+            ?.data
+            ?.rammevedtakPrivatBil != null
 }

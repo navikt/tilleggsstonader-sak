@@ -72,6 +72,8 @@ class DagligReiseBeregningService(
                 vedtaksperioder = vedtaksperioder,
                 oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
                 behandlingId = behandling.id,
+                typeVedtak = typeVedtak,
+                forrigeRammevedtakPrivatBil = forrigeVedtak?.rammevedtakPrivatBil,
             )
 
         val beregningsresultatPrivatBil =
