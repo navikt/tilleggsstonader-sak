@@ -25,8 +25,6 @@ class PrivatBilKall(
         avklarteDager: List<EndreAvklartDagRequest>,
     ) = apiRespons.oppdaterUke(behandlingId, avklartUkeId, avklarteDager).expectOkWithBody<UkeVurderingDto>()
 
-    fun fullførKjørelisteBehandling(behandlingId: BehandlingId) = apiRespons.fullførKjørelisteBehandling(behandlingId).expectStatus().isOk
-
     fun hentOppsummertBeregning(behandlingId: BehandlingId) =
         apiRespons.hentOppsummertBeregning(behandlingId).expectOkWithBody<PrivatBilOppsummertBeregningDto>()
 
@@ -67,15 +65,6 @@ class PrivatBilKall(
                 .medOnBehalfOfToken()
                 .exchange()
         }
-
-        fun fullførKjørelisteBehandling(behandlingId: BehandlingId) =
-            with(testklient.testkontekst) {
-                restTestClient
-                    .post()
-                    .uri("/api/behandling/$behandlingId/fullfør-kjørelistebehandling")
-                    .medOnBehalfOfToken()
-                    .exchange()
-            }
 
         fun hentOppsummertBeregning(behandlingId: BehandlingId) =
             with(testklient.testkontekst) {
