@@ -3,11 +3,16 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFaktaReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.VilkårReiseTilSamling
 
 object VilkårReiseTilSamlingMapper {
@@ -32,7 +37,6 @@ object VilkårReiseTilSamlingMapper {
             type = VilkårType.REISE_TIL_SAMLING,
             fom = this.fom,
             tom = this.tom,
-            utgift = this.fakta.utgifterOffentligTransport,
             erFremtidigUtgift = false,
             delvilkårwrapper = DelvilkårWrapper(this.delvilkårsett),
             opphavsvilkår = null,
@@ -42,16 +46,30 @@ object VilkårReiseTilSamlingMapper {
 
     private fun VilkårFakta?.mapTilFaktaReiseTilSamling(): FaktaReiseTilSamling =
         when (this) {
-            is VilkårFaktaReiseTilSamling -> this.mapTilFakta()
+            is FaktaReiseTilSamlingOffentligTransport -> this.mapTilFakta()
+            is FaktaReiseTilSamlingPrivatBil -> this.mapTilFakta()
+            is FaktaReiseTilSamlingUbestemt -> this.mapTilFakta()
             null -> feil("Fakta skal aldri være null for reise til samling")
             else -> feil("Ugyldig fakta for reise til samling")
         }
 
-    private fun VilkårFaktaReiseTilSamling.mapTilFakta() =
-        FaktaReiseTilSamling(
+    private fun FaktaReiseTilSamlingOffentligTransport.mapTilFakta() =
+        FaktaOffentligTransport(
             reiseId = this.reiseId,
             adresse = this.adresse,
             utgifterOffentligTransport = this.utgifterOffentligTransport,
+        )
+
+    private fun FaktaReiseTilSamlingPrivatBil.mapTilFakta() =
+        FaktaPrivatBil(
+            reiseId = this.reiseId,
+            adresse = this.adresse,
             reiseavstand = this.reiseavstand,
+        )
+
+    private fun FaktaReiseTilSamlingUbestemt.mapTilFakta() =
+        FaktaUbestemtType(
+            reiseId = this.reiseId,
+            adresse = this.adresse,
         )
 }

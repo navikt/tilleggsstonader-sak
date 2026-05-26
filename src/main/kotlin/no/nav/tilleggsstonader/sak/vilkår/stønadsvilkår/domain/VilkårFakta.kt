@@ -17,7 +17,9 @@ import java.time.LocalDate
     JsonSubTypes.Type(FaktaDagligReiseOffentligTransport::class, name = "DAGLIG_REISE_OFFENTLIG_TRANSPORT"),
     JsonSubTypes.Type(FaktaDagligReisePrivatBil::class, name = "DAGLIG_REISE_PRIVAT_BIL"),
     JsonSubTypes.Type(FaktaDagligReiseUbestemt::class, name = "DAGLIG_REISE_UBESTEMT"),
-    JsonSubTypes.Type(VilkårFaktaReiseTilSamling::class, name = "REISE_TIL_SAMLING"),
+    JsonSubTypes.Type(FaktaReiseTilSamlingOffentligTransport::class, name = "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT"),
+    JsonSubTypes.Type(FaktaReiseTilSamlingPrivatBil::class, name = "REISE_TIL_SAMLING_PRIVAT_BIL"),
+    JsonSubTypes.Type(FaktaReiseTilSamlingUbestemt::class, name = "REISE_TIL_SAMLING_UBESTEMT"),
     failOnRepeatedNames = true,
 )
 sealed interface VilkårFakta {
@@ -25,11 +27,21 @@ sealed interface VilkårFakta {
     val adresse: String?
 }
 
-data class VilkårFaktaReiseTilSamling(
+data class FaktaReiseTilSamlingOffentligTransport(
     override val reiseId: ReiseId,
     override val adresse: String?,
     val utgifterOffentligTransport: Int?,
+) : VilkårFakta
+
+data class FaktaReiseTilSamlingPrivatBil(
+    override val reiseId: ReiseId,
+    override val adresse: String?,
     val reiseavstand: BigDecimal?,
+) : VilkårFakta
+
+data class FaktaReiseTilSamlingUbestemt(
+    override val reiseId: ReiseId,
+    override val adresse: String?,
 ) : VilkårFakta
 
 data class FaktaDagligReiseUbestemt(
@@ -81,5 +93,7 @@ enum class TypeVilkårFakta {
     DAGLIG_REISE_OFFENTLIG_TRANSPORT,
     DAGLIG_REISE_PRIVAT_BIL,
     DAGLIG_REISE_UBESTEMT,
-    REISE_TIL_SAMLING,
+    REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT,
+    REISE_TIL_SAMLING_PRIVAT_BIL,
+    REISE_TIL_SAMLING_UBESTEMT,
 }

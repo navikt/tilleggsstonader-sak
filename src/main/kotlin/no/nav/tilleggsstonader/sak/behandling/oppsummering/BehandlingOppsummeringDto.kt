@@ -9,9 +9,11 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.TypeVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFaktaReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -99,7 +101,9 @@ fun Vilkår.tilOppsummertVilkår(): OppsummertVilkår =
                 is FaktaDagligReiseOffentligTransport -> TypeVilkårFakta.DAGLIG_REISE_OFFENTLIG_TRANSPORT
                 is FaktaDagligReisePrivatBil -> TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL
                 is FaktaDagligReiseUbestemt -> TypeVilkårFakta.DAGLIG_REISE_UBESTEMT
-                is VilkårFaktaReiseTilSamling -> TypeVilkårFakta.REISE_TIL_SAMLING
+                is FaktaReiseTilSamlingOffentligTransport -> TypeVilkårFakta.REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT
+                is FaktaReiseTilSamlingPrivatBil -> TypeVilkårFakta.REISE_TIL_SAMLING_PRIVAT_BIL
+                is FaktaReiseTilSamlingUbestemt -> TypeVilkårFakta.REISE_TIL_SAMLING_UBESTEMT
                 null -> null
             },
     )

@@ -20,12 +20,14 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggVi
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.VilkårReiseTilSamlingMapper.mapTilVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.VilkårReiseTilSamlingMapper.mapTilVilkårReiseTilSamling
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.LagreVilkårReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.VilkårReiseTilSamling
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.math.BigDecimal
 
 @Service
 class ReiseTilSamlingVilkårService(
@@ -110,11 +112,25 @@ class ReiseTilSamlingVilkårService(
         )
     }
 
-    private fun FaktaReiseTilSamling.fjern0Verdier(): FaktaReiseTilSamling =
-        copy(
-            utgifterOffentligTransport = utgifterOffentligTransport?.takeIf { it > 0 },
-            reiseavstand = reiseavstand?.takeIf { it > BigDecimal.ZERO },
-        )
+    private fun FaktaReiseTilSamling.fjern0Verdier(): FaktaReiseTilSamling {
+        when (this) {
+            is FaktaOffentligTransport -> {
+                return FaktaOffentligTransport(
+                    reiseId = this.reiseId,
+                    adresse = this.adresse,
+                    utgifterOffentligTransport = utgifterOffentligTransport?.takeIf { it > 0 },
+                )
+            }
+
+            is FaktaPrivatBil -> {
+                return this
+            }
+
+            is FaktaUbestemtType -> {
+                return this
+            }
+        }
+    }
 
     private fun utledStatus(eksisterendeVilkår: VilkårReiseTilSamling?): VilkårStatus? =
         when {
