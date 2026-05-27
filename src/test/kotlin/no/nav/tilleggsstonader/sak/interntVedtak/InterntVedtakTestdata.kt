@@ -994,7 +994,6 @@ object InterntVedtakTestdata {
                     tom = LocalDate.of(2024, FEBRUARY, 29),
                     aktivitet = AktivitetType.TILTAK,
                     målgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
-                    typeAktivitet = TypeAktivitet.GRUPPEAMO,
                 ),
             )
 

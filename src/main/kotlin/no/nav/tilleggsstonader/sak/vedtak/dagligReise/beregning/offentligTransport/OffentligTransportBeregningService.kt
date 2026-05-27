@@ -125,7 +125,6 @@ class OffentligTransportBeregningService(
                                 vedtaksperiode,
                                 trettidagerReisePeriode.antallReisedagerPerUke,
                             ),
-                        typeAktivitet = trettidagerReisePeriode.typeAktivitet,
                     )
                 }
 

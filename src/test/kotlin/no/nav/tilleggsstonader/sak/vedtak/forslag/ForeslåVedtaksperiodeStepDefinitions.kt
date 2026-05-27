@@ -53,7 +53,6 @@ class ForeslåVedtaksperiodeStepDefinitions {
     var resultat: List<Vedtaksperiode> = emptyList()
     var feil: ApiFeil? = null
     var idSomSkalIgnoreres = mutableSetOf<UUID>()
-    var skalTaHøydeForTypeAktivitet = false
 
     @Gitt("følgende vilkårsperioder med aktiviteter for vedtaksforslag")
     fun `følgende vilkårsperioder med aktiviteter`(dataTable: DataTable) {
@@ -79,11 +78,6 @@ class ForeslåVedtaksperiodeStepDefinitions {
         assertThat(idn).containsExactlyElementsOf(idn.distinct())
     }
 
-    @Gitt("ta høyde for typeAktivitet er satt til {}")
-    fun `ta høyde for typeAktivitet`(verdi: Boolean) {
-        skalTaHøydeForTypeAktivitet = verdi
-    }
-
     @Når("forslag til vedtaksperioder lages")
     fun `forslag til vedtaksperioder lages`() {
         try {
@@ -94,7 +88,6 @@ class ForeslåVedtaksperiodeStepDefinitions {
                         aktiviteter = aktiviteter,
                     ),
                     vilkår,
-                    skalTaHøydeForTypeAktivitet = skalTaHøydeForTypeAktivitet,
                 )
         } catch (e: ApiFeil) {
             feil = e
@@ -118,7 +111,6 @@ class ForeslåVedtaksperiodeStepDefinitions {
                     vilkår = vilkår,
                     forrigeVedtaksperioder = tidligereVedtaksperioder,
                     tidligsteEndring = tidligsteEndring?.let { parseDato(it) },
-                    skalTaHøydeForTypeAktivitet = skalTaHøydeForTypeAktivitet,
                 )
         } catch (e: ApiFeil) {
             feil = e
@@ -232,7 +224,6 @@ class ForeslåVedtaksperiodeStepDefinitions {
                 tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
                 målgruppe = parseEnum(DomenenøkkelForeslåVedtaksperioder.MÅLGRUPPE, rad),
                 aktivitet = parseEnum(DomenenøkkelForeslåVedtaksperioder.AKTIVITET, rad),
-                typeAktivitet = parseValgfriEnum<TypeAktivitet>(DomenenøkkelFelles.TYPE_AKTIVITET, rad),
             )
         }
 }
