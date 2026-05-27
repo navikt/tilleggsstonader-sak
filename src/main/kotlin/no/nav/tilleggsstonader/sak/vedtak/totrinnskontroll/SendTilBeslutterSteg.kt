@@ -93,7 +93,10 @@ class SendTilBeslutterSteg(
         if (saksbehandling.skalIkkeSendeBrev) return
 
         if (saksbehandling.erKjørelisteBehandling()) {
-            val brev = kjørelisteBehandlingBrevRepository.findByBehandlingId(saksbehandling.id) ?: return
+            val brev = kjørelisteBehandlingBrevRepository.findByBehandlingId(saksbehandling.id)
+            brukerfeilHvis(brev == null) {
+                "Brev må lagres før behandling kan sendes til beslutter"
+            }
             brukerfeilHvis(brev.saksbehandlerIdent != SikkerhetContext.hentSaksbehandler()) {
                 "En annen saksbehandler har signert kjørelistebrevet"
             }
