@@ -53,8 +53,7 @@
     "fom" : "2024-01-01",
     "tom" : "2024-02-29",
     "målgruppe" : "ARBEIDSSØKER",
-    "aktivitet" : "TILTAK",
-    "tiltaksvariant" : null
+    "aktivitet" : "TILTAK"
   } ],
   "vilkår" : [ {
     "type" : "DAGLIG_REISE",
