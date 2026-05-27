@@ -72,7 +72,7 @@ class PrivatBilBeregningStepDefinitions {
             vilkårperiodeService = vilkårperiodeService,
             behandlingService = behandlingServiceMock,
             unleashService = unleashServiceMock,
-            privatBilBeregningRevurderingService = PrivatBilBeregningRevurderingService(),
+            privatBilBeregningRevurderingService = PrivatBilBeregningRevurderingService(unleashServiceMock),
         )
 
     var reiserUtenDelperioder: Map<Int, LagreDagligReise> = emptyMap()

@@ -1,6 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.iDagHvisMandagEllerForrigeMandag
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
@@ -10,7 +13,9 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-class PrivatBilBeregningRevurderingService {
+class PrivatBilBeregningRevurderingService(
+    private val unleashService: UnleashService,
+) {
     /**
      * TODO: Tilpass denne for revurdering generelt og ikke bare opphør
      */
@@ -22,6 +27,10 @@ class PrivatBilBeregningRevurderingService {
     ): RammevedtakPrivatBil? {
         brukerfeilHvis(typeVedtak != TypeVedtak.OPPHØR && forrigeRammevedtak != null) {
             "Vi støtter foreløpig bare revurderinger av daglige reiser med bil hvor resultatet er opphør."
+        }
+
+        brukerfeilHvis(typeVedtak == TypeVedtak.OPPHØR && !unleashService.isEnabled(Toggle.KAN_OPPHØRE_PRIVAT_BIL)) {
+            "Muligheten for å opphøre daglige reiser med privat bil er skrudd av."
         }
 
         if (forrigeRammevedtak == null) return nyttRammevedtak
@@ -36,7 +45,7 @@ class PrivatBilBeregningRevurderingService {
                 slåSammenNyeOgGamlePerioderForReise(
                     forrigeRammevedtakForReise = forrigeReise,
                     nyttRammevedtakForReise = nyttReise,
-                    beregnFra = beregnFraDato ?: LocalDate.now(),
+                    beregnFra = beregnFraDato,
                 )
             }
 
@@ -49,7 +58,7 @@ class PrivatBilBeregningRevurderingService {
         beregnFra: LocalDate,
     ): RammeForReiseMedPrivatBil {
         // Bruker nytt beregningsresultat dersom forrige ikke eksisterer
-        if (forrigeRammevedtakForReise == null) return nyttRammevedtakForReise
+        if (forrigeRammevedtakForReise == null) return nyttRammevedtakForReise // TODO: Kast heller feil
 
         // Returnerer hele det gamle rammevedtak for reisen dersom hele reisen
         // er før beregn fra
@@ -59,15 +68,16 @@ class PrivatBilBeregningRevurderingService {
 
         val tidligereDelperioderSomSkalBeholdes =
             forrigeRammevedtakForReise.grunnlag.delperioder.filter { it.tom < beregnFra }
-        val nyeDelperioder = nyttRammevedtakForReise.grunnlag.delperioder.filter { it.fom >= beregnFra }
+        val nyeDelperioder = nyttRammevedtakForReise.grunnlag.delperioder.filter { it.tom >= beregnFra }
 
         val alleDelperioder = (tidligereDelperioderSomSkalBeholdes + nyeDelperioder).sorted()
 
+        feilHvis(alleDelperioder.isEmpty()) { "Fant ingen delperioder ved kombinering av rammevedtak for privat bil" }
+
+        // Oppdaterer kun delperiodene fordi fom og tom på den nye beregningen av rammevedtaket vil være riktig
         return nyttRammevedtakForReise.copy(
             grunnlag =
                 nyttRammevedtakForReise.grunnlag.copy(
-                    fom = alleDelperioder.minOf { it.fom },
-                    tom = alleDelperioder.maxOf { it.tom },
                     delperioder = alleDelperioder,
                 ),
         )
@@ -78,7 +88,7 @@ class PrivatBilBeregningRevurderingService {
      * Denne bør hentes fra en beregningsplan, men foreløpig er beregningsplanen kun
      * tilpasset offentlig transport.
      */
-    private fun finnBeregnFraDato(vedtaksperioder: List<Vedtaksperiode>): LocalDate? {
+    private fun finnBeregnFraDato(vedtaksperioder: List<Vedtaksperiode>): LocalDate {
         val opphørsdato = vedtaksperioder.maxOf { it.tom }.plusDays(1)
 
         return opphørsdato.iDagHvisMandagEllerForrigeMandag()
