@@ -69,22 +69,23 @@ class BeslutteVedtakSteg(
         ferdigstillOppgave(saksbehandling)
 
         return if (data.godkjent) {
-            val typeVedtak = vedtakService.hentVedtaksresultat(saksbehandling)
-            vedtakCounter(saksbehandling.stønadstype, typeVedtak).increment()
 
             if (erManuellKjørelistebehandling(saksbehandling)) {
                 fullførKjørelistebehandlingService.fullførKjørelistebehandling(saksbehandling)
                 StegType.FERDIGSTILLE_BEHANDLING
             } else {
+                val typeVedtak = vedtakService.hentVedtaksresultat(saksbehandling)
+                vedtakCounter(saksbehandling.stønadstype, typeVedtak).increment()
                 oppdaterResultatPåBehandling(saksbehandling, typeVedtak)
+
                 iverksettService.iverksettBehandlingFørsteGang(saksbehandling.id)
-                if (!saksbehandling.skalIkkeSendeBrev) {
+                if (saksbehandling.skalIkkeSendeBrev) {
+                    taskService.save(FerdigstillBehandlingTask.opprettTask(saksbehandling))
+                    StegType.FERDIGSTILLE_BEHANDLING
+                } else {
                     brevService.lagEndeligBeslutterbrev(saksbehandling)
                     opprettJournalførVedtaksbrevTask(saksbehandling)
                     StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV
-                } else {
-                    taskService.save(FerdigstillBehandlingTask.opprettTask(saksbehandling))
-                    StegType.FERDIGSTILLE_BEHANDLING
                 }
             }
         } else {
