@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.FerdigstillBehandlingTask
 import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.JournalførKjørelisteBehandlingBrevTask
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import org.springframework.stereotype.Service
 
@@ -19,7 +20,7 @@ class FullførKjørelistebehandlingService(
     private val behandlingService: BehandlingService,
 ) {
     fun fullførKjørelistebehandling(saksbehandling: Saksbehandling) {
-        brukerfeilHvis(saksbehandling.status == BehandlingStatus.FERDIGSTILT) {
+        brukerfeilHvisIkke(saksbehandling.status == BehandlingStatus.UTREDES || saksbehandling.status == BehandlingStatus.FATTER_VEDTAK) {
             "Kan ikke fullføre kjørelistebehandling=${saksbehandling.id} fordi den har status ${saksbehandling.status.visningsnavn()}."
         }
         brukerfeilHvis(saksbehandling.type != BehandlingType.KJØRELISTE) {

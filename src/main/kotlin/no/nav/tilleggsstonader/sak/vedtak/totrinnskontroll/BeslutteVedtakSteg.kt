@@ -69,7 +69,6 @@ class BeslutteVedtakSteg(
         ferdigstillOppgave(saksbehandling)
 
         return if (data.godkjent) {
-
             if (erManuellKjørelistebehandling(saksbehandling)) {
                 fullførKjørelistebehandlingService.fullførKjørelistebehandling(saksbehandling)
                 StegType.FERDIGSTILLE_BEHANDLING
