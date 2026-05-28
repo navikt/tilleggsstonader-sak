@@ -115,8 +115,7 @@ class BoutgifterBeregningService(
             .validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(
                 utgifter = utgifter,
                 finnMakssats = satsBoutgifterService::finnMakssats,
-            )
-            .map { lagBeregningsgrunnlag(periode = it, utgifter = utgifter, makssats = satsBoutgifterService.finnMakssats(it.fom)) }
+            ).map { lagBeregningsgrunnlag(periode = it, utgifter = utgifter, makssats = satsBoutgifterService.finnMakssats(it.fom)) }
             .validerIkkeUlikeKombinasjonerAvSvarPåFaktiskeUtgifter()
             .map {
                 BeregningsresultatForLøpendeMåned(
