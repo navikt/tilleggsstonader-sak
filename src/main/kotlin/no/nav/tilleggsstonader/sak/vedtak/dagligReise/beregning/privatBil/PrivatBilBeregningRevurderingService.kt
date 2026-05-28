@@ -58,7 +58,10 @@ class PrivatBilBeregningRevurderingService(
         beregnFra: LocalDate,
     ): RammeForReiseMedPrivatBil {
         // Bruker nytt beregningsresultat dersom forrige ikke eksisterer
-        if (forrigeRammevedtakForReise == null) return nyttRammevedtakForReise // TODO: Kast heller feil
+        feilHvis(forrigeRammevedtakForReise == null) {
+            "Kun opphør støttes for privat bil, det bør derfor finnes et " +
+                "rammevedtak for reisen fra forrige iverksatte behandling"
+        }
 
         // Returnerer hele det gamle rammevedtak for reisen dersom hele reisen
         // er før beregn fra
