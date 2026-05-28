@@ -6,6 +6,13 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgifts
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import java.time.LocalDate
 
+/**
+ * Det kan inntreffe at to løpende utgifter med ulike kronebeløp treffer samme løpende måned. Da vet ikke systemet hvordan utgiftene skal
+ * fordeles i utbetalingsperioden, så dette stopper vi foreløpig.
+ *
+ * Hvis begge utgiftene uansett er over makssats, så trenger vi ikke lure på hvordan utgiftene skal fordeles, fordi makssatsen uansett nås.
+ * Så den casen støtter vi.
+ */
 fun List<UtbetalingPeriode>.validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(
     utgifter: BoutgifterPerUtgiftstype,
     finnMakssats: (LocalDate) -> MakssatsBoutgifter,
