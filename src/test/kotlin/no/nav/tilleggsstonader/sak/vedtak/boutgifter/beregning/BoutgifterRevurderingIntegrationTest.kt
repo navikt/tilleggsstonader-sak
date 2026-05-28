@@ -24,11 +24,11 @@ class BoutgifterRevurderingIntegrationTest(
     @Autowired private val utbetalingStatusHåndterer: UtbetalingStatusHåndterer,
 ) : IntegrationTest() {
     /**
-     * Dette er en reell case fra prod, der utgiften ble lavere midt i en beregnignsperiode. Det ble før stoppet av validering, men skal gå
+     * Dette er en reell case fra prod, der utgiften ble lavere midt i en beregningsperiode. Det ble før stoppet av validering, men skal gå
      * gjennom ettersom begge periodene uansett er over makssatsen.
      */
     @Test
-    fun `tillater flere løpende utgiftstyper i samme utbetalingsperiode når en enkeltutgift alene når makssats`() {
+    fun `tillater flere løpende utgifter i samme utbetalingsperiode når en enkeltutgift alene når makssats`() {
         val førstegangsbehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.BOUTGIFTER,
