@@ -112,8 +112,10 @@ class BoutgifterBeregningService(
             .map { UtbetalingPeriode(it, skalAvkorteUtbetalingPeriode(utgifter)) }
             .validerIngenLøpendeOgMidlertidigUtgiftISammeUtbetalingsperiode(utgifter)
             .validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(utgifter)
-            .validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(utgifter)
-            .map { lagBeregningsgrunnlag(periode = it, utgifter = utgifter, makssats = satsBoutgifterService.finnMakssats(it.fom)) }
+            .validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(
+                utgifter = utgifter,
+                finnMakssats = satsBoutgifterService::finnMakssats,
+            ).map { lagBeregningsgrunnlag(periode = it, utgifter = utgifter, makssats = satsBoutgifterService.finnMakssats(it.fom)) }
             .validerIkkeUlikeKombinasjonerAvSvarPåFaktiskeUtgifter()
             .map {
                 BeregningsresultatForLøpendeMåned(

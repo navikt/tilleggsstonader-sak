@@ -39,7 +39,10 @@ class HarIngenUtbetalingsperioderSomOverlapperFlereLøpendeUtgifterValideringTes
     @Test
     fun `verifiserer at feilmeldingen blir som forventet`() {
         assertThatThrownBy {
-            utbetalingsperioder.validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(utgifter)
+            utbetalingsperioder.validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(
+                utgifter = utgifter,
+                finnMakssats = { satser.finnMakssats(it) },
+            )
         }.hasMessage(
             """
             Vi støtter foreløpig ikke at utbetalingsperioder inneholder mer enn én løpende utgift.
