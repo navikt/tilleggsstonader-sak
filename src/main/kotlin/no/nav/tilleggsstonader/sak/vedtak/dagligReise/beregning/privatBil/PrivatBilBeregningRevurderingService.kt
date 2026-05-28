@@ -82,6 +82,8 @@ class PrivatBilBeregningRevurderingService(
             grunnlag =
                 nyttRammevedtakForReise.grunnlag.copy(
                     delperioder = alleDelperioder,
+                    fom = alleDelperioder.minOf { it.fom },
+                    tom = alleDelperioder.maxOf { it.tom }
                 ),
         )
     }
