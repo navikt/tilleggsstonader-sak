@@ -297,7 +297,6 @@ private fun beregningsresultatForPeriode(
                             fom = fom,
                             tom = tom,
                             aktivitet = AktivitetType.TILTAK,
-                            typeAktivitet = null,
                             målgruppe = MålgruppeType.AAP.faktiskMålgruppe(),
                             antallReisedagerIVedtaksperioden = 20,
                         ),

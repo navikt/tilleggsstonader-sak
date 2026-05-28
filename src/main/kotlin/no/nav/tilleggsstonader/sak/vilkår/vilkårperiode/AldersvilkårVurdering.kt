@@ -31,10 +31,10 @@ object AldersvilkårVurdering {
         vilkårperiode: LagreVilkårperiode,
     ): Boolean {
         val attenårsdagenTilBruker = fødselsdato.plusYears(18)
-        brukerfeilHvis((vilkårperiode.fom <= attenårsdagenTilBruker) && (attenårsdagenTilBruker <= vilkårperiode.tom)) {
+        brukerfeilHvis((vilkårperiode.fom < attenårsdagenTilBruker) && (attenårsdagenTilBruker <= vilkårperiode.tom)) {
             "Brukeren fyller 18 år i løpet av vilkårsperioden"
         }
-        return attenårsdagenTilBruker < vilkårperiode.fom
+        return attenårsdagenTilBruker <= vilkårperiode.fom
     }
 
     private fun heleVilkårsperiodenErFørBrukerFyller67År(

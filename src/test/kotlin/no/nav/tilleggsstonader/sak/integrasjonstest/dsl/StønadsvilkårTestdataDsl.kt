@@ -132,7 +132,7 @@ class OpprettStønadsvilkårDsl {
                 vilkårType = VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
                 delvilkårsett = oppfylteDelvilkårLøpendeUtgifterEnBolig().map { it.tilDto() },
                 barnId = null,
-                utgift = 100,
+                utgift = 10000,
                 erFremtidigUtgift = false,
                 offentligTransport = null,
             )
