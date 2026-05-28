@@ -75,7 +75,7 @@ class PrivatBilBeregningRevurderingService(
 
         val alleDelperioder = (tidligereDelperioderSomSkalBeholdes + nyeDelperioder).sorted()
 
-        feilHvis(alleDelperioder.isEmpty()) { "Fant ingen delperioder ved kombinering av rammevedtak for privat bil" }
+        brukerfeilHvis(alleDelperioder.isEmpty()) { "Det er foreløpig ikke mulig å opphøre en hel reise" }
 
         // Oppdaterer kun delperiodene fordi fom og tom på den nye beregningen av rammevedtaket vil være riktig
         return nyttRammevedtakForReise.copy(
