@@ -25,7 +25,7 @@ class PrivatBilBeregningRevurderingService(
         avkortetVedtaksperioder: List<Vedtaksperiode>,
         typeVedtak: TypeVedtak,
     ): RammevedtakPrivatBil? {
-        brukerfeilHvis(typeVedtak != TypeVedtak.OPPHØR && forrigeRammevedtak != null) {
+        brukerfeilHvis(typeVedtak == TypeVedtak.INNVILGELSE && forrigeRammevedtak != null) {
             "Vi støtter foreløpig bare revurderinger av daglige reiser med bil hvor resultatet er opphør."
         }
 
