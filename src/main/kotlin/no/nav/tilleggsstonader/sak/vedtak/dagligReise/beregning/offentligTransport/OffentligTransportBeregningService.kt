@@ -42,7 +42,7 @@ class OffentligTransportBeregningService(
         }
 
         if (behandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
-            validerTypeAktivitetForOffentligTransportVilkår(oppfylteVilkårDagligReise, behandling.id)
+            validerTiltaksvariantForOffentligTransportVilkår(oppfylteVilkårDagligReise, behandling.id)
         }
 
         val oppfylteVilkårOffentligTransport = oppfylteVilkårDagligReise.filter { it.fakta is FaktaOffentligTransport }
@@ -101,7 +101,7 @@ class OffentligTransportBeregningService(
 
         return BeregningsresultatForReise(
             reiseId = reise.reiseId,
-            typeAktivitet = reise.typeAktivitet,
+            tiltaksvariant = reise.tiltaksvariant,
             perioder =
                 trettidagerReisePerioder.map { trettidagerReiseperiode ->
                     beregnForTrettiDagersPeriode(trettidagerReiseperiode, justerteVedtaksperioder, brukersNavKontor)
@@ -161,11 +161,11 @@ class OffentligTransportBeregningService(
             prisEnkelbillett = this.fakta.prisEnkelbillett,
             prisSyvdagersbillett = this.fakta.prisSyvdagersbillett,
             pris30dagersbillett = this.fakta.prisTrettidagersbillett,
-            typeAktivitet = this.fakta.typeAktivitet,
+            tiltaksvariant = this.fakta.tiltaksvariant,
         )
     }
 
-    private fun validerTypeAktivitetForOffentligTransportVilkår(
+    private fun validerTiltaksvariantForOffentligTransportVilkår(
         vilkår: List<VilkårDagligReise>,
         behandlingId: BehandlingId,
     ) {
@@ -173,14 +173,14 @@ class OffentligTransportBeregningService(
 
         offentligTransportVilkår.forEach { vilkår ->
             val fakta = vilkår.fakta as FaktaOffentligTransport
-            brukerfeilHvis(fakta.typeAktivitet == null) {
-                "Alle reiser med offentlig transport må ha typeAktivitet satt. " +
-                    "Reise mellom ${vilkår.fom.norskFormat()} - ${vilkår.tom.norskFormat()} mangler typeAktivitet."
+            brukerfeilHvis(fakta.tiltaksvariant == null) {
+                "Alle reiser med offentlig transport må ha tiltaksvariant satt. " +
+                    "Reise mellom ${vilkår.fom.norskFormat()} - ${vilkår.tom.norskFormat()} mangler tiltaksvariant."
             }
 
-            val vilkåretsTypeAktivitet = fakta.typeAktivitet
-            vilkårperiodeService.validerAktivitetMedTypeAktivitetInnenforPeriode(
-                typeAktivitet = vilkåretsTypeAktivitet,
+            val vilkåretsTiltaksvariant = fakta.tiltaksvariant
+            vilkårperiodeService.validerAktivitetMedTiltaksvariantInnenforPeriode(
+                tiltaksvariant = vilkåretsTiltaksvariant,
                 periode = Datoperiode(fom = vilkår.fom, tom = vilkår.tom),
                 behandlingId = behandlingId,
             )

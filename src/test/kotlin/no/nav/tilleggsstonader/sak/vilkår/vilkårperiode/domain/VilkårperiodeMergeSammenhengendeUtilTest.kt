@@ -11,10 +11,10 @@ import java.time.LocalDate
 
 class VilkårperiodeMergeSammenhengendeUtilTest {
     @Nested
-    inner class MergeSammenhengendeOppfylteAktiviteterMedLikTypeAktivitet {
+    inner class MergeSammenhengendeOppfylteAktiviteterMedLikTiltaksvariant {
         @Test
         fun `skal returnere tom map når ingen vilkårperioder`() {
-            val result = emptyList<Vilkårperiode>().mergeSammenhengendeOppfylteAktiviteterMedLikTypeAktivitet()
+            val result = emptyList<Vilkårperiode>().mergeSammenhengendeOppfylteAktiviteterMedLikTiltaksvariant()
 
             assertThat(result).isEmpty()
         }
@@ -28,17 +28,17 @@ class VilkårperiodeMergeSammenhengendeUtilTest {
                         tom = LocalDate.of(2025, 1, 31),
                         faktaOgVurdering = faktaOgVurderingAktivitetDagligReiseTsr(type = AktivitetType.TILTAK),
                         resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
-                        typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                        tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                     ),
                 )
 
-            val result = vilkårperioder.mergeSammenhengendeOppfylteAktiviteterMedLikTypeAktivitet()
+            val result = vilkårperioder.mergeSammenhengendeOppfylteAktiviteterMedLikTiltaksvariant()
 
             assertThat(result).isEmpty()
         }
 
         @Test
-        fun `skal gruppere etter typeAktivitet og ikke slå sammen perioder med forskjellig typeAktivitet`() {
+        fun `skal gruppere etter tiltaksvariant og ikke slå sammen perioder med forskjellig tiltaksvariant`() {
             val vilkårperioder =
                 listOf(
                     aktivitet(
@@ -46,18 +46,18 @@ class VilkårperiodeMergeSammenhengendeUtilTest {
                         tom = LocalDate.of(2025, 1, 15),
                         faktaOgVurdering = faktaOgVurderingAktivitetDagligReiseTsr(type = AktivitetType.TILTAK),
                         resultat = ResultatVilkårperiode.OPPFYLT,
-                        typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                        tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                     ),
                     aktivitet(
                         fom = LocalDate.of(2025, 1, 16),
                         tom = LocalDate.of(2025, 1, 31),
                         faktaOgVurdering = faktaOgVurderingAktivitetDagligReiseTsr(type = AktivitetType.TILTAK),
                         resultat = ResultatVilkårperiode.OPPFYLT,
-                        typeAktivitet = TypeAktivitet.ENKELAMO,
+                        tiltaksvariant = TypeAktivitet.ENKELAMO,
                     ),
                 )
 
-            val result = vilkårperioder.mergeSammenhengendeOppfylteAktiviteterMedLikTypeAktivitet()
+            val result = vilkårperioder.mergeSammenhengendeOppfylteAktiviteterMedLikTiltaksvariant()
 
             assertThat(result).hasSize(2)
             assertThat(result[TypeAktivitet.GRUPPEAMO]).containsExactly(
@@ -75,7 +75,7 @@ class VilkårperiodeMergeSammenhengendeUtilTest {
         }
 
         @Test
-        fun `skal slå sammen sammenhengende perioder med samme typeAktivitet`() {
+        fun `skal slå sammen sammenhengende perioder med samme tiltaksvariant`() {
             val vilkårperioder =
                 listOf(
                     aktivitet(
@@ -83,18 +83,18 @@ class VilkårperiodeMergeSammenhengendeUtilTest {
                         tom = LocalDate.of(2025, 1, 15),
                         faktaOgVurdering = faktaOgVurderingAktivitetDagligReiseTsr(type = AktivitetType.TILTAK),
                         resultat = ResultatVilkårperiode.OPPFYLT,
-                        typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                        tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                     ),
                     aktivitet(
                         fom = LocalDate.of(2025, 1, 16),
                         tom = LocalDate.of(2025, 1, 31),
                         faktaOgVurdering = faktaOgVurderingAktivitetDagligReiseTsr(type = AktivitetType.TILTAK),
                         resultat = ResultatVilkårperiode.OPPFYLT,
-                        typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                        tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                     ),
                 )
 
-            val result = vilkårperioder.mergeSammenhengendeOppfylteAktiviteterMedLikTypeAktivitet()
+            val result = vilkårperioder.mergeSammenhengendeOppfylteAktiviteterMedLikTiltaksvariant()
 
             assertThat(result).hasSize(1)
             assertThat(result[TypeAktivitet.GRUPPEAMO]).containsExactly(
@@ -106,7 +106,7 @@ class VilkårperiodeMergeSammenhengendeUtilTest {
         }
 
         @Test
-        fun `skal ikke slå sammen perioder med gap for samme typeAktivitet`() {
+        fun `skal ikke slå sammen perioder med gap for samme tiltaksvariant`() {
             val vilkårperioder =
                 listOf(
                     aktivitet(
@@ -114,18 +114,18 @@ class VilkårperiodeMergeSammenhengendeUtilTest {
                         tom = LocalDate.of(2025, 1, 15),
                         faktaOgVurdering = faktaOgVurderingAktivitetDagligReiseTsr(type = AktivitetType.TILTAK),
                         resultat = ResultatVilkårperiode.OPPFYLT,
-                        typeAktivitet = TypeAktivitet.ARBTREN,
+                        tiltaksvariant = TypeAktivitet.ARBTREN,
                     ),
                     aktivitet(
                         fom = LocalDate.of(2025, 1, 20),
                         tom = LocalDate.of(2025, 1, 31),
                         faktaOgVurdering = faktaOgVurderingAktivitetDagligReiseTsr(type = AktivitetType.TILTAK),
                         resultat = ResultatVilkårperiode.OPPFYLT,
-                        typeAktivitet = TypeAktivitet.ARBTREN,
+                        tiltaksvariant = TypeAktivitet.ARBTREN,
                     ),
                 )
 
-            val result = vilkårperioder.mergeSammenhengendeOppfylteAktiviteterMedLikTypeAktivitet()
+            val result = vilkårperioder.mergeSammenhengendeOppfylteAktiviteterMedLikTiltaksvariant()
 
             assertThat(result).hasSize(1)
             assertThat(result[TypeAktivitet.ARBTREN]).containsExactly(

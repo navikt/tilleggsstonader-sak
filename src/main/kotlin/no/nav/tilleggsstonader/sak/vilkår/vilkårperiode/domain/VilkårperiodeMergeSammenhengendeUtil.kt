@@ -42,12 +42,12 @@ fun List<Vilkårperiode>.mergeSammenhengendeOppfylteFaktiskeMålgrupper(): Map<F
                 .mergeSammenhengende { a, b -> a.overlapperEllerPåfølgesAv(b) }
         }
 
-fun List<Vilkårperiode>.mergeSammenhengendeOppfylteAktiviteterMedLikTypeAktivitet(): Map<TypeAktivitet, List<Datoperiode>> =
+fun List<Vilkårperiode>.mergeSammenhengendeOppfylteAktiviteterMedLikTiltaksvariant(): Map<TypeAktivitet, List<Datoperiode>> =
     this
-        .filter { it.resultat == ResultatVilkårperiode.OPPFYLT && it.typeAktivitet != null }
+        .filter { it.resultat == ResultatVilkårperiode.OPPFYLT && it.tiltaksvariant != null }
         .groupBy {
-            require(it.typeAktivitet is TypeAktivitet) { "${it.type} er ikke av type ${TypeAktivitet::class.simpleName}" }
-            it.typeAktivitet
+            require(it.tiltaksvariant is TypeAktivitet) { "${it.type} er ikke av type ${TypeAktivitet::class.simpleName}" }
+            it.tiltaksvariant
         }.mapValues {
             it.value
                 .sorted()

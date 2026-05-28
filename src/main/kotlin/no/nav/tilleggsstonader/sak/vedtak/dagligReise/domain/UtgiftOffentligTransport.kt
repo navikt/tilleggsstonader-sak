@@ -15,7 +15,7 @@ data class UtgiftOffentligTransport(
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
     val pris30dagersbillett: Int?,
-    val typeAktivitet: TypeAktivitet? = null,
+    val tiltaksvariant: TypeAktivitet? = null,
 ) : Periode<LocalDate>,
     KopierPeriode<UtgiftOffentligTransport> {
     fun delTil30Dagersperioder(): List<UtgiftOffentligTransport> =
@@ -28,7 +28,7 @@ data class UtgiftOffentligTransport(
                 prisEnkelbillett = prisEnkelbillett,
                 prisSyvdagersbillett = prisSyvdagersbillett,
                 pris30dagersbillett = pris30dagersbillett,
-                typeAktivitet = typeAktivitet,
+                tiltaksvariant = tiltaksvariant,
             )
         }
 

@@ -25,12 +25,12 @@ data class BeregningsresultatOffentligTransport(
         )
 }
 
-// Legger på Include.NON_NULL for å unngå å serialisere typeAktivitet: null i JSON for TSO
+// Legger på Include.NON_NULL for å unngå å serialisere tiltaksvariant: null i JSON for TSO
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class BeregningsresultatForReise(
     val reiseId: ReiseId,
     val perioder: List<BeregningsresultatForPeriode>,
-    val typeAktivitet: TypeAktivitet? = null,
+    val tiltaksvariant: TypeAktivitet? = null,
 )
 
 data class BeregningsresultatForPeriode(

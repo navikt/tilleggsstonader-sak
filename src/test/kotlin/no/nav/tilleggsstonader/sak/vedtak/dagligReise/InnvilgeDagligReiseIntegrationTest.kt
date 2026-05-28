@@ -35,7 +35,7 @@ class InnvilgeDagligReiseIntegrationTest : IntegrationTest() {
             ) {
                 aktivitet {
                     opprett {
-                        aktivitetTiltakTsr(fomTiltaksenheten, tomTiltaksenheten, typeAktivitet = TypeAktivitet.GRUPPEAMO)
+                        aktivitetTiltakTsr(fomTiltaksenheten, tomTiltaksenheten, tiltaksvariant = TypeAktivitet.GRUPPEAMO)
                     }
                 }
                 målgruppe {

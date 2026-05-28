@@ -273,9 +273,9 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
     }
 
     @Nested
-    inner class ValiderAktivitetMedTypeAktivitetInnenforPeriode {
+    inner class ValiderAktivitetMedTiltaksvariantInnenforPeriode {
         @Test
-        fun `skal godkjenne når aktivitet med samme typeAktivitet overlapper perioden`() {
+        fun `skal godkjenne når aktivitet med samme tiltaksvariant overlapper perioden`() {
             val behandling =
                 testoppsettService.opprettBehandlingMedFagsak(
                     behandling(fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSR)),
@@ -286,19 +286,19 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
                     behandlingId = behandling.id,
                     fom = 1 januar 2025,
                     tom = 31 januar 2025,
-                    typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                    tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                 ),
             )
 
-            vilkårperiodeService.validerAktivitetMedTypeAktivitetInnenforPeriode(
-                typeAktivitet = TypeAktivitet.GRUPPEAMO,
+            vilkårperiodeService.validerAktivitetMedTiltaksvariantInnenforPeriode(
+                tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                 periode = Datoperiode(fom = 15 januar 2025, tom = 15 februar 2025),
                 behandlingId = behandling.id,
             )
         }
 
         @Test
-        fun `skal kaste feil når ingen aktivitet med samme typeAktivitet overlapper perioden`() {
+        fun `skal kaste feil når ingen aktivitet med samme tiltaksvariant overlapper perioden`() {
             val behandling =
                 testoppsettService.opprettBehandlingMedFagsak(
                     behandling(fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSR)),
@@ -309,13 +309,13 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
                     behandlingId = behandling.id,
                     fom = 1 januar 2025,
                     tom = 31 januar 2025,
-                    typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                    tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                 ),
             )
 
             assertThatThrownBy {
-                vilkårperiodeService.validerAktivitetMedTypeAktivitetInnenforPeriode(
-                    typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                vilkårperiodeService.validerAktivitetMedTiltaksvariantInnenforPeriode(
+                    tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                     periode = Datoperiode(fom = 1 mars 2025, tom = 31 mars 2025),
                     behandlingId = behandling.id,
                 )

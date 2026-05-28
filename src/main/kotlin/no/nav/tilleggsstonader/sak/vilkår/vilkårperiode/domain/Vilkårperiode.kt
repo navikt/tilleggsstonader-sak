@@ -52,7 +52,7 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
     @Column("forrige_vilkarperiode_id")
     val forrigeVilkårperiodeId: UUID? = null,
     val type: VilkårperiodeType,
-    val typeAktivitet: TypeAktivitet? = null,
+    val tiltaksvariant: TypeAktivitet? = null,
     override val fom: LocalDate,
     override val tom: LocalDate,
     override val faktaOgVurdering: T,
@@ -76,8 +76,8 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
 
         validerBegrunnelse()
 
-        feilHvis(faktaOgVurdering is FaktaOgVurderingDagligReiseTsr && type == AktivitetType.TILTAK && typeAktivitet == null) {
-            "Mangler data: typeAktivitet må være satt for aktivitet TILTAK"
+        feilHvis(faktaOgVurdering is FaktaOgVurderingDagligReiseTsr && type == AktivitetType.TILTAK && tiltaksvariant == null) {
+            "Mangler data: tiltaksvariant må være satt for aktivitet TILTAK"
         }
 
         feilHvis(faktaOgVurdering.type.vilkårperiodeType != type) {

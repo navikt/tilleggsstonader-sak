@@ -134,7 +134,7 @@ class DagligReiseVilkårService(
                     prisTrettidagersbillett = this.prisTrettidagersbillett?.takeIf { it > 0 },
                     adresse = this.adresse,
                     periode = periode,
-                    typeAktivitet = this.typeAktivitet,
+                    tiltaksvariant = this.tiltaksvariant,
                 )
             }
 
@@ -229,11 +229,11 @@ class DagligReiseVilkårService(
         behandlingId: BehandlingId,
     ) {
         val fakta = nyttVilkår.fakta as FaktaOffentligTransport
-        brukerfeilHvis(fakta.typeAktivitet == null) {
+        brukerfeilHvis(fakta.tiltaksvariant == null) {
             "Aktivitet må velges for offentlig transport"
         }
-        vilkårperiodeService.validerAktivitetMedTypeAktivitetInnenforPeriode(
-            typeAktivitet = fakta.typeAktivitet,
+        vilkårperiodeService.validerAktivitetMedTiltaksvariantInnenforPeriode(
+            tiltaksvariant = fakta.tiltaksvariant,
             periode = Datoperiode(fom = nyttVilkår.fom, tom = nyttVilkår.tom),
             behandlingId = behandlingId,
         )

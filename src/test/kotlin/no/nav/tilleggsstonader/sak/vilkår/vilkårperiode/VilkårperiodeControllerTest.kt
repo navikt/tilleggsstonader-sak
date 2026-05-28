@@ -114,7 +114,7 @@ class VilkårperiodeControllerTest : CleanDatabaseIntegrationTest() {
         val originalLagreRequest =
             LagreVilkårperiode(
                 type = AktivitetType.TILTAK,
-                typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                 fom = LocalDate.now(),
                 tom = LocalDate.now(),
                 faktaOgSvar =
@@ -140,7 +140,7 @@ class VilkårperiodeControllerTest : CleanDatabaseIntegrationTest() {
         val originalLagreRequest =
             LagreVilkårperiode(
                 type = AktivitetType.TILTAK,
-                typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                 fom = LocalDate.now(),
                 tom = LocalDate.now(),
                 faktaOgSvar =
@@ -165,7 +165,7 @@ class VilkårperiodeControllerTest : CleanDatabaseIntegrationTest() {
         val originalLagreRequest =
             LagreVilkårperiode(
                 type = AktivitetType.TILTAK,
-                typeAktivitet = null,
+                tiltaksvariant = null,
                 fom = LocalDate.now(),
                 tom = LocalDate.now(),
                 faktaOgSvar =
@@ -180,7 +180,7 @@ class VilkårperiodeControllerTest : CleanDatabaseIntegrationTest() {
             .opprett(originalLagreRequest)
             .expectProblemDetail(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                "Mangler data: typeAktivitet må være satt for aktivitet TILTAK",
+                "Mangler data: tiltaksvariant må være satt for aktivitet TILTAK",
             )
     }
 

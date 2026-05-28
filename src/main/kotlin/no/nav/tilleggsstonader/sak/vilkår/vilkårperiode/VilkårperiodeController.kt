@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.dto.KodeverkDto
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.typeAktivitetTilTypeAndelMap
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.tiltaksvariantTilTypeAndelMap
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
@@ -90,10 +90,10 @@ class VilkårperiodeController(
         return LagreVilkårperiodeResponse(periode = periode?.tilDto())
     }
 
-    @GetMapping("/aktivitet/type-aktivitet")
-    fun hentTypeAktivitet(): List<KodeverkDto> {
+    @GetMapping("/aktivitet/tiltaksvarianter")
+    fun hentTiltaksvarianter(): List<KodeverkDto> {
         // Henter kun ut aktiviteter vi har mapping til andel/klassekode for
-        return typeAktivitetTilTypeAndelMap.keys.map {
+        return tiltaksvariantTilTypeAndelMap.keys.map {
             KodeverkDto(
                 kode = it.name,
                 beskrivelse = it.beskrivelse,

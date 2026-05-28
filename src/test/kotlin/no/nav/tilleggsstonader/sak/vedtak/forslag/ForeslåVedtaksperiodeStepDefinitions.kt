@@ -175,7 +175,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
             aktivitet(
                 fom = parseDato(DomenenøkkelFelles.FOM, rad),
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
-                typeAktivitet = parseValgfriEnum<TypeAktivitet>(DomenenøkkelFelles.TYPE_AKTIVITET, rad),
+                tiltaksvariant = parseValgfriEnum<TypeAktivitet>(DomenenøkkelFelles.TYPE_AKTIVITET, rad),
                 faktaOgVurdering =
                     faktaOgVurderingAktivitetTilsynBarn(
                         type = parseValgfriEnum<AktivitetType>(DomenenøkkelForeslåVedtaksperioder.TYPE, rad)!!,

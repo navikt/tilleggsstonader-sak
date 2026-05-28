@@ -83,20 +83,20 @@ class VilkårperiodeService(
             .findByBehandlingIdAndGlobalId(behandlingId, aktivitetGlobalId)
             ?.takeIfType<AktivitetFaktaOgVurdering>()
 
-    fun validerAktivitetMedTypeAktivitetInnenforPeriode(
-        typeAktivitet: TypeAktivitet,
+    fun validerAktivitetMedTiltaksvariantInnenforPeriode(
+        tiltaksvariant: TypeAktivitet,
         periode: Datoperiode,
         behandlingId: BehandlingId,
     ) {
         val aktiviteter =
             hentVilkårperioder(behandlingId).aktiviteter.filter { aktivitet ->
-                aktivitet.typeAktivitet == typeAktivitet &&
+                aktivitet.tiltaksvariant == tiltaksvariant &&
                     aktivitet.fom <= periode.tom &&
                     aktivitet.tom >= periode.fom
             }
 
         brukerfeilHvis(aktiviteter.isEmpty()) {
-            "Det finnes ingen aktiviteter med variant \"${typeAktivitet.beskrivelse}\" i perioden ${periode.fom.norskFormat()} - ${periode.tom.norskFormat()}"
+            "Det finnes ingen aktiviteter med variant \"${tiltaksvariant.beskrivelse}\" i perioden ${periode.fom.norskFormat()} - ${periode.tom.norskFormat()}"
         }
     }
 
@@ -151,7 +151,7 @@ class VilkårperiodeService(
                 status = Vilkårstatus.NY,
                 kildeId = vilkårperiode.kildeId,
                 type = vilkårperiode.type,
-                typeAktivitet = vilkårperiode.typeAktivitet,
+                tiltaksvariant = vilkårperiode.tiltaksvariant,
                 faktaOgVurdering = faktaOgVurdering,
                 fom = vilkårperiode.fom,
                 tom = vilkårperiode.tom,

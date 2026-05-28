@@ -66,10 +66,10 @@ class OpprettStønadsvilkårDsl {
     fun offentligTransport(
         fom: LocalDate,
         tom: LocalDate,
-        typeAktivitet: TypeAktivitet = TypeAktivitet.GRUPPEAMO,
+        tiltaksvariant: TypeAktivitet = TypeAktivitet.GRUPPEAMO,
     ) {
         dtoer += { _, _, _ ->
-            lagreDagligReiseDto(fom = fom, tom = tom, typeAktivitet = typeAktivitet)
+            lagreDagligReiseDto(fom = fom, tom = tom, tiltaksvariant = tiltaksvariant)
         }
     }
 

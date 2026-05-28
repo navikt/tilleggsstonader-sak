@@ -108,7 +108,7 @@ class PrivatBilBeregningStepDefinitions {
                             tom = tom,
                             faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
                             resultat = ResultatVilkårperiode.OPPFYLT,
-                            typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                            tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                         )
                     every { vilkårperiodeService.hentAktivitet(testAktivitet.globalId, behandlingId) } returns testAktivitet
 
