@@ -123,6 +123,7 @@ class OpprettStønadsvilkårDsl {
     fun løpendeutgifterEnBolig(
         fom: LocalDate,
         tom: LocalDate,
+        utgift: Int = 10000,
     ) {
         add { behandlingId, _ ->
             OpprettVilkårDto(
@@ -132,7 +133,7 @@ class OpprettStønadsvilkårDsl {
                 vilkårType = VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
                 delvilkårsett = oppfylteDelvilkårLøpendeUtgifterEnBolig().map { it.tilDto() },
                 barnId = null,
-                utgift = 10000,
+                utgift = utgift,
                 erFremtidigUtgift = false,
                 offentligTransport = null,
             )

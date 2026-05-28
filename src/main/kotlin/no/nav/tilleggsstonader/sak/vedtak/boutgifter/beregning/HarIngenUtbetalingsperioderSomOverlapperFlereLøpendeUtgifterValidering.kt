@@ -4,11 +4,13 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BoutgifterPerUtgiftstype
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
+import java.time.LocalDate
 
 fun List<UtbetalingPeriode>.validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(
     utgifter: BoutgifterPerUtgiftstype,
+    finnMakssats: (LocalDate) -> MakssatsBoutgifter,
 ): List<UtbetalingPeriode> {
-    val fasteUtgifter =
+    val løpendeUtgifter =
         listOf(
             TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG,
             TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER,
@@ -18,9 +20,10 @@ fun List<UtbetalingPeriode>.validerIngenUtbetalingsperioderOverlapperFlereLøpen
 
     val utbetalingsperioderMedFlereUtgifter =
         mapNotNull { utbetalingsperiode ->
-            val utgifterSomOverlapper = fasteUtgifter.filter { utgift -> utgift.second.overlapper(utbetalingsperiode) }
+            val utgifterSomOverlapper = løpendeUtgifter.filter { utgift -> utgift.second.overlapper(utbetalingsperiode) }
+            val makssats = finnMakssats(utbetalingsperiode.fom).beløp
             utgifterSomOverlapper
-                .takeIf { it.size > 1 }
+                .takeIf { it.size > 1 && !it.alleUtgifterErOverMakssats(makssats) }
                 ?.let { utbetalingsperiode to it }
         }
 
@@ -47,6 +50,9 @@ fun List<UtbetalingPeriode>.validerIngenUtbetalingsperioderOverlapperFlereLøpen
 
     return this
 }
+
+private fun List<Pair<TypeBoutgift, UtgiftBeregningBoutgifter>>.alleUtgifterErOverMakssats(makssats: Int): Boolean =
+    all { (_, utgift) -> utgift.utgift >= makssats }
 
 private fun TypeBoutgift.mapType() =
     when (this) {
