@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Resultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel.Companion.IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel.Companion.IKKE_OPPFYLT_MED_VALGFRI_BEGRUNNELSE
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel.Companion.OPPFYLT
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.jaNeiSvarRegel
 
@@ -27,16 +26,6 @@ class ReiseTilSamlingRegel :
             ),
     ) {
     companion object {
-        private val DEKKET_AV_ANNET_STIPEND =
-            RegelSteg(
-                regelId = RegelId.DEKKET_AV_ANNET_STIPEND,
-                erHovedregel = false,
-                svarMapping =
-                    jaNeiSvarRegel(
-                        hvisJa = IKKE_OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
-                        hvisNei = OPPFYLT,
-                    ),
-            )
         private val KAN_REISE_MED_EGEN_BIL =
             RegelSteg(
                 regelId = RegelId.KAN_REISE_MED_EGEN_BIL,
@@ -52,16 +41,6 @@ class ReiseTilSamlingRegel :
                         hvisNei = IKKE_OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
                     ),
             )
-        private val DOKUMENTERTE_UTGIFTER =
-            RegelSteg(
-                regelId = RegelId.DOKUMENTERTE_UTGIFTER,
-                erHovedregel = false,
-                svarMapping =
-                    jaNeiSvarRegel(
-                        hvisJa = NesteRegel(DEKKET_AV_ANNET_STIPEND.regelId, BegrunnelseType.UTEN),
-                        hvisNei = IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
-                    ),
-            )
         private val KAN_REISE_MED_OFFENTLIG_TRANSPORT =
             RegelSteg(
                 regelId = RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT,
@@ -75,6 +54,26 @@ class ReiseTilSamlingRegel :
                                 tilhørendeFaktaType = TypeVilkårFakta.REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT,
                             ),
                         hvisNei = NesteRegel(KAN_REISE_MED_EGEN_BIL.regelId, BegrunnelseType.UTEN),
+                    ),
+            )
+        private val DEKKET_AV_ANNET_STIPEND =
+            RegelSteg(
+                regelId = RegelId.DEKKET_AV_ANNET_STIPEND,
+                erHovedregel = false,
+                svarMapping =
+                    jaNeiSvarRegel(
+                        hvisJa = IKKE_OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                        hvisNei = NesteRegel(KAN_REISE_MED_OFFENTLIG_TRANSPORT.regelId, BegrunnelseType.UTEN),
+                    ),
+            )
+        private val DOKUMENTERTE_UTGIFTER =
+            RegelSteg(
+                regelId = RegelId.DOKUMENTERTE_UTGIFTER,
+                erHovedregel = false,
+                svarMapping =
+                    jaNeiSvarRegel(
+                        hvisJa = NesteRegel(DEKKET_AV_ANNET_STIPEND.regelId, BegrunnelseType.UTEN),
+                        hvisNei = IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
                     ),
             )
         private val AVSTAND_OVER_TRETTI_KM =
