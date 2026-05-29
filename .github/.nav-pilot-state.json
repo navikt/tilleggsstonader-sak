@@ -1,7 +1,7 @@
 {
   "collection": "kotlin-backend",
-  "version": "2026.05.27-123813-7e99556",
-  "source_sha": "7e99556",
+  "version": "2026.05.29-090843-cea699e",
+  "source_sha": "cea699e",
   "installed_at": "2026-04-13T13:37:44Z",
   "files": [
     {
@@ -46,7 +46,7 @@
     },
     {
       "path": ".github/agents/nav-pilot.agent.md",
-      "hash": "e50baf495f28613f"
+      "hash": "d04fd3fc8eef124b"
     },
     {
       "path": ".github/agents/nav-pilot.metadata.json",
