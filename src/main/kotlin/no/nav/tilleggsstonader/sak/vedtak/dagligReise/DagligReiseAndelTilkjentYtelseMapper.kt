@@ -93,7 +93,7 @@ private fun lagAndelForDagligReise(
 
             Stønadstype.DAGLIG_REISE_TSR -> {
                 feilHvis(tiltaksvariant == null) {
-                    "Variant/Typeaktivitet skal alltid være satt for Daglig Reise Tsr. Var $tiltaksvariant"
+                    "Tiltaksvariant skal alltid være satt for Daglig reise TSR. Var $tiltaksvariant"
                 }
                 finnTypeAndelFraTiltaksvariant(tiltaksvariant)
             }
