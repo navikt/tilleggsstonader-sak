@@ -37,3 +37,35 @@ WHERE v.data -> 'beregningsresultat' -> 'offentligTransport' -> 'reiser' IS NOT 
                            v.data -> 'beregningsresultat' -> 'offentligTransport' -> 'reiser'
                    ) AS reise
               WHERE reise ? 'typeAktivitet');
+
+
+-- 4. Rename JSON-nøkkel "typeAktivitet" -> "tiltaksvariant" i vedtak.data
+--    på stien: rammevedtakPrivatBil.reiser[*].typeAktivitet
+UPDATE vedtak v
+SET data = jsonb_set(
+        v.data,
+        '{rammevedtakPrivatBil,reiser}',
+        (SELECT COALESCE(
+                        jsonb_agg(
+                                CASE
+                                    WHEN reise ? 'typeAktivitet'
+                                        THEN (reise - 'typeAktivitet') ||
+                                             jsonb_build_object('tiltaksvariant', reise -> 'typeAktivitet')
+                                    ELSE reise
+                                    END
+                                ORDER BY ordinality
+                        ),
+                        '[]'::jsonb
+                )
+         FROM jsonb_array_elements(
+                      v.data -> 'rammevedtakPrivatBil' -> 'reiser'
+              ) WITH ORDINALITY AS reiser(reise, ordinality)),
+        false
+           )
+WHERE v.data -> 'rammevedtakPrivatBil' -> 'reiser' IS NOT NULL
+  AND jsonb_typeof(v.data -> 'rammevedtakPrivatBil' -> 'reiser') = 'array'
+  AND EXISTS (SELECT 1
+              FROM jsonb_array_elements(
+                           v.data -> 'rammevedtakPrivatBil' -> 'reiser'
+                   ) AS reise
+              WHERE reise ? 'typeAktivitet');
