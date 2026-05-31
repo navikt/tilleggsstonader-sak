@@ -58,7 +58,7 @@ fun VilkårDagligReise.tilReiserMedPrivatBil(
     }
 
     feilHvis(gjelderTiltaksenheten && tiltaksvariant == null) {
-        "Foventer at tiltaksvariant ikke er null når oppretter reise med privat bil for tiltaksenheten"
+        "Forventer at tiltaksvariant ikke er null når oppretter reise med privat bil for tiltaksenheten"
     }
 
     return ReiseMedPrivatBil(
