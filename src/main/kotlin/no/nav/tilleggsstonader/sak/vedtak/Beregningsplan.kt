@@ -8,6 +8,8 @@ data class Beregningsplan internal constructor(
     val omfang: Beregningsomfang,
     @JsonInclude(JsonInclude.Include.NON_NULL)
     val fraDato: LocalDate? = null,
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    val tidligsteEndring: LocalDate? = null,
 ) {
     init {
         require(omfang != Beregningsomfang.FRA_DATO || fraDato != null) {
@@ -28,7 +30,7 @@ data class Beregningsplan internal constructor(
     fun legacyTidligsteEndring(): LocalDate? =
         when (omfang) {
             Beregningsomfang.ALLE_PERIODER -> null
-            Beregningsomfang.FRA_DATO -> fraDato
+            Beregningsomfang.FRA_DATO -> tidligsteEndring ?: fraDato
             Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT -> null
         }
 }

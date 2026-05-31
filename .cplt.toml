@@ -13,5 +13,5 @@ ports = [5432]
 localhost = [8080]
 
 # The following are machine-specific — add to ~/.config/cplt/config.toml:
-# allow.read += ["~/.gradle/gradle.properties"]  # in personal config
+# allow.read += ["~/.gradle/gradle.properties", "~/.m2/settings.xml"]  # in personal config
 

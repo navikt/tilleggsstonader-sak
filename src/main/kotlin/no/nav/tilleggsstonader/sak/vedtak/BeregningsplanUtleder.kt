@@ -21,9 +21,11 @@ class BeregningsplanUtleder(
         val tidligsteEndring =
             utledTidligsteEndringService.utledTidligsteEndringForBeregning(saksbehandling.id, vedtaksperioder)
         return if (tidligsteEndring != null) {
+            val fraDato = finnBeregnFraDato(saksbehandling.stønadstype, tidligsteEndring)
             Beregningsplan(
                 omfang = Beregningsomfang.FRA_DATO,
-                fraDato = finnBeregnFraDato(saksbehandling.stønadstype, tidligsteEndring),
+                fraDato = fraDato,
+                tidligsteEndring = tidligsteEndring,
             )
         } else {
             Beregningsplan(Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT)
