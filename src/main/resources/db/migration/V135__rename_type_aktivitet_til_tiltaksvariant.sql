@@ -21,15 +21,17 @@ SET data = jsonb_set(
                                         THEN (reise - 'typeAktivitet') || jsonb_build_object('tiltaksvariant', reise -> 'typeAktivitet')
                                     ELSE reise
                                     END
+                                ORDER BY ordinality
                         ),
                         '[]'::jsonb
                 )
          FROM jsonb_array_elements(
                       v.data -> 'beregningsresultat' -> 'offentligTransport' -> 'reiser'
-              ) AS reise),
+              ) WITH ORDINALITY AS reiser(reise, ordinality)),
         false
 )
 WHERE v.data -> 'beregningsresultat' -> 'offentligTransport' -> 'reiser' IS NOT NULL
+  AND jsonb_typeof(v.data -> 'beregningsresultat' -> 'offentligTransport' -> 'reiser') = 'array'
   AND EXISTS (SELECT 1
               FROM jsonb_array_elements(
                            v.data -> 'beregningsresultat' -> 'offentligTransport' -> 'reiser'
