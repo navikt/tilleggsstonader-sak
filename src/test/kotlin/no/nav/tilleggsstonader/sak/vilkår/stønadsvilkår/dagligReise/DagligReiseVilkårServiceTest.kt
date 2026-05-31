@@ -120,7 +120,7 @@ class DagligReiseVilkårServiceTest {
                         prisEnkelbillett = 40,
                         prisSyvdagersbillett = null,
                         prisTrettidagersbillett = 800,
-                        typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                        tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                     ),
             )
 
@@ -130,8 +130,8 @@ class DagligReiseVilkårServiceTest {
         )
 
         verify {
-            vilkårperiodeService.validerAktivitetMedTypeAktivitetInnenforPeriode(
-                typeAktivitet = TypeAktivitet.GRUPPEAMO,
+            vilkårperiodeService.validerAktivitetMedTiltaksvariantInnenforPeriode(
+                tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                 periode = Datoperiode(fom = 1 januar 2025, tom = 31 januar 2025),
                 behandlingId = behandling.id,
             )

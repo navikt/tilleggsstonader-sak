@@ -170,7 +170,7 @@ class InterntVedtakService(
                 resultat = it.resultat,
                 begrunnelse = it.begrunnelse,
                 slettetKommentar = it.slettetKommentar,
-                tiltaksvariant = it.typeAktivitet?.beskrivelse,
+                tiltaksvariant = it.tiltaksvariant?.beskrivelse,
             )
         }
 

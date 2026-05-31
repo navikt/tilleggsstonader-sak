@@ -109,7 +109,7 @@ class BehandlingTestdataDsl internal constructor() {
                 aktivitetTiltakTsr(
                     fom = fom,
                     tom = tom,
-                    typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                    tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                 )
             }
         }

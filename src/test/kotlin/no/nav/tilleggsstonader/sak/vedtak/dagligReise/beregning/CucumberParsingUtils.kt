@@ -104,7 +104,7 @@ fun mapFaktaOffentligTransport(rad: Map<String, String>): FaktaOffentligTranspor
     FaktaOffentligTransport(
         reiseId = dummyReiseId,
         adresse = "Tiltaksveien 1",
-        typeAktivitet = TypeAktivitet.GRUPPEAMO,
+        tiltaksvariant = TypeAktivitet.GRUPPEAMO,
         reisedagerPerUke =
             parseInt(
                 DomenenøkkelOffentligtransport.ANTALL_REISEDAGER_PER_UKE,

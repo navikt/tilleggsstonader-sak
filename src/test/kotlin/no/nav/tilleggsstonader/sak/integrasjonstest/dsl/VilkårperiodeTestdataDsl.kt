@@ -177,7 +177,7 @@ class OpprettVilkårperiodeDsl {
     fun aktivitetTiltakTsr(
         fom: LocalDate,
         tom: LocalDate,
-        typeAktivitet: TypeAktivitet,
+        tiltaksvariant: TypeAktivitet,
         kildeId: String? = null,
     ) {
         add { behandlingId ->
@@ -186,7 +186,7 @@ class OpprettVilkårperiodeDsl {
                 fom = fom,
                 tom = tom,
                 aktivitetType = AktivitetType.TILTAK,
-                typeAktivitet = typeAktivitet,
+                tiltaksvariant = tiltaksvariant,
                 faktaOgSvar =
                     FaktaOgSvarAktivitetDagligReiseTsrDto(
                         svarHarUtgifter = SvarJaNei.JA,

@@ -32,7 +32,7 @@ object RammevedtakPrivatBilUtil {
             reiseId = reiseId,
             aktivitetsadresse = "aktivitetsadresse",
             aktivitetType = AktivitetType.TILTAK,
-            typeAktivitet = TypeAktivitet.GRUPPEAMO,
+            tiltaksvariant = TypeAktivitet.GRUPPEAMO,
             grunnlag =
                 RammeForReiseMedPrivatBilBeregningsgrunnlag(
                     fom = fom,

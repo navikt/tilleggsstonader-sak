@@ -35,7 +35,7 @@ fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandlin
                     fomUkedag = periode.grunnlag.fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
                     beløp = periode.beløp,
                     målgruppe = målgrupper.first(),
-                    typeAktivitet = reise.typeAktivitet,
+                    tiltaksvariant = reise.tiltaksvariant,
                     brukersNavKontor = periode.grunnlag.brukersNavKontor,
                     reiseId = null,
                 )
@@ -69,7 +69,7 @@ fun BeregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(
                         fomUkedag = fom.iDagHvisMandagEllerForrigeMandag(),
                         beløp = periode.stønadsbeløp.avrundetStønadsbeløp().toInt(),
                         målgruppe = vedtaksperiode.målgruppe,
-                        typeAktivitet = rammevedtakForReise.typeAktivitet,
+                        tiltaksvariant = rammevedtakForReise.tiltaksvariant,
                         brukersNavKontor = periode.brukersNavKontor,
                         reiseId = reise.reiseId, // Skal kun opprette andeler for privat-bil med reiseId
                     )
@@ -81,7 +81,7 @@ private fun lagAndelForDagligReise(
     fomUkedag: LocalDate,
     beløp: Int,
     målgruppe: FaktiskMålgruppe,
-    typeAktivitet: TypeAktivitet?,
+    tiltaksvariant: TypeAktivitet?,
     brukersNavKontor: String?,
     reiseId: ReiseId?,
 ): AndelTilkjentYtelse {
@@ -92,10 +92,10 @@ private fun lagAndelForDagligReise(
             }
 
             Stønadstype.DAGLIG_REISE_TSR -> {
-                feilHvis(typeAktivitet == null) {
-                    "Variant/Typeaktivitet skal alltid være satt for Daglig Reise Tsr. Var $typeAktivitet"
+                feilHvis(tiltaksvariant == null) {
+                    "Tiltaksvariant skal alltid være satt for Daglig reise TSR. Var $tiltaksvariant"
                 }
-                finnTypeAndelFraTypeAktivitet(typeAktivitet)
+                finnTypeAndelFraTiltaksvariant(tiltaksvariant)
             }
 
             else -> {
@@ -138,7 +138,7 @@ private fun validerBrukersNavKontorForStønadstype(
     }
 }
 
-val typeAktivitetTilTypeAndelMap =
+val tiltaksvariantTilTypeAndelMap =
     mapOf(
         TypeAktivitet.ARBFORB to TypeAndel.DAGLIG_REISE_TILTAK_ARBEIDSFORBEREDENDE,
         TypeAktivitet.ARBRRHDAG to TypeAndel.DAGLIG_REISE_TILTAK_ARBEIDSRETTET_REHAB,
@@ -159,9 +159,9 @@ val typeAktivitetTilTypeAndelMap =
         TypeAktivitet.UTVOPPFOPL to TypeAndel.DAGLIG_REISE_TILTAK_UTVIDET_OPPFØLGING_I_OPPLÆRING,
     )
 
-fun finnTypeAndelFraTypeAktivitet(typeAktivitet: TypeAktivitet): TypeAndel =
-    typeAktivitetTilTypeAndelMap[typeAktivitet]
-        ?: error("Kan ikke mappe til TypeAndel fra TypeAktivitet $typeAktivitet")
+fun finnTypeAndelFraTiltaksvariant(tiltaksvariant: TypeAktivitet): TypeAndel =
+    tiltaksvariantTilTypeAndelMap[tiltaksvariant]
+        ?: error("Kan ikke mappe til TypeAndel fra TypeAktivitet $tiltaksvariant")
 
 fun finnPeriodeFraAndel(
     beregningsresultat: BeregningsresultatDagligReise,

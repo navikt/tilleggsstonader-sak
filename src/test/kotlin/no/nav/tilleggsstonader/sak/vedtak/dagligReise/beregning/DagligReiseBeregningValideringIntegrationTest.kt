@@ -91,7 +91,7 @@ class DagligReiseBeregningValideringIntegrationTest(
             ) {
                 aktivitet {
                     opprett {
-                        aktivitetTiltakTsr(fom, tom, typeAktivitet = TypeAktivitet.ENKELAMO)
+                        aktivitetTiltakTsr(fom, tom, tiltaksvariant = TypeAktivitet.ENKELAMO)
                     }
                 }
                 målgruppe {
@@ -101,7 +101,7 @@ class DagligReiseBeregningValideringIntegrationTest(
                 }
                 vilkår {
                     opprett {
-                        offentligTransport(fom, tom, typeAktivitet = TypeAktivitet.ENKELAMO)
+                        offentligTransport(fom, tom, tiltaksvariant = TypeAktivitet.ENKELAMO)
                     }
                 }
             }
@@ -112,7 +112,7 @@ class DagligReiseBeregningValideringIntegrationTest(
                     behandlingContext.behandlingId,
                 ).single { it.type == AktivitetType.TILTAK }
         vilkårperiodeRepository.update(
-            aktivitet.copy(typeAktivitet = TypeAktivitet.GRUPPEAMO),
+            aktivitet.copy(tiltaksvariant = TypeAktivitet.GRUPPEAMO),
         )
 
         gjennomførBeregningStegKall(behandlingContext.behandlingId, Stønadstype.DAGLIG_REISE_TSR)

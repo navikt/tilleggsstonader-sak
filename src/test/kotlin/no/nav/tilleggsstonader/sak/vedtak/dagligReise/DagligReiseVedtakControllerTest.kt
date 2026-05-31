@@ -76,7 +76,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
         FaktaOffentligTransport(
             reiseId = dummyReiseId,
             adresse = "Tiltaksveien 1",
-            typeAktivitet = TypeAktivitet.GRUPPEAMO,
+            tiltaksvariant = TypeAktivitet.GRUPPEAMO,
             reisedagerPerUke = 4,
             prisEnkelbillett = 44,
             prisSyvdagersbillett = null,

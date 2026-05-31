@@ -70,7 +70,7 @@ fun Vilkårperiode.tilOppsummertVilkårperiode(): OppsummertVilkårperiode =
             this.faktaOgVurdering.fakta
                 .takeIfFakta<FaktaStudienivå>()
                 ?.studienivå,
-        varient = this.typeAktivitet?.beskrivelse,
+        varient = this.tiltaksvariant?.beskrivelse,
         studieprosent =
             this.faktaOgVurdering.fakta
                 .takeIfFakta<FaktaProsent>()
