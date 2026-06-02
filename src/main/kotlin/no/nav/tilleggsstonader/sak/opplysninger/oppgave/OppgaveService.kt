@@ -322,6 +322,7 @@ class OppgaveService(
         gsakOppgaveId: Long,
         endretAvEnhetsnr: String? = null,
     ) {
+        logger.info("Ferdigstiller oppgave med id $gsakOppgaveId")
         oppgaveClient.ferdigstillOppgave(gsakOppgaveId, endretAvEnhetsnr)
     }
 
@@ -403,7 +404,7 @@ class OppgaveService(
 
     fun håndterOppdatertOppgaveHendelse(oppdatertOppgaveHendelse: OppdatertOppgaveHendelse) {
         oppgaveRepository.findByGsakOppgaveId(oppdatertOppgaveHendelse.gsakOppgaveId)?.let { oppgave ->
-            if (!oppgave.erIgnorert()) { // Om satt til ignorert ønsker vi ikke oppdateringer
+            if (!oppgave.erIgnorert() && !oppgave.erFerdigstilt()) { // Om satt til ignorert ønsker vi ikke oppdateringer
                 oppgaveRepository.update(
                     oppgave.copy(
                         tilordnetSaksbehandler = oppdatertOppgaveHendelse.tilordnetSaksbehandler,
