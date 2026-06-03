@@ -3,11 +3,14 @@ package no.nav.tilleggsstonader.sak.brev.kjørelistebrev
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.interntVedtak.HtmlifyClient
 import no.nav.tilleggsstonader.sak.journalføring.FamilieDokumentClient
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -139,6 +142,64 @@ class KjørelisteBehandlingBrevServiceTest {
 
         assertThat(slot.captured.satser).isEmpty()
     }
+
+    @Test
+    fun `hentEllerGenererBrev regenererer brev når behandling er redigerbar og brev allerede finnes`() {
+        val eksisterendeBrev = lagEksisterendeBrev()
+        every { kjørelisteBehandlingBrevRepository.findByBehandlingId(saksbehandling.id) } returns eksisterendeBrev
+        every { kjørelisteBehandlingBrevRepository.update(any()) } answers { firstArg() }
+        every { htmlifyClient.genererKjørelisteBehandlingBrev(any()) } returns "<html>nytt brev</html>"
+
+        mockVedtak(listOf(lagPeriode(fomUke1, tomUke1, fraTidligereVedtak = false)))
+        service.hentEllerGenererBrev(saksbehandling.id)
+
+        verify(exactly = 1) { htmlifyClient.genererKjørelisteBehandlingBrev(any()) }
+        verify(exactly = 1) { kjørelisteBehandlingBrevRepository.update(any()) }
+        verify(exactly = 0) { kjørelisteBehandlingBrevRepository.insert(any()) }
+    }
+
+    @Test
+    fun `hentEllerGenererBrev bevarer eksisterende begrunnelse ved regenerering`() {
+        val begrunnelse = "Eksisterende begrunnelse"
+        val eksisterendeBrev = lagEksisterendeBrev(begrunnelse = begrunnelse)
+        every { kjørelisteBehandlingBrevRepository.findByBehandlingId(saksbehandling.id) } returns eksisterendeBrev
+        every { kjørelisteBehandlingBrevRepository.update(any()) } answers { firstArg() }
+
+        val slot = slot<KjørelisteBehandlingBrevRequest>()
+        every { htmlifyClient.genererKjørelisteBehandlingBrev(capture(slot)) } returns "<html/>"
+
+        mockVedtak(listOf(lagPeriode(fomUke1, tomUke1, fraTidligereVedtak = false)))
+        service.hentEllerGenererBrev(saksbehandling.id)
+
+        assertThat(slot.captured.begrunnelse).isEqualTo(begrunnelse)
+    }
+
+    @Test
+    fun `hentEllerGenererBrev returnerer lagret brev uten å generere nytt når behandling er låst`() {
+        val eksisterendeBrev = lagEksisterendeBrev()
+        val låstSaksbehandling =
+            saksbehandling(
+                fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSR),
+                status = BehandlingStatus.FATTER_VEDTAK,
+                behandlingMetode = BehandlingMetode.AUTOMATISK,
+            )
+        every { behandlingService.hentSaksbehandling(any() as BehandlingId) } returns låstSaksbehandling
+        every { kjørelisteBehandlingBrevRepository.findByBehandlingId(any()) } returns eksisterendeBrev
+
+        val resultat = service.hentEllerGenererBrev(låstSaksbehandling.id)
+
+        verify(exactly = 0) { htmlifyClient.genererKjørelisteBehandlingBrev(any()) }
+        assertThat(resultat).isEqualTo(eksisterendeBrev)
+    }
+
+    private fun lagEksisterendeBrev(begrunnelse: String? = null) =
+        KjørelisteBehandlingBrev(
+            behandlingId = saksbehandling.id,
+            saksbehandlerHtml = "<html>gammelt brev</html>",
+            pdf = Fil(ByteArray(0)),
+            saksbehandlerIdent = "Z000001",
+            begrunnelse = begrunnelse,
+        )
 
     private fun lagPeriode(
         fom: LocalDate,
