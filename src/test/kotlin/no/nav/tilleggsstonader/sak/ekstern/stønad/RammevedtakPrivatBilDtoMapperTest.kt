@@ -1,12 +1,18 @@
 package no.nav.tilleggsstonader.sak.ekstern.stønad
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.libs.utils.dato.april
+import no.nav.tilleggsstonader.libs.utils.dato.desember
+import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.juni
+import no.nav.tilleggsstonader.libs.utils.dato.mai
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.kjøreliste
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
@@ -92,6 +98,83 @@ class RammevedtakPrivatBilDtoMapperTest {
 
         assertThat(result.uker).allSatisfy {
             assertThat(it.innsendtDato).isNull()
+        }
+    }
+
+    @Nested
+    inner class Helligdager {
+        @Test
+        fun `kort periode over påske returnerer kun helligdager innenfor perioden`() {
+            val rammevedtak =
+                rammevedtakPrivatBil(
+                    fom = 14 april 2025,
+                    tom = 25 april 2025,
+                )
+
+            val helligdager = rammevedtak.tilDto(emptyMap()).single().helligdager
+
+            assertThat(helligdager.map { it.dato }).containsExactlyInAnyOrder(
+                17 april 2025, // Skjærtorsdag
+                18 april 2025, // Langfredag
+                20 april 2025, // 1. påskedag
+                21 april 2025, // 2. påskedag
+            )
+        }
+
+        @Test
+        fun `lang periode over et halvår returnerer alle helligdager uten duplikater`() {
+            val rammevedtak =
+                rammevedtakPrivatBil(
+                    fom = 1 januar 2025,
+                    tom = 30 juni 2025,
+                )
+
+            val helligdager = rammevedtak.tilDto(emptyMap()).single().helligdager
+
+            assertThat(helligdager.map { it.dato }).containsExactlyInAnyOrder(
+                1 januar 2025, // Nyttårsdag
+                17 april 2025, // Skjærtorsdag
+                18 april 2025, // Langfredag
+                20 april 2025, // 1. påskedag
+                21 april 2025, // 2. påskedag
+                1 mai 2025, // Arbeidernes dag
+                17 mai 2025, // Grunnlovsdagen
+                29 mai 2025, // Kristi himmelfartsdag
+                8 juni 2025, // 1. pinsedag
+                9 juni 2025, // 2. pinsedag
+            )
+
+            assertThat(helligdager).hasSize(helligdager.map { it.dato }.distinct().size)
+        }
+
+        @Test
+        fun `periode uten helligdager returnerer tom liste`() {
+            val rammevedtak =
+                rammevedtakPrivatBil(
+                    fom = 3 februar 2025,
+                    tom = 14 februar 2025,
+                )
+
+            val helligdager = rammevedtak.tilDto(emptyMap()).single().helligdager
+
+            assertThat(helligdager).isEmpty()
+        }
+
+        @Test
+        fun `periode over årsskifte returnerer helligdager fra begge år`() {
+            val rammevedtak =
+                rammevedtakPrivatBil(
+                    fom = 22 desember 2025,
+                    tom = 5 januar 2026,
+                )
+
+            val helligdager = rammevedtak.tilDto(emptyMap()).single().helligdager
+
+            assertThat(helligdager.map { it.dato }).containsExactlyInAnyOrder(
+                25 desember 2025, // 1. juledag
+                26 desember 2025, // 2. juledag
+                1 januar 2026, // Nyttårsdag
+            )
         }
     }
 }

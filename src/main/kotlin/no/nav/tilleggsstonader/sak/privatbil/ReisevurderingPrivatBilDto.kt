@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
-import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikDag
@@ -34,7 +33,6 @@ data class UkeVurderingDto(
 
 data class AvvikUke(
     val typeAvvik: TypeAvvikUke,
-    val avviksMelding: String,
 )
 
 data class DagDto(
@@ -56,12 +54,3 @@ data class AvklartDagDto(
     val begrunnelse: String?, // må fylles ut om avvik?
     val parkeringsutgift: Int?,
 )
-
-fun AvklartKjørtDag.tilDto() =
-    AvklartDagDto(
-        godkjentGjennomførtKjøring = this.godkjentGjennomførtKjøring,
-        automatiskVurdering = this.automatiskVurdering,
-        avvik = this.avvik,
-        begrunnelse = this.begrunnelse,
-        parkeringsutgift = this.parkeringsutgift,
-    )

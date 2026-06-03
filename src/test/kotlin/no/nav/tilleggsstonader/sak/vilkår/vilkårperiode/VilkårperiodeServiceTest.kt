@@ -1,5 +1,11 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.februar
+import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -10,6 +16,7 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
@@ -263,6 +270,57 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
 
         assertThat(test.steg).isEqualTo(StegType.INNGANGSVILKÅR)
         assertThat(test.utfall).isEqualTo(StegUtfall.UTREDNING_PÅBEGYNT)
+    }
+
+    @Nested
+    inner class ValiderAktivitetMedTiltaksvariantInnenforPeriode {
+        @Test
+        fun `skal godkjenne når aktivitet med samme tiltaksvariant overlapper perioden`() {
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSR)),
+                )
+
+            vilkårperiodeRepository.insert(
+                aktivitet(
+                    behandlingId = behandling.id,
+                    fom = 1 januar 2025,
+                    tom = 31 januar 2025,
+                    tiltaksvariant = TypeAktivitet.GRUPPEAMO,
+                ),
+            )
+
+            vilkårperiodeService.validerAktivitetMedTiltaksvariantInnenforPeriode(
+                tiltaksvariant = TypeAktivitet.GRUPPEAMO,
+                periode = Datoperiode(fom = 15 januar 2025, tom = 15 februar 2025),
+                behandlingId = behandling.id,
+            )
+        }
+
+        @Test
+        fun `skal kaste feil når ingen aktivitet med samme tiltaksvariant overlapper perioden`() {
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSR)),
+                )
+
+            vilkårperiodeRepository.insert(
+                aktivitet(
+                    behandlingId = behandling.id,
+                    fom = 1 januar 2025,
+                    tom = 31 januar 2025,
+                    tiltaksvariant = TypeAktivitet.GRUPPEAMO,
+                ),
+            )
+
+            assertThatThrownBy {
+                vilkårperiodeService.validerAktivitetMedTiltaksvariantInnenforPeriode(
+                    tiltaksvariant = TypeAktivitet.GRUPPEAMO,
+                    periode = Datoperiode(fom = 1 mars 2025, tom = 31 mars 2025),
+                    behandlingId = behandling.id,
+                )
+            }.hasMessageContaining("Det finnes ingen aktiviteter med variant")
+        }
     }
 
     @Nested

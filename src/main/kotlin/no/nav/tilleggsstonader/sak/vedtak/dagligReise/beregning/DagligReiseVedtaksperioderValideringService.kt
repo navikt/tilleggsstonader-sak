@@ -4,12 +4,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.validerReiser
@@ -18,8 +14,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mergeSammenhengendeOppfylteAktiviteterMedLikTypeAktivitet
 import org.springframework.stereotype.Service
 
 @Service
@@ -28,7 +22,6 @@ class DagligReiseVedtaksperioderValideringService(
     private val fagsakService: FagsakService,
     private val behandlingService: BehandlingService,
     private val vedtakService: VedtakService,
-    private val vilkårperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
 ) {
     fun validerVedtaksperioder(
@@ -42,10 +35,6 @@ class DagligReiseVedtaksperioderValideringService(
             typeVedtak = typeVedtak,
         )
         validerIkkeOverlappendeVedtaksperioderForTsrOgTso(
-            behandling = behandling,
-            vedtaksperioder = vedtaksperioder,
-        )
-        validerTypeAktivitetForTsr(
             behandling = behandling,
             vedtaksperioder = vedtaksperioder,
         )
@@ -81,49 +70,6 @@ class DagligReiseVedtaksperioderValideringService(
             }
         }
     }
-
-    private fun validerTypeAktivitetForTsr(
-        behandling: Saksbehandling,
-        vedtaksperioder: List<Vedtaksperiode>,
-    ) {
-        if (behandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
-            feilHvis(
-                finnesVedtaksperiodeUtenTypeAktivitet(
-                    vedtaksperioder,
-                ),
-            ) {
-                "Fant ikke tiltaksvariant. Ta kontakt med utviklerteamet"
-            }
-
-            validerFinnesAktivitetMedTypeAktivitetForHeleVedtaksperioden(
-                behandlingId = behandling.id,
-                vedtaksperioder = vedtaksperioder,
-            )
-        }
-    }
-
-    private fun validerFinnesAktivitetMedTypeAktivitetForHeleVedtaksperioden(
-        behandlingId: BehandlingId,
-        vedtaksperioder: List<Vedtaksperiode>,
-    ) {
-        val aktiviteter = vilkårperiodeService.hentVilkårperioder(behandlingId).aktiviteter
-        val sammenhengendeAktiviteterMedLikTypeAktivitet = aktiviteter.mergeSammenhengendeOppfylteAktiviteterMedLikTypeAktivitet()
-
-        vedtaksperioder.forEach { vedtaksperiode ->
-            val sammenslåtteAktiviteterMedRelevantTypeAktivitet =
-                sammenhengendeAktiviteterMedLikTypeAktivitet[vedtaksperiode.typeAktivitet]
-                    ?.takeIf { it.isNotEmpty() }
-                    ?: brukerfeil("Finner ingen perioder hvor vilkår for ${vedtaksperiode.typeAktivitet} er oppfylt")
-
-            sammenslåtteAktiviteterMedRelevantTypeAktivitet.firstOrNull { it.inneholder(vedtaksperiode) }
-                ?: brukerfeil(
-                    "Finner ingen oppfylte vilkår med ${vedtaksperiode.typeAktivitet} for hele perioden ${vedtaksperiode.formatertPeriodeNorskFormat()}",
-                )
-        }
-    }
-
-    private fun finnesVedtaksperiodeUtenTypeAktivitet(vedtaksperioder: List<Vedtaksperiode>) =
-        vedtaksperioder.any { it.typeAktivitet == null }
 
     private fun harOverlappendeVedtaksperioderPåTversAvEnheter(
         vedtaksperioderDenneEnhenten: List<Vedtaksperiode>,

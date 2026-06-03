@@ -236,7 +236,7 @@ object VilkårperiodeTestUtil {
         slettetKommentar: String? = null,
         status: Vilkårstatus = Vilkårstatus.NY,
         kildeId: String? = null,
-        typeAktivitet: TypeAktivitet? = null,
+        tiltaksvariant: TypeAktivitet? = null,
     ) = GeneriskVilkårperiode(
         behandlingId = behandlingId,
         resultat = resultat,
@@ -245,7 +245,7 @@ object VilkårperiodeTestUtil {
         fom = fom,
         tom = tom,
         type = faktaOgVurdering.type.vilkårperiodeType,
-        typeAktivitet = typeAktivitet,
+        tiltaksvariant = tiltaksvariant,
         begrunnelse = begrunnelse,
         faktaOgVurdering = faktaOgVurdering,
         kildeId = kildeId,

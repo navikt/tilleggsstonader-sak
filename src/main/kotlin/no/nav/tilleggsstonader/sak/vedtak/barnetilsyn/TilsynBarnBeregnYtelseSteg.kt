@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
@@ -107,7 +106,7 @@ class TilsynBarnBeregnYtelseSteg(
 
         val vedtaksperioder = finnNyeVedtaksperioderForOpphør(saksbehandling, opphørsdato)
 
-        val beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, opphørsdato)
+        val beregningsplan = BeregningsplanUtleder.utledForOpphørEllerSatsjustering(saksbehandling.stønadstype, opphørsdato)
 
         val beregningsresultat =
             beregningService.beregn(

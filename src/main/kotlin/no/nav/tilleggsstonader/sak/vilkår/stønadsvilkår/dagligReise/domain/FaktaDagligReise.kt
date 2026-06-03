@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
@@ -42,6 +43,7 @@ data class FaktaOffentligTransport(
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int?,
     val periode: Datoperiode? = null,
+    val tiltaksvariant: TypeAktivitet? = null,
 ) : FaktaDagligReise {
     override val type = TypeDagligReise.OFFENTLIG_TRANSPORT
 
@@ -125,6 +127,7 @@ data class FaktaOffentligTransport(
             prisSyvdagersbillett = prisSyvdagersbillett,
             prisTrettidagersbillett = prisTrettidagersbillett,
             adresse = adresse,
+            tiltaksvariant = tiltaksvariant,
         )
 }
 

@@ -19,7 +19,7 @@ data class RammeForReiseMedPrivatBil(
     val reiseId: ReiseId,
     val aktivitetsadresse: String?,
     val aktivitetType: AktivitetType,
-    val typeAktivitet: TypeAktivitet?,
+    val tiltaksvariant: TypeAktivitet?,
     val grunnlag: RammeForReiseMedPrivatBilBeregningsgrunnlag,
 ) {
     fun finnDelperiodeForPeriode(periode: Periode<LocalDate>) = grunnlag.delperioder.single { it.inneholder(periode) }

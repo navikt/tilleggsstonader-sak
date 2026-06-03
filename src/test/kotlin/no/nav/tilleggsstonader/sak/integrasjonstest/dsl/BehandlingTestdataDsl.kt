@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.integrasjonstest.dsl
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.sak.util.tilFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
@@ -108,7 +109,7 @@ class BehandlingTestdataDsl internal constructor() {
                 aktivitetTiltakTsr(
                     fom = fom,
                     tom = tom,
-                    typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                    tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                 )
             }
         }
@@ -185,7 +186,7 @@ class BehandlingTestdataDsl internal constructor() {
         }
         vilkår {
             opprett {
-                løpendeutgifterEnBolig(fom, tom)
+                løpendeutgifterEnBolig(fom.tilFørsteDagIMåneden(), tom)
             }
         }
     }

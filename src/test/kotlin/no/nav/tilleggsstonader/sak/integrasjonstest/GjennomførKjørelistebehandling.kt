@@ -28,8 +28,13 @@ fun IntegrationTest.gjennomførKjørelisteBehandling(
 
     if (tilSteg == StegType.SIMULERING) return
     gjennomførSimuleringSteg(behandling.id)
+
+    if (tilSteg == StegType.SEND_TIL_BESLUTTER) return
     kall.privatBil.genererKjørelisteVedtaksbrev(behandling.id)
-    kall.privatBil.fullførKjørelisteBehandling(behandling.id)
+    kall.totrinnskontroll.sendTilBeslutter(behandling.id)
+
+    if (tilSteg == StegType.BESLUTTE_VEDTAK) return
+    gjennomførBeslutteVedtakSteg(behandling.id)
 
     if (tilSteg in setOf(StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV, StegType.FERDIGSTILLE_BEHANDLING)) return
     kjørTasksKlareForProsesseringTilIngenTasksIgjen()

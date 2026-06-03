@@ -144,8 +144,7 @@ class AldersvilkårVurderingTest {
 
         val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = fødselsdato)
 
-        val feil = assertThrows<ApiFeil> { vurderAldersvilkår(målgruppe, fødselFaktaGrunnlag) }
-        assertThat(feil.message).isEqualTo("Brukeren fyller 18 år i løpet av vilkårsperioden")
+        assertThat(vurderAldersvilkår(målgruppe, fødselFaktaGrunnlag)).isEqualTo(SvarJaNei.JA)
     }
 
     @Test
@@ -228,8 +227,8 @@ class AldersvilkårVurderingTest {
             )
 
         val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = fødselsdato)
-        val feil = assertThrows<ApiFeil> { vurderAldersvilkår(målgruppe, fødselFaktaGrunnlag) }
-        assertThat(feil.message).isEqualTo("Brukeren fyller 18 år i løpet av vilkårsperioden")
+
+        assertThat(vurderAldersvilkår(målgruppe, fødselFaktaGrunnlag)).isEqualTo(SvarJaNei.JA)
     }
 
     @Test
@@ -312,8 +311,7 @@ class AldersvilkårVurderingTest {
 
         val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(fødselsdato = fødselsdato)
 
-        val feil = assertThrows<ApiFeil> { vurderAldersvilkår(målgruppe, fødselFaktaGrunnlag) }
-        assertThat(feil.message).isEqualTo("Brukeren fyller 18 år i løpet av vilkårsperioden")
+        assertThat(vurderAldersvilkår(målgruppe, fødselFaktaGrunnlag)).isEqualTo(SvarJaNei.JA)
     }
 
     @Test

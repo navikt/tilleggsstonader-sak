@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
@@ -14,19 +16,32 @@ object DetaljertVedtaksperioderDagligReiseMapper {
         adresserTso: Map<ReiseId, String>,
         adresserTsr: Map<ReiseId, String>,
     ): List<DetaljertVedtaksperiodeDagligReise> {
-        val reiserTso = vedtaksdataTso?.hentUtOffentligTransport()
-        val reiserTsr = vedtaksdataTsr?.hentUtOffentligTransport()
+        val reiserOffentligTransportTso = vedtaksdataTso?.hentUtOffentligTransport()
+        val reiserOffentligTransportTsr = vedtaksdataTsr?.hentUtOffentligTransport()
+        val reiserPrivatBilTso = vedtaksdataTso?.hentUtRammevedtakPrivatBil()
+        val reiserPrivatBilTsr = vedtaksdataTsr?.hentUtRammevedtakPrivatBil()
 
         return listOf(
-            reiserTso.tilDetaljerteVedtaksperioder(Stønadstype.DAGLIG_REISE_TSO, adresserTso),
-            reiserTsr.tilDetaljerteVedtaksperioder(Stønadstype.DAGLIG_REISE_TSR, adresserTsr),
+            reiserOffentligTransportTso.tilDetaljerteVedtaksperioderOffentligTransport(
+                Stønadstype.DAGLIG_REISE_TSO,
+                adresserTso,
+            ),
+            reiserOffentligTransportTsr.tilDetaljerteVedtaksperioderOffentligTransport(
+                Stønadstype.DAGLIG_REISE_TSR,
+                adresserTsr,
+            ),
+            reiserPrivatBilTso.tilDetaljerteVedtaksperioderPrivatBil(Stønadstype.DAGLIG_REISE_TSO, adresserTso),
+            reiserPrivatBilTsr.tilDetaljerteVedtaksperioderPrivatBil(Stønadstype.DAGLIG_REISE_TSR, adresserTsr),
         ).flatten()
     }
 
     private fun InnvilgelseEllerOpphørDagligReise.hentUtOffentligTransport(): List<BeregningsresultatForReise> =
         beregningsresultat.offentligTransport?.reiser.orEmpty()
 
-    private fun List<BeregningsresultatForReise>?.tilDetaljerteVedtaksperioder(
+    private fun InnvilgelseEllerOpphørDagligReise.hentUtRammevedtakPrivatBil(): List<RammeForReiseMedPrivatBil> =
+        rammevedtakPrivatBil?.reiser.orEmpty()
+
+    private fun List<BeregningsresultatForReise>?.tilDetaljerteVedtaksperioderOffentligTransport(
         stønadstype: Stønadstype,
         adresser: Map<ReiseId, String>,
     ): List<DetaljertVedtaksperiodeDagligReise> =
@@ -34,6 +49,20 @@ object DetaljertVedtaksperioderDagligReiseMapper {
             reise.tilDetaljertBeregningsperiode(
                 stønadstype = stønadstype,
                 adresse = adresser[reise.reiseId],
+            )
+        }
+
+    private fun List<RammeForReiseMedPrivatBil>?.tilDetaljerteVedtaksperioderPrivatBil(
+        stønadstype: Stønadstype,
+        adresser: Map<ReiseId, String>,
+    ): List<DetaljertVedtaksperiodeDagligReise> =
+        this.orEmpty().map { reise ->
+            DetaljertVedtaksperiodeDagligReise(
+                stønadstype = stønadstype,
+                typeDagligReise = TypeDagligReise.PRIVAT_BIL,
+                detaljertBeregningsperioder = null,
+                adresse = adresser[reise.reiseId] ?: reise.aktivitetsadresse,
+                rammevedtakPrivatBil = reise.tilDto(),
             )
         }
 
@@ -51,6 +80,7 @@ object DetaljertVedtaksperioderDagligReiseMapper {
             typeDagligReise = TypeDagligReise.OFFENTLIG_TRANSPORT,
             detaljertBeregningsperioder = detaljertBeregningsperioder,
             adresse = adresse,
+            rammevedtakPrivatBil = null,
         )
     }
 

@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
+import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
@@ -35,36 +36,42 @@ fun validerEndringAvAlleredeUtbetaltPeriode(
     for (reise in nyttBeregningsresultat.reiser) {
         val reiseIForrigeBeregningsresultat = reiserForrigeBehandling.filter { it.reiseId == reise.reiseId }
         if (reiseIForrigeBeregningsresultat.isEmpty()) continue
-        // Hvis vi kommer hit, vet vi at reisen har blitt endret på i revurderingen
 
-        // Sjekker om det finnes en periode som inneholder dagens dato i revurderingen
-        val dagensPeriodeIRevurdering = finnPeriodeMedDato(reise.perioder, dagensDato)
+        val alleredeUtbetaltePerioder =
+            reiseIForrigeBeregningsresultat
+                .flatMap { it.perioder }
+                .filter { it.grunnlag.fom.datoEllerNesteMandagHvisLørdagEllerSøndag() <= dagensDato }
 
-        // Sjekker om det finnes en periode som inneholder dagens dato i førstegangsbehandlingen
-        val dagensPeriodeIFørstegangs =
-            finnPeriodeMedDato(reiseIForrigeBeregningsresultat.flatMap { it.perioder }, dagensDato)
+        for (utbetaltPeriode in alleredeUtbetaltePerioder) {
+            val overlappendePerioderIRevurdering =
+                reise.perioder.filter {
+                    it.grunnlag.overlapper(utbetaltPeriode.grunnlag)
+                }
 
-        // Sjekk om perioden som inneholder dagens dato sin billetttype endrer seg fra enkeltbilletter til månedskort
-        val endrerFraEnkeltbilletterTilMånedskort =
-            endrerFraEnkeltbilletterTilMånedskort(
-                dagensPeriodeIFørstegangs,
-                dagensPeriodeIRevurdering,
-            )
+            brukerfeilHvis(overlappendePerioderIRevurdering.size > 1) {
+                "Fant flere overlappende revurderingsperioder for samme utbetalte periode"
+            }
 
-        brukerfeilHvis(endrerFraEnkeltbilletterTilMånedskort) {
-            """
-            I den revurderte beregningen vil en allerede utbetalt periode med enkeltbilletter bli endret 
-            til en periode med månedskort, som kan være til ugunst for søker. For å hindre dette kan du legge 
-            inn en ny reise i stedet for å forlenge den eksisterende.
-            """.trimIndent()
+            val overlappendePeriodeIRevurdering = overlappendePerioderIRevurdering.singleOrNull()
+
+            if (overlappendePeriodeIRevurdering != null) {
+                val endrerFraEnkeltbilletterTilMånedskort =
+                    endrerFraEnkeltbilletterTilMånedskort(
+                        utbetaltPeriode,
+                        overlappendePeriodeIRevurdering,
+                    )
+
+                brukerfeilHvis(endrerFraEnkeltbilletterTilMånedskort) {
+                    """
+                    I den revurderte beregningen vil en allerede utbetalt periode med enkeltbilletter bli endret 
+                    til en periode med månedskort, som kan være til ugunst for søker. For å hindre dette kan du legge 
+                    inn en ny reise i stedet for å forlenge den eksisterende.
+                    """.trimIndent()
+                }
+            }
         }
     }
 }
-
-private fun finnPeriodeMedDato(
-    perioder: List<BeregningsresultatForPeriode>,
-    dato: LocalDate,
-): BeregningsresultatForPeriode? = perioder.firstOrNull { periode -> periode.grunnlag.inneholder(dato) }
 
 private fun endrerFraEnkeltbilletterTilMånedskort(
     førstegangs: BeregningsresultatForPeriode?,

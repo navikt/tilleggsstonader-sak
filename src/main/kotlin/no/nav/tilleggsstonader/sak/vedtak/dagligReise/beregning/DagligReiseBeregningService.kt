@@ -1,50 +1,33 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.OffentligTransportBeregningRevurderingService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.OffentligTransportBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningsresultatService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilRammevedtakBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class DagligReiseBeregningService(
     private val vilkårService: VilkårService,
     private val dagligReiseVedtaksperioderValideringService: DagligReiseVedtaksperioderValideringService,
     private val offentligTransportBeregningService: OffentligTransportBeregningService,
-    private val offentligTransportBeregningRevurderingService: OffentligTransportBeregningRevurderingService,
+    private val privatBilRammevedtakBeregningService: PrivatBilRammevedtakBeregningService,
     private val privatBilBeregningService: PrivatBilBeregningService,
-    private val privatBilBeregningsresultatService: PrivatBilBeregningsresultatService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
-    private val unleashService: UnleashService,
-    private val avklartKjørelisteService: AvklartKjørelisteService,
-    private val vedtakRepository: VedtakRepository,
+    private val vedtakService: VedtakService,
 ) {
     fun beregn(
         vedtaksperioder: List<Vedtaksperiode>,
@@ -70,126 +53,43 @@ class DagligReiseBeregningService(
                 null
             }
 
-        val rammevedtakPrivatBil =
-            beregnRammePrivatBil(
-                oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
+        val forrigeVedtak =
+            behandling.forrigeIverksatteBehandlingId
+                ?.let { vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(it).data }
+
+        val offentligTransport =
+            offentligTransportBeregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
+                oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
+                forrigeBeregningsresultat = forrigeVedtak?.beregningsresultat?.offentligTransport,
+                brukersNavKontor = brukersNavKontor,
+                beregningsplan = beregningsplan,
+                behandling = behandling,
+            )
+
+        val rammevedtakPrivatBil =
+            privatBilRammevedtakBeregningService.beregnRammevedtak(
+                vedtaksperioder = vedtaksperioder,
+                oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
                 behandlingId = behandling.id,
             )
 
-        val offentligTransport =
-            if (beregningsplan.omfang == Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT) {
-                hentForrigeOffentligTransport(behandling)
-            } else {
-                beregnOffentligTransport(
-                    oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
-                    vedtaksperioder = vedtaksperioder,
-                    behandling = behandling,
-                    brukersNavKontor = brukersNavKontor,
-                    beregnFra = beregningsplan.beregnFra(),
-                )
-            }
+        val beregningsresultatPrivatBil =
+            privatBilBeregningService.beregn(
+                behandling = behandling,
+                rammevedtak = rammevedtakPrivatBil,
+                brukersNavKontor = brukersNavKontor,
+                forrigeBeregningsresultat = forrigeVedtak?.beregningsresultat?.privatBil,
+            )
 
         return BeregningDagligReise(
             beregningsresultatDagligReise =
                 BeregningsresultatDagligReise(
                     offentligTransport = offentligTransport,
-                    privatBil =
-                        beregnPrivatBil(
-                            behandling = behandling,
-                            rammevedtak = rammevedtakPrivatBil,
-                            brukersNavKontor = brukersNavKontor,
-                        ),
+                    privatBil = beregningsresultatPrivatBil,
                 ),
             rammevedtakPrivatBil = rammevedtakPrivatBil,
         )
-    }
-
-    private fun beregnOffentligTransport(
-        oppfylteVilkårDagligReise: List<VilkårDagligReise>,
-        vedtaksperioder: List<Vedtaksperiode>,
-        behandling: Saksbehandling,
-        brukersNavKontor: String?,
-        beregnFra: LocalDate?,
-    ): BeregningsresultatOffentligTransport? {
-        val oppfylteVilkårOffentligTransport = oppfylteVilkårDagligReise.filter { it.fakta is FaktaOffentligTransport }
-
-        if (oppfylteVilkårOffentligTransport.isEmpty()) return null
-
-        return offentligTransportBeregningService
-            .beregn(
-                vedtaksperioder = vedtaksperioder,
-                oppfylteVilkår = oppfylteVilkårOffentligTransport,
-                brukersNavKontor = brukersNavKontor,
-            )?.flettMedForrigeVedtakHvisRevurdering(behandling, beregnFra)
-            ?.sorterReiserOgPerioder()
-    }
-
-    private fun BeregningsresultatOffentligTransport.flettMedForrigeVedtakHvisRevurdering(
-        behandling: Saksbehandling,
-        beregnFra: LocalDate?,
-    ) = offentligTransportBeregningRevurderingService
-        .flettMedForrigeVedtakHvisRevurdering(
-            nyttBeregningsresultat = this,
-            behandling = behandling,
-            beregnFra = beregnFra,
-        )
-
-    private fun beregnPrivatBil(
-        behandling: Saksbehandling,
-        rammevedtak: RammevedtakPrivatBil?,
-        brukersNavKontor: String?,
-    ): BeregningsresultatPrivatBil? =
-        if (rammevedtak == null) {
-            null
-        } else {
-            privatBilBeregningsresultatService.beregn(
-                rammevedtak = rammevedtak,
-                avklarteUkerForBehandling = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandling.id),
-                brukersNavKontor = brukersNavKontor,
-                forrigeBeregningsresultat = hentForrigePrivatBilBeregningsresultat(behandling),
-            )
-        }
-
-    private fun hentForrigePrivatBilBeregningsresultat(behandling: Saksbehandling): BeregningsresultatPrivatBil? =
-        behandling.forrigeIverksatteBehandlingId
-            ?.let { forrigeBehandlingId ->
-                vedtakRepository
-                    .findByIdOrThrow(forrigeBehandlingId)
-                    .withTypeOrThrow<InnvilgelseEllerOpphørDagligReise>()
-                    .data
-                    .beregningsresultat
-                    .privatBil
-            }
-
-    private fun beregnRammePrivatBil(
-        vedtaksperioder: List<Vedtaksperiode>,
-        oppfylteVilkårDagligReise: List<VilkårDagligReise>,
-        behandlingId: BehandlingId,
-    ): RammevedtakPrivatBil? {
-        if (!unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)) return null
-
-        val oppfylteVilkårPrivatBil = oppfylteVilkårDagligReise.filter { it.fakta is FaktaPrivatBil }
-
-        if (oppfylteVilkårPrivatBil.isEmpty()) return null
-        return privatBilBeregningService.beregnRammevedtak(
-            vedtaksperioder = vedtaksperioder,
-            oppfylteVilkår = oppfylteVilkårPrivatBil,
-            behandlingId = behandlingId,
-        )
-    }
-
-    private fun hentForrigeOffentligTransport(behandling: Saksbehandling): BeregningsresultatOffentligTransport? {
-        val forrigeBehandlingId =
-            behandling.forrigeIverksatteBehandlingId
-                ?: feil("Kan ikke gjenbruke forrige beregningsresultat uten forrige iverksatt behandling")
-
-        return vedtakRepository
-            .findByIdOrThrow(forrigeBehandlingId)
-            .withTypeOrThrow<InnvilgelseEllerOpphørDagligReise>()
-            .data
-            .beregningsresultat
-            .offentligTransport
     }
 }
 

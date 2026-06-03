@@ -129,8 +129,7 @@
     "fom" : "2024-01-01",
     "tom" : "2024-02-01",
     "målgruppe" : "NEDSATT_ARBEIDSEVNE",
-    "aktivitet" : "TILTAK",
-    "tiltaksvariant" : null
+    "aktivitet" : "TILTAK"
   } ],
   "vilkår" : [ {
     "type" : "PASS_BARN",

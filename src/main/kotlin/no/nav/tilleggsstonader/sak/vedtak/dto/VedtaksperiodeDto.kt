@@ -15,7 +15,6 @@ data class LagretVedtaksperiodeDto(
     override val tom: LocalDate,
     val målgruppeType: FaktiskMålgruppe,
     val aktivitetType: AktivitetType,
-    val typeAktivitet: TypeAktivitetDto? = null,
     val vedtaksperiodeFraForrigeVedtak: VedtaksperiodeDto?,
 ) : Periode<LocalDate>,
     KopierPeriode<LagretVedtaksperiodeDto> {
@@ -31,7 +30,6 @@ data class LagretVedtaksperiodeDto(
             tom = tom,
             målgruppeType = målgruppeType,
             aktivitetType = aktivitetType,
-            typeAktivitet = typeAktivitet,
         )
 }
 
@@ -41,7 +39,6 @@ data class VedtaksperiodeDto(
     override val tom: LocalDate,
     val målgruppeType: FaktiskMålgruppe,
     val aktivitetType: AktivitetType,
-    val typeAktivitet: TypeAktivitetDto? = null,
 ) : Periode<LocalDate> {
     fun tilDomene() =
         Vedtaksperiode(
@@ -50,7 +47,6 @@ data class VedtaksperiodeDto(
             tom = tom,
             målgruppe = målgruppeType,
             aktivitet = aktivitetType,
-            typeAktivitet = typeAktivitet?.tilDomene(),
         )
 }
 
@@ -66,7 +62,6 @@ fun Vedtaksperiode.tilLagretVedtaksperiodeDto(forrigeVedtaksperiode: Vedtaksperi
         tom = tom,
         målgruppeType = målgruppe,
         aktivitetType = aktivitet,
-        typeAktivitet = typeAktivitet?.tilDto(),
         vedtaksperiodeFraForrigeVedtak = forrigeVedtaksperiode?.tilDto(),
     )
 
@@ -79,7 +74,6 @@ fun Vedtaksperiode.tilDto() =
         tom = tom,
         målgruppeType = målgruppe,
         aktivitetType = aktivitet,
-        typeAktivitet = typeAktivitet?.tilDto(),
     )
 
 fun List<VedtaksperiodeDto>.tilDomene() = map { it.tilDomene() }.sorted()

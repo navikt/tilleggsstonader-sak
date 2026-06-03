@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.februar
@@ -10,14 +11,20 @@ import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningStegKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsoRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
 
-class DagligReiseBeregningValideringIntegrationTest : CleanDatabaseIntegrationTest() {
+class DagligReiseBeregningValideringIntegrationTest(
+    @Autowired private val vilkårperiodeRepository: VilkårperiodeRepository,
+) : CleanDatabaseIntegrationTest() {
     @Test
     fun `Kaster feil hvis validering ikke blir gjort`() {
         val fom = 1 januar 2026
@@ -69,6 +76,52 @@ class DagligReiseBeregningValideringIntegrationTest : CleanDatabaseIntegrationTe
             .jsonPath("$.detail")
             .isEqualTo(
                 "Kan ikke innvilge for valgte perioder fordi det ikke finnes vilkår for reise for alle vedtaksperioder.",
+            )
+    }
+
+    @Test
+    fun `kaster feil om offentlig transport-vilkår har en variant som ingen aktiviteter har`() {
+        val fom = 1 januar 2026
+        val tom = 1 juni 2026
+
+        val behandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSR,
+                tilSteg = StegType.BEREGNE_YTELSE,
+            ) {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTsr(fom, tom, tiltaksvariant = TypeAktivitet.ENKELAMO)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeTiltakspenger(fom, tom)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        offentligTransport(fom, tom, tiltaksvariant = TypeAktivitet.ENKELAMO)
+                    }
+                }
+            }
+
+        val aktivitet =
+            vilkårperiodeRepository
+                .findByBehandlingId(
+                    behandlingContext.behandlingId,
+                ).single { it.type == AktivitetType.TILTAK }
+        vilkårperiodeRepository.update(
+            aktivitet.copy(tiltaksvariant = TypeAktivitet.GRUPPEAMO),
+        )
+
+        gjennomførBeregningStegKall(behandlingContext.behandlingId, Stønadstype.DAGLIG_REISE_TSR)
+            .expectStatus()
+            .isBadRequest
+            .expectBody()
+            .jsonPath("$.detail")
+            .isEqualTo(
+                "Det finnes ingen aktiviteter med variant \"${TypeAktivitet.ENKELAMO.beskrivelse}\" i perioden ${fom.norskFormat()} - ${tom.norskFormat()}",
             )
     }
 }

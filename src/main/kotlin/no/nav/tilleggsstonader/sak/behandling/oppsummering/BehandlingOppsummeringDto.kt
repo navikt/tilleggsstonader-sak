@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdagerNullable
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaProsent
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaStudienivå
 import java.time.LocalDate
 import java.util.UUID
@@ -48,6 +49,7 @@ data class OppsummertVilkårperiode(
     val aktivitetsdager: Int?,
     val varient: String?,
     val studienivå: Studienivå?,
+    val studieprosent: Int?,
 ) : Periode<LocalDate>,
     KopierPeriode<OppsummertVilkårperiode> {
     override fun medPeriode(
@@ -71,7 +73,11 @@ fun Vilkårperiode.tilOppsummertVilkårperiode(): OppsummertVilkårperiode =
             this.faktaOgVurdering.fakta
                 .takeIfFakta<FaktaStudienivå>()
                 ?.studienivå,
-        varient = this.typeAktivitet?.beskrivelse,
+        varient = this.tiltaksvariant?.beskrivelse,
+        studieprosent =
+            this.faktaOgVurdering.fakta
+                .takeIfFakta<FaktaProsent>()
+                ?.prosent,
     )
 
 data class Stønadsvilkår(

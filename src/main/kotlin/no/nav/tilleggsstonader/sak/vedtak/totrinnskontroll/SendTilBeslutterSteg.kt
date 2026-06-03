@@ -7,6 +7,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakereService
+import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.KjørelisteBehandlingBrevRepository
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.VedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
@@ -25,8 +27,10 @@ class SendTilBeslutterSteg(
     private val taskService: TaskService,
     private val behandlingService: BehandlingService,
     private val vedtaksbrevRepository: VedtaksbrevRepository,
+    private val kjørelisteBehandlingBrevRepository: KjørelisteBehandlingBrevRepository,
     private val oppgaveService: OppgaveService,
     private val totrinnskontrollService: TotrinnskontrollService,
+    private val brevmottakereService: BrevmottakereService,
 ) : BehandlingSteg<SendTilBeslutterRequest> {
     override fun validerSteg(saksbehandling: Saksbehandling) {
         brukerfeilHvis(saksbehandling.steg != stegType()) {
@@ -45,6 +49,9 @@ class SendTilBeslutterSteg(
         saksbehandling: Saksbehandling,
         data: SendTilBeslutterRequest,
     ) {
+        if (saksbehandling.erKjørelisteBehandling()) {
+            brevmottakereService.hentEllerOpprettBrevmottakere(saksbehandling.id)
+        }
         behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.FATTER_VEDTAK)
         ferdigstillOppgave(saksbehandling)
         totrinnskontrollService.sendtilBeslutter(saksbehandling, data)
@@ -67,10 +74,10 @@ class SendTilBeslutterSteg(
     private fun ferdigstillOppgave(saksbehandling: Saksbehandling) {
         val totrinnskontroll = totrinnskontrollService.hentTotrinnskontroll(saksbehandling.id)
         val oppgavetype =
-            if (totrinnskontroll?.status == TotrinnInternStatus.UNDERKJENT) {
-                Oppgavetype.BehandleUnderkjentVedtak
-            } else {
-                Oppgavetype.BehandleSak
+            when {
+                totrinnskontroll?.status == TotrinnInternStatus.UNDERKJENT -> Oppgavetype.BehandleUnderkjentVedtak
+                saksbehandling.erKjørelisteBehandling() -> Oppgavetype.BehandleKjøreliste
+                else -> Oppgavetype.BehandleSak
             }
 
         taskService.save(
@@ -85,8 +92,18 @@ class SendTilBeslutterSteg(
     private fun validerSaksbehandlersignatur(saksbehandling: Saksbehandling) {
         if (saksbehandling.skalIkkeSendeBrev) return
 
-        val vedtaksbrev = vedtaksbrevRepository.findByIdOrThrow(saksbehandling.id)
+        if (saksbehandling.erKjørelisteBehandling()) {
+            val brev = kjørelisteBehandlingBrevRepository.findByBehandlingId(saksbehandling.id)
+            brukerfeilHvis(brev == null) {
+                "Brev må lagres før behandling kan sendes til beslutter"
+            }
+            brukerfeilHvis(brev.saksbehandlerIdent != SikkerhetContext.hentSaksbehandler()) {
+                "En annen saksbehandler har signert kjørelistebrevet"
+            }
+            return
+        }
 
+        val vedtaksbrev = vedtaksbrevRepository.findByIdOrThrow(saksbehandling.id)
         brukerfeilHvis(vedtaksbrev.saksbehandlerIdent != SikkerhetContext.hentSaksbehandler()) {
             "En annen saksbehandler har signert vedtaksbrevet"
         }

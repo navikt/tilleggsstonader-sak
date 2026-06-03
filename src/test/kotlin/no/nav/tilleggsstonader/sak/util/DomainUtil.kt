@@ -612,7 +612,7 @@ fun lagreVilkårperiodeMålgruppe(
 fun lagreVilkårperiodeAktivitet(
     behandlingId: BehandlingId,
     aktivitetType: AktivitetType = AktivitetType.TILTAK,
-    typeAktivitet: TypeAktivitet? = null,
+    tiltaksvariant: TypeAktivitet? = null,
     fom: LocalDate = 1 januar 2025,
     tom: LocalDate = 31 januar 2025,
     faktaOgSvar: FaktaOgSvarDto =
@@ -624,7 +624,7 @@ fun lagreVilkårperiodeAktivitet(
     kildeId: String? = null,
 ) = LagreVilkårperiode(
     type = aktivitetType,
-    typeAktivitet = typeAktivitet,
+    tiltaksvariant = tiltaksvariant,
     fom = fom,
     tom = tom,
     faktaOgSvar = faktaOgSvar,
@@ -638,6 +638,7 @@ fun lagreDagligReiseDto(
     tom: LocalDate = 31 januar 2025,
     adresse: String = "Tiltaksveien 1",
     reiseId: ReiseId = dummyReiseId,
+    tiltaksvariant: TypeAktivitet = TypeAktivitet.GRUPPEAMO,
     svar: Map<RegelId, SvarOgBegrunnelseDto> =
         mapOf(
             RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
@@ -646,6 +647,7 @@ fun lagreDagligReiseDto(
     fakta: FaktaDagligReiseDto =
         faktaOffentligTransport(adresse = adresse, reiseId = reiseId).run {
             FaktaDagligReiseOffentligTransportDto(
+                tiltaksvariant = tiltaksvariant,
                 prisEnkelbillett = prisEnkelbillett,
                 prisSyvdagersbillett = prisSyvdagersbillett,
                 prisTrettidagersbillett = prisTrettidagersbillett,

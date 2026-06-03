@@ -21,19 +21,16 @@ object ForeslåVedtaksperiode {
         vilkår: List<Vilkår>,
         forrigeVedtaksperioder: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
-        skalTaHøydeForTypeAktivitet: Boolean,
     ): List<Vedtaksperiode> {
         val forslag =
             ForeslåVedtaksperioderUtil.foreslåPerioder(
                 vilkårperioder = vilkårperioder,
                 vilkår = vilkår,
-                skalTaHøydeForTypeAktivitet = skalTaHøydeForTypeAktivitet,
             )
         return beholdTidligereIdnForVedtaksperioder(
             forrigeVedtaksperioder = forrigeVedtaksperioder,
             forslag = forslag,
             tidligsteEndring = tidligsteEndring,
-            skalTaHøydeForTypeAktivitet = skalTaHøydeForTypeAktivitet,
         )
     }
 
@@ -45,13 +42,11 @@ object ForeslåVedtaksperiode {
         val forslag =
             ForeslåVedtaksperioderUtil.foreslåPerioderUtenVilkår(
                 vilkårperioder = vilkårperioder,
-                skalTaHøydeForTypeAktivitet = false,
             )
         return beholdTidligereIdnForVedtaksperioder(
             forrigeVedtaksperioder = forrigeVedtaksperioder,
             forslag = forslag,
             tidligsteEndring = tidligsteEndring,
-            skalTaHøydeForTypeAktivitet = false,
         )
     }
 }

@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -57,7 +58,7 @@ class DagligReiseVilkårService(
     ): VilkårDagligReise {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
-        validerKanBehandleVilkåret(nyttVilkår, behandlingId)
+        validerKanBehandleVilkåret(nyttVilkår, behandling)
         validerDelperiodeFomOgTomMotNyttVilkår(nyttVilkår)
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår)
@@ -74,7 +75,7 @@ class DagligReiseVilkårService(
     ): VilkårDagligReise {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
-        validerKanBehandleVilkåret(nyttVilkår, behandlingId)
+        validerKanBehandleVilkåret(nyttVilkår, behandling)
         validerDelperiodeFomOgTomMotNyttVilkår(nyttVilkår)
 
         val eksisterendeVilkår = vilkårRepository.findByIdOrThrow(vilkårId).mapTilVilkårDagligReise()
@@ -133,6 +134,7 @@ class DagligReiseVilkårService(
                     prisTrettidagersbillett = this.prisTrettidagersbillett?.takeIf { it > 0 },
                     adresse = this.adresse,
                     periode = periode,
+                    tiltaksvariant = this.tiltaksvariant,
                 )
             }
 
@@ -170,9 +172,10 @@ class DagligReiseVilkårService(
 
     private fun validerKanBehandleVilkåret(
         nyttVilkår: LagreVilkårDagligReise,
-        behandlingId: BehandlingId,
+        behandling: Saksbehandling,
     ) {
         val gjelderPrivatBil = nyttVilkår.fakta.type == TypeDagligReise.PRIVAT_BIL
+        val gjelderOffentligTransport = nyttVilkår.fakta.type == TypeDagligReise.OFFENTLIG_TRANSPORT
         val kanBehandlePrivatBil = unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)
 
         feilHvis(gjelderPrivatBil && !kanBehandlePrivatBil) {
@@ -180,7 +183,11 @@ class DagligReiseVilkårService(
         }
 
         if (gjelderPrivatBil) {
-            validerAktivitetForPrivatBil(nyttVilkår, behandlingId)
+            validerAktivitetForPrivatBil(nyttVilkår, behandling.id)
+        }
+
+        if (gjelderOffentligTransport && behandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
+            validerAktivitetForOffentligTransport(nyttVilkår, behandling.id)
         }
     }
 
@@ -215,5 +222,20 @@ class DagligReiseVilkårService(
         brukerfeilHvisIkke(aktivitet.inneholder(nyttVilkår)) {
             "Aktiviteten er ikke oppfylt hele vilkårperioden"
         }
+    }
+
+    private fun validerAktivitetForOffentligTransport(
+        nyttVilkår: LagreDagligReise,
+        behandlingId: BehandlingId,
+    ) {
+        val fakta = nyttVilkår.fakta as FaktaOffentligTransport
+        brukerfeilHvis(fakta.tiltaksvariant == null) {
+            "Aktivitet må velges for offentlig transport"
+        }
+        vilkårperiodeService.validerAktivitetMedTiltaksvariantInnenforPeriode(
+            tiltaksvariant = fakta.tiltaksvariant,
+            periode = Datoperiode(fom = nyttVilkår.fom, tom = nyttVilkår.tom),
+            behandlingId = behandlingId,
+        )
     }
 }

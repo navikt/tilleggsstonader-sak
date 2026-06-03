@@ -1,31 +1,25 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport
 
-import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-class OffentligTransportBeregningRevurderingService(
-    private val vedtakService: VedtakService,
-) {
+class OffentligTransportBeregningRevurderingService {
     /**
      * Beholder de reisene og perioder fra forrige iverksatte behandling som er berørt av revurderingen, slik at vi ikke risikerer at gamle
      * vedtak blir reberegnet med et annet resultat, fordi vi eksempelvis har gjort endringer i beregningskoden siden sist.
      */
     fun flettMedForrigeVedtakHvisRevurdering(
         nyttBeregningsresultat: BeregningsresultatOffentligTransport,
-        behandling: Saksbehandling,
+        forrigeOffentligTransport: BeregningsresultatOffentligTransport?,
         beregnFra: LocalDate?,
     ): BeregningsresultatOffentligTransport {
-        val forrigeIverksatte =
-            hentForrigeIverksatteVedtak(behandling)?.beregningsresultat?.offentligTransport ?: return nyttBeregningsresultat
+        val forrigeIverksatte = forrigeOffentligTransport ?: return nyttBeregningsresultat
 
-        brukerfeilHvis(beregnFra == null) { "Kan ikke beregne ytelse fordi det ikke er gjort noen endringer i revurderingen" }
+        feilHvis(beregnFra == null) { "Vi mangler beregnFra-dato for å flette sammen nytt og gammelt vedtak." }
 
         validerEndringAvAlleredeUtbetaltPeriode(
             nyttBeregningsresultat = nyttBeregningsresultat,
@@ -41,11 +35,7 @@ class OffentligTransportBeregningRevurderingService(
     }
 
     /**
-     * Beholder alle perioder fra forrige vedtak som er starter tidligere enn 30 dager unna [beregnFra]-datoen.
-     *
-     * Dette gjøres for ikke å reberegne mer enn vi trenger å gjøre, men vi er samtidig nødt til å reberegne enkelte perioder som er f.eks.
-     * 25 dager unna [beregnFra]-datoen, ettersom det kan skje at denne perioden etter revurderingen skulle vært en 30-dagersperiode
-     * i stedet.
+     * Beholder alle perioder fra forrige vedtak som starter før [beregnFra]-datoen.
      */
     private fun slåSammenNyeOgGamlePerioder(
         nyBeregningForReise: BeregningsresultatForReise,
@@ -57,15 +47,16 @@ class OffentligTransportBeregningRevurderingService(
             forrigeBeregning.reiser.find { it.reiseId == nyBeregningForReise.reiseId }?.perioder
                 ?: return nyBeregningForReise
 
-        // Alle perioder som er tidligere enn 30 dager fra endringsdatoen skal kopieres fra tidligere vedtak
+        // Alle perioder som er tidligere beregn fra-datoen skal kopieres fra tidligere vedtak
         val bevarteGamlePerioder =
             reisenIForrigeVedtak
-                .filter { it.grunnlag.fom.plusDays(30L) <= beregnFra }
+                .filter { it.grunnlag.fom < beregnFra }
                 .map { it.copy(fraTidligereVedtak = true) }
 
+        // Perioder som har identisk grunnlag som forrige vedtak skal ikke reberegnes
         val nyeEllerOppdatertePerioder =
             nyBeregningForReise.perioder
-                .filter { it.grunnlag.fom.plusDays(30L) > beregnFra }
+                .filter { it.grunnlag.fom >= beregnFra }
                 .map { nyPeriode ->
                     val tilsvarendePeriodeIForrigeVedtak = reisenIForrigeVedtak.singleOrNull { it.grunnlag == nyPeriode.grunnlag }
                     tilsvarendePeriodeIForrigeVedtak?.copy(fraTidligereVedtak = true) ?: nyPeriode.copy(fraTidligereVedtak = false)
@@ -75,10 +66,4 @@ class OffentligTransportBeregningRevurderingService(
             perioder = (bevarteGamlePerioder + nyeEllerOppdatertePerioder).sortedBy { it.grunnlag.fom },
         )
     }
-
-    private fun hentForrigeIverksatteVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørDagligReise? =
-        behandling.forrigeIverksatteBehandlingId
-            ?.let {
-                vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(it)
-            }?.data
 }

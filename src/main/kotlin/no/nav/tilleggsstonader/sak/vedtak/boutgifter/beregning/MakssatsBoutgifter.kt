@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.libs.utils.dato.desember
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import org.springframework.stereotype.Component
 import java.time.LocalDate
 
@@ -21,47 +23,46 @@ data class MakssatsBoutgifter(
     }
 }
 
-private val MAX = LocalDate.of(2099, 12, 31)
+private val MAX = 31 desember 2099
 
 val bekreftedeSatser =
     listOf(
         MakssatsBoutgifter(
-            fom = LocalDate.of(2026, 1, 1),
-            tom = LocalDate.of(2026, 12, 31),
+            fom = 1 januar 2026,
+            tom = 31 desember 2026,
             beløp = 5062,
         ),
         MakssatsBoutgifter(
-            fom = LocalDate.of(2025, 1, 1),
-            tom = LocalDate.of(2025, 12, 31),
+            fom = 1 januar 2025,
+            tom = 31 desember 2025,
             beløp = 4953,
         ),
         MakssatsBoutgifter(
-            fom = LocalDate.of(2024, 1, 1),
-            tom = LocalDate.of(2024, 12, 31),
+            fom = 1 januar 2024,
+            tom = 31 desember 2024,
             beløp = 4809,
         ),
         MakssatsBoutgifter(
-            fom = LocalDate.of(2023, 1, 1),
-            tom = LocalDate.of(2023, 12, 31),
+            fom = 1 januar 2023,
+            tom = 31 desember 2023,
             beløp = 4519,
         ),
         MakssatsBoutgifter(
-            fom = LocalDate.of(2022, 1, 1),
-            tom = LocalDate.of(2022, 12, 31),
+            fom = 1 januar 2022,
+            tom = 31 desember 2022,
             beløp = 4396,
         ),
         MakssatsBoutgifter(
-            fom = LocalDate.of(2021, 1, 1),
-            tom = LocalDate.of(2021, 12, 31),
+            fom = 1 januar 2021,
+            tom = 31 desember 2021,
             beløp = 4340,
         ),
         MakssatsBoutgifter(
-            fom = LocalDate.of(2020, 1, 1),
-            tom = LocalDate.of(2020, 12, 31),
+            fom = 1 januar 2020,
+            tom = 31 desember 2020,
             beløp = 4193,
         ),
     )
-
 val satser: List<MakssatsBoutgifter> =
     listOf(
         bekreftedeSatser.max().let {

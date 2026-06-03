@@ -131,7 +131,7 @@ class OppfølgingIntegrasjonstest : CleanDatabaseIntegrationTest() {
                     aktivitetTiltakTsr(
                         fom = 1 januar 2026,
                         tom = 28 februar 2026,
-                        typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                        tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                         kildeId = "123",
                     )
                 }
