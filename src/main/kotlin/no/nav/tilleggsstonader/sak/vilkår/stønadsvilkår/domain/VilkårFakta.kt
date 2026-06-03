@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -19,12 +18,32 @@ import java.time.LocalDate
     JsonSubTypes.Type(FaktaDagligReiseOffentligTransport::class, name = "DAGLIG_REISE_OFFENTLIG_TRANSPORT"),
     JsonSubTypes.Type(FaktaDagligReisePrivatBil::class, name = "DAGLIG_REISE_PRIVAT_BIL"),
     JsonSubTypes.Type(FaktaDagligReiseUbestemt::class, name = "DAGLIG_REISE_UBESTEMT"),
+    JsonSubTypes.Type(FaktaReiseTilSamlingOffentligTransport::class, name = "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT"),
+    JsonSubTypes.Type(FaktaReiseTilSamlingPrivatBil::class, name = "REISE_TIL_SAMLING_PRIVAT_BIL"),
+    JsonSubTypes.Type(FaktaReiseTilSamlingUbestemt::class, name = "REISE_TIL_SAMLING_UBESTEMT"),
     failOnRepeatedNames = true,
 )
 sealed interface VilkårFakta {
     val reiseId: ReiseId
     val adresse: String?
 }
+
+data class FaktaReiseTilSamlingOffentligTransport(
+    override val reiseId: ReiseId,
+    override val adresse: String?,
+    val utgifterOffentligTransport: Int?,
+) : VilkårFakta
+
+data class FaktaReiseTilSamlingPrivatBil(
+    override val reiseId: ReiseId,
+    override val adresse: String?,
+    val reiseavstand: BigDecimal?,
+) : VilkårFakta
+
+data class FaktaReiseTilSamlingUbestemt(
+    override val reiseId: ReiseId,
+    override val adresse: String?,
+) : VilkårFakta
 
 data class FaktaDagligReiseUbestemt(
     override val reiseId: ReiseId,
@@ -76,4 +95,7 @@ enum class TypeVilkårFakta {
     DAGLIG_REISE_OFFENTLIG_TRANSPORT,
     DAGLIG_REISE_PRIVAT_BIL,
     DAGLIG_REISE_UBESTEMT,
+    REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT,
+    REISE_TIL_SAMLING_PRIVAT_BIL,
+    REISE_TIL_SAMLING_UBESTEMT,
 }

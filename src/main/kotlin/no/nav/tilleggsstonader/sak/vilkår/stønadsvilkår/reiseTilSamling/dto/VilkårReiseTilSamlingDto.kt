@@ -1,0 +1,21 @@
+package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto
+
+import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
+import java.time.LocalDate
+
+data class VilkårReiseTilSamlingDto(
+    val id: VilkårId,
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val adresse: String? = null,
+    val reiseId: ReiseId,
+    val resultat: Vilkårsresultat,
+    val status: VilkårStatus?,
+    val delvilkårsett: List<DelvilkårDto>,
+    val fakta: FaktaReiseTilSamlingDto,
+    val slettetKommentar: String? = null,
+)

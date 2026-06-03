@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import java.math.BigDecimal
 import java.time.LocalDate
 

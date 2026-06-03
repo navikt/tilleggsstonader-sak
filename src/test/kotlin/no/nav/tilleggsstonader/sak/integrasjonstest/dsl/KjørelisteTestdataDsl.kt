@@ -5,8 +5,8 @@ import no.nav.tilleggsstonader.kontrakter.søknad.KjørelisteSkjema
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 
 @BehandlingTestdataDslMarker
 class KjørelisteTestdataDsl {
