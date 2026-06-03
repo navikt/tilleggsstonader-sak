@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain
 
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
@@ -36,7 +37,9 @@ data class FaktaOffentligTransport(
 ) : FaktaReiseTilSamling {
     override val type = TypeReiseTilSamling.OFFENTLIG_TRANSPORT
 
-    // TODO init validering?
+    init {
+        validerIngenNegativeUtgifter()
+    }
 
     override fun mapTilVilkårFakta() =
         FaktaReiseTilSamlingOffentligTransport(
@@ -44,6 +47,14 @@ data class FaktaOffentligTransport(
             adresse = adresse,
             utgifterOffentligTransport = utgifterOffentligTransport,
         )
+
+    private fun validerIngenNegativeUtgifter() {
+        utgifterOffentligTransport?.let {
+            brukerfeilHvis(it <= 0) {
+                "Utgifter til offentlig transport kan ikke være negative"
+            }
+        }
+    }
 }
 
 data class FaktaPrivatBil(
@@ -53,7 +64,9 @@ data class FaktaPrivatBil(
 ) : FaktaReiseTilSamling {
     override val type = TypeReiseTilSamling.PRIVAT_BIL
 
-    // TODO init validering?
+    init {
+        validerIngenNegativReiseavstand()
+    }
 
     override fun mapTilVilkårFakta() =
         FaktaReiseTilSamlingPrivatBil(
@@ -62,19 +75,11 @@ data class FaktaPrivatBil(
             reiseavstand = reiseavstand,
         )
 
-//    private fun validerIngenNegativeUtgifter() {
-//        utgifterOffentligTransport?.let {
-//            brukerfeilHvis(it <= 0) {
-//                "Utgifter til offentlig transport kan ikke være negative"
-//            }
-//        }
-//    }
-//
-//    private fun validerReiseavstand() {
-//        reiseavstand?.let {
-//            brukerfeilHvis(it <= BigDecimal.ZERO) {
-//                "Reiseavstand må være større enn 0"
-//            }
-//        }
-//    }
+    private fun validerIngenNegativReiseavstand() {
+        reiseavstand?.let {
+            brukerfeilHvis(it <= BigDecimal.ZERO) {
+                "Reiseavstand må være større enn 0"
+            }
+        }
+    }
 }

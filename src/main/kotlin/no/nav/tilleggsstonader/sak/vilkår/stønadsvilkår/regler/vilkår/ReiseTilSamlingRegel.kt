@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelSteg
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Resultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel.Companion.IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel.Companion.IKKE_OPPFYLT_MED_VALGFRI_BEGRUNNELSE
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.jaNeiSvarRegel
 
@@ -38,7 +37,11 @@ class ReiseTilSamlingRegel :
                                 begrunnelseType = BegrunnelseType.UTEN,
                                 tilhørendeFaktaType = TypeVilkårFakta.REISE_TIL_SAMLING_PRIVAT_BIL,
                             ),
-                        hvisNei = IKKE_OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                        hvisNei =
+                            SluttSvarRegel(
+                                resultat = Resultat.IKKE_OPPFYLT,
+                                begrunnelseType = BegrunnelseType.PÅKREVD,
+                            ),
                     ),
             )
         private val KAN_REISE_MED_OFFENTLIG_TRANSPORT =
@@ -53,7 +56,7 @@ class ReiseTilSamlingRegel :
                                 begrunnelseType = BegrunnelseType.UTEN,
                                 tilhørendeFaktaType = TypeVilkårFakta.REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT,
                             ),
-                        hvisNei = NesteRegel(KAN_REISE_MED_EGEN_BIL.regelId, BegrunnelseType.UTEN),
+                        hvisNei = NesteRegel(KAN_REISE_MED_EGEN_BIL.regelId, BegrunnelseType.PÅKREVD),
                     ),
             )
         private val DEKKET_AV_ANNET_STIPEND =
@@ -62,7 +65,11 @@ class ReiseTilSamlingRegel :
                 erHovedregel = false,
                 svarMapping =
                     jaNeiSvarRegel(
-                        hvisJa = IKKE_OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                        hvisJa =
+                            SluttSvarRegel(
+                                resultat = Resultat.IKKE_OPPFYLT,
+                                begrunnelseType = BegrunnelseType.PÅKREVD,
+                            ),
                         hvisNei = NesteRegel(KAN_REISE_MED_OFFENTLIG_TRANSPORT.regelId, BegrunnelseType.UTEN),
                     ),
             )
@@ -72,7 +79,7 @@ class ReiseTilSamlingRegel :
                 erHovedregel = false,
                 svarMapping =
                     jaNeiSvarRegel(
-                        hvisJa = NesteRegel(DEKKET_AV_ANNET_STIPEND.regelId, BegrunnelseType.UTEN),
+                        hvisJa = NesteRegel(DEKKET_AV_ANNET_STIPEND.regelId, BegrunnelseType.VALGFRI),
                         hvisNei = IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
                     ),
             )

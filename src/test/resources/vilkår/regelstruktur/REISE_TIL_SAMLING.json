@@ -1,3 +1,106 @@
 {
-
+  "AVSTAND_OVER_TRETTI_KM": {
+    "erHovedregel": true,
+    "reglerSomMåNullstilles": [
+      "DOKUMENTERTE_UTGIFTER",
+      "DEKKET_AV_ANNET_STIPEND",
+      "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
+      "KAN_REISE_MED_EGEN_BIL"
+    ],
+    "svaralternativer": [
+      {
+        "svarId": "JA",
+        "nesteRegelId": "DOKUMENTERTE_UTGIFTER",
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
+      },
+      {
+        "svarId": "NEI",
+        "nesteRegelId": null,
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
+      }
+    ]
+  },
+  "KAN_REISE_MED_OFFENTLIG_TRANSPORT": {
+    "erHovedregel": false,
+    "reglerSomMåNullstilles": [
+      "KAN_REISE_MED_EGEN_BIL"
+    ],
+    "svaralternativer": [
+      {
+        "svarId": "JA",
+        "nesteRegelId": null,
+        "begrunnelseType": "UTEN",
+        "tilhørendeFaktaType": "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT"
+      },
+      {
+        "svarId": "NEI",
+        "nesteRegelId": "KAN_REISE_MED_EGEN_BIL",
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
+      }
+    ]
+  },
+  "DOKUMENTERTE_UTGIFTER": {
+    "erHovedregel": false,
+    "reglerSomMåNullstilles": [
+      "DEKKET_AV_ANNET_STIPEND",
+      "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
+      "KAN_REISE_MED_EGEN_BIL"
+    ],
+    "svaralternativer": [
+      {
+        "svarId": "JA",
+        "nesteRegelId": "DEKKET_AV_ANNET_STIPEND",
+        "begrunnelseType": "VALGFRI",
+        "tilhørendeFaktaType": null
+      },
+      {
+        "svarId": "NEI",
+        "nesteRegelId": null,
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
+      }
+    ]
+  },
+  "KAN_REISE_MED_EGEN_BIL": {
+    "erHovedregel": false,
+    "reglerSomMåNullstilles": [],
+    "svaralternativer": [
+      {
+        "svarId": "JA",
+        "nesteRegelId": null,
+        "begrunnelseType": "UTEN",
+        "tilhørendeFaktaType": "REISE_TIL_SAMLING_PRIVAT_BIL"
+      },
+      {
+        "svarId": "NEI",
+        "nesteRegelId": null,
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
+      }
+    ]
+  },
+  "DEKKET_AV_ANNET_STIPEND": {
+    "erHovedregel": false,
+    "reglerSomMåNullstilles": [
+      "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
+      "KAN_REISE_MED_EGEN_BIL"
+    ],
+    "svaralternativer": [
+      {
+        "svarId": "JA",
+        "nesteRegelId": null,
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
+      },
+      {
+        "svarId": "NEI",
+        "nesteRegelId": "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
+        "begrunnelseType": "UTEN",
+        "tilhørendeFaktaType": null
+      }
+    ]
+  }
 }

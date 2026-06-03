@@ -225,7 +225,7 @@ class DagligReiseVilkårService(
     }
 
     private fun validerAktivitetForOffentligTransport(
-        nyttVilkår: LagreDagligReise,
+        nyttVilkår: LagreVilkårDagligReise,
         behandlingId: BehandlingId,
     ) {
         val fakta = nyttVilkår.fakta as FaktaOffentligTransport
