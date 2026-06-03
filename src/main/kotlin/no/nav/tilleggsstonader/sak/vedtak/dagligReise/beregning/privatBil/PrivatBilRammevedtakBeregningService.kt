@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilBeregningsgrunnlag
@@ -37,11 +38,14 @@ class PrivatBilRammevedtakBeregningService(
     private val vilkårperiodeService: VilkårperiodeService,
     private val behandlingService: BehandlingService,
     private val unleashService: UnleashService,
+    private val privatBilBeregningRevurderingService: PrivatBilBeregningRevurderingService,
 ) {
     fun beregnRammevedtak(
         vedtaksperioder: List<Vedtaksperiode>,
         oppfylteVilkårDagligReise: List<VilkårDagligReise>,
         behandlingId: BehandlingId,
+        typeVedtak: TypeVedtak,
+        forrigeRammevedtakPrivatBil: RammevedtakPrivatBil? = null,
     ): RammevedtakPrivatBil? {
         if (!unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)) return null
 
@@ -57,7 +61,18 @@ class PrivatBilRammevedtakBeregningService(
 
         if (resultatForReiser.isEmpty()) return null
 
-        return RammevedtakPrivatBil(reiser = resultatForReiser)
+        val nyttRammevedtakPrivatBil = RammevedtakPrivatBil(reiser = resultatForReiser)
+
+        if (forrigeRammevedtakPrivatBil != null) {
+            return privatBilBeregningRevurderingService.beregnRevurdering(
+                forrigeRammevedtak = forrigeRammevedtakPrivatBil,
+                nyttRammevedtak = nyttRammevedtakPrivatBil,
+                avkortetVedtaksperioder = vedtaksperioder,
+                typeVedtak = typeVedtak,
+            )
+        }
+
+        return nyttRammevedtakPrivatBil
     }
 
     private fun List<VilkårDagligReise>.mapTilReiser(behandlingId: BehandlingId): List<ReiseMedPrivatBil> =

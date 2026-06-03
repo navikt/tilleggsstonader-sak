@@ -23,7 +23,9 @@ import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningRevurderingService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilRammevedtakBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.SatsDagligReisePrivatBilProvider
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
@@ -70,6 +72,7 @@ class PrivatBilBeregningStepDefinitions {
             vilkårperiodeService = vilkårperiodeService,
             behandlingService = behandlingServiceMock,
             unleashService = unleashServiceMock,
+            privatBilBeregningRevurderingService = PrivatBilBeregningRevurderingService(unleashServiceMock),
         )
 
     var reiserUtenDelperioder: Map<Int, LagreVilkårDagligReise> = emptyMap()
@@ -158,6 +161,7 @@ class PrivatBilBeregningStepDefinitions {
                     vedtaksperioder = vedtaksperioder,
                     oppfylteVilkårDagligReise = oppfylteReisevilkår,
                     behandlingId = behandlingId,
+                    typeVedtak = TypeVedtak.INNVILGELSE,
                 )
         } catch (e: Exception) {
             feil = e
