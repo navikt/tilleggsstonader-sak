@@ -29,14 +29,21 @@ class KjørelisteBehandlingBrevService(
     private val behandlingService: BehandlingService,
 ) {
     fun hentEllerGenererBrev(behandlingId: BehandlingId): KjørelisteBehandlingBrev {
+        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val eksisterendeBrev = kjørelisteBehandlingBrevRepository.findByBehandlingId(behandlingId)
-        if (eksisterendeBrev != null) {
+
+        if (saksbehandling.status.behandlingErLåstForVidereRedigering()) {
+            brukerfeilHvis(eksisterendeBrev == null) {
+                "Finner ikke kjørelistebrev for behandlingId=$behandlingId. Det er nok fordi et brev ikke har blitt laget enda."
+            }
             return eksisterendeBrev
         }
 
-        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-        saksbehandling.status.validerKanBehandlingRedigeres()
-        return lagreBrev(saksbehandling, begrunnelse = null, eksisterendeBrev = null)
+        return lagreBrev(
+            saksbehandling,
+            begrunnelse = eksisterendeBrev?.begrunnelse,
+            eksisterendeBrev = eksisterendeBrev,
+        )
     }
 
     fun oppdaterBegrunnelseOgGenererBrev(
