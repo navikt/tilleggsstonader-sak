@@ -182,7 +182,6 @@ private fun vedtaksperiodeGrunnlag(
     fom = fom,
     tom = tom,
     aktivitet = aktivitet,
-    typeAktivitet = null,
     målgruppe = målgruppe,
     antallReisedagerIVedtaksperioden = antallReisedagerIVedtaksperioden,
 )

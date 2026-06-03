@@ -24,7 +24,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Fa
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaUbestemtType
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreVilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -53,7 +53,7 @@ class DagligReiseVilkårService(
 
     @Transactional
     fun opprettNyttVilkår(
-        nyttVilkår: LagreDagligReise,
+        nyttVilkår: LagreVilkårDagligReise,
         behandlingId: BehandlingId,
     ): VilkårDagligReise {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
@@ -69,7 +69,7 @@ class DagligReiseVilkårService(
 
     @Transactional
     fun oppdaterVilkår(
-        nyttVilkår: LagreDagligReise,
+        nyttVilkår: LagreVilkårDagligReise,
         behandlingId: BehandlingId,
         vilkårId: VilkårId,
     ): VilkårDagligReise {
@@ -102,7 +102,7 @@ class DagligReiseVilkårService(
 
     private fun lagVilkårMedVurderingerOgResultat(
         behandlingId: BehandlingId,
-        nyttVilkår: LagreDagligReise,
+        nyttVilkår: LagreVilkårDagligReise,
         eksisterendeVilkår: VilkårDagligReise? = null,
     ): VilkårDagligReise {
         val delvilkårsett =
@@ -134,7 +134,7 @@ class DagligReiseVilkårService(
                     prisTrettidagersbillett = this.prisTrettidagersbillett?.takeIf { it > 0 },
                     adresse = this.adresse,
                     periode = periode,
-                    typeAktivitet = this.typeAktivitet,
+                    tiltaksvariant = this.tiltaksvariant,
                 )
             }
 
@@ -171,7 +171,7 @@ class DagligReiseVilkårService(
     }
 
     private fun validerKanBehandleVilkåret(
-        nyttVilkår: LagreDagligReise,
+        nyttVilkår: LagreVilkårDagligReise,
         behandling: Saksbehandling,
     ) {
         val gjelderPrivatBil = nyttVilkår.fakta.type == TypeDagligReise.PRIVAT_BIL
@@ -191,7 +191,7 @@ class DagligReiseVilkårService(
         }
     }
 
-    private fun validerDelperiodeFomOgTomMotNyttVilkår(nyttVilkår: LagreDagligReise) {
+    private fun validerDelperiodeFomOgTomMotNyttVilkår(nyttVilkår: LagreVilkårDagligReise) {
         if (nyttVilkår.fakta is FaktaPrivatBil) {
             val fom = nyttVilkår.fom
             val tom = nyttVilkår.tom
@@ -208,7 +208,7 @@ class DagligReiseVilkårService(
     }
 
     private fun validerAktivitetForPrivatBil(
-        nyttVilkår: LagreDagligReise,
+        nyttVilkår: LagreVilkårDagligReise,
         behandlingId: BehandlingId,
     ) {
         val fakta = nyttVilkår.fakta as FaktaPrivatBil
@@ -225,15 +225,15 @@ class DagligReiseVilkårService(
     }
 
     private fun validerAktivitetForOffentligTransport(
-        nyttVilkår: LagreDagligReise,
+        nyttVilkår: LagreVilkårDagligReise,
         behandlingId: BehandlingId,
     ) {
         val fakta = nyttVilkår.fakta as FaktaOffentligTransport
-        brukerfeilHvis(fakta.typeAktivitet == null) {
+        brukerfeilHvis(fakta.tiltaksvariant == null) {
             "Aktivitet må velges for offentlig transport"
         }
-        vilkårperiodeService.validerAktivitetMedTypeAktivitetInnenforPeriode(
-            typeAktivitet = fakta.typeAktivitet,
+        vilkårperiodeService.validerAktivitetMedTiltaksvariantInnenforPeriode(
+            tiltaksvariant = fakta.tiltaksvariant,
             periode = Datoperiode(fom = nyttVilkår.fom, tom = nyttVilkår.tom),
             behandlingId = behandlingId,
         )

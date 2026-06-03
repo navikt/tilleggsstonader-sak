@@ -89,7 +89,7 @@ class PrivatBilRammevedtakBeregningService(
 
             vilkår.tilReiserMedPrivatBil(
                 aktivitetType = aktivitetType,
-                typeAktivitet = aktivitet.typeAktivitet,
+                tiltaksvariant = aktivitet.tiltaksvariant,
                 gjelderTiltaksenheten = saksbehandling.stønadstype.behandlendeEnhet() === Enhet.NAV_TILTAK_OSLO,
             )
         }
@@ -108,7 +108,7 @@ class PrivatBilRammevedtakBeregningService(
             RammeForReiseMedPrivatBil(
                 reiseId = reise.reiseId,
                 aktivitetsadresse = reise.aktivitetsadresse,
-                typeAktivitet = reise.typeAktivitet,
+                tiltaksvariant = reise.tiltaksvariant,
                 aktivitetType = reise.aktivitetType,
                 grunnlag =
                     lagBeregningsgrunnlagForReise(

@@ -5,6 +5,7 @@ import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.FerdigstillBehandlingTask
@@ -18,6 +19,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
+import no.nav.tilleggsstonader.sak.privatbil.FullførKjørelistebehandlingService
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -45,6 +47,7 @@ class BeslutteVedtakSteg(
     private val vedtakService: VedtakService,
     private val brevService: BrevService,
     private val iverksettService: IverksettService,
+    private val fullførKjørelistebehandlingService: FullførKjørelistebehandlingService,
 ) : BehandlingSteg<BeslutteVedtakDto> {
     override fun validerSteg(saksbehandling: Saksbehandling) {
         brukerfeilHvis(saksbehandling.steg.kommerEtter(stegType())) {
@@ -66,18 +69,23 @@ class BeslutteVedtakSteg(
         ferdigstillOppgave(saksbehandling)
 
         return if (data.godkjent) {
-            val typeVedtak = vedtakService.hentVedtaksresultat(saksbehandling)
-            oppdaterResultatPåBehandling(saksbehandling, typeVedtak)
-            vedtakCounter(saksbehandling.stønadstype, typeVedtak).increment()
-
-            iverksettService.iverksettBehandlingFørsteGang(saksbehandling.id)
-            if (!saksbehandling.skalIkkeSendeBrev) {
-                brevService.lagEndeligBeslutterbrev(saksbehandling)
-                opprettJournalførVedtaksbrevTask(saksbehandling)
-                StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV
-            } else {
-                taskService.save(FerdigstillBehandlingTask.opprettTask(saksbehandling))
+            if (erManuellKjørelistebehandling(saksbehandling)) {
+                fullførKjørelistebehandlingService.fullførKjørelistebehandling(saksbehandling)
                 StegType.FERDIGSTILLE_BEHANDLING
+            } else {
+                val typeVedtak = vedtakService.hentVedtaksresultat(saksbehandling)
+                vedtakCounter(saksbehandling.stønadstype, typeVedtak).increment()
+                oppdaterResultatPåBehandling(saksbehandling, typeVedtak)
+
+                iverksettService.iverksettBehandlingFørsteGang(saksbehandling.id)
+                if (saksbehandling.skalIkkeSendeBrev) {
+                    taskService.save(FerdigstillBehandlingTask.opprettTask(saksbehandling))
+                    StegType.FERDIGSTILLE_BEHANDLING
+                } else {
+                    brevService.lagEndeligBeslutterbrev(saksbehandling)
+                    opprettJournalførVedtaksbrevTask(saksbehandling)
+                    StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV
+                }
             }
         } else {
             opprettBehandleUnderkjentVedtakOppgave(saksbehandling, saksbehandler)
@@ -138,6 +146,10 @@ class BeslutteVedtakSteg(
     override fun stegType(): StegType = StegType.BESLUTTE_VEDTAK
 
     override fun settInnHistorikk(): Boolean = false
+
+    private fun erManuellKjørelistebehandling(saksbehandling: Saksbehandling): Boolean =
+        saksbehandling.erKjørelisteBehandling() &&
+            saksbehandling.behandlingMetode == BehandlingMetode.MANUELL
 
     companion object {
         init {

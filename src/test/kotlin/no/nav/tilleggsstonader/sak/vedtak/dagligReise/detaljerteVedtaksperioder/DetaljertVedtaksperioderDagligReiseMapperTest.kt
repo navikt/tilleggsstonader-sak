@@ -23,7 +23,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
@@ -297,7 +297,6 @@ private fun beregningsresultatForPeriode(
                             fom = fom,
                             tom = tom,
                             aktivitet = AktivitetType.TILTAK,
-                            typeAktivitet = null,
                             målgruppe = MålgruppeType.AAP.faktiskMålgruppe(),
                             antallReisedagerIVedtaksperioden = 20,
                         ),

@@ -19,9 +19,9 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.SvarOgBegrunnelse
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreVilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
@@ -53,7 +53,7 @@ class DagligReiseVilkårServiceTest {
         )
 
     val nyttVilkår =
-        LagreDagligReise(
+        LagreVilkårDagligReise(
             fom = 1 januar 2025,
             tom = 31 januar 2025,
             svar = svarOffentligTransport,
@@ -120,7 +120,7 @@ class DagligReiseVilkårServiceTest {
                         prisEnkelbillett = 40,
                         prisSyvdagersbillett = null,
                         prisTrettidagersbillett = 800,
-                        typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                        tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                     ),
             )
 
@@ -130,8 +130,8 @@ class DagligReiseVilkårServiceTest {
         )
 
         verify {
-            vilkårperiodeService.validerAktivitetMedTypeAktivitetInnenforPeriode(
-                typeAktivitet = TypeAktivitet.GRUPPEAMO,
+            vilkårperiodeService.validerAktivitetMedTiltaksvariantInnenforPeriode(
+                tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                 periode = Datoperiode(fom = 1 januar 2025, tom = 31 januar 2025),
                 behandlingId = behandling.id,
             )

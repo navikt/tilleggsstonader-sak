@@ -2,8 +2,8 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping
 
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.BegrunnelseType
@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelSteg
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
-import kotlin.collections.get
 
 object ByggVilkårFraSvar {
     fun byggDelvilkårsettFraSvarOgVilkårsregel(

@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreVilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårResultatDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
@@ -16,11 +16,11 @@ class VilkårDagligReiseKall(
 
     fun opprettVilkår(
         behandlingId: BehandlingId,
-        dto: LagreDagligReiseDto,
+        dto: LagreVilkårDagligReiseDto,
     ): VilkårDagligReiseDto = apiRespons.opprettVilkår(behandlingId, dto).expectOkWithBody()
 
     fun oppdaterVilkår(
-        lagreVilkår: LagreDagligReiseDto,
+        lagreVilkår: LagreVilkårDagligReiseDto,
         vilkårId: VilkårId,
         behandlingId: BehandlingId,
     ): VilkårDagligReiseDto = apiRespons.oppdaterVilkår(lagreVilkår, vilkårId, behandlingId).expectOkWithBody()
@@ -41,11 +41,11 @@ class VilkårDagligReiseKall(
 
         fun opprettVilkår(
             behandlingId: BehandlingId,
-            dto: LagreDagligReiseDto,
+            dto: LagreVilkårDagligReiseDto,
         ) = testklient.post("/api/vilkar/daglig-reise/$behandlingId", dto)
 
         fun oppdaterVilkår(
-            lagreVilkår: LagreDagligReiseDto,
+            lagreVilkår: LagreVilkårDagligReiseDto,
             vilkårId: VilkårId,
             behandlingId: BehandlingId,
         ) = testklient.put("/api/vilkar/daglig-reise/$behandlingId/$vilkårId", lagreVilkår)

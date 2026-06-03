@@ -9,6 +9,9 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.TypeVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -18,6 +21,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdagerNullable
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaProsent
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaStudienivå
 import java.time.LocalDate
 import java.util.UUID
@@ -45,6 +49,7 @@ data class OppsummertVilkårperiode(
     val aktivitetsdager: Int?,
     val varient: String?,
     val studienivå: Studienivå?,
+    val studieprosent: Int?,
 ) : Periode<LocalDate>,
     KopierPeriode<OppsummertVilkårperiode> {
     override fun medPeriode(
@@ -68,7 +73,11 @@ fun Vilkårperiode.tilOppsummertVilkårperiode(): OppsummertVilkårperiode =
             this.faktaOgVurdering.fakta
                 .takeIfFakta<FaktaStudienivå>()
                 ?.studienivå,
-        varient = this.typeAktivitet?.beskrivelse,
+        varient = this.tiltaksvariant?.beskrivelse,
+        studieprosent =
+            this.faktaOgVurdering.fakta
+                .takeIfFakta<FaktaProsent>()
+                ?.prosent,
     )
 
 data class Stønadsvilkår(
@@ -98,6 +107,9 @@ fun Vilkår.tilOppsummertVilkår(): OppsummertVilkår =
                 is FaktaDagligReiseOffentligTransport -> TypeVilkårFakta.DAGLIG_REISE_OFFENTLIG_TRANSPORT
                 is FaktaDagligReisePrivatBil -> TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL
                 is FaktaDagligReiseUbestemt -> TypeVilkårFakta.DAGLIG_REISE_UBESTEMT
+                is FaktaReiseTilSamlingOffentligTransport -> TypeVilkårFakta.REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT
+                is FaktaReiseTilSamlingPrivatBil -> TypeVilkårFakta.REISE_TIL_SAMLING_PRIVAT_BIL
+                is FaktaReiseTilSamlingUbestemt -> TypeVilkårFakta.REISE_TIL_SAMLING_UBESTEMT
                 null -> null
             },
     )

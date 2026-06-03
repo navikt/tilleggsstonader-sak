@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering
 
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -39,9 +40,10 @@ class SimuleringSteg(
         saksbehandling: Saksbehandling,
         kanBehandlePrivatBil: Boolean,
     ): StegType =
-        if (saksbehandling.erKjørelisteBehandling()) {
-            StegType.FULLFØR_KJØRELISTE
-        } else {
-            StegType.SEND_TIL_BESLUTTER
+        when {
+            saksbehandling.erKjørelisteBehandling() &&
+                saksbehandling.behandlingMetode == BehandlingMetode.MANUELL -> StegType.SEND_TIL_BESLUTTER
+            saksbehandling.erKjørelisteBehandling() -> StegType.FULLFØR_KJØRELISTE
+            else -> StegType.SEND_TIL_BESLUTTER
         }
 }

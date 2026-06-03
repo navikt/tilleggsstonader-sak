@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.util.validerUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -19,7 +19,7 @@ data class RammeForReiseMedPrivatBil(
     val reiseId: ReiseId,
     val aktivitetsadresse: String?,
     val aktivitetType: AktivitetType,
-    val typeAktivitet: TypeAktivitet?,
+    val tiltaksvariant: TypeAktivitet?,
     val grunnlag: RammeForReiseMedPrivatBilBeregningsgrunnlag,
 ) {
     fun finnDelperiodeForPeriode(periode: Periode<LocalDate>) = grunnlag.delperioder.single { it.inneholder(periode) }

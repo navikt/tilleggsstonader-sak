@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.privatbil.task
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.KjørelisteBehandlingBrevService
@@ -22,7 +21,6 @@ import java.util.Properties
 )
 class AutomatiskKjørelisteBehandlingTask(
     private val stegService: StegService,
-    private val taskService: TaskService,
     private val kjørelisteBehandlingBrevService: KjørelisteBehandlingBrevService,
     private val faktaGrunnlagService: FaktaGrunnlagService,
     private val fullførKjørelistebehandlingSteg: FullførKjørelistebehandlingSteg,

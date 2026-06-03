@@ -34,7 +34,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreVilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -75,7 +75,7 @@ class PrivatBilBeregningStepDefinitions {
             privatBilBeregningRevurderingService = PrivatBilBeregningRevurderingService(unleashServiceMock),
         )
 
-    var reiserUtenDelperioder: Map<Int, LagreDagligReise> = emptyMap()
+    var reiserUtenDelperioder: Map<Int, LagreVilkårDagligReise> = emptyMap()
     var delperioderForReisenummer: Map<Int, List<FaktaDelperiodePrivatBil>> = emptyMap()
 
     var vedtaksperioder: List<Vedtaksperiode> = emptyList()
@@ -111,7 +111,7 @@ class PrivatBilBeregningStepDefinitions {
                             tom = tom,
                             faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
                             resultat = ResultatVilkårperiode.OPPFYLT,
-                            typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                            tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                         )
                     every { vilkårperiodeService.hentAktivitet(testAktivitet.globalId, behandlingId) } returns testAktivitet
 

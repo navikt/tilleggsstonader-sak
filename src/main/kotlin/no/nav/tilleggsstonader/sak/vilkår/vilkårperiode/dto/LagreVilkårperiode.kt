@@ -33,7 +33,7 @@ import java.time.LocalDate
 data class LagreVilkårperiode(
     val behandlingId: BehandlingId,
     val type: VilkårperiodeType,
-    val typeAktivitet: TypeAktivitet? = null,
+    val tiltaksvariant: TypeAktivitet? = null,
     val fom: LocalDate,
     val tom: LocalDate,
     val begrunnelse: String? = null,

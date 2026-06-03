@@ -25,7 +25,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Fa
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaUbestemtType
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreVilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.oppfylteSvarOffentligtransport
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -81,8 +81,8 @@ fun mapTilVilkårDagligReise(
     typeVilkår: TypeDagligReise,
     rad: Map<String, String>,
     aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId.random(),
-): LagreDagligReise =
-    LagreDagligReise(
+): LagreVilkårDagligReise =
+    LagreVilkårDagligReise(
         fom = parseDato(DomenenøkkelFelles.FOM, rad),
         tom = parseDato(DomenenøkkelFelles.TOM, rad),
         svar = oppfylteSvarOffentligtransport,
@@ -104,7 +104,7 @@ fun mapFaktaOffentligTransport(rad: Map<String, String>): FaktaOffentligTranspor
     FaktaOffentligTransport(
         reiseId = dummyReiseId,
         adresse = "Tiltaksveien 1",
-        typeAktivitet = TypeAktivitet.GRUPPEAMO,
+        tiltaksvariant = TypeAktivitet.GRUPPEAMO,
         reisedagerPerUke =
             parseInt(
                 DomenenøkkelOffentligtransport.ANTALL_REISEDAGER_PER_UKE,

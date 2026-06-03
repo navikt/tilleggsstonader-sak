@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligRei
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
@@ -42,7 +43,7 @@ data class FaktaOffentligTransport(
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int?,
     val periode: Datoperiode? = null,
-    val typeAktivitet: TypeAktivitet? = null,
+    val tiltaksvariant: TypeAktivitet? = null,
 ) : FaktaDagligReise {
     override val type = TypeDagligReise.OFFENTLIG_TRANSPORT
 
@@ -126,7 +127,7 @@ data class FaktaOffentligTransport(
             prisSyvdagersbillett = prisSyvdagersbillett,
             prisTrettidagersbillett = prisTrettidagersbillett,
             adresse = adresse,
-            typeAktivitet = typeAktivitet,
+            tiltaksvariant = tiltaksvariant,
         )
 }
 

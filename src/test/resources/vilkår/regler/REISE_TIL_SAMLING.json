@@ -1,4 +1,81 @@
 {
-  "regler" : {},
-  "vilkårType" : "REISE_TIL_SAMLING"
+  "regler": {
+    "AVSTAND_OVER_TRETTI_KM": {
+      "regelId": "AVSTAND_OVER_TRETTI_KM",
+      "erHovedregel": true,
+      "svarMapping": {
+        "JA": {
+          "regelId": "DOKUMENTERTE_UTGIFTER",
+          "begrunnelseType": "PÅKREVD"
+        },
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "tilhørendeFaktaType": null,
+          "regelId": "SLUTT_NODE"
+        }
+      }
+    },
+    "KAN_REISE_MED_OFFENTLIG_TRANSPORT": {
+      "regelId": "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
+      "erHovedregel": false,
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "UTEN",
+          "tilhørendeFaktaType": "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT",
+          "regelId": "SLUTT_NODE"
+        },
+        "NEI": {
+          "regelId": "KAN_REISE_MED_EGEN_BIL",
+          "begrunnelseType": "PÅKREVD"
+        }
+      }
+    },
+    "DOKUMENTERTE_UTGIFTER": {
+      "regelId": "DOKUMENTERTE_UTGIFTER",
+      "erHovedregel": false,
+      "svarMapping": {
+        "JA": {
+          "regelId": "DEKKET_AV_ANNET_STIPEND",
+          "begrunnelseType": "VALGFRI"
+        },
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "tilhørendeFaktaType": null,
+          "regelId": "SLUTT_NODE"
+        }
+      }
+    },
+    "KAN_REISE_MED_EGEN_BIL": {
+      "regelId": "KAN_REISE_MED_EGEN_BIL",
+      "erHovedregel": false,
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "UTEN",
+          "tilhørendeFaktaType": "REISE_TIL_SAMLING_PRIVAT_BIL",
+          "regelId": "SLUTT_NODE"
+        },
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "tilhørendeFaktaType": null,
+          "regelId": "SLUTT_NODE"
+        }
+      }
+    },
+    "DEKKET_AV_ANNET_STIPEND": {
+      "regelId": "DEKKET_AV_ANNET_STIPEND",
+      "erHovedregel": false,
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "PÅKREVD",
+          "tilhørendeFaktaType": null,
+          "regelId": "SLUTT_NODE"
+        },
+        "NEI": {
+          "regelId": "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
+          "begrunnelseType": "UTEN"
+        }
+      }
+    }
+  },
+  "vilkårType": "REISE_TIL_SAMLING"
 }

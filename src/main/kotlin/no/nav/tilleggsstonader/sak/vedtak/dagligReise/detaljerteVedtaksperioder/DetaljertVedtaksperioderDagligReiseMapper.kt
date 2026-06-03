@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPri
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 
 object DetaljertVedtaksperioderDagligReiseMapper {
     fun finnDetaljerteVedtaksperioderDagligReise(

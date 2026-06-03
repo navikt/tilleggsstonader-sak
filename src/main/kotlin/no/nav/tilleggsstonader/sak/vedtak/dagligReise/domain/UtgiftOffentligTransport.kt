@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.util.inneholderUkedag
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import java.time.LocalDate
 
 data class UtgiftOffentligTransport(
@@ -15,7 +15,7 @@ data class UtgiftOffentligTransport(
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
     val pris30dagersbillett: Int?,
-    val typeAktivitet: TypeAktivitet? = null,
+    val tiltaksvariant: TypeAktivitet? = null,
 ) : Periode<LocalDate>,
     KopierPeriode<UtgiftOffentligTransport> {
     fun delTil30Dagersperioder(): List<UtgiftOffentligTransport> =
@@ -28,7 +28,7 @@ data class UtgiftOffentligTransport(
                 prisEnkelbillett = prisEnkelbillett,
                 prisSyvdagersbillett = prisSyvdagersbillett,
                 pris30dagersbillett = pris30dagersbillett,
-                typeAktivitet = typeAktivitet,
+                tiltaksvariant = tiltaksvariant,
             )
         }
 

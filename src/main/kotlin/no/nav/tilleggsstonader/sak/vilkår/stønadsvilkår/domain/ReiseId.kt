@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain
+package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain
 
 import java.util.UUID
 

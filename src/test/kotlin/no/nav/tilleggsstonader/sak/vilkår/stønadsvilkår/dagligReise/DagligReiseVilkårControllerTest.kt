@@ -11,13 +11,13 @@ import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseUbestemtDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreVilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SvarOgBegrunnelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import org.assertj.core.api.Assertions.assertThat
@@ -44,7 +44,7 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
     @Test
     fun `skal kunne lagre, endre og slette vilkår for daglig reise - offentlig transport`() {
         val nyttVilkår =
-            LagreDagligReiseDto(
+            LagreVilkårDagligReiseDto(
                 fom = 1 januar 2025,
                 tom = 31 januar 2025,
                 adresse = "Tiltaksveien 1",
@@ -97,7 +97,7 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
             )
 
         val nyttVilkår =
-            LagreDagligReiseDto(
+            LagreVilkårDagligReiseDto(
                 fom = 1 januar 2025,
                 tom = 31 januar 2025,
                 adresse = "Tiltaksveien 1",
@@ -134,7 +134,7 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
     )
 
     private fun assertLagretVilkår(
-        lagreVilkårRequest: LagreDagligReiseDto,
+        lagreVilkårRequest: LagreVilkårDagligReiseDto,
         resultat: VilkårDagligReiseDto,
     ) {
         assertThat(resultat.fom).isEqualTo(lagreVilkårRequest.fom)

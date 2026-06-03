@@ -22,7 +22,7 @@ fun VilkårperiodeDto.tilLagreVilkårperiodeAktivitet(behandlingId: BehandlingId
     LagreVilkårperiode(
         behandlingId = behandlingId,
         type = type as AktivitetType,
-        typeAktivitet = typeAktivitet?.kode?.let { TypeAktivitet.valueOf(it) },
+        tiltaksvariant = tiltaksvariant?.kode?.let { TypeAktivitet.valueOf(it) },
         fom = fom,
         tom = tom,
         faktaOgSvar = faktaOgVurderinger.tilFaktaOgSvarDto(),
@@ -33,7 +33,7 @@ fun VilkårperiodeDto.tilLagreVilkårperiodeMålgruppe(behandlingId: BehandlingI
     LagreVilkårperiode(
         behandlingId = behandlingId,
         type = type as MålgruppeType,
-        typeAktivitet = null,
+        tiltaksvariant = null,
         fom = fom,
         tom = tom,
         faktaOgSvar = faktaOgVurderinger.tilFaktaOgSvarDto(),

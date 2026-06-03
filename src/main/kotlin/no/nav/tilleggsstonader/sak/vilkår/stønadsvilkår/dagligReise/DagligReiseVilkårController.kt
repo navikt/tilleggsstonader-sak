@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseDtoMapper.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreVilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårResultatDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
@@ -52,7 +52,7 @@ class DagligReiseVilkårController(
     @PostMapping("{behandlingId}")
     fun opprettVilkår(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody lagreVilkårDto: LagreDagligReiseDto,
+        @RequestBody lagreVilkårDto: LagreVilkårDagligReiseDto,
     ): VilkårDagligReiseDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
@@ -69,7 +69,7 @@ class DagligReiseVilkårController(
     fun oppdaterVilkår(
         @PathVariable behandlingId: BehandlingId,
         @PathVariable vilkårId: VilkårId,
-        @RequestBody lagreVilkårDto: LagreDagligReiseDto,
+        @RequestBody lagreVilkårDto: LagreVilkårDagligReiseDto,
     ): VilkårDagligReiseDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)

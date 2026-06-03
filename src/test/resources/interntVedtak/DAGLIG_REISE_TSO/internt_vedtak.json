@@ -131,8 +131,7 @@
     "fom" : "2024-01-01",
     "tom" : "2024-02-29",
     "målgruppe" : "NEDSATT_ARBEIDSEVNE",
-    "aktivitet" : "TILTAK",
-    "tiltaksvariant" : null
+    "aktivitet" : "TILTAK"
   } ],
   "vilkår" : [ {
     "type" : "DAGLIG_REISE",
@@ -335,7 +334,7 @@
       "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
       "aktivitetsadresse" : "Testveien 1, 1234 Testby",
       "aktivitetType" : "TILTAK",
-      "typeAktivitet" : "GRUPPEAMO",
+      "tiltaksvariant" : "GRUPPEAMO",
       "grunnlag" : {
         "fom" : "2024-01-01",
         "tom" : "2024-01-31",
@@ -368,7 +367,7 @@
       "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
       "aktivitetsadresse" : "Testveien 2, 1234 Testby",
       "aktivitetType" : "TILTAK",
-      "typeAktivitet" : "GRUPPEAMO",
+      "tiltaksvariant" : "GRUPPEAMO",
       "grunnlag" : {
         "fom" : "2024-01-01",
         "tom" : "2024-01-31",
