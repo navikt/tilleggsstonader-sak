@@ -328,6 +328,25 @@ class OppgaveService(
 
     fun finnAlleOppgaveDomainForBehandling(behandlingId: BehandlingId) = oppgaveRepository.findByBehandlingId(behandlingId)
 
+    @Transactional
+    fun oppdaterStatusPåIkkeFerdigstilteOppgaverForBehandling(behandlingId: BehandlingId) {
+        finnAlleOppgaveDomainForBehandling(behandlingId)
+            .filterNot { it.erFerdigstilt() || it.erIgnorert() }
+            .forEach { oppgaveDomain ->
+                val oppgave = oppgaveClient.finnOppgaveMedId(oppgaveDomain.gsakOppgaveId)
+                oppgaveRepository.update(
+                    oppgaveDomain.copy(
+                        status =
+                            when (oppgave.status) {
+                                StatusEnum.FERDIGSTILT -> Oppgavestatus.FERDIGSTILT
+                                StatusEnum.FEILREGISTRERT -> Oppgavestatus.FEILREGISTRERT
+                                else -> Oppgavestatus.ÅPEN
+                            },
+                    ),
+                )
+            }
+    }
+
     fun finnSisteBehandlingsoppgaveForBehandling(behandlingId: BehandlingId): OppgaveDomain? =
         finnAlleOppgaveDomainForBehandling(behandlingId)
             .filter { it.erBehandlingsoppgave() }
