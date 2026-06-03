@@ -1,30 +1,19 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
-import no.nav.familie.prosessering.internal.TaskService
-import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
-import no.nav.tilleggsstonader.sak.behandlingsflyt.FerdigstillBehandlingTask
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakereService
-import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.JournalførKjørelisteBehandlingBrevTask
-import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
-import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
-import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import org.springframework.stereotype.Component
 
 @Component
 class FullførKjørelistebehandlingSteg(
     private val behandlingService: BehandlingService,
-    private val iverksettService: IverksettService,
-    private val taskService: TaskService,
-    private val oppgaveService: OppgaveService,
+    private val fullførKjørelistebehandlingService: FullførKjørelistebehandlingService,
     private val brevmottakereService: BrevmottakereService,
 ) : BehandlingSteg<Void?> {
     override fun utførSteg(
@@ -38,33 +27,10 @@ class FullførKjørelistebehandlingSteg(
             "Kan ikke fullføre behandling=${saksbehandling.id} fordi den ikke er en kjørelistebehandling."
         }
 
-        opprettTaskForSendingAvVedtaksbrev(behandlingId = saksbehandling.id)
-        behandlingService.oppdaterResultatPåBehandling(saksbehandling.id, BehandlingResultat.INNVILGET)
+        // For å opprette brevmottakere for kjøreliste-brev da det ikke gjøres ved automatisk behandling
+        brevmottakereService.hentEllerOpprettBrevmottakere(saksbehandling.id)
+        fullførKjørelistebehandlingService.fullførKjørelistebehandling(saksbehandling)
         behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.IVERKSETTER_VEDTAK)
-        taskService.save(FerdigstillBehandlingTask.opprettTask(saksbehandling))
-
-        ferdigstillOppgave(saksbehandling)
-        iverksettService.iverksettBehandlingFørsteGang(saksbehandling.id)
-    }
-
-    private fun opprettTaskForSendingAvVedtaksbrev(behandlingId: BehandlingId) {
-        // For å opprette brevmottakere for kjøreliste-brev da det ikke gjøres fra frontend
-        brevmottakereService.hentEllerOpprettBrevmottakere(behandlingId)
-        taskService.save(JournalførKjørelisteBehandlingBrevTask.opprettTask(behandlingId))
-    }
-
-    private fun ferdigstillOppgave(saksbehandling: Saksbehandling): Long? {
-        val oppgavetype = Oppgavetype.BehandleKjøreliste
-        return oppgaveService.hentOppgaveDomainSomIkkeErFerdigstilt(saksbehandling.id, oppgavetype)?.let {
-            taskService.save(
-                FerdigstillOppgaveTask.opprettTask(
-                    behandlingId = saksbehandling.id,
-                    oppgavetype = oppgavetype,
-                    oppgaveId = it.gsakOppgaveId,
-                ),
-            )
-            it.gsakOppgaveId
-        }
     }
 
     override fun stegType() = StegType.FULLFØR_KJØRELISTE

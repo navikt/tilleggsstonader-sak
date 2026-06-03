@@ -108,8 +108,7 @@ class DagligReiseBeregnYtelseSteg(
             "Opphørsdato er ikke satt"
         }
         val opphørsdato = vedtak.opphørsdato
-        val forrigeVedtak =
-            dagligReiseVedtakService.hentInnvilgelseEllerOpphørVedtak(saksbehandling.forrigeIverksatteBehandlingId)
+        val forrigeVedtak = dagligReiseVedtakService.hentInnvilgelseEllerOpphørVedtak(saksbehandling.forrigeIverksatteBehandlingId)
 
         opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
 
@@ -122,7 +121,7 @@ class DagligReiseBeregnYtelseSteg(
 
         val beregningsplan =
             BeregningsplanUtleder.utledForOpphørEllerSatsjustering(saksbehandling.stønadstype, opphørsdato)
-        val (beregningsresultat, rammevedtak) =
+        val (beregningsresultat, rammevedtakPrivatBil) =
             beregningService.beregn(
                 vedtaksperioder = avkortetVedtaksperioder,
                 behandling = saksbehandling,
@@ -134,7 +133,7 @@ class DagligReiseBeregnYtelseSteg(
             opphørsdato,
         )
 
-        rammevedtak?.let {
+        rammevedtakPrivatBil?.let {
             avklartKjørelisteService.sletteMarkerUkerUtenforAvkortetRammevedtak(
                 behandlingId = saksbehandling.id,
                 rammevedtak = it,
@@ -144,7 +143,7 @@ class DagligReiseBeregnYtelseSteg(
         dagligReiseVedtakService.lagreOpphørsvedtak(
             saksbehandling = saksbehandling,
             beregningsresultat = beregningsresultat,
-            rammevedtakPrivatBil = null, // TODO: Håndter rammevedtak i opphør
+            rammevedtakPrivatBil = rammevedtakPrivatBil,
             avkortetVedtaksperioder = avkortetVedtaksperioder,
             vedtak = vedtak,
             beregningsplan = beregningsplan,

@@ -155,7 +155,7 @@ class InnvilgeDaligReiseTsrIntegrationTest : IntegrationTest() {
                 }
             }
             vilkår {
-                oppdaterDagligReise { vilkår ->
+                oppdaterDagligReise { vilkår, _ ->
                     with(vilkår.single()) {
                         id to this.tilLagreDagligReiseDto().copy(tom = 28 februar 2026)
                     }
@@ -211,7 +211,7 @@ class InnvilgeDaligReiseTsrIntegrationTest : IntegrationTest() {
         val målgruppeRevurdering = vilkårsperioderRevurdering.målgrupper.single()
 
         assertThat(målgruppeFørstegangsbehandling.type).isEqualTo(målgruppeRevurdering.type)
-        assertThat(målgruppeFørstegangsbehandling.typeAktivitet).isEqualTo(målgruppeRevurdering.typeAktivitet)
+        assertThat(målgruppeFørstegangsbehandling.tiltaksvariant).isEqualTo(målgruppeRevurdering.tiltaksvariant)
         assertThat(målgruppeFørstegangsbehandling.fom).isEqualTo(målgruppeRevurdering.fom)
         assertThat(målgruppeFørstegangsbehandling.tom).isEqualTo(målgruppeRevurdering.tom)
         assertThat(målgruppeFørstegangsbehandling.faktaOgVurdering).isEqualTo(målgruppeRevurdering.faktaOgVurdering)
@@ -223,7 +223,7 @@ class InnvilgeDaligReiseTsrIntegrationTest : IntegrationTest() {
         val aktivitetRevurdering = vilkårsperioderRevurdering.aktiviteter.single()
 
         assertThat(aktivitetFørstegangsbehandling.type).isEqualTo(aktivitetRevurdering.type)
-        assertThat(aktivitetFørstegangsbehandling.typeAktivitet).isEqualTo(aktivitetRevurdering.typeAktivitet)
+        assertThat(aktivitetFørstegangsbehandling.tiltaksvariant).isEqualTo(aktivitetRevurdering.tiltaksvariant)
         assertThat(aktivitetFørstegangsbehandling.fom).isEqualTo(aktivitetRevurdering.fom)
         assertThat(aktivitetFørstegangsbehandling.tom).isEqualTo(aktivitetRevurdering.tom)
         assertThat(aktivitetFørstegangsbehandling.faktaOgVurdering).isEqualTo(aktivitetRevurdering.faktaOgVurdering)

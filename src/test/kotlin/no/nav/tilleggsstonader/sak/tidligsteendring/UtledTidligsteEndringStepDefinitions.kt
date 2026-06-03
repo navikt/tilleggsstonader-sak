@@ -219,7 +219,7 @@ class UtledTidligsteEndringStepDefinitions {
                 resultat = parseEnum(TidligsteEndringFellesNøkler.RESULTAT, rad),
                 status = parseEnum(TidligsteEndringFellesNøkler.STATUS, rad),
                 kildeId = parseValgfriString(VilkårperiodeNøkler.KILDE_ID, rad),
-                typeAktivitet = parseValgfriEnum<TypeAktivitet>(VilkårperiodeNøkler.TYPE_AKTIVITET, rad),
+                tiltaksvariant = parseValgfriEnum<TypeAktivitet>(VilkårperiodeNøkler.TYPE_AKTIVITET, rad),
             )
         }
 

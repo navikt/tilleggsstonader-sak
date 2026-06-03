@@ -322,10 +322,30 @@ class OppgaveService(
         gsakOppgaveId: Long,
         endretAvEnhetsnr: String? = null,
     ) {
+        logger.info("Ferdigstiller oppgave med id $gsakOppgaveId")
         oppgaveClient.ferdigstillOppgave(gsakOppgaveId, endretAvEnhetsnr)
     }
 
     fun finnAlleOppgaveDomainForBehandling(behandlingId: BehandlingId) = oppgaveRepository.findByBehandlingId(behandlingId)
+
+    @Transactional
+    fun oppdaterStatusPåIkkeFerdigstilteOppgaverForBehandling(behandlingId: BehandlingId) {
+        finnAlleOppgaveDomainForBehandling(behandlingId)
+            .filterNot { it.erFerdigstilt() || it.erIgnorert() }
+            .forEach { oppgaveDomain ->
+                val oppgave = oppgaveClient.finnOppgaveMedId(oppgaveDomain.gsakOppgaveId)
+                oppgaveRepository.update(
+                    oppgaveDomain.copy(
+                        status =
+                            when (oppgave.status) {
+                                StatusEnum.FERDIGSTILT -> Oppgavestatus.FERDIGSTILT
+                                StatusEnum.FEILREGISTRERT -> Oppgavestatus.FEILREGISTRERT
+                                else -> Oppgavestatus.ÅPEN
+                            },
+                    ),
+                )
+            }
+    }
 
     fun finnSisteBehandlingsoppgaveForBehandling(behandlingId: BehandlingId): OppgaveDomain? =
         finnAlleOppgaveDomainForBehandling(behandlingId)
@@ -403,7 +423,7 @@ class OppgaveService(
 
     fun håndterOppdatertOppgaveHendelse(oppdatertOppgaveHendelse: OppdatertOppgaveHendelse) {
         oppgaveRepository.findByGsakOppgaveId(oppdatertOppgaveHendelse.gsakOppgaveId)?.let { oppgave ->
-            if (!oppgave.erIgnorert()) { // Om satt til ignorert ønsker vi ikke oppdateringer
+            if (!oppgave.erIgnorert() && !oppgave.erFerdigstilt()) { // Om satt til ignorert ønsker vi ikke oppdateringer
                 oppgaveRepository.update(
                     oppgave.copy(
                         tilordnetSaksbehandler = oppdatertOppgaveHendelse.tilordnetSaksbehandler,

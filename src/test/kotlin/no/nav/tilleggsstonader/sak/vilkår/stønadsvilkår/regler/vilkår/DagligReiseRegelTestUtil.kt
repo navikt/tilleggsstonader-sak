@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår
 
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId

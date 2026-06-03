@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.privatbil
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import java.time.LocalDate
 
 data class InnsendtKjøreliste(

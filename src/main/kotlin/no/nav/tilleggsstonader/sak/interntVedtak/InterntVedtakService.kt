@@ -43,6 +43,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -170,7 +173,7 @@ class InterntVedtakService(
                 resultat = it.resultat,
                 begrunnelse = it.begrunnelse,
                 slettetKommentar = it.slettetKommentar,
-                tiltaksvariant = it.typeAktivitet?.beskrivelse,
+                tiltaksvariant = it.tiltaksvariant?.beskrivelse,
             )
         }
 
@@ -191,7 +194,6 @@ class InterntVedtakService(
             VedtaksperiodeInterntVedtak(
                 målgruppe = it.målgruppe,
                 aktivitet = it.aktivitet,
-                tiltaksvariant = it.typeAktivitet?.beskrivelse,
                 fom = it.fom,
                 tom = it.tom,
             )
@@ -360,6 +362,10 @@ class InterntVedtakService(
                     reiseId = fakta.reiseId,
                     adresse = fakta.adresse,
                 )
+
+            is FaktaReiseTilSamlingOffentligTransport -> TODO()
+            is FaktaReiseTilSamlingPrivatBil -> TODO()
+            is FaktaReiseTilSamlingUbestemt -> TODO()
 
             null -> null
         }

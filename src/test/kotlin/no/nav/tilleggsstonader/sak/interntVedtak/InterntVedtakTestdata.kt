@@ -704,7 +704,7 @@ object InterntVedtakTestdata {
                     fom = LocalDate.of(2024, 2, 5),
                     tom = LocalDate.of(2024, 2, 10),
                     faktaOgVurdering = faktaOgVurderingAktivitetDagligReiseTsr(),
-                    typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                    tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                 ),
             )
 
@@ -731,7 +731,7 @@ object InterntVedtakTestdata {
                             reiseId = dummyReiseId,
                             aktivitetsadresse = "Testveien 1, 1234 Testby",
                             aktivitetType = AktivitetType.TILTAK,
-                            typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                            tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                             grunnlag =
                                 RammeForReiseMedPrivatBilBeregningsgrunnlag(
                                     fom = LocalDate.of(2024, 1, 1),
@@ -767,7 +767,7 @@ object InterntVedtakTestdata {
                             reiseId = dummyReiseId,
                             aktivitetsadresse = "Testveien 2, 1234 Testby",
                             aktivitetType = AktivitetType.TILTAK,
-                            typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                            tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                             grunnlag =
                                 RammeForReiseMedPrivatBilBeregningsgrunnlag(
                                     fom = LocalDate.of(2024, 1, 1),
@@ -994,7 +994,6 @@ object InterntVedtakTestdata {
                     tom = LocalDate.of(2024, FEBRUARY, 29),
                     aktivitet = AktivitetType.TILTAK,
                     målgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
-                    typeAktivitet = TypeAktivitet.GRUPPEAMO,
                 ),
             )
 

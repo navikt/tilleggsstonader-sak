@@ -51,6 +51,7 @@ object VilkårDagligReiseMapper {
             is FaktaDagligReisePrivatBil -> this.mapTilFakta()
             is FaktaDagligReiseUbestemt -> this.mapTilFakta()
             null -> feil("Fakta skal aldri være null for daglig reise")
+            else -> feil("Ugyldig fakta for daglig reise")
         }
 
     private fun FaktaDagligReiseOffentligTransport.mapTilFakta() =
@@ -61,6 +62,7 @@ object VilkårDagligReiseMapper {
             prisSyvdagersbillett = this.prisSyvdagersbillett,
             prisTrettidagersbillett = this.prisTrettidagersbillett,
             adresse = this.adresse,
+            tiltaksvariant = this.tiltaksvariant,
         )
 
     private fun FaktaDagligReisePrivatBil.mapTilFakta() =

@@ -68,7 +68,11 @@ private fun AvklartKjørtDag.validerGyldigeVerdier() {
         "Alle dager som oppdateres må være huket av som enten godkjent eller ikke godkjent"
     }
 
-    brukerfeilHvis(parkeringsutgift != null && godkjentGjennomførtKjøring != GodkjentGjennomførtKjøring.JA) {
+    brukerfeilHvis(
+        parkeringsutgift != null &&
+            parkeringsutgift != 0 &&
+            godkjentGjennomførtKjøring != GodkjentGjennomførtKjøring.JA,
+    ) {
         "Parkeringsutgift kan kun settes dersom kjøring for dag er godkjent"
     }
 }

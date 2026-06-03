@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingIdErLik
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -11,6 +13,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -80,6 +83,23 @@ class VilkårperiodeService(
             .findByBehandlingIdAndGlobalId(behandlingId, aktivitetGlobalId)
             ?.takeIfType<AktivitetFaktaOgVurdering>()
 
+    fun validerAktivitetMedTiltaksvariantInnenforPeriode(
+        tiltaksvariant: TypeAktivitet,
+        periode: Datoperiode,
+        behandlingId: BehandlingId,
+    ) {
+        val aktiviteter =
+            hentVilkårperioder(behandlingId).aktiviteter.filter { aktivitet ->
+                aktivitet.tiltaksvariant == tiltaksvariant &&
+                    aktivitet.fom <= periode.tom &&
+                    aktivitet.tom >= periode.fom
+            }
+
+        brukerfeilHvis(aktiviteter.isEmpty()) {
+            "Det finnes ingen aktiviteter med variant \"${tiltaksvariant.beskrivelse}\" i perioden ${periode.fom.norskFormat()} - ${periode.tom.norskFormat()}"
+        }
+    }
+
     fun hentAktivitetType(
         aktivitetGlobalId: VilkårperiodeGlobalId,
         behandlingId: BehandlingId,
@@ -131,7 +151,7 @@ class VilkårperiodeService(
                 status = Vilkårstatus.NY,
                 kildeId = vilkårperiode.kildeId,
                 type = vilkårperiode.type,
-                typeAktivitet = vilkårperiode.typeAktivitet,
+                tiltaksvariant = vilkårperiode.tiltaksvariant,
                 faktaOgVurdering = faktaOgVurdering,
                 fom = vilkårperiode.fom,
                 tom = vilkårperiode.tom,

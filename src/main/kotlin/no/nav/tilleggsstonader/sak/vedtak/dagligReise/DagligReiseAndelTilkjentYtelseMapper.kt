@@ -17,42 +17,31 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatD
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import java.time.LocalDate
 
 fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandling: Saksbehandling): List<AndelTilkjentYtelse> =
     reiser
-        .flatMap { it.perioder }
-        .groupBy { it.grunnlag.fom }
-        .flatMap { (fom, reiseperioder) ->
-            val målgrupper = reiseperioder.flatMap { it.grunnlag.vedtaksperioder }.map { it.målgruppe }
-            val typeAktivitet = reiseperioder.flatMap { it.grunnlag.vedtaksperioder }.map { it.typeAktivitet }
+        .flatMap { reise ->
+            reise.perioder.map { periode ->
+                val målgrupper = periode.grunnlag.vedtaksperioder.map { it.målgruppe }
 
-            brukerfeilHvisIkke(målgrupper.distinct().size == 1) {
-                "Vi støtter foreløpig ikke ulike målgrupper på samme utbetaling. Ta kontakt med utvikler teamet hvis du trenger å gjøre dette."
-            }
-
-            if (saksbehandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
-                brukerfeilHvisIkke(typeAktivitet.distinct().size == 1) {
-                    "Vi støtter foreløpig ikke ulike aktivitetsvarianter på samme utbetaling. Ta kontakt med utvikler teamet hvis du trenger å gjøre dette/"
+                brukerfeilHvisIkke(målgrupper.distinct().size == 1) {
+                    "Vi støtter foreløpig ikke ulike målgrupper på samme utbetaling. Ta kontakt med utvikler teamet hvis du trenger å gjøre dette."
                 }
-            }
 
-            // Grupperer på brukersNavKontor for å ta høyde for at de kan ha ulike kontorer
-            reiseperioder
-                .groupBy { it.grunnlag.brukersNavKontor }
-                .map { (brukersNavKontor, reiseperioderMedSammeBrukersNavKontor) ->
-                    lagAndelForDagligReise(
-                        saksbehandling = saksbehandling,
-                        fomUkedag = fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
-                        beløp = reiseperioderMedSammeBrukersNavKontor.sumOf { it.beløp },
-                        målgruppe = målgrupper.first(),
-                        typeAktivitet = typeAktivitet.firstOrNull(),
-                        brukersNavKontor = brukersNavKontor,
-                        reiseId = null, // Skal kun opprette andeler for privat-bil med reiseId
-                    )
-                }
-        }
+                lagAndelForDagligReise(
+                    saksbehandling = saksbehandling,
+                    fomUkedag = periode.grunnlag.fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
+                    beløp = periode.beløp,
+                    målgruppe = målgrupper.first(),
+                    tiltaksvariant = reise.tiltaksvariant,
+                    brukersNavKontor = periode.grunnlag.brukersNavKontor,
+                    reiseId = null,
+                )
+            }
+        }.groupBy { Triple(it.type, it.fom, it.brukersNavKontor) }
+        .map { (_, andeler) -> andeler.first().copy(beløp = andeler.sumOf { it.beløp }) }
 
 fun BeregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(
     saksbehandling: Saksbehandling,
@@ -80,7 +69,7 @@ fun BeregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(
                         fomUkedag = fom.iDagHvisMandagEllerForrigeMandag(),
                         beløp = periode.stønadsbeløp.avrundetStønadsbeløp().toInt(),
                         målgruppe = vedtaksperiode.målgruppe,
-                        typeAktivitet = rammevedtakForReise.typeAktivitet,
+                        tiltaksvariant = rammevedtakForReise.tiltaksvariant,
                         brukersNavKontor = periode.brukersNavKontor,
                         reiseId = reise.reiseId, // Skal kun opprette andeler for privat-bil med reiseId
                     )
@@ -92,7 +81,7 @@ private fun lagAndelForDagligReise(
     fomUkedag: LocalDate,
     beløp: Int,
     målgruppe: FaktiskMålgruppe,
-    typeAktivitet: TypeAktivitet?,
+    tiltaksvariant: TypeAktivitet?,
     brukersNavKontor: String?,
     reiseId: ReiseId?,
 ): AndelTilkjentYtelse {
@@ -103,10 +92,10 @@ private fun lagAndelForDagligReise(
             }
 
             Stønadstype.DAGLIG_REISE_TSR -> {
-                feilHvis(typeAktivitet == null) {
-                    "Variant/Typeaktivitet skal alltid være satt for Daglig Reise Tsr. Var $typeAktivitet"
+                feilHvis(tiltaksvariant == null) {
+                    "Tiltaksvariant skal alltid være satt for Daglig reise TSR. Var $tiltaksvariant"
                 }
-                finnTypeAndelFraTypeAktivitet(typeAktivitet)
+                finnTypeAndelFraTiltaksvariant(tiltaksvariant)
             }
 
             else -> {
@@ -149,7 +138,7 @@ private fun validerBrukersNavKontorForStønadstype(
     }
 }
 
-val typeAktivitetTilTypeAndelMap =
+val tiltaksvariantTilTypeAndelMap =
     mapOf(
         TypeAktivitet.ARBFORB to TypeAndel.DAGLIG_REISE_TILTAK_ARBEIDSFORBEREDENDE,
         TypeAktivitet.ARBRRHDAG to TypeAndel.DAGLIG_REISE_TILTAK_ARBEIDSRETTET_REHAB,
@@ -170,9 +159,9 @@ val typeAktivitetTilTypeAndelMap =
         TypeAktivitet.UTVOPPFOPL to TypeAndel.DAGLIG_REISE_TILTAK_UTVIDET_OPPFØLGING_I_OPPLÆRING,
     )
 
-fun finnTypeAndelFraTypeAktivitet(typeAktivitet: TypeAktivitet): TypeAndel =
-    typeAktivitetTilTypeAndelMap[typeAktivitet]
-        ?: error("Kan ikke mappe til TypeAndel fra TypeAktivitet $typeAktivitet")
+fun finnTypeAndelFraTiltaksvariant(tiltaksvariant: TypeAktivitet): TypeAndel =
+    tiltaksvariantTilTypeAndelMap[tiltaksvariant]
+        ?: error("Kan ikke mappe til TypeAndel fra TypeAktivitet $tiltaksvariant")
 
 fun finnPeriodeFraAndel(
     beregningsresultat: BeregningsresultatDagligReise,

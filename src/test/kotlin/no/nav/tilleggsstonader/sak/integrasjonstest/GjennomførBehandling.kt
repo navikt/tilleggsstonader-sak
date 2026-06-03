@@ -46,7 +46,7 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReisePrivatBilDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreVilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
@@ -511,15 +511,19 @@ private fun IntegrationTest.gjennomførVilkårSteg(
                     .vilkårperioder.aktiviteter,
         ).forEach {
             if (stønadstype.gjelderDagligReise()) {
-                kall.vilkårDagligReise.opprettVilkår(behandlingId, it as LagreDagligReiseDto)
+                kall.vilkårDagligReise.opprettVilkår(behandlingId, it as LagreVilkårDagligReiseDto)
             } else {
                 kall.vilkår.opprettVilkår(it as OpprettVilkårDto)
             }
         }
 
     if (stønadstype.gjelderDagligReise()) {
+        val aktiviteter =
+            kall.vilkårperiode
+                .hentForBehandling(behandlingId)
+                .vilkårperioder.aktiviteter
         testdataProvider.vilkår.updateDagligReise
-            .map { it(vilkårDagligReise) }
+            .map { it(vilkårDagligReise, aktiviteter) }
             .forEach { (vilkårId, dto) -> kall.vilkårDagligReise.oppdaterVilkår(dto, vilkårId, behandlingId) }
 
         testdataProvider.vilkår.deleteDagligReise

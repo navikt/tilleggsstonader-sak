@@ -47,7 +47,7 @@ class OffentligTransportBeregningRevurderingServiceTest : CleanDatabaseIntegrati
                 tilSteg = StegType.SIMULERING,
             ) {
                 vilkår {
-                    oppdaterDagligReise { vilkår ->
+                    oppdaterDagligReise { vilkår, _ ->
                         with(vilkår.single()) {
                             id to tilLagreDagligReiseDto().copy(tom = førsteJanuarPlussTreTrettidagersperioder)
                         }
@@ -89,7 +89,7 @@ class OffentligTransportBeregningRevurderingServiceTest : CleanDatabaseIntegrati
                 tilSteg = StegType.SIMULERING,
             ) {
                 vilkår {
-                    oppdaterDagligReise { vilkår ->
+                    oppdaterDagligReise { vilkår, _ ->
                         with(vilkår.single()) {
                             id to tilLagreDagligReiseDto().copy(tom = reiseForlengetTom)
                         }
@@ -177,7 +177,7 @@ class OffentligTransportBeregningRevurderingServiceTest : CleanDatabaseIntegrati
                 tilSteg = StegType.SIMULERING,
             ) {
                 vilkår {
-                    oppdaterDagligReise { vilkår ->
+                    oppdaterDagligReise { vilkår, _ ->
                         with(vilkår.single()) {
                             id to tilLagreDagligReiseDto().copy(tom = reiseForlengetTom)
                         }

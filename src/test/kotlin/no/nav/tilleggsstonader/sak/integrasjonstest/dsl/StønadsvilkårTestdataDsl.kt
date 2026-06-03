@@ -1,15 +1,16 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.dsl
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreDagligReisePrivatBilDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreDagligReiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreVilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
@@ -30,7 +31,7 @@ class StønadsvilkårTestdataDsl {
     internal val opprettScope = OpprettStønadsvilkårDsl()
     internal val update = mutableListOf<(VilkårsvurderingDto) -> SvarPåVilkårDto>()
     internal val updateDagligReise =
-        mutableListOf<(List<VilkårDagligReiseDto>) -> Pair<VilkårId, LagreDagligReiseDto>>()
+        mutableListOf<(List<VilkårDagligReiseDto>, List<VilkårperiodeDto>) -> Pair<VilkårId, LagreVilkårDagligReiseDto>>()
     internal val delete = mutableListOf<(VilkårsvurderingDto) -> SlettVilkårRequest>()
     internal val deleteDagligReise =
         mutableListOf<(List<VilkårDagligReiseDto>) -> Pair<VilkårId, SlettVilkårRequestDto>>()
@@ -43,7 +44,12 @@ class StønadsvilkårTestdataDsl {
         update += block
     }
 
-    fun oppdaterDagligReise(block: (vilkårDagligReise: List<VilkårDagligReiseDto>) -> Pair<VilkårId, LagreDagligReiseDto>) {
+    fun oppdaterDagligReise(
+        block: (
+            vilkårDagligReise: List<VilkårDagligReiseDto>,
+            aktiviteter: List<VilkårperiodeDto>,
+        ) -> Pair<VilkårId, LagreVilkårDagligReiseDto>,
+    ) {
         updateDagligReise += block
     }
 
@@ -63,9 +69,10 @@ class OpprettStønadsvilkårDsl {
     fun offentligTransport(
         fom: LocalDate,
         tom: LocalDate,
+        tiltaksvariant: TypeAktivitet = TypeAktivitet.GRUPPEAMO,
     ) {
         dtoer += { _, _, _ ->
-            lagreDagligReiseDto(fom = fom, tom = tom)
+            lagreDagligReiseDto(fom = fom, tom = tom, tiltaksvariant = tiltaksvariant)
         }
     }
 
@@ -119,6 +126,7 @@ class OpprettStønadsvilkårDsl {
     fun løpendeutgifterEnBolig(
         fom: LocalDate,
         tom: LocalDate,
+        utgift: Int = 10000,
     ) {
         add { behandlingId, _ ->
             OpprettVilkårDto(
@@ -128,7 +136,7 @@ class OpprettStønadsvilkårDsl {
                 vilkårType = VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
                 delvilkårsett = oppfylteDelvilkårLøpendeUtgifterEnBolig().map { it.tilDto() },
                 barnId = null,
-                utgift = 100,
+                utgift = utgift,
                 erFremtidigUtgift = false,
                 offentligTransport = null,
             )

@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.GjenopprettOppgave
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class GjenopprettOppgaveControllerTest : CleanDatabaseIntegrationTest() {
+class OppgaveforvaltningControllerTest : CleanDatabaseIntegrationTest() {
     @Test
     fun `gjenopprett feilregistrert på behandling, har utviklerrolle`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak()

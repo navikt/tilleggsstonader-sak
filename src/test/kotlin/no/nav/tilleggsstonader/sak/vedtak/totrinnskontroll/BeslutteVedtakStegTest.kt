@@ -30,6 +30,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
+import no.nav.tilleggsstonader.sak.privatbil.FullførKjørelistebehandlingService
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.clearBrukerContext
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.mockBrukerContext
@@ -57,6 +58,7 @@ class BeslutteVedtakStegTest {
     private val brevService = mockk<BrevService>()
     private val behandlingService = mockk<BehandlingService>()
     private val iverksettService = mockk<IverksettService>(relaxed = true)
+    private val fullførKjørelistebehandlingService = mockk<FullførKjørelistebehandlingService>(relaxed = true)
 
     private val beslutteVedtakSteg =
         BeslutteVedtakSteg(
@@ -68,6 +70,7 @@ class BeslutteVedtakStegTest {
             vedtakService = vedtakService,
             brevService = brevService,
             iverksettService = iverksettService,
+            fullførKjørelistebehandlingService = fullførKjørelistebehandlingService,
         )
 
     private val innloggetBeslutter = "sign2"

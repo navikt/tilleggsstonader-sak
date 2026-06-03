@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
-import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
@@ -18,15 +17,14 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningsresultatService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 
 class KjørelisteStegTest {
-    private val behandlingService = mockk<BehandlingService>(relaxed = true)
-    private val privatBilBeregningsresultatService = mockk<PrivatBilBeregningsresultatService>(relaxed = true)
+    private val privatBilBeregningService = mockk<PrivatBilBeregningService>(relaxed = true)
     private val vedtakService = mockk<VedtakService>(relaxed = true)
     private val arbeidsfordelingService = mockk<ArbeidsfordelingService>(relaxed = true)
     private val dagligReiseVedtakService = mockk<DagligReiseVedtakService>(relaxed = true)
@@ -34,8 +32,7 @@ class KjørelisteStegTest {
 
     private val steg =
         KjørelisteSteg(
-            behandlingService = behandlingService,
-            privatBilBeregningsresultatService = privatBilBeregningsresultatService,
+            privatBilBeregningService = privatBilBeregningService,
             vedtakService = vedtakService,
             arbeidsfordelingService = arbeidsfordelingService,
             dagligReiseVedtakService = dagligReiseVedtakService,

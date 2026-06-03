@@ -12,13 +12,15 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import java.util.concurrent.Executors
 
 @Tag(name = "Forvaltning")
 @RestController
 @RequestMapping("/api/forvaltning/oppgave")
 @ProtectedWithClaims(issuer = "azuread")
-class GjenopprettOppgaveController(
+class OppgaveforvaltningController(
     private val tilgangService: TilgangService,
+    private val oppgaveService: OppgaveService,
     private val taskService: TaskService,
 ) {
     @PostMapping("/gjenopprett/{behandlingId}")
@@ -30,5 +32,17 @@ class GjenopprettOppgaveController(
         taskService.save(
             GjenopprettOppgavePåBehandlingTask.opprettTask(behandlingId),
         )
+    }
+
+    @PostMapping("/oppdater-status/{behandlingId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun oppdaterStatus(
+        @PathVariable("behandlingId") behandlingId: BehandlingId,
+    ) {
+        tilgangService.validerHarUtviklerrolle()
+        // Kjører i egen tråd for å ikke bruke OBO for å hente oppgave da det ikke er sikkert man har tilgang
+        Executors.newVirtualThreadPerTaskExecutor().submit {
+            oppgaveService.oppdaterStatusPåIkkeFerdigstilteOppgaverForBehandling(behandlingId)
+        }
     }
 }

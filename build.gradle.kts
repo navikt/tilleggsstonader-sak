@@ -5,11 +5,11 @@ val javaVersion = JavaLanguageVersion.of(21)
 val tomcatVersion = "11.0.22"
 val familieProsesseringVersion = "2.20260420122910_8bfca04"
 val tilleggsstønaderLibsVersion = "2026.05.14-21.16.acdbe034efef"
-val tilleggsstønaderKontrakterVersion = "2026.05.07-15.38.1e977dd2af22"
+val tilleggsstønaderKontrakterVersion = "2026.05.28-09.57.7d20707142f8"
 val avroVersion = "1.12.1"
 val confluentVersion = "8.0.1"
-val joarkHendelseVersion = "1.1.10"
-val tokenSupportVersion = "6.0.6"
+val joarkHendelseVersion = "1.1.11"
+val tokenSupportVersion = "6.0.8"
 val wiremockVersion = "3.13.2"
 val mockkVersion = "1.14.9"
 val testcontainerVersion = "1.21.4"
@@ -25,7 +25,7 @@ plugins {
     application
 
     kotlin("jvm") version "2.3.21"
-    id("com.diffplug.spotless") version "8.4.0"
+    id("com.diffplug.spotless") version "8.5.1"
     id("com.github.ben-manes.versions") version "0.54.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
 

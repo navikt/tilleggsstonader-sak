@@ -28,7 +28,7 @@ import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.util.dokumentInfo
 import no.nav.tilleggsstonader.sak.util.dokumentvariant
 import no.nav.tilleggsstonader.sak.util.journalpost
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.kafka.support.Acknowledgment

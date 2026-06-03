@@ -70,7 +70,9 @@ object SøknadsskjemaUtil {
     private fun mapFyllUtSpråk(språk: String): Språkkode =
         when (språk) {
             "nb-NO" -> Språkkode.NB
+            "nb" -> Språkkode.NB
             "nn-NO" -> Språkkode.NN
+            "nn" -> Språkkode.NN
             else -> error("Har ikke mapping for språk=$språk")
         }
 }

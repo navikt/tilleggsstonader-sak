@@ -14,14 +14,12 @@ object ForeslåVedtaksperioderBeholdIdUtil {
         forrigeVedtaksperioder: List<Vedtaksperiode>,
         forslag: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
-        skalTaHøydeForTypeAktivitet: Boolean = false,
     ): List<Vedtaksperiode> {
         val vedtaksperiodeBeregner =
             lagVedtaksperiodeBeregner(
                 forrigeVedtaksperioder = forrigeVedtaksperioder,
                 forslag = forslag,
                 tidligsteEndring = tidligsteEndring,
-                skalTaHøydeForTypeAktivitet = skalTaHøydeForTypeAktivitet,
             )
         return vedtaksperiodeBeregner.beregnNyeVedtaksperioder()
     }
@@ -33,7 +31,6 @@ object ForeslåVedtaksperioderBeholdIdUtil {
         forrigeVedtaksperioder: List<Vedtaksperiode>,
         forslag: List<Vedtaksperiode>,
         tidligsteEndring: LocalDate?,
-        skalTaHøydeForTypeAktivitet: Boolean,
     ): VedtaksperiodeBeregner {
         val kanEndrePerioderFraOgMed = min(tidligsteEndring, forrigeVedtaksperioder.maxOfOrNull { it.tom }?.plusDays(1))
 
@@ -54,7 +51,6 @@ object ForeslåVedtaksperioderBeholdIdUtil {
             forrigeVedtaksperioderSkalIkkeEndres = forrigeVedtaksperioderSkalIkkeEndres,
             forrigeVedtaksperioder = forrigeVedtaksperioder,
             forslagEtterTidligsteEndring = forslagEtterTidligsteEndring,
-            skalTaHøydeForTypeAktivitet = skalTaHøydeForTypeAktivitet,
         )
     }
 
@@ -62,7 +58,6 @@ object ForeslåVedtaksperioderBeholdIdUtil {
         private val forrigeVedtaksperioderSkalIkkeEndres: List<Vedtaksperiode>,
         private val forrigeVedtaksperioder: List<Vedtaksperiode>,
         private val forslagEtterTidligsteEndring: List<Vedtaksperiode>,
-        private val skalTaHøydeForTypeAktivitet: Boolean,
     ) {
         private val idnSomIkkeSkalMerges = forrigeVedtaksperioder.map { it.id }.toSet()
 
@@ -87,11 +82,7 @@ object ForeslåVedtaksperioderBeholdIdUtil {
         private fun mergeFOrrigeMedNyttForslagHvisLikeMedSammeId(nyttForslag: List<Vedtaksperiode>): List<Vedtaksperiode> =
             (forrigeVedtaksperioderSkalIkkeEndres + nyttForslag)
                 .mergeSammenhengende { v1, v2 ->
-                    if (skalTaHøydeForTypeAktivitet) {
-                        v1.id == v2.id && v1.erSammenhengendeMedLikMålgruppeOgTypeAktivitet(v2)
-                    } else {
-                        v1.id == v2.id && v1.erSammenhengendeMedLikMålgruppeOgAktivitet(v2)
-                    }
+                    v1.id == v2.id && v1.erSammenhengendeMedLikMålgruppeOgAktivitet(v2)
                 }
 
         /**
@@ -118,11 +109,7 @@ object ForeslåVedtaksperioderBeholdIdUtil {
             mergeSammenhengende { v1, v2 ->
                 !idnSomIkkeSkalMerges.contains(v1.id) &&
                     !idnSomIkkeSkalMerges.contains(v2.id) &&
-                    if (skalTaHøydeForTypeAktivitet) {
-                        v1.erSammenhengendeMedLikMålgruppeOgTypeAktivitet(v2)
-                    } else {
-                        v1.erSammenhengendeMedLikMålgruppeOgAktivitet(v2)
-                    }
+                    v1.erSammenhengendeMedLikMålgruppeOgAktivitet(v2)
             }
     }
 }

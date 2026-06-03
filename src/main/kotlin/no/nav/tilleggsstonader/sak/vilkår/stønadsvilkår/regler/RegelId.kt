@@ -35,4 +35,10 @@ enum class RegelId(
     ),
     KAN_REISE_MED_OFFENTLIG_TRANSPORT("Kan søker benytte seg av offentlig transport?"),
     KAN_KJØRE_MED_EGEN_BIL("Kan søker benytte privat bil?"),
+
+    // REISE TIL SAMLING
+    AVSTAND_OVER_TRETTI_KM("Er reiseavstanden over 30km?"),
+    KAN_REISE_MED_EGEN_BIL("Kan søker benytte privat bil?"),
+    DOKUMENTERTE_UTGIFTER("Har søker dokumenterte utgifter til reise?"),
+    DEKKET_AV_ANNET_STIPEND("Er reisen dekket av annet stipend?"),
 }

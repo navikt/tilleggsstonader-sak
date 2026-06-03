@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.domain
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Mergeable
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
@@ -28,7 +27,6 @@ data class Vedtaksperiode(
     override val tom: LocalDate,
     val målgruppe: FaktiskMålgruppe,
     val aktivitet: AktivitetType,
-    val typeAktivitet: TypeAktivitet? = null,
 ) : Periode<LocalDate>,
     KopierPeriode<Vedtaksperiode>,
     PeriodeMedId,
@@ -46,11 +44,6 @@ data class Vedtaksperiode(
     fun erSammenhengendeMedLikMålgruppeOgAktivitet(other: Vedtaksperiode): Boolean =
         this.målgruppe == other.målgruppe &&
             this.aktivitet == other.aktivitet &&
-            this.overlapperEllerPåfølgesAv(other)
-
-    fun erSammenhengendeMedLikMålgruppeOgTypeAktivitet(other: Vedtaksperiode): Boolean =
-        this.målgruppe == other.målgruppe &&
-            this.typeAktivitet == other.typeAktivitet &&
             this.overlapperEllerPåfølgesAv(other)
 
     override fun merge(other: Vedtaksperiode): Vedtaksperiode {
@@ -78,10 +71,5 @@ fun List<Vedtaksperiode>.mergeSammenhengende() =
     this
         .sorted()
         .mergeSammenhengende { v1, v2 -> v1.erSammenhengendeMedLikMålgruppeOgAktivitet(v2) }
-
-fun List<Vedtaksperiode>.mergeSammenhengendeMedLikTypeAktivitet() =
-    this
-        .sorted()
-        .mergeSammenhengende { v1, v2 -> v1.erSammenhengendeMedLikMålgruppeOgTypeAktivitet(v2) }
 
 interface DetaljertVedtaksperiode

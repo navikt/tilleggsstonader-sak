@@ -2,13 +2,14 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaUbestemtType
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -38,6 +39,7 @@ data class FaktaDagligReiseOffentligTransportDto(
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int?,
+    val tiltaksvariant: TypeAktivitet? = null,
 ) : FaktaDagligReiseDto {
     override val type = TypeDagligReise.OFFENTLIG_TRANSPORT
 
@@ -51,6 +53,7 @@ data class FaktaDagligReiseOffentligTransportDto(
         prisEnkelbillett = prisEnkelbillett,
         prisTrettidagersbillett = prisTrettidagersbillett,
         prisSyvdagersbillett = prisSyvdagersbillett,
+        tiltaksvariant = tiltaksvariant,
     )
 }
 

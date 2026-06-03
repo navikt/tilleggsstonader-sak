@@ -10,5 +10,4 @@ fun VedtaksperiodeDto.tilVedtaksperiodeDagligReiseDto() =
         id = id,
         fom = fom,
         tom = tom,
-        typeAktivitet = typeAktivitet ?: error("TypeAktivitet/Variant må alltid finnes for Daglig Reise Tsr"),
     )

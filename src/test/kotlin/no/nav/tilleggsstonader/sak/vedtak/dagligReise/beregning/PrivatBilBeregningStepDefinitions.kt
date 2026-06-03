@@ -23,8 +23,10 @@ import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningRevurderingService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilRammevedtakBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.SatsDagligReisePrivatBilProvider
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
@@ -32,14 +34,13 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreVilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -51,7 +52,6 @@ class PrivatBilBeregningStepDefinitions {
     val vilkårServiceMock = mockk<VilkårService>()
     val vilkårRepositoryFake = VilkårRepositoryFake()
     val unleashServiceMock = mockk<UnleashService>()
-    val vilkårperiodeRepositoryMock = mockk<VilkårperiodeRepository>()
     val vilkårperiodeService = mockk<VilkårperiodeService>()
 
     val dagligReiseVilkårService =
@@ -67,19 +67,20 @@ class PrivatBilBeregningStepDefinitions {
 
     val satsDagligReisePrivatBilProvider = SatsDagligReisePrivatBilProvider()
     val beregningService =
-        PrivatBilBeregningService(
+        PrivatBilRammevedtakBeregningService(
             satsDagligReisePrivatBilProvider = satsDagligReisePrivatBilProvider,
             vilkårperiodeService = vilkårperiodeService,
             behandlingService = behandlingServiceMock,
+            unleashService = unleashServiceMock,
+            privatBilBeregningRevurderingService = PrivatBilBeregningRevurderingService(unleashServiceMock),
         )
 
-    var reiserUtenDelperioder: Map<Int, LagreDagligReise> = emptyMap()
+    var reiserUtenDelperioder: Map<Int, LagreVilkårDagligReise> = emptyMap()
     var delperioderForReisenummer: Map<Int, List<FaktaDelperiodePrivatBil>> = emptyMap()
 
     var vedtaksperioder: List<Vedtaksperiode> = emptyList()
 
     var rammevedtak: RammevedtakPrivatBil? = null
-    var forventetBeregningsresultat: List<BeregningsresultatUkeCucumber> = emptyList()
     var feil: Exception? = null
 
     @Gitt("følgende vedtaksperioder for daglig reise privat bil")
@@ -110,7 +111,7 @@ class PrivatBilBeregningStepDefinitions {
                             tom = tom,
                             faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
                             resultat = ResultatVilkårperiode.OPPFYLT,
-                            typeAktivitet = TypeAktivitet.GRUPPEAMO,
+                            tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                         )
                     every { vilkårperiodeService.hentAktivitet(testAktivitet.globalId, behandlingId) } returns testAktivitet
 
@@ -158,8 +159,9 @@ class PrivatBilBeregningStepDefinitions {
             rammevedtak =
                 beregningService.beregnRammevedtak(
                     vedtaksperioder = vedtaksperioder,
-                    oppfylteVilkår = oppfylteReisevilkår,
+                    oppfylteVilkårDagligReise = oppfylteReisevilkår,
                     behandlingId = behandlingId,
+                    typeVedtak = TypeVedtak.INNVILGELSE,
                 )
         } catch (e: Exception) {
             feil = e

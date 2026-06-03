@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.libs.utils.dato.februar
@@ -7,6 +9,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
@@ -16,12 +19,14 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UtfyltDagAutomatiskVu
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammevedtakPrivatBil
+import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.avrundetStønadsbeløp
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatException
 import org.assertj.core.api.Assertions.assertThatNoException
@@ -35,7 +40,23 @@ class PrivatBilBeregningsresultatServiceTest {
     private val reiseId = ReiseId.random()
     private val brukersNavKontor = "6767"
 
-    val beregningService = PrivatBilBeregningsresultatService()
+    private val avklartKjørelisteService = mockk<AvklartKjørelisteService>()
+    private val behandling = saksbehandling(id = behandlingId)
+
+    val beregningService =
+        PrivatBilBeregningService(
+            avklartKjørelisteService = avklartKjørelisteService,
+        )
+
+    private fun beregn(
+        rammevedtak: RammevedtakPrivatBil,
+        avklarteUker: List<AvklartKjørtUke>,
+        brukersNavKontor: String?,
+        forrigeBeregningsresultat: BeregningsresultatPrivatBil? = null,
+    ): BeregningsresultatPrivatBil {
+        every { avklartKjørelisteService.hentAvklarteUkerForBehandling(behandlingId) } returns avklarteUker
+        return checkNotNull(beregningService.beregn(behandling, rammevedtak, brukersNavKontor, forrigeBeregningsresultat))
+    }
 
     @Test
     fun `dager med parkeringsutgifter blir beregnet riktig`() {
@@ -89,10 +110,9 @@ class PrivatBilBeregningsresultatServiceTest {
             )
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)
 
-        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
+        val beregningsresultat = beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
 
-        assertThat(beregningsresultat).isNotNull
-        assertThat(beregningsresultat!!.reiser).hasSize(1)
+        assertThat(beregningsresultat.reiser).hasSize(1)
 
         val beregningsresultatForReise = beregningsresultat.reiser.single()
         assertThat(beregningsresultatForReise.reiseId).isEqualTo(reiseId)
@@ -174,10 +194,9 @@ class PrivatBilBeregningsresultatServiceTest {
             )
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)
 
-        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
+        val beregningsresultat = beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
 
-        assertThat(beregningsresultat).isNotNull
-        assertThat(beregningsresultat!!.reiser).hasSize(1)
+        assertThat(beregningsresultat.reiser).hasSize(1)
 
         val beregningsresultatForReise = beregningsresultat.reiser.single()
         assertThat(beregningsresultatForReise.reiseId).isEqualTo(reiseId)
@@ -255,11 +274,11 @@ class PrivatBilBeregningsresultatServiceTest {
                         KjørelisteUtil.KjørtDag(dato = 2 januar 2026),
                     ),
             )
+
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)
 
-        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
+        val beregningsresultat = beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
 
-        assertThat(beregningsresultat).isNotNull
         assertThat(beregningsresultat.reiser).hasSize(1)
 
         val beregningsresultatForReise = beregningsresultat.reiser.single()
@@ -348,10 +367,9 @@ class PrivatBilBeregningsresultatServiceTest {
             )
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste1) + avklarUkerFraKjøreliste(kjøreliste2)
 
-        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
+        val beregningsresultat = beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
 
-        assertThat(beregningsresultat).isNotNull
-        assertThat(beregningsresultat!!.reiser).hasSize(1)
+        assertThat(beregningsresultat.reiser).hasSize(1)
 
         val beregningsresultatForReise = beregningsresultat.reiser.single()
         assertThat(beregningsresultatForReise.reiseId).isEqualTo(reiseId)
@@ -389,10 +407,9 @@ class PrivatBilBeregningsresultatServiceTest {
                 tom = 22 februar 2026,
             )
 
-        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, emptyList(), brukersNavKontor)
+        val beregningsresultat = beregn(rammevedtakPrivatBil, emptyList(), brukersNavKontor)
 
-        assertThat(beregningsresultat).isNotNull
-        assertThat(beregningsresultat!!.reiser).hasSize(1)
+        assertThat(beregningsresultat.reiser).hasSize(1)
 
         val beregningsresultatForReise = beregningsresultat.reiser.single()
         assertThat(beregningsresultatForReise.reiseId).isEqualTo(reiseId)
@@ -462,10 +479,9 @@ class PrivatBilBeregningsresultatServiceTest {
 
         val avklarteUker = kjørelister.flatMap { avklarUkerFraKjøreliste(it) }
 
-        val beregningsresultat = beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
+        val beregningsresultat = beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
 
-        assertThat(beregningsresultat).isNotNull
-        assertThat(beregningsresultat!!.reiser).hasSize(2)
+        assertThat(beregningsresultat.reiser).hasSize(2)
 
         reiseIder.forEach { reiseId ->
             val beregningsresultatForReise = beregningsresultat.reiser.single { it.reiseId == reiseId }
@@ -540,7 +556,7 @@ class PrivatBilBeregningsresultatServiceTest {
 
         assertThatException()
             .isThrownBy {
-                beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
+                beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
             }.withMessageContaining("Dag ${kjøreliste.data.reisedager.single { it.harKjørt }.dato} er ikke innenfor rammevedtak")
     }
 
@@ -595,7 +611,7 @@ class PrivatBilBeregningsresultatServiceTest {
         val avklarteUker = avklarUkerFraKjøreliste(kjøreliste)
 
         assertThatNoException().isThrownBy {
-            beregningService.beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
+            beregn(rammevedtakPrivatBil, avklarteUker, brukersNavKontor)
         }
     }
 
@@ -629,13 +645,13 @@ class PrivatBilBeregningsresultatServiceTest {
         val uke1 = avklarUkerFraKjøreliste(kjøreliste1).single()
         val uke2 = avklarUkerFraKjøreliste(kjøreliste2).single()
 
-        val forrigeBeregningsresultat = beregningService.beregn(rammevedtakPrivatBil, listOf(uke1, uke2), brukersNavKontor)
+        val forrigeBeregningsresultat = beregn(rammevedtakPrivatBil, listOf(uke1, uke2), brukersNavKontor)
 
         val uke1MedUendretStatus = uke1.copy(avklartKjørtUkeStatus = AvklartKjørtUkeStatus.UENDRET)
         val uke2MedUendretStatus = uke2.copy(avklartKjørtUkeStatus = AvklartKjørtUkeStatus.UENDRET)
 
         val beregningsresultat =
-            beregningService.beregn(
+            beregn(
                 rammevedtakPrivatBil,
                 listOf(uke1MedUendretStatus, uke2MedUendretStatus),
                 brukersNavKontor,
@@ -678,13 +694,13 @@ class PrivatBilBeregningsresultatServiceTest {
         val uke2 = avklarUkerFraKjøreliste(kjøreliste2).single()
 
         // Uke 1 var i forrige behandling (UENDRET), uke 2 er ny
-        val forrigeBeregningsresultat = beregningService.beregn(rammevedtakPrivatBil, listOf(uke1), brukersNavKontor)
+        val forrigeBeregningsresultat = beregn(rammevedtakPrivatBil, listOf(uke1), brukersNavKontor)
 
         val uke1MedUendretStatus = uke1.copy(avklartKjørtUkeStatus = AvklartKjørtUkeStatus.UENDRET)
         // uke2 har default NY status
 
         val beregningsresultat =
-            beregningService.beregn(
+            beregn(
                 rammevedtakPrivatBil,
                 listOf(uke1MedUendretStatus, uke2),
                 brukersNavKontor,
@@ -717,12 +733,12 @@ class PrivatBilBeregningsresultatServiceTest {
             )
         val uke = avklarUkerFraKjøreliste(kjøreliste).single()
 
-        val forrigeBeregningsresultat = beregningService.beregn(rammevedtakPrivatBil, listOf(uke), brukersNavKontor)
+        val forrigeBeregningsresultat = beregn(rammevedtakPrivatBil, listOf(uke), brukersNavKontor)
 
         val ukeMedEndretStatus = uke.copy(avklartKjørtUkeStatus = AvklartKjørtUkeStatus.ENDRET)
 
         val beregningsresultat =
-            beregningService.beregn(
+            beregn(
                 rammevedtakPrivatBil,
                 listOf(ukeMedEndretStatus),
                 brukersNavKontor,
@@ -777,12 +793,12 @@ class PrivatBilBeregningsresultatServiceTest {
                         ),
                     ),
             )
-        val forrigeBeregningsresultat = beregningService.beregn(forrigeRammevedtak, emptyList(), brukersNavKontor)
+        val forrigeBeregningsresultat = beregn(forrigeRammevedtak, emptyList(), brukersNavKontor)
 
         val ukeMedUendretStatus = uke.copy(avklartKjørtUkeStatus = AvklartKjørtUkeStatus.UENDRET)
 
         val beregningsresultat =
-            beregningService.beregn(
+            beregn(
                 rammevedtakPrivatBil,
                 listOf(ukeMedUendretStatus),
                 brukersNavKontor,
@@ -812,7 +828,7 @@ class PrivatBilBeregningsresultatServiceTest {
         val ukeMedUendretStatus = avklarUkerFraKjøreliste(kjøreliste).single().copy(avklartKjørtUkeStatus = AvklartKjørtUkeStatus.UENDRET)
 
         val beregningsresultat =
-            beregningService.beregn(
+            beregn(
                 rammevedtakPrivatBil,
                 listOf(ukeMedUendretStatus),
                 brukersNavKontor,
