@@ -45,7 +45,10 @@ class StønadsvilkårTestdataDsl {
     }
 
     fun oppdaterDagligReise(
-        block: (vilkårDagligReise: List<VilkårDagligReiseDto>, aktiviteter: List<VilkårperiodeDto>) -> Pair<VilkårId, LagreVilkårDagligReiseDto>,
+        block: (
+            vilkårDagligReise: List<VilkårDagligReiseDto>,
+            aktiviteter: List<VilkårperiodeDto>,
+        ) -> Pair<VilkårId, LagreVilkårDagligReiseDto>,
     ) {
         updateDagligReise += block
     }
