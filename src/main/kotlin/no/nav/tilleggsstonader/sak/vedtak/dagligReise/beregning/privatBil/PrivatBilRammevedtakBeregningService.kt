@@ -63,12 +63,16 @@ class PrivatBilRammevedtakBeregningService(
 
         val nyttRammevedtakPrivatBil = RammevedtakPrivatBil(reiser = resultatForReiser)
 
-        return privatBilBeregningRevurderingService.kombinerRammevedtakForOpphør(
-            forrigeRammevedtak = forrigeRammevedtakPrivatBil,
-            nyttRammevedtak = nyttRammevedtakPrivatBil,
-            avkortetVedtaksperioder = vedtaksperioder,
-            typeVedtak = typeVedtak,
-        )
+        if (forrigeRammevedtakPrivatBil != null) {
+            return privatBilBeregningRevurderingService.beregnRevurdering(
+                forrigeRammevedtak = forrigeRammevedtakPrivatBil,
+                nyttRammevedtak = nyttRammevedtakPrivatBil,
+                avkortetVedtaksperioder = vedtaksperioder,
+                typeVedtak = typeVedtak,
+            )
+        }
+
+        return nyttRammevedtakPrivatBil
     }
 
     private fun List<VilkårDagligReise>.mapTilReiser(behandlingId: BehandlingId): List<ReiseMedPrivatBil> =

@@ -16,20 +16,34 @@ import java.time.LocalDate
 class PrivatBilBeregningRevurderingService(
     private val unleashService: UnleashService,
 ) {
-    /**
-     * TODO: Tilpass denne for revurdering generelt og ikke bare opphør
-     */
-    fun kombinerRammevedtakForOpphør(
+    fun beregnRevurdering(
         forrigeRammevedtak: RammevedtakPrivatBil?,
         nyttRammevedtak: RammevedtakPrivatBil,
         avkortetVedtaksperioder: List<Vedtaksperiode>,
         typeVedtak: TypeVedtak,
     ): RammevedtakPrivatBil? {
+        // TODO: Håndter revurderinger som ikke er opphør
         brukerfeilHvis(typeVedtak == TypeVedtak.INNVILGELSE && forrigeRammevedtak != null) {
             "Vi støtter foreløpig bare revurderinger av daglige reiser med bil hvor resultatet er opphør."
         }
 
-        brukerfeilHvis(typeVedtak == TypeVedtak.OPPHØR && !unleashService.isEnabled(Toggle.KAN_OPPHØRE_PRIVAT_BIL)) {
+        if (typeVedtak == TypeVedtak.OPPHØR) {
+            return kombinerRammevedtakForOpphør(
+                forrigeRammevedtak = forrigeRammevedtak,
+                nyttRammevedtak = nyttRammevedtak,
+                avkortetVedtaksperioder = avkortetVedtaksperioder,
+            )
+        }
+
+        return null
+    }
+
+    fun kombinerRammevedtakForOpphør(
+        forrigeRammevedtak: RammevedtakPrivatBil?,
+        nyttRammevedtak: RammevedtakPrivatBil,
+        avkortetVedtaksperioder: List<Vedtaksperiode>,
+    ): RammevedtakPrivatBil? {
+        brukerfeilHvis(!unleashService.isEnabled(Toggle.KAN_OPPHØRE_PRIVAT_BIL)) {
             "Muligheten for å opphøre daglige reiser med privat bil er skrudd av."
         }
 
@@ -83,7 +97,7 @@ class PrivatBilBeregningRevurderingService(
                 nyttRammevedtakForReise.grunnlag.copy(
                     delperioder = alleDelperioder,
                     fom = alleDelperioder.minOf { it.fom },
-                    tom = alleDelperioder.maxOf { it.tom }
+                    tom = alleDelperioder.maxOf { it.tom },
                 ),
         )
     }
