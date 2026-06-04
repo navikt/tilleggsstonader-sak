@@ -55,7 +55,13 @@ class BoutgifterBeregnYtelseSteg(
 
         val innvilgelse = vedtak as InnvilgelseBoutgifterRequest
         val vedtaksperioder = innvilgelse.vedtaksperioder.tilDomene().sorted()
-        val beregningsplan = BeregningsplanUtleder.utledForOpphørEllerSatsjustering(saksbehandling.stønadstype, satsjusteringFra)
+        val forrigeVedtak = saksbehandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it).data }
+        val beregningsplan =
+            BeregningsplanUtleder.utledForOpphørEllerSatsjustering(
+                stønadstype = saksbehandling.stønadstype,
+                opphørsdato = satsjusteringFra,
+                stønadsspesifikkJusteringAvBeregnFra = BoutgifterBeregningService.justerBeregnFra(forrigeVedtak),
+            )
         val beregningsresultat =
             beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
@@ -89,7 +95,13 @@ class BoutgifterBeregnYtelseSteg(
         vedtak: InnvilgelseBoutgifterRequest,
     ) {
         val vedtaksperioder = vedtak.vedtaksperioder.tilDomene().sorted()
-        val beregningsplan = beregningsplanUtleder.utledForInnvilgelse(saksbehandling, vedtaksperioder)
+        val forrigeVedtak = saksbehandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it).data }
+        val beregningsplan =
+            beregningsplanUtleder.utledForInnvilgelse(
+                saksbehandling = saksbehandling,
+                vedtaksperioder = vedtaksperioder,
+                stønadsspesifikkJusteringAvBeregnFra = BoutgifterBeregningService.justerBeregnFra(forrigeVedtak),
+            )
         val beregningsresultat =
             beregningService.beregn(
                 vedtaksperioder = vedtaksperioder,
@@ -130,7 +142,12 @@ class BoutgifterBeregnYtelseSteg(
 
         val avkortedeVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, opphørsdato)
 
-        val beregningsplan = BeregningsplanUtleder.utledForOpphørEllerSatsjustering(saksbehandling.stønadstype, opphørsdato)
+        val beregningsplan =
+            BeregningsplanUtleder.utledForOpphørEllerSatsjustering(
+                stønadstype = saksbehandling.stønadstype,
+                opphørsdato = opphørsdato,
+                stønadsspesifikkJusteringAvBeregnFra = BoutgifterBeregningService.justerBeregnFra(forrigeVedtak.data),
+            )
         val beregningsresultat =
             beregningService.beregn(
                 saksbehandling,
