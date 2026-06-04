@@ -36,7 +36,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnit
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.UtdanningAvsnitt
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Oppmøteadresse
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Reiseavstand
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Reisemåte
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SamlingPeriode
 import no.nav.tilleggsstonader.sak.util.antallÅrSiden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelUtil.harFullførtFjerdetrinn
@@ -140,13 +141,8 @@ class BehandlingFaktaService(
             dokumentasjon = søknad?.let { mapDokumentasjon(it.data.dokumentasjon, it.journalpostId, grunnlagsdata) },
             arena = arenaFakta(grunnlagsdata),
             samlinger = mapSamlinger(søknad?.data?.samlinger),
-            oppmøteadresse = mapOppmøteadresse(søknad?.data?.oppmøteadresse),
-            kanReiseKollektivt = søknad?.data?.kanReiseKollektivt,
-            totalbeløpKollektivt = søknad?.data?.totalbeløpKollektivt,
-            årsakIkkeKollektivt = søknad?.data?.årsakIkkeKollektivt,
-            kanBenytteEgenBil = søknad?.data?.kanBenytteEgenBil,
-            årsakIkkeEgenBil = søknad?.data?.årsakIkkeEgenBil,
-            kanBenytteDrosje = søknad?.data?.kanBenytteDrosje,
+            reiseavstand = mapReiseavstand(søknad?.data?.reiseavstand),
+            reisemåte = mapReisemåte(søknad?.data?.reisemåte),
         )
     }
 
@@ -225,12 +221,24 @@ class BehandlingFaktaService(
     private fun mapSamlinger(samlinger: List<SamlingPeriode>?): List<FaktaSamling> =
         samlinger?.map { FaktaSamling(fom = it.fom, tom = it.tom) } ?: emptyList()
 
-    private fun mapOppmøteadresse(oppmøteadresse: Oppmøteadresse?): FaktaOppmøteadresse? =
-        oppmøteadresse?.let {
-            FaktaOppmøteadresse(
+    private fun mapReiseavstand(reiseavstand: Reiseavstand?): FaktaReiseavstand? =
+        reiseavstand?.let {
+            FaktaReiseavstand(
+                antallKilometerEnVei = it.antallKilometerEnVei,
+                land = it.land,
                 gateadresse = it.gateadresse,
                 postnummer = it.postnummer,
                 poststed = it.poststed,
+            )
+        }
+
+    private fun mapReisemåte(reisemåte: Reisemåte?): FaktaReisemåte? =
+        reisemåte?.let {
+            FaktaReisemåte(
+                kanReiseKollektivt = it.kanReiseKollektivt,
+                totalutgifterKollektivt = it.totalutgifterKollektivt,
+                kanBenytteEgenBil = it.kanBenytteEgenBil,
+                kanBenytteDrosje = it.kanBenytteDrosje,
             )
         }
 

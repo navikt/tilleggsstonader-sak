@@ -78,14 +78,14 @@ class HåndterSøknadService(
             Skjematype.SØKNAD_BOUTGIFTER -> ValgbareStønadstyperForJournalpost(Stønadstype.BOUTGIFTER)
             Skjematype.SØKNAD_DAGLIG_REISE ->
                 ValgbareStønadstyperForJournalpost(
-                    finnStønadstypeForDagligReise(journalpost),
-                    Stønadstype.entries.filter { it.gjelderDagligReise() },
+                    defaultStønadstype = finnStønadstypeForDagligReise(journalpost),
+                    valgbareStønadstyper = Stønadstype.entries.filter { it.gjelderDagligReise() },
                 )
 
             Skjematype.SØKNAD_REISE_TIL_SAMLING ->
                 ValgbareStønadstyperForJournalpost(
-                    finnStønadstypeForReiseTilSamling(journalpost),
-                    Stønadstype.entries.filter { it.gjelderReiseTilSamling() },
+                    defaultStønadstype = finnStønadstypeForReiseTilSamling(journalpost),
+                    valgbareStønadstyper = Stønadstype.entries.filter { it.gjelderReiseTilSamling() },
                 )
 
             Skjematype.DAGLIG_REISE_KJØRELISTE ->
@@ -100,15 +100,9 @@ class HåndterSøknadService(
     }
 
     private fun finnStønadstypeForReiseTilSamling(journalpost: Journalpost): Stønadstype {
-        if (!journalpost.harStrukturertSøknad()) {
-            return if (journalpost.tema == Tema.TSO.name) {
-                Stønadstype.REISE_TIL_SAMLING_TSO
-            } else {
-                TODO("Lage Stønadstype for REISE_TIL_SAMLING_TSR")
-            }
-        }
+        return Stønadstype.REISE_TIL_SAMLING_TSO
 
-        TODO("Lag ferdig denne funksjonen")
+        // TODO: Skill ut TSO fra TSR https://favro.com/organization/98c34fb974ce445eac854de0/4d617346d79341c7fbd9a40a?card=Nav-29445
     }
 
     private fun finnStønadstypeForDagligReise(journalpost: Journalpost): Stønadstype {

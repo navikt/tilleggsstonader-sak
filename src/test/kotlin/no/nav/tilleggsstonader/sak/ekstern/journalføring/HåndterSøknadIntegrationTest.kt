@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.ekstern.journalføring
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo
+import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
@@ -9,11 +11,21 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomf�
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.defaultJournalpost
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 
 class HåndterSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
-    @Test
-    internal fun `skal kunne automatisk journalføre hvis det ikke finnes eksisterende sak på person`() {
-        val opprettetBehandling = håndterSøknadService.håndterSøknad(defaultJournalpost)
+    @ParameterizedTest
+    @EnumSource(
+        value = DokumentBrevkode::class,
+        names = ["BARNETILSYN", "LÆREMIDLER", "BOUTGIFTER", "DAGLIG_REISE", "REISE_TIL_SAMLING"],
+    )
+    internal fun `skal kunne automatisk journalføre hvis det ikke finnes eksisterende sak på person`(brevkode: DokumentBrevkode) {
+        val journalpost =
+            defaultJournalpost.copy(
+                dokumenter = listOf(DokumentInfo("", brevkode = brevkode.verdi)),
+            )
+        val opprettetBehandling = håndterSøknadService.håndterSøknad(journalpost)
 
         assertThat(opprettetBehandling).isNotNull()
     }

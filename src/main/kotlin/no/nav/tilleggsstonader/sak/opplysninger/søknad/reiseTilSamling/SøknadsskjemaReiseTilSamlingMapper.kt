@@ -47,23 +47,34 @@ object SøknadsskjemaReiseTilSamlingMapper {
                 lønnetAktivitet = skjema.aktivitet.lønnetAktivitet?.verdi,
             ),
         samlinger =
-            skjema.samlinger
-                ?.map { SamlingPeriode(fom = it.fra.verdi, tom = it.til.verdi) }
-                ?: emptyList(),
-        oppmøteadresse =
-            skjema.oppmøteadresse?.let {
-                Oppmøteadresse(
-                    gateadresse = it.gateadresse.verdi,
-                    postnummer = it.postnummer.verdi.toString(),
-                    poststed = it.poststed.verdi,
-                )
+            skjema.samlinger.mapNotNull { samling ->
+                val fom = samling.fom?.verdi ?: return@mapNotNull null
+                val tom = samling.tom?.verdi ?: return@mapNotNull null
+                SamlingPeriode(fom = fom, tom = tom)
             },
-        kanReiseKollektivt = skjema.kanReiseKollektivt?.verdi,
-        totalbeløpKollektivt = skjema.totalbeløpKollektivt?.verdi,
-        årsakIkkeKollektivt = skjema.årsakIkkeKollektivt?.verdi,
-        kanBenytteEgenBil = skjema.kanBenytteEgenBil?.verdi,
-        årsakIkkeEgenBil = skjema.årsakIkkeEgenBil?.verdi,
-        kanBenytteDrosje = skjema.kanBenytteDrosje?.verdi,
+        reiseavstand =
+            Reiseavstand(
+                antallKilometerEnVei = skjema.reiseavstand.antallKilometerEnVei?.verdi,
+                land =
+                    skjema.reiseavstand.aktivitetsadresse.land
+                        ?.verdi,
+                gateadresse =
+                    skjema.reiseavstand.aktivitetsadresse.gateadresse
+                        ?.verdi,
+                postnummer =
+                    skjema.reiseavstand.aktivitetsadresse.postnummer
+                        ?.verdi,
+                poststed =
+                    skjema.reiseavstand.aktivitetsadresse.poststed
+                        ?.verdi,
+            ),
+        reisemåte =
+            Reisemåte(
+                kanReiseKollektivt = skjema.reisemåte.kanReiseKollektivt?.verdi,
+                totalutgifterKollektivt = skjema.reisemåte.totalutgifterKollektivt?.verdi,
+                kanBenytteEgenBil = skjema.reisemåte.kanBenytteEgenBil?.verdi,
+                kanBenytteDrosje = skjema.reisemåte.kanBenytteDrosje?.verdi,
+            ),
         dokumentasjon = mapDokumentasjon(skjema, journalpost),
     )
 }

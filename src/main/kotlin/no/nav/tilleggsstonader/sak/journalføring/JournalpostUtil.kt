@@ -16,6 +16,7 @@ fun Journalpost.gjelderSøknad() =
             DokumentBrevkode.BOUTGIFTER,
             DokumentBrevkode.BARNETILSYN,
             DokumentBrevkode.DAGLIG_REISE,
+            DokumentBrevkode.REISE_TIL_SAMLING,
         )
 
 fun Journalpost.gjelderKjøreliste() = this.dokumentBrevkode() == DokumentBrevkode.DAGLIG_REISE_KJØRELISTE
