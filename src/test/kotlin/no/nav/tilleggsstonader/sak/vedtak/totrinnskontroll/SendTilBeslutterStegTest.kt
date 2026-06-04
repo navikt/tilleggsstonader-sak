@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat.INNVILGE
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.Vedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.VedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
@@ -51,6 +52,7 @@ class SendTilBeslutterStegTest {
     private val vedtakService = mockk<VedtakService>()
     private val oppgaveService = mockk<OppgaveService>()
     private val totrinnskontrollService = mockk<TotrinnskontrollService>(relaxed = true)
+    private val brevmottakerVedtaksbrevRepository = mockk<BrevmottakerVedtaksbrevRepository>()
 
     private val kjørelisteBehandlingBrevRepository =
         mockk<no.nav.tilleggsstonader.sak.brev.kjørelistebrev.KjørelisteBehandlingBrevRepository>(relaxed = true)
@@ -65,6 +67,7 @@ class SendTilBeslutterStegTest {
             oppgaveService,
             totrinnskontrollService,
             brevmottakereService,
+            brevmottakerVedtaksbrevRepository,
         )
 
     private val fagsak =
@@ -113,6 +116,9 @@ class SendTilBeslutterStegTest {
         every { oppgaveService.finnBehandleSakOppgaveDomainSomIkkeErFerdigstilt(any()) } returns oppgave(behandling.id)
         every { oppgaveService.hentOppgaveDomainSomIkkeErFerdigstilt(any(), any()) } returns null
         every { oppgaveService.hentOppgave(any()) } returns Oppgave(id = 123, versjon = 0)
+        every {
+            brevmottakerVedtaksbrevRepository.findByBehandlingId(any())
+        } returns listOf(mockk(relaxed = true))
 
         // TODO tilbakekreving
         // every { simuleringService.hentLagretSimuleringsoppsummering(any()) } returns simuleringsoppsummering
