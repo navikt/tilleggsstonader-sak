@@ -135,7 +135,7 @@ class DagligReiseVedtakController(
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val plan = beregningsplanUtleder.utledForInnvilgelse(behandling, vedtaksperioder)
         val beregningsresultat =
-            beregningService.beregn(
+            beregningService.beregnOffentligTransportOgRammevedtak(
                 vedtaksperioder = vedtaksperioder,
                 behandling = behandling,
                 beregningsplan = plan,

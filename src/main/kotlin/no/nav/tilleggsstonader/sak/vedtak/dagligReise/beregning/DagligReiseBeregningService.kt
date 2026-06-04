@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.OffentligTransportBeregningService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilRammevedtakBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
@@ -25,11 +24,10 @@ class DagligReiseBeregningService(
     private val dagligReiseVedtaksperioderValideringService: DagligReiseVedtaksperioderValideringService,
     private val offentligTransportBeregningService: OffentligTransportBeregningService,
     private val privatBilRammevedtakBeregningService: PrivatBilRammevedtakBeregningService,
-    private val privatBilBeregningService: PrivatBilBeregningService,
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val vedtakService: VedtakService,
 ) {
-    fun beregn(
+    fun beregnOffentligTransportOgRammevedtak(
         vedtaksperioder: List<Vedtaksperiode>,
         behandling: Saksbehandling,
         beregningsplan: Beregningsplan,
@@ -74,21 +72,14 @@ class DagligReiseBeregningService(
                 behandlingId = behandling.id,
                 typeVedtak = typeVedtak,
                 forrigeRammevedtakPrivatBil = forrigeVedtak?.rammevedtakPrivatBil,
-            )
-
-        val beregningsresultatPrivatBil =
-            privatBilBeregningService.beregn(
-                behandling = behandling,
-                rammevedtak = rammevedtakPrivatBil,
-                brukersNavKontor = brukersNavKontor,
-                forrigeBeregningsresultat = forrigeVedtak?.beregningsresultat?.privatBil,
+                beregningsplan = beregningsplan,
             )
 
         return BeregningDagligReise(
             beregningsresultatDagligReise =
                 BeregningsresultatDagligReise(
                     offentligTransport = offentligTransport,
-                    privatBil = beregningsresultatPrivatBil,
+                    privatBil = null,
                 ),
             rammevedtakPrivatBil = rammevedtakPrivatBil,
         )
