@@ -1,10 +1,12 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
+import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
@@ -32,7 +34,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.spl
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class BoutgifterBeregningService(
@@ -68,8 +69,10 @@ class BoutgifterBeregningService(
             typeVedtak = typeVedtak,
         )
 
+        val justertBeregnFra = justerBeregnFraTilStartAvLøpendeMåned(plan.beregnFra(), forrigeVedtak)
+
         val vedtaksperioderBeregning =
-            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFra(plan.beregnFra())
+            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFra(justertBeregnFra)
 
         val utgifterPerVilkårtype =
             boutgifterUtgiftService
@@ -91,8 +94,11 @@ class BoutgifterBeregningService(
         val beregningsresultat = beregnAktuellePerioder(vedtaksperioderBeregning, utgifterPerVilkårtype)
 
         return if (forrigeVedtak != null) {
+            feilHvis(justertBeregnFra == null) {
+                "Kan ikke sette sammen nye og gamle perioder uten når justertBeregnFra=$justertBeregnFra"
+            }
             settSammenGamleOgNyePerioder(
-                beregnFra = requireNotNull(plan.beregnFra()),
+                beregnFra = justertBeregnFra,
                 nyttBeregningsresultat = beregningsresultat,
                 forrigeBeregningsresultat = forrigeVedtak.beregningsresultat,
             )
@@ -115,8 +121,13 @@ class BoutgifterBeregningService(
             .validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(
                 utgifter = utgifter,
                 finnMakssats = satsBoutgifterService::finnMakssats,
-            ).map { lagBeregningsgrunnlag(periode = it, utgifter = utgifter, makssats = satsBoutgifterService.finnMakssats(it.fom)) }
-            .validerIkkeUlikeKombinasjonerAvSvarPåFaktiskeUtgifter()
+            ).map {
+                lagBeregningsgrunnlag(
+                    periode = it,
+                    utgifter = utgifter,
+                    makssats = satsBoutgifterService.finnMakssats(it.fom),
+                )
+            }.validerIkkeUlikeKombinasjonerAvSvarPåFaktiskeUtgifter()
             .map {
                 BeregningsresultatForLøpendeMåned(
                     grunnlag = it,
@@ -145,14 +156,30 @@ class BoutgifterBeregningService(
 
         val reberegnedePerioder =
             nyttBeregningsresultat
-                .filter {
-                    it.fom.sisteDagenILøpendeMåned() >= beregnFra
-                }.markerSomDelAvTidligereUtbetaling(forrigeBeregningsresultat.perioder)
+                .filter { it.fom >= beregnFra }
+                .markerSomDelAvTidligereUtbetaling(forrigeBeregningsresultat.perioder)
         return BeregningsresultatBoutgifter(perioderFraForrigeVedtakSomSkalBeholdes + reberegnedePerioder)
     }
 
     private fun hentForrigeIverksatteVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørBoutgifter? =
         behandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it) }?.data
+
+    /**
+     * Justerer beregnFra til starten av den løpende måneden i forrige beregningsresultat som inkluderer beregnFra-datoen.
+     * Uten justeringen kan en beregnFra på en dato midt i en løpende måned skape en kortere periode enn forventet,
+     * som videre kan føre til dobbelt beregnede perioder ved opphør og satsjustering.
+     */
+    private fun justerBeregnFraTilStartAvLøpendeMåned(
+        beregnFra: LocalDate?,
+        forrigeVedtak: InnvilgelseEllerOpphørBoutgifter?,
+    ): LocalDate? {
+        if (beregnFra == null || forrigeVedtak == null) return beregnFra
+        return forrigeVedtak.beregningsresultat.perioder
+            .firstOrNull { it.grunnlag.inneholder(beregnFra) }
+            ?.grunnlag
+            ?.fom
+            ?: beregnFra
+    }
 
     private fun hentVedtak(behandlingId: BehandlingId) =
         vedtakRepository
@@ -216,8 +243,8 @@ private fun List<Beregningsgrunnlag>.validerIkkeUlikeKombinasjonerAvSvarPåFakti
                 .count()
         brukerfeilHvis(antallUlikeSvarHøyereUtgifter > 1) {
             "Vi støtter ikke at en person både skal få dekket faktiske utgifter og " +
-                "ikke faktiske utgifter i samme utbetalingsperiode " +
-                "(${beregningsgrunnlag.formatertPeriodeNorskFormat()})"
+                    "ikke faktiske utgifter i samme utbetalingsperiode " +
+                    "(${beregningsgrunnlag.formatertPeriodeNorskFormat()})"
         }
     }
 

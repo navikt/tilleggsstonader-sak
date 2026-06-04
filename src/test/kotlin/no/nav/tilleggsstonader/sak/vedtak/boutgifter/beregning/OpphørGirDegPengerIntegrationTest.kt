@@ -61,19 +61,20 @@ class OpphørGirDegPengerIntegrationTest : IntegrationTest() {
 
         val beregningsresultatSatsjustering = vedtakRepository.findByIdOrThrow(satsjusteringId)
 
-        val forventetBeregningsperioderEtterSatsjustering = listOf(
-            Datoperiode(19 august 2025, 18 september 2025),
-            Datoperiode(19 september 2025, 18 oktober 2025),
-            Datoperiode(19 oktober 2025, 18 november 2025),
-            Datoperiode(19 november 2025, 18 desember 2025),
-            Datoperiode(19 desember 2025, 18 januar 2026),
-            Datoperiode(19 januar 2026, 18 februar 2026),
-            Datoperiode(19 februar 2026, 18 mars 2026),
-            Datoperiode(19 mars 2026, 18 april  2026),
-            Datoperiode(19 april  2026, 18 mai  2026),
-            Datoperiode(19 mai 2026, 18 juni  2026),
-            Datoperiode(19 juni 2026, 30 juni  2026),
-        )
+        val forventetBeregningsperioderEtterSatsjustering =
+            listOf(
+                Datoperiode(19 august 2025, 18 september 2025),
+                Datoperiode(19 september 2025, 18 oktober 2025),
+                Datoperiode(19 oktober 2025, 18 november 2025),
+                Datoperiode(19 november 2025, 18 desember 2025),
+                Datoperiode(19 desember 2025, 18 januar 2026),
+                Datoperiode(19 januar 2026, 18 februar 2026),
+                Datoperiode(19 februar 2026, 18 mars 2026),
+                Datoperiode(19 mars 2026, 18 april 2026),
+                Datoperiode(19 april 2026, 18 mai 2026),
+                Datoperiode(19 mai 2026, 18 juni 2026),
+                Datoperiode(19 juni 2026, 30 juni 2026),
+            )
 
         val beregningsperioderEtterSatsjustering =
             (beregningsresultatSatsjustering.data as InnvilgelseEllerOpphørBoutgifter)
@@ -82,7 +83,7 @@ class OpphørGirDegPengerIntegrationTest : IntegrationTest() {
                 .map {
                     Datoperiode(
                         it.fom,
-                        it.tom
+                        it.tom,
                     )
                 }
 
@@ -90,16 +91,17 @@ class OpphørGirDegPengerIntegrationTest : IntegrationTest() {
 
         val beregningsresultatOpphør = vedtakRepository.findByIdOrThrow(opphørId)
 
-        val forventetBeregningsperioderEtterOpphør = listOf(
-            Datoperiode(19 august 2025, 18 september 2025),
-            Datoperiode(19 september 2025, 18 oktober 2025),
-            Datoperiode(19 oktober 2025, 18 november 2025),
-            Datoperiode(19 november 2025, 18 desember 2025),
-            Datoperiode(19 desember 2025, 18 januar 2026),
-            Datoperiode(19 januar 2026, 18 februar 2026),
-            Datoperiode(19 februar 2026, 18 mars 2026),
-            Datoperiode(19 mars 2026, 31 mars 2026),
-        )
+        val forventetBeregningsperioderEtterOpphør =
+            listOf(
+                Datoperiode(19 august 2025, 18 september 2025),
+                Datoperiode(19 september 2025, 18 oktober 2025),
+                Datoperiode(19 oktober 2025, 18 november 2025),
+                Datoperiode(19 november 2025, 18 desember 2025),
+                Datoperiode(19 desember 2025, 18 januar 2026),
+                Datoperiode(19 januar 2026, 18 februar 2026),
+                Datoperiode(19 februar 2026, 18 mars 2026),
+                Datoperiode(19 mars 2026, 31 mars 2026),
+            )
 
         val beregningsperioderEtterOpphør =
             (beregningsresultatOpphør.data as InnvilgelseEllerOpphørBoutgifter)
@@ -108,7 +110,7 @@ class OpphørGirDegPengerIntegrationTest : IntegrationTest() {
                 .map {
                     Datoperiode(
                         it.fom,
-                        it.tom
+                        it.tom,
                     )
                 }
 
@@ -135,16 +137,17 @@ class OpphørGirDegPengerIntegrationTest : IntegrationTest() {
 
         val beregningsresultatOpphør = vedtakRepository.findByIdOrThrow(opphørId)
 
-        val forventetBeregningsperioderEtterOpphør = listOf(
-            Datoperiode(19 august 2025, 18 september 2025),
-            Datoperiode(19 september 2025, 18 oktober 2025),
-            Datoperiode(19 oktober 2025, 18 november 2025),
-            Datoperiode(19 november 2025, 18 desember 2025),
-            Datoperiode(19 desember 2025, 31 desember 2026),
-            Datoperiode(1 januar 2026, 31 januar 2026),
-            Datoperiode(1 februar 2026, 28 februar 2026),
-            Datoperiode(1 mars 2026, 31 mars 2026),
-        )
+        val forventetBeregningsperioderEtterOpphør =
+            listOf(
+                Datoperiode(19 august 2025, 18 september 2025),
+                Datoperiode(19 september 2025, 18 oktober 2025),
+                Datoperiode(19 oktober 2025, 18 november 2025),
+                Datoperiode(19 november 2025, 18 desember 2025),
+                Datoperiode(19 desember 2025, 31 desember 2025),
+                Datoperiode(1 januar 2026, 31 januar 2026),
+                Datoperiode(1 februar 2026, 28 februar 2026),
+                Datoperiode(1 mars 2026, 31 mars 2026),
+            )
 
         val beregningsperioderEtterOpphør =
             (beregningsresultatOpphør.data as InnvilgelseEllerOpphørBoutgifter)
@@ -153,7 +156,7 @@ class OpphørGirDegPengerIntegrationTest : IntegrationTest() {
                 .map {
                     Datoperiode(
                         it.fom,
-                        it.tom
+                        it.tom,
                     )
                 }
 
@@ -187,37 +190,40 @@ class OpphørGirDegPengerIntegrationTest : IntegrationTest() {
         val vedtak =
             vedtakRepository.findByIdOrThrow(satsjusteringId).withTypeOrThrow<InnvilgelseEllerOpphørBoutgifter>()
 
-        val nyeDatoer = listOf(
-            Datoperiode(19 august 2025, 18 september 2025),
-            Datoperiode(19 september 2025, 18 oktober 2025),
-            Datoperiode(19 oktober 2025, 18 november 2025),
-            Datoperiode(19 november 2025, 18 desember 2025),
-            Datoperiode(19 desember 2025, 31 desember 2026),
-            Datoperiode(1 januar 2026, 31 januar 2026),
-            Datoperiode(1 februar 2026, 28 februar 2026),
-            Datoperiode(1 mars 2026, 31 mars 2026),
-            Datoperiode(1 april 2026, 30 april 2026),
-            Datoperiode(1 mai 2026, 31 mai 2026),
-            Datoperiode(1 juni 2026, 30 juni 2026),
-        )
-
-        val buggyPerioder = nyeDatoer.map {
-            vedtak.data.beregningsresultat.perioder.first().grunnlag.copy(fom = it.fom, tom = it.tom)
-        }.map {
-            BeregningsresultatForLøpendeMåned(
-                grunnlag = it,
-                stønadsbeløp = 5000,
-                delAvTidligereUtbetaling = false
+        val nyeDatoer =
+            listOf(
+                Datoperiode(19 august 2025, 18 september 2025),
+                Datoperiode(19 september 2025, 18 oktober 2025),
+                Datoperiode(19 oktober 2025, 18 november 2025),
+                Datoperiode(19 november 2025, 18 desember 2025),
+                Datoperiode(19 desember 2025, 31 desember 2025),
+                Datoperiode(1 januar 2026, 31 januar 2026),
+                Datoperiode(1 februar 2026, 28 februar 2026),
+                Datoperiode(1 mars 2026, 31 mars 2026),
+                Datoperiode(1 april 2026, 30 april 2026),
+                Datoperiode(1 mai 2026, 31 mai 2026),
+                Datoperiode(1 juni 2026, 30 juni 2026),
             )
-        }
+
+        val buggyPerioder =
+            nyeDatoer
+                .map {
+                    vedtak.data.beregningsresultat.perioder
+                        .first()
+                        .grunnlag
+                        .copy(fom = it.fom, tom = it.tom)
+                }.map {
+                    BeregningsresultatForLøpendeMåned(
+                        grunnlag = it,
+                        stønadsbeløp = 4953,
+                        delAvTidligereUtbetaling = false,
+                    )
+                }
         val buggyData =
             when (val d = vedtak.data) {
                 is InnvilgelseBoutgifter -> d.copy(beregningsresultat = BeregningsresultatBoutgifter(buggyPerioder))
                 is OpphørBoutgifter -> d.copy(beregningsresultat = BeregningsresultatBoutgifter(buggyPerioder))
             }
         vedtakRepository.update(vedtak.copy(data = buggyData))
-
     }
-
 }
-
