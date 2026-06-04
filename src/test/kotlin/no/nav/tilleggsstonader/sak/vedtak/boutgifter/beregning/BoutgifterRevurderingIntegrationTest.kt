@@ -195,7 +195,7 @@ class BoutgifterRevurderingIntegrationTest(
         }
 
         @Test
-        fun `opphør på sak med revurdering feilen skal ta vare på eksisterene perioder`() {
+        fun `opphør på sak med revurdering feilen skal ta vare på eksisterende perioder`() {
             val (_, satsjusteringId) = gjennomførInnvilgelseOgSatsjustering()
 
             // Simuler buggy satsjustering-data fra prod med nye perioder fra 1. januar 2026. Dette blir tilsvarende som en sak vi hadde i prod.
