@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
-import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -34,6 +33,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.spl
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class BoutgifterBeregningService(
@@ -238,8 +238,8 @@ private fun List<Beregningsgrunnlag>.validerIkkeUlikeKombinasjonerAvSvarPåFakti
                 .count()
         brukerfeilHvis(antallUlikeSvarHøyereUtgifter > 1) {
             "Vi støtter ikke at en person både skal få dekket faktiske utgifter og " +
-                    "ikke faktiske utgifter i samme utbetalingsperiode " +
-                    "(${beregningsgrunnlag.formatertPeriodeNorskFormat()})"
+                "ikke faktiske utgifter i samme utbetalingsperiode " +
+                "(${beregningsgrunnlag.formatertPeriodeNorskFormat()})"
         }
     }
 
