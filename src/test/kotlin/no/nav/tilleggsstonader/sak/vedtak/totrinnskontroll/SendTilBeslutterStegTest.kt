@@ -17,8 +17,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerTestUtil.mottakerPerson
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.Vedtaksbrev
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.VedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
@@ -119,16 +117,9 @@ class SendTilBeslutterStegTest {
         every { oppgaveService.hentOppgaveDomainSomIkkeErFerdigstilt(any(), any()) } returns null
         every { oppgaveService.hentOppgave(any()) } returns Oppgave(id = 123, versjon = 0)
         every {
-            brevmottakerVedtaksbrevRepository.findByBehandlingId(any())
+            brevmottakerVedtaksbrevRepository.existsByBehandlingId(any())
         } returns
-            listOf(
-                BrevmottakerVedtaksbrev(
-                    behandlingId = behandling.id,
-                    mottaker = mottakerPerson(ident = "ident"),
-                    journalpostId = "journalpostIdA",
-                    bestillingId = null,
-                ),
-            )
+            true
 
         // TODO tilbakekreving
         // every { simuleringService.hentLagretSimuleringsoppsummering(any()) } returns simuleringsoppsummering

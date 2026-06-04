@@ -78,9 +78,8 @@ class SendTilBeslutterSteg(
         }
 
         brukerfeilHvis(
-            brevmottakerVedtaksbrevRepository
-                .findByBehandlingId(saksbehandling.id)
-                .isEmpty(),
+            !brevmottakerVedtaksbrevRepository
+                .existsByBehandlingId(saksbehandling.id),
         ) {
             "Det finnes ingen brevmottakere på behandlingen"
         }
