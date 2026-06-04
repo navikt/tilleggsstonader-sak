@@ -17,6 +17,7 @@ import java.time.ZoneId
 class GooglemapsService(
     val googleRoutesClient: GoogleRoutesClient,
     val googlePlaceDetailsClient: GooglePlaceDetailsClient,
+    val bomstasjonService: BomstasjonService,
 ) {
     fun hentKjøreruter(
         fraAdresse: Address,
@@ -40,9 +41,10 @@ class GooglemapsService(
 
         val startOgSluttAdresse = finnStartOgSluttAdresse(kortesteRute)
         val avstandUtenFerje = kortesteRute.avstandMeter - kortesteRute.finnFerjeavstand()
+        val harBomvei = bomstasjonService.harBomvei(kortesteRute.polyline.encodedPolyline)
 
         return ReisedataDto(
-            rute = kortesteRute,
+            rute = kortesteRute.copy(harBomvei = harBomvei),
             startOgSluttAdresse = startOgSluttAdresse,
             avstandUtenFerje = avstandUtenFerje,
         )

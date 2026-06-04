@@ -126,6 +126,7 @@ spec:
         - host: tilleggsstonader-arena.prod-fss-pub.nais.io
         - host: tilleggsstonader-unleash-api.nav.cloud.nais.io
         - host: norg2.prod-fss-pub.nais.io
+        - host: nvdbapiles.atlas.vegvesen.no
   envFrom:
     - secret: tilleggsstonader-sak-unleash-api-token
     - secret: google-maps-api-key

@@ -25,6 +25,7 @@ data class ReisedataDto(
                 sluttLokasjon = rute.sluttLokasjon.tilDto(),
                 startAdresse = startOgSluttAdresse.startAdresse,
                 sluttAdresse = startOgSluttAdresse.sluttAdresse,
+                harBomvei = rute.harBomvei,
             ),
     )
 }
@@ -39,6 +40,7 @@ data class RuteDto(
     val sluttLokasjon: LokasjonDto,
     val startAdresse: String?,
     val sluttAdresse: String?,
+    val harBomvei: Boolean,
 )
 
 data class StrekningDto(

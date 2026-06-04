@@ -26,10 +26,12 @@ import tools.jackson.module.kotlin.readValue
 class GooglemapsServiceTest {
     val googleRoutesClient = mockk<GoogleRoutesClient>()
     val googlePlaceDetailsClient = mockk<GooglePlaceDetailsClient>()
+    val bomstasjonService = mockk<BomstasjonService>()
     val googlemapsService =
         GooglemapsService(
             googleRoutesClient = googleRoutesClient,
             googlePlaceDetailsClient = googlePlaceDetailsClient,
+            bomstasjonService = bomstasjonService,
         )
 
     val fraAdresse = "Myravegen 2, 6360 Åfarnes"
@@ -59,6 +61,7 @@ class GooglemapsServiceTest {
         val ruteJson = FileUtil.readFile("no/nav/tilleggsstonader/sak/googlemaps/kjørerute_response.json")
         val ruteResponse = jsonMapper.readValue<RuteResponse>(ruteJson)
         every { googleRoutesClient.hentRuter(any()) } returns ruteResponse
+        every { bomstasjonService.harBomvei(any()) } returns true
 
         val forventet =
             ReisedataDto(
@@ -68,8 +71,8 @@ class GooglemapsServiceTest {
                             Polyline(
                                 encodedPolyline =
                                     "{bm}Jukxl@o@jAwA^]M_AMoBs@kAg@sAyBQSYz@?PH\\rBtDLx@b@" +
-                                        "v@h@ZUz@Yx@eBuBUr@MFYKIIi@{@{DcHi@gA[gAg@_DS_AACMQ}AuBaA}@[KE?[?_@RUXiErKgGpO}HzRm" +
-                                        "Vxm@gYps@kn@v}AUhAGp@CpCAvB?rE@fBFtMB~CAtCA~BMnD[tEK`AQxA]zBWt@]b@A@OLUF",
+                                            "v@h@ZUz@Yx@eBuBUr@MFYKIIi@{@{DcHi@gA[gAg@_DS_AACMQ}AuBaA}@[KE?[?_@RUXiErKgGpO}HzRm" +
+                                            "Vxm@gYps@kn@v}AUhAGp@CpCAvB?rE@fBFtMB~CAtCA~BMnD[tEK`AQxA]zBWt@]b@A@OLUF",
                             ),
                         avstandMeter = 4693,
                         avstandUtenFerje = 1485,
@@ -84,6 +87,7 @@ class GooglemapsServiceTest {
                         sluttLokasjon = LokasjonDto(lat = 62.6857511, lng = 7.454786800000001),
                         startAdresse = "Myravegen 2, 6360 Åfarnes, Norway",
                         sluttAdresse = "Fv64 40, 6456 Skåla, Norway",
+                        harBomvei = true,
                     ),
             )
 
@@ -97,6 +101,7 @@ class GooglemapsServiceTest {
         val ruteJson = FileUtil.readFile("no/nav/tilleggsstonader/sak/googlemaps/kollektivrute_response.json")
         val ruteResponse = jsonMapper.readValue<RuteResponse>(ruteJson)
         every { googleRoutesClient.hentRuter(any()) } returns ruteResponse
+        every { bomstasjonService.harBomvei(any()) } returns false
 
         val forventet =
             ReisedataDto(
@@ -139,6 +144,7 @@ class GooglemapsServiceTest {
                         sluttLokasjon = LokasjonDto(lat = 62.685745999999995, lng = 7.454721900000001),
                         startAdresse = "Myravegen 2, 6360 Åfarnes, Norway",
                         sluttAdresse = "Fv64 40, 6456 Skåla, Norway",
+                        harBomvei = false,
                     ),
             )
 
