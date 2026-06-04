@@ -23,6 +23,8 @@ import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.cucumberUtils.mapVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningRevurderingService
@@ -162,6 +164,10 @@ class PrivatBilBeregningStepDefinitions {
                     oppfylteVilkårDagligReise = oppfylteReisevilkår,
                     behandlingId = behandlingId,
                     typeVedtak = TypeVedtak.INNVILGELSE,
+                    beregningsplan =
+                        Beregningsplan(
+                            omfang = Beregningsomfang.ALLE_PERIODER,
+                        ),
                 )
         } catch (e: Exception) {
             feil = e

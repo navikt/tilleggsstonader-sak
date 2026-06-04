@@ -72,6 +72,7 @@ class DagligReiseBeregningService(
                 behandlingId = behandling.id,
                 typeVedtak = typeVedtak,
                 forrigeRammevedtakPrivatBil = forrigeVedtak?.rammevedtakPrivatBil,
+                beregningsplan = beregningsplan,
             )
 
         return BeregningDagligReise(
