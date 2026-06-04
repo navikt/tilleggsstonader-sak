@@ -44,10 +44,7 @@ class DagligReiseBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         kanBehandlePrivatBil: Boolean,
     ): StegType {
-        if (
-            dagligReiseVedtakService.harRammevedtakForPrivatBil(saksbehandling.id) &&
-            saksbehandling.type == BehandlingType.REVURDERING
-        ) {
+        if (dagligReiseVedtakService.forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(saksbehandling.forrigeIverksatteBehandlingId)) {
             return StegType.KJØRELISTE
         }
 
