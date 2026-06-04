@@ -89,15 +89,14 @@ class BoutgifterVedtakController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val vedtaksperioder = vedtak.vedtaksperioder.tilDomene()
-        val forrigeVedtak = behandling.forrigeIverksatteBehandlingId?.let { vedtakService.hentVedtak(it)?.data }
+        val forrigeVedtak: InnvilgelseEllerOpphørBoutgifter? =
+            behandling.forrigeIverksatteBehandlingId
+                ?.let { vedtakService.hentVedtak(it)?.data as? InnvilgelseEllerOpphørBoutgifter }
         val plan =
             beregningsplanUtleder.utledForInnvilgelse(
                 saksbehandling = behandling,
                 vedtaksperioder = vedtaksperioder,
-                stønadsspesifikkJusteringAvBeregnFra =
-                    BoutgifterBeregningService.justerBeregnFra(
-                        forrigeVedtak as InnvilgelseEllerOpphørBoutgifter,
-                    ),
+                stønadsspesifikkJusteringAvBeregnFra = BoutgifterBeregningService.justerBeregnFra(forrigeVedtak),
             )
         return beregningService
             .beregn(
