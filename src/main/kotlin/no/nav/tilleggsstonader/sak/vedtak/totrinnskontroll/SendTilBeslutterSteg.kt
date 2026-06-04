@@ -51,9 +51,6 @@ class SendTilBeslutterSteg(
         saksbehandling: Saksbehandling,
         data: SendTilBeslutterRequest,
     ) {
-//        if (saksbehandling.erKjørelisteBehandling()) {
-//            brevmottakereService.hentEllerOpprettBrevmottakere(saksbehandling.id)
-//        }
         brevmottakereService.hentEllerOpprettBrevmottakere(saksbehandling.id)
         validerBrevmottakere(saksbehandling)
         behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.FATTER_VEDTAK)
