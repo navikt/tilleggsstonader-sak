@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
@@ -27,6 +28,7 @@ class DagligReiseBeregnYtelseSteg(
     private val opphørValideringService: OpphørValideringService,
     private val dagligReiseVedtakService: DagligReiseVedtakService,
     private val opprettAndelerDagligReiseService: OpprettAndelerDagligReiseService,
+    private val avklartKjørelisteService: AvklartKjørelisteService,
     vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -131,6 +133,13 @@ class DagligReiseBeregnYtelseSteg(
             beregningsresultat,
             opphørsdato,
         )
+
+        rammevedtakPrivatBil?.let {
+            avklartKjørelisteService.sletteMarkerUkerUtenforAvkortetRammevedtak(
+                behandlingId = saksbehandling.id,
+                rammevedtak = it,
+            )
+        }
 
         dagligReiseVedtakService.lagreOpphørsvedtak(
             saksbehandling = saksbehandling,

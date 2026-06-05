@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.springframework.stereotype.Service
@@ -110,6 +111,7 @@ class AvklartKjørelisteService(
                 }
             }
             AvklartKjørtUkeStatus.NY -> AvklartKjørtUkeStatus.NY
+            AvklartKjørtUkeStatus.SLETTET -> AvklartKjørtUkeStatus.SLETTET
         }
 
     private fun erDagerEndret(
@@ -300,6 +302,25 @@ class AvklartKjørelisteService(
         // Avklar nye kjørelister på nytt
         kjørelisterSomFinneINyMenIkkeGammelBehandling.forEach {
             avklarUkerFraKjøreliste(behandling, it)
+        }
+    }
+
+    fun sletteMarkerUkerUtenforAvkortetRammevedtak(
+        behandlingId: BehandlingId,
+        rammevedtak: RammevedtakPrivatBil,
+    ) {
+        val avklarteUker = hentAvklarteUkerForBehandling(behandlingId)
+
+        val ukerSomSkalSlettes =
+            avklarteUker.filter { uke ->
+                val reise = rammevedtak.reiser.find { it.reiseId == uke.reiseId }
+                reise != null && uke.fom > reise.grunnlag.tom
+            }
+
+        if (ukerSomSkalSlettes.isNotEmpty()) {
+            avklartKjørtUkeRepository.updateAll(
+                ukerSomSkalSlettes.map { it.copy(avklartKjørtUkeStatus = AvklartKjørtUkeStatus.SLETTET) },
+            )
         }
     }
 }
