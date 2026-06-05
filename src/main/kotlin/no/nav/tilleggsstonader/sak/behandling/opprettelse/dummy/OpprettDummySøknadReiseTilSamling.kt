@@ -5,20 +5,21 @@ import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
-import no.nav.tilleggsstonader.kontrakter.søknad.AdresseFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.DatoFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.EnumFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.EnumFlereValgFelt
-import no.nav.tilleggsstonader.kontrakter.søknad.HeltallFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
-import no.nav.tilleggsstonader.kontrakter.søknad.PeriodeFelt
+import no.nav.tilleggsstonader.kontrakter.søknad.SelectFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaReiseTilSamling
-import no.nav.tilleggsstonader.kontrakter.søknad.TekstFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AktivitetAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.AktivitetAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.AktivitetsadresseAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.ReiseavstandAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.ReisemåteAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Samling
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -69,59 +70,50 @@ class OpprettDummySøknadReiseTilSamling(
                             ),
                         samlinger =
                             listOf(
-                                PeriodeFelt(
-                                    label = "Samling 1",
-                                    fra = DatoFelt("Fra", 12 februar 2026),
-                                    til = DatoFelt("Til", 14 februar 2026),
+                                Samling(
+                                    fom = DatoFelt("Fra", 12 februar 2026),
+                                    tom = DatoFelt("Til", 14 februar 2026),
                                 ),
-                                PeriodeFelt(
-                                    label = "Samling 2",
-                                    fra = DatoFelt("Fra", 10 mars 2026),
-                                    til = DatoFelt("Til", 12 mars 2026),
+                                Samling(
+                                    fom = DatoFelt("Fra", 10 mars 2026),
+                                    tom = DatoFelt("Til", 12 mars 2026),
                                 ),
                             ),
-                        oppmøteadresse =
-                            AdresseFelt(
-                                label = "Hvor skal du møte opp?",
-                                gateadresse = TekstFelt("Gateadresse", "Mimes vei 1"),
-                                postnummer = HeltallFelt("Postnummer", 5132),
-                                poststed = TekstFelt("Poststed", "Nyborg"),
+                        reiseavstand =
+                            ReiseavstandAvsnitt(
+                                antallKilometerEnVei = VerdiFelt(verdi = "42", label = "Antall kilometer én vei"),
+                                aktivitetsadresse =
+                                    AktivitetsadresseAvsnitt(
+                                        land = SelectFelt("Land", "NO", "Norge"),
+                                        gateadresse = VerdiFelt(verdi = "Mimes vei 1", label = "Gateadresse"),
+                                        postnummer = VerdiFelt(verdi = "5132", label = "Postnummer"),
+                                        poststed = VerdiFelt(verdi = "Nyborg", label = "Poststed"),
+                                    ),
                             ),
-                        kanReiseKollektivt =
-                            EnumFelt(
-                                label = "Kan du reise kollektivt til samlingen?",
-                                verdi = JaNei.NEI,
-                                svarTekst = "Nei",
-                                alternativer = emptyList(),
-                            ),
-                        totalbeløpKollektivt = null,
-                        årsakIkkeKollektivt =
-                            EnumFelt(
-                                label = "Hvorfor kan du ikke reise kollektivt?",
-                                verdi = SøknadsskjemaReiseTilSamling.ÅrsakIkkeKollektivt.DÅRLIG_TRANSPORTTILBUD,
-                                svarTekst = "Dårlig transporttilbud",
-                                alternativer = emptyList(),
-                            ),
-                        kanBenytteEgenBil =
-                            EnumFelt(
-                                label = "Kan du benytte egen bil?",
-                                verdi = JaNei.NEI,
-                                svarTekst = "Nei",
-                                alternativer = emptyList(),
-                            ),
-                        årsakIkkeEgenBil =
-                            EnumFelt(
-                                label = "Hvorfor kan du ikke benytte egen bil?",
-                                verdi = SøknadsskjemaReiseTilSamling.ÅrsakIkkeEgenBil.DISPONERER_IKKE_BIL,
-                                svarTekst = "Jeg disponerer ikke bil",
-                                alternativer = emptyList(),
-                            ),
-                        kanBenytteDrosje =
-                            EnumFelt(
-                                label = "Kan du benytte drosje?",
-                                verdi = JaNei.JA,
-                                svarTekst = "Ja",
-                                alternativer = emptyList(),
+                        reisemåte =
+                            ReisemåteAvsnitt(
+                                kanReiseKollektivt =
+                                    EnumFelt(
+                                        label = "Kan du reise kollektivt til samlingen?",
+                                        verdi = JaNei.NEI,
+                                        svarTekst = "Nei",
+                                        alternativer = emptyList(),
+                                    ),
+                                totalutgifterKollektivt = null,
+                                kanBenytteEgenBil =
+                                    EnumFelt(
+                                        label = "Kan du benytte egen bil?",
+                                        verdi = JaNei.NEI,
+                                        svarTekst = "Nei",
+                                        alternativer = emptyList(),
+                                    ),
+                                kanBenytteDrosje =
+                                    EnumFelt(
+                                        label = "Kan du benytte drosje?",
+                                        verdi = JaNei.JA,
+                                        svarTekst = "Ja",
+                                        alternativer = emptyList(),
+                                    ),
                             ),
                         dokumentasjon = emptyList(),
                     ),

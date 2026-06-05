@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
-import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaReiseTilSamling
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
@@ -84,19 +83,23 @@ data class BehandlingFaktaReiseTilSamlingDto(
     override val arena: ArenaFakta? = null,
     val aktiviteter: FaktaAktivitet,
     val samlinger: List<FaktaSamling>,
-    val oppmøteadresse: FaktaOppmøteadresse?,
-    val kanReiseKollektivt: JaNei?,
-    val totalbeløpKollektivt: Int?,
-    val årsakIkkeKollektivt: SøknadsskjemaReiseTilSamling.ÅrsakIkkeKollektivt?,
-    val kanBenytteEgenBil: JaNei?,
-    val årsakIkkeEgenBil: SøknadsskjemaReiseTilSamling.ÅrsakIkkeEgenBil?,
-    val kanBenytteDrosje: JaNei?,
+    val reiseavstand: FaktaReiseavstand?,
+    val reisemåte: FaktaReisemåte?,
 ) : BehandlingFaktaDto
 
-data class FaktaOppmøteadresse(
+data class FaktaReiseavstand(
+    val antallKilometerEnVei: String?,
+    val land: String?,
     val gateadresse: String?,
     val postnummer: String?,
     val poststed: String?,
+)
+
+data class FaktaReisemåte(
+    val kanReiseKollektivt: JaNei?,
+    val totalutgifterKollektivt: String?,
+    val kanBenytteEgenBil: JaNei?,
+    val kanBenytteDrosje: JaNei?,
 )
 
 data class FaktaSamling(

@@ -5,7 +5,6 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
-import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaReiseTilSamling
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
@@ -22,7 +21,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Oppmøteadresse
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Reiseavstand
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Reisemåte
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SamlingPeriode
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SkjemaReiseTilSamling
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
@@ -318,18 +318,21 @@ internal class BehandlingFaktaServiceTest {
                                 SamlingPeriode(fom = 12 februar 2026, tom = 14 februar 2026),
                                 SamlingPeriode(fom = 10 mars 2026, tom = 12 mars 2026),
                             ),
-                        oppmøteadresse =
-                            Oppmøteadresse(
+                        reiseavstand =
+                            Reiseavstand(
+                                antallKilometerEnVei = "42",
+                                land = "NO",
                                 gateadresse = "Mimes vei 1",
                                 postnummer = "5132",
                                 poststed = "Nyborg",
                             ),
-                        kanReiseKollektivt = JaNei.NEI,
-                        totalbeløpKollektivt = null,
-                        årsakIkkeKollektivt = SøknadsskjemaReiseTilSamling.ÅrsakIkkeKollektivt.DÅRLIG_TRANSPORTTILBUD,
-                        kanBenytteEgenBil = JaNei.NEI,
-                        årsakIkkeEgenBil = SøknadsskjemaReiseTilSamling.ÅrsakIkkeEgenBil.DISPONERER_IKKE_BIL,
-                        kanBenytteDrosje = JaNei.JA,
+                        reisemåte =
+                            Reisemåte(
+                                kanReiseKollektivt = JaNei.NEI,
+                                totalutgifterKollektivt = null,
+                                kanBenytteEgenBil = JaNei.NEI,
+                                kanBenytteDrosje = JaNei.JA,
+                            ),
                         dokumentasjon = emptyList(),
                     ),
             )
@@ -341,13 +344,11 @@ internal class BehandlingFaktaServiceTest {
 
         assertThat(fakta.samlinger).hasSize(2)
         assertThat(fakta.samlinger.first().fom).isEqualTo(12 februar 2026)
-        assertThat(fakta.oppmøteadresse?.gateadresse).isEqualTo("Mimes vei 1")
-        assertThat(fakta.oppmøteadresse?.postnummer).isEqualTo("5132")
-        assertThat(fakta.oppmøteadresse?.poststed).isEqualTo("Nyborg")
-        assertThat(fakta.kanReiseKollektivt).isEqualTo(JaNei.NEI)
-        assertThat(fakta.årsakIkkeKollektivt).isEqualTo(SøknadsskjemaReiseTilSamling.ÅrsakIkkeKollektivt.DÅRLIG_TRANSPORTTILBUD)
-        assertThat(fakta.kanBenytteEgenBil).isEqualTo(JaNei.NEI)
-        assertThat(fakta.årsakIkkeEgenBil).isEqualTo(SøknadsskjemaReiseTilSamling.ÅrsakIkkeEgenBil.DISPONERER_IKKE_BIL)
-        assertThat(fakta.kanBenytteDrosje).isEqualTo(JaNei.JA)
+        assertThat(fakta.reiseavstand?.gateadresse).isEqualTo("Mimes vei 1")
+        assertThat(fakta.reiseavstand?.postnummer).isEqualTo("5132")
+        assertThat(fakta.reiseavstand?.poststed).isEqualTo("Nyborg")
+        assertThat(fakta.reisemåte?.kanReiseKollektivt).isEqualTo(JaNei.NEI)
+        assertThat(fakta.reisemåte?.kanBenytteEgenBil).isEqualTo(JaNei.NEI)
+        assertThat(fakta.reisemåte?.kanBenytteDrosje).isEqualTo(JaNei.JA)
     }
 }

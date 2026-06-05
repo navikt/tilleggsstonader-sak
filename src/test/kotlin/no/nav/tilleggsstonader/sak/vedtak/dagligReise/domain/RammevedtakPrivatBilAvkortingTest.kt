@@ -16,50 +16,53 @@ class RammevedtakPrivatBilAvkortingTest {
     val uke3Tom = 26 januar 2025
 
     @Nested
-    inner class AvkortReiseTilDato {
+    inner class AvkortEtterDato {
         @Test
-        fun `reise som slutter før opphørsDato returneres uendret`() {
+        fun `reise med tom lik maksTom returneres uendret`() {
             val reise = rammeForReiseMedPrivatBil(fom = uke1Fom, tom = uke1Tom)
 
-            assertThat(reise.avkortTilDato(uke2Fom.minusDays(1))).isEqualTo(reise)
+            assertThat(reise.avkortEtterDato(uke1Tom)).isEqualTo(reise)
         }
 
         @Test
-        fun `reise som starter på opphørsDato fjernes`() {
+        fun `reise fom etter maksTom fjernes`() {
             val reise = rammeForReiseMedPrivatBil(fom = uke2Fom, tom = uke2Tom)
 
-            assertThat(reise.avkortTilDato(uke2Fom.minusDays(1))).isNull()
+            assertThat(reise.avkortEtterDato(uke1Tom)).isNull()
         }
 
         @Test
-        fun `reise som starter etter opphørsDato fjernes`() {
-            val reise = rammeForReiseMedPrivatBil(fom = uke3Fom, tom = uke3Tom)
-
-            assertThat(reise.avkortTilDato(uke2Fom.minusDays(1))).isNull()
-        }
-
-        @Test
-        fun `reise som overlapper opphørsDato får sluttdato satt til dagen før opphørsDato`() {
+        fun `reise som avkortes til fom beholder kun én dag`() {
             val reise = rammeForReiseMedPrivatBil(fom = uke1Fom, tom = uke1Tom)
-            val opphørsDato = 10 januar 2025 // onsdag i uke 1
 
-            val resultat = reise.avkortTilDato(opphørsDato.minusDays(1))
+            val resultat = reise.avkortEtterDato(uke1Fom)
+
+            assertThat(resultat?.grunnlag?.fom).isEqualTo(uke1Fom)
+            assertThat(resultat?.grunnlag?.tom).isEqualTo(uke1Fom)
+        }
+
+        @Test
+        fun `reise som overlapper maksTom avkortes til maksTom`() {
+            val reise = rammeForReiseMedPrivatBil(fom = uke1Fom, tom = uke1Tom)
+            val maksTom = 9 januar 2025
+
+            val resultat = reise.avkortEtterDato(maksTom)
 
             assertThat(resultat).isNotNull
             assertThat(resultat!!.grunnlag.fom).isEqualTo(uke1Fom)
-            assertThat(resultat.grunnlag.tom).isEqualTo(9 januar 2025)
+            assertThat(resultat.grunnlag.tom).isEqualTo(maksTom)
             assertThat(
                 resultat.grunnlag.delperioder
                     .single()
                     .tom,
-            ).isEqualTo(9 januar 2025)
+            ).isEqualTo(maksTom)
         }
 
         @Test
-        fun `opphørsDato på start av uke2 beholder kun uke1`() {
+        fun `maksTom på siste dag i uke1 beholder kun uke1`() {
             val reise = reiseMed3Uker()
 
-            val resultat = reise.avkortTilDato(uke2Fom.minusDays(1))
+            val resultat = reise.avkortEtterDato(uke1Tom)
 
             assertThat(resultat).isNotNull
             assertThat(resultat!!.grunnlag.fom).isEqualTo(uke1Fom)
@@ -68,30 +71,25 @@ class RammevedtakPrivatBilAvkortingTest {
         }
 
         @Test
-        fun `opphørsDato midt i uke2 kapper uke2 og fjerner uke3`() {
+        fun `tre delperioder - én uendret, én forkortet, én fjernet`() {
             val reise = reiseMed3Uker()
-            val opphørsDato = 15 januar 2025 // onsdag i uke 2
+            val maksTom = 14 januar 2025
 
-            val resultat = reise.avkortTilDato(opphørsDato.minusDays(1))
+            val resultat = reise.avkortEtterDato(maksTom)!!
 
-            assertThat(resultat).isNotNull
-            assertThat(resultat!!.grunnlag.fom).isEqualTo(uke1Fom)
-            assertThat(resultat.grunnlag.tom).isEqualTo(14 januar 2025)
-            assertThat(resultat.grunnlag.delperioder).hasSize(2)
-            assertThat(
-                resultat.grunnlag.delperioder
-                    .last()
-                    .fom,
-            ).isEqualTo(uke2Fom)
-            assertThat(
-                resultat.grunnlag.delperioder
-                    .last()
-                    .tom,
-            ).isEqualTo(14 januar 2025)
+            assertThat(resultat.grunnlag.fom).isEqualTo(uke1Fom)
+            assertThat(resultat.grunnlag.tom).isEqualTo(maksTom)
+
+            val delperioder = resultat.grunnlag.delperioder
+            assertThat(delperioder).hasSize(2)
+            assertThat(delperioder[0].fom).isEqualTo(uke1Fom)
+            assertThat(delperioder[0].tom).isEqualTo(uke1Tom)
+            assertThat(delperioder[1].fom).isEqualTo(uke2Fom)
+            assertThat(delperioder[1].tom).isEqualTo(maksTom)
         }
 
         @Test
-        fun `satser i avkortet delperiode avkortes ikke`() {
+        fun `sats som overlapper maksTom avkortes til maksTom`() {
             val sats1 = lagSats(uke2Fom, 15 januar 2025)
             val sats2 = lagSats(16 januar 2025, uke2Tom)
             val reise =
@@ -100,19 +98,19 @@ class RammevedtakPrivatBilAvkortingTest {
                     tom = uke2Tom,
                     delperioder = listOf(lagDelperiode(uke2Fom, uke2Tom, listOf(sats1, sats2))),
                 )
-            val opphørsDato = 17 januar 2025 // torsdag i uke 2
+            val maksTom = 16 januar 2025
 
-            val resultat = reise.avkortTilDato(opphørsDato.minusDays(1))
+            val resultat = reise.avkortEtterDato(maksTom)
 
             assertThat(resultat).isNotNull
             val avkortetDelperiode = resultat!!.grunnlag.delperioder.single()
             assertThat(avkortetDelperiode.satser).hasSize(2)
-            assertThat(avkortetDelperiode.satser.first().tom).isEqualTo(15 januar 2025) // uendret
-            assertThat(avkortetDelperiode.satser.last().tom).isEqualTo(uke2Tom) // uendret — satser avkortes ikke
+            assertThat(avkortetDelperiode.satser.first().tom).isEqualTo(15 januar 2025)
+            assertThat(avkortetDelperiode.satser.last().tom).isEqualTo(maksTom)
         }
 
         @Test
-        fun `satser forblir uendret etter avkorting av delperiode`() {
+        fun `sats som starter etter maksTom fjernes`() {
             val sats1 = lagSats(uke2Fom, 14 januar 2025)
             val sats2 = lagSats(15 januar 2025, uke2Tom)
             val reise =
@@ -121,15 +119,14 @@ class RammevedtakPrivatBilAvkortingTest {
                     tom = uke2Tom,
                     delperioder = listOf(lagDelperiode(uke2Fom, uke2Tom, listOf(sats1, sats2))),
                 )
-            val opphørsDato = 15 januar 2025
+            val maksTom = 14 januar 2025
 
-            val resultat = reise.avkortTilDato(opphørsDato.minusDays(1))
+            val resultat = reise.avkortEtterDato(maksTom)
 
             assertThat(resultat).isNotNull
             val avkortetDelperiode = resultat!!.grunnlag.delperioder.single()
-            assertThat(avkortetDelperiode.satser).hasSize(2)
-            assertThat(avkortetDelperiode.satser.first().tom).isEqualTo(14 januar 2025) // uendret
-            assertThat(avkortetDelperiode.satser.last().tom).isEqualTo(uke2Tom) // uendret — satser avkortes ikke
+            assertThat(avkortetDelperiode.satser).hasSize(1)
+            assertThat(avkortetDelperiode.satser.single().tom).isEqualTo(maksTom)
         }
     }
 

@@ -40,6 +40,7 @@ class SøknadService(
     private val søknadsskjemaDagligReiseMapper: SøknadskjemaDagligReiseMapper,
     private val søknadDagligReiseRepository: SøknadDagligReiseRepository,
     private val søknadReiseTilSamlingRepository: SøknadReiseTilSamlingRepository,
+    private val søknadMetrikker: SøknadMetrikker,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -85,6 +86,9 @@ class SøknadService(
                 is SøknadReiseTilSamling -> søknadReiseTilSamlingRepository.insert(søknad)
             }
         søknadBehandlingRepository.insert(SøknadBehandling(behandlingId, søknad.id))
+
+        søknadMetrikker.registrerSøknadMetrikker(lagretSøknad)
+
         return lagretSøknad
     }
 
