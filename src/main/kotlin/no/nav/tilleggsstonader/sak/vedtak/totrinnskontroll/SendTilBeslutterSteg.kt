@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakereService
 import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.KjørelisteBehandlingBrevRepository
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.VedtaksbrevRepository
@@ -32,7 +31,6 @@ class SendTilBeslutterSteg(
     private val oppgaveService: OppgaveService,
     private val totrinnskontrollService: TotrinnskontrollService,
     private val brevmottakereService: BrevmottakereService,
-    private val brevmottakerVedtaksbrevRepository: BrevmottakerVedtaksbrevRepository,
 ) : BehandlingSteg<SendTilBeslutterRequest> {
     override fun validerSteg(saksbehandling: Saksbehandling) {
         brukerfeilHvis(saksbehandling.steg != stegType()) {
@@ -51,8 +49,11 @@ class SendTilBeslutterSteg(
         saksbehandling: Saksbehandling,
         data: SendTilBeslutterRequest,
     ) {
-        brevmottakereService.hentEllerOpprettBrevmottakere(saksbehandling.id)
-        validerBrevmottakere(saksbehandling)
+        if (saksbehandling.erKjørelisteBehandling()) {
+            brevmottakereService.hentEllerOpprettBrevmottakere(saksbehandling.id)
+        } else {
+            validerBrevmottakere(saksbehandling)
+        }
         behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.FATTER_VEDTAK)
         ferdigstillOppgave(saksbehandling)
         totrinnskontrollService.sendtilBeslutter(saksbehandling, data)
@@ -78,8 +79,7 @@ class SendTilBeslutterSteg(
         }
 
         brukerfeilHvis(
-            !brevmottakerVedtaksbrevRepository
-                .existsByBehandlingId(saksbehandling.id),
+            !brevmottakereService.harBrevmottakere(saksbehandling.id),
         ) {
             "Det finnes ingen brevmottakere på behandlingen"
         }

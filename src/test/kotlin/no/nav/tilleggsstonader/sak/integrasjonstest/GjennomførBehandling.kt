@@ -287,6 +287,7 @@ fun IntegrationTest.gjennomførBeslutteVedtakSteg(behandlingId: BehandlingId) {
 
 fun IntegrationTest.gjennomførSendTilBeslutterSteg(behandlingId: BehandlingId) {
     kall.brev.genererPdf(behandlingId, GenererPdfRequest(MINIMALT_BREV))
+    kall.brevmottakere.hent(behandlingId)
     kall.totrinnskontroll.sendTilBeslutter(behandlingId)
     kjørTasksKlareForProsessering()
 }

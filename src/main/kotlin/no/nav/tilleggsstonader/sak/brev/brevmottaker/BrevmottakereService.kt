@@ -96,6 +96,8 @@ class BrevmottakereService(
         brevmottakereRepository.update(brevmottaker.copy(mottaker = it.tilMottaker()))
     }
 
+    fun harBrevmottakere(behandlingId: BehandlingId): Boolean = brevmottakereRepository.existsByBehandlingId(behandlingId)
+
     private fun opprettInitiellBrevmottakerForBehandling(behandlingId: BehandlingId): BrevmottakerVedtaksbrev {
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
 

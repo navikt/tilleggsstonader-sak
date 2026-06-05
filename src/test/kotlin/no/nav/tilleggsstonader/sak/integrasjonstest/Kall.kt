@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.ArenaKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.BehandlingKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.BrevKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.BrevmottakereKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.GjenopprettOppgaveKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.JournalpostKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.KartKall
@@ -44,4 +45,5 @@ class Kall(
     val vilkår = VilkårKall(testklient)
     val vilkårDagligReise = VilkårDagligReiseKall(testklient)
     val vilkårperiode = VilkårperiodeKall(testklient)
+    val brevmottakere = BrevmottakereKall(testklient)
 }
