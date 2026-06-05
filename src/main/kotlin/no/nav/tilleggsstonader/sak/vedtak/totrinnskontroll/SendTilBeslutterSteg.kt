@@ -51,6 +51,8 @@ class SendTilBeslutterSteg(
     ) {
         if (saksbehandling.erKjørelisteBehandling()) {
             brevmottakereService.hentEllerOpprettBrevmottakere(saksbehandling.id)
+        } else {
+            validerBrevmottakere(saksbehandling)
         }
         behandlingService.oppdaterStatusPåBehandling(saksbehandling.id, BehandlingStatus.FATTER_VEDTAK)
         ferdigstillOppgave(saksbehandling)
@@ -69,6 +71,18 @@ class SendTilBeslutterSteg(
                     ),
             ),
         )
+    }
+
+    private fun validerBrevmottakere(saksbehandling: Saksbehandling) {
+        if (saksbehandling.skalIkkeSendeBrev) {
+            return
+        }
+
+        brukerfeilHvis(
+            !brevmottakereService.harBrevmottakere(saksbehandling.id),
+        ) {
+            "Det finnes ingen brevmottakere på behandlingen"
+        }
     }
 
     private fun ferdigstillOppgave(saksbehandling: Saksbehandling) {

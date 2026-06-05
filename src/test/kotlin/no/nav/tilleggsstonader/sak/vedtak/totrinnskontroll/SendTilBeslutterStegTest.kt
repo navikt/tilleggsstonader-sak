@@ -113,6 +113,10 @@ class SendTilBeslutterStegTest {
         every { oppgaveService.finnBehandleSakOppgaveDomainSomIkkeErFerdigstilt(any()) } returns oppgave(behandling.id)
         every { oppgaveService.hentOppgaveDomainSomIkkeErFerdigstilt(any(), any()) } returns null
         every { oppgaveService.hentOppgave(any()) } returns Oppgave(id = 123, versjon = 0)
+        every {
+            brevmottakereService.harBrevmottakere(any())
+        } returns
+            true
 
         // TODO tilbakekreving
         // every { simuleringService.hentLagretSimuleringsoppsummering(any()) } returns simuleringsoppsummering
