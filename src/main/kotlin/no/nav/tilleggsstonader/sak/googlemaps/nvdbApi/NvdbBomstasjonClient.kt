@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.googlemaps.nvdbApi
 
-import no.nav.tilleggsstonader.libs.log.logger
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClient
@@ -13,32 +12,23 @@ class NvdbBomstasjonClient(
 ) {
     private val restClient =
         builder
-            .baseUrl("https://nvdbapiles.test.atlas.vegvesen.no/")
-            .defaultHeader("X-Client", "tilleggsstonader-sak")
+            .baseUrl(baseUrl)
+            .defaultHeader("X-Client", "nav-tilleggsstonader-sak")
             .build()
 
     fun hentAlleBomstasjoner(): List<NvdbBomstasjon> {
-        val alle = mutableListOf<NvdbBomstasjon>()
-        var startParam: String? = null
-        do {
-            val response = hentSide(startParam)
-            alle.addAll(response.objekter.mapNotNull { it.tilDomene() })
-            startParam = response.metadata.neste?.start
-        } while (startParam != null)
-        logger.info("Hentet totalt {} bomstasjoner fra NVDB", alle.size)
-        return alle
+        val response = nvdbKall()
+        return response.objekter.mapNotNull { it.tilDomene() }
     }
 
-    private fun hentSide(start: String?): NvdbBomstasjonResponse =
+    private fun nvdbKall(): NvdbBomstasjonResponse =
         restClient
             .get()
             .uri { builder ->
                 builder
                     .path("/vegobjekter/45")
-                    .queryParam("srid", "4326")
                     .queryParam("inkluder", "metadata,egenskaper,lokasjon")
-                    .queryParam("alle_versjoner", "false")
-                    .apply { if (start != null) queryParam("start", start) }
+                    .queryParam("srid", "4326")
                     .build()
             }.retrieve()
             .body<NvdbBomstasjonResponse>()!!

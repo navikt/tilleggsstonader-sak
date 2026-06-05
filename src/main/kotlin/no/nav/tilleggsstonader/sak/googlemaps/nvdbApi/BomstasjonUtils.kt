@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.googlemaps
+package no.nav.tilleggsstonader.sak.googlemaps.nvdbApi
 
 import kotlin.math.asin
 import kotlin.math.cos
@@ -6,7 +6,10 @@ import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-data class GeoPoint(val lat: Double, val lng: Double)
+data class GeoPoint(
+    val lat: Double,
+    val lng: Double,
+)
 
 fun String.decodePolyline(): List<GeoPoint> {
     val punkter = mutableListOf<GeoPoint>()
@@ -38,7 +41,7 @@ fun String.decodePolyline(): List<GeoPoint> {
     return punkter
 }
 
-fun haversineDistanseMeter(
+fun finnBomstasjonPåRute(
     lat1: Double,
     lon1: Double,
     lat2: Double,

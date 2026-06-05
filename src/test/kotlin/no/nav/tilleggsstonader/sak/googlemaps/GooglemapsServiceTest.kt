@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.googlemaps.dto.OperatørDto
 import no.nav.tilleggsstonader.sak.googlemaps.dto.ReisedataDto
 import no.nav.tilleggsstonader.sak.googlemaps.dto.RuteDto
 import no.nav.tilleggsstonader.sak.googlemaps.dto.StrekningDto
+import no.nav.tilleggsstonader.sak.googlemaps.nvdbApi.BomstasjonService
 import no.nav.tilleggsstonader.sak.googlemaps.placeDetailsApi.GooglePlaceDetailsClient
 import no.nav.tilleggsstonader.sak.googlemaps.placeDetailsApi.PlaceDetailsResponse
 import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Address
@@ -61,7 +62,7 @@ class GooglemapsServiceTest {
         val ruteJson = FileUtil.readFile("no/nav/tilleggsstonader/sak/googlemaps/kjørerute_response.json")
         val ruteResponse = jsonMapper.readValue<RuteResponse>(ruteJson)
         every { googleRoutesClient.hentRuter(any()) } returns ruteResponse
-        every { bomstasjonService.harBomvei(any()) } returns true
+        every { bomstasjonService.harBomstasjonPåRute(any()) } returns true
 
         val forventet =
             ReisedataDto(
@@ -71,17 +72,29 @@ class GooglemapsServiceTest {
                             Polyline(
                                 encodedPolyline =
                                     "{bm}Jukxl@o@jAwA^]M_AMoBs@kAg@sAyBQSYz@?PH\\rBtDLx@b@" +
-                                            "v@h@ZUz@Yx@eBuBUr@MFYKIIi@{@{DcHi@gA[gAg@_DS_AACMQ}AuBaA}@[KE?[?_@RUXiErKgGpO}HzRm" +
-                                            "Vxm@gYps@kn@v}AUhAGp@CpCAvB?rE@fBFtMB~CAtCA~BMnD[tEK`AQxA]zBWt@]b@A@OLUF",
+                                        "v@h@ZUz@Yx@eBuBUr@MFYKIIi@{@{DcHi@gA[gAg@_DS_AACMQ}AuBaA}@[KE?[?_@RUXiErKgGpO}HzRm" +
+                                        "Vxm@gYps@kn@v}AUhAGp@CpCAvB?rE@fBFtMB~CAtCA~BMnD[tEK`AQxA]zBWt@]b@A@OLUF",
                             ),
                         avstandMeter = 4693,
                         avstandUtenFerje = 1485,
                         varighetSekunder = 2407.0,
                         strekninger =
                             listOf(
-                                StrekningDto(varighetSekunder = 243.0, reisetype = Reisetype.DRIVE, kollektivDetaljer = null),
-                                StrekningDto(varighetSekunder = 2088.0, reisetype = Reisetype.DRIVE, kollektivDetaljer = null),
-                                StrekningDto(varighetSekunder = 76.0, reisetype = Reisetype.DRIVE, kollektivDetaljer = null),
+                                StrekningDto(
+                                    varighetSekunder = 243.0,
+                                    reisetype = Reisetype.DRIVE,
+                                    kollektivDetaljer = null,
+                                ),
+                                StrekningDto(
+                                    varighetSekunder = 2088.0,
+                                    reisetype = Reisetype.DRIVE,
+                                    kollektivDetaljer = null,
+                                ),
+                                StrekningDto(
+                                    varighetSekunder = 76.0,
+                                    reisetype = Reisetype.DRIVE,
+                                    kollektivDetaljer = null,
+                                ),
                             ),
                         startLokasjon = LokasjonDto(lat = 62.659176200000005, lng = 7.502830500000001),
                         sluttLokasjon = LokasjonDto(lat = 62.6857511, lng = 7.454786800000001),
@@ -101,7 +114,7 @@ class GooglemapsServiceTest {
         val ruteJson = FileUtil.readFile("no/nav/tilleggsstonader/sak/googlemaps/kollektivrute_response.json")
         val ruteResponse = jsonMapper.readValue<RuteResponse>(ruteJson)
         every { googleRoutesClient.hentRuter(any()) } returns ruteResponse
-        every { bomstasjonService.harBomvei(any()) } returns false
+        every { bomstasjonService.harBomstasjonPåRute(any()) } returns false
 
         val forventet =
             ReisedataDto(
@@ -119,7 +132,11 @@ class GooglemapsServiceTest {
                         varighetSekunder = 2067.0,
                         strekninger =
                             listOf(
-                                StrekningDto(varighetSekunder = 631.0, reisetype = Reisetype.WALK, kollektivDetaljer = null),
+                                StrekningDto(
+                                    varighetSekunder = 631.0,
+                                    reisetype = Reisetype.WALK,
+                                    kollektivDetaljer = null,
+                                ),
                                 StrekningDto(
                                     varighetSekunder = 900.0,
                                     reisetype = Reisetype.TRANSIT,
@@ -138,7 +155,11 @@ class GooglemapsServiceTest {
                                                 ),
                                         ),
                                 ),
-                                StrekningDto(varighetSekunder = 534.0, reisetype = Reisetype.WALK, kollektivDetaljer = null),
+                                StrekningDto(
+                                    varighetSekunder = 534.0,
+                                    reisetype = Reisetype.WALK,
+                                    kollektivDetaljer = null,
+                                ),
                             ),
                         startLokasjon = LokasjonDto(lat = 62.659176200000005, lng = 7.502830500000001),
                         sluttLokasjon = LokasjonDto(lat = 62.685745999999995, lng = 7.454721900000001),

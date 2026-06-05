@@ -81,7 +81,7 @@ fun Route.tilDomene(
         sluttLokasjon = finnSluttLokasjon(),
         startLokasjonId = startLokasjonId,
         sluttLokasjonId = sluttLokasjonId,
-        harBomvei = this.tilDomene(startLokasjonId, sluttLokasjonId).harBomvei,
+        harBomvei = false,
     )
 
 fun List<Leg>.tilDomene(): List<Strekning> {
@@ -141,10 +141,10 @@ private fun List<Step>.mergeSammenhengende(): List<Step> =
         val last = acc.lastOrNull()
         val skalMerges =
             last != null &&
-                    last.travelMode == entry.travelMode &&
-                    last.transitDetails == entry.transitDetails &&
-                    last.navigationInstruction?.maneuver != Maneuver.FERRY &&
-                    entry.navigationInstruction?.maneuver != Maneuver.FERRY
+                last.travelMode == entry.travelMode &&
+                last.transitDetails == entry.transitDetails &&
+                last.navigationInstruction?.maneuver != Maneuver.FERRY &&
+                entry.navigationInstruction?.maneuver != Maneuver.FERRY
         if (skalMerges) {
             acc.removeLast()
             acc.add(

@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.googlemaps
 
 import no.nav.tilleggsstonader.sak.googlemaps.dto.ReisedataDto
+import no.nav.tilleggsstonader.sak.googlemaps.nvdbApi.BomstasjonService
 import no.nav.tilleggsstonader.sak.googlemaps.placeDetailsApi.GooglePlaceDetailsClient
 import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Address
 import no.nav.tilleggsstonader.sak.googlemaps.routesApi.GoogleRoutesClient
@@ -41,7 +42,7 @@ class GooglemapsService(
 
         val startOgSluttAdresse = finnStartOgSluttAdresse(kortesteRute)
         val avstandUtenFerje = kortesteRute.avstandMeter - kortesteRute.finnFerjeavstand()
-        val harBomvei = bomstasjonService.harBomvei(kortesteRute.polyline.encodedPolyline)
+        val harBomvei = bomstasjonService.harBomstasjonPåRute(kortesteRute.polyline.encodedPolyline)
 
         return ReisedataDto(
             rute = kortesteRute.copy(harBomvei = harBomvei),
