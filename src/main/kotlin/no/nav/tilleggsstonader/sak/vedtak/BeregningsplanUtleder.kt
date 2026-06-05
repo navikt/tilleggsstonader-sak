@@ -1,10 +1,10 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
+import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class BeregningsplanUtleder(
@@ -35,6 +35,10 @@ class BeregningsplanUtleder(
         fun utledForOpphørEllerSatsjustering(
             opphørsdato: LocalDate,
             stønadsspesifikkJusteringAvBeregnFra: (LocalDate) -> LocalDate = { it },
-        ): Beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, stønadsspesifikkJusteringAvBeregnFra(opphørsdato))
+        ): Beregningsplan = Beregningsplan(
+            omfang = Beregningsomfang.FRA_DATO,
+            fraDato = stønadsspesifikkJusteringAvBeregnFra(opphørsdato),
+            tidligsteEndring = opphørsdato
+        )
     }
 }
