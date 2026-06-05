@@ -84,6 +84,15 @@ class DagligReiseBeregningService(
             rammevedtakPrivatBil = rammevedtakPrivatBil,
         )
     }
+
+    companion object {
+        /**
+         * Returnerer en lambda som justerer beregnFra 29 dager bakover.
+         * Offentlig transport beregnes i 30-dagersperioder, og uten justeringen risikerer vi at bruker
+         * får for mye penger dersom tidligste endring treffer midt i en periode. Se TS-Docs for eksempler.
+         */
+        fun justerBeregnFra(): (java.time.LocalDate) -> java.time.LocalDate = { it.minusDays(29) }
+    }
 }
 
 private fun validerFinnesReiser(vilkår: List<VilkårDagligReise>) {
@@ -96,3 +105,5 @@ data class BeregningDagligReise(
     val beregningsresultatDagligReise: BeregningsresultatDagligReise,
     val rammevedtakPrivatBil: RammevedtakPrivatBil?,
 )
+
+// NOTE: Added by edit -- will be formatted by spotless

@@ -1,32 +1,32 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EnumSource
 
 class BeregningsplanUtlederTest {
-    @ParameterizedTest
-    @EnumSource(value = Stønadstype::class, names = ["DAGLIG_REISE_TSO", "DAGLIG_REISE_TSR"])
-    fun `fraDato skal forskyves 29 dager tilbake for daglig reise`(stønadstype: Stønadstype) {
+    @Test
+    fun `fraDato skal forskyves 29 dager tilbake for daglig reise`() {
         val opphørsdato = 30 januar 2026
 
-        val beregningsplan = BeregningsplanUtleder.utledForOpphørEllerSatsjustering(stønadstype, opphørsdato)
+        val beregningsplan =
+            BeregningsplanUtleder.utledForOpphørEllerSatsjustering(
+                opphørsdato = opphørsdato,
+                stønadsspesifikkJusteringAvBeregnFra = DagligReiseBeregningService.justerBeregnFra(),
+            )
 
         assertThat(beregningsplan.omfang).isEqualTo(Beregningsomfang.FRA_DATO)
         assertThat(beregningsplan.fraDato).isEqualTo(1 januar 2026)
     }
 
-    @ParameterizedTest
-    @EnumSource(value = Stønadstype::class, names = ["DAGLIG_REISE_TSO", "DAGLIG_REISE_TSR"], mode = EnumSource.Mode.EXCLUDE)
-    fun `fraDato skal være uendret for øvrige stønadstyper`(stønadstype: Stønadstype) {
+    @Test
+    fun `fraDato skal være uendret når ingen justeringslambda er satt`() {
         val opphørsdato = 30 januar 2026
 
-        val beregningsplan = BeregningsplanUtleder.utledForOpphørEllerSatsjustering(stønadstype, opphørsdato)
+        val beregningsplan = BeregningsplanUtleder.utledForOpphørEllerSatsjustering(opphørsdato)
 
         assertThat(beregningsplan.omfang).isEqualTo(Beregningsomfang.FRA_DATO)
         assertThat(beregningsplan.fraDato).isEqualTo(30 januar 2026)
@@ -37,7 +37,10 @@ class BeregningsplanUtlederTest {
         val opphørsdato = 15 mars 2026
 
         val beregningsplan =
-            BeregningsplanUtleder.utledForOpphørEllerSatsjustering(Stønadstype.DAGLIG_REISE_TSO, opphørsdato)
+            BeregningsplanUtleder.utledForOpphørEllerSatsjustering(
+                opphørsdato = opphørsdato,
+                stønadsspesifikkJusteringAvBeregnFra = DagligReiseBeregningService.justerBeregnFra(),
+            )
 
         assertThat(beregningsplan.fraDato).isEqualTo(14 februar 2026)
     }

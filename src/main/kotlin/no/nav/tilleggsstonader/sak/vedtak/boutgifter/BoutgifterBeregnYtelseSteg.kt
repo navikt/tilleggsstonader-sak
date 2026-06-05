@@ -58,7 +58,6 @@ class BoutgifterBeregnYtelseSteg(
         val forrigeVedtak = saksbehandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it).data }
         val beregningsplan =
             BeregningsplanUtleder.utledForOpphørEllerSatsjustering(
-                stønadstype = saksbehandling.stønadstype,
                 opphørsdato = satsjusteringFra,
                 stønadsspesifikkJusteringAvBeregnFra = BoutgifterBeregningService.justerBeregnFra(forrigeVedtak),
             )
@@ -144,7 +143,6 @@ class BoutgifterBeregnYtelseSteg(
 
         val beregningsplan =
             BeregningsplanUtleder.utledForOpphørEllerSatsjustering(
-                stønadstype = saksbehandling.stønadstype,
                 opphørsdato = opphørsdato,
                 stønadsspesifikkJusteringAvBeregnFra = BoutgifterBeregningService.justerBeregnFra(forrigeVedtak.data),
             )

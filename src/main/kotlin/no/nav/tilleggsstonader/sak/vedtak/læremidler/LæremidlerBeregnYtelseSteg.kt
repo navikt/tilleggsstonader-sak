@@ -71,7 +71,7 @@ class LæremidlerBeregnYtelseSteg(
         logger.info("Lagrer vedtak for satsjustering for behandling=${saksbehandling.id}, satsjusteringFra=$satsjusteringFra")
 
         val innvilgelse = vedtak as InnvilgelseLæremidlerRequest
-        val plan = BeregningsplanUtleder.utledForOpphørEllerSatsjustering(saksbehandling.stønadstype, satsjusteringFra)
+        val plan = BeregningsplanUtleder.utledForOpphørEllerSatsjustering(satsjusteringFra)
         lagreInnvilgetVedtak(
             saksbehandling = saksbehandling,
             vedtaksperioder = innvilgelse.vedtaksperioder.tilDomene(),
@@ -149,7 +149,7 @@ class LæremidlerBeregnYtelseSteg(
         )
 
         val avkortetVedtaksperioder = avkortVedtaksperiodeVedOpphør(forrigeVedtak, opphørsdato)
-        val beregningsplan = BeregningsplanUtleder.utledForOpphørEllerSatsjustering(saksbehandling.stønadstype, opphørsdato)
+        val beregningsplan = BeregningsplanUtleder.utledForOpphørEllerSatsjustering(opphørsdato)
         val beregningsresultat = beregningService.beregnForOpphør(saksbehandling, avkortetVedtaksperioder, opphørsdato)
 
         vedtakRepository.insert(
