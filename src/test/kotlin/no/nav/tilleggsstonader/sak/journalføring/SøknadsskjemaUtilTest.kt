@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil
 import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil
+import no.nav.tilleggsstonader.sak.util.SøknadReiseTilSamlingUtil
 import no.nav.tilleggsstonader.sak.util.SøknadUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -101,6 +102,21 @@ class SøknadsskjemaUtilTest {
                     mottattTidspunkt = LocalDateTime.now(),
                 )
             }.hasMessageContaining("Unrecognized property \"ukjentFelt\"")
+        }
+    }
+
+    @Nested
+    inner class ParsingReiseTilSamling {
+        @Test
+        fun `Skal kunne parse søknad av type REISE_TIL_SAMLING_TSO`() {
+            val skjema = SøknadReiseTilSamlingUtil.søknadReiseTilSamling()
+            val parsetSkjema =
+                SøknadsskjemaUtil.parseSøknadsskjema(
+                    Stønadstype.REISE_TIL_SAMLING_TSO,
+                    data = jsonMapper.writeValueAsBytes(skjema),
+                    mottattTidspunkt = LocalDateTime.now(),
+                )
+            assertThat(parsetSkjema).isEqualTo(skjema)
         }
     }
 }

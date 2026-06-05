@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaReiseTilSamling
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.OppholdUtenforNorge
 import tools.jackson.core.JsonParser
 import tools.jackson.databind.DeserializationContext
@@ -38,7 +39,7 @@ object SøknadsskjemaUtil {
             Stønadstype.BOUTGIFTER -> håndterBoutgifter(data, mottattTidspunkt)
             Stønadstype.DAGLIG_REISE_TSO -> håndterDagligReise(data, mottattTidspunkt)
             Stønadstype.DAGLIG_REISE_TSR -> håndterDagligReise(data, mottattTidspunkt)
-            Stønadstype.REISE_TIL_SAMLING_TSO -> TODO()
+            Stønadstype.REISE_TIL_SAMLING_TSO -> jsonMapper.readValue<InnsendtSkjema<SøknadsskjemaReiseTilSamling>>(data)
         }
 
     private fun håndterBoutgifter(
