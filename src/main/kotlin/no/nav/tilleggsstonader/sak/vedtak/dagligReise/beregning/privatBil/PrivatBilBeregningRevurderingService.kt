@@ -24,7 +24,7 @@ class PrivatBilBeregningRevurderingService(
             "Opphørsdato må være satt for å kunne opphøre"
         }
 
-        val avkortedeReiser = forrigeRammevedtak.reiser.mapNotNull { it.avkortTilDato(opphørsdato.minusDays(1)) }
+        val avkortedeReiser = forrigeRammevedtak.reiser.mapNotNull { it.avkortEtterDato(opphørsdato.minusDays(1)) }
 
         if (avkortedeReiser.isEmpty()) return null
 

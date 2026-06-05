@@ -21,21 +21,21 @@ class RammevedtakPrivatBilAvkortingTest {
         fun `reise som slutter før opphørsDato returneres uendret`() {
             val reise = rammeForReiseMedPrivatBil(fom = uke1Fom, tom = uke1Tom)
 
-            assertThat(reise.avkortTilDato(uke2Fom.minusDays(1))).isEqualTo(reise)
+            assertThat(reise.avkortEtterDato(uke2Fom.minusDays(1))).isEqualTo(reise)
         }
 
         @Test
         fun `reise som starter på opphørsDato fjernes`() {
             val reise = rammeForReiseMedPrivatBil(fom = uke2Fom, tom = uke2Tom)
 
-            assertThat(reise.avkortTilDato(uke2Fom.minusDays(1))).isNull()
+            assertThat(reise.avkortEtterDato(uke2Fom.minusDays(1))).isNull()
         }
 
         @Test
         fun `reise som starter etter opphørsDato fjernes`() {
             val reise = rammeForReiseMedPrivatBil(fom = uke3Fom, tom = uke3Tom)
 
-            assertThat(reise.avkortTilDato(uke2Fom.minusDays(1))).isNull()
+            assertThat(reise.avkortEtterDato(uke2Fom.minusDays(1))).isNull()
         }
 
         @Test
@@ -43,7 +43,7 @@ class RammevedtakPrivatBilAvkortingTest {
             val reise = rammeForReiseMedPrivatBil(fom = uke1Fom, tom = uke1Tom)
             val opphørsDato = 10 januar 2025 // onsdag i uke 1
 
-            val resultat = reise.avkortTilDato(opphørsDato.minusDays(1))
+            val resultat = reise.avkortEtterDato(opphørsDato.minusDays(1))
 
             assertThat(resultat).isNotNull
             assertThat(resultat!!.grunnlag.fom).isEqualTo(uke1Fom)
@@ -59,7 +59,7 @@ class RammevedtakPrivatBilAvkortingTest {
         fun `opphørsDato på start av uke2 beholder kun uke1`() {
             val reise = reiseMed3Uker()
 
-            val resultat = reise.avkortTilDato(uke2Fom.minusDays(1))
+            val resultat = reise.avkortEtterDato(uke2Fom.minusDays(1))
 
             assertThat(resultat).isNotNull
             assertThat(resultat!!.grunnlag.fom).isEqualTo(uke1Fom)
@@ -72,7 +72,7 @@ class RammevedtakPrivatBilAvkortingTest {
             val reise = reiseMed3Uker()
             val opphørsDato = 15 januar 2025 // onsdag i uke 2
 
-            val resultat = reise.avkortTilDato(opphørsDato.minusDays(1))
+            val resultat = reise.avkortEtterDato(opphørsDato.minusDays(1))
 
             assertThat(resultat).isNotNull
             assertThat(resultat!!.grunnlag.fom).isEqualTo(uke1Fom)
@@ -102,7 +102,7 @@ class RammevedtakPrivatBilAvkortingTest {
                 )
             val opphørsDato = 17 januar 2025 // torsdag i uke 2
 
-            val resultat = reise.avkortTilDato(opphørsDato.minusDays(1))
+            val resultat = reise.avkortEtterDato(opphørsDato.minusDays(1))
 
             assertThat(resultat).isNotNull
             val avkortetDelperiode = resultat!!.grunnlag.delperioder.single()
@@ -123,7 +123,7 @@ class RammevedtakPrivatBilAvkortingTest {
                 )
             val opphørsDato = 15 januar 2025
 
-            val resultat = reise.avkortTilDato(opphørsDato.minusDays(1))
+            val resultat = reise.avkortEtterDato(opphørsDato.minusDays(1))
 
             assertThat(resultat).isNotNull
             val avkortetDelperiode = resultat!!.grunnlag.delperioder.single()
