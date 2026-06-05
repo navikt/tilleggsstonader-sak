@@ -7,11 +7,11 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 class BrevmottakereKall(
     private val testklient: Testklient,
 ) {
-    fun hent(behandlingId: BehandlingId) = apiRespons.hentBrevmottakere(behandlingId).expectOkWithBody<BrevmottakereDto>()
+    fun hent(behandlingId: BehandlingId) = apiRespons.hent(behandlingId).expectOkWithBody<BrevmottakereDto>()
 
     val apiRespons = BrevmottakereApi()
 
     inner class BrevmottakereApi {
-        fun hentBrevmottakere(behandlingId: BehandlingId) = testklient.get("/api/brevmottakere/$behandlingId")
+        fun hent(behandlingId: BehandlingId) = testklient.get("/api/brevmottakere/$behandlingId")
     }
 }
