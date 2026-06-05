@@ -58,10 +58,13 @@ data class RammeForReiseMedPrivatBilBeregningsgrunnlag(
     fun vedtaksperiodeForPeriode(periode: Periode<LocalDate>) = vedtaksperioder.single { it.inneholder(periode) }
 
     fun avkortEtterDato(maksTom: LocalDate): RammeForReiseMedPrivatBilBeregningsgrunnlag? {
-        val avkortetPeriode = this.avkortFraOgMed(maksTom) ?: return null
+        if (maksTom < fom) return null
+        if (tom <= maksTom) return this
 
-        return avkortetPeriode.copy(
-            delperioder = delperioder.mapNotNull { it.avkortEtterDato(maksTom) },
+        val avkortedeDelperioder = delperioder.mapNotNull { it.avkortEtterDato(maksTom) }
+        return copy(
+            tom = maksTom,
+            delperioder = avkortedeDelperioder,
             vedtaksperioder = vedtaksperioder.avkortFraOgMed(maksTom),
         )
     }
