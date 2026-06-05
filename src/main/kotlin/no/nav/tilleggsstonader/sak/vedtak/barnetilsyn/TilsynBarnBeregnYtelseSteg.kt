@@ -106,7 +106,7 @@ class TilsynBarnBeregnYtelseSteg(
 
         val vedtaksperioder = finnNyeVedtaksperioderForOpphør(saksbehandling, opphørsdato)
 
-        val beregningsplan = BeregningsplanUtleder.utledForOpphørEllerSatsjustering(saksbehandling.stønadstype, opphørsdato)
+        val beregningsplan = BeregningsplanUtleder.utledForOpphørEllerSatsjustering(opphørsdato)
 
         val beregningsresultat =
             beregningService.beregn(

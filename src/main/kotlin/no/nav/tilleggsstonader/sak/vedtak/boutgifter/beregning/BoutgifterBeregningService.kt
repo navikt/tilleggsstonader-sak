@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
@@ -92,7 +93,7 @@ class BoutgifterBeregningService(
 
         return if (forrigeVedtak != null) {
             settSammenGamleOgNyePerioder(
-                beregnFra = requireNotNull(plan.beregnFra()),
+                beregnFra = plan.beregnFra() ?: feil("Kan ikke sette sammen nye og gamle perioder uten beregnFra"),
                 nyttBeregningsresultat = beregningsresultat,
                 forrigeBeregningsresultat = forrigeVedtak.beregningsresultat,
             )
@@ -115,8 +116,13 @@ class BoutgifterBeregningService(
             .validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(
                 utgifter = utgifter,
                 finnMakssats = satsBoutgifterService::finnMakssats,
-            ).map { lagBeregningsgrunnlag(periode = it, utgifter = utgifter, makssats = satsBoutgifterService.finnMakssats(it.fom)) }
-            .validerIkkeUlikeKombinasjonerAvSvarPåFaktiskeUtgifter()
+            ).map {
+                lagBeregningsgrunnlag(
+                    periode = it,
+                    utgifter = utgifter,
+                    makssats = satsBoutgifterService.finnMakssats(it.fom),
+                )
+            }.validerIkkeUlikeKombinasjonerAvSvarPåFaktiskeUtgifter()
             .map {
                 BeregningsresultatForLøpendeMåned(
                     grunnlag = it,
@@ -145,9 +151,8 @@ class BoutgifterBeregningService(
 
         val reberegnedePerioder =
             nyttBeregningsresultat
-                .filter {
-                    it.fom.sisteDagenILøpendeMåned() >= beregnFra
-                }.markerSomDelAvTidligereUtbetaling(forrigeBeregningsresultat.perioder)
+                .filter { it.fom >= beregnFra }
+                .markerSomDelAvTidligereUtbetaling(forrigeBeregningsresultat.perioder)
         return BeregningsresultatBoutgifter(perioderFraForrigeVedtakSomSkalBeholdes + reberegnedePerioder)
     }
 
@@ -158,6 +163,23 @@ class BoutgifterBeregningService(
         vedtakRepository
             .findByIdOrThrow(behandlingId)
             .withTypeOrThrow<InnvilgelseEllerOpphørBoutgifter>()
+
+    companion object {
+        /**
+         * Returnerer en lambda som justerer beregnFra til starten av den løpende måneden i forrige beregningsresultat
+         * som inkluderer beregnFra-datoen. Uten justeringen kan en beregnFra på en dato midt i en løpende måned
+         * skape en kortere periode enn forventet, som videre kan føre til dobbelt beregnede perioder ved opphør og satsjustering.
+         */
+        fun justerBeregnFra(forrigeVedtak: InnvilgelseEllerOpphørBoutgifter?): (LocalDate) -> LocalDate =
+            { beregnFra ->
+                forrigeVedtak
+                    ?.beregningsresultat
+                    ?.perioder
+                    ?.firstOrNull { it.grunnlag.inneholder(beregnFra) }
+                    ?.grunnlag
+                    ?.fom ?: beregnFra
+            }
+    }
 }
 
 private fun BoutgifterPerUtgiftstype.filtrerBortUtgifterSomIkkeOverlapperVedtaksperioder(

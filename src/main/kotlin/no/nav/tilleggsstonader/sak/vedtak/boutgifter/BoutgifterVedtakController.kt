@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRe
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.VedtakBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
@@ -88,7 +89,15 @@ class BoutgifterVedtakController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         val vedtaksperioder = vedtak.vedtaksperioder.tilDomene()
-        val plan = beregningsplanUtleder.utledForInnvilgelse(behandling, vedtaksperioder)
+        val forrigeVedtak: InnvilgelseEllerOpphørBoutgifter? =
+            behandling.forrigeIverksatteBehandlingId
+                ?.let { vedtakService.hentVedtak(it)?.data as? InnvilgelseEllerOpphørBoutgifter }
+        val plan =
+            beregningsplanUtleder.utledForInnvilgelse(
+                saksbehandling = behandling,
+                vedtaksperioder = vedtaksperioder,
+                stønadsspesifikkJusteringAvBeregnFra = BoutgifterBeregningService.justerBeregnFra(forrigeVedtak),
+            )
         return beregningService
             .beregn(
                 behandling = behandling,
