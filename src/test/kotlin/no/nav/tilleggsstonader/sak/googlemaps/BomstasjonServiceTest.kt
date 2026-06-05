@@ -24,7 +24,7 @@ class BomstasjonServiceTest {
     @Test
     fun `harBomvei returnerer true når bomstasjon er nær starten av ruten`() {
         // Plassert ~4m fra startpunktet (59.9230926, 10.755531)
-        oppdaterMed(NvdbBomstasjon(id = 1L, lat = 59.9231, lng = 10.7555, navn = null))
+        oppdaterMed(NvdbBomstasjon(id = 1L, lat = 59.9231, lng = 10.7555, navn = null, takstLitenBil = null, takstLitenBilRush = null))
 
         assertThat(bomstasjonService.harBomstasjonPåRute(osloPolyline)).isTrue()
     }
@@ -32,7 +32,7 @@ class BomstasjonServiceTest {
     @Test
     fun `harBomvei returnerer false når bomstasjon er langt fra ruten`() {
         // Bergen — hundrevis av km unna
-        oppdaterMed(NvdbBomstasjon(id = 2L, lat = 60.418, lng = 5.313, navn = null))
+        oppdaterMed(NvdbBomstasjon(id = 2L, lat = 60.418, lng = 5.313, navn = null, takstLitenBil = null, takstLitenBilRush = null))
 
         assertThat(bomstasjonService.harBomstasjonPåRute(osloPolyline)).isFalse()
     }

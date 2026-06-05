@@ -25,7 +25,9 @@ class BomstasjonService(
         if (treffStasjoner.isNotEmpty()) {
             println("${treffStasjoner.size} bomstasjon(er) funnet på ruten:")
             treffStasjoner.forEach { stasjon ->
-                println("  - id=${stasjon.id}, navn=${stasjon.navn}, lat=${stasjon.lat}, lng=${stasjon.lng}")
+                println(
+                    "  - id=${stasjon.id}, navn=${stasjon.navn}, lat=${stasjon.lat}, lng=${stasjon.lng}, takstLitenBil=${stasjon.takstLitenBil}, takstLitenBilRush=${stasjon.takstLitenBilRush}",
+                )
             }
         } else {
             println("Ingen bomstasjon funnet på ruten")
