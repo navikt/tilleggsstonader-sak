@@ -3,16 +3,19 @@ package no.nav.tilleggsstonader.sak.hendelser.journalføring
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
+import no.nav.tilleggsstonader.libs.log.logger
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterMottattKjørelisteService
 import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterSøknadService
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.journalføring.brevkoder
 import no.nav.tilleggsstonader.sak.journalføring.dokumentBrevkode
 import no.nav.tilleggsstonader.sak.journalføring.erInnkommende
 import no.nav.tilleggsstonader.sak.journalføring.gjelderKanalSkanningEllerNavNo
 import no.nav.tilleggsstonader.sak.journalføring.gjelderKjøreliste
+import no.nav.tilleggsstonader.sak.journalføring.gjelderReiseTilSamlingNyttSkjema
 import no.nav.tilleggsstonader.sak.journalføring.gjelderSøknad
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 /**
@@ -25,9 +28,8 @@ class JournalhendelseKafkaHåndtererService(
     private val håndterSøknadService: HåndterSøknadService,
     private val journalpostMottattMetrikker: JournalpostMottattMetrikker,
     private val håndterMottattKjørelisteService: HåndterMottattKjørelisteService,
+    private val unleashService: UnleashService,
 ) {
-    private val logger = LoggerFactory.getLogger(javaClass)
-
     fun behandleJournalhendelse(journalpostId: String) {
         val journalpost = journalpostService.hentJournalpost(journalpostId)
 
@@ -55,12 +57,17 @@ class JournalhendelseKafkaHåndtererService(
         }
     }
 
-    private fun Journalpost.kanBehandles() =
-        Tema.gjelderTemaTilleggsstønader(this.tema) &&
+    private fun Journalpost.kanBehandles(): Boolean {
+        if (this.gjelderReiseTilSamlingNyttSkjema()) {
+            return unleashService.isEnabled(Toggle.TA_I_MOT_JOURNALFØRINGER_REISE_TIL_SAMLING)
+        }
+
+        return Tema.gjelderTemaTilleggsstønader(this.tema) &&
             this.erInnkommende() &&
             this.gjelderKanalSkanningEllerNavNo() &&
             (this.gjelderSøknad() || this.gjelderKjøreliste()) &&
             !this.erFerdigstilt()
+    }
 
     /*
      Kan komme inn ferdigstilte journalposter om man har endret sakstilknytning på et allerede journalført dokument.

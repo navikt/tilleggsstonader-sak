@@ -19,6 +19,8 @@ fun Journalpost.gjelderSøknad() =
             DokumentBrevkode.REISE_TIL_SAMLING,
         )
 
+fun Journalpost.gjelderReiseTilSamlingNyttSkjema() = dokumentBrevkode() == DokumentBrevkode.REISE_TIL_SAMLING
+
 fun Journalpost.gjelderKjøreliste() = this.dokumentBrevkode() == DokumentBrevkode.DAGLIG_REISE_KJØRELISTE
 
 /**
