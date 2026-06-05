@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -45,10 +44,7 @@ class DagligReiseBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         kanBehandlePrivatBil: Boolean,
     ): StegType {
-        if (
-            dagligReiseVedtakService.harRammevedtakForPrivatBil(saksbehandling.id) &&
-            saksbehandling.type == BehandlingType.REVURDERING
-        ) {
+        if (dagligReiseVedtakService.forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(saksbehandling.forrigeIverksatteBehandlingId)) {
             return StegType.KJØRELISTE
         }
 
@@ -81,7 +77,7 @@ class DagligReiseBeregnYtelseSteg(
         val vedtaksperioder = vedtak.vedtaksperioder()
         val plan = beregningsplanUtleder.utledForInnvilgelse(saksbehandling, vedtaksperioder)
         val (beregningsresultat, rammevedtakPrivatBil) =
-            beregningService.beregn(
+            beregningService.beregnOffentligTransportOgRammevedtak(
                 vedtaksperioder = vedtaksperioder,
                 behandling = saksbehandling,
                 beregningsplan = plan,
@@ -122,13 +118,15 @@ class DagligReiseBeregnYtelseSteg(
         val avkortetVedtaksperioder = dagligReiseVedtakService.avkortVedtaksperiodeVedOpphør(forrigeVedtak, opphørsdato)
 
         val beregningsplan = BeregningsplanUtleder.utledForOpphørEllerSatsjustering(saksbehandling.stønadstype, opphørsdato)
+
         val (beregningsresultat, rammevedtakPrivatBil) =
-            beregningService.beregn(
+            beregningService.beregnOffentligTransportOgRammevedtak(
                 vedtaksperioder = avkortetVedtaksperioder,
                 behandling = saksbehandling,
                 beregningsplan = beregningsplan,
                 typeVedtak = TypeVedtak.OPPHØR,
             )
+
         opphørValideringService.validerIngenUtbetalingEtterOpphørsdatoDagligReise(
             beregningsresultat,
             opphørsdato,

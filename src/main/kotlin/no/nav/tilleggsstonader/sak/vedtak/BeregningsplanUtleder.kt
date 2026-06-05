@@ -36,7 +36,8 @@ class BeregningsplanUtleder(
         fun utledForOpphørEllerSatsjustering(
             stønadstype: Stønadstype,
             opphørsdato: LocalDate,
-        ): Beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, finnBeregnFraDato(stønadstype, opphørsdato))
+        ): Beregningsplan =
+            Beregningsplan(Beregningsomfang.FRA_DATO, finnBeregnFraDato(stønadstype, opphørsdato), tidligsteEndring = opphørsdato)
 
         private fun finnBeregnFraDato(
             stønadstype: Stønadstype,

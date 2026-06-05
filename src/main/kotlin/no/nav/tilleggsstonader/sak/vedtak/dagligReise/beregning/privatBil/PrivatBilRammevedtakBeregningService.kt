@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
@@ -46,9 +47,36 @@ class PrivatBilRammevedtakBeregningService(
         behandlingId: BehandlingId,
         typeVedtak: TypeVedtak,
         forrigeRammevedtakPrivatBil: RammevedtakPrivatBil? = null,
+        beregningsplan: Beregningsplan,
     ): RammevedtakPrivatBil? {
         if (!unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)) return null
 
+        if (forrigeRammevedtakPrivatBil != null && typeVedtak == TypeVedtak.OPPHØR) {
+            return privatBilBeregningRevurderingService.kuttEksisterendeRammevedtakForOpphør(
+                forrigeRammevedtak = forrigeRammevedtakPrivatBil,
+                opphørsdato = beregningsplan.tidligsteEndring,
+            )
+        }
+
+        val nyttRammevedtakPrivatBil =
+            beregnRammevedtak(
+                oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
+                behandlingId = behandlingId,
+                vedtaksperioder = vedtaksperioder,
+            )
+
+        brukerfeilHvis(forrigeRammevedtakPrivatBil != null) {
+            "Vi støtter foreløpig bare revurderinger av daglige reiser med bil hvor resultatet er opphør."
+        }
+
+        return nyttRammevedtakPrivatBil
+    }
+
+    private fun beregnRammevedtak(
+        oppfylteVilkårDagligReise: List<VilkårDagligReise>,
+        behandlingId: BehandlingId,
+        vedtaksperioder: List<Vedtaksperiode>,
+    ): RammevedtakPrivatBil? {
         val reiserMedBil =
             oppfylteVilkårDagligReise
                 .filter { it.fakta is FaktaPrivatBil }
@@ -61,18 +89,7 @@ class PrivatBilRammevedtakBeregningService(
 
         if (resultatForReiser.isEmpty()) return null
 
-        val nyttRammevedtakPrivatBil = RammevedtakPrivatBil(reiser = resultatForReiser)
-
-        if (forrigeRammevedtakPrivatBil != null) {
-            return privatBilBeregningRevurderingService.beregnRevurdering(
-                forrigeRammevedtak = forrigeRammevedtakPrivatBil,
-                nyttRammevedtak = nyttRammevedtakPrivatBil,
-                avkortetVedtaksperioder = vedtaksperioder,
-                typeVedtak = typeVedtak,
-            )
-        }
-
-        return nyttRammevedtakPrivatBil
+        return RammevedtakPrivatBil(reiser = resultatForReiser)
     }
 
     private fun List<VilkårDagligReise>.mapTilReiser(behandlingId: BehandlingId): List<ReiseMedPrivatBil> =
