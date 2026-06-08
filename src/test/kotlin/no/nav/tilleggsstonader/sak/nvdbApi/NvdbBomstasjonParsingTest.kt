@@ -1,12 +1,6 @@
 package no.nav.tilleggsstonader.sak.nvdbApi
 
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
-import no.nav.tilleggsstonader.sak.nvdbApi.NvdbBomstasjonResponse
-import no.nav.tilleggsstonader.sak.nvdbApi.NvdbEgenskaper
-import no.nav.tilleggsstonader.sak.nvdbApi.NvdbGeometri
-import no.nav.tilleggsstonader.sak.nvdbApi.NvdbLokasjon
-import no.nav.tilleggsstonader.sak.nvdbApi.NvdbObjekt
-import no.nav.tilleggsstonader.sak.nvdbApi.tilDomene
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -74,6 +68,33 @@ class NvdbBomstasjonParsingTest {
 
         val result = objekt.tilDomene()
         assertThat(result).isNull()
+    }
+
+    @Test
+    fun `tilDomene returnerer null når egenskaper er null`() {
+        val objekt =
+            NvdbObjekt(
+                id = 4L,
+                lokasjon = NvdbLokasjon(geometri = NvdbGeometri(wkt = "POINT (59.9231 10.7555)", srid = 4326)),
+                egenskaper = null,
+            )
+
+        assertThat(objekt.tilDomene()).isNull()
+    }
+
+    @Test
+    fun `tilDomene returnerer null for ugyldig WKT-format`() {
+        val objekt =
+            NvdbObjekt(
+                id = 7L,
+                lokasjon = NvdbLokasjon(geometri = NvdbGeometri(wkt = "UGYLDIG_WKT", srid = 4326)),
+                egenskaper =
+                    listOf(
+                        NvdbEgenskaper(id = 1, navn = "Navn bomstasjon", verdi = "Test", egenskapstype = "string"),
+                    ),
+            )
+
+        assertThat(objekt.tilDomene()).isNull()
     }
 
     @Test

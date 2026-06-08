@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.nvdbApi
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import no.nav.tilleggsstonader.sak.nvdbApi.BomstasjonService
 import no.nav.tilleggsstonader.sak.nvdbApi.NvdbBomstasjon
 import no.nav.tilleggsstonader.sak.nvdbApi.NvdbBomstasjonClient
@@ -27,6 +28,7 @@ class BomstasjonServiceTest {
         oppdaterMed(NvdbBomstasjon(id = 1L, lat = 59.9231, lng = 10.7555, navn = null, takstLitenBilRush = null))
 
         Assertions.assertThat(bomstasjonService.harBomstasjonPåRute(osloPolyline)).isTrue()
+        verify(exactly = 1) { nvdbBomstasjonClient.hentAlleBomstasjoner() }
     }
 
     @Test
@@ -35,6 +37,7 @@ class BomstasjonServiceTest {
         oppdaterMed(NvdbBomstasjon(id = 2L, lat = 60.418, lng = 5.313, navn = null, takstLitenBilRush = null))
 
         Assertions.assertThat(bomstasjonService.harBomstasjonPåRute(osloPolyline)).isFalse()
+        verify(exactly = 1) { nvdbBomstasjonClient.hentAlleBomstasjoner() }
     }
 
     @Test
@@ -42,10 +45,10 @@ class BomstasjonServiceTest {
         oppdaterMed()
 
         Assertions.assertThat(bomstasjonService.harBomstasjonPåRute(osloPolyline)).isFalse()
+        verify(exactly = 1) { nvdbBomstasjonClient.hentAlleBomstasjoner() }
     }
 
     private fun oppdaterMed(vararg stasjoner: NvdbBomstasjon) {
         every { nvdbBomstasjonClient.hentAlleBomstasjoner() } returns stasjoner.toList()
-        bomstasjonService.hentAlleBomstasjoner()
     }
 }
