@@ -9,7 +9,6 @@ import no.nav.tilleggsstonader.sak.googlemaps.dto.OperatørDto
 import no.nav.tilleggsstonader.sak.googlemaps.dto.ReisedataDto
 import no.nav.tilleggsstonader.sak.googlemaps.dto.RuteDto
 import no.nav.tilleggsstonader.sak.googlemaps.dto.StrekningDto
-import no.nav.tilleggsstonader.sak.googlemaps.nvdbApi.BomstasjonService
 import no.nav.tilleggsstonader.sak.googlemaps.placeDetailsApi.GooglePlaceDetailsClient
 import no.nav.tilleggsstonader.sak.googlemaps.placeDetailsApi.PlaceDetailsResponse
 import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Address
@@ -18,6 +17,7 @@ import no.nav.tilleggsstonader.sak.googlemaps.routesApi.LinjeType
 import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Polyline
 import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Reisetype
 import no.nav.tilleggsstonader.sak.googlemaps.routesApi.RuteResponse
+import no.nav.tilleggsstonader.sak.nvdbApi.BomstasjonService
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach

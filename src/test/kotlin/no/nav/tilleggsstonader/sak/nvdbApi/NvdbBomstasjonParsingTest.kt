@@ -1,6 +1,12 @@
-package no.nav.tilleggsstonader.sak.googlemaps.nvdbApi
+package no.nav.tilleggsstonader.sak.nvdbApi
 
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
+import no.nav.tilleggsstonader.sak.nvdbApi.NvdbBomstasjonResponse
+import no.nav.tilleggsstonader.sak.nvdbApi.NvdbEgenskaper
+import no.nav.tilleggsstonader.sak.nvdbApi.NvdbGeometri
+import no.nav.tilleggsstonader.sak.nvdbApi.NvdbLokasjon
+import no.nav.tilleggsstonader.sak.nvdbApi.NvdbObjekt
+import no.nav.tilleggsstonader.sak.nvdbApi.tilDomene
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

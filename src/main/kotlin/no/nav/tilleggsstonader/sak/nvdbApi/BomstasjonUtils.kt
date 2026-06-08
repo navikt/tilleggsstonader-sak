@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.googlemaps.nvdbApi
+package no.nav.tilleggsstonader.sak.nvdbApi
 
 import kotlin.math.asin
 import kotlin.math.cos
@@ -42,14 +42,14 @@ fun String.decodePolyline(): List<GeoPoint> {
 }
 
 fun finnBomstasjonPåRute(
-    lat1: Double,
-    lon1: Double,
-    lat2: Double,
-    lon2: Double,
+    punktLat: Double,
+    punktLng: Double,
+    stasjonLat: Double,
+    stasjonLng: Double,
 ): Double {
     val jordRadiusM = 6_371_000.0
-    val dLat = Math.toRadians(lat2 - lat1)
-    val dLon = Math.toRadians(lon2 - lon1)
-    val a = sin(dLat / 2).pow(2) + cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) * sin(dLon / 2).pow(2)
+    val dLat = Math.toRadians(stasjonLat - punktLat)
+    val dLon = Math.toRadians(stasjonLng - punktLng)
+    val a = sin(dLat / 2).pow(2) + cos(Math.toRadians(punktLat)) * cos(Math.toRadians(stasjonLat)) * sin(dLon / 2).pow(2)
     return jordRadiusM * 2 * asin(sqrt(a))
 }

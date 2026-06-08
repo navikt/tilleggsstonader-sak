@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.googlemaps.nvdbApi
+package no.nav.tilleggsstonader.sak.nvdbApi
 
 data class NvdbBomstasjonResponse(
     val objekter: List<NvdbObjekt>,
@@ -38,7 +38,6 @@ data class NvdbNeste(
 data class NvdbBomstasjon(
     val id: Long,
     val navn: String?,
-    val takstLitenBil: Double?,
     val takstLitenBilRush: Double?,
     val lat: Double,
     val lng: Double,
@@ -51,16 +50,23 @@ private fun List<NvdbEgenskaper>?.finnEgenskapVerdi(egenskapNavn: String): Strin
 fun NvdbObjekt.tilDomene(): NvdbBomstasjon? {
     val wkt = lokasjon?.geometri?.wkt ?: return null
     val match = WKT_REGEX.find(wkt) ?: return null
+    // Kan brukes på et senere tidspunkt til å vise hvilke bomstasjoner man passerer og prisene
     val navn = egenskaper?.finnEgenskapVerdi("Navn bomstasjon") ?: return null
-    val takstLitenBil = egenskaper.finnEgenskapVerdi("Takst liten bil")?.toDoubleOrNull()
     val takstLitenBilRush = egenskaper.finnEgenskapVerdi("Rushtidstakst liten bil")?.toDoubleOrNull()
     val (lat, lng) = match.destructured
     return NvdbBomstasjon(
         id = id,
         navn = navn,
-        takstLitenBil = takstLitenBil,
         takstLitenBilRush = takstLitenBilRush,
         lat = lat.toDouble(),
         lng = lng.toDouble(),
     )
 }
+/* Research på beregning av pris:
+    Praksis er 20% og alltid rushpriser
+    Gi alltid 20% med autosync - det er også standarden til bompengekalkulatoren
+
+    Diesel = takstLitenBilRush
+    Bensin = Diesel × 0,9048 (Litt usikker på denne - gir ikke alltid riktig)
+    Elbil = diesel / 2
+ */

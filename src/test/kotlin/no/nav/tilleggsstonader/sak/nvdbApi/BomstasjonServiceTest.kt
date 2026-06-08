@@ -1,11 +1,11 @@
-package no.nav.tilleggsstonader.sak.googlemaps
+package no.nav.tilleggsstonader.sak.nvdbApi
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilleggsstonader.sak.googlemaps.nvdbApi.BomstasjonService
-import no.nav.tilleggsstonader.sak.googlemaps.nvdbApi.NvdbBomstasjon
-import no.nav.tilleggsstonader.sak.googlemaps.nvdbApi.NvdbBomstasjonClient
-import org.assertj.core.api.Assertions.assertThat
+import no.nav.tilleggsstonader.sak.nvdbApi.BomstasjonService
+import no.nav.tilleggsstonader.sak.nvdbApi.NvdbBomstasjon
+import no.nav.tilleggsstonader.sak.nvdbApi.NvdbBomstasjonClient
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
 class BomstasjonServiceTest {
@@ -24,24 +24,24 @@ class BomstasjonServiceTest {
     @Test
     fun `harBomvei returnerer true når bomstasjon er nær starten av ruten`() {
         // Plassert ~4m fra startpunktet (59.9230926, 10.755531)
-        oppdaterMed(NvdbBomstasjon(id = 1L, lat = 59.9231, lng = 10.7555, navn = null, takstLitenBil = null, takstLitenBilRush = null))
+        oppdaterMed(NvdbBomstasjon(id = 1L, lat = 59.9231, lng = 10.7555, navn = null, takstLitenBilRush = null))
 
-        assertThat(bomstasjonService.harBomstasjonPåRute(osloPolyline)).isTrue()
+        Assertions.assertThat(bomstasjonService.harBomstasjonPåRute(osloPolyline)).isTrue()
     }
 
     @Test
     fun `harBomvei returnerer false når bomstasjon er langt fra ruten`() {
         // Bergen — hundrevis av km unna
-        oppdaterMed(NvdbBomstasjon(id = 2L, lat = 60.418, lng = 5.313, navn = null, takstLitenBil = null, takstLitenBilRush = null))
+        oppdaterMed(NvdbBomstasjon(id = 2L, lat = 60.418, lng = 5.313, navn = null, takstLitenBilRush = null))
 
-        assertThat(bomstasjonService.harBomstasjonPåRute(osloPolyline)).isFalse()
+        Assertions.assertThat(bomstasjonService.harBomstasjonPåRute(osloPolyline)).isFalse()
     }
 
     @Test
     fun `harBomvei returnerer false med tom bomstasjonsliste`() {
         oppdaterMed()
 
-        assertThat(bomstasjonService.harBomstasjonPåRute(osloPolyline)).isFalse()
+        Assertions.assertThat(bomstasjonService.harBomstasjonPåRute(osloPolyline)).isFalse()
     }
 
     private fun oppdaterMed(vararg stasjoner: NvdbBomstasjon) {
