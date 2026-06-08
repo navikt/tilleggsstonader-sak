@@ -35,7 +35,7 @@ private fun BeregningsresultatForReisePrivatBil.oppsummerReise(rammevedtakForRei
         reiseId = this.reiseId,
         reiseavstandEnVei = rammevedtakForReise.grunnlag.reiseavstandEnVei,
         aktivitetsadresse = rammevedtakForReise.aktivitetsadresse,
-        perioder = this.perioder.map { it.oppsummerPeriode(rammevedtakForReise) },
+        perioder = this.perioder.map { it.oppsummerPeriode(rammevedtakForReise) }.sortedBy { it.ukenummer },
     )
 
 private fun BeregningsresultatForReisePrivatBilPeriode.oppsummerPeriode(
