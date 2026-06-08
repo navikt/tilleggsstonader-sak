@@ -31,8 +31,8 @@ class CacheConfig {
             }
         }
 
-    @Bean("kodeverkCache")
-    fun kodeverkCache(): CacheManager =
+    @Bean("twentyfourHourCache")
+    fun twentyfourHourCache(): CacheManager =
         object : ConcurrentMapCacheManager() {
             override fun createConcurrentMapCache(name: String): Cache {
                 val concurrentMap =

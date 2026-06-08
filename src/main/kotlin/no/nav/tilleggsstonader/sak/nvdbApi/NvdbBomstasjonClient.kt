@@ -17,7 +17,7 @@ class NvdbBomstasjonClient(
             .defaultHeader("X-Client", "nav-tilleggsstonader-sak")
             .build()
 
-    @Cacheable("nvdb-bomstasjoner", cacheManager = "kodeverkCache", sync = true)
+    @Cacheable("nvdb-bomstasjoner", cacheManager = "twentyfourHourCache", sync = true)
     fun hentAlleBomstasjoner(): List<NvdbBomstasjon> {
         val response = nvdbKall()
         return response.objekter.mapNotNull { it.tilDomene() }

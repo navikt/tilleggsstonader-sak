@@ -53,7 +53,7 @@ class KodeverkService(
 }
 
 @Service
-@CacheConfig(cacheManager = "kodeverkCache")
+@CacheConfig(cacheManager = "twentyfourHourCache")
 class CachedKodeverkService(
     private val kodeverkClient: KodeverkClient,
 ) {
