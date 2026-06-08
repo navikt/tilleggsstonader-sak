@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.nvdbApi
 
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
@@ -16,6 +17,7 @@ class NvdbBomstasjonClient(
             .defaultHeader("X-Client", "nav-tilleggsstonader-sak")
             .build()
 
+    @Cacheable("nvdb-bomstasjoner", cacheManager = "kodeverkCache", sync = true)
     fun hentAlleBomstasjoner(): List<NvdbBomstasjon> {
         val response = nvdbKall()
         return response.objekter.mapNotNull { it.tilDomene() }
