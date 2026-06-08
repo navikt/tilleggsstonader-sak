@@ -3,7 +3,10 @@ package no.nav.tilleggsstonader.sak.ekstern.journalføring
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
+import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
+import no.nav.tilleggsstonader.kontrakter.søknad.DokumentasjonFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.KjørelisteSkjema
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
@@ -11,6 +14,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.JournalpostClientMockConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.fjernTilordningPåÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
@@ -22,6 +26,7 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagReques
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
+import no.nav.tilleggsstonader.sak.util.SøknadUtil.lagDokumentasjon
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -275,6 +280,43 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
                 it.type == BehandlingType.KJØRELISTE
             },
         ).hasSize(2)
+    }
+
+    // Test for at vi håndterer tilfelle hvor bruker har klart å sende inn kjøreliste uten dager, men med dokumentajson
+    @Test
+    fun `innsendt kjøreliste uten dager blir journalført men ingen ny behandling opprettes`() {
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
+
+        val fom = 2 mars 2026
+        val tom = 15 mars 2026
+        val behandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                defaultDagligReisePrivatBilTsoTestdata(fom, tom)
+            }
+
+        val rammevedtak = kall.privatBil.hentRammevedtak(behandlingContext.ident)
+        val reiseId = rammevedtak.single().reiseId
+
+        // Sender inn tom kjøreliste med bare dokumentasjon
+        sendInnKjøreliste(
+            KjørelisteSkjema(
+                reiseId = reiseId,
+                reisedagerPerUkeAvsnitt = emptyList(),
+                dokumentasjon = listOf(
+                    lagDokumentasjon()
+                )
+            ),
+            ident = behandlingContext.ident,
+        )
+
+        // Kun én behandling, det er førstegangsbehandlingen. Altså ingen kjørelistebehandling
+        assertThat(testoppsettService.hentBehandlinger(fagsakId = behandlingContext.fagsakId)).hasSize(1)
+        val tomKjørelisteJournalpost = JournalpostClientMockConfig.journalposter.values
+            .single { journalpost -> journalpost.dokumenter?.any { it.brevkode == DokumentBrevkode.DAGLIG_REISE_KJØRELISTE.verdi } == true }
+
+        assertThat(tomKjørelisteJournalpost.journalstatus).isEqualTo(Journalstatus.FERDIGSTILT)
     }
 
     private fun assertLagretKjørelisteInneholderDager(
