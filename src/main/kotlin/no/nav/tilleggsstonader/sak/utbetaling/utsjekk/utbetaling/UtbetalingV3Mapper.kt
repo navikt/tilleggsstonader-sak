@@ -221,8 +221,8 @@ class UtbetalingV3Mapper(
                 .toSet()
         }
 
-    private fun AndelTilkjentYtelse.mapTilUtbetalingId(fagsakutbetalingIder: Collection<FagsakUtbetalingId>): FagsakUtbetalingId =
-        fagsakutbetalingIder.single { utbetalingId ->
+    private fun AndelTilkjentYtelse.mapTilUtbetalingId(fagsakUtbetalingIder: Collection<FagsakUtbetalingId>): FagsakUtbetalingId =
+        fagsakUtbetalingIder.singleOrNull { utbetalingId ->
             this.type == utbetalingId.typeAndel && this.reiseId == utbetalingId.reiseId
-        }
+        } ?: error("Fant ikke utbetalingId for type=${this.type} reiseId=${this.reiseId}")
 }
