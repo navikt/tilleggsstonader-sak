@@ -238,8 +238,8 @@ class TestoppsettService(
 
     fun hentPersonidentForBehandlingId(behandlingId: BehandlingId) = behandlingRepository.finnAktivIdent(behandlingId)
 
-    fun settAndelerTilOkForBehandling(behandling: Behandling) {
-        val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!
+    fun settAndelerTilOkForBehandling(behandlingId: BehandlingId) {
+        val tilkjentYtelse = tilkjentYtelseRepository.findByBehandlingId(behandlingId)!!
         tilkjentYtelseRepository.update(
             tilkjentYtelse.copy(
                 andelerTilkjentYtelse =

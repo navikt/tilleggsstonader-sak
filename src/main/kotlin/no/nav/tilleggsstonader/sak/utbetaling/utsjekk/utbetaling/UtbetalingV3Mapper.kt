@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingId
 import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -101,14 +102,18 @@ class UtbetalingV3Mapper(
         behandling: Saksbehandling,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
     ): List<UtbetalingDto> =
-        finnTypeAndelerSomSkalAnnulleres(behandling, andelerTilkjentYtelse)
-            .map { typeAndel ->
-                lagUtbetaling(
-                    behandling = behandling,
-                    typeAndelOgReiseId = typeAndel,
-                    andeler = emptyList(), // periodene skal annuleres 💥
-                )
-            }
+        finnUtbetalingIderSomSkalAnnulleres(behandling, andelerTilkjentYtelse)
+            .map { utbetalingId -> lagAnnulleringUtbetaling(utbetalingId, behandling.stønadstype) }
+
+    private fun lagAnnulleringUtbetaling(
+        fagsakUtbetalingId: FagsakUtbetalingId,
+        stønadstype: Stønadstype,
+    ) = UtbetalingDto(
+        id = fagsakUtbetalingId.utbetalingId,
+        stønad = mapTilStønadUtbetaling(fagsakUtbetalingId.typeAndel),
+        perioder = emptyList(),
+        brukFagområdeTillst = stønadstype.skalBrukeGamleFagområder(),
+    )
 
     // Grupperer alle andeler som har samme fom. NB: hvis vi tar i bruk noe annet enn dagsats må dette endres, da tom kan være ulik
     private fun grupperPåDagOgMapTilPerioder(andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>): List<UtbetalingPeriodeDto> =
@@ -178,27 +183,46 @@ class UtbetalingV3Mapper(
             else -> error("Skal ikke sende andelstype=$typeAndel på kafka")
         }
 
-    private fun finnTypeAndelerSomSkalAnnulleres(
+    /**
+     * En utbetalingId som ikke har noen tilknyttede andeler som skal iverksettes nå,
+     * men har andeler som ble iverksatt forrige behandling skal annulleres.
+     */
+    private fun finnUtbetalingIderSomSkalAnnulleres(
         behandling: Saksbehandling,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
-    ): Set<TypeAndelOgReiseId> {
+    ): Set<FagsakUtbetalingId> {
+        val fagsakutbetalingIder = fagsakUtbetalingIdService.hentUtbetalingIderForFagsakId(behandling.fagsakId)
+
+        val utbetalingIderIverksattForrigeBehandling = finnUtbetalingIderSomBleIverksattIForrigeBehandling(behandling, fagsakutbetalingIder)
+        val utbetalingIderSomSkalIverksettesNå =
+            andelerTilkjentYtelse
+                .map { it.mapTilUtbetalingId(fagsakutbetalingIder) }
+                .toSet()
+
+        return utbetalingIderIverksattForrigeBehandling
+            .filter {
+                it !in utbetalingIderSomSkalIverksettesNå
+            }.toSet()
+    }
+
+    private fun finnUtbetalingIderSomBleIverksattIForrigeBehandling(
+        behandling: Saksbehandling,
+        fagsakUtbetalingIder: Collection<FagsakUtbetalingId>,
+    ): Set<FagsakUtbetalingId> =
         if (behandling.forrigeIverksatteBehandlingId == null) {
-            return emptySet()
-        }
-        val andelerForrigeBehandling =
+            emptySet()
+        } else {
             tilkjentYtelseService
                 .hentForBehandling(behandling.forrigeIverksatteBehandlingId)
                 .andelerTilkjentYtelse
-
-        val typeAndelerOgReiseIdNåværendeBehandling =
-            andelerTilkjentYtelse
-                .map { TypeAndelOgReiseId(it.type, it.reiseId) }
+                .filter { it.type != TypeAndel.UGYLDIG }
+                .filter { it.iverksetting != null }
+                .map { it.mapTilUtbetalingId(fagsakUtbetalingIder) }
                 .toSet()
+        }
 
-        return andelerForrigeBehandling
-            .filter { it.type != TypeAndel.UGYLDIG }
-            .map { TypeAndelOgReiseId(it.type, it.reiseId) }
-            .filter { it !in typeAndelerOgReiseIdNåværendeBehandling }
-            .toSet()
-    }
+    private fun AndelTilkjentYtelse.mapTilUtbetalingId(fagsakutbetalingIder: Collection<FagsakUtbetalingId>): FagsakUtbetalingId =
+        fagsakutbetalingIder.single { utbetalingId ->
+            this.type == utbetalingId.typeAndel && this.reiseId == utbetalingId.reiseId
+        }
 }

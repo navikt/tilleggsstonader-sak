@@ -78,7 +78,7 @@ class DagligReisePrivatBilVedtakSideeffekterIntegrationTest : IntegrationTest() 
         verifiserHarBlittProdusertVedtaksbrevForKjørelistebehandling(manuellKjørelisteBehandling.id)
         verifiserIkkeHarBlittProdusertInterntVedtakForBehandling(manuellKjørelisteBehandling.id)
 
-        testoppsettService.settAndelerTilOkForBehandling(manuellKjørelisteBehandling)
+        testoppsettService.settAndelerTilOkForBehandling(manuellKjørelisteBehandling.id)
         every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns true
         val reiseId =
             kall.privatBil
