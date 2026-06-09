@@ -9,8 +9,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelSteg
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Resultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel.Companion.IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SluttSvarRegel.Companion.OPPFYLT_MED_VALGFRI_BEGRUNNELSE
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.Vilkårsregel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.jaNeiSvarRegel
 
@@ -23,22 +21,43 @@ class DagligReiseRegel :
                 UNNTAK_SEKS_KM,
                 KAN_REISE_MED_OFFENTLIG_TRANSPORT,
                 KAN_KJØRE_MED_EGEN_BIL,
+                KAN_REISE_MED_TAXI,
             ),
     ) {
     companion object {
+        private val KAN_REISE_MED_TAXI =
+            RegelSteg(
+                regelId = RegelId.KAN_REISE_MED_TAXI,
+                erHovedregel = false,
+                svarMapping =
+                    jaNeiSvarRegel(
+                        hvisJa =
+                            SluttSvarRegel(
+                                resultat = Resultat.IKKE_OPPFYLT,
+                                begrunnelseType = BegrunnelseType.UTEN,
+                                feilmelding = "Må behandles i Arena",
+                            ),
+                        hvisNei = IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
+                    ),
+            )
+
         private val KAN_KJØRE_MED_EGEN_BIL =
             RegelSteg(
                 regelId = RegelId.KAN_KJØRE_MED_EGEN_BIL,
                 erHovedregel = false,
                 svarMapping =
-                    mapOf(
-                        SvarId.JA to
+                    jaNeiSvarRegel(
+                        hvisJa =
                             SluttSvarRegel(
                                 resultat = Resultat.OPPFYLT,
                                 begrunnelseType = BegrunnelseType.VALGFRI,
                                 tilhørendeFaktaType = TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL,
                             ),
-                        SvarId.NEI to OPPFYLT_MED_VALGFRI_BEGRUNNELSE,
+                        hvisNei =
+                            NesteRegel(
+                                KAN_REISE_MED_TAXI.regelId,
+                                BegrunnelseType.PÅKREVD,
+                            ),
                     ),
             )
 

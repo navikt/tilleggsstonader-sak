@@ -65,6 +65,7 @@ object ByggRegelstrukturFraVilkårregel {
                         svarId = svarId,
                         begrunnelseType = svarRegel.begrunnelseType,
                         tilhørendeFaktaType = svarRegel.tilhørendeFaktaType,
+                        feilmelding = svarRegel.feilmelding,
                     )
             }
         }
