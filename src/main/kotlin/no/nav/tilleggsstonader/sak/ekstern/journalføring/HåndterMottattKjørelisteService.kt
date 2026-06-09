@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.KjørelisteSkjema
-import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.ekstern.stønad.DagligReisePrivatBilService
@@ -57,12 +56,9 @@ class HåndterMottattKjørelisteService(
         val saksbehandling = behandlingService.hentSaksbehandling(rammevedtakTilhørendeKjøreliste.behandlingId)
         val fagsak = fagsakService.hentFagsak(saksbehandling.fagsakId)
 
-        if (kjørelisteSkjema.harDager()) {
-            val kjøreliste = lagreKjøreliste(kjørelisteSkjema, reiseId, fagsak, journalpost.journalpostId)
-            taskService.save(BehandleMottattKjørelisteTask.opprettTask(kjøreliste.id))
-        } else {
-            logger.warn("Mottatt kjøreliste uten noen utfylte dager. Ferdigstiller journalpost uten å behandlie kjøreliste videre")
-        }
+        val kjøreliste = lagreKjøreliste(kjørelisteSkjema, reiseId, fagsak, journalpost.journalpostId)
+
+        taskService.save(BehandleMottattKjørelisteTask.opprettTask(kjøreliste.id))
 
         journalpostService.oppdaterOgFerdigstillJournalpost(
             journalpost = journalpost,
@@ -74,8 +70,6 @@ class HåndterMottattKjørelisteService(
             avsender = null,
         )
     }
-
-    private fun KjørelisteSkjema.harDager() = this.reisedagerPerUkeAvsnitt.isNotEmpty()
 
     private fun lagreKjøreliste(
         skjema: KjørelisteSkjema,
