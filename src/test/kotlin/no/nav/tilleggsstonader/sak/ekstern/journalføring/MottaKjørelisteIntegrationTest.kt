@@ -6,7 +6,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
-import no.nav.tilleggsstonader.kontrakter.søknad.DokumentasjonFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.KjørelisteSkjema
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
@@ -304,17 +303,21 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
             KjørelisteSkjema(
                 reiseId = reiseId,
                 reisedagerPerUkeAvsnitt = emptyList(),
-                dokumentasjon = listOf(
-                    lagDokumentasjon()
-                )
+                dokumentasjon =
+                    listOf(
+                        lagDokumentasjon(),
+                    ),
             ),
             ident = behandlingContext.ident,
         )
 
         // Kun én behandling, det er førstegangsbehandlingen. Altså ingen kjørelistebehandling
         assertThat(testoppsettService.hentBehandlinger(fagsakId = behandlingContext.fagsakId)).hasSize(1)
-        val tomKjørelisteJournalpost = JournalpostClientMockConfig.journalposter.values
-            .single { journalpost -> journalpost.dokumenter?.any { it.brevkode == DokumentBrevkode.DAGLIG_REISE_KJØRELISTE.verdi } == true }
+        val tomKjørelisteJournalpost =
+            JournalpostClientMockConfig.journalposter.values
+                .single { journalpost ->
+                    journalpost.dokumenter?.any { it.brevkode == DokumentBrevkode.DAGLIG_REISE_KJØRELISTE.verdi } == true
+                }
 
         assertThat(tomKjørelisteJournalpost.journalstatus).isEqualTo(Journalstatus.FERDIGSTILT)
     }
