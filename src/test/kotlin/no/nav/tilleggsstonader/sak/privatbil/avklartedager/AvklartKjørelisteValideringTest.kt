@@ -367,6 +367,7 @@ class AvklartKjørelisteValideringTest {
         avvik = emptyList(),
         parkeringsutgift = parkeringsutgift,
         begrunnelse = begrunnelse,
+        avklartKjørtDagStatus = AvklartKjørtDagStatus.NY,
     )
 
     private fun kjørelisteDag(

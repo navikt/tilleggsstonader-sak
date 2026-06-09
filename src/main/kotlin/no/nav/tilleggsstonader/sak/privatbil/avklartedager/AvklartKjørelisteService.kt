@@ -102,6 +102,7 @@ class AvklartKjørelisteService(
                 } else {
                     AvklartKjørtUkeStatus.UENDRET
                 }
+
             AvklartKjørtUkeStatus.ENDRET -> {
                 val forrigeUke = hentForrigeBehandlingsUke(behandlingId, eksisterendeUke)
                 if (forrigeUke != null && !erDagerEndret(forrigeUke.dager, oppdaterteDager)) {
@@ -110,6 +111,7 @@ class AvklartKjørelisteService(
                     AvklartKjørtUkeStatus.ENDRET
                 }
             }
+
             AvklartKjørtUkeStatus.NY -> AvklartKjørtUkeStatus.NY
             AvklartKjørtUkeStatus.SLETTET -> AvklartKjørtUkeStatus.SLETTET
         }
@@ -248,6 +250,7 @@ class AvklartKjørelisteService(
             automatiskVurdering = if (avvik.isEmpty()) UtfyltDagAutomatiskVurdering.OK else UtfyltDagAutomatiskVurdering.AVVIK,
             begrunnelse = null,
             parkeringsutgift = if (godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.JA) kjørelisteDag.parkeringsutgift else null,
+            avklartKjørtDagStatus = AvklartKjørtDagStatus.NY,
         )
     }
 
@@ -296,7 +299,10 @@ class AvklartKjørelisteService(
         avklartKjørtUkeRepository.deleteAll(avklarteUkerNyBehandling)
 
         // Kopier over avklarte uker fra forrige behandling
-        val nyeAvklarteUker = avklarteUkerForrigeBehandling.map { it.kopierTilNyBehandling(behandling.id) }
+        val nyeAvklarteUker =
+            avklarteUkerForrigeBehandling
+                .filter { it.avklartKjørtUkeStatus != AvklartKjørtUkeStatus.SLETTET }
+                .map { it.kopierTilNyBehandling(behandling.id) }
         avklartKjørtUkeRepository.insertAll(nyeAvklarteUker)
 
         // Avklar nye kjørelister på nytt
@@ -305,22 +311,56 @@ class AvklartKjørelisteService(
         }
     }
 
-    fun sletteMarkerUkerUtenforAvkortetRammevedtak(
+    fun sletteMarkerUkerOgDagerUtenforAvkortetRammevedtak(
         behandlingId: BehandlingId,
         rammevedtak: RammevedtakPrivatBil,
     ) {
-        val avklarteUker = hentAvklarteUkerForBehandling(behandlingId)
+        val oppdaterteUker =
+            hentAvklarteUkerForBehandling(behandlingId).mapNotNull { uke ->
+                val rammevedtakForReise = rammevedtak.reiser.find { it.reiseId == uke.reiseId } ?: return@mapNotNull null
+                val sisteDagIRammevedtak = rammevedtakForReise.grunnlag.tom
 
-        val ukerSomSkalSlettes =
-            avklarteUker.filter { uke ->
-                val reise = rammevedtak.reiser.find { it.reiseId == uke.reiseId }
-                reise != null && uke.fom > reise.grunnlag.tom
+                when {
+                    uke.fom > sisteDagIRammevedtak -> uke.markerHeleUkaSomSlettet()
+                    uke.inneholder(sisteDagIRammevedtak) -> uke.markerDelerAvUkaSomSlettet(fraDato = sisteDagIRammevedtak)
+                    else -> null
+                }
             }
 
-        if (ukerSomSkalSlettes.isNotEmpty()) {
-            avklartKjørtUkeRepository.updateAll(
-                ukerSomSkalSlettes.map { it.copy(avklartKjørtUkeStatus = AvklartKjørtUkeStatus.SLETTET) },
-            )
+        if (oppdaterteUker.isNotEmpty()) {
+            avklartKjørtUkeRepository.updateAll(oppdaterteUker)
+        }
+    }
+
+    private fun AvklartKjørtUke.markerHeleUkaSomSlettet(): AvklartKjørtUke =
+        copy(
+            avklartKjørtUkeStatus = AvklartKjørtUkeStatus.SLETTET,
+            dager =
+                dager
+                    .map { it.copy(avklartKjørtDagStatus = AvklartKjørtDagStatus.SLETTET) }
+                    .toSet(),
+        )
+
+    private fun AvklartKjørtUke.markerDelerAvUkaSomSlettet(fraDato: LocalDate): AvklartKjørtUke? {
+        val oppdaterteDager =
+            dager
+                .map { dag ->
+                    if (dag.dato > fraDato && dag.avklartKjørtDagStatus != AvklartKjørtDagStatus.SLETTET) {
+                        dag.copy(avklartKjørtDagStatus = AvklartKjørtDagStatus.SLETTET)
+                    } else {
+                        dag
+                    }
+                }.toSet()
+        return if (oppdaterteDager != dager) {
+            val nyUkeStatus =
+                if (avklartKjørtUkeStatus == AvklartKjørtUkeStatus.UENDRET) {
+                    AvklartKjørtUkeStatus.ENDRET
+                } else {
+                    avklartKjørtUkeStatus
+                }
+            copy(dager = oppdaterteDager, avklartKjørtUkeStatus = nyUkeStatus)
+        } else {
+            null
         }
     }
 }
