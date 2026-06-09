@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.BehandlingContext
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDagStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikUke
@@ -465,5 +466,6 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
         begrunnelse = null,
         avvik = avvik,
         automatiskVurdering = automatiskVurdering,
+        avklartKjørtDagStatus = AvklartKjørtDagStatus.NY,
     )
 }

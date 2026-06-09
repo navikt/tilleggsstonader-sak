@@ -144,7 +144,7 @@ class DagligReiseBeregnYtelseSteg(
         )
 
         rammevedtakPrivatBil?.let {
-            avklartKjørelisteService.sletteMarkerUkerUtenforAvkortetRammevedtak(
+            avklartKjørelisteService.sletteMarkerUkerOgDagerUtenforAvkortetRammevedtak(
                 behandlingId = saksbehandling.id,
                 rammevedtak = it,
             )

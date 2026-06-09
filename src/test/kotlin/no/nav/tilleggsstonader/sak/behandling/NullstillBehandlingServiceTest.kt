@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientMockConfig
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteRepository
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDagStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeRepository
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
@@ -365,6 +366,7 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
                             godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
                             automatiskVurdering = UtfyltDagAutomatiskVurdering.OK,
                             avvik = listOf(),
+                            avklartKjørtDagStatus = AvklartKjørtDagStatus.NY,
                         ),
                     ),
             ),

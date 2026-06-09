@@ -21,7 +21,16 @@ data class AvklartKjørtDag(
     val parkeringsutgift: Int? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
+    @Column("avklart_kjort_dag_status")
+    val avklartKjørtDagStatus: AvklartKjørtDagStatus,
 )
+
+enum class AvklartKjørtDagStatus {
+    NY,
+    ENDRET,
+    UENDRET,
+    SLETTET,
+}
 
 enum class GodkjentGjennomførtKjøring {
     JA,
