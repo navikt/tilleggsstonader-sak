@@ -317,9 +317,10 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
 
         assertThat(gjenbruktAvklartKjørtDag)
             .usingRecursiveComparison()
-            .ignoringFields("id")
+            .ignoringFields("id", "avklartKjørtDagStatus")
             .isEqualTo(avklartKjørtDag)
         assertThat(gjenbruktAvklartKjørtDag.id).isNotEqualTo(avklartKjørtDag.id)
+        assertThat(gjenbruktAvklartKjørtDag.avklartKjørtDagStatus).isEqualTo(AvklartKjørtDagStatus.UENDRET)
     }
 
     private fun assertIngenDataPåRevurdering() {
