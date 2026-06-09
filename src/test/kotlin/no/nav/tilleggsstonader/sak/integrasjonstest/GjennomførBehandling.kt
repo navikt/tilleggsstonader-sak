@@ -135,6 +135,7 @@ fun IntegrationTest.gjennomførBehandlingsløp(
     behandlingId: BehandlingId,
     ident: String,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
+    erRevurderingDagligReiseMedPrivatBil: Boolean = false,
     testdataProvider: BehandlingTestdataDsl.() -> Unit,
 ) {
     // Oppretter grunnlagsdata
@@ -169,6 +170,10 @@ fun IntegrationTest.gjennomførBehandlingsløp(
     }
 
     gjennomførBeregningSteg(behandling.id, behandling.stønadstype, testdata.vedtak.vedtak)
+
+    if (erRevurderingDagligReiseMedPrivatBil) {
+        gjennomførEkstraStegVedDagligReisePrivatBilRevurdering(behandling.id, tilSteg)
+    }
 
     if (tilSteg == StegType.SIMULERING) {
         return
@@ -222,6 +227,7 @@ fun IntegrationTest.opprettRevurdering(opprettBehandlingDto: OpprettBehandlingDt
 fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
     fraBehandlingId: BehandlingId,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
+    erRevurderingDagligReiseMedPrivatBil: Boolean = false,
     testdataProvider: BehandlingTestdataDsl.() -> Unit,
 ): BehandlingId {
     val behandling = kall.behandling.hent(fraBehandlingId)
@@ -236,12 +242,14 @@ fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
             ),
         tilSteg = tilSteg,
         testdataProvider = testdataProvider,
+        erRevurderingDagligReiseMedPrivatBil = erRevurderingDagligReiseMedPrivatBil,
     )
 }
 
 fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
     opprettBehandlingDto: OpprettBehandlingDto,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
+    erRevurderingDagligReiseMedPrivatBil: Boolean = false,
     testdataProvider: BehandlingTestdataDsl.() -> Unit,
 ): BehandlingId {
     val revurderingId = opprettRevurdering(opprettBehandlingDto)
@@ -250,6 +258,7 @@ fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
         ident = testoppsettService.hentPersonidentForBehandlingId(revurderingId),
         tilSteg = tilSteg,
         testdataProvider = testdataProvider,
+        erRevurderingDagligReiseMedPrivatBil = erRevurderingDagligReiseMedPrivatBil,
     )
     return revurderingId
 }
