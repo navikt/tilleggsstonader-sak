@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDagStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
@@ -76,7 +77,8 @@ class PrivatBilBeregningService(
         brukersNavKontor: String?,
         forrigeReise: BeregningsresultatForReisePrivatBil,
     ): BeregningsresultatForReisePrivatBil {
-        val ukerSomSkalBeregnes = avklarteUkerForReise.filter { it.avklartKjørtUkeStatus != AvklartKjørtUkeStatus.UENDRET }
+        val ukerSomSkalBeregnes =
+            avklarteUkerForReise.filter { it.avklartKjørtUkeStatus != AvklartKjørtUkeStatus.UENDRET }
         val ukerSomSkalGjenbrukes =
             avklarteUkerForReise.filter {
                 it.avklartKjørtUkeStatus == AvklartKjørtUkeStatus.UENDRET
@@ -108,38 +110,50 @@ class PrivatBilBeregningService(
         avklarteUkerForReise: List<AvklartKjørtUke>,
         brukersNavKontor: String?,
     ): BeregningsresultatForReisePrivatBil {
-        val avklarteUkerSomSkalBeregnes = avklarteUkerForReise.filter { it.avklartKjørtUkeStatus != AvklartKjørtUkeStatus.SLETTET }
+        val avklarteDagerSomSkalBeregnes = avklarteUkerForReise.tilAvklartDagSomSkalBeregnes()
 
-        // Kaster feil om det finnes godkjente dager utenfor rammevedtak
-        validerDagerErInnenforRammevedtak(rammeForReise, avklarteUkerSomSkalBeregnes)
-        val delperioder = rammeForReise.grunnlag.delperioder
+        validerDagerErInnenforRammevedtak(
+            rammeForReise = rammeForReise,
+            avklarteDagerForReise = avklarteDagerSomSkalBeregnes,
+        )
 
         return BeregningsresultatForReisePrivatBil(
             reiseId = rammeForReise.reiseId,
             perioder =
-                delperioder.flatMap { delperiode ->
-                    val dagerForDelperiode =
-                        avklarteUkerSomSkalBeregnes
-                            .flatMap { it.dager }
-                            .filter { dag ->
-                                rammeForReise.grunnlag.inneholder(dag.dato) &&
-                                    delperiode.fom <= dag.dato && dag.dato <= delperiode.tom
-                            }
+                rammeForReise.grunnlag.delperioder.flatMap { delperiode ->
+                    val avklarteDagerIDelperiode =
+                        avklarteDagerSomSkalBeregnes.finnDagerInnenforDelperiode(
+                            delperiode = delperiode,
+                            rammeForReise = rammeForReise,
+                        )
                     lagPerioderForDagerMedSammeSats(
-                        dagerForDelperiode,
-                        delperiode,
-                        brukersNavKontor,
+                        dager = avklarteDagerIDelperiode,
+                        delperiode = delperiode,
+                        brukersNavKontor = brukersNavKontor,
                     )
                 },
         )
     }
 
+    private fun List<AvklartKjørtUke>.tilAvklartDagSomSkalBeregnes(): List<AvklartKjørtDag> =
+        filter { it.avklartKjørtUkeStatus != AvklartKjørtUkeStatus.SLETTET }
+            .flatMap { it.dager }
+            .filter { it.avklartKjørtDagStatus != AvklartKjørtDagStatus.SLETTET }
+
+    private fun List<AvklartKjørtDag>.finnDagerInnenforDelperiode(
+        delperiode: RammeForReiseMedPrivatBilDelperiode,
+        rammeForReise: RammeForReiseMedPrivatBil,
+    ): List<AvklartKjørtDag> =
+        filter { dag ->
+            rammeForReise.grunnlag.inneholder(dag.dato) &&
+                delperiode.fom <= dag.dato && dag.dato <= delperiode.tom
+        }
+
     private fun validerDagerErInnenforRammevedtak(
         rammeForReise: RammeForReiseMedPrivatBil,
-        avklarteUkerForReise: List<AvklartKjørtUke>,
+        avklarteDagerForReise: List<AvklartKjørtDag>,
     ) {
-        avklarteUkerForReise
-            .flatMap { it.dager }
+        avklarteDagerForReise
             .filter { it.godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.JA }
             .forEach {
                 feilHvis(!rammeForReise.grunnlag.inneholder(it.dato)) {
