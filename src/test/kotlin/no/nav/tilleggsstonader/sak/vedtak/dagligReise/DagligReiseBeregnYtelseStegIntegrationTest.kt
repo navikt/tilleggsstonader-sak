@@ -10,15 +10,12 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.integrasjonstest.OpprettOpphør
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -72,7 +69,7 @@ class DagligReiseBeregnYtelseStegIntegrationTest(
 
         val fom = 1 februar 2026
         val tom = 20 mars 2026
-        val opphørsdato = 10 mars 2026
+        val opphørsdato = 9 mars 2026
 
         val førstegangsbehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(Stønadstype.DAGLIG_REISE_TSO) {
@@ -82,19 +79,12 @@ class DagligReiseBeregnYtelseStegIntegrationTest(
         val revurderingId =
             opprettRevurderingOgGjennomførBehandlingsløp(
                 fraBehandlingId = førstegangsbehandlingContext.behandlingId,
-                tilSteg = StegType.BEREGNE_YTELSE,
-            ) {}
-
-        gjennomførBeregningSteg(
-            behandlingId = revurderingId,
-            stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-            opprettVedtak =
-                OpprettOpphør(
-                    årsaker = listOf(ÅrsakOpphør.ANNET),
-                    begrunnelse = "begrunnelse",
-                    opphørsdato = opphørsdato,
-                ),
-        )
+                erRevurderingDagligReiseMedPrivatBil = true,
+            ) {
+                vedtak {
+                    opphør(opphørsdato = opphørsdato)
+                }
+            }
 
         val opphørsvedtak = vedtakService.hentVedtak<OpphørDagligReise>(revurderingId).data
         assertThat(opphørsvedtak.rammevedtakPrivatBil).isNotNull

@@ -142,18 +142,21 @@ class DagligReiseVedtakService(
         behandlingId: BehandlingId,
         beregningsresultatPrivatBil: BeregningsresultatPrivatBil,
     ) {
-        val eksisterendeVedtak = hentInnvilgelseVedtak(behandlingId)
-        vedtakRepository.update(
-            eksisterendeVedtak.copy(
-                data =
-                    eksisterendeVedtak.data.copy(
+        val eksisterendeVedtak = hentInnvilgelseEllerOpphørVedtak(behandlingId)
+        val oppdatertData =
+            when (val data = eksisterendeVedtak.data) {
+                is InnvilgelseDagligReise ->
+                    data.copy(
                         beregningsresultat =
-                            eksisterendeVedtak.data.beregningsresultat.copy(
-                                privatBil = beregningsresultatPrivatBil,
-                            ),
-                    ),
-            ),
-        )
+                            data.beregningsresultat.copy(privatBil = beregningsresultatPrivatBil),
+                    )
+                is OpphørDagligReise ->
+                    data.copy(
+                        beregningsresultat =
+                            data.beregningsresultat.copy(privatBil = beregningsresultatPrivatBil),
+                    )
+            }
+        vedtakRepository.update(eksisterendeVedtak.copy(data = oppdatertData))
     }
 
     fun forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(forrigeIverksatteBehandlingId: BehandlingId?): Boolean {
