@@ -316,8 +316,7 @@ class AvklartKjørelisteService(
     ) {
         val oppdaterteUker =
             hentAvklarteUkerForBehandling(behandlingId).mapNotNull { uke ->
-                val rammevedtakForReise =
-                    rammevedtak.reiser.find { it.reiseId == uke.reiseId } ?: return@mapNotNull null
+                val rammevedtakForReise = rammevedtak.reiser.find { it.reiseId == uke.reiseId } ?: return@mapNotNull null
                 val sisteDagIRammevedtak = rammevedtakForReise.grunnlag.tom
 
                 when {
