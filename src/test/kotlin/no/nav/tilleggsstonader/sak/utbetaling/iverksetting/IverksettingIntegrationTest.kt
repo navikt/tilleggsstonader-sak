@@ -43,7 +43,7 @@ class IverksettingIntegrationTest(
     }
 
     @Test
-    fun `skal ikke send noe til økonomi ved innvilgelse frem i tid og opphør av dette`() {
+    fun `skal ikke sende noe til økonomi ved innvilgelse frem i tid og opphør av dette`() {
         val omToUker = LocalDate.now().plusWeeks(2)
         val omFireUker = LocalDate.now().plusWeeks(4)
 
