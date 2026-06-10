@@ -31,8 +31,8 @@ class CacheConfig {
             }
         }
 
-    @Bean("twentyfourHourCache")
-    fun twentyfourHourCache(): CacheManager =
+    @Bean("longCache")
+    fun longCache(): CacheManager =
         object : ConcurrentMapCacheManager() {
             override fun createConcurrentMapCache(name: String): Cache {
                 val concurrentMap =
@@ -72,22 +72,6 @@ class CacheConfig {
                         .newBuilder()
                         .maximumSize(100)
                         .expireAfterWrite(5, TimeUnit.SECONDS)
-                        .recordStats()
-                        .build<Any, Any>()
-                        .asMap()
-                return ConcurrentMapCache(name, concurrentMap, true)
-            }
-        }
-
-    @Bean("longCache")
-    fun longCache(): CacheManager =
-        object : ConcurrentMapCacheManager() {
-            override fun createConcurrentMapCache(name: String): Cache {
-                val concurrentMap =
-                    Caffeine
-                        .newBuilder()
-                        .maximumSize(1000)
-                        .expireAfterWrite(7, TimeUnit.DAYS)
                         .recordStats()
                         .build<Any, Any>()
                         .asMap()
