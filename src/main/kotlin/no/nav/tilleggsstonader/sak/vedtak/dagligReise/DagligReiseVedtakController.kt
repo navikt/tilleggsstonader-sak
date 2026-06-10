@@ -4,7 +4,6 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
@@ -117,14 +116,15 @@ class DagligReiseVedtakController(
         tilgangService.validerLesetilgangTilBehandling(behandlingId)
 
         val vedtaksdata = vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandlingId).data
-        val beregningsresultatPrivatBil = vedtaksdata.beregningsresultat.privatBil
-        val rammevedtak = vedtaksdata.rammevedtakPrivatBil
 
-        feilHvis(beregningsresultatPrivatBil == null || rammevedtak == null) {
-            "Det finnes ingen beregningsresultat for privat bil eller rammevedtak for privat bil for behandling $behandlingId"
-        }
-
-        return oppsummerBeregningPrivatBil(beregningsresultatPrivatBil, rammevedtak)
+        return PrivatBilOppsummertBeregningDto(
+            reiser =
+                vedtaksdata
+                    .hentRammevedtakMedBeregningsresultat()
+                    .map { (beregningsresultatForReise, rammevedtakForReise) ->
+                        beregningsresultatForReise.oppsummerReise(rammevedtakForReise)
+                    },
+        )
     }
 
     private fun beregnVedtak(
