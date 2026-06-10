@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 
@@ -38,4 +39,15 @@ fun IntegrationTest.gjennomførKjørelisteBehandling(
 
     if (tilSteg in setOf(StegType.JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV, StegType.FERDIGSTILLE_BEHANDLING)) return
     kjørTasksKlareForProsesseringTilIngenTasksIgjen()
+}
+
+fun IntegrationTest.gjennomførEkstraStegVedDagligReisePrivatBilRevurdering(
+    behandlingId: BehandlingId,
+    tilSteg: StegType? = StegType.FULLFØR_KJØRELISTE,
+) {
+    if (tilSteg == StegType.KJØRELISTE) return
+    gjennomførKjørelisteSteg(behandlingId)
+
+    if (tilSteg == StegType.BEREGNING) return
+    gjennomførBeregningStegDagligReise(behandlingId)
 }

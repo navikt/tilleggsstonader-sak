@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseVedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.finnSatserBruktIBeregning
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.oppsummerBeregningPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -51,13 +50,8 @@ class GenererKjørelistebehandlingBrevTest : CleanDatabaseIntegrationTest() {
         if (!FileUtil.SKRIV_TIL_FIL) return
 
         val kjørelisteBehandlingId = gjennomførBehandlingsløp()
-        val vedtaksdata = dagligReiseVedtakService.hentInnvilgelseEllerOpphørVedtak(kjørelisteBehandlingId).data
 
-        val oppsummertBeregningsresultat =
-            oppsummerBeregningPrivatBil(
-                beregningsresultatPrivatBil = vedtaksdata.beregningsresultat.privatBil!!,
-                rammevedtak = vedtaksdata.rammevedtakPrivatBil!!,
-            )
+        val oppsummertBeregningsresultat = kall.privatBil.hentOppsummertBeregning(kjørelisteBehandlingId)
 
         val req =
             KjørelisteBehandlingBrevRequest(

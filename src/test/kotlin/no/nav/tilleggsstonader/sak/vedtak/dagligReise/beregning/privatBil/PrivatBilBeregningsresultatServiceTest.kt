@@ -812,6 +812,40 @@ class PrivatBilBeregningsresultatServiceTest {
     }
 
     @Test
+    fun `avklart uke med status SLETTET blir ikke med i beregningsresultatet`() {
+        val fomRammevedtak = 2 februar 2026
+        val tomRammevedtak = 15 februar 2026
+        val delperiode = lagDelperiode(fomRammevedtak, tomRammevedtak)
+        val rammevedtakPrivatBil =
+            rammevedtakPrivatBil(reiseId = reiseId, fom = fomRammevedtak, tom = tomRammevedtak, delperioder = listOf(delperiode))
+
+        val kjørelisteUke6 =
+            KjørelisteUtil.kjøreliste(
+                reiseId = reiseId,
+                periode = Datoperiode(2 februar 2026, 8 februar 2026),
+                kjørteDager = listOf(KjørelisteUtil.KjørtDag(2 februar 2026)),
+            )
+        val kjørelisteUke7 =
+            KjørelisteUtil.kjøreliste(
+                reiseId = reiseId,
+                periode = Datoperiode(9 februar 2026, 15 februar 2026),
+                kjørteDager = listOf(KjørelisteUtil.KjørtDag(9 februar 2026)),
+            )
+
+        val ukeOK = avklarUkerFraKjøreliste(kjørelisteUke6).single()
+        val ukeSlettet =
+            avklarUkerFraKjøreliste(kjørelisteUke7)
+                .single()
+                .copy(avklartKjørtUkeStatus = AvklartKjørtUkeStatus.SLETTET)
+
+        val beregningsresultat = beregn(rammevedtakPrivatBil, listOf(ukeOK, ukeSlettet), brukersNavKontor)
+
+        val perioder = beregningsresultat.reiser.single().perioder
+        assertThat(perioder).hasSize(1)
+        assertThat(perioder.single().fom).isEqualTo(2 februar 2026)
+    }
+
+    @Test
     fun `uten forrigeBeregningsresultat beregnes alle uker uavhengig av status`() {
         val fomRammevedtak = 2 februar 2026 // Mandag
         val tomRammevedtak = 8 februar 2026

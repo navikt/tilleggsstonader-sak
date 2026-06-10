@@ -108,8 +108,10 @@ class PrivatBilBeregningService(
         avklarteUkerForReise: List<AvklartKjørtUke>,
         brukersNavKontor: String?,
     ): BeregningsresultatForReisePrivatBil {
+        val avklarteUkerSomSkalBeregnes = avklarteUkerForReise.filter { it.avklartKjørtUkeStatus != AvklartKjørtUkeStatus.SLETTET }
+
         // Kaster feil om det finnes godkjente dager utenfor rammevedtak
-        validerDagerErInnenforRammevedtak(rammeForReise, avklarteUkerForReise)
+        validerDagerErInnenforRammevedtak(rammeForReise, avklarteUkerSomSkalBeregnes)
         val delperioder = rammeForReise.grunnlag.delperioder
 
         return BeregningsresultatForReisePrivatBil(
@@ -117,7 +119,7 @@ class PrivatBilBeregningService(
             perioder =
                 delperioder.flatMap { delperiode ->
                     val dagerForDelperiode =
-                        avklarteUkerForReise
+                        avklarteUkerSomSkalBeregnes
                             .flatMap { it.dager }
                             .filter { dag ->
                                 rammeForReise.grunnlag.inneholder(dag.dato) &&
