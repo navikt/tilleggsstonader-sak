@@ -11,6 +11,7 @@
         "NEI": {
           "begrunnelseType": "PÅKREVD",
           "tilhørendeFaktaType": null,
+          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         }
       }
@@ -22,6 +23,7 @@
         "JA": {
           "begrunnelseType": "UTEN",
           "tilhørendeFaktaType": "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT",
+          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         },
         "NEI": {
@@ -41,6 +43,7 @@
         "NEI": {
           "begrunnelseType": "PÅKREVD",
           "tilhørendeFaktaType": null,
+          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         }
       }
@@ -52,11 +55,13 @@
         "JA": {
           "begrunnelseType": "UTEN",
           "tilhørendeFaktaType": "REISE_TIL_SAMLING_PRIVAT_BIL",
+          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         },
         "NEI": {
           "begrunnelseType": "PÅKREVD",
           "tilhørendeFaktaType": null,
+          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         }
       }
@@ -68,6 +73,7 @@
         "JA": {
           "begrunnelseType": "PÅKREVD",
           "tilhørendeFaktaType": null,
+          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         },
         "NEI": {

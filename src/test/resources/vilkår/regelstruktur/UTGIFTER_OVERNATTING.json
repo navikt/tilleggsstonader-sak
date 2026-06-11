@@ -7,13 +7,15 @@
         "svarId": "JA",
         "nesteRegelId": null,
         "begrunnelseType": "VALGFRI",
-        "tilhørendeFaktaType": null
+        "tilhørendeFaktaType": null,
+        "feilmelding": null
       },
       {
         "svarId": "NEI",
         "nesteRegelId": null,
         "begrunnelseType": "PÅKREVD",
-        "tilhørendeFaktaType": null
+        "tilhørendeFaktaType": null,
+        "feilmelding": null
       }
     ]
   },
@@ -25,13 +27,15 @@
         "svarId": "JA",
         "nesteRegelId": null,
         "begrunnelseType": "VALGFRI",
-        "tilhørendeFaktaType": null
+        "tilhørendeFaktaType": null,
+        "feilmelding": null
       },
       {
         "svarId": "NEI",
         "nesteRegelId": null,
         "begrunnelseType": "PÅKREVD",
-        "tilhørendeFaktaType": null
+        "tilhørendeFaktaType": null,
+        "feilmelding": null
       }
     ]
   },
@@ -43,13 +47,15 @@
         "svarId": "JA",
         "nesteRegelId": null,
         "begrunnelseType": "PÅKREVD",
-        "tilhørendeFaktaType": null
+        "tilhørendeFaktaType": null,
+        "feilmelding": null
       },
       {
         "svarId": "NEI",
         "nesteRegelId": null,
         "begrunnelseType": "PÅKREVD",
-        "tilhørendeFaktaType": null
+        "tilhørendeFaktaType": null,
+        "feilmelding": null
       }
     ]
   },
@@ -61,13 +67,15 @@
         "svarId": "JA",
         "nesteRegelId": null,
         "begrunnelseType": "PÅKREVD",
-        "tilhørendeFaktaType": null
+        "tilhørendeFaktaType": null,
+        "feilmelding": null
       },
       {
         "svarId": "NEI",
         "nesteRegelId": null,
         "begrunnelseType": "VALGFRI",
-        "tilhørendeFaktaType": null
+        "tilhørendeFaktaType": null,
+        "feilmelding": null
       }
     ]
   }
