@@ -2,13 +2,13 @@ package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingClient
 import no.nav.tilleggsstonader.sak.googlemaps.placeDetailsApi.GooglePlaceDetailsClient
-import no.nav.tilleggsstonader.sak.nvdbApi.NvdbBomstasjonClient
 import no.nav.tilleggsstonader.sak.googlemaps.routesApi.GoogleRoutesClient
 import no.nav.tilleggsstonader.sak.interntVedtak.HtmlifyClient
 import no.nav.tilleggsstonader.sak.journalføring.FamilieDokumentClient
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostClient
 import no.nav.tilleggsstonader.sak.klage.KlageClient
 import no.nav.tilleggsstonader.sak.klage.KlageClientMockConfig
+import no.nav.tilleggsstonader.sak.nvdbApi.NvdbBomstasjonClient
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetClient
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaClient
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattClient

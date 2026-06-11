@@ -16,11 +16,11 @@ class BomstasjonServiceTest {
     // Polyline fra Oslo-ruten: fra (59.9230926, 10.755531) til (59.93544, 10.6964283)
     private val osloPolyline =
         "ivvlJaus`AiAFmEZKFiCpAo@@CsFcDVI?aBLCCy@oCCgA[@aDHa@?BpCBbB?J?LBzC?F@p@BzF@zBBzD@v@@H@b@@f@@hAG~CAFg@" +
-                "JYHKDuBh@aEbAkCTG?G@oA?wAKE?{Bg@y@e@QKq@a@a@GSAQ?e@Cy@CU?i@GWCS?Kn@k@bD[bCI|@Gj@ItAG|BGvEC~AChAAl@" +
-                "AVAt@Cf@MjCIrAKdB_@~G_AhQS~DQhDC^KtBQ`DGdA?tA?\\@VHpAP`B@JDPBNx@`D~@vDh@jBRt@r@lBLZXv@N^HRr@hBPd@Nf@" +
-                "h@fB@BVj@Zf@r@zAfBnEr@hBVr@N^Tj@d@nAHZf@~Ad@|ABLl@nB\\pA\\dAPl@jA`Ex@xCVz@BHHZt@fCTx@^rAPr@V~@J`ADPDN" +
-                "b@zALzACn@g@tAg@dAa@z@INKHaBxCGTOVs@|Aq@lBMf@Md@APYzAm@pEm@lEAb@iA|I[rBGLMPELCR?N@LGd@[dAy@dCKNSd@" +
-                "ADo@jAGFCAKDCFEP?J@LYhAA@SdAi@bDU`BOjASxAiBxNCJK`BKrAUtCc@CSCmAI"
+            "JYHKDuBh@aEbAkCTG?G@oA?wAKE?{Bg@y@e@QKq@a@a@GSAQ?e@Cy@CU?i@GWCS?Kn@k@bD[bCI|@Gj@ItAG|BGvEC~AChAAl@" +
+            "AVAt@Cf@MjCIrAKdB_@~G_AhQS~DQhDC^KtBQ`DGdA?tA?\\@VHpAP`B@JDPBNx@`D~@vDh@jBRt@r@lBLZXv@N^HRr@hBPd@Nf@" +
+            "h@fB@BVj@Zf@r@zAfBnEr@hBVr@N^Tj@d@nAHZf@~Ad@|ABLl@nB\\pA\\dAPl@jA`Ex@xCVz@BHHZt@fCTx@^rAPr@V~@J`ADPDN" +
+            "b@zALzACn@g@tAg@dAa@z@INKHaBxCGTOVs@|Aq@lBMf@Md@APYzAm@pEm@lEAb@iA|I[rBGLMPELCR?N@LGd@[dAy@dCKNSd@" +
+            "ADo@jAGFCAKDCFEP?J@LYhAA@SdAi@bDU`BOjASxAiBxNCJK`BKrAUtCc@CSCmAI"
 
     @Test
     fun `harBomvei returnerer true når bomstasjon er nær starten av ruten`() {
