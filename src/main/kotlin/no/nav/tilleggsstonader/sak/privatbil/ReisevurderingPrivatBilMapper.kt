@@ -82,5 +82,6 @@ object ReisevurderingPrivatBilMapper {
             avvik = avvik,
             begrunnelse = begrunnelse,
             parkeringsutgift = parkeringsutgift,
+            avklartKjørtDagStatus = avklartKjørtDagStatus,
         )
 }

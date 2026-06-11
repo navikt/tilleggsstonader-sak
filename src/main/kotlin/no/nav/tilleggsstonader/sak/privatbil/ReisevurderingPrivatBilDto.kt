@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDagStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikDag
@@ -53,4 +54,5 @@ data class AvklartDagDto(
     val avvik: List<TypeAvvikDag>,
     val begrunnelse: String?, // må fylles ut om avvik?
     val parkeringsutgift: Int?,
+    val avklartKjørtDagStatus: AvklartKjørtDagStatus,
 )

@@ -21,7 +21,29 @@ data class AvklartKjørtDag(
     val parkeringsutgift: Int? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
-)
+    @Column("avklart_kjort_dag_status")
+    val avklartKjørtDagStatus: AvklartKjørtDagStatus,
+) {
+    fun markerSomSlettet(): AvklartKjørtDag = copy(avklartKjørtDagStatus = AvklartKjørtDagStatus.SLETTET)
+}
+
+fun Collection<AvklartKjørtDag>.markerSomSlettet(): Set<AvklartKjørtDag> = map { it.markerSomSlettet() }.toSet()
+
+fun Collection<AvklartKjørtDag>.markerSomSlettet(fraDato: LocalDate): Set<AvklartKjørtDag> =
+    map { dag ->
+        if (dag.dato > fraDato) {
+            dag.markerSomSlettet()
+        } else {
+            dag
+        }
+    }.toSet()
+
+enum class AvklartKjørtDagStatus {
+    NY,
+    ENDRET,
+    UENDRET,
+    SLETTET,
+}
 
 enum class GodkjentGjennomførtKjøring {
     JA,
