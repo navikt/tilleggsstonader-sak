@@ -204,7 +204,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
                 .single { it.type == BehandlingType.KJØRELISTE }
 
         gjennomførKjørelisteBehandling(førsteKjørelistebehandling)
-        testoppsettService.settAndelerTilOkForBehandling(førsteKjørelistebehandling)
+        testoppsettService.settAndelerTilOkForBehandling(førsteKjørelistebehandling.id)
 
         // Sender inn kjøreliste for andre rammevedtak
         sendInnKjøreliste(

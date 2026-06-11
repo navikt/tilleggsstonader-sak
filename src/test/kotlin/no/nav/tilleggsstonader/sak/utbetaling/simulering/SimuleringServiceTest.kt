@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Simuleringsresul
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.SimuleringDto
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingV3Mapper
 import no.nav.tilleggsstonader.sak.util.FileUtil.readFile
@@ -72,6 +73,14 @@ internal class SimuleringServiceTest {
         every { fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(any(), any(), any()) } answers {
             FagsakUtbetalingId(fagsakId = FagsakId(firstArg()), typeAndel = secondArg(), reiseId = thirdArg())
         }
+        every { fagsakUtbetalingIdService.hentUtbetalingIderForFagsakId(any()) } returns
+            listOf(
+                FagsakUtbetalingId(
+                    fagsakId = FagsakId.random(),
+                    typeAndel = TypeAndel.TILSYN_BARN_AAP,
+                    reiseId = null,
+                ),
+            )
     }
 
     @Test

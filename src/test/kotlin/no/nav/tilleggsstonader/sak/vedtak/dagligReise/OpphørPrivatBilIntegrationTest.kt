@@ -61,7 +61,7 @@ class OpphørPrivatBilIntegrationTest(
                 .hentBehandlinger(førstegangsbehandlingContext.fagsakId)
                 .single { it.type == BehandlingType.KJØRELISTE }
         gjennomførKjørelisteBehandling(kjørelistebehandling)
-        testoppsettService.settAndelerTilOkForBehandling(kjørelistebehandling)
+        testoppsettService.settAndelerTilOkForBehandling(kjørelistebehandling.id)
 
         val revurderingId =
             opprettRevurderingOgGjennomførBehandlingsløp(
