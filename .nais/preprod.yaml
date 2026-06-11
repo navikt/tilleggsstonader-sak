@@ -122,6 +122,7 @@ spec:
         - host: kodeverk-api.nav.no
         - host: norg2.dev-fss-pub.nais.io
         - host: ereg-services.dev-fss-pub.nais.io
+        - host: nvdbapiles.atlas.vegvesen.no
 
   envFrom:
     - secret: tilleggsstonader-sak-unleash-api-token

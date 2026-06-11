@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.googlemaps.routesApi.LinjeType
 import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Polyline
 import no.nav.tilleggsstonader.sak.googlemaps.routesApi.Reisetype
 import no.nav.tilleggsstonader.sak.googlemaps.routesApi.RuteResponse
+import no.nav.tilleggsstonader.sak.nvdbApi.BomstasjonService
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -26,10 +27,12 @@ import tools.jackson.module.kotlin.readValue
 class GooglemapsServiceTest {
     val googleRoutesClient = mockk<GoogleRoutesClient>()
     val googlePlaceDetailsClient = mockk<GooglePlaceDetailsClient>()
+    val bomstasjonService = mockk<BomstasjonService>()
     val googlemapsService =
         GooglemapsService(
             googleRoutesClient = googleRoutesClient,
             googlePlaceDetailsClient = googlePlaceDetailsClient,
+            bomstasjonService = bomstasjonService,
         )
 
     val fraAdresse = "Myravegen 2, 6360 Åfarnes"
@@ -59,6 +62,7 @@ class GooglemapsServiceTest {
         val ruteJson = FileUtil.readFile("no/nav/tilleggsstonader/sak/googlemaps/kjørerute_response.json")
         val ruteResponse = jsonMapper.readValue<RuteResponse>(ruteJson)
         every { googleRoutesClient.hentRuter(any()) } returns ruteResponse
+        every { bomstasjonService.harBomstasjonPåRute(any()) } returns true
 
         val forventet =
             ReisedataDto(
@@ -76,14 +80,27 @@ class GooglemapsServiceTest {
                         varighetSekunder = 2407.0,
                         strekninger =
                             listOf(
-                                StrekningDto(varighetSekunder = 243.0, reisetype = Reisetype.DRIVE, kollektivDetaljer = null),
-                                StrekningDto(varighetSekunder = 2088.0, reisetype = Reisetype.DRIVE, kollektivDetaljer = null),
-                                StrekningDto(varighetSekunder = 76.0, reisetype = Reisetype.DRIVE, kollektivDetaljer = null),
+                                StrekningDto(
+                                    varighetSekunder = 243.0,
+                                    reisetype = Reisetype.DRIVE,
+                                    kollektivDetaljer = null,
+                                ),
+                                StrekningDto(
+                                    varighetSekunder = 2088.0,
+                                    reisetype = Reisetype.DRIVE,
+                                    kollektivDetaljer = null,
+                                ),
+                                StrekningDto(
+                                    varighetSekunder = 76.0,
+                                    reisetype = Reisetype.DRIVE,
+                                    kollektivDetaljer = null,
+                                ),
                             ),
                         startLokasjon = LokasjonDto(lat = 62.659176200000005, lng = 7.502830500000001),
                         sluttLokasjon = LokasjonDto(lat = 62.6857511, lng = 7.454786800000001),
                         startAdresse = "Myravegen 2, 6360 Åfarnes, Norway",
                         sluttAdresse = "Fv64 40, 6456 Skåla, Norway",
+                        harBomvei = true,
                     ),
             )
 
@@ -97,6 +114,7 @@ class GooglemapsServiceTest {
         val ruteJson = FileUtil.readFile("no/nav/tilleggsstonader/sak/googlemaps/kollektivrute_response.json")
         val ruteResponse = jsonMapper.readValue<RuteResponse>(ruteJson)
         every { googleRoutesClient.hentRuter(any()) } returns ruteResponse
+        every { bomstasjonService.harBomstasjonPåRute(any()) } returns false
 
         val forventet =
             ReisedataDto(
@@ -114,7 +132,11 @@ class GooglemapsServiceTest {
                         varighetSekunder = 2067.0,
                         strekninger =
                             listOf(
-                                StrekningDto(varighetSekunder = 631.0, reisetype = Reisetype.WALK, kollektivDetaljer = null),
+                                StrekningDto(
+                                    varighetSekunder = 631.0,
+                                    reisetype = Reisetype.WALK,
+                                    kollektivDetaljer = null,
+                                ),
                                 StrekningDto(
                                     varighetSekunder = 900.0,
                                     reisetype = Reisetype.TRANSIT,
@@ -133,12 +155,17 @@ class GooglemapsServiceTest {
                                                 ),
                                         ),
                                 ),
-                                StrekningDto(varighetSekunder = 534.0, reisetype = Reisetype.WALK, kollektivDetaljer = null),
+                                StrekningDto(
+                                    varighetSekunder = 534.0,
+                                    reisetype = Reisetype.WALK,
+                                    kollektivDetaljer = null,
+                                ),
                             ),
                         startLokasjon = LokasjonDto(lat = 62.659176200000005, lng = 7.502830500000001),
                         sluttLokasjon = LokasjonDto(lat = 62.685745999999995, lng = 7.454721900000001),
                         startAdresse = "Myravegen 2, 6360 Åfarnes, Norway",
                         sluttAdresse = "Fv64 40, 6456 Skåla, Norway",
+                        harBomvei = false,
                     ),
             )
 

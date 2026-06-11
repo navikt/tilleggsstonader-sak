@@ -20,7 +20,7 @@ import java.util.UUID
 @Profile("!integrasjonstest")
 class KodeverkInitializer(
     private val kodeverkService: CachedKodeverkService,
-    @Qualifier("kodeverkCache")
+    @Qualifier("longCache")
     private val cacheManager: CacheManager,
 ) : ApplicationListener<ApplicationReadyEvent> {
     private val logger = LoggerFactory.getLogger(javaClass)
