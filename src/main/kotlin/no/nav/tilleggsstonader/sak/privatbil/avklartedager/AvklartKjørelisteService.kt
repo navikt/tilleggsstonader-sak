@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -37,10 +36,10 @@ class AvklartKjørelisteService(
     fun hentAvklartUke(ukeId: UUID): AvklartKjørtUke = avklartKjørtUkeRepository.findByIdOrThrow(ukeId)
 
     fun avklarUkerFraKjøreliste(
-        behandling: Behandling,
+        behandlingId: BehandlingId,
         kjøreliste: Kjøreliste,
     ) {
-        val rammeForReise = henteReiseFraVedtak(behandling.id, kjøreliste.data.reiseId)
+        val rammeForReise = henteReiseFraVedtak(behandlingId, kjøreliste.data.reiseId)
 
         validerAtAlleDagerIKjørelistaErInnenForRammevedtaket(rammeForReise, kjøreliste)
 
@@ -49,7 +48,7 @@ class AvklartKjørelisteService(
         val avklarteUker =
             kjørelisteGruppertPåUker.map { (ukeIÅr, reisedager) ->
                 utledAvklartUke(
-                    behandlingId = behandling.id,
+                    behandlingId = behandlingId,
                     ukeIÅr = ukeIÅr,
                     reisedager = reisedager,
                     kjørelisteId = kjøreliste.id,
@@ -281,11 +280,11 @@ class AvklartKjørelisteService(
     }
 
     fun nullstillOgGjenbrukAvklarteUker(
-        behandling: Behandling,
+        behandlingId: BehandlingId,
         behandlingIdForGjenbruk: BehandlingId,
     ) {
         val avklarteUkerForrigeBehandling = hentAvklarteUkerForBehandling(behandlingIdForGjenbruk)
-        val avklarteUkerNyBehandling = hentAvklarteUkerForBehandling(behandling.id)
+        val avklarteUkerNyBehandling = hentAvklarteUkerForBehandling(behandlingId)
 
         val kjørelisterSomFinneIForrigeBehandling = avklarteUkerForrigeBehandling.map { it.kjørelisteId }.toSet()
         val kjørelisterSomFinneINyMenIkkeGammelBehandling =
@@ -302,12 +301,12 @@ class AvklartKjørelisteService(
         val nyeAvklarteUker =
             avklarteUkerForrigeBehandling
                 .filter { it.avklartKjørtUkeStatus != AvklartKjørtUkeStatus.SLETTET }
-                .map { it.kopierTilNyBehandling(behandling.id) }
+                .map { it.kopierTilNyBehandling(behandlingId) }
         avklartKjørtUkeRepository.insertAll(nyeAvklarteUker)
 
         // Avklar nye kjørelister på nytt
         kjørelisterSomFinneINyMenIkkeGammelBehandling.forEach {
-            avklarUkerFraKjøreliste(behandling, it)
+            avklarUkerFraKjøreliste(behandlingId, it)
         }
     }
 
@@ -317,7 +316,8 @@ class AvklartKjørelisteService(
     ) {
         val oppdaterteUker =
             hentAvklarteUkerForBehandling(behandlingId).mapNotNull { uke ->
-                val rammevedtakForReise = rammevedtak.reiser.find { it.reiseId == uke.reiseId } ?: return@mapNotNull null
+                val rammevedtakForReise =
+                    rammevedtak.reiser.find { it.reiseId == uke.reiseId } ?: return@mapNotNull null
                 val sisteDagIRammevedtak = rammevedtakForReise.grunnlag.tom
 
                 when {

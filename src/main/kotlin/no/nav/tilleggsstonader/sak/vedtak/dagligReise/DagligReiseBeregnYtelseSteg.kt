@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.behandling.GjenbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -29,6 +30,7 @@ class DagligReiseBeregnYtelseSteg(
     private val dagligReiseVedtakService: DagligReiseVedtakService,
     private val opprettAndelerDagligReiseService: OpprettAndelerDagligReiseService,
     private val avklartKjørelisteService: AvklartKjørelisteService,
+    private val gjenbrukDataRevurderingService: GjenbrukDataRevurderingService,
     vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -65,6 +67,9 @@ class DagligReiseBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         vedtak: VedtakDagligReiseRequest,
     ) {
+        gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(saksbehandling.fagsakId)?.let {
+            avklartKjørelisteService.nullstillOgGjenbrukAvklarteUker(saksbehandling.id, it)
+        }
         when (vedtak) {
             is InnvilgelseDagligReiseRequest -> beregnOgLagreInnvilgelse(saksbehandling, vedtak)
             is AvslagDagligReiseDto -> dagligReiseVedtakService.lagreAvslag(saksbehandling, vedtak)
@@ -113,7 +118,8 @@ class DagligReiseBeregnYtelseSteg(
             "Opphørsdato er ikke satt"
         }
         val opphørsdato = vedtak.opphørsdato
-        val forrigeVedtak = dagligReiseVedtakService.hentInnvilgelseEllerOpphørVedtak(saksbehandling.forrigeIverksatteBehandlingId)
+        val forrigeVedtak =
+            dagligReiseVedtakService.hentInnvilgelseEllerOpphørVedtak(saksbehandling.forrigeIverksatteBehandlingId)
 
         opphørValideringService.validerVilkårperioder(saksbehandling, opphørsdato)
 
