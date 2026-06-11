@@ -335,22 +335,11 @@ class AvklartKjørelisteService(
     private fun AvklartKjørtUke.markerHeleUkaSomSlettet(): AvklartKjørtUke =
         copy(
             avklartKjørtUkeStatus = AvklartKjørtUkeStatus.SLETTET,
-            dager =
-                dager
-                    .map { it.copy(avklartKjørtDagStatus = AvklartKjørtDagStatus.SLETTET) }
-                    .toSet(),
+            dager = dager.markerSomSlettet(),
         )
 
     private fun AvklartKjørtUke.markerDelerAvUkaSomSlettet(fraDato: LocalDate): AvklartKjørtUke? {
-        val oppdaterteDager =
-            dager
-                .map { dag ->
-                    if (dag.dato > fraDato && dag.avklartKjørtDagStatus != AvklartKjørtDagStatus.SLETTET) {
-                        dag.copy(avklartKjørtDagStatus = AvklartKjørtDagStatus.SLETTET)
-                    } else {
-                        dag
-                    }
-                }.toSet()
+        val oppdaterteDager = dager.markerSomSlettet(fraDato)
         return if (oppdaterteDager != dager) {
             val nyUkeStatus =
                 if (avklartKjørtUkeStatus == AvklartKjørtUkeStatus.UENDRET) {

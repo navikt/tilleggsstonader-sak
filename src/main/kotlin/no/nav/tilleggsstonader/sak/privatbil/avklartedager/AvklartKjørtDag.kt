@@ -23,7 +23,20 @@ data class AvklartKjørtDag(
     val sporbar: Sporbar = Sporbar(),
     @Column("avklart_kjort_dag_status")
     val avklartKjørtDagStatus: AvklartKjørtDagStatus,
-)
+) {
+    fun markerSomSlettet(): AvklartKjørtDag = copy(avklartKjørtDagStatus = AvklartKjørtDagStatus.SLETTET)
+}
+
+fun Collection<AvklartKjørtDag>.markerSomSlettet(): Set<AvklartKjørtDag> = map { it.markerSomSlettet() }.toSet()
+
+fun Collection<AvklartKjørtDag>.markerSomSlettet(fraDato: LocalDate): Set<AvklartKjørtDag> =
+    map { dag ->
+        if (dag.dato > fraDato) {
+            dag.markerSomSlettet()
+        } else {
+            dag
+        }
+    }.toSet()
 
 enum class AvklartKjørtDagStatus {
     NY,
