@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingClient
 import no.nav.tilleggsstonader.sak.googlemaps.placeDetailsApi.GooglePlaceDetailsClient
+import no.nav.tilleggsstonader.sak.nvdbApi.NvdbBomstasjonClient
 import no.nav.tilleggsstonader.sak.googlemaps.routesApi.GoogleRoutesClient
 import no.nav.tilleggsstonader.sak.interntVedtak.HtmlifyClient
 import no.nav.tilleggsstonader.sak.journalføring.FamilieDokumentClient
@@ -45,6 +46,7 @@ class MockClients(
     val kafkaTemplate: KafkaTemplate<String, String>,
     val googleRoutesClient: GoogleRoutesClient,
     val googlePlaceDetailsClient: GooglePlaceDetailsClient,
+    val nvdbBomstasjonClient: NvdbBomstasjonClient,
 ) {
     fun resetAlleTilDefaults() {
         ArbeidsfordelingClientMockConfig.resetTilDefault(arbeidsfordelingClient)
@@ -65,5 +67,6 @@ class MockClients(
         KafkaFake.resetMock(kafkaTemplate)
         GoogleRoutesClientMockConfig.resetTilDefault(googleRoutesClient)
         GooglePlaceDetailsClientMockConfig.resetTilDefault(googlePlaceDetailsClient)
+        NvdbBomstasjonClientMockConfig.resetTilDefault(nvdbBomstasjonClient)
     }
 }

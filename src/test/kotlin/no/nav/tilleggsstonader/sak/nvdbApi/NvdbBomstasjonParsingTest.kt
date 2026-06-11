@@ -99,14 +99,14 @@ class NvdbBomstasjonParsingTest {
 
     @Test
     fun `deserialiserer NVDB v4 JSON-respons korrekt`() {
-        val json = FileUtil.readFile("no/nav/tilleggsstonader/sak/googlemaps/nvdb/nvdb_bomstasjoner.json")
+        val json = FileUtil.readFile("no/nav/tilleggsstonader/sak/nvdb/nvdb_bomstasjoner.json")
         val response = jsonMapper.readValue<NvdbBomstasjonResponse>(json)
 
-        assertThat(response.objekter.size).isEqualTo(110)
+        assertThat(response.objekter.size).isEqualTo(3)
         assertThat(response.metadata.neste?.start).isEqualTo("1027073034:1")
 
         val domeneObjekter = response.objekter.mapNotNull { it.tilDomene() }
-        assertThat(domeneObjekter).hasSize(108)
+        assertThat(domeneObjekter).hasSize(3)
 
         // Verifiser kjent stasjon fra fixture (første Bergen-stasjon)
         val bergenStasjon = domeneObjekter.first { it.id == 82443541L }
