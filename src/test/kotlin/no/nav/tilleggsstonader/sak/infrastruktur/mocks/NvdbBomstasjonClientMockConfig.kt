@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.context.annotation.Profile
+import org.springframework.test.util.AopTestUtils
 
 @Configuration
 @Profile("mock-nvdb")
@@ -19,8 +20,12 @@ class NvdbBomstasjonClientMockConfig {
 
     companion object {
         fun resetTilDefault(client: NvdbBomstasjonClient) {
-            clearMocks(client)
-            every { client.hentAlleBomstasjoner() } returns emptyList<NvdbBomstasjon>()
+            // NvdbBomstasjonClient har @Cacheable-metode, så Spring kan wrappe beanen i en proxy.
+            // Derfor henter vi ut underliggende mock før MockK-operasjoner.
+            val faktiskClient = runCatching { AopTestUtils.getTargetObject<NvdbBomstasjonClient>(client) }.getOrElse { client }
+
+            clearMocks(faktiskClient)
+            every { faktiskClient.hentAlleBomstasjoner() } returns emptyList<NvdbBomstasjon>()
         }
     }
 }
