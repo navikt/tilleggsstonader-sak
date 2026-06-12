@@ -113,7 +113,6 @@ fun IntegrationTest.gjennomførBehandlingsløp(
     behandlingId: BehandlingId,
     ident: String,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
-    erRevurderingDagligReiseMedPrivatBil: Boolean = false,
     testdataProvider: BehandlingTestdataDsl.() -> Unit,
 ) {
     // Oppretter grunnlagsdata
@@ -129,9 +128,9 @@ fun IntegrationTest.gjennomførBehandlingsløp(
 
     val testdata = BehandlingTestdataDsl.build(testdataProvider)
 
-    var nåværendeSteg = behandling.steg
-    while (nåværendeSteg != tilSteg) {
-        nåværendeSteg = utførStegOgReturnerNesteSteg(nåværendeSteg, behandling, testdata)
+    var nesteSteg = behandling.steg
+    while (nesteSteg != tilSteg) {
+        nesteSteg = utførStegOgReturnerNesteSteg(nesteSteg, behandling, testdata)
     }
 
     // Ferdigstiller behandling
@@ -150,7 +149,7 @@ fun IntegrationTest.gjennomførBehandlingsløp(
 fun IntegrationTest.utførStegOgReturnerNesteSteg(
     steg: StegType,
     behandling: BehandlingDto,
-    testdata: BehandlingTestdataDsl,
+    testdata: BehandlingTestdataDsl = BehandlingTestdataDsl.utenData(),
 ): StegType =
     when (steg) {
         StegType.INNGANGSVILKÅR -> gjennomførInngangsvilkårSteg(testdata, behandling.id)
@@ -185,7 +184,6 @@ fun IntegrationTest.opprettRevurdering(opprettBehandlingDto: OpprettBehandlingDt
 fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
     fraBehandlingId: BehandlingId,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
-    erRevurderingDagligReiseMedPrivatBil: Boolean = false,
     testdataProvider: BehandlingTestdataDsl.() -> Unit,
 ): BehandlingId {
     val behandling = kall.behandling.hent(fraBehandlingId)
@@ -200,14 +198,12 @@ fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
             ),
         tilSteg = tilSteg,
         testdataProvider = testdataProvider,
-        erRevurderingDagligReiseMedPrivatBil = erRevurderingDagligReiseMedPrivatBil,
     )
 }
 
 fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
     opprettBehandlingDto: OpprettBehandlingDto,
     tilSteg: StegType = StegType.BEHANDLING_FERDIGSTILT,
-    erRevurderingDagligReiseMedPrivatBil: Boolean = false,
     testdataProvider: BehandlingTestdataDsl.() -> Unit,
 ): BehandlingId {
     val revurderingId = opprettRevurdering(opprettBehandlingDto)
@@ -216,7 +212,6 @@ fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
         ident = testoppsettService.hentPersonidentForBehandlingId(revurderingId),
         tilSteg = tilSteg,
         testdataProvider = testdataProvider,
-        erRevurderingDagligReiseMedPrivatBil = erRevurderingDagligReiseMedPrivatBil,
     )
     return revurderingId
 }
