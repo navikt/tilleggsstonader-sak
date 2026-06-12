@@ -66,7 +66,6 @@ class OpphørPrivatBilIntegrationTest(
         val revurderingId =
             opprettRevurderingOgGjennomførBehandlingsløp(
                 fraBehandlingId = førstegangsbehandlingContext.behandlingId,
-                erRevurderingDagligReiseMedPrivatBil = true,
             ) {
                 vedtak {
                     opphør(opphørsdato = opphørsdato)
