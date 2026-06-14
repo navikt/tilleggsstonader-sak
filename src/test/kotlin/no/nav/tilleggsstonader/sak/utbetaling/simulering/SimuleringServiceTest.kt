@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsaker
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.utbetaling.fagomrade.FagsakUtbetalingsvalgService
 import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingId
 import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdService
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.SimuleringClient
@@ -47,8 +48,9 @@ internal class SimuleringServiceTest {
     private val tilkjentYtelseService = mockk<TilkjentYtelseService>()
     private val tilgangService = mockk<TilgangService>()
     private val fagsakUtbetalingIdService = mockk<FagsakUtbetalingIdService>()
+    private val fagsakUtbetalingsvalgService = mockk<FagsakUtbetalingsvalgService>()
 
-    private val utbetalingV3Mapper = UtbetalingV3Mapper(fagsakUtbetalingIdService, tilkjentYtelseService)
+    private val utbetalingV3Mapper = UtbetalingV3Mapper(fagsakUtbetalingIdService, fagsakUtbetalingsvalgService, tilkjentYtelseService)
 
     private val simuleringService =
         SimuleringService(
@@ -71,8 +73,13 @@ internal class SimuleringServiceTest {
         every { tilgangService.validerHarSaksbehandlerrolle() } just Runs
         every { tilgangService.harTilgangTilRolle(any()) } returns true
         every { fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(any(), any(), any()) } answers {
-            FagsakUtbetalingId(fagsakId = FagsakId(firstArg()), typeAndel = secondArg(), reiseId = thirdArg())
+            FagsakUtbetalingId(
+                fagsakId = FagsakId(firstArg()),
+                typeAndel = secondArg(),
+                reiseId = thirdArg(),
+            )
         }
+        every { fagsakUtbetalingsvalgService.hentEllerSettUtbetalPåNyttFagområde(any(), any()) } returns true
         every { fagsakUtbetalingIdService.hentUtbetalingIderForFagsakId(any()) } returns
             listOf(
                 FagsakUtbetalingId(

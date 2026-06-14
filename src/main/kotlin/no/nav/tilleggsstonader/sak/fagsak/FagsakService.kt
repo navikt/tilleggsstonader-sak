@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
@@ -131,6 +132,19 @@ class FagsakService(
         fagsakRepository.finnMedEksternId(eksternFagsakId)?.tilFagsakMedPerson()
 
     fun hentAktivIdent(fagsakId: FagsakId): String = fagsakRepository.finnAktivIdent(fagsakId)
+
+    @Transactional
+    fun settUtbetalPåNyttFagområde(
+        fagsakId: FagsakId,
+        utbetalPåNyttFagområde: Boolean,
+    ): Boolean {
+        val fagsak = fagsakRepository.findByIdOrThrow(fagsakId)
+        feilHvis(fagsak.utbetalPåNyttFagområde != null) {
+            "utbetalPåNyttFagområde er allerede satt for fagsakId=$fagsakId"
+        }
+        fagsakRepository.update(fagsak.copy(utbetalPåNyttFagområde = utbetalPåNyttFagområde))
+        return utbetalPåNyttFagområde
+    }
 
     fun hentMetadata(fagsakIder: Collection<FagsakId>): Map<FagsakId, FagsakMetadata> =
         fagsakRepository.hentFagsakMetadata(fagsakIder.toSet()).associateBy {

@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.utbetaling.fagomrade.FagsakUtbetalingsvalgService
 import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingId
 import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -16,6 +16,7 @@ import java.time.LocalDateTime
 @Service
 class UtbetalingV3Mapper(
     private val fagsakUtbetalingIdService: FagsakUtbetalingIdService,
+    private val fagsakUtbetalingsvalgService: FagsakUtbetalingsvalgService,
     private val tilkjentYtelseService: TilkjentYtelseService,
 ) {
     fun lagSimuleringDtoer(
@@ -63,26 +64,36 @@ class UtbetalingV3Mapper(
         behandling: Saksbehandling,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
         erFørsteIverksettingForBehandling: Boolean,
-    ): List<UtbetalingDto> =
-        andelerTilkjentYtelse
+    ): List<UtbetalingDto> {
+        val utbetalPåNyttFagområde =
+            fagsakUtbetalingsvalgService.hentEllerSettUtbetalPåNyttFagområde(
+                fagsakId = behandling.fagsakId,
+                stønadstype = behandling.stønadstype,
+            )
+        return andelerTilkjentYtelse
             .filterNot { it.erNullandel() }
             .groupBy { TypeAndelOgReiseId(it.type, it.reiseId) }
-            .map { (typeAndelOgReiseId, andelerAvType) -> lagUtbetaling(behandling, typeAndelOgReiseId, andelerAvType) }
-            .let { utbetalinger ->
+            .map { (typeAndelOgReiseId, andelerAvType) ->
+                lagUtbetaling(
+                    behandling = behandling,
+                    typeAndelOgReiseId = typeAndelOgReiseId,
+                    andeler = andelerAvType,
+                    utbetalPåNyttFagområde = utbetalPåNyttFagområde,
+                )
+            }.let { utbetalinger ->
                 if (erFørsteIverksettingForBehandling) {
-                    utbetalinger + lagUtbetalingDtoForAnnulering(behandling, andelerTilkjentYtelse)
+                    utbetalinger + lagUtbetalingDtoForAnnulering(behandling, andelerTilkjentYtelse, utbetalPåNyttFagområde)
                 } else {
                     utbetalinger
                 }
             }
-
-    private fun Stønadstype.skalBrukeGamleFagområder() =
-        Stønadstype.BARNETILSYN == this || Stønadstype.LÆREMIDLER == this || Stønadstype.BOUTGIFTER == this
+    }
 
     private fun lagUtbetaling(
         behandling: Saksbehandling,
         typeAndelOgReiseId: TypeAndelOgReiseId,
         andeler: Collection<AndelTilkjentYtelse>,
+        utbetalPåNyttFagområde: Boolean,
     ): UtbetalingDto {
         val utbetalingId =
             fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(
@@ -94,25 +105,26 @@ class UtbetalingV3Mapper(
             id = utbetalingId.utbetalingId,
             stønad = mapTilStønadUtbetaling(typeAndelOgReiseId.typeAndel),
             perioder = grupperPåDagOgMapTilPerioder(andeler),
-            brukFagområdeTillst = behandling.stønadstype.skalBrukeGamleFagområder(),
+            brukFagområdeTillst = !utbetalPåNyttFagområde,
         )
     }
 
     private fun lagUtbetalingDtoForAnnulering(
         behandling: Saksbehandling,
         andelerTilkjentYtelse: Collection<AndelTilkjentYtelse>,
+        utbetalPåNyttFagområde: Boolean,
     ): List<UtbetalingDto> =
         finnUtbetalingIderSomSkalAnnulleres(behandling, andelerTilkjentYtelse)
-            .map { utbetalingId -> lagAnnulleringUtbetaling(utbetalingId, behandling.stønadstype) }
+            .map { utbetalingId -> lagAnnulleringUtbetaling(utbetalingId, utbetalPåNyttFagområde) }
 
     private fun lagAnnulleringUtbetaling(
         fagsakUtbetalingId: FagsakUtbetalingId,
-        stønadstype: Stønadstype,
+        utbetalPåNyttFagområde: Boolean,
     ) = UtbetalingDto(
         id = fagsakUtbetalingId.utbetalingId,
         stønad = mapTilStønadUtbetaling(fagsakUtbetalingId.typeAndel),
         perioder = emptyList(),
-        brukFagområdeTillst = stønadstype.skalBrukeGamleFagområder(),
+        brukFagområdeTillst = !utbetalPåNyttFagområde,
     )
 
     // Grupperer alle andeler som har samme fom. NB: hvis vi tar i bruk noe annet enn dagsats må dette endres, da tom kan være ulik
