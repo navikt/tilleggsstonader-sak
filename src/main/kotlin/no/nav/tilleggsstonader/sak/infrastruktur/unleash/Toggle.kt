@@ -25,6 +25,8 @@ enum class Toggle(
 
     BRUK_OPPFOLGINGSENHET_FOR_UTBETALING("sak.bruk-oppfolgingsenhet-for-utbetaling"),
 
+    BRUK_NYTT_FAGOMRADE_FOR_UTBETALING("sak.bruk-nytt-fagomrade-for-utbetaling"),
+
     SØKNAD_ROUTING_REISE_TIL_SAMLING("sak.soknad-routing.reise-til-samling"),
 
     KAN_OPPHØRE_PRIVAT_BIL("sak.opphore-privat-bil"),

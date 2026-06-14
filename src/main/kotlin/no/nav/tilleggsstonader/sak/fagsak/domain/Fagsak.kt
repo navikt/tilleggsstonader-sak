@@ -24,6 +24,7 @@ data class Fagsak(
     val personIdenter: Set<PersonIdent>,
     val eksternId: EksternFagsakId,
     val stønadstype: Stønadstype,
+    val utbetalPåNyttFagområde: Boolean? = null,
     val sporbar: Sporbar,
 ) {
     fun erAktivIdent(personIdent: String): Boolean = hentAktivIdent() == personIdent
@@ -40,6 +41,8 @@ data class FagsakDomain(
     val fagsakPersonId: FagsakPersonId,
     @Column("stonadstype")
     val stønadstype: Stønadstype,
+    @Column("utbetal_pa_nytt_fagomrade")
+    val utbetalPåNyttFagområde: Boolean? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
 )
@@ -61,5 +64,6 @@ fun FagsakDomain.tilFagsakMedPerson(
         personIdenter = personIdenter,
         eksternId = eksternFagsakId,
         stønadstype = stønadstype,
+        utbetalPåNyttFagområde = utbetalPåNyttFagområde,
         sporbar = sporbar,
     )
