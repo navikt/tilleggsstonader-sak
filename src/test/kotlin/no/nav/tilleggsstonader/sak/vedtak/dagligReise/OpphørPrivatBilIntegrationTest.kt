@@ -91,10 +91,14 @@ class OpphørPrivatBilIntegrationTest(
         assertThat(ukerIReise).hasSize(6)
         assertThat(ukerIReise.maxOf { it.tom }).isEqualTo(opphørsdato.minusDays(1))
 
-        val dagerISisteUke = beregningsresultatPrivatBil.reiser.single().perioder.maxBy { it.fom }.grunnlag.dager
+        val dagerISisteUke =
+            beregningsresultatPrivatBil.reiser
+                .single()
+                .perioder
+                .maxBy { it.fom }
+                .grunnlag.dager
         assertThat(dagerISisteUke).hasSize(1)
         assertThat(dagerISisteUke.single().dato).isEqualTo(9 mars 2026)
-
 
         val andeler = tilkjentYtelseService.hentForBehandling(revurderingId).andelerTilkjentYtelse
         assertThat(andeler.maxOf { it.fom }).isBefore(opphørsdato.minusDays(1))
