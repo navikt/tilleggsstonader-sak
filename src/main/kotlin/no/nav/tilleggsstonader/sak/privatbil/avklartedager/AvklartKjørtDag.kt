@@ -25,18 +25,19 @@ data class AvklartKjørtDag(
     val avklartKjørtDagStatus: AvklartKjørtDagStatus,
 ) {
     fun markerSomSlettet(): AvklartKjørtDag = copy(avklartKjørtDagStatus = AvklartKjørtDagStatus.SLETTET)
+
+    fun markerSomSlettetHvisEtter(fraDato: LocalDate): AvklartKjørtDag =
+        if (dato > fraDato) {
+            markerSomSlettet()
+        } else {
+            this
+        }
 }
 
 fun Collection<AvklartKjørtDag>.markerSomSlettet(): Set<AvklartKjørtDag> = map { it.markerSomSlettet() }.toSet()
 
 fun Collection<AvklartKjørtDag>.markerSomSlettet(fraDato: LocalDate): Set<AvklartKjørtDag> =
-    map { dag ->
-        if (dag.dato > fraDato) {
-            dag.markerSomSlettet()
-        } else {
-            dag
-        }
-    }.toSet()
+    map { dag -> dag.markerSomSlettetHvisEtter(fraDato) }.toSet()
 
 enum class AvklartKjørtDagStatus {
     NY,

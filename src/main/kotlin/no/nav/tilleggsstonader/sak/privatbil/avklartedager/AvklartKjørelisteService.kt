@@ -298,11 +298,11 @@ class AvklartKjørelisteService(
         avklartKjørtUkeRepository.deleteAll(avklarteUkerNyBehandling)
 
         // Kopier over avklarte uker fra forrige behandling
-        val nyeAvklarteUker =
+        val avklarteUkerFraForrigeBehandling =
             avklarteUkerForrigeBehandling
                 .filter { it.avklartKjørtUkeStatus != AvklartKjørtUkeStatus.SLETTET }
                 .map { it.kopierTilNyBehandling(behandlingId) }
-        avklartKjørtUkeRepository.insertAll(nyeAvklarteUker)
+        avklartKjørtUkeRepository.insertAll(avklarteUkerFraForrigeBehandling)
 
         // Avklar nye kjørelister på nytt
         kjørelisterSomFinneINyMenIkkeGammelBehandling.forEach {
