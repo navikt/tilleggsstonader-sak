@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDagStatu
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.finnDagerInnenforPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.avrundetStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilDag
@@ -110,7 +111,10 @@ class PrivatBilBeregningService(
         avklarteUkerForReise: List<AvklartKjørtUke>,
         brukersNavKontor: String?,
     ): BeregningsresultatForReisePrivatBil {
-        val avklarteDagerSomSkalBeregnes = avklarteUkerForReise.tilAvklartDagSomSkalBeregnes()
+        val avklarteDagerSomSkalBeregnes =
+            avklarteUkerForReise
+                .flatMap { it.dager }
+                .filter { it.avklartKjørtDagStatus != AvklartKjørtDagStatus.SLETTET }
 
         validerDagerErInnenforRammevedtak(
             rammeForReise = rammeForReise,
@@ -121,11 +125,7 @@ class PrivatBilBeregningService(
             reiseId = rammeForReise.reiseId,
             perioder =
                 rammeForReise.grunnlag.delperioder.flatMap { delperiode ->
-                    val avklarteDagerIDelperiode =
-                        avklarteDagerSomSkalBeregnes.finnDagerInnenforDelperiode(
-                            delperiode = delperiode,
-                            rammeForReise = rammeForReise,
-                        )
+                    val avklarteDagerIDelperiode = avklarteDagerSomSkalBeregnes.finnDagerInnenforPeriode(delperiode)
                     lagPerioderForDagerMedSammeSats(
                         dager = avklarteDagerIDelperiode,
                         delperiode = delperiode,
@@ -134,20 +134,6 @@ class PrivatBilBeregningService(
                 },
         )
     }
-
-    private fun List<AvklartKjørtUke>.tilAvklartDagSomSkalBeregnes(): List<AvklartKjørtDag> =
-        filter { it.avklartKjørtUkeStatus != AvklartKjørtUkeStatus.SLETTET }
-            .flatMap { it.dager }
-            .filter { it.avklartKjørtDagStatus != AvklartKjørtDagStatus.SLETTET }
-
-    private fun List<AvklartKjørtDag>.finnDagerInnenforDelperiode(
-        delperiode: RammeForReiseMedPrivatBilDelperiode,
-        rammeForReise: RammeForReiseMedPrivatBil,
-    ): List<AvklartKjørtDag> =
-        filter { dag ->
-            rammeForReise.grunnlag.inneholder(dag.dato) &&
-                delperiode.fom <= dag.dato && dag.dato <= delperiode.tom
-        }
 
     private fun validerDagerErInnenforRammevedtak(
         rammeForReise: RammeForReiseMedPrivatBil,
