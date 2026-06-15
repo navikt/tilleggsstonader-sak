@@ -48,7 +48,11 @@ data class AvklartKjørtUke(
         copy(
             id = UUID.randomUUID(),
             behandlingId = nyBehandlingId,
-            dager = dager.map { it.copy(id = UUID.randomUUID()) }.toSet(),
+            dager =
+                dager
+                    .filter { it.avklartKjørtDagStatus != AvklartKjørtDagStatus.SLETTET }
+                    .map { it.copy(id = UUID.randomUUID(), avklartKjørtDagStatus = AvklartKjørtDagStatus.UENDRET) }
+                    .toSet(),
             avklartKjørtUkeStatus = AvklartKjørtUkeStatus.UENDRET,
         )
 }

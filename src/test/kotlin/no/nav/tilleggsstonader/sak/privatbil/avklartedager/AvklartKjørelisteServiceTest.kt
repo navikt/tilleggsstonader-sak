@@ -293,6 +293,7 @@ class AvklartKjørelisteServiceTest {
                             avvik = emptyList(),
                             parkeringsutgift = if (dagOffset == 0) parkeringPåMandag else null,
                             begrunnelse = if (dagOffset == 0) begrunnelsePåMandag else null,
+                            avklartKjørtDagStatus = AvklartKjørtDagStatus.NY,
                         )
                     }.toSet(),
         )
@@ -314,13 +315,13 @@ class AvklartKjørelisteServiceTest {
     }
 
     @Nested
-    inner class SletteMarkerUkerUtenforAvkortetRammevedtak {
+    inner class SletteMarkerUkerOgDagerUtenforAvkortetRammevedtak {
         @Test
-        fun `uker etter siste dato i reisen markeres SLETTET`() {
+        fun `uker etter siste dato i reisen markeres SLETTET med alle dager, og dager i delvis avkortet uke markeres SLETTET`() {
             val mandagUke1 = 5 januar 2026
             val mandagUke2 = 12 januar 2026
             val mandagUke3 = 19 januar 2026
-            val sisteDagIAvkortetRammevedtak = 15 januar 2026
+            val sisteDagIAvkortetRammevedtak = 15 januar 2026 // torsdag i uke 2
 
             val uker =
                 listOf(
@@ -346,42 +347,18 @@ class AvklartKjørelisteServiceTest {
             every { avklartKjørtUkeRepository.findByBehandlingId(behandlingId) } returns uker
             every { avklartKjørtUkeRepository.updateAll(capture(updateSlot)) } answers { updateSlot.captured }
 
-            service.sletteMarkerUkerUtenforAvkortetRammevedtak(behandlingId, rammevedtak)
+            service.sletteMarkerUkerOgDagerUtenforAvkortetRammevedtak(behandlingId, rammevedtak)
 
-            assertThat(updateSlot.captured).hasSize(1)
-            assertThat(updateSlot.captured[0].fom).isEqualTo(mandagUke3)
-            assertThat(updateSlot.captured[0].avklartKjørtUkeStatus).isEqualTo(AvklartKjørtUkeStatus.SLETTET)
-        }
+            // Uke 2 er delvis avkortet — fredag 16. jan er etter tom 15. jan — status skal bli ENDRET
+            val uke2 = updateSlot.captured.single { it.fom == mandagUke2 }
+            assertThat(uke2.avklartKjørtUkeStatus).isEqualTo(AvklartKjørtUkeStatus.ENDRET)
+            assertThat(uke2.dager.filter { it.avklartKjørtDagStatus == AvklartKjørtDagStatus.SLETTET }.map { it.dato })
+                .containsExactly(mandagUke2.plusDays(4)) // fredag
 
-        @Test
-        fun `uker på eller før siste dato berøres ikke`() {
-            val mandagUke1 = 5 januar 2026
-            val mandagUke2 = 12 januar 2026
-            val sisteDagIAvkortetRammevedtak = mandagUke2.plusDays(2) // onsdag i uke 2
-
-            val uker =
-                listOf(
-                    lagUke(fom = mandagUke1, tom = mandagUke1.plusDays(4), status = AvklartKjørtUkeStatus.UENDRET),
-                    lagUke(fom = mandagUke2, tom = mandagUke2.plusDays(4), status = AvklartKjørtUkeStatus.UENDRET),
-                )
-
-            val rammevedtak =
-                RammevedtakPrivatBil(
-                    reiser =
-                        listOf(
-                            lagRammeForReise(
-                                reiseId = reiseId,
-                                fom = mandagUke1,
-                                tom = sisteDagIAvkortetRammevedtak,
-                            ),
-                        ),
-                )
-
-            every { avklartKjørtUkeRepository.findByBehandlingId(behandlingId) } returns uker
-
-            service.sletteMarkerUkerUtenforAvkortetRammevedtak(behandlingId, rammevedtak)
-
-            verify(exactly = 0) { avklartKjørtUkeRepository.updateAll(any()) }
+            // Uke 3 er helt utenfor rammevedtaket
+            val uke3 = updateSlot.captured.single { it.fom == mandagUke3 }
+            assertThat(uke3.avklartKjørtUkeStatus).isEqualTo(AvklartKjørtUkeStatus.SLETTET)
+            assertThat(uke3.dager).allMatch { it.avklartKjørtDagStatus == AvklartKjørtDagStatus.SLETTET }
         }
 
         @Test
@@ -430,7 +407,7 @@ class AvklartKjørelisteServiceTest {
             every { avklartKjørtUkeRepository.findByBehandlingId(behandlingId) } returns uker
             every { avklartKjørtUkeRepository.updateAll(capture(updateSlot)) } answers { updateSlot.captured }
 
-            service.sletteMarkerUkerUtenforAvkortetRammevedtak(behandlingId, rammevedtak)
+            service.sletteMarkerUkerOgDagerUtenforAvkortetRammevedtak(behandlingId, rammevedtak)
 
             // Uke 1 (reiseId) er innenfor rammevedtak, Uke 2 (reiseId) er etter, skal slettes
             // Uke 3 (reise2) finnes ikke i rammevedtak, hoppes over
@@ -440,7 +417,7 @@ class AvklartKjørelisteServiceTest {
         }
 
         @Test
-        fun `ingen forandring på status når ingen uker skal slettes`() {
+        fun `ingen forandring når ingen uker eller dager er utenfor rammevedtaket`() {
             val mandagUke1 = 5 januar 2026
             val uker =
                 listOf(lagUke(fom = mandagUke1, tom = mandagUke1.plusDays(4), status = AvklartKjørtUkeStatus.UENDRET))
@@ -459,7 +436,7 @@ class AvklartKjørelisteServiceTest {
 
             every { avklartKjørtUkeRepository.findByBehandlingId(behandlingId) } returns uker
 
-            service.sletteMarkerUkerUtenforAvkortetRammevedtak(behandlingId, rammevedtak)
+            service.sletteMarkerUkerOgDagerUtenforAvkortetRammevedtak(behandlingId, rammevedtak)
 
             verify(exactly = 0) { avklartKjørtUkeRepository.updateAll(any()) }
         }
@@ -503,6 +480,7 @@ class AvklartKjørelisteServiceTest {
                             avvik = emptyList(),
                             parkeringsutgift = null,
                             begrunnelse = null,
+                            avklartKjørtDagStatus = AvklartKjørtDagStatus.NY,
                         )
                     }.toSet(),
         )

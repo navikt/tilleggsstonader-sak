@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDagStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
@@ -922,6 +923,7 @@ class PrivatBilBeregningsresultatServiceTest {
                                     automatiskVurdering = UtfyltDagAutomatiskVurdering.OK,
                                     avvik = emptyList(),
                                     parkeringsutgift = it.parkeringsutgift,
+                                    avklartKjørtDagStatus = AvklartKjørtDagStatus.NY,
                                 )
                             }.toSet(),
                 )
