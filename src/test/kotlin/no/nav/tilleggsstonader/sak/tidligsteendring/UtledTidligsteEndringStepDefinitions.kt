@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.cucumber.Domenenøkkel
 import no.nav.tilleggsstonader.sak.cucumber.DomenenøkkelFelles
 import no.nav.tilleggsstonader.sak.cucumber.mapRad
+import no.nav.tilleggsstonader.sak.cucumber.parseBigDecimal
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
@@ -21,7 +22,11 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DomenenøkkelPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -34,6 +39,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.GeneriskVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
@@ -81,6 +87,10 @@ class UtledTidligsteEndringStepDefinitions {
 
     var vilkår = emptyList<Vilkår>()
     var vilkårForrigeBehandling = emptyList<Vilkår>()
+    var vilkårPrivatBil = emptyMap<Int, Vilkår>()
+    var vilkårPrivatBilForrigeBehandling = emptyMap<Int, Vilkår>()
+    var delperioderPrivatBil = emptyMap<Int, List<FaktaDelperiodePrivatBil>>()
+    var delperioderPrivatBilForrigeBehandling = emptyMap<Int, List<FaktaDelperiodePrivatBil>>()
 
     var aktiviteter = emptyList<GeneriskVilkårperiode<AktivitetFaktaOgVurdering>>()
     var aktiviteterForrigeBehandling = emptyList<GeneriskVilkårperiode<AktivitetFaktaOgVurdering>>()
@@ -106,6 +116,16 @@ class UtledTidligsteEndringStepDefinitions {
     @Gitt("følgende vilkår i revurdering - utledTidligsteEndring")
     fun `følgende vilkår i revurdering`(dataTable: DataTable) {
         vilkår = mapVilkår(dataTable, barnIder)
+    }
+
+    @Gitt("følgende vilkår for daglig reise med privat bil i forrige behandling - utledTidligsteEndring")
+    fun `følgende vilkår for daglig reise med privat bil i forrige behandling`(dataTable: DataTable) {
+        vilkårPrivatBilForrigeBehandling = mapPrivatBilVilkår(dataTable)
+    }
+
+    @Gitt("følgende vilkår for daglig reise med privat bil i revurdering - utledTidligsteEndring")
+    fun `følgende vilkår for daglig reise med privat bil i revurdering`(dataTable: DataTable) {
+        vilkårPrivatBil = mapPrivatBilVilkår(dataTable)
     }
 
     @Gitt("følgende aktiviteter i forrige behandling - utledTidligsteEndring")
@@ -138,12 +158,23 @@ class UtledTidligsteEndringStepDefinitions {
         vedtaksperioder = mapVedtaksperioder(dataTable)
     }
 
+    @Gitt("følgende delperioder for vilkår daglig reise med privat bil i forrige behandling - utledTidligsteEndring")
+    fun `følgende delperioder for vilkår daglig reise med privat bil i forrige behandling`(dataTable: DataTable) {
+        delperioderPrivatBilForrigeBehandling = mapPrivatBilDelperioder(dataTable)
+    }
+
+    @Gitt("følgende delperioder for vilkår daglig reise med privat bil i revurdering - utledTidligsteEndring")
+    fun `følgende delperioder for vilkår daglig reise med privat bil i revurdering`(dataTable: DataTable) {
+        delperioderPrivatBil = mapPrivatBilDelperioder(dataTable)
+    }
+
     @Når("utleder tidligste endring")
     fun `utleder tidligste endring`() {
         tidligsteEndring =
             TidligsteEndringIBehandlingUtleder(
-                vilkår = vilkår,
-                vilkårTidligereBehandling = vilkårForrigeBehandling,
+                vilkår = byggVilkårListe(vilkår, vilkårPrivatBil, delperioderPrivatBil),
+                vilkårTidligereBehandling =
+                    byggVilkårListe(vilkårForrigeBehandling, vilkårPrivatBilForrigeBehandling, delperioderPrivatBilForrigeBehandling),
                 vilkårsperioder = Vilkårperioder(aktiviteter = aktiviteter, målgrupper = målgrupper),
                 vilkårsperioderTidligereBehandling =
                     Vilkårperioder(
@@ -208,6 +239,66 @@ class UtledTidligsteEndringStepDefinitions {
             }
         }
     }
+
+    private fun mapPrivatBilVilkår(dataTable: DataTable): Map<Int, Vilkår> =
+        dataTable
+            .mapRad { rad ->
+                val reisenr = parseInt(DomenenøkkelPrivatBil.REISENR, rad)
+                reisenr to
+                    vilkår(
+                        behandlingId = BehandlingId.random(),
+                        fom = parseDato(DomenenøkkelFelles.FOM, rad),
+                        tom = parseDato(DomenenøkkelFelles.TOM, rad),
+                        resultat = parseEnum(TidligsteEndringFellesNøkler.RESULTAT, rad),
+                        type = VilkårType.DAGLIG_REISE,
+                        status = parseEnum(TidligsteEndringFellesNøkler.STATUS, rad),
+                        fakta = mapPrivatBilFakta(rad),
+                    )
+            }.toMap()
+
+    private fun mapPrivatBilFakta(rad: Map<String, String>) =
+        FaktaDagligReisePrivatBil(
+            reiseId = ReiseId.random(),
+            reiseavstandEnVei = parseBigDecimal(DomenenøkkelPrivatBil.REISEAVSTAND_EN_VEI, rad),
+            faktaDelperioder = emptyList(),
+            adresse = "Tiltaksveien 1",
+            aktivitetId = VilkårperiodeGlobalId.random(),
+        )
+
+    private fun mapPrivatBilDelperioder(dataTable: DataTable): Map<Int, List<FaktaDelperiodePrivatBil>> =
+        dataTable
+            .mapRad {
+                parseInt(DomenenøkkelPrivatBil.REISENR, it) to
+                    FaktaDelperiodePrivatBil(
+                        fom = parseDato(DomenenøkkelFelles.FOM, it),
+                        tom = parseDato(DomenenøkkelFelles.TOM, it),
+                        reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, it),
+                        bompengerPerDag = parseValgfriInt(DomenenøkkelPrivatBil.BOMPENGER, it),
+                        fergekostnadPerDag = parseValgfriInt(DomenenøkkelPrivatBil.FERGEKOSTNAD, it),
+                    )
+            }.groupBy { it.first }
+            .mapValues { it.value.map { it.second } }
+
+    private fun byggVilkårListe(
+        generiskeVilkår: List<Vilkår>,
+        privatBilVilkår: Map<Int, Vilkår>,
+        delperioder: Map<Int, List<FaktaDelperiodePrivatBil>>,
+    ): List<Vilkår> =
+        if (privatBilVilkår.isNotEmpty()) {
+            privatBilVilkår
+                .toSortedMap()
+                .map { (reisenr, vilkår) ->
+                    val fakta = vilkår.fakta as FaktaDagligReisePrivatBil
+                    vilkår.copy(
+                        fakta =
+                            fakta.copy(
+                                faktaDelperioder = delperioder[reisenr].orEmpty(),
+                            ),
+                    )
+                }.sortedBy { it.fom }
+        } else {
+            generiskeVilkår
+        }
 
     private fun mapAktiviteter(dataTable: DataTable) =
         dataTable.mapRad { rad ->

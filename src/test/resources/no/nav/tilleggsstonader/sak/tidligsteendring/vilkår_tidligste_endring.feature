@@ -216,3 +216,89 @@ Egenskap: Utled tidligste endring av vilkår
       Når utleder tidligste endring
 
       Så forvent følgende dato for tidligste endring: 24.02.2024
+
+  Scenario: Privat bil forkortes og delperiode forkortes
+      Gitt følgende vilkår for daglig reise med privat bil i forrige behandling - utledTidligsteEndring
+        | Reisenr | Fom        | Tom        | Reiseavstand | Resultat | Status |
+        | 1       | 01.01.2024 | 31.01.2024 | 10           | OPPFYLT  | NY     |
+
+      Gitt følgende delperioder for vilkår daglig reise med privat bil i forrige behandling - utledTidligsteEndring
+        | Reisenr | Fom        | Tom        | Antall reisedager per uke |
+        | 1       | 01.01.2024 | 31.01.2024 | 5                         |
+
+      Gitt følgende vilkår for daglig reise med privat bil i revurdering - utledTidligsteEndring
+        | Reisenr | Fom        | Tom        | Reiseavstand | Resultat | Status  |
+        | 1       | 01.01.2024 | 20.01.2024 | 10           | OPPFYLT  | ENDRET  |
+
+      Gitt følgende delperioder for vilkår daglig reise med privat bil i revurdering - utledTidligsteEndring
+        | Reisenr | Fom        | Tom        | Antall reisedager per uke |
+        | 1       | 01.01.2024 | 20.01.2024 | 5                         |
+
+      Når utleder tidligste endring
+
+      Så forvent følgende dato for tidligste endring: 21.01.2024
+
+  Scenario: Privat bil forkortes og delperiode forsvinner
+      Gitt følgende vilkår for daglig reise med privat bil i forrige behandling - utledTidligsteEndring
+        | Reisenr | Fom        | Tom        | Reiseavstand | Resultat | Status |
+        | 1       | 01.01.2024 | 31.01.2024 | 10           | OPPFYLT  | NY     |
+
+      Gitt følgende delperioder for vilkår daglig reise med privat bil i forrige behandling - utledTidligsteEndring
+        | Reisenr | Fom        | Tom        | Antall reisedager per uke |
+        | 1       | 01.01.2024 | 15.01.2024 | 5                         |
+        | 1       | 16.01.2024 | 31.01.2024 | 3                         |
+
+      Gitt følgende vilkår for daglig reise med privat bil i revurdering - utledTidligsteEndring
+        | Reisenr | Fom        | Tom        | Reiseavstand | Resultat | Status  |
+        | 1       | 01.01.2024 | 15.01.2024 | 10           | OPPFYLT  | ENDRET  |
+
+      Gitt følgende delperioder for vilkår daglig reise med privat bil i revurdering - utledTidligsteEndring
+        | Reisenr | Fom        | Tom        | Antall reisedager per uke |
+        | 1       | 01.01.2024 | 15.01.2024 | 5                         |
+
+      Når utleder tidligste endring
+
+      Så forvent følgende dato for tidligste endring: 16.01.2024
+
+  Scenario: Privat bil utvides og delperiode utvides
+      Gitt følgende vilkår for daglig reise med privat bil i forrige behandling - utledTidligsteEndring
+        | Reisenr | Fom        | Tom        | Reiseavstand | Resultat | Status |
+        | 1       | 01.01.2024 | 20.01.2024 | 10           | OPPFYLT  | NY     |
+
+      Gitt følgende delperioder for vilkår daglig reise med privat bil i forrige behandling - utledTidligsteEndring
+        | Reisenr | Fom        | Tom        | Antall reisedager per uke |
+        | 1       | 01.01.2024 | 20.01.2024 | 5                         |
+
+      Gitt følgende vilkår for daglig reise med privat bil i revurdering - utledTidligsteEndring
+        | Reisenr | Fom        | Tom        | Reiseavstand | Resultat | Status  |
+        | 1       | 01.01.2024 | 31.01.2024 | 10           | OPPFYLT  | ENDRET  |
+
+      Gitt følgende delperioder for vilkår daglig reise med privat bil i revurdering - utledTidligsteEndring
+        | Reisenr | Fom        | Tom        | Antall reisedager per uke |
+        | 1       | 01.01.2024 | 31.01.2024 | 5                         |
+
+      Når utleder tidligste endring
+
+      Så forvent følgende dato for tidligste endring: 21.01.2024
+
+  Scenario: Privat bil utvides og ny delperiode kommer inn
+      Gitt følgende vilkår for daglig reise med privat bil i forrige behandling - utledTidligsteEndring
+        | Reisenr | Fom        | Tom        | Reiseavstand | Resultat | Status |
+        | 1       | 01.01.2024 | 15.01.2024 | 10           | OPPFYLT  | NY     |
+
+      Gitt følgende delperioder for vilkår daglig reise med privat bil i forrige behandling - utledTidligsteEndring
+        | Reisenr | Fom        | Tom        | Antall reisedager per uke |
+        | 1       | 01.01.2024 | 15.01.2024 | 5                         |
+
+      Gitt følgende vilkår for daglig reise med privat bil i revurdering - utledTidligsteEndring
+        | Reisenr | Fom        | Tom        | Reiseavstand | Resultat | Status  |
+        | 1       | 01.01.2024 | 31.01.2024 | 10           | OPPFYLT  | ENDRET  |
+
+      Gitt følgende delperioder for vilkår daglig reise med privat bil i revurdering - utledTidligsteEndring
+        | Reisenr | Fom        | Tom        | Antall reisedager per uke |
+        | 1       | 01.01.2024 | 15.01.2024 | 5                         |
+        | 1       | 16.01.2024 | 31.01.2024 | 3                         |
+
+      Når utleder tidligste endring
+
+      Så forvent følgende dato for tidligste endring: 16.01.2024

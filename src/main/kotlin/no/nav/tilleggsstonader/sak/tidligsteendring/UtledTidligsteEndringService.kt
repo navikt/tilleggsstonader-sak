@@ -14,8 +14,8 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -255,37 +255,73 @@ data class TidligsteEndringIBehandlingUtleder(
             vilkårNå.erFremtidigUtgift != vilkårTidligereBehandling.erFremtidigUtgift ||
             vilkårNå.type != vilkårTidligereBehandling.type ||
             vilkårNå.resultat != vilkårTidligereBehandling.resultat ||
-            erVilkårFaktaEndret(vilkårNå.fakta, vilkårTidligereBehandling.fakta) ||
+            erVilkårFaktaEndret(vilkårNå, vilkårTidligereBehandling) ||
             harNyttSvarForSkalDekkeFaktiskeUtgifter(vilkårNå, vilkårTidligereBehandling)
 
     private fun erVilkårFaktaEndret(
-        faktaNå: VilkårFakta?,
-        faktaTidligere: VilkårFakta?,
+        vilkårNå: Vilkår,
+        vilkårTidligereBehandling: Vilkår,
     ): Boolean =
         when {
-            faktaNå is FaktaDagligReiseOffentligTransport && faktaTidligere is FaktaDagligReiseOffentligTransport -> {
+            vilkårNå.fakta is FaktaDagligReiseOffentligTransport &&
+                vilkårTidligereBehandling.fakta is FaktaDagligReiseOffentligTransport -> {
+                val faktaNå = vilkårNå.fakta
+                val faktaTidligere = vilkårTidligereBehandling.fakta
                 faktaNå.reisedagerPerUke != faktaTidligere.reisedagerPerUke ||
                     faktaNå.prisEnkelbillett != faktaTidligere.prisEnkelbillett ||
                     faktaNå.prisSyvdagersbillett != faktaTidligere.prisSyvdagersbillett ||
                     faktaNå.prisTrettidagersbillett != faktaTidligere.prisTrettidagersbillett
             }
 
-            faktaNå is FaktaDagligReisePrivatBil && faktaTidligere is FaktaDagligReisePrivatBil -> {
+            vilkårNå.fakta is FaktaDagligReisePrivatBil && vilkårTidligereBehandling.fakta is FaktaDagligReisePrivatBil -> {
+                val faktaNå = vilkårNå.fakta
+                val faktaTidligere = vilkårTidligereBehandling.fakta
+                val sammenligningsFom =
+                    maxOf(requireNotNull(vilkårNå.fom), requireNotNull(vilkårTidligereBehandling.fom))
+                val sammenligningsTom =
+                    minOf(requireNotNull(vilkårNå.tom), requireNotNull(vilkårTidligereBehandling.tom))
+
                 faktaNå.reiseavstandEnVei != faktaTidligere.reiseavstandEnVei ||
-                    faktaNå.faktaDelperioder.size != faktaTidligere.faktaDelperioder.size ||
-                    faktaNå.faktaDelperioder.zip(faktaTidligere.faktaDelperioder).any { (nå, tidligere) ->
-                        nå.fom != tidligere.fom ||
-                            nå.tom != tidligere.tom ||
-                            nå.reisedagerPerUke != tidligere.reisedagerPerUke ||
-                            nå.bompengerPerDag != tidligere.bompengerPerDag ||
-                            nå.fergekostnadPerDag != tidligere.fergekostnadPerDag
-                    }
+                    normaliserPrivatBilDelperioder(faktaNå, sammenligningsFom, sammenligningsTom) !=
+                    normaliserPrivatBilDelperioder(faktaTidligere, sammenligningsFom, sammenligningsTom)
             }
 
             else -> {
                 false
             }
         }
+
+    private fun normaliserPrivatBilDelperioder(
+        fakta: FaktaDagligReisePrivatBil,
+        fom: LocalDate,
+        tom: LocalDate,
+    ): List<FaktaDelperiodePrivatBil> =
+        fakta.faktaDelperioder
+            .mapNotNull { it.kuttTilPeriode(fom, tom) }
+            .sortedWith(
+                compareBy<FaktaDelperiodePrivatBil> { it.fom }
+                    .thenBy { it.tom }
+                    .thenBy { it.reisedagerPerUke }
+                    .thenBy { it.bompengerPerDag ?: -1 }
+                    .thenBy { it.fergekostnadPerDag ?: -1 },
+            )
+
+    private fun FaktaDelperiodePrivatBil.kuttTilPeriode(
+        fom: LocalDate?,
+        tom: LocalDate?,
+    ): FaktaDelperiodePrivatBil? {
+        val sammenligningsFom = maxOf(this.fom, fom ?: return null)
+        val sammenligningsTom = minOf(this.tom, tom ?: return null)
+
+        return if (sammenligningsFom <= sammenligningsTom) {
+            copy(
+                fom = sammenligningsFom,
+                tom = sammenligningsTom,
+            )
+        } else {
+            null
+        }
+    }
 
     /**
      * Dersom svar på om bruker har høyere utgifter pga. helsemessige årsaker endrer seg
