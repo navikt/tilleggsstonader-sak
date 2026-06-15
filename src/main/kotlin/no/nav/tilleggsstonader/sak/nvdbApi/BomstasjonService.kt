@@ -11,16 +11,12 @@ class BomstasjonService(
     fun harBomstasjonPåRute(encodedPolyline: String): Boolean {
         val punkter = encodedPolyline.decodePolyline()
         val bomstasjoner = hentAlleBomstasjoner()
-        val terskelMeter = 50.0
+        val terskelMeter = 30.0
 
-        val treffStasjoner =
-            bomstasjoner
-                .filter { stasjon ->
-                    punkter.any { punkt ->
-                        finnBomstasjonPåRute(punkt.lat, punkt.lng, stasjon.lat, stasjon.lng) < terskelMeter
-                    }
-                }.distinctBy { it.navn }
-
-        return treffStasjoner.isNotEmpty()
+        return bomstasjoner
+            .filter { stasjon ->
+                beregnKortestAvstandFraPunktTilRute(stasjon.lat, stasjon.lng, punkter) < terskelMeter
+            }.distinctBy { it.navn }
+            .isNotEmpty()
     }
 }

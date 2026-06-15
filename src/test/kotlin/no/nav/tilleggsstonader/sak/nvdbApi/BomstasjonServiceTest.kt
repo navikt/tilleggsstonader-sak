@@ -41,7 +41,6 @@ class BomstasjonServiceTest {
         val bomstasjonResponse = jsonMapper.readValue<NvdbBomstasjonResponse>(bomstasjonJson)
         every { nvdbBomstasjonClient.hentAlleBomstasjoner() } returns bomstasjonResponse.objekter.mapNotNull { it.tilDomene() }
 
-        // Bergen — hundrevis av km unna
         oppdaterMed(NvdbBomstasjon(id = 2L, lat = 60.418, lng = 5.313, navn = null, takstLitenBilRush = null))
 
         Assertions.assertThat(bomstasjonService.harBomstasjonPåRute(osloPolyline)).isFalse()
@@ -49,10 +48,24 @@ class BomstasjonServiceTest {
     }
 
     @Test
+    fun `harBomvei returnerer true når bomstasjon er nær slutten av ruten`() {
+        // Bomstasjonen er IKKE nær startpunktet,
+        // men nær slutten av ruten (~11m fra (59.93544, 10.6964283))
+        oppdaterMed(NvdbBomstasjon(id = 3L, lat = 59.9355, lng = 10.6964, navn = null, takstLitenBilRush = null))
+
+        Assertions.assertThat(bomstasjonService.harBomstasjonPåRute(osloPolyline)).isTrue()
+    }
+
+    @Test
+    fun `harBomvei returnerer false for bomstasjon langt fra ruten selv om terskel er 30m`() {
+        // Bekrefter at vi ikke får falske treff: stasjon ~120m fra nærmeste punkt OG langt fra alle segmenter
+        oppdaterMed(NvdbBomstasjon(id = 4L, lat = 59.9232, lng = 10.7569, navn = null, takstLitenBilRush = null))
+
+        Assertions.assertThat(bomstasjonService.harBomstasjonPåRute(osloPolyline)).isFalse()
+    }
+
+    @Test
     fun `harBomvei returnerer false med tom bomstasjonsliste`() {
-        val bomstasjonJson = FileUtil.readFile("no/nav/tilleggsstonader/sak/nvdb/nvdb_bomstasjoner.json")
-        val bomstasjonResponse = jsonMapper.readValue<NvdbBomstasjonResponse>(bomstasjonJson)
-        every { nvdbBomstasjonClient.hentAlleBomstasjoner() } returns bomstasjonResponse.objekter.mapNotNull { it.tilDomene() }
         oppdaterMed()
 
         Assertions.assertThat(bomstasjonService.harBomstasjonPåRute(osloPolyline)).isFalse()

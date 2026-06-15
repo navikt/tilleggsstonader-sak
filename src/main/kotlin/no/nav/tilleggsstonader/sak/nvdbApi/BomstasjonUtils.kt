@@ -41,15 +41,59 @@ fun String.decodePolyline(): List<GeoPoint> {
     return punkter
 }
 
-fun finnBomstasjonPåRute(
-    punktLat: Double,
-    punktLng: Double,
-    stasjonLat: Double,
-    stasjonLng: Double,
+fun beregnAvstandMellomPunkterMeter(
+    fraLat: Double,
+    fraLng: Double,
+    tilLat: Double,
+    tilLng: Double,
 ): Double {
     val jordRadiusM = 6_371_000.0
-    val dLat = Math.toRadians(stasjonLat - punktLat)
-    val dLon = Math.toRadians(stasjonLng - punktLng)
-    val a = sin(dLat / 2).pow(2) + cos(Math.toRadians(punktLat)) * cos(Math.toRadians(stasjonLat)) * sin(dLon / 2).pow(2)
+    val dLat = Math.toRadians(tilLat - fraLat)
+    val dLon = Math.toRadians(tilLng - fraLng)
+    val a = sin(dLat / 2).pow(2) + cos(Math.toRadians(fraLat)) * cos(Math.toRadians(tilLat)) * sin(dLon / 2).pow(2)
     return jordRadiusM * 2 * asin(sqrt(a))
 }
+
+/**
+ * Korteste avstand (meter) fra et punkt til linjestykket p1→p2.
+ * Finner nærmeste punkt på linjen ved å sammenligne punktet med punktene på linjen.
+ */
+fun beregnKortestAvstandFraPunktTilLinjestykke(
+    punktLat: Double,
+    punktLng: Double,
+    p1: GeoPoint,
+    p2: GeoPoint,
+): Double {
+    val meterPerLatGrad = 111_320.0
+    val cosLat = cos(Math.toRadians((p1.lat + p2.lat) / 2.0))
+    val meterPerLngGrad = meterPerLatGrad * cosLat
+
+    val abX = (p2.lng - p1.lng) * meterPerLngGrad
+    val abY = (p2.lat - p1.lat) * meterPerLatGrad
+    val apX = (punktLng - p1.lng) * meterPerLngGrad
+    val apY = (punktLat - p1.lat) * meterPerLatGrad
+
+    val ab2 = abX * abX + abY * abY
+    if (ab2 == 0.0) return beregnAvstandMellomPunkterMeter(p1.lat, p1.lng, punktLat, punktLng)
+
+    val t = ((apX * abX + apY * abY) / ab2).coerceIn(0.0, 1.0)
+
+    val narmesteSegmentpunktLat = p1.lat + t * (p2.lat - p1.lat)
+    val narmesteSegmentpunktLng = p1.lng + t * (p2.lng - p1.lng)
+
+    return beregnAvstandMellomPunkterMeter(narmesteSegmentpunktLat, narmesteSegmentpunktLng, punktLat, punktLng)
+}
+
+/**
+ * Korteste avstand (meter) fra et punkt til en rute (liste med punkter).
+ * Returnerer [Double.MAX_VALUE] for tom liste.
+ */
+fun beregnKortestAvstandFraPunktTilRute(
+    punktLat: Double,
+    punktLng: Double,
+    rutePunkter: List<GeoPoint>,
+): Double =
+    rutePunkter
+        .zipWithNext()
+        .minOfOrNull { (p1, p2) -> beregnKortestAvstandFraPunktTilLinjestykke(punktLat, punktLng, p1, p2) }
+        ?: Double.MAX_VALUE
