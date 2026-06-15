@@ -31,11 +31,19 @@ class FagsakUtbetalingIdRepositoryTest : IntegrationTest() {
     @Test
     fun `kan ikke opprette utbetalingid med samme fagsakid og typeAndel`() {
         fagsakUtbetalingIdRepository.insert(
-            FagsakUtbetalingId(fagsakId = behandling.fagsakId, typeAndel = TypeAndel.DAGLIG_REISE_AAP, reiseId = null),
+            FagsakUtbetalingId(
+                fagsakId = behandling.fagsakId,
+                typeAndel = TypeAndel.DAGLIG_REISE_AAP,
+                reiseId = null,
+            ),
         )
         assertThatExceptionOfType(DuplicateKeyException::class.java).isThrownBy {
             fagsakUtbetalingIdRepository.insert(
-                FagsakUtbetalingId(fagsakId = behandling.fagsakId, typeAndel = TypeAndel.DAGLIG_REISE_AAP, reiseId = null),
+                FagsakUtbetalingId(
+                    fagsakId = behandling.fagsakId,
+                    typeAndel = TypeAndel.DAGLIG_REISE_AAP,
+                    reiseId = null,
+                ),
             )
         }
     }
@@ -44,11 +52,19 @@ class FagsakUtbetalingIdRepositoryTest : IntegrationTest() {
     fun `kan ikke opprette utbetalingid med samme fagsakid og typeAndel og reiseId`() {
         val reiseId = ReiseId.random()
         fagsakUtbetalingIdRepository.insert(
-            FagsakUtbetalingId(fagsakId = behandling.fagsakId, typeAndel = TypeAndel.DAGLIG_REISE_AAP, reiseId = reiseId),
+            FagsakUtbetalingId(
+                fagsakId = behandling.fagsakId,
+                typeAndel = TypeAndel.DAGLIG_REISE_AAP,
+                reiseId = reiseId,
+            ),
         )
         assertThatExceptionOfType(DuplicateKeyException::class.java).isThrownBy {
             fagsakUtbetalingIdRepository.insert(
-                FagsakUtbetalingId(fagsakId = behandling.fagsakId, typeAndel = TypeAndel.DAGLIG_REISE_AAP, reiseId = reiseId),
+                FagsakUtbetalingId(
+                    fagsakId = behandling.fagsakId,
+                    typeAndel = TypeAndel.DAGLIG_REISE_AAP,
+                    reiseId = reiseId,
+                ),
             )
         }
     }
@@ -56,11 +72,19 @@ class FagsakUtbetalingIdRepositoryTest : IntegrationTest() {
     @Test
     fun `kan opprette en utbetalingid med samme fagsakid og typeAndel med og uten reiseid`() {
         fagsakUtbetalingIdRepository.insert(
-            FagsakUtbetalingId(fagsakId = behandling.fagsakId, typeAndel = TypeAndel.DAGLIG_REISE_AAP, reiseId = ReiseId.random()),
+            FagsakUtbetalingId(
+                fagsakId = behandling.fagsakId,
+                typeAndel = TypeAndel.DAGLIG_REISE_AAP,
+                reiseId = ReiseId.random(),
+            ),
         )
         assertThatNoException().isThrownBy {
             fagsakUtbetalingIdRepository.insert(
-                FagsakUtbetalingId(fagsakId = behandling.fagsakId, typeAndel = TypeAndel.DAGLIG_REISE_AAP, reiseId = null),
+                FagsakUtbetalingId(
+                    fagsakId = behandling.fagsakId,
+                    typeAndel = TypeAndel.DAGLIG_REISE_AAP,
+                    reiseId = null,
+                ),
             )
         }
     }
@@ -68,7 +92,11 @@ class FagsakUtbetalingIdRepositoryTest : IntegrationTest() {
     @Test
     fun `finner ikke utbetalingid med reiseid når reiseid er lagret med null`() {
         fagsakUtbetalingIdRepository.insert(
-            FagsakUtbetalingId(fagsakId = behandling.fagsakId, typeAndel = TypeAndel.DAGLIG_REISE_AAP, reiseId = null),
+            FagsakUtbetalingId(
+                fagsakId = behandling.fagsakId,
+                typeAndel = TypeAndel.DAGLIG_REISE_AAP,
+                reiseId = null,
+            ),
         )
 
         assertThat(
@@ -83,7 +111,11 @@ class FagsakUtbetalingIdRepositoryTest : IntegrationTest() {
     @Test
     fun `finner ikke utbetalingid uten reiseid når reiseid er lagret med verdi`() {
         fagsakUtbetalingIdRepository.insert(
-            FagsakUtbetalingId(fagsakId = behandling.fagsakId, typeAndel = TypeAndel.DAGLIG_REISE_AAP, reiseId = ReiseId.random()),
+            FagsakUtbetalingId(
+                fagsakId = behandling.fagsakId,
+                typeAndel = TypeAndel.DAGLIG_REISE_AAP,
+                reiseId = ReiseId.random(),
+            ),
         )
 
         assertThat(
