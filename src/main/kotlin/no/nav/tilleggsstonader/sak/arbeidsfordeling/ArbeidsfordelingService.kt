@@ -7,9 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningDto
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningType
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.spring.cache.getValue
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.felles.domain.gjelderBarn
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseForPerson
@@ -28,7 +26,6 @@ class ArbeidsfordelingService(
     private val oppfolgingsenhetClient: OppfolgingsenhetClient,
     private val personService: PersonService,
     private val egenAnsattService: EgenAnsattService,
-    private val unleashService: UnleashService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -84,29 +81,9 @@ class ArbeidsfordelingService(
         stønadstype: Stønadstype,
     ): String = hentNavEnhet(personIdent, stønadstype)?.enhetNr ?: MASKINELL_JOURNALFOERENDE_ENHET
 
-    fun hentBrukersNavKontor(
-        personIdent: String,
-        stønadstype: Stønadstype,
-    ): String {
-        if (unleashService.isEnabled(Toggle.BRUK_OPPFOLGINGSENHET_FOR_UTBETALING)) {
-            return oppfolgingsenhetClient.hentOppfølgingsenhet(personIdent)
-                ?: error("Finner ikke oppfølgingsenhet for person")
-        }
-
-        val adressebeskyttelseForPerson = hentAdressebeskyttelse(personIdent, stønadstype)
-        // TODO - OK med default til Oslo her og?
-        val geografiskTilknytning =
-            utledGeografiskTilknytningKode(personService.hentGeografiskTilknytning(personIdent))
-                ?: error("Klarer ikke utlede geografisk tilknytning")
-        val diskresjonskode = høyesteGraderingen(adressebeskyttelseForPerson).tilDiskresjonskode()
-
-        return arbeidsfordelingClient
-            .finnNavKontorForGeografiskOmråde(
-                geografiskTilknytning,
-                diskresjonskode,
-                erEgenAnsatt(adressebeskyttelseForPerson),
-            )?.enhetNr ?: error("Finner ikke NAV kontor for geografiskOmraade=$geografiskTilknytning, diskresjonskode=$diskresjonskode")
-    }
+    fun hentBrukersNavKontor(personIdent: String): String =
+        oppfolgingsenhetClient.hentOppfølgingsenhet(personIdent)
+            ?: error("Finner ikke oppfølgingsenhet for person")
 
     private fun lagArbeidsfordelingKritierieForPerson(
         personIdent: String,
