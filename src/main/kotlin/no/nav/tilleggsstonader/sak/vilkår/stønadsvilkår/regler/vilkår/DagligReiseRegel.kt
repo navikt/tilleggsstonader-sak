@@ -35,7 +35,6 @@ class DagligReiseRegel :
                             SluttSvarRegel(
                                 resultat = Resultat.IKKE_OPPFYLT,
                                 begrunnelseType = BegrunnelseType.UTEN,
-                                feilmelding = "Må behandles i Arena",
                             ),
                         hvisNei = IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
                     ),

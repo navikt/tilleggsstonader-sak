@@ -25,5 +25,4 @@ data class SvarAlternativ(
     val nesteRegelId: RegelId? = null,
     val begrunnelseType: BegrunnelseType,
     val tilhørendeFaktaType: TypeVilkårFakta? = null,
-    val feilmelding: String? = null,
 )

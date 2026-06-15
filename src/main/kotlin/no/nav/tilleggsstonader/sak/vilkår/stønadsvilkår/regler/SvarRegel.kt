@@ -38,7 +38,6 @@ class SluttSvarRegel(
     val resultat: Resultat,
     override val begrunnelseType: BegrunnelseType = BegrunnelseType.UTEN,
     val tilhørendeFaktaType: TypeVilkårFakta? = null,
-    val feilmelding: String? = null,
 ) : SvarRegel {
     override val regelId: RegelId = RegelId.SLUTT_NODE
 

@@ -13,14 +13,14 @@
         "nesteRegelId": "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null,
-        "feilmelding": null
+
       },
       {
         "svarId": "NEI",
         "nesteRegelId": "UNNTAK_SEKS_KM",
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null,
-        "feilmelding": null
+
       }
     ]
   },
@@ -37,14 +37,14 @@
         "nesteRegelId": "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null,
-        "feilmelding": null
+
       },
       {
         "svarId": "NEI",
         "nesteRegelId": null,
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null,
-        "feilmelding": null
+
       }
     ]
   },
@@ -60,14 +60,14 @@
         "nesteRegelId": null,
         "begrunnelseType": "VALGFRI",
         "tilhørendeFaktaType": "DAGLIG_REISE_OFFENTLIG_TRANSPORT",
-        "feilmelding": null
+
       },
       {
         "svarId": "NEI",
         "nesteRegelId": "KAN_KJØRE_MED_EGEN_BIL",
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null,
-        "feilmelding": null
+
       }
     ]
   },
@@ -82,14 +82,14 @@
         "nesteRegelId": null,
         "begrunnelseType": "VALGFRI",
         "tilhørendeFaktaType": "DAGLIG_REISE_PRIVAT_BIL",
-        "feilmelding": null
+
       },
       {
         "svarId": "NEI",
         "nesteRegelId": "KAN_REISE_MED_TAXI",
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null,
-        "feilmelding": null
+
       }
     ]
   },
@@ -109,7 +109,7 @@
         "nesteRegelId": null,
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null,
-        "feilmelding": null
+
       }
     ]
   }
