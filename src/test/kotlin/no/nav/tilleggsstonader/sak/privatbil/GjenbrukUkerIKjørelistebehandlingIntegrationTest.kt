@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBeha
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDagStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagRequest
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
@@ -125,6 +126,11 @@ class GjenbrukUkerIKjørelistebehandlingIntegrationTest : IntegrationTest() {
             reisevurderingForAndreKjørelistebehandling.uker.single { it.fraDato == andreUkeFom }
 
         assertUkerErLike(førsteUkeIFørsteBehandling, førsteUkeIAndreBehandling)
+        assertThat(
+            førsteUkeIAndreBehandling.dager.all {
+                it.avklartDag?.avklartKjørtDagStatus == AvklartKjørtDagStatus.UENDRET
+            },
+        ).isTrue()
 
         assertThat(andreUkeIAndreBehandling.status).isEqualTo(UkeStatus.OK_AUTOMATISK)
         assertThat(andreUkeIAndreBehandling.kjørelisteId).isNotNull()
@@ -185,7 +191,10 @@ class GjenbrukUkerIKjørelistebehandlingIntegrationTest : IntegrationTest() {
             .sortedBy { it.dato }
             .zip(ukeBehandling2.dager.sortedBy { it.dato })
             .forEach { (dagBehandling1, dagBehandling2) ->
-                assertThat(dagBehandling1).isEqualTo(dagBehandling2)
+                assertThat(dagBehandling1)
+                    .usingRecursiveComparison()
+                    .ignoringFields("avklartDag.avklartKjørtDagStatus")
+                    .isEqualTo(dagBehandling2)
             }
     }
 }

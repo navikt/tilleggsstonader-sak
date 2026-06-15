@@ -8,8 +8,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningDto
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningType
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsatt
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -31,7 +29,6 @@ class ArbeidsfordelingServiceTest {
     val egenAnsattService = mockk<EgenAnsattService>()
     val arbeidsfordelingClient = mockk<ArbeidsfordelingClient>()
     val oppfolgingsenhetClient = mockk<OppfolgingsenhetClient>()
-    val unleashService = mockk<UnleashService>()
 
     val service =
         ArbeidsfordelingService(
@@ -40,7 +37,6 @@ class ArbeidsfordelingServiceTest {
             oppfolgingsenhetClient = oppfolgingsenhetClient,
             personService = personService,
             egenAnsattService = egenAnsattService,
-            unleashService = unleashService,
         )
 
     val søkerIdent = "søker"
@@ -70,7 +66,6 @@ class ArbeidsfordelingServiceTest {
         every { egenAnsattService.erEgenAnsatt(capture(slotEgenAnsatt)) } answers {
             firstArg<Set<String>>().associateWith { EgenAnsatt(it, false) }
         }
-        every { unleashService.isEnabled(Toggle.BRUK_OPPFOLGINGSENHET_FOR_UTBETALING) } returns false
     }
 
     @AfterEach
@@ -177,25 +172,13 @@ class ArbeidsfordelingServiceTest {
     @Nested
     inner class HentBrukersNavKontor {
         @Test
-        fun `skal bruke oppfolgingsenhet nar toggle er pa`() {
-            every { unleashService.isEnabled(Toggle.BRUK_OPPFOLGINGSENHET_FOR_UTBETALING) } returns true
+        fun `skal bruke oppfolgingsenhet`() {
             every { oppfolgingsenhetClient.hentOppfølgingsenhet(søkerIdent) } returns "9999"
 
-            val navKontor = service.hentBrukersNavKontor(søkerIdent, Stønadstype.LÆREMIDLER)
+            val navKontor = service.hentBrukersNavKontor(søkerIdent)
 
             assertThat(navKontor).isEqualTo("9999")
             verify(exactly = 0) { arbeidsfordelingClient.finnNavKontorForGeografiskOmråde(any(), any(), any()) }
-        }
-
-        @Test
-        fun `skal bruke eksisterende arbeidsfordeling nar toggle er av`() {
-            every { personService.hentAdressebeskyttelse(søkerIdent) } returns lagPersonUtenRelasjoner()
-            every { arbeidsfordelingClient.finnNavKontorForGeografiskOmråde(any(), any(), any()) } returns NavKontor("1010")
-
-            val navKontor = service.hentBrukersNavKontor(søkerIdent, Stønadstype.LÆREMIDLER)
-
-            assertThat(navKontor).isEqualTo("1010")
-            verify(exactly = 0) { oppfolgingsenhetClient.hentOppfølgingsenhet(any()) }
         }
     }
 

@@ -46,7 +46,7 @@ class DagligReiseBeregningService(
 
         val brukersNavKontor =
             if (behandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
-                arbeidsfordelingService.hentBrukersNavKontor(behandling.ident, behandling.stønadstype)
+                arbeidsfordelingService.hentBrukersNavKontor(behandling.ident)
             } else {
                 null
             }
