@@ -25,7 +25,6 @@
         "NEI": {
           "begrunnelseType": "PÅKREVD",
           "tilhørendeFaktaType": null,
-          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         }
       }
@@ -37,7 +36,6 @@
         "JA": {
           "begrunnelseType": "VALGFRI",
           "tilhørendeFaktaType": "DAGLIG_REISE_OFFENTLIG_TRANSPORT",
-          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         },
         "NEI": {
@@ -53,7 +51,6 @@
         "JA": {
           "begrunnelseType": "VALGFRI",
           "tilhørendeFaktaType": "DAGLIG_REISE_PRIVAT_BIL",
-          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         },
         "NEI": {
@@ -69,13 +66,11 @@
         "JA": {
           "begrunnelseType": "UTEN",
           "tilhørendeFaktaType": null,
-          "feilmelding": "Må behandles i Arena",
           "regelId": "SLUTT_NODE"
         },
         "NEI": {
           "begrunnelseType": "PÅKREVD",
           "tilhørendeFaktaType": null,
-          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         }
       }

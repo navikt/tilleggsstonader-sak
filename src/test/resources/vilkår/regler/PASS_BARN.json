@@ -7,13 +7,11 @@
         "JA": {
           "begrunnelseType": "VALGFRI",
           "tilhørendeFaktaType": null,
-          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         },
         "NEI": {
           "begrunnelseType": "PÅKREVD",
           "tilhørendeFaktaType": null,
-          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         }
       }
@@ -25,13 +23,11 @@
         "JA": {
           "begrunnelseType": "PÅKREVD",
           "tilhørendeFaktaType": null,
-          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         },
         "NEI": {
           "begrunnelseType": "VALGFRI",
           "tilhørendeFaktaType": null,
-          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         }
       }
@@ -47,7 +43,6 @@
         "NEI": {
           "begrunnelseType": "VALGFRI",
           "tilhørendeFaktaType": null,
-          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         }
       }
@@ -59,19 +54,16 @@
         "TRENGER_MER_TILSYN_ENN_JEVNALDRENDE": {
           "begrunnelseType": "VALGFRI",
           "tilhørendeFaktaType": null,
-          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         },
         "FORSØRGER_HAR_LANGVARIG_ELLER_UREGELMESSIG_ARBEIDSTID": {
           "begrunnelseType": "VALGFRI",
           "tilhørendeFaktaType": null,
-          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         },
         "NEI": {
           "begrunnelseType": "PÅKREVD",
           "tilhørendeFaktaType": null,
-          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         }
       }

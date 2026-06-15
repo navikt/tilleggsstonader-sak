@@ -7,15 +7,13 @@
         "svarId": "JA",
         "nesteRegelId": null,
         "begrunnelseType": "VALGFRI",
-        "tilhørendeFaktaType": null,
-        "feilmelding": null
+        "tilhørendeFaktaType": null
       },
       {
         "svarId": "NEI",
         "nesteRegelId": null,
         "begrunnelseType": "PÅKREVD",
-        "tilhørendeFaktaType": null,
-        "feilmelding": null
+        "tilhørendeFaktaType": null
       }
     ]
   },
@@ -27,15 +25,13 @@
         "svarId": "JA",
         "nesteRegelId": null,
         "begrunnelseType": "PÅKREVD",
-        "tilhørendeFaktaType": null,
-        "feilmelding": null
+        "tilhørendeFaktaType": null
       },
       {
         "svarId": "NEI",
         "nesteRegelId": null,
         "begrunnelseType": "VALGFRI",
-        "tilhørendeFaktaType": null,
-        "feilmelding": null
+        "tilhørendeFaktaType": null
       }
     ]
   },
@@ -49,15 +45,13 @@
         "svarId": "JA",
         "nesteRegelId": "UNNTAK_ALDER",
         "begrunnelseType": "UTEN",
-        "tilhørendeFaktaType": null,
-        "feilmelding": null
+        "tilhørendeFaktaType": null
       },
       {
         "svarId": "NEI",
         "nesteRegelId": null,
         "begrunnelseType": "VALGFRI",
-        "tilhørendeFaktaType": null,
-        "feilmelding": null
+        "tilhørendeFaktaType": null
       }
     ]
   },
@@ -69,22 +63,19 @@
         "svarId": "TRENGER_MER_TILSYN_ENN_JEVNALDRENDE",
         "nesteRegelId": null,
         "begrunnelseType": "VALGFRI",
-        "tilhørendeFaktaType": null,
-        "feilmelding": null
+        "tilhørendeFaktaType": null
       },
       {
         "svarId": "FORSØRGER_HAR_LANGVARIG_ELLER_UREGELMESSIG_ARBEIDSTID",
         "nesteRegelId": null,
         "begrunnelseType": "VALGFRI",
-        "tilhørendeFaktaType": null,
-        "feilmelding": null
+        "tilhørendeFaktaType": null
       },
       {
         "svarId": "NEI",
         "nesteRegelId": null,
         "begrunnelseType": "PÅKREVD",
-        "tilhørendeFaktaType": null,
-        "feilmelding": null
+        "tilhørendeFaktaType": null
       }
     ]
   }

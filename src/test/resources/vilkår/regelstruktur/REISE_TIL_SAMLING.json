@@ -12,15 +12,13 @@
         "svarId": "JA",
         "nesteRegelId": "DOKUMENTERTE_UTGIFTER",
         "begrunnelseType": "PÅKREVD",
-        "tilhørendeFaktaType": null,
-        "feilmelding": null
+        "tilhørendeFaktaType": null
       },
       {
         "svarId": "NEI",
         "nesteRegelId": null,
         "begrunnelseType": "PÅKREVD",
-        "tilhørendeFaktaType": null,
-        "feilmelding": null
+        "tilhørendeFaktaType": null
       }
     ]
   },
@@ -34,15 +32,13 @@
         "svarId": "JA",
         "nesteRegelId": null,
         "begrunnelseType": "UTEN",
-        "tilhørendeFaktaType": "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT",
-        "feilmelding": null
+        "tilhørendeFaktaType": "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT"
       },
       {
         "svarId": "NEI",
         "nesteRegelId": "KAN_REISE_MED_EGEN_BIL",
         "begrunnelseType": "PÅKREVD",
-        "tilhørendeFaktaType": null,
-        "feilmelding": null
+        "tilhørendeFaktaType": null
       }
     ]
   },
@@ -58,15 +54,13 @@
         "svarId": "JA",
         "nesteRegelId": "DEKKET_AV_ANNET_STIPEND",
         "begrunnelseType": "VALGFRI",
-        "tilhørendeFaktaType": null,
-        "feilmelding": null
+        "tilhørendeFaktaType": null
       },
       {
         "svarId": "NEI",
         "nesteRegelId": null,
         "begrunnelseType": "PÅKREVD",
-        "tilhørendeFaktaType": null,
-        "feilmelding": null
+        "tilhørendeFaktaType": null
       }
     ]
   },
@@ -78,15 +72,13 @@
         "svarId": "JA",
         "nesteRegelId": null,
         "begrunnelseType": "UTEN",
-        "tilhørendeFaktaType": "REISE_TIL_SAMLING_PRIVAT_BIL",
-        "feilmelding": null
+        "tilhørendeFaktaType": "REISE_TIL_SAMLING_PRIVAT_BIL"
       },
       {
         "svarId": "NEI",
         "nesteRegelId": null,
         "begrunnelseType": "PÅKREVD",
-        "tilhørendeFaktaType": null,
-        "feilmelding": null
+        "tilhørendeFaktaType": null
       }
     ]
   },
@@ -101,15 +93,13 @@
         "svarId": "JA",
         "nesteRegelId": null,
         "begrunnelseType": "PÅKREVD",
-        "tilhørendeFaktaType": null,
-        "feilmelding": null
+        "tilhørendeFaktaType": null
       },
       {
         "svarId": "NEI",
         "nesteRegelId": "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
         "begrunnelseType": "UTEN",
-        "tilhørendeFaktaType": null,
-        "feilmelding": null
+        "tilhørendeFaktaType": null
       }
     ]
   }

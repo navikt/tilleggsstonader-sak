@@ -7,13 +7,11 @@
         "JA": {
           "begrunnelseType": "VALGFRI",
           "tilhørendeFaktaType": null,
-          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         },
         "NEI": {
           "begrunnelseType": "PÅKREVD",
           "tilhørendeFaktaType": null,
-          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         }
       }
@@ -25,13 +23,11 @@
         "JA": {
           "begrunnelseType": "VALGFRI",
           "tilhørendeFaktaType": null,
-          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         },
         "NEI": {
           "begrunnelseType": "PÅKREVD",
           "tilhørendeFaktaType": null,
-          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         }
       }
@@ -43,13 +39,11 @@
         "JA": {
           "begrunnelseType": "PÅKREVD",
           "tilhørendeFaktaType": null,
-          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         },
         "NEI": {
           "begrunnelseType": "PÅKREVD",
           "tilhørendeFaktaType": null,
-          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         }
       }
@@ -61,13 +55,11 @@
         "JA": {
           "begrunnelseType": "PÅKREVD",
           "tilhørendeFaktaType": null,
-          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         },
         "NEI": {
           "begrunnelseType": "VALGFRI",
           "tilhørendeFaktaType": null,
-          "feilmelding": null,
           "regelId": "SLUTT_NODE"
         }
       }
