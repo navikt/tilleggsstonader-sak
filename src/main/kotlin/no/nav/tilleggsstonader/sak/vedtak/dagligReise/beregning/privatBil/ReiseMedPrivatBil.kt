@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -20,6 +21,7 @@ data class ReiseMedPrivatBil(
     val tiltaksvariant: TypeAktivitet?,
     val delPerioder: List<ReiseMedPrivatBilDelperiode>,
     val reiseavstandEnVei: BigDecimal,
+    val status: VilkårStatus?,
 ) : Periode<LocalDate>,
     KopierPeriode<ReiseMedPrivatBil> {
     override fun medPeriode(
@@ -79,5 +81,6 @@ fun VilkårDagligReise.tilReiserMedPrivatBil(
             },
         aktivitetType = aktivitetType,
         tiltaksvariant = tiltaksvariant,
+        status = this.status,
     )
 }

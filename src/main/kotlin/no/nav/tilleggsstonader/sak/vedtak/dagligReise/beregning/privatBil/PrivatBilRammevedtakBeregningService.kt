@@ -58,30 +58,33 @@ class PrivatBilRammevedtakBeregningService(
             )
         }
 
+        val reiserMedBil =
+            oppfylteVilkårDagligReise
+                .filter { it.fakta is FaktaPrivatBil }
+                .mapTilReiser(behandlingId)
+
         val nyttRammevedtakPrivatBil =
             beregnRammevedtak(
-                oppfylteVilkårDagligReise = oppfylteVilkårDagligReise,
-                behandlingId = behandlingId,
+                reiserMedBil = reiserMedBil,
                 vedtaksperioder = vedtaksperioder,
             )
 
-        brukerfeilHvis(forrigeRammevedtakPrivatBil != null) {
-            "Vi støtter foreløpig bare revurderinger av daglige reiser med bil hvor resultatet er opphør."
+        if (forrigeRammevedtakPrivatBil != null) {
+            return privatBilBeregningRevurderingService.beregnRammevedtakVedRevurdering(
+                reiserMedBil = reiserMedBil,
+                forrigeRammevedtak = forrigeRammevedtakPrivatBil,
+                nyttRammevedtak = nyttRammevedtakPrivatBil,
+                tidligsteEndring = beregningsplan.tidligsteEndring,
+            )
         }
 
         return nyttRammevedtakPrivatBil
     }
 
     private fun beregnRammevedtak(
-        oppfylteVilkårDagligReise: List<VilkårDagligReise>,
-        behandlingId: BehandlingId,
+        reiserMedBil: List<ReiseMedPrivatBil>,
         vedtaksperioder: List<Vedtaksperiode>,
     ): RammevedtakPrivatBil? {
-        val reiserMedBil =
-            oppfylteVilkårDagligReise
-                .filter { it.fakta is FaktaPrivatBil }
-                .mapTilReiser(behandlingId)
-
         if (reiserMedBil.isEmpty()) return null
 
         val resultatForReiser =
