@@ -174,7 +174,11 @@ class UtledTidligsteEndringStepDefinitions {
             TidligsteEndringIBehandlingUtleder(
                 vilkår = byggVilkårListe(vilkår, vilkårPrivatBil, delperioderPrivatBil),
                 vilkårTidligereBehandling =
-                    byggVilkårListe(vilkårForrigeBehandling, vilkårPrivatBilForrigeBehandling, delperioderPrivatBilForrigeBehandling),
+                    byggVilkårListe(
+                        vilkårForrigeBehandling,
+                        vilkårPrivatBilForrigeBehandling,
+                        delperioderPrivatBilForrigeBehandling,
+                    ),
                 vilkårsperioder = Vilkårperioder(aktiviteter = aktiviteter, målgrupper = målgrupper),
                 vilkårsperioderTidligereBehandling =
                     Vilkårperioder(

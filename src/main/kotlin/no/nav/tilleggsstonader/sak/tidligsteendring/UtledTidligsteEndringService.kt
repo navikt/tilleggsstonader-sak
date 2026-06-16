@@ -195,9 +195,16 @@ data class TidligsteEndringIBehandlingUtleder(
                     .fjernSlettede()
                     .mapNotNull { it.wrapSomPeriode() }
                     .sortedWith(vilkårComparator),
-        ) { vilkårNå, vilkårTidligereBehandling ->
-            erVilkårEndret(vilkårNå.periodeType, vilkårTidligereBehandling.periodeType)
-        }
+            erEndret = { vilkårNå, vilkårTidligereBehandling ->
+                erVilkårEndret(vilkårNå.periodeType, vilkårTidligereBehandling.periodeType)
+            },
+            utledEndringsdatoVedEndretPeriode = { vilkårNå, vilkårTidligereBehandling ->
+                utledTidligsteEndringForVilkårFakta(
+                    vilkårNå = vilkårNå.periodeType,
+                    vilkårTidligereBehandling = vilkårTidligereBehandling.periodeType,
+                )
+            },
+        )
 
     private fun Iterable<Vilkår>.fjernSlettede() = this.filterNot { it.status == VilkårStatus.SLETTET }
 
@@ -365,10 +372,54 @@ data class TidligsteEndringIBehandlingUtleder(
         vedtaksperiode.målgruppe != tidligereVedtaksperiode.målgruppe ||
             vedtaksperiode.aktivitet != tidligereVedtaksperiode.aktivitet
 
+    private fun utledTidligsteEndringForVilkårFakta(
+        vilkårNå: Vilkår,
+        vilkårTidligereBehandling: Vilkår,
+    ): LocalDate? {
+        val faktaNå = vilkårNå.fakta
+        val faktaTidligere = vilkårTidligereBehandling.fakta
+        if (faktaNå !is FaktaDagligReisePrivatBil || faktaTidligere !is FaktaDagligReisePrivatBil) {
+            return null
+        }
+
+        val sammenligningsFom = maxOf(requireNotNull(vilkårNå.fom), requireNotNull(vilkårTidligereBehandling.fom))
+        val sammenligningsTom = minOf(requireNotNull(vilkårNå.tom), requireNotNull(vilkårTidligereBehandling.tom))
+
+        val delperioderNå = normaliserPrivatBilDelperioder(faktaNå, sammenligningsFom, sammenligningsTom)
+        val delperioderTidligere = normaliserPrivatBilDelperioder(faktaTidligere, sammenligningsFom, sammenligningsTom)
+
+        val antallDelperioder = min(delperioderNå.size, delperioderTidligere.size)
+        for (index in 0 until antallDelperioder) {
+            val delperiodeNå = delperioderNå[index]
+            val delperiodeTidligere = delperioderTidligere[index]
+            if (delperiodeNå != delperiodeTidligere) {
+                return if (delperiodeNå.harLikFakta(delperiodeTidligere) &&
+                    (delperiodeNå.fom != delperiodeTidligere.fom || delperiodeNå.tom != delperiodeTidligere.tom)
+                ) {
+                    minOf(delperiodeNå.tom, delperiodeTidligere.tom).plusDays(1)
+                } else {
+                    minOf(delperiodeNå.fom, delperiodeTidligere.fom)
+                }
+            }
+        }
+
+        return when {
+            delperioderNå.size > antallDelperioder -> delperioderNå[antallDelperioder].fom
+            delperioderTidligere.size > antallDelperioder -> delperioderTidligere[antallDelperioder].fom
+            else -> null
+        }
+    }
+
+    private fun FaktaDelperiodePrivatBil.harLikFakta(other: FaktaDelperiodePrivatBil): Boolean =
+        this.reisedagerPerUke == other.reisedagerPerUke &&
+            this.bompengerPerDag == other.bompengerPerDag &&
+            this.fergekostnadPerDag == other.fergekostnadPerDag
+
     private fun <T : Periode<LocalDate>> utledEndringIPeriode(
         perioderNå: List<T>,
         perioderTidligere: List<T>,
         erEndret: (T, T) -> Boolean,
+        utledEndringsdatoVedEndretPeriode: ((T, T) -> LocalDate?)? = null,
     ): LocalDate? {
         val antallPerioder = min(perioderNå.size, perioderTidligere.size)
 
@@ -379,7 +430,8 @@ data class TidligsteEndringIBehandlingUtleder(
                     val periodeTidligere = perioderTidligere[index]
 
                     if (periodeNå.fom != periodeTidligere.fom || erEndret(periodeNå, periodeTidligere)) {
-                        minOf(periodeNå.fom, periodeTidligere.fom)
+                        utledEndringsdatoVedEndretPeriode?.invoke(periodeNå, periodeTidligere)
+                            ?: minOf(periodeNå.fom, periodeTidligere.fom)
                     } else if (periodeNå.tom != periodeTidligere.tom) {
                         // Legger på en dag, da det først er fra dagen etter tom-datoen at det er en endring
                         minOf(periodeNå.tom, periodeTidligere.tom).plusDays(1)
