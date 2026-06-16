@@ -62,6 +62,7 @@
     "harMerEnn6KmReisevei" : "JA",
     "lengdeReisevei" : 18.5,
     "harBehovForTransportUavhengigAvReisensLengde" : null,
+    "leveringOgHentingIBarnehage" : null,
     "kanReiseMedOffentligTransport" : "JA",
     "offentligTransport" : {
       "billettTyperValgt" : [ "ENKELTBILLETT", "TRETTIDAGERSBILLETT" ],
@@ -91,6 +92,7 @@
     "harMerEnn6KmReisevei" : "NEI",
     "lengdeReisevei" : 1.0,
     "harBehovForTransportUavhengigAvReisensLengde" : "NEI",
+    "leveringOgHentingIBarnehage" : null,
     "kanReiseMedOffentligTransport" : "JA",
     "offentligTransport" : {
       "billettTyperValgt" : [ "SYVDAGERSBILLETT" ],

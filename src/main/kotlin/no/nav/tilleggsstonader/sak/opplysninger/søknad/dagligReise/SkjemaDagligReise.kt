@@ -55,6 +55,7 @@ data class Reise(
     val harMerEnn6KmReisevei: JaNei,
     val lengdeReisevei: Double,
     val harBehovForTransportUavhengigAvReisensLengde: JaNei?,
+    val leveringOgHentingIBarnehage: LeveringOgHentingIBarnehage?,
     val kanReiseMedOffentligTransport: JaNei,
     val offentligTransport: OffentligTransport?,
     val privatTransport: PrivatTransport?,
@@ -65,6 +66,11 @@ data class ReiseAdresse(
     val gateadresse: String?,
     val postnummer: String?,
     val poststed: String?,
+)
+
+data class LeveringOgHentingIBarnehage(
+    val gateadresse: String,
+    val postnummer: String,
 )
 
 data class OffentligTransport(

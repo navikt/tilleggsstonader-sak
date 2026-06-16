@@ -66,6 +66,10 @@
           "darligTransporttilbud": true,
           "leveringHentingIBarnehageEllerSkolefritidsordningSfoAks": false
         },
+        "container" : {
+          "gateadressenHvorDuHenterEllerLevererBarn" : "EksempelSvar",
+          "postnummerHvorDuHenterEllerLevererBarn" : "EksempelSvar"
+        },
         "kanKjoreMedEgenBil": "ja",
         "parkering": "ja",
         "bompenger": 43,
