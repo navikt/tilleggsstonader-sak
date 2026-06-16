@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegController
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegFerdigstiltResponse
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 
@@ -19,7 +20,7 @@ class StegKall(
     fun ferdigstill(
         behandlingId: BehandlingId,
         dto: StegController.FerdigstillStegRequest,
-    ): BehandlingId = apiRespons.ferdigstill(behandlingId, dto).expectOkWithBody()
+    ): StegFerdigstiltResponse = apiRespons.ferdigstill(behandlingId, dto).expectOkWithBody()
 
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = StegApi()

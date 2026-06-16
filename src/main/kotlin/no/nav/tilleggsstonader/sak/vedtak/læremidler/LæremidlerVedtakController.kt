@@ -3,7 +3,10 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegFerdigstiltResponse
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
+import no.nav.tilleggsstonader.sak.behandlingsflyt.tilStegFerdigstiltResponse
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -47,38 +50,34 @@ class LæremidlerVedtakController(
     fun innvilge(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseLæremidlerRequest,
-    ) {
-        lagreVedtak(behandlingId, vedtak)
-    }
+    ): StegFerdigstiltResponse = lagreVedtak(behandlingId, vedtak).tilStegFerdigstiltResponse()
 
     @PostMapping("{behandlingId}/avslag")
     fun avslå(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: AvslagLæremidlerDto,
-    ) {
+    ): StegFerdigstiltResponse {
         validerGyldigÅrsakAvslag.validerAvslagErGyldig(
             behandlingId = behandlingId,
             årsakerAvslag = vedtak.årsakerAvslag,
             stønadstype = Stønadstype.LÆREMIDLER,
         )
-        lagreVedtak(behandlingId, vedtak)
+        return lagreVedtak(behandlingId, vedtak).tilStegFerdigstiltResponse()
     }
 
     @PostMapping("{behandlingId}/opphor")
     fun opphør(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: OpphørLæremidlerRequest,
-    ) {
-        lagreVedtak(behandlingId, vedtak)
-    }
+    ): StegFerdigstiltResponse = lagreVedtak(behandlingId, vedtak).tilStegFerdigstiltResponse()
 
     fun lagreVedtak(
         behandlingId: BehandlingId,
         vedtak: VedtakLæremidlerRequest,
-    ) {
+    ): Behandling {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
-        stegService.håndterSteg(behandlingId, steg, vedtak)
+        return stegService.håndterSteg(behandlingId, steg, vedtak)
     }
 
     @PostMapping("{behandlingId}/beregn")

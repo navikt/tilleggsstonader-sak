@@ -40,6 +40,8 @@ class BehandlingTestdataDsl internal constructor() {
 
     companion object {
         fun build(block: BehandlingTestdataDsl.() -> Unit): BehandlingTestdataDsl = BehandlingTestdataDsl().apply(block)
+
+        fun utenData() = BehandlingTestdataDsl()
     }
 
     private val defaultFom = 1 januar 2026
