@@ -49,6 +49,7 @@
     "harMerEnn6KmReisevei" : "JA",
     "lengdeReisevei" : 14.0,
     "harBehovForTransportUavhengigAvReisensLengde" : null,
+    "leveringOgHentingIBarnehage" : null,
     "kanReiseMedOffentligTransport" : "NEI",
     "offentligTransport" : null,
     "privatTransport" : {

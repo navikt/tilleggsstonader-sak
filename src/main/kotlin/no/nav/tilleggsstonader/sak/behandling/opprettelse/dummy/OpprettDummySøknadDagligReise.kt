@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaS
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Identitet
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.JaNeiType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Landvelger
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.LeveringHentingIBarnehage
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.MetadataDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.NavAdresse
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Reise
@@ -105,6 +106,11 @@ class OpprettDummySøknadDagligReise(
                 syvdagersbillett = null,
                 manedskort = null,
                 hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport = null,
+                container =
+                    LeveringHentingIBarnehage(
+                        gateadressenHvorDuHenterEllerLevererBarn = "Testadresse 1",
+                        postnummerHvorDuHenterEllerLevererBarn = "4321",
+                    ),
                 kanKjoreMedEgenBil = null,
                 skalDuBetaleForReisenSelv = JaNeiType.nei,
                 mottarDuGrunnstonadFraNav = null,
@@ -137,6 +143,7 @@ class OpprettDummySøknadDagligReise(
                 syvdagersbillett = null,
                 manedskort = 1200,
                 hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport = null,
+                container = null,
                 kanKjoreMedEgenBil = null,
                 skalDuBetaleForReisenSelv = null,
                 mottarDuGrunnstonadFraNav = null,

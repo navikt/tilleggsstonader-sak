@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Iden
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.JaNeiType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.KanKjøreMedEgenBilType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Landvelger
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.LeveringHentingIBarnehage
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.MetadataDagligReise
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.NavAdresse
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Reise
@@ -130,6 +131,11 @@ object SøknadDagligReiseUtil {
             kanKjoreMedEgenBil = KanKjøreMedEgenBilType.nei,
             skalDuBetaleForReisenSelv = JaNeiType.nei,
             hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport = null,
+            container =
+                LeveringHentingIBarnehage(
+                    gateadressenHvorDuHenterEllerLevererBarn = "Testadresse 1",
+                    postnummerHvorDuHenterEllerLevererBarn = "4321",
+                ),
             mottarDuGrunnstonadFraNav = null,
             hvorforIkkeBil = null,
             reiseMedTaxi = null,
