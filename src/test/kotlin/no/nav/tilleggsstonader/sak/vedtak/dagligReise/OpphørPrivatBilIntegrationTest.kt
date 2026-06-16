@@ -7,22 +7,17 @@ import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 
 class OpphørPrivatBilIntegrationTest(
     @Autowired private val vedtakService: VedtakService,
@@ -35,8 +30,9 @@ class OpphørPrivatBilIntegrationTest(
 
         val fom = 2 februar 2026
         val tom = 20 mars 2026
-        val opphørsdato = 9 mars 2026
+        val opphørsdato = 11 mars 2026
 
+        // Opprett førstegangsbehandling og send inn kjøreliste
         val førstegangsbehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(Stønadstype.DAGLIG_REISE_TSO) {
                 defaultDagligReisePrivatBilTsoTestdata(fom, tom)
@@ -49,13 +45,15 @@ class OpphørPrivatBilIntegrationTest(
                             KjørtDag(dato = 9 februar 2026, parkeringsutgift = 50),
                             KjørtDag(dato = 16 februar 2026, parkeringsutgift = 50),
                             KjørtDag(dato = 23 februar 2026, parkeringsutgift = 50),
-                            KjørtDag(dato = 2 februar 2026, parkeringsutgift = 50),
-                            KjørtDag(dato = 9 februar 2026, parkeringsutgift = 50),
-                            KjørtDag(dato = 16 februar 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 2 mars 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 9 mars 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 12 mars 2026, parkeringsutgift = 50),
+                            KjørtDag(dato = 16 mars 2026, parkeringsutgift = 50),
                         )
                 }
             }
 
+        // Behandle kjørelista
         val kjørelistebehandling =
             testoppsettService
                 .hentBehandlinger(førstegangsbehandlingContext.fagsakId)
@@ -63,6 +61,7 @@ class OpphørPrivatBilIntegrationTest(
         gjennomførKjørelisteBehandling(kjørelistebehandling)
         testoppsettService.settAndelerTilOkForBehandling(kjørelistebehandling.id)
 
+        // Opphør
         val revurderingId =
             opprettRevurderingOgGjennomførBehandlingsløp(
                 fraBehandlingId = førstegangsbehandlingContext.behandlingId,
@@ -88,43 +87,19 @@ class OpphørPrivatBilIntegrationTest(
         assertThat(beregningsresultatPrivatBil!!.reiser).hasSize(1)
 
         val ukerIReise = beregningsresultatPrivatBil.reiser.single().perioder
-        assertThat(ukerIReise).hasSize(5)
+        assertThat(ukerIReise).hasSize(6)
         assertThat(ukerIReise.maxOf { it.tom }).isEqualTo(opphørsdato.minusDays(1))
+
+        val dagerISisteUke =
+            beregningsresultatPrivatBil.reiser
+                .single()
+                .perioder
+                .maxBy { it.fom }
+                .grunnlag.dager
+        assertThat(dagerISisteUke).hasSize(1)
+        assertThat(dagerISisteUke.single().dato).isEqualTo(9 mars 2026)
 
         val andeler = tilkjentYtelseService.hentForBehandling(revurderingId).andelerTilkjentYtelse
         assertThat(andeler.maxOf { it.fom }).isBefore(opphørsdato.minusDays(1))
-    }
-
-    @Test
-    fun `skal kaste feil dersom opphør ikke skjer på en mandag`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-        every { unleashService.isEnabled(Toggle.KAN_OPPHØRE_PRIVAT_BIL) } returns true
-
-        val fom = 2 februar 2026
-        val tom = 20 mars 2026
-        val opphørsdato = 7 mars 2026
-
-        val førstegangsbehandlingContext =
-            opprettBehandlingOgGjennomførBehandlingsløp(Stønadstype.DAGLIG_REISE_TSO) {
-                defaultDagligReisePrivatBilTsoTestdata(fom, tom)
-            }
-
-        val revurderingId =
-            opprettRevurderingOgGjennomførBehandlingsløp(
-                fraBehandlingId = førstegangsbehandlingContext.behandlingId,
-                tilSteg = StegType.BEREGNE_YTELSE,
-            ) {}
-
-        kall.vedtak.apiRespons
-            .lagreOpphør(
-                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-                behandlingId = revurderingId,
-                opphørDto =
-                    OpphørDagligReiseRequest(
-                        opphørsdato = opphørsdato,
-                        årsakerOpphør = listOf(ÅrsakOpphør.ANNET),
-                        begrunnelse = "Begrunnelse for opphør",
-                    ),
-            ).expectProblemDetail(HttpStatus.BAD_REQUEST, "Sett opphørsdato til en mandag")
     }
 }
