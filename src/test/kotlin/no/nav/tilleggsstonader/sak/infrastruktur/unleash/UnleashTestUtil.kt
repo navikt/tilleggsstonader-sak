@@ -26,6 +26,7 @@ fun resetMock(
     every { mockk.isEnabled(any()) } returns isEnabled
     every { mockk.isEnabled(any(), any<Boolean>()) } returns isEnabled
     every { mockk.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns false
+    every { mockk.isEnabled(Toggle.BRUK_NYTT_FAGOMRADE_FOR_UTBETALING) } returns false
     justRun { mockk.destroy() }
 }
 

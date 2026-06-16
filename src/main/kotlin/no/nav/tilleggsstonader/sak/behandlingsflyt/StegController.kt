@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandlingsflyt
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -21,12 +22,12 @@ class StegController(
     fun ferdigstillSteg(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody request: FerdigstillStegRequest,
-    ): BehandlingId {
+    ): StegFerdigstiltResponse {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return stegService.håndterSteg(behandlingId, request.steg).id
+        return stegService.håndterSteg(behandlingId, request.steg).tilStegFerdigstiltResponse()
     }
 
     @PostMapping("behandling/{behandlingId}/reset")
@@ -49,3 +50,10 @@ class StegController(
         val steg: StegType,
     )
 }
+
+data class StegFerdigstiltResponse(
+    val behandlingId: BehandlingId,
+    val nesteSteg: StegType,
+)
+
+fun Behandling.tilStegFerdigstiltResponse() = StegFerdigstiltResponse(behandlingId = id, nesteSteg = steg)

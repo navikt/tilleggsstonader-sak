@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
@@ -33,6 +34,9 @@ data class AvklartKjørtDag(
             this
         }
 }
+
+fun List<AvklartKjørtDag>.finnDagerInnenforPeriode(periode: Periode<LocalDate>): List<AvklartKjørtDag> =
+    filter { dag -> periode.inneholder(dag.dato) }
 
 fun Collection<AvklartKjørtDag>.markerSomSlettet(): Set<AvklartKjørtDag> = map { it.markerSomSlettet() }.toSet()
 
