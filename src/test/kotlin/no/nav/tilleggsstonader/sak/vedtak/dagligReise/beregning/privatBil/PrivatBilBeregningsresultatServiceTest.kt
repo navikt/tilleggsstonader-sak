@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatu
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UtfyltDagAutomatiskVurdering
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.markerSomSlettet
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammevedtakPrivatBil
@@ -58,10 +59,10 @@ class PrivatBilBeregningsresultatServiceTest {
         every { avklartKjørelisteService.hentAvklarteUkerForBehandling(behandlingId) } returns avklarteUker
         return checkNotNull(
             beregningService.beregn(
-                behandling = behandling,
-                rammevedtak = rammevedtak,
-                brukersNavKontor = brukersNavKontor,
-                forrigeBeregningsresultat = forrigeBeregningsresultat,
+                behandling,
+                rammevedtak,
+                brukersNavKontor,
+                forrigeBeregningsresultat,
             ),
         )
     }
@@ -629,7 +630,12 @@ class PrivatBilBeregningsresultatServiceTest {
         val tomRammevedtak = 15 februar 2026
         val delperiode = lagDelperiode(fomRammevedtak, tomRammevedtak)
         val rammevedtakPrivatBil =
-            rammevedtakPrivatBil(reiseId = reiseId, fom = fomRammevedtak, tom = tomRammevedtak, delperioder = listOf(delperiode))
+            rammevedtakPrivatBil(
+                reiseId = reiseId,
+                fom = fomRammevedtak,
+                tom = tomRammevedtak,
+                delperioder = listOf(delperiode),
+            )
 
         val kjøreliste1 =
             KjørelisteUtil.kjøreliste(
@@ -677,7 +683,12 @@ class PrivatBilBeregningsresultatServiceTest {
         val tomRammevedtak = 15 februar 2026
         val delperiode = lagDelperiode(fomRammevedtak, tomRammevedtak)
         val rammevedtakPrivatBil =
-            rammevedtakPrivatBil(reiseId = reiseId, fom = fomRammevedtak, tom = tomRammevedtak, delperioder = listOf(delperiode))
+            rammevedtakPrivatBil(
+                reiseId = reiseId,
+                fom = fomRammevedtak,
+                tom = tomRammevedtak,
+                delperioder = listOf(delperiode),
+            )
 
         val kjøreliste1 =
             KjørelisteUtil.kjøreliste(
@@ -731,7 +742,12 @@ class PrivatBilBeregningsresultatServiceTest {
         val tomRammevedtak = 8 februar 2026
         val delperiode = lagDelperiode(fomRammevedtak, tomRammevedtak)
         val rammevedtakPrivatBil =
-            rammevedtakPrivatBil(reiseId = reiseId, fom = fomRammevedtak, tom = tomRammevedtak, delperioder = listOf(delperiode))
+            rammevedtakPrivatBil(
+                reiseId = reiseId,
+                fom = fomRammevedtak,
+                tom = tomRammevedtak,
+                delperioder = listOf(delperiode),
+            )
 
         val kjøreliste =
             KjørelisteUtil.kjøreliste(
@@ -825,7 +841,12 @@ class PrivatBilBeregningsresultatServiceTest {
         val tomRammevedtak = 15 februar 2026
         val delperiode = lagDelperiode(fomRammevedtak, tomRammevedtak)
         val rammevedtakPrivatBil =
-            rammevedtakPrivatBil(reiseId = reiseId, fom = fomRammevedtak, tom = tomRammevedtak, delperioder = listOf(delperiode))
+            rammevedtakPrivatBil(
+                reiseId = reiseId,
+                fom = fomRammevedtak,
+                tom = tomRammevedtak,
+                delperioder = listOf(delperiode),
+            )
 
         val kjørelisteUke6 =
             KjørelisteUtil.kjøreliste(
@@ -833,18 +854,21 @@ class PrivatBilBeregningsresultatServiceTest {
                 periode = Datoperiode(2 februar 2026, 8 februar 2026),
                 kjørteDager = listOf(KjørelisteUtil.KjørtDag(2 februar 2026)),
             )
+        val kjørtDagUke7 = KjørelisteUtil.KjørtDag(9 februar 2026)
         val kjørelisteUke7 =
             KjørelisteUtil.kjøreliste(
                 reiseId = reiseId,
                 periode = Datoperiode(9 februar 2026, 15 februar 2026),
-                kjørteDager = listOf(KjørelisteUtil.KjørtDag(9 februar 2026)),
+                kjørteDager = listOf(kjørtDagUke7),
             )
 
         val ukeOK = avklarUkerFraKjøreliste(kjørelisteUke6).single()
+        val avklartKjørtUke7 = avklarUkerFraKjøreliste(kjørelisteUke7).single()
         val ukeSlettet =
-            avklarUkerFraKjøreliste(kjørelisteUke7)
-                .single()
-                .copy(avklartKjørtUkeStatus = AvklartKjørtUkeStatus.SLETTET)
+            avklartKjørtUke7.copy(
+                avklartKjørtUkeStatus = AvklartKjørtUkeStatus.SLETTET,
+                dager = avklartKjørtUke7.dager.markerSomSlettet(),
+            )
 
         val beregningsresultat = beregn(rammevedtakPrivatBil, listOf(ukeOK, ukeSlettet), brukersNavKontor)
 
@@ -859,7 +883,12 @@ class PrivatBilBeregningsresultatServiceTest {
         val tomRammevedtak = 8 februar 2026
         val delperiode = lagDelperiode(fomRammevedtak, tomRammevedtak)
         val rammevedtakPrivatBil =
-            rammevedtakPrivatBil(reiseId = reiseId, fom = fomRammevedtak, tom = tomRammevedtak, delperioder = listOf(delperiode))
+            rammevedtakPrivatBil(
+                reiseId = reiseId,
+                fom = fomRammevedtak,
+                tom = tomRammevedtak,
+                delperioder = listOf(delperiode),
+            )
 
         val kjøreliste =
             KjørelisteUtil.kjøreliste(
@@ -867,7 +896,8 @@ class PrivatBilBeregningsresultatServiceTest {
                 periode = Datoperiode(fomRammevedtak, tomRammevedtak),
                 kjørteDager = listOf(KjørelisteUtil.KjørtDag(fomRammevedtak)),
             )
-        val ukeMedUendretStatus = avklarUkerFraKjøreliste(kjøreliste).single().copy(avklartKjørtUkeStatus = AvklartKjørtUkeStatus.UENDRET)
+        val ukeMedUendretStatus =
+            avklarUkerFraKjøreliste(kjøreliste).single().copy(avklartKjørtUkeStatus = AvklartKjørtUkeStatus.UENDRET)
 
         val beregningsresultat =
             beregn(
