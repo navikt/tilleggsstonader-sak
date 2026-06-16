@@ -46,12 +46,15 @@ class PrivatBilBeregningRevurderingService(
             "Muligheten for å revurdere daglige reiser med privat bil er skrudd av."
         }
 
+        val forrigeRammerByReiseId = forrigeRammevedtak.reiser.associateBy { it.reiseId }
+        val nyeRammerByReiseId = nyttRammevedtak?.reiser?.associateBy { it.reiseId }
+
         val reiser =
             reiserMedBil.mapNotNull { reise ->
                 beregnRammevedtakForReiseIRevurdering(
                     vilkårStatus = reise.status,
-                    forrigeRammeForReise = forrigeRammevedtak.reiser.firstOrNull { it.reiseId == reise.reiseId },
-                    nyRammeForReise = nyttRammevedtak?.reiser?.firstOrNull { it.reiseId == reise.reiseId },
+                    forrigeRammeForReise = forrigeRammerByReiseId[reise.reiseId],
+                    nyRammeForReise = nyeRammerByReiseId?.get(reise.reiseId),
                     tidligsteEndring = tidligsteEndring,
                 )
             }
