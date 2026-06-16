@@ -73,7 +73,7 @@ class PrivatBilBeregningRevurderingService(
         tidligsteEndring: LocalDate?,
     ): RammeForReiseMedPrivatBil? =
         when (vilkårStatus) {
-            VilkårStatus.NY -> nyRammeForReise ?: feil("Forventer at det finnes et nytt rammmevedtak for nye reiser")
+            VilkårStatus.NY -> nyRammeForReise ?: feil("Forventer at det finnes et nytt rammevedtak for nye reiser")
             VilkårStatus.SLETTET -> null
             VilkårStatus.ENDRET, VilkårStatus.UENDRET ->
                 velgRammeForReiseBasertPåTidligsteEndring(

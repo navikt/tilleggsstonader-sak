@@ -74,7 +74,7 @@ class PrivatBilBeregningRevurderingServiceTest {
                     nyttRammevedtak = null,
                     tidligsteEndring = 1 februar 2025,
                 )
-            }.hasMessageContaining("Forventer at det finnes et nytt rammmevedtak for nye reiser")
+            }.hasMessageContaining("Forventer at det finnes et nytt rammevedtak for nye reiser")
         }
     }
 
@@ -111,18 +111,18 @@ class PrivatBilBeregningRevurderingServiceTest {
     inner class UendretReise {
         @Test
         fun `reise med status UENDRET som er ferdig FØR tidligsteEndring bruker gammelt`() {
-            val forrigeRammevedtakForReiseForReise = rammeForReiseMedPrivatBil(reiseId = reiseId, fom = 1 januar 2025, tom = 28 januar 2025)
+            val forrigeRammevedtakForReise = rammeForReiseMedPrivatBil(reiseId = reiseId, fom = 1 januar 2025, tom = 28 januar 2025)
             val nyttRammevedtakForReise = rammeForReiseMedPrivatBil(reiseId = reiseId, fom = 1 januar 2025, tom = 28 januar 2025)
 
             val resultat =
                 service.beregnRammevedtakVedRevurdering(
                     reiserMedBil = listOf(reiseMedStatus(VilkårStatus.UENDRET, fom = 1 januar 2025, tom = 28 januar 2025)),
-                    forrigeRammevedtak = RammevedtakPrivatBil(reiser = listOf(forrigeRammevedtakForReiseForReise)),
+                    forrigeRammevedtak = RammevedtakPrivatBil(reiser = listOf(forrigeRammevedtakForReise)),
                     nyttRammevedtak = RammevedtakPrivatBil(reiser = listOf(nyttRammevedtakForReise)),
                     tidligsteEndring = 1 mars 2025,
                 )
 
-            assertThat(resultat!!.reiser).containsExactly(forrigeRammevedtakForReiseForReise)
+            assertThat(resultat!!.reiser).containsExactly(forrigeRammevedtakForReise)
         }
 
         @Test
