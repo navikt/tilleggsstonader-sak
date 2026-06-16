@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
@@ -48,7 +47,6 @@ class PrivatBilBeregningsresultatServiceTest {
     val beregningService =
         PrivatBilBeregningService(
             avklartKjørelisteService = avklartKjørelisteService,
-            privatBilBeregningRevurderingService = PrivatBilBeregningRevurderingService(mockk<UnleashService>()),
         )
 
     private fun beregn(
@@ -56,14 +54,12 @@ class PrivatBilBeregningsresultatServiceTest {
         avklarteUker: List<AvklartKjørtUke>,
         brukersNavKontor: String?,
         forrigeBeregningsresultat: BeregningsresultatPrivatBil? = null,
-        tidligsteEndring: LocalDate? = null,
     ): BeregningsresultatPrivatBil {
         every { avklartKjørelisteService.hentAvklarteUkerForBehandling(behandlingId) } returns avklarteUker
         return checkNotNull(
             beregningService.beregn(
                 behandling = behandling,
                 rammevedtak = rammevedtak,
-                tidligsteEndring = tidligsteEndring,
                 brukersNavKontor = brukersNavKontor,
                 forrigeBeregningsresultat = forrigeBeregningsresultat,
             ),
