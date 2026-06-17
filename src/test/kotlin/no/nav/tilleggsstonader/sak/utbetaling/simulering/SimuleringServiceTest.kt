@@ -192,14 +192,7 @@ internal class SimuleringServiceTest {
         val varselTekst = "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
 
         val alleFagsaker =
-            Fagsaker(
-                barnetilsyn = null,
-                læremidler = null,
-                boutgifter = null,
-                dagligReiseTso = fagsakDagligReiseTso,
-                dagligReiseTsr = fagsakDagligReiseTsr,
-                reiseTilSamlingTso = null,
-            )
+            Fagsaker(listOf(fagsakDagligReiseTso, fagsakDagligReiseTsr).associateBy { it.stønadstype })
         val idag = LocalDate.now()
 
         every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakDagligReiseTso
@@ -226,7 +219,7 @@ internal class SimuleringServiceTest {
 
         every { tilkjentYtelseService.hentForBehandling(any()) } returns tilkjentYtelse
 
-        val resultat = simuleringService.skalSendeVarsel(behandlingId)
+        val resultat = simuleringService.lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(behandlingId)
 
         assertThat(resultat).isEqualTo(varselTekst)
     }
@@ -243,15 +236,7 @@ internal class SimuleringServiceTest {
                 utbetalPåNyttFagområde = true,
             )
 
-        val alleFagsaker =
-            Fagsaker(
-                barnetilsyn = null,
-                læremidler = null,
-                boutgifter = null,
-                dagligReiseTso = fagsakDagligReiseTso,
-                dagligReiseTsr = fagsakDagligReiseTsr,
-                reiseTilSamlingTso = null,
-            )
+        val alleFagsaker = Fagsaker(listOf(fagsakDagligReiseTso, fagsakDagligReiseTsr).associateBy { it.stønadstype })
         val idag = LocalDate.now()
 
         every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakDagligReiseTso
@@ -278,7 +263,7 @@ internal class SimuleringServiceTest {
 
         every { tilkjentYtelseService.hentForBehandling(any()) } returns tilkjentYtelse
 
-        val resultat = simuleringService.skalSendeVarsel(behandlingId)
+        val resultat = simuleringService.lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(behandlingId)
 
         assertThat(resultat).isNull()
     }
@@ -297,14 +282,7 @@ internal class SimuleringServiceTest {
             )
 
         val alleFagsaker =
-            Fagsaker(
-                barnetilsyn = fagsakTilsynbarn,
-                læremidler = fagsakLæremidler,
-                boutgifter = null,
-                dagligReiseTso = null,
-                dagligReiseTsr = null,
-                reiseTilSamlingTso = null,
-            )
+            Fagsaker(listOf(fagsakTilsynbarn, fagsakLæremidler).associateBy { it.stønadstype })
         val varselTekst = "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
 
         every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakTilsynbarn
@@ -332,7 +310,7 @@ internal class SimuleringServiceTest {
 
         every { tilkjentYtelseService.hentForBehandling(any()) } returns tilkjentYtelse
 
-        val resultat = simuleringService.skalSendeVarsel(behandlingId)
+        val resultat = simuleringService.lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(behandlingId)
 
         assertThat(resultat).isEqualTo(varselTekst)
     }
@@ -346,15 +324,7 @@ internal class SimuleringServiceTest {
                 utbetalPåNyttFagområde = false,
             )
 
-        val alleFagsaker =
-            Fagsaker(
-                barnetilsyn = fagsakTilsynbarn,
-                læremidler = null,
-                boutgifter = null,
-                dagligReiseTso = null,
-                dagligReiseTsr = null,
-                reiseTilSamlingTso = null,
-            )
+        val alleFagsaker = Fagsaker(mapOf(fagsakTilsynbarn.stønadstype to fagsakTilsynbarn))
 
         every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakTilsynbarn
         every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns alleFagsaker
@@ -380,7 +350,7 @@ internal class SimuleringServiceTest {
 
         every { tilkjentYtelseService.hentForBehandling(any()) } returns tilkjentYtelse
 
-        val resultat = simuleringService.skalSendeVarsel(behandlingId)
+        val resultat = simuleringService.lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(behandlingId)
 
         assertThat(resultat).isNull()
     }
@@ -391,22 +361,14 @@ internal class SimuleringServiceTest {
         val fagsakLæremidler = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.LÆREMIDLER).copy(utbetalPåNyttFagområde = false)
         val behandlingId = behandling(fagsakTilsynbarn).id
 
-        val alleFagsaker =
-            Fagsaker(
-                barnetilsyn = fagsakTilsynbarn,
-                læremidler = fagsakLæremidler,
-                boutgifter = null,
-                dagligReiseTso = null,
-                dagligReiseTsr = null,
-                reiseTilSamlingTso = null,
-            )
+        val alleFagsaker = Fagsaker(listOf(fagsakTilsynbarn, fagsakLæremidler).associateBy { it.stønadstype })
 
         every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakTilsynbarn
         every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns alleFagsaker
         every { behandlingService.finnSisteIverksatteBehandling(fagsakTilsynbarn.id) } returns null
         every { behandlingService.finnSisteIverksatteBehandling(fagsakLæremidler.id) } returns behandling(fagsakLæremidler)
 
-        val resultat = simuleringService.skalSendeVarsel(behandlingId)
+        val resultat = simuleringService.lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(behandlingId)
 
         assertThat(resultat).isNull()
     }
@@ -425,12 +387,12 @@ internal class SimuleringServiceTest {
 
         val alleFagsaker =
             Fagsaker(
-                barnetilsyn = fagsakTilsynbarn,
-                læremidler = fagsakLæremidler,
-                boutgifter = fagsakBoutgifter,
-                dagligReiseTso = fagsakDagligReise,
-                dagligReiseTsr = null,
-                reiseTilSamlingTso = null,
+                listOf(
+                    fagsakTilsynbarn,
+                    fagsakLæremidler,
+                    fagsakBoutgifter,
+                    fagsakDagligReise,
+                ).associateBy { it.stønadstype },
             )
         val varselTekst = "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
         val behandlingDagligReise = behandling(fagsakDagligReise)
@@ -456,7 +418,7 @@ internal class SimuleringServiceTest {
                     ).toTypedArray(),
             )
 
-        val resultat = simuleringService.skalSendeVarsel(behandlingId)
+        val resultat = simuleringService.lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(behandlingId)
 
         assertThat(resultat).isEqualTo(varselTekst)
     }
@@ -468,17 +430,10 @@ internal class SimuleringServiceTest {
 
         every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakTilsynbarn
         every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns
-            Fagsaker(
-                barnetilsyn = fagsakTilsynbarn,
-                læremidler = null,
-                boutgifter = null,
-                dagligReiseTso = null,
-                dagligReiseTsr = null,
-                reiseTilSamlingTso = null,
-            )
+            Fagsaker(mapOf(fagsakTilsynbarn.stønadstype to fagsakTilsynbarn))
 
-        assertThatThrownBy { simuleringService.skalSendeVarsel(behandlingId) }
-            .hasMessageContaining("Mangler verdi for utbetalPåNyttFagområde")
+        assertThatThrownBy { simuleringService.lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(behandlingId) }
+            .hasMessageContaining("Forventer at utbetalPåNyttFagområde skal være satt på fagsaken")
     }
 
     @Test

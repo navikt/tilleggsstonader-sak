@@ -27,7 +27,7 @@ class SimuleringStegService(
             if (saksbehandling.steg == StegType.SIMULERING) {
                 stegService.håndterSteg(saksbehandling.id, StegType.SIMULERING)
             }
-            val varsel = simuleringService.skalSendeVarsel(saksbehandling.id)
+            val varsel = simuleringService.lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(saksbehandling.id)
 
             return simuleringService.hentLagretSimulering(saksbehandling.id)?.tilDto()?.copy(varsel = varsel)
         }

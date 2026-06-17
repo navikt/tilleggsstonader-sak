@@ -1,14 +1,11 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
-import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsaker
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.SimuleringClient
@@ -79,84 +76,38 @@ class SimuleringService(
         )
     }
 
-    fun skalSendeVarsel(behandlingId: BehandlingId): String? {
+    fun lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(behandlingId: BehandlingId): String? {
         val fagsak = fagsakService.hentFagsakForBehandling(behandlingId)
+        feilHvis(fagsak.utbetalPåNyttFagområde == null) {
+            "Forventer at utbetalPåNyttFagområde skal være satt på fagsaken"
+        }
         val alleFagsaker =
             fagsakService
                 .finnFagsakerForFagsakPersonId(fagsak.fagsakPersonId)
-        return when (fagsak.stønadstype) {
-            Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR ->
-                håndterVarselForStønaderMedEgetFagområde(
-                    listOfNotNull(
-                        alleFagsaker.dagligReiseTso,
-                        alleFagsaker.dagligReiseTsr,
-                    ),
+
+        val skalVarsleOmNyligeUtbetalingerInnenforSammeFagområde =
+            if (fagsak.utbetalPåNyttFagområde) {
+                // Motregnes kun "innad" i stønadstypen og da uavhengig av tema
+                finnesFagsakMedIverksatteAndelerInnenforPeriode(
+                    fagsaker = alleFagsaker.alleFagsakerAvStønadstypeUavhengigAvTema(fagsak.stønadstype),
+                    periode = Datoperiode(LocalDate.now(), LocalDate.now()),
                 )
-
-            Stønadstype.REISE_TIL_SAMLING_TSO ->
-                håndterVarselForStønaderMedEgetFagområde(
-                    listOfNotNull(alleFagsaker.reiseTilSamlingTso),
-                )
-
-            Stønadstype.BOUTGIFTER, Stønadstype.LÆREMIDLER, Stønadstype.BARNETILSYN ->
-                håndterTilsynbarnLæremidlerBoutgifterVarsel(fagsak, alleFagsaker)
-        }
-    }
-
-    fun håndterVarselForStønaderMedEgetFagområde(relevanteFagsaker: List<Fagsak>): String? {
-        val dagensDato = LocalDate.now()
-        return if (erVarselRelevant(relevanteFagsaker, dagensDato)) {
-            "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
-        } else {
-            null
-        }
-    }
-
-    private fun håndterTilsynbarnLæremidlerBoutgifterVarsel(
-        fagsak: Fagsak,
-        fagsaker: Fagsaker,
-    ): String? {
-        val utbetalPåNyttFagområde =
-            fagsak.utbetalPåNyttFagområde
-                ?: feil("Mangler verdi for utbetalPåNyttFagområde på fagsak=${fagsak.id}")
-        val relevanteFagsaker =
-            if (utbetalPåNyttFagområde) {
-                listOf(fagsak)
             } else {
-                fagsaker.alleFagsaker().filter { it.utbetalPåNyttFagområde == false }
+                // Motregnes mot alle andre fagsaker som også utbetaler på gammelt fagområde. Også en ventedag før utbetaling
+                finnesFagsakMedIverksatteAndelerInnenforPeriode(
+                    fagsaker = alleFagsaker.alleFagsakerMedUtbetalingPåGammeltFagområde(),
+                    periode = Datoperiode(LocalDate.now().forrigeVirkedag(), LocalDate.now()),
+                )
             }
-        val periode = Datoperiode(LocalDate.now().forrigeVirkedag(), LocalDate.now())
-        return if (erVarselRelevantForTilsynBarnLæremidlerBoutgifter(relevanteFagsaker, periode)) {
+
+        return if (skalVarsleOmNyligeUtbetalingerInnenforSammeFagområde) {
             "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
         } else {
             null
         }
     }
 
-    private fun erVarselRelevant(
-        fagsaker: List<Fagsak>,
-        dagensDato: LocalDate,
-    ): Boolean {
-        return fagsaker.any { relevantFagsak ->
-
-            val behandlingId =
-                behandlingService
-                    .finnSisteIverksatteBehandling(relevantFagsak.id)
-                    ?.id ?: return@any false
-
-            val tilkjentYtelse =
-                tilkjentYtelseService.hentForBehandling(behandlingId)
-
-            tilkjentYtelse.andelerTilkjentYtelse.any { andel ->
-                val iverksettingDato =
-                    andel.iverksetting?.iverksettingTidspunkt?.toLocalDate()
-
-                iverksettingDato?.isEqual(dagensDato) == true
-            }
-        }
-    }
-
-    private fun erVarselRelevantForTilsynBarnLæremidlerBoutgifter(
+    private fun finnesFagsakMedIverksatteAndelerInnenforPeriode(
         fagsaker: List<Fagsak>,
         periode: Datoperiode,
     ): Boolean {
