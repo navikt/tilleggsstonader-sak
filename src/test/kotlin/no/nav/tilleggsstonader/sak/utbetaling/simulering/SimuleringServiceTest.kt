@@ -292,7 +292,7 @@ internal class SimuleringServiceTest {
                 utbetalPåNyttFagområde = false,
             )
         val fagsakLæremidler =
-            fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN).copy(
+            fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.LÆREMIDLER).copy(
                 utbetalPåNyttFagområde = false,
             )
 
