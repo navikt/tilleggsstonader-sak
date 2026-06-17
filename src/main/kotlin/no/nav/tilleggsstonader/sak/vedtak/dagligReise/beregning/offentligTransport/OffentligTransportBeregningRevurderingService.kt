@@ -50,13 +50,13 @@ class OffentligTransportBeregningRevurderingService {
         // Alle perioder som er tidligere beregn fra-datoen skal kopieres fra tidligere vedtak
         val bevarteGamlePerioder =
             reisenIForrigeVedtak
-                .filter { it.grunnlag.fom < beregnFra }
+                .filter { it.grunnlag.tom.plusDays(1) < beregnFra }
                 .map { it.copy(fraTidligereVedtak = true) }
 
         // Perioder som har identisk grunnlag som forrige vedtak skal ikke reberegnes
         val nyeEllerOppdatertePerioder =
             nyBeregningForReise.perioder
-                .filter { it.grunnlag.fom >= beregnFra }
+                .filter { it.grunnlag.tom.plusDays(1) >= beregnFra }
                 .map { nyPeriode ->
                     val tilsvarendePeriodeIForrigeVedtak = reisenIForrigeVedtak.singleOrNull { it.grunnlag == nyPeriode.grunnlag }
                     tilsvarendePeriodeIForrigeVedtak?.copy(fraTidligereVedtak = true) ?: nyPeriode.copy(fraTidligereVedtak = false)
