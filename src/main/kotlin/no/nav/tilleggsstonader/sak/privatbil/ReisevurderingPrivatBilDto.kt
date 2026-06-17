@@ -15,6 +15,7 @@ import java.util.UUID
 data class ReisevurderingPrivatBilDto(
     val reiseId: ReiseId,
     val rammevedtak: RammeForReiseMedPrivatBilDto,
+    val forrigeRammevedtak: RammeForReiseMedPrivatBilDto?,
     val uker: List<UkeVurderingDto>,
 )
 
@@ -22,6 +23,7 @@ data class UkeVurderingDto(
     val ukenummer: Int,
     val fraDato: LocalDate,
     val tilDato: LocalDate,
+    val endringIRammevedtakStatus: UkeEndringIRammevedtakStatus,
     val status: UkeStatus,
     val avvik: AvvikUke?,
     val behandletDato: LocalDate?,
@@ -31,6 +33,12 @@ data class UkeVurderingDto(
     val avklartKjørtUkeStatus: AvklartKjørtUkeStatus?, // null hvis avklartKjørtUke ikke finnes
     val dager: List<DagDto>,
 )
+
+enum class UkeEndringIRammevedtakStatus {
+    NY,
+    SLETTET,
+    UENDRET,
+}
 
 data class AvvikUke(
     val typeAvvik: TypeAvvikUke,
