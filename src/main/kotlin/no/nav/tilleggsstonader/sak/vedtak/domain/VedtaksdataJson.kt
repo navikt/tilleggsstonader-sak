@@ -42,7 +42,7 @@ class TypeVedtaksdataDeserializer : ValueDeserializer<TypeVedtaksdata>() {
     override fun deserialize(
         p: JsonParser,
         ctxt: DeserializationContext,
-    ): TypeVedtaksdata = typerVedtaksdata[p.text] ?: error("Finner ikke mapping for ${p.text}")
+    ): TypeVedtaksdata = typerVedtaksdata[p.string] ?: error("Finner ikke mapping for ${p.string}")
 }
 
 val typerVedtaksdata: Map<String, TypeVedtaksdata> =

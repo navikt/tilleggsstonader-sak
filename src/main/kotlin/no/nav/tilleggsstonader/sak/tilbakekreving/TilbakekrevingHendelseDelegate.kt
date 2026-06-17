@@ -14,7 +14,7 @@ class TilbakekrevingHendelseDelegate(
 
     fun håndter(consumerRecord: ConsumerRecord<String, String>) {
         val payload = jsonMapper.readTree(consumerRecord.value())
-        val hendelsestype = payload.get("hendelsestype")?.asText()
+        val hendelsestype = payload.get("hendelsestype")?.asString()
 
         val håndterer =
             tilbakekrevingHendelseHåndterere.firstOrNull { it.håndtererHendelsetype() == hendelsestype }

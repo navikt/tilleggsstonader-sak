@@ -39,7 +39,7 @@ internal class PdlPersonUtilTest {
         val adresser: List<Bostedsadresse> = historiskeAdresser + gjeldendeAdresse
 
         assertThat(adresser.gjeldende()!!.vegadresse!!.adressenavn).isEqualTo(gjeldendeAdresse.vegadresse!!.adressenavn)
-        assertThat(adresser.gjeldende()!!.vegadresse!!.husnummer).isEqualTo(gjeldendeAdresse.vegadresse!!.husnummer)
+        assertThat(adresser.gjeldende()!!.vegadresse!!.husnummer).isEqualTo(gjeldendeAdresse.vegadresse.husnummer)
 
         assertThat(historiskeAdresser.gjeldende()).isNull()
     }
@@ -57,7 +57,7 @@ internal class PdlPersonUtilTest {
         val adresser = historiskeAdresser + gjeldendeAdresse
 
         assertThat(adresser.gjeldende()!!.vegadresse!!.adressenavn).isEqualTo(gjeldendeAdresse.vegadresse!!.adressenavn)
-        assertThat(adresser.gjeldende()!!.vegadresse!!.husnummer).isEqualTo(gjeldendeAdresse.vegadresse!!.husnummer)
+        assertThat(adresser.gjeldende()!!.vegadresse!!.husnummer).isEqualTo(gjeldendeAdresse.vegadresse.husnummer)
 
         assertThat(historiskeAdresser.gjeldende()).isNull()
     }

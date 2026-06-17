@@ -220,9 +220,9 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
 
             val beregningsresultat =
                 vedtakService
-                    .hentVedtak<InnvilgelseTilsynBarn>(behandling.id)!!
+                    .hentVedtak<InnvilgelseTilsynBarn>(behandling.id)
                     .data.beregningsresultat
-            with(beregningsresultat!!.perioder.single()) {
+            with(beregningsresultat.perioder.single()) {
                 with(this.grunnlag.vedtaksperiodeGrunnlag.single()) {
                     assertThat(this.vedtaksperiode.fom).isEqualTo(juni.atDay(1))
                     assertThat(this.vedtaksperiode.tom).isEqualTo(juni.atEndOfMonth())
@@ -464,7 +464,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
 
         private fun hentBeregningsresultat(behandlingId: BehandlingId): BeregningsresultatTilsynBarn =
             vedtakService
-                .hentVedtak<InnvilgelseTilsynBarn>(behandlingId)!!
+                .hentVedtak<InnvilgelseTilsynBarn>(behandlingId)
                 .data
                 .beregningsresultat
 
