@@ -1,82 +1,105 @@
 {
-  "AVSTAND_OVER_SEKS_KM" : {
-    "erHovedregel" : true,
-    "reglerSomMåNullstilles" : [
+  "AVSTAND_OVER_SEKS_KM": {
+    "erHovedregel": true,
+    "reglerSomMåNullstilles": [
       "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
       "KAN_KJØRE_MED_EGEN_BIL",
+      "KAN_REISE_MED_TAXI",
       "UNNTAK_SEKS_KM"
     ],
-    "svaralternativer" : [
+    "svaralternativer": [
       {
-        "svarId" : "JA",
-        "nesteRegelId" : "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
-        "begrunnelseType" : "PÅKREVD",
-        "tilhørendeFaktaType" : null
+        "svarId": "JA",
+        "nesteRegelId": "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
       },
       {
-        "svarId" : "NEI",
-        "nesteRegelId" : "UNNTAK_SEKS_KM",
-        "begrunnelseType" : "PÅKREVD",
-        "tilhørendeFaktaType" : null
+        "svarId": "NEI",
+        "nesteRegelId": "UNNTAK_SEKS_KM",
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
       }
     ]
   },
-  "UNNTAK_SEKS_KM" : {
-    "erHovedregel" : false,
-    "reglerSomMåNullstilles" : [
+  "UNNTAK_SEKS_KM": {
+    "erHovedregel": false,
+    "reglerSomMåNullstilles": [
       "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
-      "KAN_KJØRE_MED_EGEN_BIL"
+      "KAN_KJØRE_MED_EGEN_BIL",
+      "KAN_REISE_MED_TAXI"
     ],
-    "svaralternativer" : [
+    "svaralternativer": [
       {
-        "svarId" : "JA",
-        "nesteRegelId" : "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
-        "begrunnelseType" : "PÅKREVD",
-        "tilhørendeFaktaType" : null
+        "svarId": "JA",
+        "nesteRegelId": "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
       },
       {
-        "svarId" : "NEI",
-        "nesteRegelId" : null,
-        "begrunnelseType" : "PÅKREVD",
-        "tilhørendeFaktaType" : null
+        "svarId": "NEI",
+        "nesteRegelId": null,
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
       }
     ]
   },
-  "KAN_REISE_MED_OFFENTLIG_TRANSPORT" : {
-    "erHovedregel" : false,
-    "reglerSomMåNullstilles" : [
-      "KAN_KJØRE_MED_EGEN_BIL"
+  "KAN_REISE_MED_OFFENTLIG_TRANSPORT": {
+    "erHovedregel": false,
+    "reglerSomMåNullstilles": [
+      "KAN_KJØRE_MED_EGEN_BIL",
+      "KAN_REISE_MED_TAXI"
     ],
-    "svaralternativer" : [
+    "svaralternativer": [
       {
-        "svarId" : "JA",
-        "nesteRegelId" : null,
-        "begrunnelseType" : "VALGFRI",
-        "tilhørendeFaktaType" : "DAGLIG_REISE_OFFENTLIG_TRANSPORT"
+        "svarId": "JA",
+        "nesteRegelId": null,
+        "begrunnelseType": "VALGFRI",
+        "tilhørendeFaktaType": "DAGLIG_REISE_OFFENTLIG_TRANSPORT"
       },
       {
-        "svarId" : "NEI",
-        "nesteRegelId" : "KAN_KJØRE_MED_EGEN_BIL",
-        "begrunnelseType" : "PÅKREVD",
-        "tilhørendeFaktaType" : null
+        "svarId": "NEI",
+        "nesteRegelId": "KAN_KJØRE_MED_EGEN_BIL",
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
       }
     ]
   },
-  "KAN_KJØRE_MED_EGEN_BIL" : {
-    "erHovedregel" : false,
-    "reglerSomMåNullstilles" : [],
-    "svaralternativer" : [
+  "KAN_KJØRE_MED_EGEN_BIL": {
+    "erHovedregel": false,
+    "reglerSomMåNullstilles": [
+      "KAN_REISE_MED_TAXI"
+    ],
+    "svaralternativer": [
       {
-        "svarId" : "JA",
-        "nesteRegelId" : null,
-        "begrunnelseType" : "VALGFRI",
-        "tilhørendeFaktaType" : "DAGLIG_REISE_PRIVAT_BIL"
+        "svarId": "JA",
+        "nesteRegelId": null,
+        "begrunnelseType": "VALGFRI",
+        "tilhørendeFaktaType": "DAGLIG_REISE_PRIVAT_BIL"
       },
       {
-        "svarId" : "NEI",
-        "nesteRegelId" : null,
-        "begrunnelseType" : "VALGFRI",
-        "tilhørendeFaktaType" : null
+        "svarId": "NEI",
+        "nesteRegelId": "KAN_REISE_MED_TAXI",
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
+      }
+    ]
+  },
+  "KAN_REISE_MED_TAXI": {
+    "erHovedregel": false,
+    "reglerSomMåNullstilles": [],
+    "svaralternativer": [
+      {
+        "svarId": "JA",
+        "nesteRegelId": null,
+        "begrunnelseType": "UTEN",
+        "tilhørendeFaktaType": null
+      },
+      {
+        "svarId": "NEI",
+        "nesteRegelId": null,
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
       }
     ]
   }
