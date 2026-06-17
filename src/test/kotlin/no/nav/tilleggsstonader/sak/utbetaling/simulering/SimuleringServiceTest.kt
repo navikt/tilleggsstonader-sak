@@ -33,6 +33,7 @@ import no.nav.tilleggsstonader.sak.util.fagsakpersoner
 import no.nav.tilleggsstonader.sak.util.forrigeVirkedag
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import tools.jackson.module.kotlin.readValue
@@ -64,7 +65,7 @@ internal class SimuleringServiceTest {
         )
 
     private val personIdent = "12345678901"
-    private val fagsak = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN)
+    private val fagsak = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN).copy(utbetalPåNyttFagområde = true)
 
     @BeforeEach
     internal fun setUp() {
@@ -180,8 +181,14 @@ internal class SimuleringServiceTest {
     @Test
     fun `skal sende varsel for daglig reise når iverksetting er idag`() {
         val behandlingId = behandling(fagsak).id
-        val fagsakDagligReiseTso = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.DAGLIG_REISE_TSO)
-        val fagsakDagligReiseTsr = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.DAGLIG_REISE_TSR)
+        val fagsakDagligReiseTso =
+            fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.DAGLIG_REISE_TSO).copy(
+                utbetalPåNyttFagområde = true,
+            )
+        val fagsakDagligReiseTsr =
+            fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.DAGLIG_REISE_TSR).copy(
+                utbetalPåNyttFagområde = true,
+            )
         val varselTekst = "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
 
         val alleFagsaker =
@@ -225,10 +232,16 @@ internal class SimuleringServiceTest {
     }
 
     @Test
-    fun `skal sende varsel for daglig reise når iverksetting er ikke er ida`() {
+    fun `skal sende varsel for daglig reise når iverksetting ikke er i dag`() {
         val behandlingId = behandling(fagsak).id
-        val fagsakDagligReiseTso = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.DAGLIG_REISE_TSO)
-        val fagsakDagligReiseTsr = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.DAGLIG_REISE_TSR)
+        val fagsakDagligReiseTso =
+            fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.DAGLIG_REISE_TSO).copy(
+                utbetalPåNyttFagområde = true,
+            )
+        val fagsakDagligReiseTsr =
+            fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.DAGLIG_REISE_TSR).copy(
+                utbetalPåNyttFagområde = true,
+            )
 
         val alleFagsaker =
             Fagsaker(
@@ -271,11 +284,17 @@ internal class SimuleringServiceTest {
     }
 
     @Test
-    fun `skal sende varsel for tilsynbarn når dato er innenfor periode`() {
+    fun `skal sende varsel for tilsynbarn når dato er innenfor periode og det utbetales på gammelt fagområde`() {
         val behandlingId = behandling(fagsak).id
 
-        val fagsakTilsynbarn = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN)
-        val fagsakLæremidler = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN)
+        val fagsakTilsynbarn =
+            fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN).copy(
+                utbetalPåNyttFagområde = false,
+            )
+        val fagsakLæremidler =
+            fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN).copy(
+                utbetalPåNyttFagområde = false,
+            )
 
         val alleFagsaker =
             Fagsaker(
@@ -319,10 +338,13 @@ internal class SimuleringServiceTest {
     }
 
     @Test
-    fun `skal ikke sende varsel for tilsynbarn når dato er utenfor periode`() {
+    fun `skal ikke sende varsel for tilsynbarn når dato er utenfor periode og det utbetales på gammelt fagområde`() {
         val behandlingId = behandling(fagsak).id
 
-        val fagsakTilsynbarn = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN)
+        val fagsakTilsynbarn =
+            fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN).copy(
+                utbetalPåNyttFagområde = false,
+            )
 
         val alleFagsaker =
             Fagsaker(
@@ -361,6 +383,102 @@ internal class SimuleringServiceTest {
         val resultat = simuleringService.skalSendeVarsel(behandlingId)
 
         assertThat(resultat).isNull()
+    }
+
+    @Test
+    fun `skal kun sjekke samme fagsak for tilsynbarn når nytt fagområde brukes`() {
+        val fagsakTilsynbarn = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN).copy(utbetalPåNyttFagområde = true)
+        val fagsakLæremidler = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.LÆREMIDLER).copy(utbetalPåNyttFagområde = false)
+        val behandlingId = behandling(fagsakTilsynbarn).id
+
+        val alleFagsaker =
+            Fagsaker(
+                barnetilsyn = fagsakTilsynbarn,
+                læremidler = fagsakLæremidler,
+                boutgifter = null,
+                dagligReiseTso = null,
+                dagligReiseTsr = null,
+                reiseTilSamlingTso = null,
+            )
+
+        every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakTilsynbarn
+        every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns alleFagsaker
+        every { behandlingService.finnSisteIverksatteBehandling(fagsakTilsynbarn.id) } returns null
+        every { behandlingService.finnSisteIverksatteBehandling(fagsakLæremidler.id) } returns behandling(fagsakLæremidler)
+
+        val resultat = simuleringService.skalSendeVarsel(behandlingId)
+
+        assertThat(resultat).isNull()
+    }
+
+    @Test
+    fun `skal sjekke alle fagsaker med gammelt fagområde`() {
+        val fagsakTilsynbarn = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN).copy(utbetalPåNyttFagområde = false)
+        val fagsakLæremidler = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.LÆREMIDLER).copy(utbetalPåNyttFagområde = true)
+        val fagsakBoutgifter = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BOUTGIFTER).copy(utbetalPåNyttFagområde = true)
+        val fagsakDagligReise =
+            fagsak(
+                fagsakpersoner(setOf(personIdent)),
+                Stønadstype.DAGLIG_REISE_TSO,
+            ).copy(utbetalPåNyttFagområde = false)
+        val behandlingId = behandling(fagsakTilsynbarn).id
+
+        val alleFagsaker =
+            Fagsaker(
+                barnetilsyn = fagsakTilsynbarn,
+                læremidler = fagsakLæremidler,
+                boutgifter = fagsakBoutgifter,
+                dagligReiseTso = fagsakDagligReise,
+                dagligReiseTsr = null,
+                reiseTilSamlingTso = null,
+            )
+        val varselTekst = "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
+        val behandlingDagligReise = behandling(fagsakDagligReise)
+        val idag = LocalDate.now()
+
+        every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakTilsynbarn
+        every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns alleFagsaker
+        every { behandlingService.finnSisteIverksatteBehandling(fagsakTilsynbarn.id) } returns null
+        every { behandlingService.finnSisteIverksatteBehandling(fagsakLæremidler.id) } returns null
+        every { behandlingService.finnSisteIverksatteBehandling(fagsakBoutgifter.id) } returns null
+        every { behandlingService.finnSisteIverksatteBehandling(fagsakDagligReise.id) } returns behandlingDagligReise
+        every { tilkjentYtelseService.hentForBehandling(behandlingDagligReise.id) } returns
+            tilkjentYtelse(
+                behandlingId = behandlingDagligReise.id,
+                andeler =
+                    listOf(
+                        tilkjentYtelse(behandlingId = behandlingDagligReise.id).andelerTilkjentYtelse.first().copy(
+                            iverksetting =
+                                mockk {
+                                    every { iverksettingTidspunkt } returns idag.atStartOfDay()
+                                },
+                        ),
+                    ).toTypedArray(),
+            )
+
+        val resultat = simuleringService.skalSendeVarsel(behandlingId)
+
+        assertThat(resultat).isEqualTo(varselTekst)
+    }
+
+    @Test
+    fun `skal feile når utbetalPåNyttFagområde mangler for tilsynbarn læremidler og boutgifter`() {
+        val fagsakTilsynbarn = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN)
+        val behandlingId = behandling(fagsakTilsynbarn).id
+
+        every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakTilsynbarn
+        every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns
+            Fagsaker(
+                barnetilsyn = fagsakTilsynbarn,
+                læremidler = null,
+                boutgifter = null,
+                dagligReiseTso = null,
+                dagligReiseTsr = null,
+                reiseTilSamlingTso = null,
+            )
+
+        assertThatThrownBy { simuleringService.skalSendeVarsel(behandlingId) }
+            .hasMessageContaining("Mangler verdi for utbetalPåNyttFagområde")
     }
 
     @Test

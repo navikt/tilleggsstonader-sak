@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsaker
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.SimuleringClient
@@ -98,7 +99,7 @@ class SimuleringService(
                 )
 
             Stønadstype.BOUTGIFTER, Stønadstype.LÆREMIDLER, Stønadstype.BARNETILSYN ->
-                håndterTilsynbarnLæremidlerBoutgifterVarsel(alleFagsaker)
+                håndterTilsynbarnLæremidlerBoutgifterVarsel(fagsak, alleFagsaker)
         }
     }
 
@@ -111,9 +112,19 @@ class SimuleringService(
         }
     }
 
-    fun håndterTilsynbarnLæremidlerBoutgifterVarsel(alleFagsaker: Fagsaker): String? {
+    private fun håndterTilsynbarnLæremidlerBoutgifterVarsel(
+        fagsak: Fagsak,
+        fagsaker: Fagsaker,
+    ): String? {
+        val utbetalPåNyttFagområde =
+            fagsak.utbetalPåNyttFagområde
+                ?: feil("Mangler verdi for utbetalPåNyttFagområde på fagsak=${fagsak.id}")
         val relevanteFagsaker =
-            listOfNotNull(alleFagsaker.barnetilsyn, alleFagsaker.læremidler, alleFagsaker.boutgifter)
+            if (utbetalPåNyttFagområde) {
+                listOf(fagsak)
+            } else {
+                fagsaker.alleFagsaker().filter { it.utbetalPåNyttFagområde == false }
+            }
         val periode = Datoperiode(LocalDate.now().forrigeVirkedag(), LocalDate.now())
         return if (erVarselRelevantForTilsynBarnLæremidlerBoutgifter(relevanteFagsaker, periode)) {
             "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"

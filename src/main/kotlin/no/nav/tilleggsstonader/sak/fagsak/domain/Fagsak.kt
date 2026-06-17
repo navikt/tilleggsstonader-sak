@@ -16,7 +16,17 @@ data class Fagsaker(
     val dagligReiseTso: Fagsak?,
     val dagligReiseTsr: Fagsak?,
     val reiseTilSamlingTso: Fagsak?,
-)
+) {
+    fun alleFagsaker() =
+        listOfNotNull(
+            barnetilsyn,
+            læremidler,
+            boutgifter,
+            dagligReiseTso,
+            dagligReiseTsr,
+            reiseTilSamlingTso,
+        )
+}
 
 data class Fagsak(
     val id: FagsakId,
