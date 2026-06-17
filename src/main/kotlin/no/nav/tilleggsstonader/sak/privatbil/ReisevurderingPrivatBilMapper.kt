@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
-import java.time.LocalDate
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
@@ -9,6 +8,7 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
+import java.time.LocalDate
 
 object ReisevurderingPrivatBilMapper {
     fun tilReisevurderingDto(
@@ -17,21 +17,23 @@ object ReisevurderingPrivatBilMapper {
         avklarteUker: List<AvklartKjørtUke>,
         kjørelister: List<Kjøreliste>,
     ): ReisevurderingPrivatBilDto {
-        val rammevedtak = finnRammevedtakForReiseVurdering(
-            gjeldendeRammevedtakForReise = gjeldendeRammevedtakForReise,
-            forrigeRammevedtakForReise = forrigeRammevedtakForReise
-        )
-        val ukeVurderingerDto = lagUkeVurderingerDto(
-            gjeldendeRammevedtakForReise = gjeldendeRammevedtakForReise,
-            forrigeRammevedtakForReise = forrigeRammevedtakForReise,
-            avklarteUker = avklarteUker,
-            kjørelister = kjørelister
-        )
+        val rammevedtak =
+            finnRammevedtakForReiseVurdering(
+                gjeldendeRammevedtakForReise = gjeldendeRammevedtakForReise,
+                forrigeRammevedtakForReise = forrigeRammevedtakForReise,
+            )
+        val ukeVurderingerDto =
+            lagUkeVurderingerDto(
+                gjeldendeRammevedtakForReise = gjeldendeRammevedtakForReise,
+                forrigeRammevedtakForReise = forrigeRammevedtakForReise,
+                avklarteUker = avklarteUker,
+                kjørelister = kjørelister,
+            )
         return ReisevurderingPrivatBilDto(
             reiseId = rammevedtak.reiseId,
             rammevedtak = rammevedtak.tilDto(),
             forrigeRammevedtak = forrigeRammevedtakForReise?.tilDto(),
-            uker = ukeVurderingerDto
+            uker = ukeVurderingerDto,
         )
     }
 
@@ -42,8 +44,9 @@ object ReisevurderingPrivatBilMapper {
     fun finnRammevedtakForReiseVurdering(
         gjeldendeRammevedtakForReise: RammeForReiseMedPrivatBil?,
         forrigeRammevedtakForReise: RammeForReiseMedPrivatBil?,
-    ): RammeForReiseMedPrivatBil = gjeldendeRammevedtakForReise ?: forrigeRammevedtakForReise
-    ?: feil("Kan ikke lagre reisevudering. Mangler rammevedtak for reise")
+    ): RammeForReiseMedPrivatBil =
+        gjeldendeRammevedtakForReise ?: forrigeRammevedtakForReise
+            ?: feil("Kan ikke lagre reisevudering. Mangler rammevedtak for reise")
 
     private fun lagUkeVurderingerDto(
         gjeldendeRammevedtakForReise: RammeForReiseMedPrivatBil?,
@@ -99,13 +102,14 @@ object ReisevurderingPrivatBilMapper {
             kjørelisteId = kjøreliste?.id,
             avklartUkeId = avklartUke?.id,
             avklartKjørtUkeStatus = avklartUke?.avklartKjørtUkeStatus,
-            dager = datoer.map { dato ->
-                lagDagDto(
-                    dato = dato,
-                    kjørelisteForUke = kjøreliste,
-                    avklartUke = avklartUke
-                )
-            },
+            dager =
+                datoer.map { dato ->
+                    lagDagDto(
+                        dato = dato,
+                        kjørelisteForUke = kjøreliste,
+                        avklartUke = avklartUke,
+                    )
+                },
         )
 
     private fun lagDagDto(

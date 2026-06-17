@@ -1,9 +1,11 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.ekstern.stønad.DagligReisePrivatBilService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingPrivatBilMapper.lagUkeVurderingDto
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagRequest
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
@@ -15,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
-import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
-import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingPrivatBilMapper.lagUkeVurderingDto
 
 @RestController
 @RequestMapping(path = ["/api/kjoreliste"])
