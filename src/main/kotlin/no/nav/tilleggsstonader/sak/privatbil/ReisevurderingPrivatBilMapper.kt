@@ -38,8 +38,8 @@ object ReisevurderingPrivatBilMapper {
     }
 
     /**
-     * For kjørelistebehandling er ikke rammevedtaket beregnet enda, så da må vi bruke forrgie rammevedtak som grunnlag for reisevurderingen
-     * For "vanlig" revudering er rammevedtaket for denne behandlingen beregnet, så da bruker vi det i reisevuderingen
+     * For kjørelistebehandling er ikke rammevedtaket beregnet enda, så da må vi bruke forrige rammevedtak som grunnlag for reisevurderingen.
+     * For "vanlig" revurdering er rammevedtaket for denne behandlingen beregnet, så da bruker vi det i reisevurderingen.
      */
     fun finnRammevedtakForReiseVurdering(
         gjeldendeRammevedtakForReise: RammeForReiseMedPrivatBil?,
@@ -54,7 +54,7 @@ object ReisevurderingPrivatBilMapper {
         avklarteUker: List<AvklartKjørtUke>,
         kjørelister: List<Kjøreliste>,
     ): List<UkeVurderingDto> {
-        val reise = gjeldendeRammevedtakForReise ?: forrigeRammevedtakForReise ?: error("Mangler rammevedtak for reise")
+        val reise = finnRammevedtakForReiseVurdering(gjeldendeRammevedtakForReise, forrigeRammevedtakForReise)
         val gjeldendeUker = gjeldendeRammevedtakForReise?.grunnlag?.alleDatoerGruppertPåUke().orEmpty()
         val forrigeUker = forrigeRammevedtakForReise?.grunnlag?.alleDatoerGruppertPåUke().orEmpty()
         val sammenslåtteUker =
@@ -63,7 +63,7 @@ object ReisevurderingPrivatBilMapper {
                 .sortedBy { (gjeldendeUker[it] ?: forrigeUker[it]).orEmpty().min() }
 
         return sammenslåtteUker.map { uke ->
-            val datoerForUke = (gjeldendeUker[uke].orEmpty() + forrigeUker[uke].orEmpty()).distinct()
+            val datoerForUke = (gjeldendeUker[uke].orEmpty() + forrigeUker[uke].orEmpty()).distinct().sorted()
             val avklartUke = avklarteUker.singleOrNull { it.reiseId == reise.reiseId && it.uke == uke }
             val kjørelisteForUke = avklartUke?.let { kjørelister.firstOrNull { it.id == avklartUke.kjørelisteId } }
 
