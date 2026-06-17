@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.BehandlingKa
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.BrevKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.BrevmottakereKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.GjenopprettOppgaveKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.HarBehandlingKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.JournalpostKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.KartKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.OppfølgingslisteKall
@@ -27,6 +28,7 @@ class Kall(
 ) {
     val testklient = Testklient(kontekst)
     val arena = ArenaKall(testklient)
+    val harBehandling = HarBehandlingKall(testklient)
     val behandling = BehandlingKall(testklient)
     val brev = BrevKall(testklient)
     val gjenopprettOppgave = GjenopprettOppgaveKall(testklient)
