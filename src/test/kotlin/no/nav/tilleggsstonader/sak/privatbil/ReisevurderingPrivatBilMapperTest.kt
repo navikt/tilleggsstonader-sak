@@ -27,7 +27,7 @@ class ReisevurderingPrivatBilMapperTest {
 
         assertThat(dto.rammevedtak?.reiseId).isEqualTo(gjeldendeReise.reiseId)
         assertThat(dto.forrigeRammevedtak).isNull()
-        assertThat(dto.uker).allMatch { it.endringIRammevedtakStatus == UkeEndringIRammevedtakStatus.NY }
+        assertThat(dto.uker).allMatch { !it.erUkeSlettet }
     }
 
     @Test
@@ -49,7 +49,7 @@ class ReisevurderingPrivatBilMapperTest {
             )
 
         assertThat(dto.reiseId).isEqualTo(forrigeReise.reiseId)
-        assertThat(dto.uker).allMatch { it.endringIRammevedtakStatus == UkeEndringIRammevedtakStatus.SLETTET }
+        assertThat(dto.uker).allMatch { it.erUkeSlettet }
     }
 
     @Test
@@ -71,11 +71,11 @@ class ReisevurderingPrivatBilMapperTest {
             )
 
         assertThat(dto.reiseId).isEqualTo(forrigeReise.reiseId)
-        assertThat(dto.uker).allMatch { it.endringIRammevedtakStatus == UkeEndringIRammevedtakStatus.SLETTET }
+        assertThat(dto.uker).allMatch { it.erUkeSlettet }
     }
 
     @Test
-    fun `sammenslåtte uker markeres med ny, slettet og uendret`() {
+    fun `sammenslåtte uker - kun slettet hvis ikke i gjeldende rammevedtak`() {
         val reiseId = ReiseId.random()
         val gjeldendeReise =
             rammeForReiseMedPrivatBil(
@@ -98,10 +98,10 @@ class ReisevurderingPrivatBilMapperTest {
                 kjørelister = emptyList(),
             )
 
-        val statusPerUke = dto.uker.associate { it.ukenummer to it.endringIRammevedtakStatus }
-        assertThat(statusPerUke).containsEntry(2, UkeEndringIRammevedtakStatus.NY)
-        assertThat(statusPerUke).containsEntry(3, UkeEndringIRammevedtakStatus.UENDRET)
-        assertThat(statusPerUke).containsEntry(4, UkeEndringIRammevedtakStatus.SLETTET)
+        val slettetPerUke = dto.uker.associate { it.ukenummer to it.erUkeSlettet }
+        assertThat(slettetPerUke).containsEntry(2, false) // kun i gjeldende
+        assertThat(slettetPerUke).containsEntry(3, false) // i begge
+        assertThat(slettetPerUke).containsEntry(4, true) // kun i forrige
         assertThat(dto.forrigeRammevedtak).isNotNull
         assertThat(dto.forrigeRammevedtak?.reiseId).isEqualTo(forrigeReise.reiseId)
     }

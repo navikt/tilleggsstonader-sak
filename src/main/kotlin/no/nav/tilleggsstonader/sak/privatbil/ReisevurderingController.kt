@@ -81,7 +81,7 @@ class ReisevurderingController(
             datoer = oppdatertAvklartUke.alleDatoer(),
             avklartUke = oppdatertAvklartUke,
             kjøreliste = kjøreliste,
-            endringIRammevedtakStatus = UkeEndringIRammevedtakStatus.UENDRET,
+            erUkeSlettet = false,
         )
     }
 }

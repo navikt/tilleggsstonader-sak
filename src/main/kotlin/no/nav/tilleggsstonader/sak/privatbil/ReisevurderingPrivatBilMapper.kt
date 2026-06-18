@@ -76,12 +76,7 @@ object ReisevurderingPrivatBilMapper {
                 datoer = datoerForUke,
                 avklartUke = avklartUke,
                 kjøreliste = kjørelisteForUke,
-                endringIRammevedtakStatus =
-                    finnEndringIRammevedtakStatus(
-                        uke,
-                        gjeldendeUker,
-                        forrigeUker,
-                    ),
+                erUkeSlettet = erUkeSlettet(uke, gjeldendeUker, forrigeUker),
             )
         }
     }
@@ -91,13 +86,13 @@ object ReisevurderingPrivatBilMapper {
         datoer: List<LocalDate>,
         avklartUke: AvklartKjørtUke?,
         kjøreliste: Kjøreliste?,
-        endringIRammevedtakStatus: UkeEndringIRammevedtakStatus,
+        erUkeSlettet: Boolean,
     ): UkeVurderingDto =
         UkeVurderingDto(
             ukenummer = uke.ukenummer,
             fraDato = datoer.min(),
             tilDato = datoer.max(),
-            endringIRammevedtakStatus = endringIRammevedtakStatus,
+            erUkeSlettet = erUkeSlettet,
             status = avklartUke?.status ?: UkeStatus.IKKE_MOTTATT_KJØRELISTE,
             avvik = avklartUke?.typeAvvik?.let { AvvikUke(typeAvvik = it) },
             behandletDato = avklartUke?.behandletDato,
@@ -149,20 +144,12 @@ object ReisevurderingPrivatBilMapper {
             avklartKjørtDagStatus = avklartKjørtDagStatus,
         )
 
-    private fun finnEndringIRammevedtakStatus(
+    private fun erUkeSlettet(
         uke: UkeIÅr,
         gjeldendeUker: Map<UkeIÅr, List<LocalDate>>,
         forrigeUker: Map<UkeIÅr, List<LocalDate>>,
-    ): UkeEndringIRammevedtakStatus {
-        if (gjeldendeUker.isEmpty()) return UkeEndringIRammevedtakStatus.SLETTET
-
-        val finnesIGjeldende = gjeldendeUker.containsKey(uke)
-        val finnesIForrige = forrigeUker.containsKey(uke)
-
-        return when {
-            finnesIGjeldende && !finnesIForrige -> UkeEndringIRammevedtakStatus.NY
-            !finnesIGjeldende && finnesIForrige -> UkeEndringIRammevedtakStatus.SLETTET
-            else -> UkeEndringIRammevedtakStatus.UENDRET
-        }
+    ): Boolean {
+        if (gjeldendeUker.isEmpty()) return true
+        return !gjeldendeUker.containsKey(uke) && forrigeUker.containsKey(uke)
     }
 }
