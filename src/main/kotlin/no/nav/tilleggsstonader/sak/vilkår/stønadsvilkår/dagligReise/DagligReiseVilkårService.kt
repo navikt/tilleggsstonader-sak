@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Fa
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreVilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
@@ -50,6 +51,28 @@ class DagligReiseVilkårService(
             .findByBehandlingId(behandlingId)
             .map { it.mapTilVilkårDagligReise() }
             .sortedBy { it.fom }
+
+    fun harPrivatBilVilkår(
+        behandlingId: BehandlingId,
+        forrigeIverksatteBehandlingId: BehandlingId?,
+    ): Boolean {
+        val vilkårNåværende = vilkårRepository.findByBehandlingId(behandlingId)
+        val harPrivatBilNåværende =
+            vilkårNåværende.any { vilkår ->
+                vilkår.fakta is FaktaDagligReisePrivatBil
+            }
+
+        if (harPrivatBilNåværende) return true
+
+        return if (forrigeIverksatteBehandlingId != null) {
+            val vilkårForrige = vilkårRepository.findByBehandlingId(forrigeIverksatteBehandlingId)
+            vilkårForrige.any { vilkår ->
+                vilkår.fakta is FaktaDagligReisePrivatBil
+            }
+        } else {
+            false
+        }
+    }
 
     @Transactional
     fun opprettNyttVilkår(

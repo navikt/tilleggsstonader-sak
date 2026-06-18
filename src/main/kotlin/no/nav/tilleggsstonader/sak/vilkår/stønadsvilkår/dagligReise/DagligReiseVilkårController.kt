@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
@@ -8,6 +9,7 @@ import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseDtoMapper.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.HarPrivatBilVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreVilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårResultatDto
@@ -33,9 +35,27 @@ class DagligReiseVilkårController(
     private val tilgangService: TilgangService,
     private val dagligReiseVilkårService: DagligReiseVilkårService,
     private val vilkårperiodeService: VilkårperiodeService,
+    private val behandlingService: BehandlingService,
 ) {
     @GetMapping("regler")
     fun regler(): RegelstrukturDto = DagligReiseRegel().tilRegelstruktur()
+
+    @GetMapping("{behandlingId}/har-privat-bil-vilkar")
+    fun harPrivatBilVilkår(
+        @PathVariable behandlingId: BehandlingId,
+    ): HarPrivatBilVilkårDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
+
+        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
+        val harPrivatBil =
+            dagligReiseVilkårService.harPrivatBilVilkår(
+                behandlingId = saksbehandling.id,
+                forrigeIverksatteBehandlingId = saksbehandling.forrigeIverksatteBehandlingId,
+            )
+
+        return HarPrivatBilVilkårDto(harPrivatBil)
+    }
 
     @GetMapping("{behandlingId}")
     fun hentVilkår(
