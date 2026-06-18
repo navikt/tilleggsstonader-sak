@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 
 object ReisevurderingPrivatBilMapper {
     fun tilReisevurderingDto(
@@ -17,8 +18,8 @@ object ReisevurderingPrivatBilMapper {
         avklarteUker: List<AvklartKjørtUke>,
         kjørelister: List<Kjøreliste>,
     ): ReisevurderingPrivatBilDto {
-        val rammevedtak =
-            finnRammevedtakForReiseVurdering(
+        val reiseId =
+            finnReiseId(
                 gjeldendeRammevedtakForReise = gjeldendeRammevedtakForReise,
                 forrigeRammevedtakForReise = forrigeRammevedtakForReise,
             )
@@ -30,22 +31,22 @@ object ReisevurderingPrivatBilMapper {
                 kjørelister = kjørelister,
             )
         return ReisevurderingPrivatBilDto(
-            reiseId = rammevedtak.reiseId,
-            rammevedtak = rammevedtak.tilDto(),
+            reiseId = reiseId,
+            rammevedtak = gjeldendeRammevedtakForReise?.tilDto(),
             forrigeRammevedtak = forrigeRammevedtakForReise?.tilDto(),
             uker = ukeVurderingerDto,
         )
     }
 
     /**
-     * Bruker gammelt rammevedtak som grunnlag for reisevuderingen hvis hele reisen er slettet
+     * Bruker gammelt rammevedtak for å finne ReiseId hvis hele reisen er slettet
      */
-    fun finnRammevedtakForReiseVurdering(
+    private fun finnReiseId(
         gjeldendeRammevedtakForReise: RammeForReiseMedPrivatBil?,
         forrigeRammevedtakForReise: RammeForReiseMedPrivatBil?,
-    ): RammeForReiseMedPrivatBil =
-        gjeldendeRammevedtakForReise ?: forrigeRammevedtakForReise
-        ?: feil("Kan ikke lagre reisevudering. Mangler rammevedtak for reise")
+    ): ReiseId =
+        gjeldendeRammevedtakForReise?.reiseId ?: forrigeRammevedtakForReise?.reiseId
+        ?: feil("Kan ikke lage reisevudering. Mangler rammevedtak for reise")
 
     private fun lagUkeVurderingerDto(
         gjeldendeRammevedtakForReise: RammeForReiseMedPrivatBil?,
@@ -53,7 +54,10 @@ object ReisevurderingPrivatBilMapper {
         avklarteUker: List<AvklartKjørtUke>,
         kjørelister: List<Kjøreliste>,
     ): List<UkeVurderingDto> {
-        val reise = finnRammevedtakForReiseVurdering(gjeldendeRammevedtakForReise, forrigeRammevedtakForReise)
+        val reiseId = finnReiseId(
+            gjeldendeRammevedtakForReise = gjeldendeRammevedtakForReise,
+            forrigeRammevedtakForReise = forrigeRammevedtakForReise
+        )
         val gjeldendeUker = gjeldendeRammevedtakForReise?.grunnlag?.alleDatoerGruppertPåUke().orEmpty()
         val forrigeUker = forrigeRammevedtakForReise?.grunnlag?.alleDatoerGruppertPåUke().orEmpty()
         val sammenslåtteUker =
@@ -63,7 +67,7 @@ object ReisevurderingPrivatBilMapper {
 
         return sammenslåtteUker.map { uke ->
             val datoerForUke = (gjeldendeUker[uke].orEmpty() + forrigeUker[uke].orEmpty()).distinct().sorted()
-            val avklartUke = avklarteUker.singleOrNull { it.reiseId == reise.reiseId && it.uke == uke }
+            val avklartUke = avklarteUker.singleOrNull { it.reiseId == reiseId && it.uke == uke }
             val kjørelisteForUke = avklartUke?.let { kjørelister.firstOrNull { it.id == avklartUke.kjørelisteId } }
 
             lagUkeVurderingDto(
@@ -74,7 +78,6 @@ object ReisevurderingPrivatBilMapper {
                 endringIRammevedtakStatus =
                     finnEndringIRammevedtakStatus(
                         uke,
-                        gjeldendeRammevedtakForReise != null,
                         gjeldendeUker,
                         forrigeUker,
                     ),
@@ -147,11 +150,10 @@ object ReisevurderingPrivatBilMapper {
 
     private fun finnEndringIRammevedtakStatus(
         uke: UkeIÅr,
-        harGjeldendeRammevedtak: Boolean,
         gjeldendeUker: Map<UkeIÅr, List<LocalDate>>,
         forrigeUker: Map<UkeIÅr, List<LocalDate>>,
     ): UkeEndringIRammevedtakStatus {
-        if (!harGjeldendeRammevedtak) return UkeEndringIRammevedtakStatus.UENDRET
+        if (gjeldendeUker.isEmpty()) return UkeEndringIRammevedtakStatus.SLETTET
 
         val finnesIGjeldende = gjeldendeUker.containsKey(uke)
         val finnesIForrige = forrigeUker.containsKey(uke)

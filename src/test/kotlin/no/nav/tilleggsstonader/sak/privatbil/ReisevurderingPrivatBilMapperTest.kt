@@ -25,13 +25,13 @@ class ReisevurderingPrivatBilMapperTest {
                 kjørelister = emptyList(),
             )
 
-        assertThat(dto.rammevedtak.reiseId).isEqualTo(gjeldendeReise.reiseId)
+        assertThat(dto.rammevedtak?.reiseId).isEqualTo(gjeldendeReise.reiseId)
         assertThat(dto.forrigeRammevedtak).isNull()
         assertThat(dto.uker).allMatch { it.endringIRammevedtakStatus == UkeEndringIRammevedtakStatus.NY }
     }
 
     @Test
-    fun `kun forrige rammevedtak gir kun uendrede uker`() {
+    fun `kun forrige rammevedtak uten gjeldende vedtak gir kun uendrede uker`() {
         val reiseId = ReiseId.random()
         val forrigeReise =
             rammeForReiseMedPrivatBil(
@@ -48,8 +48,30 @@ class ReisevurderingPrivatBilMapperTest {
                 kjørelister = emptyList(),
             )
 
-        assertThat(dto.rammevedtak.reiseId).isEqualTo(forrigeReise.reiseId)
+        assertThat(dto.rammevedtak?.reiseId).isEqualTo(forrigeReise.reiseId)
         assertThat(dto.uker).allMatch { it.endringIRammevedtakStatus == UkeEndringIRammevedtakStatus.UENDRET }
+    }
+
+    @Test
+    fun `hel reise slettet fra gjeldende vedtak gir kun slettede uker`() {
+        val reiseId = ReiseId.random()
+        val forrigeReise =
+            rammeForReiseMedPrivatBil(
+                reiseId = reiseId,
+                fom = 6 januar 2025,
+                tom = 19 januar 2025,
+            )
+
+        val dto =
+            ReisevurderingPrivatBilMapper.tilReisevurderingDto(
+                gjeldendeRammevedtakForReise = null,
+                forrigeRammevedtakForReise = forrigeReise,
+                avklarteUker = emptyList(),
+                kjørelister = emptyList(),
+            )
+
+        assertThat(dto.rammevedtak?.reiseId).isEqualTo(forrigeReise.reiseId)
+        assertThat(dto.uker).allMatch { it.endringIRammevedtakStatus == UkeEndringIRammevedtakStatus.SLETTET }
     }
 
     @Test

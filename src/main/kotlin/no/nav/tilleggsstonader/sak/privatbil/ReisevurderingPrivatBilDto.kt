@@ -14,7 +14,7 @@ import java.util.UUID
 
 data class ReisevurderingPrivatBilDto(
     val reiseId: ReiseId,
-    val rammevedtak: RammeForReiseMedPrivatBilDto,
+    val rammevedtak: RammeForReiseMedPrivatBilDto?,
     val forrigeRammevedtak: RammeForReiseMedPrivatBilDto?,
     val uker: List<UkeVurderingDto>,
 )
