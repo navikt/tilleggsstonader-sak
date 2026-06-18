@@ -5,11 +5,13 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
@@ -37,6 +39,7 @@ class AvklartKjørelisteServiceTest {
     private val kjørelisteService = mockk<KjørelisteService>()
     private val vedtakService = mockk<VedtakService>()
     private val behandlingService = mockk<BehandlingService>()
+    private val unleashService = mockk<UnleashService>()
 
     private val service =
         AvklartKjørelisteService(
@@ -44,6 +47,7 @@ class AvklartKjørelisteServiceTest {
             avklartKjørtUkeRepository = avklartKjørtUkeRepository,
             kjørelisteService = kjørelisteService,
             behandlingService = behandlingService,
+            unleashService = unleashService,
         )
 
     private val reiseId = ReiseId.random()
@@ -239,6 +243,7 @@ class AvklartKjørelisteServiceTest {
             )
         every { kjørelisteService.hentKjøreliste(eksisterendeUke.kjørelisteId) } returns innsendtKjøreliste
         every { behandlingService.hentBehandling(behandlingId) } returns behandling
+        every { unleashService.isEnabled(Toggle.KAN_OVERSKRIDE_ANTALL_DAGER_I_RAMMEVEDTAK) } returns false
 
         val vedtakData =
             InnvilgelseDagligReise(

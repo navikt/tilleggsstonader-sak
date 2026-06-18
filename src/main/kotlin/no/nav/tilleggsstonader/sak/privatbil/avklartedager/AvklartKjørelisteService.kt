@@ -2,12 +2,14 @@ package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
 import io.github.mikaojk.holiday.getNorwegianHolidays
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
@@ -29,6 +31,7 @@ class AvklartKjørelisteService(
     private val avklartKjørtUkeRepository: AvklartKjørtUkeRepository,
     private val kjørelisteService: KjørelisteService,
     private val behandlingService: BehandlingService,
+    private val unleashService: UnleashService,
 ) {
     fun hentAvklarteUkerForBehandling(behandlingId: BehandlingId): List<AvklartKjørtUke> =
         avklartKjørtUkeRepository.findByBehandlingId(behandlingId)
@@ -75,6 +78,7 @@ class AvklartKjørelisteService(
             ukeSomSkalOppdateres = eksisterendeUke.uke,
             rammevedtak = rammevedtak,
             innsendteKjørelisteDager = innsendteKjørelisteDager,
+            tillatOverskridelseRammevedtak = unleashService.isEnabled(Toggle.KAN_OVERSKRIDE_ANTALL_DAGER_I_RAMMEVEDTAK),
         )
 
         val nyAvklartKjørtUkeStatus = beregnNyStatus(behandlingId, eksisterendeUke, oppdaterteDager)
