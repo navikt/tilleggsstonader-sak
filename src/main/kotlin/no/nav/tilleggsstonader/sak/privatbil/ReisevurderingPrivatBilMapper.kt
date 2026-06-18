@@ -61,10 +61,7 @@ object ReisevurderingPrivatBilMapper {
             )
         val gjeldendeUker = gjeldendeRammevedtakForReise?.grunnlag?.alleDatoerGruppertPåUke().orEmpty()
         val forrigeUker = forrigeRammevedtakForReise?.grunnlag?.alleDatoerGruppertPåUke().orEmpty()
-        val sammenslåtteUker =
-            (gjeldendeUker.keys + forrigeUker.keys)
-                .distinct()
-                .sortedBy { (gjeldendeUker[it] ?: forrigeUker[it]).orEmpty().min() }
+        val sammenslåtteUker = (gjeldendeUker.keys + forrigeUker.keys).distinct().sorted()
 
         return sammenslåtteUker.map { uke ->
             val datoerForUke = (gjeldendeUker[uke].orEmpty() + forrigeUker[uke].orEmpty()).distinct().sorted()
