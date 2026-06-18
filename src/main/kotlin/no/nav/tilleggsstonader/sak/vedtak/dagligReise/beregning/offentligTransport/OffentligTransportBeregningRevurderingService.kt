@@ -48,6 +48,7 @@ class OffentligTransportBeregningRevurderingService {
                 ?: return nyBeregningForReise
 
         // Alle perioder som er tidligere beregn fra-datoen skal kopieres fra tidligere vedtak
+        // Minus 1 dag i tilfelle forrige periode har færre enn 30 dager. Må da reberegnes
         val bevarteGamlePerioder =
             reisenIForrigeVedtak
                 .filter { it.grunnlag.tom.plusDays(1) < beregnFra }
