@@ -25,10 +25,9 @@ import org.junit.jupiter.api.Test
 
 class OverskridAntallDagerIRammevedtakIntegrationTest : IntegrationTest() {
     @Test
-    fun `skal kunne overskride antall dager i rammevedtak når toggle er aktiv og utbetale behandling`() {
+    fun `skal kunne overskride antall dager i rammevedtak når toggle aktiveres ved manuell godkjenning og utbetale behandling`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
         every { unleashService.isEnabled(Toggle.KAN_OVERSKRIDE_ANTALL_DAGER_I_RAMMEVEDTAK) } returns false
-
         val fom = 5 januar 2026
         val tom = 11 januar 2026
         val behandlingContext =
