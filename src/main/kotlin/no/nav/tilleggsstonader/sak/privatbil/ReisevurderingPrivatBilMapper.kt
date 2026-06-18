@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
-import java.time.LocalDate
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
@@ -10,6 +9,7 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
+import java.time.LocalDate
 
 object ReisevurderingPrivatBilMapper {
     fun tilReisevurderingDto(
@@ -46,7 +46,7 @@ object ReisevurderingPrivatBilMapper {
         forrigeRammevedtakForReise: RammeForReiseMedPrivatBil?,
     ): ReiseId =
         gjeldendeRammevedtakForReise?.reiseId ?: forrigeRammevedtakForReise?.reiseId
-        ?: feil("Kan ikke lage reisevudering. Mangler rammevedtak for reise")
+            ?: feil("Kan ikke lage reisevudering. Mangler rammevedtak for reise")
 
     private fun lagUkeVurderingerDto(
         gjeldendeRammevedtakForReise: RammeForReiseMedPrivatBil?,
@@ -54,10 +54,11 @@ object ReisevurderingPrivatBilMapper {
         avklarteUker: List<AvklartKjørtUke>,
         kjørelister: List<Kjøreliste>,
     ): List<UkeVurderingDto> {
-        val reiseId = finnReiseId(
-            gjeldendeRammevedtakForReise = gjeldendeRammevedtakForReise,
-            forrigeRammevedtakForReise = forrigeRammevedtakForReise
-        )
+        val reiseId =
+            finnReiseId(
+                gjeldendeRammevedtakForReise = gjeldendeRammevedtakForReise,
+                forrigeRammevedtakForReise = forrigeRammevedtakForReise,
+            )
         val gjeldendeUker = gjeldendeRammevedtakForReise?.grunnlag?.alleDatoerGruppertPåUke().orEmpty()
         val forrigeUker = forrigeRammevedtakForReise?.grunnlag?.alleDatoerGruppertPåUke().orEmpty()
         val sammenslåtteUker =
