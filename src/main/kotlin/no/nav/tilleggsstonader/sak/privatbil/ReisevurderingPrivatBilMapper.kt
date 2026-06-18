@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
+import java.time.LocalDate
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
@@ -8,7 +9,6 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
-import java.time.LocalDate
 
 object ReisevurderingPrivatBilMapper {
     fun tilReisevurderingDto(
@@ -38,15 +38,14 @@ object ReisevurderingPrivatBilMapper {
     }
 
     /**
-     * For kjørelistebehandling er ikke rammevedtaket beregnet enda, så da må vi bruke forrige rammevedtak som grunnlag for reisevurderingen.
-     * For "vanlig" revurdering er rammevedtaket for denne behandlingen beregnet, så da bruker vi det i reisevurderingen.
+     * Bruker gammelt rammevedtak som grunnlag for reisevuderingen hvis hele reisen er slettet
      */
     fun finnRammevedtakForReiseVurdering(
         gjeldendeRammevedtakForReise: RammeForReiseMedPrivatBil?,
         forrigeRammevedtakForReise: RammeForReiseMedPrivatBil?,
     ): RammeForReiseMedPrivatBil =
         gjeldendeRammevedtakForReise ?: forrigeRammevedtakForReise
-            ?: feil("Kan ikke lagre reisevudering. Mangler rammevedtak for reise")
+        ?: feil("Kan ikke lagre reisevudering. Mangler rammevedtak for reise")
 
     private fun lagUkeVurderingerDto(
         gjeldendeRammevedtakForReise: RammeForReiseMedPrivatBil?,
