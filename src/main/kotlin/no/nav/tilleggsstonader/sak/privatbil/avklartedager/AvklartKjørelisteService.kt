@@ -316,18 +316,20 @@ class AvklartKjørelisteService(
 
     fun sletteMarkerUkerOgDagerUtenforAvkortetRammevedtak(
         behandlingId: BehandlingId,
-        rammevedtak: RammevedtakPrivatBil,
+        rammevedtak: RammevedtakPrivatBil?,
     ) {
         val oppdaterteUker =
             hentAvklarteUkerForBehandling(behandlingId).mapNotNull { uke ->
-                val rammevedtakForReise =
-                    rammevedtak.reiser.find { it.reiseId == uke.reiseId } ?: return@mapNotNull null
-                val sisteDagIRammevedtak = rammevedtakForReise.grunnlag.tom
-
-                when {
-                    uke.fom > sisteDagIRammevedtak -> uke.markerHeleUkaSomSlettet()
-                    uke.inneholder(sisteDagIRammevedtak) -> uke.markerDelerAvUkaSomSlettet(fraDato = sisteDagIRammevedtak)
-                    else -> null
+                val rammevedtakForReise = rammevedtak?.reiser?.find { it.reiseId == uke.reiseId }
+                if (rammevedtakForReise == null) {
+                    uke.markerHeleUkaSomSlettet()
+                } else {
+                    val sisteDagIRammevedtak = rammevedtakForReise.grunnlag.tom
+                    when {
+                        uke.fom > sisteDagIRammevedtak -> uke.markerHeleUkaSomSlettet()
+                        uke.inneholder(sisteDagIRammevedtak) -> uke.markerDelerAvUkaSomSlettet(fraDato = sisteDagIRammevedtak)
+                        else -> null
+                    }
                 }
             }
 

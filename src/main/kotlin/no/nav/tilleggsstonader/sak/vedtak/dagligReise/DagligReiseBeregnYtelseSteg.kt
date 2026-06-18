@@ -149,12 +149,10 @@ class DagligReiseBeregnYtelseSteg(
             opphørsdato,
         )
 
-        rammevedtakPrivatBil?.let {
-            avklartKjørelisteService.sletteMarkerUkerOgDagerUtenforAvkortetRammevedtak(
-                behandlingId = saksbehandling.id,
-                rammevedtak = it,
-            )
-        }
+        avklartKjørelisteService.sletteMarkerUkerOgDagerUtenforAvkortetRammevedtak(
+            behandlingId = saksbehandling.id,
+            rammevedtak = rammevedtakPrivatBil,
+        )
 
         dagligReiseVedtakService.lagreOpphørsvedtak(
             saksbehandling = saksbehandling,
