@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ManglerTilgang
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
+import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Adressebeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlSøker
@@ -39,10 +40,20 @@ internal class TilgangServiceTest {
     private val behandlingService = mockk<BehandlingService>()
     private val fagsakService = mockk<FagsakService>()
     private val fagsakPersonService = mockk<FagsakPersonService>()
+    private val oppgaveService = mockk<OppgaveService>()
     private val cacheManager = ConcurrentMapCacheManager()
     private val kode6Gruppe = "kode6"
     private val kode7Gruppe = "kode7"
-    private val rolleConfig = RolleConfig("", "", "", kode6 = kode6Gruppe, kode7 = kode7Gruppe, "", "")
+    private val rolleConfig =
+        RolleConfig(
+            beslutterRolle = "beslutter",
+            saksbehandlerRolle = "saksbehandler",
+            veilederRolle = "veileder",
+            kode6 = kode6Gruppe,
+            kode7 = kode7Gruppe,
+            egenAnsatt = "egenAnsatt",
+            utvikler = "utvikler",
+        )
     private val tilgangService =
         TilgangService(
             tilgangskontrollService = tilgangskontrollService,
@@ -53,7 +64,7 @@ internal class TilgangServiceTest {
             cacheManager = cacheManager,
             auditLogger = mockk(relaxed = true),
             behandlingLogService = mockk(),
-            oppgaveService = mockk(),
+            oppgaveService = oppgaveService,
             unleashService = mockUnleashService(),
         )
     private val mocketPersonIdent = "12345"
@@ -68,6 +79,7 @@ internal class TilgangServiceTest {
         every { fagsakPersonService.hentAktivIdent(fagsak.fagsakPersonId) } returns fagsak.hentAktivIdent()
         every { behandlingService.hentSaksbehandling(behandling.id) } returns saksbehandling(fagsak, behandling)
         every { fagsakService.hentFagsak(fagsak.id) } returns fagsak
+        every { oppgaveService.hentÅpenBehandlingsoppgave(behandling.id) } returns null
     }
 
     @AfterEach
@@ -175,6 +187,28 @@ internal class TilgangServiceTest {
 
             verify(exactly = 1) { behandlingService.hentSaksbehandling(behandling.id) }
             verify(exactly = 2) { tilgangskontrollService.sjekkTilgangTilStønadstype(any(), any(), any()) }
+        }
+    }
+
+    @Nested
+    inner class ValiderSkrivetilgangTilBehandling {
+        @Test
+        fun `skal kaste ManglerTilgang dersom bruker mangler saksbehandlerrolle`() {
+            mockBrukerContext("A", groups = emptyList())
+
+            assertThatThrownBy {
+                tilgangService.validerSkrivetilgangTilBehandling(behandling.id, AuditLoggerEvent.UPDATE)
+            }.isInstanceOf(ManglerTilgang::class.java)
+        }
+
+        @Test
+        fun `skal ikke feile når bruker har saksbehandlerrolle og tilgang til behandling`() {
+            mockBrukerContext("A", groups = listOf(rolleConfig.saksbehandlerRolle))
+            every { tilgangskontrollService.sjekkTilgangTilStønadstype(any(), any(), any()) } returns Tilgang(true)
+
+            assertDoesNotThrow {
+                tilgangService.validerSkrivetilgangTilBehandling(behandling.id, AuditLoggerEvent.UPDATE, validerTilordnetOppgave = false)
+            }
         }
     }
 

@@ -56,7 +56,6 @@ class DagligReiseVilkårController(
     ): VilkårDagligReiseDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
-        tilgangService.validerHarSaksbehandlerrolle()
 
         return dagligReiseVilkårService
             .opprettNyttVilkår(
@@ -73,7 +72,6 @@ class DagligReiseVilkårController(
     ): VilkårDagligReiseDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
 
         return dagligReiseVilkårService
             .oppdaterVilkår(
@@ -91,7 +89,6 @@ class DagligReiseVilkårController(
     ): SlettVilkårResultatDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.DELETE)
-        tilgangService.validerHarSaksbehandlerrolle()
 
         return dagligReiseVilkårService
             .slettVilkår(

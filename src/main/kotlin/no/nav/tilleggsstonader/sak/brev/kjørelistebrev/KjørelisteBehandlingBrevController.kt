@@ -26,7 +26,6 @@ class KjørelisteBehandlingBrevController(
     ): KjørelistebrevResponseDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
 
         val brev =
             kjørelisteBehandlingBrevService.oppdaterBegrunnelseOgGenererBrev(

@@ -57,7 +57,6 @@ class ReisevurderingController(
     ): UkeVurderingDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle() // TODO: Trengs denne når vi har den over?
 
         behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(behandlingId)
 
