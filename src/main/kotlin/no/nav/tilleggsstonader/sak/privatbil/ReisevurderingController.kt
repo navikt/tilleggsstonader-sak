@@ -1,11 +1,11 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.ekstern.stønad.DagligReisePrivatBilService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingPrivatBilMapper.tilReisevurderingDto
-import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingPrivatBilMapper.tilUkeVurderingDto
+import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingPrivatBilMapper.lagUkeVurderingDto
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagRequest
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
@@ -38,14 +38,26 @@ class ReisevurderingController(
         val behandling = behandlingService.hentBehandling(behandlingId)
 
         val kjørelister = kjørelisteService.hentForFagsakId(behandling.fagsakId)
-        val reiserIRammevedtak =
+        val reiserIGjeldendeRammevedtak = dagligReisePrivatBilService.hentRammevedtakForBehandlingId(behandlingId)?.reiser
+        val reiserIForrigeRammevedtak =
             behandling.forrigeIverksatteBehandlingId
                 ?.let { dagligReisePrivatBilService.hentRammevedtakForBehandlingId(it)?.reiser }
         val avklarteUker = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandlingId)
+        val alleReiseIder =
+            ((reiserIGjeldendeRammevedtak ?: emptyList()) + (reiserIForrigeRammevedtak ?: emptyList()))
+                .map { it.reiseId }
+                .distinct()
 
-        return reiserIRammevedtak?.map { reise ->
-            reise.tilReisevurderingDto(avklarteUker = avklarteUker, kjørelister = kjørelister)
-        } ?: emptyList()
+        return alleReiseIder.map { reiseId ->
+            val gjeldendeReise = reiserIGjeldendeRammevedtak?.singleOrNull { it.reiseId == reiseId }
+            val forrigeReise = reiserIForrigeRammevedtak?.singleOrNull { it.reiseId == reiseId }
+            ReisevurderingPrivatBilMapper.tilReisevurderingDto(
+                gjeldendeRammevedtakForReise = gjeldendeReise,
+                forrigeRammevedtakForReise = forrigeReise,
+                avklarteUker = avklarteUker,
+                kjørelister = kjørelister,
+            )
+        }
     }
 
     @PutMapping("{behandlingId}/{ukeId}")
@@ -62,6 +74,13 @@ class ReisevurderingController(
         val oppdatertAvklartUke = avklartKjørelisteService.oppdaterAvklartUke(behandlingId, ukeId, avklarteDager)
         val kjøreliste = kjørelisteService.hentKjøreliste(oppdatertAvklartUke.kjørelisteId)
 
-        return oppdatertAvklartUke.tilUkeVurderingDto(kjøreliste = kjøreliste)
+        return lagUkeVurderingDto(
+            uke = oppdatertAvklartUke.uke,
+            datoer = oppdatertAvklartUke.alleDatoer(),
+            gjeldendeDatoerForUke = oppdatertAvklartUke.alleDatoer(),
+            avklartUke = oppdatertAvklartUke,
+            kjøreliste = kjøreliste,
+            erUkeSlettet = false,
+        )
     }
 }
