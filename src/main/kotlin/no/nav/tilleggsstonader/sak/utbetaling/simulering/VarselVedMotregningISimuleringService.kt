@@ -1,11 +1,11 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.forrigeVirkedag
 import org.springframework.stereotype.Service
@@ -19,8 +19,10 @@ class VarselVedMotregningISimuleringService(
 ) {
     fun lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(behandlingId: BehandlingId): String? {
         val fagsak = fagsakService.hentFagsakForBehandling(behandlingId)
-        feilHvis(fagsak.utbetalPåNyttFagområde == null) {
-            "Forventer at utbetalPåNyttFagområde skal være satt på fagsaken"
+
+        if (fagsak.utbetalPåNyttFagområde == null) {
+            logger.warn("Forventer at utbetalPåNyttFagområde skal være satt på fagsaken")
+            return null
         }
         val alleFagsaker =
             fagsakService.finnFagsakerForFagsakPersonId(fagsak.fagsakPersonId)

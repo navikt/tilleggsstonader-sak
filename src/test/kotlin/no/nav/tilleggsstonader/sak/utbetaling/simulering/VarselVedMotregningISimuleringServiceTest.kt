@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.fagsakpersoner
 import no.nav.tilleggsstonader.sak.util.forrigeVirkedag
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -287,8 +286,7 @@ internal class VarselVedMotregningISimuleringServiceTest {
         every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns
             Fagsaker(mapOf(fagsakTilsynbarn.stønadstype to fagsakTilsynbarn))
 
-        assertThatThrownBy { varselVedMotregningISimuleringService.lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(behandlingId) }
-            .hasMessageContaining("Forventer at utbetalPåNyttFagområde skal være satt på fagsaken")
+        assertThat(varselVedMotregningISimuleringService.lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(behandlingId)).isNull()
     }
 
     @Test
