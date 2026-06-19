@@ -41,6 +41,7 @@ data class AvvikUke(
 data class DagDto(
     val dato: LocalDate,
     val ukedag: String, // avklar om faktisk trenger, eller om frontend skal mappe ut fra dag
+    val erDagSlettet: Boolean,
     val kjørelisteDag: KjørelisteDagDto?,
     val avklartDag: AvklartDagDto?,
 )

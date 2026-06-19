@@ -64,13 +64,15 @@ object ReisevurderingPrivatBilMapper {
         val sammenslåtteUker = (gjeldendeUker.keys + forrigeUker.keys).distinct().sorted()
 
         return sammenslåtteUker.map { uke ->
-            val datoerForUke = (gjeldendeUker[uke].orEmpty() + forrigeUker[uke].orEmpty()).distinct().sorted()
+            val gjeldendeDatoerForUke = gjeldendeUker[uke].orEmpty()
+            val datoerForUke = (gjeldendeDatoerForUke + forrigeUker[uke].orEmpty()).distinct().sorted()
             val avklartUke = avklarteUker.singleOrNull { it.reiseId == reiseId && it.uke == uke }
             val kjørelisteForUke = avklartUke?.let { kjørelister.firstOrNull { it.id == avklartUke.kjørelisteId } }
 
             lagUkeVurderingDto(
                 uke = uke,
                 datoer = datoerForUke,
+                gjeldendeDatoerForUke = gjeldendeDatoerForUke,
                 avklartUke = avklartUke,
                 kjøreliste = kjørelisteForUke,
                 erUkeSlettet = erUkeSlettet(uke, gjeldendeUker, forrigeUker),
@@ -81,6 +83,7 @@ object ReisevurderingPrivatBilMapper {
     fun lagUkeVurderingDto(
         uke: UkeIÅr,
         datoer: List<LocalDate>,
+        gjeldendeDatoerForUke: List<LocalDate>,
         avklartUke: AvklartKjørtUke?,
         kjøreliste: Kjøreliste?,
         erUkeSlettet: Boolean,
@@ -101,6 +104,7 @@ object ReisevurderingPrivatBilMapper {
                 datoer.map { dato ->
                     lagDagDto(
                         dato = dato,
+                        gjeldendeDatoerForUke = gjeldendeDatoerForUke,
                         kjørelisteForUke = kjøreliste,
                         avklartUke = avklartUke,
                     )
@@ -109,12 +113,14 @@ object ReisevurderingPrivatBilMapper {
 
     private fun lagDagDto(
         dato: LocalDate,
+        gjeldendeDatoerForUke: List<LocalDate>,
         kjørelisteForUke: Kjøreliste?,
         avklartUke: AvklartKjørtUke?,
     ): DagDto =
         DagDto(
             dato = dato,
             ukedag = dato.dayOfWeek.name,
+            erDagSlettet = !gjeldendeDatoerForUke.contains(dato),
             kjørelisteDag =
                 kjørelisteForUke
                     ?.data
@@ -145,8 +151,5 @@ object ReisevurderingPrivatBilMapper {
         uke: UkeIÅr,
         gjeldendeUker: Map<UkeIÅr, List<LocalDate>>,
         forrigeUker: Map<UkeIÅr, List<LocalDate>>,
-    ): Boolean {
-        if (gjeldendeUker.isEmpty()) return true
-        return !gjeldendeUker.containsKey(uke) && forrigeUker.containsKey(uke)
-    }
+    ): Boolean = !gjeldendeUker.containsKey(uke) && forrigeUker.containsKey(uke)
 }

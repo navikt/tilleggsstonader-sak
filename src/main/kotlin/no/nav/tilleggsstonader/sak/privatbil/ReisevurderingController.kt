@@ -79,6 +79,7 @@ class ReisevurderingController(
         return lagUkeVurderingDto(
             uke = oppdatertAvklartUke.uke,
             datoer = oppdatertAvklartUke.alleDatoer(),
+            gjeldendeDatoerForUke = oppdatertAvklartUke.alleDatoer(),
             avklartUke = oppdatertAvklartUke,
             kjøreliste = kjøreliste,
             erUkeSlettet = false,
