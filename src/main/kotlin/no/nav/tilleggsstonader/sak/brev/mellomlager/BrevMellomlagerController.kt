@@ -26,7 +26,6 @@ class BrevMellomlagerController(
     ): BehandlingId {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
 
         return mellomlagringBrevService.mellomlagreBrev(
             behandlingId,

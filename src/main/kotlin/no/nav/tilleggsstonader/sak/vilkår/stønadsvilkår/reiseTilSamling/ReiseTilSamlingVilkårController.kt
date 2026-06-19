@@ -52,7 +52,6 @@ class ReiseTilSamlingVilkårController(
     ): VilkårReiseTilSamlingDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
-        tilgangService.validerHarSaksbehandlerrolle()
 
         return reiseTilSamlingVilkårService
             .opprettNyttVilkår(
@@ -69,7 +68,6 @@ class ReiseTilSamlingVilkårController(
     ): VilkårReiseTilSamlingDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
 
         return reiseTilSamlingVilkårService
             .oppdaterVilkår(
@@ -87,7 +85,6 @@ class ReiseTilSamlingVilkårController(
     ): SlettVilkårResultatDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.DELETE)
-        tilgangService.validerHarSaksbehandlerrolle()
 
         return reiseTilSamlingVilkårService
             .slettVilkår(

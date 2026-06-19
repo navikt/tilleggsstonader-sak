@@ -37,7 +37,6 @@ class SettPåVentController(
     ): StatusPåVentDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
         return settPåVentService.settPåVent(behandlingId, dto.tilDomene())
     }
 
@@ -48,7 +47,6 @@ class SettPåVentController(
     ): StatusPåVentDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE, validerTilordnetOppgave = false)
-        tilgangService.validerHarSaksbehandlerrolle()
         return settPåVentService.oppdaterSettPåVent(behandlingId, dto)
     }
 
@@ -59,7 +57,6 @@ class SettPåVentController(
     ) {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE, validerTilordnetOppgave = false)
-        tilgangService.validerHarSaksbehandlerrolle()
         taAvVentService.taAvVent(behandlingId, taAvVentDto)
     }
 

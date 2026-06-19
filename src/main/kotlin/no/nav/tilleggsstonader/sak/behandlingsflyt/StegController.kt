@@ -25,7 +25,6 @@ class StegController(
     ): StegFerdigstiltResponse {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
 
         return stegService.håndterSteg(behandlingId, request.steg).tilStegFerdigstiltResponse()
     }
@@ -37,7 +36,6 @@ class StegController(
     ) {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
 
         stegService.resetSteg(behandlingId, request.steg)
     }

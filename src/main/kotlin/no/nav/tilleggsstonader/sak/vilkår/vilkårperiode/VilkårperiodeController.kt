@@ -46,7 +46,6 @@ class VilkårperiodeController(
     ) {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
 
         vilkårperiodeGrunnlagService.oppdaterGrunnlag(behandlingId, oppdaterGrunnlag?.hentFom)
     }
@@ -57,7 +56,6 @@ class VilkårperiodeController(
     ): LagreVilkårperiodeResponse {
         tilgangService.settBehandlingsdetaljerForRequest(vilkårperiode.behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
 
         val periode = vilkårperiodeService.opprettVilkårperiode(vilkårperiode)
         return LagreVilkårperiodeResponse(periode = periode.tilDto())
@@ -70,7 +68,6 @@ class VilkårperiodeController(
     ): LagreVilkårperiodeResponse {
         tilgangService.settBehandlingsdetaljerForRequest(vilkårperiode.behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(vilkårperiode.behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
 
         val periode = vilkårperiodeService.oppdaterVilkårperiode(id, vilkårperiode)
         return LagreVilkårperiodeResponse(periode = periode.tilDto())
@@ -83,7 +80,6 @@ class VilkårperiodeController(
     ): LagreVilkårperiodeResponse {
         tilgangService.settBehandlingsdetaljerForRequest(slettVikårperiode.behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(slettVikårperiode.behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
 
         val periode = vilkårperiodeService.slettVilkårperiode(id, slettVikårperiode)
 
