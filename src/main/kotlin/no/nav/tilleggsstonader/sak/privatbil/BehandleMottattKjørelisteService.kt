@@ -62,7 +62,7 @@ class BehandleMottattKjørelisteService(
             logger.info("Legger til kjøreliste=${kjøreliste.id} i behandling=${gjenbrukBehandling.id}")
             countersPerUtfall.getValue(KjørelisteBehandlingUtfall.MANUELL_GJENBRUK).increment()
             avklartKjørelisteService.avklarUkerFraKjøreliste(
-                behandling = gjenbrukBehandling,
+                behandlingId = gjenbrukBehandling.id,
                 kjøreliste = kjøreliste,
             )
         } else {
@@ -139,7 +139,7 @@ class BehandleMottattKjørelisteService(
         gjenbrukData(kjørelistebehandling)
 
         avklartKjørelisteService.avklarUkerFraKjøreliste(
-            behandling = kjørelistebehandling,
+            behandlingId = kjørelistebehandling.id,
             kjøreliste = kjøreliste,
         )
         return kjørelistebehandling

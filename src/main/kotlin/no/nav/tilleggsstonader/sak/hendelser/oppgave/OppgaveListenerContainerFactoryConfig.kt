@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory
 import org.springframework.kafka.listener.ContainerProperties
-import org.springframework.kafka.support.serializer.JsonDeserializer
+import org.springframework.kafka.support.serializer.JacksonJsonDeserializer
 import java.time.Duration
 
 @Configuration
@@ -27,9 +27,9 @@ class OppgaveListenerContainerFactoryConfig {
                 this[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"
                 this[ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG] = false
                 this[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java
-                this[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = JsonDeserializer::class.java
-                this[JsonDeserializer.TRUSTED_PACKAGES] = "no.nav.tilleggsstonader.sak.hendelser.oppgave"
-                this[JsonDeserializer.VALUE_DEFAULT_TYPE] = OppgavehendelseRecord::class.java.name
+                this[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = JacksonJsonDeserializer::class.java
+                this[JacksonJsonDeserializer.TRUSTED_PACKAGES] = "no.nav.tilleggsstonader.sak.hendelser.oppgave"
+                this[JacksonJsonDeserializer.VALUE_DEFAULT_TYPE] = OppgavehendelseRecord::class.java.name
             }
 
         return ConcurrentKafkaListenerContainerFactory<Long, OppgavehendelseRecord>().apply {

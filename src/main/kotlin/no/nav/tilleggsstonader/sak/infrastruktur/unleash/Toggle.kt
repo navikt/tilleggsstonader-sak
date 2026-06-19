@@ -23,7 +23,9 @@ enum class Toggle(
 
     KAN_AUTOMATISK_BEHANDLE_KJØRELISTE("sak.automatisk-behandling-kjoreliste"),
 
-    BRUK_OPPFOLGINGSENHET_FOR_UTBETALING("sak.bruk-oppfolgingsenhet-for-utbetaling"),
+    KAN_OVERSKRIDE_ANTALL_DAGER_I_RAMMEVEDTAK("sak.kan-overskride-antall-dager-i-rammevedtak"),
+
+    BRUK_NYTT_FAGOMRADE_FOR_UTBETALING("sak.bruk-nytt-fagomrade-for-utbetaling"),
 
     SØKNAD_ROUTING_REISE_TIL_SAMLING("sak.soknad-routing.reise-til-samling"),
 

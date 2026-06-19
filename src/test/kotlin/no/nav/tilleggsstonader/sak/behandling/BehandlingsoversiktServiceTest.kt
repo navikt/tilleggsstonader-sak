@@ -91,14 +91,7 @@ class BehandlingsoversiktServiceTest {
     @BeforeEach
     fun setUp() {
         every { fagsakService.finnFagsakerForFagsakPersonId(fagsak.fagsakPersonId) } returns
-            Fagsaker(
-                barnetilsyn = fagsak,
-                læremidler = null,
-                boutgifter = null,
-                dagligReiseTso = null,
-                dagligReiseTsr = null,
-                reiseTilSamlingTso = null,
-            )
+            Fagsaker(mapOf(fagsak.stønadstype to fagsak))
         every { behandlingRepository.findByFagsakId(fagsakId = fagsak.id) } returns listOf(behandling)
         every { fagsakService.erLøpende(fagsak.id) } returns true
         every { vedtakService.hentVedtak(any()) } answers { vedtak }

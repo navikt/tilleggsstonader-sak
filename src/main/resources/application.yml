@@ -281,6 +281,9 @@ clients:
   ereg:
     uri: https://ereg-services.${CLIENT_ENV}-fss-pub.nais.io
     scope: api://${CLIENT_ENV}-fss.arbeidsforhold.ereg-services/.default
+  nvdb:
+    uri: https://nvdbapiles.atlas.vegvesen.no
+
 
 kjøreliste-skjema:
   url: https://www.nav.no/tilleggsstonader/soknad/kjoreliste

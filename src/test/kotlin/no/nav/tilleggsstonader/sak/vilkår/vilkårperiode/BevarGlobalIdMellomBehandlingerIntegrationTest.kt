@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
-import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreVilkårperiodeAktivitet
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -30,11 +29,7 @@ class BevarGlobalIdMellomBehandlingerIntegrationTest : IntegrationTest() {
             ) {
                 // Oppdaterer også aktivitet for å være sikker på at id'en også bevares da
                 aktivitet {
-                    oppdater { dtos, id ->
-                        with(dtos.single()) {
-                            this.id to this.tilLagreVilkårperiodeAktivitet(id)
-                        }
-                    }
+                    oppdaterEnesteAktivitet { this }
                 }
             }
 

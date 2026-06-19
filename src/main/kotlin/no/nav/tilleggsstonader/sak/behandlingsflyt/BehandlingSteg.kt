@@ -138,8 +138,6 @@ enum class StegType(
             // Steg relevante i revurdering av daglige reiser med bil
             KJØRELISTE -> BEREGNING
             BEREGNING -> SIMULERING
-
-            else -> error("Finner ikke neste steg etter ${this.visningsnavn()}")
         }
 
     fun hentNesteStegKjørelistebehandling(): StegType =

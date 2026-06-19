@@ -212,6 +212,7 @@ class BehandlingFaktaService(
                 harMerEnn6KmReisevei = reise.harMerEnn6KmReisevei,
                 lengdeReisevei = reise.lengdeReisevei,
                 harBehovForTransportUavhengigAvReisensLengde = reise.harBehovForTransportUavhengigAvReisensLengde,
+                leveringOgHentingIBarnehage = reise.leveringOgHentingIBarnehage,
                 kanReiseMedOffentligTransport = reise.kanReiseMedOffentligTransport,
                 offentligTransport = reise.offentligTransport,
                 privatTransport = reise.privatTransport,

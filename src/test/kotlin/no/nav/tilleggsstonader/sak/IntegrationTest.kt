@@ -58,6 +58,7 @@ import org.springframework.test.web.servlet.client.RestTestClient
     "mock-ytelse-client",
     "mock-google-routes",
     "mock-google-place-details",
+    "mock-nvdb",
 )
 @EnableMockOAuth2Server
 @AutoConfigureRestTestClient

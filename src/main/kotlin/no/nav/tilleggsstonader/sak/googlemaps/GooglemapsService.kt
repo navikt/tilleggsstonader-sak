@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.googlemaps.routesApi.TransitOption
 import no.nav.tilleggsstonader.sak.googlemaps.routesApi.TransitPreferences
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.nvdbApi.BomstasjonService
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.ZoneId
@@ -17,6 +18,7 @@ import java.time.ZoneId
 class GooglemapsService(
     val googleRoutesClient: GoogleRoutesClient,
     val googlePlaceDetailsClient: GooglePlaceDetailsClient,
+    val bomstasjonService: BomstasjonService,
 ) {
     fun hentKjøreruter(
         fraAdresse: Address,
@@ -40,9 +42,10 @@ class GooglemapsService(
 
         val startOgSluttAdresse = finnStartOgSluttAdresse(kortesteRute)
         val avstandUtenFerje = kortesteRute.avstandMeter - kortesteRute.finnFerjeavstand()
+        val harBomvei = bomstasjonService.harBomstasjonPåRute(kortesteRute.polyline.encodedPolyline)
 
         return ReisedataDto(
-            rute = kortesteRute,
+            rute = kortesteRute.copy(harBomvei = harBomvei),
             startOgSluttAdresse = startOgSluttAdresse,
             avstandUtenFerje = avstandUtenFerje,
         )

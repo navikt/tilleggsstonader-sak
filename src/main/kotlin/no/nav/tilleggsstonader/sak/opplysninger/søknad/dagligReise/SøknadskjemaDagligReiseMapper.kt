@@ -270,6 +270,13 @@ class SøknadskjemaDagligReiseMapper(
                 offentligTransport = mapOffentligTransport(reise),
                 privatTransport = mapPrivatTransport(reise),
                 skalDuBetaleForReisenSelv = reise.skalDuBetaleForReisenSelv?.let(::mapJaNei),
+                leveringOgHentingIBarnehage =
+                    reise.container?.let {
+                        LeveringOgHentingIBarnehage(
+                            gateadresse = it.gateadressenHvorDuHenterEllerLevererBarn,
+                            postnummer = it.postnummerHvorDuHenterEllerLevererBarn,
+                        )
+                    },
             )
         }
     }

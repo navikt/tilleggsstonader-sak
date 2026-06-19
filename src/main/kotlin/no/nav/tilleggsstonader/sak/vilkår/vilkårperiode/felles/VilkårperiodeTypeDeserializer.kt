@@ -10,5 +10,5 @@ class VilkårperiodeTypeDeserializer : ValueDeserializer<VilkårperiodeType>() {
     override fun deserialize(
         p: JsonParser,
         ctxt: DeserializationContext,
-    ): VilkårperiodeType = vilkårperiodetyper[p.text] ?: error("Finner ikke mapping for ${p.text}")
+    ): VilkårperiodeType = vilkårperiodetyper[p.string] ?: error("Finner ikke mapping for ${p.string}")
 }

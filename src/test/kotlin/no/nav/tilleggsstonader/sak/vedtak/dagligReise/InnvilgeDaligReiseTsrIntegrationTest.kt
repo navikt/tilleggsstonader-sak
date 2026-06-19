@@ -19,8 +19,6 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurdering
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreDagligReiseDto
-import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreVilkårperiodeAktivitet
-import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTask
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
@@ -141,18 +139,10 @@ class InnvilgeDaligReiseTsrIntegrationTest : IntegrationTest() {
             ident = testoppsettService.hentPersonidentForBehandlingId(revurderingId),
         ) {
             aktivitet {
-                oppdater { aktiviteter, behandlingId ->
-                    with(aktiviteter.single()) {
-                        id to this.tilLagreVilkårperiodeAktivitet(behandlingId).copy(tom = 28 februar 2026)
-                    }
-                }
+                oppdaterTomPåEnesteAktivitet(28 februar 2026)
             }
             målgruppe {
-                oppdater { målgrupper, behandlingId ->
-                    with(målgrupper.single()) {
-                        id to this.tilLagreVilkårperiodeMålgruppe(behandlingId).copy(tom = 28 februar 2026)
-                    }
-                }
+                oppdaterTomPåEnesteMålgruppe(28 februar 2026)
             }
             vilkår {
                 oppdaterDagligReise { vilkår, _ ->

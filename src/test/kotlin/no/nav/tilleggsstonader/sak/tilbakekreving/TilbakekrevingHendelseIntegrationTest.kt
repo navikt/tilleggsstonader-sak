@@ -202,8 +202,10 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
                             sakOpprettet = OffsetDateTime.now(),
                             varselSendt = null,
                             behandlingsstatus = TilbakekrevingBehandlingEndret.STATUS_TIL_BEHANDLING,
+                            forrigeBehandlingsstatus = TilbakekrevingBehandlingEndret.STATUS_OPPRETTET,
                             totaltFeilutbetaltBeløp = BigDecimal("10000"),
                             saksbehandlingURL = "http://localhost",
+                            venter = null,
                             fullstendigPeriode =
                                 TilbakekrevingPeriode(
                                     fom = 1 januar 2025,
@@ -231,8 +233,10 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
                             sakOpprettet = OffsetDateTime.now(),
                             varselSendt = null,
                             behandlingsstatus = TilbakekrevingBehandlingEndret.STATUS_TIL_BEHANDLING,
+                            forrigeBehandlingsstatus = TilbakekrevingBehandlingEndret.STATUS_OPPRETTET,
                             totaltFeilutbetaltBeløp = BigDecimal("10000"),
                             saksbehandlingURL = "http://localhost",
+                            venter = null,
                             fullstendigPeriode =
                                 TilbakekrevingPeriode(
                                     fom = 1 januar 2025,
@@ -261,8 +265,10 @@ class TilbakekrevingHendelseIntegrationTest : IntegrationTest() {
                             sakOpprettet = OffsetDateTime.now(),
                             varselSendt = null,
                             behandlingsstatus = TilbakekrevingBehandlingEndret.STATUS_TIL_BEHANDLING,
+                            forrigeBehandlingsstatus = TilbakekrevingBehandlingEndret.STATUS_OPPRETTET,
                             totaltFeilutbetaltBeløp = BigDecimal("10000"),
                             saksbehandlingURL = "http://localhost",
+                            venter = null,
                             fullstendigPeriode =
                                 TilbakekrevingPeriode(
                                     fom = 1 januar 2025,

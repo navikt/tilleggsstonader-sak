@@ -30,7 +30,7 @@ fun oppsummerBeregningPrivatBil(
             },
     )
 
-private fun BeregningsresultatForReisePrivatBil.oppsummerReise(rammevedtakForReise: RammeForReiseMedPrivatBil) =
+fun BeregningsresultatForReisePrivatBil.oppsummerReise(rammevedtakForReise: RammeForReiseMedPrivatBil) =
     OppsummertBeregningForReiseDto(
         reiseId = this.reiseId,
         reiseavstandEnVei = rammevedtakForReise.grunnlag.reiseavstandEnVei,

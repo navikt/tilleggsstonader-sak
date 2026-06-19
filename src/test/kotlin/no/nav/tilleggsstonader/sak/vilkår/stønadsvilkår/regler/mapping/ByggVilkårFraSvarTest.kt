@@ -53,6 +53,7 @@ class ByggVilkårFraSvarTest {
                         begrunnelse = "begrunnelse",
                     ),
                 RegelId.KAN_KJØRE_MED_EGEN_BIL to SvarOgBegrunnelse(SvarId.NEI, "Begrunnelse"),
+                RegelId.KAN_REISE_MED_TAXI to SvarOgBegrunnelse(SvarId.NEI, "Begrunnelse"),
             )
 
         val delvilkårsett =

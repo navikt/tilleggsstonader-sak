@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
@@ -90,14 +91,7 @@ class FagsakService(
                 .map { it.tilFagsakMedPerson() }
                 .associateBy { it.stønadstype }
 
-        return Fagsaker(
-            barnetilsyn = fagsaker[Stønadstype.BARNETILSYN],
-            læremidler = fagsaker[Stønadstype.LÆREMIDLER],
-            boutgifter = fagsaker[Stønadstype.BOUTGIFTER],
-            dagligReiseTso = fagsaker[Stønadstype.DAGLIG_REISE_TSO],
-            dagligReiseTsr = fagsaker[Stønadstype.DAGLIG_REISE_TSR],
-            reiseTilSamlingTso = fagsaker[Stønadstype.REISE_TIL_SAMLING_TSO],
-        )
+        return Fagsaker(fagsaker)
     }
 
     fun erLøpende(fagsakId: FagsakId): Boolean = fagsakRepository.harLøpendeUtbetaling(fagsakId)
@@ -131,6 +125,19 @@ class FagsakService(
         fagsakRepository.finnMedEksternId(eksternFagsakId)?.tilFagsakMedPerson()
 
     fun hentAktivIdent(fagsakId: FagsakId): String = fagsakRepository.finnAktivIdent(fagsakId)
+
+    @Transactional
+    fun settUtbetalPåNyttFagområde(
+        fagsakId: FagsakId,
+        utbetalPåNyttFagområde: Boolean,
+    ): Boolean {
+        val fagsak = fagsakRepository.findByIdOrThrow(fagsakId)
+        feilHvis(fagsak.utbetalPåNyttFagområde != null) {
+            "utbetalPåNyttFagområde er allerede satt for fagsakId=$fagsakId"
+        }
+        fagsakRepository.update(fagsak.copy(utbetalPåNyttFagområde = utbetalPåNyttFagområde))
+        return utbetalPåNyttFagområde
+    }
 
     fun hentMetadata(fagsakIder: Collection<FagsakId>): Map<FagsakId, FagsakMetadata> =
         fagsakRepository.hentFagsakMetadata(fagsakIder.toSet()).associateBy {

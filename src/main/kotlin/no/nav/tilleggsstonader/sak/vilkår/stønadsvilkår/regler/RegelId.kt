@@ -35,6 +35,7 @@ enum class RegelId(
     ),
     KAN_REISE_MED_OFFENTLIG_TRANSPORT("Kan søker benytte seg av offentlig transport?"),
     KAN_KJØRE_MED_EGEN_BIL("Kan søker benytte privat bil?"),
+    KAN_REISE_MED_TAXI("Kan søker benytte seg av taxi?"),
 
     // REISE TIL SAMLING
     AVSTAND_OVER_TRETTI_KM("Er reiseavstanden over 30km?"),

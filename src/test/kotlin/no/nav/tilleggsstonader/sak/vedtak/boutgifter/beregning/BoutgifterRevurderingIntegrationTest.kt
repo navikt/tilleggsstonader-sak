@@ -126,7 +126,7 @@ class BoutgifterRevurderingIntegrationTest(
                         opphør(opphørsdato = 1 april 2026)
                     }
                 }
-            testoppsettService.settAndelerTilOkForBehandling(testoppsettService.hentBehandling(opphørId))
+            testoppsettService.settAndelerTilOkForBehandling(opphørId)
 
             val tilkjentYtelseInnvilgelse = tilkjentYtelseRepository.findByBehandlingId(innvilgelseId)
             val tilkjentYtelseSatsjustering = tilkjentYtelseRepository.findByBehandlingId(satsjusteringId)
@@ -247,7 +247,7 @@ class BoutgifterRevurderingIntegrationTest(
                 ) {
                     defaultBoutgifterTestdata(fom = 19 august 2025, 30 juni 2026)
                 }
-            testoppsettService.settAndelerTilOkForBehandling(testoppsettService.hentBehandling(behandlingContext.behandlingId))
+            testoppsettService.settAndelerTilOkForBehandling(behandlingContext.behandlingId)
 
             // Simulerer en satsjustering ved å legge til ny aktivitet fra 1. januar slik at det beregnes fra 1. januar
             val satsjustering =
@@ -258,7 +258,7 @@ class BoutgifterRevurderingIntegrationTest(
                         }
                     }
                 }
-            testoppsettService.settAndelerTilOkForBehandling(testoppsettService.hentBehandling(satsjustering))
+            testoppsettService.settAndelerTilOkForBehandling(satsjustering)
 
             return Pair(behandlingContext.behandlingId, satsjustering)
         }

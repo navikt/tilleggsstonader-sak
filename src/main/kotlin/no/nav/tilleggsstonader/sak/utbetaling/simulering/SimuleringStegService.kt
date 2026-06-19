@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 class SimuleringStegService(
     private val stegService: StegService,
     private val simuleringService: SimuleringService,
+    private val varselVedMotregningISimuleringService: VarselVedMotregningISimuleringService,
     private val tilgangService: TilgangService,
 ) {
     @Transactional
@@ -27,7 +28,7 @@ class SimuleringStegService(
             if (saksbehandling.steg == StegType.SIMULERING) {
                 stegService.håndterSteg(saksbehandling.id, StegType.SIMULERING)
             }
-            val varsel = simuleringService.skalSendeVarsel(saksbehandling.id)
+            val varsel = varselVedMotregningISimuleringService.lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(saksbehandling.id)
 
             return simuleringService.hentLagretSimulering(saksbehandling.id)?.tilDto()?.copy(varsel = varsel)
         }

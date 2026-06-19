@@ -138,8 +138,8 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
         assertThat(ferdigstiltKjørelistebehandling.steg).isEqualTo(StegType.BEHANDLING_FERDIGSTILT)
 
         val oppgaverPåKjørelisteBehandling = oppgaveRepository.findByBehandlingId(kjørelisteBehandling.id)
-        assertThat(oppgaverPåKjørelisteBehandling).hasSize(1)
-        assertThat(oppgaverPåKjørelisteBehandling.single().status).isEqualTo(Oppgavestatus.FERDIGSTILT)
+        assertThat(oppgaverPåKjørelisteBehandling).hasSize(2)
+        assertThat(oppgaverPåKjørelisteBehandling).allMatch { it.status == Oppgavestatus.FERDIGSTILT }
 
         val gjeldendeIverksatteBehandlinger =
             testoppsettService.hentGjeldendeIverksatteBehandlinger(Stønadstype.DAGLIG_REISE_TSO)
@@ -204,7 +204,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
                 .single { it.type == BehandlingType.KJØRELISTE }
 
         gjennomførKjørelisteBehandling(førsteKjørelistebehandling)
-        testoppsettService.settAndelerTilOkForBehandling(førsteKjørelistebehandling)
+        testoppsettService.settAndelerTilOkForBehandling(førsteKjørelistebehandling.id)
 
         // Sender inn kjøreliste for andre rammevedtak
         sendInnKjøreliste(

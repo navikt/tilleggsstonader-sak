@@ -54,5 +54,5 @@ class DagligReisePrivatBilService(
     }
 
     fun hentRammevedtakForBehandlingId(behandlingId: BehandlingId): RammevedtakPrivatBil? =
-        vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandlingId)?.data?.rammevedtakPrivatBil
+        vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandlingId).data.rammevedtakPrivatBil
 }

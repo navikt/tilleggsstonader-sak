@@ -24,9 +24,14 @@ fun validerOppdatertAvklartKjørtUke(
     ukeSomSkalOppdateres: UkeIÅr,
     rammevedtak: RammeForReiseMedPrivatBil,
     innsendteKjørelisteDager: List<KjørelisteDag>,
+    tillatOverskridelseRammevedtak: Boolean = false,
 ) {
     validerInnsendteDagerErInnenforUken(ukeSomSkalOppdateres, oppdaterteDager)
-    validerAntallDagerGodkjentInnenforRammevedtak(oppdaterteDager, rammevedtak)
+    validerAntallDagerGodkjentInnenforRammevedtak(
+        oppdaterteDager = oppdaterteDager,
+        rammevedtak = rammevedtak,
+        tillatOverskridelseRammevedtak = tillatOverskridelseRammevedtak,
+    )
 
     oppdaterteDager.forEach { oppdatertDag ->
         oppdatertDag.validerGyldigeVerdier()
@@ -39,7 +44,10 @@ fun validerOppdatertAvklartKjørtUke(
 private fun validerAntallDagerGodkjentInnenforRammevedtak(
     oppdaterteDager: List<AvklartKjørtDag>,
     rammevedtak: RammeForReiseMedPrivatBil,
+    tillatOverskridelseRammevedtak: Boolean,
 ) {
+    if (tillatOverskridelseRammevedtak) return
+
     val antallDagerSomDekkes = oppdaterteDager.count { it.godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.JA }
     val tilhørendeDelperiode =
         rammevedtak.finnDelperiodeForPeriode(

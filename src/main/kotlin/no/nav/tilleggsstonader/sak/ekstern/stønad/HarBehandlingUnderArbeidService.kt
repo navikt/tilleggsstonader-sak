@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.ekstern.stønad
 
+import no.nav.tilleggsstonader.kontrakter.felles.IdentSkjematype
 import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.tilStønadstyper
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
@@ -18,6 +20,13 @@ class HarBehandlingUnderArbeidService(
             )
         return behandlinger.any { erSøknadUnderBehandling(it.behandlingsÅrsak, it.status) }
     }
+
+    fun harSøknadUnderBehandling(identSkjematype: IdentSkjematype): Boolean =
+        identSkjematype.skjematype.tilStønadstyper().any { stønadstype ->
+            fagsakService
+                .hentBehandlingerForPersonOgStønadstype(identSkjematype.ident, stønadstype)
+                .any { erSøknadUnderBehandling(it.behandlingsÅrsak, it.status) }
+        }
 
     companion object {
         private val statuserUnderBehandling =

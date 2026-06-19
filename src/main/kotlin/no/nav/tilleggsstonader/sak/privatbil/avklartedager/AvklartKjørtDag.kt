@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
@@ -21,7 +22,33 @@ data class AvklartKjørtDag(
     val parkeringsutgift: Int? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
-)
+    @Column("avklart_kjort_dag_status")
+    val avklartKjørtDagStatus: AvklartKjørtDagStatus,
+) {
+    fun markerSomSlettet(): AvklartKjørtDag = copy(avklartKjørtDagStatus = AvklartKjørtDagStatus.SLETTET)
+
+    fun markerSomSlettetHvisEtter(fraDato: LocalDate): AvklartKjørtDag =
+        if (dato > fraDato) {
+            markerSomSlettet()
+        } else {
+            this
+        }
+}
+
+fun List<AvklartKjørtDag>.finnDagerInnenforPeriode(periode: Periode<LocalDate>): List<AvklartKjørtDag> =
+    filter { dag -> periode.inneholder(dag.dato) }
+
+fun Collection<AvklartKjørtDag>.markerSomSlettet(): Set<AvklartKjørtDag> = map { it.markerSomSlettet() }.toSet()
+
+fun Collection<AvklartKjørtDag>.markerSomSlettet(fraDato: LocalDate): Set<AvklartKjørtDag> =
+    map { dag -> dag.markerSomSlettetHvisEtter(fraDato) }.toSet()
+
+enum class AvklartKjørtDagStatus {
+    NY,
+    ENDRET,
+    UENDRET,
+    SLETTET,
+}
 
 enum class GodkjentGjennomførtKjøring {
     JA,

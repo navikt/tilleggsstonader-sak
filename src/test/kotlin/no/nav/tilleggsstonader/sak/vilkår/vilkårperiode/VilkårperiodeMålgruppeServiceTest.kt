@@ -437,7 +437,7 @@ class VilkårperiodeMålgruppeServiceTest : CleanDatabaseIntegrationTest() {
             opprinneligMålgruppe.copy(behandlingId = revurdering.forrigeIverksatteBehandlingId!!),
         )
 
-        vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeIverksatteBehandlingId!!, revurdering.id)
+        vilkårperiodeService.gjenbrukVilkårperioder(revurdering.forrigeIverksatteBehandlingId, revurdering.id)
 
         return revurdering
     }

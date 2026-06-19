@@ -49,6 +49,10 @@
     "harMerEnn6KmReisevei" : "JA",
     "lengdeReisevei" : 14.0,
     "harBehovForTransportUavhengigAvReisensLengde" : null,
+    "leveringOgHentingIBarnehage" : {
+      "gateadresse" : "EksempelSvar",
+      "postnummer" : "EksempelSvar"
+    },
     "kanReiseMedOffentligTransport" : "NEI",
     "offentligTransport" : null,
     "privatTransport" : {

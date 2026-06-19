@@ -23,6 +23,7 @@ data class Rute(
     val sluttLokasjon: Lokasjon,
     val startLokasjonId: PlaceId?,
     val sluttLokasjonId: PlaceId?,
+    val harBomvei: Boolean,
 )
 
 data class Strekning(
@@ -80,6 +81,7 @@ fun Route.tilDomene(
         sluttLokasjon = finnSluttLokasjon(),
         startLokasjonId = startLokasjonId,
         sluttLokasjonId = sluttLokasjonId,
+        harBomvei = false,
     )
 
 fun List<Leg>.tilDomene(): List<Strekning> {

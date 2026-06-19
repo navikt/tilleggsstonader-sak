@@ -128,6 +128,31 @@ class AvklartKjørelisteValideringTest {
         }
 
         @Test
+        fun `skal tillate overskridelse av antall godkjente dager når toggle er aktiv`() {
+            val oppdaterteDager =
+                listOf(
+                    avklartKjørtDag(mandag, GodkjentGjennomførtKjøring.JA),
+                    avklartKjørtDag(tirsdag, GodkjentGjennomførtKjøring.JA),
+                )
+            val kjørelisteDager =
+                listOf(
+                    kjørelisteDag(mandag, harKjørt = true),
+                    kjørelisteDag(tirsdag, harKjørt = true),
+                )
+            val ramme = rammeForReise(fom = mandag, tom = tirsdag, reisedagerPerUke = 1)
+
+            assertDoesNotThrow {
+                validerOppdatertAvklartKjørtUke(
+                    oppdaterteDager = oppdaterteDager,
+                    ukeSomSkalOppdateres = mandag.tilUkeIÅr(),
+                    rammevedtak = ramme,
+                    innsendteKjørelisteDager = kjørelisteDager,
+                    tillatOverskridelseRammevedtak = true,
+                )
+            }
+        }
+
+        @Test
         fun `skal kaste feil dersom antall godkjente dager overskrider rammevedtaket ved flere delperioder`() {
             val mandagUke1 = 5 januar 2026
             val søndagUke1 = 11 januar 2026
@@ -367,6 +392,7 @@ class AvklartKjørelisteValideringTest {
         avvik = emptyList(),
         parkeringsutgift = parkeringsutgift,
         begrunnelse = begrunnelse,
+        avklartKjørtDagStatus = AvklartKjørtDagStatus.NY,
     )
 
     private fun kjørelisteDag(

@@ -2,6 +2,8 @@ package no.nav.tilleggsstonader.sak.integrasjonstest.dsl
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreVilkårperiodeAktivitet
+import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.util.lagreVilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
@@ -31,6 +33,28 @@ class VilkårperiodeTestdataDsl {
 
     fun oppdater(builder: (List<VilkårperiodeDto>, BehandlingId) -> Pair<UUID, LagreVilkårperiode>) {
         update += builder
+    }
+
+    fun oppdaterEnesteAktivitet(endre: LagreVilkårperiode.() -> LagreVilkårperiode) {
+        oppdater { perioder, behandlingId ->
+            val periode = perioder.single()
+            periode.id to periode.tilLagreVilkårperiodeAktivitet(behandlingId).endre()
+        }
+    }
+
+    fun oppdaterEnesteMålgruppe(endre: LagreVilkårperiode.() -> LagreVilkårperiode) {
+        oppdater { perioder, behandlingId ->
+            val periode = perioder.single()
+            periode.id to periode.tilLagreVilkårperiodeMålgruppe(behandlingId).endre()
+        }
+    }
+
+    fun oppdaterTomPåEnesteAktivitet(tom: LocalDate) {
+        oppdaterEnesteAktivitet { copy(tom = tom) }
+    }
+
+    fun oppdaterTomPåEnesteMålgruppe(tom: LocalDate) {
+        oppdaterEnesteMålgruppe { copy(tom = tom) }
     }
 
     fun slett(builder: (List<VilkårperiodeDto>) -> Pair<UUID, SlettVikårperiode>) {

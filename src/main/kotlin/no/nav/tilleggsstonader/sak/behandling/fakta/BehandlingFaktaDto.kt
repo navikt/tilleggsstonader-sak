@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.LeveringOgHentingIBarnehage
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.OffentligTransport
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.PrivatTransport
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ReiseAdresse
@@ -200,6 +201,7 @@ data class FaktaReise(
     val harMerEnn6KmReisevei: JaNei,
     val lengdeReisevei: Double?,
     val harBehovForTransportUavhengigAvReisensLengde: JaNei?,
+    val leveringOgHentingIBarnehage: LeveringOgHentingIBarnehage?,
     val kanReiseMedOffentligTransport: JaNei,
     val offentligTransport: OffentligTransport?,
     val privatTransport: PrivatTransport?,

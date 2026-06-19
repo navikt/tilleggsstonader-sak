@@ -2,9 +2,11 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegFerdigstiltResponse
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
+import no.nav.tilleggsstonader.sak.behandlingsflyt.tilStegFerdigstiltResponse
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
@@ -50,23 +52,19 @@ class DagligReiseVedtakController(
     fun innvilge(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseDagligReiseTsoRequest,
-    ) {
-        lagreVedtak(behandlingId, vedtak)
-    }
+    ): StegFerdigstiltResponse = lagreVedtak(behandlingId, vedtak).tilStegFerdigstiltResponse()
 
     @PostMapping("{behandlingId}/tsr/innvilgelse")
     fun innvilge(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseDagligReiseTsrRequest,
-    ) {
-        lagreVedtak(behandlingId, vedtak)
-    }
+    ): StegFerdigstiltResponse = lagreVedtak(behandlingId, vedtak).tilStegFerdigstiltResponse()
 
     @PostMapping("{behandlingId}/avslag")
     fun avslå(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: AvslagDagligReiseDto,
-    ) {
+    ): StegFerdigstiltResponse {
         val stønadsType = behandlingService.hentSaksbehandling(behandlingId).stønadstype
 
         validerGyldigÅrsakAvslag.validerAvslagErGyldig(
@@ -75,7 +73,7 @@ class DagligReiseVedtakController(
             stønadsType,
         )
 
-        lagreVedtak(behandlingId, vedtak)
+        return lagreVedtak(behandlingId, vedtak).tilStegFerdigstiltResponse()
     }
 
     @GetMapping("{behandlingId}")
@@ -93,9 +91,7 @@ class DagligReiseVedtakController(
     fun opphor(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: OpphørDagligReiseRequest,
-    ) {
-        lagreVedtak(behandlingId, vedtak)
-    }
+    ): StegFerdigstiltResponse = lagreVedtak(behandlingId, vedtak).tilStegFerdigstiltResponse()
 
     @PostMapping("{behandlingId}/tso/beregn")
     fun beregn(
@@ -117,14 +113,15 @@ class DagligReiseVedtakController(
         tilgangService.validerLesetilgangTilBehandling(behandlingId)
 
         val vedtaksdata = vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandlingId).data
-        val beregningsresultatPrivatBil = vedtaksdata.beregningsresultat.privatBil
-        val rammevedtak = vedtaksdata.rammevedtakPrivatBil
 
-        feilHvis(beregningsresultatPrivatBil == null || rammevedtak == null) {
-            "Det finnes ingen beregningsresultat for privat bil eller rammevedtak for privat bil for behandling $behandlingId"
-        }
-
-        return oppsummerBeregningPrivatBil(beregningsresultatPrivatBil, rammevedtak)
+        return PrivatBilOppsummertBeregningDto(
+            reiser =
+                vedtaksdata
+                    .hentRammevedtakMedBeregningsresultat()
+                    .map { (beregningsresultatForReise, rammevedtakForReise) ->
+                        beregningsresultatForReise.oppsummerReise(rammevedtakForReise)
+                    },
+        )
     }
 
     private fun beregnVedtak(
@@ -154,10 +151,10 @@ class DagligReiseVedtakController(
     private fun lagreVedtak(
         behandlingId: BehandlingId,
         vedtak: VedtakDagligReiseRequest,
-    ) {
+    ): Behandling {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
 
-        stegService.håndterSteg(behandlingId, beregnYtelseSteg, vedtak)
+        return stegService.håndterSteg(behandlingId, beregnYtelseSteg, vedtak)
     }
 }
