@@ -20,12 +20,14 @@ import java.util.UUID
 class SimuleringStegServiceTest {
     val stegService = mockk<StegService>()
     val simuleringService = mockk<SimuleringService>()
+    val varselVedMotregningISimuleringService = mockk<VarselVedMotregningISimuleringService>()
     val tilgangService = mockk<TilgangService>()
 
     val simuleringStegService =
         SimuleringStegService(
             stegService = stegService,
             simuleringService = simuleringService,
+            varselVedMotregningISimuleringService = varselVedMotregningISimuleringService,
             tilgangService = tilgangService,
         )
 

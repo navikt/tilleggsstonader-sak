@@ -7,10 +7,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
-import no.nav.tilleggsstonader.sak.fagsak.FagsakService
-import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsaker
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.utbetaling.fagomrade.FagsakUtbetalingsvalgService
@@ -42,8 +39,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringDeta
 
 internal class SimuleringServiceTest {
     private val simuleringClient = mockk<SimuleringClient>()
-    private val behandlingService = mockk<BehandlingService>()
-    private val fagsakService = mockk<FagsakService>()
     private val simuleringsresultatRepository = mockk<SimuleringsresultatRepository>()
     private val tilkjentYtelseService = mockk<TilkjentYtelseService>()
     private val tilgangService = mockk<TilgangService>()
@@ -59,17 +54,13 @@ internal class SimuleringServiceTest {
             tilkjentYtelseService = tilkjentYtelseService,
             tilgangService = tilgangService,
             utbetalingV3Mapper = utbetalingV3Mapper,
-            behandlingService = behandlingService,
-            fagsakService = fagsakService,
         )
 
     private val personIdent = "12345678901"
-    private val fagsak = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN)
+    private val fagsak = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN).copy(utbetalPåNyttFagområde = true)
 
     @BeforeEach
     internal fun setUp() {
-        every { fagsakService.hentFagsak(any()) } returns fagsak
-        every { fagsakService.fagsakMedOppdatertPersonIdent(any()) } returns fagsak
         every { tilgangService.validerHarSaksbehandlerrolle() } just Runs
         every { tilgangService.harTilgangTilRolle(any()) } returns true
         every { fagsakUtbetalingIdService.hentEllerOpprettUtbetalingId(any(), any(), any()) } answers {
@@ -106,7 +97,6 @@ internal class SimuleringServiceTest {
                 behandlingId = saksbehandling.id,
                 data = SimuleringJson(mockk(), mockk()),
             )
-        every { behandlingService.hentBehandling(any()) } returns behandling
         every { tilkjentYtelseService.hentForBehandling(any()) } returns tilkjentYtelse
         every { simuleringsresultatRepository.deleteById(any()) } just Runs
         every { simuleringsresultatRepository.insert(any()) } returns simuleringsresultat
@@ -165,7 +155,6 @@ internal class SimuleringServiceTest {
         every { simuleringClient.simuler(any()) } returns
             jsonMapper.readValue(readFile("mock/iverksett/simuleringsresultat.json"))
 
-        every { behandlingService.hentBehandling(any()) } returns behandling
         every { tilkjentYtelseService.hentForBehandling(any()) } returns tilkjentYtelse
         every { simuleringsresultatRepository.deleteById(any()) } just Runs
 
@@ -178,202 +167,13 @@ internal class SimuleringServiceTest {
     }
 
     @Test
-    fun `skal sende varsel for daglig reise når iverksetting er idag`() {
-        val behandlingId = behandling(fagsak).id
-        val fagsakDagligReiseTso = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.DAGLIG_REISE_TSO)
-        val fagsakDagligReiseTsr = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.DAGLIG_REISE_TSR)
-        val varselTekst = "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
-
-        val alleFagsaker =
-            Fagsaker(
-                barnetilsyn = null,
-                læremidler = null,
-                boutgifter = null,
-                dagligReiseTso = fagsakDagligReiseTso,
-                dagligReiseTsr = fagsakDagligReiseTsr,
-                reiseTilSamlingTso = null,
-            )
-        val idag = LocalDate.now()
-
-        every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakDagligReiseTso
-        every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns alleFagsaker
-
-        val behandling = behandling(fagsakDagligReiseTso)
-        every { behandlingService.finnSisteIverksatteBehandling(any()) } returns behandling
-
-        val tilkjentYtelse =
-            tilkjentYtelse(
-                behandlingId = behandling.id,
-                andeler =
-                    listOf(
-                        tilkjentYtelse(
-                            behandlingId = behandlingId,
-                        ).andelerTilkjentYtelse.first().copy(
-                            iverksetting =
-                                mockk {
-                                    every { iverksettingTidspunkt } returns idag.atStartOfDay()
-                                },
-                        ),
-                    ).toTypedArray(),
-            )
-
-        every { tilkjentYtelseService.hentForBehandling(any()) } returns tilkjentYtelse
-
-        val resultat = simuleringService.skalSendeVarsel(behandlingId)
-
-        assertThat(resultat).isEqualTo(varselTekst)
-    }
-
-    @Test
-    fun `skal sende varsel for daglig reise når iverksetting er ikke er ida`() {
-        val behandlingId = behandling(fagsak).id
-        val fagsakDagligReiseTso = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.DAGLIG_REISE_TSO)
-        val fagsakDagligReiseTsr = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.DAGLIG_REISE_TSR)
-
-        val alleFagsaker =
-            Fagsaker(
-                barnetilsyn = null,
-                læremidler = null,
-                boutgifter = null,
-                dagligReiseTso = fagsakDagligReiseTso,
-                dagligReiseTsr = fagsakDagligReiseTsr,
-                reiseTilSamlingTso = null,
-            )
-        val idag = LocalDate.now()
-
-        every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakDagligReiseTso
-        every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns alleFagsaker
-
-        val behandling = behandling(fagsakDagligReiseTso)
-        every { behandlingService.finnSisteIverksatteBehandling(any()) } returns behandling
-
-        val tilkjentYtelse =
-            tilkjentYtelse(
-                behandlingId = behandling.id,
-                andeler =
-                    listOf(
-                        tilkjentYtelse(
-                            behandlingId = behandlingId,
-                        ).andelerTilkjentYtelse.first().copy(
-                            iverksetting =
-                                mockk {
-                                    every { iverksettingTidspunkt } returns idag.atStartOfDay().minusDays(10)
-                                },
-                        ),
-                    ).toTypedArray(),
-            )
-
-        every { tilkjentYtelseService.hentForBehandling(any()) } returns tilkjentYtelse
-
-        val resultat = simuleringService.skalSendeVarsel(behandlingId)
-
-        assertThat(resultat).isNull()
-    }
-
-    @Test
-    fun `skal sende varsel for tilsynbarn når dato er innenfor periode`() {
-        val behandlingId = behandling(fagsak).id
-
-        val fagsakTilsynbarn = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN)
-        val fagsakLæremidler = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN)
-
-        val alleFagsaker =
-            Fagsaker(
-                barnetilsyn = fagsakTilsynbarn,
-                læremidler = fagsakLæremidler,
-                boutgifter = null,
-                dagligReiseTso = null,
-                dagligReiseTsr = null,
-                reiseTilSamlingTso = null,
-            )
-        val varselTekst = "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
-
-        every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakTilsynbarn
-        every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns alleFagsaker
-
-        val behandling = behandling(fagsakTilsynbarn)
-        every { behandlingService.finnSisteIverksatteBehandling(any()) } returns behandling
-        val idag = LocalDate.now()
-
-        val datoInnenfor = idag.forrigeVirkedag()
-
-        val tilkjentYtelse =
-            tilkjentYtelse(
-                behandlingId = behandling.id,
-                andeler =
-                    listOf(
-                        tilkjentYtelse(behandlingId = behandlingId).andelerTilkjentYtelse.first().copy(
-                            iverksetting =
-                                mockk {
-                                    every { iverksettingTidspunkt } returns datoInnenfor.atStartOfDay()
-                                },
-                        ),
-                    ).toTypedArray(),
-            )
-
-        every { tilkjentYtelseService.hentForBehandling(any()) } returns tilkjentYtelse
-
-        val resultat = simuleringService.skalSendeVarsel(behandlingId)
-
-        assertThat(resultat).isEqualTo(varselTekst)
-    }
-
-    @Test
-    fun `skal ikke sende varsel for tilsynbarn når dato er utenfor periode`() {
-        val behandlingId = behandling(fagsak).id
-
-        val fagsakTilsynbarn = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN)
-
-        val alleFagsaker =
-            Fagsaker(
-                barnetilsyn = fagsakTilsynbarn,
-                læremidler = null,
-                boutgifter = null,
-                dagligReiseTso = null,
-                dagligReiseTsr = null,
-                reiseTilSamlingTso = null,
-            )
-
-        every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakTilsynbarn
-        every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns alleFagsaker
-
-        val behandling = behandling(fagsakTilsynbarn)
-        every { behandlingService.finnSisteIverksatteBehandling(any()) } returns behandling
-        val idag = LocalDate.now()
-        val datoUtenfor = idag.forrigeVirkedag().minusDays(10)
-
-        val tilkjentYtelse =
-            tilkjentYtelse(
-                behandlingId = behandling.id,
-                andeler =
-                    listOf(
-                        tilkjentYtelse(behandlingId = behandlingId).andelerTilkjentYtelse.first().copy(
-                            iverksetting =
-                                mockk {
-                                    every { iverksettingTidspunkt } returns datoUtenfor.atStartOfDay()
-                                },
-                        ),
-                    ).toTypedArray(),
-            )
-
-        every { tilkjentYtelseService.hentForBehandling(any()) } returns tilkjentYtelse
-
-        val resultat = simuleringService.skalSendeVarsel(behandlingId)
-
-        assertThat(resultat).isNull()
-    }
-
-    @Test
     fun `forrigeVirkedag skal gi riktig dag`() {
-        // Mandag -> forrige virkedag er Fredag
         assertThat(LocalDate.of(2026, 3, 30).dayOfWeek).isEqualTo(DayOfWeek.MONDAY)
         assertThat(LocalDate.of(2026, 3, 30).forrigeVirkedag()).isEqualTo(LocalDate.of(2026, 3, 27))
 
-        // Sondag -> forrige virkedag er Fredag
         assertThat(LocalDate.of(2026, 3, 29).dayOfWeek).isEqualTo(DayOfWeek.SUNDAY)
         assertThat(LocalDate.of(2026, 3, 29).forrigeVirkedag()).isEqualTo(LocalDate.of(2026, 3, 27))
 
-        // Onsdag -> forrige virkedag er Tirsdag
         assertThat(LocalDate.of(2026, 3, 25).dayOfWeek).isEqualTo(DayOfWeek.WEDNESDAY)
         assertThat(LocalDate.of(2026, 3, 25).forrigeVirkedag()).isEqualTo(LocalDate.of(2026, 3, 24))
     }
