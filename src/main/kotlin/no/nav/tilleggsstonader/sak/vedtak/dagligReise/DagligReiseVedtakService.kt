@@ -140,7 +140,7 @@ class DagligReiseVedtakService(
 
     fun oppdaterVedtakMedBeregningPrivatBil(
         behandlingId: BehandlingId,
-        beregningsresultatPrivatBil: BeregningsresultatPrivatBil,
+        beregningsresultatPrivatBil: BeregningsresultatPrivatBil?,
     ) {
         val eksisterendeVedtak = hentInnvilgelseEllerOpphørVedtak(behandlingId)
         val oppdatertData =
