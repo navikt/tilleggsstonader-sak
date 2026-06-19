@@ -5,7 +5,9 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
@@ -21,6 +23,7 @@ class AvslagDagligReiseIntegrationTest : IntegrationTest() {
         assertAvslag(Stønadstype.DAGLIG_REISE_TSO) {
             defaultDagligReiseTsoTestdata()
         }
+        assertIngenNyeUtbetalinger()
     }
 
     @Test
@@ -28,6 +31,7 @@ class AvslagDagligReiseIntegrationTest : IntegrationTest() {
         assertAvslag(Stønadstype.DAGLIG_REISE_TSR) {
             defaultDagligReiseTsrTestdata()
         }
+        assertIngenNyeUtbetalinger()
     }
 
     @Test
@@ -59,6 +63,7 @@ class AvslagDagligReiseIntegrationTest : IntegrationTest() {
         assertThat(avslag.årsakerAvslag).isEqualTo(listOf(ÅrsakAvslag.ANNET))
         assertThat(avslag.begrunnelse).isEqualTo("begrunnelse")
         assertThat(avslag.type).isEqualTo(TypeVedtak.AVSLAG)
+        assertIngenNyeUtbetalinger()
     }
 
     private fun assertAvslag(
@@ -87,5 +92,10 @@ class AvslagDagligReiseIntegrationTest : IntegrationTest() {
         assertThat(avslag.årsakerAvslag).isEqualTo(listOf(ÅrsakAvslag.ANNET))
         assertThat(avslag.begrunnelse).isEqualTo("begrunnelse")
         assertThat(avslag.type).isEqualTo(TypeVedtak.AVSLAG)
+        assertIngenNyeUtbetalinger()
+    }
+
+    private fun assertIngenNyeUtbetalinger() {
+        KafkaFake.sendteMeldinger().forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
     }
 }
