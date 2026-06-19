@@ -34,7 +34,6 @@ class ReisevurderingController(
     ): List<ReisevurderingPrivatBilDto> {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerLesetilgangTilBehandling(behandlingId)
-        tilgangService.validerHarSaksbehandlerrolle() // TODO: Trengs denne når vi har den over?
 
         val behandling = behandlingService.hentBehandling(behandlingId)
 
