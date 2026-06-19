@@ -1,10 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering
 
-import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
-import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.fagsak.FagsakService
-import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -14,12 +10,10 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Simuleringsresul
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.UtbetalingV3Mapper
-import no.nav.tilleggsstonader.sak.util.forrigeVirkedag
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDate
 
 @Service
 class SimuleringService(
@@ -28,8 +22,6 @@ class SimuleringService(
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val tilgangService: TilgangService,
     private val utbetalingV3Mapper: UtbetalingV3Mapper,
-    private val fagsakService: FagsakService,
-    private val behandlingService: BehandlingService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -74,59 +66,5 @@ class SimuleringService(
                 tilkjentYtelse.andelerTilkjentYtelse,
             ),
         )
-    }
-
-    fun lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(behandlingId: BehandlingId): String? {
-        val fagsak = fagsakService.hentFagsakForBehandling(behandlingId)
-        feilHvis(fagsak.utbetalPåNyttFagområde == null) {
-            "Forventer at utbetalPåNyttFagområde skal være satt på fagsaken"
-        }
-        val alleFagsaker =
-            fagsakService
-                .finnFagsakerForFagsakPersonId(fagsak.fagsakPersonId)
-
-        val skalVarsleOmNyligeUtbetalingerInnenforSammeFagområde =
-            if (fagsak.utbetalPåNyttFagområde) {
-                // Motregnes kun "innad" i stønadstypen og da uavhengig av tema
-                finnesFagsakMedIverksatteAndelerInnenforPeriode(
-                    fagsaker = alleFagsaker.alleFagsakerAvStønadstypeUavhengigAvTema(fagsak.stønadstype),
-                    periode = Datoperiode(LocalDate.now(), LocalDate.now()),
-                )
-            } else {
-                // Motregnes mot alle andre fagsaker som også utbetaler på gammelt fagområde. Også en ventedag før utbetaling
-                finnesFagsakMedIverksatteAndelerInnenforPeriode(
-                    fagsaker = alleFagsaker.alleFagsakerMedUtbetalingPåGammeltFagområde(),
-                    periode = Datoperiode(LocalDate.now().forrigeVirkedag(), LocalDate.now()),
-                )
-            }
-
-        return if (skalVarsleOmNyligeUtbetalingerInnenforSammeFagområde) {
-            "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
-        } else {
-            null
-        }
-    }
-
-    private fun finnesFagsakMedIverksatteAndelerInnenforPeriode(
-        fagsaker: List<Fagsak>,
-        periode: Datoperiode,
-    ): Boolean {
-        return fagsaker.any { relevantFagsak ->
-
-            val behandlingId =
-                behandlingService
-                    .finnSisteIverksatteBehandling(relevantFagsak.id)
-                    ?.id ?: return@any false
-
-            val tilkjentYtelse =
-                tilkjentYtelseService.hentForBehandling(behandlingId)
-
-            tilkjentYtelse.andelerTilkjentYtelse.any { andel ->
-                val iverksettingDato =
-                    andel.iverksetting?.iverksettingTidspunkt?.toLocalDate()
-
-                iverksettingDato != null && periode.inneholder(iverksettingDato)
-            }
-        }
     }
 }
