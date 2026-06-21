@@ -16,8 +16,6 @@ val testcontainerVersion = "1.21.4"
 val springDocVersion = "3.0.3"
 val shedlockVersion = "7.7.0"
 
-val jacksonVersion = "3.1.4"
-
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
 
@@ -66,10 +64,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-jackson")
-    // Overstyrt da spring-boot 4.0.5 har jackson 3.1.0 med bug som ikke løses før 3.1.2 https://github.com/FasterXML/jackson-databind/issues/5865
-    implementation("tools.jackson.core:jackson-core:$jacksonVersion")
-    implementation("tools.jackson.core:jackson-databind:$jacksonVersion")
-    implementation("tools.jackson.module:jackson-module-kotlin:$jacksonVersion")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
