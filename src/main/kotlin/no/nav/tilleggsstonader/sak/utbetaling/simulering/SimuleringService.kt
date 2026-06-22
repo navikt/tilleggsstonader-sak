@@ -22,6 +22,7 @@ class SimuleringService(
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val tilgangService: TilgangService,
     private val utbetalingV3Mapper: UtbetalingV3Mapper,
+    private val varselVedMotregningISimuleringService: VarselVedMotregningISimuleringService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -53,6 +54,11 @@ class SimuleringService(
                 data = resultat?.let { SimuleringKontraktTilDomeneMapper.map(it) },
                 ingenEndringIUtbetaling =
                     resultat == null || resultat.oppsummeringer.isNullOrEmpty() || resultat.status == "OK_UTEN_ENDRING",
+                finnesUtbetalingerPåFagsområdeSomIkkeErRegistrert =
+                    varselVedMotregningISimuleringService
+                        .finnesUtbetalingerPåSammeFagområdeSomIkkeErRegistrertIUR(
+                            saksbehandling.id,
+                        ),
             ),
         )
     }

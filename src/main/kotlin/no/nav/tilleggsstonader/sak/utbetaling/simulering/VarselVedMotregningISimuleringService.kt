@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
-import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
@@ -17,12 +16,15 @@ class VarselVedMotregningISimuleringService(
     private val fagsakService: FagsakService,
     private val tilkjentYtelseService: TilkjentYtelseService,
 ) {
-    fun lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(behandlingId: BehandlingId): String? {
+    /**
+     * Hvis man simulerer samtidig som det har blitt gjort en utbetaling på en annen sak men samme fagområde vil man
+     * kunne endringer i utbetalinger fra den andre saken i simuleringen
+     */
+    fun finnesUtbetalingerPåSammeFagområdeSomIkkeErRegistrertIUR(behandlingId: BehandlingId): Boolean {
         val fagsak = fagsakService.hentFagsakForBehandling(behandlingId)
 
         if (fagsak.utbetalPåNyttFagområde == null) {
-            logger.warn("Forventer at utbetalPåNyttFagområde skal være satt på fagsaken")
-            return null
+            error("Forventer at utbetalPåNyttFagområde skal være satt på fagsaken")
         }
         val alleFagsaker =
             fagsakService.finnFagsakerForFagsakPersonId(fagsak.fagsakPersonId)
@@ -40,11 +42,7 @@ class VarselVedMotregningISimuleringService(
                 )
             }
 
-        return if (skalVarsleOmNyligeUtbetalingerInnenforSammeFagområde) {
-            "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
-        } else {
-            null
-        }
+        return skalVarsleOmNyligeUtbetalingerInnenforSammeFagområde
     }
 
     private fun finnesFagsakMedIverksatteAndelerInnenforPeriode(
