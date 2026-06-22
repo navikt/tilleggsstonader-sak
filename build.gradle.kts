@@ -9,14 +9,12 @@ val tilleggsstønaderKontrakterVersion = "2026.06.16-12.30.d9171e81b755"
 val avroVersion = "1.12.1"
 val confluentVersion = "8.0.1"
 val joarkHendelseVersion = "1.1.11"
-val tokenSupportVersion = "6.0.8"
+val tokenSupportVersion = "6.0.10"
 val wiremockVersion = "3.13.2"
 val mockkVersion = "1.14.11"
 val testcontainerVersion = "1.21.4"
 val springDocVersion = "3.0.3"
 val shedlockVersion = "7.7.0"
-
-val jacksonVersion = "3.1.4"
 
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
@@ -29,7 +27,7 @@ plugins {
     id("com.github.ben-manes.versions") version "0.54.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
 
-    id("org.springframework.boot") version "4.0.6"
+    id("org.springframework.boot") version "4.1.0"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.spring") version "2.3.21"
 }
@@ -66,10 +64,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-jackson")
-    // Overstyrt da spring-boot 4.0.5 har jackson 3.1.0 med bug som ikke løses før 3.1.2 https://github.com/FasterXML/jackson-databind/issues/5865
-    implementation("tools.jackson.core:jackson-core:$jacksonVersion")
-    implementation("tools.jackson.core:jackson-databind:$jacksonVersion")
-    implementation("tools.jackson.module:jackson-module-kotlin:$jacksonVersion")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
