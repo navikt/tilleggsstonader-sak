@@ -164,12 +164,4 @@ class DagligReiseVedtakService(
         if (forrigeIverksatteBehandlingId == null) return false
         return vedtakRepository.harRammevedtak(listOf(forrigeIverksatteBehandlingId))
     }
-
-    fun harRammevedtakPåDenneEllerForrgieBehandling(
-        behandlingId: BehandlingId,
-        forrigeIverksatteBehandlingId: BehandlingId?,
-    ): Boolean {
-        val behandlingIder = listOfNotNull(behandlingId, forrigeIverksatteBehandlingId)
-        return vedtakRepository.harRammevedtak(behandlingIder)
-    }
 }

@@ -65,8 +65,7 @@ class DagligReiseVedtakController(
         }
 
         val harRammevedtak =
-            dagligReiseVedtakService.harRammevedtakPåDenneEllerForrgieBehandling(
-                behandlingId = saksbehandling.id,
+            dagligReiseVedtakService.forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(
                 forrigeIverksatteBehandlingId = saksbehandling.forrigeIverksatteBehandlingId,
             )
 

@@ -22,28 +22,12 @@ class DagligReiseVedtakServiceTest {
         )
 
     @Test
-    fun `skal returnere true når nåværende behandling har rammevedtak`() {
-        val behandlingId = BehandlingId.random()
-        every { vedtakRepository.harRammevedtak(listOf(behandlingId)) } returns true
-
-        val harRammevedtak =
-            dagligReiseVedtakService.harRammevedtakPåDenneEllerForrgieBehandling(
-                behandlingId = behandlingId,
-                forrigeIverksatteBehandlingId = null,
-            )
-
-        assertThat(harRammevedtak).isTrue
-    }
-
-    @Test
-    fun `skal returnere true når en av behandlingene har rammevedtak`() {
-        val behandlingId = BehandlingId.random()
+    fun `skal returnere true når forrige behandling har rammevedtak`() {
         val forrigeBehandlingId = BehandlingId.random()
-        every { vedtakRepository.harRammevedtak(listOf(behandlingId, forrigeBehandlingId)) } returns true
+        every { vedtakRepository.harRammevedtak(listOf(forrigeBehandlingId)) } returns true
 
         val harRammevedtak =
-            dagligReiseVedtakService.harRammevedtakPåDenneEllerForrgieBehandling(
-                behandlingId = behandlingId,
+            dagligReiseVedtakService.forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(
                 forrigeIverksatteBehandlingId = forrigeBehandlingId,
             )
 
@@ -51,14 +35,12 @@ class DagligReiseVedtakServiceTest {
     }
 
     @Test
-    fun `skal returnere false når ingen behandlinger har rammevedtak`() {
-        val behandlingId = BehandlingId.random()
+    fun `skal returnere false når forrige behandling ikke har rammevedtak`() {
         val forrigeBehandlingId = BehandlingId.random()
-        every { vedtakRepository.harRammevedtak(listOf(behandlingId, forrigeBehandlingId)) } returns false
+        every { vedtakRepository.harRammevedtak(listOf(forrigeBehandlingId)) } returns false
 
         val harRammevedtak =
-            dagligReiseVedtakService.harRammevedtakPåDenneEllerForrgieBehandling(
-                behandlingId = behandlingId,
+            dagligReiseVedtakService.forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(
                 forrigeIverksatteBehandlingId = forrigeBehandlingId,
             )
 
@@ -66,13 +48,9 @@ class DagligReiseVedtakServiceTest {
     }
 
     @Test
-    fun `skal returnere false når det ikke finnes forrige behandling og nåværende ikke har rammevedtak`() {
-        val behandlingId = BehandlingId.random()
-        every { vedtakRepository.harRammevedtak(listOf(behandlingId)) } returns false
-
+    fun `skal returnere false når det ikke finnes forrige behandling`() {
         val harRammevedtak =
-            dagligReiseVedtakService.harRammevedtakPåDenneEllerForrgieBehandling(
-                behandlingId = behandlingId,
+            dagligReiseVedtakService.forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(
                 forrigeIverksatteBehandlingId = null,
             )
 
