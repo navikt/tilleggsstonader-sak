@@ -1,17 +1,13 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseVedtakService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseDtoMapper.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.HarRammevedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreVilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårResultatDto
@@ -37,33 +33,9 @@ class DagligReiseVilkårController(
     private val tilgangService: TilgangService,
     private val dagligReiseVilkårService: DagligReiseVilkårService,
     private val vilkårperiodeService: VilkårperiodeService,
-    private val behandlingService: BehandlingService,
-    private val dagligReiseVedtakService: DagligReiseVedtakService,
 ) {
     @GetMapping("regler")
     fun regler(): RegelstrukturDto = DagligReiseRegel().tilRegelstruktur()
-
-    @GetMapping("{behandlingId}/har-rammevedtak")
-    fun harRammevedtak(
-        @PathVariable behandlingId: BehandlingId,
-    ): HarRammevedtakDto {
-        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerLesetilgangTilBehandling(behandlingId)
-
-        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
-
-        if (saksbehandling.stønadstype !in setOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR)) {
-            return HarRammevedtakDto(false)
-        }
-
-        val harRammevedtak =
-            dagligReiseVedtakService.harRammevedtakPåDenneEllerForrgieBehandling(
-                behandlingId = saksbehandling.id,
-                forrigeIverksatteBehandlingId = saksbehandling.forrigeIverksatteBehandlingId,
-            )
-
-        return HarRammevedtakDto(harRammevedtak)
-    }
 
     @GetMapping("{behandlingId}")
     fun hentVilkår(
