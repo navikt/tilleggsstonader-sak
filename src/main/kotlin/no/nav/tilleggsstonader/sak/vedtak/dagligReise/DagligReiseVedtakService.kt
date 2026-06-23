@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.takeIfType
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -110,6 +111,11 @@ class DagligReiseVedtakService(
             .findByIdOrThrow(behandlingId)
             .withTypeOrThrow<InnvilgelseEllerOpphørDagligReise>()
 
+    private fun hentNullableInnvilgelseEllerOpphørVedtak(behandlingId: BehandlingId): GeneriskVedtak<InnvilgelseEllerOpphørDagligReise>? =
+        vedtakRepository
+            .findByIdOrNull(behandlingId)
+            ?.takeIfType<InnvilgelseEllerOpphørDagligReise>()
+
     fun hentInnvilgelseVedtak(behandlingId: BehandlingId): GeneriskVedtak<InnvilgelseDagligReise> =
         vedtakRepository
             .findByIdOrThrow(behandlingId)
@@ -151,6 +157,7 @@ class DagligReiseVedtakService(
                         beregningsresultat =
                             data.beregningsresultat.copy(privatBil = beregningsresultatPrivatBil),
                     )
+
                 is OpphørDagligReise ->
                     data.copy(
                         beregningsresultat =
@@ -165,18 +172,15 @@ class DagligReiseVedtakService(
         return forrigeVedtak?.data?.rammevedtakPrivatBil != null
     }
 
+    private fun harRammevedtakForPrivatBil(behandlingId: BehandlingId): Boolean {
+        val vedtak = hentNullableInnvilgelseEllerOpphørVedtak(behandlingId)
+        return vedtak?.data?.rammevedtakPrivatBil != null
+    }
+
     fun harRammevedtakPåDenneEllerForrgieBehandling(
         behandlingId: BehandlingId,
         forrigeIverksatteBehandlingId: BehandlingId?,
     ): Boolean =
-        harRammevedtakForPrivatBilPåBehandling(behandlingId) ||
+        harRammevedtakForPrivatBil(behandlingId) ||
             forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(forrigeIverksatteBehandlingId)
-
-    private fun harRammevedtakForPrivatBilPåBehandling(behandlingId: BehandlingId): Boolean =
-        vedtakRepository
-            .findById(behandlingId)
-            .orElse(null)
-            ?.takeIfType<InnvilgelseEllerOpphørDagligReise>()
-            ?.data
-            ?.rammevedtakPrivatBil != null
 }
