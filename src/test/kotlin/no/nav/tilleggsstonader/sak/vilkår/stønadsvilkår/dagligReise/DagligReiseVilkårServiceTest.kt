@@ -26,7 +26,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårReposit
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
-import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
 
@@ -173,5 +172,4 @@ class DagligReiseVilkårServiceTest {
         prisSyvdagersbillett = prisSyvdagersbillett,
         prisTrettidagersbillett = prisTrettidagersbillett,
     )
-
 }

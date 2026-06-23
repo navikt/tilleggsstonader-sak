@@ -168,7 +168,9 @@ class DagligReiseVedtakService(
     fun harRammevedtakPåDenneEllerForrgieBehandling(
         behandlingId: BehandlingId,
         forrigeIverksatteBehandlingId: BehandlingId?,
-    ): Boolean = harRammevedtakForPrivatBilPåBehandling(behandlingId) || forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(forrigeIverksatteBehandlingId)
+    ): Boolean =
+        harRammevedtakForPrivatBilPåBehandling(behandlingId) ||
+            forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(forrigeIverksatteBehandlingId)
 
     private fun harRammevedtakForPrivatBilPåBehandling(behandlingId: BehandlingId): Boolean =
         vedtakRepository

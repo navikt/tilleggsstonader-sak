@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
@@ -50,6 +51,11 @@ class DagligReiseVilkårController(
         tilgangService.validerLesetilgangTilBehandling(behandlingId)
 
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
+
+        if (saksbehandling.stønadstype !in setOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR)) {
+            return HarRammevedtakDto(false)
+        }
+
         val harRammevedtak =
             dagligReiseVedtakService.harRammevedtakPåDenneEllerForrgieBehandling(
                 behandlingId = saksbehandling.id,
