@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegFerdigstiltResponse
@@ -60,7 +61,7 @@ class DagligReiseVedtakController(
 
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
 
-        if (saksbehandling.stønadstype !in setOf(Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR)) {
+        if (!saksbehandling.stønadstype.gjelderDagligReise()) {
             return HarRammevedtakDto(false)
         }
 
