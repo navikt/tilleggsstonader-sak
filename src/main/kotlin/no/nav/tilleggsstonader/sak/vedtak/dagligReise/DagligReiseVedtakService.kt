@@ -20,10 +20,8 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.takeIfType
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -111,11 +109,6 @@ class DagligReiseVedtakService(
             .findByIdOrThrow(behandlingId)
             .withTypeOrThrow<InnvilgelseEllerOpphørDagligReise>()
 
-    private fun hentNullableInnvilgelseEllerOpphørVedtak(behandlingId: BehandlingId): GeneriskVedtak<InnvilgelseEllerOpphørDagligReise>? =
-        vedtakRepository
-            .findByIdOrNull(behandlingId)
-            ?.takeIfType<InnvilgelseEllerOpphørDagligReise>()
-
     fun hentInnvilgelseVedtak(behandlingId: BehandlingId): GeneriskVedtak<InnvilgelseDagligReise> =
         vedtakRepository
             .findByIdOrThrow(behandlingId)
@@ -168,19 +161,15 @@ class DagligReiseVedtakService(
     }
 
     fun forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(forrigeIverksatteBehandlingId: BehandlingId?): Boolean {
-        val forrigeVedtak = forrigeIverksatteBehandlingId?.let { hentInnvilgelseEllerOpphørVedtak(it) }
-        return forrigeVedtak?.data?.rammevedtakPrivatBil != null
-    }
-
-    private fun harRammevedtakForPrivatBil(behandlingId: BehandlingId): Boolean {
-        val vedtak = hentNullableInnvilgelseEllerOpphørVedtak(behandlingId)
-        return vedtak?.data?.rammevedtakPrivatBil != null
+        if (forrigeIverksatteBehandlingId == null) return false
+        return vedtakRepository.harRammevedtak(listOf(forrigeIverksatteBehandlingId))
     }
 
     fun harRammevedtakPåDenneEllerForrgieBehandling(
         behandlingId: BehandlingId,
         forrigeIverksatteBehandlingId: BehandlingId?,
-    ): Boolean =
-        harRammevedtakForPrivatBil(behandlingId) ||
-            forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(forrigeIverksatteBehandlingId)
+    ): Boolean {
+        val behandlingIder = listOfNotNull(behandlingId, forrigeIverksatteBehandlingId)
+        return vedtakRepository.harRammevedtak(behandlingIder)
+    }
 }

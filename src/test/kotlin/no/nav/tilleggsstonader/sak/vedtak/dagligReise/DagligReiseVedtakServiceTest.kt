@@ -5,20 +5,9 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
-import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammevedtakPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
-import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import java.util.Optional
 
 class DagligReiseVedtakServiceTest {
     private val vedtakRepository = mockk<VedtakRepository>()
@@ -35,7 +24,7 @@ class DagligReiseVedtakServiceTest {
     @Test
     fun `skal returnere true når nåværende behandling har rammevedtak`() {
         val behandlingId = BehandlingId.random()
-        every { vedtakRepository.findById(behandlingId) } returns Optional.of(innvilgelseVedtak(behandlingId, true))
+        every { vedtakRepository.harRammevedtak(listOf(behandlingId)) } returns true
 
         val harRammevedtak =
             dagligReiseVedtakService.harRammevedtakPåDenneEllerForrgieBehandling(
@@ -47,11 +36,10 @@ class DagligReiseVedtakServiceTest {
     }
 
     @Test
-    fun `skal returnere true når forrige behandling har rammevedtak`() {
+    fun `skal returnere true når en av behandlingene har rammevedtak`() {
         val behandlingId = BehandlingId.random()
         val forrigeBehandlingId = BehandlingId.random()
-        every { vedtakRepository.findById(behandlingId) } returns Optional.empty()
-        every { vedtakRepository.findById(forrigeBehandlingId) } returns Optional.of(innvilgelseVedtak(forrigeBehandlingId, true))
+        every { vedtakRepository.harRammevedtak(listOf(behandlingId, forrigeBehandlingId)) } returns true
 
         val harRammevedtak =
             dagligReiseVedtakService.harRammevedtakPåDenneEllerForrgieBehandling(
@@ -63,11 +51,10 @@ class DagligReiseVedtakServiceTest {
     }
 
     @Test
-    fun `skal returnere true når forrige behandling er opphør med rammevedtak`() {
+    fun `skal returnere false når ingen behandlinger har rammevedtak`() {
         val behandlingId = BehandlingId.random()
         val forrigeBehandlingId = BehandlingId.random()
-        every { vedtakRepository.findById(behandlingId) } returns Optional.empty()
-        every { vedtakRepository.findById(forrigeBehandlingId) } returns Optional.of(opphørVedtak(forrigeBehandlingId, true))
+        every { vedtakRepository.harRammevedtak(listOf(behandlingId, forrigeBehandlingId)) } returns false
 
         val harRammevedtak =
             dagligReiseVedtakService.harRammevedtakPåDenneEllerForrgieBehandling(
@@ -75,13 +62,13 @@ class DagligReiseVedtakServiceTest {
                 forrigeIverksatteBehandlingId = forrigeBehandlingId,
             )
 
-        assertThat(harRammevedtak).isTrue
+        assertThat(harRammevedtak).isFalse
     }
 
     @Test
-    fun `skal returnere false når nåværende behandling ikke har vedtak ennå og forrige ikke finnes`() {
+    fun `skal returnere false når det ikke finnes forrige behandling og nåværende ikke har rammevedtak`() {
         val behandlingId = BehandlingId.random()
-        every { vedtakRepository.findById(behandlingId) } returns Optional.empty()
+        every { vedtakRepository.harRammevedtak(listOf(behandlingId)) } returns false
 
         val harRammevedtak =
             dagligReiseVedtakService.harRammevedtakPåDenneEllerForrgieBehandling(
@@ -91,74 +78,4 @@ class DagligReiseVedtakServiceTest {
 
         assertThat(harRammevedtak).isFalse
     }
-
-    @Test
-    fun `skal returnere false når verken nåværende eller forrige har rammevedtak`() {
-        val behandlingId = BehandlingId.random()
-        val forrigeBehandlingId = BehandlingId.random()
-        every { vedtakRepository.findById(behandlingId) } returns Optional.of(avslagVedtak(behandlingId))
-        every { vedtakRepository.findById(forrigeBehandlingId) } returns Optional.of(innvilgelseVedtak(forrigeBehandlingId, false))
-
-        val harRammevedtak =
-            dagligReiseVedtakService.harRammevedtakPåDenneEllerForrgieBehandling(
-                behandlingId = behandlingId,
-                forrigeIverksatteBehandlingId = forrigeBehandlingId,
-            )
-
-        assertThat(harRammevedtak).isFalse
-    }
-
-    private fun innvilgelseVedtak(
-        behandlingId: BehandlingId,
-        harRammevedtak: Boolean,
-    ): GeneriskVedtak<InnvilgelseDagligReise> =
-        GeneriskVedtak(
-            behandlingId = behandlingId,
-            data =
-                InnvilgelseDagligReise(
-                    beregningsresultat = tomtBeregningsresultat(),
-                    rammevedtakPrivatBil = if (harRammevedtak) rammevedtakPrivatBil() else null,
-                    vedtaksperioder = emptyList(),
-                    beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
-                ),
-            gitVersjon = null,
-            tidligsteEndring = null,
-        )
-
-    private fun opphørVedtak(
-        behandlingId: BehandlingId,
-        harRammevedtak: Boolean,
-    ): GeneriskVedtak<OpphørDagligReise> =
-        GeneriskVedtak(
-            behandlingId = behandlingId,
-            data =
-                OpphørDagligReise(
-                    vedtaksperioder = emptyList(),
-                    beregningsresultat = tomtBeregningsresultat(),
-                    rammevedtakPrivatBil = if (harRammevedtak) rammevedtakPrivatBil() else null,
-                    årsaker = listOf(ÅrsakOpphør.ANNET),
-                    begrunnelse = "begrunnelse",
-                    beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
-                ),
-            gitVersjon = null,
-            tidligsteEndring = null,
-        )
-
-    private fun avslagVedtak(behandlingId: BehandlingId): GeneriskVedtak<AvslagDagligReise> =
-        GeneriskVedtak(
-            behandlingId = behandlingId,
-            data =
-                AvslagDagligReise(
-                    årsaker = listOf(ÅrsakAvslag.ANNET),
-                    begrunnelse = "begrunnelse",
-                ),
-            gitVersjon = null,
-            tidligsteEndring = null,
-        )
-
-    private fun tomtBeregningsresultat() =
-        BeregningsresultatDagligReise(
-            offentligTransport = null,
-            privatBil = null,
-        )
 }
