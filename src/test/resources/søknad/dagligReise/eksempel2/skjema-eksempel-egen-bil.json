@@ -71,6 +71,7 @@
           "postnummerHvorDuHenterEllerLevererBarn" : "EksempelSvar"
         },
         "kanKjoreMedEgenBil": "ja",
+        "bilensDrivstofftype": "bensin",
         "parkering": "ja",
         "bompenger": 43,
         "ferge": 0,
