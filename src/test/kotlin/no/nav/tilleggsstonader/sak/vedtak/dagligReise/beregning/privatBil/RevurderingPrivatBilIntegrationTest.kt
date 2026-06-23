@@ -312,13 +312,16 @@ class RevurderingPrivatBilIntegrationTest(
                 }
 
             val vedtakFørRevurdering = vedtakService.hentVedtak<InnvilgelseDagligReise>(førstegangsbehandlingContext.behandlingId).data
+            val vedtakEtterKjøreliste = vedtakService.hentVedtak<InnvilgelseDagligReise>(testoppsettService.hentBehandlinger(førstegangsbehandlingContext.fagsakId).single { it.type == BehandlingType.KJØRELISTE }.id).data
             val vedtakEtterRevurdering = vedtakService.hentVedtak<InnvilgelseDagligReise>(revurderingId).data
 
             // Rammevedtak og beregning finnes
             assertThat(vedtakEtterRevurdering.rammevedtakPrivatBil).isNotNull()
             assertThat(vedtakEtterRevurdering.rammevedtakPrivatBil!!.sisteTom()).isEqualTo(nyTom)
             assertThat(vedtakEtterRevurdering.beregningsresultat.privatBil).isNotNull()
-            assertThat(vedtakEtterRevurdering.beregningsresultat.privatBil).isEqualTo(vedtakFørRevurdering.beregningsresultat.privatBil)
+            assertThat(vedtakEtterRevurdering.beregningsresultat.privatBil)
+                .isNotEqualTo(vedtakFørRevurdering.beregningsresultat.privatBil)
+                .isEqualTo(vedtakEtterKjøreliste.beregningsresultat.privatBil)
 
 
             // TODO: Sjekke andeler at det ikke er noe nytt?
@@ -497,7 +500,7 @@ class RevurderingPrivatBilIntegrationTest(
             .dagsatsUtenParkering
 
     private fun RammevedtakPrivatBil.sisteTom() =
-        this.reiser.map { it.grunnlag.fom }.sorted().last()
+        this.reiser.map { it.grunnlag.tom }.sorted().last()
 
     private fun RammevedtakPrivatBil.førsteFom() =
         this.reiser.map { it.grunnlag.fom }.sorted().first()
