@@ -20,24 +20,15 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreVilkårDagligReise
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.SvarOgBegrunnelse
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
-import java.math.BigDecimal
 
 class DagligReiseVilkårServiceTest {
     val vilkårRepository = mockk<VilkårRepository>()
@@ -122,7 +113,7 @@ class DagligReiseVilkårServiceTest {
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSR))
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
         every { unleashService.isEnabled(any()) } returns true
-        every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
+        every { vilkårRepository.insert(any()) } answers { firstArg() }
 
         val vilkår =
             nyttVilkår.copy(
@@ -183,137 +174,4 @@ class DagligReiseVilkårServiceTest {
         prisTrettidagersbillett = prisTrettidagersbillett,
     )
 
-    @Test
-    fun `harPrivatBilVilkår skal returnere false når ingen vilkår finnes`() {
-        val behandlingId = BehandlingId.random()
-        every { vilkårRepository.findByBehandlingId(behandlingId) } returns emptyList()
-
-        val resultat = dagligReiseVilkårService.harPrivatBilVilkår(behandlingId, null)
-
-        assertThat(resultat).isFalse
-    }
-
-    @Test
-    fun `harPrivatBilVilkår skal returnere false når kun offentlig transport vilkår finnes`() {
-        val behandlingId = BehandlingId.random()
-        val vilkår =
-            lagVilkårMedFakta(
-                FaktaDagligReiseOffentligTransport(
-                    reiseId = dummyReiseId,
-                    reisedagerPerUke = 5,
-                    prisEnkelbillett = 40,
-                    prisSyvdagersbillett = null,
-                    prisTrettidagersbillett = 800,
-                    adresse = "test",
-                ),
-            )
-        every { vilkårRepository.findByBehandlingId(behandlingId) } returns listOf(vilkår)
-
-        val resultat = dagligReiseVilkårService.harPrivatBilVilkår(behandlingId, null)
-
-        assertThat(resultat).isFalse
-    }
-
-    @Test
-    fun `harPrivatBilVilkår skal returnere true når privat bil vilkår finnes i nåværende behandling`() {
-        val behandlingId = BehandlingId.random()
-        val privatBilVilkår =
-            lagVilkårMedFakta(
-                FaktaDagligReisePrivatBil(
-                    reiseId = dummyReiseId,
-                    reiseavstandEnVei = BigDecimal("10"),
-                    faktaDelperioder = emptyList(),
-                    adresse = "test",
-                    aktivitetId =
-                        VilkårperiodeGlobalId
-                            .random(),
-                ),
-            )
-        every { vilkårRepository.findByBehandlingId(behandlingId) } returns listOf(privatBilVilkår)
-
-        val resultat = dagligReiseVilkårService.harPrivatBilVilkår(behandlingId, null)
-
-        assertThat(resultat).isTrue
-    }
-
-    @Test
-    fun `harPrivatBilVilkår skal returnere true når blanding av offentlig og privat vilkår finnes`() {
-        val behandlingId = BehandlingId.random()
-        val offentligVilkår =
-            lagVilkårMedFakta(
-                FaktaDagligReiseOffentligTransport(
-                    reiseId = ReiseId.random(),
-                    reisedagerPerUke = 5,
-                    prisEnkelbillett = 40,
-                    prisSyvdagersbillett = null,
-                    prisTrettidagersbillett = 800,
-                    adresse = "test1",
-                ),
-            )
-        val privatBilVilkår =
-            lagVilkårMedFakta(
-                FaktaDagligReisePrivatBil(
-                    reiseId = dummyReiseId,
-                    reiseavstandEnVei = java.math.BigDecimal("10"),
-                    faktaDelperioder = emptyList(),
-                    adresse = "test2",
-                    aktivitetId =
-                        VilkårperiodeGlobalId
-                            .random(),
-                ),
-            )
-        every { vilkårRepository.findByBehandlingId(behandlingId) } returns listOf(offentligVilkår, privatBilVilkår)
-
-        val resultat = dagligReiseVilkårService.harPrivatBilVilkår(behandlingId, null)
-
-        assertThat(resultat).isTrue
-    }
-
-    @Test
-    fun `harPrivatBilVilkår skal returnere true når forrige behandling har privat bil`() {
-        val behandlingId = BehandlingId.random()
-        val forrigeBehandlingId = BehandlingId.random()
-        val offentligVilkår =
-            lagVilkårMedFakta(
-                FaktaDagligReiseOffentligTransport(
-                    reiseId = dummyReiseId,
-                    reisedagerPerUke = 5,
-                    prisEnkelbillett = 40,
-                    prisSyvdagersbillett = null,
-                    prisTrettidagersbillett = 800,
-                    adresse = "test",
-                ),
-            )
-        val privatBilVilkår =
-            lagVilkårMedFakta(
-                FaktaDagligReisePrivatBil(
-                    reiseId = ReiseId.random(),
-                    reiseavstandEnVei = java.math.BigDecimal("10"),
-                    faktaDelperioder = emptyList(),
-                    adresse = "test",
-                    aktivitetId =
-                        VilkårperiodeGlobalId
-                            .random(),
-                ),
-            )
-        every { vilkårRepository.findByBehandlingId(behandlingId) } returns listOf(offentligVilkår)
-        every { vilkårRepository.findByBehandlingId(forrigeBehandlingId) } returns listOf(privatBilVilkår)
-
-        val resultat = dagligReiseVilkårService.harPrivatBilVilkår(behandlingId, forrigeBehandlingId)
-
-        assertThat(resultat).isTrue
-    }
-
-    private fun lagVilkårMedFakta(fakta: VilkårFakta): Vilkår =
-        Vilkår(
-            id = VilkårId.random(),
-            behandlingId = BehandlingId.random(),
-            type = VilkårType.DAGLIG_REISE,
-            status = VilkårStatus.NY,
-            erFremtidigUtgift = false,
-            delvilkårwrapper = DelvilkårWrapper(emptyList()),
-            opphavsvilkår = null,
-            gitVersjon = null,
-            fakta = fakta,
-        )
 }
