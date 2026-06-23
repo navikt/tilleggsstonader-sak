@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Fa
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreVilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.SvarOgBegrunnelse
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
@@ -112,7 +113,7 @@ class DagligReiseVilkårServiceTest {
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSR))
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
         every { unleashService.isEnabled(any()) } returns true
-        every { vilkårRepository.insert(any()) } answers { firstArg() }
+        every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
 
         val vilkår =
             nyttVilkår.copy(
