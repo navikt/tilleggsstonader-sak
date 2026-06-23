@@ -40,13 +40,14 @@ class KjørelisteSteg(
                 null
             }
 
-        val eksisterendeRammevedtak =
-            vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(saksbehandling.id).data.rammevedtakPrivatBil
+        val eksisterendeVedtak =
+            vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(saksbehandling.id).data
 
         val beregningsresultatPrivatBil =
             privatBilBeregningService.beregn(
                 behandling = saksbehandling,
-                rammevedtak = eksisterendeRammevedtak,
+                rammevedtak = eksisterendeVedtak.rammevedtakPrivatBil,
+                tidligsteEndring = eksisterendeVedtak.beregningsplan.tidligsteEndring,
                 brukersNavKontor = brukersNavKontor,
                 forrigeBeregningsresultat = hentForrigePrivatBilBeregningsresultat(saksbehandling),
             )

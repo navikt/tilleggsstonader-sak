@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreDagligReisePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
@@ -51,6 +52,17 @@ class StønadsvilkårTestdataDsl {
         ) -> Pair<VilkårId, LagreVilkårDagligReiseDto>,
     ) {
         updateDagligReise += block
+    }
+
+    fun oppdaterEnesteDagligeReise(endre: LagreVilkårDagligReiseDto.() -> LagreVilkårDagligReiseDto) {
+        oppdaterDagligReise { perioder, _ ->
+            val periode = perioder.single()
+            periode.id to periode.tilLagreDagligReiseDto().endre()
+        }
+    }
+
+    fun oppdaterDatoPåEnesteDagligeReise(fom: LocalDate, tom: LocalDate) {
+        oppdaterEnesteDagligeReise { copy(fom = fom, tom = tom) }
     }
 
     fun slett(block: (vilkårsvurderingDto: VilkårsvurderingDto) -> SlettVilkårRequest) {

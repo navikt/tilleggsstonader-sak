@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
 
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
@@ -20,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPri
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class PrivatBilBeregningService(
@@ -28,6 +31,7 @@ class PrivatBilBeregningService(
     fun beregn(
         behandling: Saksbehandling,
         rammevedtak: RammevedtakPrivatBil?,
+        tidligsteEndring: LocalDate?,
         brukersNavKontor: String?,
         forrigeBeregningsresultat: BeregningsresultatPrivatBil?,
     ): BeregningsresultatPrivatBil? {
@@ -40,6 +44,8 @@ class PrivatBilBeregningService(
             avklarteUkerForBehandling = avklarteUkerForBehandling,
             brukersNavKontor = brukersNavKontor,
             forrigeBeregningsresultat = forrigeBeregningsresultat,
+            behandlingType = behandling.type,
+            tidligsteEndring = tidligsteEndring,
         )
     }
 
@@ -48,6 +54,8 @@ class PrivatBilBeregningService(
         avklarteUkerForBehandling: Collection<AvklartKjørtUke>,
         brukersNavKontor: String?,
         forrigeBeregningsresultat: BeregningsresultatPrivatBil? = null,
+        behandlingType: BehandlingType,
+        tidligsteEndring: LocalDate?,
     ): BeregningsresultatPrivatBil =
         BeregningsresultatPrivatBil(
             reiser =
@@ -61,18 +69,28 @@ class PrivatBilBeregningService(
                             avklarteUkerForReise = avklarteUkerForReise,
                             brukersNavKontor = brukersNavKontor,
                         )
-                    } else {
-                        lagBeregningsresultatForReiseVedRevurdering(
+                    } else if (behandlingType == BehandlingType.REVURDERING) {
+                        lagBeregningsresultatForReiseVedRevurderingAvRammevedtak(
+                            rammeForReise = reise,
+                            avklarteUkerForReise = avklarteUkerForReise,
+                            brukersNavKontor = brukersNavKontor,
+                            tidligsteEndring = tidligsteEndring,
+                            forrigeReise = forrigeReise,
+                        )
+                    } else if (behandlingType == BehandlingType.KJØRELISTE) {
+                        lagBeregningsresultatForReiseVedRevurderingAvKjøreliste(
                             rammeForReise = reise,
                             avklarteUkerForReise = avklarteUkerForReise,
                             brukersNavKontor = brukersNavKontor,
                             forrigeReise = forrigeReise,
                         )
+                    } else {
+                        feil("Burde ikke være mulig å havne her.")
                     }
                 },
         )
 
-    private fun lagBeregningsresultatForReiseVedRevurdering(
+    private fun lagBeregningsresultatForReiseVedRevurderingAvKjøreliste(
         rammeForReise: RammeForReiseMedPrivatBil,
         avklarteUkerForReise: List<AvklartKjørtUke>,
         brukersNavKontor: String?,
@@ -132,6 +150,33 @@ class PrivatBilBeregningService(
                         brukersNavKontor = brukersNavKontor,
                     )
                 },
+        )
+    }
+
+    /**
+     * Dersom rammevedtaket er endret og en reise treffer eller er etter tidligsteEndring reberegnes hele reisen,
+     * uavhengig av status på ukene.
+     * Dette sikrer at endring i f.eks. bompenger eller ferge plukkes opp.
+     */
+    private fun lagBeregningsresultatForReiseVedRevurderingAvRammevedtak(
+        rammeForReise: RammeForReiseMedPrivatBil,
+        avklarteUkerForReise: List<AvklartKjørtUke>,
+        brukersNavKontor: String?,
+        forrigeReise: BeregningsresultatForReisePrivatBil,
+        tidligsteEndring: LocalDate?,
+    ): BeregningsresultatForReisePrivatBil {
+        feilHvis(tidligsteEndring == null) {
+            "Forventer at tidligste endring er satt i en revurdering"
+        }
+
+        if (rammeForReise.grunnlag.tom < tidligsteEndring) {
+            return forrigeReise.markerAllePerioderSomFraTidligereVedtak()
+        }
+
+        return lagBeregningsresultatForReise(
+            rammeForReise = rammeForReise,
+            avklarteUkerForReise = avklarteUkerForReise,
+            brukersNavKontor = brukersNavKontor,
         )
     }
 
