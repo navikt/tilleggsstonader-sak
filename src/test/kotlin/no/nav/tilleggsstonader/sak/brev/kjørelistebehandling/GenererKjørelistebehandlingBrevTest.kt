@@ -82,14 +82,14 @@ class GenererKjørelistebehandlingBrevTest : CleanDatabaseIntegrationTest() {
                                 fom = fom,
                                 tom = 4 januar 2026,
                                 reisedagerPerUke = 3,
-                                bompengerPerDag = 50,
+                                bompengerPerDag = 50.0,
                                 fergekostnadPerDag = null,
                             ),
                             FaktaDelperiodePrivatBilDto(
                                 fom = 5 januar 2026,
                                 tom = 11 januar 2026,
                                 reisedagerPerUke = 2,
-                                bompengerPerDag = 50,
+                                bompengerPerDag = 50.0,
                                 fergekostnadPerDag = null,
                             ),
                             FaktaDelperiodePrivatBilDto(
@@ -97,7 +97,7 @@ class GenererKjørelistebehandlingBrevTest : CleanDatabaseIntegrationTest() {
                                 tom = 18 januar 2026,
                                 reisedagerPerUke = 2,
                                 bompengerPerDag = null,
-                                fergekostnadPerDag = 100,
+                                fergekostnadPerDag = 100.0,
                             ),
                         ),
                 )

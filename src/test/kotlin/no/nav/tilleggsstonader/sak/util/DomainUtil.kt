@@ -574,15 +574,15 @@ fun faktaPrivatBil(
                 fom = 1 januar 2025,
                 tom = 15 januar 2025,
                 reisedagerPerUke = 5,
-                bompengerPerDag = 80,
+                bompengerPerDag = 80.0,
                 fergekostnadPerDag = null,
             ),
             FaktaDelperiodePrivatBil(
                 fom = 16 januar 2025,
                 tom = 31 januar 2025,
                 reisedagerPerUke = 3,
-                bompengerPerDag = 50,
-                fergekostnadPerDag = 20,
+                bompengerPerDag = 50.0,
+                fergekostnadPerDag = 20.0,
             ),
         ),
 ) = FaktaPrivatBil(

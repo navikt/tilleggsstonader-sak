@@ -77,7 +77,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 tom = tomRammevedtak,
                 ekstrakostnader =
                     RammeForReiseMedPrivatEkstrakostnader(
-                        bompengerPerDag = 40,
+                        bompengerPerDag = 40.0,
                         fergekostnadPerDag = null,
                     ),
                 reisedagerPerUke = 5,
@@ -162,7 +162,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 tom = tomRammevedtak,
                 ekstrakostnader =
                     RammeForReiseMedPrivatEkstrakostnader(
-                        bompengerPerDag = 40,
+                        bompengerPerDag = 40.0,
                         fergekostnadPerDag = null,
                     ),
                 reisedagerPerUke = 5,
@@ -237,7 +237,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 tom = tomRammevedtak,
                 ekstrakostnader =
                     RammeForReiseMedPrivatEkstrakostnader(
-                        bompengerPerDag = 40,
+                        bompengerPerDag = 40.0,
                         fergekostnadPerDag = null,
                     ),
                 reisedagerPerUke = 5,
@@ -321,7 +321,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 tom = tomRammevedtak,
                 ekstrakostnader =
                     RammeForReiseMedPrivatEkstrakostnader(
-                        bompengerPerDag = 40,
+                        bompengerPerDag = 40.0,
                         fergekostnadPerDag = null,
                     ),
                 satser =
@@ -436,7 +436,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 tom = tomRammevedtak,
                 ekstrakostnader =
                     RammeForReiseMedPrivatEkstrakostnader(
-                        bompengerPerDag = 40,
+                        bompengerPerDag = 40.0,
                         fergekostnadPerDag = null,
                     ),
                 satser =
@@ -523,7 +523,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 tom = tomRammevedtak,
                 ekstrakostnader =
                     RammeForReiseMedPrivatEkstrakostnader(
-                        bompengerPerDag = 40,
+                        bompengerPerDag = 40.0,
                         fergekostnadPerDag = null,
                     ),
                 satser =
@@ -579,7 +579,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 tom = tomRammevedtak,
                 ekstrakostnader =
                     RammeForReiseMedPrivatEkstrakostnader(
-                        bompengerPerDag = 40,
+                        bompengerPerDag = 40.0,
                         fergekostnadPerDag = null,
                     ),
                 satser =
@@ -918,7 +918,7 @@ class PrivatBilBeregningsresultatServiceTest {
     ) = RammeForReiseMedPrivatBilDelperiode(
         fom = fom,
         tom = tom,
-        ekstrakostnader = RammeForReiseMedPrivatEkstrakostnader(bompengerPerDag = 40, fergekostnadPerDag = null),
+        ekstrakostnader = RammeForReiseMedPrivatEkstrakostnader(bompengerPerDag = 40.0, fergekostnadPerDag = null),
         reisedagerPerUke = 5,
         satser =
             listOf(

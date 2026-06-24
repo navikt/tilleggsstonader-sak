@@ -72,8 +72,8 @@ data class FaktaDelperiodePrivatBil(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val reisedagerPerUke: Int,
-    val bompengerPerDag: Int?,
-    val fergekostnadPerDag: Int?,
+    val bompengerPerDag: Double?,
+    val fergekostnadPerDag: Double?,
 ) : Periode<LocalDate> {
     init {
         brukerfeilHvis(reisedagerPerUke <= 0) {
