@@ -64,31 +64,36 @@ class StønadsvilkårTestdataDsl {
         }
     }
 
-    fun oppdaterDatoPåEnesteDagligeReise(fom: LocalDate, tom: LocalDate) {
+    fun oppdaterDatoPåEnesteDagligeReise(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) {
         oppdaterEnesteDagligeReise {
             when (this.fakta) {
-                is FaktaDagligReisePrivatBilDto -> copy(
-                    fom = fom,
-                    tom = tom,
-                    fakta = fakta.copy(
-                        faktaDelperioder =
-                            this.fakta.faktaDelperioder.mapIndexed { index, delperiode ->
-                                when (index) {
-                                    0.takeIf { this.fakta.faktaDelperioder.size == 1 } -> delperiode.copy(fom = fom, tom = tom)
-                                    0 -> delperiode.copy(fom = fom)
-                                    this.fakta.faktaDelperioder.lastIndex -> delperiode.copy(tom = tom)
-                                    else -> delperiode
-                                }
-                            }
+                is FaktaDagligReisePrivatBilDto ->
+                    copy(
+                        fom = fom,
+                        tom = tom,
+                        fakta =
+                            fakta.copy(
+                                faktaDelperioder =
+                                    this.fakta.faktaDelperioder.mapIndexed { index, delperiode ->
+                                        when (index) {
+                                            0.takeIf { this.fakta.faktaDelperioder.size == 1 } -> delperiode.copy(fom = fom, tom = tom)
+                                            0 -> delperiode.copy(fom = fom)
+                                            this.fakta.faktaDelperioder.lastIndex -> delperiode.copy(tom = tom)
+                                            else -> delperiode
+                                        }
+                                    },
+                            ),
                     )
-                )
-                is FaktaDagligReiseOffentligTransportDto -> copy(
-                    fom = fom,
-                    tom = tom,
-                )
+                is FaktaDagligReiseOffentligTransportDto ->
+                    copy(
+                        fom = fom,
+                        tom = tom,
+                    )
                 is FaktaDagligReiseUbestemtDto -> error("Uforventet type ${FaktaDagligReiseUbestemtDto::class}")
             }
-
         }
     }
 
