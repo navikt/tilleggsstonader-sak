@@ -1,11 +1,11 @@
 package no.nav.tilleggsstonader.sak.utbetaling.simulering
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
-import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.forrigeVirkedag
 import org.springframework.stereotype.Service
@@ -17,12 +17,15 @@ class VarselVedMotregningISimuleringService(
     private val fagsakService: FagsakService,
     private val tilkjentYtelseService: TilkjentYtelseService,
 ) {
-    fun lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(behandlingId: BehandlingId): String? {
+    /**
+     * Hvis man simulerer samtidig som det har blitt gjort en utbetaling på en annen sak men samme fagområde
+     * kan man se endringer i utbetalinger fra den andre saken i simuleringen
+     */
+    fun finnesUtbetalingerPåSammeFagområdeSomIkkeErRegistrertIUR(behandlingId: BehandlingId): Boolean {
         val fagsak = fagsakService.hentFagsakForBehandling(behandlingId)
 
         if (fagsak.utbetalPåNyttFagområde == null) {
-            logger.warn("Forventer at utbetalPåNyttFagområde skal være satt på fagsaken")
-            return null
+            feil("Forventer at utbetalPåNyttFagområde skal være satt på fagsaken")
         }
         val alleFagsaker =
             fagsakService.finnFagsakerForFagsakPersonId(fagsak.fagsakPersonId)
@@ -40,11 +43,7 @@ class VarselVedMotregningISimuleringService(
                 )
             }
 
-        return if (skalVarsleOmNyligeUtbetalingerInnenforSammeFagområde) {
-            "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
-        } else {
-            null
-        }
+        return skalVarsleOmNyligeUtbetalingerInnenforSammeFagområde
     }
 
     private fun finnesFagsakMedIverksatteAndelerInnenforPeriode(
