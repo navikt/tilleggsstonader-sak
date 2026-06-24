@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Akti
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.AktiviteterMetadata
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.AktiviteterOgMålgruppeMetadata
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArbeidsrettetAktivitetType
-import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.BilensDrivstofftypeType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DagligReiseFyllUtSendInnData
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DataFetcher
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DineOpplysninger
@@ -196,7 +195,7 @@ class OpprettDummySøknadDagligReise(
                 bompenger = 120,
                 ferge = 100,
                 piggdekkavgift = 300,
-                bilensDrivstofftype = BilensDrivstofftypeType.elbil,
+                bilensDrivstofftype = Valgfelt(value = "elbil", label = "Elbil"),
             )
 
         val metadata =
