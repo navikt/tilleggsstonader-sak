@@ -367,6 +367,81 @@ class AvklartKjørelisteServiceTest {
         }
 
         @Test
+        fun `uker før første dato i reisen markeres SLETTET med alle dager, og dager i delvis avkortet uke før fom markeres SLETTET`() {
+            val mandagUke1 = 5 januar 2026
+            val mandagUke2 = 12 januar 2026
+            val mandagUke3 = 19 januar 2026
+            val førsteDagIAvkortetRammevedtak = 14 januar 2026 // onsdag i uke 2
+
+            val uker =
+                listOf(
+                    lagUke(fom = mandagUke1, tom = mandagUke1.plusDays(4), status = AvklartKjørtUkeStatus.UENDRET),
+                    lagUke(fom = mandagUke2, tom = mandagUke2.plusDays(4), status = AvklartKjørtUkeStatus.UENDRET),
+                    lagUke(fom = mandagUke3, tom = mandagUke3.plusDays(4), status = AvklartKjørtUkeStatus.UENDRET),
+                )
+
+            val rammevedtak =
+                RammevedtakPrivatBil(
+                    reiser =
+                        listOf(
+                            lagRammeForReise(
+                                reiseId = reiseId,
+                                fom = førsteDagIAvkortetRammevedtak,
+                                tom = mandagUke3.plusDays(4),
+                            ),
+                        ),
+                )
+
+            val updateSlot = slot<List<AvklartKjørtUke>>()
+
+            every { avklartKjørtUkeRepository.findByBehandlingId(behandlingId) } returns uker
+            every { avklartKjørtUkeRepository.updateAll(capture(updateSlot)) } answers { updateSlot.captured }
+
+            service.sletteMarkerUkerOgDagerUtenforAvkortetRammevedtak(behandlingId, rammevedtak)
+
+            // Uke 1 er helt utenfor rammevedtaket
+            val uke1 = updateSlot.captured.single { it.fom == mandagUke1 }
+            assertThat(uke1.avklartKjørtUkeStatus).isEqualTo(AvklartKjørtUkeStatus.SLETTET)
+            assertThat(uke1.dager).allMatch { it.avklartKjørtDagStatus == AvklartKjørtDagStatus.SLETTET }
+
+            // Uke 2 er delvis avkortet i starten — man/tirs er før fom 14. jan — status skal bli ENDRET
+            val uke2 = updateSlot.captured.single { it.fom == mandagUke2 }
+            assertThat(uke2.avklartKjørtUkeStatus).isEqualTo(AvklartKjørtUkeStatus.ENDRET)
+            assertThat(uke2.dager.filter { it.avklartKjørtDagStatus == AvklartKjørtDagStatus.SLETTET }.map { it.dato })
+                .containsExactlyInAnyOrder(mandagUke2, mandagUke2.plusDays(1))
+        }
+
+        @Test
+        fun `dager både før fom og etter tom i samme uke markeres SLETTET`() {
+            val mandagUke = 12 januar 2026
+            val uke = lagUke(fom = mandagUke, tom = mandagUke.plusDays(4), status = AvklartKjørtUkeStatus.UENDRET)
+
+            val rammevedtak =
+                RammevedtakPrivatBil(
+                    reiser =
+                        listOf(
+                            lagRammeForReise(
+                                reiseId = reiseId,
+                                fom = mandagUke.plusDays(1), // tirsdag
+                                tom = mandagUke.plusDays(3), // torsdag
+                            ),
+                        ),
+                )
+
+            val updateSlot = slot<List<AvklartKjørtUke>>()
+
+            every { avklartKjørtUkeRepository.findByBehandlingId(behandlingId) } returns listOf(uke)
+            every { avklartKjørtUkeRepository.updateAll(capture(updateSlot)) } answers { updateSlot.captured }
+
+            service.sletteMarkerUkerOgDagerUtenforAvkortetRammevedtak(behandlingId, rammevedtak)
+
+            val oppdatertUke = updateSlot.captured.single()
+            assertThat(oppdatertUke.avklartKjørtUkeStatus).isEqualTo(AvklartKjørtUkeStatus.ENDRET)
+            assertThat(oppdatertUke.dager.filter { it.avklartKjørtDagStatus == AvklartKjørtDagStatus.SLETTET }.map { it.dato })
+                .containsExactlyInAnyOrder(mandagUke, mandagUke.plusDays(4))
+        }
+
+        @Test
         fun `uker som tilhører reise som ikke finnes i rammevedtaket markeres SLETTET`() {
             val reise2 = ReiseId.random()
             val mandagUke1 = 5 januar 2026

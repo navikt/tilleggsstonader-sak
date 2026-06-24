@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
@@ -348,6 +349,87 @@ class RevurderingPrivatBilIntegrationTest(
 
             // Utvidelse av rammevedtaket skal ikke endre utbetalinger
             assertThat(utbetalingKjørelistebehandling.utbetalinger).isEqualTo(utbetalingRevurdering.utbetalinger)
+        }
+
+        @Test
+        fun `skal få tomt beregningsresultat om innsendte uker ikke lenger er innenfor rammevedtak`() {
+            every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns true
+
+            val fomReise = 5 januar 2026
+            val tomReise = 11 januar 2026
+            val nyFom = 12 januar 2026
+
+            val førstegangsbehandlingContext =
+                opprettBehandlingOgGjennomførBehandlingsløp(stønadstype = Stønadstype.DAGLIG_REISE_TSO) {
+                    defaultDagligReisePrivatBilTsoTestdata(fom, tom)
+                    sendInnKjøreliste {
+                        periode = Datoperiode(fomReise, tomReise)
+                        kjørteDager = listOf(KjørtDag(dato = fomReise))
+                    }
+                }
+
+            val kjørelisteBehandling =
+                testoppsettService
+                    .hentBehandlinger(førstegangsbehandlingContext.fagsakId)
+                    .single { it.erKjørelisteBehandling() }
+            testoppsettService.settAndelerTilOkForBehandling(kjørelisteBehandling.id)
+
+            val revurderingId =
+                opprettRevurderingOgGjennomførBehandlingsløp(kjørelisteBehandling.id) {
+                    vilkår {
+                        oppdaterDatoPåEnesteDagligeReise(nyFom, tom)
+                    }
+                }
+
+            val revurdering = testoppsettService.hentBehandling(revurderingId)
+
+            val vedtakFørstegangsbehandling =
+                vedtakService
+                    .hentVedtak<InnvilgelseDagligReise>(
+                        førstegangsbehandlingContext.behandlingId,
+                    ).data
+            val vedtakKjørelistebehandling = vedtakService.hentVedtak<InnvilgelseDagligReise>(kjørelisteBehandling.id).data
+            val vedtakRevurdering = vedtakService.hentVedtak<InnvilgelseDagligReise>(revurdering.id).data
+
+            assertThat(vedtakFørstegangsbehandling.rammevedtakPrivatBil).isEqualTo(vedtakKjørelistebehandling.rammevedtakPrivatBil)
+            assertThat(vedtakFørstegangsbehandling.rammevedtakPrivatBil).isNotEqualTo(vedtakRevurdering.rammevedtakPrivatBil)
+
+            assertThat(vedtakFørstegangsbehandling.beregningsresultat).isNotEqualTo(vedtakKjørelistebehandling.beregningsresultat)
+
+            // Beregningsresultatene skal vise at det ikke skal utbetales noe.
+            // Finnes ikke et beregningsresultat på førstegangsbehandling
+            // TODO - Finnes beregningsresultat på revurdering, da det har kopiert fra kjørelistebehandling, men det er tomt
+            assertThat(vedtakFørstegangsbehandling.beregningsresultat.privatBil).isNull()
+            assertThat(
+                vedtakRevurdering.beregningsresultat.privatBil
+                    ?.reiser
+                    ?.single()
+                    ?.perioder,
+            ).isNotNull.isEmpty()
+
+            // Forventer kun én melding, fra kjørelistebehandling
+            val iverksettinger =
+                KafkaFake
+                    .sendteMeldinger()
+                    .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 2)
+                    .map { it.verdiEllerFeil<IverksettingDto>() }
+
+            // Utbetaling i første iverksetting (kjørelsitebehandling)
+            assertThat(
+                iverksettinger
+                    .minBy { it.vedtakstidspunkt }
+                    .utbetalinger
+                    .single()
+                    .perioder,
+            ).isNotEmpty
+            // Tom utbetaling som nuller ut kjørelistebehandling i revurdering
+            assertThat(
+                iverksettinger
+                    .maxBy { it.vedtakstidspunkt }
+                    .utbetalinger
+                    .single()
+                    .perioder,
+            ).isEmpty()
         }
 
         // Endre fom frem og tilbake

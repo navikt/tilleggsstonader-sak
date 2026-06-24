@@ -54,6 +54,8 @@ data class Behandling(
 
     fun erOpphørt(): Boolean = resultat == BehandlingResultat.OPPHØRT
 
+    fun erKjørelisteBehandling(): Boolean = type == BehandlingType.KJØRELISTE
+
     val erSatsendring get() = årsak == BehandlingÅrsak.SATSENDRING
 
     init {
