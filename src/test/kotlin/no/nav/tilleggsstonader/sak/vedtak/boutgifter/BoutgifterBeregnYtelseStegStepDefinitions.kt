@@ -33,6 +33,7 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.innvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterUtgiftService
@@ -104,6 +105,9 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             barnService = mockk(relaxed = true),
         )
     val boutgifterUtgiftService = BoutgifterUtgiftService(vilkårService = vilkårService)
+    val vedtakService = VedtakService(
+        vedtakRepository = vedtakRepositoryFake,
+    )
     val vedtaksperiodeValideringService =
         VedtaksperiodeValideringService(
             vilkårperiodeService = vilkårperiodeServiceMock,
@@ -125,11 +129,13 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         OpphørValideringService(
             vilkårsperiodeService = vilkårperiodeServiceMock,
             vilkårService = vilkårService,
+            vedtakService = vedtakService,
+            utledTidligsteEndringService = utledTidligsteEndringService,
         )
     val steg =
         BoutgifterBeregnYtelseSteg(
             beregningService =
-            beregningService,
+                beregningService,
             opphørValideringService = opphørValideringService,
             beregningsplanUtleder = beregningsplanUtleder,
             vedtakRepository = vedtakRepositoryFake,
@@ -170,10 +176,10 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     ) {
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
         every { behandlingServiceMock.hentSaksbehandling(any<BehandlingId>()) } returns
-            dummyBehandling(
-                behandlingId = behandlingId,
-                steg = StegType.VILKÅR,
-            )
+                dummyBehandling(
+                    behandlingId = behandlingId,
+                    steg = StegType.VILKÅR,
+                )
 
         val opprettVilkårDto =
             mapOpprettVilkårDto(
@@ -234,10 +240,10 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         val behandlingId = testIdTilBehandlingId.getValue(behandlingIdTall)
 
         every { behandlingServiceMock.hentSaksbehandling(any<BehandlingId>()) } returns
-            dummyBehandling(
-                behandlingId = behandlingId,
-                steg = StegType.BEREGNE_YTELSE,
-            )
+                dummyBehandling(
+                    behandlingId = behandlingId,
+                    steg = StegType.BEREGNE_YTELSE,
+                )
         val vedtaksperioder = mapVedtaksperioder(dataTable).map { it.tilDto() }
 
         kjørMedFeilkontekst {
@@ -309,7 +315,12 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         val tidligsteEndring = parseDato(tidligsteEndringStr)
         val vedtaksperioder = mapVedtaksperioder(vedtaksperiodeData).map { it.tilDto() }
 
-        every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandlingId, any()) } returns tidligsteEndring
+        every {
+            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
+                behandlingId,
+                any()
+            )
+        } returns tidligsteEndring
 
         kjørMedFeilkontekst {
             steg.utførSteg(

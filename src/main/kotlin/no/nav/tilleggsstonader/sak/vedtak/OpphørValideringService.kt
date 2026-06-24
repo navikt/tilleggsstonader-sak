@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -23,6 +25,8 @@ import java.time.YearMonth
 class OpphørValideringService(
     private val vilkårsperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
+    private val vedtakService: VedtakService,
+    private val utledTidligsteEndringService: UtledTidligsteEndringService,
 ) {
     fun validerVilkårperioder(
         saksbehandling: Saksbehandling,
@@ -30,7 +34,13 @@ class OpphørValideringService(
     ) {
         val vilkår = vilkårService.hentVilkår(saksbehandling.id)
         val vilkårperioder = vilkårsperiodeService.hentVilkårperioder(saksbehandling.id)
+        val vedtaksperioder = vedtakService.hentVedtaksperioder(saksbehandling.id)
 
+        validerIngenEndringerIVilkårFørOpphørsdato(
+            behandlingId = saksbehandling.id,
+            vedtaksperioder = vedtaksperioder,
+            opphørsdato = opphørsdato,
+        )
         validerIngenNyeOppfylteVilkårEllerVilkårperioder(vilkår, vilkårperioder)
         validerIngenEndredePerioderMedTomEtterOpphørsdato(
             vilkårperioder,
@@ -77,6 +87,21 @@ class OpphørValideringService(
 
         brukerfeilHvis(senesteTomIForrigeVedtaksperioder < opphørsdato) {
             "Opphør er et ugyldig valg fordi ønsket opphørsdato ikke korter ned vedtaket."
+        }
+    }
+
+    private fun validerIngenEndringerIVilkårFørOpphørsdato(
+        behandlingId: BehandlingId,
+        vedtaksperioder: List<Vedtaksperiode>,
+        opphørsdato: LocalDate
+    ) {
+        val tidligsteEndring = utledTidligsteEndringService.utledTidligsteEndringForBeregning(
+            behandlingId = behandlingId,
+            vedtaksperioder = vedtaksperioder
+        )
+
+        brukerfeilHvis(tidligsteEndring != null && tidligsteEndring < opphørsdato) {
+            "Opphør er et ugyldig vedtaksresultat fordi det er endringer i vilkår før opphørsdato"
         }
     }
 
@@ -127,7 +152,9 @@ class OpphørValideringService(
         }
     }
 
-    private fun Vilkårperiode.erOppfyltOgEndret(): Boolean = (status == Vilkårstatus.ENDRET) && (resultat == ResultatVilkårperiode.OPPFYLT)
+    private fun Vilkårperiode.erOppfyltOgEndret(): Boolean =
+        (status == Vilkårstatus.ENDRET) && (resultat == ResultatVilkårperiode.OPPFYLT)
 
-    private fun Vilkår.erOppfyltOgEndret(): Boolean = (status == VilkårStatus.ENDRET) && (resultat == Vilkårsresultat.OPPFYLT)
+    private fun Vilkår.erOppfyltOgEndret(): Boolean =
+        (status == VilkårStatus.ENDRET) && (resultat == Vilkårsresultat.OPPFYLT)
 }

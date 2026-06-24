@@ -1,15 +1,21 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.februar
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
@@ -37,6 +43,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårReposit
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
@@ -362,6 +369,53 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
             assertThatCode {
                 steg.utførOgReturnerNesteSteg(behandlingForOpphør, vedtakDto)
             }.doesNotThrowAnyException()
+        }
+
+        @Test
+        fun `skal ikke kunne opphøre dersom utgifter endres før opphørsdato`() {
+            val fom = 1 januar 2025
+            val tom = 28 februar 2025
+
+            val førstegangsbehandlingContext = opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.BARNETILSYN
+            ) {
+                defaultTilsynBarnTestdata(
+                    fom = fom,
+                    tom = tom,
+                )
+            }
+
+            val revurderingId = opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = førstegangsbehandlingContext.behandlingId,
+                tilSteg = StegType.BEREGNE_YTELSE
+            ) {
+                vilkår {
+                    oppdater { vilkårsvurdering ->
+                        with(vilkårsvurdering.vilkårsett.single()) {
+                            SvarPåVilkårDto(
+                                id = id,
+                                behandlingId = behandlingId,
+                                delvilkårsett = delvilkårsett,
+                                fom = fom,
+                                tom = januar.withYear(2025).atEndOfMonth(),
+                                utgift = 500,
+                                erFremtidigUtgift = erFremtidigUtgift,
+                                offentligTransport = null,
+                            )
+                        }
+                    }
+                }
+            }
+
+
+            kall.vedtak.apiRespons.lagreOpphør(
+                stønadstype = Stønadstype.BARNETILSYN,
+                behandlingId = revurderingId,
+                opphørDto = opphørDto(
+                    opphørsdato = LocalDate.of(2025, 2, 1)
+                ),
+            ).expectStatus().isBadRequest().expectBody().jsonPath("$.detail")
+                .isEqualTo("Opphør er et ugyldig vedtaksresultat fordi det er endringer i vilkår før opphørsdato")
         }
     }
 
