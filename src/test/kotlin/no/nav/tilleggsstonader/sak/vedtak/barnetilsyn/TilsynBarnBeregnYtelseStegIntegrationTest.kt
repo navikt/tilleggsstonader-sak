@@ -376,45 +376,51 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
             val fom = 1 januar 2025
             val tom = 28 februar 2025
 
-            val førstegangsbehandlingContext = opprettBehandlingOgGjennomførBehandlingsløp(
-                stønadstype = Stønadstype.BARNETILSYN
-            ) {
-                defaultTilsynBarnTestdata(
-                    fom = fom,
-                    tom = tom,
-                )
-            }
+            val førstegangsbehandlingContext =
+                opprettBehandlingOgGjennomførBehandlingsløp(
+                    stønadstype = Stønadstype.BARNETILSYN,
+                ) {
+                    defaultTilsynBarnTestdata(
+                        fom = fom,
+                        tom = tom,
+                    )
+                }
 
-            val revurderingId = opprettRevurderingOgGjennomførBehandlingsløp(
-                fraBehandlingId = førstegangsbehandlingContext.behandlingId,
-                tilSteg = StegType.BEREGNE_YTELSE
-            ) {
-                vilkår {
-                    oppdater { vilkårsvurdering ->
-                        with(vilkårsvurdering.vilkårsett.single()) {
-                            SvarPåVilkårDto(
-                                id = id,
-                                behandlingId = behandlingId,
-                                delvilkårsett = delvilkårsett,
-                                fom = fom,
-                                tom = januar.withYear(2025).atEndOfMonth(),
-                                utgift = 500,
-                                erFremtidigUtgift = erFremtidigUtgift,
-                                offentligTransport = null,
-                            )
+            val revurderingId =
+                opprettRevurderingOgGjennomførBehandlingsløp(
+                    fraBehandlingId = førstegangsbehandlingContext.behandlingId,
+                    tilSteg = StegType.BEREGNE_YTELSE,
+                ) {
+                    vilkår {
+                        oppdater { vilkårsvurdering ->
+                            with(vilkårsvurdering.vilkårsett.single()) {
+                                SvarPåVilkårDto(
+                                    id = id,
+                                    behandlingId = behandlingId,
+                                    delvilkårsett = delvilkårsett,
+                                    fom = fom,
+                                    tom = januar.withYear(2025).atEndOfMonth(),
+                                    utgift = 500,
+                                    erFremtidigUtgift = erFremtidigUtgift,
+                                    offentligTransport = null,
+                                )
+                            }
                         }
                     }
                 }
-            }
 
-
-            kall.vedtak.apiRespons.lagreOpphør(
-                stønadstype = Stønadstype.BARNETILSYN,
-                behandlingId = revurderingId,
-                opphørDto = opphørDto(
-                    opphørsdato = 1 februar 2025
-                ),
-            ).expectStatus().isBadRequest().expectBody().jsonPath("$.detail")
+            kall.vedtak.apiRespons
+                .lagreOpphør(
+                    stønadstype = Stønadstype.BARNETILSYN,
+                    behandlingId = revurderingId,
+                    opphørDto =
+                        opphørDto(
+                            opphørsdato = 1 februar 2025,
+                        ),
+                ).expectStatus()
+                .isBadRequest()
+                .expectBody()
+                .jsonPath("$.detail")
                 .isEqualTo("Opphør er et ugyldig vedtaksresultat fordi det er endringer i vilkår før opphørsdato")
         }
     }
@@ -460,15 +466,15 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
                 aktivitet(
                     behandlingId = behandlingId,
                     fom = januar.atDay(1),
-                    tom = april.atEndOfMonth()
-                )
+                    tom = april.atEndOfMonth(),
+                ),
             )
             vilkårperiodeRepository.insert(
                 målgruppe(
                     behandlingId = behandlingId,
                     fom = januar.atDay(1),
-                    tom = april.atEndOfMonth()
-                )
+                    tom = april.atEndOfMonth(),
+                ),
             )
             lagVilkårForPeriode(behandling, januar, februar, 100)
             steg.utførOgReturnerNesteSteg(behandling, innvilgelseDto(listOf(vedtaksperiode)))
@@ -495,15 +501,15 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
                 aktivitet(
                     behandlingId = behandling.id,
                     fom = januar.atDay(1),
-                    tom = april.atEndOfMonth()
-                )
+                    tom = april.atEndOfMonth(),
+                ),
             )
             vilkårperiodeRepository.insert(
                 målgruppe(
                     behandlingId = behandling.id,
                     fom = januar.atDay(1),
-                    tom = april.atEndOfMonth()
-                )
+                    tom = april.atEndOfMonth(),
+                ),
             )
             lagVilkårForPeriode(behandling, januar, april, 100)
             steg.utførOgReturnerNesteSteg(behandling, innvilgelseDto(listOf(vedtaksperiodeJanFeb, vedtaksperiodeMars)))
@@ -583,15 +589,15 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
                 aktivitet(
                     behandlingId = behandling.id,
                     fom = januar.atDay(1),
-                    tom = april.atEndOfMonth()
-                )
+                    tom = april.atEndOfMonth(),
+                ),
             )
             vilkårperiodeRepository.insert(
                 målgruppe(
                     behandlingId = behandling.id,
                     fom = januar.atDay(1),
-                    tom = april.atEndOfMonth()
-                )
+                    tom = april.atEndOfMonth(),
+                ),
             )
             vilkårperiodeRepository.insert(
                 målgruppe(
@@ -620,7 +626,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
                     vedtaksperiode.copy(
                         fom = januar.atDay(2),
                         tom = januar.atDay(2),
-                        målgruppeType = NEDSATT_ARBEIDSEVNE
+                        målgruppeType = NEDSATT_ARBEIDSEVNE,
                     ),
                 )
 

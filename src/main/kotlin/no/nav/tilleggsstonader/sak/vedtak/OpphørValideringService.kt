@@ -93,12 +93,13 @@ class OpphørValideringService(
     private fun validerIngenEndringerIVilkårFørOpphørsdato(
         behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
-        opphørsdato: LocalDate
+        opphørsdato: LocalDate,
     ) {
-        val tidligsteEndring = utledTidligsteEndringService.utledTidligsteEndringForBeregning(
-            behandlingId = behandlingId,
-            vedtaksperioder = vedtaksperioder
-        )
+        val tidligsteEndring =
+            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
+                behandlingId = behandlingId,
+                vedtaksperioder = vedtaksperioder,
+            )
 
         brukerfeilHvis(tidligsteEndring != null && tidligsteEndring < opphørsdato) {
             "Opphør er et ugyldig vedtaksresultat fordi det er endringer i vilkår før opphørsdato"
@@ -152,9 +153,7 @@ class OpphørValideringService(
         }
     }
 
-    private fun Vilkårperiode.erOppfyltOgEndret(): Boolean =
-        (status == Vilkårstatus.ENDRET) && (resultat == ResultatVilkårperiode.OPPFYLT)
+    private fun Vilkårperiode.erOppfyltOgEndret(): Boolean = (status == Vilkårstatus.ENDRET) && (resultat == ResultatVilkårperiode.OPPFYLT)
 
-    private fun Vilkår.erOppfyltOgEndret(): Boolean =
-        (status == VilkårStatus.ENDRET) && (resultat == Vilkårsresultat.OPPFYLT)
+    private fun Vilkår.erOppfyltOgEndret(): Boolean = (status == VilkårStatus.ENDRET) && (resultat == Vilkårsresultat.OPPFYLT)
 }
