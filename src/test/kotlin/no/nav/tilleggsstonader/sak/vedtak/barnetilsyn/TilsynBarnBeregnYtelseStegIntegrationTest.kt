@@ -412,7 +412,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
                 stønadstype = Stønadstype.BARNETILSYN,
                 behandlingId = revurderingId,
                 opphørDto = opphørDto(
-                    opphørsdato = LocalDate.of(2025, 2, 1)
+                    opphørsdato = 1 februar 2025
                 ),
             ).expectStatus().isBadRequest().expectBody().jsonPath("$.detail")
                 .isEqualTo("Opphør er et ugyldig vedtaksresultat fordi det er endringer i vilkår før opphørsdato")
@@ -456,8 +456,20 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
             val behandling = testoppsettService.hentSaksbehandling(behandlingId)
 
             val vedtaksperiode = vedtaksperiode.copy(fom = januar.atDay(1), tom = februar.atEndOfMonth())
-            vilkårperiodeRepository.insert(aktivitet(behandlingId = behandlingId, fom = januar.atDay(1), tom = april.atEndOfMonth()))
-            vilkårperiodeRepository.insert(målgruppe(behandlingId = behandlingId, fom = januar.atDay(1), tom = april.atEndOfMonth()))
+            vilkårperiodeRepository.insert(
+                aktivitet(
+                    behandlingId = behandlingId,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth()
+                )
+            )
+            vilkårperiodeRepository.insert(
+                målgruppe(
+                    behandlingId = behandlingId,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth()
+                )
+            )
             lagVilkårForPeriode(behandling, januar, februar, 100)
             steg.utførOgReturnerNesteSteg(behandling, innvilgelseDto(listOf(vedtaksperiode)))
         }
@@ -479,8 +491,20 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
                     målgruppeType = NEDSATT_ARBEIDSEVNE,
                     aktivitetType = AktivitetType.TILTAK,
                 )
-            vilkårperiodeRepository.insert(aktivitet(behandlingId = behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
-            vilkårperiodeRepository.insert(målgruppe(behandlingId = behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
+            vilkårperiodeRepository.insert(
+                aktivitet(
+                    behandlingId = behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth()
+                )
+            )
+            vilkårperiodeRepository.insert(
+                målgruppe(
+                    behandlingId = behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth()
+                )
+            )
             lagVilkårForPeriode(behandling, januar, april, 100)
             steg.utførOgReturnerNesteSteg(behandling, innvilgelseDto(listOf(vedtaksperiodeJanFeb, vedtaksperiodeMars)))
         }
@@ -555,8 +579,20 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
         fun setUp() {
             val faktaOgVurderingUføretrygd = faktaOgVurderingMålgruppe(type = MålgruppeType.UFØRETRYGD)
             val faktaOgVurderingNedsattArbeidsevne = faktaOgVurderingMålgruppe(type = MålgruppeType.NEDSATT_ARBEIDSEVNE)
-            vilkårperiodeRepository.insert(aktivitet(behandlingId = behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
-            vilkårperiodeRepository.insert(målgruppe(behandlingId = behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
+            vilkårperiodeRepository.insert(
+                aktivitet(
+                    behandlingId = behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth()
+                )
+            )
+            vilkårperiodeRepository.insert(
+                målgruppe(
+                    behandlingId = behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth()
+                )
+            )
             vilkårperiodeRepository.insert(
                 målgruppe(
                     behandlingId = behandling.id,
@@ -581,7 +617,11 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
         fun `skal mappe nedsatt arbeidsevne til riktig TypeAndel`() {
             val vedtaksperioder =
                 listOf(
-                    vedtaksperiode.copy(fom = januar.atDay(2), tom = januar.atDay(2), målgruppeType = NEDSATT_ARBEIDSEVNE),
+                    vedtaksperiode.copy(
+                        fom = januar.atDay(2),
+                        tom = januar.atDay(2),
+                        målgruppeType = NEDSATT_ARBEIDSEVNE
+                    ),
                 )
 
             val vedtakDto = innvilgelseDto(vedtaksperioder)
