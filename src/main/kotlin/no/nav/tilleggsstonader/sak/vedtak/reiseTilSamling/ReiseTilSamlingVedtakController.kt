@@ -12,6 +12,8 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.BeregningsresultatReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingTsoRequest
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.ReiseTilSamlingVilkårService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -28,6 +30,7 @@ class ReiseTilSamlingVedtakController(
     private val vedtakService: VedtakService,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val beregningService: ReiseTilSamlingBeregningService,
+    private val reiseTilSamlingVilkårService: ReiseTilSamlingVilkårService,
 ) {
     @GetMapping("{behandlingId}")
     fun hentVedtak(
@@ -57,7 +60,8 @@ class ReiseTilSamlingVedtakController(
                 vedtaksperioder = vedtaksperioder,
                 typeVedtak = TypeVedtak.INNVILGELSE,
             )
+        val vilkår = reiseTilSamlingVilkårService.hentVilkårForBehandling(behandlingId)
 
-        return beregningsresultat.tilDto
+        return beregningsresultat.tilDto(vilkår)
     }
 }
