@@ -150,6 +150,7 @@ class DagligReiseVedtakService(
                         beregningsresultat =
                             data.beregningsresultat.copy(privatBil = beregningsresultatPrivatBil),
                     )
+
                 is OpphørDagligReise ->
                     data.copy(
                         beregningsresultat =
@@ -160,7 +161,7 @@ class DagligReiseVedtakService(
     }
 
     fun forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(forrigeIverksatteBehandlingId: BehandlingId?): Boolean {
-        val forrigeVedtak = forrigeIverksatteBehandlingId?.let { hentInnvilgelseEllerOpphørVedtak(it) }
-        return forrigeVedtak?.data?.rammevedtakPrivatBil != null
+        if (forrigeIverksatteBehandlingId == null) return false
+        return vedtakRepository.harRammevedtak(listOf(forrigeIverksatteBehandlingId))
     }
 }

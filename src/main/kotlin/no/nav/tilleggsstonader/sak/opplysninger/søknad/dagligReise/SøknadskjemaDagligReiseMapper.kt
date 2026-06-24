@@ -334,7 +334,7 @@ class SøknadskjemaDagligReiseMapper(
         UtgifterBil(
             parkering = reise.parkering?.let(::mapJaNei),
             mottarGrunnstønad = reise.mottarDuGrunnstonadFraNav?.let(::mapJaNei),
-            drivstofftype = reise.bilensDrivstofftype?.let(::mapDrivstofftype),
+            drivstofftype = reise.bilensDrivstofftype?.let { mapDrivstofftype(BilensDrivstofftypeType.valueOf(it.value)) },
             bompenger = reise.bompenger,
             ferge = reise.ferge,
             piggdekkavgift = reise.piggdekkavgift,
