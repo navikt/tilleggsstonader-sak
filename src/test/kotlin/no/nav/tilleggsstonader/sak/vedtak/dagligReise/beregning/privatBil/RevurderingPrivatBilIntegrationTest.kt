@@ -8,8 +8,11 @@ import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.BehandlingContext
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
@@ -17,6 +20,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreDagligReise
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
+import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.IverksettingDto
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
@@ -52,7 +56,6 @@ class RevurderingPrivatBilIntegrationTest(
 
     @Nested
     inner class LeggeTilOgSlette {
-
         @Test
         fun `skal kunne legge til en ny reise i en revurdering`() {
             val fomReise1 = 5 januar 2026
@@ -312,7 +315,14 @@ class RevurderingPrivatBilIntegrationTest(
                 }
 
             val vedtakFørRevurdering = vedtakService.hentVedtak<InnvilgelseDagligReise>(førstegangsbehandlingContext.behandlingId).data
-            val vedtakEtterKjøreliste = vedtakService.hentVedtak<InnvilgelseDagligReise>(testoppsettService.hentBehandlinger(førstegangsbehandlingContext.fagsakId).single { it.type == BehandlingType.KJØRELISTE }.id).data
+            val vedtakEtterKjøreliste =
+                vedtakService
+                    .hentVedtak<InnvilgelseDagligReise>(
+                        testoppsettService
+                            .hentBehandlinger(førstegangsbehandlingContext.fagsakId)
+                            .single { it.type == BehandlingType.KJØRELISTE }
+                            .id,
+                    ).data
             val vedtakEtterRevurdering = vedtakService.hentVedtak<InnvilgelseDagligReise>(revurderingId).data
 
             // Rammevedtak og beregning finnes
@@ -323,8 +333,19 @@ class RevurderingPrivatBilIntegrationTest(
                 .isNotEqualTo(vedtakFørRevurdering.beregningsresultat.privatBil)
                 .isEqualTo(vedtakEtterKjøreliste.beregningsresultat.privatBil)
 
+            // Skal finnes to utbetalinger. En for kjøreliste og en for revurdering
+            val iverksettinger =
+                KafkaFake
+                    .sendteMeldinger()
+                    .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 2)
+                    .map { it.verdiEllerFeil<IverksettingDto>() }
 
-            // TODO: Sjekke andeler at det ikke er noe nytt?
+            val eksternIdRevurdering = testoppsettService.hentSaksbehandling(revurderingId).eksternId
+            val utbetalingKjørelistebehandling = iverksettinger.single { it.behandlingId.toLong() != eksternIdRevurdering }
+            val utbetalingRevurdering = iverksettinger.single { it.behandlingId.toLong() == eksternIdRevurdering }
+
+            // Utvidelse av rammevedtaket skal ikke endre utbetalinger
+            assertThat(utbetalingKjørelistebehandling.utbetalinger).isEqualTo(utbetalingRevurdering.utbetalinger)
         }
 
         // Endre fom frem og tilbake
@@ -356,15 +377,15 @@ class RevurderingPrivatBilIntegrationTest(
                     oppdaterDagligReise { perioder, _ ->
                         val reise2 = perioder.single { it.reiseId == førstegangsbehandlingContext.reiseId2 }
                         reise2.id to
-                                reise2.tilLagreDagligReiseDto().copy(
-                                    fakta =
-                                        (reise2.fakta as FaktaDagligReisePrivatBilDto).copy(
-                                            faktaDelperioder =
-                                                reise2.fakta.faktaDelperioder.map {
-                                                    it.copy(bompengerPerDag = 20)
-                                                },
-                                        ),
-                                )
+                            reise2.tilLagreDagligReiseDto().copy(
+                                fakta =
+                                    (reise2.fakta as FaktaDagligReisePrivatBilDto).copy(
+                                        faktaDelperioder =
+                                            reise2.fakta.faktaDelperioder.map {
+                                                it.copy(bompengerPerDag = 20)
+                                            },
+                                    ),
+                            )
                     }
                 }
             }
@@ -500,8 +521,14 @@ class RevurderingPrivatBilIntegrationTest(
             .dagsatsUtenParkering
 
     private fun RammevedtakPrivatBil.sisteTom() =
-        this.reiser.map { it.grunnlag.tom }.sorted().last()
+        this.reiser
+            .map { it.grunnlag.tom }
+            .sorted()
+            .last()
 
     private fun RammevedtakPrivatBil.førsteFom() =
-        this.reiser.map { it.grunnlag.fom }.sorted().first()
+        this.reiser
+            .map { it.grunnlag.fom }
+            .sorted()
+            .first()
 }
