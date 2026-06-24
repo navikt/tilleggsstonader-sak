@@ -88,6 +88,12 @@ data class FaktaDelperiodePrivatBil(
         brukerfeilHvis(fergekostnadPerDag != null && fergekostnadPerDag < 0) {
             "Fergekostnaden må være større enn 0"
         }
+        brukerfeilHvis(bompengerPerDag != null && bompengerPerDag > 500) {
+            "Skal du innvilge med bompenger høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet"
+        }
+        brukerfeilHvis(fergekostnadPerDag != null && fergekostnadPerDag > 500) {
+            "Skal du innvilge med fergekostnader høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet"
+        }
     }
 }
 
