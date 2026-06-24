@@ -113,7 +113,6 @@ class RevurderingPrivatBilIntegrationTest(
             assertThat(andelerFraRevurdering.andelerTilkjentYtelse).hasSameSizeAs(andelerFraKjørelistebehandling.andelerTilkjentYtelse)
         }
 
-        @Disabled("Foreløpig støttes ikke dette caset, må håndteres")
         @Test
         fun `to reiser med innsendte kjøredager - sletting av én reise`() {
             val fomReise1 = 5 januar 2026
@@ -151,7 +150,10 @@ class RevurderingPrivatBilIntegrationTest(
             assertThat(ukerForReise2).allMatch { it.avklartKjørtUkeStatus == AvklartKjørtUkeStatus.SLETTET }
 
             // Avklarte uker for reise1 er ikke slettet
-            val ukerForReise1 = avklartKjørelisteService.hentAvklarteUkerForBehandling(revurderingId)
+            val ukerForReise1 =
+                avklartKjørelisteService
+                    .hentAvklarteUkerForBehandling(revurderingId)
+                    .filter { it.reiseId == kontekst.reiseId1 }
             assertThat(ukerForReise1).allMatch { it.avklartKjørtUkeStatus == AvklartKjørtUkeStatus.UENDRET }
 
             // Beregningsresultat: kun for reise1
