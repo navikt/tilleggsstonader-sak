@@ -31,7 +31,7 @@ class PrivatBilBeregningService(
     fun beregn(
         behandling: Saksbehandling,
         rammevedtak: RammevedtakPrivatBil?,
-        tidligsteEndring: LocalDate?,
+        beregnFra: LocalDate?,
         brukersNavKontor: String?,
         forrigeBeregningsresultat: BeregningsresultatPrivatBil?,
     ): BeregningsresultatPrivatBil? {
@@ -45,7 +45,7 @@ class PrivatBilBeregningService(
             brukersNavKontor = brukersNavKontor,
             forrigeBeregningsresultat = forrigeBeregningsresultat,
             behandlingType = behandling.type,
-            tidligsteEndring = tidligsteEndring,
+            beregnFra = beregnFra,
         )
     }
 
@@ -55,7 +55,7 @@ class PrivatBilBeregningService(
         brukersNavKontor: String?,
         forrigeBeregningsresultat: BeregningsresultatPrivatBil? = null,
         behandlingType: BehandlingType,
-        tidligsteEndring: LocalDate?,
+        beregnFra: LocalDate?,
     ): BeregningsresultatPrivatBil =
         BeregningsresultatPrivatBil(
             reiser =
@@ -74,7 +74,7 @@ class PrivatBilBeregningService(
                             rammeForReise = reise,
                             avklarteUkerForReise = avklarteUkerForReise,
                             brukersNavKontor = brukersNavKontor,
-                            tidligsteEndring = tidligsteEndring,
+                            beregnFra = beregnFra,
                             forrigeReise = forrigeReise,
                         )
                     } else if (behandlingType == BehandlingType.KJØRELISTE) {
@@ -163,13 +163,13 @@ class PrivatBilBeregningService(
         avklarteUkerForReise: List<AvklartKjørtUke>,
         brukersNavKontor: String?,
         forrigeReise: BeregningsresultatForReisePrivatBil,
-        tidligsteEndring: LocalDate?,
+        beregnFra: LocalDate?,
     ): BeregningsresultatForReisePrivatBil {
-        feilHvis(tidligsteEndring == null) {
-            "Forventer at tidligste endring er satt i en revurdering"
+        feilHvis(beregnFra == null) {
+            "Forventer at beregnFra er satt i en revurdering"
         }
 
-        if (rammeForReise.grunnlag.tom < tidligsteEndring) {
+        if (rammeForReise.grunnlag.tom < beregnFra) {
             return forrigeReise.markerAllePerioderSomFraTidligereVedtak()
         }
 

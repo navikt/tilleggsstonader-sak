@@ -63,7 +63,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 rammevedtak = rammevedtak,
                 brukersNavKontor = brukersNavKontor,
                 forrigeBeregningsresultat = forrigeBeregningsresultat,
-                tidligsteEndring = null,
+                beregnFra = null,
             ),
         )
     }
