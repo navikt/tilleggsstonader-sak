@@ -160,17 +160,12 @@ data class TidligsteEndringIBehandlingUtleder(
      * Returnerer null hvis det ikke er noen endringer.
      */
     fun utledTidligsteEndring(): TidligsteEndringResultat? {
-        val endringerForvilkår = utledTidligsteEndringForVilkår()
-        val endringerForAktiviteter = utledTidligsteEndringForAktiviteter()
-        val endringerForMålgrupper = utledTidligsteEndringForMålgrupper()
-        val endringerForVedtaksperioder = utledTidligsteEndringForVedtaksperioder()
-
         val tidligsteEndring =
             listOfNotNull(
-                endringerForvilkår,
-                endringerForAktiviteter,
-                endringerForMålgrupper,
-                endringerForVedtaksperioder,
+                utledTidligsteEndringForVilkår(),
+                utledTidligsteEndringForAktiviteter(),
+                utledTidligsteEndringForMålgrupper(),
+                utledTidligsteEndringForVedtaksperioder(),
             ).minOrNull()
 
         return tidligsteEndring?.let {

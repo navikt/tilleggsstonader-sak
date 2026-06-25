@@ -35,7 +35,7 @@ class OpphørValideringService(
         val vilkår = vilkårService.hentVilkår(saksbehandling.id)
         val vilkårperioder = vilkårsperiodeService.hentVilkårperioder(saksbehandling.id)
 
-        validerIngenEndringerIVilkårFørOpphørsdato(
+        validerIngenEndringerIVilkårEllerVilkårperioderFørOpphørsdato(
             behandlingId = saksbehandling.id,
             opphørsdato = opphørsdato,
         )
@@ -88,8 +88,7 @@ class OpphørValideringService(
         }
     }
 
-    // TODO Oppdater navn
-    private fun validerIngenEndringerIVilkårFørOpphørsdato(
+    private fun validerIngenEndringerIVilkårEllerVilkårperioderFørOpphørsdato(
         behandlingId: BehandlingId,
         opphørsdato: LocalDate,
     ) {
