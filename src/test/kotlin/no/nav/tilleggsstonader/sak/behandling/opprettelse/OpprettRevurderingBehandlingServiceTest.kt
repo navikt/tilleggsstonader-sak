@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndring
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerKilde
@@ -60,6 +61,31 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
 
     @Nested
     inner class OpprettBehandling {
+        @Test
+        fun `skal ikke opprette revurdering når det finnes en kjørelistebehandling på vent`() {
+            val ferdigBehandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(
+                        status = BehandlingStatus.FERDIGSTILT,
+                        resultat = BehandlingResultat.INNVILGET,
+                    ),
+                    stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+                    opprettGrunnlagsdata = false,
+                )
+            testoppsettService.lagre(
+                behandling(
+                    fagsak = no.nav.tilleggsstonader.sak.util.fagsak(id = ferdigBehandling.fagsakId),
+                    type = BehandlingType.KJØRELISTE,
+                    status = BehandlingStatus.SATT_PÅ_VENT,
+                ),
+                opprettGrunnlagsdata = false,
+            )
+
+            assertThatThrownBy {
+                service.opprettRevurdering(opprettRevurdering(fagsakId = ferdigBehandling.fagsakId))
+            }.hasMessageContaining("Det finnes en kjørelistebehandling på vent")
+        }
+
         @Test
         fun `ny behandling skal peke til forrige innvilgede behandling fordi iverksetting skal peke til forrige iverksatte behandling`() {
             val behandling =

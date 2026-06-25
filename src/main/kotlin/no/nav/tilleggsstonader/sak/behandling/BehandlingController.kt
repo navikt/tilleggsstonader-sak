@@ -137,4 +137,13 @@ class BehandlingController(
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         nullstillBehandlingService.nullstillBehandling(behandlingService.hentBehandling(behandlingId))
     }
+
+    @GetMapping("{behandlingId}/kjoreliste-pa-vent")
+    fun harKjørelisteBehandlingPåVent(
+        @PathVariable behandlingId: BehandlingId,
+    ): Boolean {
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
+        val fagsakId = fagsakService.hentFagsakForBehandling(behandlingId).id
+        return behandlingService.harKjørelisteBehandlingPåVent(fagsakId)
+    }
 }

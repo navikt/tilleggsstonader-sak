@@ -13,13 +13,17 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
+import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 
 class KjørelistePåVentIntegrationTest : IntegrationTest() {
     @Autowired
@@ -113,5 +117,68 @@ class KjørelistePåVentIntegrationTest : IntegrationTest() {
         assertThat(nullstiltBehandling.type).isEqualTo(BehandlingType.KJØRELISTE)
         assertThat(nullstiltBehandling.steg).isEqualTo(StegType.KJØRELISTE)
         assertThat(nullstiltBehandling.status).isEqualTo(BehandlingStatus.UTREDES)
+    }
+
+    @Test
+    fun `skal hindre send til beslutter når det finnes kjørelistebehandling på vent`() {
+        val revurderingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = førstegangsbehandling.id,
+                tilSteg = StegType.SEND_TIL_BESLUTTER,
+            ) {
+                defaultDagligReisePrivatBilTsoTestdata(fomUke1, tomUke2)
+            }
+
+        opprettKjørelistePåVent()
+
+        kall.totrinnskontroll.apiRespons.sendTilBeslutter(revurderingId)
+            .expectProblemDetail(
+                HttpStatus.BAD_REQUEST,
+                "Det finnes en kjørelistebehandling på vent",
+            )
+    }
+
+    @Test
+    fun `skal hindre beslutte vedtak når det finnes kjørelistebehandling på vent`() {
+        val revurderingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = førstegangsbehandling.id,
+                tilSteg = StegType.BESLUTTE_VEDTAK,
+            ) {
+                defaultDagligReisePrivatBilTsoTestdata(fomUke1, tomUke2)
+            }
+
+        opprettKjørelistePåVent()
+
+        kall.totrinnskontroll.apiRespons.beslutteVedtak(revurderingId, BeslutteVedtakDto(godkjent = true))
+            .expectProblemDetail(
+                HttpStatus.BAD_REQUEST,
+                "Det finnes en kjørelistebehandling på vent",
+            )
+    }
+
+    private fun opprettKjørelistePåVent() {
+        val kjørelisteBehandling1 =
+            testoppsettService
+                .hentBehandlinger(førstegangsbehandling.fagsakId)
+                .single { it.type == BehandlingType.KJØRELISTE }
+
+        tilordneÅpenBehandlingOppgaveForBehandling(kjørelisteBehandling1.id)
+
+        sendInnKjøreliste(
+            kjørelisteSkjema(
+                reiseId = reiseId,
+                periode = Datoperiode(fomUke2, tomUke2),
+                dagerKjørt =
+                    listOf(
+                        KjørtDag(dato = 12 januar 2026, parkeringsutgift = 50),
+                    ),
+            ),
+            ident = brukerident,
+        )
+
+        assertThat(
+            testoppsettService.hentBehandlinger(førstegangsbehandling.fagsakId).last { it.type == BehandlingType.KJØRELISTE }.status,
+        ).isEqualTo(BehandlingStatus.SATT_PÅ_VENT)
     }
 }

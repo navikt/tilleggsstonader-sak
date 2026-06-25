@@ -10,11 +10,12 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingKategori
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.FERDIGSTILT
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.OPPRETTET
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.SATT_PÅ_VENT
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.UTREDES
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandlingsjournalpost
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingsjournalpostRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
@@ -159,6 +160,11 @@ class BehandlingService(
     fun finnesBehandlingForFagsak(fagsakId: FagsakId) = behandlingRepository.existsByFagsakId(fagsakId)
 
     fun finnAlleBehandlingerForFagsak(fagsakId: FagsakId): List<Behandling> = behandlingRepository.findByFagsakId(fagsakId)
+
+    fun harKjørelisteBehandlingPåVent(fagsakId: FagsakId): Boolean =
+        behandlingRepository.findByFagsakId(fagsakId).any {
+            it.type == BehandlingType.KJØRELISTE && it.status == SATT_PÅ_VENT
+        }
 
     fun hentBehandlinger(fagsakId: FagsakId): List<Behandling> =
         behandlingRepository.findByFagsakId(fagsakId).sortertEtterVedtakstidspunkt()

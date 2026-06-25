@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll
 
 import io.micrometer.core.instrument.Metrics
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -69,6 +70,7 @@ class BeslutteVedtakSteg(
         ferdigstillOppgave(saksbehandling)
 
         return if (data.godkjent) {
+            validerIngenKjørelistePåVent(saksbehandling)
             if (erManuellKjørelistebehandling(saksbehandling)) {
                 fullførKjørelistebehandlingService.fullførKjørelistebehandling(saksbehandling)
                 StegType.FERDIGSTILLE_BEHANDLING
@@ -150,6 +152,16 @@ class BeslutteVedtakSteg(
     private fun erManuellKjørelistebehandling(saksbehandling: Saksbehandling): Boolean =
         saksbehandling.erKjørelisteBehandling() &&
             saksbehandling.behandlingMetode == BehandlingMetode.MANUELL
+
+    private fun validerIngenKjørelistePåVent(saksbehandling: Saksbehandling) {
+        if (!saksbehandling.stønadstype.gjelderDagligReise() || saksbehandling.erKjørelisteBehandling()) {
+            return
+        }
+
+        brukerfeilHvis(behandlingService.harKjørelisteBehandlingPåVent(saksbehandling.fagsakId)) {
+            "Det finnes en kjørelistebehandling på vent. Behandle denne før vedtaket besluttes."
+        }
+    }
 
     companion object {
         init {

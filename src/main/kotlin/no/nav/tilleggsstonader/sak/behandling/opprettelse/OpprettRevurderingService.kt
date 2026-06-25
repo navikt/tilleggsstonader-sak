@@ -1,9 +1,11 @@
 package no.nav.tilleggsstonader.sak.behandling.opprettelse
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.GjenbrukDataRevurderingService
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class OpprettRevurderingService(
     private val opprettBehandlingService: OpprettBehandlingService,
+    private val behandlingService: BehandlingService,
     private val barnService: BarnService,
     private val unleashService: UnleashService,
     private val gjenbrukDataRevurderingService: GjenbrukDataRevurderingService,
@@ -49,6 +52,9 @@ class OpprettRevurderingService(
             }
         }
 
+        val fagsak = fagsakService.hentFagsak(opprettRevurdering.fagsakId)
+        validerIngenKjørelistePåVent(opprettRevurdering.fagsakId, fagsak.stønadstype)
+
         val behandling = opprettBehandlingService.opprettBehandling(lagOpprettBehandlingRequest(opprettRevurdering))
 
         val behandlingIdForGjenbruk = gjenbrukDataRevurderingService.finnBehandlingIdForGjenbruk(behandling.fagsakId)
@@ -66,6 +72,18 @@ class OpprettRevurderingService(
         )
 
         return behandling.id
+    }
+
+    private fun validerIngenKjørelistePåVent(
+        fagsakId: FagsakId,
+        stønadstype: Stønadstype,
+    ) {
+        if (!stønadstype.gjelderDagligReise()) {
+            return
+        }
+        brukerfeilHvis(behandlingService.harKjørelisteBehandlingPåVent(fagsakId)) {
+            "Det finnes en kjørelistebehandling på vent. Behandle denne før du oppretter en ny behandling."
+        }
     }
 
     private fun lagOpprettBehandlingRequest(opprettRevurdering: OpprettRevurdering): OpprettBehandling =
