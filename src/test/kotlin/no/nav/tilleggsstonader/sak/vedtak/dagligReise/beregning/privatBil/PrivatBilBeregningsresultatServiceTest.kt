@@ -33,6 +33,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatException
 import org.assertj.core.api.Assertions.assertThatNoException
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
@@ -78,7 +79,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 tom = tomRammevedtak,
                 ekstrakostnader =
                     RammeForReiseMedPrivatEkstrakostnader(
-                        bompengerPerDag = 40,
+                        bompengerPerDag = BigDecimal("40"),
                         fergekostnadPerDag = null,
                     ),
                 reisedagerPerUke = 5,
@@ -163,7 +164,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 tom = tomRammevedtak,
                 ekstrakostnader =
                     RammeForReiseMedPrivatEkstrakostnader(
-                        bompengerPerDag = 40,
+                        bompengerPerDag = BigDecimal("40"),
                         fergekostnadPerDag = null,
                     ),
                 reisedagerPerUke = 5,
@@ -238,7 +239,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 tom = tomRammevedtak,
                 ekstrakostnader =
                     RammeForReiseMedPrivatEkstrakostnader(
-                        bompengerPerDag = 40,
+                        bompengerPerDag = BigDecimal("40"),
                         fergekostnadPerDag = null,
                     ),
                 reisedagerPerUke = 5,
@@ -322,7 +323,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 tom = tomRammevedtak,
                 ekstrakostnader =
                     RammeForReiseMedPrivatEkstrakostnader(
-                        bompengerPerDag = 40,
+                        bompengerPerDag = BigDecimal("40"),
                         fergekostnadPerDag = null,
                     ),
                 satser =
@@ -437,7 +438,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 tom = tomRammevedtak,
                 ekstrakostnader =
                     RammeForReiseMedPrivatEkstrakostnader(
-                        bompengerPerDag = 40,
+                        bompengerPerDag = BigDecimal("40"),
                         fergekostnadPerDag = null,
                     ),
                 satser =
@@ -524,7 +525,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 tom = tomRammevedtak,
                 ekstrakostnader =
                     RammeForReiseMedPrivatEkstrakostnader(
-                        bompengerPerDag = 40,
+                        bompengerPerDag = BigDecimal("40"),
                         fergekostnadPerDag = null,
                     ),
                 satser =
@@ -580,7 +581,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 tom = tomRammevedtak,
                 ekstrakostnader =
                     RammeForReiseMedPrivatEkstrakostnader(
-                        bompengerPerDag = 40,
+                        bompengerPerDag = BigDecimal("40"),
                         fergekostnadPerDag = null,
                     ),
                 satser =
@@ -895,7 +896,7 @@ class PrivatBilBeregningsresultatServiceTest {
     ) = RammeForReiseMedPrivatBilDelperiode(
         fom = fom,
         tom = tom,
-        ekstrakostnader = RammeForReiseMedPrivatEkstrakostnader(bompengerPerDag = 40, fergekostnadPerDag = null),
+        ekstrakostnader = RammeForReiseMedPrivatEkstrakostnader(bompengerPerDag = BigDecimal("40"), fergekostnadPerDag = null),
         reisedagerPerUke = 5,
         satser =
             listOf(

@@ -158,7 +158,6 @@ class DagligReiseVedtakController(
             beregningsplanUtleder.utledForInnvilgelse(
                 saksbehandling = behandling,
                 vedtaksperioder = vedtaksperioder,
-                stønadsspesifikkJusteringAvBeregnFra = DagligReiseBeregningService.justerBeregnFra(),
             )
         val beregningsresultat =
             beregningService.beregnOffentligTransportOgRammevedtak(
