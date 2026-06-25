@@ -17,7 +17,6 @@ import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.AvslagBoutgifterDto
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterResponse
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
@@ -114,32 +113,29 @@ class BoutgifterVedtakControllerTest : CleanDatabaseIntegrationTest() {
                     )
                 }
 
+            testoppsettService.settAndelerTilOkForBehandling(førstegangsbehandlingContext.behandlingId)
+
             val revurderingId =
                 opprettRevurderingOgGjennomførBehandlingsløp(
                     fraBehandlingId = førstegangsbehandlingContext.behandlingId,
-                    tilSteg = StegType.BEREGNE_YTELSE,
-                ) {}
+                ) {
+                    vedtak {
+                        opphør(
+                            årsaker = listOf(ÅrsakOpphør.ANNET),
+                            begrunnelse = "Statsbudsjettet er tomt",
+                            opphørsdato = tom.minusDays(10),
+                        )
+                    }
+                }
 
-            val opphørVedtak =
-                OpphørBoutgifterRequest(
-                    årsakerOpphør = listOf(ÅrsakOpphør.ANNET),
-                    begrunnelse = "Statsbudsjettet er tomt",
-                    opphørsdato = tom.minusDays(10),
-                )
-
-            kall.vedtak.apiRespons
-                .lagreOpphør(Stønadstype.BOUTGIFTER, revurderingId, opphørVedtak)
-                .expectStatus()
-                .isOk()
-
-            val lagretDto =
+            val vedtak =
                 kall.vedtak
                     .hentVedtak(Stønadstype.BOUTGIFTER, revurderingId)
                     .expectOkWithBody<OpphørBoutgifterResponse>()
 
-            assertThat(lagretDto.årsakerOpphør).isEqualTo(opphørVedtak.årsakerOpphør)
-            assertThat(lagretDto.begrunnelse).isEqualTo(opphørVedtak.begrunnelse)
-            assertThat(lagretDto.type).isEqualTo(TypeVedtak.OPPHØR)
+            assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
+            assertThat(vedtak.årsakerOpphør).containsExactly(ÅrsakOpphør.ANNET)
+            assertThat(vedtak.begrunnelse).isEqualTo("Statsbudsjettet er tomt")
         }
     }
 }

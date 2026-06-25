@@ -35,15 +35,15 @@ class OpphørValideringService(
         val vilkår = vilkårService.hentVilkår(saksbehandling.id)
         val vilkårperioder = vilkårsperiodeService.hentVilkårperioder(saksbehandling.id)
 
-        validerIngenEndringerIVilkårEllerVilkårperioderFørOpphørsdato(
-            behandlingId = saksbehandling.id,
-            opphørsdato = opphørsdato,
-        )
         validerIngenNyeOppfylteVilkårEllerVilkårperioder(vilkår, vilkårperioder)
         validerIngenEndredePerioderMedTomEtterOpphørsdato(
             vilkårperioder,
             vilkår,
             opphørsdato,
+        )
+        validerIngenEndringerIVilkårEllerVilkårperioderFørOpphørsdato(
+            behandlingId = saksbehandling.id,
+            opphørsdato = opphørsdato,
         )
     }
 

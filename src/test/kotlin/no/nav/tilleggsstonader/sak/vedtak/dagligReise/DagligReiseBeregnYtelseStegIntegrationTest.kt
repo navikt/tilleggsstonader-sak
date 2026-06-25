@@ -67,13 +67,30 @@ class DagligReiseBeregnYtelseStegIntegrationTest(
     @Test
     fun `skal ikke kunne opphøre dersom pris er endret før opphørsdato`() {
         val fom = 1 januar 2025
-        val tom = 28 februar 2025
+        val tom = 31 mars 2025
 
         val førstegangsbehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
             ) {
-                defaultDagligReiseTsoTestdata(fom = fom, tom = tom)
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTso(fom, tom)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(fom, tom)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        offentligTransport(
+                            fom = fom.plusMonths(1),
+                            tom = tom,
+                        )
+                    }
+                }
             }
 
         val revurderingId =
@@ -85,8 +102,8 @@ class DagligReiseBeregnYtelseStegIntegrationTest(
                     oppdaterDagligReise { vilkårDagligReise, _ ->
                         vilkårDagligReise.single().id to
                             lagreDagligReiseDto(
-                                fom = fom,
-                                tom = tom,
+                                fom = fom.plusMonths(1),
+                                tom = 28 februar 2025,
                                 fakta =
                                     FaktaDagligReiseOffentligTransportDto(
                                         reisedagerPerUke = 3,
@@ -105,13 +122,13 @@ class DagligReiseBeregnYtelseStegIntegrationTest(
                 behandlingId = revurderingId,
                 opphørDto =
                     opphørDto(
-                        opphørsdato = 1 februar 2025,
+                        opphørsdato = 1 mars 2025,
                     ),
             ).expectProblemDetail(
                 forventetStatus = HttpStatus.BAD_REQUEST,
                 forventetDetail =
                     "Opphør er et ugyldig vedtaksresultat fordi " +
-                        "opphørsdato er etter eller lik tidligste endring (01.01.2025)",
+                        "opphørsdato er etter eller lik tidligste endring (01.02.2025)",
             )
     }
 }

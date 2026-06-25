@@ -3,9 +3,9 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.april
 import no.nav.tilleggsstonader.libs.utils.dato.august
+import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterResponse
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
@@ -29,7 +28,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
@@ -112,36 +111,30 @@ class LæremidlerBeregnYtelseStegTest : CleanDatabaseIntegrationTest() {
                     defaultLæremidlerTestdata(fom = fom, tom = tom)
                 }
 
+            testoppsettService.settAndelerTilOkForBehandling(førstegangsbehandlingContext.behandlingId)
+
             val revurderingId =
                 opprettRevurderingOgGjennomførBehandlingsløp(
                     fraBehandlingId = førstegangsbehandlingContext.behandlingId,
-                    tilSteg = StegType.BEREGNE_YTELSE,
-                ) {}
-
-            val opphør =
-                OpphørLæremidlerRequest(
-                    årsakerOpphør = listOf(ÅrsakOpphør.ANNET),
-                    begrunnelse = "en begrunnelse",
-                    opphørsdato = LocalDate.of(2025, 2, 1),
-                )
-
-            kall.vedtak.apiRespons
-                .lagreOpphør(
-                    stønadstype = Stønadstype.LÆREMIDLER,
-                    behandlingId = revurderingId,
-                    opphørDto = opphør,
-                ).expectStatus()
-                .isOk()
+                ) {
+                    vedtak {
+                        opphør(
+                            opphørsdato = 1 februar 2025,
+                        )
+                    }
+                }
 
             val vedtak =
                 kall.vedtak
-                    .hentVedtak(Stønadstype.BOUTGIFTER, revurderingId)
-                    .expectOkWithBody<OpphørBoutgifterResponse>()
+                    .hentVedtak(Stønadstype.LÆREMIDLER, revurderingId)
+                    .expectOkWithBody<OpphørLæremidlerResponse>()
 
             assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
+            assertThat(vedtak.årsakerOpphør).containsExactly(ÅrsakOpphør.ANNET)
+            assertThat(vedtak.begrunnelse).isEqualTo("annet")
             with(vedtak.vedtaksperioder.single()) {
                 assertThat(this.fom).isEqualTo(fom)
-                assertThat(this.tom).isEqualTo(LocalDate.of(2025, 1, 31))
+                assertThat(this.tom).isEqualTo(31 januar 2025)
             }
         }
     }
