@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
@@ -42,7 +43,7 @@ class PrivatBilBeregningsresultatServiceTest {
     private val brukersNavKontor = "6767"
 
     private val avklartKjørelisteService = mockk<AvklartKjørelisteService>()
-    private val behandling = saksbehandling(id = behandlingId)
+    private val behandling = saksbehandling(id = behandlingId, type = BehandlingType.KJØRELISTE)
 
     val beregningService =
         PrivatBilBeregningService(
@@ -845,7 +846,12 @@ class PrivatBilBeregningsresultatServiceTest {
         val ukeSlettet =
             avklarUkerFraKjøreliste(kjørelisteUke7)
                 .single()
-                .copy(avklartKjørtUkeStatus = AvklartKjørtUkeStatus.SLETTET)
+                .let {
+                    it.copy(
+                        avklartKjørtUkeStatus = AvklartKjørtUkeStatus.SLETTET,
+                        dager = it.dager.map { it.copy(avklartKjørtDagStatus = AvklartKjørtDagStatus.SLETTET) }.toSet(),
+                    )
+                }
 
         val beregningsresultat = beregn(rammevedtakPrivatBil, listOf(ukeOK, ukeSlettet), brukersNavKontor)
 
