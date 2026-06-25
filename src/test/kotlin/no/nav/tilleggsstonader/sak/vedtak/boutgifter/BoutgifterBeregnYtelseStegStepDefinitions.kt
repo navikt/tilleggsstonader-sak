@@ -85,7 +85,9 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     val utledTidligsteEndringService =
         mockk<UtledTidligsteEndringService> {
             every { utledTidligsteEndringForBeregning(any(), any()) } returns null
+            every { utledTidligsteEndringIgnorerVedtaksperioder(any()) } returns null
         }
+
     val beregningsplanUtleder = BeregningsplanUtleder(utledTidligsteEndringService)
     val vilkårperiodeServiceMock =
         mockk<VilkårperiodeService>().apply {
