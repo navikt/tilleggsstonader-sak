@@ -56,6 +56,19 @@ class OpprettRevurderingServiceTest {
         verify(exactly = 0) { opprettBehandlingService.opprettBehandling(any()) }
     }
 
+    @Test
+    fun `skal opprette revurdering for ikke-dagligReise stønadstype selv om det finnes kjørelistebehandling på vent`() {
+        val fagsakId = FagsakId.random()
+        every { unleashService.isEnabled(Toggle.KAN_OPPRETTE_REVURDERING) } returns true
+        every { fagsakService.hentFagsak(fagsakId) } returns fagsak(stønadstype = Stønadstype.BARNETILSYN, id = fagsakId)
+        every { fagsakService.hentAktivIdent(fagsakId) } returns "12345678901"
+
+        service.opprettRevurdering(opprettRevurdering(fagsakId = fagsakId))
+
+        verify(exactly = 0) { behandlingService.harKjørelisteBehandlingPåVent(any()) }
+        verify(exactly = 1) { opprettBehandlingService.opprettBehandling(any()) }
+    }
+
     private fun opprettRevurdering(
         fagsakId: FagsakId,
         årsak: BehandlingÅrsak = BehandlingÅrsak.SØKNAD,
