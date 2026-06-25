@@ -13,8 +13,8 @@ import no.nav.tilleggsstonader.sak.cucumber.parseBigDecimal
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
+import no.nav.tilleggsstonader.sak.cucumber.parseValgfriBigDecimal
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriBoolean
-import no.nav.tilleggsstonader.sak.cucumber.parseValgfriDouble
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriString
@@ -278,8 +278,8 @@ class UtledTidligsteEndringStepDefinitions {
                         fom = parseDato(DomenenøkkelFelles.FOM, it),
                         tom = parseDato(DomenenøkkelFelles.TOM, it),
                         reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, it),
-                        bompengerPerDag = parseValgfriDouble(DomenenøkkelPrivatBil.BOMPENGER, it),
-                        fergekostnadPerDag = parseValgfriDouble(DomenenøkkelPrivatBil.FERGEKOSTNAD, it),
+                        bompengerPerDag = parseValgfriBigDecimal(DomenenøkkelPrivatBil.BOMPENGER, it),
+                        fergekostnadPerDag = parseValgfriBigDecimal(DomenenøkkelPrivatBil.FERGEKOSTNAD, it),
                     )
             }.groupBy { it.first }
             .mapValues { it.value.map { it.second } }

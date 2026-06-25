@@ -91,8 +91,8 @@ data class FaktaDelperiodePrivatBilDto(
     val fom: LocalDate,
     val tom: LocalDate,
     val reisedagerPerUke: Int,
-    val bompengerPerDag: Double?,
-    val fergekostnadPerDag: Double?,
+    val bompengerPerDag: BigDecimal?,
+    val fergekostnadPerDag: BigDecimal?,
 )
 
 data object FaktaDagligReiseUbestemtDto : FaktaDagligReiseDto {

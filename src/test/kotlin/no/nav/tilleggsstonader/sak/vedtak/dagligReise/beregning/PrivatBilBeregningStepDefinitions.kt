@@ -20,7 +20,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseBigDecimal
 import no.nav.tilleggsstonader.sak.cucumber.parseBoolean
 import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
-import no.nav.tilleggsstonader.sak.cucumber.parseValgfriDouble
+import no.nav.tilleggsstonader.sak.cucumber.parseValgfriBigDecimal
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
@@ -283,8 +283,8 @@ class PrivatBilBeregningStepDefinitions {
                     FaktaDelperiodePrivatBil(
                         fom = parseDato(DomenenøkkelFelles.FOM, it),
                         tom = parseDato(DomenenøkkelFelles.TOM, it),
-                        bompengerPerDag = parseValgfriDouble(DomenenøkkelPrivatBil.BOMPENGER, it),
-                        fergekostnadPerDag = parseValgfriDouble(DomenenøkkelPrivatBil.FERGEKOSTNAD, it),
+                        bompengerPerDag = parseValgfriBigDecimal(DomenenøkkelPrivatBil.BOMPENGER, it),
+                        fergekostnadPerDag = parseValgfriBigDecimal(DomenenøkkelPrivatBil.FERGEKOSTNAD, it),
                         reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, it),
                     )
             }.groupBy { it.first }

@@ -744,8 +744,8 @@ object InterntVedtakTestdata {
                                                 reisedagerPerUke = 3,
                                                 ekstrakostnader =
                                                     RammeForReiseMedPrivatEkstrakostnader(
-                                                        bompengerPerDag = 40.0,
-                                                        fergekostnadPerDag = 50.0,
+                                                        bompengerPerDag = BigDecimal("40"),
+                                                        fergekostnadPerDag = BigDecimal("50"),
                                                     ),
                                                 satser =
                                                     listOf(
@@ -780,8 +780,8 @@ object InterntVedtakTestdata {
                                                 reisedagerPerUke = 3,
                                                 ekstrakostnader =
                                                     RammeForReiseMedPrivatEkstrakostnader(
-                                                        bompengerPerDag = 40.0,
-                                                        fergekostnadPerDag = 50.0,
+                                                        bompengerPerDag = BigDecimal("40"),
+                                                        fergekostnadPerDag = BigDecimal("50"),
                                                     ),
                                                 satser =
                                                     listOf(
@@ -800,8 +800,8 @@ object InterntVedtakTestdata {
                                                 reisedagerPerUke = 5,
                                                 ekstrakostnader =
                                                     RammeForReiseMedPrivatEkstrakostnader(
-                                                        bompengerPerDag = 40.0,
-                                                        fergekostnadPerDag = 50.0,
+                                                        bompengerPerDag = BigDecimal("40"),
+                                                        fergekostnadPerDag = BigDecimal("50"),
                                                     ),
                                                 satser =
                                                     listOf(
@@ -1074,8 +1074,8 @@ object InterntVedtakTestdata {
                                         fom = LocalDate.of(2025, 1, 1),
                                         tom = LocalDate.of(2025, 2, 28),
                                         reisedagerPerUke = 3,
-                                        bompengerPerDag = 20.0,
-                                        fergekostnadPerDag = 30.0,
+                                        bompengerPerDag = BigDecimal("20"),
+                                        fergekostnadPerDag = BigDecimal("30"),
                                     ),
                                 ),
                             aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),

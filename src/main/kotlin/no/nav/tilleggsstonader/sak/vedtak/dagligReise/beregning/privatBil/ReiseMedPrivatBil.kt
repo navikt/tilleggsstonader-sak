@@ -34,8 +34,8 @@ data class ReiseMedPrivatBilDelperiode(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val reisedagerPerUke: Int,
-    val bompengerPerDag: Double?,
-    val fergekostnadPerDag: Double?,
+    val bompengerPerDag: BigDecimal?,
+    val fergekostnadPerDag: BigDecimal?,
 ) : Periode<LocalDate>,
     KopierPeriode<ReiseMedPrivatBilDelperiode> {
     override fun medPeriode(

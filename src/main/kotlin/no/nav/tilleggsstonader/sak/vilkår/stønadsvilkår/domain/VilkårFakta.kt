@@ -72,8 +72,8 @@ data class FaktaDelperiodePrivatBil(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val reisedagerPerUke: Int,
-    val bompengerPerDag: Double?,
-    val fergekostnadPerDag: Double?,
+    val bompengerPerDag: BigDecimal?,
+    val fergekostnadPerDag: BigDecimal?,
 ) : Periode<LocalDate> {
     init {
         brukerfeilHvis(reisedagerPerUke <= 0) {
@@ -82,16 +82,16 @@ data class FaktaDelperiodePrivatBil(
         brukerfeilHvis(reisedagerPerUke > 7) {
             "Reisedager per uke kan ikke være mer enn 7"
         }
-        brukerfeilHvis(bompengerPerDag != null && bompengerPerDag < 0) {
+        brukerfeilHvis(bompengerPerDag != null && bompengerPerDag < BigDecimal.ZERO) {
             "Bompengeprisen må være større enn 0"
         }
-        brukerfeilHvis(fergekostnadPerDag != null && fergekostnadPerDag < 0) {
+        brukerfeilHvis(fergekostnadPerDag != null && fergekostnadPerDag < BigDecimal.ZERO) {
             "Fergekostnaden må være større enn 0"
         }
-        brukerfeilHvis(bompengerPerDag != null && bompengerPerDag > 500) {
+        brukerfeilHvis(bompengerPerDag != null && bompengerPerDag > BigDecimal(500)) {
             "Skal du innvilge med bompenger høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet"
         }
-        brukerfeilHvis(fergekostnadPerDag != null && fergekostnadPerDag > 500) {
+        brukerfeilHvis(fergekostnadPerDag != null && fergekostnadPerDag > BigDecimal(500)) {
             "Skal du innvilge med fergekostnader høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet"
         }
     }

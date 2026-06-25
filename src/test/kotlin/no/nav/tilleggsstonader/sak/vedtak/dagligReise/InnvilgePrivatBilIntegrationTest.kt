@@ -149,8 +149,8 @@ class InnvilgePrivatBilIntegrationTest : IntegrationTest() {
                                 fom = fomDelperiode2,
                                 tom = tomDelperiode2,
                                 reisedagerPerUke = 2,
-                                bompengerPerDag = 100.0,
-                                fergekostnadPerDag = 50.0,
+                                bompengerPerDag = BigDecimal("100"),
+                                fergekostnadPerDag = BigDecimal("50"),
                             ),
                         ),
                 )
@@ -174,7 +174,7 @@ class InnvilgePrivatBilIntegrationTest : IntegrationTest() {
         assertThat(fakta.faktaDelperioder[1].fom).isEqualTo(fomDelperiode2)
         assertThat(fakta.faktaDelperioder[1].tom).isEqualTo(tomDelperiode2)
         assertThat(fakta.faktaDelperioder[1].reisedagerPerUke).isEqualTo(2)
-        assertThat(fakta.faktaDelperioder[1].bompengerPerDag).isEqualTo(100.0)
-        assertThat(fakta.faktaDelperioder[1].fergekostnadPerDag).isEqualTo(50.0)
+        assertThat(fakta.faktaDelperioder[1].bompengerPerDag).isEqualTo(BigDecimal("100"))
+        assertThat(fakta.faktaDelperioder[1].fergekostnadPerDag).isEqualTo(BigDecimal("50"))
     }
 }

@@ -109,15 +109,13 @@ data class RammeForReiseMedPrivatBilSatsForDelperiode(
 }
 
 data class RammeForReiseMedPrivatEkstrakostnader(
-    val bompengerPerDag: Double?,
-    val fergekostnadPerDag: Double?,
+    val bompengerPerDag: BigDecimal?,
+    val fergekostnadPerDag: BigDecimal?,
 ) {
     fun beregnTotalEkstrakostnadForEnDag(): BigDecimal {
-        val bompengerEnDag = bompengerPerDag ?: 0.0
-        val fergekostnadEnDag = fergekostnadPerDag ?: 0.0
+        val bompengerEnDag = bompengerPerDag ?: BigDecimal.ZERO
+        val fergekostnadEnDag = fergekostnadPerDag ?: BigDecimal.ZERO
 
-        val sum = bompengerEnDag + fergekostnadEnDag
-
-        return sum.toBigDecimal()
+        return bompengerEnDag + fergekostnadEnDag
     }
 }
