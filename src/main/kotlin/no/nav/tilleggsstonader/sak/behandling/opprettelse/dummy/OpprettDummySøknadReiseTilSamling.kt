@@ -15,8 +15,8 @@ import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaReiseTilSamling
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.AdresseAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.AktivitetAvsnitt
-import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.AktivitetsadresseAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.ReiseavstandAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.ReisemåteAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Samling
@@ -66,7 +66,13 @@ class OpprettDummySøknadReiseTilSamling(
                                         svarTekst = "Tiltak / arbeidsrettet aktivitet",
                                         alternativer = emptyList(),
                                     ),
-                                lønnetAktivitet = EnumFelt("Mottar du lønn gjennom tiltaket?", JaNei.NEI, "Nei", emptyList()),
+                                lønnetAktivitet =
+                                    EnumFelt(
+                                        label = "Mottar du lønn gjennom tiltaket?",
+                                        verdi = JaNei.NEI,
+                                        svarTekst = "Nei",
+                                        alternativer = emptyList(),
+                                    ),
                             ),
                         samlinger =
                             listOf(
@@ -81,9 +87,23 @@ class OpprettDummySøknadReiseTilSamling(
                             ),
                         reiseavstand =
                             ReiseavstandAvsnitt(
+                                reiseFraFolkeregistrertAdr =
+                                    EnumFelt(
+                                        label = "Reiser du fra din folkeregistrerte adresse?",
+                                        verdi = JaNei.JA,
+                                        svarTekst = "Ja",
+                                        alternativer = emptyList(),
+                                    ),
+                                adresseDetSkalReisesFra =
+                                    AdresseAvsnitt(
+                                        land = SelectFelt("Land", "NO", "Norge"),
+                                        gateadresse = VerdiFelt(verdi = "Lurendreiergata 1", label = "Gateadresse"),
+                                        postnummer = VerdiFelt(verdi = "5132", label = "Postnummer"),
+                                        poststed = VerdiFelt(verdi = "Pæddekummen", label = "Poststed"),
+                                    ),
                                 antallKilometerEnVei = VerdiFelt(verdi = "42", label = "Antall kilometer én vei"),
                                 aktivitetsadresse =
-                                    AktivitetsadresseAvsnitt(
+                                    AdresseAvsnitt(
                                         land = SelectFelt("Land", "NO", "Norge"),
                                         gateadresse = VerdiFelt(verdi = "Mimes vei 1", label = "Gateadresse"),
                                         postnummer = VerdiFelt(verdi = "5132", label = "Postnummer"),
