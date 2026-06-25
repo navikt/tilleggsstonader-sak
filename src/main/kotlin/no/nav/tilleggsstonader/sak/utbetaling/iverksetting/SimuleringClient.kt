@@ -22,7 +22,7 @@ class SimuleringClient(
         val url =
             UriComponentsBuilder
                 .fromUri(uri)
-                .pathSegment("api", "simulering", "v3")
+                .pathSegment("api", "dryrun", "tilleggsstonader")
                 .toUriString()
 
         return try {
