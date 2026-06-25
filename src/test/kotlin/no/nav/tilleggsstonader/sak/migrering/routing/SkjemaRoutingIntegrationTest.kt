@@ -345,6 +345,7 @@ class SkjemaRoutingIntegrationTest(
             val vedtak =
                 DagligReiseTestUtil.innvilgelse(
                     behandlingId = dagligReiseBehandling.id,
+                    rammevedtakPrivatBil = null,
                 )
             vedtakRepository.insert(vedtak)
         }
