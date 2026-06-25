@@ -63,7 +63,8 @@ class KjørelistePåVentIntegrationTest : CleanDatabaseIntegrationTest() {
         sendInnNyKjørelisteSomSettesIKø(context.ident)
 
         val kjørelisteBehandling2 =
-            testoppsettService.hentBehandlinger(fagsakId)
+            testoppsettService
+                .hentBehandlinger(fagsakId)
                 .single { it.type == BehandlingType.KJØRELISTE && it.status == BehandlingStatus.SATT_PÅ_VENT }
 
         gjennomførKjørelisteBehandling(kjørelisteBehandling1)
@@ -94,7 +95,8 @@ class KjørelistePåVentIntegrationTest : CleanDatabaseIntegrationTest() {
 
         kall.brev.genererPdf(revurderingId, GenererPdfRequest(MINIMALT_BREV))
         kall.brevmottakere.hent(revurderingId)
-        kall.totrinnskontroll.apiRespons.sendTilBeslutter(revurderingId)
+        kall.totrinnskontroll.apiRespons
+            .sendTilBeslutter(revurderingId)
             .expectProblemDetail(HttpStatus.BAD_REQUEST, "Det finnes en kjørelistebehandling på vent")
     }
 
@@ -113,7 +115,8 @@ class KjørelistePåVentIntegrationTest : CleanDatabaseIntegrationTest() {
 
         medBrukercontext(bruker = "nissemor", roller = listOf(rolleConfig.beslutterRolle)) {
             tilordneÅpenBehandlingOppgaveForBehandling(revurderingId)
-            kall.totrinnskontroll.apiRespons.beslutteVedtak(revurderingId, BeslutteVedtakDto(godkjent = true))
+            kall.totrinnskontroll.apiRespons
+                .beslutteVedtak(revurderingId, BeslutteVedtakDto(godkjent = true))
                 .expectProblemDetail(HttpStatus.BAD_REQUEST, "Det finnes en kjørelistebehandling på vent")
         }
     }
@@ -135,7 +138,11 @@ class KjørelistePåVentIntegrationTest : CleanDatabaseIntegrationTest() {
     }
 
     private fun sendInnNyKjørelisteSomSettesIKø(ident: String) {
-        val reiseId = kall.privatBil.hentRammevedtak(ident).first().reiseId
+        val reiseId =
+            kall.privatBil
+                .hentRammevedtak(ident)
+                .first()
+                .reiseId
         sendInnKjøreliste(
             kjørelisteSkjema(
                 reiseId = reiseId,

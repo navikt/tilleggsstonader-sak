@@ -74,7 +74,9 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
                 )
             testoppsettService.lagre(
                 behandling(
-                    fagsak = no.nav.tilleggsstonader.sak.util.fagsak(id = ferdigBehandling.fagsakId),
+                    fagsak =
+                        no.nav.tilleggsstonader.sak.util
+                            .fagsak(id = ferdigBehandling.fagsakId),
                     type = BehandlingType.KJØRELISTE,
                     status = BehandlingStatus.SATT_PÅ_VENT,
                 ),
