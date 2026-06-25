@@ -169,7 +169,7 @@ class PrivatBilBeregningService(
             "Forventer at beregnFra er satt i en revurdering"
         }
 
-        if (rammeForReise.grunnlag.tom < beregnFra) {
+        if (rammeForReise.grunnlag.tom < beregnFra && forrigeReise.perioder.maxOf { it.tom } < beregnFra) {
             return forrigeReise.markerAllePerioderSomFraTidligereVedtak()
         }
 

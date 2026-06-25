@@ -197,7 +197,7 @@ class RevurderingPrivatBilIntegrationTest(
                                     (fakta as FaktaDagligReisePrivatBilDto).copy(
                                         faktaDelperioder =
                                             fakta.faktaDelperioder.map {
-                                                it.copy(bompengerPerDag = 20)
+                                                it.copy(bompengerPerDag = 20.toBigDecimal())
                                             },
                                     ),
                             )
@@ -466,7 +466,7 @@ class RevurderingPrivatBilIntegrationTest(
                                     (reise2.fakta as FaktaDagligReisePrivatBilDto).copy(
                                         faktaDelperioder =
                                             reise2.fakta.faktaDelperioder.map {
-                                                it.copy(bompengerPerDag = 20)
+                                                it.copy(bompengerPerDag = 20.toBigDecimal())
                                             },
                                     ),
                             )
