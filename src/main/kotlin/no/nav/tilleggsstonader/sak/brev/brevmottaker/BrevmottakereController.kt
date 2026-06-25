@@ -37,7 +37,6 @@ class BrevmottakereController(
     ) {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
 
         return brevmottakereService.lagreBrevmottakere(behandlingId, brevmottakere)
     }

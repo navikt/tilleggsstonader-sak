@@ -106,8 +106,17 @@ enum class KanKjøreSelv {
     SITTER_PÅ_MED_ANDRE,
 }
 
+enum class Drivstofftype {
+    ELBIL,
+    HYDROGEN,
+    BENSIN,
+    HYBRID,
+    DIESEL,
+}
+
 data class UtgifterBil(
     val mottarGrunnstønad: JaNei?,
+    val drivstofftype: Drivstofftype?,
     val parkering: JaNei?,
     val bompenger: Int?,
     val ferge: Int?,
@@ -115,6 +124,7 @@ data class UtgifterBil(
 ) {
     fun alleFelterErTomme() =
         mottarGrunnstønad == null &&
+            drivstofftype == null &&
             parkering == null &&
             bompenger == null &&
             ferge == null &&

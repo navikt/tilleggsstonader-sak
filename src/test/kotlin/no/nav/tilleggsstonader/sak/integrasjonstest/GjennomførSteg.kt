@@ -13,13 +13,18 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.dsl.BehandlingTestdataDsl
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilVedtaksperiodeDagligReiseDto
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.AvslagBoutgifterDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsoRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsrRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
@@ -227,7 +232,43 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                 )
         }
 
-        is OpprettAvslag -> TODO()
+        is OpprettAvslag ->
+            kall.vedtak.apiRespons
+                .lagreVedtak(
+                    stønadstype = stønadstype,
+                    behandlingId = behandlingId,
+                    typeVedtakPath = "avslag",
+                    vedtakDto =
+                        when (stønadstype) {
+                            Stønadstype.BARNETILSYN ->
+                                AvslagTilsynBarnDto(
+                                    årsakerAvslag = listOf(ÅrsakAvslag.ANNET),
+                                    begrunnelse = "begrunnelse",
+                                )
+
+                            Stønadstype.LÆREMIDLER ->
+                                AvslagLæremidlerDto(
+                                    årsakerAvslag = listOf(ÅrsakAvslag.ANNET),
+                                    begrunnelse = "begrunnelse",
+                                )
+
+                            Stønadstype.BOUTGIFTER ->
+                                AvslagBoutgifterDto(
+                                    årsakerAvslag = listOf(ÅrsakAvslag.ANNET),
+                                    begrunnelse = "begrunnelse",
+                                )
+
+                            Stønadstype.DAGLIG_REISE_TSO,
+                            Stønadstype.DAGLIG_REISE_TSR,
+                            ->
+                                AvslagDagligReiseDto(
+                                    årsakerAvslag = listOf(ÅrsakAvslag.ANNET),
+                                    begrunnelse = "begrunnelse",
+                                )
+
+                            Stønadstype.REISE_TIL_SAMLING_TSO -> TODO("AvslagReiseTilSamlingTsoRequest")
+                        },
+                )
         is OpprettOpphør ->
             kall.vedtak.apiRespons
                 .lagreOpphør(

@@ -155,8 +155,8 @@ class FaktaDagligReiseTest {
                                     fom = LocalDate.now(),
                                     tom = LocalDate.now().plusDays(10),
                                     reisedagerPerUke = 4,
-                                    bompengerPerDag = -10,
-                                    fergekostnadPerDag = 0,
+                                    bompengerPerDag = BigDecimal("-10"),
+                                    fergekostnadPerDag = BigDecimal.ZERO,
                                 ),
                             ),
                         reiseavstandEnVei = BigDecimal(10),
@@ -179,8 +179,8 @@ class FaktaDagligReiseTest {
                                     fom = LocalDate.now(),
                                     tom = LocalDate.now().plusDays(10),
                                     reisedagerPerUke = 4,
-                                    bompengerPerDag = 0,
-                                    fergekostnadPerDag = -10,
+                                    bompengerPerDag = BigDecimal.ZERO,
+                                    fergekostnadPerDag = BigDecimal("-10"),
                                 ),
                             ),
                         reiseavstandEnVei = BigDecimal(10),
@@ -188,6 +188,98 @@ class FaktaDagligReiseTest {
                     )
                 }
             assertThat(feil.message).isEqualTo("Fergekostnaden må være større enn 0")
+        }
+
+        @Test
+        fun `skal kaste feil hvis bompenger er høyere enn 500`() {
+            val feil =
+                assertThrows<ApiFeil> {
+                    FaktaPrivatBil(
+                        reiseId = ReiseId.random(),
+                        adresse = "Tiltaksveien 1",
+                        faktaDelperioder =
+                            listOf(
+                                FaktaDelperiodePrivatBil(
+                                    fom = LocalDate.now(),
+                                    tom = LocalDate.now().plusDays(10),
+                                    reisedagerPerUke = 4,
+                                    bompengerPerDag = BigDecimal("501"),
+                                    fergekostnadPerDag = null,
+                                ),
+                            ),
+                        reiseavstandEnVei = BigDecimal(10),
+                        aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
+                    )
+                }
+            assertThat(
+                feil.message,
+            ).isEqualTo("Skal du innvilge med bompenger høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet")
+        }
+
+        @Test
+        fun `skal kaste feil hvis fergekostnad er høyere enn 500`() {
+            val feil =
+                assertThrows<ApiFeil> {
+                    FaktaPrivatBil(
+                        reiseId = ReiseId.random(),
+                        adresse = "Tiltaksveien 1",
+                        faktaDelperioder =
+                            listOf(
+                                FaktaDelperiodePrivatBil(
+                                    fom = LocalDate.now(),
+                                    tom = LocalDate.now().plusDays(10),
+                                    reisedagerPerUke = 4,
+                                    bompengerPerDag = null,
+                                    fergekostnadPerDag = BigDecimal("501"),
+                                ),
+                            ),
+                        reiseavstandEnVei = BigDecimal(10),
+                        aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
+                    )
+                }
+            assertThat(
+                feil.message,
+            ).isEqualTo("Skal du innvilge med fergekostnader høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet")
+        }
+
+        @Test
+        fun `skal ikke kaste feil hvis bompenger er nøyaktig 500`() {
+            FaktaPrivatBil(
+                reiseId = ReiseId.random(),
+                adresse = "Tiltaksveien 1",
+                faktaDelperioder =
+                    listOf(
+                        FaktaDelperiodePrivatBil(
+                            fom = LocalDate.now(),
+                            tom = LocalDate.now().plusDays(10),
+                            reisedagerPerUke = 4,
+                            bompengerPerDag = BigDecimal("500"),
+                            fergekostnadPerDag = null,
+                        ),
+                    ),
+                reiseavstandEnVei = BigDecimal(10),
+                aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
+            )
+        }
+
+        @Test
+        fun `skal ikke kaste feil hvis fergekostnad er nøyaktig 500`() {
+            FaktaPrivatBil(
+                reiseId = ReiseId.random(),
+                adresse = "Tiltaksveien 1",
+                faktaDelperioder =
+                    listOf(
+                        FaktaDelperiodePrivatBil(
+                            fom = LocalDate.now(),
+                            tom = LocalDate.now().plusDays(10),
+                            reisedagerPerUke = 4,
+                            bompengerPerDag = null,
+                            fergekostnadPerDag = BigDecimal("500"),
+                        ),
+                    ),
+                reiseavstandEnVei = BigDecimal(10),
+                aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
+            )
         }
 
         @Test
@@ -203,8 +295,8 @@ class FaktaDagligReiseTest {
                                     fom = LocalDate.now(),
                                     tom = LocalDate.now().plusDays(10),
                                     reisedagerPerUke = 4,
-                                    bompengerPerDag = 0,
-                                    fergekostnadPerDag = 0,
+                                    bompengerPerDag = BigDecimal.ZERO,
+                                    fergekostnadPerDag = BigDecimal.ZERO,
                                 ),
                             ),
                         reiseavstandEnVei = BigDecimal("-10"),
@@ -228,8 +320,8 @@ class FaktaDagligReiseTest {
                                     fom = LocalDate.now(),
                                     tom = LocalDate.now().plusDays(10),
                                     reisedagerPerUke = -4,
-                                    bompengerPerDag = 0,
-                                    fergekostnadPerDag = 0,
+                                    bompengerPerDag = BigDecimal.ZERO,
+                                    fergekostnadPerDag = BigDecimal.ZERO,
                                 ),
                             ),
                         aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
@@ -252,8 +344,8 @@ class FaktaDagligReiseTest {
                                     fom = LocalDate.now(),
                                     tom = LocalDate.now().plusDays(10),
                                     reisedagerPerUke = 8,
-                                    bompengerPerDag = 0,
-                                    fergekostnadPerDag = 0,
+                                    bompengerPerDag = BigDecimal.ZERO,
+                                    fergekostnadPerDag = BigDecimal.ZERO,
                                 ),
                             ),
                         aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),

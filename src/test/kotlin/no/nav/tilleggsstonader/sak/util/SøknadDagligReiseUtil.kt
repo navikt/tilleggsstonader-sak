@@ -144,6 +144,7 @@ object SøknadDagligReiseUtil {
             bompenger = null,
             ferge = null,
             piggdekkavgift = null,
+            bilensDrivstofftype = null,
         )
 
     private fun metadata(): MetadataDagligReise =

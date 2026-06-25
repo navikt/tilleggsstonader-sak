@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Aktiviteter
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArbeidsrettetAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.ArsakOppholdUtenforNorgeType
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.BilensDrivstofftypeType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DagligReiseFyllUtSendInnData
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DineOpplysninger
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.FaktiskeUtgifter
@@ -333,10 +334,20 @@ class SøknadskjemaDagligReiseMapper(
         UtgifterBil(
             parkering = reise.parkering?.let(::mapJaNei),
             mottarGrunnstønad = reise.mottarDuGrunnstonadFraNav?.let(::mapJaNei),
+            drivstofftype = reise.bilensDrivstofftype?.let { mapDrivstofftype(BilensDrivstofftypeType.valueOf(it.value)) },
             bompenger = reise.bompenger,
             ferge = reise.ferge,
             piggdekkavgift = reise.piggdekkavgift,
         ).takeUnless { it.alleFelterErTomme() }
+
+    private fun mapDrivstofftype(type: BilensDrivstofftypeType): Drivstofftype =
+        when (type) {
+            BilensDrivstofftypeType.elbil -> Drivstofftype.ELBIL
+            BilensDrivstofftypeType.hydrogen -> Drivstofftype.HYDROGEN
+            BilensDrivstofftypeType.bensin -> Drivstofftype.BENSIN
+            BilensDrivstofftypeType.hybrid -> Drivstofftype.HYBRID
+            BilensDrivstofftypeType.diesel -> Drivstofftype.DIESEL
+        }
 
     private fun mapTaxi(reise: ReiseKontrakt): Taxi? {
         val skalTaTaxi =

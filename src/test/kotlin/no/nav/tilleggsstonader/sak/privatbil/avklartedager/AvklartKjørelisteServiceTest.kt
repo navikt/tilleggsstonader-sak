@@ -5,11 +5,13 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
@@ -37,6 +39,7 @@ class AvklartKjørelisteServiceTest {
     private val kjørelisteService = mockk<KjørelisteService>()
     private val vedtakService = mockk<VedtakService>()
     private val behandlingService = mockk<BehandlingService>()
+    private val unleashService = mockk<UnleashService>()
 
     private val service =
         AvklartKjørelisteService(
@@ -44,6 +47,7 @@ class AvklartKjørelisteServiceTest {
             avklartKjørtUkeRepository = avklartKjørtUkeRepository,
             kjørelisteService = kjørelisteService,
             behandlingService = behandlingService,
+            unleashService = unleashService,
         )
 
     private val reiseId = ReiseId.random()
@@ -239,6 +243,7 @@ class AvklartKjørelisteServiceTest {
             )
         every { kjørelisteService.hentKjøreliste(eksisterendeUke.kjørelisteId) } returns innsendtKjøreliste
         every { behandlingService.hentBehandling(behandlingId) } returns behandling
+        every { unleashService.isEnabled(Toggle.KAN_OVERSKRIDE_ANTALL_DAGER_I_RAMMEVEDTAK) } returns false
 
         val vedtakData =
             InnvilgelseDagligReise(
@@ -362,7 +367,7 @@ class AvklartKjørelisteServiceTest {
         }
 
         @Test
-        fun `uker som tilhører reise som ikke finnes i rammevedtaket hoppes over`() {
+        fun `uker som tilhører reise som ikke finnes i rammevedtaket markeres SLETTET`() {
             val reise2 = ReiseId.random()
             val mandagUke1 = 5 januar 2026
             val mandagUke2 = 12 januar 2026
@@ -409,11 +414,41 @@ class AvklartKjørelisteServiceTest {
 
             service.sletteMarkerUkerOgDagerUtenforAvkortetRammevedtak(behandlingId, rammevedtak)
 
-            // Uke 1 (reiseId) er innenfor rammevedtak, Uke 2 (reiseId) er etter, skal slettes
-            // Uke 3 (reise2) finnes ikke i rammevedtak, hoppes over
-            assertThat(updateSlot.captured).hasSize(1)
-            assertThat(updateSlot.captured[0].fom).isEqualTo(mandagUke2)
-            assertThat(updateSlot.captured[0].reiseId).isEqualTo(reiseId)
+            // Uke 1 (reiseId) er innenfor rammevedtak
+            // Uke 2 (reiseId) er etter tom-dato og skal slettes
+            // Uke 3 (reise2) finnes ikke i rammevedtak og skal slettes
+            assertThat(updateSlot.captured).hasSize(2)
+            val uke2 = updateSlot.captured.single { it.fom == mandagUke2 }
+            assertThat(uke2.reiseId).isEqualTo(reiseId)
+            assertThat(uke2.avklartKjørtUkeStatus).isEqualTo(AvklartKjørtUkeStatus.SLETTET)
+            assertThat(uke2.dager).allMatch { it.avklartKjørtDagStatus == AvklartKjørtDagStatus.SLETTET }
+
+            val uke3 = updateSlot.captured.single { it.fom == mandagUke3 }
+            assertThat(uke3.reiseId).isEqualTo(reise2)
+            assertThat(uke3.avklartKjørtUkeStatus).isEqualTo(AvklartKjørtUkeStatus.SLETTET)
+            assertThat(uke3.dager).allMatch { it.avklartKjørtDagStatus == AvklartKjørtDagStatus.SLETTET }
+        }
+
+        @Test
+        fun `alle uker markeres SLETTET når rammevedtak er null`() {
+            val mandagUke1 = 5 januar 2026
+            val mandagUke2 = 12 januar 2026
+            val uker =
+                listOf(
+                    lagUke(fom = mandagUke1, tom = mandagUke1.plusDays(4), status = AvklartKjørtUkeStatus.UENDRET),
+                    lagUke(fom = mandagUke2, tom = mandagUke2.plusDays(4), status = AvklartKjørtUkeStatus.ENDRET),
+                )
+
+            val updateSlot = slot<List<AvklartKjørtUke>>()
+
+            every { avklartKjørtUkeRepository.findByBehandlingId(behandlingId) } returns uker
+            every { avklartKjørtUkeRepository.updateAll(capture(updateSlot)) } answers { updateSlot.captured }
+
+            service.sletteMarkerUkerOgDagerUtenforAvkortetRammevedtak(behandlingId, null)
+
+            assertThat(updateSlot.captured).hasSize(2)
+            assertThat(updateSlot.captured).allMatch { it.avklartKjørtUkeStatus == AvklartKjørtUkeStatus.SLETTET }
+            assertThat(updateSlot.captured.flatMap { it.dager }).allMatch { it.avklartKjørtDagStatus == AvklartKjørtDagStatus.SLETTET }
         }
 
         @Test

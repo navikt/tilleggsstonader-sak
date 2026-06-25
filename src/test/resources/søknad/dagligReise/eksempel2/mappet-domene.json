@@ -60,6 +60,7 @@
       "kanKjøreMedEgenBil" : "JA",
       "utgifterBil" : {
         "mottarGrunnstønad" : null,
+        "drivstofftype" : "BENSIN",
         "parkering" : "JA",
         "bompenger" : 43,
         "ferge" : 0,

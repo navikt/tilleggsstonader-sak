@@ -31,7 +31,6 @@ class BrevController(
         val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
 
         tilgangService.validerSkrivetilgangTilBehandling(saksbehandling.id, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
 
         return Base64.getEncoder().encode(brevService.lagSaksbehandlerBrev(saksbehandling, request.html))
     }

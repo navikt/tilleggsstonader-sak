@@ -6,13 +6,13 @@ import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseDtoMapper.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreVilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårResultatDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.tilDagligreiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelstrukturDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggRegelstrukturFraVilkårregel.tilRegelstruktur
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegel
@@ -56,7 +56,6 @@ class DagligReiseVilkårController(
     ): VilkårDagligReiseDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
-        tilgangService.validerHarSaksbehandlerrolle()
 
         return dagligReiseVilkårService
             .opprettNyttVilkår(
@@ -73,7 +72,6 @@ class DagligReiseVilkårController(
     ): VilkårDagligReiseDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
 
         return dagligReiseVilkårService
             .oppdaterVilkår(
@@ -91,14 +89,19 @@ class DagligReiseVilkårController(
     ): SlettVilkårResultatDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.DELETE)
-        tilgangService.validerHarSaksbehandlerrolle()
 
-        return dagligReiseVilkårService
-            .slettVilkår(
-                behandlingId = behandlingId,
-                vilkårId = vilkårId,
-                slettetKommentar = slettVilkårRequestDto.kommentar,
-            ).tilDagligreiseDto()
+        val slettetVilkårResultat =
+            dagligReiseVilkårService
+                .slettVilkår(
+                    behandlingId = behandlingId,
+                    vilkårId = vilkårId,
+                    slettetKommentar = slettVilkårRequestDto.kommentar,
+                )
+
+        return SlettVilkårResultatDto(
+            slettetPermanent = slettetVilkårResultat.slettetPermanent,
+            vilkår = slettetVilkårResultat.vilkår.mapTilVilkårDagligReise().tilDtoMedAktivitetType(),
+        )
     }
 
     private fun VilkårDagligReise.tilDtoMedAktivitetType(): VilkårDagligReiseDto {

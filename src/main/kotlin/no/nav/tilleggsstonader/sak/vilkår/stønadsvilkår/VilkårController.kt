@@ -41,7 +41,6 @@ class VilkårController(
     ): VilkårDto {
         tilgangService.settBehandlingsdetaljerForRequest(svarPåVilkårDto.behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(svarPåVilkårDto.behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
         try {
             return vilkårService.oppdaterVilkår(svarPåVilkårDto).tilDto()
         } catch (e: Exception) {
@@ -61,7 +60,6 @@ class VilkårController(
     ): VilkårDto {
         tilgangService.settBehandlingsdetaljerForRequest(opprettVilkårDto.behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(opprettVilkårDto.behandlingId, AuditLoggerEvent.CREATE)
-        tilgangService.validerHarSaksbehandlerrolle()
 
         return vilkårService.opprettNyttVilkår(opprettVilkårDto).tilDto()
     }
@@ -72,7 +70,6 @@ class VilkårController(
     ): SlettVilkårResponse {
         tilgangService.settBehandlingsdetaljerForRequest(request.behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(request.behandlingId, AuditLoggerEvent.DELETE)
-        tilgangService.validerHarSaksbehandlerrolle()
 
         return vilkårService.slettVilkår(request).tilDto()
     }
@@ -83,7 +80,6 @@ class VilkårController(
     ): VilkårDto {
         tilgangService.settBehandlingsdetaljerForRequest(request.behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(request.behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
         return vilkårService.settVilkårTilSkalIkkeVurderes(request)
     }
 

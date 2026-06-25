@@ -63,7 +63,6 @@ class TotrinnskontrollController(
     ): StatusTotrinnskontrollDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE, validerTilordnetOppgave = false)
-        tilgangService.validerHarSaksbehandlerrolle()
 
         angreSendTilBeslutterService.angreSendTilBeslutter(behandlingId)
         return totrinnskontrollService.hentTotrinnskontrollStatus(behandlingId)

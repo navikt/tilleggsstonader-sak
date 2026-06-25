@@ -116,7 +116,6 @@ class BehandlingController(
     ) {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
         henleggService.henleggBehandling(behandlingId, henlagt)
     }
 
@@ -136,7 +135,6 @@ class BehandlingController(
     ) {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-        tilgangService.validerHarSaksbehandlerrolle()
         nullstillBehandlingService.nullstillBehandling(behandlingService.hentBehandling(behandlingId))
     }
 }

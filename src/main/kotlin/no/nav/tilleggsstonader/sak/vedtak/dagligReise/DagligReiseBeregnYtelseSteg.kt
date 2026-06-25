@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -48,7 +49,11 @@ class DagligReiseBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         kanBehandlePrivatBil: Boolean,
     ): StegType {
-        if (dagligReiseVedtakService.forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(saksbehandling.forrigeIverksatteBehandlingId)) {
+        val gjelderAvslag = vedtakRepository.findByIdOrNull(saksbehandling.id)?.type == TypeVedtak.AVSLAG
+        val forrigeIverksatteBehandlingHarRammevedtakForPrivatBil =
+            dagligReiseVedtakService.forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(saksbehandling.forrigeIverksatteBehandlingId)
+
+        if (forrigeIverksatteBehandlingHarRammevedtakForPrivatBil && !gjelderAvslag) {
             return StegType.KJØRELISTE
         }
 
@@ -147,12 +152,10 @@ class DagligReiseBeregnYtelseSteg(
             opphørsdato,
         )
 
-        rammevedtakPrivatBil?.let {
-            avklartKjørelisteService.sletteMarkerUkerOgDagerUtenforAvkortetRammevedtak(
-                behandlingId = saksbehandling.id,
-                rammevedtak = it,
-            )
-        }
+        avklartKjørelisteService.sletteMarkerUkerOgDagerUtenforAvkortetRammevedtak(
+            behandlingId = saksbehandling.id,
+            rammevedtak = rammevedtakPrivatBil,
+        )
 
         dagligReiseVedtakService.lagreOpphørsvedtak(
             saksbehandling = saksbehandling,

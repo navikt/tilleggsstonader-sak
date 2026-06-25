@@ -84,6 +84,7 @@ class TilgangService(
         feilHvis(event == AuditLoggerEvent.ACCESS) {
             "AuditLoggerEvent.ACCESS er ikke gyldig for skrivetilgangskontroll"
         }
+        validerHarSaksbehandlerrolle()
 
         val saksbehandling = hentCachedBehandling(behandlingId)
 

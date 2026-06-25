@@ -54,7 +54,7 @@ class AngreSendTilBeslutterService(
             OpprettOppgaveTask.opprettTask(
                 behandlingId = saksbehandling.id,
                 OpprettOppgave(
-                    oppgavetype = Oppgavetype.BehandleSak,
+                    oppgavetype = if (saksbehandling.erKjørelisteBehandling()) Oppgavetype.BehandleKjøreliste else Oppgavetype.BehandleSak,
                     beskrivelse = "Angret send til beslutter",
                     tilordnetNavIdent = SikkerhetContext.hentSaksbehandler(),
                 ),

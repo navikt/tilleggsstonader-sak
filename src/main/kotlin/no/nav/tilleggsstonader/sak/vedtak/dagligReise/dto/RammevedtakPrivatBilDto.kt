@@ -25,8 +25,8 @@ data class DelperiodeDto(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val reisedagerPerUke: Int,
-    val bompengerPerDag: Int?,
-    val fergekostnadPerDag: Int?,
+    val bompengerPerDag: BigDecimal?,
+    val fergekostnadPerDag: BigDecimal?,
     val satser: List<RammeForReiseMedPrivatBilDelperiodeSatserDto>,
 ) : Periode<LocalDate>
 

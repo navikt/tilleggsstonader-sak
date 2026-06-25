@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
-import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
@@ -50,11 +49,7 @@ class RevurderingDagligReiseGjenbrukForrigeBeregningsresultatIntegrationTest(
                 tilSteg = StegType.SIMULERING,
             ) {
                 aktivitet {
-                    oppdater { aktiviteter, behandlingId ->
-                        with(aktiviteter.single()) {
-                            id to tilLagreVilkårperiodeAktivitet(behandlingId).copy(begrunnelse = "oppdatert begrunnelse")
-                        }
-                    }
+                    oppdaterEnesteAktivitet { this.copy(begrunnelse = "oppdatert begrunnelse") }
                 }
                 vedtak {
                     innvilgelse(

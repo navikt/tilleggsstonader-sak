@@ -91,14 +91,7 @@ class FagsakService(
                 .map { it.tilFagsakMedPerson() }
                 .associateBy { it.stønadstype }
 
-        return Fagsaker(
-            barnetilsyn = fagsaker[Stønadstype.BARNETILSYN],
-            læremidler = fagsaker[Stønadstype.LÆREMIDLER],
-            boutgifter = fagsaker[Stønadstype.BOUTGIFTER],
-            dagligReiseTso = fagsaker[Stønadstype.DAGLIG_REISE_TSO],
-            dagligReiseTsr = fagsaker[Stønadstype.DAGLIG_REISE_TSR],
-            reiseTilSamlingTso = fagsaker[Stønadstype.REISE_TIL_SAMLING_TSO],
-        )
+        return Fagsaker(fagsaker)
     }
 
     fun erLøpende(fagsakId: FagsakId): Boolean = fagsakRepository.harLøpendeUtbetaling(fagsakId)
