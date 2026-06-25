@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
-import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
@@ -407,14 +406,14 @@ class RevurderingPrivatBilIntegrationTest(
                     ?.perioder,
             ).isNotNull.isEmpty()
 
-            // Forventer kun én melding, fra kjørelistebehandling
+            // Forventer to meldinger: én fra kjørelistebehandling og én fra revurdering
             val iverksettinger =
                 KafkaFake
                     .sendteMeldinger()
                     .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 2)
                     .map { it.verdiEllerFeil<IverksettingDto>() }
 
-            // Utbetaling i første iverksetting (kjørelsitebehandling)
+            // Utbetaling i første iverksetting (kjørelistebehandling)
             assertThat(
                 iverksettinger
                     .minBy { it.vedtakstidspunkt }
@@ -609,10 +608,4 @@ class RevurderingPrivatBilIntegrationTest(
             .map { it.grunnlag.tom }
             .sorted()
             .last()
-
-    private fun RammevedtakPrivatBil.førsteFom() =
-        this.reiser
-            .map { it.grunnlag.fom }
-            .sorted()
-            .first()
 }
