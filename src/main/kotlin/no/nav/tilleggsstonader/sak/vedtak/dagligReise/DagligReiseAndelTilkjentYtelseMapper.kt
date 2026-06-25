@@ -20,8 +20,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatP
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import java.time.LocalDate
-import kotlin.collections.maxOf
-import kotlin.collections.minOf
 
 fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandling: Saksbehandling): List<AndelTilkjentYtelse> =
     reiser
@@ -200,12 +198,22 @@ private fun finnPrivatBilPeriodeFraAndel(
     beregningsresultatPrivatBil: BeregningsresultatPrivatBil,
     andelTilkjentYtelse: AndelTilkjentYtelse,
 ): Datoperiode {
-    feilHvis(andelTilkjentYtelse.reiseId == null) {
-        "reiseId skal alltid være satt "
-    }
-    return beregningsresultatPrivatBil.reiser
-        .single { it.reiseId == andelTilkjentYtelse.reiseId }
-        .perioder
-        .single { periode -> andelTilkjentYtelse.fom.tilUkeIÅr() == periode.fom.tilUkeIÅr() }
-        .let { Datoperiode(it.fom, it.tom) }
+    val reiseId =
+        requireNotNull(andelTilkjentYtelse.reiseId) {
+            "Mangler reiseId på andel (fom=${andelTilkjentYtelse.fom})"
+        }
+
+    val uke = andelTilkjentYtelse.fom.tilUkeIÅr()
+
+    val reise =
+        beregningsresultatPrivatBil.reiser.singleOrNull { it.reiseId == reiseId }
+            ?: error("Finner ingen (eller flere) privatbilreiser for reiseId=$reiseId")
+
+    val periode =
+        reise.perioder.singleOrNull { it.fom.tilUkeIÅr() == uke }
+            ?: error(
+                "Finner ingen (eller flere) privatbilperioder for reiseId=$reiseId uke=$uke (andelFom=${andelTilkjentYtelse.fom})",
+            )
+
+    return Datoperiode(periode.fom, periode.tom)
 }

@@ -31,7 +31,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
-import java.time.Period
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 import java.util.UUID.randomUUID
 
@@ -269,7 +269,7 @@ private fun rammevedtakPrivatBil(perioder: List<PrivatBilPeriode>) =
                         },
                     delperioder =
                         perioder.map { periode ->
-                            val dagerIperiode = Period.between(periode.fom, periode.tom.plusDays(1)).days
+                            val dagerIperiode = ChronoUnit.DAYS.between(periode.fom, periode.tom.plusDays(1)).toInt()
                             no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode(
                                 fom = periode.fom,
                                 tom = periode.tom,
