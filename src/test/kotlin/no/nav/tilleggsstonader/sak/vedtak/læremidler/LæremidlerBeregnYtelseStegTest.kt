@@ -5,7 +5,11 @@ import no.nav.tilleggsstonader.libs.utils.dato.april
 import no.nav.tilleggsstonader.libs.utils.dato.august
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
@@ -16,9 +20,9 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterResponse
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
@@ -101,20 +105,18 @@ class LæremidlerBeregnYtelseStegTest : CleanDatabaseIntegrationTest() {
     inner class Opphør {
         @Test
         fun `skal lagre vedtak`() {
-            val vedtaksperiode = vedtaksperiodeDto(id = UUID.randomUUID(), fom = fom, tom = tom)
-            val innvilgelse = InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode))
+            val førstegangsbehandlingContext =
+                opprettBehandlingOgGjennomførBehandlingsløp(
+                    stønadstype = Stønadstype.LÆREMIDLER,
+                ) {
+                    defaultLæremidlerTestdata(fom = fom, tom = tom)
+                }
 
-            vilkårperiodeRepository.insertAll(listOf(målgruppe, aktivitet))
-
-            steg.utførSteg(saksbehandling, innvilgelse)
-
-            testoppsettService.ferdigstillBehandling(behandling = behandling)
-            val behandlingForOpphør =
-                testoppsettService
-                    .opprettRevurdering(
-                        forrigeBehandling = behandling,
-                        fagsak = fagsak,
-                    ).let { testoppsettService.hentSaksbehandling(it.id) }
+            val revurderingId =
+                opprettRevurderingOgGjennomførBehandlingsløp(
+                    fraBehandlingId = førstegangsbehandlingContext.behandlingId,
+                    tilSteg = StegType.BEREGNE_YTELSE,
+                ) {}
 
             val opphør =
                 OpphørLæremidlerRequest(
@@ -122,16 +124,25 @@ class LæremidlerBeregnYtelseStegTest : CleanDatabaseIntegrationTest() {
                     begrunnelse = "en begrunnelse",
                     opphørsdato = LocalDate.of(2025, 2, 1),
                 )
-            steg.utførSteg(behandlingForOpphør, opphør)
 
-            val vedtak = repository.findByIdOrThrow(behandlingForOpphør.id).withTypeOrThrow<OpphørLæremidler>()
-            assertThat(vedtak.behandlingId).isEqualTo(behandlingForOpphør.id)
+            kall.vedtak.apiRespons
+                .lagreOpphør(
+                    stønadstype = Stønadstype.LÆREMIDLER,
+                    behandlingId = revurderingId,
+                    opphørDto = opphør,
+                ).expectStatus()
+                .isOk()
+
+            val vedtak =
+                kall.vedtak
+                    .hentVedtak(Stønadstype.BOUTGIFTER, revurderingId)
+                    .expectOkWithBody<OpphørBoutgifterResponse>()
+
             assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
-            with(vedtak.data.vedtaksperioder.single()) {
+            with(vedtak.vedtaksperioder.single()) {
                 assertThat(this.fom).isEqualTo(fom)
                 assertThat(this.tom).isEqualTo(LocalDate.of(2025, 1, 31))
             }
-            assertThat(vedtak.gitVersjon).isEqualTo(Applikasjonsversjon.versjon)
         }
     }
 

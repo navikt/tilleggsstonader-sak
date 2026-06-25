@@ -56,7 +56,7 @@ class OpphørValideringServiceTest {
             type = BehandlingType.REVURDERING,
         )
     val opphørValideringService =
-        OpphørValideringService(vilkårperiodeService, vilkårService, vedtakService, utledTidligsteEndringService)
+        OpphørValideringService(vilkårperiodeService, vilkårService, utledTidligsteEndringService)
     val vilkår =
         vilkår(
             behandlingId = saksbehandling.id,
@@ -98,7 +98,7 @@ class OpphørValideringServiceTest {
                 aktiviteter = listOf(aktivitet),
             )
         every { vedtakService.hentVedtaksperioder(any()) } returns listOf(vedtaksperiode(fom, tom))
-        every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(any(), any()) } returns null
+        every { utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(any()) } returns null
         every { tilsynBarnBeregningService.beregn(any(), any(), any(), any()) } returns beregningsresultat
     }
 

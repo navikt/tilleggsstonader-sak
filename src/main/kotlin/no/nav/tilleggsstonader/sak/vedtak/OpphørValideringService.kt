@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
+import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -25,7 +26,6 @@ import java.time.YearMonth
 class OpphørValideringService(
     private val vilkårsperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
-    private val vedtakService: VedtakService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
 ) {
     fun validerVilkårperioder(
@@ -34,11 +34,9 @@ class OpphørValideringService(
     ) {
         val vilkår = vilkårService.hentVilkår(saksbehandling.id)
         val vilkårperioder = vilkårsperiodeService.hentVilkårperioder(saksbehandling.id)
-        val vedtaksperioder = vedtakService.hentVedtaksperioder(saksbehandling.id)
 
         validerIngenEndringerIVilkårFørOpphørsdato(
             behandlingId = saksbehandling.id,
-            vedtaksperioder = vedtaksperioder,
             opphørsdato = opphørsdato,
         )
         validerIngenNyeOppfylteVilkårEllerVilkårperioder(vilkår, vilkårperioder)
@@ -90,19 +88,18 @@ class OpphørValideringService(
         }
     }
 
+    // TODO Oppdater navn
     private fun validerIngenEndringerIVilkårFørOpphørsdato(
         behandlingId: BehandlingId,
-        vedtaksperioder: List<Vedtaksperiode>,
         opphørsdato: LocalDate,
     ) {
         val tidligsteEndring =
-            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
+            utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(
                 behandlingId = behandlingId,
-                vedtaksperioder = vedtaksperioder,
             )
 
-        brukerfeilHvis(tidligsteEndring != null && tidligsteEndring < opphørsdato) {
-            "Opphør er et ugyldig vedtaksresultat fordi det er endringer i vilkår før opphørsdato"
+        brukerfeilHvis(tidligsteEndring != null && tidligsteEndring <= opphørsdato) {
+            "Opphør er et ugyldig vedtaksresultat fordi opphørsdato er etter eller lik tidligste endring (${tidligsteEndring?.norskFormat()})"
         }
     }
 

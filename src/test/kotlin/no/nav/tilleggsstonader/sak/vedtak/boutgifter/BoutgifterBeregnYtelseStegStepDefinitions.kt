@@ -130,7 +130,6 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         OpphørValideringService(
             vilkårsperiodeService = vilkårperiodeServiceMock,
             vilkårService = vilkårService,
-            vedtakService = vedtakService,
             utledTidligsteEndringService = utledTidligsteEndringService,
         )
     val steg =

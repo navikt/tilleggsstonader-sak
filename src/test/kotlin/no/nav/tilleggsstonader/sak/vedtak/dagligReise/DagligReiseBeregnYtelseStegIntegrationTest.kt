@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.juni
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -18,6 +19,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.Fakta
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 
 class DagligReiseBeregnYtelseStegIntegrationTest(
     @Autowired private val vedtakService: VedtakService,
@@ -105,10 +107,9 @@ class DagligReiseBeregnYtelseStegIntegrationTest(
                     opphørDto(
                         opphørsdato = 1 februar 2025,
                     ),
-            ).expectStatus()
-            .isBadRequest()
-            .expectBody()
-            .jsonPath("$.detail")
-            .isEqualTo("Opphør er et ugyldig vedtaksresultat fordi det er endringer i vilkår før opphørsdato")
+            ).expectProblemDetail(
+                forventetStatus = HttpStatus.BAD_REQUEST,
+                forventetDetail = "Opphør er et ugyldig vedtaksresultat fordi opphørsdato er etter eller lik tidligste endring (01.01.2025)",
+            )
     }
 }

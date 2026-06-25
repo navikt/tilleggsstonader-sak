@@ -14,6 +14,8 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
@@ -23,20 +25,19 @@ import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -51,7 +52,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.AfterEach
@@ -59,6 +59,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
@@ -201,9 +202,12 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
                         utbetalingsdato = april.atDay(3),
                     ),
                 )
-            assertThat(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList())
-                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "endretTid")
-                .containsExactlyElementsOf(forventedeAndeler)
+            assertThat(
+                tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList(),
+            ).usingRecursiveFieldByFieldElementComparatorIgnoringFields(
+                "id",
+                "endretTid",
+            ).containsExactlyElementsOf(forventedeAndeler)
         }
 
         @Test
@@ -226,9 +230,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
             }
 
             val beregningsresultat =
-                vedtakService
-                    .hentVedtak<InnvilgelseTilsynBarn>(behandling.id)
-                    .data.beregningsresultat
+                vedtakService.hentVedtak<InnvilgelseTilsynBarn>(behandling.id).data.beregningsresultat
             with(beregningsresultat.perioder.single()) {
                 with(this.grunnlag.vedtaksperiodeGrunnlag.single()) {
                     assertThat(this.vedtaksperiode.fom).isEqualTo(juni.atDay(1))
@@ -246,81 +248,42 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
     inner class Opphør {
         @Test
         fun `skal lagre vedtak`() {
-            val beløpsperioderJanuar =
-                listOf(Beløpsperiode(dato = LocalDate.of(2023, 1, 2), beløp = 1000, målgruppe = NEDSATT_ARBEIDSEVNE))
-            val beløpsperiodeFebruar =
-                listOf(Beløpsperiode(dato = LocalDate.of(2023, 2, 1), beløp = 2000, målgruppe = NEDSATT_ARBEIDSEVNE))
-            val beregningsresultatJanuar =
-                beregningsresultatForMåned(beløpsperioder = beløpsperioderJanuar, måned = YearMonth.of(2023, 1))
-            val beregningsresultatFebruar =
-                beregningsresultatForMåned(beløpsperioder = beløpsperiodeFebruar, måned = YearMonth.of(2023, 2))
+            val fom = 1 januar 2025
+            val tom = 28 februar 2025
 
-            val vedtakBeregningsresultatFørstegangsbehandling =
-                BeregningsresultatTilsynBarn(
-                    perioder =
-                        listOf(
-                            beregningsresultatJanuar,
-                            beregningsresultatFebruar,
-                        ),
-                )
+            val førstegangsbehandlingContext =
+                opprettBehandlingOgGjennomførBehandlingsløp(
+                    stønadstype = Stønadstype.BARNETILSYN,
+                ) {
+                    defaultTilsynBarnTestdata(fom = fom, tom = tom)
+                }
 
-            val vedtaksperiode =
-                Vedtaksperiode(
-                    id = UUID.randomUUID(),
-                    fom = LocalDate.of(2023, 1, 2),
-                    tom = LocalDate.of(2023, 2, 28),
-                    målgruppe = NEDSATT_ARBEIDSEVNE,
-                    aktivitet = AktivitetType.TILTAK,
-                )
+            val behandlingId =
+                opprettRevurderingOgGjennomførBehandlingsløp(
+                    fraBehandlingId = førstegangsbehandlingContext.behandlingId,
+                    tilSteg = StegType.BEREGNE_YTELSE,
+                ) {
+                    aktivitet {
+                        oppdaterTomPåEnesteAktivitet(tom = fom.toYearMonth().atEndOfMonth())
+                    }
+                }
 
-            testoppsettService.lagVedtak(
-                behandling = behandling,
-                beregningsresultat = vedtakBeregningsresultatFørstegangsbehandling,
-                vedtaksperioder = listOf(vedtaksperiode),
-            )
-            testoppsettService.ferdigstillBehandling(behandling = behandling)
+            kall.vedtak.apiRespons
+                .lagreOpphør(
+                    stønadstype = Stønadstype.BARNETILSYN,
+                    behandlingId = behandlingId,
+                    opphørDto = opphørDto(opphørsdato = LocalDate.of(2025, 1, 31)),
+                ).expectStatus()
+                .isOk()
 
-            val behandlingForOpphør =
-                testoppsettService.opprettRevurdering(
-                    forrigeBehandling = behandling,
-                    fagsak = fagsak,
-                )
-            val saksbehandlingForOpphør = saksbehandling(behandling = behandlingForOpphør)
-            val aktivitetForOpphør =
-                aktivitet(
-                    behandlingForOpphør.id,
-                    fom = LocalDate.of(2023, 1, 2),
-                    tom = LocalDate.of(2023, 1, 31),
-                    status = Vilkårstatus.ENDRET,
-                )
-            val målgruppeForOpphør =
-                målgruppe.copy(behandlingId = behandlingForOpphør.id, status = Vilkårstatus.UENDRET)
+            val vedtak =
+                kall.vedtak
+                    .hentVedtak(Stønadstype.BARNETILSYN, behandlingId)
+                    .expectOkWithBody<OpphørTilsynBarnResponse>()
 
-            vilkårperiodeRepository.insert(aktivitetForOpphør)
-            vilkårperiodeRepository.insert(målgruppeForOpphør)
-            lagVilkårForPeriode(saksbehandlingForOpphør, januar, februar, 100, status = VilkårStatus.UENDRET)
-
-            val vedtakDto = opphørDto(opphørsdato = LocalDate.of(2023, 2, 1))
-            steg.utførOgReturnerNesteSteg(saksbehandlingForOpphør, vedtakDto)
-
-            val vedtak = repository.findByIdOrThrow(saksbehandlingForOpphør.id).withTypeOrThrow<OpphørTilsynBarn>()
-
-            val tilkjentYtelse =
-                tilkjentYtelseRepository.findByBehandlingId(saksbehandlingForOpphør.id)!!.andelerTilkjentYtelse
-
-            val forventetVedtaksperioderForOpphør = vedtaksperiode.copy(tom = LocalDate.of(2023, 1, 31))
-
-            assertThat(vedtak.behandlingId).isEqualTo(saksbehandlingForOpphør.id)
             assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
-            assertThat(vedtak.data.årsaker).containsExactly(ÅrsakOpphør.ENDRING_UTGIFTER)
-            assertThat(vedtak.data.begrunnelse).isEqualTo("Endring i utgifter")
-            assertThat(
-                vedtak.data.beregningsresultat.perioder
-                    .single(),
-            ).isEqualTo(beregningsresultatJanuar)
-            assertThat(tilkjentYtelse).hasSize(1)
-            assertThat(vedtak.data.vedtaksperioder).isEqualTo(listOf(forventetVedtaksperioderForOpphør))
-            assertThat(vedtak.gitVersjon).isEqualTo(Applikasjonsversjon.versjon)
+            assertThat(vedtak.årsakerOpphør).containsExactly(ÅrsakOpphør.ENDRING_UTGIFTER)
+            assertThat(vedtak.begrunnelse).isEqualTo("Endring i utgifter")
         }
 
         /**
@@ -380,10 +343,29 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
                 opprettBehandlingOgGjennomførBehandlingsløp(
                     stønadstype = Stønadstype.BARNETILSYN,
                 ) {
-                    defaultTilsynBarnTestdata(
-                        fom = fom,
-                        tom = tom,
-                    )
+                    aktivitet {
+                        opprett {
+                            aktivitetTiltakTilsynBarn(
+                                fom = fom,
+                                tom = tom,
+                                aktivitetsdager = 4,
+                            )
+                        }
+                    }
+                    målgruppe {
+                        opprett {
+                            målgruppeAAP(fom, tom)
+                        }
+                    }
+                    vilkår {
+                        opprett {
+                            passBarn(
+                                fom = fom.toYearMonth().plusMonths(1),
+                                tom = tom.toYearMonth().plusMonths(1),
+                                utgift = 1000,
+                            )
+                        }
+                    }
                 }
 
             val revurderingId =
@@ -398,8 +380,8 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
                                     id = id,
                                     behandlingId = behandlingId,
                                     delvilkårsett = delvilkårsett,
-                                    fom = fom,
-                                    tom = januar.withYear(2025).atEndOfMonth(),
+                                    fom = fom.plusMonths(1),
+                                    tom = tom,
                                     utgift = 500,
                                     erFremtidigUtgift = erFremtidigUtgift,
                                     offentligTransport = null,
@@ -415,13 +397,14 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
                     behandlingId = revurderingId,
                     opphørDto =
                         opphørDto(
-                            opphørsdato = 1 februar 2025,
+                            opphørsdato = 15 februar 2025,
                         ),
-                ).expectStatus()
-                .isBadRequest()
-                .expectBody()
-                .jsonPath("$.detail")
-                .isEqualTo("Opphør er et ugyldig vedtaksresultat fordi det er endringer i vilkår før opphørsdato")
+                ).expectProblemDetail(
+                    forventetStatus = HttpStatus.BAD_REQUEST,
+                    forventetDetail =
+                        "Opphør er et ugyldig vedtaksresultat fordi " +
+                            "opphørsdato er etter eller lik tidligste endring (01.02.2025)",
+                )
         }
     }
 
@@ -547,10 +530,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
         }
 
         private fun hentBeregningsresultat(behandlingId: BehandlingId): BeregningsresultatTilsynBarn =
-            vedtakService
-                .hentVedtak<InnvilgelseTilsynBarn>(behandlingId)
-                .data
-                .beregningsresultat
+            vedtakService.hentVedtak<InnvilgelseTilsynBarn>(behandlingId).data.beregningsresultat
 
         private fun assertHarPerioderForJanuarOgFebruar(beregningsresultat: List<BeregningsresultatForMåned>) {
             with(beregningsresultat[0].grunnlag.vedtaksperiodeGrunnlag.single()) {
@@ -643,9 +623,12 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
                     )
                 }
 
-            assertThat(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList())
-                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "endretTid")
-                .containsExactlyElementsOf(forventedeAndeler)
+            assertThat(
+                tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList(),
+            ).usingRecursiveFieldByFieldElementComparatorIgnoringFields(
+                "id",
+                "endretTid",
+            ).containsExactlyElementsOf(forventedeAndeler)
         }
 
         @Test
@@ -687,9 +670,12 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
                     beløp = beløp1DagUtgift100,
                     type = TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER,
                 )
-            assertThat(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList())
-                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "endretTid")
-                .containsExactlyElementsOf(listOf(forventetAndel))
+            assertThat(
+                tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList(),
+            ).usingRecursiveFieldByFieldElementComparatorIgnoringFields(
+                "id",
+                "endretTid",
+            ).containsExactlyElementsOf(listOf(forventetAndel))
         }
 
         @Test
@@ -730,9 +716,12 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
                     beløp = beløp1DagUtgift100,
                     type = TypeAndel.TILSYN_BARN_ETTERLATTE,
                 )
-            assertThat(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList())
-                .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "endretTid")
-                .containsExactlyElementsOf(listOf(forventetAndel))
+            assertThat(
+                tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList(),
+            ).usingRecursiveFieldByFieldElementComparatorIgnoringFields(
+                "id",
+                "endretTid",
+            ).containsExactlyElementsOf(listOf(forventetAndel))
         }
     }
 
@@ -760,9 +749,5 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
     private fun finnTotalbeløp(
         dagsats: BigDecimal,
         antallDager: Int,
-    ): Int =
-        dagsats
-            .multiply(antallDager.toBigDecimal())
-            .setScale(0, RoundingMode.HALF_UP)
-            .toInt()
+    ): Int = dagsats.multiply(antallDager.toBigDecimal()).setScale(0, RoundingMode.HALF_UP).toInt()
 }
