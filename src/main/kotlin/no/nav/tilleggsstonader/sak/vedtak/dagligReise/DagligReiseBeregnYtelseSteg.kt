@@ -108,6 +108,11 @@ class DagligReiseBeregnYtelseSteg(
             beregningsplan = plan,
         )
 
+        avklartKjørelisteService.sletteMarkerUkerOgDagerUtenforAvkortetRammevedtak(
+            behandlingId = saksbehandling.id,
+            rammevedtak = rammevedtakPrivatBil,
+        )
+
         opprettAndelerDagligReiseService.lagreAndelerForBehandling(saksbehandling)
     }
 

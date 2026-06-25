@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
 import io.github.mikaojk.holiday.getNorwegianHolidays
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
@@ -324,10 +325,10 @@ class AvklartKjørelisteService(
                 if (rammevedtakForReise == null) {
                     uke.markerHeleUkaSomSlettet()
                 } else {
-                    val sisteDagIRammevedtak = rammevedtakForReise.grunnlag.tom
+                    val grunnlag = rammevedtakForReise.grunnlag
                     when {
-                        uke.fom > sisteDagIRammevedtak -> uke.markerHeleUkaSomSlettet()
-                        uke.inneholder(sisteDagIRammevedtak) -> uke.markerDelerAvUkaSomSlettet(fraDato = sisteDagIRammevedtak)
+                        !uke.overlapper(grunnlag) -> uke.markerHeleUkaSomSlettet()
+                        !grunnlag.inneholder(uke) -> uke.markerDelerAvUkaSomSlettet(gyldigPeriode = grunnlag)
                         else -> null
                     }
                 }
@@ -344,9 +345,13 @@ class AvklartKjørelisteService(
             dager = dager.markerSomSlettet(),
         )
 
-    private fun AvklartKjørtUke.markerDelerAvUkaSomSlettet(fraDato: LocalDate): AvklartKjørtUke? {
-        val oppdaterteDager = dager.markerSomSlettet(fraDato)
-        return if (oppdaterteDager != dager) {
+    private fun AvklartKjørtUke.markerDelerAvUkaSomSlettet(gyldigPeriode: Periode<LocalDate>): AvklartKjørtUke? {
+        val oppdaterteDager = dager.markerSomSlettetUtenforPeriode(gyldigPeriode = gyldigPeriode)
+        return oppdaterUkeHvisDagerErEndret(oppdaterteDager)
+    }
+
+    private fun AvklartKjørtUke.oppdaterUkeHvisDagerErEndret(oppdaterteDager: Set<AvklartKjørtDag>): AvklartKjørtUke? =
+        if (oppdaterteDager != dager) {
             val nyUkeStatus =
                 if (avklartKjørtUkeStatus == AvklartKjørtUkeStatus.UENDRET) {
                     AvklartKjørtUkeStatus.ENDRET
@@ -357,5 +362,4 @@ class AvklartKjørelisteService(
         } else {
             null
         }
-    }
 }

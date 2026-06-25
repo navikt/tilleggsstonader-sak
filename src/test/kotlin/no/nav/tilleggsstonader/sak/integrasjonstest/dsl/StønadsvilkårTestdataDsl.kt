@@ -4,8 +4,12 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreDagligReisePrivatBilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReisePrivatBilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseUbestemtDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreVilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
@@ -51,6 +55,46 @@ class StønadsvilkårTestdataDsl {
         ) -> Pair<VilkårId, LagreVilkårDagligReiseDto>,
     ) {
         updateDagligReise += block
+    }
+
+    fun oppdaterEnesteDagligeReise(endre: LagreVilkårDagligReiseDto.() -> LagreVilkårDagligReiseDto) {
+        oppdaterDagligReise { perioder, _ ->
+            val periode = perioder.single()
+            periode.id to periode.tilLagreDagligReiseDto().endre()
+        }
+    }
+
+    fun oppdaterDatoPåEnesteDagligeReise(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) {
+        oppdaterEnesteDagligeReise {
+            when (this.fakta) {
+                is FaktaDagligReisePrivatBilDto ->
+                    copy(
+                        fom = fom,
+                        tom = tom,
+                        fakta =
+                            fakta.copy(
+                                faktaDelperioder =
+                                    this.fakta.faktaDelperioder.mapIndexed { index, delperiode ->
+                                        when (index) {
+                                            0.takeIf { this.fakta.faktaDelperioder.size == 1 } -> delperiode.copy(fom = fom, tom = tom)
+                                            0 -> delperiode.copy(fom = fom)
+                                            this.fakta.faktaDelperioder.lastIndex -> delperiode.copy(tom = tom)
+                                            else -> delperiode
+                                        }
+                                    },
+                            ),
+                    )
+                is FaktaDagligReiseOffentligTransportDto ->
+                    copy(
+                        fom = fom,
+                        tom = tom,
+                    )
+                is FaktaDagligReiseUbestemtDto -> error("Uforventet type ${FaktaDagligReiseUbestemtDto::class}")
+            }
+        }
     }
 
     fun slett(block: (vilkårsvurderingDto: VilkårsvurderingDto) -> SlettVilkårRequest) {
