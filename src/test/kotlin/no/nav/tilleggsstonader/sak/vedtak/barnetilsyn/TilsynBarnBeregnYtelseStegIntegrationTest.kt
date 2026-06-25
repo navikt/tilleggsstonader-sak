@@ -272,7 +272,7 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
                 .lagreOpphør(
                     stønadstype = Stønadstype.BARNETILSYN,
                     behandlingId = behandlingId,
-                    opphørDto = opphørDto(opphørsdato = LocalDate.of(2025, 1, 31)),
+                    opphørDto = opphørDto(opphørsdato = 31 januar 2025),
                 ).expectStatus()
                 .isOk()
 

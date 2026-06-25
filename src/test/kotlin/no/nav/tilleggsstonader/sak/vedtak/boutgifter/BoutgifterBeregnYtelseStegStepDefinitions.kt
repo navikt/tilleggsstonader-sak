@@ -33,7 +33,6 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.OpphørValideringService
-import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.innvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterUtgiftService
@@ -107,10 +106,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             barnService = mockk(relaxed = true),
         )
     val boutgifterUtgiftService = BoutgifterUtgiftService(vilkårService = vilkårService)
-    val vedtakService =
-        VedtakService(
-            vedtakRepository = vedtakRepositoryFake,
-        )
+
     val vedtaksperiodeValideringService =
         VedtaksperiodeValideringService(
             vilkårperiodeService = vilkårperiodeServiceMock,
