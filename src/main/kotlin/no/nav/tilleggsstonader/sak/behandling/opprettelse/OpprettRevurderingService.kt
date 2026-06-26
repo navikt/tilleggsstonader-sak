@@ -81,8 +81,8 @@ class OpprettRevurderingService(
         if (!stønadstype.gjelderDagligReise()) {
             return
         }
-        brukerfeilHvis(behandlingService.harKjørelisteBehandlingPåVent(fagsakId)) {
-            "Det finnes en kjørelistebehandling på vent. Behandle denne før du oppretter en ny behandling."
+        brukerfeilHvis(behandlingService.harÅpenKjørelisteBehandling(fagsakId)) {
+            "Det finnes en åpen kjørelistebehandling. Behandle denne før du oppretter en ny behandling."
         }
     }
 

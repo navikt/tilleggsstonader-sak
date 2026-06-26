@@ -185,8 +185,8 @@ class SendTilBeslutterStegTest {
     }
 
     @Test
-    internal fun `skal hindre send til beslutter når det finnes kjørelistebehandling på vent`() {
-        every { behandlingService.harKjørelisteBehandlingPåVent(any()) } returns true
+    internal fun `skal hindre send til beslutter når det finnes åpen kjørelistebehandling`() {
+        every { behandlingService.harÅpenKjørelisteBehandling(any()) } returns true
 
         val dagligReiseFagsak =
             fagsak(
@@ -210,7 +210,7 @@ class SendTilBeslutterStegTest {
         val feil = catchThrowableOfType<ApiFeil> { beslutteVedtakSteg.validerSteg(dagligReiseBehandling) }
 
         assertThat(feil.feil)
-            .contains("Det finnes en kjørelistebehandling på vent. Behandle denne før du sender til beslutter.")
+            .contains("Det finnes en åpen kjørelistebehandling. Behandle denne før du sender til beslutter.")
     }
 
     @Test

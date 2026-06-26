@@ -158,8 +158,8 @@ class BeslutteVedtakSteg(
             return
         }
 
-        brukerfeilHvis(behandlingService.harKjørelisteBehandlingPåVent(saksbehandling.fagsakId)) {
-            "Det finnes en kjørelistebehandling på vent. Behandle denne før vedtaket besluttes."
+        brukerfeilHvis(behandlingService.harÅpenKjørelisteBehandling(saksbehandling.fagsakId)) {
+            "Det finnes en åpen kjørelistebehandling. Behandle denne før vedtaket besluttes."
         }
     }
 

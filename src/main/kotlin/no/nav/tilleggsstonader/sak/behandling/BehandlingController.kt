@@ -138,13 +138,13 @@ class BehandlingController(
         nullstillBehandlingService.nullstillBehandling(behandlingService.hentBehandling(behandlingId))
     }
 
-    @GetMapping("{behandlingId}/kjoreliste-pa-vent")
-    fun harKjørelisteBehandlingPåVent(
+    @GetMapping("{behandlingId}/apen-kjorelistebehandling")
+    fun harÅpenKjørelisteBehandling(
         @PathVariable behandlingId: BehandlingId,
     ): Boolean {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerLesetilgangTilBehandling(behandlingId)
         val fagsakId = fagsakService.hentFagsakForBehandling(behandlingId).id
-        return behandlingService.harKjørelisteBehandlingPåVent(fagsakId)
+        return behandlingService.harÅpenKjørelisteBehandling(fagsakId)
     }
 }

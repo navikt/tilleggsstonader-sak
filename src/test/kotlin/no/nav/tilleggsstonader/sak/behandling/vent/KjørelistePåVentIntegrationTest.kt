@@ -81,7 +81,7 @@ class KjørelistePåVentIntegrationTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `skal hindre send til beslutter når det finnes kjørelistebehandling på vent`() {
+    fun `skal hindre send til beslutter når det finnes åpen kjørelistebehandling`() {
         val context = opprettInnvilgetDagligReiseMedGjennomførtKjøreliste()
         val revurderingId =
             opprettRevurderingOgGjennomførBehandlingsløp(
@@ -97,11 +97,11 @@ class KjørelistePåVentIntegrationTest : CleanDatabaseIntegrationTest() {
         kall.brevmottakere.hent(revurderingId)
         kall.totrinnskontroll.apiRespons
             .sendTilBeslutter(revurderingId)
-            .expectProblemDetail(HttpStatus.BAD_REQUEST, "Det finnes en kjørelistebehandling på vent")
+            .expectProblemDetail(HttpStatus.BAD_REQUEST, "Det finnes en åpen kjørelistebehandling")
     }
 
     @Test
-    fun `skal hindre beslutte vedtak når det finnes kjørelistebehandling på vent`() {
+    fun `skal hindre beslutte vedtak når det finnes åpen kjørelistebehandling`() {
         val context = opprettInnvilgetDagligReiseMedGjennomførtKjøreliste()
         val revurderingId =
             opprettRevurderingOgGjennomførBehandlingsløp(
@@ -117,7 +117,7 @@ class KjørelistePåVentIntegrationTest : CleanDatabaseIntegrationTest() {
             tilordneÅpenBehandlingOppgaveForBehandling(revurderingId)
             kall.totrinnskontroll.apiRespons
                 .beslutteVedtak(revurderingId, BeslutteVedtakDto(godkjent = true))
-                .expectProblemDetail(HttpStatus.BAD_REQUEST, "Det finnes en kjørelistebehandling på vent")
+                .expectProblemDetail(HttpStatus.BAD_REQUEST, "Det finnes en åpen kjørelistebehandling")
         }
     }
 

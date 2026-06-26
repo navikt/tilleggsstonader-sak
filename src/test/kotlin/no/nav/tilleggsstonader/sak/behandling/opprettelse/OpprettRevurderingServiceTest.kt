@@ -39,11 +39,11 @@ class OpprettRevurderingServiceTest {
         )
 
     @Test
-    fun `skal ikke opprette revurdering når det finnes en kjørelistebehandling på vent`() {
+    fun `skal ikke opprette revurdering når det finnes en åpen kjørelistebehandling`() {
         val fagsakId = FagsakId.random()
         every { unleashService.isEnabled(Toggle.KAN_OPPRETTE_REVURDERING) } returns true
         every { fagsakService.hentFagsak(fagsakId) } returns fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO, id = fagsakId)
-        every { behandlingService.harKjørelisteBehandlingPåVent(fagsakId) } returns true
+        every { behandlingService.harÅpenKjørelisteBehandling(fagsakId) } returns true
 
         assertThatThrownBy {
             service.opprettRevurdering(
@@ -51,13 +51,13 @@ class OpprettRevurderingServiceTest {
                     fagsakId = fagsakId,
                 ),
             )
-        }.hasMessageContaining("Det finnes en kjørelistebehandling på vent")
+        }.hasMessageContaining("Det finnes en åpen kjørelistebehandling")
 
         verify(exactly = 0) { opprettBehandlingService.opprettBehandling(any()) }
     }
 
     @Test
-    fun `skal opprette revurdering for ikke-dagligReise stønadstype selv om det finnes kjørelistebehandling på vent`() {
+    fun `skal opprette revurdering for ikke-dagligReise stønadstype selv om det finnes åpen kjørelistebehandling`() {
         val fagsakId = FagsakId.random()
         every { unleashService.isEnabled(Toggle.KAN_OPPRETTE_REVURDERING) } returns true
         every { fagsakService.hentFagsak(fagsakId) } returns fagsak(stønadstype = Stønadstype.BARNETILSYN, id = fagsakId)
@@ -65,7 +65,7 @@ class OpprettRevurderingServiceTest {
 
         service.opprettRevurdering(opprettRevurdering(fagsakId = fagsakId))
 
-        verify(exactly = 0) { behandlingService.harKjørelisteBehandlingPåVent(any()) }
+        verify(exactly = 0) { behandlingService.harÅpenKjørelisteBehandling(any()) }
         verify(exactly = 1) { opprettBehandlingService.opprettBehandling(any()) }
     }
 

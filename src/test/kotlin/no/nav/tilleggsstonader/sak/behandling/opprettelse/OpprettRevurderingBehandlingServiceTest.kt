@@ -62,7 +62,7 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
     @Nested
     inner class OpprettBehandling {
         @Test
-        fun `skal ikke opprette revurdering når det finnes en kjørelistebehandling på vent`() {
+        fun `skal ikke opprette revurdering når det finnes en åpen kjørelistebehandling`() {
             val ferdigBehandling =
                 testoppsettService.opprettBehandlingMedFagsak(
                     behandling(
@@ -85,7 +85,7 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
 
             assertThatThrownBy {
                 service.opprettRevurdering(opprettRevurdering(fagsakId = ferdigBehandling.fagsakId))
-            }.hasMessageContaining("Det finnes en kjørelistebehandling på vent")
+            }.hasMessageContaining("Det finnes en åpen kjørelistebehandling")
         }
 
         @Test

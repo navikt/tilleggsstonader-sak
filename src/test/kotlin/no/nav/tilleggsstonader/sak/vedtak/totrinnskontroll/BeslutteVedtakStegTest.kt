@@ -184,8 +184,8 @@ class BeslutteVedtakStegTest {
     }
 
     @Test
-    internal fun `skal hindre godkjenning av vedtak når det finnes kjørelistebehandling på vent`() {
-        every { behandlingService.harKjørelisteBehandlingPåVent(any()) } returns true
+    internal fun `skal hindre godkjenning av vedtak når det finnes åpen kjørelistebehandling`() {
+        every { behandlingService.harÅpenKjørelisteBehandling(any()) } returns true
         every { totrinnskontrollService.lagreTotrinnskontrollOgReturnerSaksbehandler(any(), any()) } returns innloggetBeslutter
         every { oppgaveService.hentOppgaveDomainSomIkkeErFerdigstilt(any(), any()) } returns null
 
@@ -218,12 +218,12 @@ class BeslutteVedtakStegTest {
             }
 
         assertThat(feil.feil)
-            .contains("Det finnes en kjørelistebehandling på vent. Behandle denne før vedtaket besluttes.")
+            .contains("Det finnes en åpen kjørelistebehandling. Behandle denne før vedtaket besluttes.")
     }
 
     @Test
-    internal fun `skal tillate underkjenning av vedtak selv om det finnes kjørelistebehandling på vent`() {
-        every { behandlingService.harKjørelisteBehandlingPåVent(any()) } returns true
+    internal fun `skal tillate underkjenning av vedtak selv om det finnes åpen kjørelistebehandling`() {
+        every { behandlingService.harÅpenKjørelisteBehandling(any()) } returns true
         every { totrinnskontrollService.lagreTotrinnskontrollOgReturnerSaksbehandler(any(), any()) } returns innloggetBeslutter
         every { oppgaveService.hentOppgaveDomainSomIkkeErFerdigstilt(any(), any()) } returns null
 

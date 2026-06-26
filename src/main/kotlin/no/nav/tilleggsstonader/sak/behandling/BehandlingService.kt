@@ -161,9 +161,9 @@ class BehandlingService(
 
     fun finnAlleBehandlingerForFagsak(fagsakId: FagsakId): List<Behandling> = behandlingRepository.findByFagsakId(fagsakId)
 
-    fun harKjørelisteBehandlingPåVent(fagsakId: FagsakId): Boolean =
-        behandlingRepository.findByFagsakIdAndStatus(fagsakId, SATT_PÅ_VENT).any {
-            it.type == BehandlingType.KJØRELISTE
+    fun harÅpenKjørelisteBehandling(fagsakId: FagsakId): Boolean =
+        behandlingRepository.findByFagsakId(fagsakId).any {
+            it.type == BehandlingType.KJØRELISTE && !it.erFerdigstilt()
         }
 
     fun hentBehandlinger(fagsakId: FagsakId): List<Behandling> =
