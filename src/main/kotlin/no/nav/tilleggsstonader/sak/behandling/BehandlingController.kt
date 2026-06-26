@@ -54,6 +54,7 @@ class BehandlingController(
         tilgangService.validerLesetilgangTilBehandling(behandlingId)
         val saksbehandling: Saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
         val tilordnetSaksbehandler = tilordnetSaksbehandlerService.finnTilordnetSaksbehandler(behandlingId).tilDto()
+        val harÅpenKjørelistebehandling = behandlingService.harÅpenKjørelisteBehandling(saksbehandling.fagsakId)
 
         if (saksbehandling.status == BehandlingStatus.OPPRETTET || saksbehandling.status == BehandlingStatus.SATT_PÅ_VENT) {
             brukerfeilHvisIkke(tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER)) {
@@ -61,7 +62,10 @@ class BehandlingController(
             }
             faktaGrunnlagService.opprettGrunnlagHvisDetIkkeEksisterer(behandlingId)
         }
-        return saksbehandling.tilDto(tilordnetSaksbehandler)
+        return saksbehandling.tilDto(
+            tilordnetSaksbehandler = tilordnetSaksbehandler,
+            harÅpenKjørelistebehandling = harÅpenKjørelistebehandling,
+        )
     }
 
     @GetMapping("fagsak-person/{fagsakPersonId}")
@@ -136,15 +140,5 @@ class BehandlingController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         nullstillBehandlingService.nullstillBehandling(behandlingService.hentBehandling(behandlingId))
-    }
-
-    @GetMapping("{behandlingId}/apen-kjorelistebehandling")
-    fun harÅpenKjørelisteBehandling(
-        @PathVariable behandlingId: BehandlingId,
-    ): Boolean {
-        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerLesetilgangTilBehandling(behandlingId)
-        val fagsakId = fagsakService.hentFagsakForBehandling(behandlingId).id
-        return behandlingService.harÅpenKjørelisteBehandling(fagsakId)
     }
 }
