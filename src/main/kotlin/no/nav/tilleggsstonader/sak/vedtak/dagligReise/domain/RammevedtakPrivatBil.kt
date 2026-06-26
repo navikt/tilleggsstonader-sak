@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.math.BigDecimal
 import java.time.LocalDate
-import no.nav.tilleggsstonader.sak.vedtak.domain.mergeSammenhengende
 
 data class RammevedtakPrivatBil(
     val reiser: List<RammevedtakForReiseMedPrivatBil>,
