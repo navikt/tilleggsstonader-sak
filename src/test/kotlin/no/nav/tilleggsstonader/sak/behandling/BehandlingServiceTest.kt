@@ -218,6 +218,35 @@ internal class BehandlingServiceTest {
     }
 
     @Nested
+    inner class HarÅpenKjørelisteBehandling {
+        @Test
+        internal fun `skal returnere true når det finnes en åpen kjørelistebehandling`() {
+            val fagsakId = FagsakId.random()
+            every {
+                behandlingRepository.findByFagsakId(fagsakId)
+            } returns
+                listOf(
+                    behandling(fagsak = fagsak(id = fagsakId), type = BehandlingType.KJØRELISTE, status = BehandlingStatus.UTREDES),
+                )
+
+            assertThat(behandlingService.harÅpenKjørelisteBehandling(fagsakId)).isTrue()
+        }
+
+        @Test
+        internal fun `skal returnere false når det ikke finnes en åpen kjørelistebehandling`() {
+            val fagsakId = FagsakId.random()
+            every {
+                behandlingRepository.findByFagsakId(fagsakId)
+            } returns
+                listOf(
+                    behandling(fagsak = fagsak(id = fagsakId), type = BehandlingType.KJØRELISTE, status = BehandlingStatus.FERDIGSTILT),
+                )
+
+            assertThat(behandlingService.harÅpenKjørelisteBehandling(fagsakId)).isFalse()
+        }
+    }
+
+    @Nested
     inner class UtledNesteBehandlingstype {
         @Test
         internal fun `skal returnere revurdering hvis det finnes en ferdigstillt førstegangsbehandling som ikke er henlagt`() {

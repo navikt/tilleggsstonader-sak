@@ -183,6 +183,79 @@ class BeslutteVedtakStegTest {
         assertHarOpprettetTaskerAvType()
     }
 
+    @Test
+    internal fun `skal hindre godkjenning av vedtak når det finnes åpen kjørelistebehandling`() {
+        every { behandlingService.harÅpenKjørelisteBehandling(any()) } returns true
+        every { totrinnskontrollService.lagreTotrinnskontrollOgReturnerSaksbehandler(any(), any()) } returns innloggetBeslutter
+        every { oppgaveService.hentOppgaveDomainSomIkkeErFerdigstilt(any(), any()) } returns null
+
+        val dagligReiseFagsak =
+            fagsak(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+                id = fagsak.id,
+                identer = fagsak.personIdenter,
+            )
+        val dagligReiseBehandling =
+            saksbehandling(
+                dagligReiseFagsak,
+                behandling(
+                    fagsak = dagligReiseFagsak,
+                    id = behandlingId,
+                    type = BehandlingType.REVURDERING,
+                    status = BehandlingStatus.FATTER_VEDTAK,
+                    steg = beslutteVedtakSteg.stegType(),
+                    resultat = BehandlingResultat.IKKE_SATT,
+                    årsak = BehandlingÅrsak.SØKNAD,
+                ),
+            )
+
+        val feil =
+            catchThrowableOfType<ApiFeil> {
+                beslutteVedtakSteg.utførOgReturnerNesteSteg(
+                    dagligReiseBehandling,
+                    BeslutteVedtakDto(godkjent = true, begrunnelse = null, årsakerUnderkjent = emptyList()),
+                )
+            }
+
+        assertThat(feil.feil)
+            .contains("Det finnes en åpen kjørelistebehandling. Behandle denne før vedtaket besluttes.")
+    }
+
+    @Test
+    internal fun `skal tillate underkjenning av vedtak selv om det finnes åpen kjørelistebehandling`() {
+        every { behandlingService.harÅpenKjørelisteBehandling(any()) } returns true
+        every { totrinnskontrollService.lagreTotrinnskontrollOgReturnerSaksbehandler(any(), any()) } returns innloggetBeslutter
+        every { oppgaveService.hentOppgaveDomainSomIkkeErFerdigstilt(any(), any()) } returns null
+
+        val dagligReiseFagsak =
+            fagsak(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+                id = fagsak.id,
+                identer = fagsak.personIdenter,
+            )
+        val dagligReiseBehandling =
+            saksbehandling(
+                dagligReiseFagsak,
+                behandling(
+                    fagsak = dagligReiseFagsak,
+                    id = behandlingId,
+                    type = BehandlingType.REVURDERING,
+                    status = BehandlingStatus.FATTER_VEDTAK,
+                    steg = beslutteVedtakSteg.stegType(),
+                    resultat = BehandlingResultat.IKKE_SATT,
+                    årsak = BehandlingÅrsak.SØKNAD,
+                ),
+            )
+
+        val nesteSteg =
+            beslutteVedtakSteg.utførOgReturnerNesteSteg(
+                dagligReiseBehandling,
+                BeslutteVedtakDto(godkjent = false, begrunnelse = "Feil i vedtaket", årsakerUnderkjent = emptyList()),
+            )
+
+        assertThat(nesteSteg).isEqualTo(StegType.SEND_TIL_BESLUTTER)
+    }
+
     private fun assertHarOpprettetTaskerAvType(vararg typeTask: String) {
         assertThat(taskSlot.map { it.type }).containsExactlyInAnyOrder(*typeTask)
     }

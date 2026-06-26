@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.FERDIGSTIL
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.OPPRETTET
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.SATT_PÅ_VENT
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.UTREDES
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandlingsjournalpost
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingsjournalpostRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
@@ -159,6 +160,11 @@ class BehandlingService(
     fun finnesBehandlingForFagsak(fagsakId: FagsakId) = behandlingRepository.existsByFagsakId(fagsakId)
 
     fun finnAlleBehandlingerForFagsak(fagsakId: FagsakId): List<Behandling> = behandlingRepository.findByFagsakId(fagsakId)
+
+    fun harÅpenKjørelisteBehandling(fagsakId: FagsakId): Boolean =
+        behandlingRepository.findByFagsakId(fagsakId).any {
+            it.type == BehandlingType.KJØRELISTE && !it.erFerdigstilt()
+        }
 
     fun hentBehandlinger(fagsakId: FagsakId): List<Behandling> =
         behandlingRepository.findByFagsakId(fagsakId).sortertEtterVedtakstidspunkt()

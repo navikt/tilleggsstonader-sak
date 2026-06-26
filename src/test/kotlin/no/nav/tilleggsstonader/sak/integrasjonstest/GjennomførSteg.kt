@@ -330,7 +330,7 @@ fun IntegrationTest.gjennomførSimuleringSteg(behandlingId: BehandlingId): StegT
     return nesteSteg
 }
 
-private const val MINIMALT_BREV = """SAKSBEHANDLER_SIGNATUR - BREVDATO_PLACEHOLDER - BESLUTTER_SIGNATUR"""
+const val MINIMALT_BREV = """SAKSBEHANDLER_SIGNATUR - BREVDATO_PLACEHOLDER - BESLUTTER_SIGNATUR"""
 
 fun IntegrationTest.gjennomførSendTilBeslutterSteg(behandlingId: BehandlingId): StegType {
     kall.brev.genererPdf(behandlingId, GenererPdfRequest(MINIMALT_BREV))

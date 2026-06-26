@@ -37,6 +37,7 @@ enum class ÅrsakUnderkjent {
     VEDTAKSBREV,
     RETUR_ETTER_ØNSKE_FRA_SAKSBEHANDLER,
     FEIL_I_UTGIFTER,
+    BEHANDLE_KJØRELISTE_PÅ_VENT,
 }
 
 data class SendTilBeslutterRequest(
