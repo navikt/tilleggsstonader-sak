@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 
 enum class TypeVedtakDagligReise(
@@ -30,7 +30,7 @@ sealed interface InnvilgelseEllerOpphørDagligReise : VedtakDagligReise {
     val vedtaksperioder: List<Vedtaksperiode>
     val beregningsplan: Beregningsplan
 
-    fun hentRammevedtakMedBeregningsresultat(): List<Pair<BeregningsresultatForReisePrivatBil, RammeForReiseMedPrivatBil>> {
+    fun hentRammevedtakMedBeregningsresultat(): List<Pair<BeregningsresultatForReisePrivatBil, RammevedtakForReiseMedPrivatBil>> {
         val beregningsresultatReiser = beregningsresultat.privatBil?.reiser ?: emptyList()
         val rammevedtakReiserMap = rammevedtakPrivatBil?.reiser?.associateBy { it.reiseId } ?: emptyMap()
 

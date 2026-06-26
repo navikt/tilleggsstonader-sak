@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.util.KjørelisteUtil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBilSatsForDelperiode
 import no.nav.tilleggsstonader.sak.util.norskFormat
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
@@ -365,7 +365,7 @@ class AvklartKjørelisteValideringTest {
 
     private fun validerKasterFeilVedOppdatering(
         oppdaterteDager: List<AvklartKjørtDag>,
-        rammevedtak: RammeForReiseMedPrivatBil = rammeForReise(),
+        rammevedtak: RammevedtakForReiseMedPrivatBil = rammeForReise(),
         kjøreliste: List<KjørelisteDag> = listOf(kjørelisteDag()),
         ukeSomSkalOppdateres: UkeIÅr = mandag.tilUkeIÅr(),
         forventetFeilmelding: String,

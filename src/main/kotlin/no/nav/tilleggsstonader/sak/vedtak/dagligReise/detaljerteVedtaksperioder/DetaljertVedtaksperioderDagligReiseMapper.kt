@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
@@ -38,7 +38,7 @@ object DetaljertVedtaksperioderDagligReiseMapper {
     private fun InnvilgelseEllerOpphørDagligReise.hentUtOffentligTransport(): List<BeregningsresultatForReise> =
         beregningsresultat.offentligTransport?.reiser.orEmpty()
 
-    private fun InnvilgelseEllerOpphørDagligReise.hentUtRammevedtakPrivatBil(): List<RammeForReiseMedPrivatBil> =
+    private fun InnvilgelseEllerOpphørDagligReise.hentUtRammevedtakPrivatBil(): List<RammevedtakForReiseMedPrivatBil> =
         rammevedtakPrivatBil?.reiser.orEmpty()
 
     private fun List<BeregningsresultatForReise>?.tilDetaljerteVedtaksperioderOffentligTransport(
@@ -52,7 +52,7 @@ object DetaljertVedtaksperioderDagligReiseMapper {
             )
         }
 
-    private fun List<RammeForReiseMedPrivatBil>?.tilDetaljerteVedtaksperioderPrivatBil(
+    private fun List<RammevedtakForReiseMedPrivatBil>?.tilDetaljerteVedtaksperioderPrivatBil(
         stønadstype: Stønadstype,
         adresser: Map<ReiseId, String>,
     ): List<DetaljertVedtaksperiodeDagligReise> =

@@ -15,7 +15,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
@@ -117,7 +117,7 @@ class PrivatBilRammevedtakBeregningService(
     private fun beregnForReise(
         reise: ReiseMedPrivatBil,
         vedtaksperioder: List<Vedtaksperiode>,
-    ): RammeForReiseMedPrivatBil? {
+    ): RammevedtakForReiseMedPrivatBil? {
         val reiseOgVedtaksperioderSnitt = finnSnittMellomReiseOgVedtaksperioder(reise, vedtaksperioder)
 
         return reiseOgVedtaksperioderSnitt.justertReiseperiode?.let { justertReise ->
@@ -125,7 +125,7 @@ class PrivatBilRammevedtakBeregningService(
                 justertReise,
                 reiseOgVedtaksperioderSnitt.justerteVedtaksperioder,
             )
-            RammeForReiseMedPrivatBil(
+            RammevedtakForReiseMedPrivatBil(
                 reiseId = reise.reiseId,
                 aktivitetsadresse = reise.aktivitetsadresse,
                 tiltaksvariant = reise.tiltaksvariant,

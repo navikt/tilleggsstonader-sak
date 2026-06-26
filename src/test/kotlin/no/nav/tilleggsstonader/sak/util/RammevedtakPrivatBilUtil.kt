@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
@@ -27,8 +27,8 @@ object RammevedtakPrivatBilUtil {
         dagsatsUtenParkering: BigDecimal = 100.toBigDecimal(),
         vedtaksperioder: List<Vedtaksperiode> = listOf(vedtaksperiode(fom, tom)),
         delperioder: List<RammeForReiseMedPrivatBilDelperiode>? = null,
-    ): RammeForReiseMedPrivatBil =
-        RammeForReiseMedPrivatBil(
+    ): RammevedtakForReiseMedPrivatBil =
+        RammevedtakForReiseMedPrivatBil(
             reiseId = reiseId,
             aktivitetsadresse = "aktivitetsadresse",
             aktivitetType = AktivitetType.TILTAK,

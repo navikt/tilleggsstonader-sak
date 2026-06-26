@@ -13,14 +13,15 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.math.BigDecimal
 import java.time.LocalDate
+import no.nav.tilleggsstonader.sak.vedtak.domain.mergeSammenhengende
 
 data class RammevedtakPrivatBil(
-    val reiser: List<RammeForReiseMedPrivatBil>,
+    val reiser: List<RammevedtakForReiseMedPrivatBil>,
 ) {
-    fun hentRammevedtakForReise(reiseId: ReiseId): RammeForReiseMedPrivatBil = reiser.single { it.reiseId == reiseId }
+    fun hentRammevedtakForReise(reiseId: ReiseId): RammevedtakForReiseMedPrivatBil = reiser.single { it.reiseId == reiseId }
 }
 
-data class RammeForReiseMedPrivatBil(
+data class RammevedtakForReiseMedPrivatBil(
     val reiseId: ReiseId,
     val aktivitetsadresse: String?,
     val aktivitetType: AktivitetType,
@@ -29,7 +30,7 @@ data class RammeForReiseMedPrivatBil(
 ) {
     fun finnDelperiodeForPeriode(periode: Periode<LocalDate>) = grunnlag.delperioder.single { it.inneholder(periode) }
 
-    fun avkortEtterDato(maksTom: LocalDate): RammeForReiseMedPrivatBil? {
+    fun avkortEtterDato(maksTom: LocalDate): RammevedtakForReiseMedPrivatBil? {
         val avkortetGrunnlag = grunnlag.avkortEtterDato(maksTom) ?: return null
 
         return copy(

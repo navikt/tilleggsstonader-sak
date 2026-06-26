@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
@@ -43,7 +43,7 @@ fun RammevedtakPrivatBil.tilDto() =
         reiser = reiser.map { it.tilDto() },
     )
 
-fun RammeForReiseMedPrivatBil.tilDto(): RammeForReiseMedPrivatBilDto =
+fun RammevedtakForReiseMedPrivatBil.tilDto(): RammeForReiseMedPrivatBilDto =
     RammeForReiseMedPrivatBilDto(
         reiseId = reiseId,
         fom = grunnlag.fom,
