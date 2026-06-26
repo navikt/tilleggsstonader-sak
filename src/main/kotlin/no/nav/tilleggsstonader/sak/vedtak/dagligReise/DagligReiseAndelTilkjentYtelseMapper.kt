@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
@@ -166,17 +167,25 @@ fun finnTypeAndelFraTiltaksvariant(tiltaksvariant: TypeAktivitet): TypeAndel =
 fun finnPeriodeFraAndel(
     beregningsresultat: BeregningsresultatDagligReise,
     andelTilkjentYtelse: AndelTilkjentYtelse,
-): Datoperiode {
-    // TODO - må implementeres for privat bil også
-    val reiseperiodeMedSammeDatoSomAndel =
-        beregningsresultat.offentligTransport
-            ?.reiser
-            ?.flatMap { it.perioder }
-            ?.filter { it.grunnlag.fom.datoEllerNesteMandagHvisLørdagEllerSøndag() == andelTilkjentYtelse.fom }
-
-    if (reiseperiodeMedSammeDatoSomAndel == null) {
-        throw NotImplementedError("Det er kun implementert å finne periode fra andel for offentlig transport")
+): Datoperiode =
+    if (andelTilkjentYtelse.reiseId != null) {
+        feilHvis(beregningsresultat.privatBil == null) {
+            "Forventer at beregningsresultat for privat bil skal være satt når en andel har reiseId"
+        }
+        finnPrivatBilPeriodeFraAndel(beregningsresultat.privatBil, andelTilkjentYtelse)
+    } else {
+        finnOffentligTransportPeriodeFraAndel(requireNotNull(beregningsresultat.offentligTransport), andelTilkjentYtelse)
     }
+
+private fun finnOffentligTransportPeriodeFraAndel(
+    beregningsresultatOffentligTransport: BeregningsresultatOffentligTransport,
+    andelTilkjentYtelse: AndelTilkjentYtelse,
+): Datoperiode {
+    val reiseperiodeMedSammeDatoSomAndel =
+        beregningsresultatOffentligTransport
+            .reiser
+            .flatMap { it.perioder }
+            .filter { it.grunnlag.fom.datoEllerNesteMandagHvisLørdagEllerSøndag() == andelTilkjentYtelse.fom }
 
     if (reiseperiodeMedSammeDatoSomAndel.isEmpty()) {
         error("Finner ingen reiseperiode fra andel med fom ${andelTilkjentYtelse.fom}")
@@ -186,4 +195,28 @@ fun finnPeriodeFraAndel(
         fom = reiseperiodeMedSammeDatoSomAndel.minOf { it.grunnlag.fom },
         tom = reiseperiodeMedSammeDatoSomAndel.maxOf { it.grunnlag.tom },
     )
+}
+
+private fun finnPrivatBilPeriodeFraAndel(
+    beregningsresultatPrivatBil: BeregningsresultatPrivatBil,
+    andelTilkjentYtelse: AndelTilkjentYtelse,
+): Datoperiode {
+    val reiseId =
+        requireNotNull(andelTilkjentYtelse.reiseId) {
+            "Mangler reiseId på andel (fom=${andelTilkjentYtelse.fom})"
+        }
+
+    val uke = andelTilkjentYtelse.fom.tilUkeIÅr()
+
+    val reise =
+        beregningsresultatPrivatBil.reiser.singleOrNull { it.reiseId == reiseId }
+            ?: error("Finner ingen (eller flere) privatbilreiser for reiseId=$reiseId")
+
+    val periode =
+        reise.perioder.singleOrNull { it.fom.tilUkeIÅr() == uke }
+            ?: error(
+                "Finner ingen (eller flere) privatbilperioder for reiseId=$reiseId uke=$uke (andelFom=${andelTilkjentYtelse.fom})",
+            )
+
+    return Datoperiode(periode.fom, periode.tom)
 }

@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
@@ -13,20 +14,52 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagO
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilDag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 import java.util.UUID.randomUUID
 
 object DagligReiseTestUtil {
+    private val defaultPrivatBilPerioder =
+        listOf(
+            PrivatBilPeriode(
+                fom = 3 januar 2024,
+                tom = 7 januar 2024,
+                stønadsbeløp = 100,
+            ),
+            PrivatBilPeriode(
+                fom = 8 januar 2024,
+                tom = 14 januar 2024,
+                stønadsbeløp = 200,
+            ),
+            PrivatBilPeriode(
+                fom = 15 januar 2024,
+                tom = 18 januar 2024,
+                stønadsbeløp = 300,
+            ),
+        )
+
+    val defaultRammevedtakPrivatBil = rammevedtakPrivatBil(perioder = defaultPrivatBilPerioder)
+
     val defaultVedtaksperioder =
         listOf(
             vedtaksperiode(
@@ -37,12 +70,12 @@ object DagligReiseTestUtil {
     val defaultBeregningsresultat =
         BeregningsresultatDagligReise(
             offentligTransport = beregningsresultatOffentligTransport(),
-            privatBil = null, // TODO
+            privatBil = beregningsresultatPrivatBil(perioder = defaultPrivatBilPerioder),
         )
     val defaultInnvilgelseDagligReise =
         InnvilgelseDagligReise(
             vedtaksperioder = defaultVedtaksperioder,
-            rammevedtakPrivatBil = null,
+            rammevedtakPrivatBil = defaultRammevedtakPrivatBil,
             beregningsresultat = defaultBeregningsresultat,
             beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
         )
@@ -61,6 +94,7 @@ object DagligReiseTestUtil {
         behandlingId: BehandlingId = BehandlingId.random(),
         vedtaksperioder: List<Vedtaksperiode> = defaultVedtaksperioder,
         beregningsresultat: BeregningsresultatDagligReise = defaultBeregningsresultat,
+        rammevedtakPrivatBil: RammevedtakPrivatBil? = if (beregningsresultat.privatBil != null) defaultRammevedtakPrivatBil else null,
     ) = GeneriskVedtak(
         behandlingId = behandlingId,
         type = TypeVedtak.INNVILGELSE,
@@ -68,7 +102,7 @@ object DagligReiseTestUtil {
             InnvilgelseDagligReise(
                 vedtaksperioder = vedtaksperioder,
                 beregningsresultat = beregningsresultat,
-                rammevedtakPrivatBil = null,
+                rammevedtakPrivatBil = rammevedtakPrivatBil,
                 beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
             ),
         gitVersjon = Applikasjonsversjon.versjon,
@@ -184,4 +218,88 @@ private fun vedtaksperiodeGrunnlag(
     aktivitet = aktivitet,
     målgruppe = målgruppe,
     antallReisedagerIVedtaksperioden = antallReisedagerIVedtaksperioden,
+)
+
+private fun beregningsresultatPrivatBil(perioder: List<PrivatBilPeriode>) =
+    BeregningsresultatPrivatBil(
+        reiser = listOf(beregningsresultatForReisePrivatBil(perioder = perioder)),
+    )
+
+private fun beregningsresultatForReisePrivatBil(
+    reiseId: ReiseId = dummyReiseId,
+    perioder: List<PrivatBilPeriode>,
+) = BeregningsresultatForReisePrivatBil(
+    reiseId = reiseId,
+    perioder = perioder.map { periode -> beregningsresultatForReisePrivatBilPeriode(periode) },
+)
+
+private fun beregningsresultatForReisePrivatBilPeriode(periode: PrivatBilPeriode) =
+    BeregningsresultatForReisePrivatBilPeriode(
+        fom = periode.fom,
+        tom = periode.tom,
+        grunnlag = beregningsresultatForReisePrivatBilGrunnlag(fom = periode.fom, stønadsbeløpForDag = periode.stønadsbeløp),
+        stønadsbeløp = periode.stønadsbeløp.toBigDecimal(),
+        brukersNavKontor = null,
+        fraTidligereVedtak = false,
+    )
+
+private fun beregningsresultatForReisePrivatBilGrunnlag(
+    fom: LocalDate = 1 januar 2024,
+    stønadsbeløpForDag: Int = 100,
+) = BeregningsresultatForReisePrivatBilGrunnlag(
+    dager =
+        listOf(
+            BeregningsresultatForReisePrivatBilDag(
+                dato = fom,
+                parkeringskostnad = 0,
+                dagsatsUtenParkering = stønadsbeløpForDag.toBigDecimal(),
+                stønadsbeløpForDag = stønadsbeløpForDag.toBigDecimal(),
+            ),
+        ),
+)
+
+private fun rammevedtakPrivatBil(perioder: List<PrivatBilPeriode>) =
+    RammevedtakPrivatBil(
+        reiser =
+            listOf(
+                rammeForReiseMedPrivatBil(
+                    reiseId = dummyReiseId,
+                    fom = perioder.first().fom,
+                    tom = perioder.last().tom,
+                    vedtaksperioder =
+                        perioder.map { periode ->
+                            DagligReiseTestUtil.vedtaksperiode(fom = periode.fom, tom = periode.tom)
+                        },
+                    delperioder =
+                        perioder.map { periode ->
+                            val dagerIperiode = ChronoUnit.DAYS.between(periode.fom, periode.tom.plusDays(1)).toInt()
+                            RammeForReiseMedPrivatBilDelperiode(
+                                fom = periode.fom,
+                                tom = periode.tom,
+                                reisedagerPerUke = 5,
+                                ekstrakostnader =
+                                    RammeForReiseMedPrivatEkstrakostnader(
+                                        null,
+                                        null,
+                                    ),
+                                satser =
+                                    listOf(
+                                        RammeForReiseMedPrivatBilSatsForDelperiode(
+                                            fom = periode.fom,
+                                            tom = periode.tom,
+                                            satsBekreftetVedVedtakstidspunkt = true,
+                                            kilometersats = 2.94.toBigDecimal(),
+                                            dagsatsUtenParkering = (periode.stønadsbeløp / dagerIperiode).toBigDecimal(),
+                                        ),
+                                    ),
+                            )
+                        },
+                ),
+            ),
+    )
+
+private data class PrivatBilPeriode(
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val stønadsbeløp: Int,
 )

@@ -148,7 +148,7 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
         @Nested
         inner class FinnPeriodeFraAndel {
             @Test
-            fun `finner periode fra andel`() {
+            fun `finner periode fra andel for offentlig transport`() {
                 val beregningsresultat = defaultInnvilgelseDagligReise.beregningsresultat
                 val andeler = beregningsresultat.offentligTransport!!.mapTilAndelTilkjentYtelse(saksbehandling)
 
@@ -167,6 +167,35 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
                             .grunnlag.tom,
                     )
                 }
+            }
+
+            @Test
+            fun `finner periode fra andel for privat bil`() {
+                val beregningsresultat = defaultInnvilgelseDagligReise.beregningsresultat
+                val privatBil = requireNotNull(beregningsresultat.privatBil)
+                val andeler =
+                    privatBil.mapTilAndelTilkjentYtelse(
+                        saksbehandling = saksbehandling,
+                        rammevedtakPrivatBil = requireNotNull(defaultInnvilgelseDagligReise.rammevedtakPrivatBil),
+                    )
+
+                andeler
+                    .sortedBy { it.fom }
+                    .forEachIndexed { index, andelTilkjentYtelse ->
+                        val periodeFraAndel = finnPeriodeFraAndel(beregningsresultat, andelTilkjentYtelse)
+                        assertThat(periodeFraAndel.fom).isEqualTo(
+                            privatBil.reiser
+                                .first()
+                                .perioder[index]
+                                .fom,
+                        )
+                        assertThat(periodeFraAndel.tom).isEqualTo(
+                            privatBil.reiser
+                                .first()
+                                .perioder[index]
+                                .tom,
+                        )
+                    }
             }
         }
     }
