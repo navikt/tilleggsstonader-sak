@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.juni
 import no.nav.tilleggsstonader.libs.utils.dato.mars
-import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
@@ -21,10 +21,10 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 
-class DagligReiseBeregnYtelseStegIntegrationTest(
+class DagligReiseOpphørIntegrationTest(
     @Autowired private val vedtakService: VedtakService,
     @Autowired private val tilkjentYtelseService: TilkjentYtelseService,
-) : IntegrationTest() {
+) : CleanDatabaseIntegrationTest() {
     @Test
     fun `skal kunne opphøre`() {
         val førstegangsbehandlingContext =

@@ -89,6 +89,5 @@ private fun FaktaOgVurderingerDto.tilFaktaOgSvarDto(): FaktaOgSvarDto =
                 svarUtgifterDekketAvAnnetRegelverk = this.utgifterDekketAvAnnetRegelverk?.svar,
             )
 
-        // Hvorfor er denne TODO og ikke bare exhaustive?
-        else -> TODO()
+        else -> TODO("FaktaOgVurderingerDto.tilFaktaOgSvarDto() ikke implementert for ${this::class.simpleName}")
     }

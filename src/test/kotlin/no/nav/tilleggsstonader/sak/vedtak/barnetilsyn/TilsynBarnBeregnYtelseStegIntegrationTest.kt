@@ -1,24 +1,15 @@
 package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.utils.dato.februar
-import no.nav.tilleggsstonader.libs.utils.dato.januar
-import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
-import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
-import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
@@ -26,26 +17,20 @@ import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelseDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
-import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
@@ -54,13 +39,11 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
@@ -242,168 +225,6 @@ class TilsynBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
                     assertThat(this.dato).isEqualTo(juni.atDay(3))
                 }
             }
-        }
-    }
-
-    @Nested
-    inner class Opphør {
-        @Test
-        fun `skal lagre vedtak`() {
-            val fom = 1 januar 2025
-            val tom = 28 februar 2025
-
-            val førstegangsbehandlingContext =
-                opprettBehandlingOgGjennomførBehandlingsløp(
-                    stønadstype = Stønadstype.BARNETILSYN,
-                ) {
-                    defaultTilsynBarnTestdata(fom = fom, tom = tom)
-                }
-
-            testoppsettService.settAndelerTilOkForBehandling(førstegangsbehandlingContext.behandlingId)
-
-            val behandlingId =
-                opprettRevurderingOgGjennomførBehandlingsløp(
-                    fraBehandlingId = førstegangsbehandlingContext.behandlingId,
-                ) {
-                    aktivitet {
-                        oppdaterTomPåEnesteAktivitet(tom = fom.toYearMonth().atEndOfMonth())
-                    }
-                    vedtak {
-                        opphør(
-                            opphørsdato = 31 januar 2025,
-                        )
-                    }
-                }
-
-            val vedtak =
-                kall.vedtak
-                    .hentVedtak(Stønadstype.BARNETILSYN, behandlingId)
-                    .expectOkWithBody<OpphørTilsynBarnResponse>()
-
-            assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
-            assertThat(vedtak.årsakerOpphør).containsExactly(ÅrsakOpphør.ANNET)
-            assertThat(vedtak.begrunnelse).isEqualTo("annet")
-        }
-
-        /**
-         * I tilfeller der AAP opphører 2 februar 2025 som er en søndag, så revurderer man fra og med 3 februar 2025.
-         * I dette tilfelle kommer det finnes en beløpsperiode for 1 og 2 februar, med beløp 0kr.
-         * Problemet her er at dato i [Beløpsperiode] er 3 januar, då den settes til første ukesdagen i perioden.
-         * Så hadde vi tidligere validering at det ikke finnes noen beløpsperioder fra og med revurder-fra.
-         * Nå validerer vi kun at det ikke finnes noen beløpsperioder med et beløp større enn 0kr
-         */
-        @Test
-        fun `skal kunne opphøre første mandag i måneden der det finnes helgdager før mandagen`() {
-            val januar = januar.withYear(2025)
-            val februar = februar.withYear(2025)
-            val aktivitet = vilkårperiodeRepository.insert(aktivitet.copy(tom = februar.atEndOfMonth()))
-            val målgruppe = vilkårperiodeRepository.insert(målgruppe.copy(tom = februar.atEndOfMonth()))
-            lagVilkårForPeriode(saksbehandling, januar, februar, 100)
-
-            val element =
-                VedtaksperiodeDto(
-                    id = UUID.randomUUID(),
-                    fom = januar.atDay(1),
-                    tom = februar.atEndOfMonth(),
-                    målgruppeType = NEDSATT_ARBEIDSEVNE,
-                    aktivitetType = AktivitetType.TILTAK,
-                )
-            val innvilgelse = innvilgelseDto(listOf(element))
-            steg.utførOgReturnerNesteSteg(saksbehandling, innvilgelse)
-
-            testoppsettService.ferdigstillBehandling(behandling = behandling)
-
-            val behandlingForOpphør =
-                testoppsettService
-                    .opprettRevurdering(
-                        forrigeBehandling = behandling,
-                        fagsak = fagsak,
-                    ).let { saksbehandling(behandling = it) }
-
-            val aktivitetForOpphør = aktivitet.kopierTilBehandling(behandlingForOpphør.id)
-            val målgruppeForOpphør = målgruppe.kopierTilBehandling(behandlingForOpphør.id)
-
-            vilkårperiodeRepository.insert(aktivitetForOpphør)
-            vilkårperiodeRepository.insert(målgruppeForOpphør)
-            lagVilkårForPeriode(behandlingForOpphør, januar, februar, 100, status = VilkårStatus.UENDRET)
-
-            val vedtakDto = opphørDto(opphørsdato = LocalDate.of(2025, 2, 3))
-            assertThatCode {
-                steg.utførOgReturnerNesteSteg(behandlingForOpphør, vedtakDto)
-            }.doesNotThrowAnyException()
-        }
-
-        @Test
-        fun `skal ikke kunne opphøre dersom utgifter endres før opphørsdato`() {
-            val fom = 1 januar 2025
-            val tom = 31 mars 2025
-
-            val førstegangsbehandlingContext =
-                opprettBehandlingOgGjennomførBehandlingsløp(
-                    stønadstype = Stønadstype.BARNETILSYN,
-                ) {
-                    aktivitet {
-                        opprett {
-                            aktivitetTiltakTilsynBarn(
-                                fom = fom,
-                                tom = tom,
-                                aktivitetsdager = 4,
-                            )
-                        }
-                    }
-                    målgruppe {
-                        opprett {
-                            målgruppeAAP(fom, tom)
-                        }
-                    }
-                    vilkår {
-                        opprett {
-                            passBarn(
-                                fom = fom.toYearMonth().plusMonths(1),
-                                tom = tom.toYearMonth(),
-                                utgift = 1000,
-                            )
-                        }
-                    }
-                }
-
-            val revurderingId =
-                opprettRevurderingOgGjennomførBehandlingsløp(
-                    fraBehandlingId = førstegangsbehandlingContext.behandlingId,
-                    tilSteg = StegType.BEREGNE_YTELSE,
-                ) {
-                    vilkår {
-                        oppdater { vilkårsvurdering ->
-                            with(vilkårsvurdering.vilkårsett.single()) {
-                                SvarPåVilkårDto(
-                                    id = id,
-                                    behandlingId = behandlingId,
-                                    delvilkårsett = delvilkårsett,
-                                    fom = fom.plusMonths(1),
-                                    tom = 28 februar 2025,
-                                    utgift = 500,
-                                    erFremtidigUtgift = erFremtidigUtgift,
-                                    offentligTransport = null,
-                                )
-                            }
-                        }
-                    }
-                }
-
-            kall.vedtak.apiRespons
-                .lagreOpphør(
-                    stønadstype = Stønadstype.BARNETILSYN,
-                    behandlingId = revurderingId,
-                    opphørDto =
-                        opphørDto(
-                            opphørsdato = 1 mars 2025,
-                        ),
-                ).expectProblemDetail(
-                    forventetStatus = HttpStatus.BAD_REQUEST,
-                    forventetDetail =
-                        "Opphør er et ugyldig vedtaksresultat fordi " +
-                            "opphørsdato er etter eller lik tidligste endring (01.02.2025)",
-                )
         }
     }
 

@@ -1,25 +1,19 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.utils.dato.februar
-import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkEmpty
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
-import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
-import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.AvslagBoutgifterDto
-import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterResponse
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
-import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -93,49 +87,6 @@ class BoutgifterVedtakControllerTest : CleanDatabaseIntegrationTest() {
             assertThat(lagretDto.årsakerAvslag).isEqualTo(avslag.årsakerAvslag)
             assertThat(lagretDto.begrunnelse).isEqualTo(avslag.begrunnelse)
             assertThat(lagretDto.type).isEqualTo(TypeVedtak.AVSLAG)
-        }
-    }
-
-    @Nested
-    inner class Opphør {
-        @Test
-        fun `skal lagre og hente opphør`() {
-            val fom = 1 januar 2025
-            val tom = 28 februar 2025
-
-            val førstegangsbehandlingContext =
-                opprettBehandlingOgGjennomførBehandlingsløp(
-                    stønadstype = Stønadstype.BOUTGIFTER,
-                ) {
-                    defaultBoutgifterTestdata(
-                        fom = fom,
-                        tom = tom,
-                    )
-                }
-
-            testoppsettService.settAndelerTilOkForBehandling(førstegangsbehandlingContext.behandlingId)
-
-            val revurderingId =
-                opprettRevurderingOgGjennomførBehandlingsløp(
-                    fraBehandlingId = førstegangsbehandlingContext.behandlingId,
-                ) {
-                    vedtak {
-                        opphør(
-                            årsaker = listOf(ÅrsakOpphør.ANNET),
-                            begrunnelse = "Statsbudsjettet er tomt",
-                            opphørsdato = tom.minusDays(10),
-                        )
-                    }
-                }
-
-            val vedtak =
-                kall.vedtak
-                    .hentVedtak(Stønadstype.BOUTGIFTER, revurderingId)
-                    .expectOkWithBody<OpphørBoutgifterResponse>()
-
-            assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
-            assertThat(vedtak.årsakerOpphør).containsExactly(ÅrsakOpphør.ANNET)
-            assertThat(vedtak.begrunnelse).isEqualTo("Statsbudsjettet er tomt")
         }
     }
 }

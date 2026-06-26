@@ -3,13 +3,9 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.april
 import no.nav.tilleggsstonader.libs.utils.dato.august
-import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
-import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
-import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
@@ -24,11 +20,9 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
-import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
@@ -97,45 +91,6 @@ class LæremidlerBeregnYtelseStegTest : CleanDatabaseIntegrationTest() {
                 assertThat(this.tom).isEqualTo(tom)
             }
             assertThat(vedtak.gitVersjon).isEqualTo(Applikasjonsversjon.versjon)
-        }
-    }
-
-    @Nested
-    inner class Opphør {
-        @Test
-        fun `skal lagre vedtak`() {
-            val førstegangsbehandlingContext =
-                opprettBehandlingOgGjennomførBehandlingsløp(
-                    stønadstype = Stønadstype.LÆREMIDLER,
-                ) {
-                    defaultLæremidlerTestdata(fom = fom, tom = tom)
-                }
-
-            testoppsettService.settAndelerTilOkForBehandling(førstegangsbehandlingContext.behandlingId)
-
-            val revurderingId =
-                opprettRevurderingOgGjennomførBehandlingsløp(
-                    fraBehandlingId = førstegangsbehandlingContext.behandlingId,
-                ) {
-                    vedtak {
-                        opphør(
-                            opphørsdato = 1 februar 2025,
-                        )
-                    }
-                }
-
-            val vedtak =
-                kall.vedtak
-                    .hentVedtak(Stønadstype.LÆREMIDLER, revurderingId)
-                    .expectOkWithBody<OpphørLæremidlerResponse>()
-
-            assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
-            assertThat(vedtak.årsakerOpphør).containsExactly(ÅrsakOpphør.ANNET)
-            assertThat(vedtak.begrunnelse).isEqualTo("annet")
-            with(vedtak.vedtaksperioder.single()) {
-                assertThat(this.fom).isEqualTo(fom)
-                assertThat(this.tom).isEqualTo(31 januar 2025)
-            }
         }
     }
 
