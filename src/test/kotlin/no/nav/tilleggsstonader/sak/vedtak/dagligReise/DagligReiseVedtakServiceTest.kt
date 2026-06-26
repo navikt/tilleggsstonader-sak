@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -16,7 +17,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
 import java.util.Optional
 
 class DagligReiseVedtakServiceTest {
@@ -82,7 +82,7 @@ class DagligReiseVedtakServiceTest {
                         rammevedtakPrivatBil = DagligReiseTestUtil.defaultRammevedtakPrivatBil,
                         årsaker = listOf(ÅrsakOpphør.ANNET),
                         begrunnelse = "opphør",
-                        beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, LocalDate.of(2025, 1, 1)),
+                        beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, 1 januar 2025),
                     ),
                 gitVersjon = "123",
                 tidligsteEndring = null,
