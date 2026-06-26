@@ -63,13 +63,12 @@ fun BeregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(
             reise.perioder
                 .map { periode ->
                     val fom = periode.fom
-                    val vedtaksperiode = rammevedtakForReise.grunnlag.vedtaksperiodeForPeriode(periode)
 
                     lagAndelForDagligReise(
                         saksbehandling = saksbehandling,
                         fomUkedag = fom.iDagHvisMandagEllerForrigeMandag(),
                         beløp = periode.stønadsbeløp.avrundetStønadsbeløp().toInt(),
-                        målgruppe = vedtaksperiode.målgruppe,
+                        målgruppe = rammevedtakForReise.finnMålgruppeForReiseperiode(periode),
                         tiltaksvariant = rammevedtakForReise.tiltaksvariant,
                         brukersNavKontor = periode.brukersNavKontor,
                         reiseId = reise.reiseId, // Skal kun opprette andeler for privat-bil med reiseId
