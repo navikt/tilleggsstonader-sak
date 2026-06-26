@@ -25,6 +25,7 @@ data class Beregningsplan internal constructor(
             Beregningsomfang.ALLE_PERIODER -> null
             Beregningsomfang.FRA_DATO -> fraDato
             Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT -> error("beregnFra-dato er ikke relevant for $omfang")
+            Beregningsomfang.KUN_NYE_KJORELISTE_UKER -> null
         }
 
     fun legacyTidligsteEndring(): LocalDate? =
@@ -32,6 +33,7 @@ data class Beregningsplan internal constructor(
             Beregningsomfang.ALLE_PERIODER -> null
             Beregningsomfang.FRA_DATO -> tidligsteEndring ?: fraDato
             Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT -> null
+            Beregningsomfang.KUN_NYE_KJORELISTE_UKER -> null
         }
 }
 
@@ -39,4 +41,5 @@ enum class Beregningsomfang {
     ALLE_PERIODER,
     FRA_DATO,
     GJENBRUK_FORRIGE_RESULTAT,
+    KUN_NYE_KJORELISTE_UKER,
 }
