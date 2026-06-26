@@ -19,6 +19,8 @@ enum class Toggle(
 
     OPPRETT_OPPGAVE_TILBAKEKREVING("sak.opprett-oppgave-tilbakekreving"),
 
+    KAN_VISE_TILBAKEKREVING("sak.kan-vise-tilbakekreving"),
+
     KAN_BEHANDLE_PRIVAT_BIL("sak.daglig-reise-privat-bil"),
 
     KAN_AUTOMATISK_BEHANDLE_KJØRELISTE("sak.automatisk-behandling-kjoreliste"),

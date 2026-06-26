@@ -9,4 +9,6 @@ interface TilbakekrevinghendelseRepository :
     RepositoryInterface<TilbakekrevingHendelse, Long>,
     InsertUpdateRepository<TilbakekrevingHendelse> {
     fun findAllByBehandlingId(behandlingId: BehandlingId): List<TilbakekrevingHendelse>
+
+    fun existsByBehandlingId(behandlingId: BehandlingId): Boolean
 }
