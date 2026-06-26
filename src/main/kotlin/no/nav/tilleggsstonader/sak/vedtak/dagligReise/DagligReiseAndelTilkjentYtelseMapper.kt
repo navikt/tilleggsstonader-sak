@@ -169,7 +169,10 @@ fun finnPeriodeFraAndel(
     andelTilkjentYtelse: AndelTilkjentYtelse,
 ): Datoperiode =
     if (andelTilkjentYtelse.reiseId != null) {
-        finnPrivatBilPeriodeFraAndel(requireNotNull(beregningsresultat.privatBil), andelTilkjentYtelse)
+        feilHvis(beregningsresultat.privatBil == null) {
+            "Forventer at beregningsresultat for privat bil skal være satt når en andel har reiseId"
+        }
+        finnPrivatBilPeriodeFraAndel(beregningsresultat.privatBil, andelTilkjentYtelse)
     } else {
         finnOffentligTransportPeriodeFraAndel(requireNotNull(beregningsresultat.offentligTransport), andelTilkjentYtelse)
     }

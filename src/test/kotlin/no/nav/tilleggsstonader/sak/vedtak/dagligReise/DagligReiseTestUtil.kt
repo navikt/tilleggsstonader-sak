@@ -20,6 +20,9 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
@@ -270,19 +273,18 @@ private fun rammevedtakPrivatBil(perioder: List<PrivatBilPeriode>) =
                     delperioder =
                         perioder.map { periode ->
                             val dagerIperiode = ChronoUnit.DAYS.between(periode.fom, periode.tom.plusDays(1)).toInt()
-                            no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode(
+                            RammeForReiseMedPrivatBilDelperiode(
                                 fom = periode.fom,
                                 tom = periode.tom,
                                 reisedagerPerUke = 5,
                                 ekstrakostnader =
-                                    no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
-                                        .RammeForReiseMedPrivatEkstrakostnader(
-                                            null,
-                                            null,
-                                        ),
+                                    RammeForReiseMedPrivatEkstrakostnader(
+                                        null,
+                                        null,
+                                    ),
                                 satser =
                                     listOf(
-                                        no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode(
+                                        RammeForReiseMedPrivatBilSatsForDelperiode(
                                             fom = periode.fom,
                                             tom = periode.tom,
                                             satsBekreftetVedVedtakstidspunkt = true,
