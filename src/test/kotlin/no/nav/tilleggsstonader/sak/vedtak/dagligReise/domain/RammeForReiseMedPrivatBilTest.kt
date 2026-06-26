@@ -10,7 +10,7 @@ import java.math.BigDecimal
 
 class RammeForReiseMedPrivatBilTest {
     @Test
-    fun `finnMålgruppeForReiseperiode returnerer målgruppe når beregningsuke spenner over to sammenhengende vedtaksperioder med lik målgruppe og aktivitet`() {
+    fun `finner rett målgruppe når beregningsuke går over to sammenhengende vedtaksperioder`() {
         val ukeFom = 6 januar 2025
         val ukeTom = 12 januar 2025
 
