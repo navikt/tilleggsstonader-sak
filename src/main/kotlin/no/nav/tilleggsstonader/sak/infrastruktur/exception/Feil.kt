@@ -96,7 +96,7 @@ inline fun brukerfeilHvisIkke(
 }
 
 inline fun <T> List<T>.singleEllerFeil(
-    httpStatus: HttpStatus = HttpStatus.BAD_REQUEST,
+    httpStatus: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
     noinline sensitivFeilmelding: (() -> String)? = null,
     lazyMessage: () -> String,
 ): T =
@@ -111,7 +111,7 @@ inline fun <T> List<T>.singleEllerFeil(
 
 inline fun <T> Iterable<T>.singleEllerFeil(
     predicate: (T) -> Boolean,
-    httpStatus: HttpStatus = HttpStatus.BAD_REQUEST,
+    httpStatus: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
     noinline sensitivFeilmelding: (() -> String)? = null,
     lazyMessage: () -> String,
 ): T = filter(predicate).singleEllerFeil(httpStatus, sensitivFeilmelding, lazyMessage)
