@@ -16,7 +16,7 @@ import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBilBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
@@ -163,7 +163,7 @@ class PrivatBilRammevedtakBeregningService(
     private fun lagBeregningsgrunnlagForReise(
         reise: ReiseMedPrivatBil,
         vedtaksperioder: List<Vedtaksperiode>,
-    ): RammeForReiseMedPrivatBilBeregningsgrunnlag {
+    ): RammevedtakForReiseMedPrivatBilBeregningsgrunnlag {
         val delperioder =
             reise.delPerioder
                 // Justerer delperioder i tilfelle rammevedtaket har blitt kortet ned mot vedtaksperioder
@@ -212,7 +212,7 @@ class PrivatBilRammevedtakBeregningService(
                     )
                 }
 
-        return RammeForReiseMedPrivatBilBeregningsgrunnlag(
+        return RammevedtakForReiseMedPrivatBilBeregningsgrunnlag(
             fom = reise.fom,
             tom = reise.tom,
             delperioder = delperioder.sortedBy { it.fom },

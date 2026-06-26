@@ -26,7 +26,7 @@ data class RammevedtakForReiseMedPrivatBil(
     val aktivitetsadresse: String?,
     val aktivitetType: AktivitetType,
     val tiltaksvariant: TypeAktivitet?,
-    val grunnlag: RammeForReiseMedPrivatBilBeregningsgrunnlag,
+    val grunnlag: RammevedtakForReiseMedPrivatBilBeregningsgrunnlag,
 ) {
     fun finnDelperiodeForPeriode(periode: Periode<LocalDate>) = grunnlag.delperioder.single { it.inneholder(periode) }
 
@@ -47,14 +47,14 @@ data class RammevedtakForReiseMedPrivatBil(
             .målgruppe
 }
 
-data class RammeForReiseMedPrivatBilBeregningsgrunnlag(
+data class RammevedtakForReiseMedPrivatBilBeregningsgrunnlag(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val delperioder: List<RammeForReiseMedPrivatBilDelperiode>,
     val reiseavstandEnVei: BigDecimal,
     val vedtaksperioder: List<Vedtaksperiode>,
 ) : Periode<LocalDate>,
-    KopierPeriode<RammeForReiseMedPrivatBilBeregningsgrunnlag> {
+    KopierPeriode<RammevedtakForReiseMedPrivatBilBeregningsgrunnlag> {
     init {
         validerUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode(
             overordnetPeriode = this,
@@ -65,9 +65,9 @@ data class RammeForReiseMedPrivatBilBeregningsgrunnlag(
     override fun medPeriode(
         fom: LocalDate,
         tom: LocalDate,
-    ): RammeForReiseMedPrivatBilBeregningsgrunnlag = this.copy(fom = fom, tom = tom)
+    ): RammevedtakForReiseMedPrivatBilBeregningsgrunnlag = this.copy(fom = fom, tom = tom)
 
-    fun avkortEtterDato(maksTom: LocalDate): RammeForReiseMedPrivatBilBeregningsgrunnlag? {
+    fun avkortEtterDato(maksTom: LocalDate): RammevedtakForReiseMedPrivatBilBeregningsgrunnlag? {
         if (maksTom < fom) return null
         if (tom <= maksTom) return this
 

@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBilBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
@@ -34,7 +34,7 @@ object RammevedtakPrivatBilUtil {
             aktivitetType = AktivitetType.TILTAK,
             tiltaksvariant = TypeAktivitet.GRUPPEAMO,
             grunnlag =
-                RammeForReiseMedPrivatBilBeregningsgrunnlag(
+                RammevedtakForReiseMedPrivatBilBeregningsgrunnlag(
                     fom = fom,
                     tom = tom,
                     delperioder =

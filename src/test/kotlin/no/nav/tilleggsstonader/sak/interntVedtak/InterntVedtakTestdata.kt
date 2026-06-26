@@ -44,7 +44,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBilBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
@@ -733,7 +733,7 @@ object InterntVedtakTestdata {
                             aktivitetType = AktivitetType.TILTAK,
                             tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                             grunnlag =
-                                RammeForReiseMedPrivatBilBeregningsgrunnlag(
+                                RammevedtakForReiseMedPrivatBilBeregningsgrunnlag(
                                     fom = LocalDate.of(2024, 1, 1),
                                     tom = LocalDate.of(2024, 1, 31),
                                     delperioder =
@@ -769,7 +769,7 @@ object InterntVedtakTestdata {
                             aktivitetType = AktivitetType.TILTAK,
                             tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                             grunnlag =
-                                RammeForReiseMedPrivatBilBeregningsgrunnlag(
+                                RammevedtakForReiseMedPrivatBilBeregningsgrunnlag(
                                     fom = LocalDate.of(2024, 1, 1),
                                     tom = LocalDate.of(2024, 1, 31),
                                     delperioder =
