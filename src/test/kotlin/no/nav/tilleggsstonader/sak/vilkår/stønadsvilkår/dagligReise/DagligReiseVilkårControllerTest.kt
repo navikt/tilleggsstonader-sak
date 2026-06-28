@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.util.FileUtil
@@ -27,6 +28,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.http.HttpStatus
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -179,6 +181,84 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
+    fun `skal kunne hente vilkår med bompenger over 500 fra databasen men ikke lagre nye verdier over 500`() {
+        val fom = 1 januar 2026
+        val tom = 31 januar 2026
+
+        val behandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+                tilSteg = StegType.VILKÅR,
+            ) {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTso(fom = fom, tom = tom)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(fom = fom, tom = tom)
+                    }
+                }
+            }
+
+        val aktivitet =
+            kall.vilkårperiode
+                .hentForBehandling(behandlingContext.behandlingId)
+                .vilkårperioder.aktiviteter
+                .single()
+
+        val nyttVilkår =
+            LagreVilkårDagligReiseDto(
+                fom = fom,
+                tom = tom,
+                adresse = "Tiltaksveien 1",
+                reiseId = dummyReiseId,
+                svar = svarPrivatBil,
+                fakta = faktaPrivatBil(aktivitet = aktivitet),
+            )
+
+        val opprettetVilkår = kall.vilkårDagligReise.opprettVilkår(behandlingContext.behandlingId, nyttVilkår)
+
+        jdbcTemplate.update(
+            """
+            UPDATE vilkar
+            SET fakta = jsonb_set(
+                CAST(fakta AS jsonb),
+                '{faktaDelperioder,0,bompengerPerDag}',
+                to_jsonb(CAST(:bompengerPerDag AS numeric)),
+                true
+            )
+            WHERE id = :vilkarId
+            """.trimIndent(),
+            mapOf(
+                "bompengerPerDag" to BigDecimal("5023"),
+                "vilkarId" to opprettetVilkår.id.id,
+            ),
+        )
+
+        val vilkårFraDb = kall.vilkårDagligReise.hentVilkår(behandlingContext.behandlingId).single()
+        val fakta = vilkårFraDb.fakta as FaktaDagligReisePrivatBilDto
+        assertThat(fakta.faktaDelperioder.single().bompengerPerDag).isEqualTo(BigDecimal("5023"))
+
+        val oppdatertVilkår =
+            nyttVilkår.copy(
+                fakta =
+                    faktaPrivatBil(
+                        aktivitet = aktivitet,
+                        bompengerPerDag = BigDecimal("501"),
+                    ),
+            )
+
+        kall.vilkårDagligReise.apiRespons
+            .oppdaterVilkår(oppdatertVilkår, opprettetVilkår.id, behandlingContext.behandlingId)
+            .expectProblemDetail(
+                forventetStatus = HttpStatus.BAD_REQUEST,
+                forventetDetail = "Skal du innvilge med bompenger høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet",
+            )
+    }
+
+    @Test
     fun `skal kunne lagre ned et vilkår med fakta UBESTEMT med adresse og reiseId om vilkår ikke er oppfylt`() {
         val svarAvstandIkkeOppfylt =
             mapOf(
@@ -227,6 +307,8 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
         reiseavstandEnVei: BigDecimal = BigDecimal("10"),
         fom: LocalDate = 1 januar 2026,
         tom: LocalDate = 31 januar 2026,
+        bompengerPerDag: BigDecimal? = null,
+        fergekostnadPerDag: BigDecimal? = null,
         aktivitet: VilkårperiodeDto,
     ) = FaktaDagligReisePrivatBilDto(
         reiseavstandEnVei = reiseavstandEnVei,
@@ -236,8 +318,8 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
                     fom = fom,
                     tom = tom,
                     reisedagerPerUke = 5,
-                    bompengerPerDag = null,
-                    fergekostnadPerDag = null,
+                    bompengerPerDag = bompengerPerDag,
+                    fergekostnadPerDag = fergekostnadPerDag,
                 ),
             ),
         aktivitetId = aktivitet.globalId,

@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
@@ -69,22 +70,37 @@ data class FaktaDagligReisePrivatBilDto(
     override fun mapTilFakta(
         reiseId: ReiseId,
         adresse: String?,
-    ) = FaktaPrivatBil(
-        reiseId = reiseId,
-        reiseavstandEnVei = reiseavstandEnVei,
-        faktaDelperioder =
-            faktaDelperioder.map {
-                FaktaDelperiodePrivatBil(
-                    fom = it.fom,
-                    tom = it.tom,
-                    reisedagerPerUke = it.reisedagerPerUke,
-                    bompengerPerDag = it.bompengerPerDag,
-                    fergekostnadPerDag = it.fergekostnadPerDag,
-                )
-            },
-        adresse = adresse,
-        aktivitetId = aktivitetId,
-    )
+    ): FaktaPrivatBil {
+        validerBompengerOgFergekostnader()
+
+        return FaktaPrivatBil(
+            reiseId = reiseId,
+            reiseavstandEnVei = reiseavstandEnVei,
+            faktaDelperioder =
+                faktaDelperioder.map {
+                    FaktaDelperiodePrivatBil(
+                        fom = it.fom,
+                        tom = it.tom,
+                        reisedagerPerUke = it.reisedagerPerUke,
+                        bompengerPerDag = it.bompengerPerDag,
+                        fergekostnadPerDag = it.fergekostnadPerDag,
+                    )
+                },
+            adresse = adresse,
+            aktivitetId = aktivitetId,
+        )
+    }
+
+    private fun validerBompengerOgFergekostnader() {
+        faktaDelperioder.forEach { delperiode ->
+            brukerfeilHvis(delperiode.bompengerPerDag != null && delperiode.bompengerPerDag > BigDecimal(500)) {
+                "Skal du innvilge med bompenger høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet"
+            }
+            brukerfeilHvis(delperiode.fergekostnadPerDag != null && delperiode.fergekostnadPerDag > BigDecimal(500)) {
+                "Skal du innvilge med fergekostnader høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet"
+            }
+        }
+    }
 }
 
 data class FaktaDelperiodePrivatBilDto(
