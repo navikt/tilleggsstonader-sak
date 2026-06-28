@@ -169,8 +169,10 @@ class RevurderingPrivatBilIntegrationTest(
 
             val andelerFraKjørelistebehandling =
                 tilkjentYtelseService.hentForBehandling(sisteKjørelistebehandling.id).andelerTilkjentYtelse.size
-            val andelerFraRevurdering = tilkjentYtelseService.hentForBehandling(revurderingId)
-            assertThat(andelerFraRevurdering.andelerTilkjentYtelse.size).isLessThan(andelerFraKjørelistebehandling)
+            val andelerFraRevurdering = tilkjentYtelseService.hentForBehandling(revurderingId).andelerTilkjentYtelse
+            assertThat(andelerFraRevurdering.size).isLessThan(andelerFraKjørelistebehandling)
+
+            assertThat(andelerFraRevurdering.map { it.reiseId }.distinct()).containsOnly(kontekst.reiseId1)
         }
     }
 
@@ -215,6 +217,93 @@ class RevurderingPrivatBilIntegrationTest(
             // dagsatsUtenParkering inkluderer bompenger — skal være høyere etter endringen
             assertThat(dagsatsMedBompenger).isGreaterThan(dagsatsUtenBompenger)
             assertThat(dagsatsMedBompenger).isEqualTo(BigDecimal("78.80"))
+        }
+
+        @Test
+        fun `endring av fergekostnader per dag skal gi høyere dagsats i rammevedtaket`() {
+            val fomReise1 = 5 januar 2026
+            val tomReise1 = 11 januar 2026
+
+            val førstegangsbehandlingContext = innvilgetPrivatBilBehandlingMedKjøreliste(fomReise1, tomReise1)
+            var reiseId: ReiseId? = null
+
+            val revurderingId =
+                opprettRevurderingOgGjennomførBehandlingsløp(
+                    fraBehandlingId = førstegangsbehandlingContext.behandlingId,
+                ) {
+                    vilkår {
+                        oppdaterEnesteDagligeReise {
+                            reiseId = this.reiseId
+                            copy(
+                                fakta =
+                                    (fakta as FaktaDagligReisePrivatBilDto).copy(
+                                        faktaDelperioder =
+                                            fakta.faktaDelperioder.map {
+                                                it.copy(fergekostnadPerDag = 20.toBigDecimal())
+                                            },
+                                    ),
+                            )
+                        }
+                    }
+                }
+
+            val dagsatsUtenFergekostnader =
+                vedtakService.hentVedtak<InnvilgelseDagligReise>(førstegangsbehandlingContext.behandlingId).data.hentUtDagsats(
+                    reiseId = reiseId!!,
+                )
+
+            val dagsatsMedFergekostnader =
+                vedtakService.hentVedtak<InnvilgelseDagligReise>(revurderingId).data.hentUtDagsats(reiseId = reiseId)
+
+            // dagsatsUtenParkering inkluderer fergekostnader — skal være høyere etter endringen
+            assertThat(dagsatsMedFergekostnader).isGreaterThan(dagsatsUtenFergekostnader)
+            assertThat(dagsatsMedFergekostnader).isEqualTo(BigDecimal("78.80"))
+        }
+
+        @Test
+        fun `økning av reiseavstand fører til reberegning av beregningsresultatet`() {
+            val fomReise1 = 5 januar 2026
+            val tomReise1 = 11 januar 2026
+            var reiseId: ReiseId? = null
+
+            val førstegangsbehandlingContext = innvilgetPrivatBilBehandlingMedKjøreliste(fomReise1, tomReise1)
+
+            val revurderingId =
+                opprettRevurderingOgGjennomførBehandlingsløp(
+                    fraBehandlingId = førstegangsbehandlingContext.behandlingId,
+                ) {
+                    vilkår {
+                        oppdaterEnesteDagligeReise {
+                            reiseId = this.reiseId
+                            copy(
+                                fakta =
+                                    (fakta as FaktaDagligReisePrivatBilDto).copy(
+                                        reiseavstandEnVei = "67".toBigDecimal(),
+                                    ),
+                            )
+                        }
+                    }
+                }
+
+            val kjørelisteBehandling =
+                testoppsettService
+                    .hentBehandlinger(førstegangsbehandlingContext.fagsakId)
+                    .single { it.erKjørelisteBehandling() }
+            val dagsatsKjørelistebehandling =
+                vedtakService
+                    .hentVedtak<InnvilgelseDagligReise>(
+                        kjørelisteBehandling.id,
+                    ).data
+                    .hentUtDagsats(reiseId!!)
+            val dagsatsRevurdering =
+                vedtakService.hentVedtak<InnvilgelseDagligReise>(revurderingId).data.hentUtDagsats(reiseId)
+
+            assertThat(dagsatsKjørelistebehandling).isLessThan(dagsatsRevurdering)
+
+            val andelerKjørelistebehandling = tilkjentYtelseService.hentForBehandling(kjørelisteBehandling.id).andelerTilkjentYtelse
+            val andelerRevurdering = tilkjentYtelseService.hentForBehandling(revurderingId).andelerTilkjentYtelse
+
+            assertThat(andelerKjørelistebehandling.sumOf { it.beløp }).isLessThan(andelerRevurdering.sumOf { it.beløp })
         }
 
         @Test
@@ -354,16 +443,16 @@ class RevurderingPrivatBilIntegrationTest(
         fun `skal få tomt beregningsresultat om innsendte uker ikke lenger er innenfor rammevedtak`() {
             every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns true
 
-            val fomReise = 5 januar 2026
-            val tomReise = 11 januar 2026
+            val fomKjøreliste = 5 januar 2026
+            val tomKjøreliste = 11 januar 2026
             val nyFom = 12 januar 2026
 
             val førstegangsbehandlingContext =
                 opprettBehandlingOgGjennomførBehandlingsløp(stønadstype = Stønadstype.DAGLIG_REISE_TSO) {
                     defaultDagligReisePrivatBilTsoTestdata(fom, tom)
                     sendInnKjøreliste {
-                        periode = Datoperiode(fomReise, tomReise)
-                        kjørteDager = listOf(KjørtDag(dato = fomReise))
+                        periode = Datoperiode(fomKjøreliste, tomKjøreliste)
+                        kjørteDager = listOf(KjørtDag(dato = fomKjøreliste))
                     }
                 }
 
@@ -438,7 +527,7 @@ class RevurderingPrivatBilIntegrationTest(
     }
 
     @Test
-    fun `reise som helt før tidligste endring beholdes uendret når kun fremtidig reise endres`() {
+    fun `reise som ikke berøres av tidligste endring beholdes uendret når kun fremtidig reise endres`() {
         val fomReise1 = 5 januar 2026
         val tomReise1 = 11 januar 2026
         val fomReise2 = 26 januar 2026
