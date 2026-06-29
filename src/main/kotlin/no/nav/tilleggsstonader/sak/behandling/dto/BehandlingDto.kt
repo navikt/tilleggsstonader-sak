@@ -47,7 +47,7 @@ fun Saksbehandling.tilDto(
     tilordnetSaksbehandler: TilordnetSaksbehandlerDto,
     harÅpenKjørelistebehandling: Boolean,
     harTilbakekrevingSak: Boolean,
-    ): BehandlingDto =
+): BehandlingDto =
     BehandlingDto(
         id = this.id,
         forrigeIverksatteBehandlingId = this.forrigeIverksatteBehandlingId,
