@@ -64,6 +64,24 @@ class StønadsvilkårTestdataDsl {
         }
     }
 
+    /**
+     * Endrer fakta på den eneste daglige reisen (privat bil), uten at testen trenger å caste eller kopiere selv.
+     */
+    fun endrePrivatBilFakta(endre: FaktaDagligReisePrivatBilDto.() -> FaktaDagligReisePrivatBilDto) {
+        oppdaterEnesteDagligeReise {
+            copy(fakta = (fakta as FaktaDagligReisePrivatBilDto).endre())
+        }
+    }
+
+    /**
+     * Endrer alle fakta-delperioder på den eneste daglige reisen (privat bil).
+     */
+    fun endrePrivatBilFaktaDelperioder(endre: (FaktaDelperiodePrivatBilDto) -> FaktaDelperiodePrivatBilDto) {
+        endrePrivatBilFakta {
+            copy(faktaDelperioder = faktaDelperioder.map(endre))
+        }
+    }
+
     fun oppdaterDatoPåEnesteDagligeReise(
         fom: LocalDate,
         tom: LocalDate,

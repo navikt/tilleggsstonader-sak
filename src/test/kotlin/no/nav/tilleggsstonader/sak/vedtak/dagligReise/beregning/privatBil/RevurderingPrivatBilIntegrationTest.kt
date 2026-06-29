@@ -7,7 +7,8 @@ import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.BehandlingContext
@@ -78,7 +79,7 @@ class RevurderingPrivatBilIntegrationTest(
                     }
                 }
 
-            val vedtak = vedtakService.hentVedtak<InnvilgelseDagligReise>(revurderingId).data
+            val vedtak = hentInnvilgelse(revurderingId)
             val rammevedtak = vedtak.rammevedtakPrivatBil!!
             val beregningPrivatBil = vedtak.beregningsresultat.privatBil!!
 
@@ -103,14 +104,9 @@ class RevurderingPrivatBilIntegrationTest(
 
             // d. Ingen nye andeler opprettes for den nye reisen
             val andelerFraKjørelistebehandling =
-                tilkjentYtelseService.hentForBehandling(
-                    testoppsettService
-                        .hentBehandlinger(førstegangsbehandlingContext.fagsakId)
-                        .single { it.type == BehandlingType.KJØRELISTE }
-                        .id,
-                )
-            val andelerFraRevurdering = tilkjentYtelseService.hentForBehandling(revurderingId)
-            assertThat(andelerFraRevurdering.andelerTilkjentYtelse).hasSameSizeAs(andelerFraKjørelistebehandling.andelerTilkjentYtelse)
+                andelerFor(kjørelisteBehandling(førstegangsbehandlingContext.fagsakId).id)
+            val andelerFraRevurdering = andelerFor(revurderingId)
+            assertThat(andelerFraRevurdering).hasSameSizeAs(andelerFraKjørelistebehandling)
         }
 
         @Test
@@ -134,7 +130,7 @@ class RevurderingPrivatBilIntegrationTest(
                     }
                 }
 
-            val vedtak = vedtakService.hentVedtak<InnvilgelseDagligReise>(revurderingId).data
+            val vedtak = hentInnvilgelse(revurderingId)
             val rammevedtak = vedtak.rammevedtakPrivatBil!!
             val beregningPrivatBil = vedtak.beregningsresultat.privatBil!!
 
@@ -160,16 +156,8 @@ class RevurderingPrivatBilIntegrationTest(
             assertThat(beregningPrivatBil.reiser.map { it.reiseId }).containsOnly(kontekst.reiseId1)
 
             // Andeler fra revurdering er færre enn tidligere fordi en reise er fjernet
-            val sisteKjørelistebehandling =
-                testoppsettService
-                    .hentBehandlinger(kontekst.behandlingContext.fagsakId)
-                    .filter { it.type == BehandlingType.KJØRELISTE }
-                    .sortedBy { it.sporbar.opprettetTid }
-                    .last()
-
-            val andelerFraKjørelistebehandling =
-                tilkjentYtelseService.hentForBehandling(sisteKjørelistebehandling.id).andelerTilkjentYtelse.size
-            val andelerFraRevurdering = tilkjentYtelseService.hentForBehandling(revurderingId).andelerTilkjentYtelse
+            val andelerFraKjørelistebehandling = andelerFor(sisteKjørelisteBehandling(kontekst.fagsakId).id).size
+            val andelerFraRevurdering = andelerFor(revurderingId)
             assertThat(andelerFraRevurdering.size).isLessThan(andelerFraKjørelistebehandling)
 
             assertThat(andelerFraRevurdering.map { it.reiseId }.distinct()).containsOnly(kontekst.reiseId1)
@@ -184,35 +172,20 @@ class RevurderingPrivatBilIntegrationTest(
             val tomReise1 = 11 januar 2026
 
             val førstegangsbehandlingContext = innvilgetPrivatBilBehandlingMedKjøreliste(fomReise1, tomReise1)
-            var reiseId: ReiseId? = null
+            val reiseId = førstegangsbehandlingContext.reiseId
 
             val revurderingId =
                 opprettRevurderingOgGjennomførBehandlingsløp(
                     fraBehandlingId = førstegangsbehandlingContext.behandlingId,
                 ) {
                     vilkår {
-                        oppdaterEnesteDagligeReise {
-                            reiseId = this.reiseId
-                            copy(
-                                fakta =
-                                    (fakta as FaktaDagligReisePrivatBilDto).copy(
-                                        faktaDelperioder =
-                                            fakta.faktaDelperioder.map {
-                                                it.copy(bompengerPerDag = 20.toBigDecimal())
-                                            },
-                                    ),
-                            )
-                        }
+                        endrePrivatBilFaktaDelperioder { it.copy(bompengerPerDag = 20.toBigDecimal()) }
                     }
                 }
 
-            val dagsatsUtenBompenger =
-                vedtakService.hentVedtak<InnvilgelseDagligReise>(førstegangsbehandlingContext.behandlingId).data.hentUtDagsats(
-                    reiseId = reiseId!!,
-                )
+            val dagsatsUtenBompenger = hentInnvilgelse(førstegangsbehandlingContext.behandlingId).hentUtDagsats(reiseId)
 
-            val dagsatsMedBompenger =
-                vedtakService.hentVedtak<InnvilgelseDagligReise>(revurderingId).data.hentUtDagsats(reiseId = reiseId)
+            val dagsatsMedBompenger = hentInnvilgelse(revurderingId).hentUtDagsats(reiseId)
 
             // dagsatsUtenParkering inkluderer bompenger — skal være høyere etter endringen
             assertThat(dagsatsMedBompenger).isGreaterThan(dagsatsUtenBompenger)
@@ -225,35 +198,20 @@ class RevurderingPrivatBilIntegrationTest(
             val tomReise1 = 11 januar 2026
 
             val førstegangsbehandlingContext = innvilgetPrivatBilBehandlingMedKjøreliste(fomReise1, tomReise1)
-            var reiseId: ReiseId? = null
+            val reiseId = førstegangsbehandlingContext.reiseId
 
             val revurderingId =
                 opprettRevurderingOgGjennomførBehandlingsløp(
                     fraBehandlingId = førstegangsbehandlingContext.behandlingId,
                 ) {
                     vilkår {
-                        oppdaterEnesteDagligeReise {
-                            reiseId = this.reiseId
-                            copy(
-                                fakta =
-                                    (fakta as FaktaDagligReisePrivatBilDto).copy(
-                                        faktaDelperioder =
-                                            fakta.faktaDelperioder.map {
-                                                it.copy(fergekostnadPerDag = 20.toBigDecimal())
-                                            },
-                                    ),
-                            )
-                        }
+                        endrePrivatBilFaktaDelperioder { it.copy(fergekostnadPerDag = 20.toBigDecimal()) }
                     }
                 }
 
-            val dagsatsUtenFergekostnader =
-                vedtakService.hentVedtak<InnvilgelseDagligReise>(førstegangsbehandlingContext.behandlingId).data.hentUtDagsats(
-                    reiseId = reiseId!!,
-                )
+            val dagsatsUtenFergekostnader = hentInnvilgelse(førstegangsbehandlingContext.behandlingId).hentUtDagsats(reiseId)
 
-            val dagsatsMedFergekostnader =
-                vedtakService.hentVedtak<InnvilgelseDagligReise>(revurderingId).data.hentUtDagsats(reiseId = reiseId)
+            val dagsatsMedFergekostnader = hentInnvilgelse(revurderingId).hentUtDagsats(reiseId)
 
             // dagsatsUtenParkering inkluderer fergekostnader — skal være høyere etter endringen
             assertThat(dagsatsMedFergekostnader).isGreaterThan(dagsatsUtenFergekostnader)
@@ -264,44 +222,27 @@ class RevurderingPrivatBilIntegrationTest(
         fun `økning av reiseavstand fører til reberegning av beregningsresultatet`() {
             val fomReise1 = 5 januar 2026
             val tomReise1 = 11 januar 2026
-            var reiseId: ReiseId? = null
 
             val førstegangsbehandlingContext = innvilgetPrivatBilBehandlingMedKjøreliste(fomReise1, tomReise1)
+            val reiseId = førstegangsbehandlingContext.reiseId
 
             val revurderingId =
                 opprettRevurderingOgGjennomførBehandlingsløp(
                     fraBehandlingId = førstegangsbehandlingContext.behandlingId,
                 ) {
                     vilkår {
-                        oppdaterEnesteDagligeReise {
-                            reiseId = this.reiseId
-                            copy(
-                                fakta =
-                                    (fakta as FaktaDagligReisePrivatBilDto).copy(
-                                        reiseavstandEnVei = "67".toBigDecimal(),
-                                    ),
-                            )
-                        }
+                        endrePrivatBilFakta { copy(reiseavstandEnVei = "67".toBigDecimal()) }
                     }
                 }
 
-            val kjørelisteBehandling =
-                testoppsettService
-                    .hentBehandlinger(førstegangsbehandlingContext.fagsakId)
-                    .single { it.erKjørelisteBehandling() }
-            val dagsatsKjørelistebehandling =
-                vedtakService
-                    .hentVedtak<InnvilgelseDagligReise>(
-                        kjørelisteBehandling.id,
-                    ).data
-                    .hentUtDagsats(reiseId!!)
-            val dagsatsRevurdering =
-                vedtakService.hentVedtak<InnvilgelseDagligReise>(revurderingId).data.hentUtDagsats(reiseId)
+            val kjørelistebehandling = kjørelisteBehandling(førstegangsbehandlingContext.fagsakId)
+            val dagsatsKjørelistebehandling = hentInnvilgelse(kjørelistebehandling.id).hentUtDagsats(reiseId)
+            val dagsatsRevurdering = hentInnvilgelse(revurderingId).hentUtDagsats(reiseId)
 
             assertThat(dagsatsKjørelistebehandling).isLessThan(dagsatsRevurdering)
 
-            val andelerKjørelistebehandling = tilkjentYtelseService.hentForBehandling(kjørelisteBehandling.id).andelerTilkjentYtelse
-            val andelerRevurdering = tilkjentYtelseService.hentForBehandling(revurderingId).andelerTilkjentYtelse
+            val andelerKjørelistebehandling = andelerFor(kjørelistebehandling.id)
+            val andelerRevurdering = andelerFor(revurderingId)
 
             assertThat(andelerKjørelistebehandling.sumOf { it.beløp }).isLessThan(andelerRevurdering.sumOf { it.beløp })
         }
@@ -319,21 +260,11 @@ class RevurderingPrivatBilIntegrationTest(
                     fraBehandlingId = førstegangsbehandlingContext.behandlingId,
                 ) {
                     vilkår {
-                        oppdaterEnesteDagligeReise {
-                            copy(
-                                fakta =
-                                    (fakta as FaktaDagligReisePrivatBilDto).copy(
-                                        faktaDelperioder =
-                                            fakta.faktaDelperioder.map {
-                                                it.copy(reisedagerPerUke = 5)
-                                            },
-                                    ),
-                            )
-                        }
+                        endrePrivatBilFaktaDelperioder { it.copy(reisedagerPerUke = 5) }
                     }
                 }
 
-            val vedtakEtterRevurdering = vedtakService.hentVedtak<InnvilgelseDagligReise>(revurderingId).data
+            val vedtakEtterRevurdering = hentInnvilgelse(revurderingId)
             val reise = vedtakEtterRevurdering.rammevedtakPrivatBil!!.reiser.single()
 
             // Rammevedtaket har ny kapasitet
@@ -369,17 +300,7 @@ class RevurderingPrivatBilIntegrationTest(
                     fraBehandlingId = førstegangsbehandlingContext.behandlingId,
                 ) {
                     vilkår {
-                        oppdaterEnesteDagligeReise {
-                            copy(
-                                fakta =
-                                    (fakta as FaktaDagligReisePrivatBilDto).copy(
-                                        faktaDelperioder =
-                                            fakta.faktaDelperioder.map {
-                                                it.copy(reisedagerPerUke = 2)
-                                            },
-                                    ),
-                            )
-                        }
+                        endrePrivatBilFaktaDelperioder { it.copy(reisedagerPerUke = 2) }
                     }
                 }
             }
@@ -405,16 +326,9 @@ class RevurderingPrivatBilIntegrationTest(
                     }
                 }
 
-            val vedtakFørRevurdering = vedtakService.hentVedtak<InnvilgelseDagligReise>(førstegangsbehandlingContext.behandlingId).data
-            val vedtakEtterKjøreliste =
-                vedtakService
-                    .hentVedtak<InnvilgelseDagligReise>(
-                        testoppsettService
-                            .hentBehandlinger(førstegangsbehandlingContext.fagsakId)
-                            .single { it.type == BehandlingType.KJØRELISTE }
-                            .id,
-                    ).data
-            val vedtakEtterRevurdering = vedtakService.hentVedtak<InnvilgelseDagligReise>(revurderingId).data
+            val vedtakFørRevurdering = hentInnvilgelse(førstegangsbehandlingContext.behandlingId)
+            val vedtakEtterKjøreliste = hentInnvilgelse(kjørelisteBehandling(førstegangsbehandlingContext.fagsakId).id)
+            val vedtakEtterRevurdering = hentInnvilgelse(revurderingId)
 
             // Rammevedtak og beregning finnes
             assertThat(vedtakEtterRevurdering.rammevedtakPrivatBil).isNotNull()
@@ -456,14 +370,11 @@ class RevurderingPrivatBilIntegrationTest(
                     }
                 }
 
-            val kjørelisteBehandling =
-                testoppsettService
-                    .hentBehandlinger(førstegangsbehandlingContext.fagsakId)
-                    .single { it.erKjørelisteBehandling() }
-            testoppsettService.settAndelerTilOkForBehandling(kjørelisteBehandling.id)
+            val kjørelistebehandling = kjørelisteBehandling(førstegangsbehandlingContext.fagsakId)
+            testoppsettService.settAndelerTilOkForBehandling(kjørelistebehandling.id)
 
             val revurderingId =
-                opprettRevurderingOgGjennomførBehandlingsløp(kjørelisteBehandling.id) {
+                opprettRevurderingOgGjennomførBehandlingsløp(kjørelistebehandling.id) {
                     vilkår {
                         oppdaterDatoPåEnesteDagligeReise(nyFom, tom)
                     }
@@ -471,13 +382,9 @@ class RevurderingPrivatBilIntegrationTest(
 
             val revurdering = testoppsettService.hentBehandling(revurderingId)
 
-            val vedtakFørstegangsbehandling =
-                vedtakService
-                    .hentVedtak<InnvilgelseDagligReise>(
-                        førstegangsbehandlingContext.behandlingId,
-                    ).data
-            val vedtakKjørelistebehandling = vedtakService.hentVedtak<InnvilgelseDagligReise>(kjørelisteBehandling.id).data
-            val vedtakRevurdering = vedtakService.hentVedtak<InnvilgelseDagligReise>(revurdering.id).data
+            val vedtakFørstegangsbehandling = hentInnvilgelse(førstegangsbehandlingContext.behandlingId)
+            val vedtakKjørelistebehandling = hentInnvilgelse(kjørelistebehandling.id)
+            val vedtakRevurdering = hentInnvilgelse(revurdering.id)
 
             assertThat(vedtakFørstegangsbehandling.rammevedtakPrivatBil).isEqualTo(vedtakKjørelistebehandling.rammevedtakPrivatBil)
             assertThat(vedtakFørstegangsbehandling.rammevedtakPrivatBil).isNotEqualTo(vedtakRevurdering.rammevedtakPrivatBil)
@@ -562,7 +469,7 @@ class RevurderingPrivatBilIntegrationTest(
                 }
             }
 
-        val vedtakEtterRevurdering = vedtakService.hentVedtak<InnvilgelseDagligReise>(revurderingId2).data
+        val vedtakEtterRevurdering = hentInnvilgelse(revurderingId2)
 
         val dagsatsEtterBompengerEndring =
             vedtakEtterRevurdering.hentUtDagsats(reiseId = førstegangsbehandlingContext.reiseId2)
@@ -584,7 +491,7 @@ class RevurderingPrivatBilIntegrationTest(
         fomReise: LocalDate,
         tomReise: LocalDate,
         reisedagerPerUke: Int = 5,
-    ): BehandlingContext {
+    ): PrivatBilKontekst {
         val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(Stønadstype.DAGLIG_REISE_TSO) {
                 aktivitet {
@@ -608,15 +515,9 @@ class RevurderingPrivatBilIntegrationTest(
                 }
             }
 
-        val kjørelistebehandling =
-            testoppsettService
-                .hentBehandlinger(behandlingContext.fagsakId)
-                .single { it.type == BehandlingType.KJØRELISTE }
-        gjennomførKjørelisteBehandling(kjørelistebehandling)
+        gjennomførAlleKjørelisterOgSettAndelerOk(behandlingContext.fagsakId)
 
-        testoppsettService.settAndelerTilOkForBehandling(kjørelistebehandling.id)
-
-        return behandlingContext
+        return PrivatBilKontekst(behandlingContext, sorterteReiseIder(behandlingContext.behandlingId))
     }
 
     /**
@@ -627,7 +528,7 @@ class RevurderingPrivatBilIntegrationTest(
         tomReise1: LocalDate,
         fomReise2: LocalDate,
         tomReise2: LocalDate,
-    ): InnvilgetToReiserKontekst {
+    ): PrivatBilKontekst {
         val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(Stønadstype.DAGLIG_REISE_TSO) {
                 aktivitet {
@@ -658,29 +559,51 @@ class RevurderingPrivatBilIntegrationTest(
                 }
             }
 
-        testoppsettService
-            .hentBehandlinger(behandlingContext.fagsakId)
-            .filter { it.type == BehandlingType.KJØRELISTE }
-            .forEach { kjørelistebehandling ->
-                gjennomførKjørelisteBehandling(kjørelistebehandling)
-                testoppsettService.settAndelerTilOkForBehandling(kjørelistebehandling.id)
-            }
+        gjennomførAlleKjørelisterOgSettAndelerOk(behandlingContext.fagsakId)
 
-        val vedtak = vedtakService.hentVedtak<InnvilgelseDagligReise>(behandlingContext.behandlingId).data
-        val reiserSortert = vedtak.rammevedtakPrivatBil!!.reiser.sortedBy { it.grunnlag.fom }
-
-        return InnvilgetToReiserKontekst(
-            behandlingContext = behandlingContext,
-            reiseId1 = reiserSortert[0].reiseId,
-            reiseId2 = reiserSortert[1].reiseId,
-        )
+        return PrivatBilKontekst(behandlingContext, sorterteReiseIder(behandlingContext.behandlingId))
     }
 
-    private data class InnvilgetToReiserKontekst(
+    /**
+     * Kontekst for en innvilget privatbil-behandling. [reiseIder] er sortert på fom.
+     */
+    private data class PrivatBilKontekst(
         val behandlingContext: BehandlingContext,
-        val reiseId1: ReiseId,
-        val reiseId2: ReiseId,
-    )
+        val reiseIder: List<ReiseId>,
+    ) {
+        val behandlingId get() = behandlingContext.behandlingId
+        val fagsakId get() = behandlingContext.fagsakId
+        val reiseId get() = reiseIder.single()
+        val reiseId1 get() = reiseIder[0]
+        val reiseId2 get() = reiseIder[1]
+    }
+
+    private fun sorterteReiseIder(behandlingId: BehandlingId): List<ReiseId> =
+        hentInnvilgelse(behandlingId)
+            .rammevedtakPrivatBil!!
+            .reiser
+            .sortedBy { it.grunnlag.fom }
+            .map { it.reiseId }
+
+    private fun gjennomførAlleKjørelisterOgSettAndelerOk(fagsakId: FagsakId) {
+        kjørelisteBehandlinger(fagsakId).forEach { kjørelistebehandling ->
+            gjennomførKjørelisteBehandling(kjørelistebehandling)
+            testoppsettService.settAndelerTilOkForBehandling(kjørelistebehandling.id)
+        }
+    }
+
+    private fun kjørelisteBehandlinger(fagsakId: FagsakId) =
+        testoppsettService
+            .hentBehandlinger(fagsakId)
+            .filter { it.erKjørelisteBehandling() }
+
+    private fun kjørelisteBehandling(fagsakId: FagsakId) = kjørelisteBehandlinger(fagsakId).single()
+
+    private fun sisteKjørelisteBehandling(fagsakId: FagsakId) = kjørelisteBehandlinger(fagsakId).maxBy { it.sporbar.opprettetTid }
+
+    private fun hentInnvilgelse(behandlingId: BehandlingId) = vedtakService.hentVedtak<InnvilgelseDagligReise>(behandlingId).data
+
+    private fun andelerFor(behandlingId: BehandlingId) = tilkjentYtelseService.hentForBehandling(behandlingId).andelerTilkjentYtelse
 
     private fun InnvilgelseDagligReise.hentUtDagsats(reiseId: ReiseId): BigDecimal =
         this.rammevedtakPrivatBil!!
@@ -695,6 +618,5 @@ class RevurderingPrivatBilIntegrationTest(
     private fun RammevedtakPrivatBil.sisteTom() =
         this.reiser
             .map { it.grunnlag.tom }
-            .sorted()
-            .last()
+            .maxOf { it }
 }
