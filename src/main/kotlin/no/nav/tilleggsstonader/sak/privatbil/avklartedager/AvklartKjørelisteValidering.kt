@@ -8,10 +8,10 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
 import no.nav.tilleggsstonader.sak.util.norskFormat
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 
 fun validerAtAlleDagerIKjørelistaErInnenForRammevedtaket(
-    rammeForReise: RammeForReiseMedPrivatBil,
+    rammeForReise: RammevedtakForReiseMedPrivatBil,
     kjøreliste: Kjøreliste,
 ) {
     feilHvisIkke(rammeForReise.grunnlag.inneholder(kjøreliste.data)) {
@@ -22,7 +22,7 @@ fun validerAtAlleDagerIKjørelistaErInnenForRammevedtaket(
 fun validerOppdatertAvklartKjørtUke(
     oppdaterteDager: List<AvklartKjørtDag>,
     ukeSomSkalOppdateres: UkeIÅr,
-    rammevedtak: RammeForReiseMedPrivatBil,
+    rammevedtak: RammevedtakForReiseMedPrivatBil,
     innsendteKjørelisteDager: List<KjørelisteDag>,
     tillatOverskridelseRammevedtak: Boolean = false,
 ) {
@@ -43,7 +43,7 @@ fun validerOppdatertAvklartKjørtUke(
 
 private fun validerAntallDagerGodkjentInnenforRammevedtak(
     oppdaterteDager: List<AvklartKjørtDag>,
-    rammevedtak: RammeForReiseMedPrivatBil,
+    rammevedtak: RammevedtakForReiseMedPrivatBil,
     tillatOverskridelseRammevedtak: Boolean,
 ) {
     if (tillatOverskridelseRammevedtak) return

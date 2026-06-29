@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import org.springframework.stereotype.Service
@@ -68,10 +68,10 @@ class PrivatBilBeregningRevurderingService(
 
     private fun beregnRammevedtakForReiseIRevurdering(
         vilkårStatus: VilkårStatus?,
-        forrigeRammeForReise: RammeForReiseMedPrivatBil?,
-        nyRammeForReise: RammeForReiseMedPrivatBil?,
+        forrigeRammeForReise: RammevedtakForReiseMedPrivatBil?,
+        nyRammeForReise: RammevedtakForReiseMedPrivatBil?,
         tidligsteEndring: LocalDate?,
-    ): RammeForReiseMedPrivatBil? =
+    ): RammevedtakForReiseMedPrivatBil? =
         when (vilkårStatus) {
             VilkårStatus.NY -> nyRammeForReise ?: feil("Forventer at det finnes et nytt rammevedtak for nye reiser")
             VilkårStatus.SLETTET -> null
@@ -87,11 +87,11 @@ class PrivatBilBeregningRevurderingService(
         }
 
     private fun velgRammeForReiseBasertPåTidligsteEndring(
-        forrigeRammeForReise: RammeForReiseMedPrivatBil?,
-        nyRammeForReise: RammeForReiseMedPrivatBil?,
+        forrigeRammeForReise: RammevedtakForReiseMedPrivatBil?,
+        nyRammeForReise: RammevedtakForReiseMedPrivatBil?,
         tidligsteEndring: LocalDate?,
         vilkårStatus: VilkårStatus,
-    ): RammeForReiseMedPrivatBil? {
+    ): RammevedtakForReiseMedPrivatBil? {
         feilHvis(tidligsteEndring == null) {
             "Forventer at tidligste endring finnes for en revurdering"
         }

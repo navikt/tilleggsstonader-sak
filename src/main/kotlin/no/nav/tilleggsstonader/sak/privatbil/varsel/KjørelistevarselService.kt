@@ -18,7 +18,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
@@ -105,12 +105,12 @@ class KjørelistevarselService(
     }
 
     private fun finnesTidligereUkerUtenInnsendtKjøreliste(
-        rammeForReiseMedPrivatBil: RammeForReiseMedPrivatBil,
+        rammevedtakForReiseMedPrivatBil: RammevedtakForReiseMedPrivatBil,
         kjørelisterForReise: List<Kjøreliste>,
     ): Boolean {
         val nåværendeUke = UkeIÅr.nå()
         val alleUkerIRammevedtak =
-            rammeForReiseMedPrivatBil.grunnlag
+            rammevedtakForReiseMedPrivatBil.grunnlag
                 .alleDatoerGruppertPåUke()
                 .keys
                 .filter { it < nåværendeUke }

@@ -1,11 +1,11 @@
 package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBilBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
@@ -27,14 +27,14 @@ object RammevedtakPrivatBilUtil {
         dagsatsUtenParkering: BigDecimal = 100.toBigDecimal(),
         vedtaksperioder: List<Vedtaksperiode> = listOf(vedtaksperiode(fom, tom)),
         delperioder: List<RammeForReiseMedPrivatBilDelperiode>? = null,
-    ): RammeForReiseMedPrivatBil =
-        RammeForReiseMedPrivatBil(
+    ): RammevedtakForReiseMedPrivatBil =
+        RammevedtakForReiseMedPrivatBil(
             reiseId = reiseId,
             aktivitetsadresse = "aktivitetsadresse",
             aktivitetType = AktivitetType.TILTAK,
             tiltaksvariant = TypeAktivitet.GRUPPEAMO,
             grunnlag =
-                RammeForReiseMedPrivatBilBeregningsgrunnlag(
+                RammevedtakForReiseMedPrivatBilBeregningsgrunnlag(
                     fom = fom,
                     tom = tom,
                     delperioder =

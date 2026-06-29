@@ -23,7 +23,7 @@ import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
@@ -556,7 +556,7 @@ class AvklartKjørelisteServiceTest {
         reiseId: ReiseId,
         fom: LocalDate,
         tom: LocalDate,
-    ): RammeForReiseMedPrivatBil =
+    ): RammevedtakForReiseMedPrivatBil =
         rammeForReiseMedPrivatBil(
             reiseId = reiseId,
             fom = fom,

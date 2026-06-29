@@ -16,8 +16,8 @@ import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
@@ -178,7 +178,7 @@ class AvklartKjørelisteService(
         kjørelisteId: KjørelisteId,
         ukeIÅr: UkeIÅr,
         reisedager: List<KjørelisteDag>,
-        rammevedtak: RammeForReiseMedPrivatBil,
+        rammevedtak: RammevedtakForReiseMedPrivatBil,
     ): AvklartKjørtUke {
         val delperiodeForUke =
             rammevedtak.finnDelperiodeForPeriode(
@@ -272,7 +272,7 @@ class AvklartKjørelisteService(
     private fun henteReiseFraVedtak(
         behandlingId: BehandlingId,
         reiseId: ReiseId,
-    ): RammeForReiseMedPrivatBil {
+    ): RammevedtakForReiseMedPrivatBil {
         val rammevedtak =
             vedtakService
                 .hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandlingId)
