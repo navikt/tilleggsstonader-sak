@@ -28,6 +28,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReisePrivatBilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
@@ -441,7 +442,7 @@ class RevurderingPrivatBilIntegrationTest(
                     fomReise = fomKjøreliste,
                     tomReise = tomKjøreliste,
                     // Mandag begge to uker
-                    dagerKjørt = listOf(fomKjøreliste, 12 januar 2026)
+                    dagerKjørt = listOf(fomKjøreliste, 12 januar 2026),
                 )
 
             val kjørelistebehandling = kjørelisteBehandling(privatBilKontekst.fagsakId)
@@ -503,6 +504,107 @@ class RevurderingPrivatBilIntegrationTest(
             assertThat(utbetalingerRevurdering).hasSize(1)
 
             assertThat(utbetalingerKjørelistebehandling.first()).isEqualTo(utbetalingerRevurdering.single())
+        }
+
+        @Test
+        fun `endring av delperioder slik at første delperiode utvides skal gi ulikt utbetalt beløp for delperiodene`() {
+            val fomReise = 5 januar 2026
+            val tomReise = 25 januar 2026
+            val skilleInitielt = 11 januar 2026
+            val skilleRevurdering = 18 januar 2026
+
+            val førstegangsbehandlingContext =
+                innvilgetPrivatBilBehandlingMedToDelperioder(
+                    fomReise = fomReise,
+                    tomReise = tomReise,
+                    skilledato = skilleInitielt,
+                    bompengerDelperiode1 = 20,
+                    bompengerDelperiode2 = 100,
+                    dagerKjørt = listOf(5 januar 2026, 12 januar 2026, 19 januar 2026),
+                )
+
+            val revurderingId =
+                opprettRevurderingOgGjennomførBehandlingsløp(
+                    fraBehandlingId = førstegangsbehandlingContext.behandlingId,
+                ) {
+                    vilkår {
+                        // Flytt skillet slik at første delperiode strekker seg over to uker og siste over én
+                        endrePrivatBilFakta {
+                            copy(
+                                faktaDelperioder =
+                                    listOf(
+                                        faktaDelperioder.first().copy(tom = skilleRevurdering),
+                                        faktaDelperioder.last().copy(fom = skilleRevurdering.plusDays(1)),
+                                    ),
+                            )
+                        }
+                    }
+                }
+
+            val iverksettinger =
+                KafkaFake
+                    .sendteMeldinger()
+                    .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 2)
+                    .map { it.verdiEllerFeil<IverksettingDto>() }
+
+            val eksternIdRevurdering = testoppsettService.hentSaksbehandling(revurderingId).eksternId
+            val utbetalingKjørelistebehandling =
+                iverksettinger
+                    .single { it.behandlingId.toLong() != eksternIdRevurdering }
+                    .utbetalinger
+                    .single()
+            val utbetalingRevurdering = iverksettinger.single { it.behandlingId.toLong() == eksternIdRevurdering }.utbetalinger.single()
+
+            assertThat(utbetalingKjørelistebehandling.perioder).hasSize(3)
+            assertThat(utbetalingKjørelistebehandling.perioder[0].beløp).isNotEqualTo(utbetalingKjørelistebehandling.perioder[1].beløp)
+            assertThat(utbetalingKjørelistebehandling.perioder[1].beløp).isEqualTo(utbetalingKjørelistebehandling.perioder[2].beløp)
+
+            assertThat(utbetalingRevurdering.perioder).hasSize(3)
+            assertThat(utbetalingRevurdering.perioder[0].beløp).isEqualTo(utbetalingRevurdering.perioder[1].beløp)
+            assertThat(utbetalingRevurdering.perioder[1].beløp).isNotEqualTo(utbetalingRevurdering.perioder[2].beløp)
+        }
+
+        @Test
+        fun `fom flyttes en uke tilbake i tid skal reberegne hele rammevedtaket men ikke endre utbetalinger`() {
+            val fomReise = 12 januar 2026
+            val tomReise = 18 januar 2026
+            val nyFom = 5 januar 2026
+
+            val førstegangsbehandlingContext = innvilgetPrivatBilBehandlingMedKjøreliste(fomReise, tomReise)
+
+            val revurderingId =
+                opprettRevurderingOgGjennomførBehandlingsløp(
+                    fraBehandlingId = førstegangsbehandlingContext.behandlingId,
+                ) {
+                    vilkår {
+                        oppdaterDatoPåEnesteDagligeReise(fom = nyFom, tom = tomReise)
+                    }
+                }
+
+            val vedtakEtterRevurdering = hentInnvilgelse(revurderingId)
+
+            // Rammevedtaket er reberegnet, så perioder er ikke gjenbrukt fra forrige vedtak
+            val perioder =
+                vedtakEtterRevurdering.beregningsresultat.privatBil!!
+                    .reiser
+                    .single()
+                    .perioder
+            assertThat(perioder).isNotEmpty()
+            assertThat(perioder).allMatch { !it.fraTidligereVedtak }
+
+            // Finnes to utbetalinger: en for kjøreliste og en for revurdering
+            val iverksettinger =
+                KafkaFake
+                    .sendteMeldinger()
+                    .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 2)
+                    .map { it.verdiEllerFeil<IverksettingDto>() }
+
+            val eksternIdRevurdering = testoppsettService.hentSaksbehandling(revurderingId).eksternId
+            val utbetalingKjørelistebehandling = iverksettinger.single { it.behandlingId.toLong() != eksternIdRevurdering }
+            val utbetalingRevurdering = iverksettinger.single { it.behandlingId.toLong() == eksternIdRevurdering }
+
+            // Å sette fom tidligere skal ikke påvirke utbetalingene i rammevedtaket
+            assertThat(utbetalingKjørelistebehandling.utbetalinger).isEqualTo(utbetalingRevurdering.utbetalinger)
         }
 
         // Endre fom frem og tilbake
@@ -569,7 +671,7 @@ class RevurderingPrivatBilIntegrationTest(
         fomReise: LocalDate,
         tomReise: LocalDate,
         reisedagerPerUke: Int = 5,
-        dagerKjørt: List<LocalDate> = listOf(fomReise)
+        dagerKjørt: List<LocalDate> = listOf(fomReise),
     ): PrivatBilKontekst {
         val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(Stønadstype.DAGLIG_REISE_TSO) {
@@ -586,6 +688,66 @@ class RevurderingPrivatBilIntegrationTest(
                 vilkår {
                     opprett {
                         privatBil(fomReise, tomReise, reisedagerPerUke = reisedagerPerUke)
+                    }
+                }
+                sendInnKjøreliste {
+                    periode = Datoperiode(fomReise, tomReise)
+                    kjørteDager = dagerKjørt.map { KjørtDag(it) }
+                }
+            }
+
+        gjennomførAlleKjørelisterOgSettAndelerOk(behandlingContext.fagsakId)
+
+        return PrivatBilKontekst(behandlingContext, sorterteReiseIder(behandlingContext.behandlingId))
+    }
+
+    /**
+     * Oppretter en innvilget privatbil-behandling med én reise med to fakta-delperioder med ulik bompengesats,
+     * og behandler den tilhørende kjørelisten.
+     */
+    private fun innvilgetPrivatBilBehandlingMedToDelperioder(
+        fomReise: LocalDate,
+        tomReise: LocalDate,
+        skilledato: LocalDate,
+        bompengerDelperiode1: Int,
+        bompengerDelperiode2: Int,
+        dagerKjørt: List<LocalDate>,
+    ): PrivatBilKontekst {
+        val behandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(Stønadstype.DAGLIG_REISE_TSO) {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTso(fom = fom, tom = tom)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(fom = fom, tom = tom)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        privatBil(
+                            fom = fomReise,
+                            tom = tomReise,
+                            delperioder =
+                                listOf(
+                                    FaktaDelperiodePrivatBilDto(
+                                        fom = fomReise,
+                                        tom = skilledato,
+                                        reisedagerPerUke = 5,
+                                        bompengerPerDag = bompengerDelperiode1.toBigDecimal(),
+                                        fergekostnadPerDag = null,
+                                    ),
+                                    FaktaDelperiodePrivatBilDto(
+                                        fom = skilledato.plusDays(1),
+                                        tom = tomReise,
+                                        reisedagerPerUke = 5,
+                                        bompengerPerDag = bompengerDelperiode2.toBigDecimal(),
+                                        fergekostnadPerDag = null,
+                                    ),
+                                ),
+                        )
                     }
                 }
                 sendInnKjøreliste {
