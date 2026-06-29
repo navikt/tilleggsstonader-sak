@@ -8,13 +8,16 @@ import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.BehandlingContext
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
+import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningStegKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
@@ -34,11 +37,10 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.groups.Tuple
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -286,9 +288,6 @@ class RevurderingPrivatBilIntegrationTest(
             assertThat(perioder.single().grunnlag.dager).hasSize(1)
         }
 
-        // ─── Redusere reisedager (validering ikke implementert) ────────
-
-        @Disabled("Validering for reduksjon av reisedager er ikke implementert enda — se TODO")
         @Test
         fun `reduksjon av reisedager per uke under antallet allerede kjørte dager kaster feil`() {
             val fomReise1 = 5 januar 2026
@@ -297,15 +296,21 @@ class RevurderingPrivatBilIntegrationTest(
             val førstegangsbehandlingContext =
                 innvilgetPrivatBilBehandlingMedKjøreliste(fomReise1, tomReise1, reisedagerPerUke = 5)
 
-            assertThrows<Exception> {
+            val revurderingId =
                 opprettRevurderingOgGjennomførBehandlingsløp(
                     fraBehandlingId = førstegangsbehandlingContext.behandlingId,
+                    tilSteg = StegType.BEREGNE_YTELSE,
                 ) {
                     vilkår {
                         endrePrivatBilFaktaDelperioder { it.copy(reisedagerPerUke = 2) }
                     }
                 }
-            }
+
+            gjennomførBeregningStegKall(revurderingId, Stønadstype.DAGLIG_REISE_TSO)
+                .expectProblemDetail(
+                    HttpStatus.BAD_REQUEST,
+                    "Det er ikke støttet å redusere antall reisedager per uke i en revurdering",
+                )
         }
     }
 
@@ -471,9 +476,6 @@ class RevurderingPrivatBilIntegrationTest(
             assertThat(rammevedtakFørstegangsbehandling).isNotEqualTo(rammevedtakRevurdering)
 
             assertThat(beregningsresultatKjørelistebehandling).isNotEqualTo(beregningsresultatRevurdering)
-
-            // Beregningsresultatene skal vise at det ikke skal utbetales noe.
-            // Finnes ikke et beregningsresultat på førstegangsbehandling
 
             // Forventer to meldinger: én fra kjørelistebehandling og én fra revurdering
             val iverksettinger =

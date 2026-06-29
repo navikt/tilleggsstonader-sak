@@ -107,7 +107,28 @@ class PrivatBilBeregningRevurderingService(
         return if (reiseErFørTidligsteEndring) {
             forrigeRammeForReise
         } else {
+            validerReisedagerIkkeRedusert(forrigeRammeForReise, nyRammeForReise)
             nyRammeForReise
+        }
+    }
+
+    /**
+     * Vi støtter ikke å redusere antall reisedager per uke i en revurdering, da reduksjon kan komme i konflikt med
+     * dager som allerede er kjørt og utbetalt. Økning av reisedager er tillatt.
+     */
+    private fun validerReisedagerIkkeRedusert(
+        forrigeRammeForReise: RammevedtakForReiseMedPrivatBil,
+        nyRammeForReise: RammevedtakForReiseMedPrivatBil,
+    ) {
+        val reisedagerErRedusert =
+            nyRammeForReise.grunnlag.delperioder.any { nyDelperiode ->
+                forrigeRammeForReise.grunnlag.delperioder
+                    .filter { it.overlapper(nyDelperiode) }
+                    .any { nyDelperiode.reisedagerPerUke < it.reisedagerPerUke }
+            }
+
+        brukerfeilHvis(reisedagerErRedusert) {
+            "Det er ikke støttet å redusere antall reisedager per uke i en revurdering, da dette kan komme i konflikt med dager som allerede er kjørt og utbetalt."
         }
     }
 }
