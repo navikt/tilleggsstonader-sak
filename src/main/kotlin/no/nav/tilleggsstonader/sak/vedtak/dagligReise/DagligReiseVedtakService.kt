@@ -138,6 +138,7 @@ class DagligReiseVedtakService(
                 type = TypeVedtak.INNVILGELSE,
                 data = eksisterendeVedtak.data.tilInnvilgelseForKjøreliste(),
                 opphørsdato = null,
+                tidligsteEndring = null
             ),
         )
     }
