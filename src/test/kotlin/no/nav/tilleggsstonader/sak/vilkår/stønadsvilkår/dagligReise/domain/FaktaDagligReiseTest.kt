@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.faktaOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReisePrivatBilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
@@ -191,98 +193,6 @@ class FaktaDagligReiseTest {
         }
 
         @Test
-        fun `skal kaste feil hvis bompenger er høyere enn 500`() {
-            val feil =
-                assertThrows<ApiFeil> {
-                    FaktaPrivatBil(
-                        reiseId = ReiseId.random(),
-                        adresse = "Tiltaksveien 1",
-                        faktaDelperioder =
-                            listOf(
-                                FaktaDelperiodePrivatBil(
-                                    fom = LocalDate.now(),
-                                    tom = LocalDate.now().plusDays(10),
-                                    reisedagerPerUke = 4,
-                                    bompengerPerDag = BigDecimal("501"),
-                                    fergekostnadPerDag = null,
-                                ),
-                            ),
-                        reiseavstandEnVei = BigDecimal(10),
-                        aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
-                    )
-                }
-            assertThat(
-                feil.message,
-            ).isEqualTo("Skal du innvilge med bompenger høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet")
-        }
-
-        @Test
-        fun `skal kaste feil hvis fergekostnad er høyere enn 500`() {
-            val feil =
-                assertThrows<ApiFeil> {
-                    FaktaPrivatBil(
-                        reiseId = ReiseId.random(),
-                        adresse = "Tiltaksveien 1",
-                        faktaDelperioder =
-                            listOf(
-                                FaktaDelperiodePrivatBil(
-                                    fom = LocalDate.now(),
-                                    tom = LocalDate.now().plusDays(10),
-                                    reisedagerPerUke = 4,
-                                    bompengerPerDag = null,
-                                    fergekostnadPerDag = BigDecimal("501"),
-                                ),
-                            ),
-                        reiseavstandEnVei = BigDecimal(10),
-                        aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
-                    )
-                }
-            assertThat(
-                feil.message,
-            ).isEqualTo("Skal du innvilge med fergekostnader høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet")
-        }
-
-        @Test
-        fun `skal ikke kaste feil hvis bompenger er nøyaktig 500`() {
-            FaktaPrivatBil(
-                reiseId = ReiseId.random(),
-                adresse = "Tiltaksveien 1",
-                faktaDelperioder =
-                    listOf(
-                        FaktaDelperiodePrivatBil(
-                            fom = LocalDate.now(),
-                            tom = LocalDate.now().plusDays(10),
-                            reisedagerPerUke = 4,
-                            bompengerPerDag = BigDecimal("500"),
-                            fergekostnadPerDag = null,
-                        ),
-                    ),
-                reiseavstandEnVei = BigDecimal(10),
-                aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
-            )
-        }
-
-        @Test
-        fun `skal ikke kaste feil hvis fergekostnad er nøyaktig 500`() {
-            FaktaPrivatBil(
-                reiseId = ReiseId.random(),
-                adresse = "Tiltaksveien 1",
-                faktaDelperioder =
-                    listOf(
-                        FaktaDelperiodePrivatBil(
-                            fom = LocalDate.now(),
-                            tom = LocalDate.now().plusDays(10),
-                            reisedagerPerUke = 4,
-                            bompengerPerDag = null,
-                            fergekostnadPerDag = BigDecimal("500"),
-                        ),
-                    ),
-                reiseavstandEnVei = BigDecimal(10),
-                aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
-            )
-        }
-
-        @Test
         fun `skal kaste feil hvis negativ reiseavstand`() {
             val feil =
                 assertThrows<ApiFeil> {
@@ -353,5 +263,56 @@ class FaktaDagligReiseTest {
                 }
             assertThat(feil.message).isEqualTo("Reisedager per uke kan ikke være mer enn 7")
         }
+    }
+
+    @Nested
+    inner class FaktaDelperiodePrivatBilDtoValidering {
+        @Test
+        fun `skal kaste feil hvis bompenger er høyere enn 500`() {
+            val feil =
+                assertThrows<ApiFeil> {
+                    faktaPrivatBilDto(
+                        bompengerPerDag = BigDecimal("501"),
+                    ).mapTilFakta(reiseId = ReiseId.random(), adresse = "Tiltaksveien 1")
+                }
+
+            assertThat(
+                feil.message,
+            ).isEqualTo("Skal du innvilge med bompenger høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet")
+        }
+
+        @Test
+        fun `skal kaste feil hvis fergekostnad er høyere enn 500`() {
+            val feil =
+                assertThrows<ApiFeil> {
+                    faktaPrivatBilDto(
+                        fergekostnadPerDag = BigDecimal("501"),
+                    ).mapTilFakta(reiseId = ReiseId.random(), adresse = "Tiltaksveien 1")
+                }
+
+            assertThat(
+                feil.message,
+            ).isEqualTo("Skal du innvilge med fergekostnader høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet")
+        }
+
+        private fun faktaPrivatBilDto(
+            bompengerPerDag: BigDecimal? = null,
+            fergekostnadPerDag: BigDecimal? = null,
+        ) = FaktaDagligReisePrivatBilDto(
+            reiseavstandEnVei = BigDecimal("10"),
+            faktaDelperioder =
+                listOf(
+                    FaktaDelperiodePrivatBilDto(
+                        fom = LocalDate.now(),
+                        tom = LocalDate.now().plusDays(10),
+                        reisedagerPerUke = 4,
+                        bompengerPerDag = bompengerPerDag,
+                        fergekostnadPerDag = fergekostnadPerDag,
+                    ),
+                ),
+            aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
+            adresse = "Tiltaksveien 1",
+            aktivitetType = "TILTAK",
+        )
     }
 }
