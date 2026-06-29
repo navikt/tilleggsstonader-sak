@@ -95,6 +95,27 @@ inline fun brukerfeilHvisIkke(
     brukerfeilHvis(!boolean, httpStatus, sensitivFeilmelding) { lazyMessage() }
 }
 
+inline fun <T> List<T>.singleEllerFeil(
+    httpStatus: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
+    noinline sensitivFeilmelding: (() -> String)? = null,
+    lazyMessage: () -> String,
+): T =
+    when (size) {
+        1 -> this[0]
+        else -> throw Feil(
+            message = lazyMessage(),
+            frontendFeilmelding = sensitivFeilmelding?.invoke() ?: lazyMessage(),
+            httpStatus = httpStatus,
+        )
+    }
+
+inline fun <T> Iterable<T>.singleEllerFeil(
+    predicate: (T) -> Boolean,
+    httpStatus: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
+    noinline sensitivFeilmelding: (() -> String)? = null,
+    lazyMessage: () -> String,
+): T = filter(predicate).singleEllerFeil(httpStatus, sensitivFeilmelding, lazyMessage)
+
 class ManglerTilgang(
     val melding: String,
     val frontendFeilmelding: String,

@@ -4,8 +4,11 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.singleEllerFeil
 import no.nav.tilleggsstonader.sak.util.validerUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.math.BigDecimal
@@ -33,6 +36,14 @@ data class RammeForReiseMedPrivatBil(
             grunnlag = avkortetGrunnlag,
         )
     }
+
+    fun finnMålgruppeForReiseperiode(reiseperiode: BeregningsresultatForReisePrivatBilPeriode): FaktiskMålgruppe =
+        grunnlag.vedtaksperioder
+            .mergeSammenhengende()
+            .singleEllerFeil(
+                predicate = { it.inneholder(reiseperiode) },
+            ) { "Kan ikke finne målgruppe for reiseperioden. Forventer nøyaktig en vedtaksperiode for reiseperioden." }
+            .målgruppe
 }
 
 data class RammeForReiseMedPrivatBilBeregningsgrunnlag(
@@ -54,8 +65,6 @@ data class RammeForReiseMedPrivatBilBeregningsgrunnlag(
         fom: LocalDate,
         tom: LocalDate,
     ): RammeForReiseMedPrivatBilBeregningsgrunnlag = this.copy(fom = fom, tom = tom)
-
-    fun vedtaksperiodeForPeriode(periode: Periode<LocalDate>) = vedtaksperioder.single { it.inneholder(periode) }
 
     fun avkortEtterDato(maksTom: LocalDate): RammeForReiseMedPrivatBilBeregningsgrunnlag? {
         if (maksTom < fom) return null
