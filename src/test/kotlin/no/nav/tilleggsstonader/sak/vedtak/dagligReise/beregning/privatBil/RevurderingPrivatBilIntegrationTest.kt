@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
@@ -354,7 +355,7 @@ class RevurderingPrivatBilIntegrationTest(
         }
 
         @Test
-        fun `skal få tomt beregningsresultat om innsendte uker ikke lenger er innenfor rammevedtak`() {
+        fun `fom flyttes frem slik at kjøreliste er utenfor rammevedtak, skal få tomt beregningsresultat`() {
             every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns true
 
             val fomKjøreliste = 5 januar 2026
@@ -427,6 +428,83 @@ class RevurderingPrivatBilIntegrationTest(
             ).isEmpty()
         }
 
+        @Test
+        fun `tom flyttes bakover slik at en del av en kjøreliste er utenfor rammevedtak, fjernes fra beregning`() {
+            every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns true
+
+            val fomKjøreliste = 5 januar 2026
+            val tomKjøreliste = 18 januar 2026
+            val nyTom = 11 januar 2026
+
+            val privatBilKontekst =
+                innvilgetPrivatBilBehandlingMedKjøreliste(
+                    fomReise = fomKjøreliste,
+                    tomReise = tomKjøreliste,
+                    // Mandag begge to uker
+                    dagerKjørt = listOf(fomKjøreliste, 12 januar 2026)
+                )
+
+            val kjørelistebehandling = kjørelisteBehandling(privatBilKontekst.fagsakId)
+            testoppsettService.settAndelerTilOkForBehandling(kjørelistebehandling.id)
+
+            val revurderingId =
+                opprettRevurderingOgGjennomførBehandlingsløp(kjørelistebehandling.id) {
+                    vilkår {
+                        oppdaterDatoPåEnesteDagligeReise(fom, nyTom)
+                    }
+                }
+
+            val revurdering = testoppsettService.hentBehandling(revurderingId)
+
+            val rammevedtakFørstegangsbehandling = hentInnvilgelse(privatBilKontekst.behandlingId).rammevedtakPrivatBil!!.reiser.single()
+            val (beregningsresultatKjørelistebehandling, rammevedtakKjørelistebehandling) =
+                hentInnvilgelse(
+                    kjørelistebehandling.id,
+                ).hentRammevedtakMedBeregningsresultat().single()
+            val (beregningsresultatRevurdering, rammevedtakRevurdering) =
+                hentInnvilgelse(
+                    revurdering.id,
+                ).hentRammevedtakMedBeregningsresultat().single()
+
+            assertThat(rammevedtakFørstegangsbehandling).isEqualTo(rammevedtakKjørelistebehandling)
+            assertThat(rammevedtakFørstegangsbehandling).isNotEqualTo(rammevedtakRevurdering)
+
+            assertThat(beregningsresultatKjørelistebehandling).isNotEqualTo(beregningsresultatRevurdering)
+
+            // Beregningsresultatene skal vise at det ikke skal utbetales noe.
+            // Finnes ikke et beregningsresultat på førstegangsbehandling
+
+            // Forventer to meldinger: én fra kjørelistebehandling og én fra revurdering
+            val iverksettinger =
+                KafkaFake
+                    .sendteMeldinger()
+                    .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 2)
+                    .map { it.verdiEllerFeil<IverksettingDto>() }
+
+            // Utbetaling i første iverksetting (kjørelistebehandling)
+            val utbetalingerKjørelistebehandling =
+                iverksettinger
+                    .minBy { it.vedtakstidspunkt }
+                    .utbetalinger
+                    .single()
+                    .perioder
+
+            // Tom utbetaling som nuller ut kjørelistebehandling i revurdering
+            val utbetalingerRevurdering =
+                iverksettinger
+                    .maxBy { it.vedtakstidspunkt }
+                    .utbetalinger
+                    .single()
+                    .perioder
+
+            // Sendt kjøreliste for to uker, skal da være to perioder
+            assertThat(utbetalingerKjørelistebehandling).hasSize(2)
+            // En uke er kuttet ned
+            assertThat(utbetalingerRevurdering).hasSize(1)
+
+            assertThat(utbetalingerKjørelistebehandling.first()).isEqualTo(utbetalingerRevurdering.single())
+        }
+
         // Endre fom frem og tilbake
         // Endre tom frem og tilbake
         // Flytte hele perioden vekk fra der den var
@@ -491,6 +569,7 @@ class RevurderingPrivatBilIntegrationTest(
         fomReise: LocalDate,
         tomReise: LocalDate,
         reisedagerPerUke: Int = 5,
+        dagerKjørt: List<LocalDate> = listOf(fomReise)
     ): PrivatBilKontekst {
         val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(Stønadstype.DAGLIG_REISE_TSO) {
@@ -511,7 +590,7 @@ class RevurderingPrivatBilIntegrationTest(
                 }
                 sendInnKjøreliste {
                     periode = Datoperiode(fomReise, tomReise)
-                    kjørteDager = listOf(KjørtDag(dato = fomReise))
+                    kjørteDager = dagerKjørt.map { KjørtDag(it) }
                 }
             }
 
@@ -587,7 +666,9 @@ class RevurderingPrivatBilIntegrationTest(
 
     private fun gjennomførAlleKjørelisterOgSettAndelerOk(fagsakId: FagsakId) {
         kjørelisteBehandlinger(fagsakId).forEach { kjørelistebehandling ->
-            gjennomførKjørelisteBehandling(kjørelistebehandling)
+            if (kjørelistebehandling.status != BehandlingStatus.FERDIGSTILT) {
+                gjennomførKjørelisteBehandling(kjørelistebehandling)
+            }
             testoppsettService.settAndelerTilOkForBehandling(kjørelistebehandling.id)
         }
     }
