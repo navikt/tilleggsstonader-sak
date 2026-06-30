@@ -309,6 +309,9 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                 )
     }
 
+fun IntegrationTest.gjennomførRegistrerKjørelisteSteg(behandlingId: BehandlingId) =
+    kall.steg.ferdigstill(behandlingId, StegController.FerdigstillStegRequest(StegType.REGISTRER_KJØRELISTE)).nesteSteg
+
 fun IntegrationTest.gjennomførKjørelisteSteg(behandlingId: BehandlingId) =
     kall.steg.ferdigstill(behandlingId, StegController.FerdigstillStegRequest(StegType.KJØRELISTE)).nesteSteg
 
