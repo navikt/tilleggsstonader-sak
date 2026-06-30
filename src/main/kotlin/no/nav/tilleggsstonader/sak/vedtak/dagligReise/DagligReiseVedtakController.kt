@@ -132,9 +132,14 @@ class DagligReiseVedtakController(
     @GetMapping("{behandlingId}/privat-bil/oppsummer-beregning")
     fun hentOppsummertBeregning(
         @PathVariable behandlingId: BehandlingId,
-    ): PrivatBilOppsummertBeregningDto {
+    ): PrivatBilOppsummertBeregningDto? {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerLesetilgangTilBehandling(behandlingId)
+
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        if (!behandling.stønadstype.gjelderDagligReise()) {
+            return null
+        }
 
         val vedtaksdata = vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandlingId).data
 
