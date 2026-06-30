@@ -31,9 +31,6 @@ class ReiseTilSamlingBeregningService(
 
         validerFinnesSamling(oppfylteVilkårReiseTilSamling)
 
-        // val forrigeVedtak =
-        //    behandling.forrigeIverksatteBehandlingId?.let { vedtakService.hentVedtak<InnvilgelseEllerOpphørReiseTilSamling> }
-
         val oppfylteOffentligTransport = oppfylteVilkårReiseTilSamling.filter { it.fakta is FaktaOffentligTransport }
         val offentligTransport =
             BeregningsresultatOffentligTransport(
