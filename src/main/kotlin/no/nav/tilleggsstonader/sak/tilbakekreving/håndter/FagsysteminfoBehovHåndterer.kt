@@ -151,6 +151,7 @@ class FagsysteminfoBehovHåndterer(
             BehandlingÅrsak.PAPIRSØKNAD,
             BehandlingÅrsak.SATSENDRING,
             BehandlingÅrsak.KJØRELISTE,
+            BehandlingÅrsak.REGISTRER_KJØRELISTE_FOR_BRUKER,
             -> TilbakekrevingRevurderingÅrsak.UKJENT
         }
 

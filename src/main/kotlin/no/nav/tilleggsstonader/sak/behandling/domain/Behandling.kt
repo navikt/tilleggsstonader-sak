@@ -77,6 +77,7 @@ enum class BehandlingKategori {
  */
 enum class BehandlingÅrsak {
     KJØRELISTE,
+    REGISTRER_KJØRELISTE_FOR_BRUKER,
     KLAGE,
     NYE_OPPLYSNINGER,
     SØKNAD,

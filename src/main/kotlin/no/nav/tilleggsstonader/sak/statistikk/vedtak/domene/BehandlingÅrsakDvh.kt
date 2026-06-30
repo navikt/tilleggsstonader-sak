@@ -19,6 +19,7 @@ enum class BehandlingÅrsakDvh {
         fun fraDomene(årsak: BehandlingÅrsak) =
             when (årsak) {
                 BehandlingÅrsak.KJØRELISTE -> KJØRELISTE
+                BehandlingÅrsak.REGISTRER_KJØRELISTE_FOR_BRUKER -> KJØRELISTE
                 BehandlingÅrsak.KLAGE -> KLAGE
                 BehandlingÅrsak.NYE_OPPLYSNINGER -> NYE_OPPLYSNINGER
                 BehandlingÅrsak.SØKNAD -> SØKNAD
