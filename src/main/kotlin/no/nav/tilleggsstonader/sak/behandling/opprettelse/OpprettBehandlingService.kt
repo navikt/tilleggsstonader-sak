@@ -93,7 +93,7 @@ class OpprettBehandlingService(
                     forrigeIverksatteBehandlingId = forrigeBehandling?.id,
                     type = behandlingType,
                     behandlingMetode = request.behandlingMetode,
-                    steg = utledBehandlingStegFraBehandlingsType(behandlingType),
+                    steg = utledBehandlingStegFraBehandlingsType(behandlingType, request.behandlingsårsak),
                     status = behandlingStatus,
                     resultat = BehandlingResultat.IKKE_SATT,
                     årsak = request.behandlingsårsak,
@@ -108,7 +108,7 @@ class OpprettBehandlingService(
             behandlingshistorikk =
                 Behandlingshistorikk(
                     behandlingId = behandling.id,
-                    steg = utledBehandlingStegFraBehandlingsType(behandlingType),
+                    steg = utledBehandlingStegFraBehandlingsType(behandlingType, request.behandlingsårsak),
                     gitVersjon = Applikasjonsversjon.versjon,
                 ),
         )
@@ -171,10 +171,19 @@ class OpprettBehandlingService(
             .rammevedtakPrivatBil != null
     }
 
-    private fun utledBehandlingStegFraBehandlingsType(behandlingType: BehandlingType): StegType =
+    private fun utledBehandlingStegFraBehandlingsType(
+        behandlingType: BehandlingType,
+        behandlingsårsak: BehandlingÅrsak,
+    ): StegType =
         when (behandlingType) {
-            BehandlingType.KJØRELISTE -> StegType.KJØRELISTE
+            BehandlingType.KJØRELISTE -> utledStegtypeForKjærelistebehandling(behandlingsårsak)
             else -> StegType.INNGANGSVILKÅR
+        }
+
+    private fun utledStegtypeForKjærelistebehandling(behandlingsårsak: BehandlingÅrsak): StegType =
+        when (behandlingsårsak) {
+            BehandlingÅrsak.REGISTRER_KJØRELISTE_FOR_BRUKER -> StegType.REGISTRER_KJØRELISTE
+            else -> StegType.KJØRELISTE
         }
 }
 
