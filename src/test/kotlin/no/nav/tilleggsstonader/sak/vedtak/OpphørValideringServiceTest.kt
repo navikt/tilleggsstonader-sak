@@ -7,14 +7,15 @@ import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.util.fagsakBoutgifter
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -34,6 +35,8 @@ import java.time.YearMonth
 class OpphørValideringServiceTest {
     private val vilkårperiodeService = mockk<VilkårperiodeService>()
     private val vilkårService = mockk<VilkårService>()
+    private val vedtakService = mockk<VedtakService>()
+    private val utledTidligsteEndringService = mockk<UtledTidligsteEndringService>()
     private val tilsynBarnBeregningService = mockk<TilsynBarnBeregningService>()
 
     val måned = YearMonth.of(2025, 1)
@@ -52,7 +55,8 @@ class OpphørValideringServiceTest {
         saksbehandling(
             type = BehandlingType.REVURDERING,
         )
-    val opphørValideringService = OpphørValideringService(vilkårperiodeService, vilkårService)
+    val opphørValideringService =
+        OpphørValideringService(vilkårperiodeService, vilkårService, utledTidligsteEndringService)
     val vilkår =
         vilkår(
             behandlingId = saksbehandling.id,
@@ -93,6 +97,8 @@ class OpphørValideringServiceTest {
                 målgrupper = listOf(målgruppe),
                 aktiviteter = listOf(aktivitet),
             )
+        every { vedtakService.hentVedtaksperioder(any()) } returns listOf(vedtaksperiode(fom, tom))
+        every { utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(any()) } returns null
         every { tilsynBarnBeregningService.beregn(any(), any(), any(), any()) } returns beregningsresultat
     }
 

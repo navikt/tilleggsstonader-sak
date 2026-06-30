@@ -1,7 +1,10 @@
 package no.nav.tilleggsstonader.sak.vedtak
 
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
+import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -23,6 +26,7 @@ import java.time.YearMonth
 class OpphørValideringService(
     private val vilkårsperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
+    private val utledTidligsteEndringService: UtledTidligsteEndringService,
 ) {
     fun validerVilkårperioder(
         saksbehandling: Saksbehandling,
@@ -36,6 +40,10 @@ class OpphørValideringService(
             vilkårperioder,
             vilkår,
             opphørsdato,
+        )
+        validerIngenEndringerIVilkårEllerVilkårperioderFørOpphørsdato(
+            behandlingId = saksbehandling.id,
+            opphørsdato = opphørsdato,
         )
     }
 
@@ -77,6 +85,20 @@ class OpphørValideringService(
 
         brukerfeilHvis(senesteTomIForrigeVedtaksperioder < opphørsdato) {
             "Opphør er et ugyldig valg fordi ønsket opphørsdato ikke korter ned vedtaket."
+        }
+    }
+
+    private fun validerIngenEndringerIVilkårEllerVilkårperioderFørOpphørsdato(
+        behandlingId: BehandlingId,
+        opphørsdato: LocalDate,
+    ) {
+        val tidligsteEndring =
+            utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(
+                behandlingId = behandlingId,
+            )
+
+        brukerfeilHvis(tidligsteEndring != null && tidligsteEndring <= opphørsdato) {
+            "Opphør er et ugyldig vedtaksresultat fordi opphørsdato er etter eller lik tidligste endring (${tidligsteEndring?.norskFormat()})"
         }
     }
 
