@@ -1,61 +1,18 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import org.springframework.stereotype.Service
 
 @Service
-class RegistrerKjørelisteSteg(
-    private val privatBilBeregningService: PrivatBilBeregningService,
-    private val vedtakService: VedtakService,
-    private val arbeidsfordelingService: ArbeidsfordelingService,
-    private val dagligReiseVedtakService: DagligReiseVedtakService,
-) : BehandlingSteg<Void?> {
+class RegistrerKjørelisteSteg : BehandlingSteg<Void?> {
     override fun utførSteg(
         saksbehandling: Saksbehandling,
         data: Void?,
     ) {
-        val brukersNavKontor =
-            if (saksbehandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
-                arbeidsfordelingService.hentBrukersNavKontor(saksbehandling.ident)
-            } else {
-                null
-            }
-
-        val eksisterendeVedtak =
-            vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(saksbehandling.id).data
-
-        val beregningsresultatPrivatBil =
-            privatBilBeregningService.beregn(
-                behandling = saksbehandling,
-                rammevedtak = eksisterendeVedtak.rammevedtakPrivatBil,
-                beregnFra = eksisterendeVedtak.beregningsplan.beregnFra(),
-                brukersNavKontor = brukersNavKontor,
-                forrigeBeregningsresultat = hentForrigePrivatBilBeregningsresultat(saksbehandling),
-            )
-
-        dagligReiseVedtakService.oppdaterVedtakMedBeregningPrivatBil(
-            behandlingId = saksbehandling.id,
-            beregningsresultatPrivatBil = beregningsresultatPrivatBil,
-        )
+        // Ikke noe å gjøre da dette er det første steget i en manuell kjørelistebehandling
     }
-
-    private fun hentForrigePrivatBilBeregningsresultat(saksbehandling: Saksbehandling): BeregningsresultatPrivatBil? =
-        saksbehandling.forrigeIverksatteBehandlingId
-            ?.let { forrigeBehandlingId ->
-                vedtakService
-                    .hentVedtak<InnvilgelseEllerOpphørDagligReise>(forrigeBehandlingId)
-                    .data
-                    .beregningsresultat
-                    .privatBil
-            }
 
     override fun stegType(): StegType = StegType.REGISTRER_KJØRELISTE
 }
