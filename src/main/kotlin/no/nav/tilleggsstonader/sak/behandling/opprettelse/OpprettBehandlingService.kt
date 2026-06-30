@@ -93,7 +93,7 @@ class OpprettBehandlingService(
                     forrigeIverksatteBehandlingId = forrigeBehandling?.id,
                     type = behandlingType,
                     behandlingMetode = request.behandlingMetode,
-                    steg = utledBehandlingStegFraBehandlingsType(behandlingType, request.behandlingsårsak),
+                    steg = utledBehandlingStegFraBehandlingsTypeOgÅrsak(behandlingType, request.behandlingsårsak),
                     status = behandlingStatus,
                     resultat = BehandlingResultat.IKKE_SATT,
                     årsak = request.behandlingsårsak,
@@ -108,7 +108,7 @@ class OpprettBehandlingService(
             behandlingshistorikk =
                 Behandlingshistorikk(
                     behandlingId = behandling.id,
-                    steg = utledBehandlingStegFraBehandlingsType(behandlingType, request.behandlingsårsak),
+                    steg = utledBehandlingStegFraBehandlingsTypeOgÅrsak(behandlingType, request.behandlingsårsak),
                     gitVersjon = Applikasjonsversjon.versjon,
                 ),
         )
@@ -171,7 +171,7 @@ class OpprettBehandlingService(
             .rammevedtakPrivatBil != null
     }
 
-    private fun utledBehandlingStegFraBehandlingsType(
+    private fun utledBehandlingStegFraBehandlingsTypeOgÅrsak(
         behandlingType: BehandlingType,
         behandlingsårsak: BehandlingÅrsak,
     ): StegType =
