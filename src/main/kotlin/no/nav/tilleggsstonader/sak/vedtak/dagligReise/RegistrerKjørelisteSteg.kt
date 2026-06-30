@@ -18,8 +18,6 @@ class RegistrerKjørelisteSteg(
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val dagligReiseVedtakService: DagligReiseVedtakService,
 ) : BehandlingSteg<Void?> {
-    override fun validerSteg(saksbehandling: Saksbehandling) {}
-
     override fun utførSteg(
         saksbehandling: Saksbehandling,
         data: Void?,

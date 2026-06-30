@@ -24,7 +24,6 @@ class OpprettRegistrerKjørelisteIntegrationTest : CleanDatabaseIntegrationTest(
     @BeforeEach
     fun setUp() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
     }
 
     @Test

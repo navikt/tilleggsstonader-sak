@@ -176,11 +176,11 @@ class OpprettBehandlingService(
         behandlingsårsak: BehandlingÅrsak,
     ): StegType =
         when (behandlingType) {
-            BehandlingType.KJØRELISTE -> utledStegtypeForKjærelistebehandling(behandlingsårsak)
+            BehandlingType.KJØRELISTE -> utledStegtypeForKjørelistebehandling(behandlingsårsak)
             else -> StegType.INNGANGSVILKÅR
         }
 
-    private fun utledStegtypeForKjærelistebehandling(behandlingsårsak: BehandlingÅrsak): StegType =
+    private fun utledStegtypeForKjørelistebehandling(behandlingsårsak: BehandlingÅrsak): StegType =
         when (behandlingsårsak) {
             BehandlingÅrsak.REGISTRER_KJØRELISTE_FOR_BRUKER -> StegType.REGISTRER_KJØRELISTE
             else -> StegType.KJØRELISTE
