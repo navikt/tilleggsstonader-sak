@@ -137,7 +137,7 @@ class DagligReiseVedtakController(
         tilgangService.validerLesetilgangTilBehandling(behandlingId)
 
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        if(!behandling.stønadstype.gjelderDagligReise()){
+        if (!behandling.stønadstype.gjelderDagligReise()) {
             return null
         }
 
