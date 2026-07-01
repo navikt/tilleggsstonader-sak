@@ -3,17 +3,23 @@ package no.nav.tilleggsstonader.sak.vedtak.barnetilsyn
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørDto
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
 import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.springframework.http.HttpStatus
 
 class TilsynBarnOpphørIntegrationTest : CleanDatabaseIntegrationTest() {
     @Test
@@ -39,7 +45,7 @@ class TilsynBarnOpphørIntegrationTest : CleanDatabaseIntegrationTest() {
                 }
                 vedtak {
                     opphør(
-                        opphørsdato = 31 januar 2025,
+                        opphørsdato = 1 februar 2025,
                     )
                 }
             }
@@ -52,6 +58,46 @@ class TilsynBarnOpphørIntegrationTest : CleanDatabaseIntegrationTest() {
         assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
         assertThat(vedtak.årsakerOpphør).containsExactly(ÅrsakOpphør.ANNET)
         assertThat(vedtak.begrunnelse).isEqualTo("annet")
+    }
+
+    @Test
+    fun `skal ikke lagre vedtak hvis dato for opphør er etter endring`() {
+        val fom = 1 januar 2025
+        val tom = 28 februar 2025
+
+        val førstegangsbehandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.BARNETILSYN,
+            ) {
+                defaultTilsynBarnTestdata(fom = fom, tom = tom)
+            }
+
+        testoppsettService.settAndelerTilOkForBehandling(førstegangsbehandlingContext.behandlingId)
+
+        val behandlingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = førstegangsbehandlingContext.behandlingId,
+                tilSteg = StegType.BEREGNE_YTELSE,
+            ) {
+                aktivitet {
+                    oppdaterTomPåEnesteAktivitet(tom = fom.toYearMonth().atEndOfMonth())
+                }
+            }
+
+        kall.vedtak.apiRespons
+            .lagreOpphør(
+                stønadstype = Stønadstype.BARNETILSYN,
+                behandlingId = behandlingId,
+                opphørDto =
+                    opphørDto(
+                        opphørsdato = 2 februar 2025,
+                    ),
+            ).expectProblemDetail(
+                forventetStatus = HttpStatus.BAD_REQUEST,
+                forventetDetail =
+                    "Opphør er et ugyldig vedtaksresultat fordi " +
+                        "opphørsdato (02.02.2025) er etter tidligste endring (01.02.2025)",
+            )
     }
 
     /**
@@ -98,76 +144,76 @@ class TilsynBarnOpphørIntegrationTest : CleanDatabaseIntegrationTest() {
             }
     }
 
-//    @Test
-//    fun `skal ikke kunne opphøre dersom utgifter endres før opphørsdato`() {
-//        val fom = 1 januar 2025
-//        val tom = 31 mars 2025
-//
-//        val førstegangsbehandlingContext =
-//            opprettBehandlingOgGjennomførBehandlingsløp(
-//                stønadstype = Stønadstype.BARNETILSYN,
-//            ) {
-//                aktivitet {
-//                    opprett {
-//                        aktivitetTiltakTilsynBarn(
-//                            fom = fom,
-//                            tom = tom,
-//                            aktivitetsdager = 4,
-//                        )
-//                    }
-//                }
-//                målgruppe {
-//                    opprett {
-//                        målgruppeAAP(fom, tom)
-//                    }
-//                }
-//                vilkår {
-//                    opprett {
-//                        passBarn(
-//                            fom = fom.toYearMonth().plusMonths(1),
-//                            tom = tom.toYearMonth(),
-//                            utgift = 1000,
-//                        )
-//                    }
-//                }
-//            }
-//
-//        val revurderingId =
-//            opprettRevurderingOgGjennomførBehandlingsløp(
-//                fraBehandlingId = førstegangsbehandlingContext.behandlingId,
-//                tilSteg = StegType.BEREGNE_YTELSE,
-//            ) {
-//                vilkår {
-//                    oppdater { vilkårsvurdering ->
-//                        with(vilkårsvurdering.vilkårsett.single()) {
-//                            SvarPåVilkårDto(
-//                                id = id,
-//                                behandlingId = behandlingId,
-//                                delvilkårsett = delvilkårsett,
-//                                fom = fom.plusMonths(1),
-//                                tom = 28 februar 2025,
-//                                utgift = 500,
-//                                erFremtidigUtgift = erFremtidigUtgift,
-//                                offentligTransport = null,
-//                            )
-//                        }
-//                    }
-//                }
-//            }
-//
-//        kall.vedtak.apiRespons
-//            .lagreOpphør(
-//                stønadstype = Stønadstype.BARNETILSYN,
-//                behandlingId = revurderingId,
-//                opphørDto =
-//                    opphørDto(
-//                        opphørsdato = 1 mars 2025,
-//                    ),
-//            ).expectProblemDetail(
-//                forventetStatus = HttpStatus.BAD_REQUEST,
-//                forventetDetail =
-//                    "Opphør er et ugyldig vedtaksresultat fordi " +
-//                        "opphørsdato er etter eller lik tidligste endring (01.02.2025)",
-//            )
-//    }
+    @Test
+    fun `skal ikke kunne opphøre dersom utgifter endres før opphørsdato`() {
+        val fom = 1 januar 2025
+        val tom = 31 mars 2025
+
+        val førstegangsbehandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.BARNETILSYN,
+            ) {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTilsynBarn(
+                            fom = fom,
+                            tom = tom,
+                            aktivitetsdager = 4,
+                        )
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(fom, tom)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        passBarn(
+                            fom = fom.toYearMonth().plusMonths(1),
+                            tom = tom.toYearMonth(),
+                            utgift = 1000,
+                        )
+                    }
+                }
+            }
+
+        val revurderingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = førstegangsbehandlingContext.behandlingId,
+                tilSteg = StegType.BEREGNE_YTELSE,
+            ) {
+                vilkår {
+                    oppdater { vilkårsvurdering ->
+                        with(vilkårsvurdering.vilkårsett.single()) {
+                            SvarPåVilkårDto(
+                                id = id,
+                                behandlingId = behandlingId,
+                                delvilkårsett = delvilkårsett,
+                                fom = fom.plusMonths(1),
+                                tom = 28 februar 2025,
+                                utgift = 500,
+                                erFremtidigUtgift = erFremtidigUtgift,
+                                offentligTransport = null,
+                            )
+                        }
+                    }
+                }
+            }
+
+        kall.vedtak.apiRespons
+            .lagreOpphør(
+                stønadstype = Stønadstype.BARNETILSYN,
+                behandlingId = revurderingId,
+                opphørDto =
+                    opphørDto(
+                        opphørsdato = 1 mars 2025,
+                    ),
+            ).expectProblemDetail(
+                forventetStatus = HttpStatus.BAD_REQUEST,
+                forventetDetail =
+                    "Opphør er et ugyldig vedtaksresultat fordi " +
+                        "opphørsdato (01.03.2025) er etter tidligste endring (01.02.2025)",
+            )
+    }
 }
