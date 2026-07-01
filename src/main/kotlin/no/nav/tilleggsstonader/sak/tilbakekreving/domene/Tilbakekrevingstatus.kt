@@ -24,6 +24,7 @@ data class Tilbakekrevingsstatus(
     val tilbakekrevingFom: LocalDate,
     val tilbakekrevingTom: LocalDate,
     val tilbakekrevingBehandlingId: String,
+    val saksbehandlingURL: String? = null,
 ) : TilbakekrevingJson {
     val type: String = "status"
 }

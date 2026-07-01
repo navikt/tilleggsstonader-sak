@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.SettPåVentK
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.SimuleringKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.SkjemaRoutingKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.StegKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.TilbakekrevingKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.TotrinnskontrollKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VedtakKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårDagligReiseKall
@@ -42,6 +43,7 @@ class Kall(
     val simulering = SimuleringKall(testklient)
     val steg = StegKall(testklient)
     val skjemaRouting = SkjemaRoutingKall(testklient)
+    val tilbakekreving = TilbakekrevingKall(testklient)
     val totrinnskontroll = TotrinnskontrollKall(testklient)
     val vedtak = VedtakKall(testklient)
     val vilkår = VilkårKall(testklient)

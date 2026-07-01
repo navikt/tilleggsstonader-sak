@@ -36,6 +36,7 @@ data class TilbakekrevingBehandlingEndret(
             tilbakekrevingFom = tilbakekreving.fullstendigPeriode.fom,
             tilbakekrevingTom = tilbakekreving.fullstendigPeriode.tom,
             tilbakekrevingBehandlingId = tilbakekreving.behandlingId,
+            saksbehandlingURL = tilbakekreving.saksbehandlingURL,
         )
 
     companion object {

@@ -40,11 +40,13 @@ data class BehandlingDto(
     val nyeOpplysningerMetadata: NyeOpplysningerMetadata?,
     val harÅpenKjørelistebehandling: Boolean,
     val tilordnetSaksbehandler: TilordnetSaksbehandlerDto,
+    val harTilbakekrevingSak: Boolean,
 )
 
 fun Saksbehandling.tilDto(
     tilordnetSaksbehandler: TilordnetSaksbehandlerDto,
     harÅpenKjørelistebehandling: Boolean,
+    harTilbakekrevingSak: Boolean,
 ): BehandlingDto =
     BehandlingDto(
         id = this.id,
@@ -68,6 +70,7 @@ fun Saksbehandling.tilDto(
         nyeOpplysningerMetadata = this.nyeOpplysningerMetadata,
         harÅpenKjørelistebehandling = harÅpenKjørelistebehandling,
         tilordnetSaksbehandler = tilordnetSaksbehandler,
+        harTilbakekrevingSak = harTilbakekrevingSak,
     )
 
 fun Behandling.tilBehandlingJournalDto(): BehandlingTilJournalføringDto =

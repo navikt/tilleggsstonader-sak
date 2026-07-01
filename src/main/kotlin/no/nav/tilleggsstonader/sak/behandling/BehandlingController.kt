@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.TilordnetSaksbehandlerService
 import no.nav.tilleggsstonader.sak.opplysninger.tilordnetSaksbehandler.dto.tilDto
+import no.nav.tilleggsstonader.sak.tilbakekreving.TilbakekrevinghendelseService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.http.HttpStatus
@@ -45,6 +46,7 @@ class BehandlingController(
     private val tilgangService: TilgangService,
     private val nullstillBehandlingService: NullstillBehandlingService,
     private val tilordnetSaksbehandlerService: TilordnetSaksbehandlerService,
+    private val tilbakekrevinghendelseService: TilbakekrevinghendelseService,
 ) {
     @GetMapping("{behandlingId}")
     fun hentBehandling(
@@ -65,6 +67,7 @@ class BehandlingController(
         return saksbehandling.tilDto(
             tilordnetSaksbehandler = tilordnetSaksbehandler,
             harÅpenKjørelistebehandling = harÅpenKjørelistebehandling,
+            harTilbakekrevingSak = tilbakekrevinghendelseService.harHendelserForBehandling(behandlingId),
         )
     }
 
