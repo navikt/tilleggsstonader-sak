@@ -1,0 +1,1 @@
+ALTER TABLE task ALTER COLUMN trigger_tid TYPE TIMESTAMP(6);
