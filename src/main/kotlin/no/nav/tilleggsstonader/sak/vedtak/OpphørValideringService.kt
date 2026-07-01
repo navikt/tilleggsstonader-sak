@@ -41,10 +41,10 @@ class OpphørValideringService(
             vilkår,
             opphørsdato,
         )
-//        validerIngenEndringerIVilkårEllerVilkårperioderFørOpphørsdato(
-//            behandlingId = saksbehandling.id,
-//            opphørsdato = opphørsdato,
-//        )
+        validerIngenEndringerIVilkårEllerVilkårperioderFørOpphørsdato(
+            behandlingId = saksbehandling.id,
+            opphørsdato = opphørsdato,
+        )
     }
 
     fun validerIngenUtbetalingEtterOpphørsdato(
