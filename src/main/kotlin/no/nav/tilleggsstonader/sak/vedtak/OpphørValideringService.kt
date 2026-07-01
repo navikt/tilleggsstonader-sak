@@ -97,8 +97,8 @@ class OpphørValideringService(
                 behandlingId = behandlingId,
             )
 
-        brukerfeilHvis(tidligsteEndring != null && tidligsteEndring <= opphørsdato) {
-            "Opphør er et ugyldig vedtaksresultat fordi opphørsdato er etter eller lik tidligste endring (${tidligsteEndring?.norskFormat()})"
+        brukerfeilHvis(tidligsteEndring != null && tidligsteEndring < opphørsdato) {
+            "Opphør er et ugyldig vedtaksresultat fordi opphørsdato (${opphørsdato.norskFormat()}) er etter tidligste endring (${tidligsteEndring?.norskFormat()})"
         }
     }
 

@@ -45,7 +45,7 @@ class TilsynBarnOpphørIntegrationTest : CleanDatabaseIntegrationTest() {
                 }
                 vedtak {
                     opphør(
-                        opphørsdato = 31 januar 2025,
+                        opphørsdato = 1 februar 2025,
                     )
                 }
             }
@@ -58,6 +58,46 @@ class TilsynBarnOpphørIntegrationTest : CleanDatabaseIntegrationTest() {
         assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
         assertThat(vedtak.årsakerOpphør).containsExactly(ÅrsakOpphør.ANNET)
         assertThat(vedtak.begrunnelse).isEqualTo("annet")
+    }
+
+    @Test
+    fun `skal ikke lagre vedtak hvis dato for opphør er etter endring`() {
+        val fom = 1 januar 2025
+        val tom = 28 februar 2025
+
+        val førstegangsbehandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.BARNETILSYN,
+            ) {
+                defaultTilsynBarnTestdata(fom = fom, tom = tom)
+            }
+
+        testoppsettService.settAndelerTilOkForBehandling(førstegangsbehandlingContext.behandlingId)
+
+        val behandlingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = førstegangsbehandlingContext.behandlingId,
+                tilSteg = StegType.BEREGNE_YTELSE,
+            ) {
+                aktivitet {
+                    oppdaterTomPåEnesteAktivitet(tom = fom.toYearMonth().atEndOfMonth())
+                }
+            }
+
+        kall.vedtak.apiRespons
+            .lagreOpphør(
+                stønadstype = Stønadstype.BARNETILSYN,
+                behandlingId = behandlingId,
+                opphørDto =
+                    opphørDto(
+                        opphørsdato = 2 februar 2025,
+                    ),
+            ).expectProblemDetail(
+                forventetStatus = HttpStatus.BAD_REQUEST,
+                forventetDetail =
+                    "Opphør er et ugyldig vedtaksresultat fordi " +
+                        "opphørsdato (02.02.2025) er etter tidligste endring (01.02.2025)",
+            )
     }
 
     /**
@@ -173,7 +213,7 @@ class TilsynBarnOpphørIntegrationTest : CleanDatabaseIntegrationTest() {
                 forventetStatus = HttpStatus.BAD_REQUEST,
                 forventetDetail =
                     "Opphør er et ugyldig vedtaksresultat fordi " +
-                        "opphørsdato er etter eller lik tidligste endring (01.02.2025)",
+                        "opphørsdato (01.03.2025) er etter tidligste endring (01.02.2025)",
             )
     }
 }

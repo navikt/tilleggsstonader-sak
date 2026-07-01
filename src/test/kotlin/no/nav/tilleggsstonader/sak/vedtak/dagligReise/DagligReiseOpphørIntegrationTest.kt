@@ -128,7 +128,7 @@ class DagligReiseOpphørIntegrationTest(
                 forventetStatus = HttpStatus.BAD_REQUEST,
                 forventetDetail =
                     "Opphør er et ugyldig vedtaksresultat fordi " +
-                        "opphørsdato er etter eller lik tidligste endring (01.02.2025)",
+                        "opphørsdato (01.03.2025) er etter tidligste endring (01.02.2025)",
             )
     }
 }
