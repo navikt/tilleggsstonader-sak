@@ -333,6 +333,22 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
             )
         }
 
+        @Test
+        fun `skal returnere tom body når vedtaket er avslag`() {
+            kall.vedtak.lagreAvslag(
+                Stønadstype.DAGLIG_REISE_TSO,
+                dummyBehandling.id,
+                AvslagDagligReiseDto(
+                    årsakerAvslag = listOf(ÅrsakAvslag.ANNET),
+                    begrunnelse = "begrunnelse",
+                ),
+            )
+
+            kall.privatBil.apiRespons
+                .hentOppsummertBeregning(dummyBehandling.id)
+                .expectOkEmpty()
+        }
+
         private fun validerOppsummertUke(
             oppsummertUke: OppsummertBeregningForPeriodeDto,
             forventetUke: ForventetOppsummertUke,
