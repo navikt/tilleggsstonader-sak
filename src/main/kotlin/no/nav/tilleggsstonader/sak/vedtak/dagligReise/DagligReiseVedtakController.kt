@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequ
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.takeIfType
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
@@ -141,7 +142,12 @@ class DagligReiseVedtakController(
             return null
         }
 
-        val vedtaksdata = vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandlingId).data
+        val vedtaksdata =
+            vedtakService
+                .hentVedtak(behandlingId)
+                ?.takeIfType<InnvilgelseEllerOpphørDagligReise>()
+                ?.data
+                ?: return null
 
         return PrivatBilOppsummertBeregningDto(
             reiser =
