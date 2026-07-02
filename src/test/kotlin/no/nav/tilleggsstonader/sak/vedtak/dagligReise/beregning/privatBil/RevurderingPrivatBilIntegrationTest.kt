@@ -315,7 +315,7 @@ class RevurderingPrivatBilIntegrationTest(
 
         @Test
         fun `kan redusere reisedager når feature-toggle er på`() {
-            every { unleashService.isEnabled(Toggle.KAN_REDUSERE_REISEDAGER_REVURDERING) } returns true
+            every { unleashService.isEnabled(Toggle.KAN_REDUSERE_REISEDAGER_REVURDERING_PRIVAT_BIL) } returns true
             val fomReise1 = 5 januar 2026
             val tomReise1 = 11 januar 2026
 

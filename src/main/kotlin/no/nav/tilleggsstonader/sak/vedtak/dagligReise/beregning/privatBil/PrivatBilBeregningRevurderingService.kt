@@ -120,7 +120,7 @@ class PrivatBilBeregningRevurderingService(
         forrigeRammeForReise: RammevedtakForReiseMedPrivatBil,
         nyRammeForReise: RammevedtakForReiseMedPrivatBil,
     ) {
-        if (!unleashService.isEnabled(Toggle.KAN_REDUSERE_REISEDAGER_REVURDERING)) {
+        if (!unleashService.isEnabled(Toggle.KAN_REDUSERE_REISEDAGER_REVURDERING_PRIVAT_BIL)) {
             val reisedagerErRedusert =
                 nyRammeForReise.grunnlag.delperioder.any { nyDelperiode ->
                     forrigeRammeForReise.grunnlag.delperioder
