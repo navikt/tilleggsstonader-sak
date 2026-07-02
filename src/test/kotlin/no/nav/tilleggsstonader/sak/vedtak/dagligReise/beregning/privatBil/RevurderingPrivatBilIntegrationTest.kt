@@ -335,7 +335,10 @@ class RevurderingPrivatBilIntegrationTest(
             gjennomførBeregningStegKall(revurderingId, Stønadstype.DAGLIG_REISE_TSO)
                 .expectStatus()
                 .isOk
-        }
+
+            val vedtakEtterRevurdering = hentInnvilgelse(revurderingId)
+            val reise = vedtakEtterRevurdering.rammevedtakPrivatBil!!.reiser.single()
+            assertThat(reise.grunnlag.delperioder.single().reisedagerPerUke).isEqualTo(2)
     }
 
     @Nested
