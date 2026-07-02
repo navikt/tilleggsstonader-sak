@@ -108,6 +108,12 @@ class DagligReiseBeregnYtelseSteg(
             beregningsplan = plan,
         )
 
+        avklartKjørelisteService.gjenopprettTidligereSlettedeUkerSomNåErInnenforRammevedtak(
+            fagsakId = saksbehandling.fagsakId,
+            behandlingId = saksbehandling.id,
+            rammevedtak = rammevedtakPrivatBil,
+        )
+
         avklartKjørelisteService.sletteMarkerUkerOgDagerUtenforAvkortetRammevedtak(
             behandlingId = saksbehandling.id,
             rammevedtak = rammevedtakPrivatBil,
