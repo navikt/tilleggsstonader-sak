@@ -7,9 +7,13 @@ import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.eksistererEllerFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.singleEllerFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
@@ -24,6 +28,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.springframework.stereotype.Service
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
@@ -362,4 +367,129 @@ class AvklartKjørelisteService(
         } else {
             null
         }
+
+    /**
+     * Gjenoppretter uker som ble slettet i historikken for fagsaken, men som nå
+     * er innenfor rammevedtaket igjen i ny behandling.
+     *
+     * Saksbehandler sin vurdering nullstilles ved at de gjenopprettede ukene
+     * får status [AvklartKjørtUkeStatus.NY], slik at de må vurderes på nytt.
+     */
+    fun gjenopprettTidligereSlettedeUkerSomNåErInnenforRammevedtak(
+        fagsakId: FagsakId,
+        behandlingId: BehandlingId,
+        rammevedtak: RammevedtakPrivatBil?,
+    ) {
+        if (rammevedtak == null) {
+            return
+        }
+
+        val eksisterendeUker =
+            hentAvklarteUkerForBehandling(behandlingId)
+                .map { ReiseUke(it.reiseId, it.uke) }
+                .toSet()
+        val slettedeUkerPåFagsaken = hentSlettedeUkerPåFagsaken(fagsakId)
+        val kjørelisteUkerPåFagsak = hentKjørelisteUkerPåFagsak(fagsakId)
+
+        val gjenopprettedeUker =
+            slettedeUkerPåFagsaken
+                .filter { ReiseUke(it.reiseId, it.uke) !in eksisterendeUker }
+                .mapNotNull { slettetUke ->
+                    gjenopprettUkeHvisInnenforRammevedtak(slettetUke, behandlingId, rammevedtak, kjørelisteUkerPåFagsak)
+                }
+
+        if (gjenopprettedeUker.isNotEmpty()) {
+            avklartKjørtUkeRepository.insertAll(gjenopprettedeUker)
+        }
+    }
+
+    private fun gjenopprettUkeHvisInnenforRammevedtak(
+        slettetUke: AvklartKjørtUke,
+        behandlingId: BehandlingId,
+        rammevedtak: RammevedtakPrivatBil,
+        kjørelisteUkerPåFagsak: Map<ReiseUke, KjørelisteUke>,
+    ): AvklartKjørtUke? {
+        val rammevedtakForReise = rammevedtak.reiser.find { it.reiseId == slettetUke.reiseId } ?: return null
+        val kjørelisteUke = kjørelisteUkerPåFagsak[ReiseUke(slettetUke.reiseId, slettetUke.uke)] ?: return null
+        val reisedagerInnenforNyttRammevedtak =
+            kjørelisteUke.reisedager.filter { rammevedtakForReise.grunnlag.inneholder(it.dato) }
+        if (reisedagerInnenforNyttRammevedtak.isEmpty()) return null
+
+        return utledAvklartUke(
+            behandlingId = behandlingId,
+            kjørelisteId = kjørelisteUke.kjørelisteId,
+            ukeIÅr = slettetUke.uke,
+            reisedager = reisedagerInnenforNyttRammevedtak,
+            rammevedtak = rammevedtakForReise,
+        )
+    }
+
+    private fun hentSlettedeUkerPåFagsaken(fagsakId: FagsakId): List<AvklartKjørtUke> {
+        val ferdigstilteBehandlinger =
+            behandlingService
+                .hentBehandlinger(fagsakId)
+                .filter { it.vedtakstidspunkt != null && it.status == BehandlingStatus.FERDIGSTILT }
+
+        val slettedeUkerMedVedtakstidspunkt =
+            ferdigstilteBehandlinger.flatMap { behandling ->
+                hentAvklarteUkerForBehandling(behandling.id)
+                    .filter { it.avklartKjørtUkeStatus == AvklartKjørtUkeStatus.SLETTET }
+                    .map {
+                        AvklartKjørtUkeMedTidspunkt(
+                            vedtakstidspunkt =
+                                behandling.vedtakstidspunkt.eksistererEllerFeil {
+                                    "Forventer at vedtakstidspunkt er satt for ferdigstilte behandlinger."
+                                },
+                            uke = it,
+                        )
+                    }
+            }
+
+        return slettedeUkerMedVedtakstidspunkt
+            .groupBy { ReiseUke(it.uke.reiseId, it.uke.uke) }
+            .map { (reiseUke, avklarteKjørteUke) ->
+                avklarteKjørteUke
+                    .singleEllerFeil {
+                        "Fant ingen eller duplikate kjørelister for reise=${reiseUke.reiseId} og uke=${reiseUke.uke}"
+                    }.uke
+            }
+    }
+
+    private fun hentKjørelisteUkerPåFagsak(fagsakId: FagsakId): Map<ReiseUke, KjørelisteUke> =
+        kjørelisteService
+            .hentForFagsakId(fagsakId)
+            .flatMap { kjøreliste ->
+                kjøreliste.data.reisedager
+                    .groupBy { it.dato.tilUkeIÅr() }
+                    .map { (uke, reisedager) ->
+                        KjørelisteUke(
+                            kjørelisteId = kjøreliste.id,
+                            reiseId = kjøreliste.data.reiseId,
+                            uke = uke,
+                            reisedager = reisedager,
+                        )
+                    }
+            }.groupBy { ReiseUke(it.reiseId, it.uke) }
+            .mapValues { (reiseUke, kjørelisteUker) ->
+                kjørelisteUker.singleEllerFeil {
+                    "Fant ingen eller duplikate kjørelister for reise=${reiseUke.reiseId} og uke=${reiseUke.uke}"
+                }
+            }
 }
+
+private data class ReiseUke(
+    val reiseId: ReiseId,
+    val uke: UkeIÅr,
+)
+
+private data class KjørelisteUke(
+    val kjørelisteId: KjørelisteId,
+    val reiseId: ReiseId,
+    val uke: UkeIÅr,
+    val reisedager: List<KjørelisteDag>,
+)
+
+private data class AvklartKjørtUkeMedTidspunkt(
+    val vedtakstidspunkt: LocalDateTime,
+    val uke: AvklartKjørtUke,
+)
