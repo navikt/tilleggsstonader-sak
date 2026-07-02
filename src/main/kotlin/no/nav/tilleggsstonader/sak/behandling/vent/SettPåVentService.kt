@@ -7,12 +7,14 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentResponse
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandling.vent.SettBehandlingPåVentOppgaveMetadata.OppdaterOppgave
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
@@ -55,6 +57,9 @@ class SettPåVentService(
         request: SettBehandlingPåVent,
     ): StatusPåVentDto {
         val behandling = behandlingService.hentBehandling(behandlingId)
+        brukerfeilHvis(behandling.erKjørelisteBehandling() && behandling.behandlingMetode == BehandlingMetode.AUTOMATISK) {
+            "Automatisk kjørelistebehandling kan ikke settes på vent."
+        }
 
         if (behandling.status != BehandlingStatus.SATT_PÅ_VENT) {
             behandling.status.validerKanBehandlingRedigeres()

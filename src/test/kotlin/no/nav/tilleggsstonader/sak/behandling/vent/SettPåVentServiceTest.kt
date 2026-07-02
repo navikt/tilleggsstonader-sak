@@ -1,8 +1,11 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.BehandlingshistorikkRepository
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
@@ -163,6 +166,45 @@ class SettPåVentServiceTest : CleanDatabaseIntegrationTest() {
                 .isThrownBy {
                     settPåVentService.settPåVent(behandling.id, settBehandlingPåVent)
                 }.withMessage("Kan ikke gjøre endringer på denne behandlingen fordi den er satt på vent.")
+        }
+
+        @Test
+        fun `skal kunne sette manuell kjørelistebehandling på vent`() {
+            val fagsakForKjøreliste = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO)
+            testoppsettService.lagreFagsak(fagsakForKjøreliste)
+            val kjørelistebehandling = behandling(fagsak = fagsakForKjøreliste, type = BehandlingType.KJØRELISTE)
+            testoppsettService.lagre(kjørelistebehandling)
+            oppgaveService.opprettOppgave(
+                behandlingId = kjørelistebehandling.id,
+                oppgave = OpprettOppgave(Oppgavetype.BehandleKjøreliste, tilordnetNavIdent = dummySaksbehandler),
+            )
+
+            testWithBrukerContext(dummySaksbehandler) {
+                settPåVentService.settPåVent(kjørelistebehandling.id, settBehandlingPåVent)
+                assertThat(testoppsettService.hentBehandling(kjørelistebehandling.id).status).isEqualTo(BehandlingStatus.SATT_PÅ_VENT)
+            }
+        }
+
+        @Test
+        fun `skal feile hvis man prøver å sette automatisk kjørelistebehandling på vent`() {
+            val fagsakForKjøreliste = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO)
+            testoppsettService.lagreFagsak(fagsakForKjøreliste)
+            val kjørelistebehandling =
+                behandling(
+                    fagsak = fagsakForKjøreliste,
+                    type = BehandlingType.KJØRELISTE,
+                ).copy(behandlingMetode = BehandlingMetode.AUTOMATISK)
+            testoppsettService.lagre(kjørelistebehandling)
+            oppgaveService.opprettOppgave(
+                behandlingId = kjørelistebehandling.id,
+                oppgave = OpprettOppgave(Oppgavetype.BehandleKjøreliste, tilordnetNavIdent = dummySaksbehandler),
+            )
+
+            testWithBrukerContext(dummySaksbehandler) {
+                assertThatThrownBy {
+                    settPåVentService.settPåVent(kjørelistebehandling.id, settBehandlingPåVent)
+                }.hasMessageContaining("Automatisk kjørelistebehandling kan ikke settes på vent.")
+            }
         }
     }
 
