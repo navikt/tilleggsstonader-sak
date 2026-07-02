@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -134,6 +135,10 @@ class DagligReiseVedtakService(
         vedtakRepository.insert(
             eksisterendeVedtak.copy(
                 behandlingId = nyBehandlingId,
+                type = TypeVedtak.INNVILGELSE,
+                data = eksisterendeVedtak.data.tilInnvilgelseForKjøreliste(),
+                opphørsdato = null,
+                tidligsteEndring = null,
             ),
         )
     }
@@ -150,6 +155,7 @@ class DagligReiseVedtakService(
                         beregningsresultat =
                             data.beregningsresultat.copy(privatBil = beregningsresultatPrivatBil),
                     )
+
                 is OpphørDagligReise ->
                     data.copy(
                         beregningsresultat =
@@ -160,7 +166,23 @@ class DagligReiseVedtakService(
     }
 
     fun forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(forrigeIverksatteBehandlingId: BehandlingId?): Boolean {
-        val forrigeVedtak = forrigeIverksatteBehandlingId?.let { hentInnvilgelseEllerOpphørVedtak(it) }
-        return forrigeVedtak?.data?.rammevedtakPrivatBil != null
+        if (forrigeIverksatteBehandlingId == null) return false
+        return vedtakRepository.harRammevedtak(listOf(forrigeIverksatteBehandlingId))
     }
 }
+
+private fun InnvilgelseEllerOpphørDagligReise.tilInnvilgelseForKjøreliste(): InnvilgelseDagligReise =
+    when (this) {
+        is InnvilgelseDagligReise ->
+            copy(
+                beregningsplan = Beregningsplan(Beregningsomfang.KUN_NYE_KJORELISTE_UKER),
+            )
+
+        is OpphørDagligReise ->
+            InnvilgelseDagligReise(
+                beregningsresultat = beregningsresultat,
+                rammevedtakPrivatBil = rammevedtakPrivatBil,
+                vedtaksperioder = vedtaksperioder,
+                beregningsplan = Beregningsplan(Beregningsomfang.KUN_NYE_KJORELISTE_UKER),
+            )
+    }

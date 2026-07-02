@@ -36,6 +36,9 @@ fun Simuleringsresultat.tilDto(): SimuleringDto =
                 ?.summerPerMåned(),
         ingenEndringIUtbetaling = this.ingenEndringIUtbetaling,
         oppsummering = lagSimuleringOppsummering(this),
+        varsel =
+            "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
+                .takeIf { finnesUtbetalingerPåFagsområdeSomIkkeErRegistrert },
     )
 
 /**

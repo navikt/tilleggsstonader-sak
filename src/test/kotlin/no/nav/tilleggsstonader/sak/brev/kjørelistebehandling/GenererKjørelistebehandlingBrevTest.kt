@@ -30,6 +30,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.converter.StringHttpMessageConverter
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter
+import java.math.BigDecimal
 import java.net.URI
 import java.time.LocalDate
 
@@ -82,14 +83,14 @@ class GenererKjørelistebehandlingBrevTest : CleanDatabaseIntegrationTest() {
                                 fom = fom,
                                 tom = 4 januar 2026,
                                 reisedagerPerUke = 3,
-                                bompengerPerDag = 50,
+                                bompengerPerDag = BigDecimal("50"),
                                 fergekostnadPerDag = null,
                             ),
                             FaktaDelperiodePrivatBilDto(
                                 fom = 5 januar 2026,
                                 tom = 11 januar 2026,
                                 reisedagerPerUke = 2,
-                                bompengerPerDag = 50,
+                                bompengerPerDag = BigDecimal("50"),
                                 fergekostnadPerDag = null,
                             ),
                             FaktaDelperiodePrivatBilDto(
@@ -97,7 +98,7 @@ class GenererKjørelistebehandlingBrevTest : CleanDatabaseIntegrationTest() {
                                 tom = 18 januar 2026,
                                 reisedagerPerUke = 2,
                                 bompengerPerDag = null,
-                                fergekostnadPerDag = 100,
+                                fergekostnadPerDag = BigDecimal("100"),
                             ),
                         ),
                 )

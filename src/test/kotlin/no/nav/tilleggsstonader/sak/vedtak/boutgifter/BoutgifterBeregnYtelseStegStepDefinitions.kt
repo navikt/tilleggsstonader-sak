@@ -84,7 +84,9 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     val utledTidligsteEndringService =
         mockk<UtledTidligsteEndringService> {
             every { utledTidligsteEndringForBeregning(any(), any()) } returns null
+            every { utledTidligsteEndringIgnorerVedtaksperioder(any()) } returns null
         }
+
     val beregningsplanUtleder = BeregningsplanUtleder(utledTidligsteEndringService)
     val vilkårperiodeServiceMock =
         mockk<VilkårperiodeService>().apply {
@@ -104,6 +106,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             barnService = mockk(relaxed = true),
         )
     val boutgifterUtgiftService = BoutgifterUtgiftService(vilkårService = vilkårService)
+
     val vedtaksperiodeValideringService =
         VedtaksperiodeValideringService(
             vilkårperiodeService = vilkårperiodeServiceMock,
@@ -125,11 +128,11 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         OpphørValideringService(
             vilkårsperiodeService = vilkårperiodeServiceMock,
             vilkårService = vilkårService,
+            utledTidligsteEndringService = utledTidligsteEndringService,
         )
     val steg =
         BoutgifterBeregnYtelseSteg(
-            beregningService =
-            beregningService,
+            beregningService = beregningService,
             opphørValideringService = opphørValideringService,
             beregningsplanUtleder = beregningsplanUtleder,
             vedtakRepository = vedtakRepositoryFake,
@@ -209,9 +212,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         typeBoutgift: TypeBoutgift,
     ): List<DelvilkårDto> {
         val harHøyereUtgifter =
-            parseValgfriBoolean(BoutgifterDomenenøkkel.HØYERE_UTGIFTER, rad)
-                ?.takeIf { it }
-                ?.let { SvarId.JA }
+            parseValgfriBoolean(BoutgifterDomenenøkkel.HØYERE_UTGIFTER, rad)?.takeIf { it }?.let { SvarId.JA }
                 ?: SvarId.NEI
         return when (typeBoutgift) {
             TypeBoutgift.UTGIFTER_OVERNATTING -> oppfylteDelvilkårUtgifterOvernatting(harHøyereUtgifter)
@@ -309,7 +310,12 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         val tidligsteEndring = parseDato(tidligsteEndringStr)
         val vedtaksperioder = mapVedtaksperioder(vedtaksperiodeData).map { it.tilDto() }
 
-        every { utledTidligsteEndringService.utledTidligsteEndringForBeregning(behandlingId, any()) } returns tidligsteEndring
+        every {
+            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
+                behandlingId,
+                any(),
+            )
+        } returns tidligsteEndring
 
         kjørMedFeilkontekst {
             steg.utførSteg(
@@ -346,10 +352,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         val forventedeAndeler = mapAndeler(dataTable)
 
         val andeler =
-            tilkjentYtelseRepositoryFake
-                .findByBehandlingId(behandlingId)!!
-                .andelerTilkjentYtelse
-                .sortedBy { it.fom }
+            tilkjentYtelseRepositoryFake.findByBehandlingId(behandlingId)!!.andelerTilkjentYtelse.sortedBy { it.fom }
 
         verifiserAtListerErLike(faktisk = andeler.map { ForenkletAndel(it) }, forventet = forventedeAndeler)
     }
@@ -382,10 +385,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     }
 
     private fun hentVedtak(behandlingId: BehandlingId): InnvilgelseEllerOpphørBoutgifter =
-        vedtakRepositoryFake
-            .findByIdOrThrow(behandlingId)
-            .withTypeOrThrow<InnvilgelseEllerOpphørBoutgifter>()
-            .data
+        vedtakRepositoryFake.findByIdOrThrow(behandlingId).withTypeOrThrow<InnvilgelseEllerOpphørBoutgifter>().data
 
     private fun dummyBehandling(
         behandlingId: BehandlingId,

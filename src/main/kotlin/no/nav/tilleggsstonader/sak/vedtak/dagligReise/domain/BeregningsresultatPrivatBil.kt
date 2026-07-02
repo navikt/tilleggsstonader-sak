@@ -12,7 +12,12 @@ data class BeregningsresultatPrivatBil(
 data class BeregningsresultatForReisePrivatBil(
     val reiseId: ReiseId,
     val perioder: List<BeregningsresultatForReisePrivatBilPeriode>,
-)
+) {
+    fun markerAllePerioderSomFraTidligereVedtak() =
+        this.copy(
+            perioder = this.perioder.map { it.markerSomFraTidligereVedtak() },
+        )
+}
 
 data class BeregningsresultatForReisePrivatBilPeriode(
     override val fom: LocalDate,
@@ -21,7 +26,9 @@ data class BeregningsresultatForReisePrivatBilPeriode(
     val stønadsbeløp: BigDecimal,
     val brukersNavKontor: String?,
     val fraTidligereVedtak: Boolean,
-) : Periode<LocalDate>
+) : Periode<LocalDate> {
+    fun markerSomFraTidligereVedtak() = this.copy(fraTidligereVedtak = true)
+}
 
 data class BeregningsresultatForReisePrivatBilGrunnlag(
     val dager: List<BeregningsresultatForReisePrivatBilDag>,

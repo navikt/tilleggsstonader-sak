@@ -45,6 +45,7 @@ class PrivatBilBeregningRevurderingServiceTest {
     @BeforeEach
     fun setup() {
         every { unleashService.isEnabled(Toggle.KAN_REVURDERE_PRIVAT_BIL) } returns true
+        every { unleashService.isEnabled(Toggle.KAN_REDUSERE_REISEDAGER_REVURDERING_PRIVAT_BIL) } returns false
     }
 
     @Nested

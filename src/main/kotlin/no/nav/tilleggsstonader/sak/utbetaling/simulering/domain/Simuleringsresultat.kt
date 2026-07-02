@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.utbetaling.UtbetalingFagområde
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.PosteringType
 import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Embedded
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
@@ -21,6 +22,8 @@ data class Simuleringsresultat(
     val sporbar: Sporbar = Sporbar(),
     val data: SimuleringJson?,
     val ingenEndringIUtbetaling: Boolean = false,
+    @Column("finnes_ikke_registrert_utbetalinger_fagomrade")
+    val finnesUtbetalingerPåFagsområdeSomIkkeErRegistrert: Boolean = false,
 )
 
 data class SimuleringJson(

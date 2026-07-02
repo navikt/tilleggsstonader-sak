@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll
 
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -43,6 +44,7 @@ class SendTilBeslutterSteg(
          */
         validerSaksbehandlersignatur(saksbehandling)
         validerOppgaver(saksbehandling)
+        validerIngenKjørelistePåVent(saksbehandling)
     }
 
     override fun utførSteg(
@@ -150,4 +152,14 @@ class SendTilBeslutterSteg(
     override fun stegType(): StegType = StegType.SEND_TIL_BESLUTTER
 
     override fun settInnHistorikk(): Boolean = false
+
+    private fun validerIngenKjørelistePåVent(saksbehandling: Saksbehandling) {
+        if (!saksbehandling.stønadstype.gjelderDagligReise() || saksbehandling.erKjørelisteBehandling()) {
+            return
+        }
+
+        brukerfeilHvis(behandlingService.harÅpenKjørelisteBehandling(saksbehandling.fagsakId)) {
+            "Det finnes en åpen kjørelistebehandling. Behandle denne før du sender til beslutter."
+        }
+    }
 }

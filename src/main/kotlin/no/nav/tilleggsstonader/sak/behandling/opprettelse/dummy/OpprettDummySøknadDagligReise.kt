@@ -19,9 +19,11 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Dine
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.FaktiskeUtgifter
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.GarDuPaVideregaendeEllerGrunnskoleType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HovedytelseType
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransportType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.HvaSlagsTypeBillettMaDuKjopeType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Identitet
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.JaNeiType
+import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.KanKjøreMedEgenBilType
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Landvelger
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.LeveringHentingIBarnehage
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.MetadataDagligReise
@@ -32,6 +34,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.Valg
 import no.nav.tilleggsstonader.libs.utils.dato.april
 import no.nav.tilleggsstonader.libs.utils.dato.august
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.mai
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
@@ -86,7 +89,7 @@ class OpprettDummySøknadDagligReise(
 
         val reise1 =
             Reise(
-                gateadresse = "Nisseveien 3",
+                gateadresse = "Kollektivgata 1",
                 postnr = "0011",
                 poststed = "OSLO",
                 fom = 1 januar 2025,
@@ -121,11 +124,12 @@ class OpprettDummySøknadDagligReise(
                 bompenger = null,
                 ferge = null,
                 piggdekkavgift = null,
+                bilensDrivstofftype = null,
             )
 
         val reise2 =
             Reise(
-                gateadresse = "Adressen 1",
+                gateadresse = "Kollektivgata 2",
                 postnr = "1100",
                 poststed = "Oslo",
                 fom = 1 mars 2026,
@@ -154,6 +158,44 @@ class OpprettDummySøknadDagligReise(
                 bompenger = null,
                 ferge = null,
                 piggdekkavgift = null,
+                bilensDrivstofftype = null,
+            )
+
+        val reise3 =
+            Reise(
+                gateadresse = "Bilveien 1",
+                postnr = "1100",
+                poststed = "Oslo",
+                fom = 1 mai 2026,
+                tom = 14 mai 2026,
+                hvorMangeDagerIUkenSkalDuMoteOppPaAktivitetstedet = Valgfelt("dager", "3"),
+                harDu6KmReisevei = JaNeiType.ja,
+                harDuAvMedisinskeArsakerBehovForTransportUavhengigAvReisensLengde = null,
+                hvorLangErReiseveienDin = 9.0,
+                kanDuReiseMedOffentligTransport = JaNeiType.nei,
+                hvaSlagsTypeBillettMaDuKjope = emptyMap(),
+                enkeltbillett = null,
+                syvdagersbillett = null,
+                manedskort = null,
+                hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport =
+                    mapOf(
+                        HvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransportType
+                            .leveringHentingIBarnehageEllerSkolefritidsordningSfoAks to true,
+                        HvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransportType.helsemessigeArsaker to false,
+                        HvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransportType.darligTransporttilbud to false,
+                    ),
+                container = null,
+                kanKjoreMedEgenBil = KanKjøreMedEgenBilType.sitterPaMedAndre,
+                skalDuBetaleForReisenSelv = JaNeiType.ja,
+                mottarDuGrunnstonadFraNav = JaNeiType.nei,
+                hvorforIkkeBil = null,
+                reiseMedTaxi = null,
+                ttKort = null,
+                parkering = JaNeiType.ja,
+                bompenger = 120,
+                ferge = 100,
+                piggdekkavgift = 300,
+                bilensDrivstofftype = Valgfelt(value = "elbil", label = "Elbil"),
             )
 
         val metadata =
@@ -196,7 +238,7 @@ class OpprettDummySøknadDagligReise(
                                 ),
                             arbeidOgOpphold = null,
                             aktiviteter = aktiviteter,
-                            reise = listOf(reise1, reise2),
+                            reise = listOf(reise1, reise2, reise3),
                         ),
                         metadata = metadata,
                     ),

@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import org.springframework.stereotype.Service
@@ -68,10 +68,10 @@ class PrivatBilBeregningRevurderingService(
 
     private fun beregnRammevedtakForReiseIRevurdering(
         vilkårStatus: VilkårStatus?,
-        forrigeRammeForReise: RammeForReiseMedPrivatBil?,
-        nyRammeForReise: RammeForReiseMedPrivatBil?,
+        forrigeRammeForReise: RammevedtakForReiseMedPrivatBil?,
+        nyRammeForReise: RammevedtakForReiseMedPrivatBil?,
         tidligsteEndring: LocalDate?,
-    ): RammeForReiseMedPrivatBil? =
+    ): RammevedtakForReiseMedPrivatBil? =
         when (vilkårStatus) {
             VilkårStatus.NY -> nyRammeForReise ?: feil("Forventer at det finnes et nytt rammevedtak for nye reiser")
             VilkårStatus.SLETTET -> null
@@ -87,11 +87,11 @@ class PrivatBilBeregningRevurderingService(
         }
 
     private fun velgRammeForReiseBasertPåTidligsteEndring(
-        forrigeRammeForReise: RammeForReiseMedPrivatBil?,
-        nyRammeForReise: RammeForReiseMedPrivatBil?,
+        forrigeRammeForReise: RammevedtakForReiseMedPrivatBil?,
+        nyRammeForReise: RammevedtakForReiseMedPrivatBil?,
         tidligsteEndring: LocalDate?,
         vilkårStatus: VilkårStatus,
-    ): RammeForReiseMedPrivatBil? {
+    ): RammevedtakForReiseMedPrivatBil? {
         feilHvis(tidligsteEndring == null) {
             "Forventer at tidligste endring finnes for en revurdering"
         }
@@ -107,7 +107,30 @@ class PrivatBilBeregningRevurderingService(
         return if (reiseErFørTidligsteEndring) {
             forrigeRammeForReise
         } else {
+            validerReisedagerIkkeRedusert(forrigeRammeForReise, nyRammeForReise)
             nyRammeForReise
+        }
+    }
+
+    /**
+     * Vi støtter ikke å redusere antall reisedager per uke i en revurdering, da reduksjon kan komme i konflikt med
+     * dager som allerede er kjørt og utbetalt. Økning av reisedager er tillatt.
+     */
+    private fun validerReisedagerIkkeRedusert(
+        forrigeRammeForReise: RammevedtakForReiseMedPrivatBil,
+        nyRammeForReise: RammevedtakForReiseMedPrivatBil,
+    ) {
+        if (!unleashService.isEnabled(Toggle.KAN_REDUSERE_REISEDAGER_REVURDERING_PRIVAT_BIL)) {
+            val reisedagerErRedusert =
+                nyRammeForReise.grunnlag.delperioder.any { nyDelperiode ->
+                    forrigeRammeForReise.grunnlag.delperioder
+                        .filter { it.overlapper(nyDelperiode) }
+                        .any { nyDelperiode.reisedagerPerUke < it.reisedagerPerUke }
+                }
+
+            brukerfeilHvis(reisedagerErRedusert) {
+                "Det er ikke støttet å redusere antall reisedager per uke i en revurdering, da dette kan komme i konflikt med dager som allerede er kjørt og utbetalt."
+            }
         }
     }
 }

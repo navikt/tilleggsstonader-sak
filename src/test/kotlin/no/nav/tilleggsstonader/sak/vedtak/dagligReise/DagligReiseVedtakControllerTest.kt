@@ -216,14 +216,14 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                     fom = fom,
                     tom = 4 januar 2026,
                     reisedagerPerUke = 2,
-                    bompengerPerDag = 50,
+                    bompengerPerDag = BigDecimal("50"),
                     fergekostnadPerDag = null,
                 ),
                 FaktaDelperiodePrivatBilDto(
                     fom = 5 januar 2026,
                     tom = 11 januar 2026,
                     reisedagerPerUke = 3,
-                    bompengerPerDag = 50,
+                    bompengerPerDag = BigDecimal("50"),
                     fergekostnadPerDag = null,
                 ),
                 FaktaDelperiodePrivatBilDto(
@@ -231,7 +231,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                     tom = 18 januar 2026,
                     reisedagerPerUke = 3,
                     bompengerPerDag = null,
-                    fergekostnadPerDag = 100,
+                    fergekostnadPerDag = BigDecimal("100"),
                 ),
             )
 
@@ -291,7 +291,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                         fom = fom,
                         tom = 4 januar 2026,
                         antallGodkjenteReisedager = 2,
-                        bompengerTotalt = 100,
+                        bompengerTotalt = BigDecimal("100"),
                         fergekostnadTotalt = null,
                         satserSize = 2,
                         totalParkeringskostnad = 150,
@@ -307,7 +307,7 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                         fom = 5 januar 2026,
                         tom = 11 januar 2026,
                         antallGodkjenteReisedager = 2,
-                        bompengerTotalt = 100,
+                        bompengerTotalt = BigDecimal("100"),
                         fergekostnadTotalt = null,
                         satserSize = 1,
                         totalParkeringskostnad = 0,
@@ -324,13 +324,29 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
                         tom = tom,
                         antallGodkjenteReisedager = 3,
                         bompengerTotalt = null,
-                        fergekostnadTotalt = 300,
+                        fergekostnadTotalt = BigDecimal("300"),
                         satserSize = 1,
                         totalParkeringskostnad = 60,
                         ukenummer = 3,
                         stønadsbeløp = BigDecimal("536"),
                     ),
             )
+        }
+
+        @Test
+        fun `skal returnere tom body når vedtaket er avslag`() {
+            kall.vedtak.lagreAvslag(
+                Stønadstype.DAGLIG_REISE_TSO,
+                dummyBehandling.id,
+                AvslagDagligReiseDto(
+                    årsakerAvslag = listOf(ÅrsakAvslag.ANNET),
+                    begrunnelse = "begrunnelse",
+                ),
+            )
+
+            kall.privatBil.apiRespons
+                .hentOppsummertBeregning(dummyBehandling.id)
+                .expectOkEmpty()
         }
 
         private fun validerOppsummertUke(
@@ -353,8 +369,8 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
         val fom: LocalDate,
         val tom: LocalDate,
         val antallGodkjenteReisedager: Int,
-        val bompengerTotalt: Int?,
-        val fergekostnadTotalt: Int?,
+        val bompengerTotalt: BigDecimal?,
+        val fergekostnadTotalt: BigDecimal?,
         val satserSize: Int,
         val totalParkeringskostnad: Int,
         val ukenummer: Int,

@@ -68,48 +68,53 @@ enum class StegType(
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    KJØRELISTE(
+    REGISTRER_KJØRELISTE(
         rekkefølge = 4,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    BEREGNING(
+    KJØRELISTE(
         rekkefølge = 5,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    SIMULERING(
+    BEREGNING(
         rekkefølge = 6,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    FULLFØR_KJØRELISTE(
+    SIMULERING(
         rekkefølge = 7,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    SEND_TIL_BESLUTTER(
+    FULLFØR_KJØRELISTE(
         rekkefølge = 8,
         tillattFor = BehandlerRolle.SAKSBEHANDLER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
     ),
-    BESLUTTE_VEDTAK(
+    SEND_TIL_BESLUTTER(
         rekkefølge = 9,
+        tillattFor = BehandlerRolle.SAKSBEHANDLER,
+        gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.UTREDES),
+    ),
+    BESLUTTE_VEDTAK(
+        rekkefølge = 10,
         tillattFor = BehandlerRolle.BESLUTTER,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.FATTER_VEDTAK),
     ),
     JOURNALFØR_OG_DISTRIBUER_VEDTAKSBREV(
-        rekkefølge = 10,
-        tillattFor = BehandlerRolle.SYSTEM,
-        gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
-    ),
-    FERDIGSTILLE_BEHANDLING(
         rekkefølge = 11,
         tillattFor = BehandlerRolle.SYSTEM,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
     ),
-    BEHANDLING_FERDIGSTILT(
+    FERDIGSTILLE_BEHANDLING(
         rekkefølge = 12,
+        tillattFor = BehandlerRolle.SYSTEM,
+        gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.IVERKSETTER_VEDTAK),
+    ),
+    BEHANDLING_FERDIGSTILT(
+        rekkefølge = 13,
         tillattFor = BehandlerRolle.SYSTEM,
         gyldigIKombinasjonMedStatus = listOf(BehandlingStatus.FERDIGSTILT),
     ),
@@ -136,12 +141,14 @@ enum class StegType(
             BEHANDLING_FERDIGSTILT -> BEHANDLING_FERDIGSTILT
 
             // Steg relevante i revurdering av daglige reiser med bil
+            REGISTRER_KJØRELISTE -> KJØRELISTE
             KJØRELISTE -> BEREGNING
             BEREGNING -> SIMULERING
         }
 
     fun hentNesteStegKjørelistebehandling(): StegType =
         when (this) {
+            REGISTRER_KJØRELISTE -> KJØRELISTE
             KJØRELISTE -> BEREGNING
             BEREGNING -> SIMULERING
             SIMULERING -> FULLFØR_KJØRELISTE

@@ -5,7 +5,7 @@ val javaVersion = JavaLanguageVersion.of(21)
 val tomcatVersion = "11.0.22"
 val familieProsesseringVersion = "2.20260526102747_ed05f71"
 val tilleggsstønaderLibsVersion = "2026.05.14-21.16.acdbe034efef"
-val tilleggsstønaderKontrakterVersion = "2026.06.16-12.30.d9171e81b755"
+val tilleggsstønaderKontrakterVersion = "2026.06.25-09.50.a69fb39b726d"
 val avroVersion = "1.12.1"
 val confluentVersion = "8.0.1"
 val joarkHendelseVersion = "1.1.11"
@@ -23,7 +23,7 @@ plugins {
     application
 
     kotlin("jvm") version "2.3.21"
-    id("com.diffplug.spotless") version "8.6.0"
+    id("com.diffplug.spotless") version "8.7.0"
     id("com.github.ben-manes.versions") version "0.54.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
 

@@ -72,8 +72,8 @@ data class FaktaDelperiodePrivatBil(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val reisedagerPerUke: Int,
-    val bompengerPerDag: Int?,
-    val fergekostnadPerDag: Int?,
+    val bompengerPerDag: BigDecimal?,
+    val fergekostnadPerDag: BigDecimal?,
 ) : Periode<LocalDate> {
     init {
         brukerfeilHvis(reisedagerPerUke <= 0) {
@@ -82,10 +82,10 @@ data class FaktaDelperiodePrivatBil(
         brukerfeilHvis(reisedagerPerUke > 7) {
             "Reisedager per uke kan ikke være mer enn 7"
         }
-        brukerfeilHvis(bompengerPerDag != null && bompengerPerDag < 0) {
+        brukerfeilHvis(bompengerPerDag != null && bompengerPerDag < BigDecimal.ZERO) {
             "Bompengeprisen må være større enn 0"
         }
-        brukerfeilHvis(fergekostnadPerDag != null && fergekostnadPerDag < 0) {
+        brukerfeilHvis(fergekostnadPerDag != null && fergekostnadPerDag < BigDecimal.ZERO) {
             "Fergekostnaden må være større enn 0"
         }
     }

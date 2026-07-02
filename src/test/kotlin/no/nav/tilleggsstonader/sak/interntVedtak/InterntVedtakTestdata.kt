@@ -43,11 +43,11 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatEkstrakostnader
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBilBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
@@ -727,13 +727,13 @@ object InterntVedtakTestdata {
             RammevedtakPrivatBil(
                 reiser =
                     listOf(
-                        RammeForReiseMedPrivatBil(
+                        RammevedtakForReiseMedPrivatBil(
                             reiseId = dummyReiseId,
                             aktivitetsadresse = "Testveien 1, 1234 Testby",
                             aktivitetType = AktivitetType.TILTAK,
                             tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                             grunnlag =
-                                RammeForReiseMedPrivatBilBeregningsgrunnlag(
+                                RammevedtakForReiseMedPrivatBilBeregningsgrunnlag(
                                     fom = LocalDate.of(2024, 1, 1),
                                     tom = LocalDate.of(2024, 1, 31),
                                     delperioder =
@@ -744,8 +744,8 @@ object InterntVedtakTestdata {
                                                 reisedagerPerUke = 3,
                                                 ekstrakostnader =
                                                     RammeForReiseMedPrivatEkstrakostnader(
-                                                        bompengerPerDag = 40,
-                                                        fergekostnadPerDag = 50,
+                                                        bompengerPerDag = BigDecimal("40"),
+                                                        fergekostnadPerDag = BigDecimal("50"),
                                                     ),
                                                 satser =
                                                     listOf(
@@ -763,13 +763,13 @@ object InterntVedtakTestdata {
                                     vedtaksperioder = vedtaksperioder,
                                 ),
                         ),
-                        RammeForReiseMedPrivatBil(
+                        RammevedtakForReiseMedPrivatBil(
                             reiseId = dummyReiseId,
                             aktivitetsadresse = "Testveien 2, 1234 Testby",
                             aktivitetType = AktivitetType.TILTAK,
                             tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                             grunnlag =
-                                RammeForReiseMedPrivatBilBeregningsgrunnlag(
+                                RammevedtakForReiseMedPrivatBilBeregningsgrunnlag(
                                     fom = LocalDate.of(2024, 1, 1),
                                     tom = LocalDate.of(2024, 1, 31),
                                     delperioder =
@@ -780,8 +780,8 @@ object InterntVedtakTestdata {
                                                 reisedagerPerUke = 3,
                                                 ekstrakostnader =
                                                     RammeForReiseMedPrivatEkstrakostnader(
-                                                        bompengerPerDag = 40,
-                                                        fergekostnadPerDag = 50,
+                                                        bompengerPerDag = BigDecimal("40"),
+                                                        fergekostnadPerDag = BigDecimal("50"),
                                                     ),
                                                 satser =
                                                     listOf(
@@ -800,8 +800,8 @@ object InterntVedtakTestdata {
                                                 reisedagerPerUke = 5,
                                                 ekstrakostnader =
                                                     RammeForReiseMedPrivatEkstrakostnader(
-                                                        bompengerPerDag = 40,
-                                                        fergekostnadPerDag = 50,
+                                                        bompengerPerDag = BigDecimal("40"),
+                                                        fergekostnadPerDag = BigDecimal("50"),
                                                     ),
                                                 satser =
                                                     listOf(
@@ -1074,8 +1074,8 @@ object InterntVedtakTestdata {
                                         fom = LocalDate.of(2025, 1, 1),
                                         tom = LocalDate.of(2025, 2, 28),
                                         reisedagerPerUke = 3,
-                                        bompengerPerDag = 20,
-                                        fergekostnadPerDag = 30,
+                                        bompengerPerDag = BigDecimal("20"),
+                                        fergekostnadPerDag = BigDecimal("30"),
                                     ),
                                 ),
                             aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),

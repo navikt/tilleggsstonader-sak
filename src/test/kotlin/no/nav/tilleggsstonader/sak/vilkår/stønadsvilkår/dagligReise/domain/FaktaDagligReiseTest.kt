@@ -3,6 +3,8 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.faktaOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReisePrivatBilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
@@ -155,8 +157,8 @@ class FaktaDagligReiseTest {
                                     fom = LocalDate.now(),
                                     tom = LocalDate.now().plusDays(10),
                                     reisedagerPerUke = 4,
-                                    bompengerPerDag = -10,
-                                    fergekostnadPerDag = 0,
+                                    bompengerPerDag = BigDecimal("-10"),
+                                    fergekostnadPerDag = BigDecimal.ZERO,
                                 ),
                             ),
                         reiseavstandEnVei = BigDecimal(10),
@@ -179,8 +181,8 @@ class FaktaDagligReiseTest {
                                     fom = LocalDate.now(),
                                     tom = LocalDate.now().plusDays(10),
                                     reisedagerPerUke = 4,
-                                    bompengerPerDag = 0,
-                                    fergekostnadPerDag = -10,
+                                    bompengerPerDag = BigDecimal.ZERO,
+                                    fergekostnadPerDag = BigDecimal("-10"),
                                 ),
                             ),
                         reiseavstandEnVei = BigDecimal(10),
@@ -203,8 +205,8 @@ class FaktaDagligReiseTest {
                                     fom = LocalDate.now(),
                                     tom = LocalDate.now().plusDays(10),
                                     reisedagerPerUke = 4,
-                                    bompengerPerDag = 0,
-                                    fergekostnadPerDag = 0,
+                                    bompengerPerDag = BigDecimal.ZERO,
+                                    fergekostnadPerDag = BigDecimal.ZERO,
                                 ),
                             ),
                         reiseavstandEnVei = BigDecimal("-10"),
@@ -228,8 +230,8 @@ class FaktaDagligReiseTest {
                                     fom = LocalDate.now(),
                                     tom = LocalDate.now().plusDays(10),
                                     reisedagerPerUke = -4,
-                                    bompengerPerDag = 0,
-                                    fergekostnadPerDag = 0,
+                                    bompengerPerDag = BigDecimal.ZERO,
+                                    fergekostnadPerDag = BigDecimal.ZERO,
                                 ),
                             ),
                         aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
@@ -252,8 +254,8 @@ class FaktaDagligReiseTest {
                                     fom = LocalDate.now(),
                                     tom = LocalDate.now().plusDays(10),
                                     reisedagerPerUke = 8,
-                                    bompengerPerDag = 0,
-                                    fergekostnadPerDag = 0,
+                                    bompengerPerDag = BigDecimal.ZERO,
+                                    fergekostnadPerDag = BigDecimal.ZERO,
                                 ),
                             ),
                         aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
@@ -261,5 +263,56 @@ class FaktaDagligReiseTest {
                 }
             assertThat(feil.message).isEqualTo("Reisedager per uke kan ikke være mer enn 7")
         }
+    }
+
+    @Nested
+    inner class FaktaDelperiodePrivatBilDtoValidering {
+        @Test
+        fun `skal kaste feil hvis bompenger er høyere enn 500`() {
+            val feil =
+                assertThrows<ApiFeil> {
+                    faktaPrivatBilDto(
+                        bompengerPerDag = BigDecimal("501"),
+                    ).mapTilFakta(reiseId = ReiseId.random(), adresse = "Tiltaksveien 1")
+                }
+
+            assertThat(
+                feil.message,
+            ).isEqualTo("Skal du innvilge med bompenger høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet")
+        }
+
+        @Test
+        fun `skal kaste feil hvis fergekostnad er høyere enn 500`() {
+            val feil =
+                assertThrows<ApiFeil> {
+                    faktaPrivatBilDto(
+                        fergekostnadPerDag = BigDecimal("501"),
+                    ).mapTilFakta(reiseId = ReiseId.random(), adresse = "Tiltaksveien 1")
+                }
+
+            assertThat(
+                feil.message,
+            ).isEqualTo("Skal du innvilge med fergekostnader høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet")
+        }
+
+        private fun faktaPrivatBilDto(
+            bompengerPerDag: BigDecimal? = null,
+            fergekostnadPerDag: BigDecimal? = null,
+        ) = FaktaDagligReisePrivatBilDto(
+            reiseavstandEnVei = BigDecimal("10"),
+            faktaDelperioder =
+                listOf(
+                    FaktaDelperiodePrivatBilDto(
+                        fom = LocalDate.now(),
+                        tom = LocalDate.now().plusDays(10),
+                        reisedagerPerUke = 4,
+                        bompengerPerDag = bompengerPerDag,
+                        fergekostnadPerDag = fergekostnadPerDag,
+                    ),
+                ),
+            aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
+            adresse = "Tiltaksveien 1",
+            aktivitetType = "TILTAK",
+        )
     }
 }

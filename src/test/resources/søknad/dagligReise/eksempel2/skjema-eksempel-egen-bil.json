@@ -66,11 +66,15 @@
           "darligTransporttilbud": true,
           "leveringHentingIBarnehageEllerSkolefritidsordningSfoAks": false
         },
-        "container" : {
-          "gateadressenHvorDuHenterEllerLevererBarn" : "EksempelSvar",
-          "postnummerHvorDuHenterEllerLevererBarn" : "EksempelSvar"
+        "container": {
+          "gateadressenHvorDuHenterEllerLevererBarn": "EksempelSvar",
+          "postnummerHvorDuHenterEllerLevererBarn": "EksempelSvar"
         },
         "kanKjoreMedEgenBil": "ja",
+        "bilensDrivstofftype": {
+          "label": "Bensin",
+          "value": "bensin"
+        },
         "parkering": "ja",
         "bompenger": 43,
         "ferge": 0,

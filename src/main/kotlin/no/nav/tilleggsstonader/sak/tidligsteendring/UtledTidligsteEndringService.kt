@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeM
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.springframework.stereotype.Service
+import java.math.BigDecimal
 import java.time.LocalDate
 import kotlin.math.min
 
@@ -309,8 +310,8 @@ data class TidligsteEndringIBehandlingUtleder(
                 compareBy<FaktaDelperiodePrivatBil> { it.fom }
                     .thenBy { it.tom }
                     .thenBy { it.reisedagerPerUke }
-                    .thenBy { it.bompengerPerDag ?: -1 }
-                    .thenBy { it.fergekostnadPerDag ?: -1 },
+                    .thenBy { it.bompengerPerDag ?: BigDecimal(-1) }
+                    .thenBy { it.fergekostnadPerDag ?: BigDecimal(-1) },
             )
 
     private fun FaktaDelperiodePrivatBil.kuttTilPeriode(

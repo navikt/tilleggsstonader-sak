@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringSteg
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseBeregnSteg
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.KjørelisteSteg
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.RegistrerKjørelisteSteg
 import no.nav.tilleggsstonader.sak.vilkår.InngangsvilkårSteg
 import no.nav.tilleggsstonader.sak.vilkår.VilkårSteg
 import org.slf4j.LoggerFactory
@@ -84,6 +85,7 @@ class StegService(
         return when (steg) {
             StegType.INNGANGSVILKÅR -> håndterInngangsvilkår(behandlingId)
             StegType.VILKÅR -> håndterVilkår(behandlingId)
+            StegType.REGISTRER_KJØRELISTE -> håndterRegistrerKjøreliste(behandlingId)
             StegType.KJØRELISTE -> håndterKjøreliste(behandlingId)
             StegType.BEREGNING -> håndterBeregnForDagligReise(behandlingId)
             StegType.SIMULERING -> håndterSimulering(behandlingId)
@@ -101,6 +103,11 @@ class StegService(
     private fun håndterVilkår(behandlingId: BehandlingId): Behandling {
         val vilkårSteg: VilkårSteg = behandlingSteg.filterIsInstance<VilkårSteg>().single()
         return håndterSteg(behandlingId, vilkårSteg)
+    }
+
+    private fun håndterRegistrerKjøreliste(behandlingId: BehandlingId): Behandling {
+        val registrerKjørelisteSteg: RegistrerKjørelisteSteg = behandlingSteg.filterIsInstance<RegistrerKjørelisteSteg>().single()
+        return håndterSteg(behandlingId, registrerKjørelisteSteg)
     }
 
     private fun håndterKjøreliste(behandlingId: BehandlingId): Behandling {

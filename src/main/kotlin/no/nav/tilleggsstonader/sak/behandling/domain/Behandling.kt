@@ -54,6 +54,8 @@ data class Behandling(
 
     fun erOpphørt(): Boolean = resultat == BehandlingResultat.OPPHØRT
 
+    fun erKjørelisteBehandling(): Boolean = type == BehandlingType.KJØRELISTE
+
     val erSatsendring get() = årsak == BehandlingÅrsak.SATSENDRING
 
     init {
@@ -75,6 +77,7 @@ enum class BehandlingKategori {
  */
 enum class BehandlingÅrsak {
     KJØRELISTE,
+    REGISTRER_KJØRELISTE_FOR_BRUKER,
     KLAGE,
     NYE_OPPLYSNINGER,
     SØKNAD,

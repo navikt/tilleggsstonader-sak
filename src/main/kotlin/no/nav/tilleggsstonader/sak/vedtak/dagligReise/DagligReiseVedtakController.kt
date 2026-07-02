@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegFerdigstiltResponse
@@ -16,12 +17,14 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.AvslagDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningDagligReiseDto
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.HarRammevedtakDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsoRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsrRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.takeIfType
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
@@ -47,7 +50,29 @@ class DagligReiseVedtakController(
     private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
     private val beregningsplanUtleder: BeregningsplanUtleder,
     private val dagligReiseVilkårService: DagligReiseVilkårService,
+    private val dagligReiseVedtakService: DagligReiseVedtakService,
 ) {
+    @GetMapping("{behandlingId}/har-rammevedtak")
+    fun harRammevedtak(
+        @PathVariable behandlingId: BehandlingId,
+    ): HarRammevedtakDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
+
+        val saksbehandling = behandlingService.hentSaksbehandling(behandlingId)
+
+        if (!saksbehandling.stønadstype.gjelderDagligReise()) {
+            return HarRammevedtakDto(false)
+        }
+
+        val harRammevedtak =
+            dagligReiseVedtakService.forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(
+                forrigeIverksatteBehandlingId = saksbehandling.forrigeIverksatteBehandlingId,
+            )
+
+        return HarRammevedtakDto(harRammevedtak)
+    }
+
     @PostMapping("{behandlingId}/tso/innvilgelse")
     fun innvilge(
         @PathVariable behandlingId: BehandlingId,
@@ -108,11 +133,21 @@ class DagligReiseVedtakController(
     @GetMapping("{behandlingId}/privat-bil/oppsummer-beregning")
     fun hentOppsummertBeregning(
         @PathVariable behandlingId: BehandlingId,
-    ): PrivatBilOppsummertBeregningDto {
+    ): PrivatBilOppsummertBeregningDto? {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerLesetilgangTilBehandling(behandlingId)
 
-        val vedtaksdata = vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandlingId).data
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        if (!behandling.stønadstype.gjelderDagligReise()) {
+            return null
+        }
+
+        val vedtaksdata =
+            vedtakService
+                .hentVedtak(behandlingId)
+                ?.takeIfType<InnvilgelseEllerOpphørDagligReise>()
+                ?.data
+                ?: return null
 
         return PrivatBilOppsummertBeregningDto(
             reiser =
@@ -134,7 +169,6 @@ class DagligReiseVedtakController(
             beregningsplanUtleder.utledForInnvilgelse(
                 saksbehandling = behandling,
                 vedtaksperioder = vedtaksperioder,
-                stønadsspesifikkJusteringAvBeregnFra = DagligReiseBeregningService.justerBeregnFra(),
             )
         val beregningsresultat =
             beregningService.beregnOffentligTransportOgRammevedtak(

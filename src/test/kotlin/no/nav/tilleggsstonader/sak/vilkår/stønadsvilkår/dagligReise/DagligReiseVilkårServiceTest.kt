@@ -49,7 +49,11 @@ class DagligReiseVilkårServiceTest {
     val svarOffentligTransport =
         mapOf(
             RegelId.AVSTAND_OVER_SEKS_KM to SvarOgBegrunnelse(svar = SvarId.JA, begrunnelse = "begrunnelse"),
-            RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelse(svar = SvarId.JA, begrunnelse = "begrunnelse"),
+            RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to
+                SvarOgBegrunnelse(
+                    svar = SvarId.JA,
+                    begrunnelse = "begrunnelse",
+                ),
         )
 
     val nyttVilkår =
@@ -105,7 +109,8 @@ class DagligReiseVilkårServiceTest {
 
     @Test
     fun `skal validere aktivitet for offentlig transport ved opprettelse`() {
-        val behandling = saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSR))
+        val behandling =
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSR))
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
         every { unleashService.isEnabled(any()) } returns true
         every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }

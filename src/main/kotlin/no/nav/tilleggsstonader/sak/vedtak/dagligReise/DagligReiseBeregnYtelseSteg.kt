@@ -91,7 +91,6 @@ class DagligReiseBeregnYtelseSteg(
             beregningsplanUtleder.utledForInnvilgelse(
                 saksbehandling = saksbehandling,
                 vedtaksperioder = vedtaksperioder,
-                stønadsspesifikkJusteringAvBeregnFra = DagligReiseBeregningService.justerBeregnFra(),
             )
         val (beregningsresultat, rammevedtakPrivatBil) =
             beregningService.beregnOffentligTransportOgRammevedtak(
@@ -107,6 +106,11 @@ class DagligReiseBeregnYtelseSteg(
             vedtaksperioder = vedtaksperioder,
             begrunnelse = vedtak.begrunnelse,
             beregningsplan = plan,
+        )
+
+        avklartKjørelisteService.sletteMarkerUkerOgDagerUtenforAvkortetRammevedtak(
+            behandlingId = saksbehandling.id,
+            rammevedtak = rammevedtakPrivatBil,
         )
 
         opprettAndelerDagligReiseService.lagreAndelerForBehandling(saksbehandling)
@@ -138,7 +142,6 @@ class DagligReiseBeregnYtelseSteg(
         val beregningsplan =
             BeregningsplanUtleder.utledForOpphørEllerSatsjustering(
                 opphørsdato = opphørsdato,
-                stønadsspesifikkJusteringAvBeregnFra = DagligReiseBeregningService.justerBeregnFra(),
             )
 
         val (beregningsresultat, rammevedtakPrivatBil) =

@@ -44,6 +44,7 @@ internal class SimuleringServiceTest {
     private val tilgangService = mockk<TilgangService>()
     private val fagsakUtbetalingIdService = mockk<FagsakUtbetalingIdService>()
     private val fagsakUtbetalingsvalgService = mockk<FagsakUtbetalingsvalgService>()
+    private val varselVedMotregningISimuleringService = mockk<VarselVedMotregningISimuleringService>(relaxed = true)
 
     private val utbetalingV3Mapper = UtbetalingV3Mapper(fagsakUtbetalingIdService, fagsakUtbetalingsvalgService, tilkjentYtelseService)
 
@@ -54,6 +55,7 @@ internal class SimuleringServiceTest {
             tilkjentYtelseService = tilkjentYtelseService,
             tilgangService = tilgangService,
             utbetalingV3Mapper = utbetalingV3Mapper,
+            varselVedMotregningISimuleringService = varselVedMotregningISimuleringService,
         )
 
     private val personIdent = "12345678901"

@@ -4,9 +4,11 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetBarnetilsynFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetDagligReiseTsoFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetDagligReiseTsrFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetLæremidlerFaktaOgVurderingerDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
@@ -66,6 +68,13 @@ private fun FaktaOgVurderingerDto.tilFaktaOgSvarDto(): FaktaOgSvarDto =
             )
         }
 
+        is AktivitetBarnetilsynFaktaOgVurderingerDto -> {
+            FaktaOgSvarAktivitetBarnetilsynDto(
+                aktivitetsdager = this.aktivitetsdager,
+                svarLønnet = this.lønnet?.svar,
+            )
+        }
+
         is MålgruppeFaktaOgVurderingerDto -> {
             FaktaOgSvarMålgruppeDto(
                 svarMedlemskap = this.medlemskap?.svar,
@@ -80,5 +89,5 @@ private fun FaktaOgVurderingerDto.tilFaktaOgSvarDto(): FaktaOgSvarDto =
                 svarUtgifterDekketAvAnnetRegelverk = this.utgifterDekketAvAnnetRegelverk?.svar,
             )
 
-        else -> TODO()
+        else -> TODO("FaktaOgVurderingerDto.tilFaktaOgSvarDto() ikke implementert for ${this::class.simpleName}")
     }

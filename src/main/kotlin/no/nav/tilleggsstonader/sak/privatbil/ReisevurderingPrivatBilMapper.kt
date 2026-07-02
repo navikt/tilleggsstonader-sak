@@ -6,15 +6,15 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import java.time.LocalDate
 
 object ReisevurderingPrivatBilMapper {
     fun tilReisevurderingDto(
-        gjeldendeRammevedtakForReise: RammeForReiseMedPrivatBil?,
-        forrigeRammevedtakForReise: RammeForReiseMedPrivatBil?,
+        gjeldendeRammevedtakForReise: RammevedtakForReiseMedPrivatBil?,
+        forrigeRammevedtakForReise: RammevedtakForReiseMedPrivatBil?,
         avklarteUker: List<AvklartKjørtUke>,
         kjørelister: List<Kjøreliste>,
     ): ReisevurderingPrivatBilDto {
@@ -42,15 +42,15 @@ object ReisevurderingPrivatBilMapper {
      * Bruker gammelt rammevedtak for å finne ReiseId hvis hele reisen er slettet
      */
     private fun finnReiseId(
-        gjeldendeRammevedtakForReise: RammeForReiseMedPrivatBil?,
-        forrigeRammevedtakForReise: RammeForReiseMedPrivatBil?,
+        gjeldendeRammevedtakForReise: RammevedtakForReiseMedPrivatBil?,
+        forrigeRammevedtakForReise: RammevedtakForReiseMedPrivatBil?,
     ): ReiseId =
         gjeldendeRammevedtakForReise?.reiseId ?: forrigeRammevedtakForReise?.reiseId
             ?: feil("Kan ikke lage reisevudering. Mangler rammevedtak for reise")
 
     private fun lagUkeVurderingerDto(
-        gjeldendeRammevedtakForReise: RammeForReiseMedPrivatBil?,
-        forrigeRammevedtakForReise: RammeForReiseMedPrivatBil?,
+        gjeldendeRammevedtakForReise: RammevedtakForReiseMedPrivatBil?,
+        forrigeRammevedtakForReise: RammevedtakForReiseMedPrivatBil?,
         avklarteUker: List<AvklartKjørtUke>,
         kjørelister: List<Kjøreliste>,
     ): List<UkeVurderingDto> {

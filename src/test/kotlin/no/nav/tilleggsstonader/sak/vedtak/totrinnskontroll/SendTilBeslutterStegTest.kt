@@ -185,6 +185,35 @@ class SendTilBeslutterStegTest {
     }
 
     @Test
+    internal fun `skal hindre send til beslutter når det finnes åpen kjørelistebehandling`() {
+        every { behandlingService.harÅpenKjørelisteBehandling(any()) } returns true
+
+        val dagligReiseFagsak =
+            fagsak(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+                id = fagsak.id,
+                identer = fagsak.personIdenter,
+            )
+        val dagligReiseBehandling =
+            saksbehandling(
+                dagligReiseFagsak,
+                behandling(
+                    fagsak = dagligReiseFagsak,
+                    type = BehandlingType.REVURDERING,
+                    status = BehandlingStatus.UTREDES,
+                    steg = beslutteVedtakSteg.stegType(),
+                    resultat = BehandlingResultat.IKKE_SATT,
+                    årsak = BehandlingÅrsak.SØKNAD,
+                ),
+            )
+
+        val feil = catchThrowableOfType<ApiFeil> { beslutteVedtakSteg.validerSteg(dagligReiseBehandling) }
+
+        assertThat(feil.feil)
+            .contains("Det finnes en åpen kjørelistebehandling. Behandle denne før du sender til beslutter.")
+    }
+
+    @Test
     internal fun `Skal feile hvis saksbehandlersignatur i vedtaksbrev er ulik saksbehandleren som sendte til beslutter`() {
         every { vedtaksbrevRepository.findByIdOrThrow(any()) } returns vedtaksbrev.copy(saksbehandlersignatur = "Saksbehandler A")
         mockBrukerContext("Saksbehandler B")

@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.satser
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.RammeForReiseMedPrivatBilDelperiodeSatserDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
@@ -30,7 +30,7 @@ fun oppsummerBeregningPrivatBil(
             },
     )
 
-fun BeregningsresultatForReisePrivatBil.oppsummerReise(rammevedtakForReise: RammeForReiseMedPrivatBil) =
+fun BeregningsresultatForReisePrivatBil.oppsummerReise(rammevedtakForReise: RammevedtakForReiseMedPrivatBil) =
     OppsummertBeregningForReiseDto(
         reiseId = this.reiseId,
         reiseavstandEnVei = rammevedtakForReise.grunnlag.reiseavstandEnVei,
@@ -39,7 +39,7 @@ fun BeregningsresultatForReisePrivatBil.oppsummerReise(rammevedtakForReise: Ramm
     )
 
 private fun BeregningsresultatForReisePrivatBilPeriode.oppsummerPeriode(
-    rammevedtakForReise: RammeForReiseMedPrivatBil,
+    rammevedtakForReise: RammevedtakForReiseMedPrivatBil,
 ): OppsummertBeregningForPeriodeDto {
     val relevantDelperiode = rammevedtakForReise.finnDelperiodeForPeriode(this)
     val relevanteSatser =
@@ -53,8 +53,8 @@ private fun BeregningsresultatForReisePrivatBilPeriode.oppsummerPeriode(
         fom = this.fom,
         tom = this.tom,
         antallGodkjenteReisedager = antallGodkjenteReisedager,
-        bompengerTotalt = relevantDelperiode.ekstrakostnader.bompengerPerDag?.times(antallGodkjenteReisedager),
-        fergekostnadTotalt = relevantDelperiode.ekstrakostnader.fergekostnadPerDag?.times(antallGodkjenteReisedager),
+        bompengerTotalt = relevantDelperiode.ekstrakostnader.bompengerPerDag?.times(antallGodkjenteReisedager.toBigDecimal()),
+        fergekostnadTotalt = relevantDelperiode.ekstrakostnader.fergekostnadPerDag?.times(antallGodkjenteReisedager.toBigDecimal()),
         satser = relevanteSatser,
         parkeringskostnadTotalt = this.grunnlag.dager.sumOf { it.parkeringskostnad },
         stønadsbeløp = this.stønadsbeløp,
@@ -89,8 +89,8 @@ data class OppsummertBeregningForPeriodeDto(
     val fom: LocalDate,
     val tom: LocalDate,
     val antallGodkjenteReisedager: Int,
-    val bompengerTotalt: Int?,
-    val fergekostnadTotalt: Int?,
+    val bompengerTotalt: BigDecimal?,
+    val fergekostnadTotalt: BigDecimal?,
     val satser: List<RammeForReiseMedPrivatBilDelperiodeSatserDto>,
     val parkeringskostnadTotalt: Int,
     val stønadsbeløp: BigDecimal,

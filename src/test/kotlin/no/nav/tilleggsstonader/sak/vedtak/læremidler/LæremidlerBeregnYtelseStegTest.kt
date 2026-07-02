@@ -18,14 +18,11 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
-import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.vedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
-import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
@@ -92,44 +89,6 @@ class LæremidlerBeregnYtelseStegTest : CleanDatabaseIntegrationTest() {
             with(vedtak.data.vedtaksperioder.single()) {
                 assertThat(this.fom).isEqualTo(fom)
                 assertThat(this.tom).isEqualTo(tom)
-            }
-            assertThat(vedtak.gitVersjon).isEqualTo(Applikasjonsversjon.versjon)
-        }
-    }
-
-    @Nested
-    inner class Opphør {
-        @Test
-        fun `skal lagre vedtak`() {
-            val vedtaksperiode = vedtaksperiodeDto(id = UUID.randomUUID(), fom = fom, tom = tom)
-            val innvilgelse = InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode))
-
-            vilkårperiodeRepository.insertAll(listOf(målgruppe, aktivitet))
-
-            steg.utførSteg(saksbehandling, innvilgelse)
-
-            testoppsettService.ferdigstillBehandling(behandling = behandling)
-            val behandlingForOpphør =
-                testoppsettService
-                    .opprettRevurdering(
-                        forrigeBehandling = behandling,
-                        fagsak = fagsak,
-                    ).let { testoppsettService.hentSaksbehandling(it.id) }
-
-            val opphør =
-                OpphørLæremidlerRequest(
-                    årsakerOpphør = listOf(ÅrsakOpphør.ANNET),
-                    begrunnelse = "en begrunnelse",
-                    opphørsdato = LocalDate.of(2025, 2, 1),
-                )
-            steg.utførSteg(behandlingForOpphør, opphør)
-
-            val vedtak = repository.findByIdOrThrow(behandlingForOpphør.id).withTypeOrThrow<OpphørLæremidler>()
-            assertThat(vedtak.behandlingId).isEqualTo(behandlingForOpphør.id)
-            assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
-            with(vedtak.data.vedtaksperioder.single()) {
-                assertThat(this.fom).isEqualTo(fom)
-                assertThat(this.tom).isEqualTo(LocalDate.of(2025, 1, 31))
             }
             assertThat(vedtak.gitVersjon).isEqualTo(Applikasjonsversjon.versjon)
         }

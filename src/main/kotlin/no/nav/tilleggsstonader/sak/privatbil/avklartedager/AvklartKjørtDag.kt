@@ -43,6 +43,11 @@ fun Collection<AvklartKjørtDag>.markerSomSlettet(): Set<AvklartKjørtDag> = map
 fun Collection<AvklartKjørtDag>.markerSomSlettet(fraDato: LocalDate): Set<AvklartKjørtDag> =
     map { dag -> dag.markerSomSlettetHvisEtter(fraDato) }.toSet()
 
+fun Collection<AvklartKjørtDag>.markerSomSlettetUtenforPeriode(gyldigPeriode: Periode<LocalDate>): Set<AvklartKjørtDag> =
+    map { dag ->
+        if (!gyldigPeriode.inneholder(dag.dato)) dag.markerSomSlettet() else dag
+    }.toSet()
+
 enum class AvklartKjørtDagStatus {
     NY,
     ENDRET,

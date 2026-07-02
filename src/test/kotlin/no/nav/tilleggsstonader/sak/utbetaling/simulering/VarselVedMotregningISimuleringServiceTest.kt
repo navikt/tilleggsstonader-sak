@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.fagsakpersoner
 import no.nav.tilleggsstonader.sak.util.forrigeVirkedag
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatException
 import org.junit.jupiter.api.Test
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -33,7 +34,7 @@ internal class VarselVedMotregningISimuleringServiceTest {
     private val fagsak = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN).copy(utbetalPåNyttFagområde = true)
 
     @Test
-    fun `skal sende varsel for daglig reise når iverksetting er idag`() {
+    fun `true når annen iverksetting på samme fagområde er i dag`() {
         val behandlingId = behandling(fagsak).id
         val fagsakDagligReiseTso =
             fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.DAGLIG_REISE_TSO).copy(
@@ -43,7 +44,6 @@ internal class VarselVedMotregningISimuleringServiceTest {
             fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.DAGLIG_REISE_TSR).copy(
                 utbetalPåNyttFagområde = true,
             )
-        val varselTekst = "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
 
         val alleFagsaker =
             Fagsaker(listOf(fagsakDagligReiseTso, fagsakDagligReiseTsr).associateBy { it.stønadstype })
@@ -73,13 +73,13 @@ internal class VarselVedMotregningISimuleringServiceTest {
 
         every { tilkjentYtelseService.hentForBehandling(any()) } returns tilkjentYtelse
 
-        val resultat = varselVedMotregningISimuleringService.lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(behandlingId)
+        val resultat = varselVedMotregningISimuleringService.finnesUtbetalingerPåSammeFagområdeSomIkkeErRegistrertIUR(behandlingId)
 
-        assertThat(resultat).isEqualTo(varselTekst)
+        assertThat(resultat).isTrue
     }
 
     @Test
-    fun `skal sende varsel for daglig reise når iverksetting ikke er i dag`() {
+    fun `false når annen iverksetting på samme fagområde ikke er i dag`() {
         val behandlingId = behandling(fagsak).id
         val fagsakDagligReiseTso =
             fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.DAGLIG_REISE_TSO).copy(
@@ -117,13 +117,13 @@ internal class VarselVedMotregningISimuleringServiceTest {
 
         every { tilkjentYtelseService.hentForBehandling(any()) } returns tilkjentYtelse
 
-        val resultat = varselVedMotregningISimuleringService.lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(behandlingId)
+        val resultat = varselVedMotregningISimuleringService.finnesUtbetalingerPåSammeFagområdeSomIkkeErRegistrertIUR(behandlingId)
 
-        assertThat(resultat).isNull()
+        assertThat(resultat).isFalse()
     }
 
     @Test
-    fun `skal sende varsel for tilsynbarn når dato er innenfor periode og det utbetales på gammelt fagområde`() {
+    fun `true når det er iverksatt forrige virkedag på en annen fagsak på gammelt fagområde`() {
         val behandlingId = behandling(fagsak).id
 
         val fagsakTilsynbarn =
@@ -137,7 +137,6 @@ internal class VarselVedMotregningISimuleringServiceTest {
 
         val alleFagsaker =
             Fagsaker(listOf(fagsakTilsynbarn, fagsakLæremidler).associateBy { it.stønadstype })
-        val varselTekst = "Forrige vedtak har enda ikke blitt registrert i økonomisystemet. Simuleringen kan derfor være unøyaktig"
 
         every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakTilsynbarn
         every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns alleFagsaker
@@ -164,13 +163,13 @@ internal class VarselVedMotregningISimuleringServiceTest {
 
         every { tilkjentYtelseService.hentForBehandling(any()) } returns tilkjentYtelse
 
-        val resultat = varselVedMotregningISimuleringService.lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(behandlingId)
+        val resultat = varselVedMotregningISimuleringService.finnesUtbetalingerPåSammeFagområdeSomIkkeErRegistrertIUR(behandlingId)
 
-        assertThat(resultat).isEqualTo(varselTekst)
+        assertThat(resultat).isTrue
     }
 
     @Test
-    fun `skal ikke sende varsel for tilsynbarn når dato er utenfor periode og det utbetales på gammelt fagområde`() {
+    fun `false når det er iverksatt på en annen fagsak på gammel fagområde for 10 dager siden`() {
         val behandlingId = behandling(fagsak).id
 
         val fagsakTilsynbarn =
@@ -204,9 +203,9 @@ internal class VarselVedMotregningISimuleringServiceTest {
 
         every { tilkjentYtelseService.hentForBehandling(any()) } returns tilkjentYtelse
 
-        val resultat = varselVedMotregningISimuleringService.lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(behandlingId)
+        val resultat = varselVedMotregningISimuleringService.finnesUtbetalingerPåSammeFagområdeSomIkkeErRegistrertIUR(behandlingId)
 
-        assertThat(resultat).isNull()
+        assertThat(resultat).isFalse
     }
 
     @Test
@@ -222,9 +221,9 @@ internal class VarselVedMotregningISimuleringServiceTest {
         every { behandlingService.finnSisteIverksatteBehandling(fagsakTilsynbarn.id) } returns null
         every { behandlingService.finnSisteIverksatteBehandling(fagsakLæremidler.id) } returns behandling(fagsakLæremidler)
 
-        val resultat = varselVedMotregningISimuleringService.lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(behandlingId)
+        val resultat = varselVedMotregningISimuleringService.finnesUtbetalingerPåSammeFagområdeSomIkkeErRegistrertIUR(behandlingId)
 
-        assertThat(resultat).isNull()
+        assertThat(resultat).isFalse
     }
 
     @Test
@@ -272,9 +271,9 @@ internal class VarselVedMotregningISimuleringServiceTest {
                     ).toTypedArray(),
             )
 
-        val resultat = varselVedMotregningISimuleringService.lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(behandlingId)
+        val resultat = varselVedMotregningISimuleringService.finnesUtbetalingerPåSammeFagområdeSomIkkeErRegistrertIUR(behandlingId)
 
-        assertThat(resultat).isEqualTo(varselTekst)
+        assertThat(resultat).isTrue
     }
 
     @Test
@@ -286,7 +285,10 @@ internal class VarselVedMotregningISimuleringServiceTest {
         every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns
             Fagsaker(mapOf(fagsakTilsynbarn.stønadstype to fagsakTilsynbarn))
 
-        assertThat(varselVedMotregningISimuleringService.lagEvtVarselForUtbetalingerPåFagsakerISammeFagområde(behandlingId)).isNull()
+        assertThatException()
+            .isThrownBy {
+                varselVedMotregningISimuleringService.finnesUtbetalingerPåSammeFagområdeSomIkkeErRegistrertIUR(behandlingId)
+            }.withMessage("Forventer at utbetalPåNyttFagområde skal være satt på fagsaken")
     }
 
     @Test

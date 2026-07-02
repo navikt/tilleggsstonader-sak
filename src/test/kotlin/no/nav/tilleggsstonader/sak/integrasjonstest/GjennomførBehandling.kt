@@ -155,6 +155,7 @@ fun IntegrationTest.utførStegOgReturnerNesteSteg(
         StegType.INNGANGSVILKÅR -> gjennomførInngangsvilkårSteg(testdata, behandling.id)
         StegType.VILKÅR -> gjennomførVilkårSteg(testdata, behandling.id, behandling.stønadstype)
         StegType.BEREGNE_YTELSE -> gjennomførBeregningSteg(behandling.id, behandling.stønadstype, testdata.vedtak.vedtak)
+        StegType.REGISTRER_KJØRELISTE -> gjennomførRegistrerKjørelisteSteg(behandling.id)
         StegType.KJØRELISTE -> gjennomførKjørelisteSteg(behandling.id)
         StegType.BEREGNING -> gjennomførBeregningStegDagligReise(behandling.id)
         StegType.SIMULERING -> gjennomførSimuleringSteg(behandling.id)
