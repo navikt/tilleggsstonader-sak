@@ -102,10 +102,11 @@ class PrivatBilBeregningService(
         }
 
         // Sjekk om reisen kan gjenbrukes helt fra forrige vedtak
+        val sisteTomForrigeVedtak = forrigeReise.perioder.maxOfOrNull { it.tom } ?: LocalDate.MIN
         if (beregnFra != null &&
             avklarteUkerForReise.alleErUendret() &&
             rammeForReise.grunnlag.tom < beregnFra &&
-            forrigeReise.perioder.maxOf { it.tom } < beregnFra
+            sisteTomForrigeVedtak < beregnFra
         ) {
             return forrigeReise.markerAllePerioderSomFraTidligereVedtak()
         }
