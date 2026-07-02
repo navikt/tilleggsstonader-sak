@@ -93,7 +93,7 @@ class PrivatBilBeregningService(
     ): BeregningsresultatForReisePrivatBil {
         // Hvis rammevedtaket er endret (beregnFra != null) og reisen overlapper med endringsdatoen,
         // skal hele reisen reberegnes for å sikre at f.eks. bompenger eller ferge blir tatt inn
-        if (beregnFra != null && rammeForReise.grunnlag.inneholder(beregnFra)) {
+        if (beregnFra != null && rammeForReise.grunnlag.tom >= beregnFra) {
             return lagBeregningsresultatForReise(
                 rammeForReise = rammeForReise,
                 avklarteUkerForReise = avklarteUkerForReise,
