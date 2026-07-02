@@ -312,6 +312,30 @@ class RevurderingPrivatBilIntegrationTest(
                     "Det er ikke støttet å redusere antall reisedager per uke i en revurdering",
                 )
         }
+
+        @Test
+        fun `kan redusere reisedager når feature-toggle er på`() {
+            every { unleashService.isEnabled(Toggle.KAN_REDUSERE_REISEDAGER_REVURDERING) } returns true
+            val fomReise1 = 5 januar 2026
+            val tomReise1 = 11 januar 2026
+
+            val førstegangsbehandlingContext =
+                innvilgetPrivatBilBehandlingMedKjøreliste(fomReise1, tomReise1, reisedagerPerUke = 5)
+
+            val revurderingId =
+                opprettRevurderingOgGjennomførBehandlingsløp(
+                    fraBehandlingId = førstegangsbehandlingContext.behandlingId,
+                    tilSteg = StegType.BEREGNE_YTELSE,
+                ) {
+                    vilkår {
+                        endrePrivatBilFaktaDelperioder { it.copy(reisedagerPerUke = 2) }
+                    }
+                }
+
+            gjennomførBeregningStegKall(revurderingId, Stønadstype.DAGLIG_REISE_TSO)
+                .expectStatus()
+                .isOk
+        }
     }
 
     @Nested
