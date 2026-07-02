@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDagStatu
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.alleErUendret
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.finnDagerInnenforPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.avrundetStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBil
@@ -69,20 +70,13 @@ class PrivatBilBeregningService(
                             avklarteUkerForReise = avklarteUkerForReise,
                             brukersNavKontor = brukersNavKontor,
                         )
-                    } else if (behandlingType == BehandlingType.REVURDERING) {
-                        lagBeregningsresultatForReiseVedRevurderingAvRammevedtak(
+                    } else if (behandlingType == BehandlingType.REVURDERING || behandlingType == BehandlingType.KJØRELISTE) {
+                        lagBeregningsresultatForReiseVedEndring(
                             rammeForReise = reise,
                             avklarteUkerForReise = avklarteUkerForReise,
                             brukersNavKontor = brukersNavKontor,
+                            forrigeReise = forrigeReise,
                             beregnFra = beregnFra,
-                            forrigeReise = forrigeReise,
-                        )
-                    } else if (behandlingType == BehandlingType.KJØRELISTE) {
-                        lagBeregningsresultatForReiseVedRevurderingAvKjøreliste(
-                            rammeForReise = reise,
-                            avklarteUkerForReise = avklarteUkerForReise,
-                            brukersNavKontor = brukersNavKontor,
-                            forrigeReise = forrigeReise,
                         )
                     } else {
                         feil("Burde ikke være mulig å havne her.")
@@ -90,18 +84,37 @@ class PrivatBilBeregningService(
                 },
         )
 
-    private fun lagBeregningsresultatForReiseVedRevurderingAvKjøreliste(
+    private fun lagBeregningsresultatForReiseVedEndring(
         rammeForReise: RammevedtakForReiseMedPrivatBil,
         avklarteUkerForReise: List<AvklartKjørtUke>,
         brukersNavKontor: String?,
         forrigeReise: BeregningsresultatForReisePrivatBil,
+        beregnFra: LocalDate?,
     ): BeregningsresultatForReisePrivatBil {
+        // Hvis rammevedtaket er endret (beregnFra != null) og reisen overlapper med endringsdatoen,
+        // skal hele reisen reberegnes for å sikre at f.eks. bompenger eller ferge blir tatt inn
+        if (beregnFra != null && rammeForReise.grunnlag.inneholder(beregnFra)) {
+            return lagBeregningsresultatForReise(
+                rammeForReise = rammeForReise,
+                avklarteUkerForReise = avklarteUkerForReise,
+                brukersNavKontor = brukersNavKontor,
+            )
+        }
+
+        // Sjekk om reisen kan gjenbrukes helt fra forrige vedtak
+        if (beregnFra != null &&
+            avklarteUkerForReise.alleErUendret() &&
+            rammeForReise.grunnlag.tom < beregnFra &&
+            forrigeReise.perioder.maxOf { it.tom } < beregnFra
+        ) {
+            return forrigeReise.markerAllePerioderSomFraTidligereVedtak()
+        }
+
+        // Del opp i endrede og uendrede uker (når kun kjøreliste er endret eller ved KJØRELISTE behandlingstype)
         val ukerSomSkalBeregnes =
             avklarteUkerForReise.filter { it.avklartKjørtUkeStatus != AvklartKjørtUkeStatus.UENDRET }
         val ukerSomSkalGjenbrukes =
-            avklarteUkerForReise.filter {
-                it.avklartKjørtUkeStatus == AvklartKjørtUkeStatus.UENDRET
-            }
+            avklarteUkerForReise.filter { it.avklartKjørtUkeStatus == AvklartKjørtUkeStatus.UENDRET }
 
         val nyBeregnedePerioder =
             lagBeregningsresultatForReise(
@@ -150,33 +163,6 @@ class PrivatBilBeregningService(
                         brukersNavKontor = brukersNavKontor,
                     )
                 },
-        )
-    }
-
-    /**
-     * Dersom rammevedtaket er endret og en reise treffer eller er etter tidligsteEndring reberegnes hele reisen,
-     * uavhengig av status på ukene.
-     * Dette sikrer at endring i f.eks. bompenger eller ferge plukkes opp.
-     */
-    private fun lagBeregningsresultatForReiseVedRevurderingAvRammevedtak(
-        rammeForReise: RammevedtakForReiseMedPrivatBil,
-        avklarteUkerForReise: List<AvklartKjørtUke>,
-        brukersNavKontor: String?,
-        forrigeReise: BeregningsresultatForReisePrivatBil,
-        beregnFra: LocalDate?,
-    ): BeregningsresultatForReisePrivatBil {
-        feilHvis(beregnFra == null) {
-            "Forventer at beregnFra er satt i en revurdering"
-        }
-
-        if (rammeForReise.grunnlag.tom < beregnFra && forrigeReise.perioder.maxOf { it.tom } < beregnFra) {
-            return forrigeReise.markerAllePerioderSomFraTidligereVedtak()
-        }
-
-        return lagBeregningsresultatForReise(
-            rammeForReise = rammeForReise,
-            avklarteUkerForReise = avklarteUkerForReise,
-            brukersNavKontor = brukersNavKontor,
         )
     }
 
