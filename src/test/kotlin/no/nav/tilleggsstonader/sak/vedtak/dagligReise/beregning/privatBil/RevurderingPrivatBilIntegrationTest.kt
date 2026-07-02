@@ -364,7 +364,7 @@ class RevurderingPrivatBilIntegrationTest(
         }
 
         @Test
-        fun `skal reberegne endret tidligere kjørelisteuke når revurdering legger til ny reise etter eksisterende reise`() {
+        fun `skal reberegne uke når revurdering legger til ny reise etter eksisterende reise og oppdaterer uke på gammel reise`() {
             val fomReise = 5 januar 2026
             val tomReise = 11 januar 2026
             val fomNyReise = 19 januar 2026
