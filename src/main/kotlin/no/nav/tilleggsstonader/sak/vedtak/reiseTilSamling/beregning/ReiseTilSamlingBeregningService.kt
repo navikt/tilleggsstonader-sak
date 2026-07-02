@@ -1,12 +1,21 @@
 package no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning
 
+import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.splitFra
+import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingBeregnUtil.filtrerBortUtgifterSomIkkeOverlapperVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingBeregnUtil.validerUtgiftHeleVedtaksperioden
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingBeregnUtil.validerUtgifterStrekkerSegUtenforVedtaksperiodene
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatForSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
+import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.VilkårReiseTilSamlingMapper.mapTilVilkårReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport
@@ -17,21 +26,48 @@ import org.springframework.stereotype.Service
 class ReiseTilSamlingBeregningService(
     private val vilkårService: VilkårService,
     private val vedtakService: VedtakService,
+    private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
 ) {
     fun beregn(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
+        beregningsplan: Beregningsplan,
         typeVedtak: TypeVedtak,
     ): BeregningReiseTilSamling {
+        vedtaksperiodeValideringService.validerVedtaksperioder(
+            vedtaksperioder = vedtaksperioder,
+            behandling = behandling,
+            typeVedtak = typeVedtak,
+        )
+        val vedtaksperioderBeregning =
+            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFra(beregningsplan.beregnFra())
+
         val oppfylteVilkårReiseTilSamling =
             vilkårService
                 .hentOppfylteReiseTilSamlingVilkår(
                     behandling.id,
                 ).map { it.mapTilVilkårReiseTilSamling() }
+                .sortedBy { it.fom }
 
-        validerFinnesSamling(oppfylteVilkårReiseTilSamling)
+        val utgifterTilBeregning =
+            oppfylteVilkårReiseTilSamling.filtrerBortUtgifterSomIkkeOverlapperVedtaksperioder(
+                vedtaksperioderBeregning,
+            )
 
-        val oppfylteOffentligTransport = oppfylteVilkårReiseTilSamling.filter { it.fakta is FaktaOffentligTransport }
+        validerUtgifter(
+            utgifter = utgifterTilBeregning,
+            vedtakstype = typeVedtak,
+            vedtaksperioder = vedtaksperioder,
+        )
+        validerUtgiftHeleVedtaksperioden(vedtaksperioder, utgifterTilBeregning)
+
+        validerUtgifterStrekkerSegUtenforVedtaksperiodene(
+            utgifterTilBeregning,
+            vedtaksperioderBeregning,
+        )
+        validerFinnesSamling(utgifterTilBeregning)
+
+        val oppfylteOffentligTransport = utgifterTilBeregning.filter { it.fakta is FaktaOffentligTransport }
         val offentligTransport =
             BeregningsresultatOffentligTransport(
                 samling =
@@ -63,3 +99,31 @@ private fun validerFinnesSamling(vilkår: List<VilkårReiseTilSamling>) {
 data class BeregningReiseTilSamling(
     val beregningsresultatOffentligTransport: BeregningsresultatOffentligTransport,
 )
+
+fun validerUtgifter(
+    utgifter: List<VilkårReiseTilSamling>,
+    vedtakstype: TypeVedtak,
+    vedtaksperioder: List<Vedtaksperiode>,
+) {
+    // Tillat opphør av hele saken
+    if (vedtakstype == TypeVedtak.OPPHØR && utgifter.isEmpty() && vedtaksperioder.isEmpty()) return
+
+    brukerfeilHvis(utgifter.isEmpty()) {
+        "Det er ikke lagt inn noen oppfylte utgiftsperioder"
+    }
+
+    feilHvis(utgifter.overlapper()) {
+        "Utgiftsperioder overlapper"
+    }
+
+    val ikkePositivUtgift =
+        utgifter
+            .mapNotNull {
+                (it.fakta as? FaktaOffentligTransport)
+                    ?.utgifterOffentligTransport
+            }.firstOrNull { it < 0 }
+
+    feilHvis(ikkePositivUtgift != null) {
+        "Utgiftsperioder inneholder ugyldig utgift: $ikkePositivUtgift"
+    }
+}

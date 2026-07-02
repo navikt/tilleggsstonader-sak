@@ -4,9 +4,11 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingBeregningService
@@ -31,6 +33,7 @@ class ReiseTilSamlingVedtakController(
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val beregningService: ReiseTilSamlingBeregningService,
     private val reiseTilSamlingVilkårService: ReiseTilSamlingVilkårService,
+    private val beregningsplanUtleder: BeregningsplanUtleder,
 ) {
     @GetMapping("{behandlingId}")
     fun hentVedtak(
@@ -54,12 +57,21 @@ class ReiseTilSamlingVedtakController(
         vedtaksperioder: List<Vedtaksperiode>,
     ): BeregningsresultatReiseTilSamlingDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        val plan =
+            beregningsplanUtleder.utledForInnvilgelse(
+                saksbehandling = behandling,
+                vedtaksperioder = vedtaksperioder,
+                stønadsspesifikkJusteringAvBeregnFra = DagligReiseBeregningService.justerBeregnFra(),
+            )
+
         val beregningsresultat =
             beregningService.beregn(
                 behandling = behandling,
                 vedtaksperioder = vedtaksperioder,
                 typeVedtak = TypeVedtak.INNVILGELSE,
+                beregningsplan = plan,
             )
+
         val vilkår = reiseTilSamlingVilkårService.hentVilkårForBehandling(behandlingId)
 
         return beregningsresultat.tilDto(vilkår)
