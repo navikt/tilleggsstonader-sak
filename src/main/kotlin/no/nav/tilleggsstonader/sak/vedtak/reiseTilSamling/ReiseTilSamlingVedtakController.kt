@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.DagligReiseBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingBeregningService
@@ -57,19 +56,12 @@ class ReiseTilSamlingVedtakController(
         vedtaksperioder: List<Vedtaksperiode>,
     ): BeregningsresultatReiseTilSamlingDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        val plan =
-            beregningsplanUtleder.utledForInnvilgelse(
-                saksbehandling = behandling,
-                vedtaksperioder = vedtaksperioder,
-                stønadsspesifikkJusteringAvBeregnFra = DagligReiseBeregningService.justerBeregnFra(),
-            )
 
         val beregningsresultat =
             beregningService.beregn(
                 behandling = behandling,
                 vedtaksperioder = vedtaksperioder,
                 typeVedtak = TypeVedtak.INNVILGELSE,
-                beregningsplan = plan,
             )
 
         val vilkår = reiseTilSamlingVilkårService.hentVilkårForBehandling(behandlingId)

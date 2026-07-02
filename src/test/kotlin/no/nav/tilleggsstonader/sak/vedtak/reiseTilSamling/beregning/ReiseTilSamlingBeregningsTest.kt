@@ -11,8 +11,6 @@ import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
@@ -75,7 +73,6 @@ class ReiseTilSamlingBeregningsTest {
             beregningService.beregn(
                 behandling,
                 vedtaksperioder,
-                Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                 TypeVedtak.INNVILGELSE,
             )
 
@@ -121,7 +118,6 @@ class ReiseTilSamlingBeregningsTest {
             beregningService.beregn(
                 behandling,
                 vedtaksperioder,
-                Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                 TypeVedtak.INNVILGELSE,
             )
 
@@ -138,7 +134,6 @@ class ReiseTilSamlingBeregningsTest {
                 beregningService.beregn(
                     behandling,
                     vedtaksperioder,
-                    Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                     TypeVedtak.INNVILGELSE,
                 )
             }

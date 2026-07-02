@@ -4,11 +4,9 @@ import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningUtil.splitFra
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingBeregnUtil.filtrerBortUtgifterSomIkkeOverlapperVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingBeregnUtil.validerUtgiftHeleVedtaksperioden
@@ -31,7 +29,6 @@ class ReiseTilSamlingBeregningService(
     fun beregn(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
-        beregningsplan: Beregningsplan,
         typeVedtak: TypeVedtak,
     ): BeregningReiseTilSamling {
         vedtaksperiodeValideringService.validerVedtaksperioder(
@@ -40,7 +37,7 @@ class ReiseTilSamlingBeregningService(
             typeVedtak = typeVedtak,
         )
         val vedtaksperioderBeregning =
-            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFra(beregningsplan.beregnFra())
+            vedtaksperioder.tilVedtaksperiodeBeregning().sorted()
 
         val oppfylteVilkårReiseTilSamling =
             vilkårService
