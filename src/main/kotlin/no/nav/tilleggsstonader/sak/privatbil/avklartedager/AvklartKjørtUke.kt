@@ -76,3 +76,5 @@ enum class AvklartKjørtUkeStatus {
 }
 
 fun Collection<AvklartKjørtUke>.finnesUkerMedAvvik() = this.any { uke -> uke.status == UkeStatus.AVVIK }
+
+fun Collection<AvklartKjørtUke>.alleErUendret() = this.all { it.avklartKjørtUkeStatus == AvklartKjørtUkeStatus.UENDRET }

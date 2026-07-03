@@ -22,8 +22,11 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehand
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreDagligReiseDto
+import no.nav.tilleggsstonader.sak.integrasjonstest.utførStegOgReturnerNesteSteg
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagRequest
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.IverksettingDto
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
@@ -390,6 +393,124 @@ class RevurderingPrivatBilIntegrationTest(
 
             // Utvidelse av rammevedtaket skal ikke endre utbetalinger
             assertThat(utbetalingKjørelistebehandling.utbetalinger).isEqualTo(utbetalingRevurdering.utbetalinger)
+        }
+
+        @Test
+        fun `skal reberegne uke når revurdering legger til ny reise etter eksisterende reise og oppdaterer uke på gammel reise`() {
+            val fomReise = 5 januar 2026
+            val tomReise = 11 januar 2026
+            val fomNyReise = 19 januar 2026
+            val tomNyReise = 25 januar 2026
+            val datoSomEndres = 5 januar 2026
+            val datoSomSkalBeholdes = 6 januar 2026
+
+            val førstegangsbehandlingContext =
+                innvilgetPrivatBilBehandlingMedKjøreliste(
+                    fomReise = fomReise,
+                    tomReise = tomReise,
+                    dagerKjørt = listOf(datoSomEndres, datoSomSkalBeholdes),
+                )
+
+            val revurderingId =
+                opprettRevurderingOgGjennomførBehandlingsløp(
+                    fraBehandlingId = førstegangsbehandlingContext.behandlingId,
+                    tilSteg = StegType.KJØRELISTE,
+                ) {
+                    vilkår {
+                        opprett {
+                            privatBil(fomNyReise, tomNyReise)
+                        }
+                    }
+                }
+
+            val reisevurderinger = kall.privatBil.hentReisevurderingForBehandling(revurderingId)
+            assertThat(reisevurderinger).hasSize(2)
+
+            val eksisterendeReise =
+                reisevurderinger.single { it.rammevedtak?.fom == fomReise }
+            val ukeSomSkalOppdateres =
+                eksisterendeReise
+                    .uker
+                    .single { it.fraDato == fomReise }
+
+            kall.privatBil.oppdaterUke(
+                behandlingId = revurderingId,
+                avklartUkeId = checkNotNull(ukeSomSkalOppdateres.avklartUkeId),
+                avklarteDager =
+                    ukeSomSkalOppdateres.dager.map { dag ->
+                        val opprinneligAvklartDag = checkNotNull(dag.avklartDag)
+                        val godkjentGjennomførtKjøring =
+                            if (dag.dato == datoSomEndres) {
+                                GodkjentGjennomførtKjøring.NEI
+                            } else {
+                                opprinneligAvklartDag.godkjentGjennomførtKjøring
+                            }
+
+                        EndreAvklartDagRequest(
+                            dato = dag.dato,
+                            godkjentGjennomførtKjøring = godkjentGjennomførtKjøring,
+                            parkeringsutgift =
+                                if (godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.JA) {
+                                    dag.kjørelisteDag?.parkeringsutgift
+                                } else {
+                                    null
+                                },
+                            begrunnelse =
+                                if (dag.dato == datoSomEndres) {
+                                    "Kjøring er ikke godkjent i revurderingen"
+                                } else {
+                                    opprinneligAvklartDag.begrunnelse
+                                },
+                        )
+                    },
+            )
+
+            val revurdering = kall.behandling.hent(revurderingId)
+            var nesteSteg = StegType.KJØRELISTE
+            while (nesteSteg != StegType.BEHANDLING_FERDIGSTILT) {
+                nesteSteg = utførStegOgReturnerNesteSteg(nesteSteg, revurdering)
+            }
+
+            val kjørelistebehandlingId = kjørelisteBehandling(førstegangsbehandlingContext.fagsakId).id
+            val vedtakEtterKjørelistebehandling = hentInnvilgelse(kjørelistebehandlingId)
+            val vedtakEtterRevurdering = hentInnvilgelse(revurderingId)
+
+            val reiseIdEksisterendeEtterRevurdering =
+                vedtakEtterRevurdering.rammevedtakPrivatBil!!
+                    .reiser
+                    .single { it.grunnlag.fom == fomReise }
+                    .reiseId
+
+            val perioderEksisterendeReiseEtterKjørelistebehandling =
+                vedtakEtterKjørelistebehandling
+                    .beregningsresultat
+                    .privatBil!!
+                    .reiser
+                    .single { it.reiseId == reiseIdEksisterendeEtterRevurdering }
+                    .perioder
+            val perioderEksisterendeReiseEtterRevurdering =
+                vedtakEtterRevurdering
+                    .beregningsresultat
+                    .privatBil!!
+                    .reiser
+                    .single { it.reiseId == reiseIdEksisterendeEtterRevurdering }
+                    .perioder
+
+            val ukeperiodeEtterKjørelistebehandling =
+                perioderEksisterendeReiseEtterKjørelistebehandling.single { periode ->
+                    periode.inneholder(datoSomEndres)
+                }
+            val ukeperiodeEtterRevurdering =
+                perioderEksisterendeReiseEtterRevurdering.single { periode ->
+                    periode.inneholder(datoSomEndres)
+                }
+
+            assertThat(ukeperiodeEtterKjørelistebehandling.grunnlag.dager.map { it.dato }).contains(datoSomEndres, datoSomSkalBeholdes)
+            assertThat(
+                ukeperiodeEtterRevurdering.grunnlag.dager.map { it.dato },
+            ).contains(datoSomSkalBeholdes).doesNotContain(datoSomEndres)
+            assertThat(ukeperiodeEtterRevurdering.stønadsbeløp).isLessThan(ukeperiodeEtterKjørelistebehandling.stønadsbeløp)
+            assertThat(ukeperiodeEtterRevurdering.fraTidligereVedtak).isFalse()
         }
 
         @Test
