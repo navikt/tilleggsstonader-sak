@@ -4,7 +4,6 @@ import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
-import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -14,7 +13,6 @@ import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSaml
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.BeregningsresultatReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingTsoRequest
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.tilDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.ReiseTilSamlingVilkårService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -31,8 +29,6 @@ class ReiseTilSamlingVedtakController(
     private val vedtakService: VedtakService,
     private val vedtakDtoMapper: VedtakDtoMapper,
     private val beregningService: ReiseTilSamlingBeregningService,
-    private val reiseTilSamlingVilkårService: ReiseTilSamlingVilkårService,
-    private val beregningsplanUtleder: BeregningsplanUtleder,
 ) {
     @GetMapping("{behandlingId}")
     fun hentVedtak(
@@ -55,6 +51,7 @@ class ReiseTilSamlingVedtakController(
         behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
     ): BeregningsresultatReiseTilSamlingDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
 
         val beregningsresultat =
@@ -63,9 +60,6 @@ class ReiseTilSamlingVedtakController(
                 vedtaksperioder = vedtaksperioder,
                 typeVedtak = TypeVedtak.INNVILGELSE,
             )
-
-        val vilkår = reiseTilSamlingVilkårService.hentVilkårForBehandling(behandlingId)
-
-        return beregningsresultat.tilDto(vilkår)
+        return beregningsresultat.tilDto()
     }
 }

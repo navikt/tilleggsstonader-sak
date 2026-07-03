@@ -12,7 +12,6 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
@@ -25,13 +24,11 @@ import org.junit.jupiter.api.Test
 
 class ReiseTilSamlingBeregningsTest {
     private val vilkårService = mockk<VilkårService>()
-    private val vedtakService = mockk<VedtakService>()
     private val vedtaksperiodeValideringService = mockk<VedtaksperiodeValideringService>()
 
     private val beregningService =
         ReiseTilSamlingBeregningService(
             vilkårService,
-            vedtakService,
             vedtaksperiodeValideringService,
         )
 
@@ -81,7 +78,7 @@ class ReiseTilSamlingBeregningsTest {
     }
 
     @Test
-    fun `summerer utgifter fra flere oppfylte vilkår`() {
+    fun `filtrerer bort vilkår som ikke overlapper vedtaksperiodene`() {
         every { vilkårService.hentOppfylteReiseTilSamlingVilkår(behandling.id) } returns
             listOf(
                 vilkår(

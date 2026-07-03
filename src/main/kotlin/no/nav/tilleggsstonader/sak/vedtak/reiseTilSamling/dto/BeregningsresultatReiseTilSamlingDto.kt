@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.BeregningRei
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatForSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.VilkårReiseTilSamling
 import java.time.LocalDate
 
 data class BeregningsresultatReiseTilSamlingDto(
@@ -24,7 +23,7 @@ data class BeregningsresultatForSamlingDto(
     val utgifterOffentligTransport: Int?,
 )
 
-fun BeregningReiseTilSamling.tilDto(vilkår: List<VilkårReiseTilSamling>): BeregningsresultatReiseTilSamlingDto =
+fun BeregningReiseTilSamling.tilDto(): BeregningsresultatReiseTilSamlingDto =
     BeregningsresultatReiseTilSamlingDto(
         offentligTransport = beregningsresultatOffentligTransport.tilDto(),
     )
