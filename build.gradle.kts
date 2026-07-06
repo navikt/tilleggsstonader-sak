@@ -3,13 +3,13 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 val javaVersion = JavaLanguageVersion.of(21)
 val tomcatVersion = "11.0.22"
-val familieProsesseringVersion = "2.20260526102747_ed05f71"
+val familieProsesseringVersion = "2.20260622101837_623782e"
 val tilleggsstønaderLibsVersion = "2026.05.14-21.16.acdbe034efef"
 val tilleggsstønaderKontrakterVersion = "2026.06.25-09.50.a69fb39b726d"
 val avroVersion = "1.12.1"
 val confluentVersion = "8.0.1"
 val joarkHendelseVersion = "1.1.11"
-val tokenSupportVersion = "6.0.10"
+val tokenSupportVersion = "6.0.11"
 val wiremockVersion = "3.13.2"
 val mockkVersion = "1.14.11"
 val testcontainerVersion = "1.21.4"
@@ -122,7 +122,7 @@ dependencies {
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("no.nav.tilleggsstonader-libs:test-util:$tilleggsstønaderLibsVersion")
 
-    testImplementation(platform("io.cucumber:cucumber-bom:7.34.3"))
+    testImplementation(platform("io.cucumber:cucumber-bom:7.34.4"))
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
 
