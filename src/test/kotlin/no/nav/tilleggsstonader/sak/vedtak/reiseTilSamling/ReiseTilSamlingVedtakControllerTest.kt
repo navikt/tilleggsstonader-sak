@@ -110,7 +110,7 @@ class ReiseTilSamlingVedtakControllerTest : CleanDatabaseIntegrationTest() {
             assertThat(reise.adresse).isEqualTo("Samlingsgata 1")
             assertThat(reise.fom).isEqualTo(fom)
             assertThat(reise.tom).isEqualTo(tom)
-            assertThat(reise.utgifterOffentligTransport).isEqualTo(utgifter)
+            assertThat(reise.beløp).isEqualTo(utgifter)
         }
     }
 }

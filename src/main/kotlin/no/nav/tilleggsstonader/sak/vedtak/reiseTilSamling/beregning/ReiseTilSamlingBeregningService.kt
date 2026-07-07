@@ -10,8 +10,10 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingBeregnUtil.filtrerBortUtgifterSomIkkeOverlapperVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingBeregnUtil.validerUtgiftHeleVedtaksperioden
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingBeregnUtil.validerUtgifterStrekkerSegUtenforVedtaksperiodene
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsgrunnlagOffentligTransportForSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransportForSamling
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.VilkårReiseTilSamlingMapper.mapTilVilkårReiseTilSamling
@@ -70,10 +72,15 @@ class ReiseTilSamlingBeregningService(
                         samling.fakta as FaktaOffentligTransport
                         BeregningsresultatOffentligTransportForSamling(
                             reiseId = samling.fakta.reiseId,
-                            adresse = samling.fakta.adresse,
-                            fom = samling.fom,
-                            tom = samling.tom,
-                            utgifterOffentligTransport = samling.fakta.utgifterOffentligTransport,
+                            grunnlag =
+                                BeregningsgrunnlagOffentligTransportForSamling(
+                                    adresse = samling.fakta.adresse,
+                                    fom = samling.fom,
+                                    tom = samling.tom,
+                                    vedtaksperioder =
+                                        vedtaksperioder.map { VedtaksperiodeGrunnlag(it) },
+                                ),
+                            beløp = samling.fakta.utgifterOffentligTransport,
                         )
                     },
             )

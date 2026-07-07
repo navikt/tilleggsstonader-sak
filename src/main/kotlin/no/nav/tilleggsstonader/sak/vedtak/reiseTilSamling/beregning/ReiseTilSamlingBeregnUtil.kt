@@ -25,7 +25,7 @@ object ReiseTilSamlingBeregnUtil {
     ) {
         val vedtaksperioderUtenOppfylteUtgifter =
             vedtaksperioder.filter { vedtaksperiode ->
-                utgifter.none { it.inneholder(vedtaksperiode) }
+                utgifter.slåSammenPåfølgende().none { it.inneholder(vedtaksperiode) }
             }
 
         brukerfeilHvisIkke(vedtaksperioderUtenOppfylteUtgifter.isEmpty()) {
