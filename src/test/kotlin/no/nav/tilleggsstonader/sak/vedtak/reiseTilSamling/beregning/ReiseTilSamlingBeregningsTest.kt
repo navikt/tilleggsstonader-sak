@@ -72,9 +72,7 @@ class ReiseTilSamlingBeregningsTest {
                 vedtaksperioder,
                 TypeVedtak.INNVILGELSE,
             )
-
-        assertThat(result.beregningsresultatOffentligTransport.beløp).isEqualTo(500)
-        assertThat(result.beregningsresultatOffentligTransport.samling).hasSize(1)
+        assertThat(result.beregningsresultatOffentligTransport.reiser).hasSize(1)
     }
 
     @Test
@@ -118,8 +116,7 @@ class ReiseTilSamlingBeregningsTest {
                 TypeVedtak.INNVILGELSE,
             )
 
-        assertThat(result.beregningsresultatOffentligTransport.beløp).isEqualTo(300)
-        assertThat(result.beregningsresultatOffentligTransport.samling).hasSize(1)
+        assertThat(result.beregningsresultatOffentligTransport.reiser).hasSize(1)
     }
 
     @Test

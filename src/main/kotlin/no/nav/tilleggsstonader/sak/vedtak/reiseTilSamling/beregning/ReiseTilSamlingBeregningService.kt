@@ -10,8 +10,8 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingBeregnUtil.filtrerBortUtgifterSomIkkeOverlapperVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingBeregnUtil.validerUtgiftHeleVedtaksperioden
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingBeregnUtil.validerUtgifterStrekkerSegUtenforVedtaksperiodene
-import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatForSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransportForSamling
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.VilkårReiseTilSamlingMapper.mapTilVilkårReiseTilSamling
@@ -65,10 +65,10 @@ class ReiseTilSamlingBeregningService(
         val oppfylteOffentligTransport = utgifterTilBeregning.filter { it.fakta is FaktaOffentligTransport }
         val offentligTransport =
             BeregningsresultatOffentligTransport(
-                samling =
+                reiser =
                     oppfylteOffentligTransport.map { samling ->
                         samling.fakta as FaktaOffentligTransport
-                        BeregningsresultatForSamling(
+                        BeregningsresultatOffentligTransportForSamling(
                             reiseId = samling.fakta.reiseId,
                             adresse = samling.fakta.adresse,
                             fom = samling.fom,
@@ -76,7 +76,6 @@ class ReiseTilSamlingBeregningService(
                             utgifterOffentligTransport = samling.fakta.utgifterOffentligTransport,
                         )
                     },
-                beløp = oppfylteOffentligTransport.sumOf { (it.fakta as FaktaOffentligTransport).utgifterOffentligTransport ?: 0 },
             )
 
         return BeregningReiseTilSamling(

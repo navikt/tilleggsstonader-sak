@@ -4,13 +4,12 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import java.time.LocalDate
 
 data class BeregningsresultatOffentligTransport(
-    val samling: List<BeregningsresultatForSamling>,
-    val beløp: Int,
+    val reiser: List<BeregningsresultatOffentligTransportForSamling>,
 )
 
-data class BeregningsresultatForSamling(
+data class BeregningsresultatOffentligTransportForSamling(
     val reiseId: ReiseId,
-    val adresse: String?, // TODO trengs denne i domenet
+    val adresse: String?,
     val fom: LocalDate,
     val tom: LocalDate,
     val utgifterOffentligTransport: Int?,

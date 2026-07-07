@@ -103,15 +103,14 @@ class ReiseTilSamlingVedtakControllerTest : CleanDatabaseIntegrationTest() {
                     .expectOkWithBody<BeregningsresultatReiseTilSamlingDto>()
 
             val offentligTransport = checkNotNull(respons.offentligTransport)
-            assertThat(offentligTransport.beløp).isEqualTo(utgifter)
-            assertThat(offentligTransport.samling).hasSize(1)
+            assertThat(offentligTransport.reiser).hasSize(1)
 
-            val samling = offentligTransport.samling.single()
-            assertThat(samling.reiseId).isEqualTo(dummyReiseId)
-            assertThat(samling.adresse).isEqualTo("Samlingsgata 1")
-            assertThat(samling.fom).isEqualTo(fom)
-            assertThat(samling.tom).isEqualTo(tom)
-            assertThat(samling.utgifterOffentligTransport).isEqualTo(utgifter)
+            val reise = offentligTransport.reiser.single()
+            assertThat(reise.reiseId).isEqualTo(dummyReiseId)
+            assertThat(reise.adresse).isEqualTo("Samlingsgata 1")
+            assertThat(reise.fom).isEqualTo(fom)
+            assertThat(reise.tom).isEqualTo(tom)
+            assertThat(reise.utgifterOffentligTransport).isEqualTo(utgifter)
         }
     }
 }
