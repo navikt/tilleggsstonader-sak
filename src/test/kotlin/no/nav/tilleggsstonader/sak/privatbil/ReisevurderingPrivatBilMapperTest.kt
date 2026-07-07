@@ -214,7 +214,7 @@ class ReisevurderingPrivatBilMapperTest {
     }
 
     @Test
-    fun `innsendt kjøreliste har prioritet over registrertKjørtUke`() {
+    fun `bruker registrertKjørtUke når dersom de er sendt inn og kjøreliste mangler`() {
         val reiseId = ReiseId.random()
         val behandlingId = BehandlingId.random()
         val kjørelisteId = KjørelisteId.random()
@@ -225,7 +225,6 @@ class ReisevurderingPrivatBilMapperTest {
                 tom = 6 januar 2025,
             )
 
-        // Lag innsendt kjøreliste med harKjørt=true og parkeringsutgift=100
         val kjøreliste =
             KjørelisteUtil.kjøreliste(
                 id = kjørelisteId,
@@ -234,7 +233,6 @@ class ReisevurderingPrivatBilMapperTest {
                 kjørteDager = listOf(KjørtDag(dato = 6 januar 2025, parkeringsutgift = 100)),
             )
 
-        // Lag avklart uke som matcher kjørelisten
         val avklartUke =
             AvklartKjørtUke(
                 id = UUID.randomUUID(),
@@ -259,7 +257,6 @@ class ReisevurderingPrivatBilMapperTest {
                     ),
             )
 
-        // Lag registrert uke med andre verdier (harKjørt=false, parkeringsutgift=null)
         val registrertUke =
             RegistrertKjørtUke(
                 behandlingId = behandlingId,
@@ -268,8 +265,8 @@ class ReisevurderingPrivatBilMapperTest {
                     setOf(
                         RegistrertKjørtDag(
                             dato = 6 januar 2025,
-                            harKjørt = false, // registrert sier false
-                            parkeringsutgift = null, // registrert sier null
+                            harKjørt = false,
+                            parkeringsutgift = null,
                         ),
                     ),
             )
@@ -283,14 +280,13 @@ class ReisevurderingPrivatBilMapperTest {
                 registrerteUker = listOf(registrertUke),
             )
 
-        // Sjekk at innsendt kjøreliste har prioritet over registrert
         val dag =
             dto.uker
                 .single()
                 .dager
                 .single()
-        assertThat(dag.kjørelisteDag?.harKjørt).isTrue() // fra kjørelisten, ikke registrert (false)
-        assertThat(dag.kjørelisteDag?.parkeringsutgift).isEqualTo(100) // fra kjørelisten, ikke registrert (null)
+        assertThat(dag.kjørelisteDag?.harKjørt).isTrue()
+        assertThat(dag.kjørelisteDag?.parkeringsutgift).isEqualTo(100)
     }
 
     @Test
