@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.privatbil
 
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
 import no.nav.tilleggsstonader.sak.privatbil.registrertekjørtedager.RegistrertKjørtDag
 import no.nav.tilleggsstonader.sak.privatbil.registrertekjørtedager.RegistrertKjørtUke
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
@@ -227,14 +228,56 @@ class ReisevurderingPrivatBilMapperTest {
                 registrerteUker = listOf(registrertUke),
             )
 
-        // registrertKjørtUke sier harKjørt=false, men ingen kjøreliste finnes — vi forventer registrertUke
-        assertThat(
-            dto.uker
-                .single()
-                .dager
-                .single()
-                .kjørelisteDag
-                ?.harKjørt,
-        ).isFalse()
+        @Test
+        fun `uke med registrertKjørtUke men uten avklartUke får status MANUELT_REGISTRERT`() {
+            val reiseId = ReiseId.random()
+            val behandlingId = BehandlingId.random()
+            val gjeldendeReise =
+                rammeForReiseMedPrivatBil(
+                    reiseId = reiseId,
+                    fom = 6 januar 2025,
+                    tom = 6 januar 2025,
+                )
+            val registrertUke =
+                RegistrertKjørtUke(
+                    behandlingId = behandlingId,
+                    reiseId = reiseId,
+                    dager = setOf(RegistrertKjørtDag(dato = 6 januar 2025, harKjørt = true)),
+                )
+
+            val dto =
+                ReisevurderingPrivatBilMapper.tilReisevurderingDto(
+                    gjeldendeRammevedtakForReise = gjeldendeReise,
+                    forrigeRammevedtakForReise = null,
+                    avklarteUker = emptyList(),
+                    kjørelister = emptyList(),
+                    registrerteUker = listOf(registrertUke),
+                )
+
+            assertThat(dto.uker.single().status).isEqualTo(UkeStatus.MANUELT_REGISTRERT)
+        }
+
+        @Test
+        fun `uke uten avklartUke og uten registrertKjørtUke får status IKKE_MOTTATT_KJØRELISTE`() {
+            val reiseId = ReiseId.random()
+            val gjeldendeReise =
+                rammeForReiseMedPrivatBil(
+                    reiseId = reiseId,
+                    fom = 6 januar 2025,
+                    tom = 6 januar 2025,
+                )
+
+            val dto =
+                ReisevurderingPrivatBilMapper.tilReisevurderingDto(
+                    gjeldendeRammevedtakForReise = gjeldendeReise,
+                    forrigeRammevedtakForReise = null,
+                    avklarteUker = emptyList(),
+                    kjørelister = emptyList(),
+                )
+
+            assertThat(dto.uker.single().status).isEqualTo(UkeStatus.IKKE_MOTTATT_KJØRELISTE)
+        }
     }
 }
+
+

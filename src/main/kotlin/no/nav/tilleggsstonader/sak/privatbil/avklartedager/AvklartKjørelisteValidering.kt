@@ -92,8 +92,9 @@ private fun AvklartKjørtDag.validerBegrunnelse(innsendtKjørelisteDag: Kjøreli
         "Må oppgi begrunnelse for parkeringsutgift over 100 for dag ${dato.norskFormat()}"
     }
 
-    // Ingen videre validering mot kjøreliste dersom det ikke finnes en (manuell søknad)
-    if (innsendtKjørelisteDag == null) return
+    brukerfeilHvis(innsendtKjørelisteDag == null) {
+        "Må oppgi begrunnelse for å endre dag ${dato.norskFormat()} når det ikke finnes en opprinnelig kjøreliste for dagen"
+    }
 
     brukerfeilHvis(godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.JA && !innsendtKjørelisteDag.harKjørt) {
         "Må oppgi begrunnelse for å godkjenne kjøring når bruker ikke har oppgitt å ha kjørt for dag ${dato.norskFormat()}"

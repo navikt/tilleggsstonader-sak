@@ -49,7 +49,7 @@ object ReisevurderingPrivatBilMapper {
         forrigeRammevedtakForReise: RammevedtakForReiseMedPrivatBil?,
     ): ReiseId =
         gjeldendeRammevedtakForReise?.reiseId ?: forrigeRammevedtakForReise?.reiseId
-            ?: feil("Kan ikke lage reisevudering. Mangler rammevedtak for reise")
+        ?: feil("Kan ikke lage reisevudering. Mangler rammevedtak for reise")
 
     private fun lagUkeVurderingerDto(
         gjeldendeRammevedtakForReise: RammevedtakForReiseMedPrivatBil?,
@@ -101,7 +101,9 @@ object ReisevurderingPrivatBilMapper {
             fraDato = datoer.min(),
             tilDato = datoer.max(),
             erUkeSlettet = erUkeSlettet,
-            status = avklartUke?.status ?: UkeStatus.IKKE_MOTTATT_KJØRELISTE,
+            status =
+                avklartUke?.status
+                    ?: if (registrertKjørtUke != null) UkeStatus.MANUELT_REGISTRERT else UkeStatus.IKKE_MOTTATT_KJØRELISTE,
             avvik = avklartUke?.typeAvvik?.let { AvvikUke(typeAvvik = it) },
             behandletDato = avklartUke?.behandletDato,
             kjørelisteInnsendtDato = kjøreliste?.datoMottatt?.toLocalDate(),
