@@ -49,7 +49,7 @@ object ReisevurderingPrivatBilMapper {
         forrigeRammevedtakForReise: RammevedtakForReiseMedPrivatBil?,
     ): ReiseId =
         gjeldendeRammevedtakForReise?.reiseId ?: forrigeRammevedtakForReise?.reiseId
-        ?: feil("Kan ikke lage reisevudering. Mangler rammevedtak for reise")
+            ?: feil("Kan ikke lage reisevudering. Mangler rammevedtak for reise")
 
     private fun lagUkeVurderingerDto(
         gjeldendeRammevedtakForReise: RammevedtakForReiseMedPrivatBil?,

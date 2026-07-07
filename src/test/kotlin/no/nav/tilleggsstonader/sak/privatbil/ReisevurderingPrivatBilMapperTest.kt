@@ -1,14 +1,25 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDagStatus
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UtfyltDagAutomatiskVurdering
 import no.nav.tilleggsstonader.sak.privatbil.registrertekjørtedager.RegistrertKjørtDag
 import no.nav.tilleggsstonader.sak.privatbil.registrertekjørtedager.RegistrertKjørtUke
+import no.nav.tilleggsstonader.sak.util.KjørelisteUtil
+import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.util.UUID
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode as KontrakterDatoperiode
 
 class ReisevurderingPrivatBilMapperTest {
     @Test
@@ -206,6 +217,86 @@ class ReisevurderingPrivatBilMapperTest {
     fun `innsendt kjøreliste har prioritet over registrertKjørtUke`() {
         val reiseId = ReiseId.random()
         val behandlingId = BehandlingId.random()
+        val kjørelisteId = KjørelisteId.random()
+        val gjeldendeReise =
+            rammeForReiseMedPrivatBil(
+                reiseId = reiseId,
+                fom = 6 januar 2025,
+                tom = 6 januar 2025,
+            )
+
+        // Lag innsendt kjøreliste med harKjørt=true og parkeringsutgift=100
+        val kjøreliste =
+            KjørelisteUtil.kjøreliste(
+                id = kjørelisteId,
+                reiseId = reiseId,
+                periode = KontrakterDatoperiode(6 januar 2025, 6 januar 2025),
+                kjørteDager = listOf(KjørtDag(dato = 6 januar 2025, parkeringsutgift = 100)),
+            )
+
+        // Lag avklart uke som matcher kjørelisten
+        val avklartUke =
+            AvklartKjørtUke(
+                id = UUID.randomUUID(),
+                behandlingId = behandlingId,
+                kjørelisteId = kjørelisteId,
+                reiseId = reiseId,
+                fom = 6 januar 2025,
+                tom = 6 januar 2025,
+                uke = (6 januar 2025).tilUkeIÅr(),
+                status = UkeStatus.OK_AUTOMATISK,
+                avklartKjørtUkeStatus = AvklartKjørtUkeStatus.NY,
+                dager =
+                    setOf(
+                        AvklartKjørtDag(
+                            dato = 6 januar 2025,
+                            godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
+                            automatiskVurdering = UtfyltDagAutomatiskVurdering.OK,
+                            avvik = emptyList(),
+                            parkeringsutgift = 100,
+                            avklartKjørtDagStatus = AvklartKjørtDagStatus.NY,
+                        ),
+                    ),
+            )
+
+        // Lag registrert uke med andre verdier (harKjørt=false, parkeringsutgift=null)
+        val registrertUke =
+            RegistrertKjørtUke(
+                behandlingId = behandlingId,
+                reiseId = reiseId,
+                dager =
+                    setOf(
+                        RegistrertKjørtDag(
+                            dato = 6 januar 2025,
+                            harKjørt = false, // registrert sier false
+                            parkeringsutgift = null, // registrert sier null
+                        ),
+                    ),
+            )
+
+        val dto =
+            ReisevurderingPrivatBilMapper.tilReisevurderingDto(
+                gjeldendeRammevedtakForReise = gjeldendeReise,
+                forrigeRammevedtakForReise = null,
+                avklarteUker = listOf(avklartUke),
+                kjørelister = listOf(kjøreliste),
+                registrerteUker = listOf(registrertUke),
+            )
+
+        // Sjekk at innsendt kjøreliste har prioritet over registrert
+        val dag =
+            dto.uker
+                .single()
+                .dager
+                .single()
+        assertThat(dag.kjørelisteDag?.harKjørt).isTrue() // fra kjørelisten, ikke registrert (false)
+        assertThat(dag.kjørelisteDag?.parkeringsutgift).isEqualTo(100) // fra kjørelisten, ikke registrert (null)
+    }
+
+    @Test
+    fun `uke med registrertKjørtUke men uten avklartUke får status MANUELT_REGISTRERT`() {
+        val reiseId = ReiseId.random()
+        val behandlingId = BehandlingId.random()
         val gjeldendeReise =
             rammeForReiseMedPrivatBil(
                 reiseId = reiseId,
@@ -216,7 +307,7 @@ class ReisevurderingPrivatBilMapperTest {
             RegistrertKjørtUke(
                 behandlingId = behandlingId,
                 reiseId = reiseId,
-                dager = setOf(RegistrertKjørtDag(dato = 6 januar 2025, harKjørt = false, parkeringsutgift = null)),
+                dager = setOf(RegistrertKjørtDag(dato = 6 januar 2025, harKjørt = true)),
             )
 
         val dto =
@@ -228,56 +319,27 @@ class ReisevurderingPrivatBilMapperTest {
                 registrerteUker = listOf(registrertUke),
             )
 
-        @Test
-        fun `uke med registrertKjørtUke men uten avklartUke får status MANUELT_REGISTRERT`() {
-            val reiseId = ReiseId.random()
-            val behandlingId = BehandlingId.random()
-            val gjeldendeReise =
-                rammeForReiseMedPrivatBil(
-                    reiseId = reiseId,
-                    fom = 6 januar 2025,
-                    tom = 6 januar 2025,
-                )
-            val registrertUke =
-                RegistrertKjørtUke(
-                    behandlingId = behandlingId,
-                    reiseId = reiseId,
-                    dager = setOf(RegistrertKjørtDag(dato = 6 januar 2025, harKjørt = true)),
-                )
+        assertThat(dto.uker.single().status).isEqualTo(UkeStatus.MANUELT_REGISTRERT)
+    }
 
-            val dto =
-                ReisevurderingPrivatBilMapper.tilReisevurderingDto(
-                    gjeldendeRammevedtakForReise = gjeldendeReise,
-                    forrigeRammevedtakForReise = null,
-                    avklarteUker = emptyList(),
-                    kjørelister = emptyList(),
-                    registrerteUker = listOf(registrertUke),
-                )
+    @Test
+    fun `uke uten avklartUke og uten registrertKjørtUke får status IKKE_MOTTATT_KJØRELISTE`() {
+        val reiseId = ReiseId.random()
+        val gjeldendeReise =
+            rammeForReiseMedPrivatBil(
+                reiseId = reiseId,
+                fom = 6 januar 2025,
+                tom = 6 januar 2025,
+            )
 
-            assertThat(dto.uker.single().status).isEqualTo(UkeStatus.MANUELT_REGISTRERT)
-        }
+        val dto =
+            ReisevurderingPrivatBilMapper.tilReisevurderingDto(
+                gjeldendeRammevedtakForReise = gjeldendeReise,
+                forrigeRammevedtakForReise = null,
+                avklarteUker = emptyList(),
+                kjørelister = emptyList(),
+            )
 
-        @Test
-        fun `uke uten avklartUke og uten registrertKjørtUke får status IKKE_MOTTATT_KJØRELISTE`() {
-            val reiseId = ReiseId.random()
-            val gjeldendeReise =
-                rammeForReiseMedPrivatBil(
-                    reiseId = reiseId,
-                    fom = 6 januar 2025,
-                    tom = 6 januar 2025,
-                )
-
-            val dto =
-                ReisevurderingPrivatBilMapper.tilReisevurderingDto(
-                    gjeldendeRammevedtakForReise = gjeldendeReise,
-                    forrigeRammevedtakForReise = null,
-                    avklarteUker = emptyList(),
-                    kjørelister = emptyList(),
-                )
-
-            assertThat(dto.uker.single().status).isEqualTo(UkeStatus.IKKE_MOTTATT_KJØRELISTE)
-        }
+        assertThat(dto.uker.single().status).isEqualTo(UkeStatus.IKKE_MOTTATT_KJØRELISTE)
     }
 }
-
-
