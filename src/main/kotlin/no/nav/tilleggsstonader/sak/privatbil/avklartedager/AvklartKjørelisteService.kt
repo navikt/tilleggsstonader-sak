@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
+import no.nav.tilleggsstonader.sak.privatbil.registrertekjørtedager.RegistrertKjørtUkeRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
@@ -33,6 +34,7 @@ class AvklartKjørelisteService(
     private val kjørelisteService: KjørelisteService,
     private val behandlingService: BehandlingService,
     private val unleashService: UnleashService,
+    private val registrertKjørtUkeRepository: RegistrertKjørtUkeRepository,
 ) {
     fun hentAvklarteUkerForBehandling(behandlingId: BehandlingId): List<AvklartKjørtUke> =
         avklartKjørtUkeRepository.findByBehandlingId(behandlingId)
@@ -47,16 +49,59 @@ class AvklartKjørelisteService(
 
         validerAtAlleDagerIKjørelistaErInnenForRammevedtaket(rammeForReise, kjøreliste)
 
-        val kjørelisteGruppertPåUker = kjøreliste.data.reisedager.groupBy { it.dato.tilUkeIÅr() }
+        val manueltRegistrerteUker =
+            avklartKjørtUkeRepository
+                .findByBehandlingId(behandlingId)
+                .filter { it.status == UkeStatus.MANUELT_REGISTRERT && it.reiseId == kjøreliste.data.reiseId }
+                .map { it.uke }
+                .toSet()
 
         val avklarteUker =
-            kjørelisteGruppertPåUker.map { (ukeIÅr, reisedager) ->
-                utledAvklartUke(
+            kjøreliste.data.reisedager
+                .groupBy { it.dato.tilUkeIÅr() }
+                .filterNot { (ukeIÅr, _) -> ukeIÅr in manueltRegistrerteUker }
+                .map { (ukeIÅr, reisedager) ->
+                    utledAvklartUke(
+                        behandlingId = behandlingId,
+                        ukeIÅr = ukeIÅr,
+                        reisedager = reisedager,
+                        kjørelisteId = kjøreliste.id,
+                        rammevedtak = rammeForReise,
+                    )
+                }
+
+        avklartKjørtUkeRepository.insertAll(avklarteUker)
+    }
+
+    fun avklarUkerFraRegistrerteDager(behandlingId: BehandlingId) {
+        val registrerteUker = registrertKjørtUkeRepository.findByBehandlingId(behandlingId)
+
+        val avklarteUker =
+            registrerteUker.map { uke ->
+                val dager = uke.dager.toList()
+                val avklarteDager =
+                    dager.map { dag ->
+                        AvklartKjørtDag(
+                            dato = dag.dato,
+                            godkjentGjennomførtKjøring =
+                                if (dag.harKjørt) GodkjentGjennomførtKjøring.JA else GodkjentGjennomførtKjøring.NEI,
+                            automatiskVurdering = UtfyltDagAutomatiskVurdering.OK,
+                            avvik = emptyList(),
+                            parkeringsutgift = dag.parkeringsutgift,
+                            avklartKjørtDagStatus = AvklartKjørtDagStatus.NY,
+                        )
+                    }
+
+                AvklartKjørtUke(
                     behandlingId = behandlingId,
-                    ukeIÅr = ukeIÅr,
-                    reisedager = reisedager,
-                    kjørelisteId = kjøreliste.id,
-                    rammevedtak = rammeForReise,
+                    kjørelisteId = null,
+                    reiseId = uke.reiseId,
+                    fom = dager.minOf { it.dato },
+                    tom = dager.maxOf { it.dato },
+                    uke = dager.minOf { it.dato }.tilUkeIÅr(),
+                    status = UkeStatus.MANUELT_REGISTRERT,
+                    dager = avklarteDager.toSet(),
+                    avklartKjørtUkeStatus = AvklartKjørtUkeStatus.NY,
                 )
             }
 
@@ -72,7 +117,10 @@ class AvklartKjørelisteService(
         val oppdaterteDager = oppdaterAvklarteDager(eksisterendeUke.dager, request)
 
         val rammevedtak = henteReiseFraVedtak(behandlingId, eksisterendeUke.reiseId)
-        val innsendteKjørelisteDager = kjørelisteService.hentKjøreliste(eksisterendeUke.kjørelisteId).data.reisedager
+        val innsendteKjørelisteDager =
+            eksisterendeUke.kjørelisteId
+                ?.let { kjørelisteService.hentKjøreliste(it).data.reisedager }
+                ?: emptyList()
 
         validerOppdatertAvklartKjørtUke(
             oppdaterteDager = oppdaterteDager,
@@ -291,10 +339,10 @@ class AvklartKjørelisteService(
         val avklarteUkerForrigeBehandling = hentAvklarteUkerForBehandling(behandlingIdForGjenbruk)
         val avklarteUkerNyBehandling = hentAvklarteUkerForBehandling(behandlingId)
 
-        val kjørelisterSomFinneIForrigeBehandling = avklarteUkerForrigeBehandling.map { it.kjørelisteId }.toSet()
+        val kjørelisterSomFinneIForrigeBehandling = avklarteUkerForrigeBehandling.mapNotNull { it.kjørelisteId }.toSet()
         val kjørelisterSomFinneINyMenIkkeGammelBehandling =
             avklarteUkerNyBehandling
-                .map { it.kjørelisteId }
+                .mapNotNull { it.kjørelisteId }
                 .filterNot { kjørelisterSomFinneIForrigeBehandling.contains(it) }
                 .distinct() // En kjøreliste kan dekke flere uker
                 .map { kjørelisteService.hentKjøreliste(it) }

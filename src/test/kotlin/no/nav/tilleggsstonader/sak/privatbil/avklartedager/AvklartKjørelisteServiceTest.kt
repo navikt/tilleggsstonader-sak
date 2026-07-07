@@ -14,6 +14,10 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus.MANUELT_REGISTRERT
+import no.nav.tilleggsstonader.sak.privatbil.registrertekjørtedager.RegistrertKjørtDag
+import no.nav.tilleggsstonader.sak.privatbil.registrertekjørtedager.RegistrertKjørtUke
+import no.nav.tilleggsstonader.sak.privatbil.registrertekjørtedager.RegistrertKjørtUkeRepository
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
@@ -40,6 +44,7 @@ class AvklartKjørelisteServiceTest {
     private val vedtakService = mockk<VedtakService>()
     private val behandlingService = mockk<BehandlingService>()
     private val unleashService = mockk<UnleashService>()
+    private val registrertKjørtUkeRepository = mockk<RegistrertKjørtUkeRepository>()
 
     private val service =
         AvklartKjørelisteService(
@@ -48,6 +53,7 @@ class AvklartKjørelisteServiceTest {
             kjørelisteService = kjørelisteService,
             behandlingService = behandlingService,
             unleashService = unleashService,
+            registrertKjørtUkeRepository = registrertKjørtUkeRepository,
         )
 
     private val reiseId = ReiseId.random()
@@ -241,7 +247,7 @@ class AvklartKjørelisteServiceTest {
                         KjørelisteUtil.KjørtDag(dato = mandag.plusDays(dagOffset.toLong()), parkeringsutgift = null)
                     },
             )
-        every { kjørelisteService.hentKjøreliste(eksisterendeUke.kjørelisteId) } returns innsendtKjøreliste
+        every { kjørelisteService.hentKjøreliste(eksisterendeUke.kjørelisteId!!) } returns innsendtKjøreliste
         every { behandlingService.hentBehandling(behandlingId) } returns behandling
         every { unleashService.isEnabled(Toggle.KAN_OVERSKRIDE_ANTALL_DAGER_I_RAMMEVEDTAK) } returns false
 
@@ -549,6 +555,103 @@ class AvklartKjørelisteServiceTest {
             service.sletteMarkerUkerOgDagerUtenforAvkortetRammevedtak(behandlingId, rammevedtak)
 
             verify(exactly = 0) { avklartKjørtUkeRepository.updateAll(any()) }
+        }
+    }
+
+    @Nested
+    inner class AvklarUkerFraRegistrerteDager {
+        @Test
+        fun `uke fra registrerte dager får status MANUELT_REGISTRERT og kjørelisteId er null`() {
+            val registrertUke =
+                RegistrertKjørtUke(
+                    behandlingId = behandlingId,
+                    reiseId = reiseId,
+                    dager =
+                        setOf(
+                            RegistrertKjørtDag(dato = mandag, harKjørt = true),
+                            RegistrertKjørtDag(dato = mandag.plusDays(1), harKjørt = false),
+                        ),
+                )
+            val insertSlot = slot<List<AvklartKjørtUke>>()
+
+            every { registrertKjørtUkeRepository.findByBehandlingId(behandlingId) } returns listOf(registrertUke)
+            every { avklartKjørtUkeRepository.insertAll(capture(insertSlot)) } returns emptyList()
+
+            service.avklarUkerFraRegistrerteDager(behandlingId)
+
+            val uke = insertSlot.captured.single()
+            assertThat(uke.status).isEqualTo(MANUELT_REGISTRERT)
+            assertThat(uke.kjørelisteId).isNull()
+            assertThat(uke.dager).hasSize(2)
+        }
+    }
+
+    @Nested
+    inner class AvklarUkerFraKjøreliste {
+        @Test
+        fun `kjøreliste for uke med MANUELT_REGISTRERT overstyrer ikke den manuelt registrerte uken`() {
+            val insertSlot = slot<List<AvklartKjørtUke>>()
+            val manueltRegistrertUke =
+                lagUke(fom = mandag, tom = fredag).copy(
+                    kjørelisteId = null,
+                    status = UkeStatus.MANUELT_REGISTRERT,
+                )
+            val kjøreliste =
+                KjørelisteUtil.kjøreliste(
+                    reiseId = reiseId,
+                    periode = Datoperiode(mandag, fredag),
+                    kjørteDager = listOf(KjørelisteUtil.KjørtDag(dato = mandag)),
+                )
+
+            settOppVedtakMock()
+            every { avklartKjørtUkeRepository.findByBehandlingId(behandlingId) } returns listOf(manueltRegistrertUke)
+            every { avklartKjørtUkeRepository.insertAll(capture(insertSlot)) } returns emptyList()
+
+            service.avklarUkerFraKjøreliste(behandlingId, kjøreliste)
+
+            assertThat(insertSlot.captured).isEmpty()
+        }
+
+        @Test
+        fun `kjøreliste for uke uten MANUELT_REGISTRERT behandles normalt`() {
+            val insertSlot = slot<List<AvklartKjørtUke>>()
+            val kjøreliste =
+                KjørelisteUtil.kjøreliste(
+                    reiseId = reiseId,
+                    periode = Datoperiode(mandag, fredag),
+                    kjørteDager = listOf(KjørelisteUtil.KjørtDag(dato = mandag)),
+                )
+
+            settOppVedtakMock()
+            every { avklartKjørtUkeRepository.findByBehandlingId(behandlingId) } returns emptyList()
+            every { avklartKjørtUkeRepository.insertAll(capture(insertSlot)) } returns emptyList()
+
+            service.avklarUkerFraKjøreliste(behandlingId, kjøreliste)
+
+            assertThat(insertSlot.captured).hasSize(1)
+            assertThat(insertSlot.captured.single().uke).isEqualTo(mandag.tilUkeIÅr())
+        }
+
+        private fun settOppVedtakMock() {
+            val vedtakData =
+                InnvilgelseDagligReise(
+                    rammevedtakPrivatBil =
+                        RammevedtakPrivatBil(
+                            reiser = listOf(rammeForReiseMedPrivatBil(reiseId = reiseId, fom = mandag, tom = fredag)),
+                        ),
+                    beregningsresultat = BeregningsresultatDagligReise(offentligTransport = null, privatBil = null),
+                    vedtaksperioder = emptyList(),
+                    beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+                )
+            val generiskVedtak =
+                GeneriskVedtak(
+                    behandlingId = behandlingId,
+                    type = TypeVedtak.INNVILGELSE,
+                    data = vedtakData,
+                    gitVersjon = Applikasjonsversjon.versjon,
+                    tidligsteEndring = null,
+                )
+            every { vedtakService.hentVedtakEllerFeil(behandlingId) } returns generiskVedtak
         }
     }
 

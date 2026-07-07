@@ -22,7 +22,7 @@ data class AvklartKjørtUke(
     @Column("behandling_id")
     val behandlingId: BehandlingId,
     @Column("kjoreliste_id")
-    val kjørelisteId: KjørelisteId,
+    val kjørelisteId: KjørelisteId? = null,
     val reiseId: ReiseId,
     override val fom: LocalDate,
     override val tom: LocalDate,
@@ -59,6 +59,7 @@ data class AvklartKjørtUke(
 
 enum class UkeStatus {
     OK_AUTOMATISK, // brukes hvis automatisk godkjent
+    MANUELT_REGISTRERT, // brukes når uke er registrert av saksbehandler og krever manuell gjennomgang
     OK_MANUELT, // brukes hvis saksbehandler godtar avvik
     AVVIK, // parkeringsutgifter/for mange dager etc. saksbehandler må ta stilling til uka
     IKKE_MOTTATT_KJØRELISTE,
