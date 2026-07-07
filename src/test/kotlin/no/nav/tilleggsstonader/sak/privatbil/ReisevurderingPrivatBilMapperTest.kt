@@ -1,6 +1,9 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.privatbil.registrertekjørtedager.RegistrertKjørtDag
+import no.nav.tilleggsstonader.sak.privatbil.registrertekjørtedager.RegistrertKjørtUke
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
@@ -150,5 +153,88 @@ class ReisevurderingPrivatBilMapperTest {
         assertThat(dagSlettetPerDato[8 januar 2025]).isFalse() // onsdag — i gjeldende
         assertThat(dagSlettetPerDato[9 januar 2025]).isFalse() // torsdag — i gjeldende
         assertThat(dagSlettetPerDato[10 januar 2025]).isFalse() // fredag — i gjeldende
+    }
+
+    @Test
+    fun `mapper uke med registrertKjørtUke til kjørelisteDag fra registrerte dager`() {
+        val reiseId = ReiseId.random()
+        val behandlingId = BehandlingId.random()
+        val gjeldendeReise =
+            rammeForReiseMedPrivatBil(
+                reiseId = reiseId,
+                fom = 6 januar 2025,
+                tom = 10 januar 2025,
+            )
+        val registrertUke =
+            RegistrertKjørtUke(
+                behandlingId = behandlingId,
+                reiseId = reiseId,
+                dager =
+                    setOf(
+                        RegistrertKjørtDag(dato = 6 januar 2025, harKjørt = true, parkeringsutgift = 80),
+                        RegistrertKjørtDag(dato = 7 januar 2025, harKjørt = false),
+                        RegistrertKjørtDag(dato = 8 januar 2025, harKjørt = true, parkeringsutgift = null),
+                        RegistrertKjørtDag(dato = 9 januar 2025, harKjørt = false),
+                        RegistrertKjørtDag(dato = 10 januar 2025, harKjørt = true, parkeringsutgift = 50),
+                    ),
+            )
+
+        val dto =
+            ReisevurderingPrivatBilMapper.tilReisevurderingDto(
+                gjeldendeRammevedtakForReise = gjeldendeReise,
+                forrigeRammevedtakForReise = null,
+                avklarteUker = emptyList(),
+                kjørelister = emptyList(),
+                registrerteUker = listOf(registrertUke),
+            )
+
+        val dager = dto.uker.single().dager
+        val dagPerDato = dager.associateBy { it.dato }
+
+        assertThat(dagPerDato[6 januar 2025]?.kjørelisteDag?.harKjørt).isTrue()
+        assertThat(dagPerDato[6 januar 2025]?.kjørelisteDag?.parkeringsutgift).isEqualTo(80)
+        assertThat(dagPerDato[7 januar 2025]?.kjørelisteDag?.harKjørt).isFalse()
+        assertThat(dagPerDato[7 januar 2025]?.kjørelisteDag?.parkeringsutgift).isNull()
+        assertThat(dagPerDato[8 januar 2025]?.kjørelisteDag?.harKjørt).isTrue()
+        assertThat(dagPerDato[8 januar 2025]?.kjørelisteDag?.parkeringsutgift).isNull()
+        assertThat(dagPerDato[10 januar 2025]?.kjørelisteDag?.harKjørt).isTrue()
+        assertThat(dagPerDato[10 januar 2025]?.kjørelisteDag?.parkeringsutgift).isEqualTo(50)
+    }
+
+    @Test
+    fun `innsendt kjøreliste har prioritet over registrertKjørtUke`() {
+        val reiseId = ReiseId.random()
+        val behandlingId = BehandlingId.random()
+        val gjeldendeReise =
+            rammeForReiseMedPrivatBil(
+                reiseId = reiseId,
+                fom = 6 januar 2025,
+                tom = 6 januar 2025,
+            )
+        val registrertUke =
+            RegistrertKjørtUke(
+                behandlingId = behandlingId,
+                reiseId = reiseId,
+                dager = setOf(RegistrertKjørtDag(dato = 6 januar 2025, harKjørt = false, parkeringsutgift = null)),
+            )
+
+        val dto =
+            ReisevurderingPrivatBilMapper.tilReisevurderingDto(
+                gjeldendeRammevedtakForReise = gjeldendeReise,
+                forrigeRammevedtakForReise = null,
+                avklarteUker = emptyList(),
+                kjørelister = emptyList(),
+                registrerteUker = listOf(registrertUke),
+            )
+
+        // registrertKjørtUke sier harKjørt=false, men ingen kjøreliste finnes — vi forventer registrertUke
+        assertThat(
+            dto.uker
+                .single()
+                .dager
+                .single()
+                .kjørelisteDag
+                ?.harKjørt,
+        ).isFalse()
     }
 }

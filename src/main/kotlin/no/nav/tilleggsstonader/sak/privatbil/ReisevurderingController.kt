@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingPrivatBilMapper.lagUkeVurderingDto
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagRequest
+import no.nav.tilleggsstonader.sak.privatbil.registrertekjørtedager.RegistrertKjørtDagService
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import org.springframework.web.bind.annotation.GetMapping
@@ -27,6 +28,7 @@ class ReisevurderingController(
     private val kjørelisteService: KjørelisteService,
     private val dagligReisePrivatBilService: DagligReisePrivatBilService,
     private val avklartKjørelisteService: AvklartKjørelisteService,
+    private val registrertKjørtDagService: RegistrertKjørtDagService,
 ) {
     @GetMapping("{behandlingId}")
     fun hentReisevurderingForBehandling(
@@ -43,6 +45,7 @@ class ReisevurderingController(
             behandling.forrigeIverksatteBehandlingId
                 ?.let { dagligReisePrivatBilService.hentRammevedtakForBehandlingId(it)?.reiser }
         val avklarteUker = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandlingId)
+        val registrerteUker = registrertKjørtDagService.hentForBehandling(behandlingId)
         val alleReiseIder =
             ((reiserIGjeldendeRammevedtak ?: emptyList()) + (reiserIForrigeRammevedtak ?: emptyList()))
                 .map { it.reiseId }
@@ -56,6 +59,7 @@ class ReisevurderingController(
                 forrigeRammevedtakForReise = forrigeReise,
                 avklarteUker = avklarteUker,
                 kjørelister = kjørelister,
+                registrerteUker = registrerteUker,
             )
         }
     }
@@ -72,7 +76,7 @@ class ReisevurderingController(
         behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(behandlingId)
 
         val oppdatertAvklartUke = avklartKjørelisteService.oppdaterAvklartUke(behandlingId, ukeId, avklarteDager)
-        val kjøreliste = kjørelisteService.hentKjøreliste(oppdatertAvklartUke.kjørelisteId)
+        val kjøreliste = oppdatertAvklartUke.kjørelisteId?.let { kjørelisteService.hentKjøreliste(it) }
 
         return lagUkeVurderingDto(
             uke = oppdatertAvklartUke.uke,

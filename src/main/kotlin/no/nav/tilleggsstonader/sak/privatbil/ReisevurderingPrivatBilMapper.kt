@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
+import no.nav.tilleggsstonader.sak.privatbil.registrertekjørtedager.RegistrertKjørtUke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
@@ -17,6 +18,7 @@ object ReisevurderingPrivatBilMapper {
         forrigeRammevedtakForReise: RammevedtakForReiseMedPrivatBil?,
         avklarteUker: List<AvklartKjørtUke>,
         kjørelister: List<Kjøreliste>,
+        registrerteUker: List<RegistrertKjørtUke> = emptyList(),
     ): ReisevurderingPrivatBilDto {
         val reiseId =
             finnReiseId(
@@ -29,6 +31,7 @@ object ReisevurderingPrivatBilMapper {
                 forrigeRammevedtakForReise = forrigeRammevedtakForReise,
                 avklarteUker = avklarteUker,
                 kjørelister = kjørelister,
+                registrerteUker = registrerteUker,
             )
         return ReisevurderingPrivatBilDto(
             reiseId = reiseId,
@@ -53,6 +56,7 @@ object ReisevurderingPrivatBilMapper {
         forrigeRammevedtakForReise: RammevedtakForReiseMedPrivatBil?,
         avklarteUker: List<AvklartKjørtUke>,
         kjørelister: List<Kjøreliste>,
+        registrerteUker: List<RegistrertKjørtUke>,
     ): List<UkeVurderingDto> {
         val reiseId =
             finnReiseId(
@@ -68,6 +72,8 @@ object ReisevurderingPrivatBilMapper {
             val datoerForUke = (gjeldendeDatoerForUke + forrigeUker[uke].orEmpty()).distinct().sorted()
             val avklartUke = avklarteUker.singleOrNull { it.reiseId == reiseId && it.uke == uke }
             val kjørelisteForUke = avklartUke?.let { kjørelister.firstOrNull { it.id == avklartUke.kjørelisteId } }
+            val registrertKjørtUke =
+                registrerteUker.singleOrNull { it.reiseId == reiseId && it.dager.any { dag -> dag.dato in datoerForUke } }
 
             lagUkeVurderingDto(
                 uke = uke,
@@ -76,6 +82,7 @@ object ReisevurderingPrivatBilMapper {
                 avklartUke = avklartUke,
                 kjøreliste = kjørelisteForUke,
                 erUkeSlettet = erUkeSlettet(uke, gjeldendeUker, forrigeUker),
+                registrertKjørtUke = registrertKjørtUke,
             )
         }
     }
@@ -87,6 +94,7 @@ object ReisevurderingPrivatBilMapper {
         avklartUke: AvklartKjørtUke?,
         kjøreliste: Kjøreliste?,
         erUkeSlettet: Boolean,
+        registrertKjørtUke: RegistrertKjørtUke? = null,
     ): UkeVurderingDto =
         UkeVurderingDto(
             ukenummer = uke.ukenummer,
@@ -107,6 +115,7 @@ object ReisevurderingPrivatBilMapper {
                         gjeldendeDatoerForUke = gjeldendeDatoerForUke,
                         kjørelisteForUke = kjøreliste,
                         avklartUke = avklartUke,
+                        registrertKjørtUke = registrertKjørtUke,
                     )
                 },
         )
@@ -116,6 +125,7 @@ object ReisevurderingPrivatBilMapper {
         gjeldendeDatoerForUke: List<LocalDate>,
         kjørelisteForUke: Kjøreliste?,
         avklartUke: AvklartKjørtUke?,
+        registrertKjørtUke: RegistrertKjørtUke? = null,
     ): DagDto =
         DagDto(
             dato = dato,
@@ -131,7 +141,16 @@ object ReisevurderingPrivatBilMapper {
                             harKjørt = reisedag.harKjørt,
                             parkeringsutgift = reisedag.parkeringsutgift,
                         )
-                    },
+                    }
+                    ?: registrertKjørtUke
+                        ?.dager
+                        ?.firstOrNull { it.dato == dato }
+                        ?.let { registrertDag ->
+                            KjørelisteDagDto(
+                                harKjørt = registrertDag.harKjørt,
+                                parkeringsutgift = registrertDag.parkeringsutgift,
+                            )
+                        },
             // TODO: Vurder å kaste feil dersom denne er null
             // Hvis den eksisterer for en uke så burde alle dager eksistere?
             avklartDag = avklartUke?.dager?.singleOrNull { it.dato == dato }?.tilAvklartDagDto(),
