@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSaml
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingValidering.validerUtgiftHeleVedtaksperioden
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingValidering.validerUtgifterStrekkerSegUtenforVedtaksperiodene
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsgrunnlagOffentligTransportForSamling
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatForReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransportForSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.VedtaksperiodeGrunnlag
@@ -86,7 +87,7 @@ class ReiseTilSamlingBeregningService(
             )
 
         return BeregningReiseTilSamling(
-            beregningsresultatOffentligTransport = offentligTransport,
+            reiser = listOf(offentligTransport),
         )
     }
 }
@@ -98,7 +99,7 @@ private fun validerFinnesSamling(vilkår: List<VilkårReiseTilSamling>) {
 }
 
 data class BeregningReiseTilSamling(
-    val beregningsresultatOffentligTransport: BeregningsresultatOffentligTransport,
+    val reiser: List<BeregningsresultatForReiseTilSamling>,
 )
 
 fun validerUtgifter(

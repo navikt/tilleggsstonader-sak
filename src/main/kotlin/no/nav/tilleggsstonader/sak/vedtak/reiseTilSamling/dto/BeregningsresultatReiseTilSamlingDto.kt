@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto
 
-import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.BeregningReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransportForSamling
@@ -23,15 +22,16 @@ data class BeregningsresultatForSamlingDto(
     val beløp: Int?,
 )
 
-data class BeregningsresultatForPeriodeOffentligTransportDto(
-    override val fom: LocalDate,
-    override val tom: LocalDate,
-) : Periode<LocalDate>
+fun BeregningReiseTilSamling.tilDto(): BeregningsresultatReiseTilSamlingDto {
+    val offentligTransport =
+        reiser
+            .filterIsInstance<BeregningsresultatOffentligTransport>()
+            .singleOrNull()
 
-fun BeregningReiseTilSamling.tilDto(): BeregningsresultatReiseTilSamlingDto =
-    BeregningsresultatReiseTilSamlingDto(
-        offentligTransport = beregningsresultatOffentligTransport.tilDto(),
+    return BeregningsresultatReiseTilSamlingDto(
+        offentligTransport = offentligTransport?.tilDto(),
     )
+}
 
 fun BeregningsresultatOffentligTransport.tilDto() =
     BeregningsresultatOffentligTransportDto(

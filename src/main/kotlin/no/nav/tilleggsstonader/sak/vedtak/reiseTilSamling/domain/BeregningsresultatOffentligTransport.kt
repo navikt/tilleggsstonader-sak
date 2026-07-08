@@ -5,9 +5,11 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import java.time.LocalDate
 import java.util.UUID
 
+interface BeregningsresultatForReiseTilSamling
+
 data class BeregningsresultatOffentligTransport(
     val reiser: List<BeregningsresultatOffentligTransportForSamling>,
-)
+) : BeregningsresultatForReiseTilSamling
 
 data class BeregningsresultatOffentligTransportForSamling(
     val reiseId: ReiseId,

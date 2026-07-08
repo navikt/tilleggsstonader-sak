@@ -72,7 +72,7 @@ class ReiseTilSamlingBeregningsTest {
                 vedtaksperioder,
                 TypeVedtak.INNVILGELSE,
             )
-        assertThat(result.beregningsresultatOffentligTransport.reiser).hasSize(1)
+        assertThat(result.reiser).hasSize(1)
     }
 
     @Test
@@ -116,7 +116,7 @@ class ReiseTilSamlingBeregningsTest {
                 TypeVedtak.INNVILGELSE,
             )
 
-        assertThat(result.beregningsresultatOffentligTransport.reiser).hasSize(1)
+        assertThat(result.reiser).hasSize(1)
     }
 
     @Test
