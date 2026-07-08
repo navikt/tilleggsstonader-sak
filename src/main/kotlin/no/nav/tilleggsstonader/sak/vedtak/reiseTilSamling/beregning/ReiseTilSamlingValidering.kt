@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.VilkårReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning.Companion.mergeSammenhengende as mergeSammenhengendeSamling
 
-object ReiseTilSamlingBeregnUtil {
+object ReiseTilSamlingValidering {
     fun List<VilkårReiseTilSamling>.slåSammenPåfølgende(): List<Datoperiode> =
         this
             .map { Datoperiode(fom = it.fom, tom = it.tom) }
