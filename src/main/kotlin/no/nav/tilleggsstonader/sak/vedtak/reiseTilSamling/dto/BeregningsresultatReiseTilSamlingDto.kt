@@ -36,7 +36,7 @@ data class BeregningsresultatPrivatBilForSamlingDto(
     val fom: LocalDate,
     val tom: LocalDate,
     val sats: BigDecimal,
-    val reiseavstandEnVei: BigDecimal?,
+    val totaltReiseAvstand: BigDecimal?,
     val beløp: Int?,
 )
 
@@ -82,6 +82,6 @@ fun BeregningsresultatPrivatBilForSamling.tilDto() =
         fom = grunnlag.fom,
         tom = grunnlag.tom,
         sats = grunnlag.sats,
-        reiseavstandEnVei = grunnlag.reiseavstandEnVei,
+        totaltReiseAvstand = grunnlag.totaltReiseAvstand,
         beløp = beløp,
     )

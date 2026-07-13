@@ -106,7 +106,7 @@ class ReiseTilSamlingBeregningService(
                                     fom = samling.fom,
                                     tom = samling.tom,
                                     sats = 2.94.toBigDecimal(),
-                                    reiseavstandEnVei = samling.fakta.reiseavstand,
+                                    totaltReiseAvstand = samling.fakta.reiseavstand,
                                     vedtaksperioder =
                                         vedtaksperioder.map { VedtaksperiodeGrunnlag(it) },
                                 ),
@@ -121,10 +121,9 @@ class ReiseTilSamlingBeregningService(
     }
 }
 
-private fun beregnBelopForPrivatBil(reiseavstandEnVei: BigDecimal?): Int? {
+private fun beregnBelopForPrivatBil(totaltReiseAvstand: BigDecimal?): Int? {
     val kilometersats: BigDecimal? = 2.94.toBigDecimal()
-    return reiseavstandEnVei
-        ?.multiply(BigDecimal.valueOf(2))
+    return totaltReiseAvstand
         ?.multiply(kilometersats)
         ?.setScale(2, RoundingMode.HALF_UP)
         ?.toInt()
