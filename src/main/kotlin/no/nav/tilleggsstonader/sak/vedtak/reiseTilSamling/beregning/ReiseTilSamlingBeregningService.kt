@@ -57,7 +57,6 @@ class ReiseTilSamlingBeregningService(
             oppfylteVilkårReiseTilSamling.filtrerBortUtgifterSomIkkeOverlapperVedtaksperioder(
                 vedtaksperioderBeregning,
             )
-        validerFinnesSamling(utgifterTilBeregning)
 
         validerUtgifter(
             utgifter = utgifterTilBeregning,
@@ -70,6 +69,7 @@ class ReiseTilSamlingBeregningService(
             utgifterTilBeregning,
             vedtaksperioderBeregning,
         )
+        validerFinnesSamling(utgifterTilBeregning)
 
         val oppfylteOffentligTransport = utgifterTilBeregning.filter { it.fakta is FaktaOffentligTransport }
         val offentligTransport =
