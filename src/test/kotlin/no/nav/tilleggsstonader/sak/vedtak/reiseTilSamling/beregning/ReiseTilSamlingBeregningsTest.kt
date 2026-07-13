@@ -59,12 +59,26 @@ class ReiseTilSamlingBeregningsTest {
                     resultat = Vilkårsresultat.OPPFYLT,
                     status = VilkårStatus.NY,
                     fom = 1 januar 2025,
-                    tom = 31 januar 2025,
+                    tom = 15 januar 2025,
                     fakta =
                         FaktaReiseTilSamlingOffentligTransport(
                             reiseId = dummyReiseId,
                             adresse = "Samlingsgata 1",
                             utgifterOffentligTransport = 500,
+                        ),
+                ),
+                vilkår(
+                    behandlingId = behandling.id,
+                    type = VilkårType.REISE_TIL_SAMLING,
+                    resultat = Vilkårsresultat.OPPFYLT,
+                    status = VilkårStatus.NY,
+                    fom = 16 januar 2025,
+                    tom = 31 januar 2025,
+                    fakta =
+                        FaktaReiseTilSamlingOffentligTransport(
+                            reiseId = dummyReiseId,
+                            adresse = "B",
+                            utgifterOffentligTransport = 200,
                         ),
                 ),
             )
@@ -80,7 +94,7 @@ class ReiseTilSamlingBeregningsTest {
         val offentligTransport =
             result.reiser.filterIsInstance<BeregningsresultatOffentligTransport>().single()
         assertThat(privatBil.reiser).hasSize(0)
-        assertThat(offentligTransport.reiser).hasSize(1)
+        assertThat(offentligTransport.reiser).hasSize(2)
     }
 
     @Test
@@ -158,8 +172,12 @@ class ReiseTilSamlingBeregningsTest {
                 vedtaksperioder,
                 TypeVedtak.INNVILGELSE,
             )
-
-        assertThat(result.reiser).hasSize(1)
+        assertThat(
+            result.reiser
+                .filterIsInstance<BeregningsresultatOffentligTransport>()
+                .single()
+                .reiser,
+        ).hasSize(1)
     }
 
     @Test
