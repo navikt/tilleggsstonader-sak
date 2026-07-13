@@ -294,4 +294,9 @@ class VilkårService(
         vilkårRepository
             .findByBehandlingId(behandlingId)
             .filter { it.resultat == Vilkårsresultat.OPPFYLT }
+
+    fun hentOppfylteReiseTilSamlingVilkår(behandlingId: BehandlingId): List<Vilkår> =
+        vilkårRepository
+            .findByBehandlingId(behandlingId)
+            .filter { it.resultat == Vilkårsresultat.OPPFYLT }
 }

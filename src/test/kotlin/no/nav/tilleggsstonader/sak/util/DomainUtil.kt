@@ -52,6 +52,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.TotrinnInternStatus
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Totrinnskontroll
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.domain.Årsaker
@@ -78,6 +79,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresult
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.VilkårReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -92,6 +95,7 @@ import java.time.LocalDateTime
 import java.time.YearMonth
 import java.util.UUID
 import kotlin.random.Random
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport as FaktaOffentligTransportReiseTilSamling
 
 fun oppgave(
     behandling: Behandling,
@@ -633,6 +637,35 @@ fun lagreVilkårperiodeAktivitet(
     kildeId = kildeId,
 )
 
+fun vilkårReiseTilSamling(
+    behandlingId: BehandlingId = BehandlingId.random(),
+    resultat: Vilkårsresultat = Vilkårsresultat.OPPFYLT,
+    status: VilkårStatus = VilkårStatus.NY,
+    delvilkår: List<Delvilkår> = emptyList(),
+    fom: LocalDate = YearMonth.now().atDay(1),
+    tom: LocalDate = YearMonth.now().atEndOfMonth(),
+    fakta: FaktaReiseTilSamling = faktaOffentligTransportReiseTilSamling(),
+): VilkårReiseTilSamling =
+    VilkårReiseTilSamling(
+        behandlingId = behandlingId,
+        resultat = resultat,
+        status = status,
+        delvilkårsett = delvilkår,
+        fom = fom,
+        tom = tom,
+        fakta = fakta,
+    )
+
+fun faktaOffentligTransportReiseTilSamling(
+    reiseId: ReiseId = dummyReiseId,
+    adresse: String = "Tiltaksveien 1",
+    utgifterOffentligTransport: Int = 40,
+) = FaktaOffentligTransportReiseTilSamling(
+    reiseId = reiseId,
+    adresse = adresse,
+    utgifterOffentligTransport = utgifterOffentligTransport,
+)
+
 fun lagreDagligReiseDto(
     fom: LocalDate = 1 januar 2025,
     tom: LocalDate = 31 januar 2025,
@@ -718,4 +751,14 @@ fun vedtaksperiode(
     tom = tom,
     målgruppe = målgruppe,
     aktivitet = aktivitet,
+)
+
+fun vedtaksperiodeForBeregning(
+    fom: LocalDate,
+    tom: LocalDate = fom,
+) = VedtaksperiodeBeregning(
+    fom = fom,
+    tom = tom,
+    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+    aktivitet = AktivitetType.TILTAK,
 )
