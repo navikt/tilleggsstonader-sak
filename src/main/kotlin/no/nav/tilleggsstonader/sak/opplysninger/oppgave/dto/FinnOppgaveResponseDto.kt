@@ -71,6 +71,7 @@ data class OppgaveDto(
     val behandlingId: UUID?,
     val sendtTilTotrinnskontrollAv: String?,
     val erOpphør: Boolean?,
+    val erKjøreliste: Boolean?,
 ) {
     constructor(
         oppgave: Oppgave,
@@ -112,6 +113,7 @@ data class OppgaveDto(
         behandlingId = metadata?.behandlingMetadata?.behandlingId,
         sendtTilTotrinnskontrollAv = metadata?.behandlingMetadata?.sendtTilTotrinnskontrollAv,
         erOpphør = metadata?.behandlingMetadata?.erOpphor,
+        erKjøreliste = metadata?.behandlingMetadata?.erKjoreliste,
     )
 }
 
