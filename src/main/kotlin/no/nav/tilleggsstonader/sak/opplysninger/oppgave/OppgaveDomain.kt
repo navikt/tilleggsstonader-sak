@@ -59,7 +59,7 @@ data class OppgaveBehandlingMetadata(
     val sendtTilTotrinnskontrollAv: String? = null,
     val erOpphor: Boolean? = false,
     val erKjoreliste: Boolean? = false,
-    )
+)
 
 /**
  * Intern representasjon av oppgavestatus, reflekterer ikke nøyaktig status i oppgave ved ÅPEN eller IGNORERT
