@@ -31,12 +31,13 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.UtgifterIForb
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.UtgifterNyBolig
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.AktivitetDagligReiseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.DokumentasjonDagligReise
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ReiseAdresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.UtdanningAvsnitt
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Reiseavstand
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Avreiseadresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Reisemåte
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SamlingPeriode
 import no.nav.tilleggsstonader.sak.util.antallÅrSiden
@@ -141,7 +142,7 @@ class BehandlingFaktaService(
             dokumentasjon = søknad?.let { mapDokumentasjon(it.data.dokumentasjon, it.journalpostId, grunnlagsdata) },
             arena = arenaFakta(grunnlagsdata),
             samlinger = mapSamlinger(søknad?.data?.samlinger),
-            reiseavstand = mapReiseavstand(søknad?.data?.reiseavstand),
+            avreiseadresse = mapAvreiseadresse(søknad?.data?.avreiseadresse),
             reisemåte = mapReisemåte(søknad?.data?.reisemåte),
         )
     }
@@ -222,24 +223,35 @@ class BehandlingFaktaService(
     private fun mapSamlinger(samlinger: List<SamlingPeriode>?): List<FaktaSamling> =
         samlinger?.map { FaktaSamling(fom = it.fom, tom = it.tom) } ?: emptyList()
 
-    private fun mapReiseavstand(reiseavstand: Reiseavstand?): FaktaReiseavstand? =
-        reiseavstand?.let {
-            FaktaReiseavstand(
-                antallKilometerEnVei = it.antallKilometerEnVei,
-                land = it.land,
-                gateadresse = it.gateadresse,
-                postnummer = it.postnummer,
-                poststed = it.poststed,
+    private fun mapAvreiseadresse(avreiseadresse: Avreiseadresse?): FaktaAvreiseadresse? =
+        avreiseadresse?.let {
+            FaktaAvreiseadresse(
+                skalReiseFraFolkeregistrertAdresse = it.skalReiseFraFolkeregistrertAdresse,
+                adresseDetSkalReisesFra =
+                    it.adresseDetSkalReisesFra.let { adresse ->
+                        ReiseAdresse(
+                            gateadresse = adresse?.adresse,
+                            postnummer = adresse?.postnummer,
+                            poststed = adresse?.poststed,
+                        )
+                    },
             )
         }
 
     private fun mapReisemåte(reisemåte: Reisemåte?): FaktaReisemåte? =
         reisemåte?.let {
             FaktaReisemåte(
-                kanReiseKollektivt = it.kanReiseKollektivt,
-                totalutgifterKollektivt = it.totalutgifterKollektivt,
+                kanReiseMedOffentligTransport = it.kanReiseMedOffentligTransport,
+                kanIkkeReiseMedOffentligTransportBegrunnelser = it.kanIkkeReiseMedOffentligTransportBegrunnelser,
+                totalUtgifterOffentligTransport = it.totalUtgifterOffentligTransport,
                 kanBenytteEgenBil = it.kanBenytteEgenBil,
-                kanBenytteDrosje = it.kanBenytteDrosje,
+                ønskerDekketUtgifterForDrosje = it.ønskerDekketUtgifterForDrosje,
+                barnehageGateadresse = it.barnehageGateadresse,
+                barnehagePostnummer = it.barnehagePostnummer,
+                kanIkkeBenytteEgenBilBegrunnelser = it.kanIkkeBenytteEgenBilBegrunnelser,
+                betalerForReiseSelv = it.betalerForReiseSelv,
+                harTTKort = it.harTTKort,
+                reiseMedBilUtgifter = it.reiseMedBilUtgifter,
             )
         }
 

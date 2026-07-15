@@ -25,8 +25,12 @@ object SøknadsskjemaUtil {
     val jsonMapperMedCustomDeserializerForDagligReise =
         jsonMapperFailOnUnknownProperties
             .rebuild()
-            .addModule(SimpleModule().addDeserializer(OppholdUtenforNorge::class.java, OppholdUtenforNorgeDeserializer()))
-            .build()
+            .addModule(
+                SimpleModule().addDeserializer(
+                    OppholdUtenforNorge::class.java,
+                    OppholdUtenforNorgeDeserializer(),
+                ),
+            ).build()
 
     fun parseSøknadsskjema(
         stønadstype: Stønadstype,
@@ -46,7 +50,10 @@ object SøknadsskjemaUtil {
         data: ByteArray,
         mottattTidspunkt: LocalDateTime,
     ): InnsendtSkjema<SøknadsskjemaBoutgifterFyllUtSendInn> {
-        val skjema = jsonMapperFailOnUnknownProperties.readValue<SøknadsskjemaBoutgifterFyllUtSendInn>(data)
+        val skjema =
+            jsonMapperFailOnUnknownProperties.readValue<SøknadsskjemaBoutgifterFyllUtSendInn>(
+                data, // .removeSpråkMapper(),
+            )
         return InnsendtSkjema(
             ident = skjema.data.data.dineOpplysninger.identitet.identitetsnummer,
             mottattTidspunkt = mottattTidspunkt,
@@ -59,7 +66,10 @@ object SøknadsskjemaUtil {
         data: ByteArray,
         mottattTidspunkt: LocalDateTime,
     ): InnsendtSkjema<SøknadsskjemaDagligReiseFyllUtSendInn> {
-        val skjema = jsonMapperMedCustomDeserializerForDagligReise.readValue<SøknadsskjemaDagligReiseFyllUtSendInn>(data)
+        val skjema =
+            jsonMapperMedCustomDeserializerForDagligReise.readValue<SøknadsskjemaDagligReiseFyllUtSendInn>(
+                data, // .removeSpråkMapper(),
+            )
         return InnsendtSkjema(
             ident = skjema.data.data.dineOpplysninger.identitet.identitetsnummer,
             mottattTidspunkt = mottattTidspunkt,
@@ -76,6 +86,14 @@ object SøknadsskjemaUtil {
             "nn" -> Språkkode.NN
             else -> error("Har ikke mapping for språk=$språk")
         }
+
+//    private fun ByteArray.removeSpråkMapper(): JsonNode {
+//        val root = jsonMapper.readTree(this)
+//        if (root is tools.jackson.databind.node.ObjectNode && root.has("språkMapper")) {
+//            root.remove("språkMapper")
+//        }
+//        return root
+//    }
 }
 
 class OppholdUtenforNorgeDeserializer : StdDeserializer<OppholdUtenforNorge>(OppholdUtenforNorge::class.java) {

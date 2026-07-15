@@ -22,7 +22,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnMedBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
-import no.nav.tilleggsstonader.kontrakter.søknad.felles.ArbeidOgOpphold
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.ArbeidOgOppholdAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.OppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
@@ -107,7 +107,13 @@ object SøknadUtil {
                             ),
                         harRettTilUtstyrsstipend =
                             HarRettTilUtstyrsstipend(
-                                erLærlingEllerLiknende = EnumFelt("Er lærling eller liknende?", JaNei.JA, "Ja", emptyList()),
+                                erLærlingEllerLiknende =
+                                    EnumFelt(
+                                        "Er lærling eller liknende?",
+                                        JaNei.JA,
+                                        "Ja",
+                                        emptyList(),
+                                    ),
                                 harTidligereFullførtVgs =
                                     EnumFelt(
                                         "Har du tidligere fullført videregående skole?",
@@ -128,7 +134,7 @@ object SøknadUtil {
     }
 
     private fun arbeidOgOpphold() =
-        ArbeidOgOpphold(
+        ArbeidOgOppholdAvsnitt(
             jobberIAnnetLand = EnumFelt("Jobber du i et annet land enn Norge?", JaNei.JA, "Ja", emptyList()),
             jobbAnnetLand = SelectFelt("Hvilket land jobber du i?", "SWE", "Sverige"),
             harPengestøtteAnnetLand =
