@@ -70,24 +70,25 @@ class ReiseTilSamlingBeregningService(
             vedtaksperioderBeregning,
         )
         validerFinnesSamling(utgifterTilBeregning)
-
         val oppfylteOffentligTransport = utgifterTilBeregning.filter { it.fakta is FaktaOffentligTransport }
+
         val offentligTransport =
             BeregningsresultatOffentligTransport(
                 reiser =
                     oppfylteOffentligTransport.map { samling ->
-                        samling.fakta as FaktaOffentligTransport
+                        val fakta = samling.fakta as FaktaOffentligTransport
+
                         BeregningsresultatOffentligTransportForSamling(
-                            reiseId = samling.fakta.reiseId,
+                            reiseId = fakta.reiseId,
                             grunnlag =
                                 BeregningsgrunnlagOffentligTransportForSamling(
-                                    adresse = samling.fakta.adresse,
+                                    adresse = fakta.adresse,
                                     fom = samling.fom,
                                     tom = samling.tom,
                                     vedtaksperioder =
                                         vedtaksperioder.map { VedtaksperiodeGrunnlag(it) },
                                 ),
-                            beløp = samling.fakta.utgifterOffentligTransport,
+                            beløp = fakta.utgifterOffentligTransport,
                         )
                     },
             )
@@ -97,26 +98,30 @@ class ReiseTilSamlingBeregningService(
             BeregningsresultatPrivatBil(
                 reiser =
                     oppfyltePrivatBil.map { samling ->
-                        samling.fakta as FaktaPrivatBil
+                        val fakta = samling.fakta as FaktaPrivatBil
+
                         BeregningsresultatPrivatBilForSamling(
-                            reiseId = samling.fakta.reiseId,
+                            reiseId = fakta.reiseId,
                             grunnlag =
                                 BeregningsgrunnlagPrivatBilForSamling(
-                                    adresse = samling.fakta.adresse,
+                                    adresse = fakta.adresse,
                                     fom = samling.fom,
                                     tom = samling.tom,
                                     sats = 2.94.toBigDecimal(),
-                                    totaltReiseAvstand = samling.fakta.reiseavstand,
+                                    totaltReiseAvstand = fakta.reiseavstand,
                                     vedtaksperioder =
                                         vedtaksperioder.map { VedtaksperiodeGrunnlag(it) },
                                 ),
-                            beløp = beregnBelopForPrivatBil(samling.fakta.reiseavstand),
+                            beløp = beregnBelopForPrivatBil(fakta.reiseavstand),
                         )
                     },
             )
-
         return BeregningReiseTilSamling(
-            reiser = listOf(offentligTransport, privatBil),
+            reiser =
+                listOfNotNull(
+                    offentligTransport.takeIf { it.reiser.isNotEmpty() },
+                    privatBil.takeIf { it.reiser.isNotEmpty() },
+                ),
         )
     }
 }
