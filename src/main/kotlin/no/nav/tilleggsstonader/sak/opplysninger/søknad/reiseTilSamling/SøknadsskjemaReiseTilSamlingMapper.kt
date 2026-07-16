@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaReiseTilSamling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
@@ -39,13 +38,23 @@ object SøknadsskjemaReiseTilSamlingMapper {
                 arbeidOgOpphold = mapArbeidOgOpphold(skjema.hovedytelse.arbeidOgOpphold),
             ),
         aktivitet =
-            AktivitetAvsnitt(
+            AktivitetReiseTilSamlingAvsnitt(
                 aktiviteter =
                     skjema.aktivitet.aktiviteter
                         ?.verdier
                         ?.map { ValgtAktivitet(id = it.verdi, label = it.label) },
                 annenAktivitet = skjema.aktivitet.annenAktivitet?.verdi,
                 lønnetAktivitet = skjema.aktivitet.lønnetAktivitet?.verdi,
+                tilleggsopplysningerAnnenAktivitet =
+                    skjema.aktivitet.tilleggsopplysningerAnnenAktivitet?.let {
+                        TilleggsopplysningerAnnenAktivitet(
+                            erLærlingEllerLiknende = it.erLærlingEllerLiknende?.verdi,
+                            fårDekketReise = it.fårDekketReise?.verdi,
+                            erUnder25År = it.erUnder25År?.verdi,
+                            måBetaleForReiseTilSkole = it.måBetaleForReiseTilSkole?.verdi,
+                        )
+                    },
+                annenAktivitetTypeUtdanning = skjema.aktivitet.annenAktivitetTypeUtdanning?.verdi,
             ),
         samlinger =
             skjema.samlinger.mapNotNull { samling ->

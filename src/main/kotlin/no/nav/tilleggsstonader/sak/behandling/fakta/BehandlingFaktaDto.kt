@@ -86,7 +86,7 @@ data class BehandlingFaktaReiseTilSamlingDto(
     override val hovedytelse: FaktaHovedytelse? = null,
     override val dokumentasjon: FaktaDokumentasjon? = null,
     override val arena: ArenaFakta? = null,
-    val aktiviteter: FaktaAktivitet,
+    val aktiviteter: FaktaAktivitetReiseTilSamling,
     val samlinger: List<FaktaSamling>,
     val avreiseadresse: FaktaAvreiseadresse?,
     val reisemåte: FaktaReisemåte?,
@@ -114,6 +114,10 @@ data class FaktaReisemåte(
 data class FaktaSamling(
     val fom: LocalDate,
     val tom: LocalDate,
+    val erObligatorisk: JaNei,
+    val harBruktEkstraReiseDager: JaNei,
+    val adresse: ReiseAdresse,
+    val antallKilometerEnVei: String,
 )
 
 data class FaktaHovedytelse(
@@ -173,6 +177,10 @@ data class FaktaAktivitet(
 )
 
 data class FaktaAktivitetDagligReise(
+    val aktivitet: FaktaAktivitet,
+)
+
+data class FaktaAktivitetReiseTilSamling(
     val aktivitet: FaktaAktivitet,
 )
 

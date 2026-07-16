@@ -18,10 +18,11 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KodeverkServiceUtil.mocke
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GeneriskFaktaGrunnlagTestUtil
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.AktivitetReiseTilSamlingAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Avreiseadresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Reisemåte
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SamlingPeriode
@@ -309,10 +310,12 @@ internal class BehandlingFaktaServiceTest {
                                 arbeidOgOpphold = null,
                             ),
                         aktivitet =
-                            AktivitetAvsnitt(
+                            AktivitetReiseTilSamlingAvsnitt(
                                 aktiviteter = listOf(ValgtAktivitet(id = "1", label = "Tiltak")),
                                 annenAktivitet = AnnenAktivitetType.TILTAK,
                                 lønnetAktivitet = JaNei.NEI,
+                                tilleggsopplysningerAnnenAktivitet = null,
+                                annenAktivitetTypeUtdanning = null,
                             ),
                         samlinger =
                             listOf(
@@ -322,7 +325,7 @@ internal class BehandlingFaktaServiceTest {
                                     erObligatorisk = JaNei.JA,
                                     harBruktEkstraReiseDager = JaNei.NEI,
                                     adresse =
-                                        no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse(
+                                        Adresse(
                                             gyldigFraOgMed = null,
                                             adresse = "Mimes vei 1",
                                             postnummer = "5132",
@@ -337,7 +340,7 @@ internal class BehandlingFaktaServiceTest {
                                     erObligatorisk = JaNei.JA,
                                     harBruktEkstraReiseDager = JaNei.NEI,
                                     adresse =
-                                        no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse(
+                                        Adresse(
                                             gyldigFraOgMed = null,
                                             adresse = "Mimes vei 1",
                                             postnummer = "5132",
@@ -351,7 +354,7 @@ internal class BehandlingFaktaServiceTest {
                             Avreiseadresse(
                                 skalReiseFraFolkeregistrertAdresse = JaNei.JA,
                                 adresseDetSkalReisesFra =
-                                    no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse(
+                                    Adresse(
                                         gyldigFraOgMed = null,
                                         adresse = "Mimes vei 1",
                                         postnummer = "5132",
