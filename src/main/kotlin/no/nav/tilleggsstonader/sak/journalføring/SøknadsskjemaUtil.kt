@@ -52,7 +52,7 @@ object SøknadsskjemaUtil {
     ): InnsendtSkjema<SøknadsskjemaBoutgifterFyllUtSendInn> {
         val skjema =
             jsonMapperFailOnUnknownProperties.readValue<SøknadsskjemaBoutgifterFyllUtSendInn>(
-                data, // .removeSpråkMapper(),
+                data,
             )
         return InnsendtSkjema(
             ident = skjema.data.data.dineOpplysninger.identitet.identitetsnummer,
@@ -68,7 +68,7 @@ object SøknadsskjemaUtil {
     ): InnsendtSkjema<SøknadsskjemaDagligReiseFyllUtSendInn> {
         val skjema =
             jsonMapperMedCustomDeserializerForDagligReise.readValue<SøknadsskjemaDagligReiseFyllUtSendInn>(
-                data, // .removeSpråkMapper(),
+                data,
             )
         return InnsendtSkjema(
             ident = skjema.data.data.dineOpplysninger.identitet.identitetsnummer,
@@ -86,14 +86,6 @@ object SøknadsskjemaUtil {
             "nn" -> Språkkode.NN
             else -> error("Har ikke mapping for språk=$språk")
         }
-
-//    private fun ByteArray.removeSpråkMapper(): JsonNode {
-//        val root = jsonMapper.readTree(this)
-//        if (root is tools.jackson.databind.node.ObjectNode && root.has("språkMapper")) {
-//            root.remove("språkMapper")
-//        }
-//        return root
-//    }
 }
 
 class OppholdUtenforNorgeDeserializer : StdDeserializer<OppholdUtenforNorge>(OppholdUtenforNorge::class.java) {

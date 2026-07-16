@@ -76,25 +76,15 @@ object SøknadsskjemaReiseTilSamlingMapper {
             Avreiseadresse(
                 skalReiseFraFolkeregistrertAdresse = skjema.avreiseadresse.skalReiseFraFolkeregistrertAdresse.verdi,
                 adresseDetSkalReisesFra =
-                    Adresse(
-                        gyldigFraOgMed = null,
-                        adresse =
-                            skjema.avreiseadresse.adresseDetSkalReisesFra
-                                ?.gateadresse
-                                ?.verdi,
-                        postnummer =
-                            skjema.avreiseadresse.adresseDetSkalReisesFra
-                                ?.postnummer
-                                ?.verdi,
-                        poststed =
-                            skjema.avreiseadresse.adresseDetSkalReisesFra
-                                ?.poststed
-                                ?.verdi,
-                        landkode =
-                            skjema.avreiseadresse.adresseDetSkalReisesFra
-                                ?.land
-                                ?.verdi,
-                    ),
+                    skjema.avreiseadresse.adresseDetSkalReisesFra?.let {
+                        Adresse(
+                            adresse = it.gateadresse?.verdi,
+                            postnummer = it.postnummer?.verdi,
+                            poststed = it.poststed?.verdi,
+                            landkode = it.land?.verdi,
+                            gyldigFraOgMed = null,
+                        )
+                    },
             ),
         reisemåte =
             Reisemåte(

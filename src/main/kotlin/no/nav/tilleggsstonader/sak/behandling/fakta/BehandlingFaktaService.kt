@@ -228,11 +228,11 @@ class BehandlingFaktaService(
             FaktaAvreiseadresse(
                 skalReiseFraFolkeregistrertAdresse = it.skalReiseFraFolkeregistrertAdresse,
                 adresseDetSkalReisesFra =
-                    it.adresseDetSkalReisesFra.let { adresse ->
+                    it.adresseDetSkalReisesFra?.let { adresse ->
                         ReiseAdresse(
-                            gateadresse = adresse?.adresse,
-                            postnummer = adresse?.postnummer,
-                            poststed = adresse?.poststed,
+                            gateadresse = adresse.adresse,
+                            postnummer = adresse.postnummer,
+                            poststed = adresse.poststed,
                         )
                     },
             )
