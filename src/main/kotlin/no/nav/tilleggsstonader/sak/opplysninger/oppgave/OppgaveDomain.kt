@@ -58,6 +58,7 @@ data class OppgaveBehandlingMetadata(
     val behandlingId: UUID,
     val sendtTilTotrinnskontrollAv: String? = null,
     val erOpphor: Boolean? = false,
+    val erKjoreliste: Boolean? = false,
 )
 
 /**
