@@ -25,21 +25,21 @@ class RegistrertKjørtDagController(
     @GetMapping("{behandlingId}")
     fun hentForBehandling(
         @PathVariable behandlingId: BehandlingId,
-    ): List<RegistrertKjørtUke> {
+    ): List<RegistrertKjørtUkeDto> {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerLesetilgangTilBehandling(behandlingId)
-        return registrertKjørtDagService.hentForBehandling(behandlingId)
+        return registrertKjørtDagService.hentForBehandling(behandlingId).map { it.tilDto() }
     }
 
     @PostMapping("{behandlingId}")
     fun lagreUke(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody request: RegistrertKjørtUkePostRequest,
-    ): RegistrertKjørtUke {
+    ): RegistrertKjørtUkeDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(behandlingId)
-        return registrertKjørtDagService.lagreUke(behandlingId, request)
+        return registrertKjørtDagService.lagreUke(behandlingId, request).tilDto()
     }
 
     @PutMapping("{behandlingId}/{ukeId}")
@@ -47,10 +47,10 @@ class RegistrertKjørtDagController(
         @PathVariable behandlingId: BehandlingId,
         @PathVariable ukeId: UUID,
         @RequestBody request: RegistrertKjørtUkePutRequest,
-    ): RegistrertKjørtUke {
+    ): RegistrertKjørtUkeDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
         behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(behandlingId)
-        return registrertKjørtDagService.oppdaterUke(behandlingId, ukeId, request)
+        return registrertKjørtDagService.oppdaterUke(behandlingId, ukeId, request).tilDto()
     }
 }

@@ -11,7 +11,7 @@ class RegistrertKjørtDagService(
     private val registrertKjørtUkeRepository: RegistrertKjørtUkeRepository,
 ) {
     fun hentForBehandling(behandlingId: BehandlingId): List<RegistrertKjørtUke> =
-        registrertKjørtUkeRepository.findByBehandlingId(behandlingId)
+        registrertKjørtUkeRepository.findByBehandlingId(behandlingId).map { it }
 
     fun lagreUke(
         behandlingId: BehandlingId,
@@ -36,12 +36,13 @@ class RegistrertKjørtDagService(
         brukerfeilHvis(eksisterende.behandlingId != behandlingId) {
             "Uke $ukeId tilhører ikke behandling $behandlingId"
         }
-        return registrertKjørtUkeRepository.update(
-            eksisterende.copy(
-                begrunnelse = request.begrunnelse,
-                dager = request.dager.tilDomene(),
-            ),
-        )
+        return registrertKjørtUkeRepository
+            .update(
+                eksisterende.copy(
+                    begrunnelse = request.begrunnelse,
+                    dager = request.dager.tilDomene(),
+                ),
+            )
     }
 
     private fun List<RegistrertKjørtDagRequest>.tilDomene(): Set<RegistrertKjørtDag> =

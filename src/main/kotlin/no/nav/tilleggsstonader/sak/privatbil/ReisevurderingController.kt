@@ -40,7 +40,8 @@ class ReisevurderingController(
         val behandling = behandlingService.hentBehandling(behandlingId)
 
         val kjørelister = kjørelisteService.hentForFagsakId(behandling.fagsakId)
-        val reiserIGjeldendeRammevedtak = dagligReisePrivatBilService.hentRammevedtakForBehandlingId(behandlingId)?.reiser
+        val reiserIGjeldendeRammevedtak =
+            dagligReisePrivatBilService.hentRammevedtakForBehandlingId(behandlingId)?.reiser
         val reiserIForrigeRammevedtak =
             behandling.forrigeIverksatteBehandlingId
                 ?.let { dagligReisePrivatBilService.hentRammevedtakForBehandlingId(it)?.reiser }
