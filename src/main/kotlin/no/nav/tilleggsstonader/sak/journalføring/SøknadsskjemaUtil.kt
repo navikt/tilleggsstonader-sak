@@ -25,8 +25,12 @@ object SøknadsskjemaUtil {
     val jsonMapperMedCustomDeserializerForDagligReise =
         jsonMapperFailOnUnknownProperties
             .rebuild()
-            .addModule(SimpleModule().addDeserializer(OppholdUtenforNorge::class.java, OppholdUtenforNorgeDeserializer()))
-            .build()
+            .addModule(
+                SimpleModule().addDeserializer(
+                    OppholdUtenforNorge::class.java,
+                    OppholdUtenforNorgeDeserializer(),
+                ),
+            ).build()
 
     fun parseSøknadsskjema(
         stønadstype: Stønadstype,
@@ -46,7 +50,10 @@ object SøknadsskjemaUtil {
         data: ByteArray,
         mottattTidspunkt: LocalDateTime,
     ): InnsendtSkjema<SøknadsskjemaBoutgifterFyllUtSendInn> {
-        val skjema = jsonMapperFailOnUnknownProperties.readValue<SøknadsskjemaBoutgifterFyllUtSendInn>(data)
+        val skjema =
+            jsonMapperFailOnUnknownProperties.readValue<SøknadsskjemaBoutgifterFyllUtSendInn>(
+                data,
+            )
         return InnsendtSkjema(
             ident = skjema.data.data.dineOpplysninger.identitet.identitetsnummer,
             mottattTidspunkt = mottattTidspunkt,
@@ -59,7 +66,10 @@ object SøknadsskjemaUtil {
         data: ByteArray,
         mottattTidspunkt: LocalDateTime,
     ): InnsendtSkjema<SøknadsskjemaDagligReiseFyllUtSendInn> {
-        val skjema = jsonMapperMedCustomDeserializerForDagligReise.readValue<SøknadsskjemaDagligReiseFyllUtSendInn>(data)
+        val skjema =
+            jsonMapperMedCustomDeserializerForDagligReise.readValue<SøknadsskjemaDagligReiseFyllUtSendInn>(
+                data,
+            )
         return InnsendtSkjema(
             ident = skjema.data.data.dineOpplysninger.identitet.identitetsnummer,
             mottattTidspunkt = mottattTidspunkt,

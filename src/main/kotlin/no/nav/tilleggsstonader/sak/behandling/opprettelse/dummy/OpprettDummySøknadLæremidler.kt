@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.SelectFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
-import no.nav.tilleggsstonader.kontrakter.søknad.felles.ArbeidOgOpphold
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.ArbeidOgOppholdAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.OppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
@@ -41,7 +41,7 @@ class OpprettDummySøknadLæremidler(
                 hovedytelse =
                     HovedytelseAvsnitt(
                         hovedytelse = EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "AAP")), emptyList()),
-                        arbeidOgOpphold = arbeidOgOpphold(),
+                        arbeidOgOpphold = ArbeidOgOppholdAvsnitt(),
                     ),
                 utdanning =
                     UtdanningAvsnitt(
@@ -93,8 +93,8 @@ class OpprettDummySøknadLæremidler(
     }
 }
 
-private fun arbeidOgOpphold() =
-    ArbeidOgOpphold(
+private fun ArbeidOgOppholdAvsnitt() =
+    ArbeidOgOppholdAvsnitt(
         jobberIAnnetLand = EnumFelt("Jobber du i et annet land enn Norge?", JaNei.JA, "Ja", emptyList()),
         jobbAnnetLand = SelectFelt("Hvilket land jobber du i?", "SWE", "Sverige"),
         harPengestøtteAnnetLand =
