@@ -39,7 +39,7 @@ import java.time.LocalDate
 import java.util.UUID
 
 class AvklartKjørelisteServiceTest {
-    private val avklartKjørtUkeRepository = mockk<AvklartKjørtUkeRepository>()
+    private val avklartKjørtUkeRepository = mockk<AvklartKjørtUkeRepository>(relaxed = true)
     private val kjørelisteService = mockk<KjørelisteService>()
     private val vedtakService = mockk<VedtakService>()
     private val behandlingService = mockk<BehandlingService>()
@@ -443,8 +443,11 @@ class AvklartKjørelisteServiceTest {
 
             val oppdatertUke = updateSlot.captured.single()
             assertThat(oppdatertUke.avklartKjørtUkeStatus).isEqualTo(AvklartKjørtUkeStatus.ENDRET)
-            assertThat(oppdatertUke.dager.filter { it.avklartKjørtDagStatus == AvklartKjørtDagStatus.SLETTET }.map { it.dato })
-                .containsExactlyInAnyOrder(mandagUke, mandagUke.plusDays(4))
+            assertThat(
+                oppdatertUke.dager
+                    .filter { it.avklartKjørtDagStatus == AvklartKjørtDagStatus.SLETTET }
+                    .map { it.dato },
+            ).containsExactlyInAnyOrder(mandagUke, mandagUke.plusDays(4))
         }
 
         @Test
@@ -575,6 +578,7 @@ class AvklartKjørelisteServiceTest {
             val insertSlot = slot<List<AvklartKjørtUke>>()
 
             every { registrertKjørtUkeRepository.findByBehandlingId(behandlingId) } returns listOf(registrertUke)
+            every { avklartKjørtUkeRepository.findByBehandlingId(behandlingId) } returns emptyList()
             every { avklartKjørtUkeRepository.insertAll(capture(insertSlot)) } returns emptyList()
 
             service.avklarUkerFraRegistrerteDager(behandlingId)
