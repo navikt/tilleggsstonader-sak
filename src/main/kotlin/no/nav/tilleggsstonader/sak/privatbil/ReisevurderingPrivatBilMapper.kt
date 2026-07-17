@@ -73,7 +73,7 @@ object ReisevurderingPrivatBilMapper {
             val avklartUke = avklarteUker.singleOrNull { it.reiseId == reiseId && it.uke == uke }
             val kjørelisteForUke = avklartUke?.let { kjørelister.firstOrNull { it.id == avklartUke.kjørelisteId } }
             val registrertKjørtUke =
-                registrerteUker.singleOrNull { it.reiseId == reiseId && it.dager.any { dag -> dag.dato in datoerForUke } }
+                registrerteUker.firstOrNull { it.reiseId == reiseId && it.dager.any { dag -> dag.dato in datoerForUke } }
 
             lagUkeVurderingDto(
                 uke = uke,
@@ -101,9 +101,7 @@ object ReisevurderingPrivatBilMapper {
             fraDato = datoer.min(),
             tilDato = datoer.max(),
             erUkeSlettet = erUkeSlettet,
-            status =
-                avklartUke?.status
-                    ?: if (registrertKjørtUke != null) UkeStatus.MANUELT_REGISTRERT else UkeStatus.IKKE_MOTTATT_KJØRELISTE,
+            status = utledUkeStatus(avklartUke, registrertKjørtUke),
             avvik = avklartUke?.typeAvvik?.let { AvvikUke(typeAvvik = it) },
             behandletDato = avklartUke?.behandletDato,
             kjørelisteInnsendtDato = kjøreliste?.datoMottatt?.toLocalDate(),
@@ -167,6 +165,13 @@ object ReisevurderingPrivatBilMapper {
             parkeringsutgift = parkeringsutgift,
             avklartKjørtDagStatus = avklartKjørtDagStatus,
         )
+
+    private fun utledUkeStatus(
+        avklartUke: AvklartKjørtUke?,
+        registrertKjørtUke: RegistrertKjørtUke?,
+    ): UkeStatus =
+        avklartUke?.status
+            ?: if (registrertKjørtUke != null) UkeStatus.MANUELT_REGISTRERT else UkeStatus.IKKE_MOTTATT_KJØRELISTE
 
     private fun erUkeSlettet(
         uke: UkeIÅr,
