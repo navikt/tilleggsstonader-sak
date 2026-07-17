@@ -11,44 +11,44 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DagpengerDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppePassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.InnsattIFengselDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.KvalifiseringsstønadDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevnePassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OmstillingsstønadPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadTilsynBarn
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ReellArbeidsøkerTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OvergangssstønadPassAvBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ReellArbeidsøkerPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SykepengerLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SykepengerTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SykepengerPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakspengerDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAPLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
@@ -65,11 +65,11 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygdLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingerUtdanningLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetPassAvBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
@@ -118,10 +118,10 @@ object VilkårperiodeTestUtil {
         mottarSykepengerForFulltidsstilling: VurderingMottarSykepengerForFulltidsstilling = vurderingMottarSykepengerForFulltidsstilling(),
     ): MålgruppeFaktaOgVurdering =
         when (type) {
-            MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeTilsynBarn
-            MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerTilsynBarn
+            MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppePassAvBarn
+            MålgruppeType.SYKEPENGER_100_PROSENT -> SykepengerPassAvBarn
             MålgruppeType.OMSTILLINGSSTØNAD ->
-                OmstillingsstønadTilsynBarn(
+                OmstillingsstønadPassAvBarn(
                     vurderinger =
                         VurderingOmstillingsstønad(
                             medlemskap = medlemskap,
@@ -129,9 +129,9 @@ object VilkårperiodeTestUtil {
                         ),
                 )
 
-            MålgruppeType.OVERGANGSSTØNAD -> OvergangssstønadTilsynBarn
+            MålgruppeType.OVERGANGSSTØNAD -> OvergangssstønadPassAvBarn
             MålgruppeType.AAP ->
-                AAPTilsynBarn(
+                AAPPassAvBarn(
                     vurderinger =
                         VurderingAAP(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
@@ -140,7 +140,7 @@ object VilkårperiodeTestUtil {
                 )
 
             MålgruppeType.UFØRETRYGD ->
-                UføretrygdTilsynBarn(
+                UføretrygdPassAvBarn(
                     vurderinger =
                         VurderingUføretrygd(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
@@ -150,7 +150,7 @@ object VilkårperiodeTestUtil {
                 )
 
             MålgruppeType.NEDSATT_ARBEIDSEVNE ->
-                NedsattArbeidsevneTilsynBarn(
+                NedsattArbeidsevnePassAvBarn(
                     vurderinger =
                         VurderingNedsattArbeidsevne(
                             dekketAvAnnetRegelverk = dekketAvAnnetRegelverk,
@@ -259,25 +259,25 @@ object VilkårperiodeTestUtil {
     ): AktivitetFaktaOgVurdering =
         when (type) {
             AktivitetType.TILTAK ->
-                TiltakTilsynBarn(
+                TiltakPassAvBarn(
                     vurderinger =
-                        VurderingTiltakTilsynBarn(
+                        VurderingTiltakPassAvBarn(
                             lønnet = lønnet,
                         ),
-                    fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = aktivitetsdager!!),
+                    fakta = FaktaAktivitetPassAvBarn(aktivitetsdager = aktivitetsdager!!),
                 )
 
             AktivitetType.UTDANNING ->
-                UtdanningTilsynBarn(
-                    fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = aktivitetsdager!!),
+                UtdanningPassAvBarn(
+                    fakta = FaktaAktivitetPassAvBarn(aktivitetsdager = aktivitetsdager!!),
                 )
 
             AktivitetType.REELL_ARBEIDSSØKER ->
-                ReellArbeidsøkerTilsynBarn(
-                    fakta = FaktaAktivitetTilsynBarn(aktivitetsdager = aktivitetsdager!!),
+                ReellArbeidsøkerPassAvBarn(
+                    fakta = FaktaAktivitetPassAvBarn(aktivitetsdager = aktivitetsdager!!),
                 )
 
-            AktivitetType.INGEN_AKTIVITET -> IngenAktivitetTilsynBarn
+            AktivitetType.INGEN_AKTIVITET -> IngenAktivitetPassAvBarn
         }
 
     fun faktaOgVurderingAktivitetLæremidler(
@@ -376,7 +376,7 @@ object VilkårperiodeTestUtil {
     )
 
     val faktaOgSvarTilsynBarnDto =
-        FaktaOgSvarAktivitetBarnetilsynDto(
+        FaktaOgSvarAktivitetPassAvBarnDto(
             svarLønnet = SvarJaNei.NEI,
             aktivitetsdager = 5,
         )
@@ -401,20 +401,20 @@ object VilkårperiodeTestUtil {
 
     fun Vilkårperiode.medAktivitetsdager(aktivitetsdager: Int): Vilkårperiode {
         val fakta = faktaOgVurdering.fakta
-        require(fakta is FaktaAktivitetTilsynBarn)
+        require(fakta is FaktaAktivitetPassAvBarn)
         val nyFakta = fakta.copy(aktivitetsdager = aktivitetsdager)
 
         return when (faktaOgVurdering) {
-            is TiltakTilsynBarn ->
-                withTypeOrThrow<TiltakTilsynBarn>()
+            is TiltakPassAvBarn ->
+                withTypeOrThrow<TiltakPassAvBarn>()
                     .let { it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(fakta = nyFakta)) }
 
-            is UtdanningTilsynBarn ->
-                withTypeOrThrow<UtdanningTilsynBarn>()
+            is UtdanningPassAvBarn ->
+                withTypeOrThrow<UtdanningPassAvBarn>()
                     .let { it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(fakta = nyFakta)) }
 
-            is ReellArbeidsøkerTilsynBarn ->
-                withTypeOrThrow<ReellArbeidsøkerTilsynBarn>()
+            is ReellArbeidsøkerPassAvBarn ->
+                withTypeOrThrow<ReellArbeidsøkerPassAvBarn>()
                     .let { it.copy(faktaOgVurdering = it.faktaOgVurdering.copy(fakta = nyFakta)) }
 
             else -> error("Har ikke aktivitetsdager på type ${faktaOgVurdering::class}")
@@ -424,8 +424,8 @@ object VilkårperiodeTestUtil {
     fun Vilkårperiode.medLønnet(lønnet: VurderingLønnet): Vilkårperiode {
         val faktaOgVurdering1 = this.faktaOgVurdering
         return when (faktaOgVurdering1) {
-            is TiltakTilsynBarn ->
-                withTypeOrThrow<TiltakTilsynBarn>().copy(
+            is TiltakPassAvBarn ->
+                withTypeOrThrow<TiltakPassAvBarn>().copy(
                     faktaOgVurdering =
                         faktaOgVurdering1.copy(
                             vurderinger = faktaOgVurdering1.vurderinger.copy(lønnet = lønnet),

@@ -26,7 +26,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.Familierelasjonsrolle
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlBarn
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørPassAvBarn
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -193,7 +193,7 @@ class FaktaGrunnlagService(
             }
 
     private fun Behandling.iverksattBehandlingAnnenForelder(): BehandlingsinformasjonAnnenForelder.IverksattBehandlingForelder {
-        val vedtak = vedtakService.hentVedtak<InnvilgelseEllerOpphørTilsynBarn>(this.id)
+        val vedtak = vedtakService.hentVedtak<InnvilgelseEllerOpphørPassAvBarn>(this.id)
         return BehandlingsinformasjonAnnenForelder.IverksattBehandlingForelder(
             barnFraTidligereVedtak = barnService.finnBarnPåFagsak(fagsakId).associate { it.id to it.ident },
             tidligereVedtak = vedtak.data,

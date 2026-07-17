@@ -30,7 +30,7 @@ internal class FagsakPersonControllerTest : CleanDatabaseIntegrationTest() {
     @Test
     internal fun `skal finne fagsaker til person`() {
         val person = testoppsettService.opprettPerson("1")
-        val tilsynBarn = testoppsettService.lagreFagsak(fagsak(person = person, stønadstype = Stønadstype.BARNETILSYN))
+        val passAvBarn = testoppsettService.lagreFagsak(fagsak(person = person, stønadstype = Stønadstype.BARNETILSYN))
         val læremidler = testoppsettService.lagreFagsak(fagsak(person = person, stønadstype = Stønadstype.LÆREMIDLER))
         val boutgifter = testoppsettService.lagreFagsak(fagsak(person = person, stønadstype = Stønadstype.BOUTGIFTER))
         val dagligReiseTsr = testoppsettService.lagreFagsak(fagsak(person = person, stønadstype = Stønadstype.DAGLIG_REISE_TSR))
@@ -38,7 +38,7 @@ internal class FagsakPersonControllerTest : CleanDatabaseIntegrationTest() {
 
         val fagsakPersonDto = testWithBrukerContext { fagsakPersonController.hentFagsakPerson(person.id) }
 
-        assertThat(fagsakPersonDto.tilsynBarn).isEqualTo(tilsynBarn.id)
+        assertThat(fagsakPersonDto.passAvBarn).isEqualTo(passAvBarn.id)
         assertThat(fagsakPersonDto.læremidler).isEqualTo(læremidler.id)
         assertThat(fagsakPersonDto.boutgifter).isEqualTo(boutgifter.id)
         assertThat(fagsakPersonDto.dagligReiseTsr).isEqualTo(dagligReiseTsr.id)

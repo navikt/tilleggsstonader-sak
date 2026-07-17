@@ -8,8 +8,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.detaljerteVedtaksperioder.DetaljertVedtaksperiodeTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.detaljerteVedtaksperioder.DetaljertVedtaksperioderTilsynBarnMapper.finnDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.DetaljertVedtaksperiodeBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.DetaljertVedtaksperioderBoutgifterMapper.finnDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReise
@@ -18,10 +16,12 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.DetaljertVedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperiodeLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperioderLæremidlerMapper.finnDetaljerteVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.detaljerteVedtaksperioder.DetaljertVedtaksperiodePassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.detaljerteVedtaksperioder.DetaljertVedtaksperioderPassAvBarnMapper.finnDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.springframework.stereotype.Service
@@ -42,7 +42,7 @@ class VedtaksperioderOversiktService(
         val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(fagsakPersonId)
 
         return VedtaksperioderOversikt(
-            tilsynBarn = fagsaker.barnetilsyn?.let { oppsummerVedtaksperioderTilsynBarn(it.id) } ?: emptyList(),
+            tilsynBarn = fagsaker.passAvBarn?.let { oppsummerVedtaksperioderPassAvBarn(it.id) } ?: emptyList(),
             læremidler = fagsaker.læremidler?.let { oppsummerVedtaksperioderLæremidler(it.id) } ?: emptyList(),
             boutgifter = fagsaker.boutgifter?.let { oppsummerVedtaksperioderBoutgifter(it.id) } ?: emptyList(),
             dagligReiseTso =
@@ -76,7 +76,7 @@ class VedtaksperioderOversiktService(
     private fun finnDetaljerteVedtaksperioderInnenforSammeEnhet(behandling: Saksbehandling?): List<DetaljertVedtaksperiode> {
         val vedtaksdata = behandling?.forrigeIverksatteBehandlingId?.let { vedtakService.hentVedtak(it)?.data }
         return when (vedtaksdata) {
-            is InnvilgelseEllerOpphørTilsynBarn -> vedtaksdata.finnDetaljerteVedtaksperioder()
+            is InnvilgelseEllerOpphørPassAvBarn -> vedtaksdata.finnDetaljerteVedtaksperioder()
             is InnvilgelseEllerOpphørLæremidler -> vedtaksdata.finnDetaljerteVedtaksperioder()
             is InnvilgelseEllerOpphørBoutgifter -> vedtaksdata.finnDetaljerteVedtaksperioder()
             null -> emptyList()
@@ -116,9 +116,9 @@ class VedtaksperioderOversiktService(
         )
     }
 
-    private fun oppsummerVedtaksperioderTilsynBarn(fagsakId: FagsakId): List<DetaljertVedtaksperiodeTilsynBarn> {
+    private fun oppsummerVedtaksperioderPassAvBarn(fagsakId: FagsakId): List<DetaljertVedtaksperiodePassAvBarn> {
         val vedtakForSisteIverksatteBehandling =
-            hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørTilsynBarn>(fagsakId)
+            hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørPassAvBarn>(fagsakId)
                 ?: return emptyList()
 
         return vedtakForSisteIverksatteBehandling.finnDetaljerteVedtaksperioder().sortedByDescending { it.fom }

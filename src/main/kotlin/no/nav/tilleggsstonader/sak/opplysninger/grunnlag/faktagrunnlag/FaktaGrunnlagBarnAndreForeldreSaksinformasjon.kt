@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.GeneriskFaktaGrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørPassAvBarn
 
 /**
  *
@@ -49,7 +49,7 @@ data class BehandlingsinformasjonAnnenForelder(
 ) {
     class IverksattBehandlingForelder(
         private val barnFraTidligereVedtak: Map<BarnId, IdentBarn>,
-        private val tidligereVedtak: InnvilgelseEllerOpphørTilsynBarn,
+        private val tidligereVedtak: InnvilgelseEllerOpphørPassAvBarn,
     ) {
         val perioderPerBarnIdent: Map<IdentBarn, List<Datoperiode>> by lazy {
             val perioderForBarn: MutableMap<BarnId, MutableList<Datoperiode>> = mutableMapOf()

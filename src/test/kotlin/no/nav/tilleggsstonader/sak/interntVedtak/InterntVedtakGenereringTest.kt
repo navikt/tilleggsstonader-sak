@@ -118,12 +118,12 @@ class InterntVedtakGenereringTest {
     }
 
     private fun mockTilsynBarn() {
-        every { behandlingService.hentSaksbehandling(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.behandling
-        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.vilkårperioder
-        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.grunnlagsdata
-        every { barnService.finnBarnPåBehandling(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.behandlingBarn
-        every { vilkårService.hentVilkår(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.vilkår
-        every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.vedtak
+        every { behandlingService.hentSaksbehandling(behandlingId) } returns InterntVedtakTestdata.PassAvBarn.behandling
+        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.PassAvBarn.vilkårperioder
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.PassAvBarn.grunnlagsdata
+        every { barnService.finnBarnPåBehandling(behandlingId) } returns InterntVedtakTestdata.PassAvBarn.behandlingBarn
+        every { vilkårService.hentVilkår(behandlingId) } returns InterntVedtakTestdata.PassAvBarn.vilkår
+        every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.PassAvBarn.vedtak
     }
 
     private fun mockLæremidler() {

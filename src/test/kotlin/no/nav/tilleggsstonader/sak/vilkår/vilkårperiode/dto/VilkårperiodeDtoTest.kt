@@ -106,7 +106,7 @@ class VilkårperiodeDtoTest {
                     ).tilDto()
 
             assertThat(tiltakTilsynBarn.faktaOgVurderinger).isEqualTo(
-                AktivitetBarnetilsynFaktaOgVurderingerDto(
+                AktivitetPassAvBarnFaktaOgVurderingerDto(
                     aktivitetsdager = 3,
                     lønnet = VurderingDto(SvarJaNei.NEI, resultat = OPPFYLT),
                 ),

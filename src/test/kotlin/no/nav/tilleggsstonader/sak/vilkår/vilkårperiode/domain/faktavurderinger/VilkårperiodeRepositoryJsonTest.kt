@@ -147,7 +147,7 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
     """
 
     private fun forventetType(type: TypeFaktaOgVurdering): Class<out FaktaOgVurdering> {
-        if (type is TypeFaktaOgVurderingTilsynBarn) {
+        if (type is TypeFaktaOgVurderingPassAvBarn) {
             return forventetTypeTilsynBarn(type)
         } else if (type is TypeFaktaOgVurderingLæremidler) {
             return forventetTypeLæremidler(type)
@@ -164,26 +164,26 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
         error("Ukjent type")
     }
 
-    private fun forventetTypeTilsynBarn(type: TypeFaktaOgVurderingTilsynBarn): Class<out FaktaOgVurderingTilsynBarn> =
+    private fun forventetTypeTilsynBarn(type: TypeFaktaOgVurderingPassAvBarn): Class<out FaktaOgVurderingPassAvBarn> =
         when (type) {
-            is MålgruppeTilsynBarnType -> {
+            is MålgruppePassAvBarnType -> {
                 when (type) {
-                    MålgruppeTilsynBarnType.SYKEPENGER_100_PROSENT_TILSYN_BARN -> SykepengerTilsynBarn::class
-                    MålgruppeTilsynBarnType.INGEN_MÅLGRUPPE_TILSYN_BARN -> IngenMålgruppeTilsynBarn::class
-                    MålgruppeTilsynBarnType.OMSTILLINGSSTØNAD_TILSYN_BARN -> OmstillingsstønadTilsynBarn::class
-                    MålgruppeTilsynBarnType.OVERGANGSSTØNAD_TILSYN_BARN -> OvergangssstønadTilsynBarn::class
-                    MålgruppeTilsynBarnType.AAP_TILSYN_BARN -> AAPTilsynBarn::class
-                    MålgruppeTilsynBarnType.UFØRETRYGD_TILSYN_BARN -> UføretrygdTilsynBarn::class
-                    MålgruppeTilsynBarnType.NEDSATT_ARBEIDSEVNE_TILSYN_BARN -> NedsattArbeidsevneTilsynBarn::class
+                    MålgruppePassAvBarnType.SYKEPENGER_100_PROSENT_TILSYN_BARN -> SykepengerPassAvBarn::class
+                    MålgruppePassAvBarnType.INGEN_MÅLGRUPPE_TILSYN_BARN -> IngenMålgruppePassAvBarn::class
+                    MålgruppePassAvBarnType.OMSTILLINGSSTØNAD_TILSYN_BARN -> OmstillingsstønadPassAvBarn::class
+                    MålgruppePassAvBarnType.OVERGANGSSTØNAD_TILSYN_BARN -> OvergangssstønadPassAvBarn::class
+                    MålgruppePassAvBarnType.AAP_TILSYN_BARN -> AAPPassAvBarn::class
+                    MålgruppePassAvBarnType.UFØRETRYGD_TILSYN_BARN -> UføretrygdPassAvBarn::class
+                    MålgruppePassAvBarnType.NEDSATT_ARBEIDSEVNE_TILSYN_BARN -> NedsattArbeidsevnePassAvBarn::class
                 }
             }
 
-            is AktivitetTilsynBarnType -> {
+            is AktivitetPassAvBarnType -> {
                 when (type) {
-                    AktivitetTilsynBarnType.UTDANNING_TILSYN_BARN -> UtdanningTilsynBarn::class
-                    AktivitetTilsynBarnType.TILTAK_TILSYN_BARN -> TiltakTilsynBarn::class
-                    AktivitetTilsynBarnType.REELL_ARBEIDSSØKER_TILSYN_BARN -> ReellArbeidsøkerTilsynBarn::class
-                    AktivitetTilsynBarnType.INGEN_AKTIVITET_TILSYN_BARN -> IngenAktivitetTilsynBarn::class
+                    AktivitetPassAvBarnType.UTDANNING_TILSYN_BARN -> UtdanningPassAvBarn::class
+                    AktivitetPassAvBarnType.TILTAK_TILSYN_BARN -> TiltakPassAvBarn::class
+                    AktivitetPassAvBarnType.REELL_ARBEIDSSØKER_TILSYN_BARN -> ReellArbeidsøkerPassAvBarn::class
+                    AktivitetPassAvBarnType.INGEN_AKTIVITET_TILSYN_BARN -> IngenAktivitetPassAvBarn::class
                 }
             }
         }.java

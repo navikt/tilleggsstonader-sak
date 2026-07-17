@@ -4,10 +4,10 @@ import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBehandling
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.defaultBehandling
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -21,7 +21,7 @@ class UtbetalingerDvhTest {
         val makssats = 8000
 
         val (vedtaksdata, andelTilkjentYtelse) =
-            lagTilsynBarnInnvilgelseMedBeløp(
+            lagPassAvBarnInnvilgelseMedBeløp(
                 fom = førsteJanuar,
                 tom = førsteJanuar,
                 månedsbeløp = stønadsbeløp,
@@ -29,7 +29,7 @@ class UtbetalingerDvhTest {
                 utgift = utgifterTotaltJanuar,
             )
 
-        val innvilgelseTilsynBarn = TilsynBarnTestUtil.innvilgelse(vedtaksdata)
+        val innvilgelseTilsynBarn = PassAvBarnTestUtil.innvilgelse(vedtaksdata)
         val resultat = UtbetalingerDvh.fraDomene(setOf(andelTilkjentYtelse), innvilgelseTilsynBarn)
 
         val forventetResultat =

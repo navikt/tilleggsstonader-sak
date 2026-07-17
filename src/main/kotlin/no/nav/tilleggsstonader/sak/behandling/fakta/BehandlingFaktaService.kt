@@ -34,7 +34,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.Dokumentasjo
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadPassAvBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.UtdanningAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Reiseavstand
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Reisemåte
@@ -64,7 +64,7 @@ class BehandlingFaktaService(
     fun hentFakta(behandlingId: BehandlingId): BehandlingFaktaDto {
         val stønadstype = fagsakService.hentFagsakForBehandling(behandlingId).stønadstype
         return when (stønadstype) {
-            Stønadstype.BARNETILSYN -> hentFaktaDtoForBarneTilsyn(behandlingId)
+            Stønadstype.BARNETILSYN -> hentFaktaDtoForPassAvBarn(behandlingId)
             Stønadstype.LÆREMIDLER -> hentFaktaDtoForLæremidler(behandlingId)
             Stønadstype.BOUTGIFTER -> hentFaktaDtoForBoutgifter(behandlingId)
             Stønadstype.DAGLIG_REISE_TSO -> hentFaktaDtoForDagligReise(behandlingId)
@@ -73,10 +73,10 @@ class BehandlingFaktaService(
         }
     }
 
-    fun hentFaktaDtoForBarneTilsyn(behandlingId: BehandlingId): BehandlingFaktaTilsynBarnDto {
-        val søknad = søknadService.hentSøknadBarnetilsyn(behandlingId)
+    fun hentFaktaDtoForPassAvBarn(behandlingId: BehandlingId): BehandlingFaktaPassAvBarnDto {
+        val søknad = søknadService.hentSøknadPassAvBarn(behandlingId)
         val grunnlagsdata = faktaGrunnlagService.hentGrunnlagsdata(behandlingId)
-        return BehandlingFaktaTilsynBarnDto(
+        return BehandlingFaktaPassAvBarnDto(
             søknadMottattTidspunkt = søknad?.mottattTidspunkt,
             hovedytelse = søknad?.data?.hovedytelse.let { mapHovedytelse(it) },
             aktivitet = mapAktivitet(søknad?.data?.aktivitet),
@@ -348,7 +348,7 @@ class BehandlingFaktaService(
 
     private fun mapBarn(
         grunnlagsdata: Grunnlag,
-        søknad: SøknadBarnetilsyn?,
+        søknad: SøknadPassAvBarn?,
         behandlingId: BehandlingId,
     ): List<FaktaBarn> {
         val søknadBarnPåIdent = søknad?.barn?.associateBy { it.ident } ?: emptyMap()

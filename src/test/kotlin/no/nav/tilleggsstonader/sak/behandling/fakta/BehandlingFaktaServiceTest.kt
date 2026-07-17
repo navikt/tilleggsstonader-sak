@@ -30,11 +30,11 @@ import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagFaktaGrunnlagPerson
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdataBarn
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagNavn
-import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.lagBarnMedBarnepass
-import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.lagDokumentasjon
-import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.lagSkjemaBarnetilsyn
-import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.lagSøknadBarn
-import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.søknadBarnetilsyn
+import no.nav.tilleggsstonader.sak.util.SøknadPassAvBarnUtil.lagBarnMedBarnepass
+import no.nav.tilleggsstonader.sak.util.SøknadPassAvBarnUtil.lagDokumentasjon
+import no.nav.tilleggsstonader.sak.util.SøknadPassAvBarnUtil.lagSkjemaPassAvBarn
+import no.nav.tilleggsstonader.sak.util.SøknadPassAvBarnUtil.lagSøknadBarn
+import no.nav.tilleggsstonader.sak.util.SøknadPassAvBarnUtil.søknadPassAvBarn
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
@@ -76,7 +76,7 @@ internal class BehandlingFaktaServiceTest {
                 personopplysninger = personopplysninger,
                 saksinformasjonAndreForeldre = listOf(saksinformasjonAndreForeldre),
             )
-        every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns søknadBarnetilsyn()
+        every { søknadService.hentSøknadPassAvBarn(behandlingId) } returns søknadPassAvBarn()
         val behandlingBarn =
             behandlingBarn(personIdent = "1", id = BarnId.fromString("60921c76-f8ef-4000-9824-f127a50a575e"))
         every { barnService.finnBarnPåBehandling(any()) } returns listOf(behandlingBarn)
@@ -102,8 +102,8 @@ internal class BehandlingFaktaServiceTest {
                     saksinformasjonAndreForeldre =
                         listOf(GeneriskFaktaGrunnlagTestUtil.faktaGrunnlagBarnAnnenForelder(identBarn = "1")),
                 )
-            every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns
-                søknadBarnetilsyn(
+            every { søknadService.hentSøknadPassAvBarn(behandlingId) } returns
+                søknadPassAvBarn(
                     barn = setOf(lagSøknadBarn(ident = "1")),
                 )
 
@@ -117,7 +117,7 @@ internal class BehandlingFaktaServiceTest {
 
             every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak
 
-            val data = service.hentFakta(behandlingId) as BehandlingFaktaTilsynBarnDto
+            val data = service.hentFakta(behandlingId) as BehandlingFaktaPassAvBarnDto
 
             assertThat(data.barn).hasSize(2)
             data.barn[0].let {
@@ -139,8 +139,8 @@ internal class BehandlingFaktaServiceTest {
                             barn = listOf(lagGrunnlagsdataBarn("1")),
                         ),
                 )
-            every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns
-                søknadBarnetilsyn(
+            every { søknadService.hentSøknadPassAvBarn(behandlingId) } returns
+                søknadPassAvBarn(
                     barn =
                         setOf(
                             lagSøknadBarn(ident = "1"),
@@ -168,8 +168,8 @@ internal class BehandlingFaktaServiceTest {
                         ),
                 )
             val barnMedBarnepass = lagBarnMedBarnepass(startetIFemte = null, årsak = null)
-            every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns
-                søknadBarnetilsyn(
+            every { søknadService.hentSøknadPassAvBarn(behandlingId) } returns
+                søknadPassAvBarn(
                     barn = setOf(lagSøknadBarn(ident = "1", data = barnMedBarnepass)),
                 )
             every { barnService.finnBarnPåBehandling(any()) } returns
@@ -181,7 +181,7 @@ internal class BehandlingFaktaServiceTest {
 
             every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak
 
-            val fakta = service.hentFakta(behandlingId) as BehandlingFaktaTilsynBarnDto
+            val fakta = service.hentFakta(behandlingId) as BehandlingFaktaPassAvBarnDto
 
             assertThat(
                 fakta.barn
@@ -199,8 +199,8 @@ internal class BehandlingFaktaServiceTest {
                             barn = listOf(lagGrunnlagsdataBarn("1", fødselsdato = LocalDate.now().minusYears(11))),
                         ),
                 )
-            every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns
-                søknadBarnetilsyn(
+            every { søknadService.hentSøknadPassAvBarn(behandlingId) } returns
+                søknadPassAvBarn(
                     barn = setOf(lagSøknadBarn(ident = "1")),
                 )
             every { barnService.finnBarnPåBehandling(any()) } returns
@@ -212,7 +212,7 @@ internal class BehandlingFaktaServiceTest {
 
             every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak
 
-            val fakta = service.hentFakta(behandlingId) as BehandlingFaktaTilsynBarnDto
+            val fakta = service.hentFakta(behandlingId) as BehandlingFaktaPassAvBarnDto
 
             assertThat(
                 fakta.barn
@@ -234,11 +234,11 @@ internal class BehandlingFaktaServiceTest {
                             barn = emptyList(),
                         ),
                 )
-            every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns
-                søknadBarnetilsyn(
+            every { søknadService.hentSøknadPassAvBarn(behandlingId) } returns
+                søknadPassAvBarn(
                     journalpostId = "journalpostId2",
                     barn = emptySet(),
-                    data = lagSkjemaBarnetilsyn(dokumentasjon = listOf(dokumentasjon)),
+                    data = lagSkjemaPassAvBarn(dokumentasjon = listOf(dokumentasjon)),
                 )
 
             val fagsak = fagsak(stønadstype = Stønadstype.BARNETILSYN)
@@ -267,9 +267,9 @@ internal class BehandlingFaktaServiceTest {
                         ),
                 )
             val dokumentasjon = lagDokumentasjon(identBarn = "1")
-            every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns
-                søknadBarnetilsyn(
-                    data = lagSkjemaBarnetilsyn(dokumentasjon = listOf(dokumentasjon)),
+            every { søknadService.hentSøknadPassAvBarn(behandlingId) } returns
+                søknadPassAvBarn(
+                    data = lagSkjemaPassAvBarn(dokumentasjon = listOf(dokumentasjon)),
                     barn = setOf(lagSøknadBarn(ident = "1")),
                 )
             every { barnService.finnBarnPåBehandling(any()) } returns

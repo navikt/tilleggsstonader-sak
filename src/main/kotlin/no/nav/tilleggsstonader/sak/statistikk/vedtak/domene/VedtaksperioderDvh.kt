@@ -2,19 +2,19 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeTilsynBarnMapper
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeLæremidlerMapper
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.BeregningsresultatPassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.VedtaksperiodePassAvBarnMapper
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
@@ -41,7 +41,7 @@ data class VedtaksperioderDvh(
             barn: List<BehandlingBarn>,
         ): JsonWrapper =
             when (val vedtaksdata = vedtak.data) {
-                is InnvilgelseEllerOpphørTilsynBarn ->
+                is InnvilgelseEllerOpphørPassAvBarn ->
                     mapVedtaksperioderTilsynBarn(
                         beregningsresultat = vedtaksdata.beregningsresultat,
                         barnIBehandlingen = barn,
@@ -56,7 +56,7 @@ data class VedtaksperioderDvh(
 
                 is InnvilgelseEllerOpphørDagligReise -> mapVedtaksperioderDagligReise(vedtaksdata)
 
-                is AvslagBoutgifter, is AvslagLæremidler, is AvslagTilsynBarn, is AvslagDagligReise ->
+                is AvslagBoutgifter, is AvslagLæremidler, is AvslagPassAvBarn, is AvslagDagligReise ->
                     JsonWrapper(
                         vedtaksperioder = emptyList(),
                     )
@@ -79,11 +79,11 @@ data class VedtaksperioderDvh(
             )
 
         private fun mapVedtaksperioderTilsynBarn(
-            beregningsresultat: BeregningsresultatTilsynBarn,
+            beregningsresultat: BeregningsresultatPassAvBarn,
             barnIBehandlingen: List<BehandlingBarn>,
         ) = JsonWrapper(
             vedtaksperioder =
-                VedtaksperiodeTilsynBarnMapper
+                VedtaksperiodePassAvBarnMapper
                     .mapTilVedtaksperiode(beregningsresultat.perioder)
                     .map {
                         VedtaksperioderDvh(

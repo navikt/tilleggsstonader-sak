@@ -1,0 +1,103 @@
+package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
+
+import no.nav.tilleggsstonader.sak.felles.domain.BarnId
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.util.toYearMonth
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelsePassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.Aktivitet
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.Beløpsperiode
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.Beregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.BeregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.BeregningsresultatPassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.UtgiftBarn
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.VedtaksperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import java.math.BigDecimal
+import java.time.LocalDate
+import java.util.UUID.randomUUID
+
+fun lagPassAvBarnInnvilgelseMedBeløp(
+    fom: LocalDate,
+    tom: LocalDate,
+    månedsbeløp: Int,
+    makssats: Int,
+    utgift: Int,
+): Pair<InnvilgelsePassAvBarn, AndelTilkjentYtelse> {
+    val målgruppe = MålgruppeType.AAP.faktiskMålgruppe()
+
+    val vedtaksperiode =
+        Vedtaksperiode(
+            id = randomUUID(),
+            fom = fom,
+            tom = tom,
+            målgruppe = målgruppe,
+            aktivitet = AktivitetType.TILTAK,
+        )
+    val aktivitet =
+        Aktivitet(
+            id = randomUUID(),
+            type = AktivitetType.TILTAK,
+            fom = fom,
+            tom = tom,
+            aktivitetsdager = 5,
+        )
+    val grunnlag =
+        VedtaksperiodeGrunnlag(
+            vedtaksperiode = VedtaksperiodeBeregning(vedtaksperiode.tilDto()),
+            aktiviteter = listOf<Aktivitet>(aktivitet),
+            antallDager = 25,
+        )
+
+    val beregningsgrunnlag =
+        Beregningsgrunnlag(
+            måned = fom.toYearMonth(),
+            makssats = makssats,
+            vedtaksperiodeGrunnlag = listOf(grunnlag),
+            utgifter = listOf(UtgiftBarn(BarnId.random(), utgift)),
+            utgifterTotal = utgift,
+            antallBarn = 1,
+        )
+
+    val beløpsperiode = Beløpsperiode(dato = fom, beløp = månedsbeløp, målgruppe = målgruppe)
+
+    val beregningsresultat =
+        BeregningsresultatPassAvBarn(
+            perioder =
+                listOf(
+                    BeregningsresultatForMåned(
+                        dagsats = BigDecimal.TEN,
+                        månedsbeløp = månedsbeløp,
+                        grunnlag = beregningsgrunnlag,
+                        beløpsperioder = listOf(beløpsperiode),
+                    ),
+                ),
+        )
+
+    val vedtaksdata =
+        InnvilgelsePassAvBarn(
+            vedtaksperioder = listOf(vedtaksperiode),
+            beregningsresultat = beregningsresultat,
+            beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+        )
+
+    val andel =
+        AndelTilkjentYtelse(
+            fom = fom,
+            tom = fom,
+            beløp = månedsbeløp,
+            id = randomUUID(),
+            satstype = Satstype.DAG,
+            utbetalingsdato = fom,
+            type = TypeAndel.TILSYN_BARN_AAP,
+        )
+
+    return vedtaksdata to andel
+}

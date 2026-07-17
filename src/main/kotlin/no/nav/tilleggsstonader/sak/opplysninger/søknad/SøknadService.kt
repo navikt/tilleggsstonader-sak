@@ -15,15 +15,15 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.SøknadskjemaBoutgifterMapper
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.SøknadskjemaDagligReiseMapper
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Søknad
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadLæremidler
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadPassAvBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadskjemaLæremidlerMapper
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaBarnetilsynMapper
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.SøknadsskjemaPassAvBarnMapper
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SøknadsskjemaReiseTilSamlingMapper
 import org.slf4j.LoggerFactory
 import org.springframework.data.repository.findByIdOrNull
@@ -33,7 +33,7 @@ import org.springframework.stereotype.Service
 class SøknadService(
     private val søknadMetadataRepository: SøknadMetadataRepository,
     private val søknadBehandlingRepository: SøknadBehandlingRepository,
-    private val søknadBarnetilsynRepository: SøknadBarnetilsynRepository,
+    private val søknadPassAvBarnRepository: SøknadPassAvBarnRepository,
     private val søknadBoutgifterRepository: SøknadBoutgifterRepository,
     private val søknadLæremidlerRepository: SøknadLæremidlerRepository,
     private val søknadskjemaBoutgifterMapper: SøknadskjemaBoutgifterMapper,
@@ -46,10 +46,10 @@ class SøknadService(
 
     fun hentSøknadMetadata(behandlingId: BehandlingId): SøknadMetadata? = søknadMetadataRepository.finnForBehandling(behandlingId)
 
-    fun hentSøknadBarnetilsyn(behandlingId: BehandlingId): SøknadBarnetilsyn? =
+    fun hentSøknadPassAvBarn(behandlingId: BehandlingId): SøknadPassAvBarn? =
         søknadBehandlingRepository
             .findByIdOrNull(behandlingId)
-            ?.let { søknadBarnetilsynRepository.findByIdOrThrow(it.søknadId) }
+            ?.let { søknadPassAvBarnRepository.findByIdOrThrow(it.søknadId) }
 
     fun hentSøknadLæremidler(behandlingId: BehandlingId): SøknadLæremidler? =
         søknadBehandlingRepository
@@ -79,7 +79,7 @@ class SøknadService(
         val søknad = mapSøknad(skjema, journalpost)
         val lagretSøknad =
             when (søknad) {
-                is SøknadBarnetilsyn -> søknadBarnetilsynRepository.insert(søknad)
+                is SøknadPassAvBarn -> søknadPassAvBarnRepository.insert(søknad)
                 is SøknadLæremidler -> søknadLæremidlerRepository.insert(søknad)
                 is SøknadBoutgifter -> søknadBoutgifterRepository.insert(søknad)
                 is SøknadDagligReise -> søknadDagligReiseRepository.insert(søknad)
@@ -98,7 +98,7 @@ class SøknadService(
     ): Søknad<out Any> =
         when (val søknadsskjema = skjema.skjema) {
             is SøknadsskjemaBarnetilsyn ->
-                SøknadsskjemaBarnetilsynMapper.map(
+                SøknadsskjemaPassAvBarnMapper.map(
                     skjema.mottattTidspunkt,
                     skjema.språk,
                     journalpost,

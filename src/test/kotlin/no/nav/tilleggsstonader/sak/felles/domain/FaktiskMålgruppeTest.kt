@@ -46,7 +46,7 @@ class FaktiskMålgruppeTest {
     @Nested
     inner class `skal mappe til rett type andel` {
         @Nested
-        inner class `for tilsyn barn` {
+        inner class `for pass av barn` {
             @Test
             fun `fra NEDSATT_ARBEIDSEVNE`() {
                 assertThat(FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE.tilTypeAndel(Stønadstype.BARNETILSYN)).isEqualTo(

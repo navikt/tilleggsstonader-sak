@@ -3,11 +3,6 @@ package no.nav.tilleggsstonader.sak.vedtak
 import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnResponse
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnResponse
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.VedtakTilsynBarnResponse
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.AvslagBoutgifterDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterResponse
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterResponse
@@ -21,20 +16,20 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelsePassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
@@ -44,6 +39,11 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.VedtakLæremidlerResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.AvslagPassAvBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.InnvilgelsePassAvBarnResponse
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.OpphørPassAvBarnResponse
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.VedtakPassAvBarnResponse
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import org.springframework.stereotype.Component
@@ -59,7 +59,7 @@ class VedtakDtoMapper(
         forrigeIverksatteBehandlingId: BehandlingId?,
     ): VedtakResponse =
         when (val data = vedtak.data) {
-            is VedtakTilsynBarn ->
+            is VedtakPassAvBarn ->
                 mapVedtakTilsynBarn(
                     vedtak,
                     data,
@@ -94,12 +94,12 @@ class VedtakDtoMapper(
 
     private fun mapVedtakTilsynBarn(
         vedtak: Vedtak,
-        data: VedtakTilsynBarn,
+        data: VedtakPassAvBarn,
         forrigeIverksatteBehandlingId: BehandlingId?,
-    ): VedtakTilsynBarnResponse =
+    ): VedtakPassAvBarnResponse =
         when (data) {
-            is InnvilgelseTilsynBarn ->
-                InnvilgelseTilsynBarnResponse(
+            is InnvilgelsePassAvBarn ->
+                InnvilgelsePassAvBarnResponse(
                     beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan),
                     vedtaksperioder =
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
@@ -108,16 +108,16 @@ class VedtakDtoMapper(
                     begrunnelse = data.begrunnelse,
                 )
 
-            is OpphørTilsynBarn ->
-                OpphørTilsynBarnResponse(
+            is OpphørPassAvBarn ->
+                OpphørPassAvBarnResponse(
                     årsakerOpphør = data.årsaker,
                     begrunnelse = data.begrunnelse,
                     vedtaksperioder = data.vedtaksperioder.tilLagretVedtaksperiodeDto(null),
                     opphørsdato = vedtak.opphørsdato ?: feil("Opphørsdato er obligatorisk for opphør"),
                 )
 
-            is AvslagTilsynBarn ->
-                AvslagTilsynBarnDto(
+            is AvslagPassAvBarn ->
+                AvslagPassAvBarnDto(
                     årsakerAvslag = data.årsaker,
                     begrunnelse = data.begrunnelse,
                 )

@@ -12,10 +12,10 @@ import no.nav.tilleggsstonader.sak.util.fagsakBoutgifter
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.TilsynBarnBeregningService
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.Beløpsperiode
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.beregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.beregning.PassAvBarnBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.Beløpsperiode
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.BeregningsresultatPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -37,7 +37,7 @@ class OpphørValideringServiceTest {
     private val vilkårService = mockk<VilkårService>()
     private val vedtakService = mockk<VedtakService>()
     private val utledTidligsteEndringService = mockk<UtledTidligsteEndringService>()
-    private val tilsynBarnBeregningService = mockk<TilsynBarnBeregningService>()
+    private val passAvBarnBeregningService = mockk<PassAvBarnBeregningService>()
 
     val måned = YearMonth.of(2025, 1)
     val fom = måned.atDay(1)
@@ -70,7 +70,7 @@ class OpphørValideringServiceTest {
     val aktivitet = VilkårperiodeTestUtil.aktivitet(status = Vilkårstatus.ENDRET, fom = fom, tom = tom)
 
     val beregningsresultat =
-        BeregningsresultatTilsynBarn(
+        BeregningsresultatPassAvBarn(
             listOf(
                 beregningsresultatForMåned(
                     måned = måned,
@@ -99,7 +99,7 @@ class OpphørValideringServiceTest {
             )
         every { vedtakService.hentVedtaksperioder(any()) } returns listOf(vedtaksperiode(fom, tom))
         every { utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(any()) } returns null
-        every { tilsynBarnBeregningService.beregn(any(), any(), any(), any()) } returns beregningsresultat
+        every { passAvBarnBeregningService.beregn(any(), any(), any(), any()) } returns beregningsresultat
     }
 
     @Nested
@@ -108,7 +108,7 @@ class OpphørValideringServiceTest {
         fun `Kaster ikke feil ved korrekt data`() {
             assertThatCode {
                 opphørValideringService.validerIngenUtbetalingEtterOpphørsdato(
-                    beregningsresultatTilsynBarn = beregningsresultat,
+                    beregningsresultatPassAvBarn = beregningsresultat,
                     opphørsdato = opphørsdato,
                 )
             }.doesNotThrowAnyException()
@@ -120,7 +120,7 @@ class OpphørValideringServiceTest {
 
             assertThatThrownBy {
                 opphørValideringService.validerIngenUtbetalingEtterOpphørsdato(
-                    beregningsresultatTilsynBarn = beregningsresultat,
+                    beregningsresultatPassAvBarn = beregningsresultat,
                     opphørsdato = opphørsdatoTilbakeITid,
                 )
             }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter opphørsdato")
@@ -137,7 +137,7 @@ class OpphørValideringServiceTest {
 
             assertThatCode {
                 opphørValideringService.validerIngenUtbetalingEtterOpphørsdato(
-                    beregningsresultatTilsynBarn = BeregningsresultatTilsynBarn(listOf(beregningsresultatForMåned)),
+                    beregningsresultatPassAvBarn = BeregningsresultatPassAvBarn(listOf(beregningsresultatForMåned)),
                     opphørsdato = opphørsdatoTilbakeITid,
                 )
             }.doesNotThrowAnyException()

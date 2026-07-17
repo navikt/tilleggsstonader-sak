@@ -102,7 +102,7 @@ class AndelTilkjentYtelseTest {
     }
 
     @Nested
-    inner class TilsynBarnAndel {
+    inner class PassAvBarnAndel {
         @Test
         fun `skal kaste feil hvis satstype ikke er dag`() {
             assertThatThrownBy {

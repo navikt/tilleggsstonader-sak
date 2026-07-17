@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GrunnlagBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
@@ -18,24 +17,25 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Innvilgelse
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelsePassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
@@ -95,9 +95,9 @@ class InterntVedtakService(
     ): BeregningsresultatInterntVedtakDto? =
         vedtak?.data?.let { data ->
             when (data) {
-                is InnvilgelseTilsynBarn ->
+                is InnvilgelsePassAvBarn ->
                     BeregningsresultatInterntVedtakDto(
-                        tilsynBarn = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan).perioder,
+                        passAvBarn = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan).perioder,
                     )
 
                 is InnvilgelseLæremidler ->
@@ -179,7 +179,7 @@ class InterntVedtakService(
 
     private fun mapVedtaksperioder(vedtak: Vedtak?): List<VedtaksperiodeInterntVedtak> =
         when (vedtak?.data) {
-            is InnvilgelseTilsynBarn -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
+            is InnvilgelsePassAvBarn -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
             is InnvilgelseLæremidler -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
             is InnvilgelseBoutgifter -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
             is InnvilgelseDagligReise -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
@@ -234,7 +234,7 @@ class InterntVedtakService(
     private fun mapVedtak(vedtak: Vedtak?): VedtakInternt? =
         vedtak?.let {
             when (vedtak.data) {
-                is VedtakTilsynBarn -> mapVedtakTilsynBarn(vedtak.data)
+                is VedtakPassAvBarn -> mapVedtakTilsynBarn(vedtak.data)
 
                 is VedtakLæremidler -> mapVedtakLæremidler(vedtak.data)
 
@@ -244,17 +244,17 @@ class InterntVedtakService(
             }
         }
 
-    private fun mapVedtakTilsynBarn(vedtak: VedtakTilsynBarn) =
+    private fun mapVedtakTilsynBarn(vedtak: VedtakPassAvBarn) =
         when (vedtak) {
-            is InnvilgelseTilsynBarn -> VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
+            is InnvilgelsePassAvBarn -> VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
 
-            is AvslagTilsynBarn ->
+            is AvslagPassAvBarn ->
                 VedtakAvslagInternt(
                     årsakerAvslag = vedtak.årsaker,
                     avslagBegrunnelse = vedtak.begrunnelse,
                 )
 
-            is OpphørTilsynBarn ->
+            is OpphørPassAvBarn ->
                 VedtakOpphørInternt(
                     årsakerOpphør = vedtak.årsaker,
                     opphørBegrunnelse = vedtak.begrunnelse,

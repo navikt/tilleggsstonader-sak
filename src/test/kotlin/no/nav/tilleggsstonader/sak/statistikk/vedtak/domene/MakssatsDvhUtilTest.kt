@@ -16,7 +16,7 @@ class MakssatsDvhUtilTest {
         val makssats = 3000 // makssatsen vil ikke treffe her, fordi 64% av 4000 er 2560
 
         val (innvilgelseTilsynBarn, andelTilkjentYtelse) =
-            lagTilsynBarnInnvilgelseMedBeløp(
+            lagPassAvBarnInnvilgelseMedBeløp(
                 fom = førsteJanuar,
                 tom = sisteJanuar,
                 månedsbeløp = stønadseløpMindreEnnMakssats,
@@ -44,7 +44,7 @@ class MakssatsDvhUtilTest {
         val makssats = 3000
 
         val (innvilgelseTilsynBarn, andelTilkjentYtelse) =
-            lagTilsynBarnInnvilgelseMedBeløp(
+            lagPassAvBarnInnvilgelseMedBeløp(
                 fom = førsteJanuar,
                 tom = sisteJanuar,
                 månedsbeløp = makssats,

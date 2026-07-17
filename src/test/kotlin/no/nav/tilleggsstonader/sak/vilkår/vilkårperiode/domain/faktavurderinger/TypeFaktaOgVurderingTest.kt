@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test
  */
 val alleEnumTyperFaktaOgVurdering: List<Pair<Stønadstype, TypeFaktaOgVurdering>> =
     listOf(
-        Stønadstype.BARNETILSYN to AktivitetTilsynBarnType.entries,
-        Stønadstype.BARNETILSYN to MålgruppeTilsynBarnType.entries,
+        Stønadstype.BARNETILSYN to AktivitetPassAvBarnType.entries,
+        Stønadstype.BARNETILSYN to MålgruppePassAvBarnType.entries,
         Stønadstype.LÆREMIDLER to AktivitetLæremidlerType.entries,
         Stønadstype.LÆREMIDLER to MålgruppeLæremidlerType.entries,
         Stønadstype.BOUTGIFTER to AktivitetBoutgifterType.entries,
@@ -34,7 +34,7 @@ class TypeFaktaOgVurderingTest {
     fun `sjekk at alle har riktig navn`() {
         alleEnumTyperFaktaOgVurdering.forEach { (stønadstype, type) ->
             when (type) {
-                is TypeFaktaOgVurderingTilsynBarn -> type.assertHarRiktigNavn(stønadstype)
+                is TypeFaktaOgVurderingPassAvBarn -> type.assertHarRiktigNavn(stønadstype)
                 is TypeFaktaOgVurderingLæremidler -> type.assertHarRiktigNavn(stønadstype)
                 is TypeFaktaOgVurderingBoutgifter -> type.assertHarRiktigNavn(stønadstype)
                 is TypeFaktaOgVurderingDagligReiseTso -> type.assertHarRiktigNavn(stønadstype)
@@ -48,7 +48,7 @@ class TypeFaktaOgVurderingTest {
     fun `sjekker at det feiler hvis man bruker feil stønadstype`() {
         assertThatThrownBy {
             alleEnumTyperFaktaOgVurdering.forEach { (_, type) ->
-                if (type == AktivitetTilsynBarnType.UTDANNING_TILSYN_BARN) {
+                if (type == AktivitetPassAvBarnType.UTDANNING_TILSYN_BARN) {
                     type.assertHarRiktigNavn(Stønadstype.LÆREMIDLER)
                 }
                 if (type == AktivitetLæremidlerType.UTDANNING_LÆREMIDLER) {

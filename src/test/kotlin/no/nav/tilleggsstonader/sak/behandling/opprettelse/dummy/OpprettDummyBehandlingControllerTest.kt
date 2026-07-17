@@ -54,7 +54,7 @@ class OpprettDummyBehandlingControllerTest : IntegrationTest() {
 
         Assertions.assertThat(behandlingRepository.findByIdOrNull(behandlingId)).isNotNull
         Assertions.assertThat(barnService.finnBarnPåBehandling(behandlingId)).hasSize(2)
-        val søknad = søknadService.hentSøknadBarnetilsyn(behandlingId)!!
+        val søknad = søknadService.hentSøknadPassAvBarn(behandlingId)!!
         Assertions.assertThat(søknad.barn).hasSize(2)
     }
 

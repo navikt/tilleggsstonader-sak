@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 
 class FagsakPersonDto(
     val id: FagsakPersonId,
-    val tilsynBarn: FagsakId?,
+    val passAvBarn: FagsakId?,
     val læremidler: FagsakId?,
     val boutgifter: FagsakId?,
     val dagligReiseTso: FagsakId?,

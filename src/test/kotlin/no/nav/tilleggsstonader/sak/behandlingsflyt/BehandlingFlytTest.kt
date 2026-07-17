@@ -26,9 +26,9 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBeha
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringStegService
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakController
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnVedtakController
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.InnvilgelsePassAvBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollController
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
@@ -67,7 +67,7 @@ class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
     lateinit var vilkårController: VilkårController
 
     @Autowired
-    lateinit var tilsynBarnVedtakController: TilsynBarnVedtakController
+    lateinit var passAvBarnVedtakController: PassAvBarnVedtakController
 
     @Autowired
     lateinit var brevController: BrevController
@@ -396,9 +396,9 @@ class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
                     aktivitetType = AktivitetType.TILTAK,
                 ),
             )
-        tilsynBarnVedtakController.lagreVedtak(
+        passAvBarnVedtakController.lagreVedtak(
             behandlingId,
-            InnvilgelseTilsynBarnRequest(vedtaksperioder = vedtaksperioderDto, begrunnelse = null),
+            InnvilgelsePassAvBarnRequest(vedtaksperioder = vedtaksperioderDto, begrunnelse = null),
         )
     }
 

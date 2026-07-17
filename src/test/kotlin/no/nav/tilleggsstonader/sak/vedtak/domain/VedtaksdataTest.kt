@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test
  */
 val alleEnumTypeVedtaksdata: List<Pair<Stønadstype, TypeVedtaksdata>> =
     listOf(
-        Stønadstype.BARNETILSYN to TypeVedtakTilsynBarn.entries,
+        Stønadstype.BARNETILSYN to TypeVedtakPassAvBarn.entries,
         Stønadstype.LÆREMIDLER to TypeVedtakLæremidler.entries,
         Stønadstype.BOUTGIFTER to TypeVedtakBoutgifter.entries,
         Stønadstype.DAGLIG_REISE_TSO to TypeVedtakDagligReise.entries,
@@ -26,7 +26,7 @@ class VedtaksdataTest {
     fun `sjekk at alle har riktig navn`() {
         alleEnumTypeVedtaksdata.forEach { (stønadstype, type) ->
             when (type) {
-                is TypeVedtakTilsynBarn -> type.assertHarRiktigNavn(stønadstype)
+                is TypeVedtakPassAvBarn -> type.assertHarRiktigNavn(stønadstype)
                 is TypeVedtakLæremidler -> type.assertHarRiktigNavn(stønadstype)
                 is TypeVedtakBoutgifter -> type.assertHarRiktigNavn(stønadstype)
                 is TypeVedtakDagligReise -> type.assertHarRiktigNavn(stønadstype)
@@ -38,7 +38,7 @@ class VedtaksdataTest {
     fun `sjekker at det feiler hvis man bruker feil stønadstype på tilsyn barn`() {
         assertThatThrownBy {
             alleEnumTypeVedtaksdata.forEach { (_, type) ->
-                if (type == TypeVedtakTilsynBarn.INNVILGELSE_TILSYN_BARN) {
+                if (type == TypeVedtakPassAvBarn.INNVILGELSE_TILSYN_BARN) {
                     type.assertHarRiktigNavn(Stønadstype.LÆREMIDLER)
                 }
             }

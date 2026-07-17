@@ -351,7 +351,7 @@ class JournalføringServiceTest {
             every { behandlingService.hentBehandlinger(any<FagsakId>()) } returns listOf(forrigeBehandling)
             every { journalpostService.hentSøknadFraJournalpost(any(), any()) } returns mockk()
             every { barnService.finnBarnPåBehandling(nyBehandling.id) } returns eksisterendeBarn.map { it.tilBehandlingBarn() }
-            every { søknadService.hentSøknadBarnetilsyn(nyBehandling.id) } returns
+            every { søknadService.hentSøknadPassAvBarn(nyBehandling.id) } returns
                 mockk {
                     every { barn } returns setOf(barn1, barn2)
                 }
@@ -385,7 +385,7 @@ class JournalføringServiceTest {
         fun `skal ta med nye barn fra søknad`() {
             val barn3 = SøknadBarn(ident = "nyttBarn", data = mockk())
 
-            every { søknadService.hentSøknadBarnetilsyn(nyBehandling.id) } returns
+            every { søknadService.hentSøknadPassAvBarn(nyBehandling.id) } returns
                 mockk {
                     every { barn } returns setOf(barn1, barn2, barn3)
                 }

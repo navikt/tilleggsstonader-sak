@@ -17,9 +17,9 @@ import tools.jackson.databind.ValueDeserializer
     visible = true,
 )
 @JsonSubTypes(
-    JsonSubTypes.Type(InnvilgelseTilsynBarn::class, name = "INNVILGELSE_TILSYN_BARN"),
-    JsonSubTypes.Type(OpphørTilsynBarn::class, name = "OPPHØR_TILSYN_BARN"),
-    JsonSubTypes.Type(AvslagTilsynBarn::class, name = "AVSLAG_TILSYN_BARN"),
+    JsonSubTypes.Type(InnvilgelsePassAvBarn::class, name = "INNVILGELSE_TILSYN_BARN"),
+    JsonSubTypes.Type(OpphørPassAvBarn::class, name = "OPPHØR_TILSYN_BARN"),
+    JsonSubTypes.Type(AvslagPassAvBarn::class, name = "AVSLAG_TILSYN_BARN"),
     JsonSubTypes.Type(InnvilgelseLæremidler::class, name = "INNVILGELSE_LÆREMIDLER"),
     JsonSubTypes.Type(AvslagLæremidler::class, name = "AVSLAG_LÆREMIDLER"),
     JsonSubTypes.Type(OpphørLæremidler::class, name = "OPPHØR_LÆREMIDLER"),
@@ -47,7 +47,7 @@ class TypeVedtaksdataDeserializer : ValueDeserializer<TypeVedtaksdata>() {
 
 val typerVedtaksdata: Map<String, TypeVedtaksdata> =
     listOf(
-        TypeVedtakTilsynBarn.entries,
+        TypeVedtakPassAvBarn.entries,
         TypeVedtakLæremidler.entries,
         TypeVedtakBoutgifter.entries,
         TypeVedtakDagligReise.entries,

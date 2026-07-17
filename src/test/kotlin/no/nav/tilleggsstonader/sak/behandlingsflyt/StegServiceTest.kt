@@ -18,9 +18,9 @@ import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.mockBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vilkår
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnBeregnYtelseSteg
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnBeregnYtelseSteg
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.InnvilgelsePassAvBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.BeslutteVedtakSteg
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.InngangsvilkårSteg
@@ -51,7 +51,7 @@ class StegServiceTest : CleanDatabaseIntegrationTest() {
     lateinit var behandlingRepository: BehandlingRepository
 
     @Autowired
-    lateinit var tilsynBarnBeregnYtelseSteg: TilsynBarnBeregnYtelseSteg
+    lateinit var passAvBarnBeregnYtelseSteg: PassAvBarnBeregnYtelseSteg
 
     @Autowired
     lateinit var inngangsvilkårSteg: InngangsvilkårSteg
@@ -100,7 +100,7 @@ class StegServiceTest : CleanDatabaseIntegrationTest() {
         opprettVilkårBarnetilsyn(behandlingId = behandling.id, barn = barn)
         val vedtakTilsynBarn = opprettVedtakTilsynBarn()
 
-        stegService.håndterSteg(saksbehandling(behandling = behandling), tilsynBarnBeregnYtelseSteg, vedtakTilsynBarn)
+        stegService.håndterSteg(saksbehandling(behandling = behandling), passAvBarnBeregnYtelseSteg, vedtakTilsynBarn)
 
         assertThat(behandlingshistorikkRepository.findByBehandlingIdOrderByEndretTidDesc(behandling.id).first().steg)
             .isEqualTo(StegType.BEREGNE_YTELSE)
@@ -157,7 +157,7 @@ class StegServiceTest : CleanDatabaseIntegrationTest() {
                 catchThrowableOfType<Feil> {
                     stegService.håndterSteg(
                         saksbehandling(behandling = behandling),
-                        tilsynBarnBeregnYtelseSteg,
+                        passAvBarnBeregnYtelseSteg,
                         vedtakTilsynBarn,
                     )
                 }
@@ -284,7 +284,7 @@ class StegServiceTest : CleanDatabaseIntegrationTest() {
         )
     }
 
-    private fun opprettVedtakTilsynBarn(): InnvilgelseTilsynBarnRequest {
+    private fun opprettVedtakTilsynBarn(): InnvilgelsePassAvBarnRequest {
         val vedtaksperioderDto =
             listOf(
                 VedtaksperiodeDto(
@@ -295,7 +295,7 @@ class StegServiceTest : CleanDatabaseIntegrationTest() {
                     aktivitetType = AktivitetType.TILTAK,
                 ),
             )
-        return InnvilgelseTilsynBarnRequest(
+        return InnvilgelsePassAvBarnRequest(
             vedtaksperioder = vedtaksperioderDto,
             begrunnelse = null,
         )

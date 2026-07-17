@@ -9,14 +9,14 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.finnPeriodeFraAndel as finnPeriodeTilsynBarnFraAndel
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.finnPeriodeFraAndel as finnPeriodeBoutgifterFraAndel
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.finnPeriodeFraAndel as finnPeriodeDagligReiseFraAndel
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.finnPerioderFraAndel as finnPerioderLæremidlerFraAndel
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.finnPeriodeFraAndel as finnPeriodeTilsynBarnFraAndel
 
 @Service
 class AndelTilkjentYtelseTilPeriodeService(
@@ -47,7 +47,7 @@ class AndelTilkjentYtelseTilPeriodeService(
                 finnPeriodeBoutgifterFraAndel(vedtakdata.beregningsresultat, andelTilkjentYtelse)
                     .let { Datoperiode(it.fom, it.tom) }
 
-            is InnvilgelseEllerOpphørTilsynBarn ->
+            is InnvilgelseEllerOpphørPassAvBarn ->
                 finnPeriodeTilsynBarnFraAndel(vedtakdata.beregningsresultat, andelTilkjentYtelse)
                     .let { Datoperiode(it.fom, it.tom) }
 

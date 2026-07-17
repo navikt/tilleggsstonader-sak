@@ -6,8 +6,8 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaPassAvBarnDto
 import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaService
-import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaTilsynBarnDto
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -311,7 +311,7 @@ class TaAvVentServiceTest : CleanDatabaseIntegrationTest() {
             )
 
             // Sjekk at fakta har blitt kopiert rett for barn
-            val fakta = behandlingFaktaService.hentFakta(behandling.id) as BehandlingFaktaTilsynBarnDto
+            val fakta = behandlingFaktaService.hentFakta(behandling.id) as BehandlingFaktaPassAvBarnDto
             assertThat(fakta.barn.size).isEqualTo(2)
         }
     }
