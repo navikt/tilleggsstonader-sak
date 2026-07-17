@@ -74,6 +74,12 @@ class AvklartKjørelisteService(
     }
 
     fun avklarUkerFraRegistrerteDager(behandlingId: BehandlingId) {
+        val eksisterendeManueltRegistrerteUker =
+            avklartKjørtUkeRepository
+                .findByBehandlingId(behandlingId)
+                .filter { it.status == UkeStatus.MANUELT_REGISTRERT }
+        avklartKjørtUkeRepository.deleteAll(eksisterendeManueltRegistrerteUker)
+
         val registrerteUker = registrertKjørtUkeRepository.findByBehandlingId(behandlingId)
 
         val avklarteUker =
