@@ -148,7 +148,7 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
 
     private fun forventetType(type: TypeFaktaOgVurdering): Class<out FaktaOgVurdering> {
         if (type is TypeFaktaOgVurderingPassAvBarn) {
-            return forventetTypeTilsynBarn(type)
+            return forventetTypePassAvBarn(type)
         } else if (type is TypeFaktaOgVurderingLæremidler) {
             return forventetTypeLæremidler(type)
         } else if (type is TypeFaktaOgVurderingBoutgifter) {
@@ -164,7 +164,7 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
         error("Ukjent type")
     }
 
-    private fun forventetTypeTilsynBarn(type: TypeFaktaOgVurderingPassAvBarn): Class<out FaktaOgVurderingPassAvBarn> =
+    private fun forventetTypePassAvBarn(type: TypeFaktaOgVurderingPassAvBarn): Class<out FaktaOgVurderingPassAvBarn> =
         when (type) {
             is MålgruppePassAvBarnType -> {
                 when (type) {

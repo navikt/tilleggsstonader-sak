@@ -122,7 +122,7 @@ class OpprettVilkårperiodeDsl {
         }
     }
 
-    fun aktivitetTiltakTilsynBarn(
+    fun aktivitetTiltakPassAvBarn(
         fom: LocalDate,
         tom: LocalDate,
         aktivitetsdager: Int,

@@ -234,7 +234,7 @@ class InterntVedtakService(
     private fun mapVedtak(vedtak: Vedtak?): VedtakInternt? =
         vedtak?.let {
             when (vedtak.data) {
-                is VedtakPassAvBarn -> mapVedtakTilsynBarn(vedtak.data)
+                is VedtakPassAvBarn -> mapVedtakPassAvBarn(vedtak.data)
 
                 is VedtakLæremidler -> mapVedtakLæremidler(vedtak.data)
 
@@ -244,7 +244,7 @@ class InterntVedtakService(
             }
         }
 
-    private fun mapVedtakTilsynBarn(vedtak: VedtakPassAvBarn) =
+    private fun mapVedtakPassAvBarn(vedtak: VedtakPassAvBarn) =
         when (vedtak) {
             is InnvilgelsePassAvBarn -> VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
 

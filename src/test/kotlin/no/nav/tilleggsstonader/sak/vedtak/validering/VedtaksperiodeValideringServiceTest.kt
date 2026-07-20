@@ -57,7 +57,7 @@ class VedtaksperiodeValideringServiceTest {
     val aktiviteter =
         listOf(
             aktivitet(
-                faktaOgVurdering = VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
+                faktaOgVurdering = VilkårperiodeTestUtil.faktaOgVurderingAktivitetPassAvBarn(type = AktivitetType.TILTAK),
                 fom = LocalDate.of(2025, 1, 1),
                 tom = LocalDate.of(2025, 2, 28),
             ),

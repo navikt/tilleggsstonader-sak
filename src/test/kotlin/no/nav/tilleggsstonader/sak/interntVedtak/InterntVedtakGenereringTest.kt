@@ -108,7 +108,7 @@ class InterntVedtakGenereringTest {
 
     private fun mock(type: Stønadstype) {
         when (type) {
-            Stønadstype.BARNETILSYN -> mockTilsynBarn()
+            Stønadstype.BARNETILSYN -> mockPassAvBarn()
             Stønadstype.LÆREMIDLER -> mockLæremidler()
             Stønadstype.BOUTGIFTER -> mockBoutgifter()
             Stønadstype.DAGLIG_REISE_TSO -> mockDagligReiseTso()
@@ -117,7 +117,7 @@ class InterntVedtakGenereringTest {
         }
     }
 
-    private fun mockTilsynBarn() {
+    private fun mockPassAvBarn() {
         every { behandlingService.hentSaksbehandling(behandlingId) } returns InterntVedtakTestdata.PassAvBarn.behandling
         every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.PassAvBarn.vilkårperioder
         every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.PassAvBarn.grunnlagsdata

@@ -42,7 +42,7 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
     fun `skal returnere vedtaksperiodeoversikt for alle stønadstyper`() {
         val fagsakPerson = testoppsettService.opprettPerson("123")
 
-        opprettBehandlingOgVedtakTilsynBarn(fagsakPerson)
+        opprettBehandlingOgVedtakPassAvBarn(fagsakPerson)
         opprettBehandlingOgVedtakLæremidler(fagsakPerson)
         opprettBehandlingOgVedtakBoutgifter(fagsakPerson)
         opprettBehandlingOgVedtakDagligReiseTso(fagsakPerson)
@@ -141,7 +141,7 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
         assertThat(privatBil?.rammevedtakPrivatBil?.reiseId).isEqualTo(dummyReiseId)
     }
 
-    private fun opprettBehandlingOgVedtakTilsynBarn(fagsakPerson: FagsakPerson) {
+    private fun opprettBehandlingOgVedtakPassAvBarn(fagsakPerson: FagsakPerson) {
         val behandling =
             testoppsettService.opprettBehandlingMedFagsak(
                 behandling = behandling(status = BehandlingStatus.FERDIGSTILT, resultat = BehandlingResultat.INNVILGET),

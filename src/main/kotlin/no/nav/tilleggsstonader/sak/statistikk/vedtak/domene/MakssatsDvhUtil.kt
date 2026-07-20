@@ -24,7 +24,7 @@ data class MakssatsDvhUtil(
                 is Avslag, is VedtakLæremidler -> ikkeRelevant
 
                 is InnvilgelseEllerOpphørPassAvBarn ->
-                    finnMakssatsTilsynBarn(
+                    finnMakssatsPassAvBarn(
                         vedtaksdata = vedtaksdata,
                         andelFom = andelTilkjentYtelse.fom,
                     )
@@ -41,7 +41,7 @@ data class MakssatsDvhUtil(
 
         private val ikkeRelevant = MakssatsDvhUtil(makssats = null, beløpErBegrensetAvMakssats = null)
 
-        private fun finnMakssatsTilsynBarn(
+        private fun finnMakssatsPassAvBarn(
             vedtaksdata: InnvilgelseEllerOpphørPassAvBarn,
             andelFom: LocalDate,
         ): MakssatsDvhUtil {

@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil.innvilgelse as innvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.innvilgelse as innvilgelseLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.innvilgelse as innvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.innvilgelse as innvilgelsePassAvBarn
 
 class VedtaksperioderDvhTest {
     val fom: LocalDate = LocalDate.of(2025, 1, 1)
@@ -25,11 +25,11 @@ class VedtaksperioderDvhTest {
     val alleBarn = barn1 + barn2
 
     @Test
-    fun `fraDomene kan mappe for InnvilgelseTilsynBarn`() {
+    fun `fraDomene kan mappe for InnvilgelsePassAvBarn`() {
         val resultat =
             VedtaksperioderDvh
                 .fraDomene(
-                    innvilgelseTilsynBarn(),
+                    innvilgelsePassAvBarn(),
                     barn = barn1,
                 ).vedtaksperioder
 

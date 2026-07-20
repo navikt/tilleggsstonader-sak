@@ -12,7 +12,7 @@ class OppfølgingServiceTest {
     val repository = OppfølgingRepositoryFake()
     val service = OppfølgingService(repository)
 
-    val behandlingTilsynBarn = behandling()
+    val behandlingPassAvBarn = behandling()
 
     @BeforeEach
     fun setUp() {
@@ -26,7 +26,7 @@ class OppfølgingServiceTest {
             val oppfølging =
                 repository.insert(
                     Oppfølging(
-                        behandlingId = behandlingTilsynBarn.id,
+                        behandlingId = behandlingPassAvBarn.id,
                         data = OppfølgingData(emptyList()),
                         aktiv = false,
                         tema = Tema.TSO,

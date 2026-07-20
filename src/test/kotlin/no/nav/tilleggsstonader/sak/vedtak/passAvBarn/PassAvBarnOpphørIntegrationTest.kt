@@ -31,7 +31,7 @@ class PassAvBarnOpphørIntegrationTest : CleanDatabaseIntegrationTest() {
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.BARNETILSYN,
             ) {
-                defaultTilsynBarnTestdata(fom = fom, tom = tom)
+                defaultPassAvBarnTestdata(fom = fom, tom = tom)
             }
 
         testoppsettService.settAndelerTilOkForBehandling(førstegangsbehandlingContext.behandlingId)
@@ -69,7 +69,7 @@ class PassAvBarnOpphørIntegrationTest : CleanDatabaseIntegrationTest() {
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.BARNETILSYN,
             ) {
-                defaultTilsynBarnTestdata(fom = fom, tom = tom)
+                defaultPassAvBarnTestdata(fom = fom, tom = tom)
             }
 
         testoppsettService.settAndelerTilOkForBehandling(førstegangsbehandlingContext.behandlingId)
@@ -116,7 +116,7 @@ class PassAvBarnOpphørIntegrationTest : CleanDatabaseIntegrationTest() {
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.BARNETILSYN,
             ) {
-                defaultTilsynBarnTestdata(fom = fom, tom = tom)
+                defaultPassAvBarnTestdata(fom = fom, tom = tom)
             }
 
         testoppsettService.settAndelerTilOkForBehandling(førstegangsbehandlingContext.behandlingId)
@@ -155,7 +155,7 @@ class PassAvBarnOpphørIntegrationTest : CleanDatabaseIntegrationTest() {
             ) {
                 aktivitet {
                     opprett {
-                        aktivitetTiltakTilsynBarn(
+                        aktivitetTiltakPassAvBarn(
                             fom = fom,
                             tom = tom,
                             aktivitetsdager = 4,

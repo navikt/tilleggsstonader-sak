@@ -35,7 +35,7 @@ class VedtaksdataTest {
     }
 
     @Test
-    fun `sjekker at det feiler hvis man bruker feil stønadstype på tilsyn barn`() {
+    fun `sjekker at det feiler hvis man bruker feil stønadstype på pass av barn`() {
         assertThatThrownBy {
             alleEnumTypeVedtaksdata.forEach { (_, type) ->
                 if (type == TypeVedtakPassAvBarn.INNVILGELSE_TILSYN_BARN) {

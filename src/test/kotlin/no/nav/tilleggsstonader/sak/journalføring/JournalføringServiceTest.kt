@@ -336,13 +336,13 @@ class JournalføringServiceTest {
                 filnavn = null,
                 saksbehandlerHarTilgang = true,
             )
-        val dokumentSøknadTilsynBarn =
+        val dokumentSøknadPassAvBarn =
             DokumentInfo(
                 "",
                 brevkode = DokumentBrevkode.BARNETILSYN.verdi,
                 dokumentvarianter = listOf(dokumentvariant),
             )
-        val journalpostMedTilsynBarnSøknad = journalpost.copy(dokumenter = listOf(dokumentSøknadTilsynBarn))
+        val journalpostMedPassAvBarnSøknad = journalpost.copy(dokumenter = listOf(dokumentSøknadPassAvBarn))
 
         @BeforeEach
         fun setUp() {
@@ -364,7 +364,7 @@ class JournalføringServiceTest {
                 forrigeBehandling.id
 
             journalføringService.journalførTilNyBehandling(
-                journalpostMedTilsynBarnSøknad,
+                journalpostMedPassAvBarnSøknad,
                 personIdent,
                 Stønadstype.BARNETILSYN,
                 BehandlingÅrsak.NYE_OPPLYSNINGER,
@@ -394,7 +394,7 @@ class JournalføringServiceTest {
             every { barnService.opprettBarn(capture(barnSlot)) } returns mockk()
 
             journalføringService.journalførTilNyBehandling(
-                journalpostMedTilsynBarnSøknad,
+                journalpostMedPassAvBarnSøknad,
                 personIdent,
                 Stønadstype.BARNETILSYN,
                 BehandlingÅrsak.SØKNAD,
@@ -421,13 +421,13 @@ class JournalføringServiceTest {
                 filnavn = null,
                 saksbehandlerHarTilgang = true,
             )
-        val dokumentSøknadTilsynBarn =
+        val dokumentSøknadPassAvBarn =
             DokumentInfo(
                 "",
                 brevkode = DokumentBrevkode.BOUTGIFTER.verdi,
                 dokumentvarianter = listOf(dokumentvariant),
             )
-        val journalpostMedSøknadBoutgifter = journalpost.copy(dokumenter = listOf(dokumentSøknadTilsynBarn))
+        val journalpostMedSøknadBoutgifter = journalpost.copy(dokumenter = listOf(dokumentSøknadPassAvBarn))
 
         @Test
         fun `skal lagre søknaden`() {

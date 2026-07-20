@@ -25,7 +25,7 @@ class AndelTilkjentYtelseTest {
         }
 
         @Test
-        fun `fom og tom er samme dag for tilsyn barn`() {
+        fun `fom og tom er samme dag for pass av barn`() {
             assertThatCode {
                 andel()
             }.doesNotThrowAnyException()
@@ -42,7 +42,7 @@ class AndelTilkjentYtelseTest {
         }
 
         @Test
-        fun `kast feil hvis TOM ikke er den samme dagen som FOM for tilsyn barn`() {
+        fun `kast feil hvis TOM ikke er den samme dagen som FOM for pass av barn`() {
             assertThatThrownBy {
                 andel().copy(tom = måned.atDay(2))
             }.hasMessageContaining("Forventer at fom(2024-01-01) er lik tom(2024-01-02) for type=TILSYN_BARN_AAP")

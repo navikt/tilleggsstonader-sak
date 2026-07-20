@@ -132,7 +132,7 @@ class VilkårperiodeAktivitetServiceTest : CleanDatabaseIntegrationTest() {
         @Test
         fun `skal kaste feil ved opprettelse av lønnet tiltak uten begrunnelse`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val faktaOgSvarTilsynBarnDto =
+            val faktaOgSvarPassAvBarnDto =
                 FaktaOgSvarAktivitetPassAvBarnDto(
                     svarLønnet = SvarJaNei.JA,
                     aktivitetsdager = 5,
@@ -144,7 +144,7 @@ class VilkårperiodeAktivitetServiceTest : CleanDatabaseIntegrationTest() {
                         type = AktivitetType.TILTAK,
                         behandlingId = behandling.id,
                         begrunnelse = null,
-                        faktaOgSvar = faktaOgSvarTilsynBarnDto,
+                        faktaOgSvar = faktaOgSvarPassAvBarnDto,
                     ),
                 )
             }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
@@ -174,7 +174,7 @@ class VilkårperiodeAktivitetServiceTest : CleanDatabaseIntegrationTest() {
         @Test
         fun `skal kaste feil ved tom og null begrunnelse på ingen aktivitet`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val faktaOgSvarTilsynBarnDto =
+            val faktaOgSvarPassAvBarnDto =
                 FaktaOgSvarAktivitetPassAvBarnDto(
                     svarLønnet = SvarJaNei.JA,
                     aktivitetsdager = null,
@@ -186,7 +186,7 @@ class VilkårperiodeAktivitetServiceTest : CleanDatabaseIntegrationTest() {
                             type = AktivitetType.INGEN_AKTIVITET,
                             begrunnelse = it,
                             behandlingId = behandling.id,
-                            faktaOgSvar = faktaOgSvarTilsynBarnDto,
+                            faktaOgSvar = faktaOgSvarPassAvBarnDto,
                         ),
                     )
                 }.hasMessageContaining("Mangler begrunnelse for ingen relevant aktivitet")
@@ -476,7 +476,7 @@ class VilkårperiodeAktivitetServiceTest : CleanDatabaseIntegrationTest() {
         svarLønnet: SvarJaNei? = null,
         nyBegrunnelse: String? = null,
     ): LagreVilkårperiode {
-        val faktaOgSvarTilsynBarnDto =
+        val faktaOgSvarPassAvBarnDto =
             FaktaOgSvarAktivitetPassAvBarnDto(
                 svarLønnet =
                     svarLønnet ?: faktaOgVurdering.vurderinger
@@ -492,7 +492,7 @@ class VilkårperiodeAktivitetServiceTest : CleanDatabaseIntegrationTest() {
             type = type as AktivitetType,
             fom = nyFom ?: fom,
             tom = nyTom ?: tom,
-            faktaOgSvar = faktaOgSvarTilsynBarnDto,
+            faktaOgSvar = faktaOgSvarPassAvBarnDto,
             begrunnelse = nyBegrunnelse ?: begrunnelse,
         )
     }

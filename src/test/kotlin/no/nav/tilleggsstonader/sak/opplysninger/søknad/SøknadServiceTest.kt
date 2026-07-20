@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadPassAvBarn
 import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagJournalpost
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.barnMedBarnepass
-import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaBarnetilsyn
+import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaPassAvBarn
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
@@ -55,11 +55,11 @@ class SøknadServiceTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `skal kunne lagre komplett søknad for barnetilsyn`() {
+    fun `skal kunne lagre komplett søknad for pass av barn`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak))
         val skjema =
-            søknadskjemaBarnetilsyn(
+            søknadskjemaPassAvBarn(
                 barnMedBarnepass = listOf(barnMedBarnepass(ident = "barn1", navn = "navn1")),
             )
         val søknad = søknadService.lagreSøknad(behandling.id, lagJournalpost("journalpostId"), skjema)
@@ -79,7 +79,7 @@ class SøknadServiceTest : CleanDatabaseIntegrationTest() {
     }
 
     private fun lagreSøknad(behandling: Behandling): SøknadPassAvBarn {
-        søknadService.lagreSøknad(behandling.id, lagJournalpost(), søknadskjemaBarnetilsyn())
+        søknadService.lagreSøknad(behandling.id, lagJournalpost(), søknadskjemaPassAvBarn())
         return søknadService.hentSøknadPassAvBarn(behandling.id)!!
     }
 }

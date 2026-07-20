@@ -60,7 +60,7 @@ class VedtakDtoMapper(
     ): VedtakResponse =
         when (val data = vedtak.data) {
             is VedtakPassAvBarn ->
-                mapVedtakTilsynBarn(
+                mapVedtakPassAvBarn(
                     vedtak,
                     data,
                     forrigeIverksatteBehandlingId,
@@ -92,7 +92,7 @@ class VedtakDtoMapper(
                 )
         }
 
-    private fun mapVedtakTilsynBarn(
+    private fun mapVedtakPassAvBarn(
         vedtak: Vedtak,
         data: VedtakPassAvBarn,
         forrigeIverksatteBehandlingId: BehandlingId?,

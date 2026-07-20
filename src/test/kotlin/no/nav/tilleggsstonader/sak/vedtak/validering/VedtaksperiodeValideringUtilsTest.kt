@@ -14,7 +14,7 @@ import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringUti
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringUtils.validerEnkeltperiode
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringUtils.validerIngenOverlappMellomVedtaksperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -52,7 +52,7 @@ class VedtaksperiodeValideringUtilsTest {
     val aktiviteter =
         listOf(
             aktivitet(
-                faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
+                faktaOgVurdering = faktaOgVurderingAktivitetPassAvBarn(type = AktivitetType.TILTAK),
                 fom = LocalDate.of(2025, 1, 1),
                 tom = LocalDate.of(2025, 2, 28),
             ),
@@ -120,7 +120,7 @@ class VedtaksperiodeValideringUtilsTest {
         val jan = YearMonth.of(2025, 1)
         val tilltakJan =
             aktivitet(
-                faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
+                faktaOgVurdering = faktaOgVurderingAktivitetPassAvBarn(type = AktivitetType.TILTAK),
                 fom = jan.atDay(1),
                 tom = jan.atDay(31),
             )
@@ -164,19 +164,19 @@ class VedtaksperiodeValideringUtilsTest {
             val aktiviteter =
                 listOf(
                     aktivitet(
-                        faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
+                        faktaOgVurdering = faktaOgVurderingAktivitetPassAvBarn(type = AktivitetType.TILTAK),
                         fom = jan.atDay(1),
                         tom = jan.atDay(9),
                     ),
                     aktivitet(
-                        faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.INGEN_AKTIVITET),
+                        faktaOgVurdering = faktaOgVurderingAktivitetPassAvBarn(type = AktivitetType.INGEN_AKTIVITET),
                         fom = jan.atDay(10),
                         tom = jan.atDay(20),
                         begrunnelse = "asd",
                         resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
                     ),
                     aktivitet(
-                        faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
+                        faktaOgVurdering = faktaOgVurderingAktivitetPassAvBarn(type = AktivitetType.TILTAK),
                         fom = jan.atDay(21),
                         tom = jan.atDay(31),
                     ),
@@ -259,7 +259,7 @@ class VedtaksperiodeValideringUtilsTest {
             val aktiviteter =
                 listOf(
                     aktivitet(
-                        faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.INGEN_AKTIVITET),
+                        faktaOgVurdering = faktaOgVurderingAktivitetPassAvBarn(type = AktivitetType.INGEN_AKTIVITET),
                         fom = jan.atDay(10),
                         tom = jan.atDay(20),
                         begrunnelse = "a",
@@ -309,7 +309,7 @@ class VedtaksperiodeValideringUtilsTest {
                 listOf(
                     aktivitet(
                         behandlingId = behandlingId,
-                        faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
+                        faktaOgVurdering = faktaOgVurderingAktivitetPassAvBarn(type = AktivitetType.TILTAK),
                         fom = jan.atDay(10),
                         tom = jan.atDay(20),
                     ),
@@ -533,7 +533,7 @@ class VedtaksperiodeValideringUtilsTest {
             val aktiviteter =
                 listOf(
                     aktivitet(
-                        faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
+                        faktaOgVurdering = faktaOgVurderingAktivitetPassAvBarn(type = AktivitetType.TILTAK),
                         fom = LocalDate.of(2025, 1, 1),
                         tom = LocalDate.of(2025, 1, 15),
                     ),
@@ -559,12 +559,12 @@ class VedtaksperiodeValideringUtilsTest {
                     aktivitet(
                         fom = LocalDate.of(2025, 1, 1),
                         tom = LocalDate.of(2025, 1, 10),
-                        faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
+                        faktaOgVurdering = faktaOgVurderingAktivitetPassAvBarn(type = AktivitetType.TILTAK),
                     ),
                     aktivitet(
                         fom = LocalDate.of(2025, 1, 11),
                         tom = LocalDate.of(2025, 1, 31),
-                        faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
+                        faktaOgVurdering = faktaOgVurderingAktivitetPassAvBarn(type = AktivitetType.TILTAK),
                     ),
                 )
 
@@ -585,12 +585,12 @@ class VedtaksperiodeValideringUtilsTest {
                     aktivitet(
                         fom = LocalDate.of(2025, 1, 1),
                         tom = LocalDate.of(2025, 1, 10),
-                        faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
+                        faktaOgVurdering = faktaOgVurderingAktivitetPassAvBarn(type = AktivitetType.TILTAK),
                     ),
                     aktivitet(
                         fom = LocalDate.of(2025, 1, 7),
                         tom = LocalDate.of(2025, 1, 31),
-                        faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
+                        faktaOgVurdering = faktaOgVurderingAktivitetPassAvBarn(type = AktivitetType.TILTAK),
                     ),
                 )
 
@@ -628,7 +628,7 @@ class VedtaksperiodeValideringUtilsTest {
                     fom = it.fom,
                     tom = it.tom,
                     faktaOgVurdering =
-                        faktaOgVurderingAktivitetTilsynBarn(
+                        faktaOgVurderingAktivitetPassAvBarn(
                             type = AktivitetType.TILTAK,
                             lønnet = VurderingLønnet(SvarJaNei.NEI),
                         ),

@@ -42,7 +42,7 @@ data class VedtaksperioderDvh(
         ): JsonWrapper =
             when (val vedtaksdata = vedtak.data) {
                 is InnvilgelseEllerOpphørPassAvBarn ->
-                    mapVedtaksperioderTilsynBarn(
+                    mapVedtaksperioderPassAvBarn(
                         beregningsresultat = vedtaksdata.beregningsresultat,
                         barnIBehandlingen = barn,
                     )
@@ -78,7 +78,7 @@ data class VedtaksperioderDvh(
                         },
             )
 
-        private fun mapVedtaksperioderTilsynBarn(
+        private fun mapVedtaksperioderPassAvBarn(
             beregningsresultat: BeregningsresultatPassAvBarn,
             barnIBehandlingen: List<BehandlingBarn>,
         ) = JsonWrapper(

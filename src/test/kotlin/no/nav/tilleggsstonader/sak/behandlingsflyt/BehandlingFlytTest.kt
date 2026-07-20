@@ -42,7 +42,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBa
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeMålgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgSvarTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgSvarPassAvBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
@@ -266,7 +266,7 @@ class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
 
     private fun vurderInngangsvilkår(
         behandlingId: BehandlingId,
-        aktivitetFaktaOgSvar: FaktaOgSvarDto = faktaOgSvarTilsynBarnDto,
+        aktivitetFaktaOgSvar: FaktaOgSvarDto = faktaOgSvarPassAvBarnDto,
     ) {
         val fom = LocalDate.of(2024, 1, 1)
         val tom = LocalDate.of(2024, 1, 31)

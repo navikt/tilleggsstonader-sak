@@ -16,12 +16,12 @@ import org.junit.jupiter.api.Test
 
 class AvslagPassAvBarnIntegrationTest : IntegrationTest() {
     @Test
-    fun `skal gjennomføre avslag for tilsyn barn`() {
+    fun `skal gjennomføre avslag for pass av barn`() {
         val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.BARNETILSYN,
             ) {
-                defaultTilsynBarnTestdata()
+                defaultPassAvBarnTestdata()
                 vedtak {
                     avslag()
                 }

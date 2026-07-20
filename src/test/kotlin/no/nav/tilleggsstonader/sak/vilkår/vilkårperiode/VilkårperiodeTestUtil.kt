@@ -230,7 +230,7 @@ object VilkårperiodeTestUtil {
         behandlingId: BehandlingId = BehandlingId.random(),
         fom: LocalDate = LocalDate.now(),
         tom: LocalDate = LocalDate.now().plusDays(5),
-        faktaOgVurdering: AktivitetFaktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(),
+        faktaOgVurdering: AktivitetFaktaOgVurdering = faktaOgVurderingAktivitetPassAvBarn(),
         begrunnelse: String? = null,
         resultat: ResultatVilkårperiode = faktaOgVurdering.utledResultat(),
         slettetKommentar: String? = null,
@@ -252,7 +252,7 @@ object VilkårperiodeTestUtil {
         gitVersjon = Applikasjonsversjon.versjon,
     )
 
-    fun faktaOgVurderingAktivitetTilsynBarn(
+    fun faktaOgVurderingAktivitetPassAvBarn(
         type: AktivitetType = AktivitetType.TILTAK,
         aktivitetsdager: Int? = 5,
         lønnet: VurderingLønnet = vurderingLønnet(),
@@ -375,7 +375,7 @@ object VilkårperiodeTestUtil {
         behandlingId = behandlingId,
     )
 
-    val faktaOgSvarTilsynBarnDto =
+    val faktaOgSvarPassAvBarnDto =
         FaktaOgSvarAktivitetPassAvBarnDto(
             svarLønnet = SvarJaNei.NEI,
             aktivitetsdager = 5,
@@ -388,7 +388,7 @@ object VilkårperiodeTestUtil {
         begrunnelse: String? = null,
         behandlingId: BehandlingId = BehandlingId.random(),
         kildeId: String? = null,
-        faktaOgSvar: FaktaOgSvarDto = faktaOgSvarTilsynBarnDto,
+        faktaOgSvar: FaktaOgSvarDto = faktaOgSvarPassAvBarnDto,
     ) = LagreVilkårperiode(
         type = type,
         fom = fom,

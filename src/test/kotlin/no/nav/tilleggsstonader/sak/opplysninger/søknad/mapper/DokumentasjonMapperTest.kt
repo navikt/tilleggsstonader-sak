@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon
 import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagDokument
 import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagJournalpost
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.lagDokumentasjon
-import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaBarnetilsyn
+import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaPassAvBarn
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -23,7 +23,7 @@ class DokumentasjonMapperTest {
             lagDokumentasjon(vedlegg = listOf(vedlegg2), barnId = "barnId"),
         )
 
-    val skjema = søknadskjemaBarnetilsyn(dokumentasjon = dokumentasjon).skjema
+    val skjema = søknadskjemaPassAvBarn(dokumentasjon = dokumentasjon).skjema
 
     val journalpost =
         lagJournalpost(

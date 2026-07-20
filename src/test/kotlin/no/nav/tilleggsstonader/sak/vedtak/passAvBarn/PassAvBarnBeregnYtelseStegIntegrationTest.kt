@@ -32,7 +32,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -467,7 +467,7 @@ class PassAvBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
                     behandlingId = behandling.id,
                     fom = januar.atDay(1),
                     tom = april.atEndOfMonth(),
-                    faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.UTDANNING),
+                    faktaOgVurdering = faktaOgVurderingAktivitetPassAvBarn(type = AktivitetType.UTDANNING),
                 ),
             )
             vilkårperiodeRepository.insert(
@@ -514,7 +514,7 @@ class PassAvBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
                     behandling.id,
                     fom = januar.atDay(1),
                     tom = april.atEndOfMonth(),
-                    faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.UTDANNING),
+                    faktaOgVurdering = faktaOgVurderingAktivitetPassAvBarn(type = AktivitetType.UTDANNING),
                 ),
             )
             vilkårperiodeRepository.insert(

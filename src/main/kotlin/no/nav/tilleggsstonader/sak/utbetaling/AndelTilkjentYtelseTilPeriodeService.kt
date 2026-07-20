@@ -16,7 +16,7 @@ import java.time.LocalDate
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.finnPeriodeFraAndel as finnPeriodeBoutgifterFraAndel
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.finnPeriodeFraAndel as finnPeriodeDagligReiseFraAndel
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.finnPerioderFraAndel as finnPerioderLæremidlerFraAndel
-import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.finnPeriodeFraAndel as finnPeriodeTilsynBarnFraAndel
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.finnPeriodeFraAndel as finnPeriodePassAvBarnFraAndel
 
 @Service
 class AndelTilkjentYtelseTilPeriodeService(
@@ -48,7 +48,7 @@ class AndelTilkjentYtelseTilPeriodeService(
                     .let { Datoperiode(it.fom, it.tom) }
 
             is InnvilgelseEllerOpphørPassAvBarn ->
-                finnPeriodeTilsynBarnFraAndel(vedtakdata.beregningsresultat, andelTilkjentYtelse)
+                finnPeriodePassAvBarnFraAndel(vedtakdata.beregningsresultat, andelTilkjentYtelse)
                     .let { Datoperiode(it.fom, it.tom) }
 
             is InnvilgelseEllerOpphørLæremidler ->

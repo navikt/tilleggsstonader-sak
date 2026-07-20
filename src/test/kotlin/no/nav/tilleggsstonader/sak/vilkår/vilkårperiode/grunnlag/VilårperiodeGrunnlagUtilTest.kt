@@ -25,7 +25,7 @@ class VilårperiodeGrunnlagUtilTest {
         }
 
         @Test
-        fun `skal kunne bruke AAP for tilsyn barn`() {
+        fun `skal kunne bruke AAP for pass av barn`() {
             assertThat(kanYtelseBrukesIBehandling(Stønadstype.BARNETILSYN, ytelse)).isTrue
         }
 

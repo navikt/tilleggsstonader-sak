@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 
 class UtbetalingerDvhTest {
     @Test
-    fun `mappes riktig for tilsyn barn`() {
+    fun `mappes riktig for pass av barn`() {
         val førsteJanuar = 1 januar 2025
 
         val utgifterTotaltJanuar = 6000
@@ -29,8 +29,8 @@ class UtbetalingerDvhTest {
                 utgift = utgifterTotaltJanuar,
             )
 
-        val innvilgelseTilsynBarn = PassAvBarnTestUtil.innvilgelse(vedtaksdata)
-        val resultat = UtbetalingerDvh.fraDomene(setOf(andelTilkjentYtelse), innvilgelseTilsynBarn)
+        val innvilgelsePassAvBarn = PassAvBarnTestUtil.innvilgelse(vedtaksdata)
+        val resultat = UtbetalingerDvh.fraDomene(setOf(andelTilkjentYtelse), innvilgelsePassAvBarn)
 
         val forventetResultat =
             UtbetalingerDvh.JsonWrapper(

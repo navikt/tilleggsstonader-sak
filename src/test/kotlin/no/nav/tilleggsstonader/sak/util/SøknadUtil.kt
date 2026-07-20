@@ -36,13 +36,13 @@ import java.time.LocalDateTime
 import java.time.Year
 
 object SøknadUtil {
-    fun søknadskjemaBarnetilsyn(
+    fun søknadskjemaPassAvBarn(
         ident: String = "søker",
         mottattTidspunkt: LocalDateTime = LocalDateTime.now(),
         barnMedBarnepass: List<BarnMedBarnepass> = listOf(barnMedBarnepass()),
         dokumentasjon: List<DokumentasjonFelt> = emptyList(),
     ): InnsendtSkjema<Skjemadata> {
-        val skjemaBarnetilsyn =
+        val skjemaPassAvBarn =
             SøknadsskjemaBarnetilsyn(
                 hovedytelse =
                     HovedytelseAvsnitt(
@@ -73,7 +73,7 @@ object SøknadUtil {
             ident = ident,
             mottattTidspunkt = mottattTidspunkt,
             språk = Språkkode.NB,
-            skjema = skjemaBarnetilsyn,
+            skjema = skjemaPassAvBarn,
         )
     }
 
@@ -82,7 +82,7 @@ object SøknadUtil {
         mottattTidspunkt: LocalDateTime = LocalDateTime.now(),
         dokumentasjon: List<DokumentasjonFelt> = emptyList(),
     ): InnsendtSkjema<Skjemadata> {
-        val skjemaBarnetilsyn =
+        val skjemaLæremidler =
             SøknadsskjemaLæremidler(
                 hovedytelse =
                     HovedytelseAvsnitt(
@@ -123,7 +123,7 @@ object SøknadUtil {
             ident = ident,
             mottattTidspunkt = mottattTidspunkt,
             språk = Språkkode.NB,
-            skjema = skjemaBarnetilsyn,
+            skjema = skjemaLæremidler,
         )
     }
 

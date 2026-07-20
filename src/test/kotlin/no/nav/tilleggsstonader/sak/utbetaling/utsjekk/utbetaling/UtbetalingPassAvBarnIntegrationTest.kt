@@ -18,12 +18,12 @@ class UtbetalingPassAvBarnIntegrationTest : IntegrationTest() {
     lateinit var fagsakUtbetalingsvalgService: FagsakUtbetalingsvalgService
 
     @Test
-    fun `iverksetting for tilsyn-barn skal bruke gammelt fagområde når toggle er av`() {
+    fun `iverksetting for pass av barn skal bruke gammelt fagområde når toggle er av`() {
         every { unleashService.isEnabled(Toggle.BRUK_NYTT_FAGOMRADE_FOR_UTBETALING) } returns false
         opprettBehandlingOgGjennomførBehandlingsløp(
             stønadstype = Stønadstype.BARNETILSYN,
         ) {
-            defaultTilsynBarnTestdata()
+            defaultPassAvBarnTestdata()
         }
 
         val iverksettingDto = hentIverksettingDtoer(1).single()
@@ -33,12 +33,12 @@ class UtbetalingPassAvBarnIntegrationTest : IntegrationTest() {
     }
 
     @Test
-    fun `iverksetting for tilsyn-barn skal bruke nytt fagområde når toggle er på`() {
+    fun `iverksetting for pass av barn skal bruke nytt fagområde når toggle er på`() {
         every { unleashService.isEnabled(Toggle.BRUK_NYTT_FAGOMRADE_FOR_UTBETALING) } returns true
         opprettBehandlingOgGjennomførBehandlingsløp(
             stønadstype = Stønadstype.BARNETILSYN,
         ) {
-            defaultTilsynBarnTestdata()
+            defaultPassAvBarnTestdata()
         }
 
         val iverksettingDto = hentIverksettingDtoer(1).single()
@@ -53,7 +53,7 @@ class UtbetalingPassAvBarnIntegrationTest : IntegrationTest() {
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.BARNETILSYN,
             ) {
-                defaultTilsynBarnTestdata()
+                defaultPassAvBarnTestdata()
             }
 
         every { unleashService.isEnabled(Toggle.BRUK_NYTT_FAGOMRADE_FOR_UTBETALING) } returns true
