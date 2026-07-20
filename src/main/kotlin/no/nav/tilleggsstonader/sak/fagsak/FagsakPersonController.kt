@@ -41,7 +41,7 @@ class FagsakPersonController(
         val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(person.id)
         return FagsakPersonDto(
             id = person.id,
-            passAvBarn = fagsaker.passAvBarn?.id,
+            tilsynBarn = fagsaker.passAvBarn?.id,
             læremidler = fagsaker.læremidler?.id,
             boutgifter = fagsaker.boutgifter?.id,
             dagligReiseTso = fagsaker.dagligReiseTso?.id,

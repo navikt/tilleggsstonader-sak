@@ -38,7 +38,7 @@ internal class FagsakPersonControllerTest : CleanDatabaseIntegrationTest() {
 
         val fagsakPersonDto = testWithBrukerContext { fagsakPersonController.hentFagsakPerson(person.id) }
 
-        assertThat(fagsakPersonDto.passAvBarn).isEqualTo(passAvBarn.id)
+        assertThat(fagsakPersonDto.tilsynBarn).isEqualTo(passAvBarn.id)
         assertThat(fagsakPersonDto.læremidler).isEqualTo(læremidler.id)
         assertThat(fagsakPersonDto.boutgifter).isEqualTo(boutgifter.id)
         assertThat(fagsakPersonDto.dagligReiseTsr).isEqualTo(dagligReiseTsr.id)
