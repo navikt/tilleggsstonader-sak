@@ -102,7 +102,7 @@ class BehandlingsoversiktServiceTest {
         val oversikt = service.hentOversikt(fagsak.fagsakPersonId)
 
         assertThat(oversikt.fagsakPersonId).isEqualTo(fagsak.fagsakPersonId)
-        assertThat(oversikt.passAvBarn!!.behandlinger).hasSize(1)
+        assertThat(oversikt.tilsynBarn!!.behandlinger).hasSize(1)
     }
 
     @Nested
@@ -111,7 +111,7 @@ class BehandlingsoversiktServiceTest {
         fun `vedtaksperioden skal mappes til min og max av vedtaksperiode fra beregningsresultatet`() {
             val oversikt = service.hentOversikt(fagsak.fagsakPersonId)
 
-            val behandling = oversikt.passAvBarn!!.behandlinger.single()
+            val behandling = oversikt.tilsynBarn!!.behandlinger.single()
             assertThat(behandling.vedtaksperiode?.fom).isEqualTo(LocalDate.of(2024, 3, 1))
             assertThat(behandling.vedtaksperiode?.tom).isEqualTo(LocalDate.of(2024, 3, 14))
         }
@@ -129,7 +129,7 @@ class BehandlingsoversiktServiceTest {
 
             val oversikt = service.hentOversikt(fagsak.fagsakPersonId)
 
-            val behandling = oversikt.passAvBarn!!.behandlinger.single()
+            val behandling = oversikt.tilsynBarn!!.behandlinger.single()
             assertThat(behandling.vedtaksperiode?.fom).isNull()
             assertThat(behandling.vedtaksperiode?.tom).isNull()
         }

@@ -40,7 +40,8 @@ data class InterntVedtak(
 )
 
 data class BeregningsresultatInterntVedtakDto(
-    val passAvBarn: List<BeregningsresultatForMånedDto>? = null,
+    // TODO TilsynBarn bør være PassAvBarn, men dette brukes eksternt
+    val tilsynBarn: List<BeregningsresultatForMånedDto>? = null,
     val læremidler: List<BeregningsresultatDtoLæremidler>? = null,
     val boutgifter: List<BeregningsresultatDtoBoutgifter>? = null,
     val dagligReise: BeregningsresultatDagligReiseDto? = null,

@@ -16,7 +16,7 @@ import java.time.LocalDateTime
 
 data class BehandlingsoversiktDto(
     val fagsakPersonId: FagsakPersonId,
-    val passAvBarn: FagsakMedBehandlinger?,
+    val tilsynBarn: FagsakMedBehandlinger?,
     val læremidler: FagsakMedBehandlinger?,
     val boutgifter: FagsakMedBehandlinger?,
     val dagligReiseTso: FagsakMedBehandlinger?,

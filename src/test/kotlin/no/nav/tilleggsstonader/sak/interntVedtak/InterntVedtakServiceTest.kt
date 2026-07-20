@@ -162,7 +162,7 @@ class InterntVedtakServiceTest {
                 InterntVedtakTestdata.PassAvBarn.vedtak.data.beregningsresultat.perioder
                     .single()
 
-            with(interntVedtak.beregningsresultat!!.passAvBarn!!.single()) {
+            with(interntVedtak.beregningsresultat!!.tilsynBarn!!.single()) {
                 assertThat(månedsbeløp).isEqualTo(forventet.månedsbeløp)
                 assertThat(dagsats).isEqualTo(forventet.dagsats)
                 assertThat(grunnlag.måned).isEqualTo(forventet.grunnlag.måned)

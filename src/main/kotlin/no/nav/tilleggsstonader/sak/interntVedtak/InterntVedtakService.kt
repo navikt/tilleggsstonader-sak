@@ -97,7 +97,7 @@ class InterntVedtakService(
             when (data) {
                 is InnvilgelsePassAvBarn ->
                     BeregningsresultatInterntVedtakDto(
-                        passAvBarn = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan).perioder,
+                        tilsynBarn = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan).perioder,
                     )
 
                 is InnvilgelseLæremidler ->
