@@ -339,7 +339,7 @@ class JournalføringServiceTest {
         val dokumentSøknadPassAvBarn =
             DokumentInfo(
                 "",
-                brevkode = DokumentBrevkode.BARNETILSYN.verdi,
+                brevkode = DokumentBrevkode.PASS_AV_BARN.verdi,
                 dokumentvarianter = listOf(dokumentvariant),
             )
         val journalpostMedPassAvBarnSøknad = journalpost.copy(dokumenter = listOf(dokumentSøknadPassAvBarn))

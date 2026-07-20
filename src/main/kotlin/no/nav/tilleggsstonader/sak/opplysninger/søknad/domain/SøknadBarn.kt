@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.opplysninger.søknad.domain
 
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.TypeBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.ÅrsakBarnepass
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate

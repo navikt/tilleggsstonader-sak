@@ -9,15 +9,15 @@ import no.nav.tilleggsstonader.kontrakter.søknad.EnumFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.EnumFlereValgFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
-import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaPassAvBarn
 import no.nav.tilleggsstonader.kontrakter.søknad.TekstFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AktivitetAvsnitt
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnAvsnitt
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnMedBarnepass
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.BarnAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.BarnMedBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.PassAvBarnAktivitetAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.TypeBarnepass
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -50,14 +50,14 @@ class OpprettDummySøknadPassAvBarn(
                 )
             }
         val skjemaBarnetilsyn =
-            SøknadsskjemaBarnetilsyn(
+            SøknadsskjemaPassAvBarn(
                 hovedytelse =
                     HovedytelseAvsnitt(
                         hovedytelse = EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "AAP")), emptyList()),
                         arbeidOgOpphold = null,
                     ),
                 aktivitet =
-                    AktivitetAvsnitt(
+                    PassAvBarnAktivitetAvsnitt(
                         aktiviteter =
                             EnumFlereValgFelt(
                                 "Hvilken aktivitet søker du om støtte i forbindelse med?",

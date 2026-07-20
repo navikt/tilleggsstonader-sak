@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper
 
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
-import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaPassAvBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
@@ -20,7 +20,7 @@ object SøknadsskjemaPassAvBarnMapper {
         mottattTidspunkt: LocalDateTime,
         språk: Språkkode,
         journalpost: Journalpost,
-        skjema: SøknadsskjemaBarnetilsyn,
+        skjema: SøknadsskjemaPassAvBarn,
     ): SøknadPassAvBarn =
         SøknadPassAvBarn(
             journalpostId = journalpost.journalpostId,
@@ -31,7 +31,7 @@ object SøknadsskjemaPassAvBarnMapper {
         )
 
     private fun mapSkjemaPassAvBarn(
-        skjema: SøknadsskjemaBarnetilsyn,
+        skjema: SøknadsskjemaPassAvBarn,
         journalpost: Journalpost,
     ) = SkjemaPassAvBarn(
         hovedytelse =
@@ -54,7 +54,7 @@ object SøknadsskjemaPassAvBarnMapper {
         dokumentasjon = mapDokumentasjon(skjema, journalpost),
     )
 
-    private fun mapBarn(skjema: SøknadsskjemaBarnetilsyn) =
+    private fun mapBarn(skjema: SøknadsskjemaPassAvBarn) =
         skjema.barn.barnMedBarnepass
             .map {
                 SøknadBarn(

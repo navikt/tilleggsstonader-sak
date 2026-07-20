@@ -160,7 +160,7 @@ class MottaSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
 
         assertThat(hendelseRepository.findByTypeAndId(TypeHendelse.JOURNALPOST, hendelse.hendelsesId)).isNotNull
 
-        mockJournalpost(brevkode = DokumentBrevkode.BARNETILSYN, søknad = søknadskjemaPassAvBarn())
+        mockJournalpost(brevkode = DokumentBrevkode.PASS_AV_BARN, søknad = søknadskjemaPassAvBarn())
         kjørTasksKlareForProsessering()
 
         validerFinnesBehandlingPåFagsakMedIdentAvTypeMedJournalpostRef(

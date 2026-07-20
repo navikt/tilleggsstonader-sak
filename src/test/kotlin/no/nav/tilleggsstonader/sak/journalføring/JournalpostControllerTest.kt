@@ -59,7 +59,7 @@ class JournalpostControllerTest(
     inner class FullførJournalpost {
         @Test
         fun `fullfør journalpost - skal ferdigstille journalpost, og opprette behandling og oppgave`() {
-            val journalpost = opprettJournalpost(journalpostMedStrukturertSøknad(DokumentBrevkode.BARNETILSYN))
+            val journalpost = opprettJournalpost(journalpostMedStrukturertSøknad(DokumentBrevkode.PASS_AV_BARN))
             leggTilJournalpostMedSøknadIMock(journalpost, jsonMapper.writeValueAsBytes(søknadskjemaPassAvBarn()))
             val dokumentInfoId = journalpost.dokumenter!!.single().dokumentInfoId
             val oppgave = opprettJournalføringsoppgave(journalpostId = journalpost.journalpostId)
