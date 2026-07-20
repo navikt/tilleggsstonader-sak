@@ -10,15 +10,15 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.beregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.innvilgetVedtak
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.opphørVedtak
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.BeregningsresultatPassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -79,7 +79,7 @@ class BehandlingsoversiktServiceTest {
             YearMonth.of(2024, 3),
             vedtaksperioder = listOf(vedtaksperiodeGrunnlag, vedtaksperiodeGrunnlag2),
         )
-    val beregningsresultat = BeregningsresultatTilsynBarn(perioder = listOf(beregningsresultatForMåned))
+    val beregningsresultat = BeregningsresultatPassAvBarn(perioder = listOf(beregningsresultatForMåned))
 
     var vedtak: Vedtak =
         innvilgetVedtak(

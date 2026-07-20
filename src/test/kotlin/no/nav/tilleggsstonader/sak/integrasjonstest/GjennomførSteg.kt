@@ -13,9 +13,6 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.dsl.BehandlingTestdataDsl
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilVedtaksperiodeDagligReiseDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.AvslagBoutgifterDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
@@ -27,6 +24,9 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.AvslagPassAvBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.InnvilgelsePassAvBarnRequest
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.OpphørPassAvBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreVilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
@@ -218,7 +218,7 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                     behandlingId = behandlingId,
                     innvilgelseDto =
                         when (stønadstype) {
-                            Stønadstype.BARNETILSYN -> InnvilgelseTilsynBarnRequest(vedtaksperioder = vedtaksperioder)
+                            Stønadstype.BARNETILSYN -> InnvilgelsePassAvBarnRequest(vedtaksperioder = vedtaksperioder)
                             Stønadstype.LÆREMIDLER -> InnvilgelseLæremidlerRequest(vedtaksperioder = vedtaksperioder)
                             Stønadstype.BOUTGIFTER -> InnvilgelseBoutgifterRequest(vedtaksperioder = vedtaksperioder)
                             Stønadstype.DAGLIG_REISE_TSO -> InnvilgelseDagligReiseTsoRequest(vedtaksperioder = vedtaksperioder)
@@ -241,7 +241,7 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                     vedtakDto =
                         when (stønadstype) {
                             Stønadstype.BARNETILSYN ->
-                                AvslagTilsynBarnDto(
+                                AvslagPassAvBarnDto(
                                     årsakerAvslag = listOf(ÅrsakAvslag.ANNET),
                                     begrunnelse = "begrunnelse",
                                 )
@@ -277,7 +277,7 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                     opphørDto =
                         when (stønadstype) {
                             Stønadstype.BARNETILSYN ->
-                                OpphørTilsynBarnRequest(
+                                OpphørPassAvBarnRequest(
                                     årsakerOpphør = opprettVedtak.årsaker,
                                     begrunnelse = opprettVedtak.begrunnelse,
                                     opphørsdato = opprettVedtak.opphørsdato,

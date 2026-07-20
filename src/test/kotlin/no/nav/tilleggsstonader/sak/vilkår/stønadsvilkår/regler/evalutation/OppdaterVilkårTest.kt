@@ -45,7 +45,7 @@ internal class OppdaterVilkårTest {
     @Nested
     inner class ValideringAvBeløp {
         @Nested
-        inner class TilsynBarn {
+        inner class PassAvBarn {
             val opprettVilkårDto =
                 OpprettVilkårDto(
                     vilkårType = VilkårType.PASS_BARN,

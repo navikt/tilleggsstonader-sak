@@ -1,18 +1,18 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvh.Companion.finnFødselsnumre
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBarn1
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBarn2
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBehandling
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.avslag
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.defaultBarn1
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.defaultBarn2
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.defaultBehandling
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgelse as innvilgelseTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil.innvilgelse as innvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.innvilgelse as innvilgelseLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.innvilgelse as innvilgelsePassAvBarn
 
 class VedtaksperioderDvhTest {
     val fom: LocalDate = LocalDate.of(2025, 1, 1)
@@ -25,11 +25,11 @@ class VedtaksperioderDvhTest {
     val alleBarn = barn1 + barn2
 
     @Test
-    fun `fraDomene kan mappe for InnvilgelseTilsynBarn`() {
+    fun `fraDomene kan mappe for InnvilgelsePassAvBarn`() {
         val resultat =
             VedtaksperioderDvh
                 .fraDomene(
-                    innvilgelseTilsynBarn(),
+                    innvilgelsePassAvBarn(),
                     barn = barn1,
                 ).vedtaksperioder
 

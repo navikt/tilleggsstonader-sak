@@ -287,7 +287,7 @@ class JournalføringService(
 
         val nyeBarn =
             søknadService
-                .hentSøknadBarnetilsyn(behandling.id)
+                .hentSøknadPassAvBarn(behandling.id)
                 ?.barn
                 ?.filterNot { barn -> eksisterendeBarn.any { it.ident == barn.ident } }
                 ?.map {

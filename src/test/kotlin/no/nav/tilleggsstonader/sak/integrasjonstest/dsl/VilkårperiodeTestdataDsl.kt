@@ -10,11 +10,11 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBoutgifterDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetPassAvBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
@@ -122,7 +122,7 @@ class OpprettVilkårperiodeDsl {
         }
     }
 
-    fun aktivitetTiltakTilsynBarn(
+    fun aktivitetTiltakPassAvBarn(
         fom: LocalDate,
         tom: LocalDate,
         aktivitetsdager: Int,
@@ -133,7 +133,7 @@ class OpprettVilkårperiodeDsl {
                 fom = fom,
                 tom = tom,
                 faktaOgSvar =
-                    FaktaOgSvarAktivitetBarnetilsynDto(
+                    FaktaOgSvarAktivitetPassAvBarnDto(
                         svarLønnet = SvarJaNei.NEI,
                         aktivitetsdager = aktivitetsdager,
                     ),

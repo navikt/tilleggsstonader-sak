@@ -32,7 +32,7 @@ sealed interface AktivitetFaktaOgVurdering : FaktaOgVurdering {
 /**
  * Typer, som implementers av enums for å få unike typer på hvert objekt
  * for å kunne deserialisere til riktig objekt
- * Eks [AktivitetTilsynBarnType.TILTAK_TILSYN_BARN] brukes i [TiltakTilsynBarn]
+ * Eks [AktivitetPassAvBarnType.TILTAK_TILSYN_BARN] brukes i [TiltakPassAvBarn]
  */
 sealed interface TypeFaktaOgVurdering {
     val vilkårperiodeType: VilkårperiodeType

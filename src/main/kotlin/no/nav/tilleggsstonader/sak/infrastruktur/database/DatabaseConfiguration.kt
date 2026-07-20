@@ -11,8 +11,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrun
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.SkjemaBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.SkjemaDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaLæremidler
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SkjemaPassAvBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SkjemaReiseTilSamling
 import no.nav.tilleggsstonader.sak.privatbil.InnsendtKjøreliste
 import no.nav.tilleggsstonader.sak.tilbakekreving.domene.TilbakekrevingJson
@@ -100,8 +100,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
             SimuleringResponseReader(),
             ÅrsakerReader(),
             ÅrsakerWriter(),
-            SkjemaBarnetilsynReader(),
-            SkjemaBarnetilsynWriter(),
+            SkjemaPassAvBarnReader(),
+            SkjemaPassAvBarnWriter(),
             SkjemaLæremidlerReader(),
             SkjemaLæremidlerWriter(),
             SkjemaBoutgifterReader(),
@@ -221,9 +221,9 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
     class ÅrsakerWriter : JsonWriter<Årsaker>()
 
     // Søknad
-    class SkjemaBarnetilsynReader : JsonReader<SkjemaBarnetilsyn>(SkjemaBarnetilsyn::class)
+    class SkjemaPassAvBarnReader : JsonReader<SkjemaPassAvBarn>(SkjemaPassAvBarn::class)
 
-    class SkjemaBarnetilsynWriter : JsonWriter<SkjemaBarnetilsyn>()
+    class SkjemaPassAvBarnWriter : JsonWriter<SkjemaPassAvBarn>()
 
     class SkjemaLæremidlerReader : JsonReader<SkjemaLæremidler>(SkjemaLæremidler::class)
 

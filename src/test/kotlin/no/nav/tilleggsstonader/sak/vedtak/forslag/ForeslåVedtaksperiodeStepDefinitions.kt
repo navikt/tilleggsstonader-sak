@@ -22,7 +22,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -177,7 +177,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
                 tom = parseDato(DomenenøkkelFelles.TOM, rad),
                 tiltaksvariant = parseValgfriEnum<TypeAktivitet>(DomenenøkkelFelles.TYPE_AKTIVITET, rad),
                 faktaOgVurdering =
-                    faktaOgVurderingAktivitetTilsynBarn(
+                    faktaOgVurderingAktivitetPassAvBarn(
                         type = parseValgfriEnum<AktivitetType>(DomenenøkkelForeslåVedtaksperioder.TYPE, rad)!!,
                     ),
             )

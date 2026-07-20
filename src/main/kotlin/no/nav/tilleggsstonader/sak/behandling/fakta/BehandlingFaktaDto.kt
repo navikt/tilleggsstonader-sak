@@ -29,7 +29,7 @@ import java.time.LocalDateTime
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes(
-    JsonSubTypes.Type(BehandlingFaktaTilsynBarnDto::class, name = "BARNETILSYN"),
+    JsonSubTypes.Type(BehandlingFaktaPassAvBarnDto::class, name = "BARNETILSYN"),
     JsonSubTypes.Type(BehandlingFaktaLæremidlerDto::class, name = "LÆREMIDLER"),
     JsonSubTypes.Type(BehandlingFaktaBoutgifterDto::class, name = "BOUTGIFTER"),
     JsonSubTypes.Type(BehandlingFaktaDagligReiseDto::class, name = "DAGLIG_REISE_TSO"),
@@ -43,7 +43,7 @@ sealed interface BehandlingFaktaDto {
     val arena: ArenaFakta?
 }
 
-data class BehandlingFaktaTilsynBarnDto(
+data class BehandlingFaktaPassAvBarnDto(
     override val søknadMottattTidspunkt: LocalDateTime?,
     override val hovedytelse: FaktaHovedytelse,
     override val dokumentasjon: FaktaDokumentasjon?,

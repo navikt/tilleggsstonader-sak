@@ -33,7 +33,7 @@ class OppfølgingIntegrasjonstest : CleanDatabaseIntegrationTest() {
     fun `henter kun oppfølginger for spesifiesert enhet`() {
         opprettBehandlingOgGjennomførBehandlingsløp(
             stønadstype = Stønadstype.BARNETILSYN,
-        ) { defaultTilsynBarnTestdata() }
+        ) { defaultPassAvBarnTestdata() }
 
         opprettBehandlingOgGjennomførBehandlingsløp(
             stønadstype = Stønadstype.DAGLIG_REISE_TSR,
@@ -67,7 +67,7 @@ class OppfølgingIntegrasjonstest : CleanDatabaseIntegrationTest() {
     fun `oppretter oppfølginger bare oppgaver for spesifiesert enhet`() {
         opprettBehandlingOgGjennomførBehandlingsløp(
             stønadstype = Stønadstype.BARNETILSYN,
-        ) { defaultTilsynBarnTestdata() }
+        ) { defaultPassAvBarnTestdata() }
 
         opprettBehandlingOgGjennomførBehandlingsløp(
             stønadstype = Stønadstype.DAGLIG_REISE_TSR,

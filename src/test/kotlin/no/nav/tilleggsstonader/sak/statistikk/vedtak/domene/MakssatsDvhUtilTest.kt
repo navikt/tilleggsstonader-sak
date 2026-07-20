@@ -7,7 +7,7 @@ import java.time.Month.JANUARY
 
 class MakssatsDvhUtilTest {
     @Test
-    fun `støtte til tilsyn barn som ikke treffer makssatsen, skal vises riktig i statistikken`() {
+    fun `støtte til pass av barn som ikke treffer makssatsen, skal vises riktig i statistikken`() {
         val førsteJanuar = LocalDate.of(2025, JANUARY, 1)
         val sisteJanuar = LocalDate.of(2025, JANUARY, 31)
 
@@ -15,8 +15,8 @@ class MakssatsDvhUtilTest {
         val stønadseløpMindreEnnMakssats = 2560
         val makssats = 3000 // makssatsen vil ikke treffe her, fordi 64% av 4000 er 2560
 
-        val (innvilgelseTilsynBarn, andelTilkjentYtelse) =
-            lagTilsynBarnInnvilgelseMedBeløp(
+        val (innvilgelsePassAvBarn, andelTilkjentYtelse) =
+            lagPassAvBarnInnvilgelseMedBeløp(
                 fom = førsteJanuar,
                 tom = sisteJanuar,
                 månedsbeløp = stønadseløpMindreEnnMakssats,
@@ -24,7 +24,7 @@ class MakssatsDvhUtilTest {
                 utgift = utgifterTotaltJanuar,
             )
 
-        val resultat = MakssatsDvhUtil.finnMakssats(andelTilkjentYtelse = andelTilkjentYtelse, vedtaksdata = innvilgelseTilsynBarn)
+        val resultat = MakssatsDvhUtil.finnMakssats(andelTilkjentYtelse = andelTilkjentYtelse, vedtaksdata = innvilgelsePassAvBarn)
 
         val forventetResultat =
             MakssatsDvhUtil(
@@ -36,15 +36,15 @@ class MakssatsDvhUtilTest {
     }
 
     @Test
-    fun `støtte til tilsyn barn som blir begrenset av makssatsen, skal vises riktig i statistikken`() {
+    fun `støtte til pass av barn som blir begrenset av makssatsen, skal vises riktig i statistikken`() {
         val førsteJanuar = LocalDate.of(2025, JANUARY, 1)
         val sisteJanuar = LocalDate.of(2025, JANUARY, 31)
 
         val utgifterTotaltJanuar = 5000
         val makssats = 3000
 
-        val (innvilgelseTilsynBarn, andelTilkjentYtelse) =
-            lagTilsynBarnInnvilgelseMedBeløp(
+        val (innvilgelsePassAvBarn, andelTilkjentYtelse) =
+            lagPassAvBarnInnvilgelseMedBeløp(
                 fom = førsteJanuar,
                 tom = sisteJanuar,
                 månedsbeløp = makssats,
@@ -52,7 +52,7 @@ class MakssatsDvhUtilTest {
                 utgift = utgifterTotaltJanuar,
             )
 
-        val resultat = MakssatsDvhUtil.finnMakssats(andelTilkjentYtelse = andelTilkjentYtelse, vedtaksdata = innvilgelseTilsynBarn)
+        val resultat = MakssatsDvhUtil.finnMakssats(andelTilkjentYtelse = andelTilkjentYtelse, vedtaksdata = innvilgelsePassAvBarn)
 
         val forventetResultat =
             MakssatsDvhUtil(

@@ -15,7 +15,6 @@ import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
@@ -26,6 +25,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -42,7 +42,7 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
     fun `skal returnere vedtaksperiodeoversikt for alle stønadstyper`() {
         val fagsakPerson = testoppsettService.opprettPerson("123")
 
-        opprettBehandlingOgVedtakTilsynBarn(fagsakPerson)
+        opprettBehandlingOgVedtakPassAvBarn(fagsakPerson)
         opprettBehandlingOgVedtakLæremidler(fagsakPerson)
         opprettBehandlingOgVedtakBoutgifter(fagsakPerson)
         opprettBehandlingOgVedtakDagligReiseTso(fagsakPerson)
@@ -141,7 +141,7 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
         assertThat(privatBil?.rammevedtakPrivatBil?.reiseId).isEqualTo(dummyReiseId)
     }
 
-    private fun opprettBehandlingOgVedtakTilsynBarn(fagsakPerson: FagsakPerson) {
+    private fun opprettBehandlingOgVedtakPassAvBarn(fagsakPerson: FagsakPerson) {
         val behandling =
             testoppsettService.opprettBehandlingMedFagsak(
                 behandling = behandling(status = BehandlingStatus.FERDIGSTILT, resultat = BehandlingResultat.INNVILGET),
@@ -149,7 +149,7 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
                 identer = fagsakPerson.identer,
             )
 
-        vedtakRepository.insert(TilsynBarnTestUtil.innvilgetVedtak(behandlingId = behandling.id))
+        vedtakRepository.insert(PassAvBarnTestUtil.innvilgetVedtak(behandlingId = behandling.id))
     }
 
     private fun opprettBehandlingOgVedtakLæremidler(fagsakPerson: FagsakPerson) {

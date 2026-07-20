@@ -29,7 +29,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.La
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.oppfylteSvarOffentligtransport
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -149,7 +149,7 @@ fun mapAktiviteter(
         fom = parseDato(DomenenøkkelFelles.FOM, rad),
         tom = parseDato(DomenenøkkelFelles.TOM, rad),
         faktaOgVurdering =
-            faktaOgVurderingAktivitetTilsynBarn(
+            faktaOgVurderingAktivitetPassAvBarn(
                 type =
                     parseValgfriEnum<AktivitetType>(DomenenøkkelFelles.AKTIVITET, rad)
                         ?: AktivitetType.TILTAK,

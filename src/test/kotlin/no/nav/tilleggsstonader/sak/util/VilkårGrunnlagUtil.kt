@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.util
 
-import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaTilsynBarnDto
+import no.nav.tilleggsstonader.sak.behandling.fakta.BehandlingFaktaPassAvBarnDto
 import no.nav.tilleggsstonader.sak.behandling.fakta.FaktaAktivitet
 import no.nav.tilleggsstonader.sak.behandling.fakta.FaktaBarn
 import no.nav.tilleggsstonader.sak.behandling.fakta.FaktaHovedytelse
@@ -12,7 +12,7 @@ import java.time.LocalDate
 
 object VilkårGrunnlagUtil {
     fun mockVilkårGrunnlagDto(barn: List<FaktaBarn> = emptyList()) =
-        BehandlingFaktaTilsynBarnDto(
+        BehandlingFaktaPassAvBarnDto(
             hovedytelse =
                 FaktaHovedytelse(
                     søknadsgrunnlag = null,

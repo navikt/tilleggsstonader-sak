@@ -6,11 +6,11 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.BeregningsresultatForMånedDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatDagligReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.BeregningsresultatForMånedDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.TypeVilkårFakta
@@ -40,6 +40,7 @@ data class InterntVedtak(
 )
 
 data class BeregningsresultatInterntVedtakDto(
+    // TODO TilsynBarn bør være PassAvBarn, men dette brukes eksternt
     val tilsynBarn: List<BeregningsresultatForMånedDto>? = null,
     val læremidler: List<BeregningsresultatDtoLæremidler>? = null,
     val boutgifter: List<BeregningsresultatDtoBoutgifter>? = null,

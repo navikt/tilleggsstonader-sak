@@ -66,7 +66,7 @@ class TilgangIntegrationTest : CleanDatabaseIntegrationTest() {
                     kall.vilkårperiode.opprett(
                         lagreVilkårperiodeAktivitet(
                             behandlingId = behandling.id,
-                            faktaOgSvar = VilkårperiodeTestUtil.faktaOgSvarTilsynBarnDto,
+                            faktaOgSvar = VilkårperiodeTestUtil.faktaOgSvarPassAvBarnDto,
                         ),
                     )
                 }
@@ -82,7 +82,7 @@ class TilgangIntegrationTest : CleanDatabaseIntegrationTest() {
                     .opprett(
                         lagreVilkårperiodeAktivitet(
                             behandlingId = behandling.id,
-                            faktaOgSvar = VilkårperiodeTestUtil.faktaOgSvarTilsynBarnDto,
+                            faktaOgSvar = VilkårperiodeTestUtil.faktaOgSvarPassAvBarnDto,
                         ),
                     ).expectStatus()
                     .isForbidden
@@ -103,7 +103,7 @@ class TilgangIntegrationTest : CleanDatabaseIntegrationTest() {
                     .opprett(
                         lagreVilkårperiodeAktivitet(
                             behandlingId = behandling.id,
-                            faktaOgSvar = VilkårperiodeTestUtil.faktaOgSvarTilsynBarnDto,
+                            faktaOgSvar = VilkårperiodeTestUtil.faktaOgSvarPassAvBarnDto,
                         ),
                     ).expectStatus()
                     .isForbidden
@@ -122,7 +122,7 @@ class TilgangIntegrationTest : CleanDatabaseIntegrationTest() {
                     .opprett(
                         lagreVilkårperiodeAktivitet(
                             behandlingId = behandling.id,
-                            faktaOgSvar = VilkårperiodeTestUtil.faktaOgSvarTilsynBarnDto,
+                            faktaOgSvar = VilkårperiodeTestUtil.faktaOgSvarPassAvBarnDto,
                         ),
                     ).expectStatus()
                     .isForbidden

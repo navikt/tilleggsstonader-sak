@@ -26,9 +26,9 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBeha
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringStegService
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakController
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnVedtakController
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.InnvilgelsePassAvBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollController
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
@@ -42,7 +42,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBa
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeMålgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgSvarTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgSvarPassAvBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
@@ -67,7 +67,7 @@ class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
     lateinit var vilkårController: VilkårController
 
     @Autowired
-    lateinit var tilsynBarnVedtakController: TilsynBarnVedtakController
+    lateinit var passAvBarnVedtakController: PassAvBarnVedtakController
 
     @Autowired
     lateinit var brevController: BrevController
@@ -266,7 +266,7 @@ class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
 
     private fun vurderInngangsvilkår(
         behandlingId: BehandlingId,
-        aktivitetFaktaOgSvar: FaktaOgSvarDto = faktaOgSvarTilsynBarnDto,
+        aktivitetFaktaOgSvar: FaktaOgSvarDto = faktaOgSvarPassAvBarnDto,
     ) {
         val fom = LocalDate.of(2024, 1, 1)
         val tom = LocalDate.of(2024, 1, 31)
@@ -396,9 +396,9 @@ class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
                     aktivitetType = AktivitetType.TILTAK,
                 ),
             )
-        tilsynBarnVedtakController.lagreVedtak(
+        passAvBarnVedtakController.lagreVedtak(
             behandlingId,
-            InnvilgelseTilsynBarnRequest(vedtaksperioder = vedtaksperioderDto, begrunnelse = null),
+            InnvilgelsePassAvBarnRequest(vedtaksperioder = vedtaksperioderDto, begrunnelse = null),
         )
     }
 

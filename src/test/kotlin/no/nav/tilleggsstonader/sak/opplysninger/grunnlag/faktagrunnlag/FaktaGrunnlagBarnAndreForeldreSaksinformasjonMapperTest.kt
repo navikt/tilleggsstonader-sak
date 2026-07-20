@@ -6,13 +6,13 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagBarnAndreForeldreSaksinformasjonMapper.mapBarnAndreForeldreSaksinformasjon
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsgrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtaksperiodeGrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.UtgiftBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelsePassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregningTestUtil.vedtaksperiodeBeregning
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.beregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.beregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.vedtaksperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.BeregningsresultatPassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.UtgiftBarn
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -209,7 +209,7 @@ class FaktaGrunnlagBarnAndreForeldreSaksinformasjonMapperTest {
         assertThat(resultat.single().data.andreForeldre).isEmpty()
     }
 
-    private fun lagVedtak(): InnvilgelseTilsynBarn {
+    private fun lagVedtak(): InnvilgelsePassAvBarn {
         val vedtaksperioder =
             listOf(
                 lagVedtaksperiodeGrunnlag(fom = LocalDate.of(2025, 1, 1), tom = LocalDate.of(2025, 1, 1)),
@@ -222,14 +222,14 @@ class FaktaGrunnlagBarnAndreForeldreSaksinformasjonMapperTest {
                 utgifter = listOf(UtgiftBarn(barnId = barnId1, 100)),
             )
         val beregningsresultat = beregningsresultatForMåned(grunnlag = beregningsgrunnlag)
-        return InnvilgelseTilsynBarn(
-            beregningsresultat = BeregningsresultatTilsynBarn(listOf(beregningsresultat)),
+        return InnvilgelsePassAvBarn(
+            beregningsresultat = BeregningsresultatPassAvBarn(listOf(beregningsresultat)),
             vedtaksperioder = emptyList(),
             beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
         )
     }
 
-    private fun lagVedtakMedSammeBarnMedForskjelligeBarnId(): InnvilgelseTilsynBarn {
+    private fun lagVedtakMedSammeBarnMedForskjelligeBarnId(): InnvilgelsePassAvBarn {
         val beregningsgrunnlagBarn1 =
             beregningsgrunnlag(
                 vedtaksperioder = listOf(lagVedtaksperiodeGrunnlag(fom = LocalDate.of(2025, 1, 1), tom = LocalDate.of(2025, 1, 1))),
@@ -247,8 +247,8 @@ class FaktaGrunnlagBarnAndreForeldreSaksinformasjonMapperTest {
                 utgifter = listOf(UtgiftBarn(barnId = barnId1FraTidligereVedtak, 100)),
             )
         val beregningsresultatBarn1GammelId = beregningsresultatForMåned(grunnlag = beregningsgrunnlagBarn1GammelId)
-        return InnvilgelseTilsynBarn(
-            beregningsresultat = BeregningsresultatTilsynBarn(listOf(beregningsresultatBarn1, beregningsresultatBarn1GammelId)),
+        return InnvilgelsePassAvBarn(
+            beregningsresultat = BeregningsresultatPassAvBarn(listOf(beregningsresultatBarn1, beregningsresultatBarn1GammelId)),
             vedtaksperioder = emptyList(),
             beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
         )

@@ -126,7 +126,7 @@ internal class VarselVedMotregningISimuleringServiceTest {
     fun `true når det er iverksatt forrige virkedag på en annen fagsak på gammelt fagområde`() {
         val behandlingId = behandling(fagsak).id
 
-        val fagsakTilsynbarn =
+        val fagsakPassAvBarn =
             fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN).copy(
                 utbetalPåNyttFagområde = false,
             )
@@ -136,12 +136,12 @@ internal class VarselVedMotregningISimuleringServiceTest {
             )
 
         val alleFagsaker =
-            Fagsaker(listOf(fagsakTilsynbarn, fagsakLæremidler).associateBy { it.stønadstype })
+            Fagsaker(listOf(fagsakPassAvBarn, fagsakLæremidler).associateBy { it.stønadstype })
 
-        every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakTilsynbarn
+        every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakPassAvBarn
         every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns alleFagsaker
 
-        val behandling = behandling(fagsakTilsynbarn)
+        val behandling = behandling(fagsakPassAvBarn)
         every { behandlingService.finnSisteIverksatteBehandling(any()) } returns behandling
         val idag = LocalDate.now()
 
@@ -172,17 +172,17 @@ internal class VarselVedMotregningISimuleringServiceTest {
     fun `false når det er iverksatt på en annen fagsak på gammel fagområde for 10 dager siden`() {
         val behandlingId = behandling(fagsak).id
 
-        val fagsakTilsynbarn =
+        val fagsakPassAvBarn =
             fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN).copy(
                 utbetalPåNyttFagområde = false,
             )
 
-        val alleFagsaker = Fagsaker(mapOf(fagsakTilsynbarn.stønadstype to fagsakTilsynbarn))
+        val alleFagsaker = Fagsaker(mapOf(fagsakPassAvBarn.stønadstype to fagsakPassAvBarn))
 
-        every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakTilsynbarn
+        every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakPassAvBarn
         every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns alleFagsaker
 
-        val behandling = behandling(fagsakTilsynbarn)
+        val behandling = behandling(fagsakPassAvBarn)
         every { behandlingService.finnSisteIverksatteBehandling(any()) } returns behandling
         val idag = LocalDate.now()
         val datoUtenfor = idag.forrigeVirkedag().minusDays(10)
@@ -209,16 +209,16 @@ internal class VarselVedMotregningISimuleringServiceTest {
     }
 
     @Test
-    fun `skal kun sjekke samme fagsak for tilsynbarn når nytt fagområde brukes`() {
-        val fagsakTilsynbarn = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN).copy(utbetalPåNyttFagområde = true)
+    fun `skal kun sjekke samme fagsak for passAvBarn når nytt fagområde brukes`() {
+        val fagsakPassAvBarn = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN).copy(utbetalPåNyttFagområde = true)
         val fagsakLæremidler = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.LÆREMIDLER).copy(utbetalPåNyttFagområde = false)
-        val behandlingId = behandling(fagsakTilsynbarn).id
+        val behandlingId = behandling(fagsakPassAvBarn).id
 
-        val alleFagsaker = Fagsaker(listOf(fagsakTilsynbarn, fagsakLæremidler).associateBy { it.stønadstype })
+        val alleFagsaker = Fagsaker(listOf(fagsakPassAvBarn, fagsakLæremidler).associateBy { it.stønadstype })
 
-        every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakTilsynbarn
+        every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakPassAvBarn
         every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns alleFagsaker
-        every { behandlingService.finnSisteIverksatteBehandling(fagsakTilsynbarn.id) } returns null
+        every { behandlingService.finnSisteIverksatteBehandling(fagsakPassAvBarn.id) } returns null
         every { behandlingService.finnSisteIverksatteBehandling(fagsakLæremidler.id) } returns behandling(fagsakLæremidler)
 
         val resultat = varselVedMotregningISimuleringService.finnesUtbetalingerPåSammeFagområdeSomIkkeErRegistrertIUR(behandlingId)
@@ -228,7 +228,7 @@ internal class VarselVedMotregningISimuleringServiceTest {
 
     @Test
     fun `skal sjekke alle fagsaker med gammelt fagområde`() {
-        val fagsakTilsynbarn = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN).copy(utbetalPåNyttFagområde = false)
+        val fagsakPassAvBarn = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN).copy(utbetalPåNyttFagområde = false)
         val fagsakLæremidler = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.LÆREMIDLER).copy(utbetalPåNyttFagområde = true)
         val fagsakBoutgifter = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BOUTGIFTER).copy(utbetalPåNyttFagområde = true)
         val fagsakDagligReise =
@@ -236,12 +236,12 @@ internal class VarselVedMotregningISimuleringServiceTest {
                 fagsakpersoner(setOf(personIdent)),
                 Stønadstype.DAGLIG_REISE_TSO,
             ).copy(utbetalPåNyttFagområde = false)
-        val behandlingId = behandling(fagsakTilsynbarn).id
+        val behandlingId = behandling(fagsakPassAvBarn).id
 
         val alleFagsaker =
             Fagsaker(
                 listOf(
-                    fagsakTilsynbarn,
+                    fagsakPassAvBarn,
                     fagsakLæremidler,
                     fagsakBoutgifter,
                     fagsakDagligReise,
@@ -251,9 +251,9 @@ internal class VarselVedMotregningISimuleringServiceTest {
         val behandlingDagligReise = behandling(fagsakDagligReise)
         val idag = LocalDate.now()
 
-        every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakTilsynbarn
+        every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakPassAvBarn
         every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns alleFagsaker
-        every { behandlingService.finnSisteIverksatteBehandling(fagsakTilsynbarn.id) } returns null
+        every { behandlingService.finnSisteIverksatteBehandling(fagsakPassAvBarn.id) } returns null
         every { behandlingService.finnSisteIverksatteBehandling(fagsakLæremidler.id) } returns null
         every { behandlingService.finnSisteIverksatteBehandling(fagsakBoutgifter.id) } returns null
         every { behandlingService.finnSisteIverksatteBehandling(fagsakDagligReise.id) } returns behandlingDagligReise
@@ -277,13 +277,13 @@ internal class VarselVedMotregningISimuleringServiceTest {
     }
 
     @Test
-    fun `skal feile når utbetalPåNyttFagområde mangler for tilsynbarn læremidler og boutgifter`() {
-        val fagsakTilsynbarn = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN)
-        val behandlingId = behandling(fagsakTilsynbarn).id
+    fun `skal feile når utbetalPåNyttFagområde mangler for passAvBarn læremidler og boutgifter`() {
+        val fagsakPassAvBarn = fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.BARNETILSYN)
+        val behandlingId = behandling(fagsakPassAvBarn).id
 
-        every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakTilsynbarn
+        every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakPassAvBarn
         every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns
-            Fagsaker(mapOf(fagsakTilsynbarn.stønadstype to fagsakTilsynbarn))
+            Fagsaker(mapOf(fagsakPassAvBarn.stønadstype to fagsakPassAvBarn))
 
         assertThatException()
             .isThrownBy {

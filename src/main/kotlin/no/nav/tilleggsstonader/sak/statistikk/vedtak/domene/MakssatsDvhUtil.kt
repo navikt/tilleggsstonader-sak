@@ -2,13 +2,13 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.util.toYearMonth
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.DEKNINGSGRAD_TILSYN_BARN
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.beregning.DEKNINGSGRAD_TILSYN_BARN
 import java.time.LocalDate
 
 data class MakssatsDvhUtil(
@@ -23,8 +23,8 @@ data class MakssatsDvhUtil(
             when (vedtaksdata) {
                 is Avslag, is VedtakLæremidler -> ikkeRelevant
 
-                is InnvilgelseEllerOpphørTilsynBarn ->
-                    finnMakssatsTilsynBarn(
+                is InnvilgelseEllerOpphørPassAvBarn ->
+                    finnMakssatsPassAvBarn(
                         vedtaksdata = vedtaksdata,
                         andelFom = andelTilkjentYtelse.fom,
                     )
@@ -41,8 +41,8 @@ data class MakssatsDvhUtil(
 
         private val ikkeRelevant = MakssatsDvhUtil(makssats = null, beløpErBegrensetAvMakssats = null)
 
-        private fun finnMakssatsTilsynBarn(
-            vedtaksdata: InnvilgelseEllerOpphørTilsynBarn,
+        private fun finnMakssatsPassAvBarn(
+            vedtaksdata: InnvilgelseEllerOpphørPassAvBarn,
             andelFom: LocalDate,
         ): MakssatsDvhUtil {
             val beregningsgrunnlagSomGjelder =

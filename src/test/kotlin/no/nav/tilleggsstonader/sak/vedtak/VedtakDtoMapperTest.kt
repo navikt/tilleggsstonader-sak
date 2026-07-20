@@ -5,12 +5,6 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.avslagVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.innvilgetVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.opphørVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.AvslagTilsynBarnDto
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnResponse
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.OpphørTilsynBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseResponse
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
@@ -20,6 +14,12 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerResponse
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.avslagVedtak
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.innvilgetVedtak
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.opphørVedtak
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.AvslagPassAvBarnDto
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.InnvilgelsePassAvBarnResponse
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.OpphørPassAvBarnResponse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
@@ -32,14 +32,14 @@ class VedtakDtoMapperTest {
     val vedtakDtoMapper = VedtakDtoMapper(vedtakService, dagligReiseVilkårService)
 
     @Nested
-    inner class TilsynBarn {
+    inner class PassAvBarn {
         @Test
         fun `skal mappe innvilget vedtak til dto`() {
             val vedtak = innvilgetVedtak()
 
             val dto = vedtakDtoMapper.toDto(vedtak, forrigeIverksatteBehandlingId = null)
 
-            assertThat(dto).isInstanceOf(InnvilgelseTilsynBarnResponse::class.java)
+            assertThat(dto).isInstanceOf(InnvilgelsePassAvBarnResponse::class.java)
         }
 
         @Test
@@ -61,9 +61,9 @@ class VedtakDtoMapperTest {
                     forrigeIverksatteBehandlingId = tidligereInnvilgetVedtak.behandlingId,
                 )
 
-            assertThat(dto).isInstanceOf(InnvilgelseTilsynBarnResponse::class.java)
+            assertThat(dto).isInstanceOf(InnvilgelsePassAvBarnResponse::class.java)
 
-            val vedtakResponse = dto as InnvilgelseTilsynBarnResponse
+            val vedtakResponse = dto as InnvilgelsePassAvBarnResponse
             assertThat(vedtakResponse.vedtaksperioder).hasSize(1)
 
             val vedtaksperiodeIRespons = vedtakResponse.vedtaksperioder!!.single()
@@ -85,7 +85,7 @@ class VedtakDtoMapperTest {
                     begrunnelse = "begrunnelse",
                 )
 
-            val dto = vedtakDtoMapper.toDto(vedtak, forrigeIverksatteBehandlingId = null) as AvslagTilsynBarnDto
+            val dto = vedtakDtoMapper.toDto(vedtak, forrigeIverksatteBehandlingId = null) as AvslagPassAvBarnDto
 
             assertThat(dto.begrunnelse).isEqualTo(vedtak.data.begrunnelse)
             assertThat(dto.type).isEqualTo(vedtak.type)
@@ -101,7 +101,7 @@ class VedtakDtoMapperTest {
                     opphørsdato = opphørsdato,
                 )
 
-            val dto = vedtakDtoMapper.toDto(vedtak, forrigeIverksatteBehandlingId = null) as OpphørTilsynBarnResponse
+            val dto = vedtakDtoMapper.toDto(vedtak, forrigeIverksatteBehandlingId = null) as OpphørPassAvBarnResponse
 
             assertThat(dto.årsakerOpphør).isEqualTo(vedtak.data.årsaker)
             assertThat(dto.begrunnelse).isEqualTo(vedtak.data.begrunnelse)

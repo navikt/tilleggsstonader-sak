@@ -8,8 +8,8 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.beregning.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -57,7 +57,7 @@ class VedtaksperiodeValideringServiceTest {
     val aktiviteter =
         listOf(
             aktivitet(
-                faktaOgVurdering = VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
+                faktaOgVurdering = VilkårperiodeTestUtil.faktaOgVurderingAktivitetPassAvBarn(type = AktivitetType.TILTAK),
                 fom = LocalDate.of(2025, 1, 1),
                 tom = LocalDate.of(2025, 2, 28),
             ),

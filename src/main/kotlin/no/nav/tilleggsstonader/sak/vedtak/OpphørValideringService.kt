@@ -5,9 +5,9 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.util.norskFormat
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.BeregningsresultatPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -48,10 +48,10 @@ class OpphørValideringService(
     }
 
     fun validerIngenUtbetalingEtterOpphørsdato(
-        beregningsresultatTilsynBarn: BeregningsresultatTilsynBarn,
+        beregningsresultatPassAvBarn: BeregningsresultatPassAvBarn,
         opphørsdato: LocalDate,
     ) {
-        beregningsresultatTilsynBarn.perioder.forEach { periode ->
+        beregningsresultatPassAvBarn.perioder.forEach { periode ->
             periode.beløpsperioder
                 .filter { it.beløp > 0 }
                 .forEach {

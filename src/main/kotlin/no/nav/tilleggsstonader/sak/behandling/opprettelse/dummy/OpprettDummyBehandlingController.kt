@@ -31,7 +31,7 @@ class OpprettDummyBehandlingController(
     private val tilgangService: TilgangService,
     private val opprettBehandlingService: OpprettBehandlingService,
     private val fagsakService: FagsakService,
-    private val opprettDummySøknadBarnetilsyn: OpprettDummySøknadBarnetilsyn,
+    private val opprettDummySøknadPassAvBarn: OpprettDummySøknadPassAvBarn,
     private val opprettDummySøknadLæremidler: OpprettDummySøknadLæremidler,
     private val opprettDummySøknadBoutgifter: OpprettDummySøknadBoutgifter,
     private val opprettDummySøknadDagligReise: OpprettDummySøknadDagligReise,
@@ -76,7 +76,7 @@ class OpprettDummyBehandlingController(
         behandling: Behandling,
     ) {
         when (fagsak.stønadstype) {
-            Stønadstype.BARNETILSYN -> opprettDummySøknadBarnetilsyn.opprettDummy(fagsak, behandling)
+            Stønadstype.BARNETILSYN -> opprettDummySøknadPassAvBarn.opprettDummy(fagsak, behandling)
             Stønadstype.LÆREMIDLER -> opprettDummySøknadLæremidler.opprettDummy(fagsak, behandling)
             Stønadstype.BOUTGIFTER -> opprettDummySøknadBoutgifter.opprettDummy(fagsak, behandling)
             Stønadstype.DAGLIG_REISE_TSO -> opprettDummySøknadDagligReise.opprettDummy(fagsak, behandling)

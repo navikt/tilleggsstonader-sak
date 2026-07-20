@@ -23,10 +23,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ResultatDelvilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetBarnetilsynFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetBoutgifterFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetDagligReiseTsoFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetLæremidlerFaktaOgVurderingerDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetPassAvBarnFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.MålgruppeFaktaOgVurderingerDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -65,15 +65,15 @@ class InterntVedtakServiceTest {
     }
 
     @Nested
-    inner class TilsynBarn {
+    inner class PassAvBarn {
         @BeforeEach
         fun setUp() {
-            every { behandlingService.hentSaksbehandling(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.behandling
-            every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.vilkårperioder
-            every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.grunnlagsdata
-            every { barnService.finnBarnPåBehandling(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.behandlingBarn
-            every { vilkårService.hentVilkår(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.vilkår
-            every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.vedtak
+            every { behandlingService.hentSaksbehandling(behandlingId) } returns InterntVedtakTestdata.PassAvBarn.behandling
+            every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.PassAvBarn.vilkårperioder
+            every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.PassAvBarn.grunnlagsdata
+            every { barnService.finnBarnPåBehandling(behandlingId) } returns InterntVedtakTestdata.PassAvBarn.behandlingBarn
+            every { vilkårService.hentVilkår(behandlingId) } returns InterntVedtakTestdata.PassAvBarn.vilkår
+            every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.PassAvBarn.vedtak
         }
 
         @Test
@@ -84,10 +84,10 @@ class InterntVedtakServiceTest {
                 assertThat(behandlingId).isEqualTo(InterntVedtakTestdata.behandlingId)
                 assertThat(eksternFagsakId).isEqualTo(1673L)
                 assertThat(stønadstype).isEqualTo(Stønadstype.BARNETILSYN)
-                assertThat(årsak).isEqualTo(InterntVedtakTestdata.TilsynBarn.behandling.årsak)
-                assertThat(ident).isEqualTo(InterntVedtakTestdata.TilsynBarn.behandling.ident)
-                assertThat(opprettetTidspunkt).isEqualTo(InterntVedtakTestdata.TilsynBarn.behandling.opprettetTid)
-                assertThat(resultat).isEqualTo(InterntVedtakTestdata.TilsynBarn.behandling.resultat)
+                assertThat(årsak).isEqualTo(InterntVedtakTestdata.PassAvBarn.behandling.årsak)
+                assertThat(ident).isEqualTo(InterntVedtakTestdata.PassAvBarn.behandling.ident)
+                assertThat(opprettetTidspunkt).isEqualTo(InterntVedtakTestdata.PassAvBarn.behandling.opprettetTid)
+                assertThat(resultat).isEqualTo(InterntVedtakTestdata.PassAvBarn.behandling.resultat)
                 assertThat(vedtakstidspunkt).isEqualTo(vedtakstidspunkt)
                 assertThat(saksbehandler).isEqualTo("saksbehandler")
                 assertThat(beslutter).isEqualTo("saksbeh2")
@@ -107,7 +107,7 @@ class InterntVedtakServiceTest {
             assertThat(interntVedtak.målgrupper).hasSize(3)
 
             val målgruppe =
-                InterntVedtakTestdata.TilsynBarn.vilkårperioder.målgrupper
+                InterntVedtakTestdata.PassAvBarn.vilkårperioder.målgrupper
                     .single { it.type == MålgruppeType.AAP }
 
             with(interntVedtak.målgrupper.single { it.type == MålgruppeType.AAP }) {
@@ -130,7 +130,7 @@ class InterntVedtakServiceTest {
             assertThat(interntVedtak.aktiviteter).hasSize(2)
 
             val aktivitet =
-                InterntVedtakTestdata.TilsynBarn.vilkårperioder.aktiviteter
+                InterntVedtakTestdata.PassAvBarn.vilkårperioder.aktiviteter
                     .single { it.resultat != ResultatVilkårperiode.SLETTET }
 
             with(interntVedtak.aktiviteter.single { it.resultat != ResultatVilkårperiode.SLETTET }) {
@@ -140,13 +140,13 @@ class InterntVedtakServiceTest {
                 assertThat(kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
                 assertThat(resultat).isEqualTo(ResultatVilkårperiode.IKKE_OPPFYLT)
                 assertThat(begrunnelse).isEqualTo("aktivitet abd")
-                with((faktaOgVurderinger as AktivitetBarnetilsynFaktaOgVurderingerDto).lønnet!!) {
+                with((faktaOgVurderinger as AktivitetPassAvBarnFaktaOgVurderingerDto).lønnet!!) {
                     assertThat(svar).isEqualTo(SvarJaNei.JA)
                     assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.IKKE_OPPFYLT)
                 }
             }
             val aktivitetSlettet =
-                InterntVedtakTestdata.TilsynBarn.vilkårperioder.aktiviteter
+                InterntVedtakTestdata.PassAvBarn.vilkårperioder.aktiviteter
                     .single { it.resultat == ResultatVilkårperiode.SLETTET }
             with(interntVedtak.aktiviteter.single { it.resultat == ResultatVilkårperiode.SLETTET }) {
                 assertThat(resultat).isEqualTo(ResultatVilkårperiode.SLETTET)
@@ -159,7 +159,7 @@ class InterntVedtakServiceTest {
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
 
             val forventet =
-                InterntVedtakTestdata.TilsynBarn.vedtak.data.beregningsresultat.perioder
+                InterntVedtakTestdata.PassAvBarn.vedtak.data.beregningsresultat.perioder
                     .single()
 
             with(interntVedtak.beregningsresultat!!.tilsynBarn!!.single()) {
@@ -455,7 +455,7 @@ class InterntVedtakServiceTest {
         @BeforeEach
         fun setUp() {
             every { behandlingService.hentSaksbehandling(behandlingId) } returns InterntVedtakTestdata.DagligReise.behandling
-            every { barnService.finnBarnPåBehandling(behandlingId) } returns InterntVedtakTestdata.TilsynBarn.behandlingBarn
+            every { barnService.finnBarnPåBehandling(behandlingId) } returns InterntVedtakTestdata.PassAvBarn.behandlingBarn
             every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.DagligReise.vilkårperioderTso
             every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.DagligReise.grunnlagsdata
             every { vilkårService.hentVilkår(behandlingId) } returns
