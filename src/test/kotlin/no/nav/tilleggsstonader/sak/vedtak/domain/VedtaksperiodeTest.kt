@@ -14,7 +14,7 @@ class VedtaksperiodeTest {
     val tom = LocalDate.of(2025, 3, 1)
     val målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
     val aktivitet = AktivitetType.TILTAK
-    val uuid = VedtaksperiodeId.random()
+    val vedtaksperiodeId = VedtaksperiodeId.random()
 
     val vedtaksperiode =
         listOf(
@@ -31,7 +31,7 @@ class VedtaksperiodeTest {
         val vedtaksperiodeDto =
             listOf(
                 VedtaksperiodeDto(
-                    id = uuid,
+                    id = vedtaksperiodeId,
                     fom = fom,
                     tom = tom,
                     målgruppeType = målgruppe,
