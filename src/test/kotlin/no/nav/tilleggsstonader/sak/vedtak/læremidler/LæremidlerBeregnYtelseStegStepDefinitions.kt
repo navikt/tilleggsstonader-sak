@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseValgfriDato
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.TilkjentYtelseRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VedtakRepositoryFake
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårperiodeRepositoryFake
@@ -119,7 +120,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
             simuleringService = simuleringService,
             beregningsplanUtleder = beregningsplanUtleder,
         )
-    val vedtaksperiodeId: UUID = UUID.randomUUID()
+    val vedtaksperiodeId: VedtaksperiodeId = VedtaksperiodeId.random()
 
     @Gitt("følgende aktiviteter for læremidler behandling={}")
     fun `følgende aktiviteter`(

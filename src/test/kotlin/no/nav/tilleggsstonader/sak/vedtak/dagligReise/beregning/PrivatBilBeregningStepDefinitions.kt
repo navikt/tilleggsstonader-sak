@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriBigDecimal
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
@@ -46,7 +47,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import org.assertj.core.api.Assertions.assertThat
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.util.UUID
 
 @Suppress("unused", "ktlint:standard:function-naming")
 class PrivatBilBeregningStepDefinitions {
@@ -252,15 +252,15 @@ class PrivatBilBeregningStepDefinitions {
     ) {
         val forventedeVedtaksperioder = mapVedtaksperioder(dataTable)
 
-        // Sammenlign uten uuid da den genereres i mapVedtaksperioder() over
-        val dummyUuid = UUID.randomUUID()
+        // Sammenlign uten id da den genereres i mapVedtaksperioder() over
+        val dummyId = VedtaksperiodeId.random()
         assertThat(
             rammevedtak!!
                 .reiser[reiseNr - 1]
                 .grunnlag.vedtaksperioder
-                .map { it.copy(id = dummyUuid) },
+                .map { it.copy(id = dummyId) },
         ).isEqualTo(
-            forventedeVedtaksperioder.map { it.copy(id = dummyUuid) },
+            forventedeVedtaksperioder.map { it.copy(id = dummyId) },
         )
     }
 

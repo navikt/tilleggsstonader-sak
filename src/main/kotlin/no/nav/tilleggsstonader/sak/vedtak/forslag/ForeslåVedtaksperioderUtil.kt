@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.mergeSammenhengende
@@ -18,7 +19,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import java.time.LocalDate
-import java.util.UUID
 
 object ForeslåVedtaksperioderUtil {
     fun foreslåPerioder(
@@ -77,7 +77,7 @@ object ForeslåVedtaksperioderUtil {
                 .flatMap { snitt -> vilkår.mapNotNull { snitt.beregnSnitt(it) } }
                 .sorted()
                 .mergeSammenhengende()
-                .map { it.copy(id = UUID.randomUUID()) }
+                .map { it.copy(id = VedtaksperiodeId.random()) }
         return forslag
     }
 
@@ -123,7 +123,7 @@ object ForeslåVedtaksperioderUtil {
     private fun ForenkletVilkårperiode<FaktiskMålgruppe>.snitt(aktivitet: ForenkletVilkårperiode<AktivitetType>) =
         this.beregnSnitt(aktivitet)?.let {
             Vedtaksperiode(
-                id = UUID.randomUUID(),
+                id = VedtaksperiodeId.random(),
                 fom = it.fom,
                 tom = it.tom,
                 målgruppe = this.type,

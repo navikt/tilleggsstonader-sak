@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsaker
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -26,7 +27,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.UUID
 
 class BehandlingsoversiktServiceTest {
     val fagsakService = mockk<FagsakService>()
@@ -45,7 +45,7 @@ class BehandlingsoversiktServiceTest {
 
     val vedtaksperiode =
         Vedtaksperiode(
-            id = UUID.randomUUID(),
+            id = VedtaksperiodeId.random(),
             fom = LocalDate.of(2024, 3, 1),
             tom = LocalDate.of(2024, 3, 14),
             målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,

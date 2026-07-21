@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.behandling.oppsummering
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
@@ -23,7 +24,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
-import java.util.UUID
 
 class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
@@ -92,14 +92,14 @@ class BehandlingOppsummeringServiceTest : CleanDatabaseIntegrationTest() {
             val vedtaksperioder =
                 listOf(
                     Vedtaksperiode(
-                        id = UUID.randomUUID(),
+                        id = VedtaksperiodeId.random(),
                         fom = LocalDate.of(2025, 1, 1),
                         tom = LocalDate.of(2025, 1, 31),
                         målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                         aktivitet = AktivitetType.TILTAK,
                     ),
                     Vedtaksperiode(
-                        id = UUID.randomUUID(),
+                        id = VedtaksperiodeId.random(),
                         fom = LocalDate.of(2025, 2, 1),
                         tom = LocalDate.of(2025, 2, 28),
                         målgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER,

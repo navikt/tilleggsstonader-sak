@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.læremidler
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
@@ -21,7 +22,6 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.BeregningsresultatForPeriodeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
-import java.util.UUID
 
 object LæremidlerTestUtil {
     val defaultVedtaksperioder =
@@ -162,7 +162,7 @@ object LæremidlerTestUtil {
         )
 
     fun vedtaksperiode(
-        id: UUID = UUID.randomUUID(),
+        id: VedtaksperiodeId = VedtaksperiodeId.random(),
         fom: LocalDate = LocalDate.of(2025, 1, 1),
         tom: LocalDate = LocalDate.of(2025, 1, 31),
         målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
@@ -176,7 +176,7 @@ object LæremidlerTestUtil {
     )
 
     fun vedtaksperiodeDto(
-        id: UUID = UUID.randomUUID(),
+        id: VedtaksperiodeId = VedtaksperiodeId.random(),
         fom: LocalDate = LocalDate.of(2025, 1, 1),
         tom: LocalDate = LocalDate.of(2025, 1, 31),
         målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,

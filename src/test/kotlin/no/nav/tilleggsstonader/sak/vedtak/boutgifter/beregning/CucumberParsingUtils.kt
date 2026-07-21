@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseValgfriDato
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
@@ -33,9 +34,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import java.time.LocalDate
-import java.util.UUID
 
-val vedtaksperiodeId: UUID = UUID.randomUUID()
+val vedtaksperiodeId: VedtaksperiodeId = VedtaksperiodeId.random()
 
 fun mapMålgrupper(
     målgruppeData: DataTable,

@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -34,7 +35,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.UUID
 
 class PassAvBarnBeregnYtelseStegTest {
     private val repository = mockk<VedtakRepository>(relaxed = true)
@@ -78,7 +78,7 @@ class PassAvBarnBeregnYtelseStegTest {
     val tom = LocalDate.of(2023, 1, 31)
     val vedtaksperiode =
         VedtaksperiodeDto(
-            id = UUID.randomUUID(),
+            id = VedtaksperiodeId.random(),
             fom = fom,
             tom = tom,
             målgruppeType = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
