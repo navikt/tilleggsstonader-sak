@@ -90,7 +90,7 @@ class ReiseTilSamlingBeregningsTest {
                 TypeVedtak.INNVILGELSE,
             )
         val offentligTransport =
-            result.reiser.filterIsInstance<BeregningsresultatOffentligTransport>().single()
+            result.samlinger.filterIsInstance<BeregningsresultatOffentligTransport>().single()
         assertThat(offentligTransport.reiser).hasSize(2)
     }
 
@@ -121,9 +121,9 @@ class ReiseTilSamlingBeregningsTest {
                 TypeVedtak.INNVILGELSE,
             )
         val privatBil =
-            result.reiser.filterIsInstance<BeregningsresultatPrivatBil>().single()
-        assertThat(privatBil.reiser).hasSize(1)
-        assertThat(privatBil.reiser.first().beløp).isEqualTo(58.80.toBigDecimal().setScale(2))
+            result.samlinger.filterIsInstance<BeregningsresultatPrivatBil>().single()
+        assertThat(privatBil.samlinger).hasSize(1)
+        assertThat(privatBil.samlinger.first().beløp).isEqualTo(58.80.toBigDecimal().setScale(2))
     }
 
     @Test
@@ -167,7 +167,7 @@ class ReiseTilSamlingBeregningsTest {
                 TypeVedtak.INNVILGELSE,
             )
         assertThat(
-            result.reiser
+            result.samlinger
                 .filterIsInstance<BeregningsresultatOffentligTransport>()
                 .single()
                 .reiser,

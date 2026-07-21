@@ -15,7 +15,7 @@ data class BeregningsresultatReiseTilSamlingDto(
 )
 
 data class BeregningsresultatOffentligTransportDto(
-    val reiser: List<BeregningsresultatForSamlingDto>,
+    val samlinger: List<BeregningsresultatForSamlingDto>,
 )
 
 data class BeregningsresultatForSamlingDto(
@@ -27,7 +27,7 @@ data class BeregningsresultatForSamlingDto(
 )
 
 data class BeregningsresultatPrivatBilDto(
-    val reiser: List<BeregningsresultatPrivatBilForSamlingDto>,
+    val samlinger: List<BeregningsresultatPrivatBilForSamlingDto>,
 )
 
 data class BeregningsresultatPrivatBilForSamlingDto(
@@ -42,11 +42,11 @@ data class BeregningsresultatPrivatBilForSamlingDto(
 
 fun BeregningReiseTilSamling.tilDto(): BeregningsresultatReiseTilSamlingDto {
     val offentligTransport =
-        reiser
+        samlinger
             .filterIsInstance<BeregningsresultatOffentligTransport>()
             .singleOrNull()
     val privatBil =
-        reiser
+        samlinger
             .filterIsInstance<BeregningsresultatPrivatBil>()
             .singleOrNull()
 
@@ -58,7 +58,7 @@ fun BeregningReiseTilSamling.tilDto(): BeregningsresultatReiseTilSamlingDto {
 
 fun BeregningsresultatOffentligTransport.tilDto() =
     BeregningsresultatOffentligTransportDto(
-        reiser = reiser.map { it.tilDto() },
+        samlinger = reiser.map { it.tilDto() },
     )
 
 fun BeregningsresultatOffentligTransportForSamling.tilDto() =
@@ -72,7 +72,7 @@ fun BeregningsresultatOffentligTransportForSamling.tilDto() =
 
 fun BeregningsresultatPrivatBil.tilDto() =
     BeregningsresultatPrivatBilDto(
-        reiser = reiser.map { it.tilDto() },
+        samlinger = samlinger.map { it.tilDto() },
     )
 
 fun BeregningsresultatPrivatBilForSamling.tilDto() =

@@ -70,60 +70,83 @@ class ReiseTilSamlingBeregningService(
             vedtaksperioderBeregning,
         )
         validerFinnesSamling(utgifterTilBeregning)
-        val oppfylteOffentligTransport = utgifterTilBeregning.filter { it.fakta is FaktaOffentligTransport }
-
         val offentligTransport =
-            BeregningsresultatOffentligTransport(
-                reiser =
-                    oppfylteOffentligTransport.map { samling ->
-                        val fakta = samling.fakta as FaktaOffentligTransport
-
-                        BeregningsresultatOffentligTransportForSamling(
-                            reiseId = fakta.reiseId,
-                            grunnlag =
-                                BeregningsgrunnlagOffentligTransportForSamling(
-                                    adresse = fakta.adresse,
-                                    fom = samling.fom,
-                                    tom = samling.tom,
-                                    vedtaksperioder =
-                                        vedtaksperioder.map { VedtaksperiodeGrunnlag(it) },
-                                ),
-                            beløp = fakta.utgifterOffentligTransport,
-                        )
-                    },
+            beregnOffentligTransport(
+                utgifterTilBeregning,
+                vedtaksperioder,
             )
 
-        val oppfyltePrivatBil = utgifterTilBeregning.filter { it.fakta is FaktaPrivatBil }
         val privatBil =
-            BeregningsresultatPrivatBil(
-                reiser =
-                    oppfyltePrivatBil.map { samling ->
-                        val fakta = samling.fakta as FaktaPrivatBil
-
-                        BeregningsresultatPrivatBilForSamling(
-                            reiseId = fakta.reiseId,
-                            grunnlag =
-                                BeregningsgrunnlagPrivatBilForSamling(
-                                    adresse = fakta.adresse,
-                                    fom = samling.fom,
-                                    tom = samling.tom,
-                                    sats = 2.94.toBigDecimal(),
-                                    totaltReiseAvstand = fakta.reiseavstand,
-                                    vedtaksperioder =
-                                        vedtaksperioder.map { VedtaksperiodeGrunnlag(it) },
-                                ),
-                            beløp = beregnBelopForPrivatBil(fakta.reiseavstand),
-                        )
-                    },
+            beregnPrivatBil(
+                utgifterTilBeregning,
+                vedtaksperioder,
             )
         return BeregningReiseTilSamling(
-            reiser =
+            samlinger =
                 listOfNotNull(
                     offentligTransport.takeIf { it.reiser.isNotEmpty() },
-                    privatBil.takeIf { it.reiser.isNotEmpty() },
+                    privatBil.takeIf { it.samlinger.isNotEmpty() },
                 ),
         )
     }
+}
+
+private fun beregnOffentligTransport(
+    utgifter: List<VilkårReiseTilSamling>,
+    vedtaksperioder: List<Vedtaksperiode>,
+): BeregningsresultatOffentligTransport {
+    val oppfylteOffentligTransport =
+        utgifter.filter { it.fakta is FaktaOffentligTransport }
+
+    return BeregningsresultatOffentligTransport(
+        reiser =
+            oppfylteOffentligTransport.map { samling ->
+                val fakta = samling.fakta as FaktaOffentligTransport
+
+                BeregningsresultatOffentligTransportForSamling(
+                    reiseId = fakta.reiseId,
+                    grunnlag =
+                        BeregningsgrunnlagOffentligTransportForSamling(
+                            adresse = fakta.adresse,
+                            fom = samling.fom,
+                            tom = samling.tom,
+                            vedtaksperioder =
+                                vedtaksperioder.map { VedtaksperiodeGrunnlag(it) },
+                        ),
+                    beløp = fakta.utgifterOffentligTransport,
+                )
+            },
+    )
+}
+
+private fun beregnPrivatBil(
+    utgifter: List<VilkårReiseTilSamling>,
+    vedtaksperioder: List<Vedtaksperiode>,
+): BeregningsresultatPrivatBil {
+    val oppfyltePrivatBil =
+        utgifter.filter { it.fakta is FaktaPrivatBil }
+
+    return BeregningsresultatPrivatBil(
+        samlinger =
+            oppfyltePrivatBil.map { samling ->
+                val fakta = samling.fakta as FaktaPrivatBil
+
+                BeregningsresultatPrivatBilForSamling(
+                    reiseId = fakta.reiseId,
+                    grunnlag =
+                        BeregningsgrunnlagPrivatBilForSamling(
+                            adresse = fakta.adresse,
+                            fom = samling.fom,
+                            tom = samling.tom,
+                            sats = 2.94.toBigDecimal(),
+                            totaltReiseAvstand = fakta.reiseavstand,
+                            vedtaksperioder =
+                                vedtaksperioder.map { VedtaksperiodeGrunnlag(it) },
+                        ),
+                    beløp = beregnBelopForPrivatBil(fakta.reiseavstand),
+                )
+            },
+    )
 }
 
 private fun beregnBelopForPrivatBil(totaltReiseAvstand: BigDecimal): BigDecimal {
@@ -138,7 +161,7 @@ private fun validerFinnesSamling(vilkår: List<VilkårReiseTilSamling>) {
 }
 
 data class BeregningReiseTilSamling(
-    val reiser: List<BeregningsresultatForReiseTilSamling>,
+    val samlinger: List<BeregningsresultatForReiseTilSamling>,
 )
 
 fun validerUtgifter(

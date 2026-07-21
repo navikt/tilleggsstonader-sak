@@ -13,7 +13,7 @@ data class BeregningsresultatOffentligTransport(
 ) : BeregningsresultatForReiseTilSamling
 
 data class BeregningsresultatPrivatBil(
-    val reiser: List<BeregningsresultatPrivatBilForSamling>,
+    val samlinger: List<BeregningsresultatPrivatBilForSamling>,
 ) : BeregningsresultatForReiseTilSamling
 
 data class BeregningsresultatOffentligTransportForSamling(
