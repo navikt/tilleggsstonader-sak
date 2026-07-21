@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus
 class EksternArenaControllerTest : CleanDatabaseIntegrationTest() {
     @Test
     fun `skal kunne sende inn rettighetstype som er mappet`() {
-        val response = kall.arena.status(ArenaFinnesPersonRequest("ident", Rettighet.TILSYN_BARN.kodeArena))
+        val response = kall.arena.status(ArenaFinnesPersonRequest("ident", Rettighet.PASS_AV_BARN.kodeArena))
         assertThat(response.finnes).isTrue()
     }
 

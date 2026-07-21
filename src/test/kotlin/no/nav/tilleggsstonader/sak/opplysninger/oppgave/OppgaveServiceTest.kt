@@ -134,7 +134,7 @@ internal class OppgaveServiceTest {
 
         assertThat(slot.captured.enhetsnummer).isEqualTo(ENHETSNUMMER)
         assertThat(slot.captured.ident).isEqualTo(OppgaveIdentV2(ident = FNR, gruppe = IdentGruppe.FOLKEREGISTERIDENT))
-        assertThat(slot.captured.behandlingstema).isEqualTo(Behandlingstema.TilsynBarn.value)
+        assertThat(slot.captured.behandlingstema).isEqualTo(Behandlingstema.PassAvBarn.value)
         assertThat(slot.captured.fristFerdigstillelse).isAfterOrEqualTo(LocalDate.now().plusDays(1))
         assertThat(slot.captured.aktivFra).isEqualTo(LocalDate.now())
         assertThat(slot.captured.tema).isEqualTo(Tema.TSO)

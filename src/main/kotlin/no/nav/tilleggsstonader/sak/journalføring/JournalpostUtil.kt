@@ -14,7 +14,7 @@ fun Journalpost.gjelderSøknad() =
         listOf(
             DokumentBrevkode.LÆREMIDLER,
             DokumentBrevkode.BOUTGIFTER,
-            DokumentBrevkode.BARNETILSYN,
+            DokumentBrevkode.PASS_AV_BARN,
             DokumentBrevkode.DAGLIG_REISE,
             DokumentBrevkode.REISE_TIL_SAMLING,
         )

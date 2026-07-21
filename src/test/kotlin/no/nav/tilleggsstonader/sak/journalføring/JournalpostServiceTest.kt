@@ -135,7 +135,7 @@ class JournalpostServiceTest {
             DokumentInfo(
                 dokumentInfoId = "123",
                 "Dokumenttittel",
-                brevkode = DokumentBrevkode.BARNETILSYN.verdi,
+                brevkode = DokumentBrevkode.PASS_AV_BARN.verdi,
                 dokumentvarianter =
                     listOf(
                         Dokumentvariant(Dokumentvariantformat.ARKIV, saksbehandlerHarTilgang = true),

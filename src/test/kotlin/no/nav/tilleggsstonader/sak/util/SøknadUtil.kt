@@ -11,17 +11,12 @@ import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.SelectFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.Skjemadata
-import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaPassAvBarn
 import no.nav.tilleggsstonader.kontrakter.søknad.TekstFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AktivitetAvsnitt
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnAvsnitt
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnMedBarnepass
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ArbeidOgOppholdAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.OppholdUtenforNorge
@@ -30,6 +25,11 @@ import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNor
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.HarRettTilUtstyrsstipend
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.UtdanningAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.BarnAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.BarnMedBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.PassAvBarnAktivitetAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.TypeBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.ÅrsakBarnepass
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -43,14 +43,14 @@ object SøknadUtil {
         dokumentasjon: List<DokumentasjonFelt> = emptyList(),
     ): InnsendtSkjema<Skjemadata> {
         val skjemaPassAvBarn =
-            SøknadsskjemaBarnetilsyn(
+            SøknadsskjemaPassAvBarn(
                 hovedytelse =
                     HovedytelseAvsnitt(
                         hovedytelse = EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "")), emptyList()),
                         arbeidOgOpphold = arbeidOgOpphold(),
                     ),
                 aktivitet =
-                    AktivitetAvsnitt(
+                    PassAvBarnAktivitetAvsnitt(
                         aktiviteter =
                             EnumFlereValgFelt(
                                 "Hvilken aktivitet søker du om støtte i forbindelse med?",

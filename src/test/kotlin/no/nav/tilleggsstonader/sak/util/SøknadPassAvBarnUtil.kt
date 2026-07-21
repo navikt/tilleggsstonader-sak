@@ -4,11 +4,11 @@ import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
+import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.TypeBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.ÅrsakBarnepass
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ArbeidOgOpphold
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.BarnMedBarnepass
@@ -53,7 +53,12 @@ object SøknadPassAvBarnUtil {
 
     fun lagBarnMedBarnepass(
         type: TypeBarnepass = TypeBarnepass.BARNEHAGE_SFO_AKS,
-        utgifter: Utgifter = Utgifter(harUtgifterTilPassHelePerioden = JaNei.NEI, LocalDate.of(2025, 1, 1), LocalDate.of(2025, 5, 31)),
+        utgifter: Utgifter =
+            Utgifter(
+                harUtgifterTilPassHelePerioden = JaNei.NEI,
+                LocalDate.of(2025, 1, 1),
+                LocalDate.of(2025, 5, 31),
+            ),
         startetIFemte: JaNei? = JaNei.JA,
         årsak: ÅrsakBarnepass? = ÅrsakBarnepass.MYE_BORTE_ELLER_UVANLIG_ARBEIDSTID,
     ) = BarnMedBarnepass(
