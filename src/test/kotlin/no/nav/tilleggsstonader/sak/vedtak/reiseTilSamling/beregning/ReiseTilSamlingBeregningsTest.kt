@@ -123,7 +123,7 @@ class ReiseTilSamlingBeregningsTest {
         val privatBil =
             result.samlinger.filterIsInstance<BeregningsresultatPrivatBil>().single()
         assertThat(privatBil.samlinger).hasSize(1)
-        assertThat(privatBil.samlinger.first().beløp).isEqualTo(58.80.toBigDecimal().setScale(2))
+        assertThat(privatBil.samlinger.first().beløp).isEqualTo(59.toBigDecimal())
     }
 
     @Test

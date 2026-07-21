@@ -111,7 +111,9 @@ private fun beregnOffentligTransport(
                             fom = samling.fom,
                             tom = samling.tom,
                             vedtaksperioder =
-                                vedtaksperioder.map { VedtaksperiodeGrunnlag(it) },
+                                vedtaksperioder
+                                    .filter { it.overlapper(samling) }
+                                    .map(::VedtaksperiodeGrunnlag),
                         ),
                     beløp = fakta.utgifterOffentligTransport,
                 )
@@ -139,9 +141,11 @@ private fun beregnPrivatBil(
                             fom = samling.fom,
                             tom = samling.tom,
                             sats = 2.94.toBigDecimal(),
-                            totaltReiseAvstand = fakta.reiseavstand,
+                            totaltReiseavstand = fakta.reiseavstand,
                             vedtaksperioder =
-                                vedtaksperioder.map { VedtaksperiodeGrunnlag(it) },
+                                vedtaksperioder
+                                    .filter { it.overlapper(samling) }
+                                    .map(::VedtaksperiodeGrunnlag),
                         ),
                     beløp = beregnBelopForPrivatBil(fakta.reiseavstand),
                 )
@@ -151,7 +155,7 @@ private fun beregnPrivatBil(
 
 private fun beregnBelopForPrivatBil(totaltReiseAvstand: BigDecimal): BigDecimal {
     val kilometersats: BigDecimal = 2.94.toBigDecimal()
-    return totaltReiseAvstand.multiply(kilometersats).setScale(2, RoundingMode.HALF_UP)
+    return totaltReiseAvstand.multiply(kilometersats).setScale(0, RoundingMode.HALF_UP)
 }
 
 private fun validerFinnesSamling(vilkår: List<VilkårReiseTilSamling>) {

@@ -33,7 +33,7 @@ data class BeregningsgrunnlagPrivatBilForSamling(
     val fom: LocalDate,
     val tom: LocalDate,
     val sats: BigDecimal,
-    val totaltReiseAvstand: BigDecimal,
+    val totaltReiseavstand: BigDecimal,
     val vedtaksperioder: List<VedtaksperiodeGrunnlag>,
 )
 
