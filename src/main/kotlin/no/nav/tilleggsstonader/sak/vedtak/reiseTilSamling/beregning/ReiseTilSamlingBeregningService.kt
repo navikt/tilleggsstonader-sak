@@ -126,12 +126,9 @@ class ReiseTilSamlingBeregningService(
     }
 }
 
-private fun beregnBelopForPrivatBil(totaltReiseAvstand: BigDecimal?): Int? {
-    val kilometersats: BigDecimal? = 2.94.toBigDecimal()
-    return totaltReiseAvstand
-        ?.multiply(kilometersats)
-        ?.setScale(2, RoundingMode.HALF_UP)
-        ?.toInt()
+private fun beregnBelopForPrivatBil(totaltReiseAvstand: BigDecimal): BigDecimal {
+    val kilometersats: BigDecimal = 2.94.toBigDecimal()
+    return totaltReiseAvstand.multiply(kilometersats).setScale(2, RoundingMode.HALF_UP)
 }
 
 private fun validerFinnesSamling(vilkår: List<VilkårReiseTilSamling>) {
@@ -165,7 +162,7 @@ fun validerUtgifter(
             .mapNotNull {
                 (it.fakta as? FaktaOffentligTransport)
                     ?.utgifterOffentligTransport
-            }.firstOrNull { it < 0 }
+            }.firstOrNull { it < 0.toBigDecimal() }
 
     feilHvis(ikkePositivUtgift != null) {
         "Utgiftsperioder inneholder ugyldig utgift: $ikkePositivUtgift"

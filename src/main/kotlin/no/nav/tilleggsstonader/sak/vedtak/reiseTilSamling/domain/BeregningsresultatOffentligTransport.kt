@@ -19,13 +19,13 @@ data class BeregningsresultatPrivatBil(
 data class BeregningsresultatOffentligTransportForSamling(
     val reiseId: ReiseId,
     val grunnlag: BeregningsgrunnlagOffentligTransportForSamling,
-    val beløp: Int?,
+    val beløp: BigDecimal,
 )
 
 data class BeregningsresultatPrivatBilForSamling(
     val reiseId: ReiseId,
     val grunnlag: BeregningsgrunnlagPrivatBilForSamling,
-    val beløp: Int?,
+    val beløp: BigDecimal,
 )
 
 data class BeregningsgrunnlagPrivatBilForSamling(
@@ -33,7 +33,7 @@ data class BeregningsgrunnlagPrivatBilForSamling(
     val fom: LocalDate,
     val tom: LocalDate,
     val sats: BigDecimal,
-    val totaltReiseAvstand: BigDecimal?,
+    val totaltReiseAvstand: BigDecimal,
     val vedtaksperioder: List<VedtaksperiodeGrunnlag>,
 )
 

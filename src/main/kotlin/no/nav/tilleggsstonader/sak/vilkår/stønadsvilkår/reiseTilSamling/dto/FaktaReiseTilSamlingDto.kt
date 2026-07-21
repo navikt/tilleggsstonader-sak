@@ -31,7 +31,7 @@ sealed interface FaktaReiseTilSamlingDto {
 }
 
 data class FaktaReiseTilSamlingOffentligTransportDto(
-    val utgifterOffentligTransport: Int?,
+    val utgifterOffentligTransport: BigDecimal,
 ) : FaktaReiseTilSamlingDto {
     override val type = TypeReiseTilSamling.OFFENTLIG_TRANSPORT
 
@@ -46,7 +46,7 @@ data class FaktaReiseTilSamlingOffentligTransportDto(
 }
 
 data class FaktaReiseTilSamlingPrivatBilDto(
-    val reiseavstand: BigDecimal?,
+    val reiseavstand: BigDecimal,
 ) : FaktaReiseTilSamlingDto {
     override val type = TypeReiseTilSamling.PRIVAT_BIL
 

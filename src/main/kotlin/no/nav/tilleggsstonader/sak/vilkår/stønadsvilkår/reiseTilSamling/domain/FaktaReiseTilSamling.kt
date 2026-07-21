@@ -33,7 +33,7 @@ data class FaktaUbestemtType(
 data class FaktaOffentligTransport(
     override val reiseId: ReiseId,
     override val adresse: String?,
-    val utgifterOffentligTransport: Int?,
+    val utgifterOffentligTransport: BigDecimal,
 ) : FaktaReiseTilSamling {
     override val type = TypeReiseTilSamling.OFFENTLIG_TRANSPORT
 
@@ -49,8 +49,8 @@ data class FaktaOffentligTransport(
         )
 
     private fun validerIngenNegativeUtgifter() {
-        utgifterOffentligTransport?.let {
-            brukerfeilHvis(it <= 0) {
+        utgifterOffentligTransport.let {
+            brukerfeilHvis(it <= 0.toBigDecimal()) {
                 "Utgifter til offentlig transport kan ikke være negative"
             }
         }
@@ -60,7 +60,7 @@ data class FaktaOffentligTransport(
 data class FaktaPrivatBil(
     override val reiseId: ReiseId,
     override val adresse: String?,
-    val reiseavstand: BigDecimal?,
+    val reiseavstand: BigDecimal,
 ) : FaktaReiseTilSamling {
     override val type = TypeReiseTilSamling.PRIVAT_BIL
 
@@ -76,7 +76,7 @@ data class FaktaPrivatBil(
         )
 
     private fun validerIngenNegativReiseavstand() {
-        reiseavstand?.let {
+        reiseavstand.let {
             brukerfeilHvis(it <= BigDecimal.ZERO) {
                 "Reiseavstand må være større enn 0"
             }

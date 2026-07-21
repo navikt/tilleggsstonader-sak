@@ -64,7 +64,7 @@ class ReiseTilSamlingBeregningsTest {
                         FaktaReiseTilSamlingOffentligTransport(
                             reiseId = dummyReiseId,
                             adresse = "Samlingsgata 1",
-                            utgifterOffentligTransport = 500,
+                            utgifterOffentligTransport = 500.toBigDecimal(),
                         ),
                 ),
                 vilkår(
@@ -78,7 +78,7 @@ class ReiseTilSamlingBeregningsTest {
                         FaktaReiseTilSamlingOffentligTransport(
                             reiseId = dummyReiseId,
                             adresse = "B",
-                            utgifterOffentligTransport = 200,
+                            utgifterOffentligTransport = 200.toBigDecimal(),
                         ),
                 ),
             )
@@ -123,7 +123,7 @@ class ReiseTilSamlingBeregningsTest {
         val privatBil =
             result.reiser.filterIsInstance<BeregningsresultatPrivatBil>().single()
         assertThat(privatBil.reiser).hasSize(1)
-        assertThat(privatBil.reiser.first().beløp).isEqualTo(58)
+        assertThat(privatBil.reiser.first().beløp).isEqualTo(58.80.toBigDecimal().setScale(2))
     }
 
     @Test
@@ -141,7 +141,7 @@ class ReiseTilSamlingBeregningsTest {
                         FaktaReiseTilSamlingOffentligTransport(
                             reiseId = dummyReiseId,
                             adresse = "A",
-                            utgifterOffentligTransport = 300,
+                            utgifterOffentligTransport = 300.toBigDecimal(),
                         ),
                 ),
                 vilkår(
@@ -155,7 +155,7 @@ class ReiseTilSamlingBeregningsTest {
                         FaktaReiseTilSamlingOffentligTransport(
                             reiseId = dummyReiseId,
                             adresse = "B",
-                            utgifterOffentligTransport = 200,
+                            utgifterOffentligTransport = 200.toBigDecimal(),
                         ),
                 ),
             )

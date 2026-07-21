@@ -659,7 +659,7 @@ fun vilkårReiseTilSamling(
 fun faktaOffentligTransportReiseTilSamling(
     reiseId: ReiseId = dummyReiseId,
     adresse: String = "Tiltaksveien 1",
-    utgifterOffentligTransport: Int = 40,
+    utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
 ) = FaktaOffentligTransportReiseTilSamling(
     reiseId = reiseId,
     adresse = adresse,

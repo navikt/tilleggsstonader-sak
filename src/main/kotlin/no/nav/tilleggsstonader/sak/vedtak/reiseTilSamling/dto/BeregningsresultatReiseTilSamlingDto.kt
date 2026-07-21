@@ -23,7 +23,7 @@ data class BeregningsresultatForSamlingDto(
     val adresse: String?,
     val fom: LocalDate,
     val tom: LocalDate,
-    val beløp: Int?,
+    val beløp: BigDecimal,
 )
 
 data class BeregningsresultatPrivatBilDto(
@@ -36,8 +36,8 @@ data class BeregningsresultatPrivatBilForSamlingDto(
     val fom: LocalDate,
     val tom: LocalDate,
     val sats: BigDecimal,
-    val totaltReiseAvstand: BigDecimal?,
-    val beløp: Int?,
+    val totaltReiseAvstand: BigDecimal,
+    val beløp: BigDecimal,
 )
 
 fun BeregningReiseTilSamling.tilDto(): BeregningsresultatReiseTilSamlingDto {

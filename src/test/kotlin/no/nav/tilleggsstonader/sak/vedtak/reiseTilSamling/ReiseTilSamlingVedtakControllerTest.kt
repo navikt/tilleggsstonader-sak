@@ -76,7 +76,7 @@ class ReiseTilSamlingVedtakControllerTest : CleanDatabaseIntegrationTest() {
                     FaktaReiseTilSamlingOffentligTransport(
                         reiseId = dummyReiseId,
                         adresse = "Samlingsgata 1",
-                        utgifterOffentligTransport = 500,
+                        utgifterOffentligTransport = 500.toBigDecimal(),
                     ),
             ),
         )
@@ -93,7 +93,7 @@ class ReiseTilSamlingVedtakControllerTest : CleanDatabaseIntegrationTest() {
     inner class Beregn {
         @Test
         fun `beregner offentlig transport basert på relevante vilkårperioder`() {
-            val utgifter = 500
+            val utgifter = 500.toBigDecimal()
 
             val request = InnvilgelseReiseTilSamlingTsoRequest(listOf(vedtaksperiode(fom = fom, tom = tom).tilDto()))
 
