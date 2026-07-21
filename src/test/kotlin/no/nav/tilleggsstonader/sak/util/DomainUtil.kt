@@ -46,6 +46,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
@@ -401,7 +402,7 @@ fun vilkårDagligReise(
     )
 
 fun vedtaksperiode(
-    id: UUID = UUID.randomUUID(),
+    id: VedtaksperiodeId = VedtaksperiodeId.random(),
     fom: LocalDate = YearMonth.now().atDay(1),
     tom: LocalDate = YearMonth.now().atEndOfMonth(),
     aktivitet: AktivitetType = AktivitetType.TILTAK,
@@ -746,7 +747,7 @@ fun vedtaksperiode(
     målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
     aktivitet: AktivitetType = AktivitetType.TILTAK,
 ) = Vedtaksperiode(
-    id = UUID.randomUUID(),
+    id = VedtaksperiodeId.random(),
     fom = fom,
     tom = tom,
     målgruppe = målgruppe,

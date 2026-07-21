@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
@@ -29,8 +30,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.util.UUID
-import java.util.UUID.randomUUID
 
 class DetaljertVedtaksperioderDagligReiseMapperTest {
     private val førsteJanuar = 1 januar 2024
@@ -263,7 +262,7 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
         )
 
     fun vedtaksperiode(
-        id: UUID = randomUUID(),
+        id: VedtaksperiodeId = VedtaksperiodeId.random(),
         fom: LocalDate = 1 januar 2025,
         tom: LocalDate = 31 januar 2025,
         målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
@@ -293,7 +292,7 @@ private fun beregningsresultatForPeriode(
                 vedtaksperioder =
                     listOf(
                         VedtaksperiodeGrunnlag(
-                            id = randomUUID(),
+                            id = VedtaksperiodeId.random(),
                             fom = fom,
                             tom = tom,
                             aktivitet = AktivitetType.TILTAK,

@@ -4,10 +4,10 @@ import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
 import no.nav.tilleggsstonader.kontrakter.periode.avkortPerioderFør
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.util.min
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import java.time.LocalDate
-import java.util.UUID
 
 object ForeslåVedtaksperioderBeholdIdUtil {
     fun beholdTidligereIdnForVedtaksperioder(
@@ -90,13 +90,13 @@ object ForeslåVedtaksperioderBeholdIdUtil {
          * Det korrigeres ved å generere en ny ID for de som har duplikat
          */
         private fun List<Vedtaksperiode>.korrigerIdnPåDuplikat(): List<Vedtaksperiode> {
-            val idnSomErBrukte = mutableSetOf<UUID>()
+            val idnSomErBrukte = mutableSetOf<VedtaksperiodeId>()
             return this.map {
                 val idFinnesIkkeFraFør = idnSomErBrukte.add(it.id)
                 if (idFinnesIkkeFraFør) {
                     it
                 } else {
-                    it.copy(id = UUID.randomUUID())
+                    it.copy(id = VedtaksperiodeId.random())
                 }
             }
         }
@@ -138,7 +138,7 @@ private class ForeslåVedtaksperioderBeholdId(
     /**
      * Gjenbrukte ID'er for vedtaksperioder skal ikke gjenbrukes flere ganger
      */
-    private val gjenbrukteIdn = mutableSetOf<UUID>()
+    private val gjenbrukteIdn = mutableSetOf<VedtaksperiodeId>()
 
     /**
      * Bruker nytt forslag delvis overlapper med forrige vedtaksperiode.
@@ -212,7 +212,7 @@ private class ForeslåVedtaksperioderBeholdId(
     private fun Vedtaksperiode.medNyId(
         fom: LocalDate = this.fom,
         tom: LocalDate = this.tom,
-    ): Vedtaksperiode = this.copy(id = UUID.randomUUID(), fom = fom, tom = tom)
+    ): Vedtaksperiode = this.copy(id = VedtaksperiodeId.random(), fom = fom, tom = tom)
 
     private data class ForrigeVedtaksperiodeMedSnitt(
         val forrigeVedtaksperiode: Vedtaksperiode,

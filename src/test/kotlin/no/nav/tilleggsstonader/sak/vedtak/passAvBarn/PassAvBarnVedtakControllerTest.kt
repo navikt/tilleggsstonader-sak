@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
@@ -50,7 +51,7 @@ class PassAvBarnVedtakControllerTest : CleanDatabaseIntegrationTest() {
     val barn = BehandlingBarn(behandlingId = behandling.id, ident = "123")
     val vedtaksperiodeDto =
         VedtaksperiodeDto(
-            id = UUID.randomUUID(),
+            id = VedtaksperiodeId.random(),
             fom = LocalDate.of(2023, 1, 1),
             tom = LocalDate.of(2023, 1, 31),
             aktivitetType = AktivitetType.TILTAK,

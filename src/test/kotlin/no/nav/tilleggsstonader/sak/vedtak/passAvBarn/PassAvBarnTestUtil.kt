@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.passAvBarn
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
@@ -30,7 +31,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.UUID
 
 object PassAvBarnTestUtil {
     fun innvilgelseDto(
@@ -49,7 +49,7 @@ object PassAvBarnTestUtil {
         )
 
     val defaultBehandling = behandling()
-    val defaultVedtaksperiodeId = UUID.randomUUID()
+    val defaultVedtaksperiodeId = VedtaksperiodeId.random()
 
     val behandlingId = BehandlingId.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e31")
 

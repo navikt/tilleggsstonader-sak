@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksb
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.BrevController
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
@@ -54,7 +55,6 @@ import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
 import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate
-import java.util.UUID
 
 class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
     @Autowired
@@ -389,7 +389,7 @@ class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
         val vedtaksperioderDto =
             listOf(
                 VedtaksperiodeDto(
-                    id = UUID.randomUUID(),
+                    id = VedtaksperiodeId.random(),
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 1, 31),
                     målgruppeType = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,

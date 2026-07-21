@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseValgfriEnum
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriInt
 import no.nav.tilleggsstonader.sak.cucumber.parseÅrMånedEllerDato
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -31,7 +32,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeM
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
-import java.util.UUID
 
 enum class DomenenøkkelForeslåVedtaksperioder(
     override val nøkkel: String,
@@ -52,7 +52,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
     var tidligereVedtaksperioder = emptyList<Vedtaksperiode>()
     var resultat: List<Vedtaksperiode> = emptyList()
     var feil: ApiFeil? = null
-    var idSomSkalIgnoreres = mutableSetOf<UUID>()
+    var idSomSkalIgnoreres = mutableSetOf<VedtaksperiodeId>()
 
     @Gitt("følgende vilkårsperioder med aktiviteter for vedtaksforslag")
     fun `følgende vilkårsperioder med aktiviteter`(dataTable: DataTable) {
@@ -127,9 +127,9 @@ class ForeslåVedtaksperiodeStepDefinitions {
     fun `forvent følgende vedtaksperioder`(dataTable: DataTable) {
         assertThat(this.feil).isNull()
 
-        val uuid = UUID.randomUUID()
-        val forventetVedtaksperioderMedSammeId = mapVedtaksperioder(dataTable).map { it.copy(id = uuid) }
-        val resultatMedSammeId = resultat.map { it.copy(id = uuid) }
+        val id = VedtaksperiodeId.random()
+        val forventetVedtaksperioderMedSammeId = mapVedtaksperioder(dataTable).map { it.copy(id = id) }
+        val resultatMedSammeId = resultat.map { it.copy(id = id) }
         assertThat(resultatMedSammeId).isEqualTo(forventetVedtaksperioderMedSammeId)
     }
 
@@ -150,7 +150,7 @@ class ForeslåVedtaksperiodeStepDefinitions {
                     assertThat(actual.id).isEqualTo(it.id)
                 }
                 if (idSomSkalIgnoreres.contains(it.id) && tidligereVedtaksperioder.any { it.id == actual.id }) {
-                    val actualId = uuidTilTestId(actual.id)
+                    val actualId = uuidTilTestId(actual.id.id)
                     throw Error(
                         "Feilet rad ${index + 1}. " +
                             "Hvis actual inneholder en id som eksisterer i tidligere vedtaksperioder må den assertes riktig actualId=$actualId",
@@ -211,15 +211,15 @@ class ForeslåVedtaksperiodeStepDefinitions {
             val id =
                 parseValgfriInt(DomenenøkkelFelles.ID, rad)?.let {
                     if (it == -1) {
-                        val id = UUID.randomUUID()
+                        val id = VedtaksperiodeId.random()
                         idSomSkalIgnoreres.add(id)
                         id
                     } else {
-                        testIdTilUUID[it]
+                        testIdTilUUID[it]?.let { uuid -> VedtaksperiodeId(uuid) }
                     }
                 }
             Vedtaksperiode(
-                id = id ?: UUID.randomUUID(),
+                id = id ?: VedtaksperiodeId.random(),
                 fom = parseÅrMånedEllerDato(DomenenøkkelFelles.FOM, rad).datoEllerFørsteDagenIMåneden(),
                 tom = parseÅrMånedEllerDato(DomenenøkkelFelles.TOM, rad).datoEllerSisteDagenIMåneden(),
                 målgruppe = parseEnum(DomenenøkkelForeslåVedtaksperioder.MÅLGRUPPE, rad),

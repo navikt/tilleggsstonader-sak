@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
@@ -48,7 +49,6 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.UUID
 
 class PassAvBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest() {
     @Autowired
@@ -75,7 +75,7 @@ class PassAvBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
     val barn = BehandlingBarn(behandlingId = behandling.id, ident = "123")
     val vedtaksperiode =
         VedtaksperiodeDto(
-            id = UUID.randomUUID(),
+            id = VedtaksperiodeId.random(),
             fom = LocalDate.of(2023, 1, 1),
             tom = LocalDate.of(2023, 1, 31),
             målgruppeType = NEDSATT_ARBEIDSEVNE,
@@ -294,7 +294,7 @@ class PassAvBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
             val vedtaksperiodeJanFeb = vedtaksperiode.copy(fom = januar.atDay(1), tom = mars.atDay(14))
             val vedtaksperiodeMars =
                 VedtaksperiodeDto(
-                    id = UUID.randomUUID(),
+                    id = VedtaksperiodeId.random(),
                     fom = mars.atDay(15),
                     tom = mars.atEndOfMonth(),
                     målgruppeType = NEDSATT_ARBEIDSEVNE,
@@ -455,7 +455,7 @@ class PassAvBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
         fun `skal mappe overgangsstønad til riktig TypeAndel`() {
             val vedtaksperiode =
                 VedtaksperiodeDto(
-                    id = UUID.randomUUID(),
+                    id = VedtaksperiodeId.random(),
                     fom = januar.atDay(2),
                     tom = januar.atDay(2),
                     målgruppeType = FaktiskMålgruppe.ENSLIG_FORSØRGER,
@@ -502,7 +502,7 @@ class PassAvBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest()
         fun `skal mappe gjenlevende til riktig TypeAndel`() {
             val vedtaksperiode =
                 VedtaksperiodeDto(
-                    id = UUID.randomUUID(),
+                    id = VedtaksperiodeId.random(),
                     fom = januar.atDay(2),
                     tom = januar.atDay(2),
                     målgruppeType = FaktiskMålgruppe.GJENLEVENDE,

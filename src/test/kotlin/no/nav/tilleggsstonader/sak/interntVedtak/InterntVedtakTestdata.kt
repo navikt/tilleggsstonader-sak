@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTestdata.Boutgifter.vedtaksperioder
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
@@ -107,7 +108,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning as Vedt
 
 object InterntVedtakTestdata {
     val behandlingId = BehandlingId.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e31")
-    val vedtaksperiodeId = UUID.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e37")
+    val vedtaksperiodeId = VedtaksperiodeId.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e37")
 
     val totrinnskontroll = totrinnskontroll(behandlingId, beslutter = "saksbeh2")
 
@@ -347,7 +348,7 @@ object InterntVedtakTestdata {
         val vedtaksperioder =
             listOf(
                 LæremidlerTestUtil.vedtaksperiode(
-                    id = UUID.randomUUID(),
+                    id = VedtaksperiodeId.random(),
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 3, 31),
                 ),

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
@@ -30,7 +31,7 @@ fun lagDagligReiseInnvilgelseMedBeløp(
 
     val vedtaksperiode =
         Vedtaksperiode(
-            id = randomUUID(),
+            id = VedtaksperiodeId.random(),
             fom = fom,
             tom = tom,
             målgruppe = målgruppe,
@@ -67,7 +68,7 @@ fun lagDagligReiseInnvilgelseMedBeløp(
                                                     vedtaksperioder =
                                                         listOf(
                                                             VedtaksperiodeGrunnlag(
-                                                                id = randomUUID(),
+                                                                id = VedtaksperiodeId.random(),
                                                                 fom = fom,
                                                                 tom = tom,
                                                                 aktivitet = aktivitet.type,

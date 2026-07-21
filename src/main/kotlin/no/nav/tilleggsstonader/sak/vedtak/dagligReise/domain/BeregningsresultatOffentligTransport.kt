@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
-import java.util.UUID
 
 data class BeregningsresultatOffentligTransport(
     val reiser: List<BeregningsresultatForReise>,
@@ -54,7 +54,7 @@ data class BeregningsgrunnlagOffentligTransport(
 ) : Periode<LocalDate>
 
 data class VedtaksperiodeGrunnlag(
-    val id: UUID,
+    val id: VedtaksperiodeId,
     val fom: LocalDate,
     val tom: LocalDate,
     val målgruppe: FaktiskMålgruppe,

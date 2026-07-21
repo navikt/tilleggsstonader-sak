@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.BehandlingshistorikkRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
@@ -38,7 +39,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
-import java.util.UUID
 
 class StegServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
@@ -290,7 +290,7 @@ class StegServiceTest : CleanDatabaseIntegrationTest() {
         val vedtaksperioderDto =
             listOf(
                 VedtaksperiodeDto(
-                    id = UUID.randomUUID(),
+                    id = VedtaksperiodeId.random(),
                     fom = LocalDate.of(2023, 1, 1),
                     tom = LocalDate.of(2023, 1, 31),
                     målgruppeType = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,

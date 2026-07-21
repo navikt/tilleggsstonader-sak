@@ -1,9 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain
 
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import java.time.LocalDate
-import java.util.UUID
 
 interface BeregningsresultatForReiseTilSamling
 
@@ -25,7 +25,7 @@ data class BeregningsgrunnlagOffentligTransportForSamling(
 )
 
 data class VedtaksperiodeGrunnlag(
-    val id: UUID,
+    val id: VedtaksperiodeId,
     val fom: LocalDate,
     val tom: LocalDate,
 ) {

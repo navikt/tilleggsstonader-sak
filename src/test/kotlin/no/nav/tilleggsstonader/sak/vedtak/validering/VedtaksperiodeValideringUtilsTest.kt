@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -36,7 +37,6 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.UUID
 
 class VedtaksperiodeValideringUtilsTest {
     val behandling = saksbehandling()
@@ -673,7 +673,7 @@ private fun lagVedtaksperiode(
     målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
     aktivitet: AktivitetType = AktivitetType.TILTAK,
 ) = Vedtaksperiode(
-    id = UUID.randomUUID(),
+    id = VedtaksperiodeId.random(),
     fom = fom,
     tom = tom,
     målgruppe = målgruppe,
