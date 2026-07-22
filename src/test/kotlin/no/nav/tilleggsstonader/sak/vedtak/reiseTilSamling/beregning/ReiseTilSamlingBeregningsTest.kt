@@ -14,6 +14,8 @@ import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
@@ -28,11 +30,13 @@ import org.junit.jupiter.api.Test
 class ReiseTilSamlingBeregningsTest {
     private val vilkårService = mockk<VilkårService>()
     private val vedtaksperiodeValideringService = mockk<VedtaksperiodeValideringService>()
+    private val satsReiseTilSamlingPrivatBilProvider = mockk<SatsPrivatBilProvider>()
 
     private val beregningService =
         ReiseTilSamlingBeregningService(
             vilkårService,
             vedtaksperiodeValideringService,
+            satsReiseTilSamlingPrivatBilProvider,
         )
 
     private val behandling = saksbehandling()
@@ -113,7 +117,9 @@ class ReiseTilSamlingBeregningsTest {
                         ),
                 ),
             )
-
+        every {
+            satsReiseTilSamlingPrivatBilProvider.finnRelevantKilometerSatsForPeriode(any())
+        } returns SatsPrivatBil(1 januar 2025, tom = 31 januar 2025, 2.94.toBigDecimal())
         val result =
             beregningService.beregn(
                 behandling,

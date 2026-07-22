@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBilBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -35,7 +36,7 @@ import java.math.RoundingMode
 
 @Service
 class PrivatBilRammevedtakBeregningService(
-    private val satsDagligReisePrivatBilProvider: SatsDagligReisePrivatBilProvider,
+    private val satsDagligReisePrivatBilProvider: SatsPrivatBilProvider,
     private val vilkårperiodeService: VilkårperiodeService,
     private val behandlingService: BehandlingService,
     private val unleashService: UnleashService,
