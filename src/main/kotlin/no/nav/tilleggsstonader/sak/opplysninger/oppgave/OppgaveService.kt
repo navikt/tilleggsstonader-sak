@@ -5,10 +5,10 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
-import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveBrukerType
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
@@ -125,7 +125,7 @@ class OppgaveService(
     }
 
     private val Oppgave.ident: String?
-        get() = this.identer?.firstOrNull { it.gruppe == IdentGruppe.FOLKEREGISTERIDENT }?.ident
+        get() = this.bruker?.let { if (it.type == OppgaveBrukerType.PERSON) it.ident else null }
 
     @Transactional
     fun fordelOppgave(
@@ -183,9 +183,24 @@ class OppgaveService(
             "Må ha behandlingId når man oppretter oppgave for behandle sak"
         }
         val enhetsnummer = arbeidsfordelingService.hentNavEnhetId(personIdent, stønadstype, oppgave.oppgavetype)
-        val mappeId = oppgave.opprettIMappe?.let { oppgaveMappe -> utledMappeId(personIdent, oppgave, enhetsnummer, oppgaveMappe) }
+        val mappeId =
+            oppgave.opprettIMappe?.let { oppgaveMappe ->
+                utledMappeId(
+                    personIdent,
+                    oppgave,
+                    enhetsnummer,
+                    oppgaveMappe,
+                )
+            }
         val opprettetOppgaveId =
-            opprettOppgaveUtenÅLagreIRepository(personIdent, stønadstype, oppgave, enhetsnummer, mappeId, behandlingstype)
+            opprettOppgaveUtenÅLagreIRepository(
+                personIdent,
+                stønadstype,
+                oppgave,
+                enhetsnummer,
+                mappeId,
+                behandlingstype,
+            )
         val oppgave =
             OppgaveDomain(
                 gsakOppgaveId = opprettetOppgaveId,
@@ -270,7 +285,12 @@ class OppgaveService(
         oppgaveRepository.findByBehandlingIdAndStatusAndTypeIn(
             behandlingId = behandlingId,
             status = Oppgavestatus.ÅPEN,
-            oppgavetype = setOf(Oppgavetype.BehandleSak, Oppgavetype.BehandleUnderkjentVedtak, Oppgavetype.BehandleKjøreliste),
+            oppgavetype =
+                setOf(
+                    Oppgavetype.BehandleSak,
+                    Oppgavetype.BehandleUnderkjentVedtak,
+                    Oppgavetype.BehandleKjøreliste,
+                ),
         )
 
     fun hentOppgave(gsakOppgaveId: Long): Oppgave = oppgaveClient.finnOppgaveMedId(gsakOppgaveId)
@@ -302,7 +322,8 @@ class OppgaveService(
         endretAvEnhetsnr: String?,
         oppgavetype: Oppgavetype,
     ) {
-        val oppgave = oppgaveRepository.findByBehandlingIdAndTypeAndStatus(behandlingId, oppgavetype, Oppgavestatus.ÅPEN)
+        val oppgave =
+            oppgaveRepository.findByBehandlingIdAndTypeAndStatus(behandlingId, oppgavetype, Oppgavestatus.ÅPEN)
         oppgave?.let {
             try {
                 ferdigstillOppgaveOgSettOppgaveDomainTilFerdig(oppgave, endretAvEnhetsnr)

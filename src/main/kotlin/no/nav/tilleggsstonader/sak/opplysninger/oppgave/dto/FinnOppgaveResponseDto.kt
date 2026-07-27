@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
-import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveBruker
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.FinnOppgaveresultatMedMetadata
@@ -34,7 +34,7 @@ fun FinnOppgaveresultatMedMetadata.tilDto() =
 data class OppgaveDto(
     val id: Long,
     val versjon: Int,
-    val identer: List<OppgaveIdentV2>?,
+    val bruker: OppgaveBruker?,
     val tildeltEnhetsnr: String?,
     val endretAvEnhetsnr: String?,
     val opprettetAvEnhetsnr: String?,
@@ -79,7 +79,7 @@ data class OppgaveDto(
     ) : this(
         id = oppgave.id,
         versjon = oppgave.versjon,
-        identer = oppgave.identer,
+        bruker = oppgave.bruker,
         tildeltEnhetsnr = oppgave.tildeltEnhetsnr,
         endretAvEnhetsnr = oppgave.endretAvEnhetsnr,
         opprettetAvEnhetsnr = oppgave.opprettetAvEnhetsnr,
