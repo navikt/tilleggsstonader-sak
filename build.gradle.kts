@@ -3,7 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 val javaVersion = JavaLanguageVersion.of(21)
 val tomcatVersion = "11.0.22"
-val familieProsesseringVersion = "2.20260622101837_623782e"
+val familieProsesseringVersion = "2.20260713101404_6072da6"
 val tilleggsstønaderLibsVersion = "2026.05.14-21.16.acdbe034efef"
 val tilleggsstønaderKontrakterVersion = "2026.07.20-15.42.126edeadd7ee"
 val avroVersion = "1.12.1"
@@ -127,8 +127,8 @@ dependencies {
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
 
     // Transitiv avhengighet fra mock-oauth2-server -> bcpix. Disse under er definert som dynamisk versjon, noe bygget vårt ikke vil ha noe av
-    testImplementation("org.bouncycastle:bcutil-jdk18on:1.84")
-    testImplementation("org.bouncycastle:bcprov-jdk18on:1.84")
+    testImplementation("org.bouncycastle:bcutil-jdk18on:1.85")
+    testImplementation("org.bouncycastle:bcprov-jdk18on:1.85")
 }
 
 kotlin {
