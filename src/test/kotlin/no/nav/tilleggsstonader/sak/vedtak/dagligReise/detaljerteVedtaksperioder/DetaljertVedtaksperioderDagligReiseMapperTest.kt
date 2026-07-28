@@ -217,7 +217,13 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                                         ),
                                         BeregningsresultatForReise(
                                             reiseId = offentligTransportTidligReiseId,
-                                            perioder = listOf(beregningsresultatForPeriode(1 februar 2026, 28 februar 2026)),
+                                            perioder =
+                                                listOf(
+                                                    beregningsresultatForPeriode(
+                                                        1 februar 2026,
+                                                        28 februar 2026,
+                                                    ),
+                                                ),
                                         ),
                                     ),
                             ),
@@ -253,7 +259,12 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
                                     ),
                             ),
                     ),
-                rammevedtakPrivatBil = RammevedtakPrivatBilUtil.rammevedtakPrivatBil(reiseId = privatBilReiseId, fom = 1 mars 2026, tom = 31 mars 2026),
+                rammevedtakPrivatBil =
+                    RammevedtakPrivatBilUtil.rammevedtakPrivatBil(
+                        reiseId = privatBilReiseId,
+                        fom = 1 mars 2026,
+                        tom = 31 mars 2026,
+                    ),
                 beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
             )
 
