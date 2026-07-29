@@ -89,7 +89,19 @@ class BoutgifterBeregningService(
             vedtaksperioderBeregning,
         )
 
-        val beregningsresultat = beregnAktuellePerioder(vedtaksperioderBeregning, utgifterPerVilkårtype)
+        /**
+         * Beregningen bruker kun perioder fra beregnFra og fremover.
+         * Perioder før beregnFra erstattes uansett av data fra forrige vedtak i [settSammenGamleOgNyePerioder].
+         * Å inkludere pre-beregnFra-perioder i beregningen kan føre til at en løpende måned som spenner over
+         * beregnFra-grensen får to vedtaksperioder, slik at den tilhørende utbetalingsperioden overlapper
+         * utgifter fra begge sider av grensen og utløser en feilmelding om overlappende utgifter.
+         */
+        val vedtaksperioderForBeregning =
+            plan.beregnFra()?.let { beregnFra ->
+                vedtaksperioderBeregning.filter { it.fom >= beregnFra }
+            } ?: vedtaksperioderBeregning
+
+        val beregningsresultat = beregnAktuellePerioder(vedtaksperioderForBeregning, utgifterPerVilkårtype)
 
         return if (forrigeVedtak != null) {
             settSammenGamleOgNyePerioder(

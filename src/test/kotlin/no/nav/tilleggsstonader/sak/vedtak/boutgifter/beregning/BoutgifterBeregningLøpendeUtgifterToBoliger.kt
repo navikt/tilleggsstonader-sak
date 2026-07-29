@@ -225,4 +225,112 @@ class BoutgifterBeregningLøpendeUtgifterToBoliger {
         assertThat(res.size).isEqualTo(4)
         assertThat(res).isEqualTo(forventet)
     }
+
+    /**
+     * Reproduserer en bug der revurdering feiler med "Vi støtter foreløpig ikke at utbetalingsperioder inneholder
+     * mer enn én løpende utgift" når:
+     *  - vedtaksperioden starter på en dato midt i måneden (f.eks. den 11.)
+     *  - forrige beregning har perioder med kalenderbaserte start-datoer (fra en tidligere bug)
+     *  - saksbehandler splitter en utgift: kutter eksisterende og legger til ny fra 1. i neste måned
+     *
+     * Årsak: beregnFra ble satt til 1. i måneden (f.eks. 01.02), men splitFra delte vedtaksperioden i to deler
+     * som begge ble sendt til beregnAktuellePerioder. Den løpende måneden som spenner over beregnFra (f.eks. 11.01->10.02)
+     * fikk to vedtaksperioder og resulterte i en utbetalingsperiode som overlappet begge utgiftene.
+     */
+    @Test
+    fun `revurdering med to consecutive utgifter der grensen faller midt i en løpende måned gir ikke feil`() {
+        // Vedtaksperiode starter 11. jan – løpende måneder går fra 11. til 10.
+        val vedtaksperiode = vedtaksperiode(fom = LocalDate.of(2025, 1, 11), tom = LocalDate.of(2025, 2, 28))
+
+        // Forrige beregning har kalenderbaserte perioder (fra eldre buggy data):
+        // 01.01->31.01 og 01.02->28.02 i stedet for 11.01->10.02 og 11.02->28.02
+        val originalUtgift =
+            mapOf(
+                TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER to
+                    listOf(
+                        lagUtgiftBeregningBoutgifter(
+                            fom = LocalDate.of(2025, 1, 1),
+                            tom = LocalDate.of(2025, 2, 28),
+                            utgift = 3000,
+                        ),
+                    ),
+            )
+        val forrigeBeregningsresultat =
+            listOf(
+                lagBeregningsresultatMåned(
+                    fom = LocalDate.of(2025, 1, 1),
+                    tom = LocalDate.of(2025, 1, 31),
+                    utgifter = originalUtgift,
+                    delAvTidligereUtbetaling = false,
+                ),
+                lagBeregningsresultatMåned(
+                    fom = LocalDate.of(2025, 2, 1),
+                    tom = LocalDate.of(2025, 2, 28),
+                    utgifter = originalUtgift,
+                    delAvTidligereUtbetaling = false,
+                ),
+            )
+
+        // I revurderingen: kutt eksisterende til 31.01 og legg til ny fra 01.02 med lavere beløp
+        val revurderingsutgifter =
+            mapOf(
+                TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER to
+                    listOf(
+                        lagUtgiftBeregningBoutgifter(
+                            fom = LocalDate.of(2025, 1, 1),
+                            tom = LocalDate.of(2025, 1, 31),
+                            utgift = 3000,
+                        ),
+                        lagUtgiftBeregningBoutgifter(
+                            fom = LocalDate.of(2025, 2, 1),
+                            tom = LocalDate.of(2025, 2, 28),
+                            utgift = 1000,
+                        ),
+                    ),
+            )
+
+        val innvilgelse =
+            innvilgelseBoutgifter(
+                beregningsresultat = BeregningsresultatBoutgifter(forrigeBeregningsresultat),
+                vedtaksperioder = listOf(vedtaksperiode),
+            )
+
+        every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns revurderingsutgifter
+        every { vedtakRepository.findByIdOrThrow(any()) } returns innvilgelse
+
+        val saksbehandling =
+            saksbehandling(
+                forrigeIverksatteBehandlingId = BehandlingId.random(),
+                type = BehandlingType.REVURDERING,
+            )
+
+        // beregnFra = 01.02.2025 (ny utgift starter der, forrige tom endret seg på 31.01)
+        val beregnFra = LocalDate.of(2025, 2, 1)
+
+        val res =
+            boutgifterBeregningService
+                .beregn(
+                    behandling = saksbehandling,
+                    vedtaksperioder = listOf(vedtaksperiode),
+                    plan = Beregningsplan(Beregningsomfang.FRA_DATO, beregnFra),
+                    typeVedtak = TypeVedtak.INNVILGELSE,
+                ).perioder
+
+        // Periode fra januar beholdes fra forrige vedtak, februarperiode beregnes på nytt med 1000 kr
+        assertThat(res).hasSize(2)
+        assertThat(res[0].fom).isEqualTo(LocalDate.of(2025, 1, 1))
+        assertThat(
+            res[0]
+                .grunnlag.utgifter[TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER]!!
+                .single()
+                .utgift,
+        ).isEqualTo(3000)
+        assertThat(res[1].fom).isEqualTo(LocalDate.of(2025, 2, 1))
+        assertThat(
+            res[1]
+                .grunnlag.utgifter[TypeBoutgift.LØPENDE_UTGIFTER_TO_BOLIGER]!!
+                .single()
+                .utgift,
+        ).isEqualTo(1000)
+    }
 }
