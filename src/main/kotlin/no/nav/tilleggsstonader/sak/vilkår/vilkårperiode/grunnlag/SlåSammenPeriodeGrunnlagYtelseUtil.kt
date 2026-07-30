@@ -31,7 +31,7 @@ object SlåSammenPeriodeGrunnlagYtelseUtil {
 
         fun slåSammen(other: PeriodeGrunnlagYtelseHolder): PeriodeGrunnlagYtelseHolder =
             PeriodeGrunnlagYtelseHolder(
-                ytelse.copy(
+                ytelse.slåSammenPeriode(
                     fom = minOf(ytelse.fom, other.ytelse.fom),
                     tom = maxOf(ytelse.tom!!, other.ytelse.tom!!),
                 ),
@@ -39,7 +39,31 @@ object SlåSammenPeriodeGrunnlagYtelseUtil {
 
         fun kanSlåsSammen(other: PeriodeGrunnlagYtelseHolder): Boolean =
             ytelse.type == other.ytelse.type &&
-                ytelse.subtype == other.ytelse.subtype &&
+                ytelse.subtype() == other.ytelse.subtype() &&
                 overlapperEllerPåfølgesAv(other)
     }
+
+    private fun PeriodeGrunnlagYtelse.subtype(): PeriodeGrunnlagYtelse.YtelseSubtype? =
+        when (this) {
+            is PeriodeGrunnlagYtelse.AAP -> subtype
+            is PeriodeGrunnlagYtelse.EnsligForsørger -> subtype
+            is PeriodeGrunnlagYtelse.Dagpenger,
+            is PeriodeGrunnlagYtelse.Omstillingsstønad,
+            is PeriodeGrunnlagYtelse.TiltakspengerArena,
+            is PeriodeGrunnlagYtelse.TiltakspengerTPSak,
+            -> null
+        }
+
+    private fun PeriodeGrunnlagYtelse.slåSammenPeriode(
+        fom: LocalDate,
+        tom: LocalDate,
+    ): PeriodeGrunnlagYtelse =
+        when (this) {
+            is PeriodeGrunnlagYtelse.AAP -> copy(fom = fom, tom = tom)
+            is PeriodeGrunnlagYtelse.Dagpenger -> copy(fom = fom, tom = tom)
+            is PeriodeGrunnlagYtelse.EnsligForsørger -> copy(fom = fom, tom = tom)
+            is PeriodeGrunnlagYtelse.Omstillingsstønad -> copy(fom = fom, tom = tom)
+            is PeriodeGrunnlagYtelse.TiltakspengerArena -> copy(fom = fom, tom = tom)
+            is PeriodeGrunnlagYtelse.TiltakspengerTPSak -> copy(fom = fom, tom = tom)
+        }
 }

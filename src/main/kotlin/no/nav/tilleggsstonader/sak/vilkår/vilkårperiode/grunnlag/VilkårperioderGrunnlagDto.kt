@@ -90,13 +90,21 @@ fun PeriodeGrunnlagYtelse.tilDto(stønadstype: Stønadstype) =
         type = this.type,
         fom = this.fom,
         tom = this.tom,
-        subtype = this.subtype,
+        subtype =
+            when (this) {
+                is HarSubtype -> subtype
+                else -> null
+            },
         kanYtelseBrukesIBehandling =
             kanYtelseBrukesIBehandling(
                 stønadstype = stønadstype,
                 ytelse = this,
             ),
-        gjenståendeDagerFraTelleverk = this.gjenståendeDagerFraTelleverk,
+        gjenståendeDagerFraTelleverk =
+            when (this) {
+                is PeriodeGrunnlagYtelse.Dagpenger -> gjenståendeDagerFraTelleverk
+                else -> null
+            },
     )
 
 fun HentetInformasjon.tilDto() =

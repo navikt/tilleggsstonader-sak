@@ -5,7 +5,6 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.felles.tilTema
-import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
@@ -108,17 +107,15 @@ class OppfølgingIntegrasjonstest : CleanDatabaseIntegrationTest() {
             ytelsePerioderDto(
                 perioder =
                     listOf(
-                        YtelsePeriode(
-                            type = TypeYtelsePeriode.DAGPENGER,
+                        YtelsePeriode.Dagpenger(
                             fom = 1 januar 2026,
                             tom = 31 januar 2026,
-                            ensligForsørgerStønadstype = null,
+                            gjenståendeDagerFraTelleverk = null,
                         ),
-                        YtelsePeriode(
-                            type = TypeYtelsePeriode.DAGPENGER,
+                        YtelsePeriode.Dagpenger(
                             fom = 1 februar 2026,
                             tom = null,
-                            ensligForsørgerStønadstype = null,
+                            gjenståendeDagerFraTelleverk = null,
                         ),
                     ),
             )

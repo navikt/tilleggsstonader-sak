@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.Kilde
 import no.nav.tilleggsstonader.kontrakter.aktivitet.StatusAktivitet
-import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -51,8 +50,7 @@ internal class VilkårperioderGrunnlagRepositoryTest : CleanDatabaseIntegrationT
                     grunnlagYtelseOk(
                         perioder =
                             listOf(
-                                PeriodeGrunnlagYtelse(
-                                    type = TypeYtelsePeriode.ENSLIG_FORSØRGER,
+                                PeriodeGrunnlagYtelse.EnsligForsørger(
                                     fom = LocalDate.now(),
                                     tom = LocalDate.now().plusDays(1),
                                 ),
@@ -73,7 +71,8 @@ internal class VilkårperioderGrunnlagRepositoryTest : CleanDatabaseIntegrationT
         assertThat(
             lagretGrunnlag.grunnlag.ytelse.perioder
                 .first()
-                .subtype,
+                .let { it as? PeriodeGrunnlagYtelse.EnsligForsørger }
+                ?.subtype,
         ).isNull()
     }
 
@@ -81,8 +80,7 @@ internal class VilkårperioderGrunnlagRepositoryTest : CleanDatabaseIntegrationT
         grunnlagYtelseOk(
             perioder =
                 listOf(
-                    PeriodeGrunnlagYtelse(
-                        type = TypeYtelsePeriode.AAP,
+                    PeriodeGrunnlagYtelse.AAP(
                         fom = LocalDate.now(),
                         tom = LocalDate.now().plusDays(1),
                     ),
