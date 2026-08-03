@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.ekstern.stønad.DagligReisePrivatBilService
 import no.nav.tilleggsstonader.sak.ekstern.stønad.finnForUke
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.privatbil.InnsendtKjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
@@ -16,6 +17,7 @@ import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
+import no.nav.tilleggsstonader.sak.util.erFørNåværendeUke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.springframework.stereotype.Service
@@ -83,11 +85,11 @@ class KjørelisteManuellRegistreringService(
             "Fant ikke rammevedtak for reise ${innsendtKjøreliste.reiseId}"
         }
 
-        feilHvis(!rammeForReise.grunnlag.inneholder(innsendtKjøreliste)) {
+        brukerfeilHvis(!rammeForReise.grunnlag.inneholder(innsendtKjøreliste)) {
             "Innsendte dager er ikke innenfor perioden i rammevedtaket"
         }
 
-        feilHvis(innsendtKjøreliste.reisedager.any { it.dato > LocalDate.now() }) {
+        brukerfeilHvis(innsendtKjøreliste.reisedager.any { it.dato > LocalDate.now() }) {
             "Kan ikke registrere kjøreliste for dager som er fremover i tid"
         }
 
@@ -111,7 +113,7 @@ class KjørelisteManuellRegistreringService(
             eksisterendeKjørelister.flatMap { it.data.reisedager.map { dag -> dag.dato } }.toSet()
 
         val overlappendeDatoer = innsendtKjøreliste.reisedager.map { it.dato }.filter { it in tidligereInnsendteDager }
-        feilHvis(overlappendeDatoer.isNotEmpty()) {
+        brukerfeilHvis(overlappendeDatoer.isNotEmpty()) {
             "Følgende datoer er allerede registrert i en tidligere kjøreliste: ${overlappendeDatoer.joinToString()}"
         }
     }
@@ -165,6 +167,7 @@ class KjørelisteManuellRegistreringService(
                 tom = reise.grunnlag.tom,
                 uker = reise.grunnlag
                     .alleDatoerGruppertPåUke()
+                    .filter { (uke, _) -> uke.erFørNåværendeUke() }
                     .map { (uke, datoer) ->
                         val kjørelisteForUke = kjørelisterForReise.finnForUke(uke)
 
