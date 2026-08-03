@@ -94,7 +94,7 @@ class HåndterMottattKjørelisteService(
                     },
             )
 
-        return kjørelisteService.lagre(kjørelisteDomene, fagsak.id, journalpostId)
+        return kjørelisteService.lagre(kjørelisteDomene, fagsak.id, journalpostId, manueltRegistrert = false)
     }
 
     private fun hentKjørelisteSkjemaFraJournalpost(journalpost: Journalpost): KjørelisteSkjema {
