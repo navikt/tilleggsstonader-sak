@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import org.springframework.data.annotation.Id
@@ -19,6 +20,9 @@ data class Kjøreliste(
     val datoMottatt: LocalDateTime,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
+    val begrunnelse: String? = null,
+    val behandlingId: BehandlingId? = null,
+    val manueltRegistrert: Boolean,
     @Column("data")
     val data: InnsendtKjøreliste,
 )

@@ -23,6 +23,7 @@ class GjenbrukDataRevurderingServiceTest {
                 behandlingshistorikkService = mockk(),
                 taskService = mockk(),
                 unleashService = mockk(),
+                avklartKjørelisteService = mockk(),
             ),
         )
 

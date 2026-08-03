@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
@@ -12,4 +13,6 @@ interface KjørelisteRepository :
     fun findByFagsakId(fagsakId: FagsakId): List<Kjøreliste>
 
     fun findByJournalpostId(journalpostId: String): Kjøreliste?
+
+    fun findByBehandlingId(behandlingId: BehandlingId): List<Kjøreliste>
 }

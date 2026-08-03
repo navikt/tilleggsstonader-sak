@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus.UTREDES
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandlingsjournalpost
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingsjournalpostRepository
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.Journalposttype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -33,6 +34,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -48,6 +50,7 @@ class BehandlingService(
     private val behandlingshistorikkService: BehandlingshistorikkService,
     private val taskService: TaskService,
     private val unleashService: UnleashService,
+    private val avklartKjørelisteService: AvklartKjørelisteService,
 ) {
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
@@ -214,6 +217,11 @@ class BehandlingService(
                 behandlingId = henlagtBehandling.id,
             ),
         )
+
+        if (behandling.type == BehandlingType.KJØRELISTE && behandling.årsak == BehandlingÅrsak.REGISTRER_KJØRELISTE_FOR_BRUKER) {
+            avklartKjørelisteService.slettAvklarteUkerOgKjørelisterLagtTilIBehandling(behandlingId)
+        }
+
         return behandlingRepository.update(henlagtBehandling)
     }
 

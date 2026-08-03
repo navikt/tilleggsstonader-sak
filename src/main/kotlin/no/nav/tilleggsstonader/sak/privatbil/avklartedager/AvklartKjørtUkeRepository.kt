@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
+import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import org.springframework.stereotype.Repository
 import java.util.UUID
 
@@ -11,4 +12,6 @@ interface AvklartKjørtUkeRepository :
     RepositoryInterface<AvklartKjørtUke, UUID>,
     InsertUpdateRepository<AvklartKjørtUke> {
     fun findByBehandlingId(behandlingId: BehandlingId): List<AvklartKjørtUke>
+
+    fun deleteAvklartKjørtUkesByKjørelisteId(kjørelisteId: KjørelisteId): Int
 }
