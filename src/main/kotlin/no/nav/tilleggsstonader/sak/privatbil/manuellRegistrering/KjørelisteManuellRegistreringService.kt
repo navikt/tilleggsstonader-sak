@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.privatbil.ManuellRegistrering
+package no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering
 
 import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
@@ -39,11 +39,12 @@ class KjørelisteManuellRegistreringService(
                 ?: error("Forventer at det finnes reiser i rammevedtak ...")
 
         val tilgjengeligeReiser = finnKjørelisterSomKanFyllesUt(kjørelister, reiserIRammevedtak)
-        val kjørelisterLagretIDenneBehandlingen = finnKjørelisterInnsendtIDenneBehandlingen(
-            behandlingId = behandlingId,
-            kjørelister = kjørelister,
-            reiserIRammevedtak = reiserIRammevedtak
-        )
+        val kjørelisterLagretIDenneBehandlingen =
+            finnKjørelisterInnsendtIDenneBehandlingen(
+                behandlingId = behandlingId,
+                kjørelister = kjørelister,
+                reiserIRammevedtak = reiserIRammevedtak,
+            )
 
         return KjørelisteOversiktDto(
             tilgjengeligeReiser = tilgjengeligeReiser,
@@ -96,17 +97,18 @@ class KjørelisteManuellRegistreringService(
         validerDagerIkkeTidligereInnsendt(
             fagsakId = behandling.fagsakId,
             reiseId = innsendtKjøreliste.reiseId,
-            innsendtKjøreliste = innsendtKjøreliste
+            innsendtKjøreliste = innsendtKjøreliste,
         )
     }
 
     private fun validerDagerIkkeTidligereInnsendt(
         fagsakId: FagsakId,
         reiseId: ReiseId,
-        innsendtKjøreliste: InnsendtKjøreliste
+        innsendtKjøreliste: InnsendtKjøreliste,
     ) {
         val eksisterendeKjørelister =
-            kjørelisteService.hentForFagsakId(fagsakId)
+            kjørelisteService
+                .hentForFagsakId(fagsakId)
                 .filter { it.data.reiseId == reiseId }
 
         val tidligereInnsendteDager =
@@ -122,7 +124,8 @@ class KjørelisteManuellRegistreringService(
         val behandlingId = saksbehandling.id
         val kjørelisterRegistrertIBehandling = kjørelisteService.hentManueltLagredeIBehandling(saksbehandling.id)
         val avklarteKjørelisteIds =
-            avklartKjørelisteService.hentAvklarteUkerForBehandling(behandlingId)
+            avklartKjørelisteService
+                .hentAvklarteUkerForBehandling(behandlingId)
                 .map { it.kjørelisteId }
                 .toSet()
 
@@ -134,7 +137,7 @@ class KjørelisteManuellRegistreringService(
     private fun finnKjørelisterInnsendtIDenneBehandlingen(
         behandlingId: BehandlingId,
         kjørelister: List<Kjøreliste>,
-        reiserIRammevedtak: List<RammevedtakForReiseMedPrivatBil>
+        reiserIRammevedtak: List<RammevedtakForReiseMedPrivatBil>,
     ): List<ManueltInnsendtKjørelisteDto> {
         val kjørelisterRegistrertIDenneBehandlingen = kjørelister.filter { it.behandlingId == behandlingId }
 
@@ -148,16 +151,16 @@ class KjørelisteManuellRegistreringService(
                 reiseTom = tilhørendeReise.grunnlag.tom,
                 aktivitetsadresse = tilhørendeReise.aktivitetsadresse,
                 begrunnelse = kjøreliste.begrunnelse,
-                innsendteUker = kjøreliste.data.reisedager.tilKjørelisteUker()
+                innsendteUker = kjøreliste.data.reisedager.tilKjørelisteUker(),
             )
         }
     }
 
     private fun finnKjørelisterSomKanFyllesUt(
         kjørelister: List<Kjøreliste>,
-        reiserIRammevedtak: List<RammevedtakForReiseMedPrivatBil>
-    ): List<ManuellRegistreringReiseDto> {
-        return reiserIRammevedtak.map { reise ->
+        reiserIRammevedtak: List<RammevedtakForReiseMedPrivatBil>,
+    ): List<ManuellRegistreringReiseDto> =
+        reiserIRammevedtak.map { reise ->
             val kjørelisterForReise = kjørelister.filter { it.data.reiseId == reise.reiseId }
 
             ManuellRegistreringReiseDto(
@@ -165,26 +168,27 @@ class KjørelisteManuellRegistreringService(
                 aktivitetsadresse = reise.aktivitetsadresse,
                 fom = reise.grunnlag.fom,
                 tom = reise.grunnlag.tom,
-                uker = reise.grunnlag
-                    .alleDatoerGruppertPåUke()
-                    .filter { (uke, _) -> uke.erFørNåværendeUke() }
-                    .map { (uke, datoer) ->
-                        val kjørelisteForUke = kjørelisterForReise.finnForUke(uke)
+                uker =
+                    reise.grunnlag
+                        .alleDatoerGruppertPåUke()
+                        .filter { (uke, _) -> uke.erFørNåværendeUke() }
+                        .map { (uke, datoer) ->
+                            val kjørelisteForUke = kjørelisterForReise.finnForUke(uke)
 
-                        ManuellRegistreringUkeDto(
-                            ukenummer = uke.ukenummer,
-                            fom = datoer.min(),
-                            tom = datoer.max(),
-                            innsendtTidligere = kjørelisteForUke != null,
-                            dager = datoer,
-                        )
-                    }
+                            ManuellRegistreringUkeDto(
+                                ukenummer = uke.ukenummer,
+                                fom = datoer.min(),
+                                tom = datoer.max(),
+                                innsendtTidligere = kjørelisteForUke != null,
+                                dager = datoer,
+                            )
+                        },
             )
         }
-    }
 
     private fun List<KjørelisteDag>.tilKjørelisteUker(): List<ManueltInnsendtKjørelisteUkeDto> =
-        this.groupBy { it.dato.tilUkeIÅr() }
+        this
+            .groupBy { it.dato.tilUkeIÅr() }
             .entries
             .sortedBy { it.key }
             .map { (uke, dager) ->

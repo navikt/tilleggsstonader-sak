@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.privatbil.ManuellRegistrering
+package no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId

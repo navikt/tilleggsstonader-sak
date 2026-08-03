@@ -1,10 +1,9 @@
-package no.nav.tilleggsstonader.sak.privatbil.ManuellRegistrering
+package no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering
 
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import java.time.LocalDate
-
 
 data class KjørelisteOversiktDto(
     val tilgjengeligeReiser: List<ManuellRegistreringReiseDto>,
