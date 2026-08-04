@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -104,6 +105,27 @@ class SimuleringStegTest {
             simuleringSteg.utførSteg(saksbehandling, null)
 
             verify(exactly = 0) { simuleringService.hentOgLagreSimuleringsresultat(saksbehandling) }
+        }
+
+        @Test
+        fun `skal utføre simulering ved innvilgelse når forrige iverksatte behandling har andeler`() {
+            val forrigeIverksatteBehandlingId = BehandlingId.random()
+            val saksbehandling =
+                saksbehandling(
+                    type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
+                )
+            every { tilkjentYtelseSerivce.hentForBehandling(saksbehandling.id) } returns
+                tilkjentYtelse(
+                    saksbehandling.id,
+                ).copy(andelerTilkjentYtelse = emptySet())
+            every { tilkjentYtelseSerivce.hentForBehandlingEllerNull(forrigeIverksatteBehandlingId) } returns
+                tilkjentYtelse(forrigeIverksatteBehandlingId)
+            mockVedtakMedType(TypeVedtak.INNVILGELSE)
+
+            simuleringSteg.utførSteg(saksbehandling, null)
+
+            verify { simuleringService.hentOgLagreSimuleringsresultat(saksbehandling) }
         }
     }
 }

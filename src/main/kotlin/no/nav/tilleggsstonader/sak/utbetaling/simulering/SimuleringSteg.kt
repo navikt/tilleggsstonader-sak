@@ -28,7 +28,15 @@ class SimuleringSteg(
         val typeVedtak = vedtakService.hentVedtaksresultat(saksbehandling)
 
         return when (typeVedtak) {
-            TypeVedtak.INNVILGELSE -> tilkjentYtelseService.hentForBehandling(saksbehandling.id).andelerTilkjentYtelse.isNotEmpty()
+            TypeVedtak.INNVILGELSE -> {
+                val harAndelerPåBehandling =
+                    tilkjentYtelseService.hentForBehandling(saksbehandling.id).andelerTilkjentYtelse.isNotEmpty()
+                val harAndelerPåForrigeIverksatteBehandling =
+                    saksbehandling.forrigeIverksatteBehandlingId
+                        ?.let { tilkjentYtelseService.hentForBehandlingEllerNull(it)?.andelerTilkjentYtelse?.isNotEmpty() == true } == true
+
+                harAndelerPåBehandling || harAndelerPåForrigeIverksatteBehandling
+            }
             TypeVedtak.AVSLAG -> false
             TypeVedtak.OPPHØR -> true
         }
