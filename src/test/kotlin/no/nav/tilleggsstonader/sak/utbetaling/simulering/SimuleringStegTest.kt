@@ -58,6 +58,50 @@ class SimuleringStegTest {
 
             verify(exactly = 0) { simuleringService.hentOgLagreSimuleringsresultat(saksbehandling) }
         }
+
+        @Test
+        fun `skal utføre simulering for opphør når forrige iverksatte behandling har andeler`() {
+            val forrigeIverksatteBehandlingId = BehandlingId.random()
+            val saksbehandling =
+                saksbehandling(
+                    type = BehandlingType.REVURDERING,
+                    forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
+                )
+            every { tilkjentYtelseSerivce.hentForBehandling(saksbehandling.id) } returns
+                tilkjentYtelse(
+                    saksbehandling.id,
+                ).copy(andelerTilkjentYtelse = emptySet())
+            every { tilkjentYtelseSerivce.hentForBehandlingEllerNull(forrigeIverksatteBehandlingId) } returns
+                tilkjentYtelse(forrigeIverksatteBehandlingId)
+            mockVedtakMedType(TypeVedtak.OPPHØR)
+
+            simuleringSteg.utførSteg(saksbehandling, null)
+
+            verify { simuleringService.hentOgLagreSimuleringsresultat(saksbehandling) }
+        }
+
+        @Test
+        fun `skal ikke utføre simulering for opphør uten andeler på behandling eller forrige iverksatte`() {
+            val forrigeIverksatteBehandlingId = BehandlingId.random()
+            val saksbehandling =
+                saksbehandling(
+                    type = BehandlingType.REVURDERING,
+                    forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
+                )
+            every { tilkjentYtelseSerivce.hentForBehandling(saksbehandling.id) } returns
+                tilkjentYtelse(
+                    saksbehandling.id,
+                ).copy(andelerTilkjentYtelse = emptySet())
+            every { tilkjentYtelseSerivce.hentForBehandlingEllerNull(forrigeIverksatteBehandlingId) } returns
+                tilkjentYtelse(
+                    forrigeIverksatteBehandlingId,
+                ).copy(andelerTilkjentYtelse = emptySet())
+            mockVedtakMedType(TypeVedtak.OPPHØR)
+
+            simuleringSteg.utførSteg(saksbehandling, null)
+
+            verify(exactly = 0) { simuleringService.hentOgLagreSimuleringsresultat(saksbehandling) }
+        }
     }
 
     @Nested
