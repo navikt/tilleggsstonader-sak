@@ -41,7 +41,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
     lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
 
     @Autowired
-    lateinit var satsDagligReisePrivatBilProvider: SatsPrivatBilProvider
+    lateinit var satsPrivatBilProvider: SatsPrivatBilProvider
 
     @Test
     fun `innvilger rammevedtak og sender inn kjøreliste som blir godkjent, uke blir sendt til utbetaling`() {
@@ -258,7 +258,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
 
     private fun List<KjørtDag>.kalkulerForventetBeløp(reiseavstandEnVei: BigDecimal): Int =
         sumOf { kjørtDag ->
-            satsDagligReisePrivatBilProvider
+            satsPrivatBilProvider
                 .finnSatsForÅr(kjørtDag.dato.year)
                 .beløp
                 .multiply(reiseavstandEnVei)

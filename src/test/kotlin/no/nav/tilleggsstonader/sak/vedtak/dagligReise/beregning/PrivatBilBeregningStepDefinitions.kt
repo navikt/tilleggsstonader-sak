@@ -67,10 +67,10 @@ class PrivatBilBeregningStepDefinitions {
 
     val behandlingId = BehandlingId.random()
 
-    val satsDagligReisePrivatBilProvider = SatsPrivatBilProvider()
+    val satsPrivatBilProvider = SatsPrivatBilProvider()
     val beregningService =
         PrivatBilRammevedtakBeregningService(
-            satsPrivatBilProvider = satsDagligReisePrivatBilProvider,
+            satsPrivatBilProvider = satsPrivatBilProvider,
             vilkårperiodeService = vilkårperiodeService,
             behandlingService = behandlingServiceMock,
             unleashService = unleashServiceMock,
