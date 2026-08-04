@@ -12,8 +12,6 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
-import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
@@ -93,9 +91,8 @@ class ReiseTilSamlingBeregningsTest {
                 vedtaksperioder,
                 TypeVedtak.INNVILGELSE,
             )
-        val offentligTransport =
-            result.samlinger.filterIsInstance<BeregningsresultatOffentligTransport>().single()
-        assertThat(offentligTransport.reiser).hasSize(2)
+        val offentligTransport = result.offentligTransport
+        assertThat(offentligTransport).hasSize(2)
     }
 
     @Test
@@ -126,10 +123,9 @@ class ReiseTilSamlingBeregningsTest {
                 vedtaksperioder,
                 TypeVedtak.INNVILGELSE,
             )
-        val privatBil =
-            result.samlinger.filterIsInstance<BeregningsresultatPrivatBil>().single()
-        assertThat(privatBil.samlinger).hasSize(1)
-        assertThat(privatBil.samlinger.first().beløp).isEqualTo(59.toBigDecimal())
+        val privatBil = result.privatBil
+        assertThat(privatBil).hasSize(1)
+        assertThat(privatBil.first().beløp).isEqualTo(59.toBigDecimal())
     }
 
     @Test
@@ -173,10 +169,7 @@ class ReiseTilSamlingBeregningsTest {
                 TypeVedtak.INNVILGELSE,
             )
         assertThat(
-            result.samlinger
-                .filterIsInstance<BeregningsresultatOffentligTransport>()
-                .single()
-                .reiser,
+            result.offentligTransport,
         ).hasSize(1)
     }
 

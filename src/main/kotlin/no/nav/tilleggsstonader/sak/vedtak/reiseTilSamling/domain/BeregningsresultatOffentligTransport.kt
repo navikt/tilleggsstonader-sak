@@ -6,23 +6,13 @@ import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.UUID
 
-interface BeregningsresultatForReiseTilSamling
-
 data class BeregningsresultatOffentligTransport(
-    val reiser: List<BeregningsresultatOffentligTransportForSamling>,
-) : BeregningsresultatForReiseTilSamling
-
-data class BeregningsresultatPrivatBil(
-    val samlinger: List<BeregningsresultatPrivatBilForSamling>,
-) : BeregningsresultatForReiseTilSamling
-
-data class BeregningsresultatOffentligTransportForSamling(
     val reiseId: ReiseId,
     val grunnlag: BeregningsgrunnlagOffentligTransportForSamling,
     val beløp: BigDecimal,
 )
 
-data class BeregningsresultatPrivatBilForSamling(
+data class BeregningsresultatPrivatBil(
     val reiseId: ReiseId,
     val grunnlag: BeregningsgrunnlagPrivatBilForSamling,
     val beløp: BigDecimal,

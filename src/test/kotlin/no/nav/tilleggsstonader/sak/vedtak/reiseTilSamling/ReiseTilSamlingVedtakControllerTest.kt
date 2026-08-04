@@ -103,9 +103,9 @@ class ReiseTilSamlingVedtakControllerTest : CleanDatabaseIntegrationTest() {
                     .expectOkWithBody<BeregningsresultatReiseTilSamlingDto>()
 
             val offentligTransport = checkNotNull(respons.offentligTransport)
-            assertThat(offentligTransport.samlinger).hasSize(1)
+            assertThat(offentligTransport).hasSize(1)
 
-            val reise = offentligTransport.samlinger.single()
+            val reise = offentligTransport.single()
             assertThat(reise.reiseId).isEqualTo(dummyReiseId)
             assertThat(reise.adresse).isEqualTo("Samlingsgata 1")
             assertThat(reise.fom).isEqualTo(fom)

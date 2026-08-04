@@ -70,7 +70,7 @@ class PrivatBilBeregningStepDefinitions {
     val satsDagligReisePrivatBilProvider = SatsPrivatBilProvider()
     val beregningService =
         PrivatBilRammevedtakBeregningService(
-            satsDagligReisePrivatBilProvider = satsDagligReisePrivatBilProvider,
+            satsPrivatBilProvider = satsDagligReisePrivatBilProvider,
             vilkårperiodeService = vilkårperiodeService,
             behandlingService = behandlingServiceMock,
             unleashService = unleashServiceMock,

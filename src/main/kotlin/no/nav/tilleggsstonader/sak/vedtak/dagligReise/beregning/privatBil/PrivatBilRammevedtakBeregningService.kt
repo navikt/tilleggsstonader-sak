@@ -36,7 +36,7 @@ import java.math.RoundingMode
 
 @Service
 class PrivatBilRammevedtakBeregningService(
-    private val satsDagligReisePrivatBilProvider: SatsPrivatBilProvider,
+    private val satsPrivatBilProvider: SatsPrivatBilProvider,
     private val vilkårperiodeService: VilkårperiodeService,
     private val behandlingService: BehandlingService,
     private val unleashService: UnleashService,
@@ -172,7 +172,7 @@ class PrivatBilRammevedtakBeregningService(
                 .map { it.first }
                 .map { delperiode ->
                     val satser =
-                        satsDagligReisePrivatBilProvider
+                        satsPrivatBilProvider
                             .finnAlleSatserInnenforPeriode(delperiode)
                             .map { sats ->
                                 val snitt =
