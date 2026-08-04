@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.felles.tilTema
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
@@ -206,7 +207,7 @@ class OppfølgingOpprettKontrollerService(
             .hentYtelser(fagsak.ident, fom = fom, tom = tom, typer)
             .also { validerResultat(it.kildeResultat) }
             .perioder
-            .filter { it.aapErFerdigAvklart != true }
+            .filter { it !is YtelsePeriode.AAP || !it.aapErFerdigAvklart }
             .map { it.type.tilMålgruppe() to PeriodeMedÅpenTom(fom = it.fom, tom = it.tom) }
             .groupBy({ it.first }, { it.second })
             .mapValues { it.value.mergeSammenhengende() }
@@ -216,9 +217,11 @@ class OppfølgingOpprettKontrollerService(
         val kildeResulatUtenOK = kildeResultat.filter { it.resultat != ResultatKilde.OK }
 
         feilHvis(kildeResulatUtenOK.isNotEmpty()) {
-            "Feil ved henting av ytelser fra andre systemer: ${kildeResulatUtenOK.joinToString(
-                ", ",
-            ) { it.type.name }}. Prøv å laste inn siden på nytt."
+            "Feil ved henting av ytelser fra andre systemer: ${
+                kildeResulatUtenOK.joinToString(
+                    ", ",
+                ) { it.type.name }
+            }. Prøv å laste inn siden på nytt."
         }
     }
 
@@ -228,7 +231,11 @@ class OppfølgingOpprettKontrollerService(
             MålgruppeType.DAGPENGER -> listOf(TypeYtelsePeriode.DAGPENGER)
             MålgruppeType.OMSTILLINGSSTØNAD -> listOf(TypeYtelsePeriode.OMSTILLINGSSTØNAD)
             MålgruppeType.OVERGANGSSTØNAD -> listOf(TypeYtelsePeriode.ENSLIG_FORSØRGER)
-            MålgruppeType.TILTAKSPENGER -> listOf(TypeYtelsePeriode.TILTAKSPENGER_TPSAK, TypeYtelsePeriode.TILTAKSPENGER_ARENA)
+            MålgruppeType.TILTAKSPENGER ->
+                listOf(
+                    TypeYtelsePeriode.TILTAKSPENGER_TPSAK,
+                    TypeYtelsePeriode.TILTAKSPENGER_ARENA,
+                )
 
             MålgruppeType.NEDSATT_ARBEIDSEVNE,
             MålgruppeType.UFØRETRYGD,

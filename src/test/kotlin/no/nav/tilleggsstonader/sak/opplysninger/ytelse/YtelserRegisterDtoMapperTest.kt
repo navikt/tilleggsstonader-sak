@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.ytelse
 
+import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.kildeResultatAAP
@@ -33,11 +34,37 @@ class YtelserRegisterDtoMapperTest {
             ).tilDto().perioder
 
         assertThat(perioder).containsExactly(
-            YtelsePeriodeRegisterDto(TypeYtelsePeriode.AAP, fom = aapNullTom2.fom, tom = aapNullTom2.tom),
-            YtelsePeriodeRegisterDto(TypeYtelsePeriode.AAP, fom = aapNullTom1.fom, tom = aapNullTom1.tom),
-            YtelsePeriodeRegisterDto(TypeYtelsePeriode.AAP, fom = aapPeriode2.fom, tom = aapPeriode2.tom),
-            YtelsePeriodeRegisterDto(TypeYtelsePeriode.ENSLIG_FORSØRGER, fom = efPeriode.fom, tom = efPeriode.tom),
-            YtelsePeriodeRegisterDto(TypeYtelsePeriode.AAP, fom = aapPeriode1.fom, tom = aapPeriode1.tom),
+            YtelsePeriodeRegisterDto(
+                type = TypeYtelsePeriode.AAP,
+                fom = aapNullTom2.fom,
+                tom = aapNullTom2.tom,
+                aapErFerdigAvklart = false,
+            ),
+            YtelsePeriodeRegisterDto(
+                type = TypeYtelsePeriode.AAP,
+                fom = aapNullTom1.fom,
+                tom = aapNullTom1.tom,
+                aapErFerdigAvklart = false,
+            ),
+            YtelsePeriodeRegisterDto(
+                type = TypeYtelsePeriode.AAP,
+                fom = aapPeriode2.fom,
+                tom = aapPeriode2.tom,
+                aapErFerdigAvklart = false,
+            ),
+            YtelsePeriodeRegisterDto(
+                type = TypeYtelsePeriode.ENSLIG_FORSØRGER,
+                fom = efPeriode.fom,
+                tom = efPeriode.tom,
+                ensligForsørgerStønadstype = EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
+                erNyttRegelverk2026 = false,
+            ),
+            YtelsePeriodeRegisterDto(
+                type = TypeYtelsePeriode.AAP,
+                fom = aapPeriode1.fom,
+                tom = aapPeriode1.tom,
+                aapErFerdigAvklart = false,
+            ),
         )
     }
 
