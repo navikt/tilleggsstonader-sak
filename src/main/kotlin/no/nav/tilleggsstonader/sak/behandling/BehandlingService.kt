@@ -219,7 +219,7 @@ class BehandlingService(
         )
 
         if (behandling.type == BehandlingType.KJØRELISTE && behandling.årsak == BehandlingÅrsak.REGISTRER_KJØRELISTE_FOR_BRUKER) {
-            avklartKjørelisteService.slettAvklarteUkerOgKjørelisterLagtTilIBehandling(behandlingId)
+            avklartKjørelisteService.slettAvklarteUkerOgKjørelisterLagtTilManueltIBehandling(behandlingId)
         }
 
         return behandlingRepository.update(henlagtBehandling)

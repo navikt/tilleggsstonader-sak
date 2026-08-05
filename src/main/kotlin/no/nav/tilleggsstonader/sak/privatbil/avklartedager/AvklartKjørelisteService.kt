@@ -364,7 +364,7 @@ class AvklartKjørelisteService(
             null
         }
 
-    fun slettAvklarteUkerOgKjørelisterLagtTilIBehandling(behandlingId: BehandlingId) {
+    fun slettAvklarteUkerOgKjørelisterLagtTilManueltIBehandling(behandlingId: BehandlingId) {
         val kjørelisterLagretIBehandling = kjørelisteService.hentManueltLagredeIBehandling(behandlingId)
 
         kjørelisterLagretIBehandling.forEach {
