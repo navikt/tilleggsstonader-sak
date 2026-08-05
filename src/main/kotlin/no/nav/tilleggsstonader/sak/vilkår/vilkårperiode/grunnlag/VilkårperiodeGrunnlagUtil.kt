@@ -11,6 +11,11 @@ fun kanYtelseBrukesIBehandling(
     if (ytelse.subtype == PeriodeGrunnlagYtelse.YtelseSubtype.AAP_FERDIG_AVKLART) {
         return false
     }
+
+    if (ytelse.type == TypeYtelsePeriode.ENSLIG_FORSØRGER && ytelse.erNyttRegelverk2026 == true) {
+        return false
+    }
+
     return ytelse.type.tilMålgruppe().kanBrukesForStønad(stønadstype)
 }
 
