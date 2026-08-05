@@ -171,6 +171,44 @@ class UtledTidligsteEndringServiceTest {
     }
 
     @Test
+    fun `utled tidligste endring når reiseId for offentlig transport endres`() {
+        val gammeltVilkår =
+            vilkår(
+                behandlingId = sisteIverksatteBehandling.id,
+                type = VilkårType.DAGLIG_REISE,
+                fom = originalFom,
+                tom = originalTom,
+                fakta =
+                    FaktaDagligReiseOffentligTransport(
+                        reiseId = ReiseId.random(),
+                        adresse = "Tiltaksgata 1",
+                        reisedagerPerUke = 5,
+                        prisEnkelbillett = 80,
+                        prisSyvdagersbillett = 500,
+                        prisTrettidagersbillett = 1800,
+                    ),
+            )
+        val nyttVilkårMedNyReiseId =
+            gammeltVilkår.copy(
+                behandlingId = behandling.id,
+                fakta = (gammeltVilkår.fakta as FaktaDagligReiseOffentligTransport).copy(reiseId = ReiseId.random()),
+            )
+
+        vilkårSisteIverksatteBehandling = listOf(gammeltVilkår)
+        vilkår = listOf(nyttVilkårMedNyReiseId)
+        vilkårperioder = vilkårperioderSisteIverksattBehandling
+        vedtaksperioder = vedtaksperioderSisteIverksatteBehandling
+
+        val result =
+            utledTidligsteEndringService.utledTidligsteEndringForBeregning(
+                behandling.id,
+                vedtaksperioder,
+            )
+
+        assertThat(result).isEqualTo(originalFom)
+    }
+
+    @Test
     fun `utled tidligste endring når daglig reise vilkår slettes og opprettes likt med ny reiseId`() {
         val gammeltVilkår =
             vilkår(
