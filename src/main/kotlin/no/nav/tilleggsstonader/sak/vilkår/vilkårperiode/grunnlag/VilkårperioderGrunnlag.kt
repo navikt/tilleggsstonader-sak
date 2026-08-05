@@ -130,7 +130,7 @@ sealed interface PeriodeGrunnlagYtelse {
         override val tom: LocalDate?,
         override val subtype: YtelseSubtype? = null,
     ) : PeriodeGrunnlagYtelse,
-        HarSubtype {
+        HarYtelseSubtype {
         init {
             validerSubtype(type)
         }
@@ -148,7 +148,7 @@ sealed interface PeriodeGrunnlagYtelse {
         override val subtype: YtelseSubtype? = null,
         val erNyttRegelverk2026: Boolean?,
     ) : PeriodeGrunnlagYtelse,
-        HarSubtype {
+        HarYtelseSubtype {
         init {
             validerSubtype(type)
         }
@@ -184,7 +184,7 @@ sealed interface PeriodeGrunnlagYtelse {
     }
 }
 
-interface HarSubtype {
+interface HarYtelseSubtype {
     val subtype: PeriodeGrunnlagYtelse.YtelseSubtype?
 
     fun validerSubtype(type: TypeYtelsePeriode) {

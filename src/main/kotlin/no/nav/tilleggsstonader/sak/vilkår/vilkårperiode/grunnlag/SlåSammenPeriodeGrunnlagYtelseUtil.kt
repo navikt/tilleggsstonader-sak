@@ -37,22 +37,20 @@ object SlåSammenPeriodeGrunnlagYtelseUtil {
                 ),
             )
 
-        fun kanSlåsSammen(other: PeriodeGrunnlagYtelseHolder): Boolean =
-            ytelse.type == other.ytelse.type &&
-                ytelse.subtype() == other.ytelse.subtype() &&
-                overlapperEllerPåfølgesAv(other)
-    }
+        fun kanSlåsSammen(other: PeriodeGrunnlagYtelseHolder): Boolean {
+            if (ytelse.type != other.ytelse.type) {
+                return false
+            }
 
-    private fun PeriodeGrunnlagYtelse.subtype(): PeriodeGrunnlagYtelse.YtelseSubtype? =
-        when (this) {
-            is PeriodeGrunnlagYtelse.AAP -> subtype
-            is PeriodeGrunnlagYtelse.EnsligForsørger -> subtype
-            is PeriodeGrunnlagYtelse.Dagpenger,
-            is PeriodeGrunnlagYtelse.Omstillingsstønad,
-            is PeriodeGrunnlagYtelse.TiltakspengerArena,
-            is PeriodeGrunnlagYtelse.TiltakspengerTPSak,
-            -> null
+            if (ytelse is HarYtelseSubtype && other.ytelse is HarYtelseSubtype) {
+                if (ytelse.subtype != other.ytelse.subtype) {
+                    return false
+                }
+            }
+
+            return overlapperEllerPåfølgesAv(other)
         }
+    }
 
     private fun PeriodeGrunnlagYtelse.slåSammenPeriode(
         fom: LocalDate,

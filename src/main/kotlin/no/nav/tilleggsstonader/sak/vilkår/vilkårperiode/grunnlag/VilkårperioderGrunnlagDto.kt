@@ -62,7 +62,7 @@ sealed interface PeriodeGrunnlagYtelseDto {
         override val subtype: YtelseSubtype? = null,
         override val kanYtelseBrukesIBehandling: Boolean,
     ) : PeriodeGrunnlagYtelseDto,
-        HarSubtype {
+        HarYtelseSubtype {
         init {
             validerSubtype(type)
         }
@@ -82,7 +82,7 @@ sealed interface PeriodeGrunnlagYtelseDto {
         val erNyttRegelverk2026: Boolean? = null,
         override val kanYtelseBrukesIBehandling: Boolean,
     ) : PeriodeGrunnlagYtelseDto,
-        HarSubtype {
+        HarYtelseSubtype {
         init {
             validerSubtype(type)
         }
