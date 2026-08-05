@@ -79,6 +79,7 @@ class DagligReiseVilkårService(
         validerDelperiodeFomOgTomMotNyttVilkår(nyttVilkår)
 
         val eksisterendeVilkår = vilkårRepository.findByIdOrThrow(vilkårId).mapTilVilkårDagligReise()
+        validerMotEksisterendeVilkår(nyttVilkår, eksisterendeVilkår)
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår, eksisterendeVilkår)
         val lagretVilkår = vilkårRepository.update(vilkår.mapTilVilkår())
@@ -204,6 +205,18 @@ class DagligReiseVilkårService(
             brukerfeilHvisIkke(tom == delperiodeTom) {
                 "Delperioden sin tom ${delperiodeTom?.norskFormat()} er ikke den samme som reiseperioden sin tom ${tom.norskFormat()}"
             }
+        }
+    }
+
+    private fun validerMotEksisterendeVilkår(
+        nyttVilkår: LagreVilkårDagligReise,
+        eksisterendeVilkår: VilkårDagligReise,
+    ) {
+        brukerfeilHvis(
+            eksisterendeVilkår.status in setOf(VilkårStatus.UENDRET, VilkårStatus.ENDRET) &&
+                eksisterendeVilkår.fakta.type != nyttVilkår.fakta.type,
+        ) {
+            "Du kan ikke endre type på en eksisterende reise fra forrige behandling. For å endre type må du slette reisen og opprette en ny reise."
         }
     }
 
