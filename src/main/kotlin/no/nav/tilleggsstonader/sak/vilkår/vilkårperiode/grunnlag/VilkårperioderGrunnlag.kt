@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.kontrakter.aktivitet.Kilde
@@ -112,7 +111,6 @@ data class RegisterAktivitet(
     JsonSubTypes.Type(value = PeriodeGrunnlagYtelse.TiltakspengerTPSak::class, name = "TILTAKSPENGER_TPSAK"),
     JsonSubTypes.Type(value = PeriodeGrunnlagYtelse.TiltakspengerArena::class, name = "TILTAKSPENGER_ARENA"),
 )
-@JsonIgnoreProperties(ignoreUnknown = true)
 sealed interface PeriodeGrunnlagYtelse {
     val fom: LocalDate
     val tom: LocalDate?
@@ -125,10 +123,8 @@ sealed interface PeriodeGrunnlagYtelse {
                 is Omstillingsstønad -> TypeYtelsePeriode.OMSTILLINGSSTØNAD
                 is TiltakspengerArena -> TypeYtelsePeriode.TILTAKSPENGER_ARENA
                 is TiltakspengerTPSak -> TypeYtelsePeriode.TILTAKSPENGER_TPSAK
-//                else -> throw IllegalArgumentException("Ukjent type: $this")
             }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     data class AAP(
         override val fom: LocalDate,
         override val tom: LocalDate?,
@@ -140,14 +136,12 @@ sealed interface PeriodeGrunnlagYtelse {
         }
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     data class Dagpenger(
         override val fom: LocalDate,
         override val tom: LocalDate?,
         val gjenståendeDagerFraTelleverk: GjenståendeDagerFraTelleverk? = null,
     ) : PeriodeGrunnlagYtelse
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     data class EnsligForsørger(
         override val fom: LocalDate,
         override val tom: LocalDate?,
@@ -160,19 +154,16 @@ sealed interface PeriodeGrunnlagYtelse {
         }
     }
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     data class Omstillingsstønad(
         override val fom: LocalDate,
         override val tom: LocalDate?,
     ) : PeriodeGrunnlagYtelse
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     data class TiltakspengerTPSak(
         override val fom: LocalDate,
         override val tom: LocalDate?,
     ) : PeriodeGrunnlagYtelse
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
     data class TiltakspengerArena(
         override val fom: LocalDate,
         override val tom: LocalDate?,
