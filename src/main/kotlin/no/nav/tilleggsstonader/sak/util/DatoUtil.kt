@@ -138,14 +138,13 @@ fun validerUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode(
             "Det er opphold mellom delperiodene ${a.tom.norskFormat()} og ${b.fom.norskFormat()}. Delperiodene må være sammenhengende.",
         )
     }
+    val flereDelperioderFeilForklaring =
+        "Dersom det er flere delperioder må stopp og startdato ved overgangen av disse være ved uke slutt/start"
 
     sortertePerioder.forEachIndexed { index, periode ->
         brukerfeilHvis(periode.tom < periode.fom) {
             "Tom ${periode.tom.norskFormat()} for delperioden er før fom ${periode.fom.norskFormat()}"
         }
-
-        val flereDelperioderFeilForklaring =
-            "Dersom det er flere delperioder må stopp og startdato ved overgangen av disse være ved uke slutt/start"
 
         if (index == 0) {
             brukerfeilHvis(periode.fom != overordnetPeriode.fom) {
