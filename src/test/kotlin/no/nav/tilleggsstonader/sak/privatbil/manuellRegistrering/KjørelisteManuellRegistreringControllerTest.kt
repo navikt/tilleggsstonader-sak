@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
-import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
+import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -38,8 +38,9 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import java.time.LocalDate
+import kotlin.random.Random
 
-class KjørelisteManuellRegistreringControllerTest : CleanDatabaseIntegrationTest() {
+class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
     @Autowired
     private lateinit var behandlingService: BehandlingService
 
@@ -64,7 +65,7 @@ class KjørelisteManuellRegistreringControllerTest : CleanDatabaseIntegrationTes
 
         val lagreRequest =
             LagreManuellKjørelisteRequest(
-                journalpostId = "123456789",
+                journalpostId = journalpostId(),
                 reiseId = kjørelisteOversikt.tilgjengeligeReiser.single().reiseId,
                 begrunnelse = null,
                 reisedager = reisedager,
@@ -123,7 +124,7 @@ class KjørelisteManuellRegistreringControllerTest : CleanDatabaseIntegrationTes
 
             val lagreRequest =
                 LagreManuellKjørelisteRequest(
-                    journalpostId = "123456789",
+                    journalpostId = journalpostId(),
                     reiseId = kjørelisteOversikt.tilgjengeligeReiser.single().reiseId,
                     begrunnelse = null,
                     reisedager = reisedager,
@@ -173,7 +174,7 @@ class KjørelisteManuellRegistreringControllerTest : CleanDatabaseIntegrationTes
                 .lagreManuellKjøreliste(
                     revurderingId,
                     LagreManuellKjørelisteRequest(
-                        journalpostId = "123456789",
+                        journalpostId = journalpostId(),
                         reiseId = kjørelisteOversikt.tilgjengeligeReiser.single().reiseId,
                         begrunnelse = null,
                         reisedager = lagKjørteDagerForUke(fom = fom, tom = 11 januar 2026, antallKjørteDager = 2),
@@ -195,7 +196,7 @@ class KjørelisteManuellRegistreringControllerTest : CleanDatabaseIntegrationTes
 
             val lagreRequest =
                 LagreManuellKjørelisteRequest(
-                    journalpostId = "123456789",
+                    journalpostId = journalpostId(),
                     reiseId = ReiseId.random(),
                     begrunnelse = null,
                     reisedager = reisedager,
@@ -229,7 +230,7 @@ class KjørelisteManuellRegistreringControllerTest : CleanDatabaseIntegrationTes
 
             val lagreRequest =
                 LagreManuellKjørelisteRequest(
-                    journalpostId = "123456789",
+                    journalpostId = journalpostId(),
                     reiseId = reiseId,
                     begrunnelse = null,
                     reisedager = reisedager,
@@ -263,7 +264,7 @@ class KjørelisteManuellRegistreringControllerTest : CleanDatabaseIntegrationTes
 
             val lagreRequest =
                 LagreManuellKjørelisteRequest(
-                    journalpostId = "123456789",
+                    journalpostId = journalpostId(),
                     reiseId = reiseId,
                     begrunnelse = null,
                     reisedager = reisedager,
@@ -295,7 +296,7 @@ class KjørelisteManuellRegistreringControllerTest : CleanDatabaseIntegrationTes
                 kall.privatBil.lagreManuellKjøreliste(
                     revurderingId,
                     LagreManuellKjørelisteRequest(
-                        journalpostId = "123456789",
+                        journalpostId = journalpostId(),
                         reiseId = kjørelisteOversikt.tilgjengeligeReiser.single().reiseId,
                         begrunnelse = null,
                         reisedager = lagKjørteDagerForUke(fom = fom, tom = tom, antallKjørteDager = 2),
@@ -338,7 +339,7 @@ class KjørelisteManuellRegistreringControllerTest : CleanDatabaseIntegrationTes
                 kall.privatBil.lagreManuellKjøreliste(
                     revurderingId,
                     LagreManuellKjørelisteRequest(
-                        journalpostId = "123456789",
+                        journalpostId = journalpostId(),
                         reiseId = kjørelisteOversikt.tilgjengeligeReiser.single().reiseId,
                         begrunnelse = null,
                         reisedager = lagKjørteDagerForUke(fom = 12 januar 2026, tom = tom, antallKjørteDager = 2),
@@ -419,7 +420,7 @@ class KjørelisteManuellRegistreringControllerTest : CleanDatabaseIntegrationTes
         Datoperiode(fom, tom).alleDatoer().mapIndexed { index, dato ->
             KjørelisteDag(
                 dato = dato,
-                harKjørt = index + 1 < antallKjørteDager,
+                harKjørt = index < antallKjørteDager,
                 parkeringsutgift = null,
             )
         }
@@ -432,4 +433,6 @@ class KjørelisteManuellRegistreringControllerTest : CleanDatabaseIntegrationTes
             nyeOpplysningerMetadata = null,
             kravMottatt = LocalDate.now(),
         )
+
+    private fun journalpostId() = Random.nextInt().toString()
 }
