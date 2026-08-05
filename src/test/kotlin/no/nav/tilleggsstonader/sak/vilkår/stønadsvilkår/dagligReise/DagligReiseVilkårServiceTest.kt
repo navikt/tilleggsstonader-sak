@@ -35,7 +35,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
-import org.springframework.data.repository.findByIdOrNull
 import java.util.Optional
 
 class DagligReiseVilkårServiceTest {
@@ -168,7 +167,8 @@ class DagligReiseVilkårServiceTest {
 
     @Test
     fun `skal ikke kunne endre type på uendret vilkår fra forrige behandling`() {
-        val behandling = saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO))
+        val behandling =
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO))
         val vilkårId = VilkårId.random()
         val eksisterendeVilkår =
             vilkårDagligReise(
@@ -209,7 +209,8 @@ class DagligReiseVilkårServiceTest {
 
     @Test
     fun `skal ikke kunne endre type på endret vilkår fra forrige behandling`() {
-        val behandling = saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO))
+        val behandling =
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO))
         val vilkårId = VilkårId.random()
         val eksisterendeVilkår =
             vilkårDagligReise(
@@ -250,7 +251,8 @@ class DagligReiseVilkårServiceTest {
 
     @Test
     fun `skal kunne endre type på nytt vilkår`() {
-        val behandling = saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO))
+        val behandling =
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO))
         val vilkårId = VilkårId.random()
         val eksisterendeVilkår =
             vilkårDagligReise(
