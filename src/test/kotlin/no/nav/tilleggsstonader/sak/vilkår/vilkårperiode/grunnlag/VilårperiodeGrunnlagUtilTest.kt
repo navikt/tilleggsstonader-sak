@@ -40,5 +40,11 @@ class VilårperiodeGrunnlagUtilTest {
             val ytelseDagpenger = ytelse.copy(type = TypeYtelsePeriode.DAGPENGER)
             assertThat(kanYtelseBrukesIBehandling(Stønadstype.DAGLIG_REISE_TSO, ytelseDagpenger)).isFalse
         }
+
+        @Test
+        fun `skal ikke kunne bruke enslig forsørger med nytt regelverk`() {
+            val ytelseEf = ytelse.copy(type = TypeYtelsePeriode.ENSLIG_FORSØRGER, erNyttRegelverk2026 = true)
+            assertThat(kanYtelseBrukesIBehandling(Stønadstype.BARNETILSYN, ytelseEf)).isFalse
+        }
     }
 }

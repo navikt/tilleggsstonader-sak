@@ -102,6 +102,7 @@ data class PeriodeGrunnlagYtelse(
     val tom: LocalDate?,
     val subtype: YtelseSubtype? = null,
     val gjenståendeDagerFraTelleverk: GjenståendeDagerFraTelleverk? = null,
+    val erNyttRegelverk2026: Boolean? = null,
 ) {
     init {
         feilHvis(subtype != null && subtype.gyldigSammenMed != type) {

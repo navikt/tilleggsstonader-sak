@@ -200,6 +200,7 @@ class VilkårperiodeGrunnlagService(
                             tom = it.tom,
                             subtype = it.tilYtelseSubtype(),
                             gjenståendeDagerFraTelleverk = if (it is YtelsePeriode.Dagpenger) it.gjenståendeDagerFraTelleverk else null,
+                            erNyttRegelverk2026 = if (it is YtelsePeriode.EnsligForsørger) it.erNyttRegelverk2026 else null,
                         )
                     }.slåSammenOverlappendeEllerPåfølgende(),
             kildeResultat =
