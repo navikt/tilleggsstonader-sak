@@ -36,6 +36,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
 import org.springframework.data.repository.findByIdOrNull
+import java.util.Optional
 
 class DagligReiseVilkårServiceTest {
     val vilkårRepository = mockk<VilkårRepository>()
@@ -192,7 +193,7 @@ class DagligReiseVilkårServiceTest {
 
         every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
         every { unleashService.isEnabled(any()) } returns true
-        every { vilkårRepository.findByIdOrNull(vilkårId) } returns eksisterendeVilkår.mapTilVilkår()
+        every { vilkårRepository.findById(vilkårId) } returns Optional.of(eksisterendeVilkår.mapTilVilkår())
 
         assertThatExceptionOfType(ApiFeil::class.java)
             .isThrownBy {
@@ -233,7 +234,7 @@ class DagligReiseVilkårServiceTest {
 
         every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
         every { unleashService.isEnabled(any()) } returns true
-        every { vilkårRepository.findByIdOrNull(vilkårId) } returns eksisterendeVilkår.mapTilVilkår()
+        every { vilkårRepository.findById(vilkårId) } returns Optional.of(eksisterendeVilkår.mapTilVilkår())
 
         assertThatExceptionOfType(ApiFeil::class.java)
             .isThrownBy {
@@ -274,7 +275,7 @@ class DagligReiseVilkårServiceTest {
 
         every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
         every { unleashService.isEnabled(any()) } returns true
-        every { vilkårRepository.findByIdOrNull(vilkårId) } returns eksisterendeVilkår.mapTilVilkår()
+        every { vilkårRepository.findById(vilkårId) } returns Optional.of(eksisterendeVilkår.mapTilVilkår())
         every { vilkårRepository.update(any<Vilkår>()) } answers { firstArg() }
 
         dagligReiseVilkårService.oppdaterVilkår(
