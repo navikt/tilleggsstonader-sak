@@ -69,8 +69,7 @@ class BoutgifterBeregningService(
             typeVedtak = typeVedtak,
         )
 
-        val vedtaksperioderBeregning =
-            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFra(plan.beregnFra())
+        val vedtaksperioderBeregning = vedtaksperioder.tilVedtaksperiodeBeregning().sorted()
 
         val utgifterPerVilkårtype =
             boutgifterUtgiftService
@@ -89,7 +88,12 @@ class BoutgifterBeregningService(
             vedtaksperioderBeregning,
         )
 
-        val beregningsresultat = beregnAktuellePerioder(vedtaksperioderBeregning, utgifterPerVilkårtype)
+        val beregningsresultat =
+            beregnAktuellePerioder(
+                vedtaksperioder = vedtaksperioderBeregning,
+                utgifter = utgifterPerVilkårtype,
+                beregnFra = plan.beregnFra(),
+            )
 
         return if (forrigeVedtak != null) {
             settSammenGamleOgNyePerioder(
@@ -105,14 +109,16 @@ class BoutgifterBeregningService(
     private fun beregnAktuellePerioder(
         vedtaksperioder: List<VedtaksperiodeBeregning>,
         utgifter: BoutgifterPerUtgiftstype,
+        beregnFra: LocalDate?,
     ): List<BeregningsresultatForLøpendeMåned> =
         vedtaksperioder
             .sorted()
+            .fitrerVekkPerioderFørBeregnFra(beregnFra)
             .splittVedGrensenTilFaktiskeUtgifter(utgifter)
             .flatMap { it.perioder.splittTilLøpendeMåneder() }
             .map { UtbetalingPeriode(it, skalAvkorteUtbetalingPeriode(utgifter)) }
             .validerIngenLøpendeOgMidlertidigUtgiftISammeUtbetalingsperiode(utgifter)
-            .validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(utgifter)
+            .validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(utgifter, beregnFra)
             .validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(
                 utgifter = utgifter,
                 finnMakssats = satsBoutgifterService::finnMakssats,
@@ -207,10 +213,19 @@ private fun validerMidlertidigeUtgifterStrekkerSegUtenforVedtaksperiodene(
     }
 }
 
+private fun List<VedtaksperiodeBeregning>.fitrerVekkPerioderFørBeregnFra(beregnFra: LocalDate?): List<VedtaksperiodeBeregning> {
+    if (beregnFra == null) return this
+    return this
+        .splitFra(beregnFra)
+        .filter { it.tom >= beregnFra }
+}
+
 private fun List<UtbetalingPeriode>.validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(
     utgifter: BoutgifterPerUtgiftstype,
+    beregnFra: LocalDate?,
 ): List<UtbetalingPeriode> {
-    val utgifterTilOvernatting = utgifter[TypeBoutgift.UTGIFTER_OVERNATTING] ?: emptyList()
+    val utgifterTilOvernatting =
+        utgifter[TypeBoutgift.UTGIFTER_OVERNATTING]?.filter { beregnFra == null || it.tom >= beregnFra } ?: emptyList()
     val utbetalingsperioder = this
 
     val detFinnesUtgiftSomKrysserUtbetalingsperioder =
