@@ -28,10 +28,23 @@ class SimuleringSteg(
         val typeVedtak = vedtakService.hentVedtaksresultat(saksbehandling)
 
         return when (typeVedtak) {
-            TypeVedtak.INNVILGELSE -> tilkjentYtelseService.hentForBehandling(saksbehandling.id).andelerTilkjentYtelse.isNotEmpty()
+            TypeVedtak.INNVILGELSE,
+            TypeVedtak.OPPHØR,
+            -> harAndelerPåBehandlingEllerForrigeIverksatte(saksbehandling)
             TypeVedtak.AVSLAG -> false
-            TypeVedtak.OPPHØR -> true
         }
+    }
+
+    private fun harAndelerPåBehandlingEllerForrigeIverksatte(saksbehandling: Saksbehandling): Boolean {
+        val harAndelerPåBehandling =
+            tilkjentYtelseService.hentForBehandling(saksbehandling.id).andelerTilkjentYtelse.isNotEmpty()
+        val harAndelerPåForrigeIverksatteBehandling =
+            saksbehandling.forrigeIverksatteBehandlingId
+                ?.let { tilkjentYtelseService.hentForBehandlingEllerNull(it) }
+                ?.andelerTilkjentYtelse
+                ?.isNotEmpty() ?: false
+
+        return harAndelerPåBehandling || harAndelerPåForrigeIverksatteBehandling
     }
 
     override fun stegType(): StegType = StegType.SIMULERING

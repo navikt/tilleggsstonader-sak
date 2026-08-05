@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
@@ -85,6 +86,7 @@ class SatsjusteringLæremidlerTest : CleanDatabaseIntegrationTest() {
         assertThat(behandling.id).isNotEqualTo(sistIverksatteBehandling.id)
         assertThat(sistIverksatteBehandling.forrigeIverksatteBehandlingId).isEqualTo(behandling.id)
         assertThat(sistIverksatteBehandling.behandlingMetode).isEqualTo(BehandlingMetode.BATCH)
+        assertThat(sistIverksatteBehandling.steg).isEqualTo(StegType.BEHANDLING_FERDIGSTILT)
 
         val tilkjentYtelseRevurdering = tilkjentYtelseRepository.findByBehandlingId(sistIverksatteBehandling.id)!!
 

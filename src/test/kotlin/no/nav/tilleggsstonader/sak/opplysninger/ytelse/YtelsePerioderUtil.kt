@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.ytelse
 
+import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
@@ -55,25 +56,31 @@ object YtelsePerioderUtil {
     fun periodeAAP(
         fom: LocalDate = LocalDate.now(),
         tom: LocalDate? = LocalDate.now(),
-    ): YtelsePeriode = YtelsePeriode(type = TypeYtelsePeriode.AAP, fom = fom, tom = tom)
+    ): YtelsePeriode = YtelsePeriode.AAP(fom = fom, tom = tom, aapErFerdigAvklart = false)
 
     fun periodeTiltakspengerTpsak(
         fom: LocalDate = LocalDate.now(),
         tom: LocalDate? = LocalDate.now(),
-    ): YtelsePeriode = YtelsePeriode(type = TypeYtelsePeriode.TILTAKSPENGER_TPSAK, fom = fom, tom = tom)
+    ): YtelsePeriode = YtelsePeriode.TiltakspengerTPSak(fom = fom, tom = tom)
 
     fun periodeTiltakspengerArena(
         fom: LocalDate = LocalDate.now(),
         tom: LocalDate? = LocalDate.now(),
-    ): YtelsePeriode = YtelsePeriode(type = TypeYtelsePeriode.TILTAKSPENGER_ARENA, fom = fom, tom = tom)
+    ): YtelsePeriode = YtelsePeriode.TiltakspengerArena(fom = fom, tom = tom)
 
     fun periodeEnsligForsørger(
         fom: LocalDate = LocalDate.now(),
         tom: LocalDate? = LocalDate.now(),
-    ): YtelsePeriode = YtelsePeriode(type = TypeYtelsePeriode.ENSLIG_FORSØRGER, fom = fom, tom = tom)
+    ): YtelsePeriode =
+        YtelsePeriode.EnsligForsørger(
+            fom = fom,
+            tom = tom,
+            ensligForsørgerStønadstype = EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
+            erNyttRegelverk2026 = false,
+        )
 
     fun periodeOmstillingsstønad(
         fom: LocalDate = LocalDate.now(),
         tom: LocalDate? = LocalDate.now(),
-    ): YtelsePeriode = YtelsePeriode(type = TypeYtelsePeriode.OMSTILLINGSSTØNAD, fom = fom, tom = tom)
+    ): YtelsePeriode = YtelsePeriode.Omstillingsstønad(fom = fom, tom = tom)
 }

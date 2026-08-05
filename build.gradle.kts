@@ -2,10 +2,9 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 val javaVersion = JavaLanguageVersion.of(21)
-val tomcatVersion = "11.0.22"
 val familieProsesseringVersion = "2.20260713101404_6072da6"
 val tilleggsstønaderLibsVersion = "2026.05.14-21.16.acdbe034efef"
-val tilleggsstønaderKontrakterVersion = "2026.07.28-09.51.b646b4a9884b"
+val tilleggsstønaderKontrakterVersion = "2026.08.05-12.24.2b90d73a627e"
 val avroVersion = "1.12.1"
 val confluentVersion = "8.0.1"
 val joarkHendelseVersion = "1.1.11"
@@ -24,7 +23,7 @@ plugins {
 
     kotlin("jvm") version "2.3.21"
     id("com.diffplug.spotless") version "8.8.0"
-    id("com.github.ben-manes.versions") version "0.54.0"
+    id("io.github.ben-manes.versions") version "0.59.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
 
     id("org.springframework.boot") version "4.1.0"
@@ -47,9 +46,6 @@ spotless {
         ktlint("1.8.0")
     }
 }
-
-// Spring 4.0.5 kommer tomcat v11.0.20, som er utsatt for CWE-532
-ext["tomcat.version"] = tomcatVersion
 
 configurations.all {
     resolutionStrategy {
@@ -122,7 +118,7 @@ dependencies {
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("no.nav.tilleggsstonader-libs:test-util:$tilleggsstønaderLibsVersion")
 
-    testImplementation(platform("io.cucumber:cucumber-bom:7.34.4"))
+    testImplementation(platform("io.cucumber:cucumber-bom:7.34.6"))
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
 
