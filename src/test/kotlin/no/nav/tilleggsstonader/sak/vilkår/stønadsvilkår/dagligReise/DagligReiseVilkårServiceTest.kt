@@ -13,22 +13,29 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.faktaPrivatBil
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.util.vilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.LagreVilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
+import org.springframework.data.repository.findByIdOrNull
 
 class DagligReiseVilkårServiceTest {
     val vilkårRepository = mockk<VilkårRepository>()
@@ -156,6 +163,127 @@ class DagligReiseVilkårServiceTest {
                     vilkårId = VilkårId.random(),
                 )
             }.withMessage("Kan ikke oppdatere vilkår når behandling er på steg=INNGANGSVILKÅR.")
+    }
+
+    @Test
+    fun `skal ikke kunne endre type på uendret vilkår fra forrige behandling`() {
+        val behandling = saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO))
+        val vilkårId = VilkårId.random()
+        val eksisterendeVilkår =
+            vilkårDagligReise(
+                behandlingId = behandling.id,
+                status = VilkårStatus.UENDRET,
+                fom = 1 januar 2025,
+                tom = 31 januar 2025,
+                fakta =
+                    faktaPrivatBil(
+                        reiseperioder =
+                            listOf(
+                                FaktaDelperiodePrivatBil(
+                                    fom = 1 januar 2025,
+                                    tom = 31 januar 2025,
+                                    reisedagerPerUke = 5,
+                                    bompengerPerDag = null,
+                                    fergekostnadPerDag = null,
+                                ),
+                            ),
+                    ),
+            ).copy(id = vilkårId)
+
+        every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
+        every { unleashService.isEnabled(any()) } returns true
+        every { vilkårRepository.findByIdOrNull(vilkårId) } returns eksisterendeVilkår.mapTilVilkår()
+
+        assertThatExceptionOfType(ApiFeil::class.java)
+            .isThrownBy {
+                dagligReiseVilkårService.oppdaterVilkår(
+                    nyttVilkår = nyttVilkår,
+                    behandlingId = behandling.id,
+                    vilkårId = vilkårId,
+                )
+            }.withMessage(
+                "Du kan ikke endre type på en eksisterende reise fra forrige behandling. For å endre type må du slette reisen og opprette en ny reise.",
+            )
+    }
+
+    @Test
+    fun `skal ikke kunne endre type på endret vilkår fra forrige behandling`() {
+        val behandling = saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO))
+        val vilkårId = VilkårId.random()
+        val eksisterendeVilkår =
+            vilkårDagligReise(
+                behandlingId = behandling.id,
+                status = VilkårStatus.ENDRET,
+                fom = 1 januar 2025,
+                tom = 31 januar 2025,
+                fakta =
+                    faktaPrivatBil(
+                        reiseperioder =
+                            listOf(
+                                FaktaDelperiodePrivatBil(
+                                    fom = 1 januar 2025,
+                                    tom = 31 januar 2025,
+                                    reisedagerPerUke = 5,
+                                    bompengerPerDag = null,
+                                    fergekostnadPerDag = null,
+                                ),
+                            ),
+                    ),
+            ).copy(id = vilkårId)
+
+        every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
+        every { unleashService.isEnabled(any()) } returns true
+        every { vilkårRepository.findByIdOrNull(vilkårId) } returns eksisterendeVilkår.mapTilVilkår()
+
+        assertThatExceptionOfType(ApiFeil::class.java)
+            .isThrownBy {
+                dagligReiseVilkårService.oppdaterVilkår(
+                    nyttVilkår = nyttVilkår,
+                    behandlingId = behandling.id,
+                    vilkårId = vilkårId,
+                )
+            }.withMessage(
+                "Du kan ikke endre type på en eksisterende reise fra forrige behandling. For å endre type må du slette reisen og opprette en ny reise.",
+            )
+    }
+
+    @Test
+    fun `skal kunne endre type på nytt vilkår`() {
+        val behandling = saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO))
+        val vilkårId = VilkårId.random()
+        val eksisterendeVilkår =
+            vilkårDagligReise(
+                behandlingId = behandling.id,
+                status = VilkårStatus.NY,
+                fom = 1 januar 2025,
+                tom = 31 januar 2025,
+                fakta =
+                    faktaPrivatBil(
+                        reiseperioder =
+                            listOf(
+                                FaktaDelperiodePrivatBil(
+                                    fom = 1 januar 2025,
+                                    tom = 31 januar 2025,
+                                    reisedagerPerUke = 5,
+                                    bompengerPerDag = null,
+                                    fergekostnadPerDag = null,
+                                ),
+                            ),
+                    ),
+            ).copy(id = vilkårId)
+
+        every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
+        every { unleashService.isEnabled(any()) } returns true
+        every { vilkårRepository.findByIdOrNull(vilkårId) } returns eksisterendeVilkår.mapTilVilkår()
+        every { vilkårRepository.update(any<Vilkår>()) } answers { firstArg() }
+
+        dagligReiseVilkårService.oppdaterVilkår(
+            nyttVilkår = nyttVilkår,
+            behandlingId = behandling.id,
+            vilkårId = vilkårId,
+        )
+
+        verify(exactly = 1) { vilkårRepository.update(any<Vilkår>()) }
     }
 
     fun faktaOffentligTransport(
