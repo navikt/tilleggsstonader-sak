@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.ytelse
 
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.GjenståendeDagerFraTelleverk
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
@@ -15,6 +17,15 @@ data class YtelserRegisterDto(
     val tidspunktHentet: LocalDateTime,
 )
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
+@JsonSubTypes(
+    JsonSubTypes.Type(value = YtelsePeriodeRegisterDto.AAP::class, name = "AAP"),
+    JsonSubTypes.Type(value = YtelsePeriodeRegisterDto.Dagpenger::class, name = "DAGPENGER"),
+    JsonSubTypes.Type(value = YtelsePeriodeRegisterDto.EnsligForsørger::class, name = "ENSLIG_FORSØRGER"),
+    JsonSubTypes.Type(value = YtelsePeriodeRegisterDto.Omstillingsstønad::class, name = "OMSTILLINGSSTØNAD"),
+    JsonSubTypes.Type(value = YtelsePeriodeRegisterDto.TiltakspengerTPSak::class, name = "TILTAKSPENGER_TPSAK"),
+    JsonSubTypes.Type(value = YtelsePeriodeRegisterDto.TiltakspengerArena::class, name = "TILTAKSPENGER_ARENA"),
+)
 sealed interface YtelsePeriodeRegisterDto {
     val type: TypeYtelsePeriode
         get() =

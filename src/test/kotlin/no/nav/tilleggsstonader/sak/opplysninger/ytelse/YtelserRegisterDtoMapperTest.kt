@@ -50,40 +50,35 @@ class YtelserRegisterDtoMapperTest {
         val aapNullTom1 = periodeAAP(fom = now().plusDays(1), tom = null)
         val aapNullTom2 = periodeAAP(fom = now().plusDays(2), tom = null)
 
-        val efPeriode = periodeEnsligForsørger(fom = now().plusDays(10), tom = now().plusDays(10), erNyttRegelverk = true)
+        val efPeriode = periodeEnsligForsørger(fom = now().plusDays(10), tom = now().plusDays(10), erNyttRegelverk = false)
         val perioder =
             ytelsePerioderDto(
                 perioder = listOf(aapNullTom2, aapPeriode1, aapNullTom1, aapPeriode2, efPeriode),
             ).tilDto().perioder
 
         assertThat(perioder).containsExactly(
-            YtelsePeriodeRegisterDto(
-                type = TypeYtelsePeriode.AAP,
+            YtelsePeriodeRegisterDto.AAP(
                 fom = aapNullTom2.fom,
                 tom = aapNullTom2.tom,
                 aapErFerdigAvklart = false,
             ),
-            YtelsePeriodeRegisterDto(
-                type = TypeYtelsePeriode.AAP,
+            YtelsePeriodeRegisterDto.AAP(
                 fom = aapNullTom1.fom,
                 tom = aapNullTom1.tom,
                 aapErFerdigAvklart = false,
             ),
-            YtelsePeriodeRegisterDto(
-                type = TypeYtelsePeriode.AAP,
+            YtelsePeriodeRegisterDto.AAP(
                 fom = aapPeriode2.fom,
                 tom = aapPeriode2.tom,
                 aapErFerdigAvklart = false,
             ),
-            YtelsePeriodeRegisterDto(
-                type = TypeYtelsePeriode.ENSLIG_FORSØRGER,
+            YtelsePeriodeRegisterDto.EnsligForsørger(
                 fom = efPeriode.fom,
                 tom = efPeriode.tom,
                 ensligForsørgerStønadstype = EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
                 erNyttRegelverk2026 = false,
             ),
-            YtelsePeriodeRegisterDto(
-                type = TypeYtelsePeriode.AAP,
+            YtelsePeriodeRegisterDto.AAP(
                 fom = aapPeriode1.fom,
                 tom = aapPeriode1.tom,
                 aapErFerdigAvklart = false,
