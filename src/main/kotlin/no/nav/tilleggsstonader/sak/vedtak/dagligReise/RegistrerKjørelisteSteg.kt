@@ -14,7 +14,7 @@ class RegistrerKjørelisteSteg(
         saksbehandling: Saksbehandling,
         data: Void?,
     ) {
-        kjørelisteManuellRegistreringService.avklarKjørelisterRegistrertIBehandling(saksbehandling)
+        kjørelisteManuellRegistreringService.avklarNyeKjørelisterManueltRegistrertIBehandling(saksbehandling)
     }
 
     override fun stegType(): StegType = StegType.REGISTRER_KJØRELISTE

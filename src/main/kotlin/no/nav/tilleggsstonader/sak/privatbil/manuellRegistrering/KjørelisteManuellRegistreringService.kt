@@ -73,7 +73,14 @@ class KjørelisteManuellRegistreringService(
         return kjøreliste.id
     }
 
-    fun avklarKjørelisterRegistrertIBehandling(saksbehandling: Saksbehandling) {
+    /**
+     * Avklarer uker fra kjørelister dersom
+     * 1. kjørelisten er manuelt registrert i denne behandlingen
+     * 2. kjørelisten ikke tidligere har blitt avklart
+     *
+     * Tar ikke hensyn til endringer på kjøreliste (foreløpig ikke mulig)
+     */
+    fun avklarNyeKjørelisterManueltRegistrertIBehandling(saksbehandling: Saksbehandling) {
         val behandlingId = saksbehandling.id
         val kjørelisterRegistrertIBehandling = kjørelisteService.hentManueltLagredeIBehandling(saksbehandling.id)
         val avklarteKjørelisteIds =
