@@ -8,10 +8,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.ekstern.stønad.DagligReisePrivatBilService
 import no.nav.tilleggsstonader.sak.ekstern.stønad.finnForUke
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.privatbil.InnsendtKjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
@@ -20,9 +16,7 @@ import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.util.erFørNåværendeUke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class KjørelisteManuellRegistreringService(
@@ -60,9 +54,12 @@ class KjørelisteManuellRegistreringService(
         behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(behandlingId)
 
         val behandling = behandlingService.hentBehandling(behandlingId)
-        val innsendtKjøreliste = InnsendtKjøreliste(reiseId = request.reiseId, reisedager = request.reisedager)
+        val innsendtKjøreliste = InnsendtKjøreliste(
+            reiseId = request.reiseId,
+            reisedager = request.reisedager,
+        )
 
-        validerInnsendtKjøreliste(behandling = behandling, innsendtKjøreliste = innsendtKjøreliste)
+        validerManuellKjøreliste(behandling = behandling, innsendtKjøreliste = innsendtKjøreliste)
 
         val kjøreliste =
             kjørelisteService.lagre(
@@ -74,75 +71,6 @@ class KjørelisteManuellRegistreringService(
                 manueltRegistrert = true,
             )
         return kjøreliste.id
-    }
-
-    private fun validerInnsendtKjøreliste(
-        behandling: Behandling,
-        innsendtKjøreliste: InnsendtKjøreliste,
-    ) {
-        brukerfeilHvis(innsendtKjøreliste.reisedager.any { it.dato > LocalDate.now() }) {
-            "Kan ikke registrere kjøreliste for dager som er fremover i tid"
-        }
-
-        validerInnsendtKjørelisteMotRammevedtak(
-            behandlingId = behandling.id,
-            innsendtKjøreliste = innsendtKjøreliste,
-        )
-
-        validerDagerIkkeTidligereInnsendt(
-            fagsakId = behandling.fagsakId,
-            reiseId = innsendtKjøreliste.reiseId,
-            innsendtKjøreliste = innsendtKjøreliste,
-        )
-    }
-
-    private fun validerInnsendtKjørelisteMotRammevedtak(
-        behandlingId: BehandlingId,
-        innsendtKjøreliste: InnsendtKjøreliste,
-    ) {
-        val rammeForReise =
-            dagligReisePrivatBilService.hentRammevedtakForReiseIBehandling(behandlingId, innsendtKjøreliste.reiseId)
-
-        feilHvis(rammeForReise == null) {
-            "Fant ikke rammevedtak for reise ${innsendtKjøreliste.reiseId}"
-        }
-
-        brukerfeilHvisIkke(rammeForReise.grunnlag.inneholder(innsendtKjøreliste)) {
-            "Perioden for innsendt kjøreliste er utenfor rammevedtaket"
-        }
-
-        validerFullstendigeUkerInnsendt(rammeForReise, innsendtKjøreliste)
-    }
-
-    private fun validerFullstendigeUkerInnsendt(
-        rammevedtakForReise: RammevedtakForReiseMedPrivatBil,
-        innsendtKjøreliste: InnsendtKjøreliste,
-    ) {
-        val rammevedtakGruppertPåUker = rammevedtakForReise.grunnlag.alleDatoerGruppertPåUke()
-        val innsendtKjørelisteGruppertPåUker = innsendtKjøreliste.reisedager.map { it.dato }.groupBy { it.tilUkeIÅr() }
-
-        innsendtKjørelisteGruppertPåUker.map { (uke, innsendteDager) ->
-            val antallDagerIRammeUke = rammevedtakGruppertPåUker.get(uke)?.size
-
-            brukerfeilHvis(antallDagerIRammeUke != innsendteDager.size) {
-                "Uke ${uke.ukenummer} er sendt inn ufullstendig."
-            }
-        }
-    }
-
-    private fun validerDagerIkkeTidligereInnsendt(
-        fagsakId: FagsakId,
-        reiseId: ReiseId,
-        innsendtKjøreliste: InnsendtKjøreliste,
-    ) {
-        val eksisterendeKjørelister =
-            kjørelisteService
-                .hentForFagsakId(fagsakId)
-                .filter { it.data.reiseId == reiseId }
-
-        brukerfeilHvis(eksisterendeKjørelister.any { it.data.overlapper(innsendtKjøreliste) }) {
-            "Innsendte dager overlapper med tidligere innsendte kjørelister for reise $reiseId"
-        }
     }
 
     fun avklarKjørelisterRegistrertIBehandling(saksbehandling: Saksbehandling) {
@@ -224,4 +152,15 @@ class KjørelisteManuellRegistreringService(
                     dager = dager.sortedBy { it.dato },
                 )
             }
+
+    private fun validerManuellKjøreliste(behandling: Behandling, innsendtKjøreliste: InnsendtKjøreliste) {
+        val rammevedtakForReise = dagligReisePrivatBilService.hentRammevedtakForReiseIBehandling(behandling.id, innsendtKjøreliste.reiseId)
+        val eksisterendeKjørelister = kjørelisteService.hentForFagsakId(behandling.fagsakId)
+
+        validerManuellKjøreliste(
+            innsendtKjøreliste = innsendtKjøreliste,
+            rammevedtakForReise = rammevedtakForReise,
+            eksisterendeKjørelister = eksisterendeKjørelister,
+        )
+    }
 }
