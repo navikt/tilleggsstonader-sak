@@ -111,12 +111,8 @@ class KjørelisteManuellRegistreringService(
                 .hentForFagsakId(fagsakId)
                 .filter { it.data.reiseId == reiseId }
 
-        val tidligereInnsendteDager =
-            eksisterendeKjørelister.flatMap { it.data.reisedager.map { dag -> dag.dato } }.toSet()
-
-        val overlappendeDatoer = innsendtKjøreliste.reisedager.map { it.dato }.filter { it in tidligereInnsendteDager }
-        brukerfeilHvis(overlappendeDatoer.isNotEmpty()) {
-            "Følgende datoer er allerede registrert i en tidligere kjøreliste: ${overlappendeDatoer.joinToString()}"
+        brukerfeilHvis(eksisterendeKjørelister.any {it.data.overlapper(innsendtKjøreliste)}) {
+            "Innsendte dager overlapper med tidligere innsendte kjørelister for reise $reiseId"
         }
     }
 
