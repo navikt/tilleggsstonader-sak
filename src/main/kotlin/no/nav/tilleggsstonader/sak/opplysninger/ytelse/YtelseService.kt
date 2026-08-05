@@ -139,7 +139,7 @@ class YtelseService(
                 ytelsePerioder.perioder
                     .filterNot {
                         it is YtelsePeriode.EnsligForsørger &&
-                            it.ensligForsørgerStønadstype != EnsligForsørgerStønadstype.BARNETILSYN
+                            it.ensligForsørgerStønadstype == EnsligForsørgerStønadstype.BARNETILSYN
                     },
         )
     }

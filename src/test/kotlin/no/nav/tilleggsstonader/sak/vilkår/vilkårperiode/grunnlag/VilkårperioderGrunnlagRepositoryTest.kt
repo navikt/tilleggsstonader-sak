@@ -53,6 +53,7 @@ internal class VilkårperioderGrunnlagRepositoryTest : CleanDatabaseIntegrationT
                                 PeriodeGrunnlagYtelse.EnsligForsørger(
                                     fom = LocalDate.now(),
                                     tom = LocalDate.now().plusDays(1),
+                                    erNyttRegelverk2026 = false,
                                 ),
                             ),
                     ),

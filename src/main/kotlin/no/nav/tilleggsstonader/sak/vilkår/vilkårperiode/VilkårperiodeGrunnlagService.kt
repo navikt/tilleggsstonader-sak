@@ -201,28 +201,34 @@ class VilkårperiodeGrunnlagService(
                                     tom = it.tom,
                                     subtype = it.tilYtelseSubtype(),
                                 )
+
                             is YtelsePeriode.Dagpenger ->
                                 PeriodeGrunnlagYtelse.Dagpenger(
                                     fom = it.fom,
                                     tom = it.tom,
                                     gjenståendeDagerFraTelleverk = it.gjenståendeDagerFraTelleverk,
                                 )
+
                             is YtelsePeriode.EnsligForsørger ->
                                 PeriodeGrunnlagYtelse.EnsligForsørger(
                                     fom = it.fom,
                                     tom = it.tom,
                                     subtype = it.tilYtelseSubtype(),
+                                    erNyttRegelverk2026 = it.erNyttRegelverk2026,
                                 )
+
                             is YtelsePeriode.Omstillingsstønad ->
                                 PeriodeGrunnlagYtelse.Omstillingsstønad(
                                     fom = it.fom,
                                     tom = it.tom,
                                 )
+
                             is YtelsePeriode.TiltakspengerTPSak ->
                                 PeriodeGrunnlagYtelse.TiltakspengerTPSak(
                                     fom = it.fom,
                                     tom = it.tom,
                                 )
+
                             is YtelsePeriode.TiltakspengerArena ->
                                 PeriodeGrunnlagYtelse.TiltakspengerArena(
                                     fom = it.fom,

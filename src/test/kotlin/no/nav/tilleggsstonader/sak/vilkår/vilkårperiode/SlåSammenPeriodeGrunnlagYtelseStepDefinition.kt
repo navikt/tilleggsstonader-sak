@@ -77,7 +77,14 @@ class SlåSammenPeriodeGrunnlagYtelseStepDefinition {
         when (type) {
             TypeYtelsePeriode.AAP -> PeriodeGrunnlagYtelse.AAP(fom = fom, tom = tom, subtype = subtype)
             TypeYtelsePeriode.DAGPENGER -> PeriodeGrunnlagYtelse.Dagpenger(fom = fom, tom = tom)
-            TypeYtelsePeriode.ENSLIG_FORSØRGER -> PeriodeGrunnlagYtelse.EnsligForsørger(fom = fom, tom = tom, subtype = subtype)
+            TypeYtelsePeriode.ENSLIG_FORSØRGER ->
+                PeriodeGrunnlagYtelse.EnsligForsørger(
+                    fom = fom,
+                    tom = tom,
+                    subtype = subtype,
+                    erNyttRegelverk2026 = false,
+                )
+
             TypeYtelsePeriode.OMSTILLINGSSTØNAD -> PeriodeGrunnlagYtelse.Omstillingsstønad(fom = fom, tom = tom)
             TypeYtelsePeriode.TILTAKSPENGER_TPSAK -> PeriodeGrunnlagYtelse.TiltakspengerTPSak(fom = fom, tom = tom)
             TypeYtelsePeriode.TILTAKSPENGER_ARENA -> PeriodeGrunnlagYtelse.TiltakspengerArena(fom = fom, tom = tom)

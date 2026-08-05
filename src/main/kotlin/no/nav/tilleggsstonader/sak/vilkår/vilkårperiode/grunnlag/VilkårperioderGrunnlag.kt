@@ -146,7 +146,7 @@ sealed interface PeriodeGrunnlagYtelse {
         override val fom: LocalDate,
         override val tom: LocalDate?,
         override val subtype: YtelseSubtype? = null,
-        val erNyttRegelverk2026: Boolean? = null,
+        val erNyttRegelverk2026: Boolean?,
     ) : PeriodeGrunnlagYtelse,
         HarSubtype {
         init {
