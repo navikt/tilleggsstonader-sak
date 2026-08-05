@@ -4,7 +4,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20260713101404_6072da6"
 val tilleggsstønaderLibsVersion = "2026.05.14-21.16.acdbe034efef"
-val tilleggsstønaderKontrakterVersion = "2026.08.04-10.45.2d8b191b586f"
+val tilleggsstønaderKontrakterVersion = "2026.08.05-10.12.bd9fe22b2e75"
 val avroVersion = "1.12.1"
 val confluentVersion = "8.0.1"
 val joarkHendelseVersion = "1.1.11"

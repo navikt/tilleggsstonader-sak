@@ -33,6 +33,7 @@ object DetaljertVedtaksperioderDagligReiseMapper {
             reiserPrivatBilTso.tilDetaljerteVedtaksperioderPrivatBil(Stønadstype.DAGLIG_REISE_TSO, adresserTso),
             reiserPrivatBilTsr.tilDetaljerteVedtaksperioderPrivatBil(Stønadstype.DAGLIG_REISE_TSR, adresserTsr),
         ).flatten()
+            .sortedBy { it.detaljertBeregningsperioder?.firstOrNull()?.fom ?: it.rammevedtakPrivatBil?.fom }
     }
 
     private fun InnvilgelseEllerOpphørDagligReise.hentUtOffentligTransport(): List<BeregningsresultatForReise> =
@@ -72,8 +73,8 @@ object DetaljertVedtaksperioderDagligReiseMapper {
     ): DetaljertVedtaksperiodeDagligReise {
         val detaljertBeregningsperioder =
             perioder
-                .sortedByDescending { it.grunnlag.fom }
                 .map { it.tilDetaljertBeregningsperiode() }
+                .sortedByDescending { it.fom }
 
         return DetaljertVedtaksperiodeDagligReise(
             stønadstype = stønadstype,
