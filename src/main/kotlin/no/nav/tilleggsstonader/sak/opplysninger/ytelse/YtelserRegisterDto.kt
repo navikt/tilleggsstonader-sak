@@ -20,6 +20,7 @@ data class YtelsePeriodeRegisterDto(
     val tom: LocalDate?,
     val aapErFerdigAvklart: Boolean? = null,
     val ensligForsørgerStønadstype: EnsligForsørgerStønadstype? = null,
+    val erNyttRegelverk2026: Boolean? = null,
 )
 
 data class KildeResultatYtelseDto(

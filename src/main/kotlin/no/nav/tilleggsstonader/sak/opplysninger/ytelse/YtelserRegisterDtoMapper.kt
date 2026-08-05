@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.opplysninger.ytelse
 
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -28,8 +29,9 @@ object YtelserRegisterDtoMapper {
                     type = it.type,
                     fom = it.fom,
                     tom = it.tom,
-                    aapErFerdigAvklart = it.aapErFerdigAvklart,
-                    ensligForsørgerStønadstype = it.ensligForsørgerStønadstype,
+                    aapErFerdigAvklart = if (it is YtelsePeriode.AAP) it.aapErFerdigAvklart else null,
+                    ensligForsørgerStønadstype = if (it is YtelsePeriode.EnsligForsørger) it.ensligForsørgerStønadstype else null,
+                    erNyttRegelverk2026 = if (it is YtelsePeriode.EnsligForsørger) it.erNyttRegelverk2026 else null,
                 )
             }.sortedWith(sorteringTomDesc)
 }

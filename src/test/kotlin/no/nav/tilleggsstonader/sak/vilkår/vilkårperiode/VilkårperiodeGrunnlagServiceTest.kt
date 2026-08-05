@@ -143,18 +143,18 @@ class VilkårperiodeGrunnlagServiceTest : CleanDatabaseIntegrationTest() {
         val nesteDag = LocalDate.now().plusDays(1) // for å få 2 ulike AAP-perioder
         every {
             ytelseClient.hentYtelser(any())
+            ytelseClient.hentYtelser(any())
         } returns
             ytelsePerioderDto(
                 perioder =
                     listOf(
-                        YtelsePeriode(TypeYtelsePeriode.AAP, LocalDate.now(), LocalDate.now(), aapErFerdigAvklart = false),
-                        YtelsePeriode(TypeYtelsePeriode.AAP, nesteDag, nesteDag, aapErFerdigAvklart = true),
-                        YtelsePeriode(
-                            TypeYtelsePeriode.ENSLIG_FORSØRGER,
-                            LocalDate.now(),
-                            LocalDate.now(),
-                            aapErFerdigAvklart = null,
+                        YtelsePeriode.AAP(fom = LocalDate.now(), tom = LocalDate.now(), aapErFerdigAvklart = false),
+                        YtelsePeriode.AAP(fom = nesteDag, tom = nesteDag, aapErFerdigAvklart = true),
+                        YtelsePeriode.EnsligForsørger(
+                            fom = LocalDate.now(),
+                            tom = LocalDate.now(),
                             ensligForsørgerStønadstype = EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
+                            erNyttRegelverk2026 = false,
                         ),
                     ),
                 kildeResultat = emptyList(),
@@ -178,6 +178,7 @@ class VilkårperiodeGrunnlagServiceTest : CleanDatabaseIntegrationTest() {
                 LocalDate.now(),
                 LocalDate.now(),
                 subtype = YtelseSubtype.OVERGANGSSTØNAD,
+                erNyttRegelverk2026 = false,
             ),
         )
     }
@@ -190,27 +191,24 @@ class VilkårperiodeGrunnlagServiceTest : CleanDatabaseIntegrationTest() {
             ytelsePerioderDto(
                 perioder =
                     listOf(
-                        YtelsePeriode(TypeYtelsePeriode.AAP, LocalDate.now(), LocalDate.now(), aapErFerdigAvklart = false),
-                        YtelsePeriode(
-                            TypeYtelsePeriode.ENSLIG_FORSØRGER,
-                            LocalDate.now(),
-                            LocalDate.now(),
-                            aapErFerdigAvklart = null,
-                            EnsligForsørgerStønadstype.BARNETILSYN,
+                        YtelsePeriode.AAP(fom = LocalDate.now(), tom = LocalDate.now(), aapErFerdigAvklart = false),
+                        YtelsePeriode.EnsligForsørger(
+                            fom = LocalDate.now(),
+                            tom = LocalDate.now(),
+                            ensligForsørgerStønadstype = EnsligForsørgerStønadstype.BARNETILSYN,
+                            erNyttRegelverk2026 = false,
                         ),
-                        YtelsePeriode(
-                            TypeYtelsePeriode.ENSLIG_FORSØRGER,
-                            LocalDate.now(),
-                            LocalDate.now(),
-                            aapErFerdigAvklart = null,
-                            EnsligForsørgerStønadstype.SKOLEPENGER,
+                        YtelsePeriode.EnsligForsørger(
+                            fom = LocalDate.now(),
+                            tom = LocalDate.now(),
+                            ensligForsørgerStønadstype = EnsligForsørgerStønadstype.SKOLEPENGER,
+                            erNyttRegelverk2026 = false,
                         ),
-                        YtelsePeriode(
-                            TypeYtelsePeriode.ENSLIG_FORSØRGER,
-                            LocalDate.now(),
-                            LocalDate.now(),
-                            aapErFerdigAvklart = null,
-                            EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
+                        YtelsePeriode.EnsligForsørger(
+                            fom = LocalDate.now(),
+                            tom = LocalDate.now(),
+                            ensligForsørgerStønadstype = EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
+                            erNyttRegelverk2026 = false,
                         ),
                     ),
                 kildeResultat = emptyList(),
@@ -228,12 +226,14 @@ class VilkårperiodeGrunnlagServiceTest : CleanDatabaseIntegrationTest() {
                 LocalDate.now(),
                 LocalDate.now(),
                 YtelseSubtype.SKOLEPENGER,
+                erNyttRegelverk2026 = false,
             ),
             PeriodeGrunnlagYtelse(
                 TypeYtelsePeriode.ENSLIG_FORSØRGER,
                 LocalDate.now(),
                 LocalDate.now(),
                 YtelseSubtype.OVERGANGSSTØNAD,
+                erNyttRegelverk2026 = false,
             ),
         )
     }

@@ -36,6 +36,7 @@ data class PeriodeGrunnlagYtelseDto(
     val subtype: PeriodeGrunnlagYtelse.YtelseSubtype?,
     val kanYtelseBrukesIBehandling: Boolean,
     val gjenståendeDagerFraTelleverk: GjenståendeDagerFraTelleverk?,
+    val erNyttRegelverk2026: Boolean?,
 )
 
 data class HentetInformasjonDto(
@@ -97,6 +98,7 @@ fun PeriodeGrunnlagYtelse.tilDto(stønadstype: Stønadstype) =
                 ytelse = this,
             ),
         gjenståendeDagerFraTelleverk = this.gjenståendeDagerFraTelleverk,
+        erNyttRegelverk2026 = this.erNyttRegelverk2026,
     )
 
 fun HentetInformasjon.tilDto() =

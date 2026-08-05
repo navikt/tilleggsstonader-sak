@@ -102,6 +102,7 @@ data class PeriodeGrunnlagYtelse(
     val tom: LocalDate?,
     val subtype: YtelseSubtype? = null,
     val gjenståendeDagerFraTelleverk: GjenståendeDagerFraTelleverk? = null,
+    val erNyttRegelverk2026: Boolean? = null,
 ) {
     init {
         feilHvis(subtype != null && subtype.gyldigSammenMed != type) {
@@ -134,8 +135,8 @@ data class HentetInformasjon(
 )
 
 fun YtelsePeriodeKontrakter.tilYtelseSubtype(): PeriodeGrunnlagYtelse.YtelseSubtype? =
-    when (this.type) {
-        TypeYtelsePeriode.ENSLIG_FORSØRGER -> {
+    when (this) {
+        is YtelsePeriodeKontrakter.EnsligForsørger -> {
             when (this.ensligForsørgerStønadstype) {
                 EnsligForsørgerStønadstypeKontrakter.OVERGANGSSTØNAD -> PeriodeGrunnlagYtelse.YtelseSubtype.OVERGANGSSTØNAD
                 EnsligForsørgerStønadstypeKontrakter.SKOLEPENGER -> PeriodeGrunnlagYtelse.YtelseSubtype.SKOLEPENGER
@@ -143,7 +144,7 @@ fun YtelsePeriodeKontrakter.tilYtelseSubtype(): PeriodeGrunnlagYtelse.YtelseSubt
             }
         }
 
-        TypeYtelsePeriode.AAP -> {
+        is YtelsePeriodeKontrakter.AAP -> {
             when (this.aapErFerdigAvklart) {
                 true -> AAP_FERDIG_AVKLART
                 else -> null
