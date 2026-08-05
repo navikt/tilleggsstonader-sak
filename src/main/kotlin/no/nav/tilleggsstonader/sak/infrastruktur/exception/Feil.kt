@@ -116,6 +116,21 @@ inline fun <T> Iterable<T>.singleEllerFeil(
     lazyMessage: () -> String,
 ): T = filter(predicate).singleEllerFeil(httpStatus, sensitivFeilmelding, lazyMessage)
 
+inline fun <T> T?.eksistererEllerFeil(
+    httpStatus: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
+    noinline sensitivFeilmelding: (() -> String)? = null,
+    lazyMessage: () -> String,
+): T {
+    if (this == null) {
+        throw Feil(
+            message = lazyMessage(),
+            frontendFeilmelding = sensitivFeilmelding?.invoke() ?: lazyMessage(),
+            httpStatus = httpStatus,
+        )
+    }
+    return this
+}
+
 class ManglerTilgang(
     val melding: String,
     val frontendFeilmelding: String,
