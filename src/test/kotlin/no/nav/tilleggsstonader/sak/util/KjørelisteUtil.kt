@@ -24,7 +24,6 @@ object KjørelisteUtil {
             listOf(
                 KjørtDag(dato = LocalDate.now(), parkeringsutgift = null),
             ),
-        manueltRegistrert: Boolean = false,
     ): Kjøreliste {
         val reisedager: List<KjørelisteDag> =
             periode.alleDatoer().map { dato ->
@@ -47,7 +46,6 @@ object KjørelisteUtil {
                     reiseId = reiseId,
                     reisedager = reisedager,
                 ),
-            manueltRegistrert = manueltRegistrert,
         )
     }
 

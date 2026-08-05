@@ -1,8 +1,5 @@
 ALTER TABLE kjoreliste
     ADD COLUMN begrunnelse VARCHAR NULL,
-    ADD COLUMN behandling_id UUID NULL REFERENCES behandling (id),
-    ADD COLUMN manuelt_registrert BOOLEAN NOT NULL DEFAULT FALSE;
+    ADD COLUMN manuelt_lagret_i_behandling UUID NULL REFERENCES behandling (id);
 
-ALTER TABLE kjoreliste ALTER COLUMN manuelt_registrert DROP DEFAULT;
-
-CREATE INDEX idx_kjoreliste_behandling_id ON kjoreliste (behandling_id) WHERE behandling_id IS NOT NULL;
+CREATE INDEX idx_kjoreliste_manuelt_lagret_i_behandling ON kjoreliste (manuelt_lagret_i_behandling) WHERE manuelt_lagret_i_behandling IS NOT NULL;

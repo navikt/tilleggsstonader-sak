@@ -164,7 +164,7 @@ class KjørelisteManuellRegistreringService(
         kjørelister: List<Kjøreliste>,
         reiserIRammevedtak: List<RammevedtakForReiseMedPrivatBil>,
     ): List<ManueltInnsendtKjørelisteDto> {
-        val kjørelisterRegistrertIDenneBehandlingen = kjørelister.filter { it.behandlingId == behandlingId }
+        val kjørelisterRegistrertIDenneBehandlingen = kjørelister.filter { it.manueltLagretIBehandling == behandlingId }
 
         return kjørelisterRegistrertIDenneBehandlingen.map { kjøreliste ->
             val tilhørendeReise = reiserIRammevedtak.single { it.reiseId == kjøreliste.data.reiseId }

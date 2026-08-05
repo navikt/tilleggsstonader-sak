@@ -24,15 +24,14 @@ class KjørelisteService(
                 fagsakId = fagsakId,
                 datoMottatt = SporbarUtils.now(),
                 begrunnelse = begrunnelse,
-                manueltRegistrert = manueltRegistrert,
-                behandlingId = behandlingId,
+                manueltLagretIBehandling = behandlingId,
                 data = innsendtKjøreliste,
             )
         return repository.insert(kjørseliste)
     }
 
     fun hentManueltLagredeIBehandling(behandlingId: BehandlingId): List<Kjøreliste> =
-        repository.findByBehandlingId(behandlingId).filter { it.manueltRegistrert }
+        repository.findByManueltLagretIBehandling(behandlingId)
 
     fun slettKjørelister(kjørelister: List<Kjøreliste>) {
         repository.deleteAll(kjørelister)

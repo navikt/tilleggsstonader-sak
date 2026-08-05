@@ -14,5 +14,5 @@ interface KjørelisteRepository :
 
     fun findByJournalpostId(journalpostId: String): Kjøreliste?
 
-    fun findByBehandlingId(behandlingId: BehandlingId): List<Kjøreliste>
+    fun findByManueltLagretIBehandling(behandlingId: BehandlingId): List<Kjøreliste>
 }

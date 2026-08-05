@@ -21,8 +21,7 @@ data class Kjøreliste(
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     val sporbar: Sporbar = Sporbar(),
     val begrunnelse: String? = null,
-    val behandlingId: BehandlingId? = null,
-    val manueltRegistrert: Boolean,
+    val manueltLagretIBehandling: BehandlingId? = null,
     @Column("data")
     val data: InnsendtKjøreliste,
 )
