@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.ytelse
 import no.nav.familie.prosessering.rest.RestTaskService.Companion.logger
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderRequest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -135,7 +136,10 @@ class YtelseService(
         return ytelsePerioder.copy(
             perioder =
                 ytelsePerioder.perioder
-                    .filter { it.ensligForsørgerStønadstype != EnsligForsørgerStønadstype.BARNETILSYN },
+                    .filter {
+                        it !is YtelsePeriode.EnsligForsørger ||
+                            it.ensligForsørgerStønadstype != EnsligForsørgerStønadstype.BARNETILSYN
+                    },
         )
     }
 }

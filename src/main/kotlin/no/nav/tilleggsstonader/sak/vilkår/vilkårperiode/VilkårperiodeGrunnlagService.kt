@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -198,7 +199,7 @@ class VilkårperiodeGrunnlagService(
                             fom = it.fom,
                             tom = it.tom,
                             subtype = it.tilYtelseSubtype(),
-                            gjenståendeDagerFraTelleverk = it.gjenståendeDagerFraTelleverk,
+                            gjenståendeDagerFraTelleverk = if (it is YtelsePeriode.Dagpenger) it.gjenståendeDagerFraTelleverk else null,
                         )
                     }.slåSammenOverlappendeEllerPåfølgende(),
             kildeResultat =
