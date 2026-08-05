@@ -41,7 +41,8 @@ class VilkårperiodeGrunnlagUtilTest {
 
         @Test
         fun `skal ikke kunne bruke enslig forsørger med nytt regelverk`() {
-            val ytelseEf = ytelse.copy(type = TypeYtelsePeriode.ENSLIG_FORSØRGER, erNyttRegelverk2026 = true)
+            val ytelseEf =
+                PeriodeGrunnlagYtelse.EnsligForsørger(fom = ytelse.fom, tom = ytelse.tom, erNyttRegelverk2026 = true)
             assertThat(kanYtelseBrukesIBehandling(Stønadstype.BARNETILSYN, ytelseEf)).isFalse
         }
     }
