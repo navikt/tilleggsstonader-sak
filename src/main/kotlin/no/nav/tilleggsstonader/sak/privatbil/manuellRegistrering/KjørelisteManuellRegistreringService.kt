@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.ekstern.stønad.finnForUke
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.privatbil.InnsendtKjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
@@ -79,26 +80,54 @@ class KjørelisteManuellRegistreringService(
         behandling: Behandling,
         innsendtKjøreliste: InnsendtKjøreliste,
     ) {
-        val rammeForReise =
-            dagligReisePrivatBilService.hentRammevedtakForReiseIBehandling(behandling.id, innsendtKjøreliste.reiseId)
-
-        feilHvis(rammeForReise == null) {
-            "Fant ikke rammevedtak for reise ${innsendtKjøreliste.reiseId}"
-        }
-
-        brukerfeilHvis(!rammeForReise.grunnlag.inneholder(innsendtKjøreliste)) {
-            "Innsendte dager er ikke innenfor perioden i rammevedtaket"
-        }
-
         brukerfeilHvis(innsendtKjøreliste.reisedager.any { it.dato > LocalDate.now() }) {
             "Kan ikke registrere kjøreliste for dager som er fremover i tid"
         }
+
+        validerInnsendtKjørelisteMotRammevedtak(
+            behandlingId = behandling.id,
+            innsendtKjøreliste = innsendtKjøreliste,
+        )
 
         validerDagerIkkeTidligereInnsendt(
             fagsakId = behandling.fagsakId,
             reiseId = innsendtKjøreliste.reiseId,
             innsendtKjøreliste = innsendtKjøreliste,
         )
+    }
+
+    private fun validerInnsendtKjørelisteMotRammevedtak(
+        behandlingId: BehandlingId,
+        innsendtKjøreliste: InnsendtKjøreliste,
+    ) {
+        val rammeForReise =
+            dagligReisePrivatBilService.hentRammevedtakForReiseIBehandling(behandlingId, innsendtKjøreliste.reiseId)
+
+        feilHvis(rammeForReise == null) {
+            "Fant ikke rammevedtak for reise ${innsendtKjøreliste.reiseId}"
+        }
+
+        brukerfeilHvisIkke(rammeForReise.grunnlag.inneholder(innsendtKjøreliste)) {
+            "Perioden for innsendt kjøreliste er utenfor rammevedtaket"
+        }
+
+        validerFullstendigeUkerInnsendt(rammeForReise, innsendtKjøreliste)
+    }
+
+    private fun validerFullstendigeUkerInnsendt(
+        rammevedtakForReise: RammevedtakForReiseMedPrivatBil,
+        innsendtKjøreliste: InnsendtKjøreliste,
+    ) {
+        val rammevedtakGruppertPåUker = rammevedtakForReise.grunnlag.alleDatoerGruppertPåUke()
+        val innsendtKjørelisteGruppertPåUker = innsendtKjøreliste.reisedager.map { it.dato }.groupBy { it.tilUkeIÅr() }
+
+        innsendtKjørelisteGruppertPåUker.map { (uke, innsendteDager) ->
+            val antallDagerIRammeUke = rammevedtakGruppertPåUker.get(uke)?.size
+
+            brukerfeilHvis(antallDagerIRammeUke != innsendteDager.size) {
+                "Uke ${uke.ukenummer} er sendt inn ufullstendig."
+            }
+        }
     }
 
     private fun validerDagerIkkeTidligereInnsendt(
@@ -111,7 +140,7 @@ class KjørelisteManuellRegistreringService(
                 .hentForFagsakId(fagsakId)
                 .filter { it.data.reiseId == reiseId }
 
-        brukerfeilHvis(eksisterendeKjørelister.any {it.data.overlapper(innsendtKjøreliste)}) {
+        brukerfeilHvis(eksisterendeKjørelister.any { it.data.overlapper(innsendtKjøreliste) }) {
             "Innsendte dager overlapper med tidligere innsendte kjørelister for reise $reiseId"
         }
     }
