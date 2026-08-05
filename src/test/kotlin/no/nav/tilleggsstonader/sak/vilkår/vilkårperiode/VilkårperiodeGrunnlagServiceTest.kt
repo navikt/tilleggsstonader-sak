@@ -175,6 +175,7 @@ class VilkårperiodeGrunnlagServiceTest : CleanDatabaseIntegrationTest() {
                 fom = LocalDate.now(),
                 tom = LocalDate.now(),
                 subtype = YtelseSubtype.OVERGANGSSTØNAD,
+                erNyttRegelverk2026 = false,
             ),
         )
     }
@@ -221,11 +222,13 @@ class VilkårperiodeGrunnlagServiceTest : CleanDatabaseIntegrationTest() {
                 fom = LocalDate.now(),
                 tom = LocalDate.now(),
                 subtype = YtelseSubtype.SKOLEPENGER,
+                erNyttRegelverk2026 = false,
             ),
             PeriodeGrunnlagYtelse.EnsligForsørger(
                 fom = LocalDate.now(),
                 tom = LocalDate.now(),
                 subtype = YtelseSubtype.OVERGANGSSTØNAD,
+                erNyttRegelverk2026 = false,
             ),
         )
     }

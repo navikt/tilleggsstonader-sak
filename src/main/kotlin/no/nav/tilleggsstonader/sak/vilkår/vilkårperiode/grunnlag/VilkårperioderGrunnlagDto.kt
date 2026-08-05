@@ -160,25 +160,25 @@ fun PeriodeGrunnlagYtelse.tilDto(stønadstype: Stønadstype) =
             PeriodeGrunnlagYtelseDto.AAP(
                 fom = this.fom,
                 tom = this.tom,
-                subtype = this.subtype,
                 kanYtelseBrukesIBehandling = kanYtelseBrukesIBehandling(stønadstype, this),
+                subtype = this.subtype,
             )
 
         is PeriodeGrunnlagYtelse.Dagpenger ->
             PeriodeGrunnlagYtelseDto.Dagpenger(
                 fom = this.fom,
                 tom = this.tom,
-                gjenståendeDagerFraTelleverk = this.gjenståendeDagerFraTelleverk,
                 kanYtelseBrukesIBehandling = kanYtelseBrukesIBehandling(stønadstype, this),
+                gjenståendeDagerFraTelleverk = this.gjenståendeDagerFraTelleverk,
             )
 
         is PeriodeGrunnlagYtelse.EnsligForsørger ->
             PeriodeGrunnlagYtelseDto.EnsligForsørger(
                 fom = this.fom,
                 tom = this.tom,
+                kanYtelseBrukesIBehandling = kanYtelseBrukesIBehandling(stønadstype, this),
                 subtype = this.subtype,
                 erNyttRegelverk2026 = this.erNyttRegelverk2026,
-                kanYtelseBrukesIBehandling = kanYtelseBrukesIBehandling(stønadstype, this),
             )
 
         is PeriodeGrunnlagYtelse.Omstillingsstønad ->
