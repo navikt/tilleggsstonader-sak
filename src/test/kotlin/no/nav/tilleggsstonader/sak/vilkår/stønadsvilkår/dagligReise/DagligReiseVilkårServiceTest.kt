@@ -35,7 +35,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
-import org.springframework.data.repository.findByIdOrNull
 import java.util.Optional
 
 class DagligReiseVilkårServiceTest {
