@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.felles.tilTema
+import no.nav.tilleggsstonader.kontrakter.ytelse.GjenståendeDagerFraTelleverk
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
@@ -17,6 +18,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelse
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDate
 
 class OppfølgingIntegrasjonstest : CleanDatabaseIntegrationTest() {
     @Autowired
@@ -110,12 +112,20 @@ class OppfølgingIntegrasjonstest : CleanDatabaseIntegrationTest() {
                         YtelsePeriode.Dagpenger(
                             fom = 1 januar 2026,
                             tom = 31 januar 2026,
-                            gjenståendeDagerFraTelleverk = null,
+                            gjenståendeDagerFraTelleverk =
+                                GjenståendeDagerFraTelleverk(
+                                    dato = LocalDate.now(),
+                                    antallDager = 31,
+                                ),
                         ),
                         YtelsePeriode.Dagpenger(
                             fom = 1 februar 2026,
                             tom = null,
-                            gjenståendeDagerFraTelleverk = null,
+                            gjenståendeDagerFraTelleverk =
+                                GjenståendeDagerFraTelleverk(
+                                    dato = LocalDate.now(),
+                                    antallDager = 28,
+                                ),
                         ),
                     ),
             )

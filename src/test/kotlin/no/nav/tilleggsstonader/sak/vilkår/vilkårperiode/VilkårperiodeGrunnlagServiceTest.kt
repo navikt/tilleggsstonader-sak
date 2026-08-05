@@ -142,15 +142,16 @@ class VilkårperiodeGrunnlagServiceTest : CleanDatabaseIntegrationTest() {
         val nesteDag = LocalDate.now().plusDays(1) // for å få 2 ulike AAP-perioder
         every {
             ytelseClient.hentYtelser(any())
+            ytelseClient.hentYtelser(any())
         } returns
             ytelsePerioderDto(
                 perioder =
                     listOf(
-                        YtelsePeriode.AAP(LocalDate.now(), LocalDate.now(), aapErFerdigAvklart = false),
-                        YtelsePeriode.AAP(nesteDag, nesteDag, aapErFerdigAvklart = true),
+                        YtelsePeriode.AAP(fom = LocalDate.now(), tom = LocalDate.now(), aapErFerdigAvklart = false),
+                        YtelsePeriode.AAP(fom = nesteDag, tom = nesteDag, aapErFerdigAvklart = true),
                         YtelsePeriode.EnsligForsørger(
-                            LocalDate.now(),
-                            LocalDate.now(),
+                            fom = LocalDate.now(),
+                            tom = LocalDate.now(),
                             ensligForsørgerStønadstype = EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
                             erNyttRegelverk2026 = false,
                         ),
@@ -186,28 +187,24 @@ class VilkårperiodeGrunnlagServiceTest : CleanDatabaseIntegrationTest() {
             ytelsePerioderDto(
                 perioder =
                     listOf(
-                        YtelsePeriode.AAP(
-                            LocalDate.now(),
-                            LocalDate.now(),
-                            aapErFerdigAvklart = false,
+                        YtelsePeriode.AAP(fom = LocalDate.now(), tom = LocalDate.now(), aapErFerdigAvklart = false),
+                        YtelsePeriode.EnsligForsørger(
+                            fom = LocalDate.now(),
+                            tom = LocalDate.now(),
+                            ensligForsørgerStønadstype = EnsligForsørgerStønadstype.BARNETILSYN,
+                            erNyttRegelverk2026 = false,
                         ),
                         YtelsePeriode.EnsligForsørger(
-                            LocalDate.now(),
-                            LocalDate.now(),
-                            EnsligForsørgerStønadstype.BARNETILSYN,
-                            false,
+                            fom = LocalDate.now(),
+                            tom = LocalDate.now(),
+                            ensligForsørgerStønadstype = EnsligForsørgerStønadstype.SKOLEPENGER,
+                            erNyttRegelverk2026 = false,
                         ),
                         YtelsePeriode.EnsligForsørger(
-                            LocalDate.now(),
-                            LocalDate.now(),
-                            EnsligForsørgerStønadstype.SKOLEPENGER,
-                            false,
-                        ),
-                        YtelsePeriode.EnsligForsørger(
-                            LocalDate.now(),
-                            LocalDate.now(),
-                            EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
-                            false,
+                            fom = LocalDate.now(),
+                            tom = LocalDate.now(),
+                            ensligForsørgerStønadstype = EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
+                            erNyttRegelverk2026 = false,
                         ),
                     ),
                 kildeResultat = emptyList(),

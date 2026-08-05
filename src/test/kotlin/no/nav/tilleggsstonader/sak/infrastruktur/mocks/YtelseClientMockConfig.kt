@@ -35,14 +35,6 @@ class YtelseClientMockConfig {
                     request.typer
                         .map { type ->
                             when (type) {
-                                TypeYtelsePeriode.ENSLIG_FORSØRGER ->
-                                    YtelsePeriode.EnsligForsørger(
-                                        fom = LocalDate.now(),
-                                        tom = LocalDate.now(),
-                                        ensligForsørgerStønadstype = EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
-                                        erNyttRegelverk2026 = false,
-                                    )
-
                                 TypeYtelsePeriode.DAGPENGER ->
                                     YtelsePeriode.Dagpenger(
                                         fom = LocalDate.now(),
@@ -53,26 +45,29 @@ class YtelseClientMockConfig {
                                                 antallDager = 40,
                                             ),
                                     )
-
+                                TypeYtelsePeriode.ENSLIG_FORSØRGER ->
+                                    YtelsePeriode.EnsligForsørger(
+                                        fom = LocalDate.now(),
+                                        tom = LocalDate.now(),
+                                        ensligForsørgerStønadstype = EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
+                                        erNyttRegelverk2026 = false,
+                                    )
                                 TypeYtelsePeriode.AAP ->
                                     YtelsePeriode.AAP(
                                         fom = LocalDate.now(),
                                         tom = LocalDate.now(),
                                         aapErFerdigAvklart = false,
                                     )
-
                                 TypeYtelsePeriode.OMSTILLINGSSTØNAD ->
                                     YtelsePeriode.Omstillingsstønad(
                                         fom = LocalDate.now(),
                                         tom = LocalDate.now(),
                                     )
-
                                 TypeYtelsePeriode.TILTAKSPENGER_TPSAK ->
                                     YtelsePeriode.TiltakspengerTPSak(
                                         fom = LocalDate.now(),
                                         tom = LocalDate.now(),
                                     )
-
                                 TypeYtelsePeriode.TILTAKSPENGER_ARENA ->
                                     YtelsePeriode.TiltakspengerArena(
                                         fom = LocalDate.now(),

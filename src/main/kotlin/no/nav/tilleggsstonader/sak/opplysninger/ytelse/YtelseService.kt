@@ -137,13 +137,9 @@ class YtelseService(
         return ytelsePerioder.copy(
             perioder =
                 ytelsePerioder.perioder
-                    .filter {
-                        if (it is YtelsePeriode.EnsligForsørger) {
-                            it.ensligForsørgerStønadstype !=
-                                EnsligForsørgerStønadstype.BARNETILSYN
-                        } else {
-                            true
-                        }
+                    .filterNot {
+                        it is YtelsePeriode.EnsligForsørger &&
+                            it.ensligForsørgerStønadstype != EnsligForsørgerStønadstype.BARNETILSYN
                     },
         )
     }

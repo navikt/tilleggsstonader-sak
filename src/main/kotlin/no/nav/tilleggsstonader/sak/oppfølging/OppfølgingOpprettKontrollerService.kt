@@ -208,7 +208,7 @@ class OppfølgingOpprettKontrollerService(
             .hentYtelser(fagsak.ident, fom = fom, tom = tom, typer)
             .also { validerResultat(it.kildeResultat) }
             .perioder
-            .filter { it !is YtelsePeriode.AAP || !it.aapErFerdigAvklart }
+            .filterNot { it is YtelsePeriode.AAP && it.aapErFerdigAvklart }
             .map { it.type.tilMålgruppe() to PeriodeMedÅpenTom(fom = it.fom, tom = it.tom) }
             .groupBy({ it.first }, { it.second })
             .mapValues { it.value.mergeSammenhengende() }

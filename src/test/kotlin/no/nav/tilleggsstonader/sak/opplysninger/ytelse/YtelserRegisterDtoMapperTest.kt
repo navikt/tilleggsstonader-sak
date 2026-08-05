@@ -57,28 +57,33 @@ class YtelserRegisterDtoMapperTest {
             ).tilDto().perioder
 
         assertThat(perioder).containsExactly(
-            YtelsePeriodeRegisterDto.AAP(
+            YtelsePeriodeRegisterDto(
+                type = TypeYtelsePeriode.AAP,
                 fom = aapNullTom2.fom,
                 tom = aapNullTom2.tom,
                 aapErFerdigAvklart = false,
             ),
-            YtelsePeriodeRegisterDto.AAP(
+            YtelsePeriodeRegisterDto(
+                type = TypeYtelsePeriode.AAP,
                 fom = aapNullTom1.fom,
                 tom = aapNullTom1.tom,
                 aapErFerdigAvklart = false,
             ),
-            YtelsePeriodeRegisterDto.AAP(
+            YtelsePeriodeRegisterDto(
+                type = TypeYtelsePeriode.AAP,
                 fom = aapPeriode2.fom,
                 tom = aapPeriode2.tom,
                 aapErFerdigAvklart = false,
             ),
-            YtelsePeriodeRegisterDto.EnsligForsørger(
+            YtelsePeriodeRegisterDto(
+                type = TypeYtelsePeriode.ENSLIG_FORSØRGER,
                 fom = efPeriode.fom,
                 tom = efPeriode.tom,
                 ensligForsørgerStønadstype = EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
-                erNyttRegelverk2026 = true,
+                erNyttRegelverk2026 = false,
             ),
-            YtelsePeriodeRegisterDto.AAP(
+            YtelsePeriodeRegisterDto(
+                type = TypeYtelsePeriode.AAP,
                 fom = aapPeriode1.fom,
                 tom = aapPeriode1.tom,
                 aapErFerdigAvklart = false,
