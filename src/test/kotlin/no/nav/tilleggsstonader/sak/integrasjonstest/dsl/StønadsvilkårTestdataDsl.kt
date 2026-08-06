@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreDagligReisePrivatBilDto
+import no.nav.tilleggsstonader.sak.util.lagreReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReisePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseUbestemtDto
@@ -135,6 +136,18 @@ class OpprettStønadsvilkårDsl {
     ) {
         dtoer += { _, _, _ ->
             lagreDagligReiseDto(fom = fom, tom = tom, tiltaksvariant = tiltaksvariant)
+        }
+    }
+
+    fun offentligTransportReiseTilSamling(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) {
+        dtoer += { _, _, _ ->
+            lagreReiseTilSamlingDto(
+                fom = fom,
+                tom = tom,
+            )
         }
     }
 

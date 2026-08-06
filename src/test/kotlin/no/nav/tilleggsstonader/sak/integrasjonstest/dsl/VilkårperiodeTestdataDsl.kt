@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivit
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetReiseTilSamlingTsoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
@@ -193,6 +194,26 @@ class OpprettVilkårperiodeDsl {
                         svarLønnet = SvarJaNei.NEI,
                         svarHarUtgifter = SvarJaNei.JA,
                         aktivitetsdager = 3,
+                    ),
+            )
+        }
+    }
+
+    fun aktivitetTiltakTsoReiseTilSamling(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) {
+        add { behandlingId ->
+            lagreVilkårperiodeAktivitet(
+                behandlingId = behandlingId,
+                fom = fom,
+                tom = tom,
+                aktivitetType = AktivitetType.TILTAK,
+                faktaOgSvar =
+                    FaktaOgSvarAktivitetReiseTilSamlingTsoDto(
+                        svarLønnet = SvarJaNei.NEI,
+                        svarHarUtgifter = SvarJaNei.JA,
+                        svarErAktivitetenObligatorisk = SvarJaNei.JA,
                     ),
             )
         }
