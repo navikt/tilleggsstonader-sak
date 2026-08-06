@@ -2,8 +2,8 @@ package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll
 
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
-import no.nav.tilleggsstonader.libs.feil.brukerfeil
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -116,10 +116,7 @@ class AngreSendTilBeslutterService(
             oppgaveService.hentOppgaveDomainSomIkkeErFerdigstilt(
                 behandlingId = saksbehandling.id,
                 oppgavetype = Oppgavetype.GodkjenneVedtak,
-            ) ?: brukerfeil(
-                feil = "Systemet har ikke rukket å opprette Godkjenne Vedtak oppgaven enda. Prøv igjen om litt.",
-                httpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
-            )
+            ) ?: feil("Systemet har ikke rukket å opprette Godkjenne Vedtak oppgaven enda. Prøv igjen om litt.")
 
         val tilordnetRessurs = oppgaveService.hentOppgave(oppgave.gsakOppgaveId).tilordnetRessurs
         brukerfeilHvis(tilordnetRessurs != null && tilordnetRessurs != SikkerhetContext.hentSaksbehandler()) {
