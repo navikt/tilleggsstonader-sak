@@ -39,7 +39,7 @@ class InnvilgeReiseTilSamlingIntegrationTest : IntegrationTest() {
                     }
                 }
             }
-// Innvilgelse Reise til samling er ikke implementert ennå, so forventer vi isNotFound
+// Siden innvilgelse for reise til samling ikke er implementert ennå, forventer vi`isNotFound`.
         gjennomførBeregningStegKall(behandlingContextNay.behandlingId, Stønadstype.REISE_TIL_SAMLING_TSO)
             .expectStatus()
             .isNotFound
