@@ -158,7 +158,7 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
             .is4xxClientError()
             .expectBody()
             .jsonPath("$.detail")
-            .isEqualTo("Alle ikke-slettede dager i uke må sendes inn")
+            .isEqualTo("Alle dager i uken må sendes inn")
     }
 
     @Test
@@ -200,7 +200,7 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
             .is4xxClientError()
             .expectBody()
             .jsonPath("$.detail")
-            .isEqualTo("Kan kun sende inn ikke-slettede dager i uke")
+            .isEqualTo("Alle dager i uken må sendes inn")
     }
 
     private fun opprettBehandlingOgSendInnKjøreliste(dagerKjørt: List<KjørtDag>): Saksbehandling {
