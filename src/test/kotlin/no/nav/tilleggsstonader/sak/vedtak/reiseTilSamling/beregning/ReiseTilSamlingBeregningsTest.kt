@@ -116,7 +116,7 @@ class ReiseTilSamlingBeregningsTest {
             )
         every {
             satsReiseTilSamlingPrivatBilProvider.finnRelevantKilometerSatsForPeriode(any())
-        } returns SatsPrivatBil(1 januar 2025, tom = 31 januar 2025, 2.94.toBigDecimal())
+        } returns SatsPrivatBil(1 januar 2025, tom = 31 januar 2025, beløp = 2.94.toBigDecimal())
         val result =
             beregningService.beregn(
                 behandling,
