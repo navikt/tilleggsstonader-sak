@@ -7,9 +7,11 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.springframework.stereotype.Service
 
 @Service
@@ -55,4 +57,12 @@ class DagligReisePrivatBilService(
 
     fun hentRammevedtakForBehandlingId(behandlingId: BehandlingId): RammevedtakPrivatBil? =
         vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(behandlingId).data.rammevedtakPrivatBil
+
+    fun hentRammevedtakForReiseIBehandling(
+        behandlingId: BehandlingId,
+        reiseId: ReiseId,
+    ): RammevedtakForReiseMedPrivatBil? =
+        hentRammevedtakForBehandlingId(behandlingId)?.let { rammevedtak ->
+            return rammevedtak.reiser.find { it.reiseId == reiseId }
+        }
 }

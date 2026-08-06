@@ -28,6 +28,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.henlagtBehandling
@@ -48,6 +49,7 @@ internal class BehandlingServiceTest {
     private val behandlingRepository: BehandlingRepository = mockk()
     private val behandlingshistorikkService: BehandlingshistorikkService = mockk(relaxed = true)
     private val taskService: TaskService = mockk(relaxed = true)
+    private val avklartKjørelisteService: AvklartKjørelisteService = mockk(relaxed = true)
 
     private val behandlingService =
         BehandlingService(
@@ -57,6 +59,7 @@ internal class BehandlingServiceTest {
             behandlingshistorikkService = behandlingshistorikkService,
             taskService = taskService,
             unleashService = mockUnleashService(),
+            avklartKjørelisteService = avklartKjørelisteService,
         )
 
     private val behandlingSlot = slot<Behandling>()
