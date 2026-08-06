@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise
 
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport

@@ -1,10 +1,10 @@
 package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
+import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
 import no.nav.tilleggsstonader.sak.util.norskFormat

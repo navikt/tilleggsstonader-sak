@@ -2,6 +2,9 @@ package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll
 
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
+import no.nav.tilleggsstonader.libs.feil.brukerfeil
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -9,9 +12,6 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkServ
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OpprettOppgave
@@ -116,7 +116,7 @@ class AngreSendTilBeslutterService(
             oppgaveService.hentOppgaveDomainSomIkkeErFerdigstilt(
                 behandlingId = saksbehandling.id,
                 oppgavetype = Oppgavetype.GodkjenneVedtak,
-            ) ?: throw ApiFeil(
+            ) ?: brukerfeil(
                 feil = "Systemet har ikke rukket å opprette Godkjenne Vedtak oppgaven enda. Prøv igjen om litt.",
                 httpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
             )

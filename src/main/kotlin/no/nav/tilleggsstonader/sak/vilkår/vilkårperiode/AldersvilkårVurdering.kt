@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
+import no.nav.tilleggsstonader.libs.feil.feil
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
@@ -22,7 +22,7 @@ object AldersvilkårVurdering {
             MålgruppeType.AAP, MålgruppeType.NEDSATT_ARBEIDSEVNE, MålgruppeType.UFØRETRYGD ->
                 vurderAldersvilkårForNedsattArbeidsevne(fødselsdato, vilkårperiode)
             MålgruppeType.OMSTILLINGSSTØNAD -> vurderAldersvilkårForOmstillingsstønad(fødselsdato, vilkårperiode)
-            else -> throw Feil("Aldersvilkår vurderes ikke for målgruppe: ${vilkårperiode.type}")
+            else -> feil("Aldersvilkår vurderes ikke for målgruppe: ${vilkårperiode.type}")
         }
     }
 

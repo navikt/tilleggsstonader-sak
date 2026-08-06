@@ -2,6 +2,8 @@ package no.nav.tilleggsstonader.sak.behandling.opprettelse
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
+import no.nav.tilleggsstonader.libs.feil.brukerfeil
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sisteFerdigstilteBehandling
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -9,8 +11,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType.FØRSTEGANGSBEHANDLING
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType.KJØRELISTE
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType.REVURDERING
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import org.springframework.http.HttpStatus
 
 object OpprettBehandlingUtil {
@@ -54,7 +54,7 @@ object OpprettBehandlingUtil {
 
     private fun validerKanOppretteRevurdering(sisteFerdigstilteBehandling: Behandling?) {
         if (sisteFerdigstilteBehandling == null) {
-            throw ApiFeil("Det finnes ikke en tidligere behandling på fagsaken", HttpStatus.BAD_REQUEST)
+            brukerfeil("Det finnes ikke en tidligere behandling på fagsaken", HttpStatus.BAD_REQUEST)
         }
     }
 

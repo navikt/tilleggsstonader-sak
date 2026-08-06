@@ -86,6 +86,7 @@ dependencies {
 
     // Tillegggsstønader libs
     implementation("no.nav.tilleggsstonader-libs:util:$tilleggsstønaderLibsVersion")
+    implementation("no.nav.tilleggsstonader-libs:feil:$tilleggsstønaderLibsVersion")
     implementation("no.nav.tilleggsstonader-libs:log:$tilleggsstønaderLibsVersion")
     implementation("no.nav.tilleggsstonader-libs:http-client:$tilleggsstønaderLibsVersion")
     implementation("no.nav.tilleggsstonader-libs:sikkerhet:$tilleggsstønaderLibsVersion")

@@ -2,6 +2,8 @@ package no.nav.tilleggsstonader.sak.behandling.vent
 
 import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.TaAvVentRequest
+import no.nav.tilleggsstonader.libs.feil.brukerfeil
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.NullstillBehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -12,8 +14,6 @@ import no.nav.tilleggsstonader.sak.behandling.vent.KanTaAvVent.Ja.PåkrevdHandli
 import no.nav.tilleggsstonader.sak.behandling.vent.KanTaAvVent.Nei.Årsak
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.fristBehandleSakOppgave
 import org.springframework.stereotype.Service

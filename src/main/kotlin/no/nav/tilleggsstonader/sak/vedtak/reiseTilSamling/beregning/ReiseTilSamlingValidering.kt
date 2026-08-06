@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning

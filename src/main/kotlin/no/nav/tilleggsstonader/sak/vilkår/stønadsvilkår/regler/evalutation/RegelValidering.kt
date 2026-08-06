@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation
 
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.libs.feil.feil
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -116,7 +116,7 @@ object RegelValidering {
         vurdering: VurderingDto,
     ) {
         if (svarMapping.begrunnelseType == BegrunnelseType.UTEN && !vurdering.begrunnelse.isNullOrEmpty()) {
-            throw Feil(
+            feil(
                 "Begrunnelse for vilkårType=$vilkårType regelId=${vurdering.regelId} " +
                     "svarId=${vurdering.svar} skal ikke ha begrunnelse",
             )

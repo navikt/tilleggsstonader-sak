@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -8,8 +10,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.FerdigstillBehandlingTask
 import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.JournalførKjørelisteBehandlingBrevTask
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.utbetaling.iverksetting.IverksettService
 import org.springframework.stereotype.Service
 

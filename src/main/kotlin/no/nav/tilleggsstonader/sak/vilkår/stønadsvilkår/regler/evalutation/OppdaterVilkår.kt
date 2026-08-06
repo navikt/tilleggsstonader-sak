@@ -1,11 +1,11 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation
 
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
+import no.nav.tilleggsstonader.libs.feil.feil
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.erFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.util.erSisteDagIMåneden
@@ -213,7 +213,7 @@ object OppdaterVilkår {
             val message =
                 "Mangler fullstendig vilkår for ${vilkårsresultat.vilkårType}. " +
                     "Svar på alle spørsmål samt fyll inn evt. påkrevd begrunnelsesfelt"
-            throw Feil(message = message, frontendFeilmelding = message)
+            feil(message = message, sensitivFeilmelding = message)
         }
     }
 
@@ -238,7 +238,9 @@ object OppdaterVilkår {
                     } else {
                         val hovedregel = it.hovedregel
                         val resultat = vilkårsresultat.resultatHovedregel(hovedregel)
-                        val svar = vurderingerPåType[hovedregel] ?: throw Feil("Savner svar for hovedregel=$hovedregel")
+                        val svar =
+                            vurderingerPåType[hovedregel]
+                                ?: feil("Savner svar for hovedregel=$hovedregel")
 
                         if (oppdatering.erFremtidigUtgift == true) {
                             it.copy(
@@ -251,7 +253,7 @@ object OppdaterVilkår {
                                 vurderinger = svar.svarTilDomene(),
                             )
                         } else {
-                            throw Feil("Håndterer ikke oppdatering av resultat=$resultat ennå")
+                            feil("Håndterer ikke oppdatering av resultat=$resultat ennå")
                         }
                     }
                 }.toList()

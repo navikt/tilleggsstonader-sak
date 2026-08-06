@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.unleash
 
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.unleash.ToggleId
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import kotlin.jvm.optionals.getOrNull
 
 object UnleashUtil {

@@ -4,13 +4,13 @@ import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.brev.JournalførVedtaksbrevService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakereService
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.DistribuerVedtaksbrevTask
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import org.springframework.stereotype.Service
 import java.util.Properties
 

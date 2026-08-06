@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
@@ -7,7 +8,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakereService
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import org.springframework.stereotype.Component
 
 @Component

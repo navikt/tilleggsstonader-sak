@@ -4,12 +4,12 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.feil.ManglerTilgang
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.ManglerTilgang
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockUnleashService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService

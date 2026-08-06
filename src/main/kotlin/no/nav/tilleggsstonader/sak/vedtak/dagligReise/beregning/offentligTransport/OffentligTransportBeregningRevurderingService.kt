@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport
 
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import org.springframework.stereotype.Service

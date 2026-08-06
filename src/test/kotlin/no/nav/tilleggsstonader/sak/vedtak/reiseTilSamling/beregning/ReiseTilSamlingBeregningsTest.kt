@@ -3,10 +3,10 @@ package no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
+import no.nav.tilleggsstonader.libs.feil.ApiFeil
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode

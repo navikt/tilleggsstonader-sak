@@ -2,6 +2,8 @@ package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.feil.brukerfeil
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtakstidspunkt
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.utledBehandlingType
@@ -31,8 +33,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.statistikk.task.BehandlingsstatistikkTask
@@ -227,7 +227,7 @@ class BehandlingService(
 
     private fun validerAtBehandlingenKanHenlegges(behandling: Behandling) {
         if (!behandling.kanHenlegges()) {
-            throw ApiFeil(
+            brukerfeil(
                 "Kan ikke henlegge en behandling med status ${behandling.status} for ${behandling.type}",
                 HttpStatus.BAD_REQUEST,
             )

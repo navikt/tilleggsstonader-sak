@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.brev.frittstående
 
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.brev.BrevUtil
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakereFrittståendeBrevService
@@ -8,7 +9,6 @@ import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagringBrevService
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Fil
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.journalføring.FamilieDokumentClient
 import org.springframework.stereotype.Service

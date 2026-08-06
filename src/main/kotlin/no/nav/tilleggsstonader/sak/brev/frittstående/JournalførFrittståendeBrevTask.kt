@@ -9,13 +9,13 @@ import no.nav.tilleggsstonader.kontrakter.dokarkiv.ArkiverDokumentResponse
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.Dokument
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.Filtype
 import no.nav.tilleggsstonader.kontrakter.dokarkiv.dokumenttyper
+import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakereFrittståendeBrevService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.MottakerUtil.tilAvsenderMottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerFrittståendeBrev
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.journalføring.ArkiverDokumentConflictException
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import org.slf4j.LoggerFactory
