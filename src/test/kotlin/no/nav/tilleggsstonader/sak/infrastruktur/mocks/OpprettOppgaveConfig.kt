@@ -3,11 +3,10 @@ package no.nav.tilleggsstonader.sak.infrastruktur.mocks
 import no.nav.tilleggsstonader.kontrakter.felles.tilBehandlingstema
 import no.nav.tilleggsstonader.kontrakter.felles.tilTema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
-import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
-import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.PersonIdent
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
@@ -68,7 +67,7 @@ class OpprettOppgaveConfig(
         return oppgavelager
             .leggTilOppgaveFraRepository(
                 OpprettOppgaveRequest(
-                    ident = OppgaveIdentV2(ident = behandling.ident, gruppe = IdentGruppe.FOLKEREGISTERIDENT),
+                    personident = PersonIdent(ident = behandling.ident),
                     tema = behandling.stønadstype.tilTema(),
                     tilordnetRessurs = oppgave.tilordnetSaksbehandler,
                     oppgavetype = oppgavetype,

@@ -8,15 +8,15 @@ import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnMappeResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveResponseDto
-import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveBruker
-import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveBrukerType
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.PersonIdent
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.OppdaterPåVentRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentRequest
@@ -141,7 +141,7 @@ class OppgaveClientMockConfig {
                         )
                     }
                 oppgavelager.oppdaterOppgave(oppdaterOppgave) // Forenklet, dette er ikke det som skje ri integrasjoner
-                OppdatertOppgaveResponse(oppdaterOppgave.id, oppdaterOppgave.versjonEllerFeil())
+                OppdatertOppgaveResponse(oppdaterOppgave.id, oppdaterOppgave.versjon)
             }
             mockFordeling(oppgaveClient, oppgavelager)
 
@@ -238,7 +238,7 @@ class OppgaveClientMockConfig {
             beskrivelse = "Dummy søknad",
             behandlingstema = behandlingstema,
             enhetsnummer = tildeltEnhetsnummer,
-            ident = OppgaveIdentV2(ident = "12345678910", gruppe = IdentGruppe.FOLKEREGISTERIDENT),
+            personident = PersonIdent(ident = "12345678910"),
             journalpostId = journalpostId,
             mappeId = MAPPE_ID_KLAR,
         )
@@ -252,7 +252,7 @@ class OppgaveClientMockConfig {
                 behandlingstema = "ab0300",
                 behandlingstype = "ae0058",
                 enhetsnummer = "",
-                ident = OppgaveIdentV2(ident = "12345678910", gruppe = IdentGruppe.FOLKEREGISTERIDENT),
+                personident = PersonIdent(ident = "12345678910"),
                 journalpostId = (++journalPostId).toString(),
                 mappeId = MAPPE_ID_KLAR,
             )
@@ -314,8 +314,8 @@ fun OpprettOppgaveRequest.tilNyOppgave(id: Long = 0) =
         id = id,
         versjon = 1,
         status = StatusEnum.OPPRETTET,
-        bruker = this.ident!!.let { OppgaveBruker(it.ident!!, it.gruppe!!) },
-        tildeltEnhetsnr = this.enhetsnummer,
+        bruker = OppgaveBruker(this.personident.ident, type = OppgaveBrukerType.PERSON),
+        tildeltEnhetsnr = this.enhetsnummer ?: "1234",
         saksreferanse = null,
         journalpostId = this.journalpostId,
         tema = this.tema,
@@ -323,7 +323,7 @@ fun OpprettOppgaveRequest.tilNyOppgave(id: Long = 0) =
         behandlingstema = this.behandlingstema,
         tilordnetRessurs = this.tilordnetRessurs,
         fristFerdigstillelse = this.fristFerdigstillelse,
-        aktivDato = this.aktivFra,
+        aktivDato = this.aktivDato,
         beskrivelse = this.beskrivelse,
         prioritet = this.prioritet,
         behandlingstype = this.behandlingstype,
