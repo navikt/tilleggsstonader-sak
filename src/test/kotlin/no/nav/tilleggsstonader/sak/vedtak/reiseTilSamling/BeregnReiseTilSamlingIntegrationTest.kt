@@ -5,12 +5,12 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningStegKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingTsoRequest
 import org.junit.jupiter.api.Test
 
-class InnvilgeReiseTilSamlingIntegrationTest : IntegrationTest() {
+class BeregnReiseTilSamlingIntegrationTest : IntegrationTest() {
     @Test
     fun `kan beregne reise til samling offentlig transport`() {
         every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoTiltakspengerTpsak()
@@ -39,9 +39,18 @@ class InnvilgeReiseTilSamlingIntegrationTest : IntegrationTest() {
                     }
                 }
             }
-// Siden innvilgelse for reise til samling ikke er implementert ennå, forventer vi`isNotFound`.
-        gjennomførBeregningStegKall(behandlingContextNay.behandlingId, Stønadstype.REISE_TIL_SAMLING_TSO)
-            .expectStatus()
-            .isNotFound
+        val vedtaksperioder =
+            kall.vedtak
+                .foreslåVedtaksperioder(behandlingContextNay.behandlingId)
+                .map { it.tilVedtaksperiodeDto() }
+
+        kall.vedtak
+            .beregn(
+                behandlingContextNay.behandlingId,
+                InnvilgelseReiseTilSamlingTsoRequest(
+                    vedtaksperioder = vedtaksperioder,
+                ),
+            ).expectStatus()
+            .isOk
     }
 }
