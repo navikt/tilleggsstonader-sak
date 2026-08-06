@@ -1,10 +1,14 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag
 
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.kontrakter.aktivitet.Kilde
 import no.nav.tilleggsstonader.kontrakter.aktivitet.StatusAktivitet
+import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.GjenståendeDagerFraTelleverk
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
@@ -15,8 +19,6 @@ import org.springframework.data.relational.core.mapping.Table
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
-import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype as EnsligForsørgerStønadstypeKontrakter
-import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode as YtelsePeriodeKontrakter
 
 data class VilkårperioderGrunnlag(
     val aktivitet: GrunnlagAktivitet,
@@ -96,19 +98,76 @@ data class RegisterAktivitet(
     )
 }
 
-data class PeriodeGrunnlagYtelse(
-    val type: TypeYtelsePeriode,
-    val fom: LocalDate,
-    val tom: LocalDate?,
-    val subtype: YtelseSubtype? = null,
-    val gjenståendeDagerFraTelleverk: GjenståendeDagerFraTelleverk? = null,
-    val erNyttRegelverk2026: Boolean? = null,
-) {
-    init {
-        feilHvis(subtype != null && subtype.gyldigSammenMed != type) {
-            "Ugyldig kombinasjon av type=$type og subtype=$subtype"
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "type",
+)
+@JsonSubTypes(
+    JsonSubTypes.Type(value = PeriodeGrunnlagYtelse.AAP::class, name = "AAP"),
+    JsonSubTypes.Type(value = PeriodeGrunnlagYtelse.Dagpenger::class, name = "DAGPENGER"),
+    JsonSubTypes.Type(value = PeriodeGrunnlagYtelse.EnsligForsørger::class, name = "ENSLIG_FORSØRGER"),
+    JsonSubTypes.Type(value = PeriodeGrunnlagYtelse.Omstillingsstønad::class, name = "OMSTILLINGSSTØNAD"),
+    JsonSubTypes.Type(value = PeriodeGrunnlagYtelse.TiltakspengerTPSak::class, name = "TILTAKSPENGER_TPSAK"),
+    JsonSubTypes.Type(value = PeriodeGrunnlagYtelse.TiltakspengerArena::class, name = "TILTAKSPENGER_ARENA"),
+)
+sealed interface PeriodeGrunnlagYtelse {
+    val fom: LocalDate
+    val tom: LocalDate?
+    val type: TypeYtelsePeriode
+        get() =
+            when (this) {
+                is AAP -> TypeYtelsePeriode.AAP
+                is Dagpenger -> TypeYtelsePeriode.DAGPENGER
+                is EnsligForsørger -> TypeYtelsePeriode.ENSLIG_FORSØRGER
+                is Omstillingsstønad -> TypeYtelsePeriode.OMSTILLINGSSTØNAD
+                is TiltakspengerArena -> TypeYtelsePeriode.TILTAKSPENGER_ARENA
+                is TiltakspengerTPSak -> TypeYtelsePeriode.TILTAKSPENGER_TPSAK
+            }
+
+    data class AAP(
+        override val fom: LocalDate,
+        override val tom: LocalDate?,
+        override val subtype: YtelseSubtype? = null,
+    ) : PeriodeGrunnlagYtelse,
+        HarYtelseSubtype {
+        init {
+            validerSubtype(type)
         }
     }
+
+    data class Dagpenger(
+        override val fom: LocalDate,
+        override val tom: LocalDate?,
+        val gjenståendeDagerFraTelleverk: GjenståendeDagerFraTelleverk? = null,
+    ) : PeriodeGrunnlagYtelse
+
+    data class EnsligForsørger(
+        override val fom: LocalDate,
+        override val tom: LocalDate?,
+        override val subtype: YtelseSubtype? = null,
+        val erNyttRegelverk2026: Boolean?,
+    ) : PeriodeGrunnlagYtelse,
+        HarYtelseSubtype {
+        init {
+            validerSubtype(type)
+        }
+    }
+
+    data class Omstillingsstønad(
+        override val fom: LocalDate,
+        override val tom: LocalDate?,
+    ) : PeriodeGrunnlagYtelse
+
+    data class TiltakspengerTPSak(
+        override val fom: LocalDate,
+        override val tom: LocalDate?,
+    ) : PeriodeGrunnlagYtelse
+
+    data class TiltakspengerArena(
+        override val fom: LocalDate,
+        override val tom: LocalDate?,
+    ) : PeriodeGrunnlagYtelse
 
     /**
      * [YtelseSubtype] brukes for ev ekstrainformasjon om en periode
@@ -125,6 +184,18 @@ data class PeriodeGrunnlagYtelse(
     }
 }
 
+interface HarYtelseSubtype {
+    val subtype: PeriodeGrunnlagYtelse.YtelseSubtype?
+
+    fun validerSubtype(type: TypeYtelsePeriode) {
+        subtype?.let {
+            feilHvis(it.gyldigSammenMed != type) {
+                "Ugyldig kombinasjon av type=$type og subtype=$subtype"
+            }
+        }
+    }
+}
+
 /**
  * Informasjon som ble brukt når aktivitet og ytelser ble hentet
  */
@@ -134,17 +205,17 @@ data class HentetInformasjon(
     val tidspunktHentet: LocalDateTime,
 )
 
-fun YtelsePeriodeKontrakter.tilYtelseSubtype(): PeriodeGrunnlagYtelse.YtelseSubtype? =
+fun YtelsePeriode.tilYtelseSubtype(): PeriodeGrunnlagYtelse.YtelseSubtype? =
     when (this) {
-        is YtelsePeriodeKontrakter.EnsligForsørger -> {
+        is YtelsePeriode.EnsligForsørger -> {
             when (this.ensligForsørgerStønadstype) {
-                EnsligForsørgerStønadstypeKontrakter.OVERGANGSSTØNAD -> PeriodeGrunnlagYtelse.YtelseSubtype.OVERGANGSSTØNAD
-                EnsligForsørgerStønadstypeKontrakter.SKOLEPENGER -> PeriodeGrunnlagYtelse.YtelseSubtype.SKOLEPENGER
+                EnsligForsørgerStønadstype.OVERGANGSSTØNAD -> PeriodeGrunnlagYtelse.YtelseSubtype.OVERGANGSSTØNAD
+                EnsligForsørgerStønadstype.SKOLEPENGER -> PeriodeGrunnlagYtelse.YtelseSubtype.SKOLEPENGER
                 else -> error("Skal ikke mappe grunnlag for ${this.ensligForsørgerStønadstype}")
             }
         }
 
-        is YtelsePeriodeKontrakter.AAP -> {
+        is YtelsePeriode.AAP -> {
             when (this.aapErFerdigAvklart) {
                 true -> AAP_FERDIG_AVKLART
                 else -> null

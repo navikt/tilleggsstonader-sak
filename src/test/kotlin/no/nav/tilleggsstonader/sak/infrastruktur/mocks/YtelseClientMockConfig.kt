@@ -28,7 +28,7 @@ class YtelseClientMockConfig {
     companion object {
         fun resetTilDefault(client: YtelseClient) {
             clearMocks(client)
-            every { client.hentYtelser(any<YtelsePerioderRequest>()) } answers {
+            every { client.hentYtelser(any()) } answers {
                 val request = firstArg<YtelsePerioderRequest>()
 
                 val perioder =

@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger.ytelse
 
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
+import no.nav.tilleggsstonader.kontrakter.ytelse.GjenståendeDagerFraTelleverk
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
@@ -68,15 +69,27 @@ object YtelsePerioderUtil {
         tom: LocalDate? = LocalDate.now(),
     ): YtelsePeriode = YtelsePeriode.TiltakspengerArena(fom = fom, tom = tom)
 
+    fun periodeDagpenger(
+        fom: LocalDate = LocalDate.now(),
+        tom: LocalDate? = LocalDate.now(),
+        gjenståendeDagerFraTelleverk: GjenståendeDagerFraTelleverk? = null,
+    ): YtelsePeriode =
+        YtelsePeriode.Dagpenger(
+            fom = fom,
+            tom = tom,
+            gjenståendeDagerFraTelleverk = gjenståendeDagerFraTelleverk,
+        )
+
     fun periodeEnsligForsørger(
         fom: LocalDate = LocalDate.now(),
         tom: LocalDate? = LocalDate.now(),
+        erNyttRegelverk: Boolean = false,
     ): YtelsePeriode =
         YtelsePeriode.EnsligForsørger(
             fom = fom,
             tom = tom,
             ensligForsørgerStønadstype = EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
-            erNyttRegelverk2026 = false,
+            erNyttRegelverk2026 = erNyttRegelverk,
         )
 
     fun periodeOmstillingsstønad(

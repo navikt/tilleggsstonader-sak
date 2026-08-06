@@ -203,6 +203,7 @@ class OppfølgingOpprettKontrollerService(
         val typer = målgrupper.flatMap { it.målgruppe.tilTypeYtelsePerioder() }.distinct()
         val fom = målgrupper.minOf { it.fom }
         val tom = målgrupper.maxOf { it.tom }
+
         return ytelseService
             .hentYtelser(fagsak.ident, fom = fom, tom = tom, typer)
             .also { validerResultat(it.kildeResultat) }
