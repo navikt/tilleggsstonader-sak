@@ -301,7 +301,7 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
                         begrunnelse = null,
                         reisedager = lagKjørteDagerForUke(fom = fom, tom = tom, antallKjørteDager = 2),
                     ),
-                )
+                ).kjørelisteId
 
             kall.steg.ferdigstill(revurderingId, StegController.FerdigstillStegRequest(StegType.REGISTRER_KJØRELISTE))
 
@@ -344,7 +344,7 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
                         begrunnelse = null,
                         reisedager = lagKjørteDagerForUke(fom = 12 januar 2026, tom = tom, antallKjørteDager = 2),
                     ),
-                )
+                ).kjørelisteId
 
             kall.steg.ferdigstill(revurderingId, StegController.FerdigstillStegRequest(StegType.REGISTRER_KJØRELISTE))
 

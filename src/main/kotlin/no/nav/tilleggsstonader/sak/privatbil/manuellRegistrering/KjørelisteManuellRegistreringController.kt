@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
+import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
@@ -35,11 +36,15 @@ class KjørelisteManuellRegistreringController(
     fun lagreManuellKjøreliste(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody request: LagreManuellKjørelisteRequest,
-    ) {
+    ): LagreManuellKjørelisteResponse {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
 
-        kjørelisteManuellRegistreringService.lagreManuellKjøreliste(behandlingId, request)
+        val lagretKjøreliste = kjørelisteManuellRegistreringService.lagreManuellKjøreliste(behandlingId, request)
+
+        return LagreManuellKjørelisteResponse(
+            kjørelisteId = lagretKjøreliste.id
+        )
     }
 }
 
@@ -48,4 +53,8 @@ data class LagreManuellKjørelisteRequest(
     val reiseId: ReiseId,
     val begrunnelse: String?,
     val reisedager: List<KjørelisteDag>,
+)
+
+data class LagreManuellKjørelisteResponse(
+    val kjørelisteId: KjørelisteId
 )

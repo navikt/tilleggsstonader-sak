@@ -5,12 +5,12 @@ import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.GenererKjørelistebrevDt
 import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.KjørelistebrevResponseDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
-import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingPrivatBilDto
 import no.nav.tilleggsstonader.sak.privatbil.UkeVurderingDto
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagRequest
 import no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering.KjørelisteOversiktDto
 import no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering.LagreManuellKjørelisteRequest
+import no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering.LagreManuellKjørelisteResponse
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.PrivatBilOppsummertBeregningDto
 import java.util.UUID
 
@@ -40,7 +40,7 @@ class PrivatBilKall(
     fun lagreManuellKjøreliste(
         behandlingId: BehandlingId,
         request: LagreManuellKjørelisteRequest,
-    ) = apiRespons.lagreManuellKjøreliste(behandlingId, request).expectOkEmpty()
+    ) = apiRespons.lagreManuellKjøreliste(behandlingId, request).expectOkWithBody<LagreManuellKjørelisteResponse>()
 
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = PrivatBilApi()
