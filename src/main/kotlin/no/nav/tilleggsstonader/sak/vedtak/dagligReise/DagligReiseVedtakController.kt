@@ -149,27 +149,15 @@ class DagligReiseVedtakController(
                 ?.data
                 ?: return null
 
-        val data =
-            PrivatBilOppsummertBeregningDto(
-                reiser =
-                    vedtaksdata
-                        .hentRammevedtakMedBeregningsresultat()
-                        .map { (beregningsresultatForReise, rammevedtakForReise) ->
-                            beregningsresultatForReise.oppsummerReise(rammevedtakForReise)
-                        },
-            )
-
-        return data.filtrerBortPerioderFraTidligereVedtak()
-    }
-
-    // TODO Denne er i KjøreliseBehandling
-    private fun PrivatBilOppsummertBeregningDto.filtrerBortPerioderFraTidligereVedtak() =
-        copy(
+        return PrivatBilOppsummertBeregningDto(
             reiser =
-                reiser
-                    .map { reise -> reise.copy(perioder = reise.perioder.filter { !it.fraTidligereVedtak }) }
-                    .filter { it.perioder.isNotEmpty() },
+                vedtaksdata
+                    .hentRammevedtakMedBeregningsresultat()
+                    .map { (beregningsresultatForReise, rammevedtakForReise) ->
+                        beregningsresultatForReise.oppsummerReise(rammevedtakForReise)
+                    },
         )
+    }
 
     private fun beregnVedtak(
         behandlingId: BehandlingId,
