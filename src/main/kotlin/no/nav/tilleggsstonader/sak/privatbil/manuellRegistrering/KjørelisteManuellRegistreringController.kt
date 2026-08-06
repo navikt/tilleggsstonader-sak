@@ -43,7 +43,7 @@ class KjørelisteManuellRegistreringController(
         val lagretKjøreliste = kjørelisteManuellRegistreringService.lagreManuellKjøreliste(behandlingId, request)
 
         return LagreManuellKjørelisteResponse(
-            kjørelisteId = lagretKjøreliste.id
+            kjørelisteId = lagretKjøreliste.id,
         )
     }
 }
@@ -56,5 +56,5 @@ data class LagreManuellKjørelisteRequest(
 )
 
 data class LagreManuellKjørelisteResponse(
-    val kjørelisteId: KjørelisteId
+    val kjørelisteId: KjørelisteId,
 )

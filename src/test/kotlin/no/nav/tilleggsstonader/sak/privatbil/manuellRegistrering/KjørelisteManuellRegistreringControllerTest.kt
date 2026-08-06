@@ -293,15 +293,16 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
             val kjørelisteOversikt = kall.privatBil.hentKjørelisteOversikt(revurderingId)
 
             val kjørelisteId =
-                kall.privatBil.lagreManuellKjøreliste(
-                    revurderingId,
-                    LagreManuellKjørelisteRequest(
-                        journalpostId = journalpostId(),
-                        reiseId = kjørelisteOversikt.tilgjengeligeReiser.single().reiseId,
-                        begrunnelse = null,
-                        reisedager = lagKjørteDagerForUke(fom = fom, tom = tom, antallKjørteDager = 2),
-                    ),
-                ).kjørelisteId
+                kall.privatBil
+                    .lagreManuellKjøreliste(
+                        revurderingId,
+                        LagreManuellKjørelisteRequest(
+                            journalpostId = journalpostId(),
+                            reiseId = kjørelisteOversikt.tilgjengeligeReiser.single().reiseId,
+                            begrunnelse = null,
+                            reisedager = lagKjørteDagerForUke(fom = fom, tom = tom, antallKjørteDager = 2),
+                        ),
+                    ).kjørelisteId
 
             kall.steg.ferdigstill(revurderingId, StegController.FerdigstillStegRequest(StegType.REGISTRER_KJØRELISTE))
 
@@ -336,15 +337,16 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
 
             // Manuelt registrer uke 2
             val kjørelisteId =
-                kall.privatBil.lagreManuellKjøreliste(
-                    revurderingId,
-                    LagreManuellKjørelisteRequest(
-                        journalpostId = journalpostId(),
-                        reiseId = kjørelisteOversikt.tilgjengeligeReiser.single().reiseId,
-                        begrunnelse = null,
-                        reisedager = lagKjørteDagerForUke(fom = 12 januar 2026, tom = tom, antallKjørteDager = 2),
-                    ),
-                ).kjørelisteId
+                kall.privatBil
+                    .lagreManuellKjøreliste(
+                        revurderingId,
+                        LagreManuellKjørelisteRequest(
+                            journalpostId = journalpostId(),
+                            reiseId = kjørelisteOversikt.tilgjengeligeReiser.single().reiseId,
+                            begrunnelse = null,
+                            reisedager = lagKjørteDagerForUke(fom = 12 januar 2026, tom = tom, antallKjørteDager = 2),
+                        ),
+                    ).kjørelisteId
 
             kall.steg.ferdigstill(revurderingId, StegController.FerdigstillStegRequest(StegType.REGISTRER_KJØRELISTE))
 
