@@ -30,7 +30,8 @@ SET grunnlag = jsonb_set(
                         'type', periode->>'type',
                         'fom', periode->'fom',
                         'tom', periode->'tom',
-                        'gjenståendeDagerFraTelleverk', periode->'gjenståendeDagerFraTelleverk'
+                        -- Bruk coalesce for å håndtere både gammel og ny stavemåte av feltet
+                        'gjenståendeDagerFraTelleverk', coalesce(periode->'gjenståendeDagerFraTelleverk', periode->'gjennståendeDagerFraTelleverk')
                     )
                 WHEN 'ENSLIG_FORSØRGER' THEN
                     jsonb_build_object(
