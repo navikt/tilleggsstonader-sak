@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
@@ -38,9 +39,13 @@ data class RammeForReiseMedPrivatBilDelperiodeSatserDto(
     val dagsatsUtenParkering: BigDecimal,
 ) : Periode<LocalDate>
 
-fun RammevedtakPrivatBil.tilDto() =
+fun RammevedtakPrivatBil.tilDto(beregningsplan: Beregningsplan): RammevedtakPrivatBilDto =
     RammevedtakPrivatBilDto(
-        reiser = reiser.map { it.tilDto() },
+        reiser =
+            reiser
+                .filter { reise ->
+                    beregningsplan.tidligsteEndring?.let { reise.grunnlag.fom >= it } ?: true
+                }.map { it.tilDto() },
     )
 
 fun RammevedtakForReiseMedPrivatBil.tilDto(): RammeForReiseMedPrivatBilDto =
