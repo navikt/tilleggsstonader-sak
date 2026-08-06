@@ -121,8 +121,9 @@ class YtelseService(
         typer: List<TypeYtelsePeriode>,
     ): YtelsePerioderDto {
         feilHvis(typer.isEmpty()) {
-            "Kan ikke hente ytelser uten å definiere typer"
+            "Kan ikke hente ytelser uten å definere typer"
         }
+
         val ytelsePerioder =
             ytelseClient.hentYtelser(
                 YtelsePerioderRequest(
@@ -136,9 +137,9 @@ class YtelseService(
         return ytelsePerioder.copy(
             perioder =
                 ytelsePerioder.perioder
-                    .filter {
-                        it !is YtelsePeriode.EnsligForsørger ||
-                            it.ensligForsørgerStønadstype != EnsligForsørgerStønadstype.BARNETILSYN
+                    .filterNot {
+                        it is YtelsePeriode.EnsligForsørger &&
+                            it.ensligForsørgerStønadstype == EnsligForsørgerStønadstype.BARNETILSYN
                     },
         )
     }

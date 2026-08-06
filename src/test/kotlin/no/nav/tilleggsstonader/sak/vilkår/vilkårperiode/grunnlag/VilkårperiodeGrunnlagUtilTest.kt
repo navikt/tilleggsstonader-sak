@@ -1,18 +1,16 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class VilårperiodeGrunnlagUtilTest {
+class VilkårperiodeGrunnlagUtilTest {
     @Nested
     inner class KanYtelseBrukesIBehandling {
         val ytelse =
-            PeriodeGrunnlagYtelse(
-                type = TypeYtelsePeriode.AAP,
+            PeriodeGrunnlagYtelse.AAP(
                 fom = LocalDate.of(2025, 1, 1),
                 tom = LocalDate.of(2025, 2, 1),
             )
@@ -31,19 +29,20 @@ class VilårperiodeGrunnlagUtilTest {
 
         @Test
         fun `skal kunne bruke dagpenger for daglig reise tsr`() {
-            val ytelseDagpenger = ytelse.copy(type = TypeYtelsePeriode.DAGPENGER)
+            val ytelseDagpenger = PeriodeGrunnlagYtelse.Dagpenger(fom = ytelse.fom, tom = ytelse.tom)
             assertThat(kanYtelseBrukesIBehandling(Stønadstype.DAGLIG_REISE_TSR, ytelseDagpenger)).isTrue
         }
 
         @Test
         fun `skal ikke kunne bruke dagpenger for daglig reise tso`() {
-            val ytelseDagpenger = ytelse.copy(type = TypeYtelsePeriode.DAGPENGER)
+            val ytelseDagpenger = PeriodeGrunnlagYtelse.Dagpenger(fom = ytelse.fom, tom = ytelse.tom)
             assertThat(kanYtelseBrukesIBehandling(Stønadstype.DAGLIG_REISE_TSO, ytelseDagpenger)).isFalse
         }
 
         @Test
         fun `skal ikke kunne bruke enslig forsørger med nytt regelverk`() {
-            val ytelseEf = ytelse.copy(type = TypeYtelsePeriode.ENSLIG_FORSØRGER, erNyttRegelverk2026 = true)
+            val ytelseEf =
+                PeriodeGrunnlagYtelse.EnsligForsørger(fom = ytelse.fom, tom = ytelse.tom, erNyttRegelverk2026 = true)
             assertThat(kanYtelseBrukesIBehandling(Stønadstype.BARNETILSYN, ytelseEf)).isFalse
         }
     }

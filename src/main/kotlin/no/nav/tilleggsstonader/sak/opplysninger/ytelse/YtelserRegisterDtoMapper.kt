@@ -24,14 +24,44 @@ object YtelserRegisterDtoMapper {
 
     private fun YtelsePerioderDto.mapPerioder(): List<YtelsePeriodeRegisterDto> =
         this.perioder
-            .map {
-                YtelsePeriodeRegisterDto(
-                    type = it.type,
-                    fom = it.fom,
-                    tom = it.tom,
-                    aapErFerdigAvklart = if (it is YtelsePeriode.AAP) it.aapErFerdigAvklart else null,
-                    ensligForsørgerStønadstype = if (it is YtelsePeriode.EnsligForsørger) it.ensligForsørgerStønadstype else null,
-                    erNyttRegelverk2026 = if (it is YtelsePeriode.EnsligForsørger) it.erNyttRegelverk2026 else null,
+            .map { it.tilDto() }
+            .sortedWith(sorteringTomDesc)
+
+    private fun YtelsePeriode.tilDto(): YtelsePeriodeRegisterDto =
+        when (this) {
+            is YtelsePeriode.AAP ->
+                YtelsePeriodeRegisterDto.AAP(
+                    fom = fom,
+                    tom = tom,
+                    aapErFerdigAvklart = aapErFerdigAvklart,
                 )
-            }.sortedWith(sorteringTomDesc)
+            is YtelsePeriode.Dagpenger ->
+                YtelsePeriodeRegisterDto.Dagpenger(
+                    fom = fom,
+                    tom = tom,
+                    gjenståendeDagerFraTelleverk = gjenståendeDagerFraTelleverk,
+                )
+            is YtelsePeriode.EnsligForsørger ->
+                YtelsePeriodeRegisterDto.EnsligForsørger(
+                    fom = fom,
+                    tom = tom,
+                    ensligForsørgerStønadstype = ensligForsørgerStønadstype,
+                    erNyttRegelverk2026 = erNyttRegelverk2026,
+                )
+            is YtelsePeriode.Omstillingsstønad ->
+                YtelsePeriodeRegisterDto.Omstillingsstønad(
+                    fom = fom,
+                    tom = tom,
+                )
+            is YtelsePeriode.TiltakspengerArena ->
+                YtelsePeriodeRegisterDto.TiltakspengerArena(
+                    fom = fom,
+                    tom = tom,
+                )
+            is YtelsePeriode.TiltakspengerTPSak ->
+                YtelsePeriodeRegisterDto.TiltakspengerTPSak(
+                    fom = fom,
+                    tom = tom,
+                )
+        }
 }

@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
-import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
@@ -166,17 +165,15 @@ class VilkårperiodeGrunnlagServiceTest : CleanDatabaseIntegrationTest() {
         val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)
         val perioder = grunnlag!!.grunnlag.ytelse.perioder
         assertThat(perioder).containsExactlyInAnyOrder(
-            PeriodeGrunnlagYtelse(TypeYtelsePeriode.AAP, LocalDate.now(), LocalDate.now()),
-            PeriodeGrunnlagYtelse(
-                TypeYtelsePeriode.AAP,
-                nesteDag,
-                nesteDag,
+            PeriodeGrunnlagYtelse.AAP(fom = LocalDate.now(), tom = LocalDate.now()),
+            PeriodeGrunnlagYtelse.AAP(
+                fom = nesteDag,
+                tom = nesteDag,
                 subtype = YtelseSubtype.AAP_FERDIG_AVKLART,
             ),
-            PeriodeGrunnlagYtelse(
-                TypeYtelsePeriode.ENSLIG_FORSØRGER,
-                LocalDate.now(),
-                LocalDate.now(),
+            PeriodeGrunnlagYtelse.EnsligForsørger(
+                fom = LocalDate.now(),
+                tom = LocalDate.now(),
                 subtype = YtelseSubtype.OVERGANGSSTØNAD,
                 erNyttRegelverk2026 = false,
             ),
@@ -220,19 +217,17 @@ class VilkårperiodeGrunnlagServiceTest : CleanDatabaseIntegrationTest() {
         val grunnlag = vilkårperioderGrunnlagRepository.findByBehandlingId(behandling.id)
         val perioder = grunnlag!!.grunnlag.ytelse.perioder
         assertThat(perioder).containsExactlyInAnyOrder(
-            PeriodeGrunnlagYtelse(TypeYtelsePeriode.AAP, LocalDate.now(), LocalDate.now()),
-            PeriodeGrunnlagYtelse(
-                TypeYtelsePeriode.ENSLIG_FORSØRGER,
-                LocalDate.now(),
-                LocalDate.now(),
-                YtelseSubtype.SKOLEPENGER,
+            PeriodeGrunnlagYtelse.AAP(fom = LocalDate.now(), tom = LocalDate.now()),
+            PeriodeGrunnlagYtelse.EnsligForsørger(
+                fom = LocalDate.now(),
+                tom = LocalDate.now(),
+                subtype = YtelseSubtype.SKOLEPENGER,
                 erNyttRegelverk2026 = false,
             ),
-            PeriodeGrunnlagYtelse(
-                TypeYtelsePeriode.ENSLIG_FORSØRGER,
-                LocalDate.now(),
-                LocalDate.now(),
-                YtelseSubtype.OVERGANGSSTØNAD,
+            PeriodeGrunnlagYtelse.EnsligForsørger(
+                fom = LocalDate.now(),
+                tom = LocalDate.now(),
+                subtype = YtelseSubtype.OVERGANGSSTØNAD,
                 erNyttRegelverk2026 = false,
             ),
         )
