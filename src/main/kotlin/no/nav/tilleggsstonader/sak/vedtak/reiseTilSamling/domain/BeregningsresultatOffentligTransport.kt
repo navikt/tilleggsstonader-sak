@@ -6,6 +6,11 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import java.math.BigDecimal
 import java.time.LocalDate
 
+data class BeregningReiseTilSamling(
+    val offentligTransport: List<BeregningsresultatOffentligTransport>,
+    val privatBil: List<BeregningsresultatPrivatBil>,
+)
+
 data class BeregningsresultatOffentligTransport(
     val reiseId: ReiseId,
     val grunnlag: BeregningsgrunnlagOffentligTransportForSamling,

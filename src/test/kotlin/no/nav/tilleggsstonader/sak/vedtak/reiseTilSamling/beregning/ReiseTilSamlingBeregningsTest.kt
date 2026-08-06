@@ -52,7 +52,7 @@ class ReiseTilSamlingBeregningsTest {
     }
 
     @Test
-    fun `beregner offentlig transport riktig for ett vilkår`() {
+    fun `beregner offentlig transport riktig for flere vilkår`() {
         every { vilkårService.hentOppfylteReiseTilSamlingVilkår(behandling.id) } returns
             listOf(
                 vilkår(

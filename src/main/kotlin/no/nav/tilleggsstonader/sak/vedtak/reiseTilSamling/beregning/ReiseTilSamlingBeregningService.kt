@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingValidering.filtrerBortUtgifterSomIkkeOverlapperVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingValidering.validerUtgiftHeleVedtaksperioden
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingValidering.validerUtgifterStrekkerSegUtenforVedtaksperiodene
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsgrunnlagOffentligTransportForSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsgrunnlagPrivatBilForSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
@@ -157,11 +158,6 @@ private fun validerFinnesSamling(vilkår: List<VilkårReiseTilSamling>) {
         "Innvilgelse er ikke et gyldig vedtaksresultat når det ikke er lagt inn perioder med samling"
     }
 }
-
-data class BeregningReiseTilSamling(
-    val offentligTransport: List<BeregningsresultatOffentligTransport>,
-    val privatBil: List<BeregningsresultatPrivatBil>,
-)
 
 fun validerUtgifter(
     utgifter: List<VilkårReiseTilSamling>,

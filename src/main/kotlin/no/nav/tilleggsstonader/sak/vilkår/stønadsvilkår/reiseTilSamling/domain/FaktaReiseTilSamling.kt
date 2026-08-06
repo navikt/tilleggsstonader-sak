@@ -49,10 +49,8 @@ data class FaktaOffentligTransport(
         )
 
     private fun validerIngenNegativeUtgifter() {
-        utgifterOffentligTransport.let {
-            brukerfeilHvis(it <= 0.toBigDecimal()) {
-                "Utgifter til offentlig transport kan ikke være negative"
-            }
+        brukerfeilHvis(utgifterOffentligTransport <= 0.toBigDecimal()) {
+            "Utgifter til offentlig transport kan ikke være negative"
         }
     }
 }
@@ -77,8 +75,8 @@ data class FaktaPrivatBil(
 
     private fun validerIngenNegativReiseavstand() {
         reiseavstand.let {
-            brukerfeilHvis(it <= BigDecimal.ZERO) {
-                "Reiseavstand må være større enn 0"
+            brukerfeilHvis(it <= 0.toBigDecimal()) {
+                "Utgifter til offentlig transport kan ikke være negative"
             }
         }
     }
