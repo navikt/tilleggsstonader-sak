@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.ofType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårsoppsummering.VilkårsoppsummeringUtil.harBarnUnder2ÅrIAktivitetsperiode
 import org.springframework.stereotype.Service
 
@@ -38,7 +38,7 @@ class VilkårsoppsummeringService(
         vilkårperiodeService
             .hentVilkårperioder(behandlingId)
             .aktiviteter
-            .ofType<AktivitetTilsynBarn>()
+            .ofType<AktivitetPassAvBarn>()
             .filter { it.resultat == ResultatVilkårperiode.OPPFYLT }
             .map { Datoperiode(fom = it.fom, tom = it.tom) }
 }

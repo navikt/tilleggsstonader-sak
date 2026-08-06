@@ -106,7 +106,7 @@ class ArbeidsfordelingServiceTest {
         }
 
         @Test
-        fun `skal hente adressebeskyttelse for barn og andre foreldre for tilsyn barn då de er parter på saken`() {
+        fun `skal hente adressebeskyttelse for barn og andre foreldre for pass av barn då de er parter på saken`() {
             every { personService.hentAdressebeskyttelseForPersonOgRelasjoner(søkerIdent) } returns
                 lagPersonMedRelasjoner()
 
@@ -145,10 +145,10 @@ class ArbeidsfordelingServiceTest {
                 lagPersonMedRelasjoner(graderingBarn = AdressebeskyttelseGradering.STRENGT_FORTROLIG)
             every { personService.hentAdressebeskyttelse(søkerIdent) } returns lagPersonUtenRelasjoner()
 
-            val arbeidsfordelingTilsynBarn = service.hentNavEnhet(søkerIdent, Stønadstype.BARNETILSYN)
+            val arbeidsfordelingPassAvBarn = service.hentNavEnhet(søkerIdent, Stønadstype.BARNETILSYN)
             val arbeidsfordelingLæremidler = service.hentNavEnhet(søkerIdent, Stønadstype.LÆREMIDLER)
 
-            assertThat(arbeidsfordelingTilsynBarn?.enhetNr).isEqualTo(Enhet.VIKAFOSSEN.enhetsnr)
+            assertThat(arbeidsfordelingPassAvBarn?.enhetNr).isEqualTo(Enhet.VIKAFOSSEN.enhetsnr)
             assertThat(arbeidsfordelingLæremidler?.enhetNr).isEqualTo(Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr)
 
             verify(exactly = 2) { arbeidsfordelingClient.finnArbeidsfordelingsenhet(any()) }

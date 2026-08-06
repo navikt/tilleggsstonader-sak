@@ -126,7 +126,7 @@ class UtbetalingIntegrationTest : IntegrationTest() {
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.BARNETILSYN,
             ) {
-                defaultTilsynBarnTestdata(fom, tom)
+                defaultPassAvBarnTestdata(fom, tom)
             }
 
         val andeler =

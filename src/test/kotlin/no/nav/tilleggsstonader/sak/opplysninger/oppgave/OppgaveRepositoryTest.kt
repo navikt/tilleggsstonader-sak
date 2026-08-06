@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
@@ -237,6 +238,43 @@ internal class OppgaveRepositoryTest : CleanDatabaseIntegrationTest() {
 
             assertThat(metadata.map { it.gsakOppgaveId to it.sendtTilTotrinnskontrollAv })
                 .containsExactlyInAnyOrder(Pair(1, null), Pair(2, null))
+        }
+
+        @Test
+        fun `skal sette erKjøreliste basert på behandlingstype`() {
+            oppgaveRepository.insert(
+                OppgaveDomain(
+                    behandlingId = behandling1.id,
+                    tilbakekrevingBehandlingId = null,
+                    type = Oppgavetype.BehandleSak,
+                    gsakOppgaveId = 1,
+                    tilordnetSaksbehandler = null,
+                    status = Oppgavestatus.ÅPEN,
+                    tildeltEnhetsnummer = null,
+                    enhetsmappeId = null,
+                ),
+            )
+            val fagsakKjøreliste = fagsak(identer = setOf(PersonIdent("3")))
+            testoppsettService.lagreFagsak(fagsakKjøreliste)
+            val behandlingKjøreliste = testoppsettService.lagre(behandling(fagsakKjøreliste, type = BehandlingType.KJØRELISTE))
+            oppgaveRepository.insert(
+                OppgaveDomain(
+                    behandlingId = behandlingKjøreliste.id,
+                    tilbakekrevingBehandlingId = null,
+                    type = Oppgavetype.BehandleKjøreliste,
+                    gsakOppgaveId = 2,
+                    tilordnetSaksbehandler = null,
+                    status = Oppgavestatus.ÅPEN,
+                    tildeltEnhetsnummer = null,
+                    enhetsmappeId = null,
+                ),
+            )
+
+            val metadata = oppgaveRepository.finnOppgaveMetadata(listOf(1, 2))
+
+            assertThat(metadata.associateBy { it.gsakOppgaveId }.mapValues { it.value.erKjoreliste })
+                .containsEntry(1L, false)
+                .containsEntry(2L, true)
         }
 
         private fun opprettOppgaver() {

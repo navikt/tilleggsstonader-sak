@@ -7,12 +7,12 @@ import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.overlapperEllerPåfølgesAv
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
-import java.util.UUID
 
 interface PeriodeMedId : Periode<LocalDate> {
-    val id: UUID
+    val id: VedtaksperiodeId
 
     fun kopier(
         fom: LocalDate,
@@ -22,7 +22,7 @@ interface PeriodeMedId : Periode<LocalDate> {
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class Vedtaksperiode(
-    override val id: UUID,
+    override val id: VedtaksperiodeId,
     override val fom: LocalDate,
     override val tom: LocalDate,
     val målgruppe: FaktiskMålgruppe,

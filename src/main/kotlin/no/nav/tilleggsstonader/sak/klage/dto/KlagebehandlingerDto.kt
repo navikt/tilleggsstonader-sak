@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.klage.dto
 import no.nav.tilleggsstonader.kontrakter.klage.KlagebehandlingDto
 
 data class KlagebehandlingerDto(
+    // TODO TilsynBarn bør være PassAvBarn, men dette brukes eksternt
     val tilsynBarn: List<KlagebehandlingDto>,
     val læremidler: List<KlagebehandlingDto>,
     val boutgifter: List<KlagebehandlingDto>,

@@ -6,12 +6,15 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
+import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.TypeBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.ÅrsakBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.KanBenytteEgenBil
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.KanIkkeBenytteEgenBilBegrunnelser
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.KanIkkeReiseMedOffentligTransportBegrunnelser
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.LeveringOgHentingIBarnehage
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.OffentligTransport
@@ -20,12 +23,13 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ReiseAdresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.Reiseperiode
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.TypeUtdanning
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Utgifter
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.ReiseMedBilUtgifter
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes(
-    JsonSubTypes.Type(BehandlingFaktaTilsynBarnDto::class, name = "BARNETILSYN"),
+    JsonSubTypes.Type(BehandlingFaktaPassAvBarnDto::class, name = "BARNETILSYN"),
     JsonSubTypes.Type(BehandlingFaktaLæremidlerDto::class, name = "LÆREMIDLER"),
     JsonSubTypes.Type(BehandlingFaktaBoutgifterDto::class, name = "BOUTGIFTER"),
     JsonSubTypes.Type(BehandlingFaktaDagligReiseDto::class, name = "DAGLIG_REISE_TSO"),
@@ -39,7 +43,7 @@ sealed interface BehandlingFaktaDto {
     val arena: ArenaFakta?
 }
 
-data class BehandlingFaktaTilsynBarnDto(
+data class BehandlingFaktaPassAvBarnDto(
     override val søknadMottattTidspunkt: LocalDateTime?,
     override val hovedytelse: FaktaHovedytelse,
     override val dokumentasjon: FaktaDokumentasjon?,
@@ -82,30 +86,38 @@ data class BehandlingFaktaReiseTilSamlingDto(
     override val hovedytelse: FaktaHovedytelse? = null,
     override val dokumentasjon: FaktaDokumentasjon? = null,
     override val arena: ArenaFakta? = null,
-    val aktiviteter: FaktaAktivitet,
+    val aktiviteter: FaktaAktivitetReiseTilSamling,
     val samlinger: List<FaktaSamling>,
-    val reiseavstand: FaktaReiseavstand?,
+    val avreiseadresse: FaktaAvreiseadresse?,
     val reisemåte: FaktaReisemåte?,
 ) : BehandlingFaktaDto
 
-data class FaktaReiseavstand(
-    val antallKilometerEnVei: String?,
-    val land: String?,
-    val gateadresse: String?,
-    val postnummer: String?,
-    val poststed: String?,
+data class FaktaAvreiseadresse(
+    val skalReiseFraFolkeregistrertAdresse: JaNei,
+    val adresseDetSkalReisesFra: ReiseAdresse?,
 )
 
 data class FaktaReisemåte(
-    val kanReiseKollektivt: JaNei?,
-    val totalutgifterKollektivt: String?,
-    val kanBenytteEgenBil: JaNei?,
-    val kanBenytteDrosje: JaNei?,
+    val kanReiseMedOffentligTransport: JaNei,
+    val kanIkkeReiseMedOffentligTransportBegrunnelser: List<KanIkkeReiseMedOffentligTransportBegrunnelser>?,
+    val totalUtgifterOffentligTransport: String?,
+    val kanBenytteEgenBil: KanBenytteEgenBil?,
+    val ønskerDekketUtgifterForDrosje: JaNei?,
+    val barnehageGateadresse: String?,
+    val barnehagePostnummer: String?,
+    val kanIkkeBenytteEgenBilBegrunnelser: List<KanIkkeBenytteEgenBilBegrunnelser>?,
+    val betalerForReiseSelv: JaNei?,
+    val harTTKort: JaNei?,
+    val reiseMedBilUtgifter: ReiseMedBilUtgifter?,
 )
 
 data class FaktaSamling(
     val fom: LocalDate,
     val tom: LocalDate,
+    val erObligatorisk: JaNei,
+    val harBruktEkstraReiseDager: JaNei,
+    val adresse: ReiseAdresse,
+    val antallKilometerEnVei: String,
 )
 
 data class FaktaHovedytelse(
@@ -165,6 +177,10 @@ data class FaktaAktivitet(
 )
 
 data class FaktaAktivitetDagligReise(
+    val aktivitet: FaktaAktivitet,
+)
+
+data class FaktaAktivitetReiseTilSamling(
     val aktivitet: FaktaAktivitet,
 )
 

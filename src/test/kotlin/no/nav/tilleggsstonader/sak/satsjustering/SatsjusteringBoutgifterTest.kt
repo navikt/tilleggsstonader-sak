@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
@@ -91,6 +92,7 @@ class SatsjusteringBoutgifterTest(
         assertThat(behandling.id).isNotEqualTo(satsjusteringBehandling.id)
         assertThat(satsjusteringBehandling.forrigeIverksatteBehandlingId).isEqualTo(behandling.id)
         assertThat(satsjusteringBehandling.behandlingMetode).isEqualTo(BehandlingMetode.BATCH)
+        assertThat(satsjusteringBehandling.steg).isEqualTo(StegType.BEHANDLING_FERDIGSTILT)
         kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 
         validerHarKopiertOverFaktagrunnlagFraForrigeBehandling(satsjusteringBehandling)

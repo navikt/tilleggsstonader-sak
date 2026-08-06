@@ -5,11 +5,12 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.beregning.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.beregning.UtgiftBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
@@ -24,7 +25,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import java.time.LocalDate
 import java.time.YearMonth
-import java.util.UUID
 
 class VedtaksperiodeValideringServiceTest {
     val vilkårperiodeService = mockk<VilkårperiodeService>()
@@ -57,7 +57,7 @@ class VedtaksperiodeValideringServiceTest {
     val aktiviteter =
         listOf(
             aktivitet(
-                faktaOgVurdering = VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
+                faktaOgVurdering = VilkårperiodeTestUtil.faktaOgVurderingAktivitetPassAvBarn(type = AktivitetType.TILTAK),
                 fom = LocalDate.of(2025, 1, 1),
                 tom = LocalDate.of(2025, 2, 28),
             ),
@@ -210,7 +210,7 @@ class VedtaksperiodeValideringServiceTest {
         målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
         aktivitet: AktivitetType = AktivitetType.TILTAK,
     ) = Vedtaksperiode(
-        id = UUID.randomUUID(),
+        id = VedtaksperiodeId.random(),
         fom = fom,
         tom = tom,
         målgruppe = målgruppe,

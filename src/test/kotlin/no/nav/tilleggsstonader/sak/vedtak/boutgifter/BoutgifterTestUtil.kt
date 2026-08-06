@@ -2,10 +2,10 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.defaultBehandling
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.BoutgifterBeregnUtil.beregnStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.UtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.finnMakssats
@@ -19,16 +19,16 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.defaultBehandling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import java.time.LocalDate
 import java.time.Month.JANUARY
-import java.util.UUID
 
 object BoutgifterTestUtil {
-    val vedtaksperiodeIdFørstegangsbehandling: UUID = UUID.randomUUID()
+    val vedtaksperiodeIdFørstegangsbehandling: VedtaksperiodeId = VedtaksperiodeId.random()
 
     val vilkårperioder =
         Vilkårperioder(
@@ -68,7 +68,7 @@ object BoutgifterTestUtil {
     )
 
     fun vedtaksperiode(
-        id: UUID = vedtaksperiodeIdFørstegangsbehandling,
+        id: VedtaksperiodeId = vedtaksperiodeIdFørstegangsbehandling,
         fom: LocalDate,
         tom: LocalDate,
         målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
@@ -82,7 +82,7 @@ object BoutgifterTestUtil {
     )
 
     fun vedtaksperiodeDto(
-        id: UUID = UUID.randomUUID(),
+        id: VedtaksperiodeId = VedtaksperiodeId.random(),
         fom: LocalDate = LocalDate.of(2025, 1, 1),
         tom: LocalDate = LocalDate.of(2025, 1, 31),
         målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,

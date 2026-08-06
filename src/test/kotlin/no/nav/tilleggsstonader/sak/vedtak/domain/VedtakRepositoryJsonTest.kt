@@ -112,9 +112,9 @@ class VedtakRepositoryJsonTest : CleanDatabaseIntegrationTest() {
 
     private fun forventetType(type: TypeVedtaksdata): Class<out Vedtaksdata> =
         when (type) {
-            TypeVedtakTilsynBarn.INNVILGELSE_TILSYN_BARN -> InnvilgelseTilsynBarn::class
-            TypeVedtakTilsynBarn.AVSLAG_TILSYN_BARN -> AvslagTilsynBarn::class
-            TypeVedtakTilsynBarn.OPPHØR_TILSYN_BARN -> OpphørTilsynBarn::class
+            TypeVedtakPassAvBarn.INNVILGELSE_TILSYN_BARN -> InnvilgelsePassAvBarn::class
+            TypeVedtakPassAvBarn.AVSLAG_TILSYN_BARN -> AvslagPassAvBarn::class
+            TypeVedtakPassAvBarn.OPPHØR_TILSYN_BARN -> OpphørPassAvBarn::class
             TypeVedtakLæremidler.INNVILGELSE_LÆREMIDLER -> InnvilgelseLæremidler::class
             TypeVedtakLæremidler.AVSLAG_LÆREMIDLER -> AvslagLæremidler::class
             TypeVedtakLæremidler.OPPHØR_LÆREMIDLER -> OpphørLæremidler::class

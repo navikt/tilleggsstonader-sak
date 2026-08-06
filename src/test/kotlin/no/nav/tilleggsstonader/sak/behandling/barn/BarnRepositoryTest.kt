@@ -48,10 +48,10 @@ class BarnRepositoryTest : CleanDatabaseIntegrationTest() {
         val fagsakPerson = fagsakPerson(setOf(PersonIdent(identSøker)))
 
         val fagsakLæremidler = fagsak(fagsakPersonId = fagsakPerson.id, stønadstype = Stønadstype.LÆREMIDLER)
-        val fagsakTilsynBarn = fagsak(fagsakPersonId = fagsakPerson.id, stønadstype = Stønadstype.BARNETILSYN)
+        val fagsakPassAvBarn = fagsak(fagsakPersonId = fagsakPerson.id, stønadstype = Stønadstype.BARNETILSYN)
 
-        val behandlingTilsynBarn = behandling(fagsakTilsynBarn)
-        val barnTilsynBarn = behandlingBarn(behandlingId = behandlingTilsynBarn.id, personIdent = identBarn)
+        val behandlingPassAvBarn = behandling(fagsakPassAvBarn)
+        val barnPassAvBarn = behandlingBarn(behandlingId = behandlingPassAvBarn.id, personIdent = identBarn)
 
         @BeforeEach
         fun setUp() {
@@ -66,9 +66,9 @@ class BarnRepositoryTest : CleanDatabaseIntegrationTest() {
         @Test
         fun `skal finne ident til barn kobler til fagsakPersonId`() {
             testoppsettService.lagreFagsak(fagsakLæremidler)
-            testoppsettService.lagreFagsak(fagsakTilsynBarn)
-            testoppsettService.lagre(behandlingTilsynBarn, opprettGrunnlagsdata = false)
-            barnRepository.insert(barnTilsynBarn)
+            testoppsettService.lagreFagsak(fagsakPassAvBarn)
+            testoppsettService.lagre(behandlingPassAvBarn, opprettGrunnlagsdata = false)
+            barnRepository.insert(barnPassAvBarn)
 
             assertThat(barnRepository.finnIdenterTilFagsakPersonId(fagsakPerson.id))
                 .containsExactly(identBarn)

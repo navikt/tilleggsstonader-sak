@@ -28,8 +28,8 @@ import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil.søknadBoutgifter
 import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil.søknadDagligReise
 import no.nav.tilleggsstonader.sak.util.SøknadReiseTilSamlingUtil.søknadReiseTilSamling
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.barnMedBarnepass
-import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaBarnetilsyn
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaLæremidler
+import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReisePrivatBilDto
@@ -96,7 +96,7 @@ private fun søknadForStønadstype(
     ident: String,
 ) = when (stønadstype) {
     Stønadstype.BARNETILSYN ->
-        søknadskjemaBarnetilsyn(
+        søknadskjemaPassAvBarn(
             ident = ident,
             barnMedBarnepass = listOf(barnMedBarnepass(ident = PdlClientMockConfig.BARN_FNR)),
         )

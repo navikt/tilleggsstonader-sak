@@ -27,7 +27,7 @@ class KlageService(
         val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(fagsakPersonId)
         val eksterneFagsakIder =
             listOfNotNull(
-                fagsaker.barnetilsyn,
+                fagsaker.passAvBarn,
                 fagsaker.læremidler,
                 fagsaker.boutgifter,
                 fagsaker.dagligReiseTso,
@@ -46,7 +46,7 @@ class KlageService(
             }
 
         return KlagebehandlingerDto(
-            tilsynBarn = klagebehandlingerPåEksternId[fagsaker.barnetilsyn?.eksternId?.id] ?: emptyList(),
+            tilsynBarn = klagebehandlingerPåEksternId[fagsaker.passAvBarn?.eksternId?.id] ?: emptyList(),
             læremidler = klagebehandlingerPåEksternId[fagsaker.læremidler?.eksternId?.id] ?: emptyList(),
             boutgifter = klagebehandlingerPåEksternId[fagsaker.boutgifter?.eksternId?.id] ?: emptyList(),
             dagligReiseTso = klagebehandlingerPåEksternId[fagsaker.dagligReiseTso?.eksternId?.id] ?: emptyList(),

@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.april
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
@@ -21,7 +22,6 @@ import org.assertj.core.api.Assertions.assertThatNoException
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.util.UUID.randomUUID
 
 class OffentligTransportBeregningValideringTest {
     val førsteJanuar = 1 januar 2025
@@ -238,7 +238,7 @@ class OffentligTransportBeregningValideringTest {
             tom: LocalDate,
             antallDager: Int,
         ) = VedtaksperiodeGrunnlag(
-            id = randomUUID(),
+            id = VedtaksperiodeId.random(),
             fom = fom,
             tom = tom,
             aktivitet = AktivitetType.TILTAK,

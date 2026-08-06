@@ -30,7 +30,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil.søknadBoutgifter
 import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil.søknadDagligReise
-import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaBarnetilsyn
+import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaPassAvBarn
 import no.nav.tilleggsstonader.sak.util.dokumentInfo
 import no.nav.tilleggsstonader.sak.util.journalpost
 import no.nav.tilleggsstonader.sak.util.journalpostMedStrukturertSøknad
@@ -59,8 +59,8 @@ class JournalpostControllerTest(
     inner class FullførJournalpost {
         @Test
         fun `fullfør journalpost - skal ferdigstille journalpost, og opprette behandling og oppgave`() {
-            val journalpost = opprettJournalpost(journalpostMedStrukturertSøknad(DokumentBrevkode.BARNETILSYN))
-            leggTilJournalpostMedSøknadIMock(journalpost, jsonMapper.writeValueAsBytes(søknadskjemaBarnetilsyn()))
+            val journalpost = opprettJournalpost(journalpostMedStrukturertSøknad(DokumentBrevkode.PASS_AV_BARN))
+            leggTilJournalpostMedSøknadIMock(journalpost, jsonMapper.writeValueAsBytes(søknadskjemaPassAvBarn()))
             val dokumentInfoId = journalpost.dokumenter!!.single().dokumentInfoId
             val oppgave = opprettJournalføringsoppgave(journalpostId = journalpost.journalpostId)
             val journalpostId =

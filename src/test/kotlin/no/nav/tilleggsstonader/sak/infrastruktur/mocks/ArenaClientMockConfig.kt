@@ -75,7 +75,7 @@ class ArenaClientMockConfig {
                                 type = "Ny rettighet",
                                 status = "Opprettet",
                                 rettighet = "Tilsyn av barn tilleggsstønad",
-                                rettighetkode = Rettighet.TILSYN_BARN,
+                                rettighetkode = Rettighet.PASS_AV_BARN,
                                 fom = LocalDate.now().minusDays(10),
                                 tom = LocalDate.now().plusDays(10),
                                 totalbeløp = 1000,

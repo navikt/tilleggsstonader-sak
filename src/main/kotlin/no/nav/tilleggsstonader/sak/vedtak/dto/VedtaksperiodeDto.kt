@@ -3,14 +3,14 @@ package no.nav.tilleggsstonader.sak.vedtak.dto
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
-import java.util.UUID
 
 data class LagretVedtaksperiodeDto(
-    val id: UUID,
+    val id: VedtaksperiodeId,
     override val fom: LocalDate,
     override val tom: LocalDate,
     val målgruppeType: FaktiskMålgruppe,
@@ -34,7 +34,7 @@ data class LagretVedtaksperiodeDto(
 }
 
 data class VedtaksperiodeDto(
-    val id: UUID = UUID.randomUUID(),
+    val id: VedtaksperiodeId = VedtaksperiodeId.random(),
     override val fom: LocalDate,
     override val tom: LocalDate,
     val målgruppeType: FaktiskMålgruppe,

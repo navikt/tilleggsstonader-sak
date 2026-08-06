@@ -6,7 +6,7 @@ import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.TypeBarnepass
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService

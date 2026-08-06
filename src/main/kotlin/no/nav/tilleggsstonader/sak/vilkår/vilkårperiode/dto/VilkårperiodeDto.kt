@@ -24,8 +24,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingLæremidler
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingReiseTilSamlingTso
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfVurderinger
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaProsent
@@ -101,7 +101,7 @@ fun Vurdering.tilDto() = VurderingDto(svar = svar, resultat = resultat)
 @JsonSubTypes(
     JsonSubTypes.Type(MålgruppeFaktaOgVurderingerDto::class, name = "MÅLGRUPPE"),
     JsonSubTypes.Type(MålgruppeLæremidlerFaktaOgVurderingerDto::class, name = "MÅLGRUPPE_LÆREMIDLER"),
-    JsonSubTypes.Type(AktivitetBarnetilsynFaktaOgVurderingerDto::class, name = "AKTIVITET_BARNETILSYN"),
+    JsonSubTypes.Type(AktivitetPassAvBarnFaktaOgVurderingerDto::class, name = "AKTIVITET_BARNETILSYN"),
     JsonSubTypes.Type(AktivitetLæremidlerFaktaOgVurderingerDto::class, name = "AKTIVITET_LÆREMIDLER"),
     JsonSubTypes.Type(AktivitetBoutgifterFaktaOgVurderingerDto::class, name = "AKTIVITET_BOUTGIFTER"),
     JsonSubTypes.Type(AktivitetDagligReiseTsoFaktaOgVurderingerDto::class, name = "AKTIVITET_DAGLIG_REISE_TSO"),
@@ -122,7 +122,7 @@ data class MålgruppeLæremidlerFaktaOgVurderingerDto(
     val aldersvilkår: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
-data class AktivitetBarnetilsynFaktaOgVurderingerDto(
+data class AktivitetPassAvBarnFaktaOgVurderingerDto(
     val aktivitetsdager: Int? = null,
     val lønnet: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
@@ -194,8 +194,8 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
 
         is AktivitetFaktaOgVurdering -> {
             when (this) {
-                is FaktaOgVurderingTilsynBarn ->
-                    AktivitetBarnetilsynFaktaOgVurderingerDto(
+                is FaktaOgVurderingPassAvBarn ->
+                    AktivitetPassAvBarnFaktaOgVurderingerDto(
                         aktivitetsdager = fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
                         lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
                     )

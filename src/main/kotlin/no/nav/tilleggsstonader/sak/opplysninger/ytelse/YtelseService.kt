@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.ytelse
 import no.nav.familie.prosessering.rest.RestTaskService.Companion.logger
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderRequest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -120,8 +121,9 @@ class YtelseService(
         typer: List<TypeYtelsePeriode>,
     ): YtelsePerioderDto {
         feilHvis(typer.isEmpty()) {
-            "Kan ikke hente ytelser uten å definiere typer"
+            "Kan ikke hente ytelser uten å definere typer"
         }
+
         val ytelsePerioder =
             ytelseClient.hentYtelser(
                 YtelsePerioderRequest(
@@ -135,7 +137,10 @@ class YtelseService(
         return ytelsePerioder.copy(
             perioder =
                 ytelsePerioder.perioder
-                    .filter { it.ensligForsørgerStønadstype != EnsligForsørgerStønadstype.BARNETILSYN },
+                    .filterNot {
+                        it is YtelsePeriode.EnsligForsørger &&
+                            it.ensligForsørgerStønadstype == EnsligForsørgerStønadstype.BARNETILSYN
+                    },
         )
     }
 }

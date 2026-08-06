@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.april
 import no.nav.tilleggsstonader.libs.utils.dato.august
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
@@ -34,7 +35,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
-import java.util.UUID
 
 class LæremidlerBeregnYtelseStegTest : CleanDatabaseIntegrationTest() {
     @Autowired
@@ -75,7 +75,7 @@ class LæremidlerBeregnYtelseStegTest : CleanDatabaseIntegrationTest() {
     inner class Innvilgelse {
         @Test
         fun `skal lagre vedtak`() {
-            val vedtaksperiode = vedtaksperiodeDto(id = UUID.randomUUID(), fom = fom, tom = tom)
+            val vedtaksperiode = vedtaksperiodeDto(id = VedtaksperiodeId.random(), fom = fom, tom = tom)
             val innvilgelse = InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode))
 
             vilkårperiodeRepository.insert(aktivitet)
@@ -129,7 +129,7 @@ class LæremidlerBeregnYtelseStegTest : CleanDatabaseIntegrationTest() {
         lagreMålgruppeOgAktivitet(fom, tom)
         val saksbehandling = testoppsettService.hentSaksbehandling(behandling.id)
 
-        val vedtaksperiode = vedtaksperiodeDto(id = UUID.randomUUID(), fom = fom, tom = tom)
+        val vedtaksperiode = vedtaksperiodeDto(id = VedtaksperiodeId.random(), fom = fom, tom = tom)
         val innvilgelse = InnvilgelseLæremidlerRequest(vedtaksperioder = listOf(vedtaksperiode))
         steg.utførSteg(saksbehandling, innvilgelse)
 
@@ -169,7 +169,7 @@ class LæremidlerBeregnYtelseStegTest : CleanDatabaseIntegrationTest() {
 
         val vedtaksperiode =
             vedtaksperiodeDto(
-                id = UUID.randomUUID(),
+                id = VedtaksperiodeId.random(),
                 fom = LocalDate.of(2024, 12, 1),
                 tom = LocalDate.of(2024, 12, 31),
             )

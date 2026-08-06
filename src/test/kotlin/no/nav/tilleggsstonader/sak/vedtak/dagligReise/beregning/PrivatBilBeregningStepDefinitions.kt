@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.cucumber.parseDato
 import no.nav.tilleggsstonader.sak.cucumber.parseInt
 import no.nav.tilleggsstonader.sak.cucumber.parseValgfriBigDecimal
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.VilkårRepositoryFake
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
@@ -40,13 +41,12 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.La
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import org.assertj.core.api.Assertions.assertThat
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.util.UUID
 
 @Suppress("unused", "ktlint:standard:function-naming")
 class PrivatBilBeregningStepDefinitions {
@@ -111,7 +111,7 @@ class PrivatBilBeregningStepDefinitions {
                             behandlingId = behandlingId,
                             fom = fom,
                             tom = tom,
-                            faktaOgVurdering = faktaOgVurderingAktivitetTilsynBarn(type = AktivitetType.TILTAK),
+                            faktaOgVurdering = faktaOgVurderingAktivitetPassAvBarn(type = AktivitetType.TILTAK),
                             resultat = ResultatVilkårperiode.OPPFYLT,
                             tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                         )
@@ -252,15 +252,15 @@ class PrivatBilBeregningStepDefinitions {
     ) {
         val forventedeVedtaksperioder = mapVedtaksperioder(dataTable)
 
-        // Sammenlign uten uuid da den genereres i mapVedtaksperioder() over
-        val dummyUuid = UUID.randomUUID()
+        // Sammenlign uten id da den genereres i mapVedtaksperioder() over
+        val dummyId = VedtaksperiodeId.random()
         assertThat(
             rammevedtak!!
                 .reiser[reiseNr - 1]
                 .grunnlag.vedtaksperioder
-                .map { it.copy(id = dummyUuid) },
+                .map { it.copy(id = dummyId) },
         ).isEqualTo(
-            forventedeVedtaksperioder.map { it.copy(id = dummyUuid) },
+            forventedeVedtaksperioder.map { it.copy(id = dummyId) },
         )
     }
 

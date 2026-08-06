@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.søknad
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
-import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.søknadBarnetilsyn
+import no.nav.tilleggsstonader.sak.util.SøknadPassAvBarnUtil.søknadPassAvBarn
 import no.nav.tilleggsstonader.sak.util.behandling
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -14,7 +14,7 @@ class SøknadMetadataRepositoryTest : CleanDatabaseIntegrationTest() {
     lateinit var søknadBehandlingRepository: SøknadBehandlingRepository
 
     @Autowired
-    lateinit var søknadBarnetilsynRepository: SøknadBarnetilsynRepository
+    lateinit var søknadPassAvBarnRepository: SøknadPassAvBarnRepository
 
     @Autowired
     lateinit var søknadMetadataRepository: SøknadMetadataRepository
@@ -23,7 +23,7 @@ class SøknadMetadataRepositoryTest : CleanDatabaseIntegrationTest() {
     fun `skal hente metadata fra søknaden`() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
 
-        val søknadBarnetilsyn = søknadBarnetilsynRepository.insert(søknadBarnetilsyn())
+        val søknadBarnetilsyn = søknadPassAvBarnRepository.insert(søknadPassAvBarn())
         søknadBehandlingRepository.insert(
             SøknadBehandling(
                 behandlingId = behandling.id,

@@ -26,8 +26,8 @@ import no.nav.tilleggsstonader.sak.migrering.routing.SkjemaRouting
 import no.nav.tilleggsstonader.sak.oppfølging.Oppfølging
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadPassAvBarn
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
@@ -68,7 +68,7 @@ abstract class CleanDatabaseIntegrationTest : IntegrationTest() {
             Vilkår::class,
             BehandlingBarn::class,
             SøknadBehandling::class,
-            SøknadBarnetilsyn::class,
+            SøknadPassAvBarn::class,
             SettPåVent::class,
             OppgaveDomain::class,
             Totrinnskontroll::class,

@@ -38,7 +38,7 @@ class EksternVedtakServiceTest : CleanDatabaseIntegrationTest() {
         val behandling = behandling(fagsak, status = BehandlingStatus.FERDIGSTILT, resultat = BehandlingResultat.INNVILGET)
         testoppsettService.lagre(behandling, opprettGrunnlagsdata = false)
 
-        val result = service.hentVedtaksinformasjonTilsynBarn(request)
+        val result = service.hentVedtaksinformasjonPassAvBarn(request)
 
         assertThat(result.harInnvilgetVedtak).isTrue
 
@@ -49,7 +49,7 @@ class EksternVedtakServiceTest : CleanDatabaseIntegrationTest() {
     fun `skal sjekke arena hvis personen ikke har en iverksatt behandling i ny løsning`() {
         mockArena(harInnvilgetVedtak = true)
 
-        val result = service.hentVedtaksinformasjonTilsynBarn(request)
+        val result = service.hentVedtaksinformasjonPassAvBarn(request)
 
         assertThat(result.harInnvilgetVedtak).isTrue
 
@@ -58,7 +58,7 @@ class EksternVedtakServiceTest : CleanDatabaseIntegrationTest() {
 
     @Test
     fun `har ikke vedtak hvis personen ikke har iverksatt behandling eller vedtak i arena`() {
-        val result = service.hentVedtaksinformasjonTilsynBarn(request)
+        val result = service.hentVedtaksinformasjonPassAvBarn(request)
 
         assertThat(result.harInnvilgetVedtak).isFalse
 

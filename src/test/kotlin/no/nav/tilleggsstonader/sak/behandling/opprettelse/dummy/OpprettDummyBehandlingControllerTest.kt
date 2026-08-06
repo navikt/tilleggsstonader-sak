@@ -54,7 +54,7 @@ class OpprettDummyBehandlingControllerTest : IntegrationTest() {
 
         Assertions.assertThat(behandlingRepository.findByIdOrNull(behandlingId)).isNotNull
         Assertions.assertThat(barnService.finnBarnPåBehandling(behandlingId)).hasSize(2)
-        val søknad = søknadService.hentSøknadBarnetilsyn(behandlingId)!!
+        val søknad = søknadService.hentSøknadPassAvBarn(behandlingId)!!
         Assertions.assertThat(søknad.barn).hasSize(2)
     }
 
@@ -100,7 +100,7 @@ class OpprettDummyBehandlingControllerTest : IntegrationTest() {
         Assertions.assertThat(søknad).isNotNull
         Assertions.assertThat(søknad).isInstanceOf(SøknadReiseTilSamling::class.java)
         Assertions.assertThat(søknad.data.samlinger).hasSize(2)
-        Assertions.assertThat(søknad.data.reiseavstand.poststed).isEqualTo("Nyborg")
-        Assertions.assertThat(søknad.data.reisemåte.kanBenytteDrosje).isEqualTo(JaNei.JA)
+        Assertions.assertThat(søknad.data.avreiseadresse.adresseDetSkalReisesFra).isNull()
+        Assertions.assertThat(søknad.data.reisemåte.ønskerDekketUtgifterForDrosje).isEqualTo(JaNei.NEI)
     }
 }

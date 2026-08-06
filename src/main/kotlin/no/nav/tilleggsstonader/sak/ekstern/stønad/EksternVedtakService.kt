@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.ekstern.stønad
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
-import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.VedtaksinformasjonTilsynBarnDto
+import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.VedtaksinformasjonPassAvBarnDto
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -22,8 +22,8 @@ class EksternVedtakService(
      * Når vi legger inn informasjon om hvilke perioder det gjelder,
      * så må vi slå sammen beregningsresultat tvers flere behandlinger pga revurderFra som ikke tar med perioder før måneden som det revurderes fra
      */
-    fun hentVedtaksinformasjonTilsynBarn(request: IdentRequest): VedtaksinformasjonTilsynBarnDto =
-        VedtaksinformasjonTilsynBarnDto(
+    fun hentVedtaksinformasjonPassAvBarn(request: IdentRequest): VedtaksinformasjonPassAvBarnDto =
+        VedtaksinformasjonPassAvBarnDto(
             harInnvilgetVedtak = harVedtak(request) || harVedtakIArena(request),
         )
 

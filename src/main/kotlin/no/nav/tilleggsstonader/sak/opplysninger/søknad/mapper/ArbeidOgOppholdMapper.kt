@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper
 
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ArbeidOgOpphold
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.OppholdUtenforNorge
-import no.nav.tilleggsstonader.kontrakter.søknad.felles.ArbeidOgOpphold as ArbeidOgOppholdKontrakt
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.ArbeidOgOppholdAvsnitt as ArbeidOgOppholdKontrakt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.OppholdUtenforNorge as OppholdUtenforNorgeKontrakter
 
 object ArbeidOgOppholdMapper {

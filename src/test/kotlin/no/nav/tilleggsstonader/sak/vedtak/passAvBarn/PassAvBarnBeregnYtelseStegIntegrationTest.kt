@@ -1,0 +1,573 @@
+package no.nav.tilleggsstonader.sak.vedtak.passAvBarn
+
+import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.fagsak
+import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelsePassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.innvilgelseDto
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.BeregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.BeregningsresultatPassAvBarn
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetPassAvBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.time.LocalDate
+import java.time.YearMonth
+
+class PassAvBarnBeregnYtelseStegIntegrationTest : CleanDatabaseIntegrationTest() {
+    @Autowired
+    lateinit var steg: PassAvBarnBeregnYtelseSteg
+
+    @Autowired
+    lateinit var repository: VedtakRepository
+
+    @Autowired
+    lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
+
+    @Autowired
+    lateinit var vilkårperiodeRepository: VilkårperiodeRepository
+
+    @Autowired
+    lateinit var vilkårRepository: VilkårRepository
+
+    @Autowired
+    lateinit var vedtakService: VedtakService
+
+    val fagsak = fagsak()
+    val behandling = behandling(fagsak = fagsak)
+    val saksbehandling = saksbehandling(behandling = behandling)
+    val barn = BehandlingBarn(behandlingId = behandling.id, ident = "123")
+    val vedtaksperiode =
+        VedtaksperiodeDto(
+            id = VedtaksperiodeId.random(),
+            fom = LocalDate.of(2023, 1, 1),
+            tom = LocalDate.of(2023, 1, 31),
+            målgruppeType = NEDSATT_ARBEIDSEVNE,
+            aktivitetType = AktivitetType.TILTAK,
+        )
+    val aktivitet = aktivitet(behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 1, 31))
+    val målgruppe = målgruppe(behandling.id, fom = LocalDate.of(2023, 1, 1), tom = LocalDate.of(2023, 2, 28))
+
+    val januar = YearMonth.of(2023, 1)
+    val februar = YearMonth.of(2023, 2)
+    val mars = YearMonth.of(2023, 3)
+    val april = YearMonth.of(2023, 4)
+    val utgift = 100
+
+    @BeforeEach
+    fun setUp() {
+        testoppsettService.opprettBehandlingMedFagsak(behandling)
+        barnRepository.insert(barn)
+    }
+
+    @AfterEach
+    override fun tearDown() {
+        super.tearDown()
+        resetMock(unleashService)
+    }
+
+    @Nested
+    inner class Innvilgelse {
+        @Test
+        fun `skal lagre vedtak`() {
+            vilkårperiodeRepository.insert(aktivitet)
+            vilkårperiodeRepository.insert(målgruppe)
+            lagVilkårForPeriode(saksbehandling, januar, januar, 100)
+
+            val vedtakDto = innvilgelseDto(listOf(vedtaksperiode))
+            steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
+
+            val vedtak = repository.findByIdOrThrow(saksbehandling.id).withTypeOrThrow<InnvilgelsePassAvBarn>()
+
+            assertThat(vedtak.behandlingId).isEqualTo(saksbehandling.id)
+            assertThat(vedtak.type).isEqualTo(TypeVedtak.INNVILGELSE)
+            assertThat(vedtak.data.beregningsresultat.perioder).hasSize(1)
+            assertThat(vedtak.gitVersjon).isEqualTo(Applikasjonsversjon.versjon)
+        }
+
+        @Test
+        fun `skal lagre andeler for hver vedtakssperiode, splittede per måned`() {
+            val vedtaksperiode1 = vedtaksperiode.copy(fom = januar.atDay(2), tom = januar.atDay(6))
+            val vedtaksperiode2 = vedtaksperiode.copy(fom = januar.atDay(10), tom = januar.atDay(11))
+            val vedtaksperiode3 = vedtaksperiode.copy(fom = januar.atDay(24), tom = februar.atDay(3))
+            val vedtaksperiode4 = vedtaksperiode.copy(fom = februar.atDay(28), tom = april.atDay(3))
+
+            vilkårperiodeRepository.insert(aktivitet(behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
+            vilkårperiodeRepository.insert(målgruppe(behandling.id, fom = januar.atDay(1), tom = april.atEndOfMonth()))
+            lagVilkårForPeriode(saksbehandling, januar, februar, 100)
+            lagVilkårForPeriode(saksbehandling, mars, april, 200)
+
+            steg.utførOgReturnerNesteSteg(
+                saksbehandling,
+                innvilgelseDto(
+                    listOf(
+                        vedtaksperiode1,
+                        vedtaksperiode2,
+                        vedtaksperiode3,
+                        vedtaksperiode4,
+                    ),
+                ),
+            )
+
+            val dagsatsForUtgift100 = BigDecimal("2.95")
+            val dagsatsForUtgift200 = BigDecimal("5.91")
+
+            val forventedeAndeler =
+                listOf(
+                    andelTilkjentYtelse(
+                        fom = vedtaksperiode1.fom,
+                        beløp = finnTotalbeløp(dagsatsForUtgift100, 5),
+                        utbetalingsdato = januar.atDay(2),
+                    ),
+                    andelTilkjentYtelse(
+                        fom = vedtaksperiode2.fom,
+                        beløp = finnTotalbeløp(dagsatsForUtgift100, 2),
+                        utbetalingsdato = januar.atDay(2),
+                    ),
+                    andelTilkjentYtelse(
+                        fom = vedtaksperiode3.fom,
+                        beløp = finnTotalbeløp(dagsatsForUtgift100, 6),
+                        utbetalingsdato = januar.atDay(2),
+                    ),
+                    andelTilkjentYtelse(
+                        fom = februar.atDay(1),
+                        beløp = finnTotalbeløp(dagsatsForUtgift100, 3),
+                        utbetalingsdato = februar.atDay(1),
+                    ),
+                    andelTilkjentYtelse(
+                        fom = vedtaksperiode4.fom,
+                        beløp = finnTotalbeløp(dagsatsForUtgift100, 1),
+                        utbetalingsdato = februar.atDay(1),
+                    ),
+                    andelTilkjentYtelse(
+                        fom = mars.atDay(1),
+                        beløp = finnTotalbeløp(dagsatsForUtgift200, 23),
+                        utbetalingsdato = mars.atDay(1),
+                    ),
+                    andelTilkjentYtelse(
+                        fom = april.atDay(3),
+                        beløp = finnTotalbeløp(dagsatsForUtgift200, 1),
+                        utbetalingsdato = april.atDay(3),
+                    ),
+                )
+            assertThat(
+                tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList(),
+            ).usingRecursiveFieldByFieldElementComparatorIgnoringFields(
+                "id",
+                "endretTid",
+            ).containsExactlyElementsOf(forventedeAndeler)
+        }
+
+        @Test
+        fun `hvis en vedtakssperiode begynner en helgdag skal man opprette vedtakssperiode og andeler som begynner neste mandag`() {
+            val juni = YearMonth.of(2024, 6)
+
+            val vedtaksperiode1 =
+                vedtaksperiode.copy(
+                    fom = juni.atDay(1),
+                    tom = juni.atEndOfMonth(),
+                )
+            vilkårperiodeRepository.insert(aktivitet(behandling.id, fom = juni.atDay(1), tom = juni.atEndOfMonth()))
+            vilkårperiodeRepository.insert(målgruppe(behandling.id, fom = juni.atDay(1), tom = juni.atEndOfMonth()))
+            lagVilkårForPeriode(saksbehandling, juni, juni, 100)
+            steg.utførOgReturnerNesteSteg(saksbehandling, innvilgelseDto(listOf(vedtaksperiode1)))
+
+            with(tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.single()) {
+                assertThat(this.fom).isEqualTo(juni.atDay(3))
+                assertThat(this.tom).isEqualTo(juni.atDay(3))
+            }
+
+            val beregningsresultat =
+                vedtakService.hentVedtak<InnvilgelsePassAvBarn>(behandling.id).data.beregningsresultat
+            with(beregningsresultat.perioder.single()) {
+                with(this.grunnlag.vedtaksperiodeGrunnlag.single()) {
+                    assertThat(this.vedtaksperiode.fom).isEqualTo(juni.atDay(1))
+                    assertThat(this.vedtaksperiode.tom).isEqualTo(juni.atEndOfMonth())
+                }
+
+                with(this.beløpsperioder.single()) {
+                    assertThat(this.dato).isEqualTo(juni.atDay(3))
+                }
+            }
+        }
+    }
+
+    @Nested
+    inner class RevurderingSkalBeholdePerioderFraForrigeBehandling {
+        @Test
+        fun `skal beholde perioder fra forrige behandling som er før måneden til tidligsteEndring`() {
+            innvilgPerioderForJanuarOgFebruar(behandling.id)
+            assertHarPerioderForJanuarOgFebruar(behandling.id)
+
+            testoppsettService.oppdater(behandling.copy(status = BehandlingStatus.FERDIGSTILT))
+            val revurdering = opprettRevurdering()
+
+            innvilgPerioderForMars(revurdering)
+            // Verifiser tidligste endring 1.mars, da man har innvilget ny vedtaksperiode i mars
+            assertThat(vedtakService.hentVedtak(revurdering.id)?.tidligsteEndring).isEqualTo(mars.atDay(1))
+
+            assertHarPerioderForJanuarTilMars(revurdering.id)
+        }
+
+        private fun opprettRevurdering() =
+            testoppsettService
+                .lagre(
+                    behandling(
+                        fagsak = fagsak(id = behandling.fagsakId),
+                        type = BehandlingType.REVURDERING,
+                        forrigeIverksatteBehandlingId = behandling.id,
+                    ),
+                    opprettGrunnlagsdata = true,
+                ).let { testoppsettService.hentSaksbehandling(it.id) }
+
+        /**
+         * vedtakssperiode jan-feb
+         * Aktivitet jan-april
+         * Vilkår(utgifter) jan-feb
+         */
+        private fun innvilgPerioderForJanuarOgFebruar(behandlingId: BehandlingId) {
+            val behandling = testoppsettService.hentSaksbehandling(behandlingId)
+
+            val vedtaksperiode = vedtaksperiode.copy(fom = januar.atDay(1), tom = februar.atEndOfMonth())
+            vilkårperiodeRepository.insert(
+                aktivitet(
+                    behandlingId = behandlingId,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth(),
+                ),
+            )
+            vilkårperiodeRepository.insert(
+                målgruppe(
+                    behandlingId = behandlingId,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth(),
+                ),
+            )
+            lagVilkårForPeriode(behandling, januar, februar, 100)
+            steg.utførOgReturnerNesteSteg(behandling, innvilgelseDto(listOf(vedtaksperiode)))
+        }
+
+        /**
+         * Ikke helt reellt tilfelle. Vanligvis når man oppretter en revurdering gjenbruker man vilkårperioder, vedtakssperiode og vilkår fra forrige behandling
+         * Dette er mest for å vise at man faktiskt beholder beregningsresultat fra forrige behandling
+         * vedtakssperiode jan-mars og mars-mars
+         * Aktivitet jan-april
+         * Vilkår(utgifter) jan-april
+         */
+        private fun innvilgPerioderForMars(behandling: Saksbehandling) {
+            val vedtaksperiodeJanFeb = vedtaksperiode.copy(fom = januar.atDay(1), tom = mars.atDay(14))
+            val vedtaksperiodeMars =
+                VedtaksperiodeDto(
+                    id = VedtaksperiodeId.random(),
+                    fom = mars.atDay(15),
+                    tom = mars.atEndOfMonth(),
+                    målgruppeType = NEDSATT_ARBEIDSEVNE,
+                    aktivitetType = AktivitetType.TILTAK,
+                )
+            vilkårperiodeRepository.insert(
+                aktivitet(
+                    behandlingId = behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth(),
+                ),
+            )
+            vilkårperiodeRepository.insert(
+                målgruppe(
+                    behandlingId = behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth(),
+                ),
+            )
+            lagVilkårForPeriode(behandling, januar, april, 100)
+            steg.utførOgReturnerNesteSteg(behandling, innvilgelseDto(listOf(vedtaksperiodeJanFeb, vedtaksperiodeMars)))
+        }
+
+        /**
+         * For førstegangsbehandlingen opprettes det kun perioder for jan og feb
+         * då det kun finnes overlapp mellom vedtakssperioder og vilkår for januar og mars
+         */
+        private fun assertHarPerioderForJanuarOgFebruar(behandlingId: BehandlingId) {
+            val beregningsresultat = hentBeregningsresultat(behandlingId)
+            with(beregningsresultat.perioder.sortedBy { it.grunnlag.måned }) {
+                assertThat(this).hasSize(2)
+                assertHarPerioderForJanuarOgFebruar(this)
+            }
+        }
+
+        /**
+         * For revurdering gjenbrukes perioder for januar og februar, samt oppretter perioder for mars
+         */
+        private fun assertHarPerioderForJanuarTilMars(behandlingId: BehandlingId) {
+            val beregningsresultat = hentBeregningsresultat(behandlingId)
+            with(beregningsresultat.perioder.sortedBy { it.grunnlag.måned }) {
+                assertThat(this).hasSize(3)
+                // Januar og februar beholder fra forrige behandling, selv om det ikke finnes noen perioder for de denne gangen.
+                assertHarPerioderForJanuarOgFebruar(this)
+
+                /*
+                 * På grunn av at man har endret fra den 15 mars splittes vedtakssperioder i 2
+                 * Det er fordi man i beregningsresultat i behandlingen kun ønsker å se
+                 * beløp som blir innvilget fra datoet man revurderer fra
+                 */
+                assertHarPerioderForMars(this)
+            }
+        }
+
+        private fun hentBeregningsresultat(behandlingId: BehandlingId): BeregningsresultatPassAvBarn =
+            vedtakService.hentVedtak<InnvilgelsePassAvBarn>(behandlingId).data.beregningsresultat
+
+        private fun assertHarPerioderForJanuarOgFebruar(beregningsresultat: List<BeregningsresultatForMåned>) {
+            with(beregningsresultat[0].grunnlag.vedtaksperiodeGrunnlag.single()) {
+                assertThat(this.vedtaksperiode.fom).isEqualTo(januar.atDay(1))
+                assertThat(this.vedtaksperiode.tom).isEqualTo(januar.atEndOfMonth())
+            }
+
+            with(beregningsresultat[1].grunnlag.vedtaksperiodeGrunnlag.single()) {
+                assertThat(this.vedtaksperiode.fom).isEqualTo(februar.atDay(1))
+                assertThat(this.vedtaksperiode.tom).isEqualTo(februar.atEndOfMonth())
+            }
+        }
+
+        private fun assertHarPerioderForMars(beregningsresultatForMåneds: List<BeregningsresultatForMåned>) {
+            assertThat(beregningsresultatForMåneds[2].grunnlag.vedtaksperiodeGrunnlag).hasSize(2)
+            with(beregningsresultatForMåneds[2].grunnlag.vedtaksperiodeGrunnlag[0]) {
+                assertThat(this.vedtaksperiode.fom).isEqualTo(mars.atDay(1))
+                assertThat(this.vedtaksperiode.tom).isEqualTo(mars.atDay(14))
+            }
+            with(beregningsresultatForMåneds[2].grunnlag.vedtaksperiodeGrunnlag[1]) {
+                assertThat(this.vedtaksperiode.fom).isEqualTo(mars.atDay(15))
+                assertThat(this.vedtaksperiode.tom).isEqualTo(mars.atDay(31))
+            }
+        }
+    }
+
+    @Nested
+    inner class MålgruppeMapping {
+        val beløp1DagUtgift100 = 3
+
+        @BeforeEach
+        fun setUp() {
+            val faktaOgVurderingUføretrygd = faktaOgVurderingMålgruppe(type = MålgruppeType.UFØRETRYGD)
+            val faktaOgVurderingNedsattArbeidsevne = faktaOgVurderingMålgruppe(type = MålgruppeType.NEDSATT_ARBEIDSEVNE)
+            vilkårperiodeRepository.insert(
+                aktivitet(
+                    behandlingId = behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth(),
+                ),
+            )
+            vilkårperiodeRepository.insert(
+                målgruppe(
+                    behandlingId = behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth(),
+                ),
+            )
+            vilkårperiodeRepository.insert(
+                målgruppe(
+                    behandlingId = behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth(),
+                    faktaOgVurdering = faktaOgVurderingUføretrygd,
+                ),
+            )
+            vilkårperiodeRepository.insert(
+                målgruppe(
+                    behandlingId = behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth(),
+                    faktaOgVurdering = faktaOgVurderingNedsattArbeidsevne,
+                    begrunnelse = "nedsatt arbeidsevne",
+                ),
+            )
+            lagVilkårForPeriode(saksbehandling, januar, mars, 100)
+        }
+
+        @Test
+        fun `skal mappe nedsatt arbeidsevne til riktig TypeAndel`() {
+            val vedtaksperioder =
+                listOf(
+                    vedtaksperiode.copy(
+                        fom = januar.atDay(2),
+                        tom = januar.atDay(2),
+                        målgruppeType = NEDSATT_ARBEIDSEVNE,
+                    ),
+                )
+
+            val vedtakDto = innvilgelseDto(vedtaksperioder)
+            steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
+
+            val forventedeAndeler =
+                vedtaksperioder.map {
+                    andelTilkjentYtelse(
+                        fom = it.fom,
+                        tom = it.fom,
+                        beløp = beløp1DagUtgift100,
+                        type = TypeAndel.TILSYN_BARN_AAP,
+                    )
+                }
+
+            assertThat(
+                tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList(),
+            ).usingRecursiveFieldByFieldElementComparatorIgnoringFields(
+                "id",
+                "endretTid",
+            ).containsExactlyElementsOf(forventedeAndeler)
+        }
+
+        @Test
+        fun `skal mappe overgangsstønad til riktig TypeAndel`() {
+            val vedtaksperiode =
+                VedtaksperiodeDto(
+                    id = VedtaksperiodeId.random(),
+                    fom = januar.atDay(2),
+                    tom = januar.atDay(2),
+                    målgruppeType = FaktiskMålgruppe.ENSLIG_FORSØRGER,
+                    aktivitetType = AktivitetType.UTDANNING,
+                )
+
+            vilkårperiodeRepository.insert(
+                aktivitet(
+                    behandlingId = behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth(),
+                    faktaOgVurdering = faktaOgVurderingAktivitetPassAvBarn(type = AktivitetType.UTDANNING),
+                ),
+            )
+            vilkårperiodeRepository.insert(
+                målgruppe(
+                    behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth(),
+                    faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.OVERGANGSSTØNAD),
+                ),
+            )
+
+            val vedtakDto = innvilgelseDto(listOf(vedtaksperiode))
+
+            steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
+
+            val forventetAndel =
+                andelTilkjentYtelse(
+                    fom = vedtaksperiode.fom,
+                    tom = vedtaksperiode.fom,
+                    beløp = beløp1DagUtgift100,
+                    type = TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER,
+                )
+            assertThat(
+                tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList(),
+            ).usingRecursiveFieldByFieldElementComparatorIgnoringFields(
+                "id",
+                "endretTid",
+            ).containsExactlyElementsOf(listOf(forventetAndel))
+        }
+
+        @Test
+        fun `skal mappe gjenlevende til riktig TypeAndel`() {
+            val vedtaksperiode =
+                VedtaksperiodeDto(
+                    id = VedtaksperiodeId.random(),
+                    fom = januar.atDay(2),
+                    tom = januar.atDay(2),
+                    målgruppeType = FaktiskMålgruppe.GJENLEVENDE,
+                    aktivitetType = AktivitetType.UTDANNING,
+                )
+
+            vilkårperiodeRepository.insert(
+                aktivitet(
+                    behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth(),
+                    faktaOgVurdering = faktaOgVurderingAktivitetPassAvBarn(type = AktivitetType.UTDANNING),
+                ),
+            )
+            vilkårperiodeRepository.insert(
+                målgruppe(
+                    behandling.id,
+                    fom = januar.atDay(1),
+                    tom = april.atEndOfMonth(),
+                    faktaOgVurdering = faktaOgVurderingMålgruppe(type = MålgruppeType.OMSTILLINGSSTØNAD),
+                ),
+            )
+
+            val vedtakDto = innvilgelseDto(listOf(vedtaksperiode))
+            steg.utførOgReturnerNesteSteg(saksbehandling, vedtakDto)
+
+            val forventetAndel =
+                andelTilkjentYtelse(
+                    fom = vedtaksperiode.fom,
+                    tom = vedtaksperiode.fom,
+                    beløp = beløp1DagUtgift100,
+                    type = TypeAndel.TILSYN_BARN_ETTERLATTE,
+                )
+            assertThat(
+                tilkjentYtelseRepository.findByBehandlingId(saksbehandling.id)!!.andelerTilkjentYtelse.toList(),
+            ).usingRecursiveFieldByFieldElementComparatorIgnoringFields(
+                "id",
+                "endretTid",
+            ).containsExactlyElementsOf(listOf(forventetAndel))
+        }
+    }
+
+    private fun lagVilkårForPeriode(
+        behandling: Saksbehandling,
+        fom: YearMonth,
+        tom: YearMonth,
+        utgift: Int,
+        status: VilkårStatus = VilkårStatus.NY,
+    ) {
+        vilkårRepository.insert(
+            vilkår(
+                behandlingId = behandling.id,
+                barnId = barn.id,
+                type = VilkårType.PASS_BARN,
+                resultat = Vilkårsresultat.OPPFYLT,
+                fom = fom.atDay(1),
+                tom = tom.atEndOfMonth(),
+                utgift = utgift,
+                status = status,
+            ),
+        )
+    }
+
+    private fun finnTotalbeløp(
+        dagsats: BigDecimal,
+        antallDager: Int,
+    ): Int = dagsats.multiply(antallDager.toBigDecimal()).setScale(0, RoundingMode.HALF_UP).toInt()
+}

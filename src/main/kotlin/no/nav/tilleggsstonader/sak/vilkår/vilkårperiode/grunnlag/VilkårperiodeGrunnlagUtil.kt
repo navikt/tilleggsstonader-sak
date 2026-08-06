@@ -8,9 +8,14 @@ fun kanYtelseBrukesIBehandling(
     stønadstype: Stønadstype,
     ytelse: PeriodeGrunnlagYtelse,
 ): Boolean {
-    if (ytelse.subtype == PeriodeGrunnlagYtelse.YtelseSubtype.AAP_FERDIG_AVKLART) {
+    if (ytelse is PeriodeGrunnlagYtelse.AAP && ytelse.subtype == PeriodeGrunnlagYtelse.YtelseSubtype.AAP_FERDIG_AVKLART) {
         return false
     }
+
+    if (ytelse is PeriodeGrunnlagYtelse.EnsligForsørger && ytelse.erNyttRegelverk2026 == true) {
+        return false
+    }
+
     return ytelse.type.tilMålgruppe().kanBrukesForStønad(stønadstype)
 }
 

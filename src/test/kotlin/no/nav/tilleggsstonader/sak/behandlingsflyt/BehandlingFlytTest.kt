@@ -20,15 +20,16 @@ import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerVedtaksb
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.BrevController
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgaveTask
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringStegService
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnVedtakController
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnVedtakController
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.InnvilgelsePassAvBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollController
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
@@ -42,7 +43,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBa
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeMålgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgSvarTilsynBarnDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgSvarPassAvBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
@@ -54,7 +55,6 @@ import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
 import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate
-import java.util.UUID
 
 class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
     @Autowired
@@ -67,7 +67,7 @@ class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
     lateinit var vilkårController: VilkårController
 
     @Autowired
-    lateinit var tilsynBarnVedtakController: TilsynBarnVedtakController
+    lateinit var passAvBarnVedtakController: PassAvBarnVedtakController
 
     @Autowired
     lateinit var brevController: BrevController
@@ -266,7 +266,7 @@ class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
 
     private fun vurderInngangsvilkår(
         behandlingId: BehandlingId,
-        aktivitetFaktaOgSvar: FaktaOgSvarDto = faktaOgSvarTilsynBarnDto,
+        aktivitetFaktaOgSvar: FaktaOgSvarDto = faktaOgSvarPassAvBarnDto,
     ) {
         val fom = LocalDate.of(2024, 1, 1)
         val tom = LocalDate.of(2024, 1, 31)
@@ -389,16 +389,16 @@ class BehandlingFlytTest : CleanDatabaseIntegrationTest() {
         val vedtaksperioderDto =
             listOf(
                 VedtaksperiodeDto(
-                    id = UUID.randomUUID(),
+                    id = VedtaksperiodeId.random(),
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 1, 31),
                     målgruppeType = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                     aktivitetType = AktivitetType.TILTAK,
                 ),
             )
-        tilsynBarnVedtakController.lagreVedtak(
+        passAvBarnVedtakController.lagreVedtak(
             behandlingId,
-            InnvilgelseTilsynBarnRequest(vedtaksperioder = vedtaksperioderDto, begrunnelse = null),
+            InnvilgelsePassAvBarnRequest(vedtaksperioder = vedtaksperioderDto, begrunnelse = null),
         )
     }
 

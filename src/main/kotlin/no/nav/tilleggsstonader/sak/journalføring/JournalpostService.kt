@@ -202,7 +202,7 @@ class JournalpostService(
 
 private fun Stønadstype.tilDokumentBrevkode(): DokumentBrevkode =
     when (this) {
-        Stønadstype.BARNETILSYN -> DokumentBrevkode.BARNETILSYN
+        Stønadstype.BARNETILSYN -> DokumentBrevkode.PASS_AV_BARN
         Stønadstype.LÆREMIDLER -> DokumentBrevkode.LÆREMIDLER
         Stønadstype.BOUTGIFTER -> DokumentBrevkode.BOUTGIFTER
         Stønadstype.DAGLIG_REISE_TSO,
