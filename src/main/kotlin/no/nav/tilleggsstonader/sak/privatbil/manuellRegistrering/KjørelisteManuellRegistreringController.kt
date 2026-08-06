@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
-import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
@@ -36,11 +35,11 @@ class KjørelisteManuellRegistreringController(
     fun lagreManuellKjøreliste(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody request: LagreManuellKjørelisteRequest,
-    ): KjørelisteId {
+    ) {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
 
-        return kjørelisteManuellRegistreringService.lagreManuellKjøreliste(behandlingId, request)
+        kjørelisteManuellRegistreringService.lagreManuellKjøreliste(behandlingId, request)
     }
 }
 

@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.privatbil.InnsendtKjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
-import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.util.erFørNåværendeUke
@@ -50,27 +49,26 @@ class KjørelisteManuellRegistreringService(
     fun lagreManuellKjøreliste(
         behandlingId: BehandlingId,
         request: LagreManuellKjørelisteRequest,
-    ): KjørelisteId {
+    ): Kjøreliste {
         behandlingService.markerBehandlingSomPåbegyntHvisDenHarStatusOpprettet(behandlingId)
 
         val behandling = behandlingService.hentBehandling(behandlingId)
-        val innsendtKjøreliste = InnsendtKjøreliste(
-            reiseId = request.reiseId,
-            reisedager = request.reisedager,
-        )
+        val innsendtKjøreliste =
+            InnsendtKjøreliste(
+                reiseId = request.reiseId,
+                reisedager = request.reisedager,
+            )
 
         validerManuellKjøreliste(behandling = behandling, innsendtKjøreliste = innsendtKjøreliste)
 
-        val kjøreliste =
-            kjørelisteService.lagre(
-                innsendtKjøreliste = innsendtKjøreliste,
-                fagsakId = behandling.fagsakId,
-                journalpostId = request.journalpostId,
-                begrunnelse = request.begrunnelse,
-                behandlingId = behandlingId,
-                manueltRegistrert = true,
-            )
-        return kjøreliste.id
+        return kjørelisteService.lagre(
+            innsendtKjøreliste = innsendtKjøreliste,
+            fagsakId = behandling.fagsakId,
+            journalpostId = request.journalpostId,
+            begrunnelse = request.begrunnelse,
+            behandlingId = behandlingId,
+            manueltRegistrert = true,
+        )
     }
 
     /**
@@ -160,7 +158,10 @@ class KjørelisteManuellRegistreringService(
                 )
             }
 
-    private fun validerManuellKjøreliste(behandling: Behandling, innsendtKjøreliste: InnsendtKjøreliste) {
+    private fun validerManuellKjøreliste(
+        behandling: Behandling,
+        innsendtKjøreliste: InnsendtKjøreliste,
+    ) {
         val rammevedtakForReise = dagligReisePrivatBilService.hentRammevedtakForReiseIBehandling(behandling.id, innsendtKjøreliste.reiseId)
         val eksisterendeKjørelister = kjørelisteService.hentForFagsakId(behandling.fagsakId)
 

@@ -13,7 +13,7 @@ import java.time.LocalDate
 fun validerManuellKjøreliste(
     innsendtKjøreliste: InnsendtKjøreliste,
     rammevedtakForReise: RammevedtakForReiseMedPrivatBil?,
-    eksisterendeKjørelister: List<Kjøreliste>
+    eksisterendeKjørelister: List<Kjøreliste>,
 ) {
     brukerfeilHvis(innsendtKjøreliste.reisedager.any { it.dato > LocalDate.now() }) {
         "Kan ikke registrere kjøreliste for dager som er fremover i tid"
@@ -26,7 +26,7 @@ fun validerManuellKjøreliste(
 
     validerDagerIkkeTidligereInnsendt(
         innsendtKjøreliste = innsendtKjøreliste,
-        eksisterendeKjørelister = eksisterendeKjørelister
+        eksisterendeKjørelister = eksisterendeKjørelister,
     )
 }
 
@@ -63,10 +63,9 @@ private fun validerFullstendigeUkerInnsendt(
 
 private fun validerDagerIkkeTidligereInnsendt(
     innsendtKjøreliste: InnsendtKjøreliste,
-    eksisterendeKjørelister: List<Kjøreliste>
+    eksisterendeKjørelister: List<Kjøreliste>,
 ) {
     brukerfeilHvis(eksisterendeKjørelister.any { it.data.overlapper(innsendtKjøreliste) }) {
         "Innsendte dager overlapper med tidligere innsendte kjørelister for reise ${innsendtKjøreliste.reiseId}"
     }
 }
-
