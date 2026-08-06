@@ -44,7 +44,7 @@ fun RammevedtakPrivatBil.tilDto(beregningsplan: Beregningsplan): RammevedtakPriv
         reiser =
             reiser
                 .filter { reise ->
-                    beregningsplan.tidligsteEndring?.let { reise.grunnlag.fom >= it } ?: true
+                    beregningsplan.tidligsteEndring?.let { reise.grunnlag.tom >= it } ?: true
                 }.map { it.tilDto() },
     )
 

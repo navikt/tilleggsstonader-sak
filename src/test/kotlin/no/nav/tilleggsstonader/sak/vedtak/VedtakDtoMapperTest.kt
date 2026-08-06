@@ -2,7 +2,9 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
@@ -147,25 +149,33 @@ class VedtakDtoMapperTest {
     @Nested
     inner class DagligReise {
         @Test
-        fun `skal kun inkludere rammevedtak-reiser fra og med tidligste endring`() {
-            val reiseFørEndring = rammeForReiseMedPrivatBil(reiseId = ReiseId.random(), fom = 9 januar 2026, tom = 9 januar 2026)
+        fun `skal kun ekskludere rammevedtak-reiser som er avsluttet før tidligste endring`() {
+            val reiseFørEndring = rammeForReiseMedPrivatBil(reiseId = ReiseId.random(), fom = 1 januar 2026, tom = 31 januar 2026)
+            val reiseSomDekkerTidligsteEndring =
+                rammeForReiseMedPrivatBil(reiseId = ReiseId.random(), fom = 20 januar 2026, tom = 8 februar 2026)
             val reiseLikTidligsteEndring =
-                rammeForReiseMedPrivatBil(reiseId = ReiseId.random(), fom = 10 januar 2026, tom = 10 januar 2026)
+                rammeForReiseMedPrivatBil(reiseId = ReiseId.random(), fom = 1 februar 2026, tom = 28 februar 2026)
             val reiseEtterEndring =
-                rammeForReiseMedPrivatBil(reiseId = ReiseId.random(), fom = 11 januar 2026, tom = 11 januar 2026)
+                rammeForReiseMedPrivatBil(reiseId = ReiseId.random(), fom = 1 mars 2026, tom = 31 mars 2026)
             val vedtak =
                 DagligReiseTestUtil.innvilgelse(
                     data =
                         DagligReiseTestUtil.defaultInnvilgelseDagligReise.copy(
                             rammevedtakPrivatBil =
                                 RammevedtakPrivatBil(
-                                    reiser = listOf(reiseFørEndring, reiseLikTidligsteEndring, reiseEtterEndring),
+                                    reiser =
+                                        listOf(
+                                            reiseFørEndring,
+                                            reiseSomDekkerTidligsteEndring,
+                                            reiseLikTidligsteEndring,
+                                            reiseEtterEndring,
+                                        ),
                                 ),
                             beregningsplan =
                                 Beregningsplan(
                                     omfang = Beregningsomfang.FRA_DATO,
-                                    fraDato = 10 januar 2026,
-                                    tidligsteEndring = 10 januar 2026,
+                                    fraDato = 1 februar 2026,
+                                    tidligsteEndring = 1 februar 2026,
                                 ),
                         ),
                 )
@@ -173,6 +183,7 @@ class VedtakDtoMapperTest {
             val dto = vedtakDtoMapper.toDto(vedtak, forrigeIverksatteBehandlingId = null) as InnvilgelseDagligReiseResponse
 
             assertThat(dto.rammevedtakPrivatBil!!.reiser.map { it.reiseId }).containsExactlyInAnyOrder(
+                reiseSomDekkerTidligsteEndring.reiseId,
                 reiseLikTidligsteEndring.reiseId,
                 reiseEtterEndring.reiseId,
             )
