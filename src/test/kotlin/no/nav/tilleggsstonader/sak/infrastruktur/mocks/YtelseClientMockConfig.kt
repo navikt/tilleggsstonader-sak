@@ -34,37 +34,50 @@ class YtelseClientMockConfig {
                 val perioder =
                     request.typer
                         .map { type ->
-                            val ensligForsørgerStønadstype =
-                                if (type == TypeYtelsePeriode.ENSLIG_FORSØRGER) {
-                                    EnsligForsørgerStønadstype.OVERGANGSSTØNAD
-                                } else {
-                                    null
-                                }
-                            if (type == TypeYtelsePeriode.DAGPENGER) {
-                                YtelsePeriode(
-                                    type = type,
-                                    fom = LocalDate.now(),
-                                    tom = null,
-                                    ensligForsørgerStønadstype = ensligForsørgerStønadstype,
-                                    gjenståendeDagerFraTelleverk =
-                                        GjenståendeDagerFraTelleverk(
-                                            dato = LocalDate.now(),
-                                            antallDager = 40,
-                                        ),
-                                )
-                            } else {
-                                YtelsePeriode(
-                                    type = type,
-                                    fom = LocalDate.now(),
-                                    tom = LocalDate.now(),
-                                    ensligForsørgerStønadstype = ensligForsørgerStønadstype,
-                                )
+                            when (type) {
+                                TypeYtelsePeriode.DAGPENGER ->
+                                    YtelsePeriode.Dagpenger(
+                                        fom = LocalDate.now(),
+                                        tom = null,
+                                        gjenståendeDagerFraTelleverk =
+                                            GjenståendeDagerFraTelleverk(
+                                                dato = LocalDate.now(),
+                                                antallDager = 40,
+                                            ),
+                                    )
+                                TypeYtelsePeriode.ENSLIG_FORSØRGER ->
+                                    YtelsePeriode.EnsligForsørger(
+                                        fom = LocalDate.now(),
+                                        tom = LocalDate.now(),
+                                        ensligForsørgerStønadstype = EnsligForsørgerStønadstype.OVERGANGSSTØNAD,
+                                        erNyttRegelverk2026 = false,
+                                    )
+                                TypeYtelsePeriode.AAP ->
+                                    YtelsePeriode.AAP(
+                                        fom = LocalDate.now(),
+                                        tom = LocalDate.now(),
+                                        aapErFerdigAvklart = false,
+                                    )
+                                TypeYtelsePeriode.OMSTILLINGSSTØNAD ->
+                                    YtelsePeriode.Omstillingsstønad(
+                                        fom = LocalDate.now(),
+                                        tom = LocalDate.now(),
+                                    )
+                                TypeYtelsePeriode.TILTAKSPENGER_TPSAK ->
+                                    YtelsePeriode.TiltakspengerTPSak(
+                                        fom = LocalDate.now(),
+                                        tom = LocalDate.now(),
+                                    )
+                                TypeYtelsePeriode.TILTAKSPENGER_ARENA ->
+                                    YtelsePeriode.TiltakspengerArena(
+                                        fom = LocalDate.now(),
+                                        tom = LocalDate.now(),
+                                    )
                             }
                         }.toMutableList()
                 if (request.typer.contains(TypeYtelsePeriode.AAP)) {
                     perioder +=
-                        YtelsePeriode(
-                            type = TypeYtelsePeriode.AAP,
+                        YtelsePeriode.AAP(
                             fom = LocalDate.now().plusDays(1),
                             tom = LocalDate.now().plusDays(1),
                             aapErFerdigAvklart = true,

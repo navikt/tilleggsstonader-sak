@@ -14,7 +14,7 @@ import org.springframework.data.relational.core.mapping.Table
 data class Fagsaker(
     private val fagsaker: Map<Stønadstype, Fagsak>,
 ) {
-    val barnetilsyn: Fagsak? = fagsaker[Stønadstype.BARNETILSYN]
+    val passAvBarn: Fagsak? = fagsaker[Stønadstype.BARNETILSYN]
     val læremidler: Fagsak? = fagsaker[Stønadstype.LÆREMIDLER]
     val boutgifter: Fagsak? = fagsaker[Stønadstype.BOUTGIFTER]
     val dagligReiseTso: Fagsak? = fagsaker[Stønadstype.DAGLIG_REISE_TSO]

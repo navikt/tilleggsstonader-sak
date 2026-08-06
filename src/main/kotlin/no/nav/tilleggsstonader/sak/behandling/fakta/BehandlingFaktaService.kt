@@ -31,12 +31,14 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.UtgifterIForb
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.UtgifterNyBolig
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.AktivitetDagligReiseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.DokumentasjonDagligReise
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ReiseAdresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadPassAvBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.UtdanningAvsnitt
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Reiseavstand
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.AktivitetReiseTilSamlingAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Avreiseadresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Reisemåte
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SamlingPeriode
 import no.nav.tilleggsstonader.sak.util.antallÅrSiden
@@ -64,7 +66,7 @@ class BehandlingFaktaService(
     fun hentFakta(behandlingId: BehandlingId): BehandlingFaktaDto {
         val stønadstype = fagsakService.hentFagsakForBehandling(behandlingId).stønadstype
         return when (stønadstype) {
-            Stønadstype.BARNETILSYN -> hentFaktaDtoForBarneTilsyn(behandlingId)
+            Stønadstype.BARNETILSYN -> hentFaktaDtoForPassAvBarn(behandlingId)
             Stønadstype.LÆREMIDLER -> hentFaktaDtoForLæremidler(behandlingId)
             Stønadstype.BOUTGIFTER -> hentFaktaDtoForBoutgifter(behandlingId)
             Stønadstype.DAGLIG_REISE_TSO -> hentFaktaDtoForDagligReise(behandlingId)
@@ -73,10 +75,10 @@ class BehandlingFaktaService(
         }
     }
 
-    fun hentFaktaDtoForBarneTilsyn(behandlingId: BehandlingId): BehandlingFaktaTilsynBarnDto {
-        val søknad = søknadService.hentSøknadBarnetilsyn(behandlingId)
+    fun hentFaktaDtoForPassAvBarn(behandlingId: BehandlingId): BehandlingFaktaPassAvBarnDto {
+        val søknad = søknadService.hentSøknadPassAvBarn(behandlingId)
         val grunnlagsdata = faktaGrunnlagService.hentGrunnlagsdata(behandlingId)
-        return BehandlingFaktaTilsynBarnDto(
+        return BehandlingFaktaPassAvBarnDto(
             søknadMottattTidspunkt = søknad?.mottattTidspunkt,
             hovedytelse = søknad?.data?.hovedytelse.let { mapHovedytelse(it) },
             aktivitet = mapAktivitet(søknad?.data?.aktivitet),
@@ -136,12 +138,12 @@ class BehandlingFaktaService(
         val grunnlagsdata = faktaGrunnlagService.hentGrunnlagsdata(behandlingId)
         return BehandlingFaktaReiseTilSamlingDto(
             søknadMottattTidspunkt = søknad?.mottattTidspunkt,
-            aktiviteter = mapAktivitet(søknad?.data?.aktivitet),
+            aktiviteter = mapAktivitetForReiseTilSamling(søknad?.data?.aktivitet),
             hovedytelse = søknad?.data?.hovedytelse.let { mapHovedytelse(it) },
             dokumentasjon = søknad?.let { mapDokumentasjon(it.data.dokumentasjon, it.journalpostId, grunnlagsdata) },
             arena = arenaFakta(grunnlagsdata),
             samlinger = mapSamlinger(søknad?.data?.samlinger),
-            reiseavstand = mapReiseavstand(søknad?.data?.reiseavstand),
+            avreiseadresse = mapAvreiseadresse(søknad?.data?.avreiseadresse),
             reisemåte = mapReisemåte(søknad?.data?.reisemåte),
         )
     }
@@ -166,6 +168,22 @@ class BehandlingFaktaService(
                         dekkesUtgiftenAvAndre = null,
                     )
                 },
+        )
+
+    private fun mapAktivitetForReiseTilSamling(aktivitet: AktivitetReiseTilSamlingAvsnitt?) =
+        FaktaAktivitetReiseTilSamling(
+            aktivitet =
+                FaktaAktivitet(
+                    søknadsgrunnlag =
+                        aktivitet?.let { avsnitt ->
+                            SøknadsgrunnlagAktivitet(
+                                aktiviteter = avsnitt.aktiviteter?.map { it.label },
+                                annenAktivitet = avsnitt.annenAktivitet,
+                                lønnetAktivitet = avsnitt.lønnetAktivitet,
+                                dekkesUtgiftenAvAndre = null,
+                            )
+                        },
+                ),
         )
 
     private fun mapAktivitetForDagligReise(aktivitet: AktivitetDagligReiseAvsnitt?) =
@@ -220,26 +238,53 @@ class BehandlingFaktaService(
         }
 
     private fun mapSamlinger(samlinger: List<SamlingPeriode>?): List<FaktaSamling> =
-        samlinger?.map { FaktaSamling(fom = it.fom, tom = it.tom) } ?: emptyList()
-
-    private fun mapReiseavstand(reiseavstand: Reiseavstand?): FaktaReiseavstand? =
-        reiseavstand?.let {
-            FaktaReiseavstand(
+        samlinger?.map {
+            FaktaSamling(
+                fom = it.fom,
+                tom = it.tom,
+                erObligatorisk = it.erObligatorisk,
+                harBruktEkstraReiseDager = it.harBruktEkstraReiseDager,
+                adresse =
+                    it.adresse.let { adresse ->
+                        ReiseAdresse(
+                            gateadresse = adresse.adresse,
+                            postnummer = adresse.postnummer,
+                            poststed = adresse.poststed,
+                        )
+                    },
                 antallKilometerEnVei = it.antallKilometerEnVei,
-                land = it.land,
-                gateadresse = it.gateadresse,
-                postnummer = it.postnummer,
-                poststed = it.poststed,
+            )
+        } ?: emptyList()
+
+    private fun mapAvreiseadresse(avreiseadresse: Avreiseadresse?): FaktaAvreiseadresse? =
+        avreiseadresse?.let {
+            FaktaAvreiseadresse(
+                skalReiseFraFolkeregistrertAdresse = it.skalReiseFraFolkeregistrertAdresse,
+                adresseDetSkalReisesFra =
+                    it.adresseDetSkalReisesFra?.let { adresse ->
+                        ReiseAdresse(
+                            gateadresse = adresse.adresse,
+                            postnummer = adresse.postnummer,
+                            poststed = adresse.poststed,
+                        )
+                    },
             )
         }
 
     private fun mapReisemåte(reisemåte: Reisemåte?): FaktaReisemåte? =
         reisemåte?.let {
             FaktaReisemåte(
-                kanReiseKollektivt = it.kanReiseKollektivt,
-                totalutgifterKollektivt = it.totalutgifterKollektivt,
+                kanReiseMedOffentligTransport = it.kanReiseMedOffentligTransport,
+                kanIkkeReiseMedOffentligTransportBegrunnelser = it.kanIkkeReiseMedOffentligTransportBegrunnelser,
+                totalUtgifterOffentligTransport = it.totalUtgifterOffentligTransport,
                 kanBenytteEgenBil = it.kanBenytteEgenBil,
-                kanBenytteDrosje = it.kanBenytteDrosje,
+                ønskerDekketUtgifterForDrosje = it.ønskerDekketUtgifterForDrosje,
+                barnehageGateadresse = it.barnehageGateadresse,
+                barnehagePostnummer = it.barnehagePostnummer,
+                kanIkkeBenytteEgenBilBegrunnelser = it.kanIkkeBenytteEgenBilBegrunnelser,
+                betalerForReiseSelv = it.betalerForReiseSelv,
+                harTTKort = it.harTTKort,
+                reiseMedBilUtgifter = it.reiseMedBilUtgifter,
             )
         }
 
@@ -348,7 +393,7 @@ class BehandlingFaktaService(
 
     private fun mapBarn(
         grunnlagsdata: Grunnlag,
-        søknad: SøknadBarnetilsyn?,
+        søknad: SøknadPassAvBarn?,
         behandlingId: BehandlingId,
     ): List<FaktaBarn> {
         val søknadBarnPåIdent = søknad?.barn?.associateBy { it.ident } ?: emptyMap()

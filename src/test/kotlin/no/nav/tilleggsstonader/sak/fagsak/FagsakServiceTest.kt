@@ -41,13 +41,13 @@ internal class FagsakServiceTest : CleanDatabaseIntegrationTest() {
         @Test
         fun `skal hente fagsaker for personid`() {
             val res = fagsakService.finnFagsakerForFagsakPersonId(fagsakTilknyttetPesonIdent123.fagsakPersonId)
-            assertThat(res.barnetilsyn).isNotNull
+            assertThat(res.passAvBarn).isNotNull
         }
 
         @Test
         fun `skal ikke returnere noe om ingen fagsaker er knyttet til personid`() {
             val res = fagsakService.finnFagsakerForFagsakPersonId(FagsakPersonId.random())
-            assertThat(res.barnetilsyn).isNull()
+            assertThat(res.passAvBarn).isNull()
         }
 
         @Nested

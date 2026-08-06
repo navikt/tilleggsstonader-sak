@@ -20,7 +20,7 @@ class FaktaGrunnlagArenaVedtakTest {
         }
 
         @Test
-        fun `skal mappe vedtakTom hvis det er innen 3 plus 2 mnd for tilsyn barn`() {
+        fun `skal mappe vedtakTom hvis det er innen 3 plus 2 mnd for pass av barn`() {
             val dato3mndsiden = LocalDate.now().minusMonths(5)
             val arenaStatus =
                 ArenaStatusDtoUtil.arenaStatusDto(

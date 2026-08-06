@@ -44,8 +44,13 @@ interface OppgaveRepository :
         CASE 
             WHEN v.type = 'OPPHØR' THEN TRUE 
             ELSE FALSE 
-        END AS er_opphor
+        END AS er_opphor,
+        CASE
+            WHEN b.type = 'KJØRELISTE' THEN TRUE
+            ELSE FALSE
+        END AS er_kjoreliste
         FROM oppgave o
+        JOIN behandling b ON b.id = o.behandling_id
         LEFT JOIN totrinnskontroll t ON t.behandling_id = o.behandling_id AND t.status = 'KAN_FATTE_VEDTAK'
         LEFT JOIN vedtak v ON o.behandling_id = v.behandling_id 
         WHERE gsak_oppgave_id IN (:oppgaveIder)

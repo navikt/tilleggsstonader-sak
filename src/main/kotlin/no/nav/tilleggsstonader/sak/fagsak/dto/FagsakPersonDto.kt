@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 
 class FagsakPersonDto(
     val id: FagsakPersonId,
+    // TODO TilsynBarn bør være PassAvBarn, men dette brukes eksternt
     val tilsynBarn: FagsakId?,
     val læremidler: FagsakId?,
     val boutgifter: FagsakId?,

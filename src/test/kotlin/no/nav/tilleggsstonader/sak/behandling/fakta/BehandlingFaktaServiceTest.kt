@@ -5,7 +5,8 @@ import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.KanBenytteEgenBil
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -17,11 +18,12 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KodeverkServiceUtil.mocke
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GeneriskFaktaGrunnlagTestUtil
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Reiseavstand
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.AktivitetReiseTilSamlingAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Avreiseadresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Reisemåte
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SamlingPeriode
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SkjemaReiseTilSamling
@@ -30,11 +32,11 @@ import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagFaktaGrunnlagPerson
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdataBarn
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagNavn
-import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.lagBarnMedBarnepass
-import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.lagDokumentasjon
-import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.lagSkjemaBarnetilsyn
-import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.lagSøknadBarn
-import no.nav.tilleggsstonader.sak.util.SøknadBarnetilsynUtil.søknadBarnetilsyn
+import no.nav.tilleggsstonader.sak.util.SøknadPassAvBarnUtil.lagBarnMedBarnepass
+import no.nav.tilleggsstonader.sak.util.SøknadPassAvBarnUtil.lagDokumentasjon
+import no.nav.tilleggsstonader.sak.util.SøknadPassAvBarnUtil.lagSkjemaPassAvBarn
+import no.nav.tilleggsstonader.sak.util.SøknadPassAvBarnUtil.lagSøknadBarn
+import no.nav.tilleggsstonader.sak.util.SøknadPassAvBarnUtil.søknadPassAvBarn
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
@@ -76,7 +78,7 @@ internal class BehandlingFaktaServiceTest {
                 personopplysninger = personopplysninger,
                 saksinformasjonAndreForeldre = listOf(saksinformasjonAndreForeldre),
             )
-        every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns søknadBarnetilsyn()
+        every { søknadService.hentSøknadPassAvBarn(behandlingId) } returns søknadPassAvBarn()
         val behandlingBarn =
             behandlingBarn(personIdent = "1", id = BarnId.fromString("60921c76-f8ef-4000-9824-f127a50a575e"))
         every { barnService.finnBarnPåBehandling(any()) } returns listOf(behandlingBarn)
@@ -102,8 +104,8 @@ internal class BehandlingFaktaServiceTest {
                     saksinformasjonAndreForeldre =
                         listOf(GeneriskFaktaGrunnlagTestUtil.faktaGrunnlagBarnAnnenForelder(identBarn = "1")),
                 )
-            every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns
-                søknadBarnetilsyn(
+            every { søknadService.hentSøknadPassAvBarn(behandlingId) } returns
+                søknadPassAvBarn(
                     barn = setOf(lagSøknadBarn(ident = "1")),
                 )
 
@@ -117,7 +119,7 @@ internal class BehandlingFaktaServiceTest {
 
             every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak
 
-            val data = service.hentFakta(behandlingId) as BehandlingFaktaTilsynBarnDto
+            val data = service.hentFakta(behandlingId) as BehandlingFaktaPassAvBarnDto
 
             assertThat(data.barn).hasSize(2)
             data.barn[0].let {
@@ -139,8 +141,8 @@ internal class BehandlingFaktaServiceTest {
                             barn = listOf(lagGrunnlagsdataBarn("1")),
                         ),
                 )
-            every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns
-                søknadBarnetilsyn(
+            every { søknadService.hentSøknadPassAvBarn(behandlingId) } returns
+                søknadPassAvBarn(
                     barn =
                         setOf(
                             lagSøknadBarn(ident = "1"),
@@ -168,8 +170,8 @@ internal class BehandlingFaktaServiceTest {
                         ),
                 )
             val barnMedBarnepass = lagBarnMedBarnepass(startetIFemte = null, årsak = null)
-            every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns
-                søknadBarnetilsyn(
+            every { søknadService.hentSøknadPassAvBarn(behandlingId) } returns
+                søknadPassAvBarn(
                     barn = setOf(lagSøknadBarn(ident = "1", data = barnMedBarnepass)),
                 )
             every { barnService.finnBarnPåBehandling(any()) } returns
@@ -181,7 +183,7 @@ internal class BehandlingFaktaServiceTest {
 
             every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak
 
-            val fakta = service.hentFakta(behandlingId) as BehandlingFaktaTilsynBarnDto
+            val fakta = service.hentFakta(behandlingId) as BehandlingFaktaPassAvBarnDto
 
             assertThat(
                 fakta.barn
@@ -199,8 +201,8 @@ internal class BehandlingFaktaServiceTest {
                             barn = listOf(lagGrunnlagsdataBarn("1", fødselsdato = LocalDate.now().minusYears(11))),
                         ),
                 )
-            every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns
-                søknadBarnetilsyn(
+            every { søknadService.hentSøknadPassAvBarn(behandlingId) } returns
+                søknadPassAvBarn(
                     barn = setOf(lagSøknadBarn(ident = "1")),
                 )
             every { barnService.finnBarnPåBehandling(any()) } returns
@@ -212,7 +214,7 @@ internal class BehandlingFaktaServiceTest {
 
             every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak
 
-            val fakta = service.hentFakta(behandlingId) as BehandlingFaktaTilsynBarnDto
+            val fakta = service.hentFakta(behandlingId) as BehandlingFaktaPassAvBarnDto
 
             assertThat(
                 fakta.barn
@@ -234,11 +236,11 @@ internal class BehandlingFaktaServiceTest {
                             barn = emptyList(),
                         ),
                 )
-            every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns
-                søknadBarnetilsyn(
+            every { søknadService.hentSøknadPassAvBarn(behandlingId) } returns
+                søknadPassAvBarn(
                     journalpostId = "journalpostId2",
                     barn = emptySet(),
-                    data = lagSkjemaBarnetilsyn(dokumentasjon = listOf(dokumentasjon)),
+                    data = lagSkjemaPassAvBarn(dokumentasjon = listOf(dokumentasjon)),
                 )
 
             val fagsak = fagsak(stønadstype = Stønadstype.BARNETILSYN)
@@ -267,9 +269,9 @@ internal class BehandlingFaktaServiceTest {
                         ),
                 )
             val dokumentasjon = lagDokumentasjon(identBarn = "1")
-            every { søknadService.hentSøknadBarnetilsyn(behandlingId) } returns
-                søknadBarnetilsyn(
-                    data = lagSkjemaBarnetilsyn(dokumentasjon = listOf(dokumentasjon)),
+            every { søknadService.hentSøknadPassAvBarn(behandlingId) } returns
+                søknadPassAvBarn(
+                    data = lagSkjemaPassAvBarn(dokumentasjon = listOf(dokumentasjon)),
                     barn = setOf(lagSøknadBarn(ident = "1")),
                 )
             every { barnService.finnBarnPåBehandling(any()) } returns
@@ -308,30 +310,71 @@ internal class BehandlingFaktaServiceTest {
                                 arbeidOgOpphold = null,
                             ),
                         aktivitet =
-                            AktivitetAvsnitt(
+                            AktivitetReiseTilSamlingAvsnitt(
                                 aktiviteter = listOf(ValgtAktivitet(id = "1", label = "Tiltak")),
                                 annenAktivitet = AnnenAktivitetType.TILTAK,
                                 lønnetAktivitet = JaNei.NEI,
+                                tilleggsopplysningerAnnenAktivitet = null,
+                                annenAktivitetTypeUtdanning = null,
                             ),
                         samlinger =
                             listOf(
-                                SamlingPeriode(fom = 12 februar 2026, tom = 14 februar 2026),
-                                SamlingPeriode(fom = 10 mars 2026, tom = 12 mars 2026),
+                                SamlingPeriode(
+                                    fom = 12 februar 2026,
+                                    tom = 14 februar 2026,
+                                    erObligatorisk = JaNei.JA,
+                                    harBruktEkstraReiseDager = JaNei.NEI,
+                                    adresse =
+                                        Adresse(
+                                            gyldigFraOgMed = null,
+                                            adresse = "Mimes vei 1",
+                                            postnummer = "5132",
+                                            poststed = "Nyborg",
+                                            landkode = "NO",
+                                        ),
+                                    antallKilometerEnVei = "42",
+                                ),
+                                SamlingPeriode(
+                                    fom = 10 mars 2026,
+                                    tom = 12 mars 2026,
+                                    erObligatorisk = JaNei.JA,
+                                    harBruktEkstraReiseDager = JaNei.NEI,
+                                    adresse =
+                                        Adresse(
+                                            gyldigFraOgMed = null,
+                                            adresse = "Mimes vei 1",
+                                            postnummer = "5132",
+                                            poststed = "Nyborg",
+                                            landkode = "NO",
+                                        ),
+                                    antallKilometerEnVei = "42",
+                                ),
                             ),
-                        reiseavstand =
-                            Reiseavstand(
-                                antallKilometerEnVei = "42",
-                                land = "NO",
-                                gateadresse = "Mimes vei 1",
-                                postnummer = "5132",
-                                poststed = "Nyborg",
+                        avreiseadresse =
+                            Avreiseadresse(
+                                skalReiseFraFolkeregistrertAdresse = JaNei.JA,
+                                adresseDetSkalReisesFra =
+                                    Adresse(
+                                        gyldigFraOgMed = null,
+                                        adresse = "Mimes vei 1",
+                                        postnummer = "5132",
+                                        poststed = "Nyborg",
+                                        landkode = "NO",
+                                    ),
                             ),
                         reisemåte =
                             Reisemåte(
-                                kanReiseKollektivt = JaNei.NEI,
-                                totalutgifterKollektivt = null,
-                                kanBenytteEgenBil = JaNei.NEI,
-                                kanBenytteDrosje = JaNei.JA,
+                                kanReiseMedOffentligTransport = JaNei.NEI,
+                                kanIkkeReiseMedOffentligTransportBegrunnelser = null,
+                                totalUtgifterOffentligTransport = null,
+                                kanBenytteEgenBil = KanBenytteEgenBil.NEI,
+                                ønskerDekketUtgifterForDrosje = JaNei.JA,
+                                barnehageGateadresse = null,
+                                barnehagePostnummer = null,
+                                kanIkkeBenytteEgenBilBegrunnelser = null,
+                                betalerForReiseSelv = null,
+                                harTTKort = null,
+                                reiseMedBilUtgifter = null,
                             ),
                         dokumentasjon = emptyList(),
                     ),
@@ -344,11 +387,11 @@ internal class BehandlingFaktaServiceTest {
 
         assertThat(fakta.samlinger).hasSize(2)
         assertThat(fakta.samlinger.first().fom).isEqualTo(12 februar 2026)
-        assertThat(fakta.reiseavstand?.gateadresse).isEqualTo("Mimes vei 1")
-        assertThat(fakta.reiseavstand?.postnummer).isEqualTo("5132")
-        assertThat(fakta.reiseavstand?.poststed).isEqualTo("Nyborg")
-        assertThat(fakta.reisemåte?.kanReiseKollektivt).isEqualTo(JaNei.NEI)
-        assertThat(fakta.reisemåte?.kanBenytteEgenBil).isEqualTo(JaNei.NEI)
-        assertThat(fakta.reisemåte?.kanBenytteDrosje).isEqualTo(JaNei.JA)
+        assertThat(fakta.avreiseadresse?.adresseDetSkalReisesFra?.gateadresse).isEqualTo("Mimes vei 1")
+        assertThat(fakta.avreiseadresse?.adresseDetSkalReisesFra?.postnummer).isEqualTo("5132")
+        assertThat(fakta.avreiseadresse?.adresseDetSkalReisesFra?.poststed).isEqualTo("Nyborg")
+        assertThat(fakta.reisemåte?.kanReiseMedOffentligTransport).isEqualTo(JaNei.NEI)
+        assertThat(fakta.reisemåte?.kanBenytteEgenBil).isEqualTo(KanBenytteEgenBil.NEI)
+        assertThat(fakta.reisemåte?.ønskerDekketUtgifterForDrosje).isEqualTo(JaNei.JA)
     }
 }

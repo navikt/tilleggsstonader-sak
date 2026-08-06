@@ -3,8 +3,10 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
@@ -17,7 +19,12 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsgrunnlagO
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilDag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
@@ -28,9 +35,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 import java.time.LocalDate
-import java.util.UUID
-import java.util.UUID.randomUUID
 
 class DetaljertVedtaksperioderDagligReiseMapperTest {
     private val førsteJanuar = 1 januar 2024
@@ -190,6 +196,103 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
         assertThat(privatBil.detaljertBeregningsperioder).isNull()
     }
 
+    @Test
+    fun `skal sortere detaljerte vedtaksperioder på fom for blandede typer`() {
+        val offentligTransportTidligReiseId = ReiseId.random()
+        val offentligTransportSenReiseId = ReiseId.random()
+        val privatBilReiseId = ReiseId.random()
+
+        val vedtak =
+            InnvilgelseDagligReise(
+                vedtaksperioder = defaultVedtaksperioder,
+                beregningsresultat =
+                    BeregningsresultatDagligReise(
+                        offentligTransport =
+                            BeregningsresultatOffentligTransport(
+                                reiser =
+                                    listOf(
+                                        BeregningsresultatForReise(
+                                            reiseId = offentligTransportSenReiseId,
+                                            perioder = listOf(beregningsresultatForPeriode(5 mars 2026, 31 mars 2026)),
+                                        ),
+                                        BeregningsresultatForReise(
+                                            reiseId = offentligTransportTidligReiseId,
+                                            perioder =
+                                                listOf(
+                                                    beregningsresultatForPeriode(
+                                                        1 februar 2026,
+                                                        28 februar 2026,
+                                                    ),
+                                                ),
+                                        ),
+                                    ),
+                            ),
+                        privatBil =
+                            BeregningsresultatPrivatBil(
+                                reiser =
+                                    listOf(
+                                        BeregningsresultatForReisePrivatBil(
+                                            reiseId = privatBilReiseId,
+                                            perioder =
+                                                listOf(
+                                                    BeregningsresultatForReisePrivatBilPeriode(
+                                                        fom = 1 mars 2026,
+                                                        tom = 31 mars 2026,
+                                                        grunnlag =
+                                                            BeregningsresultatForReisePrivatBilGrunnlag(
+                                                                dager =
+                                                                    listOf(
+                                                                        BeregningsresultatForReisePrivatBilDag(
+                                                                            dato = 1 mars 2026,
+                                                                            parkeringskostnad = 0,
+                                                                            dagsatsUtenParkering = BigDecimal("100.00"),
+                                                                            stønadsbeløpForDag = BigDecimal("100.00"),
+                                                                        ),
+                                                                    ),
+                                                            ),
+                                                        stønadsbeløp = BigDecimal("100.00"),
+                                                        brukersNavKontor = null,
+                                                        fraTidligereVedtak = false,
+                                                    ),
+                                                ),
+                                        ),
+                                    ),
+                            ),
+                    ),
+                rammevedtakPrivatBil =
+                    RammevedtakPrivatBilUtil.rammevedtakPrivatBil(
+                        reiseId = privatBilReiseId,
+                        fom = 1 mars 2026,
+                        tom = 31 mars 2026,
+                    ),
+                beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+            )
+
+        val resultat =
+            finnDetaljerteVedtaksperioderDagligReise(
+                vedtaksdataTso = vedtak,
+                vedtaksdataTsr = null,
+                adresserTso =
+                    mapOf(
+                        offentligTransportTidligReiseId to "adresse 1",
+                        privatBilReiseId to "adresse 2",
+                        offentligTransportSenReiseId to "adresse 3",
+                    ),
+                adresserTsr = emptyMap(),
+            )
+
+        val fomDatoer =
+            resultat.map {
+                it.detaljertBeregningsperioder?.firstOrNull()?.fom ?: it.rammevedtakPrivatBil?.fom
+            }
+
+        assertThat(fomDatoer).containsExactly(
+            1 februar 2026,
+            1 mars 2026,
+            5 mars 2026,
+        )
+    }
+
     private fun innvilgelse(data: InnvilgelseDagligReise = defaultInnvilgelseDagligReise) =
         GeneriskVedtak(
             behandlingId = BehandlingId.random(),
@@ -263,7 +366,7 @@ class DetaljertVedtaksperioderDagligReiseMapperTest {
         )
 
     fun vedtaksperiode(
-        id: UUID = randomUUID(),
+        id: VedtaksperiodeId = VedtaksperiodeId.random(),
         fom: LocalDate = 1 januar 2025,
         tom: LocalDate = 31 januar 2025,
         målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
@@ -293,7 +396,7 @@ private fun beregningsresultatForPeriode(
                 vedtaksperioder =
                     listOf(
                         VedtaksperiodeGrunnlag(
-                            id = randomUUID(),
+                            id = VedtaksperiodeId.random(),
                             fom = fom,
                             tom = tom,
                             aktivitet = AktivitetType.TILTAK,

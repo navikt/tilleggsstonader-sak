@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.ekstern.stønad
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.IdentRequest
-import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.VedtaksinformasjonTilsynBarnDto
+import no.nav.tilleggsstonader.sak.ekstern.stønad.dto.VedtaksinformasjonPassAvBarnDto
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
@@ -27,7 +27,7 @@ class EksternVedtakController(
     @ProtectedWithClaims(issuer = "azuread", claimMap = ["roles=access_as_application"])
     fun hentVedtaksinformasjon(
         @RequestBody request: IdentRequest,
-    ): VedtaksinformasjonTilsynBarnDto {
+    ): VedtaksinformasjonPassAvBarnDto {
         val gyldigKlient =
             SikkerhetContext.kallKommerFra(
                 eksternApplikasjon.bidragGrunnlag,
@@ -36,6 +36,6 @@ class EksternVedtakController(
         feilHvisIkke(gyldigKlient, HttpStatus.UNAUTHORIZED) {
             "Kallet utføres ikke av en autorisert klient"
         }
-        return eksternVedtakService.hentVedtaksinformasjonTilsynBarn(request)
+        return eksternVedtakService.hentVedtaksinformasjonPassAvBarn(request)
     }
 }

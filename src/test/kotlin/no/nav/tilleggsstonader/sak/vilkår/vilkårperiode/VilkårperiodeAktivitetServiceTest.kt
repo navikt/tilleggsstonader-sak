@@ -27,10 +27,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakBoutgifter
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBarnetilsynDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBoutgifterDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetPassAvBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.GrunnlagAktivitet
@@ -132,8 +132,8 @@ class VilkårperiodeAktivitetServiceTest : CleanDatabaseIntegrationTest() {
         @Test
         fun `skal kaste feil ved opprettelse av lønnet tiltak uten begrunnelse`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val faktaOgSvarTilsynBarnDto =
-                FaktaOgSvarAktivitetBarnetilsynDto(
+            val faktaOgSvarPassAvBarnDto =
+                FaktaOgSvarAktivitetPassAvBarnDto(
                     svarLønnet = SvarJaNei.JA,
                     aktivitetsdager = 5,
                 )
@@ -144,7 +144,7 @@ class VilkårperiodeAktivitetServiceTest : CleanDatabaseIntegrationTest() {
                         type = AktivitetType.TILTAK,
                         behandlingId = behandling.id,
                         begrunnelse = null,
-                        faktaOgSvar = faktaOgSvarTilsynBarnDto,
+                        faktaOgSvar = faktaOgSvarPassAvBarnDto,
                     ),
                 )
             }.hasMessageContaining("Mangler begrunnelse for ikke oppfylt vurdering av lønnet arbeid")
@@ -174,8 +174,8 @@ class VilkårperiodeAktivitetServiceTest : CleanDatabaseIntegrationTest() {
         @Test
         fun `skal kaste feil ved tom og null begrunnelse på ingen aktivitet`() {
             val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
-            val faktaOgSvarTilsynBarnDto =
-                FaktaOgSvarAktivitetBarnetilsynDto(
+            val faktaOgSvarPassAvBarnDto =
+                FaktaOgSvarAktivitetPassAvBarnDto(
                     svarLønnet = SvarJaNei.JA,
                     aktivitetsdager = null,
                 )
@@ -186,7 +186,7 @@ class VilkårperiodeAktivitetServiceTest : CleanDatabaseIntegrationTest() {
                             type = AktivitetType.INGEN_AKTIVITET,
                             begrunnelse = it,
                             behandlingId = behandling.id,
-                            faktaOgSvar = faktaOgSvarTilsynBarnDto,
+                            faktaOgSvar = faktaOgSvarPassAvBarnDto,
                         ),
                     )
                 }.hasMessageContaining("Mangler begrunnelse for ingen relevant aktivitet")
@@ -476,8 +476,8 @@ class VilkårperiodeAktivitetServiceTest : CleanDatabaseIntegrationTest() {
         svarLønnet: SvarJaNei? = null,
         nyBegrunnelse: String? = null,
     ): LagreVilkårperiode {
-        val faktaOgSvarTilsynBarnDto =
-            FaktaOgSvarAktivitetBarnetilsynDto(
+        val faktaOgSvarPassAvBarnDto =
+            FaktaOgSvarAktivitetPassAvBarnDto(
                 svarLønnet =
                     svarLønnet ?: faktaOgVurdering.vurderinger
                         .takeIfVurderinger<LønnetVurdering>()
@@ -492,7 +492,7 @@ class VilkårperiodeAktivitetServiceTest : CleanDatabaseIntegrationTest() {
             type = type as AktivitetType,
             fom = nyFom ?: fom,
             tom = nyTom ?: tom,
-            faktaOgSvar = faktaOgSvarTilsynBarnDto,
+            faktaOgSvar = faktaOgSvarPassAvBarnDto,
             begrunnelse = nyBegrunnelse ?: begrunnelse,
         )
     }

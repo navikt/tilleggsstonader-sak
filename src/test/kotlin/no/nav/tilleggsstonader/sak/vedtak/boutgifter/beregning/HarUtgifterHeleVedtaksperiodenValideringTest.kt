@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift.UTGIFTER_OVERNATTING
@@ -11,7 +12,6 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.Month.JANUARY
-import java.util.UUID
 
 class HarUtgifterHeleVedtaksperiodenValideringTest {
     val førsteJanuar: LocalDate = LocalDate.of(2025, JANUARY, 1)
@@ -145,7 +145,7 @@ private fun lagDummyVedtaksperiode(
     fom: LocalDate,
     tom: LocalDate = fom,
 ) = Vedtaksperiode(
-    id = UUID.randomUUID(),
+    id = VedtaksperiodeId.random(),
     fom = fom,
     tom = tom,
     målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,

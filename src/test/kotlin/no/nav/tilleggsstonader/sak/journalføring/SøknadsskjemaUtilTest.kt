@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 class SøknadsskjemaUtilTest {
     @Test
     fun `Skal kunne parse søknad av type BARNETILSYN`() {
-        val skjema = SøknadUtil.søknadskjemaBarnetilsyn()
+        val skjema = SøknadUtil.søknadskjemaPassAvBarn()
         val parsetSkjema =
             SøknadsskjemaUtil.parseSøknadsskjema(
                 Stønadstype.BARNETILSYN,

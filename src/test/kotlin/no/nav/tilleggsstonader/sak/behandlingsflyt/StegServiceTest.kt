@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.BehandlingshistorikkRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
@@ -18,9 +19,9 @@ import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.mockBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vilkår
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnBeregnYtelseSteg
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.dto.InnvilgelseTilsynBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnBeregnYtelseSteg
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.InnvilgelsePassAvBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.BeslutteVedtakSteg
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.InngangsvilkårSteg
@@ -38,7 +39,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
-import java.util.UUID
 
 class StegServiceTest : CleanDatabaseIntegrationTest() {
     @Autowired
@@ -51,7 +51,7 @@ class StegServiceTest : CleanDatabaseIntegrationTest() {
     lateinit var behandlingRepository: BehandlingRepository
 
     @Autowired
-    lateinit var tilsynBarnBeregnYtelseSteg: TilsynBarnBeregnYtelseSteg
+    lateinit var passAvBarnBeregnYtelseSteg: PassAvBarnBeregnYtelseSteg
 
     @Autowired
     lateinit var inngangsvilkårSteg: InngangsvilkårSteg
@@ -97,10 +97,10 @@ class StegServiceTest : CleanDatabaseIntegrationTest() {
                 ),
             )
         val barn = lagBarn(behandling)
-        opprettVilkårBarnetilsyn(behandlingId = behandling.id, barn = barn)
-        val vedtakTilsynBarn = opprettVedtakTilsynBarn()
+        opprettVilkårPassAvBarn(behandlingId = behandling.id, barn = barn)
+        val vedtakPassAvBarn = opprettVedtakPassAvBarn()
 
-        stegService.håndterSteg(saksbehandling(behandling = behandling), tilsynBarnBeregnYtelseSteg, vedtakTilsynBarn)
+        stegService.håndterSteg(saksbehandling(behandling = behandling), passAvBarnBeregnYtelseSteg, vedtakPassAvBarn)
 
         assertThat(behandlingshistorikkRepository.findByBehandlingIdOrderByEndretTidDesc(behandling.id).first().steg)
             .isEqualTo(StegType.BEREGNE_YTELSE)
@@ -151,14 +151,16 @@ class StegServiceTest : CleanDatabaseIntegrationTest() {
                 testoppsettService.opprettBehandlingMedFagsak(
                     behandling(steg = StegType.BEHANDLING_FERDIGSTILT),
                 )
-            val barn = lagBarn(behandling)
-            val vedtakTilsynBarn = opprettVedtakTilsynBarn()
+
+            lagBarn(behandling)
+
+            val vedtakPassAvBarn = opprettVedtakPassAvBarn()
             val exception =
                 catchThrowableOfType<Feil> {
                     stegService.håndterSteg(
                         saksbehandling(behandling = behandling),
-                        tilsynBarnBeregnYtelseSteg,
-                        vedtakTilsynBarn,
+                        passAvBarnBeregnYtelseSteg,
+                        vedtakPassAvBarn,
                     )
                 }
             assertThat(exception).hasMessage("Kan ikke utføre 'Beregne ytelse' når behandlingstatus er Opprettet")
@@ -264,7 +266,7 @@ class StegServiceTest : CleanDatabaseIntegrationTest() {
     private fun lagBarn(behandling: Behandling): BehandlingBarn =
         barnRepository.insert(BehandlingBarn(behandlingId = behandling.id, ident = "123"))
 
-    private fun opprettVilkårBarnetilsyn(
+    private fun opprettVilkårPassAvBarn(
         behandlingId: BehandlingId,
         barn: BehandlingBarn,
     ) {
@@ -284,18 +286,18 @@ class StegServiceTest : CleanDatabaseIntegrationTest() {
         )
     }
 
-    private fun opprettVedtakTilsynBarn(): InnvilgelseTilsynBarnRequest {
+    private fun opprettVedtakPassAvBarn(): InnvilgelsePassAvBarnRequest {
         val vedtaksperioderDto =
             listOf(
                 VedtaksperiodeDto(
-                    id = UUID.randomUUID(),
+                    id = VedtaksperiodeId.random(),
                     fom = LocalDate.of(2023, 1, 1),
                     tom = LocalDate.of(2023, 1, 31),
                     målgruppeType = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                     aktivitetType = AktivitetType.TILTAK,
                 ),
             )
-        return InnvilgelseTilsynBarnRequest(
+        return InnvilgelsePassAvBarnRequest(
             vedtaksperioder = vedtaksperioderDto,
             begrunnelse = null,
         )

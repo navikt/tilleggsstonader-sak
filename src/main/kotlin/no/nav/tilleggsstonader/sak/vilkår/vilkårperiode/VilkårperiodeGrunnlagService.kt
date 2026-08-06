@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -193,13 +194,47 @@ class VilkårperiodeGrunnlagService(
             perioder =
                 ytelserFraRegister.perioder
                     .map {
-                        PeriodeGrunnlagYtelse(
-                            type = it.type,
-                            fom = it.fom,
-                            tom = it.tom,
-                            subtype = it.tilYtelseSubtype(),
-                            gjenståendeDagerFraTelleverk = it.gjenståendeDagerFraTelleverk,
-                        )
+                        when (it) {
+                            is YtelsePeriode.AAP ->
+                                PeriodeGrunnlagYtelse.AAP(
+                                    fom = it.fom,
+                                    tom = it.tom,
+                                    subtype = it.tilYtelseSubtype(),
+                                )
+
+                            is YtelsePeriode.Dagpenger ->
+                                PeriodeGrunnlagYtelse.Dagpenger(
+                                    fom = it.fom,
+                                    tom = it.tom,
+                                    gjenståendeDagerFraTelleverk = it.gjenståendeDagerFraTelleverk,
+                                )
+
+                            is YtelsePeriode.EnsligForsørger ->
+                                PeriodeGrunnlagYtelse.EnsligForsørger(
+                                    fom = it.fom,
+                                    tom = it.tom,
+                                    subtype = it.tilYtelseSubtype(),
+                                    erNyttRegelverk2026 = it.erNyttRegelverk2026,
+                                )
+
+                            is YtelsePeriode.Omstillingsstønad ->
+                                PeriodeGrunnlagYtelse.Omstillingsstønad(
+                                    fom = it.fom,
+                                    tom = it.tom,
+                                )
+
+                            is YtelsePeriode.TiltakspengerTPSak ->
+                                PeriodeGrunnlagYtelse.TiltakspengerTPSak(
+                                    fom = it.fom,
+                                    tom = it.tom,
+                                )
+
+                            is YtelsePeriode.TiltakspengerArena ->
+                                PeriodeGrunnlagYtelse.TiltakspengerArena(
+                                    fom = it.fom,
+                                    tom = it.tom,
+                                )
+                        }
                     }.slåSammenOverlappendeEllerPåfølgende(),
             kildeResultat =
                 ytelserFraRegister.kildeResultat.map {

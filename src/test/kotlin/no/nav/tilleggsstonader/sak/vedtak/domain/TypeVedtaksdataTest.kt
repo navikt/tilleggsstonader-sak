@@ -8,7 +8,7 @@ class TypeVedtaksdataTest {
     fun `typerVedtaksdata må inneholde unike navn`() {
         val alleEnums =
             listOf(
-                TypeVedtakTilsynBarn.entries,
+                TypeVedtakPassAvBarn.entries,
                 TypeVedtakLæremidler.entries,
                 TypeVedtakBoutgifter.entries,
                 TypeVedtakDagligReise.entries,

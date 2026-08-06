@@ -127,13 +127,13 @@ class BehandlingTestdataDsl internal constructor() {
         }
     }
 
-    fun defaultTilsynBarnTestdata(
+    fun defaultPassAvBarnTestdata(
         fom: LocalDate = defaultFom,
         tom: LocalDate = defaultTom,
     ) {
         aktivitet {
             opprett {
-                aktivitetTiltakTilsynBarn(
+                aktivitetTiltakPassAvBarn(
                     fom = fom,
                     tom = tom,
                     aktivitetsdager = 4,

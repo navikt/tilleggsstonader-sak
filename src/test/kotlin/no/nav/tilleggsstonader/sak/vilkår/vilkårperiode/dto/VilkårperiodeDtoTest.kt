@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto
 
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingDekketAvAnnetRegelverk
@@ -93,20 +93,20 @@ class VilkårperiodeDtoTest {
         }
 
         @Test
-        fun `mapper ut faktaOgVurderinger for tiltak tilsyn barn`() {
-            val tiltakTilsynBarn =
+        fun `mapper ut faktaOgVurderinger for tiltak pass av barn`() {
+            val tiltakPassAvBarn =
                 VilkårperiodeTestUtil
                     .aktivitet(
                         faktaOgVurdering =
-                            faktaOgVurderingAktivitetTilsynBarn(
+                            faktaOgVurderingAktivitetPassAvBarn(
                                 type = AktivitetType.TILTAK,
                                 aktivitetsdager = 3,
                                 lønnet = VurderingLønnet(svar = SvarJaNei.NEI),
                             ),
                     ).tilDto()
 
-            assertThat(tiltakTilsynBarn.faktaOgVurderinger).isEqualTo(
-                AktivitetBarnetilsynFaktaOgVurderingerDto(
+            assertThat(tiltakPassAvBarn.faktaOgVurderinger).isEqualTo(
+                AktivitetPassAvBarnFaktaOgVurderingerDto(
                     aktivitetsdager = 3,
                     lønnet = VurderingDto(SvarJaNei.NEI, resultat = OPPFYLT),
                 ),

@@ -5,10 +5,10 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadPassAvBarn
 import no.nav.tilleggsstonader.sak.util.JournalpostUtil.lagJournalpost
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.barnMedBarnepass
-import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaBarnetilsyn
+import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaPassAvBarn
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
@@ -55,16 +55,16 @@ class SøknadServiceTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `skal kunne lagre komplett søknad for barnetilsyn`() {
+    fun `skal kunne lagre komplett søknad for pass av barn`() {
         val fagsak = testoppsettService.lagreFagsak(fagsak())
         val behandling = testoppsettService.lagre(behandling(fagsak))
         val skjema =
-            søknadskjemaBarnetilsyn(
+            søknadskjemaPassAvBarn(
                 barnMedBarnepass = listOf(barnMedBarnepass(ident = "barn1", navn = "navn1")),
             )
         val søknad = søknadService.lagreSøknad(behandling.id, lagJournalpost("journalpostId"), skjema)
 
-        require(søknad is SøknadBarnetilsyn)
+        require(søknad is SøknadPassAvBarn)
         assertThat(søknad.journalpostId).isEqualTo("journalpostId")
         assertThat(søknad.barn).hasSize(1)
         assertThat(søknad.barn.single().ident).isEqualTo("barn1")
@@ -73,13 +73,13 @@ class SøknadServiceTest : CleanDatabaseIntegrationTest() {
     private fun kopierSøknadTilRevurdering(
         behandling: Behandling,
         revurdering: Behandling,
-    ): SøknadBarnetilsyn? {
+    ): SøknadPassAvBarn? {
         søknadService.kopierSøknad(behandling.id, revurdering.id)
-        return søknadService.hentSøknadBarnetilsyn(revurdering.id)
+        return søknadService.hentSøknadPassAvBarn(revurdering.id)
     }
 
-    private fun lagreSøknad(behandling: Behandling): SøknadBarnetilsyn {
-        søknadService.lagreSøknad(behandling.id, lagJournalpost(), søknadskjemaBarnetilsyn())
-        return søknadService.hentSøknadBarnetilsyn(behandling.id)!!
+    private fun lagreSøknad(behandling: Behandling): SøknadPassAvBarn {
+        søknadService.lagreSøknad(behandling.id, lagJournalpost(), søknadskjemaPassAvBarn())
+        return søknadService.hentSøknadPassAvBarn(behandling.id)!!
     }
 }

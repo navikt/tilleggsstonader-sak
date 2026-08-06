@@ -18,7 +18,7 @@ class HåndterSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
     @ParameterizedTest
     @EnumSource(
         value = DokumentBrevkode::class,
-        names = ["BARNETILSYN", "LÆREMIDLER", "BOUTGIFTER", "DAGLIG_REISE", "REISE_TIL_SAMLING"],
+        names = ["PASS_AV_BARN", "LÆREMIDLER", "BOUTGIFTER", "DAGLIG_REISE", "REISE_TIL_SAMLING"],
     )
     internal fun `skal kunne automatisk journalføre hvis det ikke finnes eksisterende sak på person`(brevkode: DokumentBrevkode) {
         val journalpost =

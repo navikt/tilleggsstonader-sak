@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
@@ -35,8 +36,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
-import java.util.UUID
-import java.util.UUID.randomUUID
 
 object DagligReiseTestUtil {
     private val defaultPrivatBilPerioder =
@@ -128,7 +127,7 @@ object DagligReiseTestUtil {
     )
 
     fun vedtaksperiode(
-        id: UUID = randomUUID(),
+        id: VedtaksperiodeId = VedtaksperiodeId.random(),
         fom: LocalDate = 1 januar 2024,
         tom: LocalDate = 31 januar 2024,
         målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
@@ -205,7 +204,7 @@ private fun beregningsgrunnlagOffentligTransport(
 )
 
 private fun vedtaksperiodeGrunnlag(
-    id: UUID = randomUUID(),
+    id: VedtaksperiodeId = VedtaksperiodeId.random(),
     fom: LocalDate = 1 januar 2025,
     tom: LocalDate = 31 januar 2025,
     aktivitet: AktivitetType = AktivitetType.TILTAK,

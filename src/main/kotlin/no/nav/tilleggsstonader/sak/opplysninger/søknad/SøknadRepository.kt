@@ -4,12 +4,12 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.InsertUpdateRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.RepositoryInterface
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Søknad
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarnetilsyn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBehandling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadLæremidler
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadPassAvBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
 import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.stereotype.Repository
@@ -22,9 +22,9 @@ import java.util.UUID
  */
 
 @Repository
-interface SøknadBarnetilsynRepository :
-    RepositoryInterface<SøknadBarnetilsyn, UUID>,
-    InsertUpdateRepository<SøknadBarnetilsyn>
+interface SøknadPassAvBarnRepository :
+    RepositoryInterface<SøknadPassAvBarn, UUID>,
+    InsertUpdateRepository<SøknadPassAvBarn>
 
 /**
  * Brukes kun for å hente ut metadata fra [SøknadMetadata]

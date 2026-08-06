@@ -6,10 +6,10 @@ import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.Skjemadata
-import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaPassAvBarn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaReiseTilSamling
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.OppholdUtenforNorge
 import tools.jackson.core.JsonParser
@@ -25,8 +25,12 @@ object SøknadsskjemaUtil {
     val jsonMapperMedCustomDeserializerForDagligReise =
         jsonMapperFailOnUnknownProperties
             .rebuild()
-            .addModule(SimpleModule().addDeserializer(OppholdUtenforNorge::class.java, OppholdUtenforNorgeDeserializer()))
-            .build()
+            .addModule(
+                SimpleModule().addDeserializer(
+                    OppholdUtenforNorge::class.java,
+                    OppholdUtenforNorgeDeserializer(),
+                ),
+            ).build()
 
     fun parseSøknadsskjema(
         stønadstype: Stønadstype,
@@ -34,7 +38,7 @@ object SøknadsskjemaUtil {
         mottattTidspunkt: LocalDateTime,
     ): InnsendtSkjema<out Skjemadata> =
         when (stønadstype) {
-            Stønadstype.BARNETILSYN -> jsonMapper.readValue<InnsendtSkjema<SøknadsskjemaBarnetilsyn>>(data)
+            Stønadstype.BARNETILSYN -> jsonMapper.readValue<InnsendtSkjema<SøknadsskjemaPassAvBarn>>(data)
             Stønadstype.LÆREMIDLER -> jsonMapper.readValue<InnsendtSkjema<SøknadsskjemaLæremidler>>(data)
             Stønadstype.BOUTGIFTER -> håndterBoutgifter(data, mottattTidspunkt)
             Stønadstype.DAGLIG_REISE_TSO -> håndterDagligReise(data, mottattTidspunkt)
@@ -46,7 +50,10 @@ object SøknadsskjemaUtil {
         data: ByteArray,
         mottattTidspunkt: LocalDateTime,
     ): InnsendtSkjema<SøknadsskjemaBoutgifterFyllUtSendInn> {
-        val skjema = jsonMapperFailOnUnknownProperties.readValue<SøknadsskjemaBoutgifterFyllUtSendInn>(data)
+        val skjema =
+            jsonMapperFailOnUnknownProperties.readValue<SøknadsskjemaBoutgifterFyllUtSendInn>(
+                data,
+            )
         return InnsendtSkjema(
             ident = skjema.data.data.dineOpplysninger.identitet.identitetsnummer,
             mottattTidspunkt = mottattTidspunkt,
@@ -59,7 +66,10 @@ object SøknadsskjemaUtil {
         data: ByteArray,
         mottattTidspunkt: LocalDateTime,
     ): InnsendtSkjema<SøknadsskjemaDagligReiseFyllUtSendInn> {
-        val skjema = jsonMapperMedCustomDeserializerForDagligReise.readValue<SøknadsskjemaDagligReiseFyllUtSendInn>(data)
+        val skjema =
+            jsonMapperMedCustomDeserializerForDagligReise.readValue<SøknadsskjemaDagligReiseFyllUtSendInn>(
+                data,
+            )
         return InnsendtSkjema(
             ident = skjema.data.data.dineOpplysninger.identitet.identitetsnummer,
             mottattTidspunkt = mottattTidspunkt,

@@ -27,7 +27,8 @@ class BehandlingsoversiktService(
 
         return BehandlingsoversiktDto(
             fagsakPersonId = fagsakPersonId,
-            tilsynBarn = hentFagsakMedBehandlinger(fagsak.barnetilsyn),
+            // TODO TilsynBarn bør være PassAvBarn, men dette brukes eksternt
+            tilsynBarn = hentFagsakMedBehandlinger(fagsak.passAvBarn),
             læremidler = hentFagsakMedBehandlinger(fagsak.læremidler),
             boutgifter = hentFagsakMedBehandlinger(fagsak.boutgifter),
             dagligReiseTso = hentFagsakMedBehandlinger(fagsak.dagligReiseTso),

@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
@@ -58,7 +58,7 @@ data class SøknadMetadata(
 )
 
 @Table("soknad")
-data class SøknadBarnetilsyn(
+data class SøknadPassAvBarn(
     @Id
     override val id: UUID = UUID.randomUUID(),
     override val journalpostId: String,
@@ -67,12 +67,12 @@ data class SøknadBarnetilsyn(
     override val språk: Språkkode,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
     override val sporbar: Sporbar = Sporbar(),
-    override val data: SkjemaBarnetilsyn,
+    override val data: SkjemaPassAvBarn,
     @MappedCollection(idColumn = "soknad_id")
     val barn: Set<SøknadBarn>,
-) : Søknad<SkjemaBarnetilsyn>
+) : Søknad<SkjemaPassAvBarn>
 
-data class SkjemaBarnetilsyn(
+data class SkjemaPassAvBarn(
     val hovedytelse: HovedytelseAvsnitt,
     val aktivitet: AktivitetAvsnitt,
     val dokumentasjon: List<Dokumentasjon>,

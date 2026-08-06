@@ -11,18 +11,13 @@ import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.SelectFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.Skjemadata
-import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBarnetilsyn
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaLæremidler
+import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaPassAvBarn
 import no.nav.tilleggsstonader.kontrakter.søknad.TekstFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
 import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AktivitetAvsnitt
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.AnnenAktivitetType
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnAvsnitt
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.BarnMedBarnepass
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.TypeBarnepass
-import no.nav.tilleggsstonader.kontrakter.søknad.barnetilsyn.ÅrsakBarnepass
-import no.nav.tilleggsstonader.kontrakter.søknad.felles.ArbeidOgOpphold
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.ArbeidOgOppholdAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.OppholdUtenforNorge
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
@@ -30,27 +25,32 @@ import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNor
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.HarRettTilUtstyrsstipend
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.UtdanningAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.BarnAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.BarnMedBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.PassAvBarnAktivitetAvsnitt
+import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.TypeBarnepass
+import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.ÅrsakBarnepass
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
 
 object SøknadUtil {
-    fun søknadskjemaBarnetilsyn(
+    fun søknadskjemaPassAvBarn(
         ident: String = "søker",
         mottattTidspunkt: LocalDateTime = LocalDateTime.now(),
         barnMedBarnepass: List<BarnMedBarnepass> = listOf(barnMedBarnepass()),
         dokumentasjon: List<DokumentasjonFelt> = emptyList(),
     ): InnsendtSkjema<Skjemadata> {
-        val skjemaBarnetilsyn =
-            SøknadsskjemaBarnetilsyn(
+        val skjemaPassAvBarn =
+            SøknadsskjemaPassAvBarn(
                 hovedytelse =
                     HovedytelseAvsnitt(
                         hovedytelse = EnumFlereValgFelt("", listOf(VerdiFelt(Hovedytelse.AAP, "")), emptyList()),
                         arbeidOgOpphold = arbeidOgOpphold(),
                     ),
                 aktivitet =
-                    AktivitetAvsnitt(
+                    PassAvBarnAktivitetAvsnitt(
                         aktiviteter =
                             EnumFlereValgFelt(
                                 "Hvilken aktivitet søker du om støtte i forbindelse med?",
@@ -73,7 +73,7 @@ object SøknadUtil {
             ident = ident,
             mottattTidspunkt = mottattTidspunkt,
             språk = Språkkode.NB,
-            skjema = skjemaBarnetilsyn,
+            skjema = skjemaPassAvBarn,
         )
     }
 
@@ -82,7 +82,7 @@ object SøknadUtil {
         mottattTidspunkt: LocalDateTime = LocalDateTime.now(),
         dokumentasjon: List<DokumentasjonFelt> = emptyList(),
     ): InnsendtSkjema<Skjemadata> {
-        val skjemaBarnetilsyn =
+        val skjemaLæremidler =
             SøknadsskjemaLæremidler(
                 hovedytelse =
                     HovedytelseAvsnitt(
@@ -107,7 +107,13 @@ object SøknadUtil {
                             ),
                         harRettTilUtstyrsstipend =
                             HarRettTilUtstyrsstipend(
-                                erLærlingEllerLiknende = EnumFelt("Er lærling eller liknende?", JaNei.JA, "Ja", emptyList()),
+                                erLærlingEllerLiknende =
+                                    EnumFelt(
+                                        "Er lærling eller liknende?",
+                                        JaNei.JA,
+                                        "Ja",
+                                        emptyList(),
+                                    ),
                                 harTidligereFullførtVgs =
                                     EnumFelt(
                                         "Har du tidligere fullført videregående skole?",
@@ -123,12 +129,12 @@ object SøknadUtil {
             ident = ident,
             mottattTidspunkt = mottattTidspunkt,
             språk = Språkkode.NB,
-            skjema = skjemaBarnetilsyn,
+            skjema = skjemaLæremidler,
         )
     }
 
     private fun arbeidOgOpphold() =
-        ArbeidOgOpphold(
+        ArbeidOgOppholdAvsnitt(
             jobberIAnnetLand = EnumFelt("Jobber du i et annet land enn Norge?", JaNei.JA, "Ja", emptyList()),
             jobbAnnetLand = SelectFelt("Hvilket land jobber du i?", "SWE", "Sverige"),
             harPengestøtteAnnetLand =

@@ -53,7 +53,7 @@ fun journalpostSøknadForStønadstype(
 
 private fun brevkodeForStønadstype(stønadstype: Stønadstype) =
     when (stønadstype) {
-        Stønadstype.BARNETILSYN -> DokumentBrevkode.BARNETILSYN
+        Stønadstype.BARNETILSYN -> DokumentBrevkode.PASS_AV_BARN
         Stønadstype.LÆREMIDLER -> DokumentBrevkode.LÆREMIDLER
         Stønadstype.BOUTGIFTER -> DokumentBrevkode.BOUTGIFTER
         Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR -> DokumentBrevkode.DAGLIG_REISE

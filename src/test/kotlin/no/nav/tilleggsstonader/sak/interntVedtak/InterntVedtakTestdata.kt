@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.interntVedtak.InterntVedtakTestdata.Boutgifter.vedtaksperioder
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadMetadata
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
@@ -26,9 +27,6 @@ import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.beregningsresultatForMåned
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.TilsynBarnTestUtil.vedtaksperiodeGrunnlag
-import no.nav.tilleggsstonader.sak.vedtak.barnetilsyn.domain.BeregningsresultatTilsynBarn
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.domain.BeregningsresultatForLøpendeMåned
@@ -56,7 +54,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseTilsynBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelsePassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -67,6 +65,9 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.beregningsresultatForMåned
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.vedtaksperiodeGrunnlag
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.BeregningsresultatPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
@@ -81,7 +82,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetLæremidler
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetTilsynBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppeLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingAldersVilkår
@@ -107,7 +108,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning as Vedt
 
 object InterntVedtakTestdata {
     val behandlingId = BehandlingId.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e31")
-    val vedtaksperiodeId = UUID.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e37")
+    val vedtaksperiodeId = VedtaksperiodeId.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e37")
 
     val totrinnskontroll = totrinnskontroll(behandlingId, beslutter = "saksbeh2")
 
@@ -175,7 +176,7 @@ object InterntVedtakTestdata {
             ),
         )
 
-    object TilsynBarn {
+    object PassAvBarn {
         val fagsak = fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()))
 
         val behandling =
@@ -272,9 +273,9 @@ object InterntVedtakTestdata {
                 behandlingId = behandlingId,
                 type = TypeVedtak.INNVILGELSE,
                 data =
-                    InnvilgelseTilsynBarn(
+                    InnvilgelsePassAvBarn(
                         beregningsresultat =
-                            BeregningsresultatTilsynBarn(
+                            BeregningsresultatPassAvBarn(
                                 perioder =
                                     listOf(
                                         beregningsresultatForMåned(
@@ -297,13 +298,13 @@ object InterntVedtakTestdata {
                 opphørsdato = null,
             )
 
-        private val aktiviteterTilsynBarn =
+        private val aktiviteterPassAvBarn =
             listOf(
                 VilkårperiodeTestUtil.aktivitet(
                     begrunnelse = "aktivitet abd",
                     resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
                     faktaOgVurdering =
-                        faktaOgVurderingAktivitetTilsynBarn(
+                        faktaOgVurderingAktivitetPassAvBarn(
                             lønnet = vurderingLønnet(SvarJaNei.JA),
                         ),
                     fom = LocalDate.of(2024, 2, 5),
@@ -320,7 +321,7 @@ object InterntVedtakTestdata {
         val vilkårperioder =
             Vilkårperioder(
                 målgrupper = målgrupper,
-                aktiviteter = aktiviteterTilsynBarn,
+                aktiviteter = aktiviteterPassAvBarn,
             )
     }
 
@@ -347,7 +348,7 @@ object InterntVedtakTestdata {
         val vedtaksperioder =
             listOf(
                 LæremidlerTestUtil.vedtaksperiode(
-                    id = UUID.randomUUID(),
+                    id = VedtaksperiodeId.random(),
                     fom = LocalDate.of(2024, 1, 1),
                     tom = LocalDate.of(2024, 3, 31),
                 ),

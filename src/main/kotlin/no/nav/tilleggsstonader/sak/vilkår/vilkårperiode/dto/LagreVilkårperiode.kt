@@ -10,8 +10,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetLæremidler
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetReiseTilSamlingTso
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetTilsynBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ErAktivitetenObligatoriskVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
@@ -44,7 +44,7 @@ data class LagreVilkårperiode(
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME)
 @JsonSubTypes(
     JsonSubTypes.Type(FaktaOgSvarMålgruppeDto::class, name = "MÅLGRUPPE"),
-    JsonSubTypes.Type(FaktaOgSvarAktivitetBarnetilsynDto::class, name = "AKTIVITET_BARNETILSYN"),
+    JsonSubTypes.Type(FaktaOgSvarAktivitetPassAvBarnDto::class, name = "AKTIVITET_BARNETILSYN"),
     JsonSubTypes.Type(FaktaOgSvarAktivitetLæremidlerDto::class, name = "AKTIVITET_LÆREMIDLER"),
     JsonSubTypes.Type(FaktaOgSvarAktivitetBoutgifterDto::class, name = "AKTIVITET_BOUTGIFTER"),
     JsonSubTypes.Type(FaktaOgSvarAktivitetDagligReiseTsoDto::class, name = "AKTIVITET_DAGLIG_REISE_TSO"),
@@ -59,7 +59,7 @@ data class FaktaOgSvarMålgruppeDto(
     val svarMottarSykepengerForFulltidsstilling: SvarJaNei? = null,
 ) : FaktaOgSvarDto()
 
-data class FaktaOgSvarAktivitetBarnetilsynDto(
+data class FaktaOgSvarAktivitetPassAvBarnDto(
     val aktivitetsdager: Int? = null,
     val svarLønnet: SvarJaNei? = null,
 ) : FaktaOgSvarDto()
@@ -113,8 +113,8 @@ fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
                         ?.svar,
             )
 
-        is AktivitetTilsynBarn ->
-            FaktaOgSvarAktivitetBarnetilsynDto(
+        is AktivitetPassAvBarn ->
+            FaktaOgSvarAktivitetPassAvBarnDto(
                 aktivitetsdager = this.fakta.takeIfFakta<FaktaAktivitetsdager>()?.aktivitetsdager,
                 svarLønnet =
                     this.vurderinger

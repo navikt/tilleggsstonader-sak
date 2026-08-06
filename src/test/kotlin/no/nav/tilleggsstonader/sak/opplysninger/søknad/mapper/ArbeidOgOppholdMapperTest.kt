@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.mapper.ArbeidOgOppholdMa
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import no.nav.tilleggsstonader.kontrakter.søknad.felles.ArbeidOgOpphold as ArbeidOgOppholdKontrakt
+import no.nav.tilleggsstonader.kontrakter.søknad.felles.ArbeidOgOppholdAvsnitt as ArbeidOgOppholdKontrakt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.OppholdUtenforNorge as OppholdUtenforNorgeKontrakt
 
 class ArbeidOgOppholdMapperTest {

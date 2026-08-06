@@ -176,6 +176,7 @@ class UtførSatsjusteringService(
 
         // Her lages også internt vedtak og behandling- og vedtaksstatistikk
         ferdigstillBehandlingSteg.utførSteg(revurdering, null)
+        behandlingService.oppdaterStegPåBehandling(revurdering.id, StegType.BEHANDLING_FERDIGSTILT)
     }
 
     private fun opprettRevurderingForSatsendring(fagsakId: FagsakId): Saksbehandling {
