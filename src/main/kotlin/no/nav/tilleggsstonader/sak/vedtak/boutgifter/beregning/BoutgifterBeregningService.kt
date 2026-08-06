@@ -112,7 +112,6 @@ class BoutgifterBeregningService(
         beregnFra: LocalDate?,
     ): List<BeregningsresultatForLøpendeMåned> =
         vedtaksperioder
-            .sorted()
             .filtrerVekkPerioderFørBeregnFra(beregnFra)
             .splittVedGrensenTilFaktiskeUtgifter(utgifter)
             .flatMap { it.perioder.splittTilLøpendeMåneder() }
