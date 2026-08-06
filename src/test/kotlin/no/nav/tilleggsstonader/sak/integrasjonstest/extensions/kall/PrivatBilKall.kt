@@ -40,7 +40,7 @@ class PrivatBilKall(
     fun lagreManuellKjøreliste(
         behandlingId: BehandlingId,
         request: LagreManuellKjørelisteRequest,
-    ) = apiRespons.lagreManuellKjøreliste(behandlingId, request).expectOkWithBody<KjørelisteId>()
+    ) = apiRespons.lagreManuellKjøreliste(behandlingId, request).expectOkEmpty()
 
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = PrivatBilApi()
