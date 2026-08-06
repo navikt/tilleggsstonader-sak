@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.LocalDate
 
 class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
     @Autowired
@@ -106,7 +105,6 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
             )
 
         assertThat(oppdatertUke.status).isEqualTo(UkeStatus.OK_MANUELT)
-        assertThat(oppdatertUke.behandletDato).isEqualTo(LocalDate.now())
         // Originalt avvik skal ikke fjernes ved manuell oppdatering, da det kan være relevant for saksbehandler å
         // se at det har vært et avvik som førte til manuell behandling
         assertThat(oppdatertUke.avvik!!.typeAvvik).isEqualTo(TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK)

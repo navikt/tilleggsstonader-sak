@@ -73,7 +73,6 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
         assertThat(innsendtUke.avvik).isNull()
         assertThat(innsendtUke.status).isEqualTo(UkeStatus.OK_AUTOMATISK)
         assertThat(innsendtUke.avklartUkeId).isNotNull()
-        assertThat(innsendtUke.behandletDato).isNull() // TODO: Skal denne settes? = innsendt dato for kjøreliste?
 
         val forventedeDager =
             listOf(
@@ -144,7 +143,6 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
         assertThat(innsendtUke.avvik!!.typeAvvik).isEqualTo(TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK)
         assertThat(innsendtUke.status).isEqualTo(UkeStatus.AVVIK)
         assertThat(innsendtUke.avklartUkeId).isNotNull()
-        assertThat(innsendtUke.behandletDato).isNull()
 
         val forventedeDager =
             listOf(
@@ -211,7 +209,6 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
         assertThat(innsendtUke.avvik).isNull()
         assertThat(innsendtUke.status).isEqualTo(UkeStatus.AVVIK)
         assertThat(innsendtUke.avklartUkeId).isNotNull()
-        assertThat(innsendtUke.behandletDato).isNull()
 
         val forventedeDager =
             listOf(
@@ -258,7 +255,6 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
         assertThat(innsendtUke.avvik).isNull()
         assertThat(innsendtUke.status).isEqualTo(UkeStatus.AVVIK)
         assertThat(innsendtUke.avklartUkeId).isNotNull()
-        assertThat(innsendtUke.behandletDato).isNull()
 
         val forventedeDager =
             listOf(
@@ -318,7 +314,6 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
         assertThat(innsendtUke.avvik).isNull()
         assertThat(innsendtUke.status).isEqualTo(UkeStatus.AVVIK)
         assertThat(innsendtUke.avklartUkeId).isNotNull()
-        assertThat(innsendtUke.behandletDato).isNull()
 
         val forventedeDager =
             listOf(
@@ -414,7 +409,6 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
             assertThat(uke.avvik).isNull()
             assertThat(uke.kjørelisteId).isNull()
             assertThat(uke.avklartUkeId).isNull()
-            assertThat(uke.behandletDato).isNull()
 
             uke.dager.forEach { dag ->
                 assertThat(dag.avklartDag).isNull()

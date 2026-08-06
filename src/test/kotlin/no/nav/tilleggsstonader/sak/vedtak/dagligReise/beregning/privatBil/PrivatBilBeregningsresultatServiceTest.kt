@@ -922,7 +922,6 @@ class PrivatBilBeregningsresultatServiceTest {
                     tom = dager.maxOf { it.dato },
                     uke = uke,
                     status = UkeStatus.OK_AUTOMATISK,
-                    behandletDato = LocalDate.now(),
                     avklartKjørtUkeStatus = AvklartKjørtUkeStatus.NY,
                     dager =
                         dager
