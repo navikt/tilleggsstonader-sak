@@ -75,7 +75,7 @@ class AvklartKjørelisteService(
         val innsendteKjørelisteDager = kjørelisteService.hentKjøreliste(eksisterendeUke.kjørelisteId).data.reisedager
 
         validerOppdatertAvklartKjørtUke(
-            oppdaterteDager = oppdaterteDager,
+            oppdaterteDager = oppdaterteDager.filter { it.avklartKjørtDagStatus != AvklartKjørtDagStatus.SLETTET },
             ukeSomSkalOppdateres = eksisterendeUke.uke,
             rammevedtak = rammevedtak,
             innsendteKjørelisteDager = innsendteKjørelisteDager,
@@ -148,10 +148,14 @@ class AvklartKjørelisteService(
     private fun oppdaterAvklarteDager(
         eksisterendeDager: Collection<AvklartKjørtDag>,
         oppdaterteDager: Collection<EndreAvklartDagRequest>,
-    ): List<AvklartKjørtDag> =
-        eksisterendeDager
+    ): List<AvklartKjørtDag> {
+        return eksisterendeDager
             .associateWith { eksisterendeDag -> oppdaterteDager.find { it.dato == eksisterendeDag.dato } }
             .map { (eksisterendeDag, oppdatertDag) ->
+                if (eksisterendeDag.erSlettet()) {
+                    feilHvis(oppdatertDag != null) { "Dag ${eksisterendeDag.dato} er slettet" }
+                    return@map eksisterendeDag
+                }
                 feilHvis(oppdatertDag == null) { "Alle dager i uke må sendes inn" }
 
                 eksisterendeDag.copy(
@@ -160,6 +164,7 @@ class AvklartKjørelisteService(
                     begrunnelse = oppdatertDag.begrunnelse,
                 )
             }
+    }
 
     private fun utledGodkjentGjennomførtKjøringAutomatisk(
         harKjørt: Boolean,

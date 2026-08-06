@@ -220,6 +220,40 @@ class AvklartKjørelisteServiceTest {
 
             assertThat(oppdatertSlot.captured.avklartKjørtUkeStatus).isEqualTo(AvklartKjørtUkeStatus.UENDRET)
         }
+
+        @Test
+        fun `skal kunne oppdatere uke uten å sende inn slettede dager`() {
+            val ukeMedSlettetMandag =
+                lagUke(status = AvklartKjørtUkeStatus.ENDRET).let { uke ->
+                    val mandag = uke.dager.single { it.dato == mandag }.markerSomSlettet()
+                    uke.copy(dager = (uke.dager.filterNot { it.dato == mandag.dato } + mandag).toSet())
+                }
+            val oppdatertSlot = slot<AvklartKjørtUke>()
+
+            settOppMocks(ukeMedSlettetMandag)
+            every { avklartKjørtUkeRepository.update(capture(oppdatertSlot)) } answers { oppdatertSlot.captured }
+
+            val request =
+                lagRequest()
+                    .filterNot { it.dato == mandag }
+                    .map {
+                        if (it.dato == mandag.plusDays(1)) {
+                            it.copy(parkeringsutgift = 100, begrunnelse = "endret i test")
+                        } else {
+                            it
+                        }
+                    }
+
+            service.oppdaterAvklartUke(
+                behandlingId = behandlingId,
+                ukeId = ukeMedSlettetMandag.id,
+                request = request,
+            )
+
+            val oppdatertUke = oppdatertSlot.captured
+            assertThat(oppdatertUke.dager.single { it.dato == mandag }.avklartKjørtDagStatus).isEqualTo(AvklartKjørtDagStatus.SLETTET)
+            assertThat(oppdatertUke.dager.single { it.dato == mandag.plusDays(1) }.parkeringsutgift).isEqualTo(100)
+        }
     }
 
     private fun settOppMocks(
