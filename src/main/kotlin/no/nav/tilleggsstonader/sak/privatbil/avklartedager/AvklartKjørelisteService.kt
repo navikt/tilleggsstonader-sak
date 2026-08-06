@@ -9,7 +9,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
@@ -149,21 +149,31 @@ class AvklartKjørelisteService(
         eksisterendeDager: Collection<AvklartKjørtDag>,
         oppdaterteDager: Collection<EndreAvklartDagRequest>,
     ): List<AvklartKjørtDag> {
-        return eksisterendeDager
-            .associateWith { eksisterendeDag -> oppdaterteDager.find { it.dato == eksisterendeDag.dato } }
-            .map { (eksisterendeDag, oppdatertDag) ->
-                if (eksisterendeDag.erSlettet()) {
-                    feilHvis(oppdatertDag != null) { "Dag ${eksisterendeDag.dato} er slettet" }
-                    return@map eksisterendeDag
-                }
-                feilHvis(oppdatertDag == null) { "Alle dager i uke må sendes inn" }
+        val ikkeSlettedeDatoer = eksisterendeDager.filterNot { it.erSlettet() }.map { it.dato }.toSet()
+        val requestPerDato = oppdaterteDager.groupBy { it.dato }
 
+        brukerfeilHvis(requestPerDato.any { (_, request) -> request.size > 1 }) {
+            "Kan ikke sende inn duplikate dager"
+        }
+
+        val requestDatoer = requestPerDato.keys
+
+        brukerfeilHvis(requestDatoer != ikkeSlettedeDatoer) {
+            "Alle dager i uken må sendes inn"
+        }
+
+        return eksisterendeDager.map { eksisterendeDag ->
+            if (eksisterendeDag.erSlettet()) {
+                eksisterendeDag
+            } else {
+                val oppdatertDag = requestPerDato.getValue(eksisterendeDag.dato).single()
                 eksisterendeDag.copy(
                     godkjentGjennomførtKjøring = oppdatertDag.godkjentGjennomførtKjøring,
                     parkeringsutgift = oppdatertDag.parkeringsutgift,
                     begrunnelse = oppdatertDag.begrunnelse,
                 )
             }
+        }
     }
 
     private fun utledGodkjentGjennomførtKjøringAutomatisk(

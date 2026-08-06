@@ -115,7 +115,7 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `skal feile dersom det ikke sendes inn en hel uke dersom hele uka er innsendt`() {
+    fun `skal feile dersom det ikke sendes inn alle ikke-slettede dager i uke`() {
         val kjørelistebehandling =
             opprettBehandlingOgSendInnKjøreliste(
                 dagerKjørt =
@@ -147,11 +147,6 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
                     godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
                     parkeringsutgift = 50,
                 ),
-                EndreAvklartDagRequest(
-                    dato = 7 januar 2026,
-                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
-                    parkeringsutgift = 50,
-                ),
             )
 
         kall.privatBil.apiRespons
@@ -160,10 +155,10 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
                 avklartUkeId = avklartUkeId,
                 avklarteDager = request,
             ).expectStatus()
-            .is5xxServerError()
+            .is4xxClientError()
             .expectBody()
             .jsonPath("$.detail")
-            .isEqualTo("Alle dager i uke må sendes inn")
+            .isEqualTo("Alle ikke-slettede dager i uke må sendes inn")
     }
 
     @Test
@@ -202,10 +197,10 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
                 avklartUkeId = avklartUkeId,
                 avklarteDager = request,
             ).expectStatus()
-            .is5xxServerError()
+            .is4xxClientError()
             .expectBody()
             .jsonPath("$.detail")
-            .isEqualTo("Alle dager i uke må sendes inn")
+            .isEqualTo("Kan kun sende inn ikke-slettede dager i uke")
     }
 
     private fun opprettBehandlingOgSendInnKjøreliste(dagerKjørt: List<KjørtDag>): Saksbehandling {
