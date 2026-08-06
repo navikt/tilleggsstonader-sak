@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.integrasjonstest
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseTilSamling
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegController
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegFerdigstiltResponse
@@ -27,11 +28,13 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequ
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.AvslagPassAvBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.InnvilgelsePassAvBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.OpphørPassAvBarnRequest
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingTsoRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreVilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.LagreVilkårReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import org.springframework.test.web.servlet.client.RestTestClient
@@ -148,7 +151,11 @@ fun IntegrationTest.gjennomførVilkårSteg(
             if (stønadstype.gjelderDagligReise()) {
                 kall.vilkårDagligReise.opprettVilkår(behandlingId, it as LagreVilkårDagligReiseDto)
             } else {
-                kall.vilkår.opprettVilkår(it as OpprettVilkårDto)
+                if (stønadstype.gjelderReiseTilSamling()) {
+                    kall.vilkårReiseTilSamling.opprettVilkår(behandlingId, it as LagreVilkårReiseTilSamlingDto)
+                } else {
+                    kall.vilkår.opprettVilkår(it as OpprettVilkårDto)
+                }
             }
         }
 
@@ -227,7 +234,10 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                                     vedtaksperioder = vedtaksperioder.tilVedtaksperiodeDagligReiseDto(),
                                 )
 
-                            Stønadstype.REISE_TIL_SAMLING_TSO -> TODO("InnvilgelseReiseTilSamlingTsoRequest")
+                            Stønadstype.REISE_TIL_SAMLING_TSO ->
+                                InnvilgelseReiseTilSamlingTsoRequest(
+                                    vedtaksperioder = vedtaksperioder,
+                                )
                         },
                 )
         }
