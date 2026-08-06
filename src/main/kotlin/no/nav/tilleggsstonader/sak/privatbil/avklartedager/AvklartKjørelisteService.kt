@@ -1,6 +1,10 @@
 package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
 import io.github.mikaojk.holiday.getNorwegianHolidays
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.UUID
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
@@ -8,13 +12,9 @@ import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.eksistererEllerFeil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.singleEllerFeil
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
@@ -27,10 +27,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBi
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.springframework.stereotype.Service
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.util.UUID
+
 import no.nav.tilleggsstonader.libs.feil.singleEllerFeil
 
 @Service
@@ -134,9 +131,9 @@ class AvklartKjørelisteService(
         return oppdaterteDager.any { oppdatert ->
             val eksisterende = eksisterendePerDato[oppdatert.dato]
             eksisterende == null ||
-                eksisterende.godkjentGjennomførtKjøring != oppdatert.godkjentGjennomførtKjøring ||
-                eksisterende.parkeringsutgift != oppdatert.parkeringsutgift ||
-                eksisterende.begrunnelse != oppdatert.begrunnelse
+                    eksisterende.godkjentGjennomførtKjøring != oppdatert.godkjentGjennomførtKjøring ||
+                    eksisterende.parkeringsutgift != oppdatert.parkeringsutgift ||
+                    eksisterende.begrunnelse != oppdatert.begrunnelse
         }
     }
 
@@ -286,8 +283,8 @@ class AvklartKjørelisteService(
 
     private fun LocalDate.erHelgEllerHelligdag() =
         this.dayOfWeek == DayOfWeek.SATURDAY ||
-            this.dayOfWeek == DayOfWeek.SUNDAY ||
-            getNorwegianHolidays(year).map { it.date }.contains(this)
+                this.dayOfWeek == DayOfWeek.SUNDAY ||
+                getNorwegianHolidays(year).map { it.date }.contains(this)
 
     private fun henteReiseFraVedtak(
         behandlingId: BehandlingId,
@@ -417,14 +414,14 @@ class AvklartKjørelisteService(
             hentAvklarteUkerForBehandling(behandlingId)
                 .map { ReiseUke(it.reiseId, it.uke) }
                 .toSet()
-        val slettedeUkerPåFagsaken = hentSlettedeUkerPåFagsaken(fagsakId)
         val kjørelisteUkerPåFagsak = hentKjørelisteUkerPåFagsak(fagsakId)
 
+
         val gjenopprettedeUker =
-            slettedeUkerPåFagsaken
-                .filter { ReiseUke(it.reiseId, it.uke) !in eksisterendeUker }
+            kjørelisteUkerPåFagsak
+                .filter { it.key !in eksisterendeUker }
                 .mapNotNull { slettetUke ->
-                    gjenopprettUkeHvisInnenforRammevedtak(slettetUke, behandlingId, rammevedtak, kjørelisteUkerPåFagsak)
+                    gjenopprettUkeHvisInnenforRammevedtak(slettetUke.value, behandlingId, rammevedtak)
                 }
 
         if (gjenopprettedeUker.isNotEmpty()) {
@@ -433,55 +430,23 @@ class AvklartKjørelisteService(
     }
 
     private fun gjenopprettUkeHvisInnenforRammevedtak(
-        slettetUke: AvklartKjørtUke,
+        ukeSomSkalGjenopprettes: KjørelisteUke,
         behandlingId: BehandlingId,
         rammevedtak: RammevedtakPrivatBil,
-        kjørelisteUkerPåFagsak: Map<ReiseUke, KjørelisteUke>,
     ): AvklartKjørtUke? {
-        val rammevedtakForReise = rammevedtak.reiser.find { it.reiseId == slettetUke.reiseId } ?: return null
-        val kjørelisteUke = kjørelisteUkerPåFagsak[ReiseUke(slettetUke.reiseId, slettetUke.uke)] ?: return null
+        val rammevedtakForReise =
+            rammevedtak.reiser.find { it.reiseId == ukeSomSkalGjenopprettes.reiseId } ?: return null
         val reisedagerInnenforNyttRammevedtak =
-            kjørelisteUke.reisedager.filter { rammevedtakForReise.grunnlag.inneholder(it.dato) }
+            ukeSomSkalGjenopprettes.reisedager.filter { rammevedtakForReise.grunnlag.inneholder(it.dato) }
         if (reisedagerInnenforNyttRammevedtak.isEmpty()) return null
 
         return utledAvklartUke(
             behandlingId = behandlingId,
-            kjørelisteId = kjørelisteUke.kjørelisteId,
-            ukeIÅr = slettetUke.uke,
+            kjørelisteId = ukeSomSkalGjenopprettes.kjørelisteId,
+            ukeIÅr = ukeSomSkalGjenopprettes.uke,
             reisedager = reisedagerInnenforNyttRammevedtak,
             rammevedtak = rammevedtakForReise,
         )
-    }
-
-    private fun hentSlettedeUkerPåFagsaken(fagsakId: FagsakId): List<AvklartKjørtUke> {
-        val ferdigstilteBehandlinger =
-            behandlingService
-                .hentBehandlinger(fagsakId)
-                .filter { it.vedtakstidspunkt != null && it.status == BehandlingStatus.FERDIGSTILT }
-
-        val slettedeUkerMedVedtakstidspunkt =
-            ferdigstilteBehandlinger.flatMap { behandling ->
-                hentAvklarteUkerForBehandling(behandling.id)
-                    .filter { it.avklartKjørtUkeStatus == AvklartKjørtUkeStatus.SLETTET }
-                    .map {
-                        AvklartKjørtUkeMedTidspunkt(
-                            vedtakstidspunkt =
-                                behandling.vedtakstidspunkt.eksistererEllerFeil {
-                                    "Forventer at vedtakstidspunkt er satt for ferdigstilte behandlinger."
-                                },
-                            uke = it,
-                        )
-                    }
-            }
-
-        return slettedeUkerMedVedtakstidspunkt
-            .groupBy { ReiseUke(it.uke.reiseId, it.uke.uke) }
-            .map { (reiseUke, avklarteKjørteUke) ->
-                avklarteKjørteUke
-                    .singleEllerFeil {
-                        "Fant ingen eller duplikate kjørelister for reise=${reiseUke.reiseId} og uke=${reiseUke.uke}"
-                    }.uke
-            }
     }
 
     private fun hentKjørelisteUkerPåFagsak(fagsakId: FagsakId): Map<ReiseUke, KjørelisteUke> =
