@@ -138,6 +138,8 @@ fun validerUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode(
             "Det er opphold mellom delperiodene ${a.tom.norskFormat()} og ${b.fom.norskFormat()}. Delperiodene må være sammenhengende.",
         )
     }
+    val flereDelperioderFeilForklaring =
+        "Dersom det er flere delperioder må stopp og startdato ved overgangen av disse være ved uke slutt/start"
 
     sortertePerioder.forEachIndexed { index, periode ->
         brukerfeilHvis(periode.tom < periode.fom) {
@@ -146,21 +148,21 @@ fun validerUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode(
 
         if (index == 0) {
             brukerfeilHvis(periode.fom != overordnetPeriode.fom) {
-                "Delperioden sin fom ${periode.fom.norskFormat()} må være lik reiseperioden sin fom"
+                "Delperiode med fom ${periode.fom.norskFormat()} må være lik reiseperioden sin fom"
             }
         } else {
             brukerfeilHvis(periode.fom.dayOfWeek != DayOfWeek.MONDAY) {
-                "Delperiode fom ${periode.fom.norskFormat()} må starte på en mandag"
+                "$flereDelperioderFeilForklaring. Delperiode med fom ${periode.fom.norskFormat()} må starte på en mandag"
             }
         }
 
         if (index == sortertePerioder.lastIndex) {
             brukerfeilHvis(periode.tom != overordnetPeriode.tom) {
-                "Delperioden sin tom ${periode.tom.norskFormat()} må være lik reiseperioden sin tom "
+                "Delperiode med tom ${periode.tom.norskFormat()} må være lik reiseperioden sin tom"
             }
         } else {
             brukerfeilHvis(periode.tom.dayOfWeek != DayOfWeek.SUNDAY) {
-                "Delperiode tom ${periode.tom.norskFormat()} må slutte på en søndag "
+                "$flereDelperioderFeilForklaring. Delperiode med tom ${periode.tom.norskFormat()} må slutte på en søndag"
             }
         }
     }
