@@ -113,7 +113,7 @@ class BoutgifterBeregningService(
     ): List<BeregningsresultatForLøpendeMåned> =
         vedtaksperioder
             .sorted()
-            .fitrerVekkPerioderFørBeregnFra(beregnFra)
+            .filtrerVekkPerioderFørBeregnFra(beregnFra)
             .splittVedGrensenTilFaktiskeUtgifter(utgifter)
             .flatMap { it.perioder.splittTilLøpendeMåneder() }
             .map { UtbetalingPeriode(it, skalAvkorteUtbetalingPeriode(utgifter)) }
@@ -213,7 +213,7 @@ private fun validerMidlertidigeUtgifterStrekkerSegUtenforVedtaksperiodene(
     }
 }
 
-private fun List<VedtaksperiodeBeregning>.fitrerVekkPerioderFørBeregnFra(beregnFra: LocalDate?): List<VedtaksperiodeBeregning> {
+private fun List<VedtaksperiodeBeregning>.filtrerVekkPerioderFørBeregnFra(beregnFra: LocalDate?): List<VedtaksperiodeBeregning> {
     if (beregnFra == null) return this
     return this
         .splitFra(beregnFra)
