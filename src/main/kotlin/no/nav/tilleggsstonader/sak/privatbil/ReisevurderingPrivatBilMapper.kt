@@ -98,6 +98,7 @@ object ReisevurderingPrivatBilMapper {
             behandletDato = avklartUke?.behandletDato,
             kjørelisteInnsendtDato = kjøreliste?.datoMottatt?.toLocalDate(),
             kjørelisteId = kjøreliste?.id,
+            erKjørelisteManueltRegistrert = kjøreliste?.manueltLagretIBehandling != null,
             avklartUkeId = avklartUke?.id,
             avklartKjørtUkeStatus = avklartUke?.avklartKjørtUkeStatus,
             dager =
