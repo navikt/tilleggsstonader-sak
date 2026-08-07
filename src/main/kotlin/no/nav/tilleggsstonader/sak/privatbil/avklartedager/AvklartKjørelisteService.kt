@@ -150,15 +150,15 @@ class AvklartKjørelisteService(
         oppdaterteDager: Collection<EndreAvklartDagRequest>,
     ): List<AvklartKjørtDag> {
         val ikkeSlettedeDatoer = eksisterendeDager.filterNot { it.erSlettet() }.map { it.dato }.toSet()
-        val requestPerDato = oppdaterteDager.groupBy { it.dato }
+        val oppdaterteDagerPerDato = oppdaterteDager.groupBy { it.dato }
 
-        brukerfeilHvis(requestPerDato.any { (_, request) -> request.size > 1 }) {
+        brukerfeilHvis(oppdaterteDagerPerDato.any { (_, oppdaterteDager) -> oppdaterteDager.size > 1 }) {
             "Kan ikke sende inn duplikate dager"
         }
 
-        val requestDatoer = requestPerDato.keys
+        val oppdaterteDagerDatoer = oppdaterteDagerPerDato.keys
 
-        brukerfeilHvis(requestDatoer != ikkeSlettedeDatoer) {
+        brukerfeilHvis(oppdaterteDagerDatoer != ikkeSlettedeDatoer) {
             "Alle dager i uken må sendes inn"
         }
 
@@ -166,7 +166,7 @@ class AvklartKjørelisteService(
             if (eksisterendeDag.erSlettet()) {
                 eksisterendeDag
             } else {
-                val oppdatertDag = requestPerDato.getValue(eksisterendeDag.dato).single()
+                val oppdatertDag = oppdaterteDagerPerDato.getValue(eksisterendeDag.dato).single()
                 eksisterendeDag.copy(
                     godkjentGjennomførtKjøring = oppdatertDag.godkjentGjennomførtKjøring,
                     parkeringsutgift = oppdatertDag.parkeringsutgift,
