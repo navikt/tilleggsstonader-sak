@@ -369,6 +369,50 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
         }
     }
 
+    @Nested
+    inner class NullstillBehandling {
+        @Test
+        fun `skal beholde eksisterende kjørelister og slette nye ved nullstilling`() {
+            val fom = 5 januar 2026
+            val tom = 18 januar 2026
+
+            val (revurderingId, fagsakId) =
+                opprettRammevedtakOgRevurdering(
+                    fom,
+                    tom,
+                    skalSendeInnKjørelisteForFørsteUka = true,
+                )
+
+            val kjørelisteOversikt = kall.privatBil.hentKjørelisteOversikt(revurderingId)
+
+            // Manuelt registrer uke 2
+            val kjørelisteId =
+                kall.privatBil
+                    .lagreManuellKjøreliste(
+                        revurderingId,
+                        LagreManuellKjørelisteRequest(
+                            journalpostId = journalpostId(),
+                            reiseId = kjørelisteOversikt.tilgjengeligeReiser.single().reiseId,
+                            begrunnelse = null,
+                            reisedager = lagKjørteDagerForUke(fom = 12 januar 2026, tom = tom, antallKjørteDager = 2),
+                        ),
+                    ).kjørelisteId
+
+            kall.steg.ferdigstill(revurderingId, StegController.FerdigstillStegRequest(StegType.REGISTRER_KJØRELISTE))
+
+            kall.behandling.nullstill(revurderingId)
+
+            val kjørelisterLagretIBehandling =
+                kjørelisteRepository.findByFagsakId(fagsakId)
+            assertThat(kjørelisterLagretIBehandling).hasSize(1)
+            assertThat(kjørelisterLagretIBehandling.filter { it.id == kjørelisteId }).isEmpty()
+
+            val avklarteUker = avklartKjørtUkeRepository.findByBehandlingId(revurderingId)
+            assertThat(avklarteUker.filter { it.kjørelisteId == kjørelisteId }).isEmpty()
+            assertThat(avklarteUker).hasSize(1)
+        }
+    }
+
     data class RevurderingContext(
         val revurderingId: BehandlingId,
         val fagsakId: FagsakId,

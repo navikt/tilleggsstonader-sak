@@ -59,7 +59,6 @@ internal class BehandlingServiceTest {
             behandlingshistorikkService = behandlingshistorikkService,
             taskService = taskService,
             unleashService = mockUnleashService(),
-            avklartKjørelisteService = avklartKjørelisteService,
         )
 
     private val behandlingSlot = slot<Behandling>()

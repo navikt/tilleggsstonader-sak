@@ -3,10 +3,13 @@ package no.nav.tilleggsstonader.sak.behandling
 import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -17,6 +20,7 @@ class HenleggService(
     private val fagsakService: FagsakService,
     private val oppgaveService: OppgaveService,
     private val tilkjentYtelseService: TilkjentYtelseService,
+    private val avklartKjørelisteService: AvklartKjørelisteService,
 ) {
     @Transactional
     fun henleggBehandling(
@@ -24,6 +28,12 @@ class HenleggService(
         henlagt: HenlagtDto,
     ): Behandling {
         val behandling = behandlingService.henleggBehandling(behandlingId, henlagt)
+
+        // Rydder opp manuelle kjørelister hvis de er lagt inn i behandling
+        if (behandling.type == BehandlingType.KJØRELISTE && behandling.årsak == BehandlingÅrsak.REGISTRER_KJØRELISTE_FOR_BRUKER) {
+            avklartKjørelisteService.slettAvklarteUkerOgKjørelisterLagtTilManueltIBehandling(behandling.id)
+        }
+
         // Rydder opp i andel_tilkjent_ytelse, for å tydelig markere at dette er andeler vi aldri skal utbetale
         tilkjentYtelseService.settAndelerForBehandlingTilUaktuellHvisFinnes(behandling.id)
         ferdigstillOppgaveTask(behandling)

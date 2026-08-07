@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
@@ -31,7 +31,7 @@ class AvklartKjørelisteService(
     private val vedtakService: VedtakService,
     private val avklartKjørtUkeRepository: AvklartKjørtUkeRepository,
     private val kjørelisteService: KjørelisteService,
-    private val behandlingRepository: BehandlingRepository,
+    private val behandlingService: BehandlingService,
     private val unleashService: UnleashService,
 ) {
     fun hentAvklarteUkerForBehandling(behandlingId: BehandlingId): List<AvklartKjørtUke> =
@@ -138,8 +138,7 @@ class AvklartKjørelisteService(
         uke: AvklartKjørtUke,
     ): AvklartKjørtUke? {
         val forrigeBehandlingId =
-            behandlingRepository.findByIdOrThrow(behandlingId).forrigeIverksatteBehandlingId
-                ?: return null
+            behandlingService.hentBehandling(behandlingId).forrigeIverksatteBehandlingId ?: return null
 
         return hentAvklarteUkerForBehandling(forrigeBehandlingId)
             .find { it.uke == uke.uke && it.reiseId == uke.reiseId }
