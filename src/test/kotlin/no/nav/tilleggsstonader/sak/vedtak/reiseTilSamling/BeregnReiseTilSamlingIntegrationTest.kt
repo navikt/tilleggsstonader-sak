@@ -44,7 +44,7 @@ class BeregnReiseTilSamlingIntegrationTest : IntegrationTest() {
                 .foreslåVedtaksperioder(behandlingContextNay.behandlingId)
                 .map { it.tilVedtaksperiodeDto() }
 
-        kall.vedtak
+        kall.beregnReiseTilSamling
             .beregn(
                 behandlingContextNay.behandlingId,
                 InnvilgelseReiseTilSamlingTsoRequest(

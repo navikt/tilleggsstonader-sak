@@ -9,12 +9,13 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.V
 class VilkårReiseTilSamlingKall(
     private val testklient: Testklient,
 ) {
-    fun hentVilkår(behandlingId: BehandlingId): List<VilkårReiseTilSamlingDto> = apiRespons.hentVilkår(behandlingId).expectOkWithBody()
+    fun hentVilkår(behandlingId: BehandlingId): List<VilkårReiseTilSamlingDto> =
+        apiRespons.hentVilkår(behandlingId).expectOkWithBody<List<VilkårReiseTilSamlingDto>>()
 
     fun opprettVilkår(
         behandlingId: BehandlingId,
         dto: LagreVilkårReiseTilSamlingDto,
-    ): VilkårReiseTilSamlingDto = apiRespons.opprettVilkår(behandlingId, dto).expectOkWithBody()
+    ): VilkårReiseTilSamlingDto = apiRespons.opprettVilkår(behandlingId, dto).expectOkWithBody<VilkårReiseTilSamlingDto>()
 
     fun regler(): RegelstrukturDto = apiRespons.regler().expectOkWithBody()
 

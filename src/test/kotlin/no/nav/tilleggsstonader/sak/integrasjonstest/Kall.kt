@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.integrasjonstest
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.ArenaKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.BehandlingKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.BeregnReiseTilSamlingKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.BrevKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.BrevmottakereKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.GjenopprettOppgaveKall
@@ -45,6 +46,7 @@ class Kall(
     val skjemaRouting = SkjemaRoutingKall(testklient)
     val totrinnskontroll = TotrinnskontrollKall(testklient)
     val vedtak = VedtakKall(testklient)
+    val beregnReiseTilSamling = BeregnReiseTilSamlingKall(testklient)
     val vilkår = VilkårKall(testklient)
     val vilkårDagligReise = VilkårDagligReiseKall(testklient)
     val vilkårReiseTilSamling = VilkårReiseTilSamlingKall(testklient)

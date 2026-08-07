@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakRequest
-import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingTsoRequest
 import org.springframework.test.web.servlet.client.RestTestClient
 
 class VedtakKall(
@@ -79,11 +78,6 @@ class VedtakKall(
         lagreVedtak(stønadstype, behandlingId, "innvilgelse", innvilgelseDto)
     }
 
-    fun beregn(
-        behandlingId: BehandlingId,
-        vedtakDto: InnvilgelseReiseTilSamlingTsoRequest,
-    ): RestTestClient.ResponseSpec = apiRespons.beregn(behandlingId, vedtakDto)
-
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = VedtakApi()
 
@@ -136,14 +130,6 @@ class VedtakKall(
             behandlingId: BehandlingId,
             opphørDto: VedtakRequest,
         ) = lagreVedtak(stønadstype, behandlingId, "opphor", opphørDto)
-
-        fun beregn(
-            behandlingId: BehandlingId,
-            vedtakDto: InnvilgelseReiseTilSamlingTsoRequest,
-        ) = testklient.post(
-            "/api/vedtak/reise-til-samling/$behandlingId/tso/beregn",
-            vedtakDto,
-        )
     }
 }
 
