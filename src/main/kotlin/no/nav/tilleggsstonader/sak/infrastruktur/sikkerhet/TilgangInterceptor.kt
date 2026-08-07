@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet
 
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.ManglerTilgang
+import no.nav.tilleggsstonader.libs.feil.ManglerTilgang
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.AsyncHandlerInterceptor

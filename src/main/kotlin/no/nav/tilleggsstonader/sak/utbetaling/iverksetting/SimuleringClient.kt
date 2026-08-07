@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.utbetaling.iverksetting
 
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.http.client.postForEntityNullable
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.SimuleringResponseDto
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.SimuleringDto
 import no.nav.tilleggsstonader.sak.util.EnvUtil

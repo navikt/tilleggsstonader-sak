@@ -2,6 +2,8 @@ package no.nav.tilleggsstonader.sak.fagsak
 
 import io.micrometer.core.instrument.Metrics
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.feil.feil
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingTilJournalføringDto
 import no.nav.tilleggsstonader.sak.behandling.dto.tilBehandlingJournalDto
@@ -20,8 +22,6 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.identer
@@ -113,7 +113,7 @@ class FagsakService(
 
     fun hentFagsakForBehandling(behandlingId: BehandlingId): Fagsak =
         fagsakRepository.finnFagsakTilBehandling(behandlingId)?.tilFagsakMedPerson()
-            ?: throw Feil("Finner ikke fagsak til behandlingId=$behandlingId")
+            ?: feil("Finner ikke fagsak til behandlingId=$behandlingId")
 
     fun hentEksternId(fagsakId: FagsakId): Long = eksternFagsakIdRepository.findByFagsakId(fagsakId).id
 

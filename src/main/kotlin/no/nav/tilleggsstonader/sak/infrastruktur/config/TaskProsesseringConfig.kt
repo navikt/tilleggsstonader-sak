@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.infrastruktur.config
 
 import no.nav.familie.prosessering.config.ProsesseringInfoProvider
 import no.nav.security.token.support.spring.SpringTokenValidationContextHolder
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.RolleConfig
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import org.springframework.context.annotation.Bean
@@ -24,7 +24,7 @@ class TaskProsesseringConfig(
                         .getClaims("azuread")
                         .getStringClaim("preferred_username")
                 } catch (e: Exception) {
-                    throw Feil("Mangler preferred_username på request")
+                    feil("Mangler preferred_username på request")
                 }
 
             override fun harTilgang(): Boolean = SikkerhetContext.hentGrupperFraToken().contains(rolleConfig.utvikler)

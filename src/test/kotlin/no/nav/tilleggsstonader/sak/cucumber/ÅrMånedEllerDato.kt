@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.cucumber
 
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import java.time.LocalDate
 import java.time.YearMonth
 

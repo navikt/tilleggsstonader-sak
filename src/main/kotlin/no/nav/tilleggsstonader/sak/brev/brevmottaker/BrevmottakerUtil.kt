@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.brev.brevmottaker
 
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 
 object BrevmottakerUtil {
     fun validerUnikeBrevmottakere(brevmottakereDto: BrevmottakereDto) {

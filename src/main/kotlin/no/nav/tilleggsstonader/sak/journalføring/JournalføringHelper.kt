@@ -11,9 +11,9 @@ import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.libs.feil.brukerfeil
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
 import org.springframework.http.HttpStatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.DokumentInfo as DokumentInfoJournalpost
@@ -38,7 +38,10 @@ object JournalføringHelper {
             DokumentBrevkode.erGyldigBrevkode(it.brevkode.toString()) &&
                 dokumentBrevkode == DokumentBrevkode.fraBrevkode(it.brevkode.toString()) &&
                 harOriginalDokument(it)
-        } ?: throw ApiFeil("Det finnes ingen søknad i journalposten for å opprette en ny behandling", HttpStatus.BAD_REQUEST)
+        } ?: brukerfeil(
+            "Det finnes ingen søknad i journalposten for å opprette en ny behandling",
+            HttpStatus.BAD_REQUEST,
+        )
     }
 
     private fun harOriginalDokument(dokument: DokumentInfoJournalpost): Boolean =

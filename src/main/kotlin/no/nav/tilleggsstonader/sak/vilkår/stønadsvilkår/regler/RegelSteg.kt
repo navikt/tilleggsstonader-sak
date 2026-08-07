@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler
 
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.libs.feil.feil
 
 /**
  * Ett [RegelSteg] er en regel med ett spørsmål med flere svar som mapper til en [SvarRegel]
@@ -28,7 +28,7 @@ data class RegelSteg(
     val erHovedregel: Boolean,
     val svarMapping: Map<SvarId, SvarRegel>,
 ) {
-    fun svarMapping(svarId: SvarId): SvarRegel = svarMapping[svarId] ?: throw Feil("Finner ikke svarId=$svarId for regelId=$regelId")
+    fun svarMapping(svarId: SvarId): SvarRegel = svarMapping[svarId] ?: feil("Finner ikke svarId=$svarId for regelId=$regelId")
 }
 
 /**

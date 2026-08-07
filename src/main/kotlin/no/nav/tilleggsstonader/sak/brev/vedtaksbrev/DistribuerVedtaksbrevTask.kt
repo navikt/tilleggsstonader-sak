@@ -4,10 +4,10 @@ import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.sak.brev.ResultatDistribusjon
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerVedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.util.stoppTaskOgRekjørSenere
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -40,7 +40,7 @@ class DistribuerVedtaksbrevTask(
 
         brevmottakerVedtaksbrevRepository
             .findByBehandlingId(behandlingId)
-            .ifEmpty { throw Feil("Ingen brevmottakere funnet") }
+            .ifEmpty { feil("Ingen brevmottakere funnet") }
             .filter { it.harIkkeFåttBrevet() }
             .map { distribuerVedtaksbrevService.distribuerVedtaksbrev(mottaker = it) }
             .håndterRekjøringSenereHvisMottakerErDød(task)

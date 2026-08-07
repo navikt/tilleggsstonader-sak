@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll
 
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.libs.feil.feil
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -10,8 +12,6 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkServ
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext.NAVIDENT_REGEX
@@ -106,16 +106,16 @@ class TotrinnskontrollService(
             totrinnskontrollRepository.findTopByBehandlingIdOrderBySporbarEndretEndretTidDesc(behandlingId = saksbehandling.id)
                 ?: error("Finnes ikke eksisterende Tostrinnskontroll på behandling")
         if (sisteTotrinnskontroll.status != TotrinnInternStatus.KAN_FATTE_VEDTAK) {
-            throw Feil(
+            feil(
                 message = "Status for totrinnskontoll er ikke korrekt, status =  ${sisteTotrinnskontroll.status} ",
-                frontendFeilmelding = "Status for totrinnskontoll er ikke korrekt, vennligst last side på nytt ",
+                sensitivFeilmelding = "Status for totrinnskontoll er ikke korrekt, vennligst last side på nytt ",
             )
         }
 
         if (beslutterErLikBehandler(sisteTotrinnskontroll)) {
-            throw Feil(
+            feil(
                 message = "Beslutter er samme som saksbehandler, kan ikke utføre totrinnskontroll",
-                frontendFeilmelding = "Beslutter er samme som behandler, samme person kan ikke godkjenne vedtaket",
+                sensitivFeilmelding = "Beslutter er samme som behandler, samme person kan ikke godkjenne vedtaket",
             )
         }
         val nyStatus = if (beslutteVedtak.godkjent) BehandlingStatus.IVERKSETTER_VEDTAK else BehandlingStatus.UTREDES
@@ -203,9 +203,9 @@ class TotrinnskontrollService(
         val behandlingId = behandling.id
 
         if (behandling.steg != StegType.BESLUTTE_VEDTAK) {
-            throw Feil(
+            feil(
                 message = "Totrinnskontroll kan ikke gjennomføres da steg på behandling er feil , steg = ${behandling.steg}",
-                frontendFeilmelding = "Feil i steg, kontakt brukerstøtte id=$behandlingId",
+                sensitivFeilmelding = "Feil i steg, kontakt brukerstøtte id=$behandlingId",
             )
         }
         val totrinnskontroll =
