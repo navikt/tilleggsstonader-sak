@@ -46,7 +46,12 @@ class AngreSendTilBeslutterServiceTest {
         every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
         every { totrinnskontrollService.hentSaksbehandlerSomSendteTilBeslutter(behandling.id) } returns saksbehandler1
         every { totrinnskontrollService.hentBeslutter(behandling.id) } returns null
-        every { oppgaveService.hentOppgaveDomainSomIkkeErFerdigstilt(behandling.id, Oppgavetype.GodkjenneVedtak) } returns
+        every {
+            oppgaveService.hentOppgaveDomainSomIkkeErFerdigstilt(
+                behandling.id,
+                Oppgavetype.GodkjenneVedtak,
+            )
+        } returns
             oppgave(behandlingId = behandling.id)
         every { oppgaveService.hentOppgave(oppgave.gsakOppgaveId) } returns
             Oppgave(id = 123, versjon = 0, tilordnetRessurs = null)
@@ -141,7 +146,7 @@ class AngreSendTilBeslutterServiceTest {
             } returns null
 
             assertThat(
-                catchThrowableOfType<ApiFeil> {
+                catchThrowableOfType<Feil> {
                     service.angreSendTilBeslutter(behandling.id)
                 },
             ).hasMessageContaining("Systemet har ikke rukket å opprette Godkjenne Vedtak oppgaven enda")
