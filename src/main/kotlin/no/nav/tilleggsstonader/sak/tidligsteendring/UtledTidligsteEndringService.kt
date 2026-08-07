@@ -272,6 +272,16 @@ data class TidligsteEndringIBehandlingUtleder(
     ): Boolean =
         when {
             vilkårNå.fakta is FaktaDagligReiseOffentligTransport &&
+                vilkårTidligereBehandling.fakta is FaktaDagligReisePrivatBil -> {
+                true
+            }
+
+            vilkårNå.fakta is FaktaDagligReisePrivatBil &&
+                vilkårTidligereBehandling.fakta is FaktaDagligReiseOffentligTransport -> {
+                true
+            }
+
+            vilkårNå.fakta is FaktaDagligReiseOffentligTransport &&
                 vilkårTidligereBehandling.fakta is FaktaDagligReiseOffentligTransport -> {
                 val faktaNå = vilkårNå.fakta
                 val faktaTidligere = vilkårTidligereBehandling.fakta
