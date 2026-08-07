@@ -2,10 +2,16 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.libs.utils.dato.februar
+import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
+import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseResponse
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseResponse
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
@@ -21,6 +27,7 @@ import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.AvslagPassAvBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.InnvilgelsePassAvBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.OpphørPassAvBarnResponse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -141,6 +148,47 @@ class VedtakDtoMapperTest {
 
     @Nested
     inner class DagligReise {
+        @Test
+        fun `skal kun ekskludere rammevedtak-reiser som er avsluttet før tidligste endring`() {
+            val reiseFørEndring = rammeForReiseMedPrivatBil(reiseId = ReiseId.random(), fom = 1 januar 2026, tom = 31 januar 2026)
+            val reiseSomDekkerTidligsteEndring =
+                rammeForReiseMedPrivatBil(reiseId = ReiseId.random(), fom = 20 januar 2026, tom = 8 februar 2026)
+            val reiseLikTidligsteEndring =
+                rammeForReiseMedPrivatBil(reiseId = ReiseId.random(), fom = 1 februar 2026, tom = 28 februar 2026)
+            val reiseEtterEndring =
+                rammeForReiseMedPrivatBil(reiseId = ReiseId.random(), fom = 1 mars 2026, tom = 31 mars 2026)
+            val vedtak =
+                DagligReiseTestUtil.innvilgelse(
+                    data =
+                        DagligReiseTestUtil.defaultInnvilgelseDagligReise.copy(
+                            rammevedtakPrivatBil =
+                                RammevedtakPrivatBil(
+                                    reiser =
+                                        listOf(
+                                            reiseFørEndring,
+                                            reiseSomDekkerTidligsteEndring,
+                                            reiseLikTidligsteEndring,
+                                            reiseEtterEndring,
+                                        ),
+                                ),
+                            beregningsplan =
+                                Beregningsplan(
+                                    omfang = Beregningsomfang.FRA_DATO,
+                                    fraDato = 1 februar 2026,
+                                    tidligsteEndring = 1 februar 2026,
+                                ),
+                        ),
+                )
+
+            val dto = vedtakDtoMapper.toDto(vedtak, forrigeIverksatteBehandlingId = null) as InnvilgelseDagligReiseResponse
+
+            assertThat(dto.rammevedtakPrivatBil!!.reiser.map { it.reiseId }).containsExactlyInAnyOrder(
+                reiseSomDekkerTidligsteEndring.reiseId,
+                reiseLikTidligsteEndring.reiseId,
+                reiseEtterEndring.reiseId,
+            )
+        }
+
         @Test
         fun `skal mappe opphørt vedtak til dto`() {
             val opphørsdato = LocalDate.of(2024, 1, 15)

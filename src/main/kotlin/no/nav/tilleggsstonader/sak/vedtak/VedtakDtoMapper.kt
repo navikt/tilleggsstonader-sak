@@ -217,7 +217,7 @@ class VedtakDtoMapper(
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,
-                    rammevedtakPrivatBil = data.rammevedtakPrivatBil?.tilDto(),
+                    rammevedtakPrivatBil = data.rammevedtakPrivatBil?.tilDto(data.beregningsplan),
                 )
             }
 
