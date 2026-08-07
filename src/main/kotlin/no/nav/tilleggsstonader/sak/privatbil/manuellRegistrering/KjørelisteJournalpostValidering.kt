@@ -29,7 +29,7 @@ class KjørelisteJournalpostValideringService(
         val journalpostFagsakId = journalpost.sak?.fagsakId
 
         brukerfeilHvis(journalpostFagsakId != fagsak.eksternId.id.toString()) {
-            "Journalpost med id=$journalpostId finnes ikke på fagsak"
+            "Journalpost med id=$journalpostId finnes ikke på saksnummer ${fagsak.eksternId.id}. Journalfør dokumentet på riktig saksnummer i gosys."
         }
     }
 }

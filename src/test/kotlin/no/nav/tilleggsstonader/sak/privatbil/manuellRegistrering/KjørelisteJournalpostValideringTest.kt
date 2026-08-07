@@ -58,6 +58,8 @@ class KjørelisteJournalpostValideringTest {
 
         assertThatThrownBy {
             validering.validerJournalpost(behandlingId, "999")
-        }.hasMessageContaining("Journalpost med id=999 finnes ikke på fagsak")
+        }.hasMessageContaining(
+            "Journalpost med id=999 finnes ikke på saksnummer ${fagsak.eksternId.id}. Journalfør dokumentet på riktig saksnummer i gosys.",
+        )
     }
 }
