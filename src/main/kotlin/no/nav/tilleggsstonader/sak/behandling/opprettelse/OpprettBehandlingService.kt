@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.behandling.vent.SettBehandlingPåVentOppgaveM
 import no.nav.tilleggsstonader.sak.behandling.vent.SettPåVentService
 import no.nav.tilleggsstonader.sak.behandling.vent.ÅrsakSettPåVent
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegUtil
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
@@ -93,7 +94,7 @@ class OpprettBehandlingService(
                     forrigeIverksatteBehandlingId = forrigeBehandling?.id,
                     type = behandlingType,
                     behandlingMetode = request.behandlingMetode,
-                    steg = utledBehandlingStegFraBehandlingsTypeOgÅrsak(behandlingType, request.behandlingsårsak),
+                    steg = StegUtil.utledFørsteStegForBehandling(behandlingType, request.behandlingsårsak),
                     status = behandlingStatus,
                     resultat = BehandlingResultat.IKKE_SATT,
                     årsak = request.behandlingsårsak,
@@ -108,7 +109,7 @@ class OpprettBehandlingService(
             behandlingshistorikk =
                 Behandlingshistorikk(
                     behandlingId = behandling.id,
-                    steg = utledBehandlingStegFraBehandlingsTypeOgÅrsak(behandlingType, request.behandlingsårsak),
+                    steg = StegUtil.utledFørsteStegForBehandling(behandlingType, request.behandlingsårsak),
                     gitVersjon = Applikasjonsversjon.versjon,
                 ),
         )
@@ -170,21 +171,6 @@ class OpprettBehandlingService(
             .data
             .rammevedtakPrivatBil != null
     }
-
-    private fun utledBehandlingStegFraBehandlingsTypeOgÅrsak(
-        behandlingType: BehandlingType,
-        behandlingsårsak: BehandlingÅrsak,
-    ): StegType =
-        when (behandlingType) {
-            BehandlingType.KJØRELISTE -> utledStegtypeForKjørelistebehandling(behandlingsårsak)
-            else -> StegType.INNGANGSVILKÅR
-        }
-
-    private fun utledStegtypeForKjørelistebehandling(behandlingsårsak: BehandlingÅrsak): StegType =
-        when (behandlingsårsak) {
-            BehandlingÅrsak.REGISTRER_KJØRELISTE_FOR_BRUKER -> StegType.REGISTRER_KJØRELISTE
-            else -> StegType.KJØRELISTE
-        }
 }
 
 data class OpprettBehandling(

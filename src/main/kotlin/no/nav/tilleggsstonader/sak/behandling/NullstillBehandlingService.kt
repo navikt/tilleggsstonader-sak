@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegUtil
 import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagerBrevRepository
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.VedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -46,15 +46,14 @@ class NullstillBehandlingService(
         }
         logger.info("Nullstiller behandling=${behandling.id}")
 
-        if (behandling.type == BehandlingType.KJØRELISTE) {
-            if (behandling.årsak == BehandlingÅrsak.REGISTRER_KJØRELISTE_FOR_BRUKER) {
-                behandlingService.oppdaterStegPåBehandling(behandling.id, StegType.REGISTRER_KJØRELISTE)
-            } else {
-                behandlingService.oppdaterStegPåBehandling(behandling.id, StegType.KJØRELISTE)
-            }
-        } else {
-            behandlingService.oppdaterStegPåBehandling(behandling.id, StegType.INNGANGSVILKÅR)
-        }
+        behandlingService.oppdaterStegPåBehandling(
+            behandlingId = behandling.id,
+            steg =
+                StegUtil.utledFørsteStegForBehandling(
+                    behandlingType = behandling.type,
+                    behandlingsårsak = behandling.årsak,
+                ),
+        )
 
         slettDataIBehandling(behandling)
 
