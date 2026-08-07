@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil
+package no.nav.tilleggsstonader.sak.vedtak.sats
 
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
@@ -8,17 +8,17 @@ import org.springframework.stereotype.Component
 import java.math.BigDecimal
 import java.time.LocalDate
 
-data class SatsDagligReisePrivatBil(
+data class SatsPrivatBil(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val beløp: BigDecimal,
     val bekreftet: Boolean = true,
 ) : Periode<LocalDate>,
-    KopierPeriode<SatsDagligReisePrivatBil> {
+    KopierPeriode<SatsPrivatBil> {
     override fun medPeriode(
         fom: LocalDate,
         tom: LocalDate,
-    ) = SatsDagligReisePrivatBil(
+    ) = SatsPrivatBil(
         fom = fom,
         tom = tom,
         beløp = beløp,
@@ -28,31 +28,31 @@ data class SatsDagligReisePrivatBil(
 
 private val MAX = LocalDate.of(2099, 12, 31)
 
-private val bekreftedeSatser: List<SatsDagligReisePrivatBil> =
+private val bekreftedeSatser: List<SatsPrivatBil> =
     listOf(
-        SatsDagligReisePrivatBil(
+        SatsPrivatBil(
             fom = 1 januar 2026,
             tom = 31 desember 2026,
             beløp = BigDecimal("2.94"),
         ),
-        SatsDagligReisePrivatBil(
+        SatsPrivatBil(
             fom = 1 januar 2025,
             tom = 31 desember 2025,
             beløp = BigDecimal("2.88"),
         ),
-        SatsDagligReisePrivatBil(
+        SatsPrivatBil(
             fom = 1 januar 2024,
             tom = 31 desember 2024,
             beløp = BigDecimal("2.79"),
         ),
-        SatsDagligReisePrivatBil(
+        SatsPrivatBil(
             fom = 1 januar 2023,
             tom = 31 desember 2023,
             beløp = BigDecimal("2.62"),
         ),
     )
 
-val satser: List<SatsDagligReisePrivatBil> =
+val satser: List<SatsPrivatBil> =
     listOf(
         bekreftedeSatser.max().let {
             it.copy(
@@ -64,11 +64,11 @@ val satser: List<SatsDagligReisePrivatBil> =
     ) + bekreftedeSatser
 
 @Component
-class SatsDagligReisePrivatBilProvider {
-    val alleSatser: List<SatsDagligReisePrivatBil>
+class SatsPrivatBilProvider {
+    val alleSatser: List<SatsPrivatBil>
         get() = satser
 
-    fun finnRelevantKilometerSatsForPeriode(periode: Periode<LocalDate>): SatsDagligReisePrivatBil =
+    fun finnRelevantKilometerSatsForPeriode(periode: Periode<LocalDate>): SatsPrivatBil =
         alleSatser.find { it.inneholder(periode) }
             ?: error("Kan ikke finne relevant kilometersats for $periode")
 

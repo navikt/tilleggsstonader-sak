@@ -31,13 +31,13 @@ sealed interface VilkårFakta {
 data class FaktaReiseTilSamlingOffentligTransport(
     override val reiseId: ReiseId,
     override val adresse: String?,
-    val utgifterOffentligTransport: Int?,
+    val utgifterOffentligTransport: BigDecimal,
 ) : VilkårFakta
 
 data class FaktaReiseTilSamlingPrivatBil(
     override val reiseId: ReiseId,
     override val adresse: String?,
-    val reiseavstand: BigDecimal?,
+    val reiseavstand: BigDecimal,
 ) : VilkårFakta
 
 data class FaktaReiseTilSamlingUbestemt(

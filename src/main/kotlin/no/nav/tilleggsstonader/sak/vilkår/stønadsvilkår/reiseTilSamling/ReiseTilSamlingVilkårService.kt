@@ -118,7 +118,7 @@ class ReiseTilSamlingVilkårService(
                 return FaktaOffentligTransport(
                     reiseId = this.reiseId,
                     adresse = this.adresse,
-                    utgifterOffentligTransport = utgifterOffentligTransport?.takeIf { it > 0 },
+                    utgifterOffentligTransport = utgifterOffentligTransport,
                 )
             }
 
