@@ -2,9 +2,9 @@ package no.nav.tilleggsstonader.sak.infrastruktur.database.repository
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.oppfølging.Behandlingsdetaljer
 import no.nav.tilleggsstonader.sak.oppfølging.Oppfølging
 import no.nav.tilleggsstonader.sak.oppfølging.OppfølgingMedDetaljer

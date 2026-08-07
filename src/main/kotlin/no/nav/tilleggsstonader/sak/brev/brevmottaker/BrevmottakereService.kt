@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.brev.brevmottaker
 
 import no.nav.tilleggsstonader.kontrakter.brevmottaker.BrevmottakerDto
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerUtil.validerAntallBrevmottakere
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerUtil.validerUnikeBrevmottakere
@@ -9,7 +10,6 @@ import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.Mottaker
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.MottakerRolle
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.MottakerType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

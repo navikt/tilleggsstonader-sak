@@ -2,8 +2,8 @@ package no.nav.tilleggsstonader.sak.journalføring.dto
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest.UstrukturertDokumentasjonType.IKKE_VALGT
 import java.time.LocalDate
 

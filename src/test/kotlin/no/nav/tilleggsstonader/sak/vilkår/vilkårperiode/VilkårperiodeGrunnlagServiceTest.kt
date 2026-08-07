@@ -4,6 +4,8 @@ import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
+import no.nav.tilleggsstonader.libs.feil.ApiFeil
+import no.nav.tilleggsstonader.libs.feil.Feil
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -11,8 +13,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.ArenaKontraktUtil
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetClient
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDto
@@ -111,7 +111,7 @@ class VilkårperiodeGrunnlagServiceTest : CleanDatabaseIntegrationTest() {
                     vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id, ingenVilkårperioder)
                 }
             }
-        assertThat(exception.frontendFeilmelding).contains("Behandlingen er ikke påbegynt")
+        assertThat(exception.feil).contains("Behandlingen er ikke påbegynt")
     }
 
     @Test
@@ -125,7 +125,7 @@ class VilkårperiodeGrunnlagServiceTest : CleanDatabaseIntegrationTest() {
                     vilkårperiodeGrunnlagService.hentEllerOpprettGrunnlag(behandling.id, ingenVilkårperioder)
                 }
             }
-        assertThat(exception.frontendFeilmelding).contains("Behandlingen er ikke påbegynt")
+        assertThat(exception.feil).contains("Behandlingen er ikke påbegynt")
     }
 
     @Test
@@ -342,7 +342,7 @@ class VilkårperiodeGrunnlagServiceTest : CleanDatabaseIntegrationTest() {
             val feil =
                 org.junit.jupiter.api
                     .assertThrows<Feil> { vilkårperiodeGrunnlagService.oppdaterGrunnlag(behandling.id) }
-            assertThat(feil.frontendFeilmelding)
+            assertThat(feil.message)
                 .isEqualTo("Kan ikke oppdatere grunnlag når behandlingen er i annet steg enn vilkår.")
         }
 
@@ -353,7 +353,7 @@ class VilkårperiodeGrunnlagServiceTest : CleanDatabaseIntegrationTest() {
             val feil =
                 org.junit.jupiter.api
                     .assertThrows<Feil> { vilkårperiodeGrunnlagService.oppdaterGrunnlag(behandling.id) }
-            assertThat(feil.frontendFeilmelding)
+            assertThat(feil.message)
                 .isEqualTo("Kan ikke oppdatere grunnlag når behandlingen er låst")
         }
     }

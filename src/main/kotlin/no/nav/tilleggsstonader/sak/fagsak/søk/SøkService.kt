@@ -1,10 +1,10 @@
 package no.nav.tilleggsstonader.sak.fagsak.søk
 
+import no.nav.tilleggsstonader.libs.feil.brukerfeil
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPerson
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.arena.ArenaService
 import no.nav.tilleggsstonader.sak.opplysninger.dto.NavnDto
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -28,7 +28,7 @@ class SøkService(
     fun søkPersonForEksternFagsak(eksternFagsakId: Long): Søkeresultat {
         val fagsak =
             fagsakService.hentFagsakPåEksternIdHvisEksisterer(eksternFagsakId)
-                ?: throw ApiFeil("Finner ikke fagsak for eksternFagsakId=$eksternFagsakId", HttpStatus.BAD_REQUEST)
+                ?: brukerfeil("Finner ikke fagsak for eksternFagsakId=$eksternFagsakId", HttpStatus.BAD_REQUEST)
         val fagsakPerson = fagsakPersonService.hentPerson(fagsak.fagsakPersonId)
         return tilSøkeresultat(fagsakPerson.hentAktivIdent(), fagsakPerson)
     }
@@ -47,7 +47,7 @@ class SøkService(
             return tilSøkeresultat(gjeldendePersonIdent, null)
         }
 
-        throw ApiFeil("Personen har ikke fagsak eller sak i arena", HttpStatus.BAD_REQUEST)
+        brukerfeil("Personen har ikke fagsak eller sak i arena", HttpStatus.BAD_REQUEST)
     }
 
     private fun tilSøkeresultat(

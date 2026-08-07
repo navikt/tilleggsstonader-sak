@@ -3,13 +3,13 @@ package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 import io.github.mikaojk.holiday.getNorwegianHolidays
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
-import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
@@ -31,7 +31,7 @@ class AvklartKjørelisteService(
     private val vedtakService: VedtakService,
     private val avklartKjørtUkeRepository: AvklartKjørtUkeRepository,
     private val kjørelisteService: KjørelisteService,
-    private val behandlingService: BehandlingService,
+    private val behandlingRepository: BehandlingRepository,
     private val unleashService: UnleashService,
 ) {
     fun hentAvklarteUkerForBehandling(behandlingId: BehandlingId): List<AvklartKjørtUke> =
@@ -139,8 +139,9 @@ class AvklartKjørelisteService(
         uke: AvklartKjørtUke,
     ): AvklartKjørtUke? {
         val forrigeBehandlingId =
-            behandlingService.hentBehandling(behandlingId).forrigeIverksatteBehandlingId
+            behandlingRepository.findByIdOrThrow(behandlingId).forrigeIverksatteBehandlingId
                 ?: return null
+
         return hentAvklarteUkerForBehandling(forrigeBehandlingId)
             .find { it.uke == uke.uke && it.reiseId == uke.reiseId }
     }
@@ -377,4 +378,14 @@ class AvklartKjørelisteService(
         } else {
             null
         }
+
+    fun slettAvklarteUkerOgKjørelisterLagtTilManueltIBehandling(behandlingId: BehandlingId) {
+        val kjørelisterLagretIBehandling = kjørelisteService.hentManueltLagredeIBehandling(behandlingId)
+
+        kjørelisterLagretIBehandling.forEach {
+            avklartKjørtUkeRepository.deleteAvklartKjørtUkesByKjørelisteId(it.id)
+        }
+
+        kjørelisteService.slettKjørelister(kjørelisterLagretIBehandling)
+    }
 }

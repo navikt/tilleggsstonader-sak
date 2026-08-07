@@ -272,10 +272,21 @@ data class TidligsteEndringIBehandlingUtleder(
     ): Boolean =
         when {
             vilkårNå.fakta is FaktaDagligReiseOffentligTransport &&
+                vilkårTidligereBehandling.fakta is FaktaDagligReisePrivatBil -> {
+                true
+            }
+
+            vilkårNå.fakta is FaktaDagligReisePrivatBil &&
+                vilkårTidligereBehandling.fakta is FaktaDagligReiseOffentligTransport -> {
+                true
+            }
+
+            vilkårNå.fakta is FaktaDagligReiseOffentligTransport &&
                 vilkårTidligereBehandling.fakta is FaktaDagligReiseOffentligTransport -> {
                 val faktaNå = vilkårNå.fakta
                 val faktaTidligere = vilkårTidligereBehandling.fakta
-                faktaNå.reisedagerPerUke != faktaTidligere.reisedagerPerUke ||
+                faktaNå.reiseId != faktaTidligere.reiseId ||
+                    faktaNå.reisedagerPerUke != faktaTidligere.reisedagerPerUke ||
                     faktaNå.prisEnkelbillett != faktaTidligere.prisEnkelbillett ||
                     faktaNå.prisSyvdagersbillett != faktaTidligere.prisSyvdagersbillett ||
                     faktaNå.prisTrettidagersbillett != faktaTidligere.prisTrettidagersbillett
@@ -289,7 +300,8 @@ data class TidligsteEndringIBehandlingUtleder(
                 val sammenligningsTom =
                     minOf(requireNotNull(vilkårNå.tom), requireNotNull(vilkårTidligereBehandling.tom))
 
-                faktaNå.reiseavstandEnVei != faktaTidligere.reiseavstandEnVei ||
+                faktaNå.reiseId != faktaTidligere.reiseId ||
+                    faktaNå.reiseavstandEnVei != faktaTidligere.reiseavstandEnVei ||
                     normaliserPrivatBilDelperioder(faktaNå, sammenligningsFom, sammenligningsTom) !=
                     normaliserPrivatBilDelperioder(faktaTidligere, sammenligningsFom, sammenligningsTom)
             }

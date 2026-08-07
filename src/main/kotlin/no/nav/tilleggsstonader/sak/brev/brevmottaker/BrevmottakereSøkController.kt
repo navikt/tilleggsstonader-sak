@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.brev.brevmottaker
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
+import no.nav.tilleggsstonader.libs.feil.brukerfeil
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.PersonIdentDto
 import no.nav.tilleggsstonader.sak.opplysninger.ereg.EregService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -39,7 +39,7 @@ class BrevmottakereSøkController(
         @PathVariable organisasjonsnummer: String,
     ): IOrganisasjonDto {
         if (!ORGNR_REGEX.matches(organisasjonsnummer)) {
-            throw ApiFeil("Ugyldig organisasjonsnummer", HttpStatus.BAD_REQUEST)
+            brukerfeil("Ugyldig organisasjonsnummer", HttpStatus.BAD_REQUEST)
         }
         val organisasjonsNavnDto = eregService.hentOrganisasjon(organisasjonsnummer)
         return IOrganisasjonDto(organisasjonsNavnDto.navn.navnelinje1, organisasjonsNavnDto.organisasjonsnummer)

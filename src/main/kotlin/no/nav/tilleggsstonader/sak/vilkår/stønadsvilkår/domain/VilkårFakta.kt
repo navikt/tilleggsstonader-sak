@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -31,13 +31,13 @@ sealed interface VilkårFakta {
 data class FaktaReiseTilSamlingOffentligTransport(
     override val reiseId: ReiseId,
     override val adresse: String?,
-    val utgifterOffentligTransport: Int?,
+    val utgifterOffentligTransport: BigDecimal,
 ) : VilkårFakta
 
 data class FaktaReiseTilSamlingPrivatBil(
     override val reiseId: ReiseId,
     override val adresse: String?,
-    val reiseavstand: BigDecimal?,
+    val reiseavstand: BigDecimal,
 ) : VilkårFakta
 
 data class FaktaReiseTilSamlingUbestemt(

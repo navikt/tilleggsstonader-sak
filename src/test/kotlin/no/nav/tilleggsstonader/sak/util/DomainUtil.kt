@@ -82,6 +82,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.VilkårReiseTilSamling
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingOffentligTransportDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.LagreVilkårReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -660,7 +663,7 @@ fun vilkårReiseTilSamling(
 fun faktaOffentligTransportReiseTilSamling(
     reiseId: ReiseId = dummyReiseId,
     adresse: String = "Tiltaksveien 1",
-    utgifterOffentligTransport: Int = 40,
+    utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
 ) = FaktaOffentligTransportReiseTilSamling(
     reiseId = reiseId,
     adresse = adresse,
@@ -689,6 +692,38 @@ fun lagreDagligReiseDto(
             )
         },
 ) = LagreVilkårDagligReiseDto(
+    fom = fom,
+    tom = tom,
+    reiseId = reiseId,
+    adresse = adresse,
+    svar = svar,
+    fakta = fakta,
+)
+
+fun lagreReiseTilSamlingDto(
+    fom: LocalDate = 1 januar 2025,
+    tom: LocalDate = 31 januar 2025,
+    adresse: String = "Tiltaksveien 1",
+    reiseId: ReiseId = dummyReiseId,
+    utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
+    svar: Map<RegelId, SvarOgBegrunnelseDto> =
+        mapOf(
+            RegelId.AVSTAND_OVER_TRETTI_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
+            RegelId.DOKUMENTERTE_UTGIFTER to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
+            RegelId.DEKKET_AV_ANNET_STIPEND to SvarOgBegrunnelseDto(svar = SvarId.NEI),
+            RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
+        ),
+    fakta: FaktaReiseTilSamlingDto =
+        faktaOffentligTransportReiseTilSamling(
+            adresse = adresse,
+            reiseId = reiseId,
+            utgifterOffentligTransport = utgifterOffentligTransport,
+        ).run {
+            FaktaReiseTilSamlingOffentligTransportDto(
+                utgifterOffentligTransport = utgifterOffentligTransport,
+            )
+        },
+) = LagreVilkårReiseTilSamlingDto(
     fom = fom,
     tom = tom,
     reiseId = reiseId,

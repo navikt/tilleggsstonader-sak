@@ -3,18 +3,33 @@ package no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain
 import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
+import java.math.BigDecimal
 import java.time.LocalDate
 
-interface BeregningsresultatForReiseTilSamling
+data class BeregningReiseTilSamling(
+    val offentligTransport: List<BeregningsresultatOffentligTransport>,
+    val privatBil: List<BeregningsresultatPrivatBil>,
+)
 
 data class BeregningsresultatOffentligTransport(
-    val reiser: List<BeregningsresultatOffentligTransportForSamling>,
-) : BeregningsresultatForReiseTilSamling
-
-data class BeregningsresultatOffentligTransportForSamling(
     val reiseId: ReiseId,
     val grunnlag: BeregningsgrunnlagOffentligTransportForSamling,
-    val beløp: Int?,
+    val beløp: BigDecimal,
+)
+
+data class BeregningsresultatPrivatBil(
+    val reiseId: ReiseId,
+    val grunnlag: BeregningsgrunnlagPrivatBilForSamling,
+    val beløp: BigDecimal,
+)
+
+data class BeregningsgrunnlagPrivatBilForSamling(
+    val adresse: String?,
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val sats: BigDecimal,
+    val totaltReiseavstand: BigDecimal,
+    val vedtaksperioder: List<VedtaksperiodeGrunnlag>,
 )
 
 data class BeregningsgrunnlagOffentligTransportForSamling(

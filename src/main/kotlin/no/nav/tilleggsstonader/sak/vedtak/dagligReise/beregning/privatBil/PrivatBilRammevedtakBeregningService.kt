@@ -6,11 +6,11 @@ import no.nav.tilleggsstonader.kontrakter.felles.allePerioderErSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBilBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -35,7 +36,7 @@ import java.math.RoundingMode
 
 @Service
 class PrivatBilRammevedtakBeregningService(
-    private val satsDagligReisePrivatBilProvider: SatsDagligReisePrivatBilProvider,
+    private val satsPrivatBilProvider: SatsPrivatBilProvider,
     private val vilkårperiodeService: VilkårperiodeService,
     private val behandlingService: BehandlingService,
     private val unleashService: UnleashService,
@@ -171,7 +172,7 @@ class PrivatBilRammevedtakBeregningService(
                 .map { it.first }
                 .map { delperiode ->
                     val satser =
-                        satsDagligReisePrivatBilProvider
+                        satsPrivatBilProvider
                             .finnAlleSatserInnenforPeriode(delperiode)
                             .map { sats ->
                                 val snitt =

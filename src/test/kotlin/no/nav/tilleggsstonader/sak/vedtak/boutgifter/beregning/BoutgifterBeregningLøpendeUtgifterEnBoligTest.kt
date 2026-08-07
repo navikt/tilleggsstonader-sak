@@ -2,11 +2,14 @@ package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.libs.utils.dato.april
+import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.mai
 import no.nav.tilleggsstonader.libs.utils.dato.mars
+import no.nav.tilleggsstonader.libs.utils.dato.november
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
@@ -313,5 +316,70 @@ class BoutgifterBeregningLøpendeUtgifterEnBoligTest {
         assertThat(perioder[2].fom).isEqualTo(1 april 2026)
         assertThat(perioder[2].tom).isEqualTo(30 april 2026)
         assertThat(perioder[2].stønadsbeløp).isEqualTo(600)
+    }
+
+    @Test
+    fun `revurdering av gammel satsjustering skal ikke skape gap mellom gamle og nye perioder`() {
+        every { vilkårperiodeService.hentVilkårperioder(any()) } returns
+            Vilkårperioder(
+                målgrupper = listOf(målgruppe(fom = 11 november 2025, tom = 31 mars 2026)),
+                aktiviteter = listOf(aktivitet(fom = 11 november 2025, tom = 31 mars 2026)),
+            )
+
+        val utgifter: BoutgifterPerUtgiftstype =
+            mapOf(
+                TypeBoutgift.LØPENDE_UTGIFTER_EN_BOLIG to
+                    listOf(
+                        lagUtgiftBeregningBoutgifter(
+                            fom = 11 november 2025,
+                            tom = 31 mars 2026,
+                            utgift = 3000,
+                        ),
+                    ),
+            )
+
+        // Gamle, nyttårskuttede perioder fra forrige (buggy) vedtak
+        val gamlePerioder =
+            listOf(
+                lagBeregningsresultatMåned(fom = 11 november 2025, tom = 10 desember 2025, utgifter = utgifter),
+                lagBeregningsresultatMåned(fom = 11 desember 2025, tom = 31 desember 2025, utgifter = utgifter),
+                lagBeregningsresultatMåned(fom = 1 januar 2026, tom = 31 januar 2026, utgifter = utgifter),
+            )
+
+        val innvilgelseBoutgifter =
+            innvilgelseBoutgifter(
+                beregningsresultat = BeregningsresultatBoutgifter(gamlePerioder),
+                vedtaksperioder =
+                    listOf(vedtaksperiode(fom = 11 november 2025, tom = 31 januar 2026)),
+            )
+
+        every { boutgifterUtgiftService.hentUtgifterTilBeregning(any()) } returns utgifter
+        every { vedtakRepository.findByIdOrThrow(any()) } returns innvilgelseBoutgifter
+
+        val saksbehandling =
+            saksbehandling(
+                forrigeIverksatteBehandlingId = BehandlingId.random(),
+                type = BehandlingType.REVURDERING,
+            )
+
+        val res =
+            boutgifterBeregningService
+                .beregn(
+                    behandling = saksbehandling,
+                    vedtaksperioder = listOf(vedtaksperiode(fom = 11 november 2025, tom = 31 mars 2026)),
+                    plan = Beregningsplan(Beregningsomfang.FRA_DATO, 1 februar 2026),
+                    typeVedtak = TypeVedtak.INNVILGELSE,
+                ).perioder
+
+        val perioder = res.map { Datoperiode(it.fom, it.tom) }
+
+        assertThat(perioder)
+            .containsExactly(
+                Datoperiode(11 november 2025, 10 desember 2025),
+                Datoperiode(11 desember 2025, 31 desember 2025),
+                Datoperiode(1 januar 2026, 31 januar 2026),
+                Datoperiode(1 februar 2026, 28 februar 2026),
+                Datoperiode(1 mars 2026, 31 mars 2026),
+            )
     }
 }

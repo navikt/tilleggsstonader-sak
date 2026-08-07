@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
-import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
@@ -39,7 +39,7 @@ class AvklartKjørelisteServiceTest {
     private val avklartKjørtUkeRepository = mockk<AvklartKjørtUkeRepository>()
     private val kjørelisteService = mockk<KjørelisteService>()
     private val vedtakService = mockk<VedtakService>()
-    private val behandlingService = mockk<BehandlingService>()
+    private val behandlingRepository = mockk<BehandlingRepository>()
     private val unleashService = mockk<UnleashService>()
 
     private val service =
@@ -47,7 +47,7 @@ class AvklartKjørelisteServiceTest {
             vedtakService = vedtakService,
             avklartKjørtUkeRepository = avklartKjørtUkeRepository,
             kjørelisteService = kjørelisteService,
-            behandlingService = behandlingService,
+            behandlingRepository = behandlingRepository,
             unleashService = unleashService,
         )
 
@@ -343,7 +343,7 @@ class AvklartKjørelisteServiceTest {
                     },
             )
         every { kjørelisteService.hentKjøreliste(eksisterendeUke.kjørelisteId) } returns innsendtKjøreliste
-        every { behandlingService.hentBehandling(behandlingId) } returns behandling
+        every { behandlingRepository.findByIdOrThrow(behandlingId) } returns behandling
         every { unleashService.isEnabled(Toggle.KAN_OVERSKRIDE_ANTALL_DAGER_I_RAMMEVEDTAK) } returns false
 
         val vedtakData =

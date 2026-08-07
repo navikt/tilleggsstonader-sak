@@ -1,11 +1,11 @@
 package no.nav.tilleggsstonader.sak.brev.frittstående
 
 import no.nav.tilleggsstonader.kontrakter.dokdist.Distribusjonstype
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.sak.brev.DistribuerBrevService
 import no.nav.tilleggsstonader.sak.brev.ResultatDistribusjon
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.BrevmottakerFrittståendeBrevRepository
 import no.nav.tilleggsstonader.sak.brev.brevmottaker.domain.BrevmottakerFrittståendeBrev
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.infrastruktur.felles.TransactionHandler
 import org.springframework.stereotype.Service
 

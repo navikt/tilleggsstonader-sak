@@ -1,11 +1,11 @@
 package no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning
 
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.util.formatertPeriodeNorskFormat
 import no.nav.tilleggsstonader.sak.util.sisteDagenILøpendeMåned
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
@@ -69,8 +69,7 @@ class BoutgifterBeregningService(
             typeVedtak = typeVedtak,
         )
 
-        val vedtaksperioderBeregning =
-            vedtaksperioder.tilVedtaksperiodeBeregning().sorted().splitFra(plan.beregnFra())
+        val vedtaksperioderBeregning = vedtaksperioder.tilVedtaksperiodeBeregning().sorted()
 
         val utgifterPerVilkårtype =
             boutgifterUtgiftService
@@ -89,7 +88,12 @@ class BoutgifterBeregningService(
             vedtaksperioderBeregning,
         )
 
-        val beregningsresultat = beregnAktuellePerioder(vedtaksperioderBeregning, utgifterPerVilkårtype)
+        val beregningsresultat =
+            beregnAktuellePerioder(
+                vedtaksperioder = vedtaksperioderBeregning,
+                utgifter = utgifterPerVilkårtype,
+                beregnFra = plan.beregnFra(),
+            )
 
         return if (forrigeVedtak != null) {
             settSammenGamleOgNyePerioder(
@@ -105,14 +109,15 @@ class BoutgifterBeregningService(
     private fun beregnAktuellePerioder(
         vedtaksperioder: List<VedtaksperiodeBeregning>,
         utgifter: BoutgifterPerUtgiftstype,
+        beregnFra: LocalDate?,
     ): List<BeregningsresultatForLøpendeMåned> =
         vedtaksperioder
-            .sorted()
+            .filtrerVekkPerioderFørBeregnFra(beregnFra)
             .splittVedGrensenTilFaktiskeUtgifter(utgifter)
             .flatMap { it.perioder.splittTilLøpendeMåneder() }
             .map { UtbetalingPeriode(it, skalAvkorteUtbetalingPeriode(utgifter)) }
             .validerIngenLøpendeOgMidlertidigUtgiftISammeUtbetalingsperiode(utgifter)
-            .validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(utgifter)
+            .validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(utgifter, beregnFra)
             .validerIngenUtbetalingsperioderOverlapperFlereLøpendeUtgifter(
                 utgifter = utgifter,
                 finnMakssats = satsBoutgifterService::finnMakssats,
@@ -207,10 +212,19 @@ private fun validerMidlertidigeUtgifterStrekkerSegUtenforVedtaksperiodene(
     }
 }
 
+private fun List<VedtaksperiodeBeregning>.filtrerVekkPerioderFørBeregnFra(beregnFra: LocalDate?): List<VedtaksperiodeBeregning> {
+    if (beregnFra == null) return this
+    return this
+        .splitFra(beregnFra)
+        .filter { it.tom >= beregnFra }
+}
+
 private fun List<UtbetalingPeriode>.validerIngenUtgifterTilOvernattingKrysserUtbetalingsperioder(
     utgifter: BoutgifterPerUtgiftstype,
+    beregnFra: LocalDate?,
 ): List<UtbetalingPeriode> {
-    val utgifterTilOvernatting = utgifter[TypeBoutgift.UTGIFTER_OVERNATTING] ?: emptyList()
+    val utgifterTilOvernatting =
+        utgifter[TypeBoutgift.UTGIFTER_OVERNATTING]?.filter { beregnFra == null || it.tom >= beregnFra } ?: emptyList()
     val utbetalingsperioder = this
 
     val detFinnesUtgiftSomKrysserUtbetalingsperioder =

@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.brev.brevmottaker.domain
 
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 
 data class Mottaker(
     val mottakerRolle: MottakerRolle,

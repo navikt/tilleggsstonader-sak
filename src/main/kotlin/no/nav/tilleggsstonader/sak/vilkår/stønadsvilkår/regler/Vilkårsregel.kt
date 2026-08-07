@@ -1,10 +1,10 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -42,7 +42,7 @@ abstract class Vilkårsregel(
     constructor(vilkårType: VilkårType, regler: Set<RegelSteg>) :
         this(vilkårType, regler.associateBy { it.regelId })
 
-    fun regel(regelId: RegelId): RegelSteg = regler[regelId] ?: throw Feil("Finner ikke regelId=$regelId for vilkårType=$vilkårType")
+    fun regel(regelId: RegelId): RegelSteg = regler[regelId] ?: feil("Finner ikke regelId=$regelId for vilkårType=$vilkårType")
 
     protected fun automatiskVurdertDelvilkår(
         regelId: RegelId,

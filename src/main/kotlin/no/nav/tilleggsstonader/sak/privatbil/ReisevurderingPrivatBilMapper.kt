@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
@@ -98,6 +98,7 @@ object ReisevurderingPrivatBilMapper {
             behandletDato = avklartUke?.behandletDato,
             kjørelisteInnsendtDato = kjøreliste?.datoMottatt?.toLocalDate(),
             kjørelisteId = kjøreliste?.id,
+            erKjørelisteManueltRegistrert = kjøreliste?.manueltLagretIBehandling != null,
             avklartUkeId = avklartUke?.id,
             avklartKjørtUkeStatus = avklartUke?.avklartKjørtUkeStatus,
             dager =

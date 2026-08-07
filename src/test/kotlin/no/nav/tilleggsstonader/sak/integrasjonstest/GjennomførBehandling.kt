@@ -26,6 +26,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.journalpostSøknadF
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.util.SøknadBoutgifterUtil.søknadBoutgifter
 import no.nav.tilleggsstonader.sak.util.SøknadDagligReiseUtil.søknadDagligReise
+import no.nav.tilleggsstonader.sak.util.SøknadReiseTilSamlingUtil.søknadReiseTilSamling
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.barnMedBarnepass
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaLæremidler
 import no.nav.tilleggsstonader.sak.util.SøknadUtil.søknadskjemaPassAvBarn
@@ -106,7 +107,7 @@ private fun søknadForStønadstype(
     Stønadstype.DAGLIG_REISE_TSR,
     -> søknadDagligReise(ident = ident)
 
-    Stønadstype.REISE_TIL_SAMLING_TSO -> TODO("lage søgnadskjema for reise til samling")
+    Stønadstype.REISE_TIL_SAMLING_TSO -> søknadReiseTilSamling(ident = ident)
 }
 
 fun IntegrationTest.gjennomførBehandlingsløp(

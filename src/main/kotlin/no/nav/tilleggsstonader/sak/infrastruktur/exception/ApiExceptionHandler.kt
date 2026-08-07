@@ -1,6 +1,9 @@
 package no.nav.tilleggsstonader.sak.infrastruktur.exception
 
 import no.nav.security.token.support.core.exceptions.JwtTokenMissingException
+import no.nav.tilleggsstonader.libs.feil.ApiFeil
+import no.nav.tilleggsstonader.libs.feil.Feil
+import no.nav.tilleggsstonader.libs.feil.ManglerTilgang
 import no.nav.tilleggsstonader.libs.log.SecureLogger
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PdlNotFoundException
 import org.springframework.core.NestedExceptionUtils
@@ -71,23 +74,23 @@ class ApiExceptionHandler : ResponseEntityExceptionHandler() {
     @ExceptionHandler(ApiFeil::class)
     fun handleThrowable(feil: ApiFeil): ProblemDetail {
         val metodeSomFeiler = finnMetodeSomFeiler(feil)
-        secureLogger.info("En håndtert feil har oppstått(${feil.httpStatus}): ${feil.frontendFeilmelding}", feil)
+        secureLogger.info("En håndtert feil har oppstått(${feil.httpStatus}): ${feil.message}", feil)
         logger.info(
             "En håndtert feil har oppstått(${feil.httpStatus}) " +
                 "metode=$metodeSomFeiler exception=${rootCause(feil)}: ${feil.message} ",
         )
-        return ProblemDetail.forStatusAndDetail(feil.httpStatus, feil.frontendFeilmelding)
+        return ProblemDetail.forStatusAndDetail(feil.httpStatus, feil.message)
     }
 
     @ExceptionHandler(Feil::class)
     fun handleThrowable(feil: Feil): ProblemDetail {
         val metodeSomFeiler = finnMetodeSomFeiler(feil)
-        secureLogger.error("En håndtert feil har oppstått(${feil.httpStatus}): ${feil.frontendFeilmelding}", feil)
+        secureLogger.error("En håndtert feil har oppstått(${feil.httpStatus}): ${feil.sensitivFeilmelding}", feil)
         logger.error(
             "En håndtert feil har oppstått(${feil.httpStatus}) " +
                 "metode=$metodeSomFeiler exception=${rootCause(feil)}: ${feil.message} ",
         )
-        return ProblemDetail.forStatusAndDetail(feil.httpStatus, feil.frontendFeilmelding)
+        return ProblemDetail.forStatusAndDetail(feil.httpStatus, feil.message)
     }
 
     @ExceptionHandler(PdlNotFoundException::class)

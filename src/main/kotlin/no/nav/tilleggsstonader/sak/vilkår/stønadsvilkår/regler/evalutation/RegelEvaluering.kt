@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation
 
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.Feil
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
@@ -20,7 +20,7 @@ data class RegelResultat(
     val delvilkår: Map<RegelId, Vilkårsresultat>,
 ) {
     fun resultatHovedregel(hovedregel: RegelId) =
-        delvilkår[hovedregel] ?: throw Feil("Savner resultat for regelId=$hovedregel vilkårType=$vilkårType")
+        delvilkår[hovedregel] ?: feil("Savner resultat for regelId=$hovedregel vilkårType=$vilkårType")
 }
 
 object RegelEvaluering {

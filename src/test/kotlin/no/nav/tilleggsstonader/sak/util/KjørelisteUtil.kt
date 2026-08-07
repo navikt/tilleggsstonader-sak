@@ -19,6 +19,7 @@ object KjørelisteUtil {
         datoMottatt: LocalDateTime = LocalDateTime.now(),
         reiseId: ReiseId = ReiseId.random(),
         periode: Datoperiode,
+        begrunnelse: String? = null,
         kjørteDager: List<KjørtDag> =
             listOf(
                 KjørtDag(dato = LocalDate.now(), parkeringsutgift = null),
@@ -39,6 +40,7 @@ object KjørelisteUtil {
             journalpostId = journalpostId,
             fagsakId = fagsakId,
             datoMottatt = datoMottatt,
+            begrunnelse = begrunnelse,
             data =
                 InnsendtKjøreliste(
                     reiseId = reiseId,
