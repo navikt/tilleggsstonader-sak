@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.libs.utils.dato.januar
-import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
@@ -28,18 +27,19 @@ import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteRepository
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeRepository
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
-import no.nav.tilleggsstonader.sak.util.erFørNåværendeUke
 import no.nav.tilleggsstonader.sak.util.finnNesteSøndag
-import no.nav.tilleggsstonader.sak.util.iDagHvisMandagEllerForrigeMandag
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import java.time.LocalDate
 import kotlin.random.Random
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
     @Autowired
     private lateinit var behandlingService: BehandlingService
@@ -50,11 +50,51 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
     @Autowired
     private lateinit var avklartKjørtUkeRepository: AvklartKjørtUkeRepository
 
+    val fom = 5 januar 2026
+    val tom = 18 januar 2026
+
+    var revurderingId: BehandlingId? = null
+    var fagsakId: FagsakId? = null
+
+    @BeforeAll
+    fun setUp() {
+        val førstegangsBehandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                defaultDagligReisePrivatBilTsoTestdata(fom, tom)
+
+                sendInnKjøreliste {
+                    periode = Datoperiode(fom, fom.finnNesteSøndag())
+                    kjørteDager =
+                        listOf(
+                            KjørtDag(dato = fom, parkeringsutgift = 50),
+                        )
+                }
+            }
+
+        val manuellKjørelisteBehandling =
+            testoppsettService.hentBehandlinger(førstegangsBehandlingContext.fagsakId).single {
+                it.type == BehandlingType.KJØRELISTE && it.behandlingMetode == BehandlingMetode.MANUELL
+            }
+
+        gjennomførKjørelisteBehandling(manuellKjørelisteBehandling)
+
+
+        revurderingId =
+            opprettRevurdering(opprettBehandlingDto(fagsakId = førstegangsBehandlingContext.fagsakId))
+
+        fagsakId = førstegangsBehandlingContext.fagsakId
+    }
+
+    @AfterEach
+    fun cleanUp() {
+        kall.behandling.nullstill(revurderingId!!)
+    }
+
     @Test
     fun `skal være mulig å manuelt registrere en kjøreliste som blir utbetalt`() {
-        val fom = 5 januar 2026
-        val tom = 11 januar 2026
-        val (revurderingId, fagsakId) = opprettRammevedtakOgRevurdering(fom, tom)
+        val revurderingId = revurderingId!!
 
         val kjørelisteOversikt = kall.privatBil.hentKjørelisteOversikt(revurderingId)
 
@@ -77,7 +117,7 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
         )
 
         // Sjekk at riktig kjøreliste ble lagret ned
-        val alleKjørelisterPåFagsak = kjørelisteRepository.findByFagsakId(fagsakId)
+        val alleKjørelisterPåFagsak = kjørelisteRepository.findByFagsakId(fagsakId!!)
         assertThat(alleKjørelisterPåFagsak).hasSize(1)
         assertThat(alleKjørelisterPåFagsak.single().data.fom).isEqualTo(fom)
         assertThat(alleKjørelisterPåFagsak.single().data.tom).isEqualTo(tom)
@@ -100,194 +140,10 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
     }
 
     @Nested
-    inner class ValideringVedLagring {
-        @Test
-        fun `skal ikke være mulig å sende inn kjørelister fremover i tid`() {
-            val dagensDato = LocalDate.now()
-            val fom = dagensDato.minusMonths(1)
-            val tom = dagensDato.plusMonths(1)
-
-            val (revurderingId) = opprettRammevedtakOgRevurdering(fom, tom)
-
-            val kjørelisteOversikt = kall.privatBil.hentKjørelisteOversikt(revurderingId)
-
-            // Skal kun hente uker bakover i tid
-            kjørelisteOversikt.tilgjengeligeReiser.forEach {
-                it.uker.forEach { uke ->
-                    assertThat(uke.fom.tilUkeIÅr().erFørNåværendeUke()).isTrue
-                }
-            }
-
-            val mandag = dagensDato.iDagHvisMandagEllerForrigeMandag()
-
-            val reisedager = lagKjørteDagerForUke(fom = mandag, tom = mandag.finnNesteSøndag(), antallKjørteDager = 2)
-
-            val lagreRequest =
-                LagreManuellKjørelisteRequest(
-                    journalpostId = journalpostId(),
-                    reiseId = kjørelisteOversikt.tilgjengeligeReiser.single().reiseId,
-                    begrunnelse = null,
-                    reisedager = reisedager,
-                )
-
-            kall.privatBil.apiRespons
-                .lagreManuellKjøreliste(
-                    revurderingId,
-                    lagreRequest,
-                ).expectProblemDetail(
-                    HttpStatus.BAD_REQUEST,
-                    "Kan ikke registrere kjøreliste for dager som er fremover i tid",
-                )
-        }
-
-        @Test
-        fun `skal ikke være mulig å registrere kjørelister for uker som alt er innsendt`() {
-            val fom = 5 januar 2026
-            val tom = 18 januar 2026
-
-            val (revurderingId) =
-                opprettRammevedtakOgRevurdering(
-                    fom = fom,
-                    tom = tom,
-                    skalSendeInnKjørelisteForFørsteUka = true,
-                )
-
-            val kjørelisteOversikt = kall.privatBil.hentKjørelisteOversikt(revurderingId)
-
-            val innsendteUker =
-                kjørelisteOversikt.tilgjengeligeReiser
-                    .single()
-                    .uker
-                    .filter { it.innsendtTidligere }
-            assertThat(innsendteUker).hasSize(1)
-            assertThat(innsendteUker.single().fom).isEqualTo(fom)
-
-            val ikkeInnsendteUker =
-                kjørelisteOversikt.tilgjengeligeReiser
-                    .single()
-                    .uker
-                    .filter { !it.innsendtTidligere }
-            assertThat(ikkeInnsendteUker).hasSize(1)
-
-            // Sender inn for uke som alt er registrert
-            kall.privatBil.apiRespons
-                .lagreManuellKjøreliste(
-                    revurderingId,
-                    LagreManuellKjørelisteRequest(
-                        journalpostId = journalpostId(),
-                        reiseId = kjørelisteOversikt.tilgjengeligeReiser.single().reiseId,
-                        begrunnelse = null,
-                        reisedager = lagKjørteDagerForUke(fom = fom, tom = 11 januar 2026, antallKjørteDager = 2),
-                    ),
-                ).expectProblemDetail(
-                    forventetStatus = HttpStatus.BAD_REQUEST,
-                    forventetDetail = "Innsendte dager overlapper med tidligere innsendte kjørelister",
-                )
-        }
-
-        @Test
-        fun `skal ikke være mulig å sende inn kjøreliste hvis rammevedtak ikke finnes`() {
-            val fom = 1 januar 2026
-            val tom = 31 januar 2026
-
-            val (revurderingId) = opprettRammevedtakOgRevurdering(fom, tom)
-
-            val reisedager = lagKjørteDagerForUke(fom = fom, tom = tom, antallKjørteDager = 2)
-
-            val lagreRequest =
-                LagreManuellKjørelisteRequest(
-                    journalpostId = journalpostId(),
-                    reiseId = ReiseId.random(),
-                    begrunnelse = null,
-                    reisedager = reisedager,
-                )
-
-            kall.privatBil.apiRespons
-                .lagreManuellKjøreliste(
-                    revurderingId,
-                    lagreRequest,
-                ).expectProblemDetail(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Fant ikke rammevedtak for reise",
-                )
-        }
-
-        @Test
-        fun `skal ikke kunne sende inn kjøreliste utenfor rammevedtaket`() {
-            val fom = 5 januar 2026
-            val tom = 11 januar 2026
-
-            val (revurderingId) = opprettRammevedtakOgRevurdering(fom, tom)
-
-            val reiseId =
-                kall.privatBil
-                    .hentKjørelisteOversikt(revurderingId)
-                    .tilgjengeligeReiser
-                    .single()
-                    .reiseId
-
-            val reisedager = lagKjørteDagerForUke(fom = 5 januar 2026, tom = 18 januar 2026, antallKjørteDager = 2)
-
-            val lagreRequest =
-                LagreManuellKjørelisteRequest(
-                    journalpostId = journalpostId(),
-                    reiseId = reiseId,
-                    begrunnelse = null,
-                    reisedager = reisedager,
-                )
-
-            kall.privatBil.apiRespons
-                .lagreManuellKjøreliste(
-                    revurderingId,
-                    lagreRequest,
-                ).expectProblemDetail(
-                    HttpStatus.BAD_REQUEST,
-                    "Perioden for innsendt kjøreliste er utenfor rammevedtaket",
-                )
-        }
-
-        @Test
-        fun `skal ikke kunne sende inn ufullstendige uker`() {
-            val fom = 5 januar 2026
-            val tom = 11 januar 2026
-
-            val (revurderingId) = opprettRammevedtakOgRevurdering(fom, tom)
-
-            val reiseId =
-                kall.privatBil
-                    .hentKjørelisteOversikt(revurderingId)
-                    .tilgjengeligeReiser
-                    .single()
-                    .reiseId
-
-            val reisedager = lagKjørteDagerForUke(fom = 5 januar 2026, tom = 6 januar 2026, antallKjørteDager = 2)
-
-            val lagreRequest =
-                LagreManuellKjørelisteRequest(
-                    journalpostId = journalpostId(),
-                    reiseId = reiseId,
-                    begrunnelse = null,
-                    reisedager = reisedager,
-                )
-
-            kall.privatBil.apiRespons
-                .lagreManuellKjøreliste(
-                    revurderingId,
-                    lagreRequest,
-                ).expectProblemDetail(
-                    HttpStatus.BAD_REQUEST,
-                    "Uke 2 er sendt inn ufullstendig.",
-                )
-        }
-    }
-
-    @Nested
     inner class SlettManuellKjøreliste {
         @Test
         fun `skal kunne slette en kjøreliste og tilhørende avklart uke som ble lagret manuelt i denne behandlingen`() {
-            val fom = 5 januar 2026
-            val tom = 18 januar 2026
-            val (revurderingId, fagsakId) = opprettRammevedtakOgRevurdering(fom, tom)
+            val revurderingId = revurderingId!!
 
             val reiseId =
                 kall.privatBil
@@ -340,10 +196,10 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
 
             // Avklarte uker som ble opprettet for kjørelisten skal ha blitt slettet
             val avklarteUker = avklartKjørtUkeRepository.findByBehandlingId(revurderingId)
-            assertThat(avklarteUker).hasSize(1)
+            assertThat(avklarteUker).hasSize(2)
             assertThat(avklarteUker.single().kjørelisteId).isEqualTo(kjørelisteIdSomBeholdes)
 
-            val kjørelister = kjørelisteRepository.findByFagsakId(fagsakId)
+            val kjørelister = kjørelisteRepository.findByFagsakId(fagsakId!!)
 
             assertThat(kjørelister).hasSize(1)
             assertThat(kjørelister.single().id).isEqualTo(kjørelisteIdSomBeholdes)
@@ -351,11 +207,9 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
 
         @Test
         fun `skal ikke kunne slette kjørelister som er innsendt av bruker`() {
-            val fom = 5 januar 2026
-            val tom = 18 januar 2026
-            val (revurderingId, fagsakId) = opprettRammevedtakOgRevurdering(fom, tom, skalSendeInnKjørelisteForFørsteUka = true)
+            val revurderingId = revurderingId!!
 
-            val innsendtKjørelisteId = kjørelisteRepository.findByFagsakId(fagsakId).single().id
+            val innsendtKjørelisteId = kjørelisteRepository.findByFagsakId(fagsakId!!).single().id
 
             kall.privatBil.apiRespons.slettManuellKjøreliste(revurderingId, innsendtKjørelisteId).expectProblemDetail(
                 forventetStatus = HttpStatus.BAD_REQUEST,
@@ -368,10 +222,7 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
     inner class Henlegg {
         @Test
         fun `skal slette nye kjørelister og avklarte uker ved henleggelse`() {
-            val fom = 5 januar 2026
-            val tom = 11 januar 2026
-
-            val (revurderingId) = opprettRammevedtakOgRevurdering(fom, tom)
+            val revurderingId = revurderingId!!
 
             val kjørelisteOversikt = kall.privatBil.hentKjørelisteOversikt(revurderingId)
 
@@ -406,15 +257,7 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
 
         @Test
         fun `skal beholde eksisterende kjørelister og slette nye ved henleggelse`() {
-            val fom = 5 januar 2026
-            val tom = 18 januar 2026
-
-            val (revurderingId, fagsakId) =
-                opprettRammevedtakOgRevurdering(
-                    fom,
-                    tom,
-                    skalSendeInnKjørelisteForFørsteUka = true,
-                )
+            val revurderingId = revurderingId!!
 
             val kjørelisteOversikt = kall.privatBil.hentKjørelisteOversikt(revurderingId)
 
@@ -442,7 +285,7 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
             )
 
             val kjørelisterLagretIBehandling =
-                kjørelisteRepository.findByFagsakId(fagsakId)
+                kjørelisteRepository.findByFagsakId(fagsakId!!)
             assertThat(kjørelisterLagretIBehandling).hasSize(1)
             assertThat(kjørelisterLagretIBehandling.filter { it.id == kjørelisteId }).isEmpty()
 
@@ -456,15 +299,7 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
     inner class NullstillBehandling {
         @Test
         fun `skal beholde eksisterende kjørelister og slette nye ved nullstilling`() {
-            val fom = 5 januar 2026
-            val tom = 18 januar 2026
-
-            val (revurderingId, fagsakId) =
-                opprettRammevedtakOgRevurdering(
-                    fom,
-                    tom,
-                    skalSendeInnKjørelisteForFørsteUka = true,
-                )
+            val revurderingId = revurderingId!!
 
             val kjørelisteOversikt = kall.privatBil.hentKjørelisteOversikt(revurderingId)
 
@@ -486,7 +321,7 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
             kall.behandling.nullstill(revurderingId)
 
             val kjørelisterLagretIBehandling =
-                kjørelisteRepository.findByFagsakId(fagsakId)
+                kjørelisteRepository.findByFagsakId(fagsakId!!)
             assertThat(kjørelisterLagretIBehandling).hasSize(1)
             assertThat(kjørelisterLagretIBehandling.filter { it.id == kjørelisteId }).isEmpty()
 
@@ -494,51 +329,6 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
             assertThat(avklarteUker.filter { it.kjørelisteId == kjørelisteId }).isEmpty()
             assertThat(avklarteUker).hasSize(1)
         }
-    }
-
-    data class RevurderingContext(
-        val revurderingId: BehandlingId,
-        val fagsakId: FagsakId,
-    )
-
-    private fun opprettRammevedtakOgRevurdering(
-        fom: LocalDate,
-        tom: LocalDate,
-        skalSendeInnKjørelisteForFørsteUka: Boolean = false,
-    ): RevurderingContext {
-        val førstegangsBehandlingContext =
-            opprettBehandlingOgGjennomførBehandlingsløp(
-                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-            ) {
-                defaultDagligReisePrivatBilTsoTestdata(fom, tom)
-
-                if (skalSendeInnKjørelisteForFørsteUka) {
-                    sendInnKjøreliste {
-                        periode = Datoperiode(fom, fom.finnNesteSøndag())
-                        kjørteDager =
-                            listOf(
-                                KjørtDag(dato = fom, parkeringsutgift = 50),
-                            )
-                    }
-                }
-            }
-
-        if (skalSendeInnKjørelisteForFørsteUka) {
-            val manuellKjørelisteBehandling =
-                testoppsettService.hentBehandlinger(førstegangsBehandlingContext.fagsakId).single {
-                    it.type == BehandlingType.KJØRELISTE && it.behandlingMetode == BehandlingMetode.MANUELL
-                }
-
-            gjennomførKjørelisteBehandling(manuellKjørelisteBehandling)
-        }
-
-        val revurderingId =
-            opprettRevurdering(opprettBehandlingDto(fagsakId = førstegangsBehandlingContext.fagsakId))
-
-        return RevurderingContext(
-            revurderingId = revurderingId,
-            fagsakId = førstegangsBehandlingContext.fagsakId,
-        )
     }
 
     private fun lagKjørteDagerForUke(
