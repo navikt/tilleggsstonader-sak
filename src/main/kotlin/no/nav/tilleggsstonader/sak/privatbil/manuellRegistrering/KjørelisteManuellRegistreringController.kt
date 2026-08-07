@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -45,6 +46,17 @@ class KjørelisteManuellRegistreringController(
         return LagreManuellKjørelisteResponse(
             kjørelisteId = lagretKjøreliste.id,
         )
+    }
+
+    @DeleteMapping("{behandlingId}/{kjørelisteId}")
+    fun slettManuellKjøreliste(
+        @PathVariable behandlingId: BehandlingId,
+        @PathVariable kjørelisteId: KjørelisteId,
+    ) {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
+        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.DELETE)
+
+        kjørelisteManuellRegistreringService.slettManuellKjøreliste(behandlingId, kjørelisteId)
     }
 }
 

@@ -282,6 +282,89 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
     }
 
     @Nested
+    inner class SlettManuellKjøreliste {
+        @Test
+        fun `skal kunne slette en kjøreliste og tilhørende avklart uke som ble lagret manuelt i denne behandlingen`() {
+            val fom = 5 januar 2026
+            val tom = 18 januar 2026
+            val (revurderingId, fagsakId) = opprettRammevedtakOgRevurdering(fom, tom)
+
+            val reiseId =
+                kall.privatBil
+                    .hentKjørelisteOversikt(revurderingId)
+                    .tilgjengeligeReiser
+                    .single()
+                    .reiseId
+
+            val kjørelisteIdSomSkalSlettes =
+                kall.privatBil
+                    .lagreManuellKjøreliste(
+                        behandlingId = revurderingId,
+                        request =
+                            LagreManuellKjørelisteRequest(
+                                journalpostId = journalpostId(),
+                                reiseId = reiseId,
+                                begrunnelse = null,
+                                reisedager =
+                                    lagKjørteDagerForUke(
+                                        fom = 5 januar 2026,
+                                        tom = 11 januar 2026,
+                                        antallKjørteDager = 2,
+                                    ),
+                            ),
+                    ).kjørelisteId
+
+            val kjørelisteIdSomBeholdes =
+                kall.privatBil
+                    .lagreManuellKjøreliste(
+                        behandlingId = revurderingId,
+                        request =
+                            LagreManuellKjørelisteRequest(
+                                journalpostId = journalpostId(),
+                                reiseId = reiseId,
+                                begrunnelse = null,
+                                reisedager =
+                                    lagKjørteDagerForUke(
+                                        fom = 12 januar 2026,
+                                        tom = 18 januar 2026,
+                                        antallKjørteDager = 2,
+                                    ),
+                            ),
+                    ).kjørelisteId
+
+            // Ferdigstiller steget slik at avklarte uker opprettes
+            kall.steg.ferdigstill(revurderingId, StegController.FerdigstillStegRequest(StegType.REGISTRER_KJØRELISTE))
+            kall.steg.reset(revurderingId, StegController.ResetStegRequest(StegType.REGISTRER_KJØRELISTE))
+
+            kall.privatBil.slettManuellKjøreliste(revurderingId, kjørelisteIdSomSkalSlettes)
+
+            // Avklarte uker som ble opprettet for kjørelisten skal ha blitt slettet
+            val avklarteUker = avklartKjørtUkeRepository.findByBehandlingId(revurderingId)
+            assertThat(avklarteUker).hasSize(1)
+            assertThat(avklarteUker.single().kjørelisteId).isEqualTo(kjørelisteIdSomBeholdes)
+
+            val kjørelister = kjørelisteRepository.findByFagsakId(fagsakId)
+
+            assertThat(kjørelister).hasSize(1)
+            assertThat(kjørelister.single().id).isEqualTo(kjørelisteIdSomBeholdes)
+        }
+
+        @Test
+        fun `skal ikke kunne slette kjørelister som er innsendt av bruker`() {
+            val fom = 5 januar 2026
+            val tom = 18 januar 2026
+            val (revurderingId, fagsakId) = opprettRammevedtakOgRevurdering(fom, tom, skalSendeInnKjørelisteForFørsteUka = true)
+
+            val innsendtKjørelisteId = kjørelisteRepository.findByFagsakId(fagsakId).single().id
+
+            kall.privatBil.apiRespons.slettManuellKjøreliste(revurderingId, innsendtKjørelisteId).expectProblemDetail(
+                forventetStatus = HttpStatus.BAD_REQUEST,
+                forventetDetail = "Kan ikke slette en kjøreliste som ikke er innsendt manuelt i denne behandlingen",
+            )
+        }
+    }
+
+    @Nested
     inner class Henlegg {
         @Test
         fun `skal slette nye kjørelister og avklarte uker ved henleggelse`() {

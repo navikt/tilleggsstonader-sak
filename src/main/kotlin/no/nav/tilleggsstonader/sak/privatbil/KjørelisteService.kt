@@ -37,6 +37,10 @@ class KjørelisteService(
         repository.deleteAll(kjørelister)
     }
 
+    fun slettKjøreliste(kjøreliste: Kjøreliste) {
+        repository.delete(kjøreliste)
+    }
+
     fun hentForFagsakId(fagsakId: FagsakId): List<Kjøreliste> = repository.findByFagsakId(fagsakId)
 
     fun hentKjøreliste(kjørelisteId: KjørelisteId): Kjøreliste = repository.findByIdOrThrow(kjørelisteId)

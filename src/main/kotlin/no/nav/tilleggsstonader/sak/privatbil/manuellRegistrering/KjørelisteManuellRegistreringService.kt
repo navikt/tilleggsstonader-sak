@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering
 
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -11,6 +12,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.privatbil.InnsendtKjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
+import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.util.erFørNåværendeUke
@@ -69,6 +71,20 @@ class KjørelisteManuellRegistreringService(
             behandlingId = behandlingId,
             manueltRegistrert = true,
         )
+    }
+
+    fun slettManuellKjøreliste(
+        behandlingId: BehandlingId,
+        kjørelisteId: KjørelisteId,
+    ) {
+        val kjørelisteSomSkalSlettes = kjørelisteService.hentKjøreliste(kjørelisteId)
+
+        brukerfeilHvisIkke(kjørelisteSomSkalSlettes.manueltLagretIBehandling == behandlingId) {
+            "Kan ikke slette en kjøreliste som ikke er innsendt manuelt i denne behandlingen"
+        }
+
+        avklartKjørelisteService.slettAvklartKjøreliste(kjørelisteSomSkalSlettes.id)
+        kjørelisteService.slettKjøreliste(kjørelisteSomSkalSlettes)
     }
 
     /**
