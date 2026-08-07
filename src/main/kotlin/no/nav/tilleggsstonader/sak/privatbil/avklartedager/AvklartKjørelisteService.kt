@@ -3,7 +3,7 @@ package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 import io.github.mikaojk.holiday.getNorwegianHolidays
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
-import no.nav.tilleggsstonader.libs.feil.feilHvis
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
@@ -75,7 +75,7 @@ class AvklartKjørelisteService(
         val innsendteKjørelisteDager = kjørelisteService.hentKjøreliste(eksisterendeUke.kjørelisteId).data.reisedager
 
         validerOppdatertAvklartKjørtUke(
-            oppdaterteDager = oppdaterteDager,
+            oppdaterteDager = oppdaterteDager.filter { it.avklartKjørtDagStatus != AvklartKjørtDagStatus.SLETTET },
             ukeSomSkalOppdateres = eksisterendeUke.uke,
             rammevedtak = rammevedtak,
             innsendteKjørelisteDager = innsendteKjørelisteDager,
@@ -149,18 +149,33 @@ class AvklartKjørelisteService(
     private fun oppdaterAvklarteDager(
         eksisterendeDager: Collection<AvklartKjørtDag>,
         oppdaterteDager: Collection<EndreAvklartDagRequest>,
-    ): List<AvklartKjørtDag> =
-        eksisterendeDager
-            .associateWith { eksisterendeDag -> oppdaterteDager.find { it.dato == eksisterendeDag.dato } }
-            .map { (eksisterendeDag, oppdatertDag) ->
-                feilHvis(oppdatertDag == null) { "Alle dager i uke må sendes inn" }
+    ): List<AvklartKjørtDag> {
+        val ikkeSlettedeDatoer = eksisterendeDager.filterNot { it.erSlettet() }.map { it.dato }.toSet()
+        val oppdaterteDagerPerDato = oppdaterteDager.groupBy { it.dato }
 
+        brukerfeilHvis(oppdaterteDagerPerDato.any { (_, oppdaterteDager) -> oppdaterteDager.size > 1 }) {
+            "Kan ikke sende inn duplikate dager"
+        }
+
+        val oppdaterteDagerDatoer = oppdaterteDagerPerDato.keys
+
+        brukerfeilHvis(oppdaterteDagerDatoer != ikkeSlettedeDatoer) {
+            "Alle dager i uken må sendes inn"
+        }
+
+        return eksisterendeDager.map { eksisterendeDag ->
+            if (eksisterendeDag.erSlettet()) {
+                eksisterendeDag
+            } else {
+                val oppdatertDag = oppdaterteDagerPerDato.getValue(eksisterendeDag.dato).single()
                 eksisterendeDag.copy(
                     godkjentGjennomførtKjøring = oppdatertDag.godkjentGjennomførtKjøring,
                     parkeringsutgift = oppdatertDag.parkeringsutgift,
                     begrunnelse = oppdatertDag.begrunnelse,
                 )
             }
+        }
+    }
 
     private fun utledGodkjentGjennomførtKjøringAutomatisk(
         harKjørt: Boolean,

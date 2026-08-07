@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -219,6 +220,106 @@ class AvklartKjørelisteServiceTest {
             )
 
             assertThat(oppdatertSlot.captured.avklartKjørtUkeStatus).isEqualTo(AvklartKjørtUkeStatus.UENDRET)
+        }
+
+        @Test
+        fun `skal kunne oppdatere uke uten å sende inn slettede dager`() {
+            val ukeMedSlettetMandag =
+                lagUke(status = AvklartKjørtUkeStatus.ENDRET).let { uke ->
+                    val mandag = uke.dager.single { it.dato == mandag }.markerSomSlettet()
+                    uke.copy(dager = (uke.dager.filterNot { it.dato == mandag.dato } + mandag).toSet())
+                }
+            val oppdatertSlot = slot<AvklartKjørtUke>()
+
+            settOppMocks(ukeMedSlettetMandag)
+            every { avklartKjørtUkeRepository.update(capture(oppdatertSlot)) } answers { oppdatertSlot.captured }
+
+            val request =
+                lagRequest()
+                    .filterNot { it.dato == mandag }
+                    .map {
+                        if (it.dato == mandag.plusDays(1)) {
+                            it.copy(parkeringsutgift = 100, begrunnelse = "endret i test")
+                        } else {
+                            it
+                        }
+                    }
+
+            service.oppdaterAvklartUke(
+                behandlingId = behandlingId,
+                ukeId = ukeMedSlettetMandag.id,
+                request = request,
+            )
+
+            val oppdatertUke = oppdatertSlot.captured
+            assertThat(oppdatertUke.dager.single { it.dato == mandag }.avklartKjørtDagStatus).isEqualTo(AvklartKjørtDagStatus.SLETTET)
+            assertThat(oppdatertUke.dager.single { it.dato == mandag.plusDays(1) }.parkeringsutgift).isEqualTo(100)
+        }
+
+        @Test
+        fun `skal feile hvis request inneholder duplikate dager`() {
+            val ukeMedSlettetMandag =
+                lagUke(status = AvklartKjørtUkeStatus.ENDRET).let { uke ->
+                    val mandag = uke.dager.single { it.dato == mandag }.markerSomSlettet()
+                    uke.copy(dager = (uke.dager.filterNot { it.dato == mandag.dato } + mandag).toSet())
+                }
+
+            settOppMocks(ukeMedSlettetMandag)
+            val tirsdag = mandag.plusDays(1)
+            val request =
+                lagRequest()
+                    .filterNot { it.dato == mandag }
+                    .let { it + it.single { dag -> dag.dato == tirsdag } }
+
+            assertThatThrownBy {
+                service.oppdaterAvklartUke(
+                    behandlingId = behandlingId,
+                    ukeId = ukeMedSlettetMandag.id,
+                    request = request,
+                )
+            }.hasMessageContaining("Kan ikke sende inn duplikate dager")
+        }
+
+        @Test
+        fun `skal feile hvis request inneholder slettet dag`() {
+            val ukeMedSlettetMandag =
+                lagUke(status = AvklartKjørtUkeStatus.ENDRET).let { uke ->
+                    val mandag = uke.dager.single { it.dato == mandag }.markerSomSlettet()
+                    uke.copy(dager = (uke.dager.filterNot { it.dato == mandag.dato } + mandag).toSet())
+                }
+
+            settOppMocks(ukeMedSlettetMandag)
+            val request = lagRequest()
+
+            assertThatThrownBy {
+                service.oppdaterAvklartUke(
+                    behandlingId = behandlingId,
+                    ukeId = ukeMedSlettetMandag.id,
+                    request = request,
+                )
+            }.hasMessageContaining("Alle dager i uken må sendes inn")
+        }
+
+        @Test
+        fun `skal feile hvis request mangler en ikke-slettet dag`() {
+            val ukeMedSlettetMandag =
+                lagUke(status = AvklartKjørtUkeStatus.ENDRET).let { uke ->
+                    val mandag = uke.dager.single { it.dato == mandag }.markerSomSlettet()
+                    uke.copy(dager = (uke.dager.filterNot { it.dato == mandag.dato } + mandag).toSet())
+                }
+
+            settOppMocks(ukeMedSlettetMandag)
+            val request =
+                lagRequest()
+                    .filterNot { it.dato == mandag || it.dato == mandag.plusDays(1) }
+
+            assertThatThrownBy {
+                service.oppdaterAvklartUke(
+                    behandlingId = behandlingId,
+                    ukeId = ukeMedSlettetMandag.id,
+                    request = request,
+                )
+            }.hasMessageContaining("Alle dager i uken må sendes inn")
         }
     }
 
