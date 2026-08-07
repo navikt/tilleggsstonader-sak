@@ -87,7 +87,6 @@ class AvklartKjørelisteService(
         return avklartKjørtUkeRepository.update(
             eksisterendeUke.copy(
                 status = UkeStatus.OK_MANUELT,
-                behandletDato = LocalDate.now(),
                 dager = oppdaterteDager.toSet(),
                 avklartKjørtUkeStatus = nyAvklartKjørtUkeStatus,
             ),
@@ -220,7 +219,6 @@ class AvklartKjørelisteService(
             // Rart at den er avhengig av både ukeavvik og dagavvik
             status = utledAutomatiskStatusForUke(avklarteDager, avvikUke),
             typeAvvik = avvikUke,
-            behandletDato = null,
             dager = avklarteDager.toSet(),
             avklartKjørtUkeStatus = AvklartKjørtUkeStatus.NY,
         )

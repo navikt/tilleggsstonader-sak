@@ -95,7 +95,6 @@ object ReisevurderingPrivatBilMapper {
             erUkeSlettet = erUkeSlettet,
             status = avklartUke?.status ?: UkeStatus.IKKE_MOTTATT_KJØRELISTE,
             avvik = avklartUke?.typeAvvik?.let { AvvikUke(typeAvvik = it) },
-            behandletDato = avklartUke?.behandletDato,
             kjørelisteInnsendtDato = kjøreliste?.datoMottatt?.toLocalDate(),
             kjørelisteId = kjøreliste?.id,
             erKjørelisteManueltRegistrert = kjøreliste?.manueltLagretIBehandling != null,

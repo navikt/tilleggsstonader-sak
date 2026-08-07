@@ -183,7 +183,6 @@ class GjenbrukUkerIKjørelistebehandlingIntegrationTest : IntegrationTest() {
         assertThat(ukeBehandling1.avklartUkeId).isNotEqualTo(ukeBehandling2.avklartUkeId)
         assertThat(ukeBehandling1.status).isEqualTo(ukeBehandling2.status)
         assertThat(ukeBehandling1.avvik).isEqualTo(ukeBehandling2.avvik)
-        assertThat(ukeBehandling1.behandletDato).isEqualTo(ukeBehandling2.behandletDato)
         assertThat(ukeBehandling1.kjørelisteInnsendtDato).isEqualTo(ukeBehandling2.kjørelisteInnsendtDato)
         assertThat(ukeBehandling1.dager).hasSameSizeAs(ukeBehandling2.dager)
 
