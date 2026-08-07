@@ -1,16 +1,20 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
+import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -71,5 +75,36 @@ class RevurderingDagligReiseGjenbrukForrigeBeregningsresultatIntegrationTest(
         assertThat(vedtakRevurdering.beregningsplan.omfang).isEqualTo(Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT)
         assertThat(vedtakRevurdering.beregningsresultat.offentligTransport)
             .isEqualTo(vedtakFørstegangsbehandling.beregningsresultat.offentligTransport)
+    }
+
+    @Test
+    fun `revurdering med bytte fra offentlig transport til privat bil skal ikke beholde beregningsresultat for offentlig transport`() {
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
+        every { unleashService.isEnabled(Toggle.KAN_REVURDERE_PRIVAT_BIL) } returns true
+
+        val førstegangsbehandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(Stønadstype.DAGLIG_REISE_TSO) {
+                defaultDagligReiseTsoTestdata(fom, tom)
+            }
+
+        val revurderingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = førstegangsbehandlingContext.behandlingId,
+                tilSteg = StegType.SIMULERING,
+            ) {
+                vilkår {
+                    slettDagligReise { vilkår ->
+                        vilkår.single { it.fakta.type == TypeDagligReise.OFFENTLIG_TRANSPORT }.id to
+                            SlettVilkårRequestDto(kommentar = "Skal bytte til privat bil")
+                    }
+                    opprett {
+                        privatBil(fom = fom, tom = tom, reisedagerPerUke = 5)
+                    }
+                }
+            }
+
+        val vedtakRevurdering = vedtakService.hentVedtak<InnvilgelseDagligReise>(revurderingId).data
+
+        assertThat(vedtakRevurdering.beregningsresultat.offentligTransport).isNull()
     }
 }
