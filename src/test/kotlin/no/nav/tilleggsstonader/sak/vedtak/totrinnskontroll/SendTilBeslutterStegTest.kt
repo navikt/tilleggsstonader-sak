@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.FerdigstillOppgave
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.clearBrukerContext
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.mockBrukerContext
+import no.nav.tilleggsstonader.sak.util.eksternOppgave
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.oppgave
@@ -112,7 +113,7 @@ class SendTilBeslutterStegTest {
         every { vedtaksbrevRepository.existsById(any()) } returns true
         every { oppgaveService.finnBehandleSakOppgaveDomainSomIkkeErFerdigstilt(any()) } returns oppgave(behandling.id)
         every { oppgaveService.hentOppgaveDomainSomIkkeErFerdigstilt(any(), any()) } returns null
-        every { oppgaveService.hentOppgave(any()) } returns Oppgave(id = 123, versjon = 0)
+        every { oppgaveService.hentOppgave(any()) } returns eksternOppgave(id = 123, versjon = 0)
         every {
             brevmottakereService.harBrevmottakere(any())
         } returns
@@ -164,7 +165,7 @@ class SendTilBeslutterStegTest {
     internal fun `Skal kaste feil hvis BehandleSak-oppgaven er tilordnet en annen saksbehandler`() {
         val oppgaveId = 10099L
         val oppgaveDomain = oppgave(behandling.id, gsakOppgaveId = oppgaveId)
-        val oppgave = Oppgave(id = oppgaveId, versjon = 0, tilordnetRessurs = "annenSaksbehandler")
+        val oppgave = eksternOppgave(id = oppgaveId, versjon = 0, tilordnetRessurs = "annenSaksbehandler")
         every { oppgaveService.finnBehandleSakOppgaveDomainSomIkkeErFerdigstilt(any()) } returns oppgaveDomain
         every { oppgaveService.hentOppgave(oppgaveDomain.gsakOppgaveId) } returns oppgave
 

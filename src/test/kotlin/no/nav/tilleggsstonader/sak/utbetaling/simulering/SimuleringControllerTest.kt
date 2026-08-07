@@ -57,7 +57,7 @@ internal class SimuleringControllerTest : CleanDatabaseIntegrationTest() {
 
     @Test
     internal fun `Skal håndtere 204 No Content for behandling uten endring i utbetalinger, og lagre ned dette`() {
-        val personIdent = "identIngenEndring"
+        val personIdent = "123456888012"
 
         every { mockClients.simuleringClient.simuler(match { it.personident == personIdent }) } returns null
 
@@ -80,7 +80,7 @@ internal class SimuleringControllerTest : CleanDatabaseIntegrationTest() {
 
     @Test
     internal fun `Skal håndtere simulering med tom oppsumeringer-liste, og lagre ned og hente dette`() {
-        val personIdent = "utbetalingFraGårsdagenErSattPåPause"
+        val personIdent = "123456888012"
 
         every {
             mockClients.simuleringClient.simuler(match { it.personident == personIdent })

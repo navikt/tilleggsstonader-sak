@@ -5,4 +5,4 @@ plugins {
 }
 
 // Avkommenter hvis du vil bruke en lokal versjon av kontrakter
-// includeBuild("../tilleggsstonader-kontrakter")
+includeBuild("../tilleggsstonader-kontrakter")

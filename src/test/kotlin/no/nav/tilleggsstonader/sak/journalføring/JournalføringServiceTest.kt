@@ -47,6 +47,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
+import no.nav.tilleggsstonader.sak.util.eksternOppgave
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
@@ -111,7 +112,7 @@ class JournalføringServiceTest {
     val oppgaveBeskrivelse = "Beskrivelse"
     val oppgaveId = "111222"
     val oppgave =
-        Oppgave(
+        eksternOppgave(
             id = oppgaveId.toLong(),
             versjon = 1,
             tildeltEnhetsnr = Enhet.NAV_TILTAK_OSLO.enhetsnr,
