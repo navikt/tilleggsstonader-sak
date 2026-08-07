@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
+import no.nav.tilleggsstonader.kontrakter.journalpost.Sak
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.libs.utils.dato.januar
@@ -473,6 +474,7 @@ fun journalpost(
     journalposttype: Journalposttype = Journalposttype.I,
     journalstatus: Journalstatus = Journalstatus.MOTTATT,
     tema: String = Tema.TSO.toString(),
+    sak: Sak? = null,
     dokumenter: List<DokumentInfo>? = null,
     bruker: Bruker? = null,
     kanal: String? = "NAV_NO",
@@ -482,6 +484,7 @@ fun journalpost(
     journalposttype = journalposttype,
     journalstatus = journalstatus,
     tema = tema,
+    sak = sak,
     dokumenter = dokumenter,
     bruker = bruker,
     kanal = kanal,

@@ -25,6 +25,7 @@ class KjørelisteManuellRegistreringService(
     private val behandlingService: BehandlingService,
     private val dagligReisePrivatBilService: DagligReisePrivatBilService,
     private val avklartKjørelisteService: AvklartKjørelisteService,
+    private val kjørelisteJournalpostValidering: KjørelisteJournalpostValidering,
 ) {
     fun hentKjørelisteOversikt(behandlingId: BehandlingId): KjørelisteOversiktDto {
         val behandling = behandlingService.hentBehandling(behandlingId)
@@ -62,6 +63,7 @@ class KjørelisteManuellRegistreringService(
             )
 
         validerManuellKjøreliste(behandling = behandling, innsendtKjøreliste = innsendtKjøreliste)
+        kjørelisteJournalpostValidering.validerJournalpost(behandlingId, request.journalpostId)
 
         return kjørelisteService.lagre(
             innsendtKjøreliste = innsendtKjøreliste,
