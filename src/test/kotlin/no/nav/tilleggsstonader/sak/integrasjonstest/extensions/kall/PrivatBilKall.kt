@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.GenererKjørelistebrevDt
 import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.KjørelistebrevResponseDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
+import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingPrivatBilDto
 import no.nav.tilleggsstonader.sak.privatbil.UkeVurderingDto
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagRequest
@@ -41,6 +42,11 @@ class PrivatBilKall(
         behandlingId: BehandlingId,
         request: LagreManuellKjørelisteRequest,
     ) = apiRespons.lagreManuellKjøreliste(behandlingId, request).expectOkWithBody<LagreManuellKjørelisteResponse>()
+
+    fun slettManuellKjøreliste(
+        behandlingId: BehandlingId,
+        kjørelisteId: KjørelisteId,
+    ) = apiRespons.slettManuellKjøreliste(behandlingId, kjørelisteId).expectOkEmpty()
 
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = PrivatBilApi()
@@ -114,6 +120,17 @@ class PrivatBilKall(
                 .post()
                 .uri("/api/kjoreliste/manuell-registrering/$behandlingId")
                 .body(request)
+                .medOnBehalfOfToken()
+                .exchange()
+        }
+
+        fun slettManuellKjøreliste(
+            behandlingId: BehandlingId,
+            kjørelisteId: KjørelisteId,
+        ) = with(testklient.testkontekst) {
+            restTestClient
+                .delete()
+                .uri("/api/kjoreliste/manuell-registrering/$behandlingId/$kjørelisteId")
                 .medOnBehalfOfToken()
                 .exchange()
         }

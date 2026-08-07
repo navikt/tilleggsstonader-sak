@@ -385,4 +385,8 @@ class AvklartKjørelisteService(
 
         kjørelisteService.slettKjørelister(kjørelisterLagretIBehandling)
     }
+
+    fun slettAvklartKjøreliste(kjørelisteId: KjørelisteId) {
+        avklartKjørtUkeRepository.deleteAvklartKjørtUkesByKjørelisteId(kjørelisteId)
+    }
 }
