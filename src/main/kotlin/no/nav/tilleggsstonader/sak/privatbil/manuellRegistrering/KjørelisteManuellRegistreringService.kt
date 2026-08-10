@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering
 
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
@@ -18,6 +19,7 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteSer
 import no.nav.tilleggsstonader.sak.util.erFørNåværendeUke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class KjørelisteManuellRegistreringService(
@@ -87,6 +89,67 @@ class KjørelisteManuellRegistreringService(
 
         avklartKjørelisteService.slettAvklartKjøreliste(kjørelisteSomSkalSlettes.id)
         kjørelisteService.slettKjøreliste(kjørelisteSomSkalSlettes)
+    }
+
+    fun oppdaterUke(
+        behandlingId: BehandlingId,
+        kjørelisteId: KjørelisteId,
+        ukeFom: LocalDate,
+        dager: List<KjørelisteDag>,
+    ): ManueltInnsendtKjørelisteUkeDto {
+        val kjøreliste = kjørelisteService.hentKjøreliste(kjørelisteId)
+
+        brukerfeilHvisIkke(kjøreliste.manueltLagretIBehandling == behandlingId) {
+            "Kan ikke endre en kjøreliste som ikke er manuelt registrert i denne behandlingen"
+        }
+
+        val uke = ukeFom.tilUkeIÅr()
+        brukerfeilHvis(dager.any { it.dato.tilUkeIÅr() != uke }) {
+            "Alle dager må tilhøre uke ${uke.ukenummer}"
+        }
+
+        val behandling = behandlingService.hentBehandling(behandlingId)
+        val rammevedtakForReise =
+            dagligReisePrivatBilService.hentRammevedtakForReiseIBehandling(behandling.id, kjøreliste.data.reiseId)
+        val andreKjørelister = kjørelisteService.hentForFagsakId(behandling.fagsakId).filter { it.id != kjørelisteId }
+
+        validerManuellKjøreliste(
+            innsendtKjøreliste = InnsendtKjøreliste(reiseId = kjøreliste.data.reiseId, reisedager = dager),
+            rammevedtakForReise = rammevedtakForReise,
+            eksisterendeKjørelister = andreKjørelister,
+        )
+
+        val oppdaterteReisedager = kjøreliste.data.reisedager.filter { it.dato.tilUkeIÅr() != uke } + dager
+        val oppdatertKjøreliste =
+            kjørelisteService.oppdater(
+                kjøreliste.copy(data = kjøreliste.data.copy(reisedager = oppdaterteReisedager)),
+            )
+
+        avklartKjørelisteService.slettAvklartKjøreliste(kjørelisteId)
+        avklartKjørelisteService.avklarUkerFraKjøreliste(behandlingId, oppdatertKjøreliste)
+
+        return dager.sortedBy { it.dato }.let { sortert ->
+            ManueltInnsendtKjørelisteUkeDto(
+                ukenummer = uke.ukenummer,
+                fom = sortert.minOf { it.dato },
+                tom = sortert.maxOf { it.dato },
+                dager = sortert,
+            )
+        }
+    }
+
+    fun oppdaterBegrunnelse(
+        behandlingId: BehandlingId,
+        kjørelisteId: KjørelisteId,
+        begrunnelse: String?,
+    ) {
+        val kjøreliste = kjørelisteService.hentKjøreliste(kjørelisteId)
+
+        brukerfeilHvisIkke(kjøreliste.manueltLagretIBehandling == behandlingId) {
+            "Kan ikke endre en kjøreliste som ikke er manuelt registrert i denne behandlingen"
+        }
+
+        kjørelisteService.oppdater(kjøreliste.copy(begrunnelse = begrunnelse))
     }
 
     /**
@@ -180,7 +243,8 @@ class KjørelisteManuellRegistreringService(
         behandling: Behandling,
         innsendtKjøreliste: InnsendtKjøreliste,
     ) {
-        val rammevedtakForReise = dagligReisePrivatBilService.hentRammevedtakForReiseIBehandling(behandling.id, innsendtKjøreliste.reiseId)
+        val rammevedtakForReise =
+            dagligReisePrivatBilService.hentRammevedtakForReiseIBehandling(behandling.id, innsendtKjøreliste.reiseId)
         val eksisterendeKjørelister = kjørelisteService.hentForFagsakId(behandling.fagsakId)
 
         validerManuellKjøreliste(

@@ -44,4 +44,6 @@ class KjørelisteService(
     fun hentForFagsakId(fagsakId: FagsakId): List<Kjøreliste> = repository.findByFagsakId(fagsakId)
 
     fun hentKjøreliste(kjørelisteId: KjørelisteId): Kjøreliste = repository.findByIdOrThrow(kjørelisteId)
+
+    fun oppdater(kjøreliste: Kjøreliste): Kjøreliste = repository.update(kjøreliste)
 }

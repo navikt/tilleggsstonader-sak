@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.time.LocalDate
 
 @RestController
 @RequestMapping(path = ["/api/kjoreliste/manuell-registrering"])
@@ -58,6 +60,31 @@ class KjørelisteManuellRegistreringController(
 
         kjørelisteManuellRegistreringService.slettManuellKjøreliste(behandlingId, kjørelisteId)
     }
+
+    @PutMapping("{behandlingId}/{kjørelisteId}/uke/{ukeFom}")
+    fun oppdaterUke(
+        @PathVariable behandlingId: BehandlingId,
+        @PathVariable kjørelisteId: KjørelisteId,
+        @PathVariable ukeFom: LocalDate,
+        @RequestBody request: OppdaterKjørelisteUkeRequest,
+    ): ManueltInnsendtKjørelisteUkeDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
+        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+
+        return kjørelisteManuellRegistreringService.oppdaterUke(behandlingId, kjørelisteId, ukeFom, request.dager)
+    }
+
+    @PutMapping("{behandlingId}/{kjørelisteId}/begrunnelse")
+    fun oppdaterBegrunnelse(
+        @PathVariable behandlingId: BehandlingId,
+        @PathVariable kjørelisteId: KjørelisteId,
+        @RequestBody request: OppdaterKjørelisteBegrunnelseRequest,
+    ) {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
+        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
+
+        kjørelisteManuellRegistreringService.oppdaterBegrunnelse(behandlingId, kjørelisteId, request.begrunnelse)
+    }
 }
 
 data class LagreManuellKjørelisteRequest(
@@ -69,4 +96,12 @@ data class LagreManuellKjørelisteRequest(
 
 data class LagreManuellKjørelisteResponse(
     val kjørelisteId: KjørelisteId,
+)
+
+data class OppdaterKjørelisteUkeRequest(
+    val dager: List<KjørelisteDag>,
+)
+
+data class OppdaterKjørelisteBegrunnelseRequest(
+    val begrunnelse: String?,
 )

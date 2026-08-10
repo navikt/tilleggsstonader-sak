@@ -12,7 +12,11 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagReques
 import no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering.KjørelisteOversiktDto
 import no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering.LagreManuellKjørelisteRequest
 import no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering.LagreManuellKjørelisteResponse
+import no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering.ManueltInnsendtKjørelisteUkeDto
+import no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering.OppdaterKjørelisteBegrunnelseRequest
+import no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering.OppdaterKjørelisteUkeRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.PrivatBilOppsummertBeregningDto
+import java.time.LocalDate
 import java.util.UUID
 
 class PrivatBilKall(
@@ -47,6 +51,21 @@ class PrivatBilKall(
         behandlingId: BehandlingId,
         kjørelisteId: KjørelisteId,
     ) = apiRespons.slettManuellKjøreliste(behandlingId, kjørelisteId).expectOkEmpty()
+
+    fun oppdaterManuellKjørelisteUke(
+        behandlingId: BehandlingId,
+        kjørelisteId: KjørelisteId,
+        ukeFom: LocalDate,
+        request: OppdaterKjørelisteUkeRequest,
+    ) = apiRespons
+        .oppdaterManuellKjørelisteUke(behandlingId, kjørelisteId, ukeFom, request)
+        .expectOkWithBody<ManueltInnsendtKjørelisteUkeDto>()
+
+    fun oppdaterManuellKjørelisteBegrunnelse(
+        behandlingId: BehandlingId,
+        kjørelisteId: KjørelisteId,
+        request: OppdaterKjørelisteBegrunnelseRequest,
+    ) = apiRespons.oppdaterManuellKjørelisteBegrunnelse(behandlingId, kjørelisteId, request).expectOkEmpty()
 
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = PrivatBilApi()
@@ -131,6 +150,33 @@ class PrivatBilKall(
             restTestClient
                 .delete()
                 .uri("/api/kjoreliste/manuell-registrering/$behandlingId/$kjørelisteId")
+                .medOnBehalfOfToken()
+                .exchange()
+        }
+
+        fun oppdaterManuellKjørelisteUke(
+            behandlingId: BehandlingId,
+            kjørelisteId: KjørelisteId,
+            ukeFom: LocalDate,
+            request: OppdaterKjørelisteUkeRequest,
+        ) = with(testklient.testkontekst) {
+            restTestClient
+                .put()
+                .uri("/api/kjoreliste/manuell-registrering/$behandlingId/$kjørelisteId/uke/$ukeFom")
+                .body(request)
+                .medOnBehalfOfToken()
+                .exchange()
+        }
+
+        fun oppdaterManuellKjørelisteBegrunnelse(
+            behandlingId: BehandlingId,
+            kjørelisteId: KjørelisteId,
+            request: OppdaterKjørelisteBegrunnelseRequest,
+        ) = with(testklient.testkontekst) {
+            restTestClient
+                .put()
+                .uri("/api/kjoreliste/manuell-registrering/$behandlingId/$kjørelisteId/begrunnelse")
+                .body(request)
                 .medOnBehalfOfToken()
                 .exchange()
         }
