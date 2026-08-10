@@ -149,7 +149,7 @@ class VedtakDtoMapperTest {
     @Nested
     inner class DagligReise {
         @Test
-        fun `skal kun ekskludere rammevedtak-reiser som er avsluttet før tidligste endring`() {
+        fun `skal kun flagge rammevedtak-reiser som er avsluttet før tidligste endring`() {
             val reiseFørEndring = rammeForReiseMedPrivatBil(reiseId = ReiseId.random(), fom = 1 januar 2026, tom = 31 januar 2026)
             val reiseSomDekkerTidligsteEndring =
                 rammeForReiseMedPrivatBil(reiseId = ReiseId.random(), fom = 20 januar 2026, tom = 8 februar 2026)
@@ -182,11 +182,17 @@ class VedtakDtoMapperTest {
 
             val dto = vedtakDtoMapper.toDto(vedtak, forrigeIverksatteBehandlingId = null) as InnvilgelseDagligReiseResponse
 
-            assertThat(dto.rammevedtakPrivatBil!!.reiser.map { it.reiseId }).containsExactlyInAnyOrder(
+            val reiser = dto.rammevedtakPrivatBil!!.reiser
+            assertThat(reiser.map { it.reiseId }).containsExactlyInAnyOrder(
+                reiseFørEndring.reiseId,
                 reiseSomDekkerTidligsteEndring.reiseId,
                 reiseLikTidligsteEndring.reiseId,
                 reiseEtterEndring.reiseId,
             )
+            assertThat(reiser.single { it.reiseId == reiseFørEndring.reiseId }.fraTidligereVedtak).isTrue()
+            assertThat(reiser.single { it.reiseId == reiseSomDekkerTidligsteEndring.reiseId }.fraTidligereVedtak).isFalse()
+            assertThat(reiser.single { it.reiseId == reiseLikTidligsteEndring.reiseId }.fraTidligereVedtak).isFalse()
+            assertThat(reiser.single { it.reiseId == reiseEtterEndring.reiseId }.fraTidligereVedtak).isFalse()
         }
 
         @Test

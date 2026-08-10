@@ -20,6 +20,7 @@ data class RammeForReiseMedPrivatBilDto(
     val delperioder: List<DelperiodeDto>,
     val reiseavstandEnVei: BigDecimal,
     val aktivitetsadresse: String?,
+    val fraTidligereVedtak: Boolean,
 )
 
 data class DelperiodeDto(
@@ -39,16 +40,13 @@ data class RammeForReiseMedPrivatBilDelperiodeSatserDto(
     val dagsatsUtenParkering: BigDecimal,
 ) : Periode<LocalDate>
 
-fun RammevedtakPrivatBil.tilDto(beregningsplan: Beregningsplan): RammevedtakPrivatBilDto =
+fun RammevedtakPrivatBil.tilDto(beregningsplan: Beregningsplan?): RammevedtakPrivatBilDto =
     RammevedtakPrivatBilDto(
         reiser =
-            reiser
-                .filter { reise ->
-                    beregningsplan.tidligsteEndring?.let { reise.grunnlag.tom >= it } ?: true
-                }.map { it.tilDto() },
+            reiser.map { it.tilDto(beregningsplan) },
     )
 
-fun RammevedtakForReiseMedPrivatBil.tilDto(): RammeForReiseMedPrivatBilDto =
+fun RammevedtakForReiseMedPrivatBil.tilDto(beregningsplan: Beregningsplan?): RammeForReiseMedPrivatBilDto =
     RammeForReiseMedPrivatBilDto(
         reiseId = reiseId,
         fom = grunnlag.fom,
@@ -66,6 +64,7 @@ fun RammevedtakForReiseMedPrivatBil.tilDto(): RammeForReiseMedPrivatBilDto =
             },
         reiseavstandEnVei = grunnlag.reiseavstandEnVei,
         aktivitetsadresse = aktivitetsadresse,
+        fraTidligereVedtak = beregningsplan?.tidligsteEndring?.let { it >= grunnlag.tom } ?: false,
     )
 
 fun RammeForReiseMedPrivatBilSatsForDelperiode.tilDto() =

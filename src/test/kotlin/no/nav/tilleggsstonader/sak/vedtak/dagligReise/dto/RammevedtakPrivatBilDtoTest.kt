@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 
 class RammevedtakPrivatBilDtoTest {
     @Test
-    fun `skal kun ekskludere reiser som er avsluttet før tidligste endring`() {
+    fun `skal kun flagge reiser som er avsluttet før tidligste endring`() {
         val reiseFørEndring = rammeForReiseMedPrivatBil(reiseId = ReiseId.random(), fom = 1 januar 2026, tom = 31 januar 2026)
         val reiseSomDekkerTidligsteEndring =
             rammeForReiseMedPrivatBil(reiseId = ReiseId.random(), fom = 20 januar 2026, tom = 8 februar 2026)
@@ -36,10 +36,15 @@ class RammevedtakPrivatBilDtoTest {
             )
 
         assertThat(dto.reiser.map { it.reiseId }).containsExactlyInAnyOrder(
+            reiseFørEndring.reiseId,
             reiseSomDekkerTidligsteEndring.reiseId,
             reiseLikTidligsteEndring.reiseId,
             reiseEtterEndring.reiseId,
         )
+        assertThat(dto.reiser.single { it.reiseId == reiseFørEndring.reiseId }.fraTidligereVedtak).isTrue()
+        assertThat(dto.reiser.single { it.reiseId == reiseSomDekkerTidligsteEndring.reiseId }.fraTidligereVedtak).isFalse()
+        assertThat(dto.reiser.single { it.reiseId == reiseLikTidligsteEndring.reiseId }.fraTidligereVedtak).isFalse()
+        assertThat(dto.reiser.single { it.reiseId == reiseEtterEndring.reiseId }.fraTidligereVedtak).isFalse()
     }
 
     @Test
