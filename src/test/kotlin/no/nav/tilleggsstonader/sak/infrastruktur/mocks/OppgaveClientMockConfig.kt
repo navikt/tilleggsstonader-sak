@@ -8,11 +8,13 @@ import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnMappeResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveResponseDto
+import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveBruker
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveBrukerType
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
@@ -239,6 +241,7 @@ class OppgaveClientMockConfig {
             behandlingstema = behandlingstema,
             enhetsnummer = tildeltEnhetsnummer,
             personident = PersonIdent(ident = "12345678910"),
+            ident = OppgaveIdentV2(ident = "12345678910", gruppe = IdentGruppe.FOLKEREGISTERIDENT),
             journalpostId = journalpostId,
             mappeId = MAPPE_ID_KLAR,
         )
@@ -253,6 +256,7 @@ class OppgaveClientMockConfig {
                 behandlingstype = "ae0058",
                 enhetsnummer = "",
                 personident = PersonIdent(ident = "12345678910"),
+                ident = OppgaveIdentV2(ident = "12345678910", gruppe = IdentGruppe.FOLKEREGISTERIDENT),
                 journalpostId = (++journalPostId).toString(),
                 mappeId = MAPPE_ID_KLAR,
             )
