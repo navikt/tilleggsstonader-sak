@@ -92,6 +92,8 @@ rolle:
   utvikler: "9f2c914f-9619-41a2-bea6-d62910514c8a" # Team Tilleggsstønader - Utviklere # tilgang til forvaltning-endepunkt og prosessering
 
 CLIENT_ENV: prod
+tilleggsstonader:
+  url: https://tilleggsstonader.intern.nav.no
 
 no.nav.security.jwt:
   issuer:
