@@ -4,6 +4,7 @@ import io.github.mikaojk.holiday.getNorwegianHolidays
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
+import no.nav.tilleggsstonader.libs.feil.singleEllerFeil
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
@@ -26,8 +27,6 @@ import org.springframework.stereotype.Service
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.util.UUID
-
-import no.nav.tilleggsstonader.libs.feil.singleEllerFeil
 
 @Service
 class AvklartKjørelisteService(
