@@ -89,7 +89,7 @@ fun BeregningDagligReise.tilDto(
 ): BeregningDagligReiseDto =
     BeregningDagligReiseDto(
         beregningsresultat = beregningsresultatDagligReise.tilDto(beregningsplan, vilkår),
-        rammevedtakPrivatBil = rammevedtakPrivatBil?.tilDto(),
+        rammevedtakPrivatBil = rammevedtakPrivatBil?.tilDto(beregningsplan),
     )
 
 fun BeregningsresultatDagligReise.tilDto(

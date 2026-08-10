@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
@@ -56,6 +57,7 @@ object DetaljertVedtaksperioderDagligReiseMapper {
     private fun List<RammevedtakForReiseMedPrivatBil>?.tilDetaljerteVedtaksperioderPrivatBil(
         stønadstype: Stønadstype,
         adresser: Map<ReiseId, String>,
+        beregningsplan: Beregningsplan? = null,
     ): List<DetaljertVedtaksperiodeDagligReise> =
         this.orEmpty().map { reise ->
             DetaljertVedtaksperiodeDagligReise(
@@ -63,7 +65,7 @@ object DetaljertVedtaksperioderDagligReiseMapper {
                 typeDagligReise = TypeDagligReise.PRIVAT_BIL,
                 detaljertBeregningsperioder = null,
                 adresse = adresser[reise.reiseId] ?: reise.aktivitetsadresse,
-                rammevedtakPrivatBil = reise.tilDto(),
+                rammevedtakPrivatBil = reise.tilDto(beregningsplan),
             )
         }
 

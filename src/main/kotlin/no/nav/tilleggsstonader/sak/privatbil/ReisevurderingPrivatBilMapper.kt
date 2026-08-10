@@ -32,8 +32,8 @@ object ReisevurderingPrivatBilMapper {
             )
         return ReisevurderingPrivatBilDto(
             reiseId = reiseId,
-            rammevedtak = gjeldendeRammevedtakForReise?.tilDto(),
-            forrigeRammevedtak = forrigeRammevedtakForReise?.tilDto(),
+            rammevedtak = gjeldendeRammevedtakForReise?.tilDto(beregningsplan = null),
+            forrigeRammevedtak = forrigeRammevedtakForReise?.tilDto(beregningsplan = null),
             uker = ukeVurderingerDto,
         )
     }

@@ -36,6 +36,7 @@ fun BeregningsresultatForReisePrivatBil.oppsummerReise(rammevedtakForReise: Ramm
         reiseavstandEnVei = rammevedtakForReise.grunnlag.reiseavstandEnVei,
         aktivitetsadresse = rammevedtakForReise.aktivitetsadresse,
         perioder = this.perioder.map { it.oppsummerPeriode(rammevedtakForReise) }.sortedBy { it.ukenummer },
+        fraTidligereVedtak = this.perioder.all { it.fraTidligereVedtak },
     )
 
 private fun BeregningsresultatForReisePrivatBilPeriode.oppsummerPeriode(
@@ -80,9 +81,11 @@ data class OppsummertBeregningForReiseDto(
     val reiseavstandEnVei: BigDecimal,
     val aktivitetsadresse: String?,
     val perioder: List<OppsummertBeregningForPeriodeDto>,
+    val fraTidligereVedtak: Boolean,
 ) {
     val totaltStønadsbeløpMedPerioderFraForrigeVedtak = perioder.sumOf { it.stønadsbeløp }
-    val totaltStønadsbeløpUtenPerioderFraForrigeVedtak = perioder.filter { !it.fraTidligereVedtak }.sumOf { it.stønadsbeløp }
+    val totaltStønadsbeløpUtenPerioderFraForrigeVedtak =
+        perioder.filter { !it.fraTidligereVedtak }.sumOf { it.stønadsbeløp }
 }
 
 data class OppsummertBeregningForPeriodeDto(
