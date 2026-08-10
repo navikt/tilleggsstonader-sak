@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevingPeriode
 import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.TilbakekrevingRevurderingÅrsak
 import no.nav.tilleggsstonader.sak.tilbakekreving.hendelse.UtvidetPeriode
 import no.nav.tilleggsstonader.sak.utbetaling.AndelTilkjentYtelseTilPeriodeService
+import no.nav.tilleggsstonader.sak.util.EnvUtil
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -129,11 +130,19 @@ class FagsysteminfoBehovHåndterer(
 
         return TilbakekrevingFagsysteminfoSvarRevurdering(
             behandlingId = eksternBehandlingId,
+            url = "${hentTsSakBaseUrl()}/behandling/${saksbehandling.id}",
             årsak = mapÅrsak(saksbehandling),
             årsakTilFeilutbetaling = if (vedtak.data is Opphør) vedtak.data.begrunnelse else null,
             vedtaksdato = saksbehandling.vedtakstidspunkt!!.toLocalDate(),
         )
     }
+
+    private fun hentTsSakBaseUrl(): String =
+        if (EnvUtil.erIProd()) {
+            "https://tilleggsstonader.intern.nav.no"
+        } else {
+            "https://tilleggsstonader.intern.dev.nav.no"
+        }
 
     private fun mapÅrsak(saksbehandling: Saksbehandling): TilbakekrevingRevurderingÅrsak =
         when (saksbehandling.årsak) {
