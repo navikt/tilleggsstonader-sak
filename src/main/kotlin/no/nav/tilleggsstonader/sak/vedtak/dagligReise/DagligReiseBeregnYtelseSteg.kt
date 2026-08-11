@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseReque
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GjennopprettAvklarteDagerService
 
 @Service
 class DagligReiseBeregnYtelseSteg(
@@ -31,6 +32,7 @@ class DagligReiseBeregnYtelseSteg(
     private val dagligReiseVedtakService: DagligReiseVedtakService,
     private val opprettAndelerDagligReiseService: OpprettAndelerDagligReiseService,
     private val avklartKjørelisteService: AvklartKjørelisteService,
+    private val gjenopprettAvklarteDagerService: GjennopprettAvklarteDagerService,
     private val gjenbrukDataRevurderingService: GjenbrukDataRevurderingService,
     vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
@@ -108,7 +110,7 @@ class DagligReiseBeregnYtelseSteg(
             beregningsplan = plan,
         )
 
-        avklartKjørelisteService.gjenopprettTidligereSlettedeDagerSomNåErInnenforRammevedtak(
+        gjenopprettAvklarteDagerService.gjenopprettTidligereSlettedeDagerSomNåErInnenforRammevedtak(
             fagsakId = saksbehandling.fagsakId,
             behandlingId = saksbehandling.id,
             rammevedtak = rammevedtakPrivatBil,
