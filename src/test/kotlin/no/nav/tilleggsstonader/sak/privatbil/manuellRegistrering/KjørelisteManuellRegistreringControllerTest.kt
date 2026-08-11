@@ -354,7 +354,7 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
                     ),
                 ).expectProblemDetail(
                     forventetStatus = HttpStatus.BAD_REQUEST,
-                    forventetDetail = "Alle dager må tilhøre uke",
+                    forventetDetail = "Oppdaterte dager må tilhøre uke",
                 )
         }
     }
