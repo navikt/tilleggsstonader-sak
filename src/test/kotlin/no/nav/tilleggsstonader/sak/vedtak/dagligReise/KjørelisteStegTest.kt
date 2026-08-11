@@ -168,7 +168,13 @@ class KjørelisteStegTest {
             )
         }
 
-        val oppdatertSats = oppdatertRammevedtak.captured.reiser.first().grunnlag.delperioder.first().satser.first()
+        val oppdatertSats =
+            oppdatertRammevedtak.captured.reiser
+                .first()
+                .grunnlag.delperioder
+                .first()
+                .satser
+                .first()
         assertThat(oppdatertSats.satsBekreftetVedVedtakstidspunkt).isTrue()
         assertThat(oppdatertSats.kilometersats).isEqualTo(BigDecimal("2.88"))
     }
