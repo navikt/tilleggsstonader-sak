@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -29,6 +30,7 @@ class KjørelisteStegTest {
     private val arbeidsfordelingService = mockk<ArbeidsfordelingService>(relaxed = true)
     private val dagligReiseVedtakService = mockk<DagligReiseVedtakService>(relaxed = true)
     private val avklartKjørelisteService = mockk<AvklartKjørelisteService>()
+    private val satsPrivatBilProvider = mockk<SatsPrivatBilProvider>()
 
     private val steg =
         KjørelisteSteg(
@@ -37,6 +39,7 @@ class KjørelisteStegTest {
             arbeidsfordelingService = arbeidsfordelingService,
             dagligReiseVedtakService = dagligReiseVedtakService,
             avklartKjørelisteService = avklartKjørelisteService,
+            satsPrivatBilProvider = satsPrivatBilProvider,
         )
 
     private val saksbehandling = saksbehandling(steg = StegType.KJØRELISTE)

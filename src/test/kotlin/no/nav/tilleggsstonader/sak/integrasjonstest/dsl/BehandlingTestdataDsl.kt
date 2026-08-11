@@ -97,7 +97,52 @@ class BehandlingTestdataDsl internal constructor() {
         }
         vilkår {
             opprett {
-                privatBil(fom, tom, delperioder = delperioder, hentAktivitetId = hentAktivitetId, reiseavstandEnVei = reiseavstandEnVei)
+                privatBil(
+                    fom,
+                    tom,
+                    delperioder = delperioder,
+                    hentAktivitetId = hentAktivitetId,
+                    reiseavstandEnVei = reiseavstandEnVei,
+                )
+            }
+        }
+    }
+
+    fun defaultDagligReisePrivatBilTsrTestdata(
+        fom: LocalDate = defaultFom,
+        tom: LocalDate = defaultTom,
+        reiseavstandEnVei: BigDecimal = 10.toBigDecimal(),
+        delperioder: List<FaktaDelperiodePrivatBilDto> =
+            listOf(
+                FaktaDelperiodePrivatBilDto(
+                    fom = fom,
+                    tom = tom,
+                    reisedagerPerUke = 5,
+                    bompengerPerDag = null,
+                    fergekostnadPerDag = null,
+                ),
+            ),
+        hentAktivitetId: (List<VilkårperiodeDto>) -> VilkårperiodeGlobalId = { it.single().globalId },
+    ) {
+        aktivitet {
+            opprett {
+                aktivitetTiltakTsr(fom, tom, tiltaksvariant = TypeAktivitet.GRUPPEAMO)
+            }
+        }
+        målgruppe {
+            opprett {
+                målgruppeTiltakspenger(fom, tom)
+            }
+        }
+        vilkår {
+            opprett {
+                privatBil(
+                    fom,
+                    tom,
+                    delperioder = delperioder,
+                    hentAktivitetId = hentAktivitetId,
+                    reiseavstandEnVei = reiseavstandEnVei,
+                )
             }
         }
     }

@@ -153,6 +153,8 @@ class PrivatBilBeregningService(
             avklarteDagerForReise = avklarteDagerSomSkalBeregnes,
         )
 
+        validerAtAlleDelperioderHarTilgjengeligSats(rammeForReise = rammeForReise)
+
         return BeregningsresultatForReisePrivatBil(
             reiseId = rammeForReise.reiseId,
             perioder =
@@ -178,6 +180,17 @@ class PrivatBilBeregningService(
                     "Dag ${it.dato} er ikke innenfor rammevedtak (${rammeForReise.grunnlag.fom} - ${rammeForReise.grunnlag.tom})"
                 }
             }
+    }
+
+    private fun validerAtAlleDelperioderHarTilgjengeligSats(rammeForReise: RammevedtakForReiseMedPrivatBil) {
+        feilHvis(
+            rammeForReise.grunnlag.delperioder.any { delperiode ->
+                delperiode.satser.any { sats -> !sats.satsBekreftetVedVedtakstidspunkt }
+            },
+        ) {
+            // TODO Sikkert nice med litt mer forklarende feilmelding her
+            "Kjøreliste inneholder dager som ikke har tilgjengelig sats"
+        }
     }
 
     private fun lagPerioderForDagerMedSammeSats(
