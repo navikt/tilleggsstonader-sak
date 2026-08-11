@@ -19,7 +19,6 @@ class GjennopprettAvklarteDagerService(
     private val avklartKjørtUkeRepository: AvklartKjørtUkeRepository,
     private val kjørelisteService: KjørelisteService,
 ) {
-
     /**
      * Gjenoppretter uker som ble slettet i historikken for fagsaken, men som nå
      * er innenfor rammevedtaket igjen i ny behandling.
@@ -153,7 +152,6 @@ class GjennopprettAvklarteDagerService(
                 }
             }
 }
-
 
 private fun KjørelisteDag.finnesI(reisedager: Set<AvklartKjørtDag>): Boolean {
     val reisedagerDatoer = reisedager.map { it.dato }

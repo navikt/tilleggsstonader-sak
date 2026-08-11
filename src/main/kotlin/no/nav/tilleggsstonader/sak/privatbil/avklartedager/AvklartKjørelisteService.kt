@@ -1,7 +1,5 @@
 package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
-import java.time.LocalDate
-import java.util.UUID
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
@@ -19,6 +17,8 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBi
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.springframework.stereotype.Service
+import java.time.LocalDate
+import java.util.UUID
 
 @Service
 class AvklartKjørelisteService(
@@ -121,9 +121,9 @@ class AvklartKjørelisteService(
         return oppdaterteDager.any { oppdatert ->
             val eksisterende = eksisterendePerDato[oppdatert.dato]
             eksisterende == null ||
-                    eksisterende.godkjentGjennomførtKjøring != oppdatert.godkjentGjennomførtKjøring ||
-                    eksisterende.parkeringsutgift != oppdatert.parkeringsutgift ||
-                    eksisterende.begrunnelse != oppdatert.begrunnelse
+                eksisterende.godkjentGjennomførtKjøring != oppdatert.godkjentGjennomførtKjøring ||
+                eksisterende.parkeringsutgift != oppdatert.parkeringsutgift ||
+                eksisterende.begrunnelse != oppdatert.begrunnelse
         }
     }
 
@@ -168,7 +168,6 @@ class AvklartKjørelisteService(
             }
         }
     }
-
 
     private fun henteReiseFraVedtak(
         behandlingId: BehandlingId,

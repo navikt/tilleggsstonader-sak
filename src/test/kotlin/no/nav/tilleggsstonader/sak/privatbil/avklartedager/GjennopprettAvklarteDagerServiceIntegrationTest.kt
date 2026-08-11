@@ -15,7 +15,7 @@ import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class GjennopprettAvklarteDagerServiceIntegrationTest() : IntegrationTest() {
+class GjennopprettAvklarteDagerServiceIntegrationTest : IntegrationTest() {
     @Test
     fun `skal gjenopprette kjøreliste etter opphør selv om det er mellomliggende behandlinger`() {
         every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true

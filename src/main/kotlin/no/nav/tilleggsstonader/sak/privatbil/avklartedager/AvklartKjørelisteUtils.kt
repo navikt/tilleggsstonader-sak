@@ -1,8 +1,6 @@
 package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 
 import io.github.mikaojk.holiday.getNorwegianHolidays
-import java.time.DayOfWeek
-import java.time.LocalDate
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -10,7 +8,8 @@ import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
-
+import java.time.DayOfWeek
+import java.time.LocalDate
 
 fun utledAvklartDag(
     kjørelisteDag: KjørelisteDag,
@@ -118,8 +117,8 @@ private fun utledGodkjentGjennomførtKjøringAutomatisk(
 
 private fun LocalDate.erHelgEllerHelligdag() =
     this.dayOfWeek == DayOfWeek.SATURDAY ||
-            this.dayOfWeek == DayOfWeek.SUNDAY ||
-            getNorwegianHolidays(year).map { it.date }.contains(this)
+        this.dayOfWeek == DayOfWeek.SUNDAY ||
+        getNorwegianHolidays(year).map { it.date }.contains(this)
 
 private fun erAntallDagerInnenforRamme(
     dager: List<KjørelisteDag>,

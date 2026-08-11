@@ -106,5 +106,4 @@ class OpphørPrivatBilIntegrationTest(
         val andeler = tilkjentYtelseService.hentForBehandling(revurderingId).andelerTilkjentYtelse
         assertThat(andeler.maxOf { it.fom }).isBefore(opphørsdato.minusDays(1))
     }
-
 }
