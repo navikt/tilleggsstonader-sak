@@ -17,16 +17,12 @@ interface BehandlingSteg<T> {
     fun utførOgReturnerNesteSteg(
         saksbehandling: Saksbehandling,
         data: T,
-        kanBehandlePrivatBil: Boolean = false,
     ): StegType {
         utførSteg(saksbehandling, data)
-        return nesteSteg(saksbehandling, kanBehandlePrivatBil)
+        return nesteSteg(saksbehandling)
     }
 
-    fun nesteSteg(
-        saksbehandling: Saksbehandling,
-        kanBehandlePrivatBil: Boolean,
-    ): StegType {
+    fun nesteSteg(saksbehandling: Saksbehandling): StegType {
         if (saksbehandling.type == BehandlingType.KJØRELISTE) {
             return stegType().hentNesteStegKjørelistebehandling()
         }

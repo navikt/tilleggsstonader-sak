@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
-import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
@@ -12,7 +11,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkEmpty
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
@@ -248,8 +246,6 @@ class DagligReiseVedtakControllerTest : CleanDatabaseIntegrationTest() {
 
         @Test
         fun `skal oppsummere rammevedtak og beregningsresultat for privat bil i kjørelistebehandling`() {
-            every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-
             val førstegangsBehandlingContext =
                 opprettBehandlingOgGjennomførBehandlingsløp(
                     stønadstype = Stønadstype.DAGLIG_REISE_TSO,

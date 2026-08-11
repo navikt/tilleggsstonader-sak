@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
-import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.april
@@ -10,7 +9,6 @@ import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.BehandlingContext
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
@@ -23,7 +21,6 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UtfyltDagAutomatiskVu
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
@@ -31,11 +28,6 @@ import java.time.LocalDate
 class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
     @Autowired
     private lateinit var behandlingService: BehandlingService
-
-    @BeforeEach
-    fun setUp() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-    }
 
     @Test
     fun `happy case - skal vurdere uke til automatisk ok dersom dager er innenfor ramme og parkering er under 100kr`() {

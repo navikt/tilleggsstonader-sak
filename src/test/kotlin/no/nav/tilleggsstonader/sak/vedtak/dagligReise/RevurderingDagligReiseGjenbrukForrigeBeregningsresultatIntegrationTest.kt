@@ -79,7 +79,6 @@ class RevurderingDagligReiseGjenbrukForrigeBeregningsresultatIntegrationTest(
 
     @Test
     fun `revurdering med bytte fra offentlig transport til privat bil skal ikke beholde beregningsresultat for offentlig transport`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
         every { unleashService.isEnabled(Toggle.KAN_REVURDERE_PRIVAT_BIL) } returns true
 
         val førstegangsbehandlingContext =

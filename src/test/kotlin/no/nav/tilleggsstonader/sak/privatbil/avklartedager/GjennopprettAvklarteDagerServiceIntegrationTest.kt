@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test
 class GjennopprettAvklarteDagerServiceIntegrationTest : IntegrationTest() {
     @Test
     fun `skal gjenopprette kjøreliste etter opphør selv om det er mellomliggende behandlinger`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
         every { unleashService.isEnabled(Toggle.KAN_OPPHØRE_PRIVAT_BIL) } returns true
         every { unleashService.isEnabled(Toggle.KAN_REVURDERE_PRIVAT_BIL) } returns true
 
@@ -77,7 +76,6 @@ class GjennopprettAvklarteDagerServiceIntegrationTest : IntegrationTest() {
 
     @Test
     fun `skal gjenopprette slettet enkeltdag i eksisterende uke når rammevedtaket utvides igjen`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
         every { unleashService.isEnabled(Toggle.KAN_OPPHØRE_PRIVAT_BIL) } returns true
         every { unleashService.isEnabled(Toggle.KAN_REVURDERE_PRIVAT_BIL) } returns true
 

@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningStegKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
@@ -88,7 +87,6 @@ class InnvilgeDagligReiseIntegrationTest : IntegrationTest() {
 
     @Test
     fun `innvilge rammevedtak privat bil og henter ut rammevedtak`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
         val fom = 15 september 2025
         val tom = 14 oktober 2025
 

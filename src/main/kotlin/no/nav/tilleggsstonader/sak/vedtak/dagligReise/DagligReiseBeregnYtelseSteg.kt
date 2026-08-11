@@ -47,10 +47,7 @@ class DagligReiseBeregnYtelseSteg(
      * En daglige reiser behandling skal kun havne i steg "KJØRELISTE" dersom forrige behandling
      * inneholdt et rammevedtak for privat bil.
      */
-    override fun nesteSteg(
-        saksbehandling: Saksbehandling,
-        kanBehandlePrivatBil: Boolean,
-    ): StegType {
+    override fun nesteSteg(saksbehandling: Saksbehandling): StegType {
         val gjelderAvslag = vedtakRepository.findByIdOrNull(saksbehandling.id)?.type == TypeVedtak.AVSLAG
         val forrigeIverksatteBehandlingHarRammevedtakForPrivatBil =
             dagligReiseVedtakService.forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(saksbehandling.forrigeIverksatteBehandlingId)
@@ -59,7 +56,7 @@ class DagligReiseBeregnYtelseSteg(
             return StegType.KJØRELISTE
         }
 
-        return super.nesteSteg(saksbehandling, kanBehandlePrivatBil)
+        return super.nesteSteg(saksbehandling)
     }
 
     override fun lagreVedtakForSatsjustering(

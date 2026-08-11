@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.ekstern.journalføring
 
-import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
@@ -11,7 +10,6 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.fjernTilordningPåÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
@@ -36,8 +34,6 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
 
     @Test
     fun `daglig-reise tso sak med innvilget rammevedtak, mottar kjøreliste, verifiser blir journalført og lagret`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-
         val fom = 1 januar 2026
         val tom = 14 januar 2026
         val behandlingContext =
@@ -89,8 +85,6 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
 
     @Test
     fun `skal kun opprettes en kjørelistebehandling om det kommer inn to kjørelister etter hverandre`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-
         val fom = 2 mars 2026
         val tom = 15 mars 2026
         val behandlingContext =
@@ -145,8 +139,6 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
 
     @Test
     fun `skal opprette to kjørelistebehandlinger om den første ikke er ferdigstilt men er påbegynt`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-
         val fom = 2 mars 2026
         val tom = 15 mars 2026
         val behandlingContext =
@@ -194,8 +186,6 @@ class MottaKjørelisteIntegrationTest : IntegrationTest() {
 
     @Test
     fun `skal opprette ny kjørelistebehandling når første er manuelt endret og ikke lenger tilordnet`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-
         val fom = 2 mars 2026
         val tom = 15 mars 2026
         val behandlingContext =

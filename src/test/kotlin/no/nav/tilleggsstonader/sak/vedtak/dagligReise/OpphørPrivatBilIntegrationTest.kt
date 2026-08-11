@@ -26,7 +26,6 @@ class OpphørPrivatBilIntegrationTest(
 ) : IntegrationTest() {
     @Test
     fun `skal kutte rammevedtak og innsendte kjørelister i opphør`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
         every { unleashService.isEnabled(Toggle.KAN_OPPHØRE_PRIVAT_BIL) } returns true
 
         val fom = 2 februar 2026
