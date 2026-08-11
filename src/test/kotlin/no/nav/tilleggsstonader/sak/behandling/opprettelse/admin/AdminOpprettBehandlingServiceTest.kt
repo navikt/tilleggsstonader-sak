@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.behandling.domain.ManuellOpprettelseMetadata
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.ForenkletBehandlingstype
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandling
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingOppgaveMetadata
@@ -72,6 +73,11 @@ class AdminOpprettBehandlingServiceTest {
             beskrivelse = "Manuelt opprettet sak fra journalpost. Skal saksbehandles i ny løsning.",
             prioritet = OppgavePrioritet.NORM,
         )
+    val manuellOpprettelseMetadata =
+        ManuellOpprettelseMetadata(
+            kilde = "KILDE",
+            beskrivelse = "BESKRIVELSE",
+        )
 
     @BeforeEach
     fun setUp() {
@@ -105,6 +111,7 @@ class AdminOpprettBehandlingServiceTest {
             valgteBarn = setOf(identBarn),
             medBrev = true,
             kravMottatt = LocalDate.now(),
+            manuellOpprettelseMetadata = manuellOpprettelseMetadata,
         )
 
         with(opprettedeBarnSlot.captured.single()) {
@@ -120,6 +127,7 @@ class AdminOpprettBehandlingServiceTest {
                     oppgaveMetadata = forventetOppgaveMetadata,
                     behandlingMetode = behandlingMetode,
                     forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
+                    manuellOpprettelseMetadata = manuellOpprettelseMetadata,
                 ),
             )
         }
@@ -133,6 +141,7 @@ class AdminOpprettBehandlingServiceTest {
             valgteBarn = setOf(identBarn),
             medBrev = false,
             kravMottatt = LocalDate.now(),
+            manuellOpprettelseMetadata = ManuellOpprettelseMetadata(kilde = "KILDE", beskrivelse = "BESKRIVELSE"),
         )
 
         with(opprettedeBarnSlot.captured.single()) {
@@ -148,6 +157,7 @@ class AdminOpprettBehandlingServiceTest {
                     oppgaveMetadata = forventetOppgaveMetadata,
                     behandlingMetode = behandlingMetode,
                     forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
+                    manuellOpprettelseMetadata = manuellOpprettelseMetadata,
                 ),
             )
         }
@@ -161,6 +171,7 @@ class AdminOpprettBehandlingServiceTest {
             valgteBarn = setOf(),
             medBrev = false,
             kravMottatt = LocalDate.now(),
+            manuellOpprettelseMetadata = ManuellOpprettelseMetadata(kilde = "KILDE", beskrivelse = "BESKRIVELSE"),
         )
 
         assertThat(opprettedeBarnSlot.isCaptured).isFalse()
@@ -173,6 +184,7 @@ class AdminOpprettBehandlingServiceTest {
                     oppgaveMetadata = forventetOppgaveMetadata,
                     behandlingMetode = behandlingMetode,
                     forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
+                    manuellOpprettelseMetadata = manuellOpprettelseMetadata,
                 ),
             )
         }
@@ -189,6 +201,7 @@ class AdminOpprettBehandlingServiceTest {
                 valgteBarn = setOf(identBarn),
                 medBrev = true,
                 kravMottatt = LocalDate.now(),
+                manuellOpprettelseMetadata = manuellOpprettelseMetadata,
             )
         }.hasMessageContaining("Det finnes allerede en behandling på personen")
     }
@@ -202,6 +215,7 @@ class AdminOpprettBehandlingServiceTest {
                 valgteBarn = setOf(identBarn, "annenIdent"),
                 medBrev = true,
                 kravMottatt = LocalDate.now(),
+                manuellOpprettelseMetadata = manuellOpprettelseMetadata,
             )
         }.hasMessageContaining("Barn finnes ikke på person")
     }
@@ -215,6 +229,7 @@ class AdminOpprettBehandlingServiceTest {
                 valgteBarn = setOf(identBarn, "annenIdent"),
                 medBrev = true,
                 kravMottatt = LocalDate.now(),
+                manuellOpprettelseMetadata = manuellOpprettelseMetadata,
             )
         }.hasMessageContaining("skal ikke ha barn")
     }

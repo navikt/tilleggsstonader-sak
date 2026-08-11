@@ -47,6 +47,7 @@ class AdminOpprettBehandlingController(
             valgteBarn = request.valgteBarn,
             medBrev = request.medBrev,
             kravMottatt = request.kravMottatt,
+            manuellOpprettelseMetadata = request.manuellOpprettelseMetadata,
         )
     }
 }

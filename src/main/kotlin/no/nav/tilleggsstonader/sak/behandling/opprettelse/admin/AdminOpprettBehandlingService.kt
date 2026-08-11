@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.behandling.domain.ManuellOpprettelseMetadata
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.ForenkletBehandlingstype
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandling
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingOppgaveMetadata
@@ -47,6 +48,7 @@ class AdminOpprettBehandlingService(
         valgteBarn: Set<String>,
         medBrev: Boolean,
         kravMottatt: LocalDate,
+        manuellOpprettelseMetadata: ManuellOpprettelseMetadata,
     ): BehandlingId {
         validerOpprettelseAvBehandling(stønadstype, ident, valgteBarn)
 
@@ -67,6 +69,7 @@ class AdminOpprettBehandlingService(
                             prioritet = OppgavePrioritet.NORM,
                         ),
                     forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
+                    manuellOpprettelseMetadata = manuellOpprettelseMetadata,
                 ),
             )
 

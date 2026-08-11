@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
+import no.nav.tilleggsstonader.sak.behandling.domain.ManuellOpprettelseMetadata
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
@@ -101,6 +102,7 @@ class OpprettBehandlingService(
                     kravMottatt = request.kravMottatt,
                     kategori = BehandlingKategori.NASJONAL,
                     nyeOpplysningerMetadata = request.nyeOpplysningerMetadata,
+                    manuellOpprettelseMetadata = request.manuellOpprettelseMetadata,
                 ),
             )
         eksternBehandlingIdRepository.insert(EksternBehandlingId(behandlingId = behandling.id))
@@ -183,6 +185,7 @@ data class OpprettBehandling(
     val nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
     val oppgaveMetadata: OpprettBehandlingOppgaveMetadata,
     val forenkletBehandlingstype: ForenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
+    val manuellOpprettelseMetadata: ManuellOpprettelseMetadata? = null,
 )
 
 enum class ForenkletBehandlingstype {

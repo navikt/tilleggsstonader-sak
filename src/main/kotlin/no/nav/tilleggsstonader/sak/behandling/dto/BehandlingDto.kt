@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
+import no.nav.tilleggsstonader.sak.behandling.domain.ManuellOpprettelseMetadata
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -38,6 +39,7 @@ data class BehandlingDto(
     val henlagtÅrsak: HenlagtÅrsak?,
     val henlagtBegrunnelse: String?,
     val nyeOpplysningerMetadata: NyeOpplysningerMetadata?,
+    val manuellOpprettelseMetadata: ManuellOpprettelseMetadata?,
     val harÅpenKjørelistebehandling: Boolean,
     val tilordnetSaksbehandler: TilordnetSaksbehandlerDto,
 )
@@ -66,6 +68,7 @@ fun Saksbehandling.tilDto(
         stønadstype = stønadstype,
         vedtaksdato = this.vedtakstidspunkt,
         nyeOpplysningerMetadata = this.nyeOpplysningerMetadata,
+        manuellOpprettelseMetadata = this.manuellOpprettelseMetadata,
         harÅpenKjørelistebehandling = harÅpenKjørelistebehandling,
         tilordnetSaksbehandler = tilordnetSaksbehandler,
     )
