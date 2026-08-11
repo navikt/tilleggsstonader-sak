@@ -44,4 +44,6 @@ class KjørelisteService(
     fun hentForFagsakId(fagsakId: FagsakId): List<Kjøreliste> = repository.findByFagsakId(fagsakId)
 
     fun hentKjøreliste(kjørelisteId: KjørelisteId): Kjøreliste = repository.findByIdOrThrow(kjørelisteId)
+
+    fun eksistererForJournalpostId(journalpostId: String): Boolean = repository.findByJournalpostId(journalpostId) != null
 }
