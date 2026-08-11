@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.libs.feil.ApiFeil
 import no.nav.tilleggsstonader.libs.feil.Feil
@@ -12,8 +11,8 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveService
-import no.nav.tilleggsstonader.sak.util.eksternOppgave
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
+import no.nav.tilleggsstonader.sak.util.eksternOppgave
 import no.nav.tilleggsstonader.sak.util.oppgave
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import org.assertj.core.api.Assertions.assertThat
