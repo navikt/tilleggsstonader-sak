@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain
 
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
@@ -33,7 +33,7 @@ data class FaktaUbestemtType(
 data class FaktaOffentligTransport(
     override val reiseId: ReiseId,
     override val adresse: String?,
-    val utgifterOffentligTransport: Int?,
+    val utgifterOffentligTransport: BigDecimal,
 ) : FaktaReiseTilSamling {
     override val type = TypeReiseTilSamling.OFFENTLIG_TRANSPORT
 
@@ -49,10 +49,8 @@ data class FaktaOffentligTransport(
         )
 
     private fun validerIngenNegativeUtgifter() {
-        utgifterOffentligTransport?.let {
-            brukerfeilHvis(it <= 0) {
-                "Utgifter til offentlig transport kan ikke være negative"
-            }
+        brukerfeilHvis(utgifterOffentligTransport <= 0.toBigDecimal()) {
+            "Utgifter til offentlig transport kan ikke være negative"
         }
     }
 }
@@ -60,7 +58,7 @@ data class FaktaOffentligTransport(
 data class FaktaPrivatBil(
     override val reiseId: ReiseId,
     override val adresse: String?,
-    val reiseavstand: BigDecimal?,
+    val reiseavstand: BigDecimal,
 ) : FaktaReiseTilSamling {
     override val type = TypeReiseTilSamling.PRIVAT_BIL
 
@@ -76,9 +74,9 @@ data class FaktaPrivatBil(
         )
 
     private fun validerIngenNegativReiseavstand() {
-        reiseavstand?.let {
-            brukerfeilHvis(it <= BigDecimal.ZERO) {
-                "Reiseavstand må være større enn 0"
+        reiseavstand.let {
+            brukerfeilHvis(it <= 0.toBigDecimal()) {
+                "Utgifter til offentlig transport kan ikke være negative"
             }
         }
     }

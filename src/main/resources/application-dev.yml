@@ -1,4 +1,6 @@
 CLIENT_ENV: dev
+tilleggsstonader:
+  url: https://tilleggsstonader.intern.dev.nav.no
 
 rolle:
   veileder: "3611981f-eda7-46ab-b8f2-50c3159e101c"

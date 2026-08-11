@@ -11,12 +11,12 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.vent.OppdaterPåVentRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentRequest
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.SettPåVentResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.vent.TaAvVentRequest
+import no.nav.tilleggsstonader.libs.feil.brukerfeil
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.http.client.ProblemDetailException
 import no.nav.tilleggsstonader.libs.http.client.getForEntity
 import no.nav.tilleggsstonader.libs.http.client.patchForEntity
 import no.nav.tilleggsstonader.libs.http.client.postForEntity
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.util.medContentTypeJsonUTF8
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -103,9 +103,9 @@ class OppgaveClient(
             )
         } catch (e: ProblemDetailException) {
             if (e.detail.detail?.contains("har ikke tilgang til") == true) {
-                throw ApiFeil("Bruker har ikke tilgang til enhet", HttpStatus.BAD_REQUEST)
+                brukerfeil("Bruker har ikke tilgang til enhet", HttpStatus.BAD_REQUEST)
             } else if (e.detail.detail?.contains("allerede er ferdigstilt") == true) {
-                throw ApiFeil(
+                brukerfeil(
                     "Oppgaven med id=$oppgaveId er allerede ferdigstilt. Prøv å hente oppgaver på nytt.",
                     HttpStatus.BAD_REQUEST,
                 )
@@ -218,7 +218,7 @@ class OppgaveClient(
 
     private fun sjekkOgHåndtertConflict(e: ProblemDetailException) {
         if (e.httpStatus == HttpStatus.CONFLICT) {
-            throw ApiFeil(
+            brukerfeil(
                 "Oppgaven har endret seg siden du sist hentet oppgaver. For å kunne gjøre endringer må du laste inn siden på nytt",
                 HttpStatus.CONFLICT,
             )

@@ -26,9 +26,9 @@ data class UkeVurderingDto(
     val erUkeSlettet: Boolean,
     val status: UkeStatus,
     val avvik: AvvikUke?,
-    val behandletDato: LocalDate?,
     val kjørelisteInnsendtDato: LocalDate?, // null hvis kjøreliste ikke er mottatt
     val kjørelisteId: KjørelisteId?, // null hvis kjøreliste ikke er mottatt
+    val erKjørelisteManueltRegistrert: Boolean,
     val avklartUkeId: UUID?,
     val avklartKjørtUkeStatus: AvklartKjørtUkeStatus?, // null hvis avklartKjørtUke ikke finnes
     val dager: List<DagDto>,

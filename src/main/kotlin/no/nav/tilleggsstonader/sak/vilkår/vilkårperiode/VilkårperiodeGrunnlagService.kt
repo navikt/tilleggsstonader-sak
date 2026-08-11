@@ -1,14 +1,14 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.brukerfeilHvisIkke
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.RegisterAktivitetService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
@@ -194,14 +194,47 @@ class VilkårperiodeGrunnlagService(
             perioder =
                 ytelserFraRegister.perioder
                     .map {
-                        PeriodeGrunnlagYtelse(
-                            type = it.type,
-                            fom = it.fom,
-                            tom = it.tom,
-                            subtype = it.tilYtelseSubtype(),
-                            gjenståendeDagerFraTelleverk = if (it is YtelsePeriode.Dagpenger) it.gjenståendeDagerFraTelleverk else null,
-                            erNyttRegelverk2026 = if (it is YtelsePeriode.EnsligForsørger) it.erNyttRegelverk2026 else null,
-                        )
+                        when (it) {
+                            is YtelsePeriode.AAP ->
+                                PeriodeGrunnlagYtelse.AAP(
+                                    fom = it.fom,
+                                    tom = it.tom,
+                                    subtype = it.tilYtelseSubtype(),
+                                )
+
+                            is YtelsePeriode.Dagpenger ->
+                                PeriodeGrunnlagYtelse.Dagpenger(
+                                    fom = it.fom,
+                                    tom = it.tom,
+                                    gjenståendeDagerFraTelleverk = it.gjenståendeDagerFraTelleverk,
+                                )
+
+                            is YtelsePeriode.EnsligForsørger ->
+                                PeriodeGrunnlagYtelse.EnsligForsørger(
+                                    fom = it.fom,
+                                    tom = it.tom,
+                                    subtype = it.tilYtelseSubtype(),
+                                    erNyttRegelverk2026 = it.erNyttRegelverk2026,
+                                )
+
+                            is YtelsePeriode.Omstillingsstønad ->
+                                PeriodeGrunnlagYtelse.Omstillingsstønad(
+                                    fom = it.fom,
+                                    tom = it.tom,
+                                )
+
+                            is YtelsePeriode.TiltakspengerTPSak ->
+                                PeriodeGrunnlagYtelse.TiltakspengerTPSak(
+                                    fom = it.fom,
+                                    tom = it.tom,
+                                )
+
+                            is YtelsePeriode.TiltakspengerArena ->
+                                PeriodeGrunnlagYtelse.TiltakspengerArena(
+                                    fom = it.fom,
+                                    tom = it.tom,
+                                )
+                        }
                     }.slåSammenOverlappendeEllerPåfølgende(),
             kildeResultat =
                 ytelserFraRegister.kildeResultat.map {

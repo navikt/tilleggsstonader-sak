@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feil
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
@@ -32,8 +32,8 @@ object ReisevurderingPrivatBilMapper {
             )
         return ReisevurderingPrivatBilDto(
             reiseId = reiseId,
-            rammevedtak = gjeldendeRammevedtakForReise?.tilDto(),
-            forrigeRammevedtak = forrigeRammevedtakForReise?.tilDto(),
+            rammevedtak = gjeldendeRammevedtakForReise?.tilDto(beregningsplan = null),
+            forrigeRammevedtak = forrigeRammevedtakForReise?.tilDto(beregningsplan = null),
             uker = ukeVurderingerDto,
         )
     }
@@ -95,9 +95,9 @@ object ReisevurderingPrivatBilMapper {
             erUkeSlettet = erUkeSlettet,
             status = avklartUke?.status ?: UkeStatus.IKKE_MOTTATT_KJØRELISTE,
             avvik = avklartUke?.typeAvvik?.let { AvvikUke(typeAvvik = it) },
-            behandletDato = avklartUke?.behandletDato,
             kjørelisteInnsendtDato = kjøreliste?.datoMottatt?.toLocalDate(),
             kjørelisteId = kjøreliste?.id,
+            erKjørelisteManueltRegistrert = kjøreliste?.manueltLagretIBehandling != null,
             avklartUkeId = avklartUke?.id,
             avklartKjørtUkeStatus = avklartUke?.avklartKjørtUkeStatus,
             dager =

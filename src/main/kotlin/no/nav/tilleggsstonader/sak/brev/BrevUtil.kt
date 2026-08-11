@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.brev
 
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import java.time.LocalDate
 

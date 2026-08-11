@@ -30,7 +30,6 @@ data class AvklartKjørtUke(
     val uke: UkeIÅr,
     val status: UkeStatus,
     val typeAvvik: TypeAvvikUke? = null,
-    val behandletDato: LocalDate? = null,
     @MappedCollection(idColumn = "avklart_kjort_uke_id")
     val dager: Set<AvklartKjørtDag>,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)

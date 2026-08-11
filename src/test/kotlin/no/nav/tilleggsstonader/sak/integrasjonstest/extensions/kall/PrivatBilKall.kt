@@ -5,9 +5,13 @@ import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.GenererKjørelistebrevDt
 import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.KjørelistebrevResponseDto
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
+import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.privatbil.ReisevurderingPrivatBilDto
 import no.nav.tilleggsstonader.sak.privatbil.UkeVurderingDto
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagRequest
+import no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering.KjørelisteOversiktDto
+import no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering.LagreManuellKjørelisteRequest
+import no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering.LagreManuellKjørelisteResponse
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.PrivatBilOppsummertBeregningDto
 import java.util.UUID
 
@@ -30,6 +34,19 @@ class PrivatBilKall(
 
     fun genererKjørelisteVedtaksbrev(behandlingId: BehandlingId) =
         apiRespons.genererKjørelisteVedtaksbrev(behandlingId).expectOkWithBody<KjørelistebrevResponseDto>()
+
+    fun hentKjørelisteOversikt(behandlingId: BehandlingId) =
+        apiRespons.hentKjørelisteOversikt(behandlingId).expectOkWithBody<KjørelisteOversiktDto>()
+
+    fun lagreManuellKjøreliste(
+        behandlingId: BehandlingId,
+        request: LagreManuellKjørelisteRequest,
+    ) = apiRespons.lagreManuellKjøreliste(behandlingId, request).expectOkWithBody<LagreManuellKjørelisteResponse>()
+
+    fun slettManuellKjøreliste(
+        behandlingId: BehandlingId,
+        kjørelisteId: KjørelisteId,
+    ) = apiRespons.slettManuellKjøreliste(behandlingId, kjørelisteId).expectOkEmpty()
 
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = PrivatBilApi()
@@ -84,5 +101,38 @@ class PrivatBilKall(
                     .medOnBehalfOfToken()
                     .exchange()
             }
+
+        // Endepunkter for manuell registrering av kjøreliste
+        fun hentKjørelisteOversikt(behandlingId: BehandlingId) =
+            with(testklient.testkontekst) {
+                restTestClient
+                    .get()
+                    .uri("api/kjoreliste/manuell-registrering/$behandlingId")
+                    .medOnBehalfOfToken()
+                    .exchange()
+            }
+
+        fun lagreManuellKjøreliste(
+            behandlingId: BehandlingId,
+            request: LagreManuellKjørelisteRequest,
+        ) = with(testklient.testkontekst) {
+            restTestClient
+                .post()
+                .uri("/api/kjoreliste/manuell-registrering/$behandlingId")
+                .body(request)
+                .medOnBehalfOfToken()
+                .exchange()
+        }
+
+        fun slettManuellKjøreliste(
+            behandlingId: BehandlingId,
+            kjørelisteId: KjørelisteId,
+        ) = with(testklient.testkontekst) {
+            restTestClient
+                .delete()
+                .uri("/api/kjoreliste/manuell-registrering/$behandlingId/$kjørelisteId")
+                .medOnBehalfOfToken()
+                .exchange()
+        }
     }
 }

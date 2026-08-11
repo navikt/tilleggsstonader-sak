@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.integrasjonstest
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.ArenaKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.BehandlingKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.BeregnReiseTilSamlingKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.BrevKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.BrevmottakereKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.GjenopprettOppgaveKall
@@ -21,6 +22,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.Totrinnskont
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VedtakKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårDagligReiseKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårReiseTilSamlingKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårperiodeKall
 
 class Kall(
@@ -44,8 +46,10 @@ class Kall(
     val skjemaRouting = SkjemaRoutingKall(testklient)
     val totrinnskontroll = TotrinnskontrollKall(testklient)
     val vedtak = VedtakKall(testklient)
+    val beregnReiseTilSamling = BeregnReiseTilSamlingKall(testklient)
     val vilkår = VilkårKall(testklient)
     val vilkårDagligReise = VilkårDagligReiseKall(testklient)
+    val vilkårReiseTilSamling = VilkårReiseTilSamlingKall(testklient)
     val vilkårperiode = VilkårperiodeKall(testklient)
     val brevmottakere = BrevmottakereKall(testklient)
 }

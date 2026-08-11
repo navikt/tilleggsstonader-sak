@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.migrering.arena
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvisIkke
+import no.nav.tilleggsstonader.libs.feil.feil
+import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.EksternApplikasjon
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.util.EnvUtil.erIProd
@@ -40,7 +40,7 @@ class EksternArenaController(
                  * Spesialhåndtering i test fordi Arena tester tjenesten med rettighet=AAP som ikke eksisterer
                  * Kaster [ApiFeil] som logger info i stedet for error, med INTERNAL_SERVER_ERROR som skjer ellers
                  */
-                throw ApiFeil("Finner ikke mapping for AAP", HttpStatus.INTERNAL_SERVER_ERROR)
+                feil("Finner ikke mapping for AAP")
             } else {
                 throw e
             }

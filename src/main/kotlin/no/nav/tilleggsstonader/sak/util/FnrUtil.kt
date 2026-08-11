@@ -1,6 +1,6 @@
 package no.nav.tilleggsstonader.sak.util
 
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.ApiFeil
+import no.nav.tilleggsstonader.libs.feil.brukerfeil
 import org.springframework.http.HttpStatus
 
 object FnrUtil {
@@ -14,10 +14,10 @@ object FnrUtil {
 
     fun validerIdent(personIdent: String) {
         if (personIdent.length != 11) {
-            throw ApiFeil("Ugyldig personident. Det må være 11 sifre", HttpStatus.BAD_REQUEST)
+            brukerfeil("Ugyldig personident. Det må være 11 sifre", HttpStatus.BAD_REQUEST)
         }
         if (!FNR_REGEX.matches(personIdent)) {
-            throw ApiFeil("Ugyldig personident. Det kan kun inneholde tall", HttpStatus.BAD_REQUEST)
+            brukerfeil("Ugyldig personident. Det kan kun inneholde tall", HttpStatus.BAD_REQUEST)
         }
     }
 }

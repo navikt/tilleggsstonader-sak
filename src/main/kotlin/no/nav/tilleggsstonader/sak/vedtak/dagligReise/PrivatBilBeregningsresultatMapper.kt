@@ -4,8 +4,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.kontrakter.felles.påfølgesAv
 import no.nav.tilleggsstonader.libs.utils.dato.ukenummer
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.SatsDagligReisePrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.satser
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilPeriode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
@@ -13,6 +11,8 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.RammeForReiseMedPrivatBilDelperiodeSatserDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.sats.satser
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -36,6 +36,7 @@ fun BeregningsresultatForReisePrivatBil.oppsummerReise(rammevedtakForReise: Ramm
         reiseavstandEnVei = rammevedtakForReise.grunnlag.reiseavstandEnVei,
         aktivitetsadresse = rammevedtakForReise.aktivitetsadresse,
         perioder = this.perioder.map { it.oppsummerPeriode(rammevedtakForReise) }.sortedBy { it.ukenummer },
+        fraTidligereVedtak = this.perioder.all { it.fraTidligereVedtak },
     )
 
 private fun BeregningsresultatForReisePrivatBilPeriode.oppsummerPeriode(
@@ -62,7 +63,7 @@ private fun BeregningsresultatForReisePrivatBilPeriode.oppsummerPeriode(
     )
 }
 
-fun PrivatBilOppsummertBeregningDto.finnSatserBruktIBeregning(): List<SatsDagligReisePrivatBil> =
+fun PrivatBilOppsummertBeregningDto.finnSatserBruktIBeregning(): List<SatsPrivatBil> =
     reiser
         .flatMap { reise ->
             reise.perioder.mergeSammenhengende().flatMap { periode ->
@@ -80,9 +81,11 @@ data class OppsummertBeregningForReiseDto(
     val reiseavstandEnVei: BigDecimal,
     val aktivitetsadresse: String?,
     val perioder: List<OppsummertBeregningForPeriodeDto>,
+    val fraTidligereVedtak: Boolean,
 ) {
     val totaltStønadsbeløpMedPerioderFraForrigeVedtak = perioder.sumOf { it.stønadsbeløp }
-    val totaltStønadsbeløpUtenPerioderFraForrigeVedtak = perioder.filter { !it.fraTidligereVedtak }.sumOf { it.stønadsbeløp }
+    val totaltStønadsbeløpUtenPerioderFraForrigeVedtak =
+        perioder.filter { !it.fraTidligereVedtak }.sumOf { it.stønadsbeløp }
 }
 
 data class OppsummertBeregningForPeriodeDto(

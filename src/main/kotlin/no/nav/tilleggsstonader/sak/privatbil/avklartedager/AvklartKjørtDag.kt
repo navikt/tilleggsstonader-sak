@@ -33,6 +33,8 @@ data class AvklartKjørtDag(
         } else {
             this
         }
+
+    fun erSlettet() = avklartKjørtDagStatus == AvklartKjørtDagStatus.SLETTET
 }
 
 fun List<AvklartKjørtDag>.finnDagerInnenforPeriode(periode: Periode<LocalDate>): List<AvklartKjørtDag> =

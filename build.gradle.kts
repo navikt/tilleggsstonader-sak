@@ -3,7 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20260713101404_6072da6"
-val tilleggsstønaderLibsVersion = "2026.05.14-21.16.acdbe034efef"
+val tilleggsstønaderLibsVersion = "2026.08.07-12.32.dfeb3286fb52"
 val tilleggsstønaderKontrakterVersion = "2026.08.10-11.12.3f8dac8d00ee"
 val avroVersion = "1.12.1"
 val confluentVersion = "8.0.1"
@@ -12,7 +12,7 @@ val tokenSupportVersion = "6.0.11"
 val wiremockVersion = "3.13.2"
 val mockkVersion = "1.14.11"
 val testcontainerVersion = "1.21.4"
-val springDocVersion = "3.0.3"
+val springDocVersion = "3.1.0"
 val shedlockVersion = "7.7.0"
 
 group = "no.nav.tilleggsstonader.sak"
@@ -22,7 +22,7 @@ plugins {
     application
 
     kotlin("jvm") version "2.3.21"
-    id("com.diffplug.spotless") version "8.8.0"
+    id("com.diffplug.spotless") version "8.9.0"
     id("io.github.ben-manes.versions") version "0.59.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
 
@@ -86,6 +86,7 @@ dependencies {
 
     // Tillegggsstønader libs
     implementation("no.nav.tilleggsstonader-libs:util:$tilleggsstønaderLibsVersion")
+    implementation("no.nav.tilleggsstonader-libs:feil:$tilleggsstønaderLibsVersion")
     implementation("no.nav.tilleggsstonader-libs:log:$tilleggsstønaderLibsVersion")
     implementation("no.nav.tilleggsstonader-libs:http-client:$tilleggsstønaderLibsVersion")
     implementation("no.nav.tilleggsstonader-libs:sikkerhet:$tilleggsstønaderLibsVersion")

@@ -1,14 +1,16 @@
 package no.nav.tilleggsstonader.sak.behandling
 
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegUtil
 import no.nav.tilleggsstonader.sak.brev.mellomlager.MellomlagerBrevRepository
 import no.nav.tilleggsstonader.sak.brev.vedtaksbrev.VedtaksbrevRepository
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.exception.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringsresultatRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -33,6 +35,7 @@ class NullstillBehandlingService(
     private val vedtaksbrevRepository: VedtaksbrevRepository,
     private val barnService: BarnService,
     private val faktaGrunnlagService: FaktaGrunnlagService,
+    private val avklartKjørelisteService: AvklartKjørelisteService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -43,13 +46,16 @@ class NullstillBehandlingService(
         }
         logger.info("Nullstiller behandling=${behandling.id}")
 
-        if (behandling.type == BehandlingType.KJØRELISTE) {
-            behandlingService.oppdaterStegPåBehandling(behandling.id, StegType.KJØRELISTE)
-        } else {
-            behandlingService.oppdaterStegPåBehandling(behandling.id, StegType.INNGANGSVILKÅR)
-        }
+        behandlingService.oppdaterStegPåBehandling(
+            behandlingId = behandling.id,
+            steg =
+                StegUtil.utledFørsteStegForBehandling(
+                    behandlingType = behandling.type,
+                    behandlingsårsak = behandling.årsak,
+                ),
+        )
 
-        slettDataIBehandling(behandling.id)
+        slettDataIBehandling(behandling)
 
         gjenbrukData(behandling)
     }
@@ -73,15 +79,19 @@ class NullstillBehandlingService(
     /**
      * Nullstiller ikke barn, då barn gjenbrukes og har ev. med nye fra ny søknad
      */
-    private fun slettDataIBehandling(behandlingId: BehandlingId) {
-        vilkårperiodeRepository.findByBehandlingId(behandlingId).let(vilkårperiodeRepository::deleteAll)
-        vilkårRepository.findByBehandlingId(behandlingId).let(vilkårRepository::deleteAll)
+    private fun slettDataIBehandling(behandling: Behandling) {
+        vilkårperiodeRepository.findByBehandlingId(behandling.id).let(vilkårperiodeRepository::deleteAll)
+        vilkårRepository.findByBehandlingId(behandling.id).let(vilkårRepository::deleteAll)
 
-        vedtakService.slettVedtakMedId(behandlingId)
-        tilkjentYtelseRepository.findByBehandlingId(behandlingId)?.let(tilkjentYtelseRepository::delete)
-        simuleringsresultatRepository.deleteById(behandlingId)
-        mellomlagerBrevRepository.deleteById(behandlingId)
-        vedtaksbrevRepository.deleteById(behandlingId)
+        if (behandling.type == BehandlingType.KJØRELISTE && behandling.årsak == BehandlingÅrsak.REGISTRER_KJØRELISTE_FOR_BRUKER) {
+            avklartKjørelisteService.slettAvklarteUkerOgKjørelisterLagtTilManueltIBehandling(behandling.id)
+        }
+
+        vedtakService.slettVedtakMedId(behandling.id)
+        tilkjentYtelseRepository.findByBehandlingId(behandling.id)?.let(tilkjentYtelseRepository::delete)
+        simuleringsresultatRepository.deleteById(behandling.id)
+        mellomlagerBrevRepository.deleteById(behandling.id)
+        vedtaksbrevRepository.deleteById(behandling.id)
     }
 
     private fun gjenbrukData(behandling: Behandling) {

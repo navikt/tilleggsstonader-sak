@@ -44,6 +44,7 @@ class TilbakekrevingKafkaListenerTest {
             andelTilkjentYtelseTilPeriodeService = andelTilkjentYtelseTilPeriodeService,
             kafkaTemplate = kafkaTemplate,
             oppgaveService = oppgaveService,
+            tilleggsstonaderUrl = "https://tilleggsstonader",
         )
 
     val tilbakekrevingHendelseDelegate = TilbakekrevingHendelseDelegate(listOf(håndterer))

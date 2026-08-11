@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.LocalDate
 
 class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
     @Autowired
@@ -106,7 +105,6 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
             )
 
         assertThat(oppdatertUke.status).isEqualTo(UkeStatus.OK_MANUELT)
-        assertThat(oppdatertUke.behandletDato).isEqualTo(LocalDate.now())
         // Originalt avvik skal ikke fjernes ved manuell oppdatering, da det kan være relevant for saksbehandler å
         // se at det har vært et avvik som førte til manuell behandling
         assertThat(oppdatertUke.avvik!!.typeAvvik).isEqualTo(TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK)
@@ -115,7 +113,7 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `skal feile dersom det ikke sendes inn en hel uke dersom hele uka er innsendt`() {
+    fun `skal feile dersom det ikke sendes inn alle ikke-slettede dager i uke`() {
         val kjørelistebehandling =
             opprettBehandlingOgSendInnKjøreliste(
                 dagerKjørt =
@@ -147,11 +145,6 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
                     godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
                     parkeringsutgift = 50,
                 ),
-                EndreAvklartDagRequest(
-                    dato = 7 januar 2026,
-                    godkjentGjennomførtKjøring = GodkjentGjennomførtKjøring.JA,
-                    parkeringsutgift = 50,
-                ),
             )
 
         kall.privatBil.apiRespons
@@ -160,10 +153,10 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
                 avklartUkeId = avklartUkeId,
                 avklarteDager = request,
             ).expectStatus()
-            .is5xxServerError()
+            .is4xxClientError()
             .expectBody()
             .jsonPath("$.detail")
-            .isEqualTo("Alle dager i uke må sendes inn")
+            .isEqualTo("Alle dager i uken må sendes inn")
     }
 
     @Test
@@ -202,10 +195,10 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
                 avklartUkeId = avklartUkeId,
                 avklarteDager = request,
             ).expectStatus()
-            .is5xxServerError()
+            .is4xxClientError()
             .expectBody()
             .jsonPath("$.detail")
-            .isEqualTo("Alle dager i uke må sendes inn")
+            .isEqualTo("Alle dager i uken må sendes inn")
     }
 
     private fun opprettBehandlingOgSendInnKjøreliste(dagerKjørt: List<KjørtDag>): Saksbehandling {

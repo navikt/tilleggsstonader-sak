@@ -45,6 +45,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import org.assertj.core.api.Assertions.assertThat
+import java.util.UUID
 
 enum class TidligsteEndringFellesNøkler(
     override val nøkkel: String,
@@ -257,18 +258,23 @@ class UtledTidligsteEndringStepDefinitions {
                         resultat = parseEnum(TidligsteEndringFellesNøkler.RESULTAT, rad),
                         type = VilkårType.DAGLIG_REISE,
                         status = parseEnum(TidligsteEndringFellesNøkler.STATUS, rad),
-                        fakta = mapPrivatBilFakta(rad),
+                        fakta = mapPrivatBilFakta(rad, reisenr),
                     )
             }.toMap()
 
-    private fun mapPrivatBilFakta(rad: Map<String, String>) =
-        FaktaDagligReisePrivatBil(
-            reiseId = ReiseId.random(),
-            reiseavstandEnVei = parseBigDecimal(DomenenøkkelPrivatBil.REISEAVSTAND_EN_VEI, rad),
-            faktaDelperioder = emptyList(),
-            adresse = "Tiltaksveien 1",
-            aktivitetId = VilkårperiodeGlobalId.random(),
-        )
+    private fun mapPrivatBilFakta(
+        rad: Map<String, String>,
+        reisenr: Int,
+    ) = FaktaDagligReisePrivatBil(
+        reiseId = reiseIdFraReisenr(reisenr),
+        reiseavstandEnVei = parseBigDecimal(DomenenøkkelPrivatBil.REISEAVSTAND_EN_VEI, rad),
+        faktaDelperioder = emptyList(),
+        adresse = "Tiltaksveien 1",
+        aktivitetId = VilkårperiodeGlobalId.random(),
+    )
+
+    private fun reiseIdFraReisenr(reisenr: Int): ReiseId =
+        ReiseId(UUID.nameUUIDFromBytes("tidligste-endring-reisenr-$reisenr".toByteArray()))
 
     private fun mapPrivatBilDelperioder(dataTable: DataTable): Map<Int, List<FaktaDelperiodePrivatBil>> =
         dataTable
