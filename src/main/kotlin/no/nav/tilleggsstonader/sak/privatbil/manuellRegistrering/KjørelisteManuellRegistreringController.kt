@@ -61,29 +61,16 @@ class KjørelisteManuellRegistreringController(
         kjørelisteManuellRegistreringService.slettManuellKjøreliste(behandlingId, kjørelisteId)
     }
 
-    @PutMapping("{behandlingId}/{kjørelisteId}/uke/{ukeFom}")
-    fun oppdaterUke(
+    @PutMapping("{behandlingId}/{kjørelisteId}")
+    fun oppdaterKjøreliste(
         @PathVariable behandlingId: BehandlingId,
         @PathVariable kjørelisteId: KjørelisteId,
-        @PathVariable ukeFom: LocalDate,
-        @RequestBody request: OppdaterKjørelisteUkeRequest,
-    ): ManueltInnsendtKjørelisteUkeDto {
+        @RequestBody request: OppdaterKjørelisteRequest,
+    ): ManueltInnsendtKjørelisteDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
 
-        return kjørelisteManuellRegistreringService.oppdaterUke(behandlingId, kjørelisteId, ukeFom, request.dager)
-    }
-
-    @PutMapping("{behandlingId}/{kjørelisteId}/begrunnelse")
-    fun oppdaterBegrunnelse(
-        @PathVariable behandlingId: BehandlingId,
-        @PathVariable kjørelisteId: KjørelisteId,
-        @RequestBody request: OppdaterKjørelisteBegrunnelseRequest,
-    ) {
-        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.UPDATE)
-
-        kjørelisteManuellRegistreringService.oppdaterBegrunnelse(behandlingId, kjørelisteId, request.begrunnelse)
+        return kjørelisteManuellRegistreringService.oppdaterKjøreliste(behandlingId, kjørelisteId, request)
     }
 }
 
@@ -98,10 +85,12 @@ data class LagreManuellKjørelisteResponse(
     val kjørelisteId: KjørelisteId,
 )
 
-data class OppdaterKjørelisteUkeRequest(
-    val dager: List<KjørelisteDag>,
+data class OppdaterKjørelisteRequest(
+    val begrunnelse: String?,
+    val uker: List<OppdaterKjørelisteUkeRequest>,
 )
 
-data class OppdaterKjørelisteBegrunnelseRequest(
-    val begrunnelse: String?,
+data class OppdaterKjørelisteUkeRequest(
+    val fom: LocalDate,
+    val dager: List<KjørelisteDag>,
 )

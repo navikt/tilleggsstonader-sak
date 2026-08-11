@@ -486,11 +486,13 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
 
             val oppdaterteDager = lagKjørteDagerForUke(fom = fom, tom = tom, antallKjørteDager = 5)
 
-            kall.privatBil.oppdaterManuellKjørelisteUke(
+            kall.privatBil.oppdaterManuellKjøreliste(
                 revurderingId,
                 kjørelisteId,
-                fom,
-                OppdaterKjørelisteUkeRequest(dager = oppdaterteDager),
+                OppdaterKjørelisteRequest(
+                    begrunnelse = null,
+                    uker = listOf(OppdaterKjørelisteUkeRequest(fom = fom, dager = oppdaterteDager)),
+                ),
             )
 
             val lagretKjøreliste = kjørelisteRepository.findByFagsakId(fagsakId).single()
@@ -523,12 +525,18 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
                     ).kjørelisteId
 
             kall.privatBil.apiRespons
-                .oppdaterManuellKjørelisteUke(
+                .oppdaterManuellKjøreliste(
                     revurderingId,
                     kjørelisteId,
-                    fom,
-                    OppdaterKjørelisteUkeRequest(
-                        dager = lagKjørteDagerForUke(fom = 12 januar 2026, tom = 18 januar 2026, antallKjørteDager = 2),
+                    OppdaterKjørelisteRequest(
+                        begrunnelse = null,
+                        uker =
+                            listOf(
+                                OppdaterKjørelisteUkeRequest(
+                                    fom = fom,
+                                    dager = lagKjørteDagerForUke(fom = 12 januar 2026, tom = 18 januar 2026, antallKjørteDager = 2),
+                                ),
+                            ),
                     ),
                 ).expectProblemDetail(
                     forventetStatus = HttpStatus.BAD_REQUEST,
@@ -564,10 +572,13 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
                         ),
                     ).kjørelisteId
 
-            kall.privatBil.oppdaterManuellKjørelisteBegrunnelse(
+            kall.privatBil.oppdaterManuellKjøreliste(
                 revurderingId,
                 kjørelisteId,
-                OppdaterKjørelisteBegrunnelseRequest(begrunnelse = "Ny begrunnelse"),
+                OppdaterKjørelisteRequest(
+                    begrunnelse = "Ny begrunnelse",
+                    uker = emptyList(),
+                ),
             )
 
             val lagretKjøreliste = kjørelisteRepository.findByFagsakId(fagsakId).single()
