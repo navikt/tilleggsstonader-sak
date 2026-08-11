@@ -21,9 +21,10 @@ data class RammevedtakPrivatBil(
 ) {
     fun hentRammevedtakForReise(reiseId: ReiseId): RammevedtakForReiseMedPrivatBil = reiser.single { it.reiseId == reiseId }
 
-    fun finnSatserSomSkalOppdateres(
-        bekreftedeSatser: List<SatsPrivatBil>,
-    ): Map<RammeForReiseMedPrivatBilSatsForDelperiode, RammeForReiseMedPrivatBilSatsForDelperiode> =
+    typealias EksisterendeSatsPrivatBil = RammeForReiseMedPrivatBilSatsForDelperiode
+    typealias OppdatertSatsPrivatBil = RammeForReiseMedPrivatBilSatsForDelperiode
+
+    fun finnSatserSomSkalOppdateres(bekreftedeSatser: List<SatsPrivatBil>): Map<EksisterendeSatsPrivatBil, OppdatertSatsPrivatBil> =
         reiser
             .flatMap { it.grunnlag.delperioder }
             .flatMap { it.satser }
@@ -33,9 +34,7 @@ data class RammevedtakPrivatBil(
                 }
             }.toMap()
 
-    fun oppdaterSatser(
-        satserSomSkalOppdateres: Map<RammeForReiseMedPrivatBilSatsForDelperiode, RammeForReiseMedPrivatBilSatsForDelperiode>,
-    ): RammevedtakPrivatBil =
+    fun oppdaterSatser(satserSomSkalOppdateres: Map<EksisterendeSatsPrivatBil, OppdatertSatsPrivatBil>): RammevedtakPrivatBil =
         copy(
             reiser =
                 reiser.map { reise ->
@@ -46,8 +45,8 @@ data class RammevedtakPrivatBil(
                                     reise.grunnlag.delperioder.map { delperiode ->
                                         delperiode.copy(
                                             satser =
-                                                delperiode.satser.map { sats ->
-                                                    satserSomSkalOppdateres[sats] ?: sats
+                                                delperiode.satser.map { eksisterendeSats ->
+                                                    satserSomSkalOppdateres[eksisterendeSats] ?: eksisterendeSats
                                                 },
                                         )
                                     },
