@@ -1,2 +1,2 @@
 DROP INDEX kjoreliste_journalpost_id_idx;
-CREATE INDEX ON kjoreliste (journalpost_id);
+CREATE INDEX idx_kjoreliste_journalpost_id ON kjoreliste (journalpost_id);
