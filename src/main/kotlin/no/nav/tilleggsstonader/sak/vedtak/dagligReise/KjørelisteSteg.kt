@@ -78,49 +78,11 @@ class KjørelisteSteg(
             satsPrivatBilProvider.alleSatser
                 .filter { it.bekreftet }
 
-        var erOppdatert = false
+        val satserSomSkalOppdateres = eksisterendeRammevedtak.finnSatserSomSkalOppdateres(bekreftedeSatser)
 
-        val oppdatertRammevedtak =
-            eksisterendeRammevedtak.copy(
-                reiser =
-                    eksisterendeRammevedtak.reiser.map { reise ->
-                        reise.copy(
-                            grunnlag =
-                                reise.grunnlag.copy(
-                                    delperioder =
-                                        reise.grunnlag.delperioder.map { delperiode ->
-                                            delperiode.copy(
-                                                satser =
-                                                    delperiode.satser.map { sats ->
-                                                        val nySats =
-                                                            bekreftedeSatser.find {
-                                                                it.inneholder(sats.fom) &&
-                                                                    it.inneholder(
-                                                                        sats.tom,
-                                                                    )
-                                                            }
-                                                        val skalOppdateres =
-                                                            !sats.satsBekreftetVedVedtakstidspunkt &&
-                                                                nySats != null
+        if (satserSomSkalOppdateres.isEmpty()) return eksisterendeRammevedtak
 
-                                                        if (skalOppdateres) {
-                                                            erOppdatert = true
-                                                            sats.copy(
-                                                                satsBekreftetVedVedtakstidspunkt = true,
-                                                                kilometersats = nySats.beløp,
-                                                            )
-                                                        } else {
-                                                            sats
-                                                        }
-                                                    },
-                                            )
-                                        },
-                                ),
-                        )
-                    },
-            )
-
-        if (!erOppdatert) return eksisterendeRammevedtak
+        val oppdatertRammevedtak = eksisterendeRammevedtak.oppdaterSatser(satserSomSkalOppdateres)
 
         dagligReiseVedtakService.oppdaterVedtakMedNyttRammevedtakPrivatBil(
             behandlingId = behandlingId,

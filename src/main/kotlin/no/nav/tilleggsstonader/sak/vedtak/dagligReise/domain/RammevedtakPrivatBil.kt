@@ -4,11 +4,13 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
+import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
 import no.nav.tilleggsstonader.libs.feil.singleEllerFeil
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.util.validerUkentligeDelperioderErSammenhengendeInnenforOverordnetPeriode
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.mergeSammenhengende
+import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.math.BigDecimal
@@ -18,6 +20,41 @@ data class RammevedtakPrivatBil(
     val reiser: List<RammevedtakForReiseMedPrivatBil>,
 ) {
     fun hentRammevedtakForReise(reiseId: ReiseId): RammevedtakForReiseMedPrivatBil = reiser.single { it.reiseId == reiseId }
+
+    fun finnSatserSomSkalOppdateres(
+        bekreftedeSatser: List<SatsPrivatBil>,
+    ): Map<RammeForReiseMedPrivatBilSatsForDelperiode, RammeForReiseMedPrivatBilSatsForDelperiode> =
+        reiser
+            .flatMap { it.grunnlag.delperioder }
+            .flatMap { it.satser }
+            .mapNotNull { sats ->
+                sats.lagOppdatertSatsHvisSkalOppdateres(bekreftedeSatser)?.let { oppdatertSats ->
+                    sats to oppdatertSats
+                }
+            }.toMap()
+
+    fun oppdaterSatser(
+        satserSomSkalOppdateres: Map<RammeForReiseMedPrivatBilSatsForDelperiode, RammeForReiseMedPrivatBilSatsForDelperiode>,
+    ): RammevedtakPrivatBil =
+        copy(
+            reiser =
+                reiser.map { reise ->
+                    reise.copy(
+                        grunnlag =
+                            reise.grunnlag.copy(
+                                delperioder =
+                                    reise.grunnlag.delperioder.map { delperiode ->
+                                        delperiode.copy(
+                                            satser =
+                                                delperiode.satser.map { sats ->
+                                                    satserSomSkalOppdateres[sats] ?: sats
+                                                },
+                                        )
+                                    },
+                            ),
+                    )
+                },
+        )
 }
 
 data class RammevedtakForReiseMedPrivatBil(
@@ -92,7 +129,15 @@ data class RammeForReiseMedPrivatBilDelperiode(
         tom: LocalDate,
     ): RammeForReiseMedPrivatBilDelperiode = this.copy(fom = fom, tom = tom)
 
-    fun finnSatsForDato(dato: LocalDate): RammeForReiseMedPrivatBilSatsForDelperiode = satser.single { it.inneholder(dato) }
+    fun finnSatsForDato(dato: LocalDate): RammeForReiseMedPrivatBilSatsForDelperiode {
+        val sats = satser.single { it.inneholder(dato) }
+
+        feilHvisIkke(sats.satsBekreftetVedVedtakstidspunkt) {
+            "Kan ikke beregne sats for år ${dato.year}, da satsen ikke er satt"
+        }
+
+        return sats
+    }
 
     fun avkortEtterDato(maksTom: LocalDate): RammeForReiseMedPrivatBilDelperiode? {
         val avkortetPeriode = this.avkortFraOgMed(maksTom) ?: return null
@@ -115,6 +160,20 @@ data class RammeForReiseMedPrivatBilSatsForDelperiode(
         fom: LocalDate,
         tom: LocalDate,
     ): RammeForReiseMedPrivatBilSatsForDelperiode = this.copy(fom = fom, tom = tom)
+
+    fun lagOppdatertSatsHvisSkalOppdateres(bekreftedeSatser: List<SatsPrivatBil>): RammeForReiseMedPrivatBilSatsForDelperiode? {
+        if (satsBekreftetVedVedtakstidspunkt) return null
+
+        val nySats =
+            bekreftedeSatser.firstOrNull {
+                it.inneholder(fom) && it.inneholder(tom)
+            } ?: return null
+
+        return copy(
+            satsBekreftetVedVedtakstidspunkt = true,
+            kilometersats = nySats.beløp,
+        )
+    }
 }
 
 data class RammeForReiseMedPrivatEkstrakostnader(

@@ -44,7 +44,7 @@ class SatsjusteringDagligReisePrivatBilTest(
     private fun mockSatser() {
         val bekreftedeSatser = satsPrivatBilProvider.alleSatser.filter { it.bekreftet }
         val ubekreftetSats = satsPrivatBilProvider.alleSatser.first { !it.bekreftet }
-        val nyBrekeftetSats =
+        val nyBekreftetSats =
             ubekreftetSats.copy(
                 tom =
                     ubekreftetSats.fom
@@ -55,7 +55,7 @@ class SatsjusteringDagligReisePrivatBilTest(
                 beløp = 10.toBigDecimal(),
             )
 
-        val nyUbrekeftetSats =
+        val nyUbekreftetSats =
             ubekreftetSats.copy(
                 fom = ubekreftetSats.fom.plusYears(1),
                 beløp = 20.toBigDecimal(),
@@ -63,7 +63,7 @@ class SatsjusteringDagligReisePrivatBilTest(
 
         every {
             satsPrivatBilProvider.alleSatser
-        } returns bekreftedeSatser + nyBrekeftetSats + nyUbrekeftetSats
+        } returns bekreftedeSatser + nyBekreftetSats + nyUbekreftetSats
     }
 
     @AfterEach
@@ -224,7 +224,7 @@ class SatsjusteringDagligReisePrivatBilTest(
             behandlingId = kjørelisteBehandling.id,
         ).expectProblemDetail(
             forventetStatus = HttpStatus.INTERNAL_SERVER_ERROR,
-            forventetDetail = "Kjøreliste inneholder dager som ikke har tilgjengelig sats",
+            forventetDetail = "Kan ikke beregne sats for år ${tom.year}, da satsen ikke er satt",
         )
     }
 }
