@@ -318,7 +318,7 @@ fun OpprettOppgaveRequest.tilNyOppgave(id: Long = 0) =
         id = id,
         versjon = 1,
         status = StatusEnum.OPPRETTET,
-        bruker = OppgaveBruker(this.personident.ident, type = OppgaveBrukerType.PERSON),
+        bruker = OppgaveBruker(this.personident?.ident, type = OppgaveBrukerType.PERSON),
         tildeltEnhetsnr = this.enhetsnummer ?: "1234",
         saksreferanse = null,
         journalpostId = this.journalpostId,
