@@ -48,7 +48,6 @@ class AutomatiskKjørelisteBehandlingTest : CleanDatabaseIntegrationTest() {
 
     @BeforeEach
     fun setUp() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
         every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns true
     }
 

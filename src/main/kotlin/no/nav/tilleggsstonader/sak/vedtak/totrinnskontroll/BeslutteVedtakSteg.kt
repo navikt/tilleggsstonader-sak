@@ -62,7 +62,6 @@ class BeslutteVedtakSteg(
     override fun utførOgReturnerNesteSteg(
         saksbehandling: Saksbehandling,
         data: BeslutteVedtakDto,
-        kanBehandlePrivatBil: Boolean,
     ): StegType {
         fagsakService.fagsakMedOppdatertPersonIdent(saksbehandling.fagsakId)
         val saksbehandler = totrinnskontrollService.lagreTotrinnskontrollOgReturnerSaksbehandler(saksbehandling, data)

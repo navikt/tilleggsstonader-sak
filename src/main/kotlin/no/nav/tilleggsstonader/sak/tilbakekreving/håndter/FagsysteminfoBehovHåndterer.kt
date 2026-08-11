@@ -25,6 +25,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Service
 import tools.jackson.databind.JsonNode
@@ -41,6 +42,8 @@ class FagsysteminfoBehovHåndterer(
     private val andelTilkjentYtelseTilPeriodeService: AndelTilkjentYtelseTilPeriodeService,
     private val kafkaTemplate: KafkaTemplate<String, String>,
     private val oppgaveService: OppgaveService,
+    @Value("\${tilleggsstonader.url}")
+    private val tilleggsstonaderUrl: String,
 ) : TilbakekrevingHendelseHåndterer {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -129,6 +132,7 @@ class FagsysteminfoBehovHåndterer(
 
         return TilbakekrevingFagsysteminfoSvarRevurdering(
             behandlingId = eksternBehandlingId,
+            url = "$tilleggsstonaderUrl/behandling/${saksbehandling.id}",
             årsak = mapÅrsak(saksbehandling),
             årsakTilFeilutbetaling = if (vedtak.data is Opphør) vedtak.data.begrunnelse else null,
             vedtaksdato = saksbehandling.vedtakstidspunkt!!.toLocalDate(),

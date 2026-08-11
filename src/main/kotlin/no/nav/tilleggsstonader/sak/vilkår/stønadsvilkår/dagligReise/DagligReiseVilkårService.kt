@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
-import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -13,7 +12,6 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.SlettetVilkårResultat
@@ -177,11 +175,6 @@ class DagligReiseVilkårService(
     ) {
         val gjelderPrivatBil = nyttVilkår.fakta.type == TypeDagligReise.PRIVAT_BIL
         val gjelderOffentligTransport = nyttVilkår.fakta.type == TypeDagligReise.OFFENTLIG_TRANSPORT
-        val kanBehandlePrivatBil = unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)
-
-        feilHvis(gjelderPrivatBil && !kanBehandlePrivatBil) {
-            "TS-sak støtter foreløpig ikke behandling av saker som gjelder privat bil"
-        }
 
         if (gjelderPrivatBil) {
             validerAktivitetForPrivatBil(nyttVilkår, behandling.id)

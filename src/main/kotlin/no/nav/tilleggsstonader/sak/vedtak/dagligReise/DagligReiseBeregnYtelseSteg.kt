@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.behandling.GjenbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GjennopprettAvklarteDagerService
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
@@ -31,6 +32,7 @@ class DagligReiseBeregnYtelseSteg(
     private val dagligReiseVedtakService: DagligReiseVedtakService,
     private val opprettAndelerDagligReiseService: OpprettAndelerDagligReiseService,
     private val avklartKjørelisteService: AvklartKjørelisteService,
+    private val gjenopprettAvklarteDagerService: GjennopprettAvklarteDagerService,
     private val gjenbrukDataRevurderingService: GjenbrukDataRevurderingService,
     vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
@@ -45,10 +47,7 @@ class DagligReiseBeregnYtelseSteg(
      * En daglige reiser behandling skal kun havne i steg "KJØRELISTE" dersom forrige behandling
      * inneholdt et rammevedtak for privat bil.
      */
-    override fun nesteSteg(
-        saksbehandling: Saksbehandling,
-        kanBehandlePrivatBil: Boolean,
-    ): StegType {
+    override fun nesteSteg(saksbehandling: Saksbehandling): StegType {
         val gjelderAvslag = vedtakRepository.findByIdOrNull(saksbehandling.id)?.type == TypeVedtak.AVSLAG
         val forrigeIverksatteBehandlingHarRammevedtakForPrivatBil =
             dagligReiseVedtakService.forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(saksbehandling.forrigeIverksatteBehandlingId)
@@ -57,7 +56,7 @@ class DagligReiseBeregnYtelseSteg(
             return StegType.KJØRELISTE
         }
 
-        return super.nesteSteg(saksbehandling, kanBehandlePrivatBil)
+        return super.nesteSteg(saksbehandling)
     }
 
     override fun lagreVedtakForSatsjustering(
@@ -106,6 +105,12 @@ class DagligReiseBeregnYtelseSteg(
             vedtaksperioder = vedtaksperioder,
             begrunnelse = vedtak.begrunnelse,
             beregningsplan = plan,
+        )
+
+        gjenopprettAvklarteDagerService.gjenopprettTidligereSlettedeDagerSomNåErInnenforRammevedtak(
+            fagsakId = saksbehandling.fagsakId,
+            behandlingId = saksbehandling.id,
+            rammevedtak = rammevedtakPrivatBil,
         )
 
         avklartKjørelisteService.sletteMarkerUkerOgDagerUtenforAvkortetRammevedtak(

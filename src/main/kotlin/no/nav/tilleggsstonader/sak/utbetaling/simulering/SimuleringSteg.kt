@@ -49,10 +49,7 @@ class SimuleringSteg(
 
     override fun stegType(): StegType = StegType.SIMULERING
 
-    override fun nesteSteg(
-        saksbehandling: Saksbehandling,
-        kanBehandlePrivatBil: Boolean,
-    ): StegType =
+    override fun nesteSteg(saksbehandling: Saksbehandling): StegType =
         when {
             saksbehandling.erKjørelisteBehandling() &&
                 saksbehandling.behandlingMetode == BehandlingMetode.MANUELL -> StegType.SEND_TIL_BESLUTTER

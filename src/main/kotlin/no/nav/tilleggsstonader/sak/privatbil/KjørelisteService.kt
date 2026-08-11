@@ -45,5 +45,7 @@ class KjørelisteService(
 
     fun hentKjøreliste(kjørelisteId: KjørelisteId): Kjøreliste = repository.findByIdOrThrow(kjørelisteId)
 
+    fun eksistererForJournalpostId(journalpostId: String): Boolean = repository.findByJournalpostId(journalpostId) != null
+
     fun oppdater(kjøreliste: Kjøreliste): Kjøreliste = repository.update(kjøreliste)
 }
