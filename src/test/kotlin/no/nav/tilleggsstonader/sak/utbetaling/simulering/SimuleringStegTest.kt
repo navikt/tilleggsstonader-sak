@@ -105,10 +105,11 @@ class SimuleringStegTest {
 
         @Test
         fun `skal ikke utføre simulering ved innvilgelse når forrige iverksatte behandling har andeler som ikke er sendt til økonomi`() {
+fun `skal ikke utføre simulering for innvilget revurdering når forrige iverksatte behandling har andeler som ikke er sendt til økonomi`() {
             val forrigeIverksatteBehandlingId = BehandlingId.random()
             val saksbehandling =
                 saksbehandling(
-                    type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    type = BehandlingType.REVURDERING,
                     forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
                 )
             every { tilkjentYtelseSerivce.hentForBehandling(saksbehandling.id) } returns
