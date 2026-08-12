@@ -189,7 +189,12 @@ class DagligReiseVedtakService(
         return oppdatertRammevedtak
     }
 
-    fun oppdaterVedtakMedNyttRammevedtakPrivatBil(
+    fun forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(forrigeIverksatteBehandlingId: BehandlingId?): Boolean {
+        if (forrigeIverksatteBehandlingId == null) return false
+        return vedtakRepository.harRammevedtak(listOf(forrigeIverksatteBehandlingId))
+    }
+
+    private fun oppdaterVedtakMedNyttRammevedtakPrivatBil(
         behandlingId: BehandlingId,
         rammevedtakPrivatBil: RammevedtakPrivatBil,
     ) {
@@ -203,11 +208,6 @@ class DagligReiseVedtakService(
             }
 
         vedtakRepository.update(eksisterendeVedtak.copy(data = oppdatertData))
-    }
-
-    fun forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(forrigeIverksatteBehandlingId: BehandlingId?): Boolean {
-        if (forrigeIverksatteBehandlingId == null) return false
-        return vedtakRepository.harRammevedtak(listOf(forrigeIverksatteBehandlingId))
     }
 }
 
