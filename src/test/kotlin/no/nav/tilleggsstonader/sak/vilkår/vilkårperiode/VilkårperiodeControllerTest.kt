@@ -79,7 +79,7 @@ class VilkårperiodeControllerTest : CleanDatabaseIntegrationTest() {
         val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling())
         opprettOgTilordneOppgaveForBehandling(behandling.id)
         val behandlingForAnnenFagsak =
-            testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("1")))).let {
+            testoppsettService.lagreFagsak(fagsak(setOf(PersonIdent("123488888012")))).let {
                 testoppsettService.lagre(behandling(it))
             }
 

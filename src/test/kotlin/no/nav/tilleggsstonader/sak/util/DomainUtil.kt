@@ -16,7 +16,11 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.Sak
+import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveBruker
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
+import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -110,6 +114,30 @@ fun oppgave(
     tilordnetSaksbehandler: String? = null,
     tildeltEnhetsnr: String? = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr,
 ): OppgaveDomain = oppgave(behandling.id, gsakOppgaveId, type, status, tilordnetSaksbehandler, tildeltEnhetsnr)
+
+fun eksternOppgave(
+    id: Long = 123,
+    versjon: Int = 0,
+    tildeltEnhetsnr: String = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr,
+    tema: Tema = Tema.TSO,
+    oppgavetype: String = Oppgavetype.Journalføring.value,
+    prioritet: OppgavePrioritet = OppgavePrioritet.NORM,
+    status: StatusEnum = StatusEnum.AAPNET,
+    aktivDato: LocalDate = 1 januar 2026,
+    bruker: OppgaveBruker? = null,
+    tilordnetRessurs: String? = null,
+) = Oppgave(
+    id = id,
+    tildeltEnhetsnr = tildeltEnhetsnr,
+    versjon = versjon,
+    tema = tema,
+    oppgavetype = oppgavetype,
+    prioritet = prioritet,
+    status = status,
+    aktivDato = aktivDato,
+    bruker = bruker,
+    tilordnetRessurs = tilordnetRessurs,
+)
 
 fun oppgave(
     behandlingId: BehandlingId?,
@@ -274,14 +302,14 @@ fun saksbehandling(
 fun behandlingBarn(
     id: BarnId = BarnId.random(),
     behandlingId: BehandlingId = BehandlingId.random(),
-    personIdent: String = "1",
+    personIdent: String = "123456789321",
 ) = BehandlingBarn(
     id = id,
     behandlingId = behandlingId,
     ident = personIdent,
 )
 
-val defaultIdenter = setOf(PersonIdent("15"))
+val defaultIdenter = setOf(PersonIdent("123456789012"))
 
 fun fagsakPerson(identer: Set<PersonIdent> = defaultIdenter) = FagsakPerson(identer = identer)
 
