@@ -95,9 +95,13 @@ class PrivatBilBeregningRevurderingService(
         vilkårStatus: VilkårStatus,
     ): RammevedtakForReiseMedPrivatBil? =
         when (beregningsplan.omfang) {
-            Beregningsomfang.ALLE_PERIODER -> nyRammeForReise
-            Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT -> forrigeRammeForReise
-            Beregningsomfang.KUN_NYE_KJORELISTE_UKER -> forrigeRammeForReise
+            Beregningsomfang.ALLE_PERIODER ->
+                nyRammeForReise
+                    ?: feil("Forventer at det finnes et nytt rammevedtak for reise i ny beregning når vilkår har status $vilkårStatus")
+            Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT ->
+                forrigeRammeForReise
+                    ?: feil("Forventer at det finnes et rammevedtak for reise i forrige beregning når vilkår har status $vilkårStatus")
+            Beregningsomfang.KUN_NYE_KJORELISTE_UKER -> error("Forventer ikke å komme hit ved beregningsomfang ${beregningsplan.omfang}")
             Beregningsomfang.FRA_DATO ->
                 velgRammeForReiseBasertPåBeregnFraDato(
                     beregnFra = beregningsplan.fraDato ?: feil("Forventer at fraDato finnes for beregningsplan med omfang FRA_DATO"),
@@ -117,11 +121,11 @@ class PrivatBilBeregningRevurderingService(
             "Forventer at det finnes et rammevedtak for reise både i eksisterende og ny beregning når vilkår har status $vilkårStatus"
         }
 
-        val reiseErFørberegnFra =
+        val reiseErFørBeregnFra =
             forrigeRammeForReise.grunnlag.tom < beregnFra &&
                 nyRammeForReise.grunnlag.tom < beregnFra
 
-        return if (reiseErFørberegnFra) {
+        return if (reiseErFørBeregnFra) {
             forrigeRammeForReise
         } else {
             validerReisedagerIkkeRedusert(forrigeRammeForReise, nyRammeForReise)

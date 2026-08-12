@@ -180,19 +180,15 @@ class PrivatBilBeregningRevurderingServiceTest {
         }
 
         @Test
-        fun `reise med status UENDRET og beregningsomfang KUN_NYE_KJORELISTE_UKER bruker forrige`() {
-            val forrigeRammevedtakForReise = rammeForReiseMedPrivatBil(reiseId = reiseId, fom = 1 januar 2025, tom = 31 mars 2025)
-            val nyttRammevedtakForReise = rammeForReiseMedPrivatBil(reiseId = reiseId, fom = 1 februar 2025, tom = 30 april 2025)
-
-            val resultat =
+        fun `reise med status UENDRET og beregningsomfang KUN_NYE_KJORELISTE_UKER kaster feil`() {
+            assertThatThrownBy {
                 service.beregnRammevedtakVedRevurdering(
                     reiserMedBil = listOf(reiseMedStatus(VilkårStatus.UENDRET)),
-                    forrigeRammevedtak = RammevedtakPrivatBil(reiser = listOf(forrigeRammevedtakForReise)),
-                    nyttRammevedtak = RammevedtakPrivatBil(reiser = listOf(nyttRammevedtakForReise)),
+                    forrigeRammevedtak = rammevedtakPrivatBil(reiseId = reiseId),
+                    nyttRammevedtak = null,
                     beregningsplan = Beregningsplan(Beregningsomfang.KUN_NYE_KJORELISTE_UKER),
                 )
-
-            assertThat(resultat!!.reiser).containsExactly(forrigeRammevedtakForReise)
+            }.hasMessageContaining("Forventer ikke å komme hit ved beregningsomfang ${Beregningsomfang.KUN_NYE_KJORELISTE_UKER}")
         }
     }
 
