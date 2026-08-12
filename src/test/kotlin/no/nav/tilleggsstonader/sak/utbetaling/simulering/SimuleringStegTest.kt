@@ -6,7 +6,9 @@ import io.mockk.verify
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
@@ -72,12 +74,54 @@ class SimuleringStegTest {
                     saksbehandling.id,
                 ).copy(andelerTilkjentYtelse = emptySet())
             every { tilkjentYtelseSerivce.hentForBehandlingEllerNull(forrigeIverksatteBehandlingId) } returns
-                tilkjentYtelse(forrigeIverksatteBehandlingId)
+                tilkjentYtelse(forrigeIverksatteBehandlingId, andelTilkjentYtelse(statusIverksetting = StatusIverksetting.OK))
             mockVedtakMedType(TypeVedtak.OPPHØR)
 
             simuleringSteg.utførSteg(saksbehandling, null)
 
             verify { simuleringService.hentOgLagreSimuleringsresultat(saksbehandling) }
+        }
+
+        @Test
+        fun `skal ikke utføre simulering for opphør når forrige iverksatte behandling har andeler som ikke er sendt til økonomi`() {
+            val forrigeIverksatteBehandlingId = BehandlingId.random()
+            val saksbehandling =
+                saksbehandling(
+                    type = BehandlingType.REVURDERING,
+                    forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
+                )
+            every { tilkjentYtelseSerivce.hentForBehandling(saksbehandling.id) } returns
+                tilkjentYtelse(
+                    saksbehandling.id,
+                ).copy(andelerTilkjentYtelse = emptySet())
+            every { tilkjentYtelseSerivce.hentForBehandlingEllerNull(forrigeIverksatteBehandlingId) } returns
+                tilkjentYtelse(forrigeIverksatteBehandlingId, andelTilkjentYtelse(statusIverksetting = StatusIverksetting.UBEHANDLET))
+            mockVedtakMedType(TypeVedtak.OPPHØR)
+
+            simuleringSteg.utførSteg(saksbehandling, null)
+
+            verify(exactly = 0) { simuleringService.hentOgLagreSimuleringsresultat(saksbehandling) }
+        }
+
+        @Test
+        fun `skal ikke utføre simulering ved innvilgelse når forrige iverksatte behandling har andeler som ikke er sendt til økonomi`() {
+            val forrigeIverksatteBehandlingId = BehandlingId.random()
+            val saksbehandling =
+                saksbehandling(
+                    type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
+                )
+            every { tilkjentYtelseSerivce.hentForBehandling(saksbehandling.id) } returns
+                tilkjentYtelse(
+                    saksbehandling.id,
+                ).copy(andelerTilkjentYtelse = emptySet())
+            every { tilkjentYtelseSerivce.hentForBehandlingEllerNull(forrigeIverksatteBehandlingId) } returns
+                tilkjentYtelse(forrigeIverksatteBehandlingId, andelTilkjentYtelse(statusIverksetting = StatusIverksetting.UBEHANDLET))
+            mockVedtakMedType(TypeVedtak.INNVILGELSE)
+
+            simuleringSteg.utførSteg(saksbehandling, null)
+
+            verify(exactly = 0) { simuleringService.hentOgLagreSimuleringsresultat(saksbehandling) }
         }
 
         @Test
@@ -164,7 +208,7 @@ class SimuleringStegTest {
                     saksbehandling.id,
                 ).copy(andelerTilkjentYtelse = emptySet())
             every { tilkjentYtelseSerivce.hentForBehandlingEllerNull(forrigeIverksatteBehandlingId) } returns
-                tilkjentYtelse(forrigeIverksatteBehandlingId)
+                tilkjentYtelse(forrigeIverksatteBehandlingId, andelTilkjentYtelse(statusIverksetting = StatusIverksetting.OK))
             mockVedtakMedType(TypeVedtak.INNVILGELSE)
 
             simuleringSteg.utførSteg(saksbehandling, null)

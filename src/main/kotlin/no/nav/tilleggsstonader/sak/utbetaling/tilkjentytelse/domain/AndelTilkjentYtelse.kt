@@ -170,6 +170,16 @@ data class AndelTilkjentYtelse(
     }
 
     fun erNullandel() = beløp == 0 && satstype == Satstype.UGYLDIG && type == TypeAndel.UGYLDIG
+
+    fun erSendtTilUtbetaling() =
+        statusIverksetting in
+            listOf(
+                StatusIverksetting.FEILET,
+                StatusIverksetting.HOS_OPPDRAG,
+                StatusIverksetting.MOTTATT,
+                StatusIverksetting.OK,
+                StatusIverksetting.SENDT,
+            )
 }
 
 data class Iverksetting(
