@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
+import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.GjenbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -70,8 +71,10 @@ class JournalføringService(
         journalføringRequest.valider()
         validerGyldigAvsender(journalpost, journalføringRequest)
 
+        // Skal i praksis være umulig at en oppgave ikke har en tildelt enhet her
         val journalførendeEnhet =
             oppgaveService.hentOppgave(journalføringRequest.oppgaveId.toLong()).tildeltEnhetsnr
+                ?: MASKINELL_JOURNALFOERENDE_ENHET
 
         if (journalføringRequest.skalJournalføreTilNyBehandling() && !journalføringRequest.gjelderKlage()) {
             journalførTilNyBehandling(
