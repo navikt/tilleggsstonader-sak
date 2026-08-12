@@ -158,11 +158,7 @@ class BehandleMottattKjørelisteService(
         val skalOppretteAutomatiskTask =
             !harAvvik && unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE)
 
-        if (skalOppretteAutomatiskTask) {
-            return true
-        } else {
-            return false
-        }
+        return skalOppretteAutomatiskTask
     }
 
     enum class KjørelisteBehandlingUtfall(

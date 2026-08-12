@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligRe
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -31,6 +32,7 @@ class DagligReiseVedtakService(
     private val vedtakRepository: VedtakRepository,
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val simuleringService: SimuleringService,
+    private val satsPrivatBilProvider: SatsPrivatBilProvider,
 ) {
     fun lagreInnvilgetVedtak(
         behandling: Saksbehandling,
@@ -165,9 +167,47 @@ class DagligReiseVedtakService(
         vedtakRepository.update(eksisterendeVedtak.copy(data = oppdatertData))
     }
 
+    fun oppdaterRammevedtakHvisNyeSatser(
+        behandlingId: BehandlingId,
+        eksisterendeRammevedtak: RammevedtakPrivatBil,
+    ): RammevedtakPrivatBil {
+        val bekreftedeSatser =
+            satsPrivatBilProvider.alleSatser
+                .filter { it.bekreftet }
+
+        val satserSomSkalOppdateres = eksisterendeRammevedtak.finnSatserSomSkalOppdateres(bekreftedeSatser)
+
+        if (satserSomSkalOppdateres.isEmpty()) return eksisterendeRammevedtak
+
+        val oppdatertRammevedtak = eksisterendeRammevedtak.oppdaterSatser(satserSomSkalOppdateres)
+
+        oppdaterVedtakMedNyttRammevedtakPrivatBil(
+            behandlingId = behandlingId,
+            rammevedtakPrivatBil = oppdatertRammevedtak,
+        )
+
+        return oppdatertRammevedtak
+    }
+
     fun forrigeIverksatteBehandlingHarRammevedtakForPrivatBil(forrigeIverksatteBehandlingId: BehandlingId?): Boolean {
         if (forrigeIverksatteBehandlingId == null) return false
         return vedtakRepository.harRammevedtak(listOf(forrigeIverksatteBehandlingId))
+    }
+
+    private fun oppdaterVedtakMedNyttRammevedtakPrivatBil(
+        behandlingId: BehandlingId,
+        rammevedtakPrivatBil: RammevedtakPrivatBil,
+    ) {
+        val eksisterendeVedtak = hentInnvilgelseEllerOpphørVedtak(behandlingId)
+
+        val oppdatertData =
+            when (val data = eksisterendeVedtak.data) {
+                is InnvilgelseDagligReise -> data.copy(rammevedtakPrivatBil = rammevedtakPrivatBil)
+
+                is OpphørDagligReise -> data.copy(rammevedtakPrivatBil = rammevedtakPrivatBil)
+            }
+
+        vedtakRepository.update(eksisterendeVedtak.copy(data = oppdatertData))
     }
 }
 

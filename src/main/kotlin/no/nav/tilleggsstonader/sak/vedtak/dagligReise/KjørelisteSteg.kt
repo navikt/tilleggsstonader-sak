@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.privatBil.PrivatBilBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import org.springframework.stereotype.Service
 
 @Service
@@ -21,6 +22,7 @@ class KjørelisteSteg(
     private val arbeidsfordelingService: ArbeidsfordelingService,
     private val dagligReiseVedtakService: DagligReiseVedtakService,
     private val avklartKjørelisteService: AvklartKjørelisteService,
+    private val satsPrivatBilProvider: SatsPrivatBilProvider,
 ) : BehandlingSteg<Void?> {
     override fun validerSteg(saksbehandling: Saksbehandling) {
         val avklarteUker = avklartKjørelisteService.hentAvklarteUkerForBehandling(saksbehandling.id)
@@ -43,10 +45,18 @@ class KjørelisteSteg(
         val eksisterendeVedtak =
             vedtakService.hentVedtak<InnvilgelseEllerOpphørDagligReise>(saksbehandling.id).data
 
+        val rammevedtakPrivatBil =
+            eksisterendeVedtak.rammevedtakPrivatBil?.let {
+                dagligReiseVedtakService.oppdaterRammevedtakHvisNyeSatser(
+                    behandlingId = saksbehandling.id,
+                    eksisterendeRammevedtak = it,
+                )
+            }
+
         val beregningsresultatPrivatBil =
             privatBilBeregningService.beregn(
                 behandling = saksbehandling,
-                rammevedtak = eksisterendeVedtak.rammevedtakPrivatBil,
+                rammevedtak = rammevedtakPrivatBil,
                 beregnFra = eksisterendeVedtak.beregningsplan.beregnFra(),
                 brukersNavKontor = brukersNavKontor,
                 forrigeBeregningsresultat = hentForrigePrivatBilBeregningsresultat(saksbehandling),
