@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppdatertOppgaveResponse
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
@@ -125,7 +126,9 @@ class OppgaveService(
     }
 
     private val Oppgave.ident: String?
-        get() = this.bruker?.let { if (it.type == OppgaveBrukerType.PERSON) it.ident else null }
+        get() =
+            this.bruker?.ident.takeIf { this.bruker?.type == OppgaveBrukerType.PERSON }
+                ?: this.identer?.firstOrNull { it.gruppe == IdentGruppe.FOLKEREGISTERIDENT }?.ident
 
     @Transactional
     fun fordelOppgave(
