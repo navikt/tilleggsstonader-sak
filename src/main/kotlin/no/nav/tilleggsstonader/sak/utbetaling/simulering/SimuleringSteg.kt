@@ -42,7 +42,7 @@ class SimuleringSteg(
             saksbehandling.forrigeIverksatteBehandlingId
                 ?.let { tilkjentYtelseService.hentForBehandlingEllerNull(it) }
                 ?.andelerTilkjentYtelse
-                ?.isNotEmpty() ?: false
+                ?.any { it.erSendtTilUtbetaling() } ?: false
 
         return harAndelerPåBehandling || harAndelerPåForrigeIverksatteBehandling
     }
