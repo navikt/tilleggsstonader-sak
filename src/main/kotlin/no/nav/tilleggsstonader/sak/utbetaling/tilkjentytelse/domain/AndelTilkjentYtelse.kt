@@ -177,7 +177,8 @@ data class AndelTilkjentYtelse(
             StatusIverksetting.HOS_OPPDRAG,
             StatusIverksetting.MOTTATT,
             StatusIverksetting.OK,
-            StatusIverksetting.SENDT -> true
+            StatusIverksetting.SENDT,
+            -> true
             else -> false
         }
 }
