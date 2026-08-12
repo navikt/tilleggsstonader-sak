@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransp
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
-import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.utils.norskFormat
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -38,7 +37,7 @@ class OffentligTransportBeregningService(
     ): BeregningsresultatOffentligTransport? {
         if (beregningsplan.omfang == Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT) {
             return forrigeBeregningsresultat
-                ?: feil("Kan ikke gjenbruke forrige beregningsresultat uten forrige iverksatt behandling")
+            // ?: feil("Kan ikke gjenbruke forrige beregningsresultat uten forrige iverksatt behandling")
         }
 
         if (behandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {

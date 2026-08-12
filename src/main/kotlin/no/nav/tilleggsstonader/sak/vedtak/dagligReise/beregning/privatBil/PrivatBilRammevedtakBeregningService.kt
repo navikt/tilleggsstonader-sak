@@ -72,7 +72,7 @@ class PrivatBilRammevedtakBeregningService(
                 reiserMedBil = reiserMedBil,
                 forrigeRammevedtak = forrigeRammevedtakPrivatBil,
                 nyttRammevedtak = nyttRammevedtakPrivatBil,
-                tidligsteEndring = beregningsplan.tidligsteEndring,
+                beregningsplan = beregningsplan,
             )
         }
 

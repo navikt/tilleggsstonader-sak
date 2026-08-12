@@ -5,6 +5,8 @@ import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -40,7 +42,7 @@ class PrivatBilBeregningRevurderingService(
         reiserMedBil: List<ReiseMedPrivatBil>,
         forrigeRammevedtak: RammevedtakPrivatBil,
         nyttRammevedtak: RammevedtakPrivatBil?,
-        tidligsteEndring: LocalDate?,
+        beregningsplan: Beregningsplan,
     ): RammevedtakPrivatBil? {
         brukerfeilHvis(!unleashService.isEnabled(Toggle.KAN_REVURDERE_PRIVAT_BIL)) {
             "Muligheten for å revurdere daglige reiser med privat bil er skrudd av."
@@ -55,7 +57,7 @@ class PrivatBilBeregningRevurderingService(
                     vilkårStatus = reise.status,
                     forrigeRammeForReise = forrigeRammerByReiseId[reise.reiseId],
                     nyRammeForReise = nyeRammerByReiseId?.get(reise.reiseId),
-                    tidligsteEndring = tidligsteEndring,
+                    beregningsplan = beregningsplan,
                 )
             }
 
@@ -70,41 +72,56 @@ class PrivatBilBeregningRevurderingService(
         vilkårStatus: VilkårStatus?,
         forrigeRammeForReise: RammevedtakForReiseMedPrivatBil?,
         nyRammeForReise: RammevedtakForReiseMedPrivatBil?,
-        tidligsteEndring: LocalDate?,
+        beregningsplan: Beregningsplan,
     ): RammevedtakForReiseMedPrivatBil? =
         when (vilkårStatus) {
             VilkårStatus.NY -> nyRammeForReise ?: feil("Forventer at det finnes et nytt rammevedtak for nye reiser")
             VilkårStatus.SLETTET -> null
             VilkårStatus.ENDRET, VilkårStatus.UENDRET ->
-                velgRammeForReiseBasertPåTidligsteEndring(
+                velgRammeForReiseBasertPåBeregningsplan(
                     forrigeRammeForReise,
                     nyRammeForReise,
-                    tidligsteEndring,
+                    beregningsplan,
                     vilkårStatus,
                 )
 
             null -> feil("Forventer at alle vilkår har en status.")
         }
 
-    private fun velgRammeForReiseBasertPåTidligsteEndring(
+    private fun velgRammeForReiseBasertPåBeregningsplan(
         forrigeRammeForReise: RammevedtakForReiseMedPrivatBil?,
         nyRammeForReise: RammevedtakForReiseMedPrivatBil?,
-        tidligsteEndring: LocalDate?,
+        beregningsplan: Beregningsplan,
         vilkårStatus: VilkårStatus,
-    ): RammevedtakForReiseMedPrivatBil? {
-        feilHvis(tidligsteEndring == null) {
-            "Forventer at tidligste endring finnes for en revurdering"
+    ): RammevedtakForReiseMedPrivatBil? =
+        when (beregningsplan.omfang) {
+            Beregningsomfang.ALLE_PERIODER -> nyRammeForReise
+            Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT -> forrigeRammeForReise
+            Beregningsomfang.KUN_NYE_KJORELISTE_UKER -> forrigeRammeForReise
+            Beregningsomfang.FRA_DATO ->
+                velgRammeForReiseBasertPåBeregnFraDato(
+                    beregnFra = beregningsplan.fraDato ?: feil("Forventer at fraDato finnes for beregningsplan med omfang FRA_DATO"),
+                    forrigeRammeForReise = forrigeRammeForReise,
+                    nyRammeForReise = nyRammeForReise,
+                    vilkårStatus = vilkårStatus,
+                )
         }
 
+    private fun velgRammeForReiseBasertPåBeregnFraDato(
+        beregnFra: LocalDate,
+        forrigeRammeForReise: RammevedtakForReiseMedPrivatBil?,
+        nyRammeForReise: RammevedtakForReiseMedPrivatBil?,
+        vilkårStatus: VilkårStatus,
+    ): RammevedtakForReiseMedPrivatBil {
         feilHvis(forrigeRammeForReise == null || nyRammeForReise == null) {
             "Forventer at det finnes et rammevedtak for reise både i eksisterende og ny beregning når vilkår har status $vilkårStatus"
         }
 
-        val reiseErFørTidligsteEndring =
-            forrigeRammeForReise.grunnlag.tom < tidligsteEndring &&
-                nyRammeForReise.grunnlag.tom < tidligsteEndring
+        val reiseErFørberegnFra =
+            forrigeRammeForReise.grunnlag.tom < beregnFra &&
+                nyRammeForReise.grunnlag.tom < beregnFra
 
-        return if (reiseErFørTidligsteEndring) {
+        return if (reiseErFørberegnFra) {
             forrigeRammeForReise
         } else {
             validerReisedagerIkkeRedusert(forrigeRammeForReise, nyRammeForReise)

@@ -10,6 +10,8 @@ import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammevedtakPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -18,6 +20,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class PrivatBilBeregningRevurderingServiceTest {
     private val unleashService = mockk<UnleashService>()
@@ -60,7 +63,7 @@ class PrivatBilBeregningRevurderingServiceTest {
                     reiserMedBil = listOf(reiseMedStatus(VilkårStatus.NY)),
                     forrigeRammevedtak = forrigeRammevedtakForReiseForReise,
                     nyttRammevedtak = RammevedtakPrivatBil(reiser = listOf(nyttRammevedtakForReise)),
-                    tidligsteEndring = 1 januar 2025,
+                    beregningsplan = beregnFraDato(1 januar 2025),
                 )
 
             assertThat(resultat!!.reiser).containsExactly(nyttRammevedtakForReise)
@@ -73,7 +76,7 @@ class PrivatBilBeregningRevurderingServiceTest {
                     reiserMedBil = listOf(reiseMedStatus(VilkårStatus.NY)),
                     forrigeRammevedtak = rammevedtakPrivatBil(reiseId = ReiseId.random()),
                     nyttRammevedtak = null,
-                    tidligsteEndring = 1 februar 2025,
+                    beregningsplan = beregnFraDato(1 februar 2025),
                 )
             }.hasMessageContaining("Forventer at det finnes et nytt rammevedtak for nye reiser")
         }
@@ -88,7 +91,7 @@ class PrivatBilBeregningRevurderingServiceTest {
                     reiserMedBil = listOf(reiseMedStatus(VilkårStatus.SLETTET)),
                     forrigeRammevedtak = rammevedtakPrivatBil(reiseId = reiseId, fom = 1 januar 2025, tom = 28 februar 2025),
                     nyttRammevedtak = null,
-                    tidligsteEndring = 1 mars 2025,
+                    beregningsplan = beregnFraDato(1 mars 2025),
                 )
 
             assertThat(resultat).isNull()
@@ -101,7 +104,7 @@ class PrivatBilBeregningRevurderingServiceTest {
                     reiserMedBil = listOf(reiseMedStatus(VilkårStatus.SLETTET, fom = 1 januar 2025, tom = 28 januar 2025)),
                     forrigeRammevedtak = rammevedtakPrivatBil(reiseId = reiseId, fom = 1 januar 2025, tom = 28 januar 2025),
                     nyttRammevedtak = null,
-                    tidligsteEndring = 1 mars 2025,
+                    beregningsplan = beregnFraDato(1 mars 2025),
                 )
 
             assertThat(resultat).isNull()
@@ -120,7 +123,7 @@ class PrivatBilBeregningRevurderingServiceTest {
                     reiserMedBil = listOf(reiseMedStatus(VilkårStatus.UENDRET, fom = 1 januar 2025, tom = 28 januar 2025)),
                     forrigeRammevedtak = RammevedtakPrivatBil(reiser = listOf(forrigeRammevedtakForReise)),
                     nyttRammevedtak = RammevedtakPrivatBil(reiser = listOf(nyttRammevedtakForReise)),
-                    tidligsteEndring = 1 mars 2025,
+                    beregningsplan = beregnFraDato(1 mars 2025),
                 )
 
             assertThat(resultat!!.reiser).containsExactly(forrigeRammevedtakForReise)
@@ -138,25 +141,10 @@ class PrivatBilBeregningRevurderingServiceTest {
                     reiserMedBil = listOf(reiseMedStatus(VilkårStatus.UENDRET, fom = 1 januar 2025, tom = 31 mars 2025)),
                     forrigeRammevedtak = RammevedtakPrivatBil(reiser = listOf(reiserIForrigeRammevedtak)),
                     nyttRammevedtak = RammevedtakPrivatBil(reiser = listOf(nyttRammevedtakForReise)),
-                    tidligsteEndring = 1 februar 2025,
+                    beregningsplan = beregnFraDato(1 februar 2025),
                 )
 
             assertThat(resultat!!.reiser).containsExactly(nyttRammevedtakForReise)
-        }
-
-        @Test
-        fun `reise med status UENDRET med tidligsteEndring null kaster feil`() {
-            val forrigeRammevedtakForReise = rammeForReiseMedPrivatBil(reiseId = reiseId, fom = 1 januar 2025, tom = 28 januar 2025)
-            val nyttRammevedtakForReise = rammeForReiseMedPrivatBil(reiseId = reiseId, fom = 1 januar 2025, tom = 28 januar 2025)
-
-            assertThatThrownBy {
-                service.beregnRammevedtakVedRevurdering(
-                    reiserMedBil = listOf(reiseMedStatus(VilkårStatus.UENDRET, fom = 1 januar 2025, tom = 28 januar 2025)),
-                    forrigeRammevedtak = RammevedtakPrivatBil(reiser = listOf(forrigeRammevedtakForReise)),
-                    nyttRammevedtak = RammevedtakPrivatBil(reiser = listOf(nyttRammevedtakForReise)),
-                    tidligsteEndring = null,
-                )
-            }.hasMessageContaining("Forventer at tidligste endring finnes for en revurdering")
         }
     }
 
@@ -172,7 +160,7 @@ class PrivatBilBeregningRevurderingServiceTest {
                     reiserMedBil = listOf(reiseMedStatus(VilkårStatus.ENDRET, fom = 1 januar 2025, tom = 28 februar 2025)),
                     forrigeRammevedtak = RammevedtakPrivatBil(reiser = listOf(forrigeRammevedtakForReise)),
                     nyttRammevedtak = RammevedtakPrivatBil(reiser = listOf(nyttRammevedtakForReise)),
-                    tidligsteEndring = 1 mars 2025,
+                    beregningsplan = beregnFraDato(1 mars 2025),
                 )
 
             assertThat(resultat!!.reiser).containsExactly(nyttRammevedtakForReise)
@@ -188,7 +176,7 @@ class PrivatBilBeregningRevurderingServiceTest {
                     reiserMedBil = listOf(reiseMedStatus(VilkårStatus.ENDRET, fom = 1 januar 2025, tom = 30 april 2025)),
                     forrigeRammevedtak = RammevedtakPrivatBil(reiser = listOf(forrigeRammevedtakForReise)),
                     nyttRammevedtak = RammevedtakPrivatBil(reiser = listOf(nyttRammevedtakForReise)),
-                    tidligsteEndring = 1 februar 2025,
+                    beregningsplan = beregnFraDato(1 februar 2025),
                 )
 
             assertThat(resultat!!.reiser).containsExactly(nyttRammevedtakForReise)
@@ -204,7 +192,7 @@ class PrivatBilBeregningRevurderingServiceTest {
                     reiserMedBil = listOf(reiseMedStatus(VilkårStatus.ENDRET, fom = 1 januar 2025, tom = 28 januar 2025)),
                     forrigeRammevedtak = RammevedtakPrivatBil(reiser = listOf(forrigeRammevedtakForReise)),
                     nyttRammevedtak = RammevedtakPrivatBil(reiser = listOf(nyttRammevedtakForReise)),
-                    tidligsteEndring = 1 mars 2025,
+                    beregningsplan = beregnFraDato(1 mars 2025),
                 )
 
             assertThat(resultat!!.reiser).containsExactly(forrigeRammevedtakForReise)
@@ -220,7 +208,7 @@ class PrivatBilBeregningRevurderingServiceTest {
                     reiserMedBil = listOf(reiseMedStatus(VilkårStatus.ENDRET, fom = 1 februar 2025, tom = 31 mars 2025)),
                     forrigeRammevedtak = RammevedtakPrivatBil(reiser = listOf(forrigeRammevedtakForReise)),
                     nyttRammevedtak = RammevedtakPrivatBil(reiser = listOf(nyttRammevedtakForReise)),
-                    tidligsteEndring = 1 januar 2025,
+                    beregningsplan = beregnFraDato(1 januar 2025),
                 )
 
             assertThat(resultat!!.reiser).containsExactly(nyttRammevedtakForReise)
@@ -236,10 +224,12 @@ class PrivatBilBeregningRevurderingServiceTest {
                     reiserMedBil = listOf(reiseMedStatus(VilkårStatus.ENDRET, fom = 1 februar 2025, tom = 31 mars 2025)),
                     forrigeRammevedtak = RammevedtakPrivatBil(reiser = listOf(forrigeRammevedtakForReise)),
                     nyttRammevedtak = RammevedtakPrivatBil(reiser = listOf(nyttRammevedtakForReise)),
-                    tidligsteEndring = 1 januar 2025,
+                    beregningsplan = beregnFraDato(1 januar 2025),
                 )
 
             assertThat(resultat!!.reiser).containsExactly(nyttRammevedtakForReise)
         }
     }
+
+    private fun beregnFraDato(fraDato: LocalDate) = Beregningsplan(omfang = Beregningsomfang.FRA_DATO, fraDato = fraDato)
 }
