@@ -31,8 +31,8 @@ class PrivatBilBeregningRevurderingServiceTest {
     private fun reiseMedStatus(
         status: VilkårStatus,
         reiseId: ReiseId = this.reiseId,
-        fom: java.time.LocalDate = 1 januar 2025,
-        tom: java.time.LocalDate = 31 mars 2025,
+        fom: LocalDate = 1 januar 2025,
+        tom: LocalDate = 31 mars 2025,
     ) = ReiseMedPrivatBil(
         fom = fom,
         tom = tom,
@@ -145,6 +145,54 @@ class PrivatBilBeregningRevurderingServiceTest {
                 )
 
             assertThat(resultat!!.reiser).containsExactly(nyttRammevedtakForReise)
+        }
+
+        @Test
+        fun `reise med status UENDRET og beregningsomfang ALLE_PERIODER bruker nytt`() {
+            val forrigeRammevedtakForReise = rammeForReiseMedPrivatBil(reiseId = reiseId, fom = 1 januar 2025, tom = 31 mars 2025)
+            val nyttRammevedtakForReise = rammeForReiseMedPrivatBil(reiseId = reiseId, fom = 1 januar 2025, tom = 31 mars 2025)
+
+            val resultat =
+                service.beregnRammevedtakVedRevurdering(
+                    reiserMedBil = listOf(reiseMedStatus(VilkårStatus.UENDRET)),
+                    forrigeRammevedtak = RammevedtakPrivatBil(reiser = listOf(forrigeRammevedtakForReise)),
+                    nyttRammevedtak = RammevedtakPrivatBil(reiser = listOf(nyttRammevedtakForReise)),
+                    beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+                )
+
+            assertThat(resultat!!.reiser).containsExactly(nyttRammevedtakForReise)
+        }
+
+        @Test
+        fun `reise med status UENDRET og beregningsomfang GJENBRUK_FORRIGE_RESULTAT bruker forrige`() {
+            val forrigeRammevedtakForReise = rammeForReiseMedPrivatBil(reiseId = reiseId, fom = 1 januar 2025, tom = 31 mars 2025)
+            val nyttRammevedtakForReise = rammeForReiseMedPrivatBil(reiseId = reiseId, fom = 1 februar 2025, tom = 30 april 2025)
+
+            val resultat =
+                service.beregnRammevedtakVedRevurdering(
+                    reiserMedBil = listOf(reiseMedStatus(VilkårStatus.UENDRET)),
+                    forrigeRammevedtak = RammevedtakPrivatBil(reiser = listOf(forrigeRammevedtakForReise)),
+                    nyttRammevedtak = RammevedtakPrivatBil(reiser = listOf(nyttRammevedtakForReise)),
+                    beregningsplan = Beregningsplan(Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT),
+                )
+
+            assertThat(resultat!!.reiser).containsExactly(forrigeRammevedtakForReise)
+        }
+
+        @Test
+        fun `reise med status UENDRET og beregningsomfang KUN_NYE_KJORELISTE_UKER bruker forrige`() {
+            val forrigeRammevedtakForReise = rammeForReiseMedPrivatBil(reiseId = reiseId, fom = 1 januar 2025, tom = 31 mars 2025)
+            val nyttRammevedtakForReise = rammeForReiseMedPrivatBil(reiseId = reiseId, fom = 1 februar 2025, tom = 30 april 2025)
+
+            val resultat =
+                service.beregnRammevedtakVedRevurdering(
+                    reiserMedBil = listOf(reiseMedStatus(VilkårStatus.UENDRET)),
+                    forrigeRammevedtak = RammevedtakPrivatBil(reiser = listOf(forrigeRammevedtakForReise)),
+                    nyttRammevedtak = RammevedtakPrivatBil(reiser = listOf(nyttRammevedtakForReise)),
+                    beregningsplan = Beregningsplan(Beregningsomfang.KUN_NYE_KJORELISTE_UKER),
+                )
+
+            assertThat(resultat!!.reiser).containsExactly(forrigeRammevedtakForReise)
         }
     }
 
