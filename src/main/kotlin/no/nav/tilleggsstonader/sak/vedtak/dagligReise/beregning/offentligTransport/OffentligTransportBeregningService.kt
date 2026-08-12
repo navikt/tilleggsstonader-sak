@@ -37,7 +37,6 @@ class OffentligTransportBeregningService(
     ): BeregningsresultatOffentligTransport? {
         if (beregningsplan.omfang == Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT) {
             return forrigeBeregningsresultat
-            // ?: feil("Kan ikke gjenbruke forrige beregningsresultat uten forrige iverksatt behandling")
         }
 
         if (behandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
