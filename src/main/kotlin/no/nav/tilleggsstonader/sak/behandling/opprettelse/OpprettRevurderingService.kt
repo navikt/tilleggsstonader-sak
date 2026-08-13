@@ -45,9 +45,12 @@ class OpprettRevurderingService(
             "Feature toggle for å kunne opprette revurdering er slått av"
         }
         logger.info("Oppretter revurdering for fagsak=${opprettRevurdering.fagsakId}")
-
+        // have to check this
         if (opprettRevurdering.årsak == BehandlingÅrsak.NYE_OPPLYSNINGER) {
-            feilHvis(opprettRevurdering.nyeOpplysningerMetadata == null) {
+            feilHvis(
+                opprettRevurdering.årsakMetadata == null ||
+                    opprettRevurdering.nyeOpplysningerEndringer == null,
+            ) {
                 "Krever metadata ved behandlingsårsak NYE_OPPLYSNINGER"
             }
         }
@@ -93,7 +96,8 @@ class OpprettRevurderingService(
                 behandlingsårsak = opprettRevurdering.årsak,
                 behandlingMetode = opprettRevurdering.behandlingMetode,
                 kravMottatt = opprettRevurdering.kravMottatt,
-                nyeOpplysningerMetadata = opprettRevurdering.nyeOpplysningerMetadata,
+                årsakMetadata = opprettRevurdering.årsakMetadata,
+                nyeOpplysningerEndringer = opprettRevurdering.nyeOpplysningerEndringer,
                 oppgaveMetadata =
                     OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                         tilordneSaksbehandler = SikkerhetContext.hentSaksbehandlerHvisFinnes(),
@@ -108,7 +112,8 @@ class OpprettRevurderingService(
                 behandlingsårsak = opprettRevurdering.årsak,
                 behandlingMetode = opprettRevurdering.behandlingMetode,
                 kravMottatt = opprettRevurdering.kravMottatt,
-                nyeOpplysningerMetadata = opprettRevurdering.nyeOpplysningerMetadata,
+                nyeOpplysningerEndringer = opprettRevurdering.nyeOpplysningerEndringer,
+                årsakMetadata = opprettRevurdering.årsakMetadata,
                 oppgaveMetadata = OpprettBehandlingOppgaveMetadata.UtenOppgave,
                 forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
             )

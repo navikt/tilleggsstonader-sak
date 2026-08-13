@@ -9,9 +9,9 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
-import no.nav.tilleggsstonader.sak.behandling.domain.ManuellOpprettelseMetadata
-import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
+import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndringer
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadata
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -38,8 +38,8 @@ data class BehandlingDto(
     val vedtaksdato: LocalDateTime?,
     val henlagtÅrsak: HenlagtÅrsak?,
     val henlagtBegrunnelse: String?,
-    val nyeOpplysningerMetadata: NyeOpplysningerMetadata?,
-    val manuellOpprettelseMetadata: ManuellOpprettelseMetadata?,
+    val årsakMetadata: ÅrsakMetadata?,
+    val nyeOpplysningerEndringer: NyeOpplysningerEndringer?,
     val harÅpenKjørelistebehandling: Boolean,
     val tilordnetSaksbehandler: TilordnetSaksbehandlerDto,
 )
@@ -67,8 +67,8 @@ fun Saksbehandling.tilDto(
         henlagtBegrunnelse = this.henlagtBegrunnelse,
         stønadstype = stønadstype,
         vedtaksdato = this.vedtakstidspunkt,
-        nyeOpplysningerMetadata = this.nyeOpplysningerMetadata,
-        manuellOpprettelseMetadata = this.manuellOpprettelseMetadata,
+        årsakMetadata = this.årsakMetadata,
+        nyeOpplysningerEndringer = this.nyeOpplysningerEndringer,
         harÅpenKjørelistebehandling = harÅpenKjørelistebehandling,
         tilordnetSaksbehandler = tilordnetSaksbehandler,
     )

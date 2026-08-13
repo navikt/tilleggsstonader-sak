@@ -30,9 +30,10 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndring
-import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerKilde
-import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
+import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndringer
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadata
+import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadataKilde
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.BrevUtil.BESLUTTER_SIGNATUR_PLACEHOLDER
 import no.nav.tilleggsstonader.sak.brev.BrevUtil.BREVDATO_PLACEHOLDER
@@ -99,6 +100,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.util.UUID
+import kotlin.collections.List
 import kotlin.random.Random
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport as FaktaOffentligTransportReiseTilSamling
 
@@ -146,7 +148,8 @@ fun behandling(
     henlagtBegrunnelse: String? = null,
     vedtakstidspunkt: LocalDateTime? = null,
     kravMottatt: LocalDate? = null,
-    nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
+    årsakMetadata: ÅrsakMetadata? = null,
+    nyeOpplysningerEndringer: NyeOpplysningerEndringer? = null,
 ): Behandling =
     Behandling(
         fagsakId = fagsak.id,
@@ -165,7 +168,8 @@ fun behandling(
             vedtakstidspunkt
                 ?: if (resultat != BehandlingResultat.IKKE_SATT) SporbarUtils.now() else null,
         kravMottatt = kravMottatt,
-        nyeOpplysningerMetadata = nyeOpplysningerMetadata,
+        årsakMetadata = årsakMetadata,
+        nyeOpplysningerEndringer = nyeOpplysningerEndringer,
         behandlingMetode = BehandlingMetode.MANUELL,
     )
 
@@ -184,7 +188,8 @@ fun henlagtBehandling(
     henlagtBegrunnelse: String? = "Registrert feil",
     vedtakstidspunkt: LocalDateTime? = SporbarUtils.now(),
     kravMottatt: LocalDate? = null,
-    nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
+    årsakMetadata: ÅrsakMetadata? = null,
+    nyeOpplysningerEndringer: NyeOpplysningerEndringer? = null,
 ) = Behandling(
     fagsakId = fagsak.id,
     forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
@@ -202,7 +207,8 @@ fun henlagtBehandling(
         vedtakstidspunkt
             ?: if (resultat != BehandlingResultat.IKKE_SATT) SporbarUtils.now() else null,
     kravMottatt = kravMottatt,
-    nyeOpplysningerMetadata = nyeOpplysningerMetadata,
+    årsakMetadata = årsakMetadata,
+    nyeOpplysningerEndringer = nyeOpplysningerEndringer,
     behandlingMetode = BehandlingMetode.MANUELL,
 )
 
@@ -529,15 +535,18 @@ fun dokumentvariant(
 
 fun dokumentvariantOriginal() = dokumentvariant(variantformat = Dokumentvariantformat.ORIGINAL, filnavn = "original.json")
 
-fun nyeOpplysningerMetadata(
-    kilde: NyeOpplysningerKilde = NyeOpplysningerKilde.ETTERSENDING,
-    endringer: List<NyeOpplysningerEndring> = listOf(NyeOpplysningerEndring.AKTIVITET),
+fun årsakMetadata(
+    kilde: ÅrsakMetadataKilde = ÅrsakMetadataKilde.ETTERSENDING,
     beskrivelse: String? = "tralala",
-) = NyeOpplysningerMetadata(
+) = ÅrsakMetadata(
     kilde = kilde,
-    endringer = endringer,
     beskrivelse = beskrivelse,
 )
+
+fun nyeOpplysningerEndringer(endringer: List<NyeOpplysningerEndring> = listOf(NyeOpplysningerEndring.AKTIVITET)) =
+    NyeOpplysningerEndringer(
+        endringer = endringer,
+    )
 
 fun totrinnskontroll(
     behandlingId: BehandlingId,

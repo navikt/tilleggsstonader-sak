@@ -10,8 +10,9 @@ import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndring
-import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerKilde
-import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
+import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndringer
+import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadata
+import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadataKilde
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -99,19 +100,23 @@ internal class BehandlingControllerTest : CleanDatabaseIntegrationTest() {
             testoppsettService.lagre(
                 behandling(fagsak, type = BehandlingType.FØRSTEGANGSBEHANDLING).copy(
                     årsak = BehandlingÅrsak.NYE_OPPLYSNINGER,
-                    nyeOpplysningerMetadata =
-                        NyeOpplysningerMetadata(
-                            kilde = NyeOpplysningerKilde.ETTERSENDING,
-                            endringer = listOf(NyeOpplysningerEndring.MÅLGRUPPE),
+                    årsakMetadata =
+                        ÅrsakMetadata(
+                            kilde = ÅrsakMetadataKilde.ETTERSENDING,
                             beskrivelse = "Hello world",
                         ),
+                    nyeOpplysningerEndringer =
+                        NyeOpplysningerEndringer(
+                            endringer = listOf(NyeOpplysningerEndring.MÅLGRUPPE),
+                        ),
+                    //                        listOf(NyeOpplysningerEndring.MÅLGRUPPE),
                 ),
             )
         val hentetBehandling = kall.behandling.hent(behandling.id)
 
-        assertThat(hentetBehandling.nyeOpplysningerMetadata?.kilde).isEqualTo(NyeOpplysningerKilde.ETTERSENDING)
-        assertThat(hentetBehandling.nyeOpplysningerMetadata?.endringer).containsExactly(NyeOpplysningerEndring.MÅLGRUPPE)
-        assertThat(hentetBehandling.nyeOpplysningerMetadata?.beskrivelse).isEqualTo("Hello world")
+        assertThat(hentetBehandling.årsakMetadata?.kilde).isEqualTo(ÅrsakMetadataKilde.ETTERSENDING)
+        assertThat(hentetBehandling.nyeOpplysningerEndringer?.endringer).containsExactly(NyeOpplysningerEndring.MÅLGRUPPE)
+        assertThat(hentetBehandling.årsakMetadata?.beskrivelse).isEqualTo("Hello world")
     }
 
     @Nested

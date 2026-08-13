@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatus
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatusHåndterer
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.status.UtbetalingStatusRecord
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.IverksettingDto
+import no.nav.tilleggsstonader.sak.util.årsakMetadata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -113,7 +114,8 @@ class InnvilgeDaligReiseTsrIntegrationTest : IntegrationTest() {
                     OpprettBehandlingDto(
                         fagsakId = førstegangsbehandling.fagsakId,
                         årsak = BehandlingÅrsak.SØKNAD,
-                        nyeOpplysningerMetadata = null,
+                        årsakMetadata = null,
+                        nyeOpplysningerEndringer = null,
                         kravMottatt = fom,
                         forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
                     ),

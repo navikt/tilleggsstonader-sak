@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførRegistrerKjørelisteSteg
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurdering
+import no.nav.tilleggsstonader.sak.util.årsakMetadata
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -38,7 +39,8 @@ class OpprettRegistrerKjørelisteIntegrationTest : CleanDatabaseIntegrationTest(
                 OpprettBehandlingDto(
                     fagsakId = behandlingContext.fagsakId,
                     årsak = BehandlingÅrsak.REGISTRER_KJØRELISTE_FOR_BRUKER,
-                    nyeOpplysningerMetadata = null,
+                    årsakMetadata = null,
+                    nyeOpplysningerEndringer = null,
                     kravMottatt = LocalDate.now(),
                     forenkletBehandlingstype = ForenkletBehandlingstype.KJØRELISTE,
                 ),
@@ -62,7 +64,8 @@ class OpprettRegistrerKjørelisteIntegrationTest : CleanDatabaseIntegrationTest(
                 OpprettBehandlingDto(
                     fagsakId = behandlingContext.fagsakId,
                     årsak = BehandlingÅrsak.REGISTRER_KJØRELISTE_FOR_BRUKER,
-                    nyeOpplysningerMetadata = null,
+                    årsakMetadata = null,
+                    nyeOpplysningerEndringer = null,
                     kravMottatt = LocalDate.now(),
                     forenkletBehandlingstype = ForenkletBehandlingstype.KJØRELISTE,
                 ),

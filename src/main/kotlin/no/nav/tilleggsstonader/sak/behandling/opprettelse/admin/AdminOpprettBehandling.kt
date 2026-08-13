@@ -1,7 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.opprettelse.admin
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.sak.behandling.domain.ManuellOpprettelseMetadata
+import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadata
 import java.time.LocalDate
 
 data class PersoninfoDto(
@@ -25,5 +25,5 @@ data class AdminOpprettFørstegangsbehandlingDto(
     val valgteBarn: Set<String>,
     val medBrev: Boolean = true,
     val kravMottatt: LocalDate,
-    val manuellOpprettelseMetadata: ManuellOpprettelseMetadata,
+    val årsakMetadata: ÅrsakMetadata,
 )
