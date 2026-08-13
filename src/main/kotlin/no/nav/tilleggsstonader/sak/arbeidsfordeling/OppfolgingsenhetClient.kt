@@ -27,7 +27,7 @@ class OppfolgingsenhetClient(
      *
      * Bruker oppfølgingsenhet til å knytte utbetalinger til et NAV-kontor for tiltaksenheten.
      */
-    fun hentOppfølgingsenhet(fnr: String): String? {
+    fun hentOppfølgingsenhet(fnr: String): Oppfolgingsenhet? {
         val request =
             OppfolgingsenhetRequest(
                 variables = OppfolgingsenhetRequestVariables(fnr = fnr),
@@ -53,7 +53,7 @@ class OppfolgingsenhetClient(
         }
 
         val data = response.data ?: error("Data er null fra oppfolgingsenhet")
-        return data.oppfolgingsEnhet?.enhet?.id
+        return data.oppfolgingsEnhet?.enhet
     }
 }
 

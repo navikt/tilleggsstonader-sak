@@ -22,6 +22,8 @@ import org.springframework.stereotype.Component
 class ArbeidsfordelingService(
     @Qualifier("shortCache")
     private val cacheManager: CacheManager,
+    @Qualifier("longCache")
+    private val longCacheManager: CacheManager,
     private val arbeidsfordelingClient: ArbeidsfordelingClient,
     private val oppfolgingsenhetClient: OppfolgingsenhetClient,
     private val personService: PersonService,
@@ -81,9 +83,11 @@ class ArbeidsfordelingService(
         stønadstype: Stønadstype,
     ): String = hentNavEnhet(personIdent, stønadstype)?.enhetNr ?: MASKINELL_JOURNALFOERENDE_ENHET
 
-    fun hentBrukersNavKontor(personIdent: String): String =
-        oppfolgingsenhetClient.hentOppfølgingsenhet(personIdent)
-            ?: error("Finner ikke oppfølgingsenhet for person")
+    fun hentBrukersNavKontor(personIdent: String): Oppfolgingsenhet =
+        longCacheManager.getValue("brukers-nav-kontor", personIdent) {
+            oppfolgingsenhetClient.hentOppfølgingsenhet(personIdent)
+                ?: error("Finner ikke oppfølgingsenhet for person")
+        }
 
     private fun lagArbeidsfordelingKritierieForPerson(
         personIdent: String,

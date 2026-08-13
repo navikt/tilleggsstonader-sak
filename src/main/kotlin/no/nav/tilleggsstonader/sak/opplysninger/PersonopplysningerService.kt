@@ -1,11 +1,13 @@
 package no.nav.tilleggsstonader.sak.opplysninger
 
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningType
+import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.opplysninger.dto.Adressebeskyttelse
+import no.nav.tilleggsstonader.sak.opplysninger.dto.NavKontorDto
 import no.nav.tilleggsstonader.sak.opplysninger.dto.NavnDto
 import no.nav.tilleggsstonader.sak.opplysninger.dto.PersonopplysningerDto
 import no.nav.tilleggsstonader.sak.opplysninger.egenansatt.EgenAnsattService
@@ -14,6 +16,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gradering
 import no.nav.tilleggsstonader.sak.util.antallÅrSiden
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
@@ -23,7 +26,10 @@ class PersonopplysningerService(
     private val personService: PersonService,
     private val fullmaktService: FullmaktService,
     private val egenAnsattService: EgenAnsattService,
+    private val arbeidsfordelingService: ArbeidsfordelingService,
 ) {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     // TODO denne burde hente fra grunnlag?
     fun hentPersonopplysninger(behandlingId: BehandlingId): PersonopplysningerDto =
         hentPersonopplysninger(behandlingService.hentAktivIdent(behandlingId))
@@ -49,8 +55,19 @@ class PersonopplysningerService(
             erSkjermet = egenAnsattService.erEgenAnsatt(ident),
             dødsdato = pdlSøker.dødsfall.gjeldende()?.dødsdato,
             harGeografiskTilknytningUtland = harGeografiskTilknytningUtland(ident),
+            navKontor = hentNavKontor(ident),
         )
     }
+
+    private fun hentNavKontor(ident: String): NavKontorDto? =
+        try {
+            arbeidsfordelingService
+                .hentBrukersNavKontor(ident)
+                .let { enhet -> enhet.id?.let { id -> NavKontorDto(enhetId = id, navn = enhet.navn) } }
+        } catch (e: Exception) {
+            logger.warn("Fant ikke nav-kontor for person: ${e.message}")
+            null
+        }
 
     private fun harGeografiskTilknytningUtland(ident: String): Boolean {
         val geografiskTilknytning = personService.hentGeografiskTilknytning(ident)

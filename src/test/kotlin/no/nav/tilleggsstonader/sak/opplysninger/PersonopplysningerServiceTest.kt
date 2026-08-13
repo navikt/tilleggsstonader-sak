@@ -4,6 +4,8 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningDto
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningType
+import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
+import no.nav.tilleggsstonader.sak.arbeidsfordeling.Oppfolgingsenhet
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
@@ -28,6 +30,7 @@ class PersonopplysningerServiceTest {
     private val personService = mockk<PersonService>()
     private val fullmaktService = mockk<FullmaktService>()
     private val egenAnsattService = mockk<EgenAnsattService>()
+    private val arbeidsfordelingService = mockk<ArbeidsfordelingService>()
 
     private val service =
         PersonopplysningerService(
@@ -36,6 +39,7 @@ class PersonopplysningerServiceTest {
             personService = personService,
             fullmaktService = fullmaktService,
             egenAnsattService = egenAnsattService,
+            arbeidsfordelingService = arbeidsfordelingService,
         )
 
     @BeforeEach
@@ -52,6 +56,8 @@ class PersonopplysningerServiceTest {
                 null,
                 null,
             )
+        every { arbeidsfordelingService.hentBrukersNavKontor(any()) } returns
+            Oppfolgingsenhet(id = "1014", navn = "Nav Midt-Agder", kilde = "NORG")
     }
 
     @Nested
@@ -102,6 +108,40 @@ class PersonopplysningerServiceTest {
 
             assertThat(service.hentPersonopplysningerForFagsakPerson(FagsakPersonId.random()).adressebeskyttelse)
                 .isEqualTo(Adressebeskyttelse.FORTROLIG)
+        }
+    }
+
+    @Nested
+    inner class NavKontorMapping {
+        @Test
+        fun `skal returnere nav-kontor med id og navn`() {
+            every { arbeidsfordelingService.hentBrukersNavKontor(any()) } returns
+                Oppfolgingsenhet(id = "1014", navn = "Nav Midt-Agder", kilde = "NORG")
+
+            val result = service.hentPersonopplysningerForFagsakPerson(FagsakPersonId.random())
+
+            assertThat(result.navKontor?.enhetId).isEqualTo("1014")
+            assertThat(result.navKontor?.navn).isEqualTo("Nav Midt-Agder")
+        }
+
+        @Test
+        fun `skal returnere null for nav-kontor når oppfølgingsenhet ikke finnes`() {
+            every { arbeidsfordelingService.hentBrukersNavKontor(any()) } throws
+                IllegalStateException("Finner ikke oppfølgingsenhet for person")
+
+            val result = service.hentPersonopplysningerForFagsakPerson(FagsakPersonId.random())
+
+            assertThat(result.navKontor).isNull()
+        }
+
+        @Test
+        fun `skal returnere null for nav-kontor når enhet-id er null`() {
+            every { arbeidsfordelingService.hentBrukersNavKontor(any()) } returns
+                Oppfolgingsenhet(id = null, navn = "Nav Ukjent", kilde = "NORG")
+
+            val result = service.hentPersonopplysningerForFagsakPerson(FagsakPersonId.random())
+
+            assertThat(result.navKontor).isNull()
         }
     }
 }

@@ -37,7 +37,7 @@ class KjørelisteSteg(
     ) {
         val brukersNavKontor =
             if (saksbehandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
-                arbeidsfordelingService.hentBrukersNavKontor(saksbehandling.ident)
+                arbeidsfordelingService.hentBrukersNavKontor(saksbehandling.ident).id
             } else {
                 null
             }
