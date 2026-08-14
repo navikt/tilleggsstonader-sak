@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.PersonIdent
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveDomain
@@ -68,6 +69,7 @@ class OpprettOppgaveConfig(
         return oppgavelager
             .leggTilOppgaveFraRepository(
                 OpprettOppgaveRequest(
+                    personident = PersonIdent(ident = behandling.ident),
                     ident = OppgaveIdentV2(ident = behandling.ident, gruppe = IdentGruppe.FOLKEREGISTERIDENT),
                     tema = behandling.stønadstype.tilTema(),
                     tilordnetRessurs = oppgave.tilordnetSaksbehandler,

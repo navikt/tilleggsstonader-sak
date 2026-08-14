@@ -78,7 +78,7 @@ internal class KlageServiceTest {
 
             val request = opprettKlageSlot.captured
 
-            assertThat(request.ident).isEqualTo("15")
+            assertThat(request.ident).isEqualTo("123456789012")
             assertThat(request.stønadstype).isEqualTo(Stønadstype.BARNETILSYN)
             assertThat(request.eksternFagsakId).isEqualTo(eksternFagsakId.id.toString())
             assertThat(request.fagsystem).isEqualTo(Fagsystem.TILLEGGSSTONADER)

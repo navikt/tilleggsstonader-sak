@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
-import io.mockk.every
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
@@ -11,7 +10,6 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
@@ -41,8 +39,6 @@ class InnvilgePrivatBilIntegrationTest : IntegrationTest() {
 
     @Test
     fun `innvilge rammevedtak privat bil og henter ut rammevedtak`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-
         val behandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
@@ -122,8 +118,6 @@ class InnvilgePrivatBilIntegrationTest : IntegrationTest() {
 
     @Test
     fun `skal lagre og hente fakta med to perioder for privat bil`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-
         val fomDelperiode1 = 6 april 2026
         val tomDelperiode1 = 12 april 2026
         val fomDelperiode2 = 13 april 2026

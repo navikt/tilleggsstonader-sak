@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
@@ -25,7 +26,6 @@ class OpphørPrivatBilIntegrationTest(
 ) : IntegrationTest() {
     @Test
     fun `skal kutte rammevedtak og innsendte kjørelister i opphør`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
         every { unleashService.isEnabled(Toggle.KAN_OPPHØRE_PRIVAT_BIL) } returns true
 
         val fom = 2 februar 2026
@@ -60,11 +60,13 @@ class OpphørPrivatBilIntegrationTest(
                 .single { it.type == BehandlingType.KJØRELISTE }
         gjennomførKjørelisteBehandling(kjørelistebehandling)
         testoppsettService.settAndelerTilOkForBehandling(kjørelistebehandling.id)
+        testoppsettService.settAndelerTilOkForBehandling(førstegangsbehandlingContext.behandlingId)
 
         // Opphør
         val revurderingId =
             opprettRevurderingOgGjennomførBehandlingsløp(
                 fraBehandlingId = førstegangsbehandlingContext.behandlingId,
+                tilSteg = StegType.SIMULERING,
             ) {
                 vedtak {
                     opphør(opphørsdato = opphørsdato)
@@ -72,6 +74,7 @@ class OpphørPrivatBilIntegrationTest(
             }
 
         val opphørsvedtak = vedtakService.hentVedtak<OpphørDagligReise>(revurderingId).data
+        testoppsettService.settAndelerTilOkForBehandling(revurderingId)
 
         val rammevedtak = opphørsvedtak.rammevedtakPrivatBil
         assertThat(rammevedtak).isNotNull

@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
-import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.februar
@@ -12,7 +11,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
@@ -45,8 +43,6 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
 
     @Test
     fun `innvilger rammevedtak og sender inn kjøreliste som blir godkjent, uke blir sendt til utbetaling`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-
         val fom = 2 februar 2026
         val tom = 22 februar 2026
         val reiseavstandEnVei = BigDecimal(7.9)
@@ -153,8 +149,6 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
 
     @Test
     fun `sak med to overlappende reiser, begge utbetales med samme typeAndel, grupperes på reise til økonomi`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-
         val fom = 2 mars 2026
         val tom = 15 mars 2026
 

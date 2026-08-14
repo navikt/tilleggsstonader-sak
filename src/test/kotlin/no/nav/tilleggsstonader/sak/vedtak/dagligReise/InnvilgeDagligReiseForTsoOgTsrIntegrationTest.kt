@@ -7,17 +7,13 @@ import no.nav.tilleggsstonader.libs.utils.dato.oktober
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
-import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningStegKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class InnvilgeDagligReiseIntegrationTest : IntegrationTest() {
+class InnvilgeDagligReiseForTsoOgTsrIntegrationTest : IntegrationTest() {
     @Test
     fun `Skal ikke kunne innvilge daglig reise for både Nay og Tiltaksenheten samtidig`() {
         every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoTiltakspengerTpsak()
@@ -84,27 +80,5 @@ class InnvilgeDagligReiseIntegrationTest : IntegrationTest() {
             .isEqualTo(
                 "Kan ikke ha overlappende vedtaksperioder for Nay og Tiltaksenheten. Se oversikt øverst på siden for å finne overlappende vedtaksperiode.",
             )
-    }
-
-    @Test
-    fun `innvilge rammevedtak privat bil og henter ut rammevedtak`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-        val fom = 15 september 2025
-        val tom = 14 oktober 2025
-
-        val behandlingContext =
-            opprettBehandlingOgGjennomførBehandlingsløp(
-                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-            ) {
-                defaultDagligReisePrivatBilTsoTestdata(fom, tom)
-            }
-
-        KafkaFake
-            .sendteMeldinger()
-            .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
-
-        val rammevedtak = kall.privatBil.hentRammevedtak(behandlingContext.ident)
-
-        assertThat(rammevedtak).isNotEmpty()
     }
 }

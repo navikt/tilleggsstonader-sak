@@ -279,6 +279,7 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                             Stønadstype.REISE_TIL_SAMLING_TSO -> TODO("AvslagReiseTilSamlingTsoRequest")
                         },
                 )
+
         is OpprettOpphør ->
             kall.vedtak.apiRespons
                 .lagreOpphør(
@@ -324,6 +325,9 @@ fun IntegrationTest.gjennomførRegistrerKjørelisteSteg(behandlingId: Behandling
 
 fun IntegrationTest.gjennomførKjørelisteSteg(behandlingId: BehandlingId) =
     kall.steg.ferdigstill(behandlingId, StegController.FerdigstillStegRequest(StegType.KJØRELISTE)).nesteSteg
+
+fun IntegrationTest.gjennomførKjørelisteStegKall(behandlingId: BehandlingId) =
+    kall.steg.apiRespons.ferdigstill(behandlingId, StegController.FerdigstillStegRequest(StegType.KJØRELISTE))
 
 fun IntegrationTest.gjennomførBeregningStegDagligReise(behandlingId: BehandlingId) =
     kall.steg.ferdigstill(behandlingId, StegController.FerdigstillStegRequest(StegType.BEREGNING)).nesteSteg

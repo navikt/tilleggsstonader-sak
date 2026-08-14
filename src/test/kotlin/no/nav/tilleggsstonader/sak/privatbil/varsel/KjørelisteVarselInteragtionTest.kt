@@ -1,13 +1,11 @@
 package no.nav.tilleggsstonader.sak.privatbil.varsel
 
-import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
@@ -34,8 +32,6 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
 
     @Test
     fun `skal sende kjørelistevarsel hvis ingen uker er sendt inn`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-
         val fom = dagensDato.minusWeeks(3)
         val tom = dagensDato.plusWeeks(3)
 
@@ -54,8 +50,6 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
 
     @Test
     fun `skal sende kjørelistevarsel hvis forrige uke ikke er sendt inn`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-
         val fom = toUkerTilbake.mandag()
         val tom = denneUka.søndag()
 
@@ -77,8 +71,6 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
 
     @Test
     fun `skal ikke sende kjørelistevarsel hvis forrige uke er sendt inn`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-
         val fom = toUkerTilbake.mandag()
         val tom = denneUka.søndag()
 
@@ -100,8 +92,6 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
 
     @Test
     fun `skal sende kjørelistevarsel hvis et av to overlappende rammevedtak mangler kjøreliste forrige uke`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-
         val fom = enUkeTilbake.mandag()
         val tom = enUkeTilbake.søndag()
 
@@ -145,8 +135,6 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
 
     @Test
     fun `skal kun sende ett kjørelistevarsel to rammevedtak mangler kjøreliste forrige uke`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-
         val fom = enUkeTilbake.mandag()
         val tom = enUkeTilbake.søndag()
 
@@ -179,8 +167,6 @@ class KjørelisteVarselInteragtionTest : CleanDatabaseIntegrationTest() {
 
     @Test
     fun `skal ikke sende kjørelistevarsel hvis ikke har rammevedtak forrige uke`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-
         val fom = denneUka.mandag()
         val tom = denneUka.søndag()
 

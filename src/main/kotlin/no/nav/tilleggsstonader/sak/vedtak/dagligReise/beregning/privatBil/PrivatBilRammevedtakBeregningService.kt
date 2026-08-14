@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.finnSnittMellomReiseOgVedtaksperioder
@@ -50,8 +49,6 @@ class PrivatBilRammevedtakBeregningService(
         forrigeRammevedtakPrivatBil: RammevedtakPrivatBil? = null,
         beregningsplan: Beregningsplan,
     ): RammevedtakPrivatBil? {
-        if (!unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL)) return null
-
         if (forrigeRammevedtakPrivatBil != null && typeVedtak == TypeVedtak.OPPHØR) {
             return privatBilBeregningRevurderingService.kuttEksisterendeRammevedtakForOpphør(
                 forrigeRammevedtak = forrigeRammevedtakPrivatBil,
@@ -75,7 +72,7 @@ class PrivatBilRammevedtakBeregningService(
                 reiserMedBil = reiserMedBil,
                 forrigeRammevedtak = forrigeRammevedtakPrivatBil,
                 nyttRammevedtak = nyttRammevedtakPrivatBil,
-                tidligsteEndring = beregningsplan.tidligsteEndring,
+                beregningsplan = beregningsplan,
             )
         }
 

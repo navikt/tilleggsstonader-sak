@@ -16,10 +16,10 @@ import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Behandlingstype
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnMappeResponseDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.FinnOppgaveResponseDto
-import no.nav.tilleggsstonader.kontrakter.oppgave.IdentGruppe
 import no.nav.tilleggsstonader.kontrakter.oppgave.MappeDto
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
-import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveBruker
+import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveBrukerType
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
@@ -41,6 +41,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.lagNavn
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlPersonKort
+import no.nav.tilleggsstonader.sak.util.eksternOppgave
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -51,6 +52,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 import java.time.LocalDate
 import java.util.UUID
+import no.nav.tilleggsstonader.kontrakter.oppgave.PersonIdent as PersonIdentKontrakt
 
 internal class OppgaveServiceTest {
     private val oppgaveClient = mockk<OppgaveClient>()
@@ -133,10 +135,10 @@ internal class OppgaveServiceTest {
         oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak))
 
         assertThat(slot.captured.enhetsnummer).isEqualTo(ENHETSNUMMER)
-        assertThat(slot.captured.ident).isEqualTo(OppgaveIdentV2(ident = FNR, gruppe = IdentGruppe.FOLKEREGISTERIDENT))
+        assertThat(slot.captured.personident).isEqualTo(PersonIdentKontrakt(ident = FNR))
         assertThat(slot.captured.behandlingstema).isEqualTo(Behandlingstema.PassAvBarn.value)
         assertThat(slot.captured.fristFerdigstillelse).isAfterOrEqualTo(LocalDate.now().plusDays(1))
-        assertThat(slot.captured.aktivFra).isEqualTo(LocalDate.now())
+        assertThat(slot.captured.aktivDato).isEqualTo(LocalDate.now())
         assertThat(slot.captured.tema).isEqualTo(Tema.TSO)
         assertThat(opprettOppgaveDomainSlot.captured.behandlingId).isEqualTo(BEHANDLING_ID)
     }
@@ -183,7 +185,10 @@ internal class OppgaveServiceTest {
             val slot = slot<OpprettOppgaveRequest>()
             mockOpprettOppgave(slot)
 
-            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak, opprettIMappe = null))
+            oppgaveService.opprettOppgave(
+                BEHANDLING_ID,
+                OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak, opprettIMappe = null),
+            )
 
             assertThat(slot.captured.mappeId).isNull()
         }
@@ -350,11 +355,7 @@ internal class OppgaveServiceTest {
                 listOf(
                     lagEksternTestOppgave().copy(
                         id = oppgaveIdMedNavn,
-                        identer = listOf(OppgaveIdentV2("1", gruppe = IdentGruppe.FOLKEREGISTERIDENT)),
-                    ),
-                    lagEksternTestOppgave().copy(
-                        id = 2,
-                        identer = listOf(OppgaveIdentV2("2", gruppe = IdentGruppe.ORGNR)),
+                        bruker = OppgaveBruker(ident = "1", type = OppgaveBrukerType.PERSON),
                     ),
                     lagEksternTestOppgave().copy(id = 3),
                 ),
@@ -362,7 +363,10 @@ internal class OppgaveServiceTest {
         val oppgaver =
             oppgaveService
                 .hentOppgaver(
-                    FinnOppgaveRequestDto(ident = "01010172272", enhet = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr),
+                    FinnOppgaveRequestDto(
+                        ident = "01010172272",
+                        enhet = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr,
+                    ),
                 ).oppgaver
 
         verify(exactly = 1) { personService.hentPersonKortBolk(eq(listOf("1"))) }
@@ -434,7 +438,11 @@ internal class OppgaveServiceTest {
         every { oppgaveClient.hentOppgaver(any()) } returns FinnOppgaveResponseDto(0, emptyList())
 
         oppgaveService.hentOppgaver(
-            FinnOppgaveRequestDto(ident = null, oppgaverPåVent = true, enhet = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr),
+            FinnOppgaveRequestDto(
+                ident = null,
+                oppgaverPåVent = true,
+                enhet = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr,
+            ),
         )
 
         verify { oppgaveClient.hentOppgaver(match { it.erUtenMappe == false && it.mappeId == OppgaveClientMockConfig.MAPPE_ID_PÅ_VENT }) }
@@ -445,7 +453,11 @@ internal class OppgaveServiceTest {
         every { oppgaveClient.hentOppgaver(any()) } returns FinnOppgaveResponseDto(0, emptyList())
 
         oppgaveService.hentOppgaver(
-            FinnOppgaveRequestDto(ident = null, oppgaverPåVent = false, enhet = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr),
+            FinnOppgaveRequestDto(
+                ident = null,
+                oppgaverPåVent = false,
+                enhet = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr,
+            ),
         )
 
         verify { oppgaveClient.hentOppgaver(match { it.erUtenMappe == false }) }
@@ -523,7 +535,7 @@ internal class OppgaveServiceTest {
             enhetsmappeId = OppgaveClientMockConfig.MAPPE_ID_KLAR,
         )
 
-    private fun lagEksternTestOppgave(): Oppgave = Oppgave(id = GSAK_OPPGAVE_ID, versjon = 0)
+    private fun lagEksternTestOppgave(): Oppgave = eksternOppgave(id = GSAK_OPPGAVE_ID, versjon = 0)
 
     private fun lagFinnOppgaveResponseDto(): FinnOppgaveResponseDto =
         FinnOppgaveResponseDto(

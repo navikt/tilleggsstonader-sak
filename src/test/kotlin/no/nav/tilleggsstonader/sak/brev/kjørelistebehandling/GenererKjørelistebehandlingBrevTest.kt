@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.brev.kjørelistebehandling
 
-import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
@@ -12,7 +11,6 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.KjørelisteBehandlingBrevRequest
 import no.nav.tilleggsstonader.sak.brev.kjørelistebrev.KjørelisteBehandlingBrevService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.interntVedtak.HtmlifyClient
@@ -46,8 +44,6 @@ class GenererKjørelistebehandlingBrevTest : CleanDatabaseIntegrationTest() {
 
     @Test
     fun `lag html og pdf`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-
         if (!FileUtil.SKRIV_TIL_FIL) return
 
         val kjørelisteBehandlingId = gjennomførBehandlingsløp()

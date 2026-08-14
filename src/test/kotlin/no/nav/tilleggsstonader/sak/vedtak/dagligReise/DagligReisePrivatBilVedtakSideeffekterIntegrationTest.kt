@@ -32,8 +32,6 @@ class DagligReisePrivatBilVedtakSideeffekterIntegrationTest : IntegrationTest() 
 
     @Test
     fun `blir produsert vedtaksstatistikk for rammevedtakbehandling og kjørelistebehandlinger`() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-
         val fom = 6 april 2026
         val tom = 26 april 2026
 

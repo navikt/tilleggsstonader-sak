@@ -4,7 +4,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20260713101404_6072da6"
 val tilleggsstønaderLibsVersion = "2026.08.07-12.32.dfeb3286fb52"
-val tilleggsstønaderKontrakterVersion = "2026.08.05-12.24.2b90d73a627e"
+val tilleggsstønaderKontrakterVersion = "2026.08.12-10.44.7c5db548d32f"
 val avroVersion = "1.12.1"
 val confluentVersion = "8.0.1"
 val joarkHendelseVersion = "1.1.11"
@@ -12,7 +12,7 @@ val tokenSupportVersion = "6.0.11"
 val wiremockVersion = "3.13.2"
 val mockkVersion = "1.14.11"
 val testcontainerVersion = "1.21.4"
-val springDocVersion = "3.0.3"
+val springDocVersion = "3.1.0"
 val shedlockVersion = "7.7.0"
 
 group = "no.nav.tilleggsstonader.sak"
@@ -22,7 +22,7 @@ plugins {
     application
 
     kotlin("jvm") version "2.3.21"
-    id("com.diffplug.spotless") version "8.8.0"
+    id("com.diffplug.spotless") version "8.9.0"
     id("io.github.ben-manes.versions") version "0.59.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
 

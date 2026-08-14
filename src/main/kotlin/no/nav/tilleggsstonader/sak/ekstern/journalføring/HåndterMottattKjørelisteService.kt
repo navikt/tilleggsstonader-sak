@@ -38,6 +38,10 @@ class HåndterMottattKjørelisteService(
     private val taskService: TaskService,
 ) {
     fun behandleKjøreliste(journalpost: Journalpost) {
+        feilHvis(kjørelisteService.eksistererForJournalpostId(journalpost.journalpostId)) {
+            "Kjøreliste med journalpostId=${journalpost.journalpostId} er allerede mottatt"
+        }
+
         val kjørelisteSkjema =
             hentKjørelisteSkjemaFraJournalpost(journalpost)
         val reiseId = ReiseId(UUID.fromString(kjørelisteSkjema.reiseId))

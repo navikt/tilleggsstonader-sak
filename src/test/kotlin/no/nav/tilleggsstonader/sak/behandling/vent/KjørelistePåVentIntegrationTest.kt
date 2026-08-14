@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.behandling.vent
 
-import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.januar
@@ -9,7 +8,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.GenererPdfRequest
-import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.BehandlingContext
 import no.nav.tilleggsstonader.sak.integrasjonstest.MINIMALT_BREV
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
@@ -22,7 +20,6 @@ import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 
@@ -31,11 +28,6 @@ class KjørelistePåVentIntegrationTest : CleanDatabaseIntegrationTest() {
     private val tomUke1 = 11 januar 2026
     private val fomUke2 = 12 januar 2026
     private val tomUke2 = 18 januar 2026
-
-    @BeforeEach
-    fun setUp() {
-        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_PRIVAT_BIL) } returns true
-    }
 
     @Test
     fun `skal sette nye kjørelistebehandlinger på vent om det finnes åpen kjørelistebehandling`() {
