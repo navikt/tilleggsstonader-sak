@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.time.LocalDate
 
 @RestController
 @RequestMapping(path = ["/api/kjoreliste/manuell-registrering"])
@@ -91,6 +90,6 @@ data class OppdaterKjørelisteRequest(
 )
 
 data class OppdaterKjørelisteUkeRequest(
-    val fom: LocalDate,
+    val ukeIÅr: String,
     val dager: List<KjørelisteDag>,
 )

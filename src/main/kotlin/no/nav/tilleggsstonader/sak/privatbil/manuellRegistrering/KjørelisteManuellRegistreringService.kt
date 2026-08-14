@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering
 
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
+import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -105,7 +106,7 @@ class KjørelisteManuellRegistreringService(
             dagligReisePrivatBilService.hentRammevedtakForReiseIBehandling(behandling.id, kjøreliste.data.reiseId)
         val andreKjørelister = kjørelisteService.hentForFagsakId(behandling.fagsakId).filter { it.id != kjørelisteId }
 
-        val ukerSomOppdateres = request.uker.associate { it.fom.tilUkeIÅr() to it.dager }
+        val ukerSomOppdateres = request.uker.associate { UkeIÅr.fraString(it.ukeIÅr) to it.dager }
         val dagerbeholdt = kjøreliste.data.reisedager.filter { it.dato.tilUkeIÅr() !in ukerSomOppdateres.keys }
         val oppdaterteReisedager = dagerbeholdt + request.uker.flatMap { it.dager }
 
@@ -225,6 +226,7 @@ class KjørelisteManuellRegistreringService(
             .map { (uke, dager) ->
                 ManueltInnsendtKjørelisteUkeDto(
                     ukenummer = uke.ukenummer,
+                    ukeIÅr = uke.toString(),
                     fom = dager.minOf { it.dato },
                     tom = dager.maxOf { it.dato },
                     dager = dager.sortedBy { it.dato },

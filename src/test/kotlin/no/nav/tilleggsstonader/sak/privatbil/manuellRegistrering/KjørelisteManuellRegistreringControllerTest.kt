@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
@@ -305,7 +306,7 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
                 kjørelisteId,
                 OppdaterKjørelisteRequest(
                     begrunnelse = null,
-                    uker = listOf(OppdaterKjørelisteUkeRequest(fom = fom, dager = oppdaterteDager)),
+                    uker = listOf(OppdaterKjørelisteUkeRequest(ukeIÅr = fom.tilUkeIÅr().toString(), dager = oppdaterteDager)),
                 ),
             )
 
@@ -347,7 +348,7 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
                         uker =
                             listOf(
                                 OppdaterKjørelisteUkeRequest(
-                                    fom = fom,
+                                    ukeIÅr = fom.tilUkeIÅr().toString(),
                                     dager = lagKjørteDagerForUke(fom = 12 januar 2026, tom = 18 januar 2026, antallKjørteDager = 2),
                                 ),
                             ),
