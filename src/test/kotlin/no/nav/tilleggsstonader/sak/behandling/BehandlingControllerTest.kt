@@ -109,7 +109,6 @@ internal class BehandlingControllerTest : CleanDatabaseIntegrationTest() {
                         NyeOpplysningerEndringer(
                             endringer = listOf(NyeOpplysningerEndring.MÅLGRUPPE),
                         ),
-                    //                        listOf(NyeOpplysningerEndring.MÅLGRUPPE),
                 ),
             )
         val hentetBehandling = kall.behandling.hent(behandling.id)
