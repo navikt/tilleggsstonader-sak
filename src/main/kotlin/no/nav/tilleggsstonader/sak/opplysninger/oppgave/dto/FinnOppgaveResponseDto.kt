@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgave
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveBruker
-import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveIdentV2
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgavePrioritet
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.domain.FinnOppgaveresultatMedMetadata
@@ -36,7 +35,6 @@ data class OppgaveDto(
     val id: Long,
     val versjon: Int,
     val bruker: OppgaveBruker?,
-    val identer: List<OppgaveIdentV2>?,
     val tildeltEnhetsnr: String?,
     val endretAvEnhetsnr: String?,
     val opprettetAvEnhetsnr: String?,
@@ -82,7 +80,6 @@ data class OppgaveDto(
         id = oppgave.id,
         versjon = oppgave.versjon,
         bruker = oppgave.bruker,
-        identer = oppgave.identer,
         tildeltEnhetsnr = oppgave.tildeltEnhetsnr,
         endretAvEnhetsnr = oppgave.endretAvEnhetsnr,
         opprettetAvEnhetsnr = oppgave.opprettetAvEnhetsnr,

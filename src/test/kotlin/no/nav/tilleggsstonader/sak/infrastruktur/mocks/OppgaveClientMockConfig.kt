@@ -83,8 +83,7 @@ class OppgaveClientMockConfig {
                         .filter { oppgave ->
                             request.aktørId?.let { aktørId ->
                                 // [PdlClientConfig] legger til prefix "00" på aktørId lokalt
-                                oppgave.bruker?.let { it.ident == aktørId || "00${it.ident}" == aktørId } == true ||
-                                    oppgave.identer?.any { it.ident == aktørId || "00${it.ident}" == aktørId } ?: false
+                                oppgave.bruker?.let { it.ident == aktørId || "00${it.ident}" == aktørId } ?: false
                             } ?: true
                         }.toList()
                 val toIndex = minOf((request.offset + request.limit).toInt(), oppgaver.size)
@@ -319,7 +318,6 @@ fun OpprettOppgaveRequest.tilNyOppgave(id: Long = 0) =
         id = id,
         versjon = 1,
         status = StatusEnum.OPPRETTET,
-        identer = this.ident!!.let { listOf(OppgaveIdentV2(it.ident!!, it.gruppe!!)) },
         bruker = OppgaveBruker(this.personident?.ident, type = OppgaveBrukerType.PERSON),
         tildeltEnhetsnr = this.enhetsnummer ?: "1234",
         saksreferanse = null,
