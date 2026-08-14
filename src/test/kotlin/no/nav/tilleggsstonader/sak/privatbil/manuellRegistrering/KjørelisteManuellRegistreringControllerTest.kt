@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
@@ -167,7 +168,12 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
         fun `skal ikke kunne slette kjørelister som er innsendt av bruker`() {
             val fom = 5 januar 2026
             val tom = 18 januar 2026
-            val (revurderingId, fagsakId) = opprettRammevedtakOgRevurdering(fom, tom, skalSendeInnKjørelisteForFørsteUka = true)
+            val (revurderingId, fagsakId) =
+                opprettRammevedtakOgRevurdering(
+                    fom,
+                    tom,
+                    skalSendeInnKjørelisteForFørsteUka = true,
+                )
 
             val innsendtKjørelisteId = kjørelisteRepository.findByFagsakId(fagsakId).single().id
 
@@ -263,6 +269,135 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
             val avklarteUker = avklartKjørtUkeRepository.findByBehandlingId(revurderingId)
             assertThat(avklarteUker.filter { it.kjørelisteId == kjørelisteId }).isEmpty()
             assertThat(avklarteUker).hasSize(1)
+        }
+    }
+
+    @Nested
+    inner class OppdaterUke {
+        @Test
+        fun `skal oppdatere dager i en uke og re-avklare avklarte uker`() {
+            val fom = 5 januar 2026
+            val tom = 11 januar 2026
+            val (revurderingId, fagsakId) = opprettRammevedtakOgRevurdering(fom, tom)
+
+            val reiseId =
+                kall.privatBil
+                    .hentKjørelisteOversikt(revurderingId)
+                    .tilgjengeligeReiser
+                    .single()
+                    .reiseId
+
+            val kjørelisteId =
+                kall.privatBil
+                    .lagreManuellKjøreliste(
+                        revurderingId,
+                        LagreManuellKjørelisteRequest(
+                            journalpostId = journalpostId(),
+                            reiseId = reiseId,
+                            begrunnelse = null,
+                            reisedager = lagKjørteDagerForUke(fom = fom, tom = tom, antallKjørteDager = 2),
+                        ),
+                    ).kjørelisteId
+
+            val oppdaterteDager = lagKjørteDagerForUke(fom = fom, tom = tom, antallKjørteDager = 5)
+
+            kall.privatBil.oppdaterManuellKjøreliste(
+                revurderingId,
+                kjørelisteId,
+                OppdaterKjørelisteRequest(
+                    begrunnelse = null,
+                    uker = listOf(OppdaterKjørelisteUkeRequest(ukeIÅr = fom.tilUkeIÅr().toString(), dager = oppdaterteDager)),
+                ),
+            )
+
+            val lagretKjøreliste = kjørelisteRepository.findByFagsakId(fagsakId).single()
+            assertThat(lagretKjøreliste.data.reisedager.count { it.harKjørt }).isEqualTo(5)
+        }
+
+        @Test
+        fun `skal ikke kunne oppdatere med dager fra feil uke`() {
+            val fom = 5 januar 2026
+            val tom = 11 januar 2026
+            val (revurderingId) = opprettRammevedtakOgRevurdering(fom, tom)
+
+            val reiseId =
+                kall.privatBil
+                    .hentKjørelisteOversikt(revurderingId)
+                    .tilgjengeligeReiser
+                    .single()
+                    .reiseId
+
+            val kjørelisteId =
+                kall.privatBil
+                    .lagreManuellKjøreliste(
+                        revurderingId,
+                        LagreManuellKjørelisteRequest(
+                            journalpostId = journalpostId(),
+                            reiseId = reiseId,
+                            begrunnelse = null,
+                            reisedager = lagKjørteDagerForUke(fom = fom, tom = tom, antallKjørteDager = 2),
+                        ),
+                    ).kjørelisteId
+
+            kall.privatBil.apiRespons
+                .oppdaterManuellKjøreliste(
+                    revurderingId,
+                    kjørelisteId,
+                    OppdaterKjørelisteRequest(
+                        begrunnelse = null,
+                        uker =
+                            listOf(
+                                OppdaterKjørelisteUkeRequest(
+                                    ukeIÅr = fom.tilUkeIÅr().toString(),
+                                    dager = lagKjørteDagerForUke(fom = 12 januar 2026, tom = 18 januar 2026, antallKjørteDager = 2),
+                                ),
+                            ),
+                    ),
+                ).expectProblemDetail(
+                    forventetStatus = HttpStatus.BAD_REQUEST,
+                    forventetDetail = "Oppdaterte dager må tilhøre uke",
+                )
+        }
+    }
+
+    @Nested
+    inner class OppdaterBegrunnelse {
+        @Test
+        fun `skal oppdatere begrunnelse på manuelt registrert kjøreliste`() {
+            val fom = 5 januar 2026
+            val tom = 11 januar 2026
+            val (revurderingId, fagsakId) = opprettRammevedtakOgRevurdering(fom, tom)
+
+            val reiseId =
+                kall.privatBil
+                    .hentKjørelisteOversikt(revurderingId)
+                    .tilgjengeligeReiser
+                    .single()
+                    .reiseId
+
+            val kjørelisteId =
+                kall.privatBil
+                    .lagreManuellKjøreliste(
+                        revurderingId,
+                        LagreManuellKjørelisteRequest(
+                            journalpostId = journalpostId(),
+                            reiseId = reiseId,
+                            begrunnelse = "Orginal begrunnelse",
+                            reisedager = lagKjørteDagerForUke(fom = fom, tom = tom, antallKjørteDager = 2),
+                        ),
+                    ).kjørelisteId
+
+            kall.privatBil.oppdaterManuellKjøreliste(
+                revurderingId,
+                kjørelisteId,
+                OppdaterKjørelisteRequest(
+                    begrunnelse = "Ny begrunnelse",
+                    uker = emptyList(),
+                ),
+            )
+
+            val lagretKjøreliste = kjørelisteRepository.findByFagsakId(fagsakId).single()
+            assertThat(lagretKjøreliste.begrunnelse).isEqualTo("Ny begrunnelse")
         }
     }
 
