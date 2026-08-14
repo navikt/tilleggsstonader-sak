@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteSer
 import no.nav.tilleggsstonader.sak.util.erFørNåværendeUke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class KjørelisteManuellRegistreringService(
@@ -90,6 +91,7 @@ class KjørelisteManuellRegistreringService(
         kjørelisteService.slettKjøreliste(kjørelisteSomSkalSlettes)
     }
 
+    @Transactional
     fun oppdaterKjøreliste(
         behandlingId: BehandlingId,
         kjørelisteId: KjørelisteId,
@@ -131,7 +133,8 @@ class KjørelisteManuellRegistreringService(
 
         val reiserIRammevedtak =
             dagligReisePrivatBilService.hentRammevedtakForBehandlingId(behandlingId)?.reiser
-                ?: error("Forventer at det finnes reiser i rammevedtak ...")
+                ?: error("Forventer at det finnes reiser i rammevedtak til behandling $behandlingId")
+
         val tilhørendeReise = reiserIRammevedtak.single { it.reiseId == kjøreliste.data.reiseId }
 
         return ManueltInnsendtKjørelisteDto(
