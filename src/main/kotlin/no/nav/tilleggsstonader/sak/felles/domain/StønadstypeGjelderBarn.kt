@@ -10,4 +10,6 @@ fun Stønadstype.gjelderBarn() =
         Stønadstype.DAGLIG_REISE_TSO -> false
         Stønadstype.DAGLIG_REISE_TSR -> false
         Stønadstype.REISE_TIL_SAMLING_TSO -> false
+        Stønadstype.FLYTTING_TSO -> false
+        Stønadstype.FLYTTING_TSR -> false
     }

@@ -108,6 +108,9 @@ private fun søknadForStønadstype(
     -> søknadDagligReise(ident = ident)
 
     Stønadstype.REISE_TIL_SAMLING_TSO -> søknadReiseTilSamling(ident = ident)
+    Stønadstype.FLYTTING_TSO,
+    Stønadstype.FLYTTING_TSR,
+    -> error("Søknad for $stønadstype er ikke implementert i testdata")
 }
 
 fun IntegrationTest.gjennomførBehandlingsløp(

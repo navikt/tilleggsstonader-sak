@@ -210,4 +210,7 @@ private fun Stønadstype.tilDokumentBrevkode(): DokumentBrevkode =
         -> DokumentBrevkode.DAGLIG_REISE
 
         Stønadstype.REISE_TIL_SAMLING_TSO -> DokumentBrevkode.REISE_TIL_SAMLING
+        Stønadstype.FLYTTING_TSO,
+        Stønadstype.FLYTTING_TSR,
+        -> DokumentBrevkode.FLYTTING
     }

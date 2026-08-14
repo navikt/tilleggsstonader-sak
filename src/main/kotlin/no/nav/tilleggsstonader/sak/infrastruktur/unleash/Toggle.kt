@@ -27,6 +27,8 @@ enum class Toggle(
 
     SØKNAD_ROUTING_REISE_TIL_SAMLING("sak.soknad-routing.reise-til-samling"),
 
+    SØKNAD_ROUTING_FLYTTING("sak.soknad-routing.flytting"),
+
     KAN_OPPHØRE_PRIVAT_BIL("sak.opphore-privat-bil"),
     KAN_REVURDERE_PRIVAT_BIL("sak.revurdere-privat-bil"),
     KAN_REDUSERE_REISEDAGER_REVURDERING_PRIVAT_BIL("sak.redusere-reisedager-revurdering-privat-bil"),

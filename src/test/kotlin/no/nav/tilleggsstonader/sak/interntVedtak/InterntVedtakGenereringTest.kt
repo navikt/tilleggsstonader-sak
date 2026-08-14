@@ -114,6 +114,9 @@ class InterntVedtakGenereringTest {
             Stønadstype.DAGLIG_REISE_TSO -> mockDagligReiseTso()
             Stønadstype.DAGLIG_REISE_TSR -> mockDagligReiseTsr()
             Stønadstype.REISE_TIL_SAMLING_TSO -> TODO("mockReiseTilSamlingTso")
+            Stønadstype.FLYTTING_TSO,
+            Stønadstype.FLYTTING_TSR,
+            -> TODO("mockFlytting")
         }
     }
 

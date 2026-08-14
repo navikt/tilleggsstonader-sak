@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.fagsak.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderFlytting
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseTilSamling
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
@@ -33,6 +34,7 @@ data class Fagsaker(
         when (stønadstype) {
             Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR -> fagsaker.values.filter { it.stønadstype.gjelderDagligReise() }
             Stønadstype.REISE_TIL_SAMLING_TSO -> fagsaker.values.filter { it.stønadstype.gjelderReiseTilSamling() }
+            Stønadstype.FLYTTING_TSO, Stønadstype.FLYTTING_TSR -> fagsaker.values.filter { it.stønadstype.gjelderFlytting() }
             Stønadstype.BARNETILSYN,
             Stønadstype.LÆREMIDLER,
             Stønadstype.BOUTGIFTER,

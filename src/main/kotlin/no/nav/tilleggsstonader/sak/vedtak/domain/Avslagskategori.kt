@@ -80,6 +80,16 @@ fun gyldigeAvslagsårsaker(
                 Avslagskategori.STØNADSVILKÅR -> emptySet()
                 Avslagskategori.GENERELL -> generelleÅrsaker
             }
+
+        Stønadstype.FLYTTING_TSO,
+        Stønadstype.FLYTTING_TSR,
+        -> // TODO("hva er gyldige avslagsårsaker for FLYTTING?")
+            when (gjelder) {
+                Avslagskategori.AKTIVITET -> emptySet()
+                Avslagskategori.MÅLGRUPPE -> emptySet()
+                Avslagskategori.STØNADSVILKÅR -> emptySet()
+                Avslagskategori.GENERELL -> generelleÅrsaker
+            }
     }
 }
 

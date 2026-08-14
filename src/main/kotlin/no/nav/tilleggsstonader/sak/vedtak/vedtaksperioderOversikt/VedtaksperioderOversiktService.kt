@@ -70,6 +70,9 @@ class VedtaksperioderOversiktService(
                 finnDetaljerteVedtaksperioderForDagligReise(behandling = behandling)
 
             Stønadstype.REISE_TIL_SAMLING_TSO -> TODO()
+            Stønadstype.FLYTTING_TSO,
+            Stønadstype.FLYTTING_TSR,
+            -> TODO()
         }
     }
 

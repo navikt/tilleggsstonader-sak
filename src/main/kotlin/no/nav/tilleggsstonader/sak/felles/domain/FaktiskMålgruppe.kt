@@ -75,5 +75,9 @@ enum class FaktiskMålgruppe(
             }
 
             Stønadstype.DAGLIG_REISE_TSR -> error("Kan ikke utlede Typeandel for Daglige reiser TSR fra FaktiskMålgruppe")
+
+            Stønadstype.FLYTTING_TSO,
+            Stønadstype.FLYTTING_TSR,
+            -> error("Kan ikke utlede Typeandel for FLYTTING fra FaktiskMålgruppe - ikke implementert")
         }
 }

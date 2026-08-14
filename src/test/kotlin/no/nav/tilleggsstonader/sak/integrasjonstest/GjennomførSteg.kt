@@ -238,6 +238,10 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                                 InnvilgelseReiseTilSamlingTsoRequest(
                                     vedtaksperioder = vedtaksperioder,
                                 )
+
+                            Stønadstype.FLYTTING_TSO,
+                            Stønadstype.FLYTTING_TSR,
+                            -> TODO("InnvilgelseFlyttingRequest")
                         },
                 )
         }
@@ -277,6 +281,9 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                                 )
 
                             Stønadstype.REISE_TIL_SAMLING_TSO -> TODO("AvslagReiseTilSamlingTsoRequest")
+                            Stønadstype.FLYTTING_TSO,
+                            Stønadstype.FLYTTING_TSR,
+                            -> TODO("AvslagFlyttingRequest")
                         },
                 )
 
@@ -316,6 +323,9 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                                 )
 
                             Stønadstype.REISE_TIL_SAMLING_TSO -> TODO("OpphørReiseTilSamlingTsoRequest")
+                            Stønadstype.FLYTTING_TSO,
+                            Stønadstype.FLYTTING_TSR,
+                            -> TODO("OpphørFlyttingRequest")
                         },
                 )
     }

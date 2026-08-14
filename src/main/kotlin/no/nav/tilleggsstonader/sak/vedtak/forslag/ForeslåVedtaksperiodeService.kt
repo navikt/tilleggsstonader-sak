@@ -55,5 +55,7 @@ class ForeslåVedtaksperiodeService(
             Stønadstype.DAGLIG_REISE_TSO -> true
             Stønadstype.DAGLIG_REISE_TSR -> true
             Stønadstype.REISE_TIL_SAMLING_TSO -> true
+            Stønadstype.FLYTTING_TSO -> true
+            Stønadstype.FLYTTING_TSR -> true
         }
 }
