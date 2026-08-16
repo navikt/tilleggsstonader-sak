@@ -8,8 +8,8 @@ import no.nav.tilleggsstonader.sak.privatbil.InnsendtKjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.Kjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
+import no.nav.tilleggsstonader.sak.util.finnMandagNesteUke
 import no.nav.tilleggsstonader.sak.util.finnNesteSøndag
-import no.nav.tilleggsstonader.sak.util.iDagHvisMandagEllerForrigeMandag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBilBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
@@ -30,14 +30,14 @@ class ValiderManuellKjørelisteTest {
         val dagensDato = LocalDate.now()
         val fom = dagensDato.minusMonths(1)
         val tom = dagensDato.plusMonths(1)
-        val denneUkensMandag = dagensDato.iDagHvisMandagEllerForrigeMandag()
+        val mandagNesteUke = dagensDato.finnMandagNesteUke()
 
         assertThatThrownBy {
             validerManuellKjøreliste(
                 innsendtKjøreliste =
                     InnsendtKjøreliste(
                         reiseId = reiseId,
-                        reisedager = lagKjørteDager(ukeFom = denneUkensMandag, ukeTom = denneUkensMandag.finnNesteSøndag()),
+                        reisedager = lagKjørteDager(ukeFom = mandagNesteUke, ukeTom = mandagNesteUke.finnNesteSøndag()),
                     ),
                 rammevedtakForReise = rammeForReise(fom, tom),
                 eksisterendeKjørelister = emptyList(),
