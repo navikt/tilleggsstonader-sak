@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndring
-import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndringer
 import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
 import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadata
 import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadataKilde
@@ -199,11 +198,7 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
                 ÅrsakMetadata(
                     kilde = opprettBehandlingDto.årsakMetadata!!.kilde,
                     beskrivelse = opprettBehandlingDto.årsakMetadata.beskrivelse,
-                ),
-            )
-            assertThat(nyBehandling.nyeOpplysningerEndringer).isEqualTo(
-                NyeOpplysningerEndringer(
-                    endringer = opprettBehandlingDto.nyeOpplysningerEndringer!!.endringer,
+                    endringer = opprettBehandlingDto.årsakMetadata.endringer,
                 ),
             )
         }
@@ -476,18 +471,6 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
         valgteBarn = valgteBarn,
         kravMottatt = null,
         årsakMetadata = if (årsak == BehandlingÅrsak.NYE_OPPLYSNINGER) opprettÅrsakMetadata() else null,
-        nyeOpplysningerEndringer =
-            if (årsak == BehandlingÅrsak.NYE_OPPLYSNINGER) {
-                NyeOpplysningerEndringer(
-                    endringer =
-                        listOf(
-                            NyeOpplysningerEndring.AKTIVITET,
-                            NyeOpplysningerEndring.MÅLGRUPPE,
-                        ),
-                )
-            } else {
-                null
-            },
         skalOppretteOppgave = skalOppretteOppgave,
         behandlingMetode = BehandlingMetode.MANUELL,
         forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
@@ -497,5 +480,6 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
         ÅrsakMetadata(
             kilde = ÅrsakMetadataKilde.ETTERSENDING,
             beskrivelse = "Tittei",
+            endringer = listOf(NyeOpplysningerEndring.MÅLGRUPPE),
         )
 }

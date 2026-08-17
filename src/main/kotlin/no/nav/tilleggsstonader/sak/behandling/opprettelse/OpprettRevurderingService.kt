@@ -48,8 +48,7 @@ class OpprettRevurderingService(
         // have to check this
         if (opprettRevurdering.årsak == BehandlingÅrsak.NYE_OPPLYSNINGER) {
             feilHvis(
-                opprettRevurdering.årsakMetadata == null ||
-                    opprettRevurdering.nyeOpplysningerEndringer == null,
+                opprettRevurdering.årsakMetadata == null,
             ) {
                 "Krever metadata ved behandlingsårsak NYE_OPPLYSNINGER"
             }
@@ -97,7 +96,6 @@ class OpprettRevurderingService(
                 behandlingMetode = opprettRevurdering.behandlingMetode,
                 kravMottatt = opprettRevurdering.kravMottatt,
                 årsakMetadata = opprettRevurdering.årsakMetadata,
-                nyeOpplysningerEndringer = opprettRevurdering.nyeOpplysningerEndringer,
                 oppgaveMetadata =
                     OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                         tilordneSaksbehandler = SikkerhetContext.hentSaksbehandlerHvisFinnes(),
@@ -112,7 +110,6 @@ class OpprettRevurderingService(
                 behandlingsårsak = opprettRevurdering.årsak,
                 behandlingMetode = opprettRevurdering.behandlingMetode,
                 kravMottatt = opprettRevurdering.kravMottatt,
-                nyeOpplysningerEndringer = opprettRevurdering.nyeOpplysningerEndringer,
                 årsakMetadata = opprettRevurdering.årsakMetadata,
                 oppgaveMetadata = OpprettBehandlingOppgaveMetadata.UtenOppgave,
                 forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,

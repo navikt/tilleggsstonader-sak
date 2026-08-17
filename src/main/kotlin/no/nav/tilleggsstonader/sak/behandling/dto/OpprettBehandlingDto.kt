@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling.dto
 
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndringer
+import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndring
 import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
 import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadata
 import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadataKilde
@@ -14,7 +14,6 @@ data class OpprettBehandlingDto(
     val fagsakId: FagsakId,
     val årsak: BehandlingÅrsak,
     val årsakMetadata: ÅrsakMetadataDto?,
-    val nyeOpplysningerEndringer: NyeOpplysningerEndringer?,
     val valgteBarn: Set<String> = emptySet(),
     val kravMottatt: LocalDate?,
     val forenkletBehandlingstype: ForenkletBehandlingstype,
@@ -24,7 +23,6 @@ data class OpprettBehandlingDto(
             fagsakId = fagsakId,
             årsak = årsak,
             årsakMetadata = årsakMetadata?.tilDomene(),
-            nyeOpplysningerEndringer = nyeOpplysningerEndringer,
             valgteBarn = valgteBarn,
             kravMottatt = kravMottatt,
             skalOppretteOppgave = true,
@@ -36,11 +34,13 @@ data class OpprettBehandlingDto(
 data class ÅrsakMetadataDto(
     val kilde: ÅrsakMetadataKilde,
     val beskrivelse: String?,
+    val endringer: List<NyeOpplysningerEndring>,
 ) {
     fun tilDomene() =
         ÅrsakMetadata(
             kilde = kilde,
             beskrivelse = beskrivelse,
+            endringer = endringer,
         )
 }
 

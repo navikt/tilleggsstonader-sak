@@ -34,7 +34,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndring
-import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndringer
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadata
 import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadataKilde
@@ -177,7 +176,6 @@ fun behandling(
     vedtakstidspunkt: LocalDateTime? = null,
     kravMottatt: LocalDate? = null,
     årsakMetadata: ÅrsakMetadata? = null,
-    nyeOpplysningerEndringer: NyeOpplysningerEndringer? = null,
 ): Behandling =
     Behandling(
         fagsakId = fagsak.id,
@@ -197,7 +195,6 @@ fun behandling(
                 ?: if (resultat != BehandlingResultat.IKKE_SATT) SporbarUtils.now() else null,
         kravMottatt = kravMottatt,
         årsakMetadata = årsakMetadata,
-        nyeOpplysningerEndringer = nyeOpplysningerEndringer,
         behandlingMetode = BehandlingMetode.MANUELL,
     )
 
@@ -217,7 +214,6 @@ fun henlagtBehandling(
     vedtakstidspunkt: LocalDateTime? = SporbarUtils.now(),
     kravMottatt: LocalDate? = null,
     årsakMetadata: ÅrsakMetadata? = null,
-    nyeOpplysningerEndringer: NyeOpplysningerEndringer? = null,
 ) = Behandling(
     fagsakId = fagsak.id,
     forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
@@ -236,7 +232,6 @@ fun henlagtBehandling(
             ?: if (resultat != BehandlingResultat.IKKE_SATT) SporbarUtils.now() else null,
     kravMottatt = kravMottatt,
     årsakMetadata = årsakMetadata,
-    nyeOpplysningerEndringer = nyeOpplysningerEndringer,
     behandlingMetode = BehandlingMetode.MANUELL,
 )
 
@@ -566,15 +561,12 @@ fun dokumentvariantOriginal() = dokumentvariant(variantformat = Dokumentvariantf
 fun årsakMetadata(
     kilde: ÅrsakMetadataKilde = ÅrsakMetadataKilde.ETTERSENDING,
     beskrivelse: String? = "tralala",
+    endringer: List<NyeOpplysningerEndring> = listOf(NyeOpplysningerEndring.AKTIVITET),
 ) = ÅrsakMetadata(
     kilde = kilde,
     beskrivelse = beskrivelse,
+    endringer = endringer,
 )
-
-fun nyeOpplysningerEndringer(endringer: List<NyeOpplysningerEndring> = listOf(NyeOpplysningerEndring.AKTIVITET)) =
-    NyeOpplysningerEndringer(
-        endringer = endringer,
-    )
 
 fun totrinnskontroll(
     behandlingId: BehandlingId,

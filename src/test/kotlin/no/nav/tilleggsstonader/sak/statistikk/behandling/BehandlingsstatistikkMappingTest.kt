@@ -11,7 +11,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
-import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndringer
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadata
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
@@ -480,7 +479,6 @@ class BehandlingsstatistikkMappingTest {
         resultat: BehandlingResultat = BehandlingResultat.IKKE_SATT,
         henlagtÅrsak: HenlagtÅrsak? = null,
         årsakMetadata: ÅrsakMetadata? = null,
-        nyeOpplysningerEndringer: NyeOpplysningerEndringer? = null,
     ) = Saksbehandling(
         id = behandlingId,
         eksternId = eksternId,
@@ -492,7 +490,6 @@ class BehandlingsstatistikkMappingTest {
         kategori = kategori,
         årsak = BehandlingÅrsak.SØKNAD,
         årsakMetadata = årsakMetadata,
-        nyeOpplysningerEndringer = nyeOpplysningerEndringer,
         kravMottatt = null,
         resultat = resultat,
         vedtakstidspunkt = null,

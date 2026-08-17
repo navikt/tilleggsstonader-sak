@@ -196,7 +196,6 @@ fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
                 årsak = BehandlingÅrsak.SØKNAD,
                 kravMottatt = LocalDate.now(),
                 årsakMetadata = null,
-                nyeOpplysningerEndringer = null,
                 forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
             ),
         tilSteg = tilSteg,

@@ -8,7 +8,6 @@ data class OpprettRevurdering(
     val fagsakId: FagsakId,
     val årsak: BehandlingÅrsak,
     val årsakMetadata: ÅrsakMetadata?,
-    val nyeOpplysningerEndringer: NyeOpplysningerEndringer?,
     val valgteBarn: Set<String>,
     val kravMottatt: LocalDate?,
     val skalOppretteOppgave: Boolean,

@@ -78,6 +78,7 @@ class AdminOpprettBehandlingServiceTest {
         ÅrsakMetadata(
             kilde = ÅrsakMetadataKilde.GOSYS,
             beskrivelse = "BESKRIVELSE",
+            endringer = emptyList(),
         )
 
     @BeforeEach
@@ -142,7 +143,7 @@ class AdminOpprettBehandlingServiceTest {
             valgteBarn = setOf(identBarn),
             medBrev = false,
             kravMottatt = LocalDate.now(),
-            årsakMetadata = ÅrsakMetadata(kilde = ÅrsakMetadataKilde.GOSYS, beskrivelse = "BESKRIVELSE"),
+            årsakMetadata = ÅrsakMetadata(kilde = ÅrsakMetadataKilde.GOSYS, beskrivelse = "BESKRIVELSE", endringer = emptyList()),
         )
 
         with(opprettedeBarnSlot.captured.single()) {
@@ -172,7 +173,7 @@ class AdminOpprettBehandlingServiceTest {
             valgteBarn = setOf(),
             medBrev = false,
             kravMottatt = LocalDate.now(),
-            årsakMetadata = ÅrsakMetadata(kilde = ÅrsakMetadataKilde.GOSYS, beskrivelse = "BESKRIVELSE"),
+            årsakMetadata = ÅrsakMetadata(kilde = ÅrsakMetadataKilde.GOSYS, beskrivelse = "BESKRIVELSE", endringer = emptyList()),
         )
 
         assertThat(opprettedeBarnSlot.isCaptured).isFalse()

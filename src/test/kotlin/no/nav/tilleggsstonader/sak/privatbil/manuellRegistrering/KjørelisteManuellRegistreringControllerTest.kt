@@ -374,7 +374,6 @@ class KjørelisteManuellRegistreringControllerTest : IntegrationTest() {
             forenkletBehandlingstype = ForenkletBehandlingstype.KJØRELISTE,
             årsak = BehandlingÅrsak.REGISTRER_KJØRELISTE_FOR_BRUKER,
             årsakMetadata = null,
-            nyeOpplysningerEndringer = null,
             kravMottatt = LocalDate.now(),
         )
 
