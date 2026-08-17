@@ -30,6 +30,7 @@ class VedtaksdataTest {
                 is TypeVedtakLæremidler -> type.assertHarRiktigNavn(stønadstype)
                 is TypeVedtakBoutgifter -> type.assertHarRiktigNavn(stønadstype)
                 is TypeVedtakDagligReise -> type.assertHarRiktigNavn(stønadstype)
+                is TypeVedtakReiseTilSamling -> type.assertHarRiktigNavn(stønadstype)
             }
         }
     }

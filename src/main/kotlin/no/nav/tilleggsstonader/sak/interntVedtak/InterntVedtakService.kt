@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelsePassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
@@ -33,6 +34,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakPassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.tilDto
@@ -241,6 +243,8 @@ class InterntVedtakService(
                 is VedtakBoutgifter -> mapVedtakBoutgifter(vedtak.data)
 
                 is VedtakDagligReise -> mapVedtakDagligReise(vedtak.data)
+                is VedtakReiseTilSamling -> mapVedtakReiseTilSamling(vedtak.data)
+                else -> error("Kan ikke mappe vedtak for type ${vedtak.data.javaClass.simpleName}")
             }
         }
 
@@ -309,6 +313,11 @@ class InterntVedtakService(
                     årsakerOpphør = vedtak.årsaker,
                     opphørBegrunnelse = vedtak.begrunnelse,
                 )
+        }
+
+    private fun mapVedtakReiseTilSamling(vedtak: VedtakReiseTilSamling) =
+        when (vedtak) {
+            is InnvilgelseReiseTilSamling -> VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
         }
 
     private fun mapRammevedtakPrivatBil(vedtak: Vedtak?): RammevedtakPrivatBil? =
