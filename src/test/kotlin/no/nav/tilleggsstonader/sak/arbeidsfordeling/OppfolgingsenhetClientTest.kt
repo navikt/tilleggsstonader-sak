@@ -55,7 +55,8 @@ class OppfolgingsenhetClientTest {
 
         val navKontor = client.hentOppfølgingsenhet("12345678901")
 
-        assertThat(navKontor).isEqualTo("1234")
+        assertThat(navKontor?.id).isEqualTo("1234")
+        assertThat(navKontor?.navn).isEqualTo("NAV Test")
     }
 
     @Test

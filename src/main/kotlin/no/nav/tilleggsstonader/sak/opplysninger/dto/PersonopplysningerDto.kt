@@ -15,6 +15,7 @@ data class PersonopplysningerDto(
     val dødsdato: LocalDate?,
     val alder: Int,
     val harGeografiskTilknytningUtland: Boolean,
+    val navKontor: NavKontorDto?,
 )
 
 data class StatsborgerskapDto(
@@ -123,6 +124,11 @@ enum class Folkeregisterpersonstatus(
             map.getOrDefault(status.status, UKJENT)
     }
 }
+
+data class NavKontorDto(
+    val enhetId: String,
+    val navn: String,
+)
 
 data class NavnDto(
     val fornavn: String,
