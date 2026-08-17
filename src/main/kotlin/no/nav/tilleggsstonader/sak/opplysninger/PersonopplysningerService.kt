@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.opplysninger
 
 import no.nav.tilleggsstonader.kontrakter.pdl.GeografiskTilknytningType
+import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakPersonService
@@ -65,7 +66,8 @@ class PersonopplysningerService(
                 .hentBrukersNavKontor(ident)
                 .let { enhet -> enhet.id?.let { id -> NavKontorDto(enhetId = id, navn = enhet.navn) } }
         } catch (e: Exception) {
-            logger.warn("Fant ikke nav-kontor for person: ${e.message}")
+            logger.warn("Fant ikke nav-kontor, returnerer null. Se secure-logs for feilmelding")
+            secureLogger.warn("Fant ikke navkontor for person $ident", e)
             null
         }
 
