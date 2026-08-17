@@ -166,6 +166,11 @@ private fun mapAktiviteter(
             return mapAktiviteterReiseTilSamlingTso(type, faktaOgSvar)
         }
 
+        Stønadstype.REISE_TIL_SAMLING_TSR -> {
+            // TODO: Implementer mapping av aktiviteter for REISE_TIL_SAMLING_TSR
+            error("Mapping av aktiviteter for $stønadstype er ikke implementert")
+        }
+
         Stønadstype.FLYTTING_TSO,
         Stønadstype.FLYTTING_TSR,
         -> error("Mapping av aktiviteter for $stønadstype er ikke implementert")
@@ -206,6 +211,11 @@ private fun mapMålgruppe(
 
         Stønadstype.REISE_TIL_SAMLING_TSO -> {
             mapMålgruppeReiseTilSamlingTso(type, faktaOgSvar, målgruppe, fødselFaktaGrunnlag)
+        }
+
+        Stønadstype.REISE_TIL_SAMLING_TSR -> {
+            // TODO: Implementer mapping av målgruppe for REISE_TIL_SAMLING_TSR
+            error("Mapping av målgruppe for $stønadstype er ikke implementert")
         }
 
         Stønadstype.FLYTTING_TSO,

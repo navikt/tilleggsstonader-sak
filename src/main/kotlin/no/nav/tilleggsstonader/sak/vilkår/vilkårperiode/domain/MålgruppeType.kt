@@ -110,7 +110,7 @@ enum class MålgruppeType(
                         INGEN_MÅLGRUPPE,
                     )
 
-            Stønadstype.DAGLIG_REISE_TSR, Stønadstype.FLYTTING_TSR ->
+            Stønadstype.DAGLIG_REISE_TSR, Stønadstype.REISE_TIL_SAMLING_TSR, Stønadstype.FLYTTING_TSR ->
                 this in
                     listOf(
                         INGEN_MÅLGRUPPE,

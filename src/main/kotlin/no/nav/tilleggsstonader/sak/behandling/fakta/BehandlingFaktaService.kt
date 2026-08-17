@@ -71,7 +71,9 @@ class BehandlingFaktaService(
             Stønadstype.BOUTGIFTER -> hentFaktaDtoForBoutgifter(behandlingId)
             Stønadstype.DAGLIG_REISE_TSO -> hentFaktaDtoForDagligReise(behandlingId)
             Stønadstype.DAGLIG_REISE_TSR -> hentFaktaDtoForDagligReise(behandlingId)
-            Stønadstype.REISE_TIL_SAMLING_TSO -> hentFaktaDtoForReiseTilSamling(behandlingId)
+            Stønadstype.REISE_TIL_SAMLING_TSO,
+            Stønadstype.REISE_TIL_SAMLING_TSR,
+            -> hentFaktaDtoForReiseTilSamling(behandlingId)
             Stønadstype.FLYTTING_TSO,
             Stønadstype.FLYTTING_TSR,
             -> error("Henting av fakta for $stønadstype er ikke implementert")

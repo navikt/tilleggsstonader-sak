@@ -57,7 +57,9 @@ private fun brevkodeForStønadstype(stønadstype: Stønadstype) =
         Stønadstype.LÆREMIDLER -> DokumentBrevkode.LÆREMIDLER
         Stønadstype.BOUTGIFTER -> DokumentBrevkode.BOUTGIFTER
         Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR -> DokumentBrevkode.DAGLIG_REISE
-        Stønadstype.REISE_TIL_SAMLING_TSO -> DokumentBrevkode.REISE_TIL_SAMLING
+        Stønadstype.REISE_TIL_SAMLING_TSO,
+        Stønadstype.REISE_TIL_SAMLING_TSR,
+        -> DokumentBrevkode.REISE_TIL_SAMLING
         Stønadstype.FLYTTING_TSO,
         Stønadstype.FLYTTING_TSR,
         -> DokumentBrevkode.FLYTTING

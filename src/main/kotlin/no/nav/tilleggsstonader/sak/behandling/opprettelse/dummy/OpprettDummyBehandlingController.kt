@@ -81,7 +81,9 @@ class OpprettDummyBehandlingController(
             Stønadstype.BOUTGIFTER -> opprettDummySøknadBoutgifter.opprettDummy(fagsak, behandling)
             Stønadstype.DAGLIG_REISE_TSO -> opprettDummySøknadDagligReise.opprettDummy(fagsak, behandling)
             Stønadstype.DAGLIG_REISE_TSR -> opprettDummySøknadDagligReise.opprettDummy(fagsak, behandling)
-            Stønadstype.REISE_TIL_SAMLING_TSO -> opprettDummySøknadReiseTilSamling.opprettDummy(fagsak, behandling)
+            Stønadstype.REISE_TIL_SAMLING_TSO,
+            Stønadstype.REISE_TIL_SAMLING_TSR,
+            -> opprettDummySøknadReiseTilSamling.opprettDummy(fagsak, behandling)
             Stønadstype.FLYTTING_TSO,
             Stønadstype.FLYTTING_TSR,
             -> error("Dummy-behandling for ${fagsak.stønadstype} er ikke implementert")
