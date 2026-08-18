@@ -9,8 +9,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
-import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndring
 import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadata
+import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadataEndring
 import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadataKilde
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
@@ -103,14 +103,14 @@ internal class BehandlingControllerTest : CleanDatabaseIntegrationTest() {
                         ÅrsakMetadata(
                             kilde = ÅrsakMetadataKilde.ETTERSENDING,
                             beskrivelse = "Hello world",
-                            endringer = listOf(NyeOpplysningerEndring.MÅLGRUPPE),
+                            endringer = listOf(ÅrsakMetadataEndring.MÅLGRUPPE),
                         ),
                 ),
             )
         val hentetBehandling = kall.behandling.hent(behandling.id)
 
         assertThat(hentetBehandling.årsakMetadata?.kilde).isEqualTo(ÅrsakMetadataKilde.ETTERSENDING)
-        assertThat(hentetBehandling.årsakMetadata?.endringer).containsExactly(NyeOpplysningerEndring.MÅLGRUPPE)
+        assertThat(hentetBehandling.årsakMetadata?.endringer).containsExactly(ÅrsakMetadataEndring.MÅLGRUPPE)
         assertThat(hentetBehandling.årsakMetadata?.beskrivelse).isEqualTo("Hello world")
     }
 

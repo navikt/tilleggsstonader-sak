@@ -33,9 +33,9 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
-import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndring
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadata
+import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadataEndring
 import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadataKilde
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.brev.BrevUtil.BESLUTTER_SIGNATUR_PLACEHOLDER
@@ -561,7 +561,7 @@ fun dokumentvariantOriginal() = dokumentvariant(variantformat = Dokumentvariantf
 fun årsakMetadata(
     kilde: ÅrsakMetadataKilde = ÅrsakMetadataKilde.ETTERSENDING,
     beskrivelse: String? = "tralala",
-    endringer: List<NyeOpplysningerEndring> = listOf(NyeOpplysningerEndring.AKTIVITET),
+    endringer: List<ÅrsakMetadataEndring> = listOf(ÅrsakMetadataEndring.AKTIVITET),
 ) = ÅrsakMetadata(
     kilde = kilde,
     beskrivelse = beskrivelse,

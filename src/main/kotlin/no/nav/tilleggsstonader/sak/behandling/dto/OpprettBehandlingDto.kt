@@ -2,9 +2,9 @@ package no.nav.tilleggsstonader.sak.behandling.dto
 
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndring
 import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
 import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadata
+import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadataEndring
 import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadataKilde
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.ForenkletBehandlingstype
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -34,7 +34,7 @@ data class OpprettBehandlingDto(
 data class ÅrsakMetadataDto(
     val kilde: ÅrsakMetadataKilde,
     val beskrivelse: String?,
-    val endringer: List<NyeOpplysningerEndring>,
+    val endringer: List<ÅrsakMetadataEndring>,
 ) {
     fun tilDomene() =
         ÅrsakMetadata(

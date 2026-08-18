@@ -7,8 +7,8 @@ data class ÅrsakMetadata(
     val kilde: ÅrsakMetadataKilde,
     @Column("arsak_metadata_beskrivelse")
     val beskrivelse: String?,
-    @Column("nye_opplysninger_endringer")
-    val endringer: List<NyeOpplysningerEndring>,
+    @Column("arsak_metadata_endringer")
+    val endringer: List<ÅrsakMetadataEndring>,
 )
 
 enum class ÅrsakMetadataKilde {
@@ -20,13 +20,8 @@ enum class ÅrsakMetadataKilde {
     PAPIRSØKNAD,
     ANNET,
 }
-//
-// data class NyeOpplysningerEndringer(
-//    @Column("nye_opplysninger_endringer")
-//    val endringer: List<NyeOpplysningerEndring>,
-// )
 
-enum class NyeOpplysningerEndring {
+enum class ÅrsakMetadataEndring {
     AKTIVITET,
     MÅLGRUPPE,
     UTGIFT,

@@ -3,3 +3,6 @@ ALTER TABLE behandling
 
 ALTER TABLE behandling
     RENAME COLUMN nye_opplysninger_beskrivelse TO arsak_metadata_beskrivelse;
+
+ALTER TABLE behandling
+    RENAME COLUMN nye_opplysninger_endringer TO arsak_metadata_endringer;

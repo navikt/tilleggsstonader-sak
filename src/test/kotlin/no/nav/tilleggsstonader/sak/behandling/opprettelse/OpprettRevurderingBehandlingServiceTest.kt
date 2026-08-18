@@ -9,9 +9,9 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndring
 import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
 import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadata
+import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadataEndring
 import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadataKilde
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -480,6 +480,6 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
         ÅrsakMetadata(
             kilde = ÅrsakMetadataKilde.ETTERSENDING,
             beskrivelse = "Tittei",
-            endringer = listOf(NyeOpplysningerEndring.MÅLGRUPPE),
+            endringer = listOf(ÅrsakMetadataEndring.MÅLGRUPPE),
         )
 }

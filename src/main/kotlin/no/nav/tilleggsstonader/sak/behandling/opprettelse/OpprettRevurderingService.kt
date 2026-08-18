@@ -45,7 +45,6 @@ class OpprettRevurderingService(
             "Feature toggle for å kunne opprette revurdering er slått av"
         }
         logger.info("Oppretter revurdering for fagsak=${opprettRevurdering.fagsakId}")
-        // have to check this
         if (opprettRevurdering.årsak == BehandlingÅrsak.NYE_OPPLYSNINGER) {
             feilHvis(
                 opprettRevurdering.årsakMetadata == null,
