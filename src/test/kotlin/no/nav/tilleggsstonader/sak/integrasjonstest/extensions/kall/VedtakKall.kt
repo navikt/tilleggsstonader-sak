@@ -140,7 +140,12 @@ private fun Stønadstype.tilPath(): String =
         Stønadstype.BOUTGIFTER -> "boutgifter"
         Stønadstype.DAGLIG_REISE_TSO -> "daglig-reise"
         Stønadstype.DAGLIG_REISE_TSR -> "daglig-reise"
-        Stønadstype.REISE_TIL_SAMLING_TSO -> "reise-til-samling"
+        Stønadstype.REISE_TIL_SAMLING_TSO,
+        Stønadstype.REISE_TIL_SAMLING_TSR,
+        -> "reise-til-samling"
+        Stønadstype.FLYTTING_TSO,
+        Stønadstype.FLYTTING_TSR,
+        -> TODO("path for FLYTTING")
     }
 
 private fun Enhet.tilPath(): String =

@@ -39,4 +39,13 @@ fun bestemRoutingStrategi(skjematype: Skjematype): RoutingStrategi =
                 alleMedAAPVedtakTilNyLøsning = false,
                 featureToggleMaksAntallForPrivatBil = null,
             )
+        Skjematype.SØKNAD_FLYTTING ->
+            RoutingStrategi.SendEnkelteBrukereTilNyLøsning(
+                featureToggleMaksAntallForStønad = Toggle.SØKNAD_ROUTING_FLYTTING,
+                kreverAtSøkerErUtenAktivtVedtakIArena = true,
+                kreverAktivtAapVedtak = false,
+                kreverUgradertAdresse = true,
+                alleMedAAPVedtakTilNyLøsning = false,
+                featureToggleMaksAntallForPrivatBil = null,
+            )
     }

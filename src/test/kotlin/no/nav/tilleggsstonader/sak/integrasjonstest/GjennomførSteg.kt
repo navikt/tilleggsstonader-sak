@@ -234,10 +234,16 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                                     vedtaksperioder = vedtaksperioder.tilVedtaksperiodeDagligReiseDto(),
                                 )
 
-                            Stønadstype.REISE_TIL_SAMLING_TSO ->
+                            Stønadstype.REISE_TIL_SAMLING_TSO,
+                            Stønadstype.REISE_TIL_SAMLING_TSR,
+                            ->
                                 InnvilgelseReiseTilSamlingTsoRequest(
                                     vedtaksperioder = vedtaksperioder,
                                 )
+
+                            Stønadstype.FLYTTING_TSO,
+                            Stønadstype.FLYTTING_TSR,
+                            -> TODO("InnvilgelseFlyttingRequest")
                         },
                 )
         }
@@ -276,7 +282,12 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                                     begrunnelse = "begrunnelse",
                                 )
 
-                            Stønadstype.REISE_TIL_SAMLING_TSO -> TODO("AvslagReiseTilSamlingTsoRequest")
+                            Stønadstype.REISE_TIL_SAMLING_TSO,
+                            Stønadstype.REISE_TIL_SAMLING_TSR,
+                            -> TODO("AvslagReiseTilSamlingTsoRequest")
+                            Stønadstype.FLYTTING_TSO,
+                            Stønadstype.FLYTTING_TSR,
+                            -> TODO("AvslagFlyttingRequest")
                         },
                 )
 
@@ -315,7 +326,12 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                                     opphørsdato = opprettVedtak.opphørsdato,
                                 )
 
-                            Stønadstype.REISE_TIL_SAMLING_TSO -> TODO("OpphørReiseTilSamlingTsoRequest")
+                            Stønadstype.REISE_TIL_SAMLING_TSO,
+                            Stønadstype.REISE_TIL_SAMLING_TSR,
+                            -> TODO("OpphørReiseTilSamlingTsoRequest")
+                            Stønadstype.FLYTTING_TSO,
+                            Stønadstype.FLYTTING_TSR,
+                            -> TODO("OpphørFlyttingRequest")
                         },
                 )
     }
