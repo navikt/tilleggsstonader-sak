@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.behandling.opprettelse.admin
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadata
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -47,7 +48,7 @@ class AdminOpprettBehandlingController(
             valgteBarn = request.valgteBarn,
             medBrev = request.medBrev,
             kravMottatt = request.kravMottatt,
-            årsakMetadata = request.årsakMetadata,
+            årsakMetadata = ÅrsakMetadata(request.årsakKilde, request.årsakBeskrivelse, emptyList()),
         )
     }
 }
