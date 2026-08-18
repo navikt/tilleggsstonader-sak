@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@ProtectedWithClaims(issuer = EksternBrukerUtils.ISSUER_TOKENX, claimMap = ["acr=Level4"])
 @RequestMapping(
     path = ["/api/ekstern/privat-bil"],
     produces = [MediaType.APPLICATION_JSON_VALUE],
@@ -23,7 +24,6 @@ class DagligReisePrivatBilController(
     private val fagsakService: FagsakService,
 ) {
     @GetMapping("/rammevedtak")
-    @ProtectedWithClaims(issuer = EksternBrukerUtils.ISSUER_TOKENX, claimMap = ["acr=Level4"])
     fun hentRammevedtak(): List<RammevedtakDto> {
         val ident = EksternBrukerUtils.hentFnrFraToken()
 
@@ -39,7 +39,6 @@ class DagligReisePrivatBilController(
     }
 
     @GetMapping("/kjoreliste/{reiseId}")
-    @ProtectedWithClaims(issuer = EksternBrukerUtils.ISSUER_TOKENX, claimMap = ["acr=Level4"])
     fun hentManueltRegistrertKjørelisteForReise(
         @PathVariable reiseId: String,
     ): ManueltRegistrertKjørelisteEksternDto {
