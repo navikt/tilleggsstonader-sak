@@ -244,7 +244,6 @@ class InterntVedtakService(
 
                 is VedtakDagligReise -> mapVedtakDagligReise(vedtak.data)
                 is VedtakReiseTilSamling -> mapVedtakReiseTilSamling(vedtak.data)
-                else -> error("Kan ikke mappe vedtak for type ${vedtak.data.javaClass.simpleName}")
             }
         }
 
