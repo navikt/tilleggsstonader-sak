@@ -317,6 +317,7 @@ class InterntVedtakService(
     private fun mapVedtakReiseTilSamling(vedtak: VedtakReiseTilSamling) =
         when (vedtak) {
             is InnvilgelseReiseTilSamling -> VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
+            else -> TODO("Må lage opphør og avslag for reise til samling")
         }
 
     private fun mapRammevedtakPrivatBil(vedtak: Vedtak?): RammevedtakPrivatBil? =
