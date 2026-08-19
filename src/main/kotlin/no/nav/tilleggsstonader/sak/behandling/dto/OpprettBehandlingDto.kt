@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerKilde
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
 import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.ForenkletBehandlingstype
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import java.time.LocalDate
 
@@ -17,6 +18,8 @@ data class OpprettBehandlingDto(
     val valgteBarn: Set<String> = emptySet(),
     val kravMottatt: LocalDate?,
     val forenkletBehandlingstype: ForenkletBehandlingstype,
+    val skalTillateFlereÅpneBehandlinger: Boolean = true,
+    val skalSetteSaksbehandlerSomOppgaveEier: Boolean = true,
 ) {
     fun tilDomene() =
         OpprettRevurdering(
@@ -28,6 +31,8 @@ data class OpprettBehandlingDto(
             skalOppretteOppgave = true,
             behandlingMetode = BehandlingMetode.MANUELL,
             forenkletBehandlingstype = forenkletBehandlingstype,
+            skalTillateFlereÅpneBehandlinger = skalTillateFlereÅpneBehandlinger,
+            skalSetteSaksbehandlerSomOppgaveEier = skalSetteSaksbehandlerSomOppgaveEier,
         )
 }
 
@@ -42,6 +47,16 @@ data class NyeOpplysningerMetadataDto(
             endringer = endringer,
             beskrivelse = beskrivelse,
         )
+}
+
+data class OpprettRevurderingResponseDto(
+    val status: Status,
+    val behandlingId: BehandlingId? = null,
+) {
+    enum class Status {
+        OPPRETTET,
+        ÅPNE_BEHANDLINGER_FUNNET,
+    }
 }
 
 data class BarnTilRevurderingDto(

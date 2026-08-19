@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerKilde
 import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
 import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientMockConfig
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil
@@ -102,7 +103,7 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
             vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.PASS_BARN))
 
             val nyBehandlingId =
-                service.opprettRevurdering(opprettRevurdering(fagsakId = behandling.fagsakId))
+                service.opprettRevurdering(opprettRevurdering(fagsakId = behandling.fagsakId)).assertOpprettet()
 
             val nyBehandling = testoppsettService.hentBehandling(nyBehandlingId)
             assertThat(nyBehandling.forrigeIverksatteBehandlingId).isEqualTo(behandling.id)
@@ -128,7 +129,7 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
                     årsak = BehandlingÅrsak.SØKNAD,
                     valgteBarn = setOf(PdlClientMockConfig.BARN_FNR),
                 )
-            val nyBehandlingId = service.opprettRevurdering(opprettRevurdering)
+            val nyBehandlingId = service.opprettRevurdering(opprettRevurdering).assertOpprettet()
 
             val nyBehandling = testoppsettService.hentBehandling(nyBehandlingId)
             assertThat(nyBehandling.forrigeIverksatteBehandlingId).isNull()
@@ -152,7 +153,7 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
             vilkårRepository.insert(vilkår(behandlingId = behandling.id, type = VilkårType.PASS_BARN))
 
             val nyBehandlingId =
-                service.opprettRevurdering(opprettRevurdering(fagsakId = behandling.fagsakId))
+                service.opprettRevurdering(opprettRevurdering(fagsakId = behandling.fagsakId)).assertOpprettet()
 
             val nyBehandling = testoppsettService.hentBehandling(nyBehandlingId)
             assertThat(nyBehandling.forrigeIverksatteBehandlingId).isNull()
@@ -191,7 +192,7 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
                     fagsakId = behandling.fagsakId,
                     årsak = BehandlingÅrsak.NYE_OPPLYSNINGER,
                 )
-            val nyBehandlingId = service.opprettRevurdering(opprettBehandlingDto)
+            val nyBehandlingId = service.opprettRevurdering(opprettBehandlingDto).assertOpprettet()
 
             val nyBehandling = testoppsettService.hentBehandling(nyBehandlingId)
             assertThat(nyBehandling.nyeOpplysningerMetadata).isEqualTo(
@@ -253,7 +254,7 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
         @Test
         fun `skal gjenbruke barn fra forrige behandlingen`() {
             val nyBehandlingId =
-                service.opprettRevurdering(opprettRevurdering(fagsakId = tidligereBehandling!!.fagsakId))
+                service.opprettRevurdering(opprettRevurdering(fagsakId = tidligereBehandling!!.fagsakId)).assertOpprettet()
 
             with(barnService.finnBarnPåBehandling(tidligereBehandling!!.id)) {
                 assertThat(this).hasSize(1)
@@ -268,7 +269,7 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
         @Test
         fun `skal gjenbruke informasjon fra forrige behandling`() {
             val revurderingId =
-                service.opprettRevurdering(opprettRevurdering(fagsakId = tidligereBehandling!!.fagsakId))
+                service.opprettRevurdering(opprettRevurdering(fagsakId = tidligereBehandling!!.fagsakId)).assertOpprettet()
 
             assertThat(vilkårperiodeRepository.findByBehandlingId(revurderingId)).hasSize(2)
             assertThat(vilkårRepository.findByBehandlingId(revurderingId)).hasSize(1)
@@ -320,7 +321,7 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
                     årsak = BehandlingÅrsak.SØKNAD,
                     valgteBarn = setOf(PdlClientMockConfig.BARN2_FNR),
                 )
-            val behandlingIdRevurdering = service.opprettRevurdering(opprettRevurdering)
+            val behandlingIdRevurdering = service.opprettRevurdering(opprettRevurdering).assertOpprettet()
 
             with(barnService.finnBarnPåBehandling(behandlingIdRevurdering)) {
                 assertThat(this).hasSize(2)
@@ -337,7 +338,7 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
                     årsak = BehandlingÅrsak.SØKNAD,
                     valgteBarn = setOf(),
                 )
-            val behandlingIdRevurdering = service.opprettRevurdering(opprettRevurdering)
+            val behandlingIdRevurdering = service.opprettRevurdering(opprettRevurdering).assertOpprettet()
 
             with(barnService.finnBarnPåBehandling(behandlingIdRevurdering)) {
                 assertThat(this).hasSize(1)
@@ -474,6 +475,8 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
         skalOppretteOppgave = skalOppretteOppgave,
         behandlingMetode = BehandlingMetode.MANUELL,
         forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
+        skalTillateFlereÅpneBehandlinger = true,
+        skalSetteSaksbehandlerSomOppgaveEier = true,
     )
 
     private fun opprettNyeOpplysningerMetadata() =
@@ -482,4 +485,7 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
             endringer = listOf(NyeOpplysningerEndring.AKTIVITET, NyeOpplysningerEndring.MÅLGRUPPE),
             beskrivelse = "Tittei",
         )
+
+    private fun OpprettRevurderingResultat.assertOpprettet(): BehandlingId =
+        (this as OpprettRevurderingResultat.Opprettet).behandlingId
 }

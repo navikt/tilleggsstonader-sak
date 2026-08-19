@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.GjenbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
 import no.nav.tilleggsstonader.sak.behandling.dto.BarnTilRevurderingDto
@@ -40,7 +41,7 @@ class OpprettRevurderingService(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Transactional
-    fun opprettRevurdering(opprettRevurdering: OpprettRevurdering): BehandlingId {
+    fun opprettRevurdering(opprettRevurdering: OpprettRevurdering): OpprettRevurderingResultat {
         feilHvisIkke(unleashService.isEnabled(Toggle.KAN_OPPRETTE_REVURDERING)) {
             "Feature toggle for å kunne opprette revurdering er slått av"
         }
@@ -49,6 +50,13 @@ class OpprettRevurderingService(
         if (opprettRevurdering.årsak == BehandlingÅrsak.NYE_OPPLYSNINGER) {
             feilHvis(opprettRevurdering.nyeOpplysningerMetadata == null) {
                 "Krever metadata ved behandlingsårsak NYE_OPPLYSNINGER"
+            }
+        }
+
+        if (!opprettRevurdering.skalTillateFlereÅpneBehandlinger) {
+            val eksisterendeBehandlinger = behandlingService.hentBehandlinger(opprettRevurdering.fagsakId)
+            if (!eksisterendeBehandlinger.all { it.status === BehandlingStatus.FERDIGSTILT }) {
+                return OpprettRevurderingResultat.ÅpneBehandlingerFunnet
             }
         }
 
@@ -71,7 +79,7 @@ class OpprettRevurderingService(
             },
         )
 
-        return behandling.id
+        return OpprettRevurderingResultat.Opprettet(behandling.id)
     }
 
     private fun validerIngenKjørelistePåVent(
@@ -96,7 +104,13 @@ class OpprettRevurderingService(
                 nyeOpplysningerMetadata = opprettRevurdering.nyeOpplysningerMetadata,
                 oppgaveMetadata =
                     OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
-                        tilordneSaksbehandler = SikkerhetContext.hentSaksbehandlerHvisFinnes(),
+                        tilordneSaksbehandler =
+                            if (opprettRevurdering.skalSetteSaksbehandlerSomOppgaveEier) {
+                                SikkerhetContext
+                                    .hentSaksbehandlerHvisFinnes()
+                            } else {
+                                null
+                            },
                         beskrivelse = "Skal behandles i TS-Sak",
                         prioritet = OppgavePrioritet.NORM,
                     ),
