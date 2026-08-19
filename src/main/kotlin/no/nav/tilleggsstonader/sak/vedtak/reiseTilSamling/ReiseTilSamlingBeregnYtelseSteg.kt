@@ -54,7 +54,7 @@ class ReiseTilSamlingBeregnYtelseSteg(
         saksbehandling: Saksbehandling,
         vedtak: InnvilgelseReiseTilSamlingRequest,
     ) {
-        val vedtaksperioder = vedtak.vedtaksperioder() // look
+        val vedtaksperioder = vedtak.vedtaksperioder()
         val plan =
             beregningsplanUtleder.utledForInnvilgelse(
                 saksbehandling = saksbehandling,
