@@ -486,6 +486,5 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
             beskrivelse = "Tittei",
         )
 
-    private fun OpprettRevurderingResultat.assertOpprettet(): BehandlingId =
-        (this as OpprettRevurderingResultat.Opprettet).behandlingId
+    private fun OpprettRevurderingResultat.assertOpprettet(): BehandlingId = (this as OpprettRevurderingResultat.Opprettet).behandlingId
 }
