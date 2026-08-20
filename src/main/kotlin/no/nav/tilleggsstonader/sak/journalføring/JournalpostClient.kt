@@ -60,6 +60,16 @@ class JournalpostClient(
         return restTemplate.postForEntity<List<Journalpost>>(uri, journalposterForBrukerRequest)
     }
 
+    fun finnJournalposterForFagsak(fagsakId: String): List<Journalpost> {
+        val uri =
+            UriComponentsBuilder
+                .fromUri(journalpostUri)
+                .pathSegment("fagsak")
+                .toUriString()
+
+        return restTemplate.postForEntity<List<Journalpost>>(uri, fagsakId)
+    }
+
     fun hentJournalpost(journalpostId: String): Journalpost {
         val uri =
             UriComponentsBuilder
@@ -76,7 +86,11 @@ class JournalpostClient(
         saksbehandler: String?,
     ): ArkiverDokumentResponse {
         try {
-            return restTemplate.postForEntity(dokarkivUri.toString(), arkiverDokumentRequest, headerMedSaksbehandler(saksbehandler))
+            return restTemplate.postForEntity(
+                dokarkivUri.toString(),
+                arkiverDokumentRequest,
+                headerMedSaksbehandler(saksbehandler),
+            )
         } catch (e: Exception) {
             if (e is HttpClientErrorException.Conflict) {
                 håndterConflictArkiverDokument(e)
