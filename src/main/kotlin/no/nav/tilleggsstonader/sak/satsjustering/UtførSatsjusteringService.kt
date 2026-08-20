@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.satsjustering
 
 import no.nav.familie.prosessering.error.RekjørSenereException
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
@@ -11,6 +12,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.ForenkletBehandlingstype
+import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettRevurderingResultat
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.vent.SettBehandlingPåVent
 import no.nav.tilleggsstonader.sak.behandling.vent.SettBehandlingPåVentOppgaveMetadata
@@ -180,7 +182,7 @@ class UtførSatsjusteringService(
     }
 
     private fun opprettRevurderingForSatsendring(fagsakId: FagsakId): Saksbehandling {
-        val revurderingId =
+        val resultat =
             revurderingBehandlingService.opprettRevurdering(
                 OpprettRevurdering(
                     fagsakId = fagsakId,
@@ -191,11 +193,20 @@ class UtførSatsjusteringService(
                     skalOppretteOppgave = false,
                     behandlingMetode = BehandlingMetode.BATCH,
                     forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
+                    skalTillateFlereÅpneBehandlinger = true,
+                    skalSetteSaksbehandlerSomOppgaveEier = true,
                 ),
             )
-        // Gjenbruker grunnlag fra forrige behandling ved satsjustering
-        faktaGrunnlagService.kopierGrunnlagsdataFraForrigeIverksatteBehandling(revurderingId)
-        return behandlingService.hentSaksbehandling(revurderingId)
+
+        when (resultat) {
+            is OpprettRevurderingResultat.Opprettet -> {
+                // Gjenbruker grunnlag fra forrige behandling ved satsjustering
+                faktaGrunnlagService.kopierGrunnlagsdataFraForrigeIverksatteBehandling(resultat.behandlingId)
+                return behandlingService.hentSaksbehandling(resultat.behandlingId)
+            }
+
+            else -> feil("Kunne ikke opprette revurdering for satsjustering for fagsakId=$fagsakId. Resultat=$resultat")
+        }
     }
 
     private fun finnDatoForSatsjustering(revurdering: Saksbehandling): LocalDate =

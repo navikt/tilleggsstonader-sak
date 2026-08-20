@@ -8,13 +8,16 @@ import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.GjenbrukDataRevurderingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
+import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
@@ -39,10 +42,30 @@ class OpprettRevurderingServiceTest {
         )
 
     @Test
+    fun `skal returnere ÅpneBehandlingerFunnet når det finnes åpne behandlinger og skalTillate er false`() {
+        val fagsakId = FagsakId.random()
+        every { unleashService.isEnabled(Toggle.KAN_OPPRETTE_REVURDERING) } returns true
+        every { behandlingService.hentBehandlinger(fagsakId) } returns
+            listOf(behandling(status = BehandlingStatus.SATT_PÅ_VENT))
+
+        val resultat =
+            service.opprettRevurdering(
+                opprettRevurdering(fagsakId = fagsakId).copy(skalTillateFlereÅpneBehandlinger = false),
+            )
+
+        assertThat(resultat).isEqualTo(OpprettRevurderingResultat.ÅpneBehandlingerFunnet)
+        verify(exactly = 0) { opprettBehandlingService.opprettBehandling(any()) }
+    }
+
+    @Test
     fun `skal ikke opprette revurdering når det finnes en åpen kjørelistebehandling`() {
         val fagsakId = FagsakId.random()
         every { unleashService.isEnabled(Toggle.KAN_OPPRETTE_REVURDERING) } returns true
-        every { fagsakService.hentFagsak(fagsakId) } returns fagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSO, id = fagsakId)
+        every { fagsakService.hentFagsak(fagsakId) } returns
+            fagsak(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+                id = fagsakId,
+            )
         every { behandlingService.harÅpenKjørelisteBehandling(fagsakId) } returns true
 
         assertThatThrownBy {
@@ -60,7 +83,11 @@ class OpprettRevurderingServiceTest {
     fun `skal opprette revurdering for ikke-dagligReise stønadstype selv om det finnes åpen kjørelistebehandling`() {
         val fagsakId = FagsakId.random()
         every { unleashService.isEnabled(Toggle.KAN_OPPRETTE_REVURDERING) } returns true
-        every { fagsakService.hentFagsak(fagsakId) } returns fagsak(stønadstype = Stønadstype.BARNETILSYN, id = fagsakId)
+        every { fagsakService.hentFagsak(fagsakId) } returns
+            fagsak(
+                stønadstype = Stønadstype.BARNETILSYN,
+                id = fagsakId,
+            )
         every { fagsakService.hentAktivIdent(fagsakId) } returns "12345678901"
 
         service.opprettRevurdering(opprettRevurdering(fagsakId = fagsakId))
@@ -81,5 +108,7 @@ class OpprettRevurderingServiceTest {
         skalOppretteOppgave = true,
         behandlingMetode = no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode.MANUELL,
         forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
+        skalTillateFlereÅpneBehandlinger = true,
+        skalSetteSaksbehandlerSomOppgaveEier = true,
     )
 }
