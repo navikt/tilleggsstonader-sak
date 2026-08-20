@@ -17,7 +17,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
-import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
+import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadata
 import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkService
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.Behandlingshistorikk
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettBehandlingUtil.validerKanOppretteNyBehandling
@@ -100,7 +100,7 @@ class OpprettBehandlingService(
                     årsak = request.behandlingsårsak,
                     kravMottatt = request.kravMottatt,
                     kategori = BehandlingKategori.NASJONAL,
-                    nyeOpplysningerMetadata = request.nyeOpplysningerMetadata,
+                    årsakMetadata = request.årsakMetadata,
                 ),
             )
         eksternBehandlingIdRepository.insert(EksternBehandlingId(behandlingId = behandling.id))
@@ -180,7 +180,7 @@ data class OpprettBehandling(
     val behandlingsårsak: BehandlingÅrsak,
     val behandlingMetode: BehandlingMetode,
     val kravMottatt: LocalDate? = null,
-    val nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
+    val årsakMetadata: ÅrsakMetadata? = null,
     val oppgaveMetadata: OpprettBehandlingOppgaveMetadata,
     val forenkletBehandlingstype: ForenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
 )

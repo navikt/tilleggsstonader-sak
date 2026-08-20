@@ -29,7 +29,7 @@ import no.nav.tilleggsstonader.sak.util.BehandlingOppsettUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.fagsakpersoner
-import no.nav.tilleggsstonader.sak.util.nyeOpplysningerMetadata
+import no.nav.tilleggsstonader.sak.util.årsakMetadata
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
@@ -111,7 +111,7 @@ class BehandlingRepositoryTest : CleanDatabaseIntegrationTest() {
                         henlagtBegrunnelse = "Registrert feil",
                         vedtakstidspunkt = SporbarUtils.now(),
                         kravMottatt = LocalDate.now(),
-                        nyeOpplysningerMetadata = nyeOpplysningerMetadata(),
+                        årsakMetadata = årsakMetadata(),
                     ),
                 )
         }
@@ -157,7 +157,7 @@ class BehandlingRepositoryTest : CleanDatabaseIntegrationTest() {
         assertThat(endretAv).isEqualTo(behandling.sporbar.endret.endretAv)
         assertThat(endretTid).isEqualTo(behandling.sporbar.endret.endretTid)
         assertThat(vedtakstidspunkt).isEqualTo(behandling.vedtakstidspunkt)
-        assertThat(nyeOpplysningerMetadata).isEqualTo(behandling.nyeOpplysningerMetadata)
+        assertThat(årsakMetadata).isEqualTo(behandling.årsakMetadata)
     }
 
     @Test
