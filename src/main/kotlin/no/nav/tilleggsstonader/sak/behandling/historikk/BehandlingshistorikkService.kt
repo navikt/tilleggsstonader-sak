@@ -95,7 +95,7 @@ class BehandlingshistorikkService(
                     when (this.steg) {
                         StegType.SEND_TIL_BESLUTTER -> metadataMap.remove("kommentarTilBeslutter")
                         StegType.BESLUTTE_VEDTAK -> metadataMap.remove("begrunnelse")
-                        else -> metadataMap
+                        else -> {}
                     }
 
                     JsonWrapper(jsonMapper.writeValueAsString(metadataMap))
