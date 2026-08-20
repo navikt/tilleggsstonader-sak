@@ -237,4 +237,25 @@ class BehandlingTestdataDsl internal constructor() {
             }
         }
     }
+
+    fun defaultReiseTilSamlingTSOTestdata(
+        fom: LocalDate = defaultFom,
+        tom: LocalDate = defaultTom,
+    ) {
+        aktivitet {
+            opprett {
+                aktivitetTiltakTsoReiseTilSamling(fom, tom)
+            }
+        }
+        målgruppe {
+            opprett {
+                målgruppeAAP(fom, tom)
+            }
+        }
+        vilkår {
+            opprett {
+                offentligTransportReiseTilSamling(fom, tom)
+            }
+        }
+    }
 }

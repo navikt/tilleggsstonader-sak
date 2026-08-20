@@ -11,6 +11,8 @@ import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
@@ -90,6 +92,7 @@ class ReiseTilSamlingBeregningsTest {
                 behandling,
                 vedtaksperioder,
                 TypeVedtak.INNVILGELSE,
+                beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
             )
         val offentligTransport = result.offentligTransport
         assertThat(offentligTransport).hasSize(2)
@@ -122,6 +125,7 @@ class ReiseTilSamlingBeregningsTest {
                 behandling,
                 vedtaksperioder,
                 TypeVedtak.INNVILGELSE,
+                beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
             )
         val privatBil = result.privatBil
         assertThat(privatBil).hasSize(1)
@@ -167,6 +171,7 @@ class ReiseTilSamlingBeregningsTest {
                 behandling,
                 vedtaksperioder,
                 TypeVedtak.INNVILGELSE,
+                beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
             )
         assertThat(
             result.offentligTransport,
@@ -183,6 +188,7 @@ class ReiseTilSamlingBeregningsTest {
                     behandling,
                     vedtaksperioder,
                     TypeVedtak.INNVILGELSE,
+                    beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
                 )
             }
 

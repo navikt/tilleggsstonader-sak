@@ -7,8 +7,8 @@ import tools.jackson.databind.DeserializationContext
 import tools.jackson.databind.ValueDeserializer
 
 /**
- * [VedtaksdataJson] definierer alle suklasser av [Vedtaksdata]
- * Den mapper riktig type [JsonSubTypes.Type.name] til riktig klass den skal deserialisere til
+ * [VedtaksdataJson] definierer alle subklasser av [Vedtaksdata]
+ * Den mapper riktig type [JsonSubTypes.Type.name] til riktig klasse den skal deserialisere til
  */
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -29,6 +29,7 @@ import tools.jackson.databind.ValueDeserializer
     JsonSubTypes.Type(InnvilgelseDagligReise::class, name = "INNVILGELSE_DAGLIG_REISE"),
     JsonSubTypes.Type(AvslagDagligReise::class, name = "AVSLAG_DAGLIG_REISE"),
     JsonSubTypes.Type(OpphørDagligReise::class, name = "OPPHØR_DAGLIG_REISE"),
+    JsonSubTypes.Type(InnvilgelseReiseTilSamling::class, name = "INNVILGELSE_REISE_TIL_SAMLING"),
     failOnRepeatedNames = true,
 )
 sealed interface VedtaksdataJson
@@ -51,4 +52,5 @@ val typerVedtaksdata: Map<String, TypeVedtaksdata> =
         TypeVedtakLæremidler.entries,
         TypeVedtakBoutgifter.entries,
         TypeVedtakDagligReise.entries,
+        TypeVedtakReiseTilSamling.entries,
     ).flatten().associateBy { it.name }
