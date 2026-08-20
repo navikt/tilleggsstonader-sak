@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.Skjemadata
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostDatoUtil.mestRelevanteDato
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
@@ -44,6 +45,9 @@ class JournalpostService(
                 antall = 200,
             ),
         )
+
+    fun hentJournalposterForFagsak(fagsakId: FagsakId): List<Journalpost> =
+        journalpostClient.finnJournalposterForFagsak(fagsakId.toString())
 
     fun hentJournalpost(journalpostId: String): Journalpost = journalpostClient.hentJournalpost(journalpostId)
 
