@@ -8,7 +8,7 @@ val tilleggsstønaderKontrakterVersion = "2026.08.18-10.22.815df0ee133f"
 val avroVersion = "1.12.1"
 val confluentVersion = "8.0.1"
 val joarkHendelseVersion = "1.1.11"
-val tokenSupportVersion = "6.0.11"
+val tokenSupportVersion = "6.0.12"
 val wiremockVersion = "3.13.2"
 val mockkVersion = "1.14.11"
 val testcontainerVersion = "1.21.4"
@@ -21,14 +21,14 @@ version = "1.0.0"
 plugins {
     application
 
-    kotlin("jvm") version "2.3.21"
+    kotlin("jvm") version "2.4.10"
     id("com.diffplug.spotless") version "8.9.0"
-    id("io.github.ben-manes.versions") version "0.59.0"
+    id("io.github.ben-manes.versions") version "0.61.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
 
     id("org.springframework.boot") version "4.1.0"
     id("io.spring.dependency-management") version "1.1.7"
-    kotlin("plugin.spring") version "2.3.21"
+    kotlin("plugin.spring") version "2.4.10"
 }
 
 repositories {
