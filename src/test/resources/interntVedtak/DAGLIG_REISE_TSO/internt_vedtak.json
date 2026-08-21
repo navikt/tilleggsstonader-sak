@@ -118,7 +118,10 @@
     "faktaOgVurderinger" : {
       "@type" : "AKTIVITET_DAGLIG_REISE_TSO",
       "lønnet" : null,
-      "harUtgifter" : null,
+      "harUtgifter" : {
+        "svar" : "JA",
+        "resultat" : "OPPFYLT"
+      },
       "aktivitetsdager" : 3
     },
     "kilde" : "MANUELL",
