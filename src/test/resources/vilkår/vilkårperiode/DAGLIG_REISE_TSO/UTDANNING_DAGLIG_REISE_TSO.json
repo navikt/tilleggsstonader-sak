@@ -3,5 +3,10 @@
   "fakta": {
     "aktivitetsdager": 3
   },
-  "vurderinger": {}
+  "vurderinger": {
+    "harUtgifter": {
+      "svar": null,
+      "resultat": "IKKE_VURDERT"
+    }
+  }
 }

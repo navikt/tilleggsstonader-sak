@@ -101,6 +101,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakReiseTilSamlingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygdLæremidler
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUtdanningDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUtdanningReiseTilSamlingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingerUtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBoutgifterDto
@@ -331,6 +332,10 @@ private fun mapAktiviteterDagligReiseTso(
 
         AktivitetType.UTDANNING ->
             UtdanningDagligReiseTso(
+                vurderinger =
+                    VurderingUtdanningDagligReiseTso(
+                        harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
+                    ),
                 fakta = FaktaAktivitetDagligReiseTso(faktaOgSvar.aktivitetsdager),
             )
 
