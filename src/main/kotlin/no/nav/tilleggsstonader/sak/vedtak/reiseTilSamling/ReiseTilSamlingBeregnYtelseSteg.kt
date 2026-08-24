@@ -74,6 +74,7 @@ class ReiseTilSamlingBeregnYtelseSteg(
             begrunnelse = vedtak.begrunnelse,
             beregningsplan = plan,
         )
+        opprettAndelerReiseTilSamlingService.lagreAndelerForBehandling(saksbehandling)
     }
 
     private fun lagreInnvilgetVedtak(
