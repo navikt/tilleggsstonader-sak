@@ -14,8 +14,13 @@ import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.BeregningsresultatOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.BeregningsresultatReiseTilSamlingDto
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingResponse
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingTsoRequest
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -57,6 +62,29 @@ class ReiseTilSamlingVedtakControllerTest : CleanDatabaseIntegrationTest() {
 
     val dummyVedtaksperiode = vedtaksperiode(fom = fom, tom = tom)
 
+    val dummyInnvilgelse =
+        InnvilgelseReiseTilSamlingResponse(
+            vedtaksperioder = listOf(dummyVedtaksperiode.tilLagretVedtaksperiodeDto(null)),
+            beregningsresultat =
+                BeregningsresultatReiseTilSamlingDto(
+                    offentligTransport =
+                        listOf(
+                            BeregningsresultatOffentligTransportDto(
+                                reiseId = dummyReiseId,
+                                adresse = "Samlingsgata 1",
+                                fom = fom,
+                                tom = tom,
+                                beløp = 500.toBigDecimal(),
+                            ),
+                        ),
+                    privatBil = null,
+                    beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+                ),
+            gjelderFraOgMed = fom,
+            gjelderTilOgMed = tom,
+            begrunnelse = null,
+        )
+
     @BeforeEach
     fun setUp() {
         testoppsettService.opprettBehandlingMedFagsak(dummyBehandling, stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO)
@@ -87,6 +115,24 @@ class ReiseTilSamlingVedtakControllerTest : CleanDatabaseIntegrationTest() {
         kall.vedtak
             .hentVedtak(Stønadstype.REISE_TIL_SAMLING_TSO, dummyBehandlingId)
             .expectOkEmpty()
+    }
+
+    @Test
+    fun `hent ut lagrede vedtak av type innvilgelse`() {
+        val vedtakRequest = InnvilgelseReiseTilSamlingTsoRequest(listOf(dummyVedtaksperiode.tilDto()))
+
+        kall.vedtak.lagreInnvilgelse(
+            Stønadstype.REISE_TIL_SAMLING_TSO,
+            dummyBehandling.id,
+            vedtakRequest,
+        )
+
+        val response =
+            kall.vedtak
+                .hentVedtak(Stønadstype.REISE_TIL_SAMLING_TSO, dummyBehandlingId)
+                .expectOkWithBody<InnvilgelseReiseTilSamlingResponse>()
+
+        assertThat(response).isEqualTo(dummyInnvilgelse)
     }
 
     @Nested

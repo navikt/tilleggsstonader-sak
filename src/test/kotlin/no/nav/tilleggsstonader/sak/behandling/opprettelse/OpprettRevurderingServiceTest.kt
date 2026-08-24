@@ -77,7 +77,7 @@ class OpprettRevurderingServiceTest {
         årsak = årsak,
         valgteBarn = emptySet(),
         kravMottatt = null,
-        nyeOpplysningerMetadata = null,
+        årsakMetadata = null,
         skalOppretteOppgave = true,
         behandlingMetode = no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode.MANUELL,
         forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,

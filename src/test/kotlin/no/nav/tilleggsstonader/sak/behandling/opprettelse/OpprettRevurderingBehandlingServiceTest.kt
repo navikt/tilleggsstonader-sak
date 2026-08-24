@@ -9,10 +9,10 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndring
-import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerKilde
-import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
 import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
+import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadata
+import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadataEndring
+import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadataKilde
 import no.nav.tilleggsstonader.sak.behandlingsflyt.task.OpprettOppgaveForOpprettetBehandlingTask
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.PdlClientMockConfig
@@ -172,7 +172,7 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
                     opprettRevurdering(
                         fagsakId = behandling.fagsakId,
                         årsak = BehandlingÅrsak.NYE_OPPLYSNINGER,
-                    ).copy(nyeOpplysningerMetadata = null),
+                    ).copy(årsakMetadata = null),
                 )
             }.hasMessage("Krever metadata ved behandlingsårsak NYE_OPPLYSNINGER")
         }
@@ -194,11 +194,11 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
             val nyBehandlingId = service.opprettRevurdering(opprettBehandlingDto)
 
             val nyBehandling = testoppsettService.hentBehandling(nyBehandlingId)
-            assertThat(nyBehandling.nyeOpplysningerMetadata).isEqualTo(
-                NyeOpplysningerMetadata(
-                    kilde = opprettBehandlingDto.nyeOpplysningerMetadata!!.kilde,
-                    endringer = opprettBehandlingDto.nyeOpplysningerMetadata.endringer,
-                    beskrivelse = opprettBehandlingDto.nyeOpplysningerMetadata.beskrivelse,
+            assertThat(nyBehandling.årsakMetadata).isEqualTo(
+                ÅrsakMetadata(
+                    kilde = opprettBehandlingDto.årsakMetadata!!.kilde,
+                    beskrivelse = opprettBehandlingDto.årsakMetadata.beskrivelse,
+                    endringer = opprettBehandlingDto.årsakMetadata.endringer,
                 ),
             )
         }
@@ -470,16 +470,16 @@ class OpprettRevurderingBehandlingServiceTest : CleanDatabaseIntegrationTest() {
         årsak = årsak,
         valgteBarn = valgteBarn,
         kravMottatt = null,
-        nyeOpplysningerMetadata = if (årsak == BehandlingÅrsak.NYE_OPPLYSNINGER) opprettNyeOpplysningerMetadata() else null,
+        årsakMetadata = if (årsak == BehandlingÅrsak.NYE_OPPLYSNINGER) opprettÅrsakMetadata() else null,
         skalOppretteOppgave = skalOppretteOppgave,
         behandlingMetode = BehandlingMetode.MANUELL,
         forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
     )
 
-    private fun opprettNyeOpplysningerMetadata() =
-        NyeOpplysningerMetadata(
-            kilde = NyeOpplysningerKilde.ETTERSENDING,
-            endringer = listOf(NyeOpplysningerEndring.AKTIVITET, NyeOpplysningerEndring.MÅLGRUPPE),
+    private fun opprettÅrsakMetadata() =
+        ÅrsakMetadata(
+            kilde = ÅrsakMetadataKilde.ETTERSENDING,
             beskrivelse = "Tittei",
+            endringer = listOf(ÅrsakMetadataEndring.MÅLGRUPPE),
         )
 }

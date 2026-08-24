@@ -2,10 +2,10 @@ package no.nav.tilleggsstonader.sak.behandling.dto
 
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerEndring
-import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerKilde
-import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
 import no.nav.tilleggsstonader.sak.behandling.domain.OpprettRevurdering
+import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadata
+import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadataEndring
+import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadataKilde
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.ForenkletBehandlingstype
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import java.time.LocalDate
@@ -13,7 +13,7 @@ import java.time.LocalDate
 data class OpprettBehandlingDto(
     val fagsakId: FagsakId,
     val årsak: BehandlingÅrsak,
-    val nyeOpplysningerMetadata: NyeOpplysningerMetadataDto?,
+    val årsakMetadata: ÅrsakMetadataDto?,
     val valgteBarn: Set<String> = emptySet(),
     val kravMottatt: LocalDate?,
     val forenkletBehandlingstype: ForenkletBehandlingstype,
@@ -22,7 +22,7 @@ data class OpprettBehandlingDto(
         OpprettRevurdering(
             fagsakId = fagsakId,
             årsak = årsak,
-            nyeOpplysningerMetadata = nyeOpplysningerMetadata?.tilDomene(),
+            årsakMetadata = årsakMetadata?.tilDomene(),
             valgteBarn = valgteBarn,
             kravMottatt = kravMottatt,
             skalOppretteOppgave = true,
@@ -31,16 +31,16 @@ data class OpprettBehandlingDto(
         )
 }
 
-data class NyeOpplysningerMetadataDto(
-    val kilde: NyeOpplysningerKilde,
-    val endringer: List<NyeOpplysningerEndring>,
+data class ÅrsakMetadataDto(
+    val kilde: ÅrsakMetadataKilde,
     val beskrivelse: String?,
+    val endringer: List<ÅrsakMetadataEndring>,
 ) {
     fun tilDomene() =
-        NyeOpplysningerMetadata(
+        ÅrsakMetadata(
             kilde = kilde,
-            endringer = endringer,
             beskrivelse = beskrivelse,
+            endringer = endringer,
         )
 }
 

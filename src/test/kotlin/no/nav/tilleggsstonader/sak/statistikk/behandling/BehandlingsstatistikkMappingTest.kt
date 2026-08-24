@@ -11,8 +11,8 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
-import no.nav.tilleggsstonader.sak.behandling.domain.NyeOpplysningerMetadata
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.behandling.domain.ÅrsakMetadata
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -478,7 +478,7 @@ class BehandlingsstatistikkMappingTest {
         kategori: BehandlingKategori = BehandlingKategori.NASJONAL,
         resultat: BehandlingResultat = BehandlingResultat.IKKE_SATT,
         henlagtÅrsak: HenlagtÅrsak? = null,
-        nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
+        årsakMetadata: ÅrsakMetadata? = null,
     ) = Saksbehandling(
         id = behandlingId,
         eksternId = eksternId,
@@ -489,7 +489,7 @@ class BehandlingsstatistikkMappingTest {
         steg = StegType.INNGANGSVILKÅR,
         kategori = kategori,
         årsak = BehandlingÅrsak.SØKNAD,
-        nyeOpplysningerMetadata = nyeOpplysningerMetadata,
+        årsakMetadata = årsakMetadata,
         kravMottatt = null,
         resultat = resultat,
         vedtakstidspunkt = null,

@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørPassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.beregning.DEKNINGSGRAD_TILSYN_BARN
@@ -37,6 +38,7 @@ data class MakssatsDvhUtil(
                     )
 
                 is InnvilgelseEllerOpphørDagligReise -> ikkeRelevant
+                is InnvilgelseEllerOpphørReiseTilSamling -> ikkeRelevant
             }
 
         private val ikkeRelevant = MakssatsDvhUtil(makssats = null, beløpErBegrensetAvMakssats = null)

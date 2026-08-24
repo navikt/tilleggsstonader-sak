@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto
 
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatPrivatBil
@@ -10,6 +11,7 @@ import java.time.LocalDate
 data class BeregningsresultatReiseTilSamlingDto(
     val offentligTransport: List<BeregningsresultatOffentligTransportDto>?,
     val privatBil: List<BeregningsresultatPrivatBilDto>?,
+    val beregningsplan: Beregningsplan,
 )
 
 data class BeregningsresultatOffentligTransportDto(
@@ -30,7 +32,7 @@ data class BeregningsresultatPrivatBilDto(
     val beløp: BigDecimal,
 )
 
-fun BeregningReiseTilSamling.tilDto() =
+fun BeregningReiseTilSamling.tilDto(beregningsplan: Beregningsplan) =
     BeregningsresultatReiseTilSamlingDto(
         offentligTransport =
             offentligTransport
@@ -40,6 +42,7 @@ fun BeregningReiseTilSamling.tilDto() =
             privatBil
                 .takeIf { it.isNotEmpty() }
                 ?.map { it.tilDto() },
+        beregningsplan = beregningsplan,
     )
 
 fun BeregningsresultatOffentligTransport.tilDto() =

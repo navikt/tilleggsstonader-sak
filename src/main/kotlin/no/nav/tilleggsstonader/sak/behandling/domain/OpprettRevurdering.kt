@@ -7,7 +7,7 @@ import java.time.LocalDate
 data class OpprettRevurdering(
     val fagsakId: FagsakId,
     val årsak: BehandlingÅrsak,
-    val nyeOpplysningerMetadata: NyeOpplysningerMetadata?,
+    val årsakMetadata: ÅrsakMetadata?,
     val valgteBarn: Set<String>,
     val kravMottatt: LocalDate?,
     val skalOppretteOppgave: Boolean,
