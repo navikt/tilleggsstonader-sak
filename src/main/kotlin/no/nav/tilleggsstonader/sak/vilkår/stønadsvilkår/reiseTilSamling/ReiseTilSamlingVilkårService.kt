@@ -156,12 +156,13 @@ class ReiseTilSamlingVilkårService(
     ) {
         val gjelderPrivatBil = nyttVilkår.fakta.type == TypeReiseTilSamling.PRIVAT_BIL
         val gjelderOffentligTransport = nyttVilkår.fakta.type == TypeReiseTilSamling.OFFENTLIG_TRANSPORT
+        val gjelderTsr = behandling.stønadstype == Stønadstype.REISE_TIL_SAMLING_TSR
 
-        if (gjelderPrivatBil) {
+        if (gjelderPrivatBil && gjelderTsr) {
             validerAktivitetForPrivatBil(nyttVilkår, behandling.id)
         }
 
-        if (gjelderOffentligTransport && behandling.stønadstype == Stønadstype.REISE_TIL_SAMLING_TSR) {
+        if (gjelderOffentligTransport && gjelderTsr) {
             validerAktivitetForOffentligTransport(nyttVilkår, behandling.id)
         }
     }
@@ -171,7 +172,10 @@ class ReiseTilSamlingVilkårService(
         behandlingId: BehandlingId,
     ) {
         val fakta = nyttVilkår.fakta as FaktaPrivatBil
-        val aktivitet = vilkårperiodeService.hentAktivitet(fakta.aktivitetId, behandlingId)
+        brukerfeilHvis(fakta.aktivitetId == null) {
+            "Aktivitet må velges for privat bil"
+        }
+        val aktivitet = vilkårperiodeService.hentAktivitet(fakta.aktivitetId!!, behandlingId)
         brukerfeilHvis(aktivitet == null) {
             "Aktiviteten finnes ikke"
         }

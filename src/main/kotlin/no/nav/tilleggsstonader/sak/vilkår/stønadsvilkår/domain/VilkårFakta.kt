@@ -39,7 +39,7 @@ data class FaktaReiseTilSamlingPrivatBil(
     override val reiseId: ReiseId,
     override val adresse: String?,
     val reiseavstand: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
 ) : VilkårFakta
 
 data class FaktaReiseTilSamlingUbestemt(

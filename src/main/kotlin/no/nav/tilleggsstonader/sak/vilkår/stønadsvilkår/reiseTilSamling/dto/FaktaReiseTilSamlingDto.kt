@@ -51,7 +51,7 @@ data class FaktaReiseTilSamlingOffentligTransportDto(
 
 data class FaktaReiseTilSamlingPrivatBilDto(
     val reiseavstand: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
 ) : FaktaReiseTilSamlingDto {
     override val type = TypeReiseTilSamling.PRIVAT_BIL
 
