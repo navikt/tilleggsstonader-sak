@@ -56,6 +56,10 @@ object SøknadskjemaLæremidlerMapper {
                             skjema.utdanning.harRettTilUtstyrsstipend
                                 ?.harTidligereFullførtVgs
                                 ?.verdi,
+                        tarOpplæringVgsSamtidig =
+                            skjema.utdanning.harRettTilUtstyrsstipend
+                                ?.tarOpplæringVgsSamtidig
+                                ?.verdi,
                     ),
                 harFunksjonsnedsettelse = skjema.utdanning.harFunksjonsnedsettelse.verdi,
             ),

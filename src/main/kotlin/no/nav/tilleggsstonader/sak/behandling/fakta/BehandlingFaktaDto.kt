@@ -152,6 +152,7 @@ data class SøknadsgrunnlagUtdanning(
 data class HarRettTilUtstyrsstipendDto(
     val erLærlingEllerLiknende: JaNei?,
     val harTidligereFullførtVgs: JaNei?,
+    val tarOpplæringVgsSamtidig: JaNei?,
 )
 
 data class FaktaArbeidOgOpphold(
