@@ -43,7 +43,12 @@ object SøknadsskjemaUtil {
             Stønadstype.BOUTGIFTER -> håndterBoutgifter(data, mottattTidspunkt)
             Stønadstype.DAGLIG_REISE_TSO -> håndterDagligReise(data, mottattTidspunkt)
             Stønadstype.DAGLIG_REISE_TSR -> håndterDagligReise(data, mottattTidspunkt)
-            Stønadstype.REISE_TIL_SAMLING_TSO -> jsonMapper.readValue<InnsendtSkjema<SøknadsskjemaReiseTilSamling>>(data)
+            Stønadstype.REISE_TIL_SAMLING_TSO,
+            Stønadstype.REISE_TIL_SAMLING_TSR,
+            -> jsonMapper.readValue<InnsendtSkjema<SøknadsskjemaReiseTilSamling>>(data)
+            Stønadstype.FLYTTING_TSO,
+            Stønadstype.FLYTTING_TSR,
+            -> error("Søknadsskjema for $stønadstype er ikke implementert")
         }
 
     private fun håndterBoutgifter(

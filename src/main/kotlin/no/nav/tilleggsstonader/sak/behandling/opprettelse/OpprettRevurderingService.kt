@@ -46,9 +46,13 @@ class OpprettRevurderingService(
             "Feature toggle for å kunne opprette revurdering er slått av"
         }
         logger.info("Oppretter revurdering for fagsak=${opprettRevurdering.fagsakId}")
-
-        if (opprettRevurdering.årsak == BehandlingÅrsak.NYE_OPPLYSNINGER) {
-            feilHvis(opprettRevurdering.nyeOpplysningerMetadata == null) {
+        if (opprettRevurdering.årsak == BehandlingÅrsak.NYE_OPPLYSNINGER ||
+            opprettRevurdering.årsak == BehandlingÅrsak.MANUELT_OPPRETTET ||
+            opprettRevurdering.årsak == BehandlingÅrsak.MANUELT_OPPRETTET_UTEN_BREV
+        ) {
+            feilHvis(
+                opprettRevurdering.årsakMetadata == null,
+            ) {
                 "Krever metadata ved behandlingsårsak NYE_OPPLYSNINGER"
             }
         }
@@ -101,7 +105,7 @@ class OpprettRevurderingService(
                 behandlingsårsak = opprettRevurdering.årsak,
                 behandlingMetode = opprettRevurdering.behandlingMetode,
                 kravMottatt = opprettRevurdering.kravMottatt,
-                nyeOpplysningerMetadata = opprettRevurdering.nyeOpplysningerMetadata,
+                årsakMetadata = opprettRevurdering.årsakMetadata,
                 oppgaveMetadata =
                     OpprettBehandlingOppgaveMetadata.OppgaveMetadata(
                         tilordneSaksbehandler =
@@ -122,7 +126,7 @@ class OpprettRevurderingService(
                 behandlingsårsak = opprettRevurdering.årsak,
                 behandlingMetode = opprettRevurdering.behandlingMetode,
                 kravMottatt = opprettRevurdering.kravMottatt,
-                nyeOpplysningerMetadata = opprettRevurdering.nyeOpplysningerMetadata,
+                årsakMetadata = opprettRevurdering.årsakMetadata,
                 oppgaveMetadata = OpprettBehandlingOppgaveMetadata.UtenOppgave,
                 forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
             )

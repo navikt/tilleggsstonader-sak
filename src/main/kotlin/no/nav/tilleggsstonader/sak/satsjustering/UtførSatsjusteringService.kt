@@ -188,7 +188,7 @@ class UtførSatsjusteringService(
                     fagsakId = fagsakId,
                     årsak = BehandlingÅrsak.SATSENDRING,
                     valgteBarn = emptySet(), // TODO - kopier over barn
-                    nyeOpplysningerMetadata = null,
+                    årsakMetadata = null,
                     kravMottatt = null,
                     skalOppretteOppgave = false,
                     behandlingMetode = BehandlingMetode.BATCH,

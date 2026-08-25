@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering
 
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
+import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
 import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -18,6 +19,7 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteSer
 import no.nav.tilleggsstonader.sak.util.erFørNåværendeUke
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class KjørelisteManuellRegistreringService(
@@ -87,6 +89,63 @@ class KjørelisteManuellRegistreringService(
 
         avklartKjørelisteService.slettAvklartKjøreliste(kjørelisteSomSkalSlettes.id)
         kjørelisteService.slettKjøreliste(kjørelisteSomSkalSlettes)
+    }
+
+    @Transactional
+    fun oppdaterKjøreliste(
+        behandlingId: BehandlingId,
+        kjørelisteId: KjørelisteId,
+        request: OppdaterKjørelisteRequest,
+    ): ManueltInnsendtKjørelisteDto {
+        val kjøreliste = kjørelisteService.hentKjøreliste(kjørelisteId)
+
+        brukerfeilHvisIkke(kjøreliste.manueltLagretIBehandling == behandlingId) {
+            "Kan ikke endre en kjøreliste som ikke er manuelt registrert i denne behandlingen"
+        }
+
+        val behandling = behandlingService.hentBehandling(behandlingId)
+        val rammevedtakForReise =
+            dagligReisePrivatBilService.hentRammevedtakForReiseIBehandling(behandling.id, kjøreliste.data.reiseId)
+        val andreKjørelister = kjørelisteService.hentForFagsakId(behandling.fagsakId).filter { it.id != kjørelisteId }
+
+        val ukerSomOppdateres = request.uker.associate { UkeIÅr.fraString(it.ukeIÅr) to it.dager }
+        val dagerbeholdt = kjøreliste.data.reisedager.filter { it.dato.tilUkeIÅr() !in ukerSomOppdateres.keys }
+        val oppdaterteReisedager = dagerbeholdt + request.uker.flatMap { it.dager }
+
+        validerOppdaterKjøreliste(
+            ukerSomOppdateres = ukerSomOppdateres,
+            oppdaterteReisedager = oppdaterteReisedager,
+            reiseId = kjøreliste.data.reiseId,
+            rammevedtakForReise = rammevedtakForReise,
+            andreKjørelister = andreKjørelister,
+        )
+
+        val oppdatertKjøreliste =
+            kjørelisteService.oppdater(
+                kjøreliste.copy(
+                    data = kjøreliste.data.copy(reisedager = oppdaterteReisedager),
+                    begrunnelse = request.begrunnelse,
+                ),
+            )
+
+        avklartKjørelisteService.slettAvklartKjøreliste(kjørelisteId)
+        avklartKjørelisteService.avklarUkerFraKjøreliste(behandlingId, oppdatertKjøreliste)
+
+        val reiserIRammevedtak =
+            dagligReisePrivatBilService.hentRammevedtakForBehandlingId(behandlingId)?.reiser
+                ?: error("Forventer at det finnes reiser i rammevedtak til behandling $behandlingId")
+
+        val tilhørendeReise = reiserIRammevedtak.single { it.reiseId == kjøreliste.data.reiseId }
+
+        return ManueltInnsendtKjørelisteDto(
+            id = oppdatertKjøreliste.id,
+            journalpostId = oppdatertKjøreliste.journalpostId,
+            reiseFom = tilhørendeReise.grunnlag.fom,
+            reiseTom = tilhørendeReise.grunnlag.tom,
+            aktivitetsadresse = tilhørendeReise.aktivitetsadresse,
+            begrunnelse = oppdatertKjøreliste.begrunnelse,
+            innsendteUker = oppdatertKjøreliste.data.reisedager.tilKjørelisteUker(),
+        )
     }
 
     /**
@@ -170,6 +229,7 @@ class KjørelisteManuellRegistreringService(
             .map { (uke, dager) ->
                 ManueltInnsendtKjørelisteUkeDto(
                     ukenummer = uke.ukenummer,
+                    ukeIÅr = uke.toString(),
                     fom = dager.minOf { it.dato },
                     tom = dager.maxOf { it.dato },
                     dager = dager.sortedBy { it.dato },
@@ -180,7 +240,8 @@ class KjørelisteManuellRegistreringService(
         behandling: Behandling,
         innsendtKjøreliste: InnsendtKjøreliste,
     ) {
-        val rammevedtakForReise = dagligReisePrivatBilService.hentRammevedtakForReiseIBehandling(behandling.id, innsendtKjøreliste.reiseId)
+        val rammevedtakForReise =
+            dagligReisePrivatBilService.hentRammevedtakForReiseIBehandling(behandling.id, innsendtKjøreliste.reiseId)
         val eksisterendeKjørelister = kjørelisteService.hentForFagsakId(behandling.fagsakId)
 
         validerManuellKjøreliste(

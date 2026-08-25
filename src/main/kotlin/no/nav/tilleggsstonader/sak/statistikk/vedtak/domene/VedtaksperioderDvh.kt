@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørPassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeLæremidlerMapper
@@ -55,6 +56,7 @@ data class VedtaksperioderDvh(
                 is InnvilgelseEllerOpphørBoutgifter -> mapVedtaksperioderBoutgifter(vedtaksdata)
 
                 is InnvilgelseEllerOpphørDagligReise -> mapVedtaksperioderDagligReise(vedtaksdata)
+                is InnvilgelseEllerOpphørReiseTilSamling -> mapVedtaksperioderReiseTilSamling(vedtaksdata)
 
                 is AvslagBoutgifter, is AvslagLæremidler, is AvslagPassAvBarn, is AvslagDagligReise ->
                     JsonWrapper(
@@ -111,6 +113,19 @@ data class VedtaksperioderDvh(
             )
 
         private fun mapVedtaksperioderDagligReise(vedtaksdata: InnvilgelseEllerOpphørDagligReise) =
+            JsonWrapper(
+                vedtaksperioder =
+                    vedtaksdata.vedtaksperioder.map {
+                        VedtaksperioderDvh(
+                            fom = it.fom,
+                            tom = it.tom,
+                            aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
+                            lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
+                        )
+                    },
+            )
+
+        private fun mapVedtaksperioderReiseTilSamling(vedtaksdata: InnvilgelseEllerOpphørReiseTilSamling) =
             JsonWrapper(
                 vedtaksperioder =
                     vedtaksdata.vedtaksperioder.map {

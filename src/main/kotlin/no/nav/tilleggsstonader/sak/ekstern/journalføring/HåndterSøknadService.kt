@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Skjematype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderFlytting
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseTilSamling
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
@@ -86,6 +87,13 @@ class HåndterSøknadService(
                 ValgbareStønadstyperForJournalpost(
                     defaultStønadstype = finnStønadstypeForReiseTilSamling(journalpost),
                     valgbareStønadstyper = Stønadstype.entries.filter { it.gjelderReiseTilSamling() },
+                )
+
+            // TODO utled TSO eller TSR
+            Skjematype.SØKNAD_FLYTTING ->
+                ValgbareStønadstyperForJournalpost(
+                    defaultStønadstype = if (journalpost.tema == Tema.TSO.name) Stønadstype.FLYTTING_TSO else Stønadstype.FLYTTING_TSR,
+                    valgbareStønadstyper = Stønadstype.entries.filter { it.gjelderFlytting() },
                 )
 
             Skjematype.DAGLIG_REISE_KJØRELISTE ->

@@ -107,7 +107,12 @@ private fun søknadForStønadstype(
     Stønadstype.DAGLIG_REISE_TSR,
     -> søknadDagligReise(ident = ident)
 
-    Stønadstype.REISE_TIL_SAMLING_TSO -> søknadReiseTilSamling(ident = ident)
+    Stønadstype.REISE_TIL_SAMLING_TSO,
+    Stønadstype.REISE_TIL_SAMLING_TSR,
+    -> søknadReiseTilSamling(ident = ident)
+    Stønadstype.FLYTTING_TSO,
+    Stønadstype.FLYTTING_TSR,
+    -> error("Søknad for $stønadstype er ikke implementert i testdata")
 }
 
 fun IntegrationTest.gjennomførBehandlingsløp(
@@ -195,7 +200,7 @@ fun IntegrationTest.opprettRevurderingOgGjennomførBehandlingsløp(
                 fagsakId = behandling.fagsakId,
                 årsak = BehandlingÅrsak.SØKNAD,
                 kravMottatt = LocalDate.now(),
-                nyeOpplysningerMetadata = null,
+                årsakMetadata = null,
                 forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
             ),
         tilSteg = tilSteg,

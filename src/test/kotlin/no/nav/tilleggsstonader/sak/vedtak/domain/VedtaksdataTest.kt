@@ -16,6 +16,7 @@ val alleEnumTypeVedtaksdata: List<Pair<Stønadstype, TypeVedtaksdata>> =
         Stønadstype.LÆREMIDLER to TypeVedtakLæremidler.entries,
         Stønadstype.BOUTGIFTER to TypeVedtakBoutgifter.entries,
         Stønadstype.DAGLIG_REISE_TSO to TypeVedtakDagligReise.entries,
+        Stønadstype.REISE_TIL_SAMLING_TSO to TypeVedtakReiseTilSamling.entries,
     ).flatMap { (stønadstype, enums) -> enums.map { stønadstype to it } }
 
 class VedtaksdataTest {
@@ -30,6 +31,7 @@ class VedtaksdataTest {
                 is TypeVedtakLæremidler -> type.assertHarRiktigNavn(stønadstype)
                 is TypeVedtakBoutgifter -> type.assertHarRiktigNavn(stønadstype)
                 is TypeVedtakDagligReise -> type.assertHarRiktigNavn(stønadstype)
+                is TypeVedtakReiseTilSamling -> type.assertHarRiktigNavn(stønadstype)
             }
         }
     }

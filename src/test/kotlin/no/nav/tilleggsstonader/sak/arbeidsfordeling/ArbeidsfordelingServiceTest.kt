@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.AdressebeskyttelseFor
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.domain.PersonMedAdresseBeskyttelse
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.tilDiskresjonskode
+import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -25,6 +26,7 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 
 class ArbeidsfordelingServiceTest {
     val cacheManager = ConcurrentMapCacheManager()
+    val longCacheManager = ConcurrentMapCacheManager()
     val personService = mockk<PersonService>()
     val egenAnsattService = mockk<EgenAnsattService>()
     val arbeidsfordelingClient = mockk<ArbeidsfordelingClient>()
@@ -33,6 +35,7 @@ class ArbeidsfordelingServiceTest {
     val service =
         ArbeidsfordelingService(
             cacheManager = cacheManager,
+            longCacheManager = longCacheManager,
             arbeidsfordelingClient = arbeidsfordelingClient,
             oppfolgingsenhetClient = oppfolgingsenhetClient,
             personService = personService,
@@ -171,14 +174,26 @@ class ArbeidsfordelingServiceTest {
 
     @Nested
     inner class HentBrukersNavKontor {
+        private val enhet = Oppfolgingsenhet(id = "9999", navn = "NAV Testkontor", kilde = "NORG")
+
         @Test
-        fun `skal bruke oppfolgingsenhet`() {
-            every { oppfolgingsenhetClient.hentOppfølgingsenhet(søkerIdent) } returns "9999"
+        fun `returnerer oppfølgingsenhet med id og navn`() {
+            every { oppfolgingsenhetClient.hentOppfølgingsenhet(søkerIdent) } returns enhet
 
             val navKontor = service.hentBrukersNavKontor(søkerIdent)
 
-            assertThat(navKontor).isEqualTo("9999")
+            assertThat(navKontor.id).isEqualTo("9999")
+            assertThat(navKontor.navn).isEqualTo("NAV Testkontor")
             verify(exactly = 0) { arbeidsfordelingClient.finnNavKontorForGeografiskOmråde(any(), any(), any()) }
+        }
+
+        @Test
+        fun `kaster feil når oppfølgingsenhet ikke finnes`() {
+            every { oppfolgingsenhetClient.hentOppfølgingsenhet(søkerIdent) } returns null
+
+            assertThat(Assertions.catchThrowable { service.hentBrukersNavKontor(søkerIdent) })
+                .hasMessageContaining("Finner ikke oppfølgingsenhet for person")
+                .isInstanceOf(IllegalStateException::class.java)
         }
     }
 

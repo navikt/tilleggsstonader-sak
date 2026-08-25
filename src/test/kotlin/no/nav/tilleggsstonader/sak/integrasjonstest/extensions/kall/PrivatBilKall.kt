@@ -12,6 +12,8 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagReques
 import no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering.KjørelisteOversiktDto
 import no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering.LagreManuellKjørelisteRequest
 import no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering.LagreManuellKjørelisteResponse
+import no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering.ManueltInnsendtKjørelisteDto
+import no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering.OppdaterKjørelisteRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.PrivatBilOppsummertBeregningDto
 import java.util.UUID
 
@@ -47,6 +49,14 @@ class PrivatBilKall(
         behandlingId: BehandlingId,
         kjørelisteId: KjørelisteId,
     ) = apiRespons.slettManuellKjøreliste(behandlingId, kjørelisteId).expectOkEmpty()
+
+    fun oppdaterManuellKjøreliste(
+        behandlingId: BehandlingId,
+        kjørelisteId: KjørelisteId,
+        request: OppdaterKjørelisteRequest,
+    ) = apiRespons
+        .oppdaterManuellKjøreliste(behandlingId, kjørelisteId, request)
+        .expectOkWithBody<ManueltInnsendtKjørelisteDto>()
 
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = PrivatBilApi()
@@ -131,6 +141,19 @@ class PrivatBilKall(
             restTestClient
                 .delete()
                 .uri("/api/kjoreliste/manuell-registrering/$behandlingId/$kjørelisteId")
+                .medOnBehalfOfToken()
+                .exchange()
+        }
+
+        fun oppdaterManuellKjøreliste(
+            behandlingId: BehandlingId,
+            kjørelisteId: KjørelisteId,
+            request: OppdaterKjørelisteRequest,
+        ) = with(testklient.testkontekst) {
+            restTestClient
+                .put()
+                .uri("/api/kjoreliste/manuell-registrering/$behandlingId/$kjørelisteId")
+                .body(request)
                 .medOnBehalfOfToken()
                 .exchange()
         }

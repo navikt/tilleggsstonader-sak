@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseTilSamling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
@@ -66,7 +67,7 @@ class VedtakKall(
         behandlingId: BehandlingId,
         innvilgelseDto: VedtakRequest,
     ) {
-        if (stønadstype.gjelderDagligReise()) {
+        if (stønadstype.gjelderDagligReise() || stønadstype.gjelderReiseTilSamling()) {
             return lagreEnhetsspesifiktVedtak(
                 stønadstype,
                 behandlingId,
@@ -75,6 +76,7 @@ class VedtakKall(
                 stønadstype.behandlendeEnhet(),
             )
         }
+
         lagreVedtak(stønadstype, behandlingId, "innvilgelse", innvilgelseDto)
     }
 
@@ -113,7 +115,7 @@ class VedtakKall(
             behandlingId: BehandlingId,
             innvilgelseDto: VedtakRequest,
         ): RestTestClient.ResponseSpec {
-            if (stønadstype.gjelderDagligReise()) {
+            if (stønadstype.gjelderDagligReise() || stønadstype.gjelderReiseTilSamling()) {
                 return lagreEnhetsspesifiktVedtak(
                     stønadstype,
                     behandlingId,
@@ -140,7 +142,12 @@ private fun Stønadstype.tilPath(): String =
         Stønadstype.BOUTGIFTER -> "boutgifter"
         Stønadstype.DAGLIG_REISE_TSO -> "daglig-reise"
         Stønadstype.DAGLIG_REISE_TSR -> "daglig-reise"
-        Stønadstype.REISE_TIL_SAMLING_TSO -> "reise-til-samling"
+        Stønadstype.REISE_TIL_SAMLING_TSO,
+        Stønadstype.REISE_TIL_SAMLING_TSR,
+        -> "reise-til-samling"
+        Stønadstype.FLYTTING_TSO,
+        Stønadstype.FLYTTING_TSR,
+        -> TODO("path for FLYTTING")
     }
 
 private fun Enhet.tilPath(): String =

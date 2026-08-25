@@ -6,6 +6,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatException
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 
 class FaktiskMålgruppeTest {
     @Test
@@ -143,12 +145,13 @@ class FaktiskMålgruppeTest {
 
         @Nested
         inner class `for daglig reise tsr` {
-            @Test
-            fun `kan ikke mappe`() {
+            @ParameterizedTest
+            @EnumSource(value = Stønadstype::class, names = ["DAGLIG_REISE_TSR", "REISE_TIL_SAMLING_TSR"], mode = EnumSource.Mode.INCLUDE)
+            fun `kan ikke mappe stønadstype til andel`(stønadstype: Stønadstype) {
                 assertThatException()
                     .isThrownBy {
-                        FaktiskMålgruppe.GJENLEVENDE.tilTypeAndel(Stønadstype.DAGLIG_REISE_TSR)
-                    }.withMessage("Kan ikke utlede Typeandel for Daglige reiser TSR fra FaktiskMålgruppe")
+                        FaktiskMålgruppe.GJENLEVENDE.tilTypeAndel(stønadstype)
+                    }.withMessage("Kan ikke utlede Typeandel for $stønadstype fra FaktiskMålgruppe")
             }
         }
     }

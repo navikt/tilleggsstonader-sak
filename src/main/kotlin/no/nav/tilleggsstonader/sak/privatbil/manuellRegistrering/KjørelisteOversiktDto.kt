@@ -22,6 +22,7 @@ data class ManueltInnsendtKjørelisteDto(
 
 data class ManueltInnsendtKjørelisteUkeDto(
     val ukenummer: Int,
+    val ukeIÅr: String,
     val fom: LocalDate,
     val tom: LocalDate,
     val dager: List<KjørelisteDag>,

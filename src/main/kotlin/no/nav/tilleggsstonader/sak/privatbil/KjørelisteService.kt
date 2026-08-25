@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.privatbil
 
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.SporbarUtils
@@ -46,4 +47,11 @@ class KjørelisteService(
     fun hentKjøreliste(kjørelisteId: KjørelisteId): Kjøreliste = repository.findByIdOrThrow(kjørelisteId)
 
     fun eksistererForJournalpostId(journalpostId: String): Boolean = repository.findByJournalpostId(journalpostId) != null
+
+    fun oppdater(kjøreliste: Kjøreliste): Kjøreliste {
+        brukerfeilHvis(kjøreliste.manueltLagretIBehandling == null) {
+            "Kan ikke oppdatere kjøreliste som er innsendt elektronisk"
+        }
+        return repository.update(kjøreliste)
+    }
 }

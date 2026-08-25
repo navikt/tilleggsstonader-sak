@@ -22,6 +22,7 @@ object VedtaksdataFilesUtil {
             Stønadstype.BARNETILSYN -> "TILSYN_BARN"
             Stønadstype.DAGLIG_REISE_TSO -> "DAGLIG_REISE"
             Stønadstype.DAGLIG_REISE_TSR -> "DAGLIG_REISE"
+            Stønadstype.REISE_TIL_SAMLING_TSO -> "REISE_TIL_SAMLING"
             else -> name
         }
 

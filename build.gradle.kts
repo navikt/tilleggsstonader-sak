@@ -4,16 +4,16 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20260713101404_6072da6"
 val tilleggsstønaderLibsVersion = "2026.08.07-12.32.dfeb3286fb52"
-val tilleggsstønaderKontrakterVersion = "2026.08.13-10.12.b6ff16f9c72f"
+val tilleggsstønaderKontrakterVersion = "2026.08.24-15.57.1d77ef8050e5"
 val avroVersion = "1.12.1"
 val confluentVersion = "8.0.1"
 val joarkHendelseVersion = "1.1.11"
-val tokenSupportVersion = "6.0.11"
+val tokenSupportVersion = "6.0.12"
 val wiremockVersion = "3.13.2"
 val mockkVersion = "1.14.11"
 val testcontainerVersion = "1.21.4"
 val springDocVersion = "3.1.0"
-val shedlockVersion = "7.7.0"
+val shedlockVersion = "7.8.0"
 
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
@@ -21,14 +21,14 @@ version = "1.0.0"
 plugins {
     application
 
-    kotlin("jvm") version "2.3.21"
+    kotlin("jvm") version "2.4.10"
     id("com.diffplug.spotless") version "8.9.0"
-    id("io.github.ben-manes.versions") version "0.59.0"
+    id("io.github.ben-manes.versions") version "0.61.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
 
     id("org.springframework.boot") version "4.1.0"
     id("io.spring.dependency-management") version "1.1.7"
-    kotlin("plugin.spring") version "2.3.21"
+    kotlin("plugin.spring") version "2.4.10"
 }
 
 repositories {
@@ -102,6 +102,11 @@ dependencies {
     // Shedlock – hindrer at schedulede jobber kjøres på tvers av replicas
     implementation("net.javacrumbs.shedlock:shedlock-spring:$shedlockVersion")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedlockVersion")
+
+    implementation("no.nav.security:token-validation-spring:$tokenSupportVersion")
+    implementation("no.nav.security:token-validation-core:$tokenSupportVersion")
+    implementation("no.nav.security:token-client-core:$tokenSupportVersion")
+    implementation("no.nav.security:token-client-spring:$tokenSupportVersion")
 
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test") {

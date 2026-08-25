@@ -73,7 +73,19 @@ fun gyldigeAvslagsårsaker(
                 Avslagskategori.GENERELL -> generelleÅrsaker
             }
 
-        Stønadstype.REISE_TIL_SAMLING_TSO -> // TODO("hva er gyldige avslagsårsaker for reise til samling TSO?  Lag oppgave")
+        Stønadstype.REISE_TIL_SAMLING_TSO,
+        Stønadstype.REISE_TIL_SAMLING_TSR,
+        -> // TODO("hva er gyldige avslagsårsaker for reise til samling?  Lag oppgave")
+            when (gjelder) {
+                Avslagskategori.AKTIVITET -> emptySet()
+                Avslagskategori.MÅLGRUPPE -> emptySet()
+                Avslagskategori.STØNADSVILKÅR -> emptySet()
+                Avslagskategori.GENERELL -> generelleÅrsaker
+            }
+
+        Stønadstype.FLYTTING_TSO,
+        Stønadstype.FLYTTING_TSR,
+        -> // TODO("hva er gyldige avslagsårsaker for FLYTTING?")
             when (gjelder) {
                 Avslagskategori.AKTIVITET -> emptySet()
                 Avslagskategori.MÅLGRUPPE -> emptySet()

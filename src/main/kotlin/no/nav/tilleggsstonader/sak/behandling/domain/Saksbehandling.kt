@@ -26,7 +26,7 @@ data class Saksbehandling(
     @Column("arsak")
     val årsak: BehandlingÅrsak,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
-    val nyeOpplysningerMetadata: NyeOpplysningerMetadata? = null,
+    val årsakMetadata: ÅrsakMetadata? = null,
     val kravMottatt: LocalDate? = null,
     val resultat: BehandlingResultat,
     val vedtakstidspunkt: LocalDateTime?,
