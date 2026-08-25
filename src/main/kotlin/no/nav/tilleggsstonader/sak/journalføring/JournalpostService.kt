@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.Skjemadata
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.libs.feil.feilHvis
+import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostDatoUtil.mestRelevanteDato
@@ -31,6 +32,7 @@ import java.time.LocalDateTime
 class JournalpostService(
     private val journalpostClient: JournalpostClient,
     private val personService: PersonService,
+    private val fagsakService: FagsakService,
 ) {
     fun finnJournalposterForBruker(
         personIdent: String,
@@ -46,8 +48,10 @@ class JournalpostService(
             ),
         )
 
-    fun hentJournalposterForFagsak(fagsakId: FagsakId): List<Journalpost> =
-        journalpostClient.finnJournalposterForFagsak(fagsakId.toString())
+    fun hentJournalposterForFagsak(fagsakId: FagsakId): List<Journalpost> {
+        val fagsak = fagsakService.hentFagsak(fagsakId)
+        return journalpostClient.finnJournalposterForFagsak(fagsak.eksternId)
+    }
 
     fun hentJournalpost(journalpostId: String): Journalpost = journalpostClient.hentJournalpost(journalpostId)
 
