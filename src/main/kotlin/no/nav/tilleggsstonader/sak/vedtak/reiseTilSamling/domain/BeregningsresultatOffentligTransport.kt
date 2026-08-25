@@ -34,6 +34,7 @@ data class BeregningsgrunnlagPrivatBilForSamling(
     val sats: BigDecimal,
     val totaltReiseavstand: BigDecimal,
     val vedtaksperioder: List<VedtaksperiodeGrunnlag>,
+    val brukersNavKontor: String?,
 )
 
 data class BeregningsgrunnlagOffentligTransportForSamling(
@@ -41,6 +42,7 @@ data class BeregningsgrunnlagOffentligTransportForSamling(
     val fom: LocalDate,
     val tom: LocalDate,
     val vedtaksperioder: List<VedtaksperiodeGrunnlag>,
+    val brukersNavKontor: String?,
 )
 
 data class VedtaksperiodeGrunnlag(

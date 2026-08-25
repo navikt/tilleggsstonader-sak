@@ -1,8 +1,10 @@
 package no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvis
+import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -33,6 +35,7 @@ class ReiseTilSamlingBeregningService(
     private val vilkårService: VilkårService,
     private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
     private val satsPrivatBilProvider: SatsPrivatBilProvider,
+    private val arbeidsfordelingService: ArbeidsfordelingService,
 ) {
     fun beregn(
         behandling: Saksbehandling,
@@ -60,6 +63,13 @@ class ReiseTilSamlingBeregningService(
                 vedtaksperioderBeregning,
             )
 
+        val brukersNavKontor =
+            if (behandling.stønadstype == Stønadstype.REISE_TIL_SAMLING_TSR) {
+                arbeidsfordelingService.hentBrukersNavKontor(behandling.ident).id
+            } else {
+                null
+            }
+
         validerUtgifter(
             utgifter = utgifterTilBeregning,
             vedtakstype = typeVedtak,
@@ -76,12 +86,14 @@ class ReiseTilSamlingBeregningService(
             beregnOffentligTransport(
                 utgifterTilBeregning,
                 vedtaksperioder,
+                brukersNavKontor,
             )
 
         val privatBil =
             beregnPrivatBil(
                 utgifterTilBeregning,
                 vedtaksperioder,
+                brukersNavKontor,
             )
         return BeregningReiseTilSamling(
             offentligTransport = offentligTransport,
@@ -92,6 +104,7 @@ class ReiseTilSamlingBeregningService(
     private fun beregnOffentligTransport(
         utgifter: List<VilkårReiseTilSamling>,
         vedtaksperioder: List<Vedtaksperiode>,
+        brukersNavKontor: String?,
     ): List<BeregningsresultatOffentligTransport> {
         val oppfylteOffentligTransport =
             utgifter.filter { it.fakta is FaktaOffentligTransport }
@@ -110,6 +123,7 @@ class ReiseTilSamlingBeregningService(
                             vedtaksperioder
                                 .filter { it.overlapper(samling) }
                                 .map(::VedtaksperiodeGrunnlag),
+                        brukersNavKontor = brukersNavKontor,
                     ),
                 beløp = fakta.utgifterOffentligTransport,
             )
@@ -119,6 +133,7 @@ class ReiseTilSamlingBeregningService(
     private fun beregnPrivatBil(
         utgifter: List<VilkårReiseTilSamling>,
         vedtaksperioder: List<Vedtaksperiode>,
+        brukersNavKontor: String?,
     ): List<BeregningsresultatPrivatBil> {
         val oppfyltePrivatBil =
             utgifter.filter { it.fakta is FaktaPrivatBil }
@@ -141,6 +156,7 @@ class ReiseTilSamlingBeregningService(
                         vedtaksperioder
                             .filter { it.overlapper(samling) }
                             .map(::VedtaksperiodeGrunnlag),
+                    brukersNavKontor = brukersNavKontor,
                 )
 
             BeregningsresultatPrivatBil(
