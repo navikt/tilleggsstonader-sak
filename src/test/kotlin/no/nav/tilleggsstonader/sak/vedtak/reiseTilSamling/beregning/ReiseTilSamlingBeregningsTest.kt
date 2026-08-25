@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.libs.feil.ApiFeil
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.libs.utils.dato.februar
@@ -23,9 +24,11 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilS
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.util.UUID
 
 class ReiseTilSamlingBeregningsTest {
     private val vilkårService = mockk<VilkårService>()
@@ -69,6 +72,7 @@ class ReiseTilSamlingBeregningsTest {
                             reiseId = dummyReiseId,
                             adresse = "Samlingsgata 1",
                             utgifterOffentligTransport = 500.toBigDecimal(),
+                            tiltaksvariant = TypeAktivitet.GRUPPEAMO,
                         ),
                 ),
                 vilkår(
@@ -96,10 +100,13 @@ class ReiseTilSamlingBeregningsTest {
             )
         val offentligTransport = result.offentligTransport
         assertThat(offentligTransport).hasSize(2)
+        assertThat(offentligTransport[0].tiltaksvariant).isEqualTo(TypeAktivitet.GRUPPEAMO)
+        assertThat(offentligTransport[1].tiltaksvariant).isNull()
     }
 
     @Test
     fun `beregner privat bil riktig for ett vilkår`() {
+        val aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID())
         every { vilkårService.hentOppfylteReiseTilSamlingVilkår(behandling.id) } returns
             listOf(
                 vilkår(
@@ -114,6 +121,7 @@ class ReiseTilSamlingBeregningsTest {
                             reiseId = dummyReiseId,
                             adresse = "Samlingsgata 1",
                             reiseavstand = 20.toBigDecimal(),
+                            aktivitetId = aktivitetId,
                         ),
                 ),
             )
@@ -130,6 +138,7 @@ class ReiseTilSamlingBeregningsTest {
         val privatBil = result.privatBil
         assertThat(privatBil).hasSize(1)
         assertThat(privatBil.first().beløp).isEqualTo(59.toBigDecimal())
+        assertThat(privatBil.first().aktivitetId).isEqualTo(aktivitetId)
     }
 
     @Test

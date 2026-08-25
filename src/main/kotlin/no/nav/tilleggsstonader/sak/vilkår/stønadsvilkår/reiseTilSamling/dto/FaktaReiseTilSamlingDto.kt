@@ -2,12 +2,14 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaUbestemtType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 
 @JsonTypeInfo(
@@ -32,6 +34,7 @@ sealed interface FaktaReiseTilSamlingDto {
 
 data class FaktaReiseTilSamlingOffentligTransportDto(
     val utgifterOffentligTransport: BigDecimal,
+    val tiltaksvariant: TypeAktivitet? = null,
 ) : FaktaReiseTilSamlingDto {
     override val type = TypeReiseTilSamling.OFFENTLIG_TRANSPORT
 
@@ -42,11 +45,13 @@ data class FaktaReiseTilSamlingOffentligTransportDto(
         reiseId = reiseId,
         adresse = adresse,
         utgifterOffentligTransport = utgifterOffentligTransport,
+        tiltaksvariant = tiltaksvariant,
     )
 }
 
 data class FaktaReiseTilSamlingPrivatBilDto(
     val reiseavstand: BigDecimal,
+    val aktivitetId: VilkårperiodeGlobalId,
 ) : FaktaReiseTilSamlingDto {
     override val type = TypeReiseTilSamling.PRIVAT_BIL
 
@@ -57,6 +62,7 @@ data class FaktaReiseTilSamlingPrivatBilDto(
         reiseId = reiseId,
         adresse = adresse,
         reiseavstand = reiseavstand,
+        aktivitetId = aktivitetId,
     )
 }
 

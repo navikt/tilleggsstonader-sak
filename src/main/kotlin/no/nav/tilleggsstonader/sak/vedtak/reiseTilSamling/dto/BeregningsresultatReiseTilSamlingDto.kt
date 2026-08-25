@@ -1,10 +1,12 @@
 package no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto
 
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -20,6 +22,7 @@ data class BeregningsresultatOffentligTransportDto(
     val fom: LocalDate,
     val tom: LocalDate,
     val beløp: BigDecimal,
+    val tiltaksvariant: TypeAktivitet? = null,
 )
 
 data class BeregningsresultatPrivatBilDto(
@@ -30,6 +33,7 @@ data class BeregningsresultatPrivatBilDto(
     val sats: BigDecimal,
     val totaltReiseavstand: BigDecimal,
     val beløp: BigDecimal,
+    val aktivitetId: VilkårperiodeGlobalId,
 )
 
 fun BeregningReiseTilSamling.tilDto(beregningsplan: Beregningsplan) =
@@ -52,6 +56,7 @@ fun BeregningsresultatOffentligTransport.tilDto() =
         fom = grunnlag.fom,
         tom = grunnlag.tom,
         beløp = beløp,
+        tiltaksvariant = tiltaksvariant,
     )
 
 fun BeregningsresultatPrivatBil.tilDto() =
@@ -63,4 +68,5 @@ fun BeregningsresultatPrivatBil.tilDto() =
         sats = grunnlag.sats,
         totaltReiseavstand = grunnlag.totaltReiseavstand,
         beløp = beløp,
+        aktivitetId = aktivitetId,
     )

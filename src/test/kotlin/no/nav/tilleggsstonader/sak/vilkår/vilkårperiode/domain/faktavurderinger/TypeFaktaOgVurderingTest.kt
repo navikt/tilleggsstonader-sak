@@ -40,6 +40,7 @@ class TypeFaktaOgVurderingTest {
                 is TypeFaktaOgVurderingDagligReiseTso -> type.assertHarRiktigNavn(stønadstype)
                 is TypeFaktaOgVurderingDagligReiseTsr -> type.assertHarRiktigNavn(stønadstype)
                 is TypeFaktaOgVurderingReiseTilSamlingTso -> type.assertHarRiktigNavn(stønadstype)
+                is TypeFaktaOgVurderingReiseTilSamlingTsr -> type.assertHarRiktigNavn(stønadstype)
             }
         }
     }

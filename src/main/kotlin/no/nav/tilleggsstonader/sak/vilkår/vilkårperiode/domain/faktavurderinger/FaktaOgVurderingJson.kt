@@ -70,6 +70,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
     JsonSubTypes.Type(NedsattArbeidsevneReiseTilSamlingTso::class, name = "NEDSATT_ARBEIDSEVNE_REISE_TIL_SAMLING_TSO"),
     JsonSubTypes.Type(UføretrygdReiseTilSamlingTso::class, name = "UFØRETRYGD_REISE_TIL_SAMLING_TSO"),
     JsonSubTypes.Type(IngenMålgruppeReiseTilSamlingTso::class, name = "INGEN_MÅLGRUPPE_REISE_TIL_SAMLING_TSO"),
+    JsonSubTypes.Type(UtdanningReiseTilSamlingTsr::class, name = "UTDANNING_REISE_TIL_SAMLING_TSR"),
+    JsonSubTypes.Type(TiltakReiseTilSamlingTsr::class, name = "TILTAK_REISE_TIL_SAMLING_TSR"),
+    JsonSubTypes.Type(IngenAktivitetReiseTilSamlingTsr::class, name = "INGEN_AKTIVITET_REISE_TIL_SAMLING_TSR"),
+    JsonSubTypes.Type(DagpengerReiseTilSamlingTsr::class, name = "DAGPENGER_REISE_TIL_SAMLING_TSR"),
+    JsonSubTypes.Type(TiltakspengerReiseTilSamlingTsr::class, name = "TILTAKSPENGER_REISE_TIL_SAMLING_TSR"),
+    JsonSubTypes.Type(KvalifiseringsstønadReiseTilSamlingTsr::class, name = "KVALIFISERINGSSTØNAD_REISE_TIL_SAMLING_TSR"),
+    JsonSubTypes.Type(InnsattIFengselReiseTilSamlingTsr::class, name = "INNSATT_I_FENGSEL_REISE_TIL_SAMLING_TSR"),
+    JsonSubTypes.Type(IngenMålgruppeReiseTilSamlingTsr::class, name = "INGEN_MÅLGRUPPE_REISE_TIL_SAMLING_TSR"),
     failOnRepeatedNames = true,
 )
 sealed interface FaktaOgVurderingJson

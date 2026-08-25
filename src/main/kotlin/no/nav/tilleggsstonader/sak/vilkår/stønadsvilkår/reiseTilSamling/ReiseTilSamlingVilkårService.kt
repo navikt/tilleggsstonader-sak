@@ -1,5 +1,9 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
@@ -10,6 +14,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.vedtak.domain.TypeReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.SlettetVilkårResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
@@ -22,10 +27,10 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.Vilk�
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.VilkårReiseTilSamlingMapper.mapTilVilkårReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.LagreVilkårReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.VilkårReiseTilSamling
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -34,6 +39,7 @@ class ReiseTilSamlingVilkårService(
     private val vilkårRepository: VilkårRepository,
     private val behandlingService: BehandlingService,
     private val vilkårService: VilkårService,
+    private val vilkårperiodeService: VilkårperiodeService,
     private val unleashService: UnleashService,
 ) {
     fun hentVilkårForBehandling(behandlingId: BehandlingId): List<VilkårReiseTilSamling> =
@@ -49,7 +55,8 @@ class ReiseTilSamlingVilkårService(
     ): VilkårReiseTilSamling {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
-        validerKanBehandleVilkåret()
+        validerFeatureToggle()
+        validerAktivitet(nyttVilkår, behandling)
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår)
         val lagretVilkår = vilkårRepository.insert(vilkår.mapTilVilkår())
@@ -65,7 +72,8 @@ class ReiseTilSamlingVilkårService(
     ): VilkårReiseTilSamling {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
-        validerKanBehandleVilkåret()
+        validerFeatureToggle()
+        validerAktivitet(nyttVilkår, behandling)
 
         val eksisterendeVilkår = vilkårRepository.findByIdOrThrow(vilkårId).mapTilVilkårReiseTilSamling()
 
@@ -108,28 +116,8 @@ class ReiseTilSamlingVilkårService(
             status = utledStatus(eksisterendeVilkår),
             delvilkårsett = delvilkårsett,
             resultat = RegelEvaluering.utledVilkårResultat(delvilkårsett),
-            fakta = nyttVilkår.fakta.fjern0Verdier(),
+            fakta = nyttVilkår.fakta,
         )
-    }
-
-    private fun FaktaReiseTilSamling.fjern0Verdier(): FaktaReiseTilSamling {
-        when (this) {
-            is FaktaOffentligTransport -> {
-                return FaktaOffentligTransport(
-                    reiseId = this.reiseId,
-                    adresse = this.adresse,
-                    utgifterOffentligTransport = utgifterOffentligTransport,
-                )
-            }
-
-            is FaktaPrivatBil -> {
-                return this
-            }
-
-            is FaktaUbestemtType -> {
-                return this
-            }
-        }
     }
 
     private fun utledStatus(eksisterendeVilkår: VilkårReiseTilSamling?): VilkårStatus? =
@@ -154,11 +142,59 @@ class ReiseTilSamlingVilkårService(
         behandling.status.validerKanBehandlingRedigeres()
     }
 
-    private fun validerKanBehandleVilkåret() {
+    private fun validerFeatureToggle() {
         val kanBehandleReiseTilSamling = unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_TIL_SAMLING)
 
         feilHvis(!kanBehandleReiseTilSamling) {
             "TS-sak støtter foreløpig ikke behandling av saker som gjelder reise til samling"
         }
+    }
+
+    private fun validerAktivitet(
+        nyttVilkår: LagreVilkårReiseTilSamling,
+        behandling: Saksbehandling,
+    ) {
+        val gjelderPrivatBil = nyttVilkår.fakta.type == TypeReiseTilSamling.PRIVAT_BIL
+        val gjelderOffentligTransport = nyttVilkår.fakta.type == TypeReiseTilSamling.OFFENTLIG_TRANSPORT
+
+        if (gjelderPrivatBil) {
+            validerAktivitetForPrivatBil(nyttVilkår, behandling.id)
+        }
+
+        if (gjelderOffentligTransport && behandling.stønadstype == Stønadstype.REISE_TIL_SAMLING_TSR) {
+            validerAktivitetForOffentligTransport(nyttVilkår, behandling.id)
+        }
+    }
+
+    private fun validerAktivitetForPrivatBil(
+        nyttVilkår: LagreVilkårReiseTilSamling,
+        behandlingId: BehandlingId,
+    ) {
+        val fakta = nyttVilkår.fakta as FaktaPrivatBil
+        val aktivitet = vilkårperiodeService.hentAktivitet(fakta.aktivitetId, behandlingId)
+        brukerfeilHvis(aktivitet == null) {
+            "Aktiviteten finnes ikke"
+        }
+        brukerfeilHvis(aktivitet.resultat != ResultatVilkårperiode.OPPFYLT) {
+            "Aktiviteten er ikke oppfylt"
+        }
+        brukerfeilHvisIkke(aktivitet.inneholder(nyttVilkår)) {
+            "Aktiviteten er ikke oppfylt hele vilkårperioden"
+        }
+    }
+
+    private fun validerAktivitetForOffentligTransport(
+        nyttVilkår: LagreVilkårReiseTilSamling,
+        behandlingId: BehandlingId,
+    ) {
+        val fakta = nyttVilkår.fakta as FaktaOffentligTransport
+        brukerfeilHvis(fakta.tiltaksvariant == null) {
+            "Aktivitet må velges for offentlig transport"
+        }
+        vilkårperiodeService.validerAktivitetMedTiltaksvariantInnenforPeriode(
+            tiltaksvariant = fakta.tiltaksvariant,
+            periode = Datoperiode(fom = nyttVilkår.fom, tom = nyttVilkår.tom),
+            behandlingId = behandlingId,
+        )
     }
 }
