@@ -69,8 +69,9 @@ class JournalpostClient(
         val uri =
             UriComponentsBuilder
                 .fromUri(journalpostUri)
-                .path("fagsak/{fagsakId}")
+                .pathSegment("fagsak", "{fagsakId}")
                 .apply { journalposttyper.forEach { queryParam("journalposttype", it) } }
+                .encode()
                 .toUriString()
 
         return restTemplate.getForEntity<List<Journalpost>>(uri, uriVariables = mapOf("fagsakId" to eksternFagsakId.id))
