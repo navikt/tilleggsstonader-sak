@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.libs.http.client.postForEntity
 import no.nav.tilleggsstonader.libs.http.client.putForEntity
 import no.nav.tilleggsstonader.libs.log.NavHttpHeaders
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
+import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -60,6 +61,16 @@ class JournalpostClient(
         return restTemplate.postForEntity<List<Journalpost>>(uri, journalposterForBrukerRequest)
     }
 
+    fun finnJournalposterForFagsak(eksternFagsakId: EksternFagsakId): List<Journalpost> {
+        val uri =
+            UriComponentsBuilder
+                .fromUri(journalpostUri)
+                .pathSegment("fagsak", "{fagsakId}")
+                .toUriString()
+
+        return restTemplate.getForEntity<List<Journalpost>>(uri, uriVariables = mapOf("fagsakId" to eksternFagsakId.toString()))
+    }
+
     fun hentJournalpost(journalpostId: String): Journalpost {
         val uri =
             UriComponentsBuilder
@@ -76,7 +87,11 @@ class JournalpostClient(
         saksbehandler: String?,
     ): ArkiverDokumentResponse {
         try {
-            return restTemplate.postForEntity(dokarkivUri.toString(), arkiverDokumentRequest, headerMedSaksbehandler(saksbehandler))
+            return restTemplate.postForEntity(
+                dokarkivUri.toString(),
+                arkiverDokumentRequest,
+                headerMedSaksbehandler(saksbehandler),
+            )
         } catch (e: Exception) {
             if (e is HttpClientErrorException.Conflict) {
                 håndterConflictArkiverDokument(e)
