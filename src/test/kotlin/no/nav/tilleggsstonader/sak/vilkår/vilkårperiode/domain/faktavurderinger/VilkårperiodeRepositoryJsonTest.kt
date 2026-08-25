@@ -309,7 +309,8 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
                 when (type) {
                     MålgruppeReiseTilSamlingTsrType.DAGPENGER_REISE_TIL_SAMLING_TSR -> DagpengerReiseTilSamlingTsr::class
                     MålgruppeReiseTilSamlingTsrType.TILTAKSPENGER_REISE_TIL_SAMLING_TSR -> TiltakspengerReiseTilSamlingTsr::class
-                    MålgruppeReiseTilSamlingTsrType.KVALIFISERINGSSTØNAD_REISE_TIL_SAMLING_TSR -> KvalifiseringsstønadReiseTilSamlingTsr::class
+                    MålgruppeReiseTilSamlingTsrType.KVALIFISERINGSSTØNAD_REISE_TIL_SAMLING_TSR ->
+                        KvalifiseringsstønadReiseTilSamlingTsr::class
                     MålgruppeReiseTilSamlingTsrType.INNSATT_I_FENGSEL_REISE_TIL_SAMLING_TSR -> InnsattIFengselReiseTilSamlingTsr::class
                     MålgruppeReiseTilSamlingTsrType.INGEN_MÅLGRUPPE_REISE_TIL_SAMLING_TSR -> IngenMålgruppeReiseTilSamlingTsr::class
                 }
