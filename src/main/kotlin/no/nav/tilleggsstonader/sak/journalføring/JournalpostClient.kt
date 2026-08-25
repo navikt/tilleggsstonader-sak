@@ -69,11 +69,11 @@ class JournalpostClient(
         val uri =
             UriComponentsBuilder
                 .fromUri(journalpostUri)
-                .pathSegment("fagsak", "{fagsakId}")
+                .path("fagsak/{fagsakId}")
                 .apply { journalposttyper.forEach { queryParam("journalposttype", it) } }
                 .toUriString()
 
-        return restTemplate.getForEntity<List<Journalpost>>(uri, uriVariables = mapOf("fagsakId" to eksternFagsakId.toString()))
+        return restTemplate.getForEntity<List<Journalpost>>(uri, uriVariables = mapOf("fagsakId" to eksternFagsakId.id))
     }
 
     fun hentJournalpost(journalpostId: String): Journalpost {
