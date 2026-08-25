@@ -24,7 +24,7 @@ data class BeregningsresultatPrivatBil(
     val reiseId: ReiseId,
     val grunnlag: BeregningsgrunnlagPrivatBilForSamling,
     val beløp: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId,
+    val aktivitetId: VilkårperiodeGlobalId?,
 )
 
 data class BeregningsgrunnlagPrivatBilForSamling(

@@ -238,7 +238,7 @@ class ReiseTilSamlingVilkårServiceTest {
     @Test
     fun `skal feile når aktivitet ikke finnes for privat bil`() {
         val behandling =
-            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSR))
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
         every { unleashService.isEnabled(any()) } returns true
         every { vilkårperiodeService.hentAktivitet(any(), any()) } returns null
@@ -269,7 +269,7 @@ class ReiseTilSamlingVilkårServiceTest {
     @Test
     fun `skal feile når aktivitet ikke er oppfylt for privat bil`() {
         val behandling =
-            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSR))
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
         every { unleashService.isEnabled(any()) } returns true
 
@@ -303,7 +303,7 @@ class ReiseTilSamlingVilkårServiceTest {
     @Test
     fun `skal feile når aktivitet ikke dekker hele vilkårperioden for privat bil`() {
         val behandling =
-            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSR))
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
         every { unleashService.isEnabled(any()) } returns true
 

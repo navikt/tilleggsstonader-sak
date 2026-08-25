@@ -33,7 +33,7 @@ data class BeregningsresultatPrivatBilDto(
     val sats: BigDecimal,
     val totaltReiseavstand: BigDecimal,
     val beløp: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId,
+    val aktivitetId: VilkårperiodeGlobalId?,
 )
 
 fun BeregningReiseTilSamling.tilDto(beregningsplan: Beregningsplan) =
