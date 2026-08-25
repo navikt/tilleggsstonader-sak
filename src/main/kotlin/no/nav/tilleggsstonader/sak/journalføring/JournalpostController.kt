@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.journalføring
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
+import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.sak.ekstern.journalføring.HåndterSøknadService
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.journalføring.dto.JournalføringRequest
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -28,9 +30,10 @@ class JournalpostController(
     @GetMapping("/fagsak/{fagsakId}")
     fun hentJournalposterForFagsak(
         @PathVariable fagsakId: FagsakId,
+        @RequestParam(name = "journalposttype", required = false) journalposttyper: List<Journalposttype>?,
     ): List<Journalpost> {
         tilgangService.validerTilgangTilFagsak(fagsakId, AuditLoggerEvent.ACCESS)
-        return journalpostService.hentJournalposterForFagsak(fagsakId)
+        return journalpostService.hentJournalposterForFagsak(fagsakId, journalposttyper ?: emptyList())
     }
 
     @GetMapping("/{journalpostId}/dokument-pdf/{dokumentInfoId}", produces = [MediaType.APPLICATION_PDF_VALUE])

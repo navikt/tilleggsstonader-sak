@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.JournalposterForBrukerRequest
+import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
@@ -48,9 +49,12 @@ class JournalpostService(
             ),
         )
 
-    fun hentJournalposterForFagsak(fagsakId: FagsakId): List<Journalpost> {
+    fun hentJournalposterForFagsak(
+        fagsakId: FagsakId,
+        journalposttyper: List<Journalposttype> = emptyList(),
+    ): List<Journalpost> {
         val fagsak = fagsakService.hentFagsak(fagsakId)
-        return journalpostClient.finnJournalposterForFagsak(fagsak.eksternId)
+        return journalpostClient.finnJournalposterForFagsak(fagsak.eksternId, journalposttyper)
     }
 
     fun hentJournalpost(journalpostId: String): Journalpost = journalpostClient.hentJournalpost(journalpostId)

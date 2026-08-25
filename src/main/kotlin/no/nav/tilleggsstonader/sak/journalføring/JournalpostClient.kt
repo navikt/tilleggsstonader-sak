@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.JournalposterForBrukerRequest
+import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.libs.http.client.getForEntity
 import no.nav.tilleggsstonader.libs.http.client.postForEntity
 import no.nav.tilleggsstonader.libs.http.client.putForEntity
@@ -61,11 +62,15 @@ class JournalpostClient(
         return restTemplate.postForEntity<List<Journalpost>>(uri, journalposterForBrukerRequest)
     }
 
-    fun finnJournalposterForFagsak(eksternFagsakId: EksternFagsakId): List<Journalpost> {
+    fun finnJournalposterForFagsak(
+        eksternFagsakId: EksternFagsakId,
+        journalposttyper: List<Journalposttype> = emptyList(),
+    ): List<Journalpost> {
         val uri =
             UriComponentsBuilder
                 .fromUri(journalpostUri)
                 .pathSegment("fagsak", "{fagsakId}")
+                .apply { journalposttyper.forEach { queryParam("journalposttype", it) } }
                 .toUriString()
 
         return restTemplate.getForEntity<List<Journalpost>>(uri, uriVariables = mapOf("fagsakId" to eksternFagsakId.toString()))
