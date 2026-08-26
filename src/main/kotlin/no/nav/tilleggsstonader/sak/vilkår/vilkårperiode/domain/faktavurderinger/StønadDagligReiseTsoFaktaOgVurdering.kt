@@ -67,10 +67,10 @@ data class TiltakDagligReiseTso(
 }
 
 data class UtdanningDagligReiseTso(
+    override val vurderinger: VurderingUtdanningDagligReiseTso,
     override val fakta: FaktaAktivitetDagligReiseTso,
 ) : AktivitetDagligReiseTso {
     override val type: AktivitetDagligReiseTsoType = AktivitetDagligReiseTsoType.UTDANNING_DAGLIG_REISE_TSO
-    override val vurderinger: IngenVurderinger = IngenVurderinger
 }
 
 data object IngenAktivitetDagligReiseTso : AktivitetDagligReiseTso {
@@ -84,6 +84,10 @@ data class VurderingTiltakDagligReiseTso(
     override val harUtgifter: VurderingHarUtgifter,
 ) : HarUtgifterVurdering,
     LønnetVurdering
+
+data class VurderingUtdanningDagligReiseTso(
+    override val harUtgifter: VurderingHarUtgifter,
+) : HarUtgifterVurdering
 
 data class FaktaAktivitetDagligReiseTso(
     override val aktivitetsdager: Int? = null,
