@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Bruker
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.JournalposterForBrukerRequest
+import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
@@ -17,7 +18,9 @@ import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.Skjemadata
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.libs.feil.feilHvis
+import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsak
+import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostDatoUtil.mestRelevanteDato
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
@@ -30,6 +33,7 @@ import java.time.LocalDateTime
 class JournalpostService(
     private val journalpostClient: JournalpostClient,
     private val personService: PersonService,
+    private val fagsakService: FagsakService,
 ) {
     fun finnJournalposterForBruker(
         personIdent: String,
@@ -44,6 +48,14 @@ class JournalpostService(
                 antall = 200,
             ),
         )
+
+    fun hentJournalposterForFagsak(
+        fagsakId: FagsakId,
+        journalposttyper: List<Journalposttype> = emptyList(),
+    ): List<Journalpost> {
+        val fagsak = fagsakService.hentFagsak(fagsakId)
+        return journalpostClient.finnJournalposterForFagsak(fagsak.eksternId, journalposttyper)
+    }
 
     fun hentJournalpost(journalpostId: String): Journalpost = journalpostClient.hentJournalpost(journalpostId)
 
