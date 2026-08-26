@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderFlytting
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseTilSamling
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderStøtteTilReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
@@ -39,6 +40,9 @@ data class Fagsaker(
                         .gjelderReiseTilSamling()
                 }
             Stønadstype.FLYTTING_TSO, Stønadstype.FLYTTING_TSR -> fagsaker.values.filter { it.stønadstype.gjelderFlytting() }
+            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+            -> fagsaker.values.filter { it.stønadstype.gjelderStøtteTilReiseOppstartAvslutningHjemreise() }
             Stønadstype.BARNETILSYN,
             Stønadstype.LÆREMIDLER,
             Stønadstype.BOUTGIFTER,

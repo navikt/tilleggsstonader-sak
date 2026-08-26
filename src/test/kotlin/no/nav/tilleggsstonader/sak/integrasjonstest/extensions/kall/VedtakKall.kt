@@ -148,6 +148,9 @@ private fun Stønadstype.tilPath(): String =
         Stønadstype.FLYTTING_TSO,
         Stønadstype.FLYTTING_TSR,
         -> TODO("path for FLYTTING")
+        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+        -> TODO("path for STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE")
     }
 
 private fun Enhet.tilPath(): String =

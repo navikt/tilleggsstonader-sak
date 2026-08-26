@@ -13,4 +13,6 @@ fun Stønadstype.gjelderBarn() =
         Stønadstype.REISE_TIL_SAMLING_TSR -> false
         Stønadstype.FLYTTING_TSO -> false
         Stønadstype.FLYTTING_TSR -> false
+        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO -> false
+        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR -> false
     }
