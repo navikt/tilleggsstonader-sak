@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.LogiskVedlegg
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
+import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
@@ -29,7 +30,8 @@ import java.util.UUID
 class JournalpostServiceTest {
     private val journalpostClient = mockk<JournalpostClient>()
     private val personService = mockk<PersonService>()
-    private val journalpostService = JournalpostService(journalpostClient, personService)
+    private val fagsakService = mockk<FagsakService>()
+    private val journalpostService = JournalpostService(journalpostClient, personService, fagsakService)
 
     @Nested
     inner class FinnJournalpostOgPersonIdent {

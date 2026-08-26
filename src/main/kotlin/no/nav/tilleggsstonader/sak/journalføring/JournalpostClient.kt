@@ -10,11 +10,13 @@ import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.journalpost.Dokumentvariantformat
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.journalpost.JournalposterForBrukerRequest
+import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.libs.http.client.getForEntity
 import no.nav.tilleggsstonader.libs.http.client.postForEntity
 import no.nav.tilleggsstonader.libs.http.client.putForEntity
 import no.nav.tilleggsstonader.libs.log.NavHttpHeaders
 import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
+import no.nav.tilleggsstonader.sak.fagsak.domain.EksternFagsakId
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -60,6 +62,21 @@ class JournalpostClient(
         return restTemplate.postForEntity<List<Journalpost>>(uri, journalposterForBrukerRequest)
     }
 
+    fun finnJournalposterForFagsak(
+        eksternFagsakId: EksternFagsakId,
+        journalposttyper: List<Journalposttype> = emptyList(),
+    ): List<Journalpost> {
+        val uri =
+            UriComponentsBuilder
+                .fromUri(journalpostUri)
+                .pathSegment("fagsak", "{fagsakId}")
+                .apply { journalposttyper.forEach { queryParam("journalposttype", it) } }
+                .encode()
+                .toUriString()
+
+        return restTemplate.getForEntity<List<Journalpost>>(uri, uriVariables = mapOf("fagsakId" to eksternFagsakId.id))
+    }
+
     fun hentJournalpost(journalpostId: String): Journalpost {
         val uri =
             UriComponentsBuilder
@@ -76,7 +93,11 @@ class JournalpostClient(
         saksbehandler: String?,
     ): ArkiverDokumentResponse {
         try {
-            return restTemplate.postForEntity(dokarkivUri.toString(), arkiverDokumentRequest, headerMedSaksbehandler(saksbehandler))
+            return restTemplate.postForEntity(
+                dokarkivUri.toString(),
+                arkiverDokumentRequest,
+                headerMedSaksbehandler(saksbehandler),
+            )
         } catch (e: Exception) {
             if (e is HttpClientErrorException.Conflict) {
                 håndterConflictArkiverDokument(e)
