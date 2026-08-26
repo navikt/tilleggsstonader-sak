@@ -13,4 +13,6 @@ data class OpprettRevurdering(
     val skalOppretteOppgave: Boolean,
     val behandlingMetode: BehandlingMetode,
     val forenkletBehandlingstype: ForenkletBehandlingstype,
+    val skalTillateFlereÅpneBehandlinger: Boolean,
+    val skalSetteSaksbehandlerSomOppgaveEier: Boolean,
 )

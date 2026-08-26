@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.behandling
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
+import no.nav.tilleggsstonader.libs.feil.brukerfeil
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -11,7 +12,9 @@ import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingTilJournalføringDto
 import no.nav.tilleggsstonader.sak.behandling.dto.BehandlingsoversiktDto
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.behandling.dto.OpprettBehandlingDto
+import no.nav.tilleggsstonader.sak.behandling.dto.OpprettRevurderingResponseDto
 import no.nav.tilleggsstonader.sak.behandling.dto.tilDto
+import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettRevurderingResultat
 import no.nav.tilleggsstonader.sak.behandling.opprettelse.OpprettRevurderingService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
@@ -87,13 +90,36 @@ class BehandlingController(
     }
 
     @PostMapping
+    @Deprecated("Bruk /v2 som returnerer OpprettRevurderingResponseDto med status")
     fun opprettRevurdering(
         @RequestBody request: OpprettBehandlingDto,
     ): BehandlingId {
         tilgangService.validerTilgangTilFagsak(request.fagsakId, AuditLoggerEvent.CREATE)
         tilgangService.validerHarSaksbehandlerrolle()
 
-        return opprettRevurderingService.opprettRevurdering(request.tilDomene())
+        return when (val resultat = opprettRevurderingService.opprettRevurdering(request.tilDomene())) {
+            is OpprettRevurderingResultat.Opprettet -> resultat.behandlingId
+            OpprettRevurderingResultat.ÅpneBehandlingerFunnet ->
+                brukerfeil("Det finnes åpne behandlinger. Behandle disse før du oppretter en ny revurdering.")
+        }
+    }
+
+    @PostMapping("/v2")
+    fun opprettRevurderingV2(
+        @RequestBody request: OpprettBehandlingDto,
+    ): OpprettRevurderingResponseDto {
+        tilgangService.validerTilgangTilFagsak(request.fagsakId, AuditLoggerEvent.CREATE)
+        tilgangService.validerHarSaksbehandlerrolle()
+
+        return when (val resultat = opprettRevurderingService.opprettRevurdering(request.tilDomene())) {
+            is OpprettRevurderingResultat.Opprettet ->
+                OpprettRevurderingResponseDto(
+                    status = OpprettRevurderingResponseDto.Status.OPPRETTET,
+                    behandlingId = resultat.behandlingId,
+                )
+            OpprettRevurderingResultat.ÅpneBehandlingerFunnet ->
+                OpprettRevurderingResponseDto(status = OpprettRevurderingResponseDto.Status.ÅPNE_BEHANDLINGER_FUNNET)
+        }
     }
 
     @PostMapping("person")
