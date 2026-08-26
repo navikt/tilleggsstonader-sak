@@ -5,7 +5,7 @@ SET fakta_og_vurdering = jsonb_set(
         vp.fakta_og_vurdering::jsonb,
         '{vurderinger,harUtgifter}',
         '{
-          "svar": "GAMMEL_MANGLER_DATA",
+          "svar": null,
           "resultat": "IKKE_VURDERT"
         }'::jsonb
                          )
