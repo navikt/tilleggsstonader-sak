@@ -193,7 +193,7 @@ class UtførSatsjusteringService(
                     skalOppretteOppgave = false,
                     behandlingMetode = BehandlingMetode.BATCH,
                     forenkletBehandlingstype = ForenkletBehandlingstype.ORDINAER_BEHANDLING,
-                    skalTillateFlereÅpneBehandlinger = false,
+                    skalTillateFlereÅpneBehandlinger = true,
                     skalSetteSaksbehandlerSomOppgaveEier = false,
                 ),
             )
