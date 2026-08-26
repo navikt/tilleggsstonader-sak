@@ -14,6 +14,11 @@ data class InnsendtKjøreliste(
 
     @JsonIgnore
     override val tom: LocalDate = reisedager.maxOf { it.dato }
+
+    fun overlapper(other: InnsendtKjøreliste): Boolean {
+        val datoer = reisedager.map { it.dato }.toHashSet()
+        return other.reisedager.any { it.dato in datoer }
+    }
 }
 
 data class KjørelisteDag(
