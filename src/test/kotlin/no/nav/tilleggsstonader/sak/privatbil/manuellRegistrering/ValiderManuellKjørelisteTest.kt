@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.privatbil.manuellRegistrering
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
+import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.privatbil.InnsendtKjøreliste
@@ -14,7 +15,9 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBilBeregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -106,6 +109,49 @@ class ValiderManuellKjørelisteTest {
                 eksisterendeKjørelister = emptyList(),
             )
         }.hasMessageContaining("Uke 2 er sendt inn ufullstendig.")
+    }
+
+    @Nested
+    inner class Overlapper {
+        // Uke 3 2026: 12–18 jan | Uke 4: 19–25 jan | Uke 5: 26 jan–1 feb | Uke 6: 2–8 feb
+
+        @Test
+        fun `overlapper returnerer true når to kjørelister deler reisedager i samme uke`() {
+            // Kjøreliste A: uke 3 og uke 5
+            // Kjøreliste B: uke 4 og uke 5  →  uke 5 er felles
+            val a =
+                InnsendtKjøreliste(
+                    reiseId = reiseId,
+                    reisedager = lagKjørteDager(12 januar 2026, 18 januar 2026) + lagKjørteDager(26 januar 2026, 1 februar 2026),
+                )
+            val b =
+                InnsendtKjøreliste(
+                    reiseId = reiseId,
+                    reisedager = lagKjørteDager(19 januar 2026, 25 januar 2026) + lagKjørteDager(26 januar 2026, 1 februar 2026),
+                )
+
+            assertThat(a.overlapper(b)).isTrue()
+        }
+
+        @Test
+        fun `overlapper returnerer false når kjørelister har dager i forskjellige uker, selv om fom-tom overlapper`() {
+            // Kjøreliste A: uke 3 og uke 5  (fom=12 jan, tom=1 feb)
+            // Kjøreliste B: uke 4 og uke 6  (fom=19 jan, tom=8 feb)
+            // Gammel Periode.overlapper ville gitt true fordi fom/tom-rangene overlapper,
+            // men ingen reisedag er felles.
+            val a =
+                InnsendtKjøreliste(
+                    reiseId = reiseId,
+                    reisedager = lagKjørteDager(12 januar 2026, 18 januar 2026) + lagKjørteDager(26 januar 2026, 1 februar 2026),
+                )
+            val b =
+                InnsendtKjøreliste(
+                    reiseId = reiseId,
+                    reisedager = lagKjørteDager(19 januar 2026, 25 januar 2026) + lagKjørteDager(2 februar 2026, 8 februar 2026),
+                )
+
+            assertThat(a.overlapper(b)).isFalse()
+        }
     }
 
     private fun lagKjørelisteForUke(
