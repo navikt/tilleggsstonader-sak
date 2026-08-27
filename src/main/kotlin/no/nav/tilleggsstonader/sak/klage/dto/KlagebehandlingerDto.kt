@@ -9,6 +9,8 @@ data class KlagebehandlingerDto(
     val boutgifter: List<KlagebehandlingDto>,
     val dagligReiseTso: List<KlagebehandlingDto>,
     val dagligReiseTsr: List<KlagebehandlingDto>,
+    val reiseTilSamlingTso: List<KlagebehandlingDto>,
+    val reiseTilSamlingTsr: List<KlagebehandlingDto>,
 ) {
     companion object {
         fun empty() =
@@ -18,6 +20,8 @@ data class KlagebehandlingerDto(
                 boutgifter = emptyList(),
                 dagligReiseTso = emptyList(),
                 dagligReiseTsr = emptyList(),
+                reiseTilSamlingTso = emptyList(),
+                reiseTilSamlingTsr = emptyList(),
             )
     }
 }
