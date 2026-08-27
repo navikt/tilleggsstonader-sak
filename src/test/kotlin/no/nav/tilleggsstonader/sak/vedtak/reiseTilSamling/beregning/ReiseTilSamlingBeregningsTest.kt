@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning
 import io.mockk.every
 import io.mockk.justRun
 import io.mockk.mockk
-import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.libs.feil.ApiFeil
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.libs.utils.dato.februar
@@ -72,7 +71,7 @@ class ReiseTilSamlingBeregningsTest {
                             reiseId = dummyReiseId,
                             adresse = "Samlingsgata 1",
                             utgifterOffentligTransport = 500.toBigDecimal(),
-                            tiltaksvariant = TypeAktivitet.GRUPPEAMO,
+                            aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
                         ),
                 ),
                 vilkår(
@@ -100,8 +99,8 @@ class ReiseTilSamlingBeregningsTest {
             )
         val offentligTransport = result.offentligTransport
         assertThat(offentligTransport).hasSize(2)
-        assertThat(offentligTransport[0].tiltaksvariant).isEqualTo(TypeAktivitet.GRUPPEAMO)
-        assertThat(offentligTransport[1].tiltaksvariant).isNull()
+        assertThat(offentligTransport[0].aktivitetId).isNotNull()
+        assertThat(offentligTransport[1].aktivitetId).isNull()
     }
 
     @Test

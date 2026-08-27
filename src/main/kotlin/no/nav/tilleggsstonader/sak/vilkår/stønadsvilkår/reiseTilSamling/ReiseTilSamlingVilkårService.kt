@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling
 
-import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
@@ -31,6 +30,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domai
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.VilkårReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -154,28 +154,27 @@ class ReiseTilSamlingVilkårService(
         nyttVilkår: LagreVilkårReiseTilSamling,
         behandling: Saksbehandling,
     ) {
-        val gjelderPrivatBil = nyttVilkår.fakta.type == TypeReiseTilSamling.PRIVAT_BIL
-        val gjelderOffentligTransport = nyttVilkår.fakta.type == TypeReiseTilSamling.OFFENTLIG_TRANSPORT
-        val gjelderTsr = behandling.stønadstype == Stønadstype.REISE_TIL_SAMLING_TSR
+        if (behandling.stønadstype != Stønadstype.REISE_TIL_SAMLING_TSR) return
 
-        if (gjelderPrivatBil && gjelderTsr) {
-            validerAktivitetForPrivatBil(nyttVilkår, behandling.id)
-        }
+        val aktivitetId =
+            when (nyttVilkår.fakta.type) {
+                TypeReiseTilSamling.PRIVAT_BIL -> (nyttVilkår.fakta as FaktaPrivatBil).aktivitetId
+                TypeReiseTilSamling.OFFENTLIG_TRANSPORT -> (nyttVilkår.fakta as FaktaOffentligTransport).aktivitetId
+                else -> return
+            }
 
-        if (gjelderOffentligTransport && gjelderTsr) {
-            validerAktivitetForOffentligTransport(nyttVilkår, behandling.id)
-        }
+        validerAktivitetId(aktivitetId, nyttVilkår, behandling.id)
     }
 
-    private fun validerAktivitetForPrivatBil(
+    private fun validerAktivitetId(
+        aktivitetId: VilkårperiodeGlobalId?,
         nyttVilkår: LagreVilkårReiseTilSamling,
         behandlingId: BehandlingId,
     ) {
-        val fakta = nyttVilkår.fakta as FaktaPrivatBil
-        brukerfeilHvis(fakta.aktivitetId == null) {
-            "Aktivitet må velges for privat bil"
+        brukerfeilHvis(aktivitetId == null) {
+            "Aktivitet må velges"
         }
-        val aktivitet = vilkårperiodeService.hentAktivitet(fakta.aktivitetId!!, behandlingId)
+        val aktivitet = vilkårperiodeService.hentAktivitet(aktivitetId, behandlingId)
         brukerfeilHvis(aktivitet == null) {
             "Aktiviteten finnes ikke"
         }
@@ -185,20 +184,5 @@ class ReiseTilSamlingVilkårService(
         brukerfeilHvisIkke(aktivitet.inneholder(nyttVilkår)) {
             "Aktiviteten er ikke oppfylt hele vilkårperioden"
         }
-    }
-
-    private fun validerAktivitetForOffentligTransport(
-        nyttVilkår: LagreVilkårReiseTilSamling,
-        behandlingId: BehandlingId,
-    ) {
-        val fakta = nyttVilkår.fakta as FaktaOffentligTransport
-        brukerfeilHvis(fakta.tiltaksvariant == null) {
-            "Aktivitet må velges for offentlig transport"
-        }
-        vilkårperiodeService.validerAktivitetMedTiltaksvariantInnenforPeriode(
-            tiltaksvariant = fakta.tiltaksvariant,
-            periode = Datoperiode(fom = nyttVilkår.fom, tom = nyttVilkår.tom),
-            behandlingId = behandlingId,
-        )
     }
 }

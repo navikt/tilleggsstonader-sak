@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport
@@ -34,7 +33,7 @@ sealed interface FaktaReiseTilSamlingDto {
 
 data class FaktaReiseTilSamlingOffentligTransportDto(
     val utgifterOffentligTransport: BigDecimal,
-    val tiltaksvariant: TypeAktivitet? = null,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
 ) : FaktaReiseTilSamlingDto {
     override val type = TypeReiseTilSamling.OFFENTLIG_TRANSPORT
 
@@ -45,7 +44,7 @@ data class FaktaReiseTilSamlingOffentligTransportDto(
         reiseId = reiseId,
         adresse = adresse,
         utgifterOffentligTransport = utgifterOffentligTransport,
-        tiltaksvariant = tiltaksvariant,
+        aktivitetId = aktivitetId,
     )
 }
 

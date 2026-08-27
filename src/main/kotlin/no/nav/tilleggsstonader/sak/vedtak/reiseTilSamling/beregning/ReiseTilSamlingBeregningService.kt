@@ -101,7 +101,7 @@ class ReiseTilSamlingBeregningService(
 
             BeregningsresultatOffentligTransport(
                 reiseId = fakta.reiseId,
-                tiltaksvariant = fakta.tiltaksvariant,
+                aktivitetId = fakta.aktivitetId,
                 grunnlag =
                     BeregningsgrunnlagOffentligTransportForSamling(
                         adresse = fakta.adresse,

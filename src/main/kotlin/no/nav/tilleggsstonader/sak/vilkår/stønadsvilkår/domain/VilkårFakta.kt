@@ -32,7 +32,7 @@ data class FaktaReiseTilSamlingOffentligTransport(
     override val reiseId: ReiseId,
     override val adresse: String?,
     val utgifterOffentligTransport: BigDecimal,
-    val tiltaksvariant: TypeAktivitet? = null,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
 ) : VilkårFakta
 
 data class FaktaReiseTilSamlingPrivatBil(

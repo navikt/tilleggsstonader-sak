@@ -37,7 +37,7 @@ object VilkårReiseTilSamlingDtoMapper {
     private fun FaktaOffentligTransport.tilDto() =
         FaktaReiseTilSamlingOffentligTransportDto(
             utgifterOffentligTransport = this.utgifterOffentligTransport,
-            tiltaksvariant = this.tiltaksvariant,
+            aktivitetId = this.aktivitetId,
         )
 
     private fun FaktaPrivatBil.tilDto() =

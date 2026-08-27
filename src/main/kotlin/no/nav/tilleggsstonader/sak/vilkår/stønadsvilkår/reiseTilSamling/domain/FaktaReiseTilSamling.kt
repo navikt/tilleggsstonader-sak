@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain
 
-import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
@@ -36,7 +35,7 @@ data class FaktaOffentligTransport(
     override val reiseId: ReiseId,
     override val adresse: String?,
     val utgifterOffentligTransport: BigDecimal,
-    val tiltaksvariant: TypeAktivitet? = null,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
 ) : FaktaReiseTilSamling {
     override val type = TypeReiseTilSamling.OFFENTLIG_TRANSPORT
 
@@ -49,7 +48,7 @@ data class FaktaOffentligTransport(
             reiseId = reiseId,
             adresse = adresse,
             utgifterOffentligTransport = utgifterOffentligTransport,
-            tiltaksvariant = tiltaksvariant,
+            aktivitetId = aktivitetId,
         )
 
     private fun validerIngenNegativeUtgifter() {

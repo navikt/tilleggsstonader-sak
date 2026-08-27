@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain
 
-import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
@@ -17,7 +16,7 @@ data class BeregningsresultatOffentligTransport(
     val reiseId: ReiseId,
     val grunnlag: BeregningsgrunnlagOffentligTransportForSamling,
     val beløp: BigDecimal,
-    val tiltaksvariant: TypeAktivitet? = null,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
 )
 
 data class BeregningsresultatPrivatBil(

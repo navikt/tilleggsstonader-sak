@@ -697,12 +697,12 @@ fun faktaOffentligTransportReiseTilSamling(
     reiseId: ReiseId = dummyReiseId,
     adresse: String = "Tiltaksveien 1",
     utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
-    tiltaksvariant: TypeAktivitet? = null,
+    aktivitetId: VilkårperiodeGlobalId? = null,
 ) = FaktaOffentligTransportReiseTilSamling(
     reiseId = reiseId,
     adresse = adresse,
     utgifterOffentligTransport = utgifterOffentligTransport,
-    tiltaksvariant = tiltaksvariant,
+    aktivitetId = aktivitetId,
 )
 
 fun faktaPrivatBilReiseTilSamling(

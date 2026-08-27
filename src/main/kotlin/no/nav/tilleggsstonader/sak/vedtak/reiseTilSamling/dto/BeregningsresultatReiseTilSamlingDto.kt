@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto
 
-import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
@@ -22,7 +21,7 @@ data class BeregningsresultatOffentligTransportDto(
     val fom: LocalDate,
     val tom: LocalDate,
     val beløp: BigDecimal,
-    val tiltaksvariant: TypeAktivitet? = null,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
 )
 
 data class BeregningsresultatPrivatBilDto(
@@ -56,7 +55,7 @@ fun BeregningsresultatOffentligTransport.tilDto() =
         fom = grunnlag.fom,
         tom = grunnlag.tom,
         beløp = beløp,
-        tiltaksvariant = tiltaksvariant,
+        aktivitetId = aktivitetId,
     )
 
 fun BeregningsresultatPrivatBil.tilDto() =

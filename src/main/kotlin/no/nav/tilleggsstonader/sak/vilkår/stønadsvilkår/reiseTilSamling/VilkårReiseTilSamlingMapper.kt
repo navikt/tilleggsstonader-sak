@@ -58,7 +58,7 @@ object VilkårReiseTilSamlingMapper {
             reiseId = this.reiseId,
             adresse = this.adresse,
             utgifterOffentligTransport = this.utgifterOffentligTransport,
-            tiltaksvariant = this.tiltaksvariant,
+            aktivitetId = this.aktivitetId,
         )
 
     private fun FaktaReiseTilSamlingPrivatBil.mapTilFakta() =

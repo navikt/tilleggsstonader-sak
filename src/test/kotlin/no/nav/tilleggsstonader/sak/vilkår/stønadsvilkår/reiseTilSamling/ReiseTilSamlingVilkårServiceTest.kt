@@ -3,8 +3,6 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
-import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.feil.ApiFeil
@@ -82,7 +80,7 @@ class ReiseTilSamlingVilkårServiceTest {
                         reiseId = it.reiseId,
                         adresse = it.adresse,
                         utgifterOffentligTransport = it.utgifterOffentligTransport,
-                        tiltaksvariant = it.tiltaksvariant,
+                        aktivitetId = it.aktivitetId,
                     )
                 },
         )
@@ -154,6 +152,12 @@ class ReiseTilSamlingVilkårServiceTest {
         every { unleashService.isEnabled(any()) } returns true
         every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
 
+        val aktivitetId = VilkårperiodeGlobalId.random()
+        val aktivitet = mockk<VilkårperiodeAktivitet>(relaxed = true)
+        every { aktivitet.resultat } returns ResultatVilkårperiode.OPPFYLT
+        every { aktivitet.inneholder(any<Periode<LocalDate>>()) } returns true
+        every { vilkårperiodeService.hentAktivitet(aktivitetId, any()) } returns aktivitet
+
         val vilkår =
             nyttVilkår.copy(
                 fakta =
@@ -161,7 +165,7 @@ class ReiseTilSamlingVilkårServiceTest {
                         reiseId = dummyReiseId,
                         adresse = "Samlingsveien 1",
                         utgifterOffentligTransport = 500.toBigDecimal(),
-                        tiltaksvariant = TypeAktivitet.GRUPPEAMO,
+                        aktivitetId = aktivitetId,
                     ),
             )
 
@@ -170,17 +174,11 @@ class ReiseTilSamlingVilkårServiceTest {
             behandlingId = behandling.id,
         )
 
-        verify {
-            vilkårperiodeService.validerAktivitetMedTiltaksvariantInnenforPeriode(
-                tiltaksvariant = TypeAktivitet.GRUPPEAMO,
-                periode = Datoperiode(fom = 1 januar 2025, tom = 31 januar 2025),
-                behandlingId = behandling.id,
-            )
-        }
+        verify(exactly = 1) { vilkårRepository.insert(any<Vilkår>()) }
     }
 
     @Test
-    fun `skal feile når tiltaksvariant mangler for offentlig transport TSR`() {
+    fun `skal feile når aktivitetId mangler for offentlig transport TSR`() {
         val behandling =
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSR))
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
@@ -193,7 +191,7 @@ class ReiseTilSamlingVilkårServiceTest {
                         reiseId = dummyReiseId,
                         adresse = "Samlingsveien 1",
                         utgifterOffentligTransport = 500.toBigDecimal(),
-                        tiltaksvariant = null,
+                        aktivitetId = null,
                     ),
             )
 
@@ -203,11 +201,11 @@ class ReiseTilSamlingVilkårServiceTest {
                     nyttVilkår = vilkår,
                     behandlingId = behandling.id,
                 )
-            }.withMessage("Aktivitet må velges for offentlig transport")
+            }.withMessage("Aktivitet må velges")
     }
 
     @Test
-    fun `skal ikke kreve tiltaksvariant for offentlig transport TSO`() {
+    fun `skal ikke kreve aktivitetId for offentlig transport TSO`() {
         val behandling =
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
@@ -221,7 +219,7 @@ class ReiseTilSamlingVilkårServiceTest {
                         reiseId = dummyReiseId,
                         adresse = "Samlingsveien 1",
                         utgifterOffentligTransport = 500.toBigDecimal(),
-                        tiltaksvariant = null,
+                        aktivitetId = null,
                     ),
             )
 
@@ -231,7 +229,7 @@ class ReiseTilSamlingVilkårServiceTest {
         )
 
         verify(exactly = 0) {
-            vilkårperiodeService.validerAktivitetMedTiltaksvariantInnenforPeriode(any(), any(), any())
+            vilkårperiodeService.hentAktivitet(any(), any())
         }
     }
 
