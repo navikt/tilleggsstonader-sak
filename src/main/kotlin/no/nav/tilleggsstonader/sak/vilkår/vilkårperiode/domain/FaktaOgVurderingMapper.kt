@@ -188,6 +188,8 @@ private fun mapAktiviteter(
 
         Stønadstype.FLYTTING_TSO,
         Stønadstype.FLYTTING_TSR,
+        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
         -> error("Mapping av aktiviteter for $stønadstype er ikke implementert")
     }
 }
@@ -234,6 +236,9 @@ private fun mapMålgruppe(
 
         Stønadstype.FLYTTING_TSO,
         Stønadstype.FLYTTING_TSR,
+        -> error("Mapping av målgruppe for $stønadstype er ikke implementert")
+        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
         -> error("Mapping av målgruppe for $stønadstype er ikke implementert")
     }
 }

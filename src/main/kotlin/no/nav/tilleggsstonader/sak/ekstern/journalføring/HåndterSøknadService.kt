@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderFlytting
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseTilSamling
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderStøtteTilReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
@@ -94,6 +95,20 @@ class HåndterSøknadService(
                 ValgbareStønadstyperForJournalpost(
                     defaultStønadstype = if (journalpost.tema == Tema.TSO.name) Stønadstype.FLYTTING_TSO else Stønadstype.FLYTTING_TSR,
                     valgbareStønadstyper = Stønadstype.entries.filter { it.gjelderFlytting() },
+                )
+
+            // TODO utled TSO eller TSR
+            Skjematype.SØKNAD_STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE ->
+                ValgbareStønadstyperForJournalpost(
+                    defaultStønadstype =
+                        if (journalpost.tema ==
+                            Tema.TSO.name
+                        ) {
+                            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO
+                        } else {
+                            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR
+                        },
+                    valgbareStønadstyper = Stønadstype.entries.filter { it.gjelderStøtteTilReiseOppstartAvslutningHjemreise() },
                 )
 
             Skjematype.DAGLIG_REISE_KJØRELISTE ->

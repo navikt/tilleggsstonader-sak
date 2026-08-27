@@ -86,6 +86,8 @@ class OpprettDummyBehandlingController(
             -> opprettDummySøknadReiseTilSamling.opprettDummy(fagsak, behandling)
             Stønadstype.FLYTTING_TSO,
             Stønadstype.FLYTTING_TSR,
+            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
             -> error("Dummy-behandling for ${fagsak.stønadstype} er ikke implementert")
         }
     }
