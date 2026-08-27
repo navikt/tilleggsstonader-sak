@@ -34,6 +34,7 @@ class BehandlingsoversiktService(
             dagligReiseTso = hentFagsakMedBehandlinger(fagsak.dagligReiseTso),
             dagligReiseTsr = hentFagsakMedBehandlinger(fagsak.dagligReiseTsr),
             reiseTilSamlingTso = hentFagsakMedBehandlinger(fagsak.reiseTilSamlingTso),
+            reiseTilSamlingTsr = hentFagsakMedBehandlinger(fagsak.reiseTilSamlingTsr),
         )
     }
 

@@ -22,6 +22,7 @@ data class BehandlingsoversiktDto(
     val dagligReiseTso: FagsakMedBehandlinger?,
     val dagligReiseTsr: FagsakMedBehandlinger?,
     val reiseTilSamlingTso: FagsakMedBehandlinger?,
+    val reiseTilSamlingTsr: FagsakMedBehandlinger?,
 )
 
 data class FagsakMedBehandlinger(
