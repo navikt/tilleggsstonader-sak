@@ -709,7 +709,7 @@ fun faktaPrivatBilReiseTilSamling(
     reiseId: ReiseId = dummyReiseId,
     adresse: String = "Tiltaksveien 1",
     reiseavstand: BigDecimal = 20.toBigDecimal(),
-    aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId(UUID.randomUUID()),
+    aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId.random(),
 ) = FaktaPrivatBilReiseTilSamling(
     reiseId = reiseId,
     adresse = adresse,

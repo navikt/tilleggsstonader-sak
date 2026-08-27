@@ -105,7 +105,7 @@ class ReiseTilSamlingBeregningsTest {
 
     @Test
     fun `beregner privat bil riktig for ett vilkår`() {
-        val aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID())
+        val aktivitetId = VilkårperiodeGlobalId.random()
         every { vilkårService.hentOppfylteReiseTilSamlingVilkår(behandling.id) } returns
             listOf(
                 vilkår(
