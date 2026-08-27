@@ -24,6 +24,8 @@ val alleEnumTyperFaktaOgVurdering: List<Pair<Stønadstype, TypeFaktaOgVurdering>
         Stønadstype.DAGLIG_REISE_TSR to MålgruppeDagligReiseTsrType.entries,
         Stønadstype.REISE_TIL_SAMLING_TSO to AktivitetReiseTilSamlingTsoType.entries,
         Stønadstype.REISE_TIL_SAMLING_TSO to MålgruppeReiseTilSamlingTsoType.entries,
+        Stønadstype.REISE_TIL_SAMLING_TSR to AktivitetReiseTilSamlingTsrType.entries,
+        Stønadstype.REISE_TIL_SAMLING_TSR to MålgruppeReiseTilSamlingTsrType.entries,
     ).flatMap { (stønadstype, enums) -> enums.map { stønadstype to it } }
 
 class TypeFaktaOgVurderingTest {
@@ -40,6 +42,7 @@ class TypeFaktaOgVurderingTest {
                 is TypeFaktaOgVurderingDagligReiseTso -> type.assertHarRiktigNavn(stønadstype)
                 is TypeFaktaOgVurderingDagligReiseTsr -> type.assertHarRiktigNavn(stønadstype)
                 is TypeFaktaOgVurderingReiseTilSamlingTso -> type.assertHarRiktigNavn(stønadstype)
+                is TypeFaktaOgVurderingReiseTilSamlingTsr -> type.assertHarRiktigNavn(stønadstype)
             }
         }
     }

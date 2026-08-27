@@ -106,6 +106,7 @@ import java.util.UUID
 import kotlin.collections.List
 import kotlin.random.Random
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport as FaktaOffentligTransportReiseTilSamling
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil as FaktaPrivatBilReiseTilSamling
 
 fun oppgave(
     behandling: Behandling,
@@ -696,10 +697,24 @@ fun faktaOffentligTransportReiseTilSamling(
     reiseId: ReiseId = dummyReiseId,
     adresse: String = "Tiltaksveien 1",
     utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
+    aktivitetId: VilkårperiodeGlobalId? = null,
 ) = FaktaOffentligTransportReiseTilSamling(
     reiseId = reiseId,
     adresse = adresse,
     utgifterOffentligTransport = utgifterOffentligTransport,
+    aktivitetId = aktivitetId,
+)
+
+fun faktaPrivatBilReiseTilSamling(
+    reiseId: ReiseId = dummyReiseId,
+    adresse: String = "Tiltaksveien 1",
+    reiseavstand: BigDecimal = 20.toBigDecimal(),
+    aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId.random(),
+) = FaktaPrivatBilReiseTilSamling(
+    reiseId = reiseId,
+    adresse = adresse,
+    reiseavstand = reiseavstand,
+    aktivitetId = aktivitetId,
 )
 
 fun lagreDagligReiseDto(

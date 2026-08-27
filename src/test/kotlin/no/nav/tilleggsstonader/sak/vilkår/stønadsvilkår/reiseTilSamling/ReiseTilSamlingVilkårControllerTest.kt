@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
+import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
@@ -21,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.F
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.LagreVilkårReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.VilkårReiseTilSamlingDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -98,17 +100,43 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
 
     @Test
     fun `skal kunne lagre, endre og slette vilkår for reise til samling - privat bil`() {
+        val fom = 1 januar 2025
+        val tom = 31 januar 2025
+
+        val behandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO,
+                tilSteg = StegType.VILKÅR,
+            ) {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTsoReiseTilSamling(fom = fom, tom = tom)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(fom = fom, tom = tom)
+                    }
+                }
+            }
+
+        val aktivitet =
+            kall.vilkårperiode
+                .hentForBehandling(behandlingContext.behandlingId)
+                .vilkårperioder.aktiviteter
+                .single()
+
         val nyttVilkår =
             LagreVilkårReiseTilSamlingDto(
-                fom = 1 januar 2025,
-                tom = 31 januar 2025,
+                fom = fom,
+                tom = tom,
                 adresse = "Samlingsveien 1",
                 reiseId = dummyReiseId,
                 svar = svarPrivatBil,
-                fakta = faktaPrivatBil(),
+                fakta = faktaPrivatBil(aktivitet = aktivitet),
             )
 
-        val resultat = kall.vilkårReiseTilSamling.opprettVilkår(behandling.id, nyttVilkår)
+        val resultat = kall.vilkårReiseTilSamling.opprettVilkår(behandlingContext.behandlingId, nyttVilkår)
 
         assertThat(resultat.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
         assertThat(resultat.status).isEqualTo(VilkårStatus.NY)
@@ -116,10 +144,11 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
 
         val oppdatertVilkår =
             nyttVilkår.copy(
-                fakta = faktaPrivatBil(reiseavstand = BigDecimal("50")),
+                fakta = faktaPrivatBil(reiseavstand = BigDecimal("50"), aktivitet = aktivitet),
             )
 
-        val resultatOppdatert = kall.vilkårReiseTilSamling.oppdaterVilkår(oppdatertVilkår, resultat.id, behandling.id)
+        val resultatOppdatert =
+            kall.vilkårReiseTilSamling.oppdaterVilkår(oppdatertVilkår, resultat.id, behandlingContext.behandlingId)
 
         assertThat(resultatOppdatert.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
         assertThat(resultatOppdatert.status).isEqualTo(VilkårStatus.NY)
@@ -127,7 +156,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
 
         val resultatSlettet =
             kall.vilkårReiseTilSamling.slettVilkår(
-                behandlingId = behandling.id,
+                behandlingId = behandlingContext.behandlingId,
                 vilkårId = resultatOppdatert.id,
                 dto = SlettVilkårRequestDto(),
             )
@@ -135,7 +164,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
         assertThat(resultatSlettet.slettetPermanent).isTrue
         assertThat(resultatSlettet.vilkår.slettetKommentar).isNull()
 
-        val hentedeVilkår = kall.vilkårReiseTilSamling.hentVilkår(behandling.id)
+        val hentedeVilkår = kall.vilkårReiseTilSamling.hentVilkår(behandlingContext.behandlingId)
         assertThat(hentedeVilkår).isEmpty()
     }
 
@@ -176,10 +205,13 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
             utgifterOffentligTransport = utgifterOffentligTransport,
         )
 
-    private fun faktaPrivatBil(reiseavstand: BigDecimal = BigDecimal("35")) =
-        FaktaReiseTilSamlingPrivatBilDto(
-            reiseavstand = reiseavstand,
-        )
+    private fun faktaPrivatBil(
+        reiseavstand: BigDecimal = BigDecimal("35"),
+        aktivitet: VilkårperiodeDto,
+    ) = FaktaReiseTilSamlingPrivatBilDto(
+        reiseavstand = reiseavstand,
+        aktivitetId = aktivitet.globalId,
+    )
 
     private fun assertLagretVilkår(
         lagreVilkårRequest: LagreVilkårReiseTilSamlingDto,
