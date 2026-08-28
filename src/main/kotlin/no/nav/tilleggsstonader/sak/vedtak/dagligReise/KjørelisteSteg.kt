@@ -57,7 +57,7 @@ class KjørelisteSteg(
             privatBilBeregningService.beregn(
                 behandling = saksbehandling,
                 rammevedtak = rammevedtakPrivatBil,
-                beregnFra = eksisterendeVedtak.beregningsplan.beregnFra(),
+                beregningsplan = eksisterendeVedtak.beregningsplan,
                 brukersNavKontor = brukersNavKontor,
                 forrigeBeregningsresultat = hentForrigePrivatBilBeregningsresultat(saksbehandling),
             )

@@ -13,6 +13,8 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatu
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.alleErUendret
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.finnDagerInnenforPeriode
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.avrundetStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilDag
@@ -32,11 +34,15 @@ class PrivatBilBeregningService(
     fun beregn(
         behandling: Saksbehandling,
         rammevedtak: RammevedtakPrivatBil?,
-        beregnFra: LocalDate?,
+        beregningsplan: Beregningsplan,
         brukersNavKontor: String?,
         forrigeBeregningsresultat: BeregningsresultatPrivatBil?,
     ): BeregningsresultatPrivatBil? {
         if (rammevedtak == null) return null
+
+        if (beregningsplan.omfang == Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT) {
+            return forrigeBeregningsresultat
+        }
 
         val avklarteUkerForBehandling = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandling.id)
 
@@ -46,7 +52,7 @@ class PrivatBilBeregningService(
             brukersNavKontor = brukersNavKontor,
             forrigeBeregningsresultat = forrigeBeregningsresultat,
             behandlingType = behandling.type,
-            beregnFra = beregnFra,
+            beregnFra = beregningsplan.beregnFra(),
         )
     }
 
