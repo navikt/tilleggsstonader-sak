@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomf�
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
@@ -115,9 +116,10 @@ class RevurderingDagligReiseGjenbrukForrigeBeregningsresultatIntegrationTest(
 
         val vedtakRevurdering = vedtakService.hentVedtak<InnvilgelseDagligReise>(revurderingId).data
 
+        val dummyBeregningsplan = Beregningsplan(omfang = Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT)
         assertThat(vedtakRevurdering.beregningsplan.omfang).isEqualTo(Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT)
-        assertThat(vedtakRevurdering.beregningsresultat.privatBil)
-            .isEqualTo(vedtakKjørelistebehandling.beregningsresultat.privatBil)
+        assertThat(vedtakRevurdering.copy(beregningsplan = dummyBeregningsplan))
+            .isEqualTo(vedtakKjørelistebehandling.copy(beregningsplan = dummyBeregningsplan))
     }
 
     @Test
