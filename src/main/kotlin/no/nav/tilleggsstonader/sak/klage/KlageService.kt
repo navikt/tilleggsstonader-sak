@@ -32,6 +32,8 @@ class KlageService(
                 fagsaker.boutgifter,
                 fagsaker.dagligReiseTso,
                 fagsaker.dagligReiseTsr,
+                fagsaker.reiseTilSamlingTso,
+                fagsaker.reiseTilSamlingTsr,
             ).map {
                 it.eksternId.id
             }
@@ -51,6 +53,8 @@ class KlageService(
             boutgifter = klagebehandlingerPåEksternId[fagsaker.boutgifter?.eksternId?.id] ?: emptyList(),
             dagligReiseTso = klagebehandlingerPåEksternId[fagsaker.dagligReiseTso?.eksternId?.id] ?: emptyList(),
             dagligReiseTsr = klagebehandlingerPåEksternId[fagsaker.dagligReiseTsr?.eksternId?.id] ?: emptyList(),
+            reiseTilSamlingTso = klagebehandlingerPåEksternId[fagsaker.reiseTilSamlingTso?.eksternId?.id] ?: emptyList(),
+            reiseTilSamlingTsr = klagebehandlingerPåEksternId[fagsaker.reiseTilSamlingTsr?.eksternId?.id] ?: emptyList(),
         )
     }
 

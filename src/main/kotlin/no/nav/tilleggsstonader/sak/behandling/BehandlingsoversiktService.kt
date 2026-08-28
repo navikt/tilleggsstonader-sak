@@ -33,6 +33,8 @@ class BehandlingsoversiktService(
             boutgifter = hentFagsakMedBehandlinger(fagsak.boutgifter),
             dagligReiseTso = hentFagsakMedBehandlinger(fagsak.dagligReiseTso),
             dagligReiseTsr = hentFagsakMedBehandlinger(fagsak.dagligReiseTsr),
+            reiseTilSamlingTso = hentFagsakMedBehandlinger(fagsak.reiseTilSamlingTso),
+            reiseTilSamlingTsr = hentFagsakMedBehandlinger(fagsak.reiseTilSamlingTsr),
         )
     }
 
