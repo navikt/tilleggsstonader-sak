@@ -82,7 +82,7 @@ class RevurderingDagligReiseGjenbrukForrigeBeregningsresultatIntegrationTest(
     }
 
     @Test
-    fun `revurdering privat bil med omfant GJENBRUK_FORRIGE skal gjenbruke forrige resultat`() {
+    fun `revurdering privat bil med omfang GJENBRUK_FORRIGE_RESULTAT skal gjenbruke forrige resultat`() {
         val førstegangsbehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(Stønadstype.DAGLIG_REISE_TSO) {
                 defaultDagligReisePrivatBilTsoTestdata(fom, tom)
