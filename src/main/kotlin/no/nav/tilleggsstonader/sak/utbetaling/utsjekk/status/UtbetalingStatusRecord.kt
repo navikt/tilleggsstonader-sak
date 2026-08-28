@@ -11,7 +11,9 @@ data class UtbetalingStatusRecord(
 data class UtbetalingStatusDetaljer(
     val ytelse: String, // TILLEGGSSTØNADER, DAGPENGER, etc.
     val linjer: List<UtbetalingLinje>,
-)
+) {
+    fun alleBehandlingIder() = linjer.map { it.behandlingId }.toSet()
+}
 
 data class UtbetalingLinje(
     val behandlingId: String,
