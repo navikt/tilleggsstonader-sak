@@ -1,7 +1,7 @@
 {
   "collection": "kotlin-backend",
-  "version": "2026.08.10-101926-2d0911b",
-  "source_sha": "2d0911b",
+  "version": "2026.08.31-071248-161c849",
+  "source_sha": "161c849",
   "installed_at": "2026-04-13T13:37:44Z",
   "files": [
     {
@@ -14,7 +14,7 @@
     },
     {
       "path": ".github/agents/kafka.agent.md",
-      "hash": "a0f5501d6e8843c7"
+      "hash": "a24bcfe97adde8fb"
     },
     {
       "path": ".github/agents/kafka.metadata.json",
@@ -38,7 +38,7 @@
     },
     {
       "path": ".github/agents/security-champion.agent.md",
-      "hash": "5ccba48b66938fd0"
+      "hash": "a209e3ce5d93746d"
     },
     {
       "path": ".github/agents/security-champion.metadata.json",
@@ -46,7 +46,7 @@
     },
     {
       "path": ".github/agents/nav-pilot.agent.md",
-      "hash": "09c7351bf3ceb03b"
+      "hash": "f381cdcba7fcb644"
     },
     {
       "path": ".github/agents/nav-pilot.metadata.json",
@@ -66,11 +66,11 @@
     },
     {
       "path": ".github/skills/observability-setup/",
-      "hash": "78181a920d929a23"
+      "hash": "b16ee0c748b966bf"
     },
     {
       "path": ".github/skills/security-review/",
-      "hash": "c74a83a4e61fbf58"
+      "hash": "3c05f1012664e5c8"
     },
     {
       "path": ".github/skills/tokenx-auth/",
@@ -78,7 +78,7 @@
     },
     {
       "path": ".github/skills/nav-plan/",
-      "hash": "0a160744cf2b4e82"
+      "hash": "db7618d269cd2f07"
     },
     {
       "path": ".github/skills/nav-deep-interview/",
@@ -94,11 +94,11 @@
     },
     {
       "path": ".github/instructions/kotlin-ktor.instructions.md",
-      "hash": "f180c7d9ebb3ddee"
+      "hash": "e6a054a0dc9bf870"
     },
     {
       "path": ".github/instructions/kotlin-spring.instructions.md",
-      "hash": "9c5bc41afd68d962"
+      "hash": "db9355ee1afaeaef"
     },
     {
       "path": ".github/instructions/testing.instructions.md",
@@ -118,11 +118,11 @@
     },
     {
       "path": ".github/instructions/database.instructions.md",
-      "hash": "9fb524bf4111f25f"
+      "hash": "9fc5267c1dc9dd01"
     },
     {
       "path": ".github/prompts/spring-boot-endpoint.prompt.md",
-      "hash": "3e68aab2f5cbe402"
+      "hash": "82404ec13b5fd880"
     },
     {
       "path": ".github/prompts/kafka-topic.prompt.md",
