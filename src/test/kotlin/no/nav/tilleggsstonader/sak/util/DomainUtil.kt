@@ -713,11 +713,17 @@ fun faktaPrivatBilReiseTilSamling(
     reiseId: ReiseId = dummyReiseId,
     adresse: String = "Tiltaksveien 1",
     reiseavstand: BigDecimal = 40.toBigDecimal(),
+    bompenger: BigDecimal? = null,
+    fergekostnad: BigDecimal? = null,
+    parkering: BigDecimal? = null,
     aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId.random(),
 ) = FaktaPrivatBilReiseTilSamling(
     reiseId = reiseId,
     adresse = adresse,
     reiseavstand = reiseavstand,
+    bompenger = bompenger,
+    fergekostnad = fergekostnad,
+    parkering = parkering,
     aktivitetId = aktivitetId,
 )
 

@@ -194,6 +194,62 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
+    fun `skal lagre og hente bompenger, fergekostnad og parkering for privat bil`() {
+        val fom = 1 januar 2025
+        val tom = 31 januar 2025
+
+        val behandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO,
+                tilSteg = StegType.VILKÅR,
+            ) {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTsoReiseTilSamling(fom = fom, tom = tom)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(fom = fom, tom = tom)
+                    }
+                }
+            }
+
+        val aktivitet =
+            kall.vilkårperiode
+                .hentForBehandling(behandlingContext.behandlingId)
+                .vilkårperioder.aktiviteter
+                .single()
+
+        val nyttVilkår =
+            LagreVilkårReiseTilSamlingDto(
+                fom = fom,
+                tom = tom,
+                adresse = "Samlingsveien 1",
+                reiseId = dummyReiseId,
+                svar = svarPrivatBil,
+                fakta =
+                    faktaPrivatBil(
+                        bompenger = BigDecimal("50"),
+                        fergekostnad = BigDecimal("120"),
+                        parkering = BigDecimal("75.50"),
+                        aktivitet = aktivitet,
+                    ),
+            )
+
+        val resultat = kall.vilkårReiseTilSamling.opprettVilkår(behandlingContext.behandlingId, nyttVilkår)
+
+        assertLagretVilkår(nyttVilkår, resultat)
+
+        val hentetVilkår =
+            kall.vilkårReiseTilSamling
+                .hentVilkår(behandlingContext.behandlingId)
+                .single()
+
+        assertThat(hentetVilkår.fakta).isEqualTo(nyttVilkår.fakta)
+    }
+
+    @Test
     fun `skal hente alle regler som tilhører reise til samling`() {
         val resultat = kall.vilkårReiseTilSamling.regler()
 
@@ -207,9 +263,15 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
 
     private fun faktaPrivatBil(
         reiseavstand: BigDecimal = BigDecimal("35"),
+        bompenger: BigDecimal? = null,
+        fergekostnad: BigDecimal? = null,
+        parkering: BigDecimal? = null,
         aktivitet: VilkårperiodeDto,
     ) = FaktaReiseTilSamlingPrivatBilDto(
         reiseavstand = reiseavstand,
+        bompenger = bompenger,
+        fergekostnad = fergekostnad,
+        parkering = parkering,
         aktivitetId = aktivitet.globalId,
     )
 

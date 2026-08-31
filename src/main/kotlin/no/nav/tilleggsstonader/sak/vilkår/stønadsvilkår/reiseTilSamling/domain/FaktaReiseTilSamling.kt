@@ -63,11 +63,15 @@ data class FaktaPrivatBil(
     override val adresse: String?,
     val reiseavstand: BigDecimal,
     val aktivitetId: VilkårperiodeGlobalId? = null,
+    val bompenger: BigDecimal? = null,
+    val fergekostnad: BigDecimal? = null,
+    val parkering: BigDecimal? = null,
 ) : FaktaReiseTilSamling {
     override val type = TypeReiseTilSamling.PRIVAT_BIL
 
     init {
         validerIngenNegativReiseavstand()
+        validerIngenNegativeUtgifter()
     }
 
     override fun mapTilVilkårFakta() =
@@ -76,6 +80,9 @@ data class FaktaPrivatBil(
             adresse = adresse,
             reiseavstand = reiseavstand,
             aktivitetId = aktivitetId,
+            bompenger = bompenger,
+            fergekostnad = fergekostnad,
+            parkering = parkering,
         )
 
     private fun validerIngenNegativReiseavstand() {
@@ -83,6 +90,18 @@ data class FaktaPrivatBil(
             brukerfeilHvis(it <= 30.toBigDecimal()) {
                 "Reiseavstand kan ikke være mindre enn 30 km"
             }
+        }
+    }
+
+    private fun validerIngenNegativeUtgifter() {
+        brukerfeilHvis(bompenger != null && bompenger < BigDecimal.ZERO) {
+            "Bompenger kan ikke være negativt"
+        }
+        brukerfeilHvis(fergekostnad != null && fergekostnad < BigDecimal.ZERO) {
+            "Fergekostnad kan ikke være negativ"
+        }
+        brukerfeilHvis(parkering != null && parkering < BigDecimal.ZERO) {
+            "Parkering kan ikke være negativ"
         }
     }
 }

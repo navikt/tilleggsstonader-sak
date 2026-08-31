@@ -53,6 +53,9 @@ data class FaktaReiseTilSamlingPrivatBil(
     override val adresse: String?,
     val reiseavstand: BigDecimal,
     val aktivitetId: VilkårperiodeGlobalId? = null,
+    val bompenger: BigDecimal? = null,
+    val fergekostnad: BigDecimal? = null,
+    val parkering: BigDecimal? = null,
 ) : VilkårFakta
 
 data class FaktaReiseTilSamlingUbestemt(
