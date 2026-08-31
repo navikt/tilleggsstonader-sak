@@ -1,0 +1,36 @@
+{
+  "regler" : {
+    "KAN_REISE_MED_OFFENTLIG_TRANSPORT" : {
+      "regelId" : "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
+      "erHovedregel" : true,
+      "svarMapping" : {
+        "JA" : {
+          "begrunnelseType" : "UTEN",
+          "tilhørendeFaktaType" : "REISE_OPPSTART_AVSLUTNING_HJEMREISE_OFFENTLIG_TRANSPORT",
+          "regelId" : "SLUTT_NODE"
+        },
+        "NEI" : {
+          "regelId" : "KAN_REISE_MED_EGEN_BIL",
+          "begrunnelseType" : "PÅKREVD"
+        }
+      }
+    },
+    "KAN_REISE_MED_EGEN_BIL" : {
+      "regelId" : "KAN_REISE_MED_EGEN_BIL",
+      "erHovedregel" : false,
+      "svarMapping" : {
+        "JA" : {
+          "begrunnelseType" : "UTEN",
+          "tilhørendeFaktaType" : "REISE_OPPSTART_AVSLUTNING_HJEMREISE_PRIVAT_BIL",
+          "regelId" : "SLUTT_NODE"
+        },
+        "NEI" : {
+          "begrunnelseType" : "PÅKREVD",
+          "tilhørendeFaktaType" : null,
+          "regelId" : "SLUTT_NODE"
+        }
+      }
+    }
+  },
+  "vilkårType" : "REISE_OPPSTART_AVSLUTNING_HJEMREISE"
+}

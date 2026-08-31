@@ -85,6 +85,10 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresult
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårReiseOppstartAvslutningHjemreiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.VilkårReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingDto
@@ -775,6 +779,31 @@ fun lagreReiseTilSamlingDto(
     tom = tom,
     reiseId = reiseId,
     adresse = adresse,
+    svar = svar,
+    fakta = fakta,
+)
+
+fun lagreReiseOppstartAvslutningHjemreiseDto(
+    fom: LocalDate = 1 januar 2025,
+    tom: LocalDate = 31 januar 2025,
+    adresse: String = "Tiltaksveien 1",
+    reiseId: ReiseId = dummyReiseId,
+    typeReiseformål: TypeReiseformål = TypeReiseformål.OPPSTART,
+    utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
+    svar: Map<RegelId, SvarOgBegrunnelseDto> =
+        mapOf(
+            RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
+        ),
+    fakta: FaktaReiseOppstartAvslutningHjemreiseDto =
+        FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
+            utgifterOffentligTransport = utgifterOffentligTransport,
+        ),
+) = LagreVilkårReiseOppstartAvslutningHjemreiseDto(
+    fom = fom,
+    tom = tom,
+    reiseId = reiseId,
+    adresse = adresse,
+    typeReiseformål = typeReiseformål,
     svar = svar,
     fakta = fakta,
 )

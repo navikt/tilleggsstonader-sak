@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.Totrinnskont
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VedtakKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårDagligReiseKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårReiseOppstartAvslutningHjemreiseKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårReiseTilSamlingKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårperiodeKall
 
@@ -50,6 +51,7 @@ class Kall(
     val vilkår = VilkårKall(testklient)
     val vilkårDagligReise = VilkårDagligReiseKall(testklient)
     val vilkårReiseTilSamling = VilkårReiseTilSamlingKall(testklient)
+    val vilkårReiseOppstartAvslutningHjemreise = VilkårReiseOppstartAvslutningHjemreiseKall(testklient)
     val vilkårperiode = VilkårperiodeKall(testklient)
     val brevmottakere = BrevmottakereKall(testklient)
 }

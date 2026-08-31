@@ -45,6 +45,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreisePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingUbestemt
@@ -375,6 +378,10 @@ class InterntVedtakService(
             is FaktaReiseTilSamlingOffentligTransport -> TODO()
             is FaktaReiseTilSamlingPrivatBil -> TODO()
             is FaktaReiseTilSamlingUbestemt -> TODO()
+
+            is FaktaReiseOppstartAvslutningHjemreiseOffentligTransport -> TODO()
+            is FaktaReiseOppstartAvslutningHjemreisePrivatBil -> TODO()
+            is FaktaReiseOppstartAvslutningHjemreiseUbestemt -> TODO()
 
             null -> null
         }
