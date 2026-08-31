@@ -2,14 +2,17 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderStøtteTilReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvis
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingIdErLik
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
@@ -53,6 +56,7 @@ class VilkårperiodeService(
     private val vilkårperiodeGrunnlagService: VilkårperiodeGrunnlagService,
     private val faktaGrunnlagService: FaktaGrunnlagService,
     private val vilkårRepository: VilkårRepository,
+    private val unleashService: UnleashService,
 ) {
     fun hentVilkårperioder(behandlingId: BehandlingId): Vilkårperioder {
         val vilkårsperioder = vilkårperiodeRepository.findByBehandlingId(behandlingId).sorted()
@@ -281,6 +285,18 @@ class VilkårperiodeService(
         behandling.status.validerKanBehandlingRedigeres()
         feilHvis(behandling.steg != StegType.INNGANGSVILKÅR) {
             "Kan ikke opprette eller endre periode når behandling ikke er på steg ${StegType.INNGANGSVILKÅR}"
+        }
+        validerFeatureTogglet(behandling)
+    }
+
+    private fun validerFeatureTogglet(behandling: Saksbehandling) {
+        if (!behandling.stønadstype.gjelderStøtteTilReiseOppstartAvslutningHjemreise()) {
+            return
+        }
+        val kanBehandle = unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_OPPSTART_AVSLUTNING_HJEMREISE)
+        feilHvis(!kanBehandle) {
+            "TS-sak støtter foreløpig ikke behandling av saker som gjelder " +
+                "reise ved oppstart/avslutning/hjemreise"
         }
     }
 

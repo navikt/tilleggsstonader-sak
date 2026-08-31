@@ -22,6 +22,8 @@ object FaktaVurderingerJsonFilesUtil {
     fun Stønadstype.tilTypeFaktaOgVurderingSuffix() =
         when (this) {
             Stønadstype.BARNETILSYN -> "TILSYN_BARN"
+            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO -> "REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO"
+            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR -> "REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR"
             else -> name
         }
 

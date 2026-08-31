@@ -80,7 +80,7 @@ class BehandlingFaktaService(
             -> error("Henting av fakta for $stønadstype er ikke implementert")
             Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
             Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
-            -> error("Henting av fakta for $stønadstype er ikke implementert")
+            -> hentFaktaDtoForReiseOppstartAvslutningHjemreise(behandlingId)
         }
     }
 
@@ -154,6 +154,15 @@ class BehandlingFaktaService(
             samlinger = mapSamlinger(søknad?.data?.samlinger),
             avreiseadresse = mapAvreiseadresse(søknad?.data?.avreiseadresse),
             reisemåte = mapReisemåte(søknad?.data?.reisemåte),
+        )
+    }
+
+    private fun hentFaktaDtoForReiseOppstartAvslutningHjemreise(
+        behandlingId: BehandlingId,
+    ): BehandlingFaktaReiseOppstartAvslutningHjemreiseDto {
+        val grunnlagsdata = faktaGrunnlagService.hentGrunnlagsdata(behandlingId)
+        return BehandlingFaktaReiseOppstartAvslutningHjemreiseDto(
+            arena = arenaFakta(grunnlagsdata),
         )
     }
 

@@ -146,25 +146,19 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
         )
     """
 
-    private fun forventetType(type: TypeFaktaOgVurdering): Class<out FaktaOgVurdering> {
-        if (type is TypeFaktaOgVurderingPassAvBarn) {
-            return forventetTypePassAvBarn(type)
-        } else if (type is TypeFaktaOgVurderingLæremidler) {
-            return forventetTypeLæremidler(type)
-        } else if (type is TypeFaktaOgVurderingBoutgifter) {
-            return forventetTypeBoutgifter(type)
-        } else if (type is TypeFaktaOgVurderingDagligReiseTso) {
-            return forventetTypeDagligReiseTso(type)
-        } else if (type is TypeFaktaOgVurderingDagligReiseTsr) {
-            return forventetTypeDagligReiseTsr(type)
-        } else if (type is TypeFaktaOgVurderingReiseTilSamlingTso) {
-            return forventetTypeReiseTilSamlingTso(type)
-        } else if (type is TypeFaktaOgVurderingReiseTilSamlingTsr) {
-            return forventetTypeReiseTilSamlingTsr(type)
+    private fun forventetType(type: TypeFaktaOgVurdering): Class<out FaktaOgVurdering> =
+        when (type) {
+            is TypeFaktaOgVurderingPassAvBarn -> forventetTypePassAvBarn(type)
+            is TypeFaktaOgVurderingLæremidler -> forventetTypeLæremidler(type)
+            is TypeFaktaOgVurderingBoutgifter -> forventetTypeBoutgifter(type)
+            is TypeFaktaOgVurderingDagligReiseTso -> forventetTypeDagligReiseTso(type)
+            is TypeFaktaOgVurderingDagligReiseTsr -> forventetTypeDagligReiseTsr(type)
+            is TypeFaktaOgVurderingReiseTilSamlingTso -> forventetTypeReiseTilSamlingTso(type)
+            is TypeFaktaOgVurderingReiseTilSamlingTsr -> forventetTypeReiseTilSamlingTsr(type)
+            is TypeFaktaOgVurderingReiseOppstartAvslutningHjemreiseTso -> forventetTypeReiseOppstartAvslutningHjemreiseTso(type)
+            is TypeFaktaOgVurderingReiseOppstartAvslutningHjemreiseTsr -> forventetTypeReiseOppstartAvslutningHjemreiseTsr(type)
+            else -> error("Ukjent type")
         }
-
-        error("Ukjent type")
-    }
 
     private fun forventetTypePassAvBarn(type: TypeFaktaOgVurderingPassAvBarn): Class<out FaktaOgVurderingPassAvBarn> =
         when (type) {
@@ -321,6 +315,68 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
                     AktivitetReiseTilSamlingTsrType.TILTAK_REISE_TIL_SAMLING_TSR -> TiltakReiseTilSamlingTsr::class
                     AktivitetReiseTilSamlingTsrType.UTDANNING_REISE_TIL_SAMLING_TSR -> UtdanningReiseTilSamlingTsr::class
                     AktivitetReiseTilSamlingTsrType.INGEN_AKTIVITET_REISE_TIL_SAMLING_TSR -> IngenAktivitetReiseTilSamlingTsr::class
+                }
+            }
+        }.java
+
+    private fun forventetTypeReiseOppstartAvslutningHjemreiseTso(
+        type: TypeFaktaOgVurderingReiseOppstartAvslutningHjemreiseTso,
+    ): Class<out FaktaOgVurderingReiseOppstartAvslutningHjemreiseTso> =
+        when (type) {
+            is MålgruppeReiseOppstartAvslutningHjemreiseTsoType -> {
+                when (type) {
+                    MålgruppeReiseOppstartAvslutningHjemreiseTsoType.AAP_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO ->
+                        AAPReiseOppstartAvslutningHjemreiseTso::class
+                    MålgruppeReiseOppstartAvslutningHjemreiseTsoType.UFØRETRYGD_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO ->
+                        UføretrygdReiseOppstartAvslutningHjemreiseTso::class
+                    MålgruppeReiseOppstartAvslutningHjemreiseTsoType.NEDSATT_ARBEIDSEVNE_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO ->
+                        NedsattArbeidsevneReiseOppstartAvslutningHjemreiseTso::class
+                    MålgruppeReiseOppstartAvslutningHjemreiseTsoType.OMSTILLINGSSTØNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO ->
+                        OmstillingsstønadReiseOppstartAvslutningHjemreiseTso::class
+                    MålgruppeReiseOppstartAvslutningHjemreiseTsoType.OVERGANGSSTØNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO ->
+                        OvergangssstønadReiseOppstartAvslutningHjemreiseTso::class
+                    MålgruppeReiseOppstartAvslutningHjemreiseTsoType.INGEN_MÅLGRUPPE_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO ->
+                        IngenMålgruppeReiseOppstartAvslutningHjemreiseTso::class
+                }
+            }
+
+            is AktivitetReiseOppstartAvslutningHjemreiseTsoType -> {
+                when (type) {
+                    AktivitetReiseOppstartAvslutningHjemreiseTsoType.TILTAK_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO ->
+                        TiltakReiseOppstartAvslutningHjemreiseTso::class
+                    AktivitetReiseOppstartAvslutningHjemreiseTsoType.UTDANNING_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO ->
+                        UtdanningReiseOppstartAvslutningHjemreiseTso::class
+                    AktivitetReiseOppstartAvslutningHjemreiseTsoType.INGEN_AKTIVITET_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO ->
+                        IngenAktivitetReiseOppstartAvslutningHjemreiseTso::class
+                }
+            }
+        }.java
+
+    private fun forventetTypeReiseOppstartAvslutningHjemreiseTsr(
+        type: TypeFaktaOgVurderingReiseOppstartAvslutningHjemreiseTsr,
+    ): Class<out FaktaOgVurderingReiseOppstartAvslutningHjemreiseTsr> =
+        when (type) {
+            is MålgruppeReiseOppstartAvslutningHjemreiseTsrType -> {
+                when (type) {
+                    MålgruppeReiseOppstartAvslutningHjemreiseTsrType.DAGPENGER_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR ->
+                        DagpengerReiseOppstartAvslutningHjemreiseTsr::class
+                    MålgruppeReiseOppstartAvslutningHjemreiseTsrType.TILTAKSPENGER_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR ->
+                        TiltakspengerReiseOppstartAvslutningHjemreiseTsr::class
+                    MålgruppeReiseOppstartAvslutningHjemreiseTsrType.KVALIFISERINGSSTØNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR ->
+                        KvalifiseringsstønadReiseOppstartAvslutningHjemreiseTsr::class
+                    MålgruppeReiseOppstartAvslutningHjemreiseTsrType.INNSATT_I_FENGSEL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR ->
+                        InnsattIFengselReiseOppstartAvslutningHjemreiseTsr::class
+                    MålgruppeReiseOppstartAvslutningHjemreiseTsrType.INGEN_MÅLGRUPPE_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR ->
+                        IngenMålgruppeReiseOppstartAvslutningHjemreiseTsr::class
+                }
+            }
+
+            is AktivitetReiseOppstartAvslutningHjemreiseTsrType -> {
+                when (type) {
+                    AktivitetReiseOppstartAvslutningHjemreiseTsrType.TILTAK_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR ->
+                        TiltakReiseOppstartAvslutningHjemreiseTsr::class
+                    AktivitetReiseOppstartAvslutningHjemreiseTsrType.INGEN_AKTIVITET_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR ->
+                        IngenAktivitetReiseOppstartAvslutningHjemreiseTsr::class
                 }
             }
         }.java

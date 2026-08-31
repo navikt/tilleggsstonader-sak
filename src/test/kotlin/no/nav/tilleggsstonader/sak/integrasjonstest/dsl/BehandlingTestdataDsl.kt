@@ -258,4 +258,20 @@ class BehandlingTestdataDsl internal constructor() {
             }
         }
     }
+
+    fun defaultReiseTilOppstartAvslutningOgHjemreiserTSOTestdata(
+        fom: LocalDate = defaultFom,
+        tom: LocalDate = defaultTom,
+    ) {
+        aktivitet {
+            opprett {
+                aktivitetTiltakTsoReiseTilOppstart(fom, tom)
+            }
+        }
+        målgruppe {
+            opprett {
+                målgruppeAAP(fom, tom)
+            }
+        }
+    }
 }

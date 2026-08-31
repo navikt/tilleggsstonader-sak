@@ -25,6 +25,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingPassAvBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingReiseOppstartAvslutningHjemreiseTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingReiseOppstartAvslutningHjemreiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingReiseTilSamlingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingReiseTilSamlingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
@@ -109,6 +111,14 @@ fun Vurdering.tilDto() = VurderingDto(svar = svar, resultat = resultat)
     JsonSubTypes.Type(AktivitetDagligReiseTsrFaktaOgVurderingerDto::class, name = "AKTIVITET_DAGLIG_REISE_TSR"),
     JsonSubTypes.Type(AktivitetReiseTilSamlingTsoFaktaOgVurderingerDto::class, name = "AKTIVITET_REISE_TIL_SAMLING_TSO"),
     JsonSubTypes.Type(AktivitetReiseTilSamlingTsrFaktaOgVurderingerDto::class, name = "AKTIVITET_REISE_TIL_SAMLING_TSR"),
+    JsonSubTypes.Type(
+        AktivitetReiseOppstartAvslutningHjemreiseTsoFaktaOgVurderingerDto::class,
+        name = "AKTIVITET_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO",
+    ),
+    JsonSubTypes.Type(
+        AktivitetReiseOppstartAvslutningHjemreiseTsrFaktaOgVurderingerDto::class,
+        name = "AKTIVITET_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR",
+    ),
 )
 sealed class FaktaOgVurderingerDto
 
@@ -163,6 +173,18 @@ data class AktivitetReiseTilSamlingTsrFaktaOgVurderingerDto(
     val harUtgifter: VurderingDto? = null,
     val erAktivitetenObligatorisk: VurderingDto? = null,
     val aktivitetsdager: Int? = null,
+) : FaktaOgVurderingerDto()
+
+data class AktivitetReiseOppstartAvslutningHjemreiseTsoFaktaOgVurderingerDto(
+    val lønnet: VurderingDto? = null,
+    val harUtgifter: VurderingDto? = null,
+    val erAktivitetenObligatorisk: VurderingDto? = null,
+) : FaktaOgVurderingerDto()
+
+data class AktivitetReiseOppstartAvslutningHjemreiseTsrFaktaOgVurderingerDto(
+    val lønnet: VurderingDto? = null,
+    val harUtgifter: VurderingDto? = null,
+    val erAktivitetenObligatorisk: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
 fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
@@ -261,6 +283,28 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                                 ?.erAktivitetenObligatorisk
                                 ?.tilDto(),
                         aktivitetsdager = fakta.takeIfFakta<FaktaAktivitetsdagerNullable>()?.aktivitetsdager,
+                    )
+
+                is FaktaOgVurderingReiseOppstartAvslutningHjemreiseTso ->
+                    AktivitetReiseOppstartAvslutningHjemreiseTsoFaktaOgVurderingerDto(
+                        lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
+                        harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
+                        erAktivitetenObligatorisk =
+                            vurderinger
+                                .takeIfVurderinger<ErAktivitetenObligatoriskVurdering>()
+                                ?.erAktivitetenObligatorisk
+                                ?.tilDto(),
+                    )
+
+                is FaktaOgVurderingReiseOppstartAvslutningHjemreiseTsr ->
+                    AktivitetReiseOppstartAvslutningHjemreiseTsrFaktaOgVurderingerDto(
+                        lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
+                        harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
+                        erAktivitetenObligatorisk =
+                            vurderinger
+                                .takeIfVurderinger<ErAktivitetenObligatoriskVurdering>()
+                                ?.erAktivitetenObligatorisk
+                                ?.tilDto(),
                     )
             }
         }
