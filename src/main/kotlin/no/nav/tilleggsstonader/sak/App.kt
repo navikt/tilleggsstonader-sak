@@ -13,5 +13,8 @@ import org.springframework.boot.webmvc.autoconfigure.error.ErrorMvcAutoConfigura
 class App
 
 fun main(args: Array<String>) {
+    // Avro 1.12.2 krever eksplisitt tillit til pakker som brukes i genererte schema-klasser,
+    // se https://issues.apache.org/jira/browse/AVRO-3971 (CVE-2024-47561)
+    System.setProperty("org.apache.avro.SERIALIZABLE_PACKAGES", "no.nav.person.pdl.leesah")
     runApplication<App>(*args)
 }
