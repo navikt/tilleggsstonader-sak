@@ -29,7 +29,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetPassAvBarn
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetReiseOppstartAvslutningHjemreiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetReiseTilSamlingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetBoutgifter
@@ -110,7 +109,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningReiseOppstartAvslutningHjemreiseTso
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningReiseOppstartAvslutningHjemreiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningReiseTilSamlingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningReiseTilSamlingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
@@ -139,7 +137,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygdLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUtdanningDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUtdanningReiseOppstartAvslutningHjemreiseTso
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUtdanningReiseOppstartAvslutningHjemreiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUtdanningReiseTilSamlingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUtdanningReiseTilSamlingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingerUtdanningLæremidler
@@ -958,18 +955,10 @@ private fun mapAktiviteterReiseOppstartAvslutningHjemreiseTsr(
                         harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
                         erAktivitetenObligatorisk = VurderingErAktivitetenObligatorisk(faktaOgSvar.svarErAktivitetenObligatorisk),
                     ),
-                fakta = FaktaAktivitetReiseOppstartAvslutningHjemreiseTsr(faktaOgSvar.aktivitetsdager),
             )
 
         AktivitetType.UTDANNING ->
-            UtdanningReiseOppstartAvslutningHjemreiseTsr(
-                vurderinger =
-                    VurderingUtdanningReiseOppstartAvslutningHjemreiseTsr(
-                        harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
-                        erAktivitetenObligatorisk = VurderingErAktivitetenObligatorisk(faktaOgSvar.svarErAktivitetenObligatorisk),
-                    ),
-                fakta = FaktaAktivitetReiseOppstartAvslutningHjemreiseTsr(faktaOgSvar.aktivitetsdager),
-            )
+            feil("Utdanning er ikke en gyldig aktivitet for reise oppstart/avslutning/hjemreise TSR")
 
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetReiseOppstartAvslutningHjemreiseTsr
         AktivitetType.REELL_ARBEIDSSØKER ->

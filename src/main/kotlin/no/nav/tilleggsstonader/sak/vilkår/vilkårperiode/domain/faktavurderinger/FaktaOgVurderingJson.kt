@@ -115,10 +115,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
         name = "INGEN_MÅLGRUPPE_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO",
     ),
     JsonSubTypes.Type(
-        UtdanningReiseOppstartAvslutningHjemreiseTsr::class,
-        name = "UTDANNING_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR",
-    ),
-    JsonSubTypes.Type(
         TiltakReiseOppstartAvslutningHjemreiseTsr::class,
         name = "TILTAK_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR",
     ),

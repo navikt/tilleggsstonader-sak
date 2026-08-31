@@ -1,8 +1,6 @@
 {
   "type": "TILTAK_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR",
-  "fakta": {
-    "aktivitetsdager": 3
-  },
+  "fakta": {},
   "vurderinger": {
     "lønnet": {
       "svar": "NEI",

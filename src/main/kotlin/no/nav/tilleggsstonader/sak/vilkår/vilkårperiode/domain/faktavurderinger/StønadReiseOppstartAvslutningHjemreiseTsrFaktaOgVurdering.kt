@@ -21,18 +21,10 @@ sealed interface AktivitetReiseOppstartAvslutningHjemreiseTsr :
 
 data class TiltakReiseOppstartAvslutningHjemreiseTsr(
     override val vurderinger: VurderingTiltakReiseOppstartAvslutningHjemreiseTsr,
-    override val fakta: FaktaAktivitetReiseOppstartAvslutningHjemreiseTsr,
 ) : AktivitetReiseOppstartAvslutningHjemreiseTsr {
     override val type: AktivitetReiseOppstartAvslutningHjemreiseTsrType =
         AktivitetReiseOppstartAvslutningHjemreiseTsrType.TILTAK_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR
-}
-
-data class UtdanningReiseOppstartAvslutningHjemreiseTsr(
-    override val vurderinger: VurderingUtdanningReiseOppstartAvslutningHjemreiseTsr,
-    override val fakta: FaktaAktivitetReiseOppstartAvslutningHjemreiseTsr,
-) : AktivitetReiseOppstartAvslutningHjemreiseTsr {
-    override val type: AktivitetReiseOppstartAvslutningHjemreiseTsrType =
-        AktivitetReiseOppstartAvslutningHjemreiseTsrType.UTDANNING_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR
+    override val fakta: IngenFakta = IngenFakta
 }
 
 data object IngenAktivitetReiseOppstartAvslutningHjemreiseTsr : AktivitetReiseOppstartAvslutningHjemreiseTsr {
@@ -89,24 +81,12 @@ data class VurderingTiltakReiseOppstartAvslutningHjemreiseTsr(
     LønnetVurdering,
     ErAktivitetenObligatoriskVurdering
 
-data class VurderingUtdanningReiseOppstartAvslutningHjemreiseTsr(
-    override val harUtgifter: VurderingHarUtgifter,
-    override val erAktivitetenObligatorisk: VurderingErAktivitetenObligatorisk,
-) : HarUtgifterVurdering,
-    ErAktivitetenObligatoriskVurdering
-
-data class FaktaAktivitetReiseOppstartAvslutningHjemreiseTsr(
-    override val aktivitetsdager: Int? = null,
-) : Fakta,
-    FaktaAktivitetsdagerNullable
-
 sealed interface TypeFaktaOgVurderingReiseOppstartAvslutningHjemreiseTsr : TypeFaktaOgVurdering
 
 enum class AktivitetReiseOppstartAvslutningHjemreiseTsrType(
     override val vilkårperiodeType: AktivitetType,
 ) : TypeAktivitetOgVurdering,
     TypeFaktaOgVurderingReiseOppstartAvslutningHjemreiseTsr {
-    UTDANNING_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR(AktivitetType.UTDANNING),
     TILTAK_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR(AktivitetType.TILTAK),
     INGEN_AKTIVITET_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR(AktivitetType.INGEN_AKTIVITET),
 }

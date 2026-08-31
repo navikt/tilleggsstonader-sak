@@ -375,8 +375,6 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
                 when (type) {
                     AktivitetReiseOppstartAvslutningHjemreiseTsrType.TILTAK_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR ->
                         TiltakReiseOppstartAvslutningHjemreiseTsr::class
-                    AktivitetReiseOppstartAvslutningHjemreiseTsrType.UTDANNING_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR ->
-                        UtdanningReiseOppstartAvslutningHjemreiseTsr::class
                     AktivitetReiseOppstartAvslutningHjemreiseTsrType.INGEN_AKTIVITET_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR ->
                         IngenAktivitetReiseOppstartAvslutningHjemreiseTsr::class
                 }
