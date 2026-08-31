@@ -8,9 +8,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.math.BigDecimal
 import java.time.LocalDate
 
-// TODO burde fil bytte navn til BeregningReiseTilSamling?
-
-data class BeregningReiseTilSamling(
+data class BeregningsresultatReiseTilSamling(
     val offentligTransport: List<BeregningsresultatOffentligTransport>,
     val privatBil: List<BeregningsresultatPrivatBil>,
 )

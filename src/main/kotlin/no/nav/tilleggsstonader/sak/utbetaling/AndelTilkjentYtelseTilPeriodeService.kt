@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørPassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -17,6 +18,7 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.finnPeriodeFraAndel as finn
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.finnPeriodeFraAndel as finnPeriodeDagligReiseFraAndel
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.finnPerioderFraAndel as finnPerioderLæremidlerFraAndel
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.finnPeriodeFraAndel as finnPeriodePassAvBarnFraAndel
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.finnPeriodeFraAndel as finnPeriodeReiseTilSamlingFraAndel
 
 @Service
 class AndelTilkjentYtelseTilPeriodeService(
@@ -57,6 +59,10 @@ class AndelTilkjentYtelseTilPeriodeService(
 
             is InnvilgelseEllerOpphørDagligReise ->
                 finnPeriodeDagligReiseFraAndel(vedtakdata.beregningsresultat, andelTilkjentYtelse)
+
+            is InnvilgelseEllerOpphørReiseTilSamling ->
+                finnPeriodeReiseTilSamlingFraAndel(vedtakdata.beregningsresultat, andelTilkjentYtelse)
+
             else -> error("Behandling ${vedtak.behandlingId} har ikke et iverksatt vedtak")
         }
     }
