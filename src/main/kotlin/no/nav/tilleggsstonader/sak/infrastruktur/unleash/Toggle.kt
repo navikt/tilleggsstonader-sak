@@ -36,4 +36,6 @@ enum class Toggle(
     KAN_REDUSERE_REISEDAGER_REVURDERING_PRIVAT_BIL("sak.redusere-reisedager-revurdering-privat-bil"),
 
     KAN_BEHANDLE_REISE_TIL_SAMLING("sak.reise-til-samling"),
+
+    KAN_BEHANDLE_REISE_OPPSTART_AVSLUTNING_HJEMREISE("sak.reise-oppstart-avslutning-hjemreise"),
 }

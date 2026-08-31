@@ -1,0 +1,16 @@
+{
+  "type": "UTDANNING_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR",
+  "fakta": {
+    "aktivitetsdager": 3
+  },
+  "vurderinger": {
+    "harUtgifter": {
+      "svar": "JA",
+      "resultat": "OPPFYLT"
+    },
+    "erAktivitetenObligatorisk": {
+      "svar": "JA",
+      "resultat": "OPPFYLT"
+    }
+  }
+}

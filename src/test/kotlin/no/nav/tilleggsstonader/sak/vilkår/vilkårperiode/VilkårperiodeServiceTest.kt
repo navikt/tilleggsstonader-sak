@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
@@ -14,6 +15,9 @@ import no.nav.tilleggsstonader.sak.behandling.historikk.BehandlingshistorikkServ
 import no.nav.tilleggsstonader.sak.behandling.historikk.domain.StegUtfall
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.mockIsEnabled
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.resetMock
 import no.nav.tilleggsstonader.sak.util.BrukerContextUtil.testWithBrukerContext
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.fagsak
@@ -37,6 +41,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -395,6 +400,68 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
                 lagretAktivitet.id,
                 SlettVikårperiode(lagretAktivitet.behandlingId, kommentar = "kommentar"),
             )
+        }
+    }
+
+    @Nested
+    inner class FeatureToggleReiseOppstartAvslutningHjemreise {
+        @Autowired
+        lateinit var unleashService: UnleashService
+
+        @AfterEach
+        fun tearDown() {
+            resetMock(unleashService)
+        }
+
+        @Test
+        fun `skal ikke kunne opprette vilkårperiode når toggelen er av`() {
+            unleashService.mockIsEnabled(Toggle.KAN_BEHANDLE_REISE_OPPSTART_AVSLUTNING_HJEMREISE, false)
+
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(status = BehandlingStatus.OPPRETTET),
+                    stønadstype = Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+                )
+            val målgruppeSomSkalOpprettes =
+                dummyVilkårperiodeMålgruppe(behandlingId = behandling.id)
+
+            assertThatThrownBy {
+                vilkårperiodeService.opprettVilkårperiode(målgruppeSomSkalOpprettes)
+            }.hasMessageContaining("TS-sak støtter foreløpig ikke behandling av saker")
+        }
+
+        @Test
+        fun `skal kunne opprette vilkårperiode når toggelen er på`() {
+            unleashService.mockIsEnabled(Toggle.KAN_BEHANDLE_REISE_OPPSTART_AVSLUTNING_HJEMREISE, true)
+
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(status = BehandlingStatus.OPPRETTET),
+                    stønadstype = Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+                )
+            val målgruppeSomSkalOpprettes =
+                dummyVilkårperiodeMålgruppe(behandlingId = behandling.id)
+
+            val opprettetVilkårperiode = vilkårperiodeService.opprettVilkårperiode(målgruppeSomSkalOpprettes)
+
+            assertThat(opprettetVilkårperiode.behandlingId).isEqualTo(behandling.id)
+        }
+
+        @Test
+        fun `toggelen skal ikke påvirke andre stønadstyper`() {
+            unleashService.mockIsEnabled(Toggle.KAN_BEHANDLE_REISE_OPPSTART_AVSLUTNING_HJEMREISE, false)
+
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling(status = BehandlingStatus.OPPRETTET),
+                    stønadstype = Stønadstype.BARNETILSYN,
+                )
+            val målgruppeSomSkalOpprettes =
+                dummyVilkårperiodeMålgruppe(behandlingId = behandling.id)
+
+            val opprettetVilkårperiode = vilkårperiodeService.opprettVilkårperiode(målgruppeSomSkalOpprettes)
+
+            assertThat(opprettetVilkårperiode.behandlingId).isEqualTo(behandling.id)
         }
     }
 }

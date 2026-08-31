@@ -394,4 +394,17 @@ internal class BehandlingFaktaServiceTest {
         assertThat(fakta.reisemåte?.kanBenytteEgenBil).isEqualTo(KanBenytteEgenBil.NEI)
         assertThat(fakta.reisemåte?.ønskerDekketUtgifterForDrosje).isEqualTo(JaNei.JA)
     }
+
+    @Test
+    fun `skal mappe minimal fakta for reise ved oppstart, avslutning og hjemreise`() {
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns lagGrunnlagsdata()
+        every { fagsakService.hentFagsakForBehandling(behandlingId) } returns
+            fagsak(stønadstype = Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO)
+
+        val fakta = service.hentFakta(behandlingId) as BehandlingFaktaReiseOppstartAvslutningHjemreiseDto
+
+        assertThat(fakta.søknadMottattTidspunkt).isNull()
+        assertThat(fakta.hovedytelse).isNull()
+        assertThat(fakta.dokumentasjon).isNull()
+    }
 }
