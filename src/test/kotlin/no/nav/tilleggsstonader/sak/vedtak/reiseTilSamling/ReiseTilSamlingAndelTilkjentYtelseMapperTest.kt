@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.Beregningsresul
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 
 class ReiseTilSamlingAndelTilkjentYtelseMapperTest {
     val saksbehandling = saksbehandling(fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
@@ -17,9 +18,10 @@ class ReiseTilSamlingAndelTilkjentYtelseMapperTest {
         @Test
         fun `fom og tom på andel tilkjent ytelse skal være lik fom til reisen hvis det er en ukedag`() {
             val mandag = 1 september 2025
+            val belopOffentlig = BigDecimal.valueOf(123)
             val beregningsresultat =
                 BeregningsresultatReiseTilSamling(
-                    offentligTransport = listOf(lagBeregningsresultatForOffentligTransport(mandag)),
+                    offentligTransport = listOf(lagBeregningsresultatForOffentligTransport(mandag, beløp = belopOffentlig)),
                     privatBil = emptyList(),
                 )
             val andeler = beregningsresultat.mapTilAndelTilkentYtelse(saksbehandling)
@@ -27,6 +29,7 @@ class ReiseTilSamlingAndelTilkjentYtelseMapperTest {
                 assertThat(fom).isEqualTo(mandag)
                 assertThat(tom).isEqualTo(mandag)
                 assertThat(utbetalingsdato).isEqualTo(mandag)
+                assertThat(beløp).isEqualTo(belopOffentlig.toInt())
             }
         }
 
@@ -67,19 +70,22 @@ class ReiseTilSamlingAndelTilkjentYtelseMapperTest {
         @Test
         fun `fom og tom på andel tilkjent ytelse skal være lik fom til reisen hvis det er en ukedag`() {
             val mandag = 1 september 2025
+            val belopPrivat = BigDecimal.valueOf(456)
             val beregningsresultat =
                 BeregningsresultatReiseTilSamling(
                     offentligTransport = emptyList(),
-                    privatBil = listOf(lagBeregningsresultatForPrivatBil(mandag)),
+                    privatBil = listOf(lagBeregningsresultatForPrivatBil(mandag, beløp = belopPrivat)),
                 )
             val andeler = beregningsresultat.mapTilAndelTilkentYtelse(saksbehandling)
             with(andeler.single()) {
                 assertThat(fom).isEqualTo(mandag)
                 assertThat(tom).isEqualTo(mandag)
                 assertThat(utbetalingsdato).isEqualTo(mandag)
+                assertThat(beløp).isEqualTo(belopPrivat.toInt())
             }
         }
 
+// TODO legge til sjekk på verdi på beløp
         @Test
         fun `når beregningsresultat ikke har privat bil returneres ingen andeler`() {
             val beregningsresultat =

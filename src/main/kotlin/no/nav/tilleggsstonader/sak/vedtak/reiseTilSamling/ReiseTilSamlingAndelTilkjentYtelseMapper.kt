@@ -101,7 +101,9 @@ private fun validerBrukersNavKontorForStønadstype(
             }
         }
 
-        else -> {}
+        else -> {
+            error("Uforventet stønadstype $stønadstype . Forventet Reise til samling")
+        }
     }
 }
 
@@ -109,28 +111,30 @@ fun finnPeriodeFraAndel(
     beregningsresultat: BeregningsresultatReiseTilSamling,
     andelTilkjentYtelse: AndelTilkjentYtelse,
 ): Datoperiode {
-    val offentligTransportPeriodeMedSammeDatoSomAndel =
-        beregningsresultat.offentligTransport.filter {
-            it.grunnlag.fom.datoEllerNesteMandagHvisLørdagEllerSøndag() ==
-                andelTilkjentYtelse.fom
-        }
-    val privatBilPeriodeMedSammeDatoSomAndel =
-        beregningsresultat.privatBil.filter {
-            it.grunnlag.fom.datoEllerNesteMandagHvisLørdagEllerSøndag() ==
-                andelTilkjentYtelse.fom
-        }
+    val fom =
+        beregningsresultat.offentligTransport
+            .find { it.reiseId == andelTilkjentYtelse.reiseId }
+            ?.grunnlag
+            ?.fom
+            ?: beregningsresultat.privatBil
+                .find { it.reiseId == andelTilkjentYtelse.reiseId }
+                ?.grunnlag
+                ?.fom
+            ?: error("Fant ikke periode for andel med reiseId ${andelTilkjentYtelse.reiseId}")
 
-    val alleFom = (
-        offentligTransportPeriodeMedSammeDatoSomAndel.map { it.grunnlag.fom } +
-            privatBilPeriodeMedSammeDatoSomAndel.map { it.grunnlag.fom }
-    )
-    val alleTom = (
-        offentligTransportPeriodeMedSammeDatoSomAndel.map { it.grunnlag.tom } +
-            privatBilPeriodeMedSammeDatoSomAndel.map { it.grunnlag.tom }
-    )
+    val tom =
+        beregningsresultat.offentligTransport
+            .find { it.reiseId == andelTilkjentYtelse.reiseId }
+            ?.grunnlag
+            ?.tom
+            ?: beregningsresultat.privatBil
+                .find { it.reiseId == andelTilkjentYtelse.reiseId }
+                ?.grunnlag
+                ?.tom
+            ?: error("Fant ikke periode for andel med reiseId ${andelTilkjentYtelse.reiseId}")
 
     return Datoperiode(
-        fom = alleFom.minOrNull()!!,
-        tom = alleTom.maxOrNull()!!,
+        fom = fom,
+        tom = tom,
     )
 }
