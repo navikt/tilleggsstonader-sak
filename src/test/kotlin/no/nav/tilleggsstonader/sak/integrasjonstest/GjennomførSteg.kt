@@ -28,6 +28,8 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequ
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.AvslagPassAvBarnDto
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.InnvilgelsePassAvBarnRequest
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.OpphørPassAvBarnRequest
+import no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise.dto.InnvilgelseReiseOppstartAvslutningHjemreiseTsoRequest
+import no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise.dto.InnvilgelseReiseOppstartAvslutningHjemreiseTsrRequest
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingTsoRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreVilkårDagligReiseDto
@@ -258,9 +260,14 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                             Stønadstype.FLYTTING_TSO,
                             Stønadstype.FLYTTING_TSR,
                             -> TODO("InnvilgelseFlyttingRequest")
-                            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
-                            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
-                            -> TODO("InnvilgelseStøtteTilReiseOppstartAvslutningHjemreiseRequest")
+                            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO ->
+                                InnvilgelseReiseOppstartAvslutningHjemreiseTsoRequest(
+                                    vedtaksperioder = vedtaksperioder,
+                                )
+                            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR ->
+                                InnvilgelseReiseOppstartAvslutningHjemreiseTsrRequest(
+                                    vedtaksperioder = vedtaksperioder,
+                                )
                         },
                 )
         }

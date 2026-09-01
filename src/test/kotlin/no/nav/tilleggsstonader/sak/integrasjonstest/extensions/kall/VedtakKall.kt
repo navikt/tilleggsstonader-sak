@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseTilSamling
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderStøtteTilReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
@@ -67,7 +68,10 @@ class VedtakKall(
         behandlingId: BehandlingId,
         innvilgelseDto: VedtakRequest,
     ) {
-        if (stønadstype.gjelderDagligReise() || stønadstype.gjelderReiseTilSamling()) {
+        if (stønadstype.gjelderDagligReise() ||
+            stønadstype.gjelderReiseTilSamling() ||
+            stønadstype.gjelderStøtteTilReiseOppstartAvslutningHjemreise()
+        ) {
             return lagreEnhetsspesifiktVedtak(
                 stønadstype,
                 behandlingId,
@@ -115,7 +119,10 @@ class VedtakKall(
             behandlingId: BehandlingId,
             innvilgelseDto: VedtakRequest,
         ): RestTestClient.ResponseSpec {
-            if (stønadstype.gjelderDagligReise() || stønadstype.gjelderReiseTilSamling()) {
+            if (stønadstype.gjelderDagligReise() ||
+                stønadstype.gjelderReiseTilSamling() ||
+                stønadstype.gjelderStøtteTilReiseOppstartAvslutningHjemreise()
+            ) {
                 return lagreEnhetsspesifiktVedtak(
                     stønadstype,
                     behandlingId,
@@ -150,7 +157,7 @@ private fun Stønadstype.tilPath(): String =
         -> TODO("path for FLYTTING")
         Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
         Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
-        -> TODO("path for STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE")
+        -> "reise-oppstart-avslutning-hjemreise"
     }
 
 private fun Enhet.tilPath(): String =

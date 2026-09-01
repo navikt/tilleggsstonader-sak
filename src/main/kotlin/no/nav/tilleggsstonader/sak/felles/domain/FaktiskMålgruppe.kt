@@ -89,10 +89,13 @@ enum class FaktiskMålgruppe(
             Stønadstype.FLYTTING_TSO,
             -> error("Kan ikke utlede Typeandel for FLYTTING fra FaktiskMålgruppe - ikke implementert")
 
-            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
-            ->
-                error(
-                    "Kan ikke utlede Typeandel for STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE fra FaktiskMålgruppe - ikke implementert",
-                )
+            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO -> {
+                when (this) {
+                    NEDSATT_ARBEIDSEVNE -> TypeAndel.REISE_OPPSTART_AAP
+                    ENSLIG_FORSØRGER -> TypeAndel.REISE_OPPSTART_ENSLIG_FORSØRGER
+                    GJENLEVENDE -> TypeAndel.REISE_OPPSTART_ETTERLATTE
+                    else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
+                }
+            }
         }
 }

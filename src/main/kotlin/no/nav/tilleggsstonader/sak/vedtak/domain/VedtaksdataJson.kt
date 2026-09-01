@@ -30,6 +30,10 @@ import tools.jackson.databind.ValueDeserializer
     JsonSubTypes.Type(AvslagDagligReise::class, name = "AVSLAG_DAGLIG_REISE"),
     JsonSubTypes.Type(OpphørDagligReise::class, name = "OPPHØR_DAGLIG_REISE"),
     JsonSubTypes.Type(InnvilgelseReiseTilSamling::class, name = "INNVILGELSE_REISE_TIL_SAMLING"),
+    JsonSubTypes.Type(
+        InnvilgelseReiseOppstartAvslutningHjemreise::class,
+        name = "INNVILGELSE_REISE_OPPSTART_AVSLUTNING_HJEMREISE",
+    ),
     failOnRepeatedNames = true,
 )
 sealed interface VedtaksdataJson
@@ -53,4 +57,5 @@ val typerVedtaksdata: Map<String, TypeVedtaksdata> =
         TypeVedtakBoutgifter.entries,
         TypeVedtakDagligReise.entries,
         TypeVedtakReiseTilSamling.entries,
+        TypeVedtakReiseOppstartAvslutningHjemreise.entries,
     ).flatten().associateBy { it.name }
