@@ -24,7 +24,7 @@ class ReiseTilSamlingAndelTilkjentYtelseMapperTest {
                     offentligTransport = listOf(lagBeregningsresultatForOffentligTransport(mandag, beløp = belopOffentlig)),
                     privatBil = emptyList(),
                 )
-            val andeler = beregningsresultat.mapTilAndelTilkentYtelse(saksbehandling)
+            val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling)
             with(andeler.single()) {
                 assertThat(fom).isEqualTo(mandag)
                 assertThat(tom).isEqualTo(mandag)
@@ -47,7 +47,7 @@ class ReiseTilSamlingAndelTilkjentYtelseMapperTest {
                     privatBil = emptyList(),
                 )
 
-            val andeler = beregningsresultat.mapTilAndelTilkentYtelse(saksbehandling)
+            val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling)
             assertThat(andeler.map { it.fom }).containsExactlyInAnyOrder(mandag, tirsdag)
             assertThat(andeler.size).isEqualTo(2)
         }
@@ -60,7 +60,7 @@ class ReiseTilSamlingAndelTilkjentYtelseMapperTest {
                     privatBil = emptyList(),
                 )
 
-            val andeler = beregningsresultat.mapTilAndelTilkentYtelse(saksbehandling)
+            val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling)
             assertThat(andeler).isEmpty()
         }
     }
@@ -76,7 +76,7 @@ class ReiseTilSamlingAndelTilkjentYtelseMapperTest {
                     offentligTransport = emptyList(),
                     privatBil = listOf(lagBeregningsresultatForPrivatBil(mandag, beløp = belopPrivat)),
                 )
-            val andeler = beregningsresultat.mapTilAndelTilkentYtelse(saksbehandling)
+            val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling)
             with(andeler.single()) {
                 assertThat(fom).isEqualTo(mandag)
                 assertThat(tom).isEqualTo(mandag)
@@ -93,7 +93,7 @@ class ReiseTilSamlingAndelTilkjentYtelseMapperTest {
                     privatBil = emptyList(),
                 )
 
-            val andeler = beregningsresultat.mapTilAndelTilkentYtelse(saksbehandling)
+            val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling)
             assertThat(andeler).isEmpty()
         }
     }

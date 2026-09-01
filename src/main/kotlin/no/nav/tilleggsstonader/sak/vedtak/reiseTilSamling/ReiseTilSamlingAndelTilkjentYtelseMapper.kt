@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.Beregningsresul
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import java.time.LocalDate
 
-fun BeregningsresultatReiseTilSamling.mapTilAndelTilkentYtelse(saksbehandling: Saksbehandling): List<AndelTilkjentYtelse> =
+fun BeregningsresultatReiseTilSamling.mapTilAndelTilkjentYtelse(saksbehandling: Saksbehandling): List<AndelTilkjentYtelse> =
     offentligTransport.map { beregningsresultatOffentligTransport ->
         beregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandling)
     } +

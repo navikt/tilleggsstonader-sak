@@ -4,7 +4,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørReiseTilSamling
-import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.mapTilAndelTilkentYtelse
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.mapTilAndelTilkjentYtelse
 import org.springframework.stereotype.Service
 
 @Service
@@ -16,7 +16,7 @@ class OpprettAndelerReiseTilSamlingService(
         val vedtak = vedtakService.hentVedtak<InnvilgelseEllerOpphørReiseTilSamling>(saksbehandling.id)
         tilkjentYtelseService.lagreTilkjentYtelse(
             behandlingId = saksbehandling.id,
-            andeler = vedtak.data.beregningsresultat.mapTilAndelTilkentYtelse(saksbehandling),
+            andeler = vedtak.data.beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling),
         )
     }
 }
