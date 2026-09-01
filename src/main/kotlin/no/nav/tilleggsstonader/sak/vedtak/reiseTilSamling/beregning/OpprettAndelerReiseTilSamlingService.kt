@@ -16,7 +16,7 @@ class OpprettAndelerReiseTilSamlingService(
         val vedtak = vedtakService.hentVedtak<InnvilgelseEllerOpphørReiseTilSamling>(saksbehandling.id)
         tilkjentYtelseService.lagreTilkjentYtelse(
             behandlingId = saksbehandling.id,
-            andeler = vedtak.data.beregningsresultat.mapTilAndelTilkentYtelse(saksbehandling) ?: emptyList(),
+            andeler = vedtak.data.beregningsresultat.mapTilAndelTilkentYtelse(saksbehandling),
         )
     }
 }
