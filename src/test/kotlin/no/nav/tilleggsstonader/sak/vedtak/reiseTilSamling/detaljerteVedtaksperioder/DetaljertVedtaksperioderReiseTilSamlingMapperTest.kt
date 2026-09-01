@@ -6,12 +6,12 @@ import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseReiseTilSamling
-import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.lagBeregningsresultatForOffentligTransport
-import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.lagBeregningsresultatForPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.detaljerteVedtaksperioder.DetaljertVedtaksperioderReiseTilSamlingMapper.finnDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatReiseTilSamling
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.lagBeregningsresultatForOffentligTransport
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.lagBeregningsresultatForPrivatBil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
