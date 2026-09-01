@@ -1,7 +1,7 @@
 #######
 # Denne er brukt til å gjøre det mulig å bruke tokens lokalt
 #
-# secret kan hentes fra cluster med "kubectl -n tilleggsstonader get secret azuread-tilleggsstonader-sak-lokal -o json | jq '.data | map_values(@base64d)'"
+# secret kan hentes fra cluster med "nais secret get azuread-tilleggsstonader-sak-lokal -e dev-gcp -t tilleggsstonader --with-values --reason "Lokal utvikling" --output json | jq '.[]'"
 #
 # Kjøres en gang eller ved endringer med
 # kubectl apply -f .nais/azure-ad-app-lokal.yaml
