@@ -157,12 +157,14 @@ class OpprettStønadsvilkårDsl {
         fom: LocalDate,
         tom: LocalDate,
         typeReiseformål: TypeReiseformål = TypeReiseformål.OPPSTART,
+        hentAktivitetId: (List<VilkårperiodeDto>) -> VilkårperiodeGlobalId = { it.single().globalId },
     ) {
-        dtoer += { _, _, _ ->
+        dtoer += { _, _, aktiviteter ->
             lagreReiseOppstartAvslutningHjemreiseDto(
                 fom = fom,
                 tom = tom,
                 typeReiseformål = typeReiseformål,
+                aktivitetId = hentAktivitetId(aktiviteter),
             )
         }
     }

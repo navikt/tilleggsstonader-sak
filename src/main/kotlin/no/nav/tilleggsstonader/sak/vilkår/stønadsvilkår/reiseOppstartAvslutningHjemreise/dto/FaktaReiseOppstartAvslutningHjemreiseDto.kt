@@ -35,7 +35,7 @@ sealed interface FaktaReiseOppstartAvslutningHjemreiseDto {
 
 data class FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
     val utgifterOffentligTransport: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId? = null,
+    val aktivitetId: VilkårperiodeGlobalId,
 ) : FaktaReiseOppstartAvslutningHjemreiseDto {
     override val type = TypeReiseOppstartAvslutningHjemreise.OFFENTLIG_TRANSPORT
 
@@ -54,7 +54,7 @@ data class FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
 
 data class FaktaReiseOppstartAvslutningHjemreisePrivatBilDto(
     val reiseavstand: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId? = null,
+    val aktivitetId: VilkårperiodeGlobalId,
 ) : FaktaReiseOppstartAvslutningHjemreiseDto {
     override val type = TypeReiseOppstartAvslutningHjemreise.PRIVAT_BIL
 

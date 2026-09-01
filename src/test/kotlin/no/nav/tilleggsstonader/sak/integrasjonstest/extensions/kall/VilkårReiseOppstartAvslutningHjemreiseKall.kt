@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelstrukturDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.AktivitetMedReiserDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårReiseOppstartAvslutningHjemreiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.SlettVilkårResultatDto
@@ -12,8 +13,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 class VilkårReiseOppstartAvslutningHjemreiseKall(
     private val testklient: Testklient,
 ) {
-    fun hentVilkår(behandlingId: BehandlingId): List<VilkårReiseOppstartAvslutningHjemreiseDto> =
-        apiRespons.hentVilkår(behandlingId).expectOkWithBody<List<VilkårReiseOppstartAvslutningHjemreiseDto>>()
+    fun hentVilkår(behandlingId: BehandlingId): List<AktivitetMedReiserDto> =
+        apiRespons.hentVilkår(behandlingId).expectOkWithBody<List<AktivitetMedReiserDto>>()
 
     fun opprettVilkår(
         behandlingId: BehandlingId,
