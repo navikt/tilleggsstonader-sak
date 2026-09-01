@@ -119,7 +119,7 @@ class ReiseTilSamlingBeregningsTest {
                         FaktaReiseTilSamlingPrivatBil(
                             reiseId = dummyReiseId,
                             adresse = "Samlingsgata 1",
-                            reiseavstand = 20.toBigDecimal(),
+                            reiseavstand = 40.toBigDecimal(),
                             aktivitetId = aktivitetId,
                         ),
                 ),
@@ -136,7 +136,7 @@ class ReiseTilSamlingBeregningsTest {
             )
         val privatBil = result.privatBil
         assertThat(privatBil).hasSize(1)
-        assertThat(privatBil.first().beløp).isEqualTo(59.toBigDecimal())
+        assertThat(privatBil.first().beløp).isEqualTo(118.toBigDecimal())
         assertThat(privatBil.first().aktivitetId).isEqualTo(aktivitetId)
     }
 

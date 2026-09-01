@@ -358,7 +358,7 @@ class ReiseTilSamlingVilkårServiceTest {
                     FaktaPrivatBil(
                         reiseId = dummyReiseId,
                         adresse = "Samlingsveien 1",
-                        reiseavstand = 20.toBigDecimal(),
+                        reiseavstand = 40.toBigDecimal(),
                         aktivitetId = aktivitetId,
                     ),
             )
@@ -369,5 +369,18 @@ class ReiseTilSamlingVilkårServiceTest {
         )
 
         verify(exactly = 1) { vilkårRepository.insert(any<Vilkår>()) }
+    }
+
+    @Test
+    fun `skal feile når reiseavstand er mindre enn 30 km`() {
+        assertThatExceptionOfType(ApiFeil::class.java)
+            .isThrownBy {
+                FaktaPrivatBil(
+                    reiseId = dummyReiseId,
+                    adresse = "Samlingsveien 1",
+                    reiseavstand = 20.toBigDecimal(),
+                    aktivitetId = null,
+                )
+            }.withMessage("Reiseavstand kan ikke være mindre enn 30 km")
     }
 }

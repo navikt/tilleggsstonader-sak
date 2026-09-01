@@ -80,8 +80,8 @@ data class FaktaPrivatBil(
 
     private fun validerIngenNegativReiseavstand() {
         reiseavstand.let {
-            brukerfeilHvis(it <= 0.toBigDecimal()) {
-                "Utgifter til offentlig transport kan ikke være negative"
+            brukerfeilHvis(it <= 30.toBigDecimal()) {
+                "Reiseavstand kan ikke være mindre enn 30 km"
             }
         }
     }
