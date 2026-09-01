@@ -138,7 +138,7 @@ private fun validerBrukersNavKontorForStønadstype(
     }
 }
 
-val tiltaksvariantTilTypeAndelMap =
+val tiltaksvariantTilTypeAndelMapDagligReiseTsr =
     mapOf(
         TypeAktivitet.ARBFORB to TypeAndel.DAGLIG_REISE_TILTAK_ARBEIDSFORBEREDENDE,
         TypeAktivitet.ARBRRHDAG to TypeAndel.DAGLIG_REISE_TILTAK_ARBEIDSRETTET_REHAB,
@@ -160,7 +160,7 @@ val tiltaksvariantTilTypeAndelMap =
     )
 
 fun finnTypeAndelFraTiltaksvariant(tiltaksvariant: TypeAktivitet): TypeAndel =
-    tiltaksvariantTilTypeAndelMap[tiltaksvariant]
+    tiltaksvariantTilTypeAndelMapDagligReiseTsr[tiltaksvariant]
         ?: error("Kan ikke mappe til TypeAndel fra TypeAktivitet $tiltaksvariant")
 
 fun finnPeriodeFraAndel(

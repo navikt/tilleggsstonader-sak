@@ -4,6 +4,8 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
+import no.nav.tilleggsstonader.sak.felles.dto.KodeverkDto
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -198,6 +200,46 @@ class VilkårperiodeControllerTest : CleanDatabaseIntegrationTest() {
                         "Mangler nødvendig saksbehandlerrolle for å utføre handlingen",
                     )
             }
+        }
+    }
+
+    @Nested
+    inner class HentTiltaksvarianter {
+        @Test
+        fun `skal hente ulike tiltaksvarianter for alle stønadstyper som har tiltaksvarianter`() {
+            val stønadstyperMedTiltaksvarianter =
+                listOf(
+                    Stønadstype.DAGLIG_REISE_TSR,
+                    Stønadstype.REISE_TIL_SAMLING_TSR,
+                    Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+                )
+
+            val tiltaksvarianterPerStønadstype =
+                stønadstyperMedTiltaksvarianter.associateWith { kall.vilkårperiode.hentTiltaksvarianter(it) }
+
+            tiltaksvarianterPerStønadstype.values.forEach { tiltaksvarianter ->
+                assertThat(tiltaksvarianter).isNotEmpty()
+            }
+
+            assertThat(tiltaksvarianterPerStønadstype.values.distinct()).hasSize(stønadstyperMedTiltaksvarianter.size)
+        }
+
+        @Test
+        fun `skal returnere tom liste for stønadstype som ikke har tiltaksvarianter`() {
+            val tiltaksvarianter = kall.vilkårperiode.hentTiltaksvarianter(Stønadstype.BARNETILSYN)
+
+            assertThat(tiltaksvarianter).isEmpty()
+        }
+
+        @Test
+        fun `skal bruke daglig reise tsr som default stønadstype når man ikke sender inn stønadstype`() {
+            val tiltaksvarianterUtenParam =
+                kall.vilkårperiode.apiRespons
+                    .hentTiltaksvarianter()
+                    .expectOkWithBody<List<KodeverkDto>>()
+            val tiltaksvarianterDagligReiseTsr = kall.vilkårperiode.hentTiltaksvarianter(Stønadstype.DAGLIG_REISE_TSR)
+
+            assertThat(tiltaksvarianterUtenParam).isEqualTo(tiltaksvarianterDagligReiseTsr)
         }
     }
 }

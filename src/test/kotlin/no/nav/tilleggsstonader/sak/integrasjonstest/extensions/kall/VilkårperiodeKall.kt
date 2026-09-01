@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.dto.KodeverkDto
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
@@ -33,6 +35,8 @@ class VilkårperiodeKall(
             .expectOkEmpty()
     }
 
+    fun hentTiltaksvarianter(stønadstype: Stønadstype): List<KodeverkDto> = apiRespons.hentTiltaksvarianter(stønadstype).expectOkWithBody()
+
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = VilkårperiodeApi()
 
@@ -53,5 +57,10 @@ class VilkårperiodeKall(
 
         fun oppdaterGrunnlag(behandlingId: BehandlingId) =
             testklient.post("/api/vilkarperiode/behandling/$behandlingId/oppdater-grunnlag", Unit)
+
+        fun hentTiltaksvarianter(stønadstype: Stønadstype) =
+            testklient.get("/api/vilkarperiode/aktivitet/tiltaksvarianter?stønadstype=$stønadstype")
+
+        fun hentTiltaksvarianter() = testklient.get("/api/vilkarperiode/aktivitet/tiltaksvarianter")
     }
 }
