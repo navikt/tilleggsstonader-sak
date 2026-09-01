@@ -74,6 +74,7 @@ class BehandlingFaktaService(
             Stønadstype.REISE_TIL_SAMLING_TSO,
             Stønadstype.REISE_TIL_SAMLING_TSR,
             -> hentFaktaDtoForReiseTilSamling(behandlingId)
+
             Stønadstype.FLYTTING_TSO,
             Stønadstype.FLYTTING_TSR,
             -> error("Henting av fakta for $stønadstype er ikke implementert")
@@ -380,18 +381,19 @@ class BehandlingFaktaService(
     private fun mapUtdanning(utdanningAvsnitt: UtdanningAvsnitt?) =
         FaktaUtdanning(
             søknadsgrunnlag =
-                utdanningAvsnitt?.let {
+                utdanningAvsnitt?.let { avsnitt ->
                     SøknadsgrunnlagUtdanning(
-                        aktiviteter = it.aktiviteter?.map { it.label },
-                        annenUtdanning = it.annenUtdanning,
+                        aktiviteter = avsnitt.aktiviteter?.map { it.label },
+                        annenUtdanning = avsnitt.annenUtdanning,
                         harRettTilUtstyrsstipend =
-                            it.harRettTilUtstyrsstipend?.let {
+                            avsnitt.harRettTilUtstyrsstipend?.let {
                                 HarRettTilUtstyrsstipendDto(
                                     erLærlingEllerLiknende = it.erLærlingEllerLiknende,
                                     harTidligereFullførtVgs = it.harTidligereFullførtVgs,
+                                    tarOpplæringVgsSamtidig = it.tarOpplæringVgsSamtidig,
                                 )
                             },
-                        harFunksjonsnedsettelse = it.harFunksjonsnedsettelse,
+                        harFunksjonsnedsettelse = avsnitt.harFunksjonsnedsettelse,
                     )
                 },
         )

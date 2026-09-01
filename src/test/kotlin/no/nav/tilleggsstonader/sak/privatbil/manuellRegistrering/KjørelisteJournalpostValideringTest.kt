@@ -49,17 +49,18 @@ class KjørelisteJournalpostValideringTest {
         val annenFagsakId = FagsakId.random()
         val annenFagsak = fagsak(id = annenFagsakId, eksternId = EksternFagsakId(id = 2, fagsakId = annenFagsakId))
 
-        every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak
-        every { journalpostService.hentJournalpost("999") } returns
+        val journalpost =
             journalpost(
                 journalpostId = "999",
                 sak = Sak(fagsakId = annenFagsak.eksternId.id.toString()),
             )
+        every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak
+        every { journalpostService.hentJournalpost("999") } returns journalpost
 
         assertThatThrownBy {
             validering.validerJournalpost(behandlingId, "999")
         }.hasMessageContaining(
-            "Journalpost med id=999 finnes ikke på saksnummer ${fagsak.eksternId.id}. Journalfør dokumentet på riktig saksnummer i gosys.",
+            "Journalpost med id=999 finnes ikke på saksnummer ${fagsak.eksternId.id}, men på ${journalpost.sak?.fagsakId}. Journalfør dokumentet på riktig saksnummer i gosys.",
         )
     }
 }
