@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.INGEN_AKTIVITET
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.INGEN_OVERLAPP_AKTIVITET_MÅLGRUPPE
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.LØNN_I_TILTAK
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.MANGELFULL_DOKUMENTASJON
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.REISEAVSTAND_UNDER_30_KM
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.REISEAVSTAND_UNDER_6_KM
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.RETT_TIL_BOSTØTTE
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag.RETT_TIL_UTSTYRSSTIPEND
@@ -75,11 +76,11 @@ fun gyldigeAvslagsårsaker(
 
         Stønadstype.REISE_TIL_SAMLING_TSO,
         Stønadstype.REISE_TIL_SAMLING_TSR,
-        -> // TODO("hva er gyldige avslagsårsaker for reise til samling?  Lag oppgave")
+        ->
             when (gjelder) {
-                Avslagskategori.AKTIVITET -> emptySet()
-                Avslagskategori.MÅLGRUPPE -> emptySet()
-                Avslagskategori.STØNADSVILKÅR -> emptySet()
+                Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET, LØNN_I_TILTAK)
+                Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
+                Avslagskategori.STØNADSVILKÅR -> setOf(MANGELFULL_DOKUMENTASJON, REISEAVSTAND_UNDER_30_KM, LØNN_I_TILTAK)
                 Avslagskategori.GENERELL -> generelleÅrsaker
             }
 

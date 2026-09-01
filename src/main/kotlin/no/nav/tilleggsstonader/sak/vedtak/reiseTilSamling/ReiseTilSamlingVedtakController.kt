@@ -16,10 +16,12 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.AvslagReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.BeregningsresultatReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingTsoRequest
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.VedtakReiseTilSamlingRequest
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -39,6 +41,7 @@ class ReiseTilSamlingVedtakController(
     private val stegService: StegService,
     private val beregnYtelseSteg: ReiseTilSamlingBeregnYtelseSteg,
     private val beregningsplanUtleder: BeregningsplanUtleder,
+    private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
 ) {
     @GetMapping("{behandlingId}")
     fun hentVedtak(
@@ -83,6 +86,22 @@ class ReiseTilSamlingVedtakController(
         @PathVariable behandlingId: BehandlingId,
         @RequestBody vedtak: InnvilgelseReiseTilSamlingTsoRequest,
     ): StegFerdigstiltResponse = lagreVedtak(behandlingId, vedtak).tilStegFerdigstiltResponse()
+
+    @PostMapping("{behandlingId}/avslag")
+    fun avslå(
+        @PathVariable behandlingId: BehandlingId,
+        @RequestBody vedtak: AvslagReiseTilSamlingDto,
+    ): StegFerdigstiltResponse {
+        val stønadstype = behandlingService.hentSaksbehandling(behandlingId).stønadstype
+
+        validerGyldigÅrsakAvslag.validerAvslagErGyldig(
+            behandlingId,
+            vedtak.årsakerAvslag,
+            stønadstype,
+        )
+
+        return lagreVedtak(behandlingId, vedtak).tilStegFerdigstiltResponse()
+    }
 
     private fun lagreVedtak(
         behandlingId: BehandlingId,

@@ -10,12 +10,14 @@ import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.OpprettAndelerReiseTilSamlingService
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatReiseTilSamling
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.AvslagReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingRequest
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.VedtakReiseTilSamlingRequest
 import org.springframework.stereotype.Service
@@ -49,7 +51,27 @@ class ReiseTilSamlingBeregnYtelseSteg(
     ) {
         when (vedtak) {
             is InnvilgelseReiseTilSamlingRequest -> beregnOgLagreInnvilgelse(saksbehandling, vedtak)
+            is AvslagReiseTilSamlingDto -> lagreAvslag(saksbehandling, vedtak)
         }
+    }
+
+    private fun lagreAvslag(
+        saksbehandling: Saksbehandling,
+        vedtak: AvslagReiseTilSamlingDto,
+    ) {
+        vedtakRepository.insert(
+            GeneriskVedtak(
+                behandlingId = saksbehandling.id,
+                type = TypeVedtak.AVSLAG,
+                data =
+                    AvslagReiseTilSamling(
+                        årsaker = vedtak.årsakerAvslag,
+                        begrunnelse = vedtak.begrunnelse,
+                    ),
+                gitVersjon = Applikasjonsversjon.versjon,
+                tidligsteEndring = null,
+            ),
+        )
     }
 
     private fun beregnOgLagreInnvilgelse(

@@ -8,7 +8,7 @@ enum class TypeVedtakReiseTilSamling(
     override val typeVedtak: TypeVedtak,
 ) : TypeVedtaksdata {
     INNVILGELSE_REISE_TIL_SAMLING(TypeVedtak.INNVILGELSE),
-    //  AVSLAG_REISE_TIL_SAMLING(TypeVedtak.AVSLAG),
+    AVSLAG_REISE_TIL_SAMLING(TypeVedtak.AVSLAG),
     //  OPPHØR_REISE_TIL_SAMLING(TypeVedtak.OPPHØR),
 }
 
@@ -36,4 +36,18 @@ data class InnvilgelseReiseTilSamling(
     override val type: TypeVedtaksdata =
         TypeVedtakReiseTilSamling
             .INNVILGELSE_REISE_TIL_SAMLING
+}
+
+data class AvslagReiseTilSamling(
+    override val årsaker: List<ÅrsakAvslag>,
+    override val begrunnelse: String,
+) : VedtakReiseTilSamling,
+    Avslag {
+    override val type: TypeVedtaksdata =
+        TypeVedtakReiseTilSamling
+            .AVSLAG_REISE_TIL_SAMLING
+
+    init {
+        this.validerÅrsakerOgBegrunnelse()
+    }
 }

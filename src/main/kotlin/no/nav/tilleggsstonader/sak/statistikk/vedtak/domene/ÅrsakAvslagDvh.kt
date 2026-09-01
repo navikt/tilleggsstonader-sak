@@ -12,6 +12,7 @@ enum class ÅrsakAvslagDvh {
     HAR_IKKE_MERUTGIFTER,
     RETT_TIL_BOSTØTTE,
     REISEAVSTAND_UNDER_6_KM,
+    REISEAVSTAND_UNDER_30_KM,
     LØNN_I_TILTAK,
     ANNET,
     ;
@@ -39,6 +40,7 @@ enum class ÅrsakAvslagDvh {
                 ÅrsakAvslag.HAR_IKKE_MERUTGIFTER -> HAR_IKKE_MERUTGIFTER
                 ÅrsakAvslag.RETT_TIL_BOSTØTTE -> RETT_TIL_BOSTØTTE
                 ÅrsakAvslag.REISEAVSTAND_UNDER_6_KM -> REISEAVSTAND_UNDER_6_KM
+                ÅrsakAvslag.REISEAVSTAND_UNDER_30_KM -> REISEAVSTAND_UNDER_30_KM
                 ÅrsakAvslag.LØNN_I_TILTAK -> LØNN_I_TILTAK
                 ÅrsakAvslag.ANNET -> ANNET
             }

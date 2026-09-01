@@ -18,6 +18,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagPassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Innvilgelse
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
@@ -323,7 +324,11 @@ class InterntVedtakService(
     private fun mapVedtakReiseTilSamling(vedtak: VedtakReiseTilSamling) =
         when (vedtak) {
             is InnvilgelseReiseTilSamling -> VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
-            else -> TODO("Må lage opphør og avslag for reise til samling")
+            is AvslagReiseTilSamling ->
+                VedtakAvslagInternt(
+                    årsakerAvslag = vedtak.årsaker,
+                    avslagBegrunnelse = vedtak.begrunnelse,
+                )
         }
 
     private fun mapVedtakReiseOppstartAvslutningHjemreise(vedtak: VedtakReiseOppstartAvslutningHjemreise) =

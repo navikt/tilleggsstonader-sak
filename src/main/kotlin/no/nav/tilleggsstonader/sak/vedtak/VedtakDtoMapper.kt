@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagPassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
@@ -51,6 +52,7 @@ import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise.dto.InnvilgelseReiseOppstartAvslutningHjemreiseResponse
 import no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise.dto.VedtakReiseOppstartAvslutningHjemreiseResponse
 import no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.AvslagReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingResponse
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.VedtakReiseTilSamlingResponse
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.tilDto
@@ -277,6 +279,11 @@ class VedtakDtoMapper(
                     begrunnelse = data.begrunnelse,
                 )
             }
+            is AvslagReiseTilSamling ->
+                AvslagReiseTilSamlingDto(
+                    årsakerAvslag = data.årsaker,
+                    begrunnelse = data.begrunnelse,
+                )
         }
 
     private fun mapVedtakReiseOppstartAvslutningHjemreise(
