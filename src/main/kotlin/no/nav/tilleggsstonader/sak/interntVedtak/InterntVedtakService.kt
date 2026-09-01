@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelsePassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørBoutgifter
@@ -34,6 +35,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakPassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
@@ -247,6 +249,7 @@ class InterntVedtakService(
 
                 is VedtakDagligReise -> mapVedtakDagligReise(vedtak.data)
                 is VedtakReiseTilSamling -> mapVedtakReiseTilSamling(vedtak.data)
+                is VedtakReiseOppstartAvslutningHjemreise -> mapVedtakReiseOppstartAvslutningHjemreise(vedtak.data)
             }
         }
 
@@ -321,6 +324,13 @@ class InterntVedtakService(
         when (vedtak) {
             is InnvilgelseReiseTilSamling -> VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
             else -> TODO("Må lage opphør og avslag for reise til samling")
+        }
+
+    private fun mapVedtakReiseOppstartAvslutningHjemreise(vedtak: VedtakReiseOppstartAvslutningHjemreise) =
+        when (vedtak) {
+            is InnvilgelseReiseOppstartAvslutningHjemreise ->
+                VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
+            else -> TODO("Må lage opphør og avslag for reise oppstart, avslutning, hjemreise")
         }
 
     private fun mapRammevedtakPrivatBil(vedtak: Vedtak?): RammevedtakPrivatBil? =

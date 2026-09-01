@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelsePassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
@@ -31,6 +32,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakPassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
@@ -46,6 +48,9 @@ import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.InnvilgelsePassAvBarnRe
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.OpphørPassAvBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.VedtakPassAvBarnResponse
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise.dto.InnvilgelseReiseOppstartAvslutningHjemreiseResponse
+import no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise.dto.VedtakReiseOppstartAvslutningHjemreiseResponse
+import no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingResponse
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.VedtakReiseTilSamlingResponse
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.tilDto
@@ -97,6 +102,13 @@ class VedtakDtoMapper(
                 )
             is VedtakReiseTilSamling ->
                 mapVedtakReiseTilSamling(
+                    vedtak = vedtak,
+                    data = data,
+                    tidligsteEndring = vedtak.tidligsteEndring,
+                    forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
+                )
+            is VedtakReiseOppstartAvslutningHjemreise ->
+                mapVedtakReiseOppstartAvslutningHjemreise(
                     vedtak = vedtak,
                     data = data,
                     tidligsteEndring = vedtak.tidligsteEndring,
@@ -255,6 +267,27 @@ class VedtakDtoMapper(
         when (data) {
             is InnvilgelseReiseTilSamling -> {
                 InnvilgelseReiseTilSamlingResponse(
+                    vedtaksperioder =
+                        data.vedtaksperioder.tilLagretVedtaksperiodeDto(
+                            hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
+                        ),
+                    beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan),
+                    gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
+                    gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
+                    begrunnelse = data.begrunnelse,
+                )
+            }
+        }
+
+    private fun mapVedtakReiseOppstartAvslutningHjemreise(
+        vedtak: Vedtak,
+        data: VedtakReiseOppstartAvslutningHjemreise,
+        tidligsteEndring: LocalDate?,
+        forrigeIverksatteBehandlingId: BehandlingId?,
+    ): VedtakReiseOppstartAvslutningHjemreiseResponse =
+        when (data) {
+            is InnvilgelseReiseOppstartAvslutningHjemreise -> {
+                InnvilgelseReiseOppstartAvslutningHjemreiseResponse(
                     vedtaksperioder =
                         data.vedtaksperioder.tilLagretVedtaksperiodeDto(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),

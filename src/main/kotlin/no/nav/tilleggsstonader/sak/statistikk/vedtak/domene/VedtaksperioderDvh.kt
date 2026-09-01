@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørPassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatLæremidler
@@ -57,6 +58,8 @@ data class VedtaksperioderDvh(
 
                 is InnvilgelseEllerOpphørDagligReise -> mapVedtaksperioderDagligReise(vedtaksdata)
                 is InnvilgelseEllerOpphørReiseTilSamling -> mapVedtaksperioderReiseTilSamling(vedtaksdata)
+                is InnvilgelseEllerOpphørReiseOppstartAvslutningHjemreise ->
+                    mapVedtaksperioderReiseOppstartAvslutningHjemreise(vedtaksdata)
 
                 is AvslagBoutgifter, is AvslagLæremidler, is AvslagPassAvBarn, is AvslagDagligReise ->
                     JsonWrapper(
@@ -137,6 +140,20 @@ data class VedtaksperioderDvh(
                         )
                     },
             )
+
+        private fun mapVedtaksperioderReiseOppstartAvslutningHjemreise(
+            vedtaksdata: InnvilgelseEllerOpphørReiseOppstartAvslutningHjemreise,
+        ) = JsonWrapper(
+            vedtaksperioder =
+                vedtaksdata.vedtaksperioder.map {
+                    VedtaksperioderDvh(
+                        fom = it.fom,
+                        tom = it.tom,
+                        aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
+                        lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
+                    )
+                },
+        )
 
         fun List<BarnId>.finnFødselsnumre(barn: List<BehandlingBarn>) =
             this.mapNotNull { barnId ->
