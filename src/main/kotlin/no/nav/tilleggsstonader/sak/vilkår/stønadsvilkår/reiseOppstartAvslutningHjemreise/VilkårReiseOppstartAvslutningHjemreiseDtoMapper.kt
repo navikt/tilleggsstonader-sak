@@ -57,5 +57,7 @@ object VilkårReiseOppstartAvslutningHjemreiseDtoMapper {
         FaktaReiseOppstartAvslutningHjemreisePrivatBilDto(
             reiseavstand = this.reiseavstand,
             aktivitetId = this.aktivitetId,
+            bompenger = this.bompenger,
+            fergekostnad = this.fergekostnad,
         )
 }

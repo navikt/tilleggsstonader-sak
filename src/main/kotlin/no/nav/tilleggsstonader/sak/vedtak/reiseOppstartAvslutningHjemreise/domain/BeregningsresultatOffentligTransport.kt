@@ -33,6 +33,8 @@ data class BeregningsgrunnlagPrivatBil(
     val sats: BigDecimal,
     val totaltReiseavstand: BigDecimal,
     val vedtaksperioder: List<VedtaksperiodeGrunnlag>,
+    val bompenger: BigDecimal? = null,
+    val fergekostnad: BigDecimal? = null,
 )
 
 data class BeregningsgrunnlagOffentligTransport(
