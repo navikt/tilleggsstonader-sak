@@ -1,11 +1,13 @@
 package no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatPrivatBil
@@ -131,3 +133,25 @@ fun finnPeriodeFraAndel(
 
     error("Fant ikke periode for andel med reiseId ${andelTilkjentYtelse.reiseId}")
 }
+
+/**
+ * Tiltaksvarianter (arena-aktiviteter) som er aktuelle for stønadstype [Stønadstype.REISE_TIL_SAMLING_TSR].
+ */
+val tiltaksvariantTilTypeAndelMapReiseTilSamlingTsr =
+    mapOf(
+        TypeAktivitet.ARBFORB to TypeAndel.REISE_TIL_SAMLING_TILTAK_ARBEIDSFORBEREDENDE,
+        TypeAktivitet.ARBTREN to TypeAndel.REISE_TIL_SAMLING_TILTAK_ARBEIDSTRENING,
+        TypeAktivitet.AVKLARAG to TypeAndel.REISE_TIL_SAMLING_TILTAK_AVKLARING,
+        TypeAktivitet.ENKELAMO to TypeAndel.REISE_TIL_SAMLING_TILTAK_ENKELTPLASS_AMO,
+        TypeAktivitet.ENKFAGYRKE to TypeAndel.REISE_TIL_SAMLING_TILTAK_ENKELTPLASS_FAG_YRKE_HOYERE_UTD,
+        TypeAktivitet.GRUPPEAMO to TypeAndel.REISE_TIL_SAMLING_TILTAK_GRUPPE_AMO,
+        TypeAktivitet.GRUFAGYRKE to TypeAndel.REISE_TIL_SAMLING_TILTAK_GRUPPE_FAG_YRKE_HOYERE_UTD,
+        TypeAktivitet.HOYEREUTD to TypeAndel.REISE_TIL_SAMLING_TILTAK_HØYERE_UTDANNING,
+        TypeAktivitet.JOBBK to TypeAndel.REISE_TIL_SAMLING_TILTAK_JOBBKLUBB,
+        TypeAktivitet.INDOPPFAG to TypeAndel.REISE_TIL_SAMLING_TILTAK_OPPFØLGING,
+        TypeAktivitet.UTVOPPFOPL to TypeAndel.REISE_TIL_SAMLING_TILTAK_UTVIDET_OPPFØLGING_I_OPPLÆRING,
+    )
+
+fun finnTypeAndelFraTiltaksvariantReiseTilSamling(tiltaksvariant: TypeAktivitet): TypeAndel =
+    tiltaksvariantTilTypeAndelMapReiseTilSamlingTsr[tiltaksvariant]
+        ?: error("Kan ikke mappe til TypeAndel fra TypeAktivitet $tiltaksvariant")

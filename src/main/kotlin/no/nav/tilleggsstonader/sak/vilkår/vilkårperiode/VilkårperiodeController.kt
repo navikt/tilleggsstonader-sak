@@ -1,11 +1,14 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.dto.KodeverkDto
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.tiltaksvariantTilTypeAndelMap
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.tiltaksvariantTilTypeAndelMapDagligReiseTsr
+import no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise.tiltaksvariantTilTypeAndelReiseOppstartMap
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.tiltaksvariantTilTypeAndelMapReiseTilSamlingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiodeResponse
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
@@ -87,9 +91,21 @@ class VilkårperiodeController(
     }
 
     @GetMapping("/aktivitet/tiltaksvarianter")
-    fun hentTiltaksvarianter(): List<KodeverkDto> {
+    fun hentTiltaksvarianter(
+        @RequestParam(defaultValue = "DAGLIG_REISE_TSR") stønadstype: Stønadstype,
+    ): List<KodeverkDto> {
         // Henter kun ut aktiviteter vi har mapping til andel/klassekode for
-        return tiltaksvariantTilTypeAndelMap.keys.map {
+        val tiltaksvarianter =
+            when (stønadstype) {
+                Stønadstype.DAGLIG_REISE_TSR -> tiltaksvariantTilTypeAndelMapDagligReiseTsr.keys
+                Stønadstype.REISE_TIL_SAMLING_TSR -> tiltaksvariantTilTypeAndelMapReiseTilSamlingTsr.keys
+                Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR ->
+                    tiltaksvariantTilTypeAndelReiseOppstartMap.keys
+
+                else -> emptySet()
+            }
+
+        return tiltaksvarianter.map {
             KodeverkDto(
                 kode = it.name,
                 beskrivelse = it.beskrivelse,
