@@ -69,6 +69,8 @@ object VilkårReiseOppstartAvslutningHjemreiseMapper {
             typeReiseformål = this.typeReiseformål,
             reiseavstand = this.reiseavstand,
             aktivitetId = this.aktivitetId,
+            bompenger = this.bompenger,
+            fergekostnad = this.fergekostnad,
         )
 
     private fun FaktaReiseOppstartAvslutningHjemreiseUbestemt.mapTilFakta() =

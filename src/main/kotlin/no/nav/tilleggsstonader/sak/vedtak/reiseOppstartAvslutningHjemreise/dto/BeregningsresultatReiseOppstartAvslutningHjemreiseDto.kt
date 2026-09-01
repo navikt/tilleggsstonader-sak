@@ -33,6 +33,8 @@ data class BeregningsresultatPrivatBilDto(
     val totaltReiseavstand: BigDecimal,
     val beløp: BigDecimal,
     val aktivitetId: VilkårperiodeGlobalId,
+    val bompenger: BigDecimal? = null,
+    val fergekostnad: BigDecimal? = null,
 )
 
 fun BeregningReiseOppstartAvslutningHjemreise.tilDto(beregningsplan: Beregningsplan) =
@@ -68,4 +70,6 @@ fun BeregningsresultatPrivatBil.tilDto() =
         totaltReiseavstand = grunnlag.totaltReiseavstand,
         beløp = beløp,
         aktivitetId = aktivitetId,
+        bompenger = grunnlag.bompenger,
+        fergekostnad = grunnlag.fergekostnad,
     )

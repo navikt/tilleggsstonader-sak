@@ -55,6 +55,8 @@ data class FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
 data class FaktaReiseOppstartAvslutningHjemreisePrivatBilDto(
     val reiseavstand: BigDecimal,
     val aktivitetId: VilkårperiodeGlobalId,
+    val bompenger: BigDecimal? = null,
+    val fergekostnad: BigDecimal? = null,
 ) : FaktaReiseOppstartAvslutningHjemreiseDto {
     override val type = TypeReiseOppstartAvslutningHjemreise.PRIVAT_BIL
 
@@ -68,6 +70,8 @@ data class FaktaReiseOppstartAvslutningHjemreisePrivatBilDto(
         typeReiseformål = typeReiseformål,
         reiseavstand = reiseavstand,
         aktivitetId = aktivitetId,
+        bompenger = bompenger,
+        fergekostnad = fergekostnad,
     )
 }
 

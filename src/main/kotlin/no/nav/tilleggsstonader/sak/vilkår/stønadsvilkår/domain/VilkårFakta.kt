@@ -74,6 +74,8 @@ data class FaktaReiseOppstartAvslutningHjemreisePrivatBil(
     val typeReiseformål: TypeReiseformål,
     val reiseavstand: BigDecimal,
     val aktivitetId: VilkårperiodeGlobalId,
+    val bompenger: BigDecimal? = null,
+    val fergekostnad: BigDecimal? = null,
 ) : VilkårFakta
 
 data class FaktaReiseOppstartAvslutningHjemreiseUbestemt(
