@@ -31,6 +31,9 @@ data class BeregningsresultatPrivatBilDto(
     val tom: LocalDate,
     val sats: BigDecimal,
     val totaltReiseavstand: BigDecimal,
+    val bompenger: BigDecimal?,
+    val fergekostnad: BigDecimal?,
+    val parkering: BigDecimal?,
     val beløp: BigDecimal,
     val aktivitetId: VilkårperiodeGlobalId?,
 )
@@ -66,6 +69,9 @@ fun BeregningsresultatPrivatBil.tilDto() =
         tom = grunnlag.tom,
         sats = grunnlag.sats,
         totaltReiseavstand = grunnlag.totaltReiseavstand,
+        bompenger = grunnlag.bompenger,
+        fergekostnad = grunnlag.fergekostnad,
+        parkering = grunnlag.parkering,
         beløp = beløp,
         aktivitetId = aktivitetId,
     )

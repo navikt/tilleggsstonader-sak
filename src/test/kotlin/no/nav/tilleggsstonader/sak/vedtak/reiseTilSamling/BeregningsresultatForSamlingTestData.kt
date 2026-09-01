@@ -58,6 +58,9 @@ fun lagBeregningsresultatForPrivatBil(
             tom = tom,
             sats = BigDecimal.ZERO,
             totaltReiseavstand = BigDecimal.ZERO,
+            bompenger = null,
+            fergekostnad = null,
+            parkering = null,
             vedtaksperioder = listOf(lagVedtaksperiodeGrunnlag(fom, tom)),
             brukersNavKontor = null,
         )

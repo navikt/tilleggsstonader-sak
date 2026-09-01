@@ -34,6 +34,9 @@ data class BeregningsgrunnlagPrivatBilForSamling(
     val tom: LocalDate,
     val sats: BigDecimal,
     val totaltReiseavstand: BigDecimal,
+    val bompenger: BigDecimal?,
+    val fergekostnad: BigDecimal?,
+    val parkering: BigDecimal?,
     val vedtaksperioder: List<VedtaksperiodeGrunnlag>,
     val brukersNavKontor: String?,
 )
