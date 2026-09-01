@@ -48,8 +48,8 @@ object SøknadsskjemaUtil {
             -> jsonMapper.readValue<InnsendtSkjema<SøknadsskjemaReiseTilSamling>>(data)
             Stønadstype.FLYTTING_TSO,
             Stønadstype.FLYTTING_TSR,
-            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
-            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
             -> error("Søknadsskjema for $stønadstype er ikke implementert")
         }
 

@@ -227,7 +227,7 @@ private fun Stønadstype.tilDokumentBrevkode(): DokumentBrevkode =
         Stønadstype.FLYTTING_TSO,
         Stønadstype.FLYTTING_TSR,
         -> DokumentBrevkode.FLYTTING
-        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
-        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
-        -> DokumentBrevkode.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_ELLER_HJEMREISE
+        Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+        Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+        -> DokumentBrevkode.REISE_OPPSTART_AVSLUTNING_ELLER_HJEMREISE
     }

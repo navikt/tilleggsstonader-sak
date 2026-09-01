@@ -49,8 +49,8 @@ import java.util.UUID
  * kontrakter-felles-biblioteket ennå, så vi sjekker lokalt her i testkoden.
  */
 private fun Stønadstype.gjelderReiseOppstartAvslutningHjemreise(): Boolean =
-    this == Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO ||
-        this == Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR
+    this == Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO ||
+        this == Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR
 
 fun IntegrationTest.gjennomførInngangsvilkårSteg(
     testdataDsl: BehandlingTestdataDsl,
@@ -260,11 +260,11 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                             Stønadstype.FLYTTING_TSO,
                             Stønadstype.FLYTTING_TSR,
                             -> TODO("InnvilgelseFlyttingRequest")
-                            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO ->
+                            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO ->
                                 InnvilgelseReiseOppstartAvslutningHjemreiseTsoRequest(
                                     vedtaksperioder = vedtaksperioder,
                                 )
-                            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR ->
+                            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR ->
                                 InnvilgelseReiseOppstartAvslutningHjemreiseTsrRequest(
                                     vedtaksperioder = vedtaksperioder,
                                 )
@@ -312,9 +312,9 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                             Stønadstype.FLYTTING_TSO,
                             Stønadstype.FLYTTING_TSR,
                             -> TODO("AvslagFlyttingRequest")
-                            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
-                            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
-                            -> TODO("AvslagStøtteTilReiseOppstartAvslutningHjemreiseRequest")
+                            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+                            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+                            -> TODO("AvslagReiseOppstartAvslutningHjemreiseRequest")
                         },
                 )
 
@@ -359,9 +359,9 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                             Stønadstype.FLYTTING_TSO,
                             Stønadstype.FLYTTING_TSR,
                             -> TODO("OpphørFlyttingRequest")
-                            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
-                            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
-                            -> TODO("OpphørStøtteTilReiseOppstartAvslutningHjemreiseRequest")
+                            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+                            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+                            -> TODO("OpphørReiseOppstartAvslutningHjemreiseRequest")
                         },
                 )
     }

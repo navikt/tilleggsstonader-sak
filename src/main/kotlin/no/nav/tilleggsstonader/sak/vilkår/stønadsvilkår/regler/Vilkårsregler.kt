@@ -47,8 +47,8 @@ fun vilkårsreglerForStønad(stønadstype: Stønadstype): List<Vilkårsregel> =
         Stønadstype.FLYTTING_TSO,
         Stønadstype.FLYTTING_TSR,
         -> emptyList() // TODO: legg til vilkårsregler for FLYTTING
-        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
-        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+        Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+        Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
         -> listOf(ReiseOppstartAvslutningHjemreiseRegel())
     }
 

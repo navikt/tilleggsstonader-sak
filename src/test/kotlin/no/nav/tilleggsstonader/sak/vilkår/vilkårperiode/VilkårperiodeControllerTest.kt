@@ -211,7 +211,7 @@ class VilkårperiodeControllerTest : CleanDatabaseIntegrationTest() {
                 listOf(
                     Stønadstype.DAGLIG_REISE_TSR,
                     Stønadstype.REISE_TIL_SAMLING_TSR,
-                    Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+                    Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
                 )
 
             val tiltaksvarianterPerStønadstype =

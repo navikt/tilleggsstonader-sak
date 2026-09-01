@@ -36,7 +36,7 @@ class ReiseOppstartAvslutningHjemreiseTsoIntegrationTest : CleanDatabaseIntegrat
         val behandling =
             testoppsettService.opprettBehandlingMedFagsak(
                 behandling = behandling(),
-                stønadstype = Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+                stønadstype = Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
                 identer = setOf(PersonIdent(ident = ident)),
             )
 
@@ -74,7 +74,7 @@ class ReiseOppstartAvslutningHjemreiseTsoIntegrationTest : CleanDatabaseIntegrat
 
         val vedtak =
             kall.vedtak.apiRespons
-                .hentVedtak(Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO, behandling.id)
+                .hentVedtak(Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO, behandling.id)
                 .expectOkWithBody<InnvilgelseReiseOppstartAvslutningHjemreiseResponse>()
 
         val offentligTransport = vedtak.beregningsresultat.offentligTransport

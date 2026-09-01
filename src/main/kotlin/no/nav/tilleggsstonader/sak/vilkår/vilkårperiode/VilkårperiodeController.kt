@@ -99,7 +99,7 @@ class VilkårperiodeController(
             when (stønadstype) {
                 Stønadstype.DAGLIG_REISE_TSR -> tiltaksvariantTilTypeAndelMapDagligReiseTsr.keys
                 Stønadstype.REISE_TIL_SAMLING_TSR -> tiltaksvariantTilTypeAndelMapReiseTilSamlingTsr.keys
-                Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR ->
+                Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR ->
                     tiltaksvariantTilTypeAndelReiseOppstartMap.keys
 
                 else -> emptySet()

@@ -420,7 +420,7 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
             val behandling =
                 testoppsettService.opprettBehandlingMedFagsak(
                     behandling(status = BehandlingStatus.OPPRETTET),
-                    stønadstype = Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+                    stønadstype = Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
                 )
             val målgruppeSomSkalOpprettes =
                 dummyVilkårperiodeMålgruppe(behandlingId = behandling.id)
@@ -437,7 +437,7 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
             val behandling =
                 testoppsettService.opprettBehandlingMedFagsak(
                     behandling(status = BehandlingStatus.OPPRETTET),
-                    stønadstype = Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+                    stønadstype = Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
                 )
             val målgruppeSomSkalOpprettes =
                 dummyVilkårperiodeMålgruppe(behandlingId = behandling.id)

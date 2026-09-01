@@ -30,8 +30,8 @@ class JournalhendelseKafkaHåndtererServiceTest {
     @EnumSource(
         value = DokumentBrevkode::class,
         names = [
-            "STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_ELLER_HJEMREISE",
-            "STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_ELLER_HJEMREISE_GAMMEL",
+            "REISE_OPPSTART_AVSLUTNING_ELLER_HJEMREISE",
+            "REISE_OPPSTART_AVSLUTNING_ELLER_HJEMREISE_GAMMEL",
             "REISE_FOR_Å_KOMME_I_ARBEID",
             "REISE_FOR_Å_KOMME_I_ARBEID_GAMMEL",
             "FLYTTING",

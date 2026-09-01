@@ -399,7 +399,7 @@ internal class BehandlingFaktaServiceTest {
     fun `skal mappe minimal fakta for reise ved oppstart, avslutning og hjemreise`() {
         every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns lagGrunnlagsdata()
         every { fagsakService.hentFagsakForBehandling(behandlingId) } returns
-            fagsak(stønadstype = Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO)
+            fagsak(stønadstype = Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO)
 
         val fakta = service.hentFakta(behandlingId) as BehandlingFaktaReiseOppstartAvslutningHjemreiseDto
 

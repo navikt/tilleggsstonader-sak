@@ -4,8 +4,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseTilSamling
-import no.nav.tilleggsstonader.kontrakter.felles.gjelderStøtteTilReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
@@ -70,7 +70,7 @@ class VedtakKall(
     ) {
         if (stønadstype.gjelderDagligReise() ||
             stønadstype.gjelderReiseTilSamling() ||
-            stønadstype.gjelderStøtteTilReiseOppstartAvslutningHjemreise()
+            stønadstype.gjelderReiseOppstartAvslutningHjemreise()
         ) {
             return lagreEnhetsspesifiktVedtak(
                 stønadstype,
@@ -121,7 +121,7 @@ class VedtakKall(
         ): RestTestClient.ResponseSpec {
             if (stønadstype.gjelderDagligReise() ||
                 stønadstype.gjelderReiseTilSamling() ||
-                stønadstype.gjelderStøtteTilReiseOppstartAvslutningHjemreise()
+                stønadstype.gjelderReiseOppstartAvslutningHjemreise()
             ) {
                 return lagreEnhetsspesifiktVedtak(
                     stønadstype,
@@ -155,8 +155,8 @@ private fun Stønadstype.tilPath(): String =
         Stønadstype.FLYTTING_TSO,
         Stønadstype.FLYTTING_TSR,
         -> TODO("path for FLYTTING")
-        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
-        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+        Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+        Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
         -> "reise-oppstart-avslutning-hjemreise"
     }
 

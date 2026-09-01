@@ -37,11 +37,11 @@ import java.time.LocalDateTime
     JsonSubTypes.Type(BehandlingFaktaReiseTilSamlingDto::class, name = "REISE_TIL_SAMLING_TSO"),
     JsonSubTypes.Type(
         BehandlingFaktaReiseOppstartAvslutningHjemreiseDto::class,
-        name = "STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO",
+        name = "REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO",
     ),
     JsonSubTypes.Type(
         BehandlingFaktaReiseOppstartAvslutningHjemreiseDto::class,
-        name = "STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR",
+        name = "REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR",
     ),
 )
 sealed interface BehandlingFaktaDto {

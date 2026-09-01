@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
-import no.nav.tilleggsstonader.kontrakter.felles.gjelderStøtteTilReiseOppstartAvslutningHjemreise
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
@@ -290,7 +290,7 @@ class VilkårperiodeService(
     }
 
     private fun validerFeatureTogglet(behandling: Saksbehandling) {
-        if (!behandling.stønadstype.gjelderStøtteTilReiseOppstartAvslutningHjemreise()) {
+        if (!behandling.stønadstype.gjelderReiseOppstartAvslutningHjemreise()) {
             return
         }
         val kanBehandle = unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_OPPSTART_AVSLUTNING_HJEMREISE)

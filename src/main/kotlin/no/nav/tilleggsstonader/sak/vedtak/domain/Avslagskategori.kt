@@ -93,9 +93,9 @@ fun gyldigeAvslagsårsaker(
                 Avslagskategori.GENERELL -> generelleÅrsaker
             }
 
-        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
-        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
-        -> // TODO("hva er gyldige avslagsårsaker for STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE?")
+        Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+        Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+        -> // TODO("hva er gyldige avslagsårsaker for REISE_OPPSTART_AVSLUTNING_HJEMREISE?")
             when (gjelder) {
                 Avslagskategori.AKTIVITET -> emptySet()
                 Avslagskategori.MÅLGRUPPE -> emptySet()

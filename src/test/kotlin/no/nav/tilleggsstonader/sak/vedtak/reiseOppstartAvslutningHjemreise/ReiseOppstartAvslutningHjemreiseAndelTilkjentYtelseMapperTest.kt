@@ -55,7 +55,7 @@ class ReiseOppstartAvslutningHjemreiseAndelTilkjentYtelseMapperTest {
         val aktivitetId = VilkårperiodeGlobalId.random()
         val saksbehandling =
             saksbehandling(
-                fagsak = fagsak(stønadstype = Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO),
+                fagsak = fagsak(stønadstype = Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO),
             )
         val vedtaksperioder =
             listOf(
@@ -100,7 +100,7 @@ class ReiseOppstartAvslutningHjemreiseAndelTilkjentYtelseMapperTest {
         val mandag = 5 januar 2026
         val saksbehandling =
             saksbehandling(
-                fagsak = fagsak(stønadstype = Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO),
+                fagsak = fagsak(stønadstype = Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO),
             )
         val vedtaksperioder =
             listOf(
@@ -142,7 +142,7 @@ class ReiseOppstartAvslutningHjemreiseAndelTilkjentYtelseMapperTest {
         val sluttdato = 9 januar 2026
         val saksbehandling =
             saksbehandling(
-                fagsak = fagsak(stønadstype = Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO),
+                fagsak = fagsak(stønadstype = Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO),
             )
         val vedtaksperioder =
             listOf(
@@ -185,7 +185,7 @@ class ReiseOppstartAvslutningHjemreiseAndelTilkjentYtelseMapperTest {
             VilkårperiodeTestUtil.aktivitet(tiltaksvariant = TypeAktivitet.GRUPPEAMO)
         val saksbehandling =
             saksbehandling(
-                fagsak = fagsak(stønadstype = Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR),
+                fagsak = fagsak(stønadstype = Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR),
             )
         val beregningsresultat =
             BeregningsresultatOffentligTransport(

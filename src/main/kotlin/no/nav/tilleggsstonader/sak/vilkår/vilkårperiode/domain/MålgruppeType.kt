@@ -102,7 +102,7 @@ enum class MålgruppeType(
             Stønadstype.DAGLIG_REISE_TSO,
             Stønadstype.REISE_TIL_SAMLING_TSO,
             Stønadstype.FLYTTING_TSO,
-            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
             ->
                 this in
                     listOf(
@@ -117,7 +117,7 @@ enum class MålgruppeType(
             Stønadstype.DAGLIG_REISE_TSR,
             Stønadstype.REISE_TIL_SAMLING_TSR,
             Stønadstype.FLYTTING_TSR,
-            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
             ->
                 this in
                     listOf(

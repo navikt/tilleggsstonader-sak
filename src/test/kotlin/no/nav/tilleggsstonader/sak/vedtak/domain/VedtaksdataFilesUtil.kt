@@ -23,7 +23,7 @@ object VedtaksdataFilesUtil {
             Stønadstype.DAGLIG_REISE_TSO -> "DAGLIG_REISE"
             Stønadstype.DAGLIG_REISE_TSR -> "DAGLIG_REISE"
             Stønadstype.REISE_TIL_SAMLING_TSO -> "REISE_TIL_SAMLING"
-            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO -> "REISE_OPPSTART_AVSLUTNING_HJEMREISE"
+            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO -> "REISE_OPPSTART_AVSLUTNING_HJEMREISE"
             else -> name
         }
 

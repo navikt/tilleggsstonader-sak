@@ -48,9 +48,9 @@ fun bestemRoutingStrategi(skjematype: Skjematype): RoutingStrategi =
                 alleMedAAPVedtakTilNyLøsning = false,
                 featureToggleMaksAntallForPrivatBil = null,
             )
-        Skjematype.SØKNAD_STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE ->
+        Skjematype.SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE ->
             RoutingStrategi.SendEnkelteBrukereTilNyLøsning(
-                featureToggleMaksAntallForStønad = Toggle.SØKNAD_ROUTING_STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE,
+                featureToggleMaksAntallForStønad = Toggle.SØKNAD_ROUTING_REISE_OPPSTART_AVSLUTNING_HJEMREISE,
                 kreverAtSøkerErUtenAktivtVedtakIArena = true,
                 kreverAktivtAapVedtak = false,
                 kreverUgradertAdresse = true,

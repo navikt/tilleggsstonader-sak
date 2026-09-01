@@ -87,8 +87,8 @@ class OpprettDummyBehandlingController(
             -> opprettDummySøknadReiseTilSamling.opprettDummy(fagsak, behandling)
             Stønadstype.FLYTTING_TSO,
             Stønadstype.FLYTTING_TSR,
-            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
-            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
             -> logger.warn("Ikke støtte for å opprette dummy-søknad for ${fagsak.stønadstype}") // TODO
         }
     }

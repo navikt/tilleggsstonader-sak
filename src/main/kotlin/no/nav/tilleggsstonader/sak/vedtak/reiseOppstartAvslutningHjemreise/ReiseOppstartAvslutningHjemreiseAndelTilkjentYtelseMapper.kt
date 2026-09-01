@@ -88,7 +88,7 @@ private fun finnTypeAndelReiseOppstart(
     aktiviteter: List<Vilkårperiode>,
 ): TypeAndel =
     when (saksbehandling.stønadstype) {
-        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO -> {
+        Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO -> {
             val målgrupper =
                 vedtaksperioder
                     .filter { !reiseDato.isBefore(it.fom) && !reiseDato.isAfter(it.tom) }
@@ -101,7 +101,7 @@ private fun finnTypeAndelReiseOppstart(
             målgrupper.single().tilTypeAndel(saksbehandling.stønadstype)
         }
 
-        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR -> {
+        Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR -> {
             val aktivitet =
                 aktiviteter.find { it.globalId == aktivitetId }
                     ?: error("Finner ikke aktivitet med id=$aktivitetId")

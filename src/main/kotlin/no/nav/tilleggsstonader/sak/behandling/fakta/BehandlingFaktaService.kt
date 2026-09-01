@@ -78,8 +78,8 @@ class BehandlingFaktaService(
             Stønadstype.FLYTTING_TSO,
             Stønadstype.FLYTTING_TSR,
             -> error("Henting av fakta for $stønadstype er ikke implementert")
-            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
-            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
             -> hentFaktaDtoForReiseOppstartAvslutningHjemreise(behandlingId)
         }
     }

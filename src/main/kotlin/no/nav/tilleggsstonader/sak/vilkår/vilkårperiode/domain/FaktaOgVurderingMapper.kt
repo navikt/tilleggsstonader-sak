@@ -211,12 +211,12 @@ private fun mapAktiviteter(
             return mapAktiviteterReiseTilSamlingTsr(type, faktaOgSvar)
         }
 
-        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO -> {
+        Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO -> {
             require(faktaOgSvar is FaktaOgSvarAktivitetReiseOppstartAvslutningHjemreiseTsoDto)
             return mapAktiviteterReiseOppstartAvslutningHjemreiseTso(type, faktaOgSvar)
         }
 
-        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR -> {
+        Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR -> {
             require(faktaOgSvar is FaktaOgSvarAktivitetReiseOppstartAvslutningHjemreiseTsrDto)
             return mapAktiviteterReiseOppstartAvslutningHjemreiseTsr(type, faktaOgSvar)
         }
@@ -267,11 +267,11 @@ private fun mapMålgruppe(
             mapMålgruppeReiseTilSamlingTsr(type)
         }
 
-        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO -> {
+        Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO -> {
             mapMålgruppeReiseOppstartAvslutningHjemreiseTso(type, faktaOgSvar, målgruppe, fødselFaktaGrunnlag)
         }
 
-        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR -> {
+        Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR -> {
             mapMålgruppeReiseOppstartAvslutningHjemreiseTsr(type)
         }
 

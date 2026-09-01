@@ -58,7 +58,7 @@ class ForeslåVedtaksperiodeService(
             Stønadstype.REISE_TIL_SAMLING_TSR -> true
             Stønadstype.FLYTTING_TSO -> true
             Stønadstype.FLYTTING_TSR -> true
-            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO -> true
-            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR -> true
+            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO -> true
+            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR -> true
         }
 }

@@ -32,8 +32,8 @@ class ReiseOppstartAvslutningHjemreiseBeregnYtelseSteg(
 ) : BeregnYtelseSteg<VedtakReiseOppstartAvslutningHjemreiseRequest>(
         stønadstype =
             listOf(
-                Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
-                Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+                Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+                Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
             ),
         vedtakRepository = vedtakRepository,
         tilkjentYtelseService = tilkjentYtelseService,
