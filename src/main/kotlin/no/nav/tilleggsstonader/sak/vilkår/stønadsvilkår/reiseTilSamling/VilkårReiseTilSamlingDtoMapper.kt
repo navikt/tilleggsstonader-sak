@@ -44,5 +44,8 @@ object VilkårReiseTilSamlingDtoMapper {
         FaktaReiseTilSamlingPrivatBilDto(
             reiseavstand = this.reiseavstand,
             aktivitetId = this.aktivitetId,
+            bompenger = this.bompenger,
+            fergekostnad = this.fergekostnad,
+            parkering = this.parkering,
         )
 }
