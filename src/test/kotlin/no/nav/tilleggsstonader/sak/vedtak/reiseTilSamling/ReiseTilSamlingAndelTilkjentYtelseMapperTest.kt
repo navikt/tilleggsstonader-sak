@@ -85,7 +85,6 @@ class ReiseTilSamlingAndelTilkjentYtelseMapperTest {
             }
         }
 
-// TODO legge til sjekk på verdi på beløp
         @Test
         fun `når beregningsresultat ikke har privat bil returneres ingen andeler`() {
             val beregningsresultat =
