@@ -111,30 +111,23 @@ fun finnPeriodeFraAndel(
     beregningsresultat: BeregningsresultatReiseTilSamling,
     andelTilkjentYtelse: AndelTilkjentYtelse,
 ): Datoperiode {
-    val fom =
+    val offentligGrunnlag =
         beregningsresultat.offentligTransport
             .find { it.reiseId == andelTilkjentYtelse.reiseId }
             ?.grunnlag
-            ?.fom
-            ?: beregningsresultat.privatBil
-                .find { it.reiseId == andelTilkjentYtelse.reiseId }
-                ?.grunnlag
-                ?.fom
-            ?: error("Fant ikke periode for andel med reiseId ${andelTilkjentYtelse.reiseId}")
 
-    val tom =
-        beregningsresultat.offentligTransport
+    if (offentligGrunnlag != null) {
+        return Datoperiode(fom = offentligGrunnlag.fom, tom = offentligGrunnlag.tom)
+    }
+
+    val privatGrunnlag =
+        beregningsresultat.privatBil
             .find { it.reiseId == andelTilkjentYtelse.reiseId }
             ?.grunnlag
-            ?.tom
-            ?: beregningsresultat.privatBil
-                .find { it.reiseId == andelTilkjentYtelse.reiseId }
-                ?.grunnlag
-                ?.tom
-            ?: error("Fant ikke periode for andel med reiseId ${andelTilkjentYtelse.reiseId}")
 
-    return Datoperiode(
-        fom = fom,
-        tom = tom,
-    )
+    if (privatGrunnlag != null) {
+        return Datoperiode(fom = privatGrunnlag.fom, tom = privatGrunnlag.tom)
+    }
+
+    error("Fant ikke periode for andel med reiseId ${andelTilkjentYtelse.reiseId}")
 }
