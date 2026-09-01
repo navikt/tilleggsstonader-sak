@@ -195,6 +195,42 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
     }
 
     @Test
+    fun `kaster brukerfeil hvis reisen strekker seg utenfor vedtaksperioden`() {
+        every { vilkårService.hentOppfylteReiseOppstartAvslutningHjemreiseVilkår(behandling.id) } returns
+            listOf(
+                vilkår(
+                    behandlingId = behandling.id,
+                    type = VilkårType.REISE_OPPSTART_AVSLUTNING_HJEMREISE,
+                    resultat = Vilkårsresultat.OPPFYLT,
+                    status = VilkårStatus.NY,
+                    fom = 1 januar 2025,
+                    tom = 5 februar 2025,
+                    fakta =
+                        FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
+                            reiseId = dummyReiseId,
+                            adresse = "A",
+                            typeReiseformål = TypeReiseformål.OPPSTART,
+                            utgifterOffentligTransport = 300.toBigDecimal(),
+                            aktivitetId = VilkårperiodeGlobalId.random(),
+                        ),
+                ),
+            )
+
+        val feil =
+            catchThrowableOfType<ApiFeil> {
+                beregningService.beregn(
+                    behandling,
+                    vedtaksperioder,
+                    TypeVedtak.INNVILGELSE,
+                    beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+                )
+            }
+
+        assertThat(feil.message)
+            .contains("strekker seg utenfor vedtaksperiodene")
+    }
+
+    @Test
     fun `kaster brukerfeil hvis ingen oppfylte vilkår`() {
         every { vilkårService.hentOppfylteReiseOppstartAvslutningHjemreiseVilkår(behandling.id) } returns emptyList()
 

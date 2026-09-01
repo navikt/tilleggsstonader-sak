@@ -23,18 +23,16 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.math.BigDecimal
 
-// TODO: Utvid testen etter hvert som søknadsmapping og beregning for
-//  STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO blir implementert.
 class ReiseOppstartAvslutningHjemreiseTsoIntegrationTest : CleanDatabaseIntegrationTest() {
-    val fom = 1 januar 2026
-    val tom = 31 januar 2026
     val ident = "12345678910"
 
     @Autowired
     lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
 
     @Test
-    fun `skal kunne lagre målgruppe, aktivitet og stønadsvilkår for reise oppstart, avslutning og hjemreise TSO`() {
+    fun `skal kunne lagre stønadsvilkår, beregne ytelse og opprette andel tilkjent ytelse for reise oppstart TSO`() {
+        val reisedato = 1 januar 2026 // torsdag
+
         val behandling =
             testoppsettService.opprettBehandlingMedFagsak(
                 behandling = behandling(),
@@ -44,8 +42,8 @@ class ReiseOppstartAvslutningHjemreiseTsoIntegrationTest : CleanDatabaseIntegrat
 
         opprettOgTilordneOppgaveForBehandling(behandling.id)
 
-        gjennomførBehandlingsløp(ident = ident, behandlingId = behandling.id, tilSteg = StegType.BEREGNE_YTELSE) {
-            defaultReiseTilOppstartAvslutningOgHjemreiserTSOTestdata(fom, tom)
+        gjennomførBehandlingsløp(ident = ident, behandlingId = behandling.id, tilSteg = StegType.SIMULERING) {
+            defaultReiseTilOppstartAvslutningOgHjemreiserTSOTestdata(reisedato, reisedato)
         }
 
         val vilkårperioder = kall.vilkårperiode.hentForBehandling(behandling.id).vilkårperioder
@@ -73,24 +71,6 @@ class ReiseOppstartAvslutningHjemreiseTsoIntegrationTest : CleanDatabaseIntegrat
         assertThat(reiseVilkår.fakta).isInstanceOf(FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto::class.java)
         assertThat((reiseVilkår.fakta as FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto).aktivitetId)
             .isEqualTo(aktivitet.globalId)
-    }
-
-    @Test
-    fun `skal kunne beregne ytelse og opprette andel tilkjent ytelse for reise oppstart TSO`() {
-        val reisedato = 1 januar 2026 // torsdag
-
-        val behandling =
-            testoppsettService.opprettBehandlingMedFagsak(
-                behandling = behandling(),
-                stønadstype = Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
-                identer = setOf(PersonIdent(ident = ident)),
-            )
-
-        opprettOgTilordneOppgaveForBehandling(behandling.id)
-
-        gjennomførBehandlingsløp(ident = ident, behandlingId = behandling.id, tilSteg = StegType.SIMULERING) {
-            defaultReiseTilOppstartAvslutningOgHjemreiserTSOTestdata(reisedato, reisedato)
-        }
 
         val vedtak =
             kall.vedtak.apiRespons

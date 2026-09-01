@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -27,7 +26,6 @@ fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(
     lagAndelForReiseOppstart(
         saksbehandling = saksbehandling,
         reiseFom = grunnlag.fom,
-        reiseTom = grunnlag.tom,
         beløp = beløp,
         reiseId = reiseId,
         aktivitetId = aktivitetId,
@@ -43,7 +41,6 @@ fun BeregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(
     lagAndelForReiseOppstart(
         saksbehandling = saksbehandling,
         reiseFom = grunnlag.fom,
-        reiseTom = grunnlag.tom,
         beløp = beløp,
         reiseId = reiseId,
         aktivitetId = aktivitetId,
@@ -54,17 +51,13 @@ fun BeregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(
 private fun lagAndelForReiseOppstart(
     saksbehandling: Saksbehandling,
     reiseFom: LocalDate,
-    reiseTom: LocalDate,
     beløp: BigDecimal,
     reiseId: ReiseId,
     aktivitetId: VilkårperiodeGlobalId,
     vedtaksperioder: List<Vedtaksperiode>,
     aktiviteter: List<Vilkårperiode>,
 ): AndelTilkjentYtelse {
-    feilHvis(reiseFom != reiseTom) {
-        "Forventer at reise for STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE gjelder én enkelt dag " +
-            "(fom=$reiseFom, tom=$reiseTom, reiseId=$reiseId)"
-    }
+    // Reisen kan vare lenger enn én dag, men utbetales som en dagsats med reisens startdato som betalingsdag.
     val fomUkedag = reiseFom.datoEllerNesteMandagHvisLørdagEllerSøndag()
 
     val typeAndel =

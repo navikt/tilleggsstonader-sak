@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.libs.feil.Feil
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
@@ -138,10 +137,20 @@ class ReiseOppstartAvslutningHjemreiseAndelTilkjentYtelseMapperTest {
     }
 
     @Test
-    fun `kaster feil hvis reisen strekker seg over mer enn én dag`() {
+    fun `reise som strekker seg over flere dager utbetales som en dagsats på reisens startdato`() {
+        val startdato = 5 januar 2026 // mandag
+        val sluttdato = 9 januar 2026
         val saksbehandling =
             saksbehandling(
                 fagsak = fagsak(stønadstype = Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO),
+            )
+        val vedtaksperioder =
+            listOf(
+                vedtaksperiode(
+                    fom = 1 januar 2026,
+                    tom = 31 januar 2026,
+                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                ),
             )
         val beregningsresultat =
             BeregningsresultatOffentligTransport(
@@ -150,23 +159,23 @@ class ReiseOppstartAvslutningHjemreiseAndelTilkjentYtelseMapperTest {
                 grunnlag =
                     BeregningsgrunnlagOffentligTransport(
                         adresse = "Oppstartsgata 1",
-                        fom = 1 januar 2026,
-                        tom = 2 januar 2026,
+                        fom = startdato,
+                        tom = sluttdato,
                         vedtaksperioder = emptyList(),
                     ),
                 beløp = 40.toBigDecimal(),
             )
 
-        val feil =
-            catchThrowableOfType<Feil> {
-                beregningsresultat.mapTilAndelTilkjentYtelse(
-                    saksbehandling = saksbehandling,
-                    vedtaksperioder = emptyList(),
-                    aktiviteter = emptyList(),
-                )
-            }
+        val andel =
+            beregningsresultat.mapTilAndelTilkjentYtelse(
+                saksbehandling = saksbehandling,
+                vedtaksperioder = vedtaksperioder,
+                aktiviteter = emptyList(),
+            )
 
-        assertThat(feil.message).contains("gjelder én enkelt dag")
+        assertThat(andel.fom).isEqualTo(startdato)
+        assertThat(andel.tom).isEqualTo(startdato)
+        assertThat(andel.beløp).isEqualTo(40)
     }
 
     @Test
