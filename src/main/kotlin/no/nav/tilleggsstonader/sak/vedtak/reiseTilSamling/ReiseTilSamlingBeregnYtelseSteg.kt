@@ -13,8 +13,9 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.OpprettAndelerReiseTilSamlingService
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingBeregningService
-import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningReiseTilSamling
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingRequest
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.VedtakReiseTilSamlingRequest
 import org.springframework.stereotype.Service
@@ -24,6 +25,7 @@ import java.time.LocalDate
 class ReiseTilSamlingBeregnYtelseSteg(
     private val beregningService: ReiseTilSamlingBeregningService,
     private val beregningsplanUtleder: BeregningsplanUtleder,
+    private val opprettAndelerReiseTilSamlingService: OpprettAndelerReiseTilSamlingService,
     vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
@@ -74,11 +76,12 @@ class ReiseTilSamlingBeregnYtelseSteg(
             begrunnelse = vedtak.begrunnelse,
             beregningsplan = plan,
         )
+        opprettAndelerReiseTilSamlingService.lagreAndelerForBehandling(saksbehandling)
     }
 
     private fun lagreInnvilgetVedtak(
         behandling: Saksbehandling,
-        beregningsresultat: BeregningReiseTilSamling,
+        beregningsresultat: BeregningsresultatReiseTilSamling,
         vedtaksperioder: List<Vedtaksperiode>,
         begrunnelse: String?,
         beregningsplan: Beregningsplan,

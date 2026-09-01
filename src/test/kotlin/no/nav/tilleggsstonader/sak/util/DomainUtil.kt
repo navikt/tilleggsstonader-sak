@@ -712,7 +712,7 @@ fun faktaOffentligTransportReiseTilSamling(
 fun faktaPrivatBilReiseTilSamling(
     reiseId: ReiseId = dummyReiseId,
     adresse: String = "Tiltaksveien 1",
-    reiseavstand: BigDecimal = 20.toBigDecimal(),
+    reiseavstand: BigDecimal = 40.toBigDecimal(),
     aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId.random(),
 ) = FaktaPrivatBilReiseTilSamling(
     reiseId = reiseId,

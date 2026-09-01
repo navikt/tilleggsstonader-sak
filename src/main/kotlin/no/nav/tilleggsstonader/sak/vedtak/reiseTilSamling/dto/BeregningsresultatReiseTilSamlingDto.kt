@@ -1,9 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto
 
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
-import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatPrivatBil
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
@@ -35,7 +35,7 @@ data class BeregningsresultatPrivatBilDto(
     val aktivitetId: VilkårperiodeGlobalId?,
 )
 
-fun BeregningReiseTilSamling.tilDto(beregningsplan: Beregningsplan) =
+fun BeregningsresultatReiseTilSamling.tilDto(beregningsplan: Beregningsplan) =
     BeregningsresultatReiseTilSamlingDto(
         offentligTransport =
             offentligTransport

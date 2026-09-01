@@ -10,8 +10,8 @@ Nødvendige secrets kan hentes fra cluster:
 
 1. `gcloud auth login`
 2. `brew install jq` hvis du mangler det.
-3. `kubectl --context dev-gcp -n tilleggsstonader get secret azuread-tilleggsstonader-sak-lokal -o json | jq '.data | map_values(@base64d)' | grep CLIENT`
-4. `kubectl --context dev-gcp -n tilleggsstonader get secret google-maps-api-key -o json | jq '.data | map_values(@base64d)'`
+3. Hent AZURE_APP_CLIENT_ID og AZURE_APP_CLIENT_SECRET `nais secret get azuread-tilleggsstonader-sak-lokal -e dev-gcp -t tilleggsstonader --with-values --reason "Lokal utvikling" --output json | jq '.[]'`
+4. Hent GOOGLE_MAPS_API_KEY `nais secret get google-maps-api-key -e dev-gcp -t tilleggsstonader --with-values --reason "Lokal utvikling" --output json | jq '.[]'`
 5. Legg til en .env-fil i prosjektet med innholdet `AZURE_APP_CLIENT_ID={secret}` , `AZURE_APP_CLIENT_SECRET={secret},` og `GOOGLE_MAPS_API_KEY={secret}`. Du kan se eksempel på en .env fil på `.env.template`.
 6. Variablene legges inn under `SakAppLocal` eller `SakAppLocalPostgres` -> Edit Configurations -> Modify Options -> huk av for Environment Variables, og velg `.env`-fila du opprettet. Hvis du ikke ser `.env`-fila i Finder, bruk følgende keyboard shortcut, `cmd + shift + .`, for å vise skjulte filer.
 

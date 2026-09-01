@@ -72,7 +72,12 @@ enum class FaktiskMålgruppe(
 
             Stønadstype.REISE_TIL_SAMLING_TSO,
             -> {
-                TODO("Hvilke typeandel skal brukes her?")
+                when (this) {
+                    NEDSATT_ARBEIDSEVNE -> TypeAndel.REISE_TIL_SAMLING_AAP
+                    ENSLIG_FORSØRGER -> TypeAndel.REISE_TIL_SAMLING_ENSLIG_FORSØRGER
+                    GJENLEVENDE -> TypeAndel.REISE_TIL_SAMLING_ETTERLATTE
+                    else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
+                }
             }
 
             Stønadstype.REISE_TIL_SAMLING_TSR,
