@@ -9,6 +9,9 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreisePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingUbestemt
@@ -110,6 +113,12 @@ fun Vilkår.tilOppsummertVilkår(): OppsummertVilkår =
                 is FaktaReiseTilSamlingOffentligTransport -> TypeVilkårFakta.REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT
                 is FaktaReiseTilSamlingPrivatBil -> TypeVilkårFakta.REISE_TIL_SAMLING_PRIVAT_BIL
                 is FaktaReiseTilSamlingUbestemt -> TypeVilkårFakta.REISE_TIL_SAMLING_UBESTEMT
+                is FaktaReiseOppstartAvslutningHjemreiseOffentligTransport ->
+                    TypeVilkårFakta.REISE_OPPSTART_AVSLUTNING_HJEMREISE_OFFENTLIG_TRANSPORT
+                is FaktaReiseOppstartAvslutningHjemreisePrivatBil ->
+                    TypeVilkårFakta.REISE_OPPSTART_AVSLUTNING_HJEMREISE_PRIVAT_BIL
+                is FaktaReiseOppstartAvslutningHjemreiseUbestemt ->
+                    TypeVilkårFakta.REISE_OPPSTART_AVSLUTNING_HJEMREISE_UBESTEMT
                 null -> null
             },
     )

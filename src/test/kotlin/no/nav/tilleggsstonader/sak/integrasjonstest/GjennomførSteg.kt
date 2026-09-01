@@ -34,12 +34,21 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.Lagre
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårReiseOppstartAvslutningHjemreiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.LagreVilkårReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import org.springframework.test.web.servlet.client.RestTestClient
 import org.springframework.test.web.servlet.client.expectBody
 import java.util.UUID
+
+/**
+ * `gjelderReiseOppstartAvslutningHjemreise()`-lignende hjelpefunksjon finnes ikke i det eksterne
+ * kontrakter-felles-biblioteket ennå, så vi sjekker lokalt her i testkoden.
+ */
+private fun Stønadstype.gjelderReiseOppstartAvslutningHjemreise(): Boolean =
+    this == Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO ||
+        this == Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR
 
 fun IntegrationTest.gjennomførInngangsvilkårSteg(
     testdataDsl: BehandlingTestdataDsl,
@@ -153,6 +162,11 @@ fun IntegrationTest.gjennomførVilkårSteg(
             } else {
                 if (stønadstype.gjelderReiseTilSamling()) {
                     kall.vilkårReiseTilSamling.opprettVilkår(behandlingId, it as LagreVilkårReiseTilSamlingDto)
+                } else if (stønadstype.gjelderReiseOppstartAvslutningHjemreise()) {
+                    kall.vilkårReiseOppstartAvslutningHjemreise.opprettVilkår(
+                        behandlingId,
+                        it as LagreVilkårReiseOppstartAvslutningHjemreiseDto,
+                    )
                 } else {
                     kall.vilkår.opprettVilkår(it as OpprettVilkårDto)
                 }

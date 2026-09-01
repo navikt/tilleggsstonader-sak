@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreDagligReisePrivatBilDto
+import no.nav.tilleggsstonader.sak.util.lagreReiseOppstartAvslutningHjemreiseDto
 import no.nav.tilleggsstonader.sak.util.lagreReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReisePrivatBilDto
@@ -25,6 +26,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.Vilkårsvurdering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBolig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import java.math.BigDecimal
@@ -147,6 +149,20 @@ class OpprettStønadsvilkårDsl {
             lagreReiseTilSamlingDto(
                 fom = fom,
                 tom = tom,
+            )
+        }
+    }
+
+    fun offentligTransportReiseOppstartAvslutningHjemreise(
+        fom: LocalDate,
+        tom: LocalDate,
+        typeReiseformål: TypeReiseformål = TypeReiseformål.OPPSTART,
+    ) {
+        dtoer += { _, _, _ ->
+            lagreReiseOppstartAvslutningHjemreiseDto(
+                fom = fom,
+                tom = tom,
+                typeReiseformål = typeReiseformål,
             )
         }
     }

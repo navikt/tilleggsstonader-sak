@@ -273,5 +273,10 @@ class BehandlingTestdataDsl internal constructor() {
                 målgruppeAAP(fom, tom)
             }
         }
+        vilkår {
+            opprett {
+                offentligTransportReiseOppstartAvslutningHjemreise(fom = fom, tom = tom)
+            }
+        }
     }
 }

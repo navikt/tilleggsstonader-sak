@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -21,6 +22,18 @@ import java.time.LocalDate
     JsonSubTypes.Type(FaktaReiseTilSamlingOffentligTransport::class, name = "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT"),
     JsonSubTypes.Type(FaktaReiseTilSamlingPrivatBil::class, name = "REISE_TIL_SAMLING_PRIVAT_BIL"),
     JsonSubTypes.Type(FaktaReiseTilSamlingUbestemt::class, name = "REISE_TIL_SAMLING_UBESTEMT"),
+    JsonSubTypes.Type(
+        FaktaReiseOppstartAvslutningHjemreiseOffentligTransport::class,
+        name = "REISE_OPPSTART_AVSLUTNING_HJEMREISE_OFFENTLIG_TRANSPORT",
+    ),
+    JsonSubTypes.Type(
+        FaktaReiseOppstartAvslutningHjemreisePrivatBil::class,
+        name = "REISE_OPPSTART_AVSLUTNING_HJEMREISE_PRIVAT_BIL",
+    ),
+    JsonSubTypes.Type(
+        FaktaReiseOppstartAvslutningHjemreiseUbestemt::class,
+        name = "REISE_OPPSTART_AVSLUTNING_HJEMREISE_UBESTEMT",
+    ),
     failOnRepeatedNames = true,
 )
 sealed interface VilkårFakta {
@@ -45,6 +58,28 @@ data class FaktaReiseTilSamlingPrivatBil(
 data class FaktaReiseTilSamlingUbestemt(
     override val reiseId: ReiseId,
     override val adresse: String?,
+) : VilkårFakta
+
+data class FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
+    override val reiseId: ReiseId,
+    override val adresse: String?,
+    val typeReiseformål: TypeReiseformål,
+    val utgifterOffentligTransport: BigDecimal,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
+) : VilkårFakta
+
+data class FaktaReiseOppstartAvslutningHjemreisePrivatBil(
+    override val reiseId: ReiseId,
+    override val adresse: String?,
+    val typeReiseformål: TypeReiseformål,
+    val reiseavstand: BigDecimal,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
+) : VilkårFakta
+
+data class FaktaReiseOppstartAvslutningHjemreiseUbestemt(
+    override val reiseId: ReiseId,
+    override val adresse: String?,
+    val typeReiseformål: TypeReiseformål,
 ) : VilkårFakta
 
 data class FaktaDagligReiseUbestemt(
@@ -100,4 +135,7 @@ enum class TypeVilkårFakta {
     REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT,
     REISE_TIL_SAMLING_PRIVAT_BIL,
     REISE_TIL_SAMLING_UBESTEMT,
+    REISE_OPPSTART_AVSLUTNING_HJEMREISE_OFFENTLIG_TRANSPORT,
+    REISE_OPPSTART_AVSLUTNING_HJEMREISE_PRIVAT_BIL,
+    REISE_OPPSTART_AVSLUTNING_HJEMREISE_UBESTEMT,
 }

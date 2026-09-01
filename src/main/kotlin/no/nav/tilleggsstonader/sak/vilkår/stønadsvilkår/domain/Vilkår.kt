@@ -100,6 +100,10 @@ data class Vilkår(
                 // TODO skal det være noe her?
             }
 
+            VilkårType.REISE_OPPSTART_AVSLUTNING_HJEMREISE -> {
+                // Dette er kun for tester foreløpig
+            }
+
             VilkårType.EKSEMPEL -> {
                 // Dette er kun for tester foreløpig
             }
@@ -267,6 +271,15 @@ enum class VilkårType(
     REISE_TIL_SAMLING(
         "Reise til samling",
         listOf(Stønadstype.REISE_TIL_SAMLING_TSO),
+    ),
+
+    // Reise oppstart, avslutning og hjemreise
+    REISE_OPPSTART_AVSLUTNING_HJEMREISE(
+        "Reise oppstart, avslutning og hjemreise",
+        listOf(
+            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+        ),
     ),
     ;
 
