@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.libs.feil.ApiFeil
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
@@ -33,12 +34,14 @@ class ReiseTilSamlingBeregningsTest {
     private val vilkårService = mockk<VilkårService>()
     private val vedtaksperiodeValideringService = mockk<VedtaksperiodeValideringService>()
     private val satsReiseTilSamlingPrivatBilProvider = mockk<SatsPrivatBilProvider>()
+    private val arbeidsfordelingService = mockk<ArbeidsfordelingService>()
 
     private val beregningService =
         ReiseTilSamlingBeregningService(
             vilkårService,
             vedtaksperiodeValideringService,
             satsReiseTilSamlingPrivatBilProvider,
+            arbeidsfordelingService,
         )
 
     private val behandling = saksbehandling()

@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.domain
 
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
-import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningReiseTilSamling
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatReiseTilSamling
 
 enum class TypeVedtakReiseTilSamling(
     override val typeVedtak: TypeVedtak,
@@ -21,13 +21,13 @@ enum class TypeReiseTilSamling {
 sealed interface VedtakReiseTilSamling : Vedtaksdata
 
 sealed interface InnvilgelseEllerOpphørReiseTilSamling : VedtakReiseTilSamling {
-    val beregningsresultat: BeregningReiseTilSamling
+    val beregningsresultat: BeregningsresultatReiseTilSamling
     val vedtaksperioder: List<Vedtaksperiode>
     val beregningsplan: Beregningsplan
 }
 
 data class InnvilgelseReiseTilSamling(
-    override val beregningsresultat: BeregningReiseTilSamling,
+    override val beregningsresultat: BeregningsresultatReiseTilSamling,
     override val vedtaksperioder: List<Vedtaksperiode>,
     val begrunnelse: String? = null,
     override val beregningsplan: Beregningsplan,
