@@ -106,4 +106,6 @@ fun Stønadstype.visningsnavnStønadsvilkår() =
         Stønadstype.REISE_TIL_SAMLING_TSR -> "reise til samling"
         Stønadstype.FLYTTING_TSO -> "flytting"
         Stønadstype.FLYTTING_TSR -> "flytting"
+        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO -> "støtte til reise ved oppstart, avslutning og hjemreise"
+        Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR -> "støtte til reise ved oppstart, avslutning og hjemreise"
     }

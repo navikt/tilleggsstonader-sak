@@ -22,6 +22,8 @@ import no.nav.tilleggsstonader.sak.util.KjørelisteUtil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammeForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil.rammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.util.saksbehandling
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.avrundetStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
@@ -64,7 +66,7 @@ class PrivatBilBeregningsresultatServiceTest {
                 rammevedtak = rammevedtak,
                 brukersNavKontor = brukersNavKontor,
                 forrigeBeregningsresultat = forrigeBeregningsresultat,
-                beregnFra = null,
+                beregningsplan = Beregningsplan(omfang = Beregningsomfang.ALLE_PERIODER),
             ),
         )
     }

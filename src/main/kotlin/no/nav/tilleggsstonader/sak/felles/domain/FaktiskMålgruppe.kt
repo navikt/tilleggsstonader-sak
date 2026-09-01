@@ -83,9 +83,16 @@ enum class FaktiskMålgruppe(
             Stønadstype.REISE_TIL_SAMLING_TSR,
             Stønadstype.DAGLIG_REISE_TSR,
             Stønadstype.FLYTTING_TSR,
+            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
             -> error("Kan ikke utlede Typeandel for $stønadstype fra FaktiskMålgruppe")
 
             Stønadstype.FLYTTING_TSO,
             -> error("Kan ikke utlede Typeandel for FLYTTING fra FaktiskMålgruppe - ikke implementert")
+
+            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+            ->
+                error(
+                    "Kan ikke utlede Typeandel for STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE fra FaktiskMålgruppe - ikke implementert",
+                )
         }
 }

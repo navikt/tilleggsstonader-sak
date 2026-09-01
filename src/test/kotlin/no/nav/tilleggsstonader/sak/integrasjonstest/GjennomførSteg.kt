@@ -244,6 +244,9 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                             Stønadstype.FLYTTING_TSO,
                             Stønadstype.FLYTTING_TSR,
                             -> TODO("InnvilgelseFlyttingRequest")
+                            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+                            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+                            -> TODO("InnvilgelseStøtteTilReiseOppstartAvslutningHjemreiseRequest")
                         },
                 )
         }
@@ -288,6 +291,9 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                             Stønadstype.FLYTTING_TSO,
                             Stønadstype.FLYTTING_TSR,
                             -> TODO("AvslagFlyttingRequest")
+                            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+                            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+                            -> TODO("AvslagStøtteTilReiseOppstartAvslutningHjemreiseRequest")
                         },
                 )
 
@@ -332,6 +338,9 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                             Stønadstype.FLYTTING_TSO,
                             Stønadstype.FLYTTING_TSR,
                             -> TODO("OpphørFlyttingRequest")
+                            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+                            Stønadstype.STØTTE_TIL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+                            -> TODO("OpphørStøtteTilReiseOppstartAvslutningHjemreiseRequest")
                         },
                 )
     }

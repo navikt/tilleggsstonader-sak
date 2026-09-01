@@ -27,7 +27,7 @@ object BehandlingUtil {
         behandlingÅrsak: BehandlingÅrsak,
     ): BehandlingType =
         if (skalVæreRevurdering) {
-            if (behandlingÅrsak == BehandlingÅrsak.KJØRELISTE) {
+            if (behandlingÅrsak == BehandlingÅrsak.KJØRELISTE || behandlingÅrsak == BehandlingÅrsak.REGISTRER_KJØRELISTE_FOR_BRUKER) {
                 BehandlingType.KJØRELISTE
             } else {
                 BehandlingType.REVURDERING

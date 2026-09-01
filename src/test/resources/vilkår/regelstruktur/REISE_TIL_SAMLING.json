@@ -1,4 +1,24 @@
 {
+  "KAN_REISE_MED_OFFENTLIG_TRANSPORT": {
+    "erHovedregel": false,
+    "reglerSomMåNullstilles": [
+      "KAN_REISE_MED_EGEN_BIL"
+    ],
+    "svaralternativer": [
+      {
+        "svarId": "JA",
+        "nesteRegelId": null,
+        "begrunnelseType": "UTEN",
+        "tilhørendeFaktaType": "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT"
+      },
+      {
+        "svarId": "NEI",
+        "nesteRegelId": "KAN_REISE_MED_EGEN_BIL",
+        "begrunnelseType": "PÅKREVD",
+        "tilhørendeFaktaType": null
+      }
+    ]
+  },
   "AVSTAND_OVER_TRETTI_KM": {
     "erHovedregel": true,
     "reglerSomMåNullstilles": [
@@ -22,21 +42,19 @@
       }
     ]
   },
-  "KAN_REISE_MED_OFFENTLIG_TRANSPORT": {
+  "KAN_REISE_MED_EGEN_BIL": {
     "erHovedregel": false,
-    "reglerSomMåNullstilles": [
-      "KAN_REISE_MED_EGEN_BIL"
-    ],
+    "reglerSomMåNullstilles": [],
     "svaralternativer": [
       {
         "svarId": "JA",
         "nesteRegelId": null,
         "begrunnelseType": "UTEN",
-        "tilhørendeFaktaType": "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT"
+        "tilhørendeFaktaType": "REISE_TIL_SAMLING_PRIVAT_BIL"
       },
       {
         "svarId": "NEI",
-        "nesteRegelId": "KAN_REISE_MED_EGEN_BIL",
+        "nesteRegelId": null,
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null
       }
@@ -55,24 +73,6 @@
         "nesteRegelId": "DEKKET_AV_ANNET_STIPEND",
         "begrunnelseType": "VALGFRI",
         "tilhørendeFaktaType": null
-      },
-      {
-        "svarId": "NEI",
-        "nesteRegelId": null,
-        "begrunnelseType": "PÅKREVD",
-        "tilhørendeFaktaType": null
-      }
-    ]
-  },
-  "KAN_REISE_MED_EGEN_BIL": {
-    "erHovedregel": false,
-    "reglerSomMåNullstilles": [],
-    "svaralternativer": [
-      {
-        "svarId": "JA",
-        "nesteRegelId": null,
-        "begrunnelseType": "UTEN",
-        "tilhørendeFaktaType": "REISE_TIL_SAMLING_PRIVAT_BIL"
       },
       {
         "svarId": "NEI",

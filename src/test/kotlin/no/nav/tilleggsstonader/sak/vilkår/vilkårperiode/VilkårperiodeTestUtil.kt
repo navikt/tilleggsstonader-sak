@@ -68,6 +68,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygdLæremidler
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUtdanningDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingerUtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetPassAvBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarDto
@@ -458,7 +459,14 @@ object VilkårperiodeTestUtil {
                     fakta = FaktaAktivitetDagligReiseTso(aktivitetsdager = 3),
                 )
 
-            AktivitetType.UTDANNING -> UtdanningDagligReiseTso(fakta = FaktaAktivitetDagligReiseTso(aktivitetsdager = 3))
+            AktivitetType.UTDANNING ->
+                UtdanningDagligReiseTso(
+                    vurderinger =
+                        VurderingUtdanningDagligReiseTso(
+                            harUtgifter = harUtgifter,
+                        ),
+                    fakta = FaktaAktivitetDagligReiseTso(aktivitetsdager = 3),
+                )
 
             AktivitetType.INGEN_AKTIVITET -> IngenAktivitetDagligReiseTso
 

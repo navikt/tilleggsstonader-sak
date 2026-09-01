@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilS
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 
 sealed interface FaktaReiseTilSamling {
@@ -34,6 +35,7 @@ data class FaktaOffentligTransport(
     override val reiseId: ReiseId,
     override val adresse: String?,
     val utgifterOffentligTransport: BigDecimal,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
 ) : FaktaReiseTilSamling {
     override val type = TypeReiseTilSamling.OFFENTLIG_TRANSPORT
 
@@ -46,6 +48,7 @@ data class FaktaOffentligTransport(
             reiseId = reiseId,
             adresse = adresse,
             utgifterOffentligTransport = utgifterOffentligTransport,
+            aktivitetId = aktivitetId,
         )
 
     private fun validerIngenNegativeUtgifter() {
@@ -59,6 +62,7 @@ data class FaktaPrivatBil(
     override val reiseId: ReiseId,
     override val adresse: String?,
     val reiseavstand: BigDecimal,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
 ) : FaktaReiseTilSamling {
     override val type = TypeReiseTilSamling.PRIVAT_BIL
 
@@ -71,6 +75,7 @@ data class FaktaPrivatBil(
             reiseId = reiseId,
             adresse = adresse,
             reiseavstand = reiseavstand,
+            aktivitetId = aktivitetId,
         )
 
     private fun validerIngenNegativReiseavstand() {

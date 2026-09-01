@@ -70,6 +70,78 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
     JsonSubTypes.Type(NedsattArbeidsevneReiseTilSamlingTso::class, name = "NEDSATT_ARBEIDSEVNE_REISE_TIL_SAMLING_TSO"),
     JsonSubTypes.Type(UføretrygdReiseTilSamlingTso::class, name = "UFØRETRYGD_REISE_TIL_SAMLING_TSO"),
     JsonSubTypes.Type(IngenMålgruppeReiseTilSamlingTso::class, name = "INGEN_MÅLGRUPPE_REISE_TIL_SAMLING_TSO"),
+    JsonSubTypes.Type(UtdanningReiseTilSamlingTsr::class, name = "UTDANNING_REISE_TIL_SAMLING_TSR"),
+    JsonSubTypes.Type(TiltakReiseTilSamlingTsr::class, name = "TILTAK_REISE_TIL_SAMLING_TSR"),
+    JsonSubTypes.Type(IngenAktivitetReiseTilSamlingTsr::class, name = "INGEN_AKTIVITET_REISE_TIL_SAMLING_TSR"),
+    JsonSubTypes.Type(DagpengerReiseTilSamlingTsr::class, name = "DAGPENGER_REISE_TIL_SAMLING_TSR"),
+    JsonSubTypes.Type(TiltakspengerReiseTilSamlingTsr::class, name = "TILTAKSPENGER_REISE_TIL_SAMLING_TSR"),
+    JsonSubTypes.Type(KvalifiseringsstønadReiseTilSamlingTsr::class, name = "KVALIFISERINGSSTØNAD_REISE_TIL_SAMLING_TSR"),
+    JsonSubTypes.Type(InnsattIFengselReiseTilSamlingTsr::class, name = "INNSATT_I_FENGSEL_REISE_TIL_SAMLING_TSR"),
+    JsonSubTypes.Type(IngenMålgruppeReiseTilSamlingTsr::class, name = "INGEN_MÅLGRUPPE_REISE_TIL_SAMLING_TSR"),
+    JsonSubTypes.Type(
+        UtdanningReiseOppstartAvslutningHjemreiseTso::class,
+        name = "UTDANNING_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO",
+    ),
+    JsonSubTypes.Type(
+        TiltakReiseOppstartAvslutningHjemreiseTso::class,
+        name = "TILTAK_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO",
+    ),
+    JsonSubTypes.Type(
+        IngenAktivitetReiseOppstartAvslutningHjemreiseTso::class,
+        name = "INGEN_AKTIVITET_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO",
+    ),
+    JsonSubTypes.Type(
+        AAPReiseOppstartAvslutningHjemreiseTso::class,
+        name = "AAP_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO",
+    ),
+    JsonSubTypes.Type(
+        OmstillingsstønadReiseOppstartAvslutningHjemreiseTso::class,
+        name = "OMSTILLINGSSTØNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO",
+    ),
+    JsonSubTypes.Type(
+        OvergangssstønadReiseOppstartAvslutningHjemreiseTso::class,
+        name = "OVERGANGSSTØNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO",
+    ),
+    JsonSubTypes.Type(
+        NedsattArbeidsevneReiseOppstartAvslutningHjemreiseTso::class,
+        name = "NEDSATT_ARBEIDSEVNE_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO",
+    ),
+    JsonSubTypes.Type(
+        UføretrygdReiseOppstartAvslutningHjemreiseTso::class,
+        name = "UFØRETRYGD_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO",
+    ),
+    JsonSubTypes.Type(
+        IngenMålgruppeReiseOppstartAvslutningHjemreiseTso::class,
+        name = "INGEN_MÅLGRUPPE_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO",
+    ),
+    JsonSubTypes.Type(
+        TiltakReiseOppstartAvslutningHjemreiseTsr::class,
+        name = "TILTAK_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR",
+    ),
+    JsonSubTypes.Type(
+        IngenAktivitetReiseOppstartAvslutningHjemreiseTsr::class,
+        name = "INGEN_AKTIVITET_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR",
+    ),
+    JsonSubTypes.Type(
+        DagpengerReiseOppstartAvslutningHjemreiseTsr::class,
+        name = "DAGPENGER_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR",
+    ),
+    JsonSubTypes.Type(
+        TiltakspengerReiseOppstartAvslutningHjemreiseTsr::class,
+        name = "TILTAKSPENGER_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR",
+    ),
+    JsonSubTypes.Type(
+        KvalifiseringsstønadReiseOppstartAvslutningHjemreiseTsr::class,
+        name = "KVALIFISERINGSSTØNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR",
+    ),
+    JsonSubTypes.Type(
+        InnsattIFengselReiseOppstartAvslutningHjemreiseTsr::class,
+        name = "INNSATT_I_FENGSEL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR",
+    ),
+    JsonSubTypes.Type(
+        IngenMålgruppeReiseOppstartAvslutningHjemreiseTsr::class,
+        name = "INGEN_MÅLGRUPPE_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR",
+    ),
     failOnRepeatedNames = true,
 )
 sealed interface FaktaOgVurderingJson

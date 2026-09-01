@@ -4,23 +4,28 @@
     "omfang" : "ALLE_PERIODER"
   },
   "beregningsresultat" : {
-    "offentligTransport" : [ {
+    "offentligTransport" : [
+      {
       "reiseId" : "01a01909-7c2e-72dc-a318-f8c08154a603",
       "grunnlag" : {
         "adresse" : "rfg",
         "fom" : "2026-08-20",
         "tom" : "2026-08-22",
-        "vedtaksperioder" : [ {
+        "vedtaksperioder" : [
+          {
           "id" : "29dc9897-4d0c-442a-a101-95295ac10111",
           "fom" : "2026-08-20",
           "tom" : "2026-08-22",
           "målgruppe" : "NEDSATT_ARBEIDSEVNE",
           "aktivitet" : "TILTAK"
-        } ],
+        }
+        ],
         "brukersNavKontor" : null
       },
-      "beløp" : 245365
-    } ],
+      "beløp" : 245365,
+        "aktivitetId": null
+    }
+    ],
     "privatBil" : [ ]
   },
   "type" : "INNVILGELSE_REISE_TIL_SAMLING",

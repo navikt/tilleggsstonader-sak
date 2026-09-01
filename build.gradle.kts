@@ -2,10 +2,10 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 val javaVersion = JavaLanguageVersion.of(21)
-val familieProsesseringVersion = "2.20260713101404_6072da6"
+val familieProsesseringVersion = "2.20260817115650_f13f507"
 val tilleggsstønaderLibsVersion = "2026.08.07-12.32.dfeb3286fb52"
-val tilleggsstønaderKontrakterVersion = "2026.08.25-12.13.891665e2adb7"
-val avroVersion = "1.12.1"
+val tilleggsstønaderKontrakterVersion = "2026.08.26-22.25.3fa8158770cf"
+val avroVersion = "1.12.2"
 val confluentVersion = "8.0.1"
 val joarkHendelseVersion = "1.1.11"
 val tokenSupportVersion = "6.0.12"
@@ -13,7 +13,7 @@ val wiremockVersion = "3.13.2"
 val mockkVersion = "1.14.11"
 val testcontainerVersion = "1.21.4"
 val springDocVersion = "3.1.0"
-val shedlockVersion = "7.8.0"
+val shedlockVersion = "7.9.0"
 
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
@@ -22,11 +22,11 @@ plugins {
     application
 
     kotlin("jvm") version "2.4.10"
-    id("com.diffplug.spotless") version "8.9.0"
+    id("com.diffplug.spotless") version "8.10.0"
     id("io.github.ben-manes.versions") version "0.61.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
 
-    id("org.springframework.boot") version "4.1.0"
+    id("org.springframework.boot") version "4.1.1"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.spring") version "2.4.10"
 }
@@ -124,7 +124,7 @@ dependencies {
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("no.nav.tilleggsstonader-libs:test-util:$tilleggsstønaderLibsVersion")
 
-    testImplementation(platform("io.cucumber:cucumber-bom:7.34.6"))
+    testImplementation(platform("io.cucumber:cucumber-bom:7.34.7"))
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
 
