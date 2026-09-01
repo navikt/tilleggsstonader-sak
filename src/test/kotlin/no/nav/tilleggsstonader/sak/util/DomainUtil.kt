@@ -790,6 +790,7 @@ fun lagreReiseOppstartAvslutningHjemreiseDto(
     reiseId: ReiseId = dummyReiseId,
     typeReiseformål: TypeReiseformål = TypeReiseformål.OPPSTART,
     utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
+    aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId.random(),
     svar: Map<RegelId, SvarOgBegrunnelseDto> =
         mapOf(
             RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
@@ -797,6 +798,7 @@ fun lagreReiseOppstartAvslutningHjemreiseDto(
     fakta: FaktaReiseOppstartAvslutningHjemreiseDto =
         FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
             utgifterOffentligTransport = utgifterOffentligTransport,
+            aktivitetId = aktivitetId,
         ),
 ) = LagreVilkårReiseOppstartAvslutningHjemreiseDto(
     fom = fom,

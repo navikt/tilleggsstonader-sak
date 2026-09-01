@@ -1,11 +1,13 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise
 
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.AktivitetMedReiser
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReiseOppstartAvslutningHjemreise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.AktivitetMedReiserDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreisePrivatBilDto
@@ -13,6 +15,16 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårReiseOppstartAvslutningHjemreiseDto
 
 object VilkårReiseOppstartAvslutningHjemreiseDtoMapper {
+    fun AktivitetMedReiser.tilDto() =
+        AktivitetMedReiserDto(
+            aktivitetId = this.aktivitetId,
+            aktivitetType = this.aktivitetType,
+            tiltaksvariant = this.tiltaksvariant,
+            fom = this.fom,
+            tom = this.tom,
+            reiser = this.reiser.map { it.tilDto() },
+        )
+
     fun VilkårReiseOppstartAvslutningHjemreise.tilDto() =
         VilkårReiseOppstartAvslutningHjemreiseDto(
             id = this.id,

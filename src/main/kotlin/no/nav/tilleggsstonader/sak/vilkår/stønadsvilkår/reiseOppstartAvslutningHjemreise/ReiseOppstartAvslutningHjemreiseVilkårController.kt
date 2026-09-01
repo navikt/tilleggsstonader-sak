@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelstrukturD
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggRegelstrukturFraVilkårregel.tilRegelstruktur
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseOppstartAvslutningHjemreiseRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.VilkårReiseOppstartAvslutningHjemreiseDtoMapper.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.AktivitetMedReiserDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårReiseOppstartAvslutningHjemreiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.SlettVilkårResultatDto
@@ -36,11 +37,11 @@ class ReiseOppstartAvslutningHjemreiseVilkårController(
     @GetMapping("{behandlingId}")
     fun hentVilkår(
         @PathVariable behandlingId: BehandlingId,
-    ): List<VilkårReiseOppstartAvslutningHjemreiseDto> {
+    ): List<AktivitetMedReiserDto> {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerLesetilgangTilBehandling(behandlingId)
 
-        return reiseOppstartAvslutningHjemreiseVilkårService.hentVilkårForBehandling(behandlingId).map {
+        return reiseOppstartAvslutningHjemreiseVilkårService.hentVilkårGruppertPåAktivitet(behandlingId).map {
             it.tilDto()
         }
     }

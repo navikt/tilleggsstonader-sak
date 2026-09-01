@@ -52,9 +52,16 @@ class ReiseOppstartAvslutningHjemreiseTsoIntegrationTest : CleanDatabaseIntegrat
         val vilkår = kall.vilkårReiseOppstartAvslutningHjemreise.hentVilkår(behandling.id)
         assertThat(vilkår).hasSize(1)
 
-        val reiseVilkår = vilkår.single()
+        val aktivitetMedReiser = vilkår.single()
+        assertThat(aktivitetMedReiser.aktivitetId).isEqualTo(aktivitet.globalId)
+        assertThat(aktivitetMedReiser.aktivitetType).isEqualTo(AktivitetType.TILTAK)
+        assertThat(aktivitetMedReiser.reiser).hasSize(1)
+
+        val reiseVilkår = aktivitetMedReiser.reiser.single()
         assertThat(reiseVilkår.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
         assertThat(reiseVilkår.typeReiseformål).isEqualTo(TypeReiseformål.OPPSTART)
         assertThat(reiseVilkår.fakta).isInstanceOf(FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto::class.java)
+        assertThat((reiseVilkår.fakta as FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto).aktivitetId)
+            .isEqualTo(aktivitet.globalId)
     }
 }
