@@ -95,10 +95,7 @@ class HåndterSøknadService(
                     )
                 } else {
                     // Saksbehandler skal kunne velge en annen stønadstype hvis bruker har brukt feil søknadsskjema
-                    ValgbareStønadstyperForJournalpost(
-                        defaultStønadstype = null,
-                        valgbareStønadstyper = finnTilgjengeligeStønadstyper(),
-                    )
+                    valgbareStønadstyperForIkkeStøttetSkjematype()
                 }
 
             // TODO utled TSO eller TSR
@@ -110,10 +107,7 @@ class HåndterSøknadService(
                     )
                 } else {
                     // Saksbehandler skal kunne velge en annen stønadstype hvis bruker har brukt feil søknadsskjema
-                    ValgbareStønadstyperForJournalpost(
-                        defaultStønadstype = null,
-                        valgbareStønadstyper = finnTilgjengeligeStønadstyper(),
-                    )
+                    valgbareStønadstyperForIkkeStøttetSkjematype()
                 }
 
             // TODO utled TSO eller TSR
@@ -125,22 +119,21 @@ class HåndterSøknadService(
                     )
                 } else {
                     // Saksbehandler skal kunne velge en annen stønadstype hvis bruker har brukt feil søknadsskjema
-                    ValgbareStønadstyperForJournalpost(
-                        defaultStønadstype = null,
-                        valgbareStønadstyper = finnTilgjengeligeStønadstyper(),
-                    )
+                    valgbareStønadstyperForIkkeStøttetSkjematype()
                 }
 
             Skjematype.DAGLIG_REISE_KJØRELISTE ->
                 error("Skal ikke behandle kjøreliste")
 
-            null ->
-                ValgbareStønadstyperForJournalpost(
-                    defaultStønadstype = null,
-                    valgbareStønadstyper = finnTilgjengeligeStønadstyper(),
-                )
+            null -> valgbareStønadstyperForIkkeStøttetSkjematype()
         }
     }
+
+    private fun valgbareStønadstyperForIkkeStøttetSkjematype() =
+        ValgbareStønadstyperForJournalpost(
+            defaultStønadstype = null,
+            valgbareStønadstyper = finnTilgjengeligeStønadstyper(),
+        )
 
     /**
      * Stønadstyper som ikke kan opprettes automatisk fra en journalpost, f.eks. fordi de foreløpig ikke
