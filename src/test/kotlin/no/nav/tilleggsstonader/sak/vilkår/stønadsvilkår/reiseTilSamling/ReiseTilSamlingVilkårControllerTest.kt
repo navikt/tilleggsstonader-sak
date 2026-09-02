@@ -34,17 +34,18 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
 
     val svarOffentligTransport =
         mapOf(
+            RegelId.HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING to SvarOgBegrunnelseDto(svar = SvarId.JA),
+            RegelId.ER_SAMLING_OBLIGATORISK to SvarOgBegrunnelseDto(svar = SvarId.JA),
             RegelId.AVSTAND_OVER_TRETTI_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
-            RegelId.DOKUMENTERTE_UTGIFTER to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "dokumentert"),
-            RegelId.DEKKET_AV_ANNET_STIPEND to SvarOgBegrunnelseDto(svar = SvarId.NEI),
             RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
+            RegelId.DOKUMENTERTE_UTGIFTER to SvarOgBegrunnelseDto(svar = SvarId.JA),
         )
 
     val svarPrivatBil =
         mapOf(
+            RegelId.HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING to SvarOgBegrunnelseDto(svar = SvarId.JA),
+            RegelId.ER_SAMLING_OBLIGATORISK to SvarOgBegrunnelseDto(svar = SvarId.JA),
             RegelId.AVSTAND_OVER_TRETTI_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
-            RegelId.DOKUMENTERTE_UTGIFTER to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "dokumentert"),
-            RegelId.DEKKET_AV_ANNET_STIPEND to SvarOgBegrunnelseDto(svar = SvarId.NEI),
             RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.NEI, begrunnelse = "begrunnelse"),
             RegelId.KAN_REISE_MED_EGEN_BIL to SvarOgBegrunnelseDto(svar = SvarId.JA),
         )
@@ -172,6 +173,8 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
     fun `skal kunne lagre ned et vilkår med fakta UBESTEMT om vilkår ikke er oppfylt`() {
         val svarAvstandIkkeOppfylt =
             mapOf(
+                RegelId.HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING to SvarOgBegrunnelseDto(svar = SvarId.JA),
+                RegelId.ER_SAMLING_OBLIGATORISK to SvarOgBegrunnelseDto(svar = SvarId.JA),
                 RegelId.AVSTAND_OVER_TRETTI_KM to SvarOgBegrunnelseDto(svar = SvarId.NEI, begrunnelse = "antall km"),
             )
 

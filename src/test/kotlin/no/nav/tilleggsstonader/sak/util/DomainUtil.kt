@@ -765,10 +765,11 @@ fun lagreReiseTilSamlingDto(
     utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
     svar: Map<RegelId, SvarOgBegrunnelseDto> =
         mapOf(
+            RegelId.HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING to SvarOgBegrunnelseDto(svar = SvarId.JA),
+            RegelId.ER_SAMLING_OBLIGATORISK to SvarOgBegrunnelseDto(svar = SvarId.JA),
             RegelId.AVSTAND_OVER_TRETTI_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
-            RegelId.DOKUMENTERTE_UTGIFTER to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
-            RegelId.DEKKET_AV_ANNET_STIPEND to SvarOgBegrunnelseDto(svar = SvarId.NEI),
             RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
+            RegelId.DOKUMENTERTE_UTGIFTER to SvarOgBegrunnelseDto(svar = SvarId.JA),
         ),
     fakta: FaktaReiseTilSamlingDto =
         faktaOffentligTransportReiseTilSamling(

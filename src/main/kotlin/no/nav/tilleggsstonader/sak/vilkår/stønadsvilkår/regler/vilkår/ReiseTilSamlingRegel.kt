@@ -17,11 +17,12 @@ class ReiseTilSamlingRegel :
         vilkårType = VilkårType.REISE_TIL_SAMLING,
         regler =
             setOf(
+                HAR_NØDVENDIGE_UTGIFTER_TIL_REISE,
+                ER_SAMLING_OBLIGATORISK,
                 AVSTAND_OVER_TRETTI_KM,
                 KAN_REISE_MED_OFFENTLIG_TRANSPORT,
                 DOKUMENTERTE_UTGIFTER,
                 KAN_REISE_MED_EGEN_BIL,
-                DEKKET_AV_ANNET_STIPEND,
             ),
     ) {
     companion object {
@@ -34,7 +35,7 @@ class ReiseTilSamlingRegel :
                         hvisJa =
                             SluttSvarRegel(
                                 resultat = Resultat.OPPFYLT,
-                                begrunnelseType = BegrunnelseType.UTEN,
+                                begrunnelseType = BegrunnelseType.VALGFRI,
                                 tilhørendeFaktaType = TypeVilkårFakta.REISE_TIL_SAMLING_PRIVAT_BIL,
                             ),
                         hvisNei =
@@ -44,54 +45,59 @@ class ReiseTilSamlingRegel :
                             ),
                     ),
             )
-        private val KAN_REISE_MED_OFFENTLIG_TRANSPORT =
-            RegelSteg(
-                regelId = RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT,
-                erHovedregel = false,
-                svarMapping =
-                    jaNeiSvarRegel(
-                        hvisJa =
-                            SluttSvarRegel(
-                                resultat = Resultat.OPPFYLT,
-                                begrunnelseType = BegrunnelseType.UTEN,
-                                tilhørendeFaktaType = TypeVilkårFakta.REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT,
-                            ),
-                        hvisNei = NesteRegel(KAN_REISE_MED_EGEN_BIL.regelId, BegrunnelseType.PÅKREVD),
-                    ),
-            )
-        private val DEKKET_AV_ANNET_STIPEND =
-            RegelSteg(
-                regelId = RegelId.DEKKET_AV_ANNET_STIPEND,
-                erHovedregel = false,
-                svarMapping =
-                    jaNeiSvarRegel(
-                        hvisJa =
-                            SluttSvarRegel(
-                                resultat = Resultat.IKKE_OPPFYLT,
-                                begrunnelseType = BegrunnelseType.PÅKREVD,
-                            ),
-                        hvisNei = NesteRegel(KAN_REISE_MED_OFFENTLIG_TRANSPORT.regelId, BegrunnelseType.UTEN),
-                    ),
-            )
         private val DOKUMENTERTE_UTGIFTER =
             RegelSteg(
                 regelId = RegelId.DOKUMENTERTE_UTGIFTER,
                 erHovedregel = false,
                 svarMapping =
                     jaNeiSvarRegel(
-                        hvisJa = NesteRegel(DEKKET_AV_ANNET_STIPEND.regelId, BegrunnelseType.VALGFRI),
+                        hvisJa =
+                            SluttSvarRegel(
+                                resultat = Resultat.OPPFYLT,
+                                begrunnelseType = BegrunnelseType.VALGFRI,
+                                tilhørendeFaktaType = TypeVilkårFakta.REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT,
+                            ),
                         hvisNei = IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
+                    ),
+            )
+        private val KAN_REISE_MED_OFFENTLIG_TRANSPORT =
+            RegelSteg(
+                regelId = RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT,
+                erHovedregel = false,
+                svarMapping =
+                    jaNeiSvarRegel(
+                        hvisJa = NesteRegel(DOKUMENTERTE_UTGIFTER.regelId, BegrunnelseType.VALGFRI),
+                        hvisNei = NesteRegel(KAN_REISE_MED_EGEN_BIL.regelId, BegrunnelseType.PÅKREVD),
                     ),
             )
         private val AVSTAND_OVER_TRETTI_KM =
             RegelSteg(
                 regelId = RegelId.AVSTAND_OVER_TRETTI_KM,
+                erHovedregel = false,
+                svarMapping =
+                    jaNeiSvarRegel(
+                        hvisJa = NesteRegel(KAN_REISE_MED_OFFENTLIG_TRANSPORT.regelId, BegrunnelseType.PÅKREVD),
+                        hvisNei = IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
+                    ),
+            )
+        private val ER_SAMLING_OBLIGATORISK =
+            RegelSteg(
+                regelId = RegelId.ER_SAMLING_OBLIGATORISK,
+                erHovedregel = false,
+                svarMapping =
+                    jaNeiSvarRegel(
+                        hvisJa = NesteRegel(AVSTAND_OVER_TRETTI_KM.regelId, BegrunnelseType.VALGFRI),
+                        hvisNei = IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
+                    ),
+            )
+        private val HAR_NØDVENDIGE_UTGIFTER_TIL_REISE =
+            RegelSteg(
+                regelId = RegelId.HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING,
                 erHovedregel = true,
                 svarMapping =
                     jaNeiSvarRegel(
-                        hvisJa = NesteRegel(DOKUMENTERTE_UTGIFTER.regelId, BegrunnelseType.PÅKREVD),
-                        hvisNei =
-                        IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
+                        hvisJa = NesteRegel(ER_SAMLING_OBLIGATORISK.regelId, BegrunnelseType.VALGFRI),
+                        hvisNei = IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
                     ),
             )
     }

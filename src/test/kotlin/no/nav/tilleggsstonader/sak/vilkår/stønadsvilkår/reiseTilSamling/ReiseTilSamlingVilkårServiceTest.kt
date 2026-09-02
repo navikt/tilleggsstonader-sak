@@ -54,17 +54,18 @@ class ReiseTilSamlingVilkårServiceTest {
 
     val svarOffentligTransport =
         mapOf(
+            RegelId.HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING to SvarOgBegrunnelse(svar = SvarId.JA),
+            RegelId.ER_SAMLING_OBLIGATORISK to SvarOgBegrunnelse(svar = SvarId.JA),
             RegelId.AVSTAND_OVER_TRETTI_KM to SvarOgBegrunnelse(svar = SvarId.JA, begrunnelse = "begrunnelse"),
-            RegelId.DOKUMENTERTE_UTGIFTER to SvarOgBegrunnelse(svar = SvarId.JA, begrunnelse = "begrunnelse"),
-            RegelId.DEKKET_AV_ANNET_STIPEND to SvarOgBegrunnelse(svar = SvarId.NEI),
             RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelse(svar = SvarId.JA),
+            RegelId.DOKUMENTERTE_UTGIFTER to SvarOgBegrunnelse(svar = SvarId.JA),
         )
 
     val svarPrivatBil =
         mapOf(
+            RegelId.HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING to SvarOgBegrunnelse(svar = SvarId.JA),
+            RegelId.ER_SAMLING_OBLIGATORISK to SvarOgBegrunnelse(svar = SvarId.JA),
             RegelId.AVSTAND_OVER_TRETTI_KM to SvarOgBegrunnelse(svar = SvarId.JA, begrunnelse = "begrunnelse"),
-            RegelId.DOKUMENTERTE_UTGIFTER to SvarOgBegrunnelse(svar = SvarId.JA, begrunnelse = "begrunnelse"),
-            RegelId.DEKKET_AV_ANNET_STIPEND to SvarOgBegrunnelse(svar = SvarId.NEI),
             RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelse(svar = SvarId.NEI, begrunnelse = "begrunnelse"),
             RegelId.KAN_REISE_MED_EGEN_BIL to SvarOgBegrunnelse(svar = SvarId.JA),
         )
