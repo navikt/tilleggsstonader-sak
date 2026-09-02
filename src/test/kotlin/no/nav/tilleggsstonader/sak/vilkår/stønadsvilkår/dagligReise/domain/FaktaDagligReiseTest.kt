@@ -282,17 +282,17 @@ class FaktaDagligReiseTest {
         }
 
         @Test
-        fun `skal kaste feil hvis fergekostnad er høyere enn 500`() {
+        fun `skal kaste feil hvis fergekostnad er høyere enn 900`() {
             val feil =
                 assertThrows<ApiFeil> {
                     faktaPrivatBilDto(
-                        fergekostnadPerDag = BigDecimal("501"),
+                        fergekostnadPerDag = BigDecimal("901"),
                     ).mapTilFakta(reiseId = ReiseId.random(), adresse = "Tiltaksveien 1")
                 }
 
             assertThat(
                 feil.message,
-            ).isEqualTo("Skal du innvilge med fergekostnader høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet")
+            ).isEqualTo("Skal du innvilge med fergekostnader høyere enn 900kr må du ta kontakt med Tilleggsstønader-temet")
         }
 
         private fun faktaPrivatBilDto(
