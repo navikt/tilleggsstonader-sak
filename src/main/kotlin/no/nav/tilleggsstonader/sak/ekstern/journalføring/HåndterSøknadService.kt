@@ -14,9 +14,11 @@ import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.libs.feil.feilHvis
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.journalføring.JournalføringService
 import no.nav.tilleggsstonader.sak.journalføring.JournalpostService
 import no.nav.tilleggsstonader.sak.journalføring.dokumentBrevkode
@@ -42,6 +44,7 @@ class HåndterSøknadService(
     private val journalføringService: JournalføringService,
     private val søknadService: SøknadService,
     private val ytelseService: YtelseService,
+    private val unleashService: UnleashService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -71,6 +74,10 @@ class HåndterSøknadService(
         }
     }
 
+    /**
+     * OBS - ved nye stønadstyper bør "valgbareStønadstyperForIkkeStøttetSkjematype()" returneres inntil det er prod-klart,
+     * hvis ikke er det mulig for saksbehandler å opprette saker av denne typen i prod.
+     */
     fun finnStønadstyperSomKanOpprettesFraJournalpost(journalpost: Journalpost): ValgbareStønadstyperForJournalpost {
         val skjematype = journalpost.dokumentBrevkode()?.tilSkjematype()
 
@@ -85,47 +92,95 @@ class HåndterSøknadService(
                 )
 
             Skjematype.SØKNAD_REISE_TIL_SAMLING ->
-                ValgbareStønadstyperForJournalpost(
-                    defaultStønadstype = finnStønadstypeForReiseTilSamling(journalpost),
-                    valgbareStønadstyper = Stønadstype.entries.filter { it.gjelderReiseTilSamling() },
-                )
+                if (unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_TIL_SAMLING)) {
+                    ValgbareStønadstyperForJournalpost(
+                        defaultStønadstype = finnStønadstypeForReiseTilSamling(journalpost),
+                        valgbareStønadstyper = Stønadstype.entries.filter { it.gjelderReiseTilSamling() },
+                    )
+                } else {
+                    // Saksbehandler skal kunne velge en annen stønadstype hvis bruker har brukt feil søknadsskjema
+                    valgbareStønadstyperForIkkeStøttetSkjematype()
+                }
 
             // TODO utled TSO eller TSR
             Skjematype.SØKNAD_FLYTTING ->
-                ValgbareStønadstyperForJournalpost(
-                    defaultStønadstype = if (journalpost.tema == Tema.TSO.name) Stønadstype.FLYTTING_TSO else Stønadstype.FLYTTING_TSR,
-                    valgbareStønadstyper = Stønadstype.entries.filter { it.gjelderFlytting() },
-                )
+                if (unleashService.isEnabled(Toggle.KAN_BEHANDLE_FLYTTING)) {
+                    ValgbareStønadstyperForJournalpost(
+                        defaultStønadstype = finnStønadstypeForFlytting(journalpost),
+                        valgbareStønadstyper = Stønadstype.entries.filter { it.gjelderFlytting() },
+                    )
+                } else {
+                    // Saksbehandler skal kunne velge en annen stønadstype hvis bruker har brukt feil søknadsskjema
+                    valgbareStønadstyperForIkkeStøttetSkjematype()
+                }
 
             // TODO utled TSO eller TSR
             Skjematype.SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE ->
-                ValgbareStønadstyperForJournalpost(
-                    defaultStønadstype =
-                        if (journalpost.tema ==
-                            Tema.TSO.name
-                        ) {
-                            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO
-                        } else {
-                            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR
-                        },
-                    valgbareStønadstyper = Stønadstype.entries.filter { it.gjelderReiseOppstartAvslutningHjemreise() },
-                )
+                if (unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_OPPSTART_AVSLUTNING_HJEMREISE)) {
+                    ValgbareStønadstyperForJournalpost(
+                        defaultStønadstype = finnStønadstypeForReiseOppstartAvslutningHjemreise(journalpost),
+                        valgbareStønadstyper = Stønadstype.entries.filter { it.gjelderReiseOppstartAvslutningHjemreise() },
+                    )
+                } else {
+                    // Saksbehandler skal kunne velge en annen stønadstype hvis bruker har brukt feil søknadsskjema
+                    valgbareStønadstyperForIkkeStøttetSkjematype()
+                }
 
             Skjematype.DAGLIG_REISE_KJØRELISTE ->
                 error("Skal ikke behandle kjøreliste")
 
-            null ->
-                ValgbareStønadstyperForJournalpost(
-                    defaultStønadstype = null,
-                    valgbareStønadstyper = Stønadstype.entries,
-                )
+            null -> valgbareStønadstyperForIkkeStøttetSkjematype()
         }
+    }
+
+    private fun valgbareStønadstyperForIkkeStøttetSkjematype() =
+        ValgbareStønadstyperForJournalpost(
+            defaultStønadstype = null,
+            valgbareStønadstyper = finnTilgjengeligeStønadstyper(),
+        )
+
+    /**
+     * Stønadstyper som ikke kan opprettes automatisk fra en journalpost, f.eks. fordi de foreløpig ikke
+     * er togglet på i prod, skal heller ikke være valgbare når saksbehandler skal velge stønadstype manuelt.
+     */
+    private fun finnTilgjengeligeStønadstyper(): List<Stønadstype> {
+        val utilgjengeligeStønadstyper = mutableSetOf<Stønadstype>()
+
+        if (!unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_TIL_SAMLING)) {
+            utilgjengeligeStønadstyper.addAll(Stønadstype.entries.filter { it.gjelderReiseTilSamling() })
+        }
+        if (!unleashService.isEnabled(Toggle.KAN_BEHANDLE_FLYTTING)) {
+            utilgjengeligeStønadstyper.addAll(Stønadstype.entries.filter { it.gjelderFlytting() })
+        }
+        if (!unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_OPPSTART_AVSLUTNING_HJEMREISE)) {
+            utilgjengeligeStønadstyper.addAll(Stønadstype.entries.filter { it.gjelderReiseOppstartAvslutningHjemreise() })
+        }
+
+        return Stønadstype.entries - utilgjengeligeStønadstyper
     }
 
     private fun finnStønadstypeForReiseTilSamling(journalpost: Journalpost): Stønadstype {
         return Stønadstype.REISE_TIL_SAMLING_TSO
 
         // TODO: Skill ut TSO fra TSR https://favro.com/organization/98c34fb974ce445eac854de0/4d617346d79341c7fbd9a40a?card=Nav-29445
+    }
+
+    private fun finnStønadstypeForFlytting(journalpost: Journalpost): Stønadstype {
+        if (journalpost.tema == Tema.TSR.name) {
+            return Stønadstype.FLYTTING_TSR
+        }
+        return Stønadstype.FLYTTING_TSO
+
+        // TODO utled TSO eller TSR
+    }
+
+    private fun finnStønadstypeForReiseOppstartAvslutningHjemreise(journalpost: Journalpost): Stønadstype {
+        if (journalpost.tema == Tema.TSR.name) {
+            return Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR
+        }
+        return Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO
+
+        // TODO utled TSO eller TSR
     }
 
     private fun finnStønadstypeForDagligReise(journalpost: Journalpost): Stønadstype {
