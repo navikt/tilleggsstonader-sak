@@ -28,6 +28,12 @@ object DetaljertVedtaksperioderReiseTilSamlingMapper {
         ).sortedBy { it.fom }
             .mergeSammenhengende(
                 skalMerges = { p1, p2 -> p1.overlapper(p2) },
-                merge = { p1, p2 -> p1.copy(fom = minOf(p1.fom, p2.fom), tom = maxOf(p1.tom, p2.tom), beløp = p1.beløp + p2.beløp) },
+                merge = { p1, p2 ->
+                    p1.copy(
+                        fom = minOf(p1.fom, p2.fom),
+                        tom = maxOf(p1.tom, p2.tom),
+                        beløp = p1.beløp + p2.beløp,
+                    )
+                },
             ).sortedByDescending { it.fom }
 }
