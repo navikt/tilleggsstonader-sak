@@ -31,17 +31,17 @@ class DetaljertVedtaksperioderReiseTilSamlingMapperTest {
             lagVedtak(
                 offentligTransport =
                     listOf(
-                        lagBeregningsresultatForOffentligTransport(1.januar(2024), 31.januar(2024), beløp = BigDecimal("100")),
-                        lagBeregningsresultatForOffentligTransport(1.mars(2024), 31.mars(2024), beløp = BigDecimal("200")),
+                        lagBeregningsresultatForOffentligTransport(1 januar 2024, 31 januar 2024, beløp = BigDecimal("100")),
+                        lagBeregningsresultatForOffentligTransport(1 mars 2024, 31 mars 2024, beløp = BigDecimal("200")),
                     ),
             )
 
         val resultat = vedtak.finnDetaljerteVedtaksperioder(Stønadstype.REISE_TIL_SAMLING_TSO)
 
         assertThat(resultat).hasSize(2)
-        assertThat(resultat[0].fom).isEqualTo(1.mars(2024))
+        assertThat(resultat[0].fom).isEqualTo(1 mars 2024)
         assertThat(resultat[0].beløp).isEqualByComparingTo(BigDecimal("200"))
-        assertThat(resultat[1].fom).isEqualTo(1.januar(2024))
+        assertThat(resultat[1].fom).isEqualTo(1 januar 2024)
         assertThat(resultat[1].beløp).isEqualByComparingTo(BigDecimal("100"))
         assertThat(resultat.map { it.stønadstype }).containsOnly(Stønadstype.REISE_TIL_SAMLING_TSO)
     }
@@ -52,16 +52,16 @@ class DetaljertVedtaksperioderReiseTilSamlingMapperTest {
             lagVedtak(
                 offentligTransport =
                     listOf(
-                        lagBeregningsresultatForOffentligTransport(1.januar(2024), 15.februar(2024), beløp = BigDecimal("300")),
-                        lagBeregningsresultatForOffentligTransport(1.februar(2024), 28.februar(2024), beløp = BigDecimal("200")),
+                        lagBeregningsresultatForOffentligTransport(1 januar 2024, 15 februar 2024, beløp = BigDecimal("300")),
+                        lagBeregningsresultatForOffentligTransport(1 februar 2024, 28 februar 2024, beløp = BigDecimal("200")),
                     ),
             )
 
         val resultat = vedtak.finnDetaljerteVedtaksperioder(Stønadstype.REISE_TIL_SAMLING_TSO)
 
         assertThat(resultat).hasSize(1)
-        assertThat(resultat[0].fom).isEqualTo(1.januar(2024))
-        assertThat(resultat[0].tom).isEqualTo(28.februar(2024))
+        assertThat(resultat[0].fom).isEqualTo(1 januar 2024)
+        assertThat(resultat[0].tom).isEqualTo(28 februar 2024)
         assertThat(resultat[0].beløp).isEqualByComparingTo(BigDecimal("500"))
         assertThat(resultat[0].stønadstype).isEqualTo(Stønadstype.REISE_TIL_SAMLING_TSO)
     }
@@ -72,19 +72,19 @@ class DetaljertVedtaksperioderReiseTilSamlingMapperTest {
             lagVedtak(
                 offentligTransport =
                     listOf(
-                        lagBeregningsresultatForOffentligTransport(1.januar(2024), 31.januar(2024), beløp = BigDecimal("400")),
+                        lagBeregningsresultatForOffentligTransport(1 januar 2024, 31 januar 2024, beløp = BigDecimal("400")),
                     ),
                 privatBil =
                     listOf(
-                        lagBeregningsresultatForPrivatBil(15.januar(2024), 28.februar(2024), beløp = BigDecimal("100")),
+                        lagBeregningsresultatForPrivatBil(15 januar 2024, 28 februar 2024, beløp = BigDecimal("100")),
                     ),
             )
 
         val resultat = vedtak.finnDetaljerteVedtaksperioder(Stønadstype.REISE_TIL_SAMLING_TSO)
 
         assertThat(resultat).hasSize(1)
-        assertThat(resultat[0].fom).isEqualTo(1.januar(2024))
-        assertThat(resultat[0].tom).isEqualTo(28.februar(2024))
+        assertThat(resultat[0].fom).isEqualTo(1 januar 2024)
+        assertThat(resultat[0].tom).isEqualTo(28 februar 2024)
         assertThat(resultat[0].beløp).isEqualByComparingTo(BigDecimal("500"))
         assertThat(resultat[0].stønadstype).isEqualTo(Stønadstype.REISE_TIL_SAMLING_TSO)
     }
@@ -95,14 +95,14 @@ class DetaljertVedtaksperioderReiseTilSamlingMapperTest {
             lagVedtak(
                 offentligTransport =
                     listOf(
-                        lagBeregningsresultatForOffentligTransport(1.mars(2024), 31.mars(2024), beløp = BigDecimal.ONE),
-                        lagBeregningsresultatForOffentligTransport(1.januar(2024), 31.januar(2024), beløp = BigDecimal.ONE),
+                        lagBeregningsresultatForOffentligTransport(1 mars 2024, 31 mars 2024, beløp = BigDecimal.ONE),
+                        lagBeregningsresultatForOffentligTransport(1 januar 2024, 31 januar 2024, beløp = BigDecimal.ONE),
                     ),
             )
 
         val resultat = vedtak.finnDetaljerteVedtaksperioder(Stønadstype.REISE_TIL_SAMLING_TSO)
 
-        assertThat(resultat.map { it.fom }).containsExactly(1.mars(2024), 1.januar(2024))
+        assertThat(resultat.map { it.fom }).containsExactly(1 mars 2024, 1 januar 2024)
     }
 
     @Test
@@ -111,7 +111,7 @@ class DetaljertVedtaksperioderReiseTilSamlingMapperTest {
             lagVedtak(
                 offentligTransport =
                     listOf(
-                        lagBeregningsresultatForOffentligTransport(1.januar(2024), 31.januar(2024), beløp = BigDecimal("100")),
+                        lagBeregningsresultatForOffentligTransport(1 januar 2024, 31 januar 2024, beløp = BigDecimal("100")),
                     ),
             )
 
@@ -128,14 +128,14 @@ class DetaljertVedtaksperioderReiseTilSamlingMapperTest {
             lagVedtak(
                 offentligTransport =
                     listOf(
-                        lagBeregningsresultatForOffentligTransport(1.januar(2024), 31.januar(2024), beløp = BigDecimal("100")),
+                        lagBeregningsresultatForOffentligTransport(1 januar 2024, 31 januar 2024, beløp = BigDecimal("100")),
                     ),
             )
         val vedtakTsr =
             lagVedtak(
                 offentligTransport =
                     listOf(
-                        lagBeregningsresultatForOffentligTransport(15.januar(2024), 15.februar(2024), beløp = BigDecimal("200")),
+                        lagBeregningsresultatForOffentligTransport(15 januar 2024, 15 februar 2024, beløp = BigDecimal("200")),
                     ),
             )
 
