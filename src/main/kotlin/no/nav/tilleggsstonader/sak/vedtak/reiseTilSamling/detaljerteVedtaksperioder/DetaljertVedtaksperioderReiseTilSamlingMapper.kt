@@ -1,13 +1,17 @@
 package no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.detaljerteVedtaksperioder
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørReiseTilSamling
 
 object DetaljertVedtaksperioderReiseTilSamlingMapper {
-    fun InnvilgelseEllerOpphørReiseTilSamling.finnDetaljerteVedtaksperioder(): List<DetaljertVedtaksperiodeReiseTilSamling> =
+    fun InnvilgelseEllerOpphørReiseTilSamling.finnDetaljerteVedtaksperioder(
+        stønadstype: Stønadstype,
+    ): List<DetaljertVedtaksperiodeReiseTilSamling> =
         (
             beregningsresultat.offentligTransport.map { resultat ->
                 DetaljertVedtaksperiodeReiseTilSamling(
+                    stønadstype = stønadstype,
                     fom = resultat.grunnlag.fom,
                     tom = resultat.grunnlag.tom,
                     beløp = resultat.beløp,
@@ -15,6 +19,7 @@ object DetaljertVedtaksperioderReiseTilSamlingMapper {
             } +
                 beregningsresultat.privatBil.map { resultat ->
                     DetaljertVedtaksperiodeReiseTilSamling(
+                        stønadstype = stønadstype,
                         fom = resultat.grunnlag.fom,
                         tom = resultat.grunnlag.tom,
                         beløp = resultat.beløp,

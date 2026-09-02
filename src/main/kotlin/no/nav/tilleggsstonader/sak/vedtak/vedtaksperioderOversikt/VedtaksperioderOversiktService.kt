@@ -56,11 +56,11 @@ class VedtaksperioderOversiktService(
                     ?: emptyList(),
             reiseTilSamlingTso =
                 fagsaker.reiseTilSamlingTso?.let {
-                    oppsummerVedtaksperioderReiseTilSamling(it.id)
+                    oppsummerVedtaksperioderReiseTilSamling(it.id, Stønadstype.REISE_TIL_SAMLING_TSO)
                 } ?: emptyList(),
             reiseTilSamlingTsr =
                 fagsaker.reiseTilSamlingTsr?.let {
-                    oppsummerVedtaksperioderReiseTilSamling(it.id)
+                    oppsummerVedtaksperioderReiseTilSamling(it.id, Stønadstype.REISE_TIL_SAMLING_TSR)
                 } ?: emptyList(),
         )
     }
@@ -201,15 +201,18 @@ class VedtaksperioderOversiktService(
             fagsakIdTsr?.let { hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørReiseTilSamling>(it) }
 
         return listOfNotNull(
-            vedtaksdataTso?.finnDetaljerteVedtaksperioder(),
-            vedtaksdataTsr?.finnDetaljerteVedtaksperioder(),
+            vedtaksdataTso?.finnDetaljerteVedtaksperioder(Stønadstype.REISE_TIL_SAMLING_TSO),
+            vedtaksdataTsr?.finnDetaljerteVedtaksperioder(Stønadstype.REISE_TIL_SAMLING_TSR),
         ).flatten()
             .sortedByDescending { it.fom }
     }
 
-    private fun oppsummerVedtaksperioderReiseTilSamling(fagsakId: FagsakId): List<DetaljertVedtaksperiodeReiseTilSamling> =
+    private fun oppsummerVedtaksperioderReiseTilSamling(
+        fagsakId: FagsakId,
+        stønadstype: Stønadstype,
+    ): List<DetaljertVedtaksperiodeReiseTilSamling> =
         hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørReiseTilSamling>(fagsakId)
-            ?.finnDetaljerteVedtaksperioder()
+            ?.finnDetaljerteVedtaksperioder(stønadstype)
             ?: emptyList()
 
     private inline fun <reified T : Vedtaksdata> hentVedtaksdataForSisteIverksatteBehandling(fagsakId: FagsakId): T? =
