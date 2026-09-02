@@ -174,10 +174,11 @@ class ReiseTilSamlingBeregningService(
 
     private fun beregnBelopForPrivatBil(grunnlag: BeregningsgrunnlagPrivatBilForSamling): BigDecimal =
         (
-            grunnlag.totaltReiseavstand.multiply(grunnlag.sats) +
-                (grunnlag.bompenger ?: BigDecimal.ZERO) +
-                (grunnlag.fergekostnad ?: BigDecimal.ZERO) +
-                (grunnlag.parkering ?: BigDecimal.ZERO)
+            grunnlag.totaltReiseavstand
+                .multiply(grunnlag.sats)
+                .plus(grunnlag.bompenger ?: BigDecimal.ZERO)
+                .plus(grunnlag.fergekostnad ?: BigDecimal.ZERO)
+                .plus(grunnlag.parkering ?: BigDecimal.ZERO)
         ).setScale(0, RoundingMode.HALF_UP)
 }
 
