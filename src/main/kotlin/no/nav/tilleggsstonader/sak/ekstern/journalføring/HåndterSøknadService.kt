@@ -74,6 +74,10 @@ class HåndterSøknadService(
         }
     }
 
+    /**
+     * OBS - ved nye stønadstyper bør "valgbareStønadstyperForIkkeStøttetSkjematype()" returneres inntil det er prod-klart,
+     * hvis ikke er det mulig for saksbehandler å opprette saker av denne typen i prod.
+     */
     fun finnStønadstyperSomKanOpprettesFraJournalpost(journalpost: Journalpost): ValgbareStønadstyperForJournalpost {
         val skjematype = journalpost.dokumentBrevkode()?.tilSkjematype()
 
