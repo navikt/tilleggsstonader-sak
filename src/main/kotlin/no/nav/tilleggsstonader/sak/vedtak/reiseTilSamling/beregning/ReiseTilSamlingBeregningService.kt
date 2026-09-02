@@ -153,6 +153,9 @@ class ReiseTilSamlingBeregningService(
                     tom = samling.tom,
                     sats = sats.beløp,
                     totaltReiseavstand = fakta.reiseavstand,
+                    bompenger = fakta.bompenger,
+                    fergekostnad = fakta.fergekostnad,
+                    parkering = fakta.parkering,
                     vedtaksperioder =
                         vedtaksperioder
                             .filter { it.overlapper(samling) }
@@ -170,7 +173,13 @@ class ReiseTilSamlingBeregningService(
     }
 
     private fun beregnBelopForPrivatBil(grunnlag: BeregningsgrunnlagPrivatBilForSamling): BigDecimal =
-        grunnlag.totaltReiseavstand.multiply(grunnlag.sats).setScale(0, RoundingMode.HALF_UP)
+        (
+            grunnlag.totaltReiseavstand
+                .multiply(grunnlag.sats)
+                .plus(grunnlag.bompenger ?: BigDecimal.ZERO)
+                .plus(grunnlag.fergekostnad ?: BigDecimal.ZERO)
+                .plus(grunnlag.parkering ?: BigDecimal.ZERO)
+        ).setScale(0, RoundingMode.HALF_UP)
 }
 
 private fun validerFinnesSamling(vilkår: List<VilkårReiseTilSamling>) {

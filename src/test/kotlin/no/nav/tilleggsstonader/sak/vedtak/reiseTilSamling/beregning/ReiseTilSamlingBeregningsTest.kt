@@ -144,6 +144,49 @@ class ReiseTilSamlingBeregningsTest {
     }
 
     @Test
+    fun `beregner privat bil med bompenger, fergekostnad og parkering`() {
+        every { vilkårService.hentOppfylteReiseTilSamlingVilkår(behandling.id) } returns
+            listOf(
+                vilkår(
+                    behandlingId = behandling.id,
+                    type = VilkårType.REISE_TIL_SAMLING,
+                    resultat = Vilkårsresultat.OPPFYLT,
+                    status = VilkårStatus.NY,
+                    fom = 1 januar 2025,
+                    tom = 31 januar 2025,
+                    fakta =
+                        FaktaReiseTilSamlingPrivatBil(
+                            reiseId = dummyReiseId,
+                            adresse = "Samlingsgata 1",
+                            reiseavstand = 40.toBigDecimal(),
+                            bompenger = 50.toBigDecimal(),
+                            fergekostnad = 100.toBigDecimal(),
+                            parkering = 75.toBigDecimal(),
+                        ),
+                ),
+            )
+        every {
+            satsReiseTilSamlingPrivatBilProvider.finnRelevantKilometerSatsForPeriode(any())
+        } returns SatsPrivatBil(1 januar 2025, tom = 31 januar 2025, beløp = 2.94.toBigDecimal())
+
+        val result =
+            beregningService.beregn(
+                behandling,
+                vedtaksperioder,
+                TypeVedtak.INNVILGELSE,
+                beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+            )
+
+        val privatBil = result.privatBil
+        assertThat(privatBil).hasSize(1)
+        // 40 * 2.94 + 50 + 100 + 75 = 342,6 = 343
+        assertThat(privatBil.first().beløp).isEqualTo(343.toBigDecimal())
+        assertThat(privatBil.first().grunnlag.bompenger).isEqualTo(50.toBigDecimal())
+        assertThat(privatBil.first().grunnlag.fergekostnad).isEqualTo(100.toBigDecimal())
+        assertThat(privatBil.first().grunnlag.parkering).isEqualTo(75.toBigDecimal())
+    }
+
+    @Test
     fun `filtrerer bort vilkår som ikke overlapper vedtaksperiodene`() {
         every { vilkårService.hentOppfylteReiseTilSamlingVilkår(behandling.id) } returns
             listOf(
