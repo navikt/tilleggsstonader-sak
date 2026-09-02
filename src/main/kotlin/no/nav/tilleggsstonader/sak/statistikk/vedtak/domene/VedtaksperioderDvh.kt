@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagPassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
@@ -61,7 +62,7 @@ data class VedtaksperioderDvh(
                 is InnvilgelseEllerOpphørReiseOppstartAvslutningHjemreise ->
                     mapVedtaksperioderReiseOppstartAvslutningHjemreise(vedtaksdata)
 
-                is AvslagBoutgifter, is AvslagLæremidler, is AvslagPassAvBarn, is AvslagDagligReise ->
+                is AvslagBoutgifter, is AvslagLæremidler, is AvslagPassAvBarn, is AvslagDagligReise, is AvslagReiseTilSamling ->
                     JsonWrapper(
                         vedtaksperioder = emptyList(),
                     )

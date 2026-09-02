@@ -30,6 +30,7 @@ import tools.jackson.databind.ValueDeserializer
     JsonSubTypes.Type(AvslagDagligReise::class, name = "AVSLAG_DAGLIG_REISE"),
     JsonSubTypes.Type(OpphørDagligReise::class, name = "OPPHØR_DAGLIG_REISE"),
     JsonSubTypes.Type(InnvilgelseReiseTilSamling::class, name = "INNVILGELSE_REISE_TIL_SAMLING"),
+    JsonSubTypes.Type(AvslagReiseTilSamling::class, name = "AVSLAG_REISE_TIL_SAMLING"),
     JsonSubTypes.Type(
         InnvilgelseReiseOppstartAvslutningHjemreise::class,
         name = "INNVILGELSE_REISE_OPPSTART_AVSLUTNING_HJEMREISE",
