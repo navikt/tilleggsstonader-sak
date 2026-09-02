@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -130,6 +131,7 @@ val tiltaksvariantTilTypeAndelReiseOppstartMap =
 
 fun finnTypeAndelFraTiltaksvariantReiseOppstart(tiltaksvariant: TypeAktivitet): TypeAndel =
     tiltaksvariantTilTypeAndelReiseOppstartMap[tiltaksvariant]
-        ?: error(
-            "Kan ikke mappe til TypeAndel fra TypeAktivitet $tiltaksvariant for reise oppstart/avslutning/hjemreise",
+        ?: feil(
+            "Tiltaksvariant ${tiltaksvariant.name} (${tiltaksvariant.beskrivelse}) er ikke støttet for " +
+                "innvilgelse av reise oppstart/avslutning/hjemreise TSR. Ta kontakt med utviklerteamet.",
         )
