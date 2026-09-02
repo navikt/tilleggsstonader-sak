@@ -5,34 +5,38 @@
       "erHovedregel" : true,
       "svarMapping" : {
         "JA" : {
-          "regelId" : "ER_SAMLING_OBLIGATORISK",
-          "begrunnelseType" : "VALGFRI"
+          "begrunnelseType" : "VALGFRI",
+          "tilhørendeFaktaType" : null,
+          "regelId" : "SLUTT_NODE"
         },
         "NEI" : {
           "begrunnelseType" : "PÅKREVD",
           "tilhørendeFaktaType" : null,
           "regelId" : "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler" : [ ]
     },
     "ER_SAMLING_OBLIGATORISK" : {
       "regelId" : "ER_SAMLING_OBLIGATORISK",
-      "erHovedregel" : false,
+      "erHovedregel" : true,
       "svarMapping" : {
         "JA" : {
-          "regelId" : "AVSTAND_OVER_TRETTI_KM",
-          "begrunnelseType" : "VALGFRI"
+          "begrunnelseType" : "VALGFRI",
+          "tilhørendeFaktaType" : null,
+          "regelId" : "SLUTT_NODE"
         },
         "NEI" : {
           "begrunnelseType" : "PÅKREVD",
           "tilhørendeFaktaType" : null,
           "regelId" : "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler" : [ ]
     },
     "AVSTAND_OVER_TRETTI_KM" : {
       "regelId" : "AVSTAND_OVER_TRETTI_KM",
-      "erHovedregel" : false,
+      "erHovedregel" : true,
       "svarMapping" : {
         "JA" : {
           "regelId" : "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
@@ -43,7 +47,8 @@
           "tilhørendeFaktaType" : null,
           "regelId" : "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler" : [ ]
     },
     "KAN_REISE_MED_OFFENTLIG_TRANSPORT" : {
       "regelId" : "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
@@ -57,7 +62,8 @@
           "regelId" : "KAN_REISE_MED_EGEN_BIL",
           "begrunnelseType" : "PÅKREVD"
         }
-      }
+      },
+      "avhengerAvHovedregler" : [ "HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING", "ER_SAMLING_OBLIGATORISK" ]
     },
     "DOKUMENTERTE_UTGIFTER" : {
       "regelId" : "DOKUMENTERTE_UTGIFTER",
@@ -73,7 +79,8 @@
           "tilhørendeFaktaType" : null,
           "regelId" : "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler" : [ ]
     },
     "KAN_REISE_MED_EGEN_BIL" : {
       "regelId" : "KAN_REISE_MED_EGEN_BIL",
@@ -89,7 +96,8 @@
           "tilhørendeFaktaType" : null,
           "regelId" : "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler" : [ ]
     }
   },
   "vilkårType" : "REISE_TIL_SAMLING"

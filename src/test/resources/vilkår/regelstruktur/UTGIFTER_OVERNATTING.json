@@ -15,7 +15,8 @@
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null
       }
-    ]
+    ],
+    "avhengerAvHovedregler": []
   },
   "DOKUMENTERT_UTGIFTER_OVERNATTING": {
     "erHovedregel": true,
@@ -33,7 +34,8 @@
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null
       }
-    ]
+    ],
+    "avhengerAvHovedregler": []
   },
   "NØDVENDIGE_MERUTGIFTER": {
     "erHovedregel": true,
@@ -51,7 +53,8 @@
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null
       }
-    ]
+    ],
+    "avhengerAvHovedregler": []
   },
   "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER": {
     "erHovedregel": true,
@@ -69,6 +72,7 @@
         "begrunnelseType": "VALGFRI",
         "tilhørendeFaktaType": null
       }
-    ]
+    ],
+    "avhengerAvHovedregler": []
   }
 }

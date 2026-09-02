@@ -15,7 +15,8 @@
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null
       }
-    ]
+    ],
+    "avhengerAvHovedregler": []
   },
   "ANNEN_FORELDER_MOTTAR_STØTTE": {
     "erHovedregel": true,
@@ -33,7 +34,8 @@
         "begrunnelseType": "VALGFRI",
         "tilhørendeFaktaType": null
       }
-    ]
+    ],
+    "avhengerAvHovedregler": []
   },
   "HAR_FULLFØRT_FJERDEKLASSE": {
     "erHovedregel": true,
@@ -53,7 +55,8 @@
         "begrunnelseType": "VALGFRI",
         "tilhørendeFaktaType": null
       }
-    ]
+    ],
+    "avhengerAvHovedregler": []
   },
   "UNNTAK_ALDER": {
     "erHovedregel": false,
@@ -77,6 +80,7 @@
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null
       }
-    ]
+    ],
+    "avhengerAvHovedregler": []
   }
 }

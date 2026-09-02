@@ -14,7 +14,8 @@
           "tilhørendeFaktaType": null,
           "regelId": "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler": []
     },
     "ANNEN_FORELDER_MOTTAR_STØTTE": {
       "regelId": "ANNEN_FORELDER_MOTTAR_STØTTE",
@@ -30,7 +31,8 @@
           "tilhørendeFaktaType": null,
           "regelId": "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler": []
     },
     "HAR_FULLFØRT_FJERDEKLASSE": {
       "regelId": "HAR_FULLFØRT_FJERDEKLASSE",
@@ -45,7 +47,8 @@
           "tilhørendeFaktaType": null,
           "regelId": "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler": []
     },
     "UNNTAK_ALDER": {
       "regelId": "UNNTAK_ALDER",
@@ -66,7 +69,8 @@
           "tilhørendeFaktaType": null,
           "regelId": "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler": []
     }
   },
   "vilkårType": "PASS_BARN"

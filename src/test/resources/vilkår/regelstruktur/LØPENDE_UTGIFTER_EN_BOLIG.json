@@ -15,7 +15,8 @@
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null
       }
-    ]
+    ],
+    "avhengerAvHovedregler": []
   },
   "NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET": {
     "erHovedregel": true,
@@ -33,7 +34,8 @@
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null
       }
-    ]
+    ],
+    "avhengerAvHovedregler": []
   },
   "RETT_TIL_BOSTØTTE": {
     "erHovedregel": true,
@@ -51,7 +53,8 @@
         "begrunnelseType": "VALGFRI",
         "tilhørendeFaktaType": null
       }
-    ]
+    ],
+    "avhengerAvHovedregler": []
   },
   "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER": {
     "erHovedregel": true,
@@ -69,6 +72,7 @@
         "begrunnelseType": "VALGFRI",
         "tilhørendeFaktaType": null
       }
-    ]
+    ],
+    "avhengerAvHovedregler": []
   }
 }

@@ -1,17 +1,11 @@
 {
   "HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING": {
     "erHovedregel": true,
-    "reglerSomMåNullstilles": [
-      "ER_SAMLING_OBLIGATORISK",
-      "AVSTAND_OVER_TRETTI_KM",
-      "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
-      "DOKUMENTERTE_UTGIFTER",
-      "KAN_REISE_MED_EGEN_BIL"
-    ],
+    "reglerSomMåNullstilles": [],
     "svaralternativer": [
       {
         "svarId": "JA",
-        "nesteRegelId": "ER_SAMLING_OBLIGATORISK",
+        "nesteRegelId": null,
         "begrunnelseType": "VALGFRI",
         "tilhørendeFaktaType": null
       },
@@ -21,20 +15,16 @@
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null
       }
-    ]
+    ],
+    "avhengerAvHovedregler": []
   },
   "ER_SAMLING_OBLIGATORISK": {
-    "erHovedregel": false,
-    "reglerSomMåNullstilles": [
-      "AVSTAND_OVER_TRETTI_KM",
-      "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
-      "DOKUMENTERTE_UTGIFTER",
-      "KAN_REISE_MED_EGEN_BIL"
-    ],
+    "erHovedregel": true,
+    "reglerSomMåNullstilles": [],
     "svaralternativer": [
       {
         "svarId": "JA",
-        "nesteRegelId": "AVSTAND_OVER_TRETTI_KM",
+        "nesteRegelId": null,
         "begrunnelseType": "VALGFRI",
         "tilhørendeFaktaType": null
       },
@@ -44,10 +34,11 @@
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null
       }
-    ]
+    ],
+    "avhengerAvHovedregler": []
   },
   "AVSTAND_OVER_TRETTI_KM": {
-    "erHovedregel": false,
+    "erHovedregel": true,
     "reglerSomMåNullstilles": [
       "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
       "DOKUMENTERTE_UTGIFTER",
@@ -66,7 +57,8 @@
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null
       }
-    ]
+    ],
+    "avhengerAvHovedregler": []
   },
   "KAN_REISE_MED_OFFENTLIG_TRANSPORT": {
     "erHovedregel": false,
@@ -87,6 +79,10 @@
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null
       }
+    ],
+    "avhengerAvHovedregler": [
+      "HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING",
+      "ER_SAMLING_OBLIGATORISK"
     ]
   },
   "DOKUMENTERTE_UTGIFTER": {
@@ -105,7 +101,8 @@
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null
       }
-    ]
+    ],
+    "avhengerAvHovedregler": []
   },
   "KAN_REISE_MED_EGEN_BIL": {
     "erHovedregel": false,
@@ -123,6 +120,7 @@
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null
       }
-    ]
+    ],
+    "avhengerAvHovedregler": []
   }
 }

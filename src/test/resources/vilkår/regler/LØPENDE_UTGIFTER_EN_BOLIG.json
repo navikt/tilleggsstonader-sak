@@ -14,7 +14,8 @@
           "tilhørendeFaktaType": null,
           "regelId": "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler": []
     },
     "NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET": {
       "regelId": "NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET",
@@ -30,7 +31,8 @@
           "tilhørendeFaktaType": null,
           "regelId": "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler": []
     },
     "RETT_TIL_BOSTØTTE": {
       "regelId": "RETT_TIL_BOSTØTTE",
@@ -46,7 +48,8 @@
           "tilhørendeFaktaType": null,
           "regelId": "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler": []
     },
     "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER": {
       "regelId": "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER",
@@ -62,7 +65,8 @@
           "tilhørendeFaktaType": null,
           "regelId": "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler": []
     }
   },
   "vilkårType": "LØPENDE_UTGIFTER_EN_BOLIG"

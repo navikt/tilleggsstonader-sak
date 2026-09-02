@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresult
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegel
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -87,4 +88,41 @@ class ByggVilkårFraSvarTest {
                 )
             }.hasMessageContaining("Ikke alle svar kunne mappes til vurderinger")
     }
+
+    @Test
+    fun `skal kaste feil dersom underregel er besvart hvis forelder regel skal avslutte kjeden`() {
+        val svar =
+            mapOf(
+                RegelId.AVSTAND_OVER_TRETTI_KM to
+                    SvarOgBegrunnelse(svar = SvarId.NEI, begrunnelse = "begrunnelse"),
+                RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelse(svar = SvarId.JA),
+            )
+
+        Assertions
+            .assertThatThrownBy {
+                ByggVilkårFraSvar.byggDelvilkårsettFraSvarOgVilkårsregel(
+                    vilkårsregel = ReiseTilSamlingRegel(),
+                    svar = svar,
+                )
+            }.hasMessageContaining("Ikke alle svar kunne mappes til vurderinger")
+    }
+
+    @Test
+    fun `skal kaste feil dersom underregel er besvart hvis beste-forelder regel skal avslutte kjeden`() {
+        val svar =
+            mapOf(
+                RegelId.AVSTAND_OVER_TRETTI_KM to
+                    SvarOgBegrunnelse(svar = SvarId.NEI, begrunnelse = "begrunnelse"),
+                RegelId.DOKUMENTERTE_UTGIFTER to SvarOgBegrunnelse(svar = SvarId.JA),
+            )
+
+        Assertions
+            .assertThatThrownBy {
+                ByggVilkårFraSvar.byggDelvilkårsettFraSvarOgVilkårsregel(
+                    vilkårsregel = ReiseTilSamlingRegel(),
+                    svar = svar,
+                )
+            }.hasMessageContaining("Ikke alle svar kunne mappes til vurderinger")
+    }
+
 }

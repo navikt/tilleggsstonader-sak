@@ -12,7 +12,8 @@
           "regelId": "UNNTAK_SEKS_KM",
           "begrunnelseType": "PÅKREVD"
         }
-      }
+      },
+      "avhengerAvHovedregler": []
     },
     "UNNTAK_SEKS_KM": {
       "regelId": "UNNTAK_SEKS_KM",
@@ -27,7 +28,8 @@
           "tilhørendeFaktaType": null,
           "regelId": "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler": []
     },
     "KAN_REISE_MED_OFFENTLIG_TRANSPORT": {
       "regelId": "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
@@ -42,7 +44,8 @@
           "regelId": "KAN_KJØRE_MED_EGEN_BIL",
           "begrunnelseType": "PÅKREVD"
         }
-      }
+      },
+      "avhengerAvHovedregler": []
     },
     "KAN_KJØRE_MED_EGEN_BIL": {
       "regelId": "KAN_KJØRE_MED_EGEN_BIL",
@@ -57,7 +60,8 @@
           "regelId": "KAN_REISE_MED_TAXI",
           "begrunnelseType": "PÅKREVD"
         }
-      }
+      },
+      "avhengerAvHovedregler": []
     },
     "KAN_REISE_MED_TAXI": {
       "regelId": "KAN_REISE_MED_TAXI",
@@ -73,7 +77,8 @@
           "tilhørendeFaktaType": null,
           "regelId": "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler": []
     }
   },
   "vilkårType": "DAGLIG_REISE"

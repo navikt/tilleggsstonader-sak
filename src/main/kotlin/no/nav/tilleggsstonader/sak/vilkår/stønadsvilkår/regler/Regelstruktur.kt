@@ -9,6 +9,8 @@ data class RegelInfo(
     // Liste med alle regler som må nullstilles dersom regelen endrer svar.
     val reglerSomMåNullstilles: List<RegelId>,
     val svaralternativer: List<SvarAlternativ>,
+    // Regler (fra andre, uavhengige hovedregler) som må være besvart Ja for at denne regelen skal være aktiv/synlig.
+    val avhengerAvHovedregler: List<RegelId> = emptyList(),
 )
 
 /**

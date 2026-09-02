@@ -14,7 +14,8 @@
           "tilhørendeFaktaType": null,
           "regelId": "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler": []
     },
     "DOKUMENTERT_UTGIFTER_OVERNATTING": {
       "regelId": "DOKUMENTERT_UTGIFTER_OVERNATTING",
@@ -30,7 +31,8 @@
           "tilhørendeFaktaType": null,
           "regelId": "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler": []
     },
     "NØDVENDIGE_MERUTGIFTER": {
       "regelId": "NØDVENDIGE_MERUTGIFTER",
@@ -46,7 +48,8 @@
           "tilhørendeFaktaType": null,
           "regelId": "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler": []
     },
     "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER": {
       "regelId": "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER",
@@ -62,7 +65,8 @@
           "tilhørendeFaktaType": null,
           "regelId": "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler": []
     }
   },
   "vilkårType": "UTGIFTER_OVERNATTING"

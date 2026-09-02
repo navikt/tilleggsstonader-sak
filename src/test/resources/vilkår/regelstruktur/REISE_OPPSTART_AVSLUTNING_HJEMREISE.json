@@ -12,7 +12,8 @@
       "nesteRegelId" : "KAN_REISE_MED_EGEN_BIL",
       "begrunnelseType" : "PÅKREVD",
       "tilhørendeFaktaType" : null
-    } ]
+    } ],
+    "avhengerAvHovedregler" : [ ]
   },
   "KAN_REISE_MED_EGEN_BIL" : {
     "erHovedregel" : false,
@@ -27,6 +28,7 @@
       "nesteRegelId" : null,
       "begrunnelseType" : "PÅKREVD",
       "tilhørendeFaktaType" : null
-    } ]
+    } ],
+    "avhengerAvHovedregler" : [ ]
   }
 }

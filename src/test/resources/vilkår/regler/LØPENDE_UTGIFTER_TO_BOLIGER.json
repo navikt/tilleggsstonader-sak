@@ -14,7 +14,8 @@
           "tilhørendeFaktaType": null,
           "regelId": "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler": []
     },
     "DOKUMENTERT_UTGIFTER_BOLIG": {
       "regelId": "DOKUMENTERT_UTGIFTER_BOLIG",
@@ -30,7 +31,8 @@
           "tilhørendeFaktaType": null,
           "regelId": "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler": []
     },
     "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER": {
       "regelId": "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER",
@@ -46,7 +48,8 @@
           "tilhørendeFaktaType": null,
           "regelId": "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler": []
     }
   },
   "vilkårType": "LØPENDE_UTGIFTER_TO_BOLIGER"

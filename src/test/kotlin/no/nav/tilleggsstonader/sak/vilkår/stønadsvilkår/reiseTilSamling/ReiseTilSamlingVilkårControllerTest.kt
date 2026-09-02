@@ -197,6 +197,31 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
+    fun `skal ikke bli oppfylt dersom et av hovedvilkårene ikke er oppfyllt`() {
+        val svarSpørsmålEnBesvartNei =
+            mapOf(
+                RegelId.HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING to
+                    SvarOgBegrunnelseDto(svar = SvarId.NEI, begrunnelse = "begrunnelse"),
+                RegelId.ER_SAMLING_OBLIGATORISK to SvarOgBegrunnelseDto(svar = SvarId.JA),
+                RegelId.AVSTAND_OVER_TRETTI_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
+            )
+
+        val nyttVilkår =
+            LagreVilkårReiseTilSamlingDto(
+                fom = 1 januar 2025,
+                tom = 31 januar 2025,
+                adresse = "Samlingsveien 1",
+                reiseId = dummyReiseId,
+                svar = svarSpørsmålEnBesvartNei,
+                fakta = faktaOffentligTransport(),
+            )
+
+        val resultat = kall.vilkårReiseTilSamling.opprettVilkår(behandling.id, nyttVilkår)
+
+        assertThat(resultat.resultat).isEqualTo(Vilkårsresultat.IKKE_OPPFYLT)
+    }
+
+    @Test
     fun `skal lagre og hente bompenger, fergekostnad og parkering for privat bil`() {
         val fom = 1 januar 2025
         val tom = 31 januar 2025
@@ -285,7 +310,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
         assertThat(resultat.fom).isEqualTo(lagreVilkårRequest.fom)
         assertThat(resultat.tom).isEqualTo(lagreVilkårRequest.tom)
         assertThat(resultat.fakta).isEqualTo(lagreVilkårRequest.fakta)
-        assertThat(resultat.delvilkårsett).hasSize(1)
+        assertThat(resultat.delvilkårsett).hasSize(3)
 
         assertAlleSvarHarFåttVurdering(delvilkår = resultat.delvilkårsett, svar = lagreVilkårRequest.svar)
     }

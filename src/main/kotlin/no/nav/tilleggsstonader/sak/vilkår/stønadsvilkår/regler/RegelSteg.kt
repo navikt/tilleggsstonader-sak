@@ -6,6 +6,10 @@ import no.nav.tilleggsstonader.libs.feil.feil
  * Ett [RegelSteg] er en regel med ett spørsmål med flere svar som mapper til en [SvarRegel]
  * @param regelId er id for spørsmålet
  * @param svarMapping er en mapping mellom svarId og regel for det svaret
+ * @param avhengerAvHovedregler brukes når denne regelen er avhengig av at andre, uavhengige hovedregler
+ * (som ikke leder til denne regelen via [SvarRegel.NesteRegel]) er besvart Ja. Brukes kun som metadata for
+ * å styre synlighet i frontend (se [no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelInfo]) og
+ * påvirker ikke selve evalueringen av svar.
  *
  * Eks
  * SPØRSMÅL_1 har 2 ulike svar,
@@ -27,6 +31,7 @@ data class RegelSteg(
     val regelId: RegelId,
     val erHovedregel: Boolean,
     val svarMapping: Map<SvarId, SvarRegel>,
+    val avhengerAvHovedregler: Set<RegelId> = emptySet(),
 ) {
     fun svarMapping(svarId: SvarId): SvarRegel = svarMapping[svarId] ?: feil("Finner ikke svarId=$svarId for regelId=$regelId")
 }

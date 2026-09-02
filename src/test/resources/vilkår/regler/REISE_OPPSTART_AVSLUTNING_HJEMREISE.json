@@ -13,7 +13,8 @@
           "regelId" : "KAN_REISE_MED_EGEN_BIL",
           "begrunnelseType" : "PÅKREVD"
         }
-      }
+      },
+      "avhengerAvHovedregler" : [ ]
     },
     "KAN_REISE_MED_EGEN_BIL" : {
       "regelId" : "KAN_REISE_MED_EGEN_BIL",
@@ -29,7 +30,8 @@
           "tilhørendeFaktaType" : null,
           "regelId" : "SLUTT_NODE"
         }
-      }
+      },
+      "avhengerAvHovedregler" : [ ]
     }
   },
   "vilkårType" : "REISE_OPPSTART_AVSLUTNING_HJEMREISE"

@@ -32,6 +32,7 @@ object ByggRegelstrukturFraVilkårregel {
                 erHovedregel = regel.erHovedregel,
                 svaralternativer = regel.svarMapping.tilSvaralternativer(),
                 reglerSomMåNullstilles = finnEtterkommere(alleReglerMedDirekteNesteRegel, start = regelId).toList(),
+                avhengerAvHovedregler = regel.avhengerAvHovedregler.toList(),
             )
         }
     }

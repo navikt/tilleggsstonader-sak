@@ -15,7 +15,8 @@
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null
       }
-    ]
+    ],
+    "avhengerAvHovedregler": []
   },
   "DOKUMENTERT_UTGIFTER_BOLIG": {
     "erHovedregel": true,
@@ -33,7 +34,8 @@
         "begrunnelseType": "PÅKREVD",
         "tilhørendeFaktaType": null
       }
-    ]
+    ],
+    "avhengerAvHovedregler": []
   },
   "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER": {
     "erHovedregel": true,
@@ -51,6 +53,7 @@
         "begrunnelseType": "VALGFRI",
         "tilhørendeFaktaType": null
       }
-    ]
+    ],
+    "avhengerAvHovedregler": []
   }
 }

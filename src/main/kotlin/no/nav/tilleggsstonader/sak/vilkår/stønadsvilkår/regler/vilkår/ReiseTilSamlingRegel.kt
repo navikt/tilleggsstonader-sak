@@ -64,6 +64,11 @@ class ReiseTilSamlingRegel :
             RegelSteg(
                 regelId = RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT,
                 erHovedregel = false,
+                avhengerAvHovedregler =
+                    setOf(
+                        RegelId.HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING,
+                        RegelId.ER_SAMLING_OBLIGATORISK,
+                    ),
                 svarMapping =
                     jaNeiSvarRegel(
                         hvisJa = NesteRegel(DOKUMENTERTE_UTGIFTER.regelId, BegrunnelseType.VALGFRI),
@@ -73,7 +78,7 @@ class ReiseTilSamlingRegel :
         private val AVSTAND_OVER_TRETTI_KM =
             RegelSteg(
                 regelId = RegelId.AVSTAND_OVER_TRETTI_KM,
-                erHovedregel = false,
+                erHovedregel = true,
                 svarMapping =
                     jaNeiSvarRegel(
                         hvisJa = NesteRegel(KAN_REISE_MED_OFFENTLIG_TRANSPORT.regelId, BegrunnelseType.PÅKREVD),
@@ -83,10 +88,14 @@ class ReiseTilSamlingRegel :
         private val ER_SAMLING_OBLIGATORISK =
             RegelSteg(
                 regelId = RegelId.ER_SAMLING_OBLIGATORISK,
-                erHovedregel = false,
+                erHovedregel = true,
                 svarMapping =
                     jaNeiSvarRegel(
-                        hvisJa = NesteRegel(AVSTAND_OVER_TRETTI_KM.regelId, BegrunnelseType.VALGFRI),
+                        hvisJa =
+                            SluttSvarRegel(
+                                resultat = Resultat.OPPFYLT,
+                                begrunnelseType = BegrunnelseType.VALGFRI,
+                            ),
                         hvisNei = IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
                     ),
             )
@@ -96,7 +105,11 @@ class ReiseTilSamlingRegel :
                 erHovedregel = true,
                 svarMapping =
                     jaNeiSvarRegel(
-                        hvisJa = NesteRegel(ER_SAMLING_OBLIGATORISK.regelId, BegrunnelseType.VALGFRI),
+                        hvisJa =
+                            SluttSvarRegel(
+                                resultat = Resultat.OPPFYLT,
+                                begrunnelseType = BegrunnelseType.VALGFRI,
+                            ),
                         hvisNei = IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
                     ),
             )

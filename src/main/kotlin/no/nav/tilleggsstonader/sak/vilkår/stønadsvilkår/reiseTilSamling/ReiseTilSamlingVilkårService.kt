@@ -16,8 +16,10 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.SlettetVilkårResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Delvilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelEvaluering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggVilkårFraSvar
@@ -115,9 +117,19 @@ class ReiseTilSamlingVilkårService(
             tom = nyttVilkår.tom,
             status = utledStatus(eksisterendeVilkår),
             delvilkårsett = delvilkårsett,
-            resultat = RegelEvaluering.utledVilkårResultat(delvilkårsett),
+            resultat = utledVilkårResultat(delvilkårsett),
             fakta = nyttVilkår.fakta,
         )
+    }
+
+    // Avviker bevisst fra RegelEvaluering.utledVilkårResultat: her skal et Nei på ett av
+    // spørsmål 1-3 gi IKKE_OPPFYLT med en gang, selv om de andre ikke er besvart ennå.
+    // Skal kun gjelde reise til samling, ikke andre vilkårstyper med flere hovedregler.
+    private fun utledVilkårResultat(delvilkårsett: List<Delvilkår>): Vilkårsresultat {
+        if (delvilkårsett.any { it.resultat == Vilkårsresultat.IKKE_OPPFYLT }) {
+            return Vilkårsresultat.IKKE_OPPFYLT
+        }
+        return RegelEvaluering.utledVilkårResultat(delvilkårsett)
     }
 
     private fun utledStatus(eksisterendeVilkår: VilkårReiseTilSamling?): VilkårStatus? =

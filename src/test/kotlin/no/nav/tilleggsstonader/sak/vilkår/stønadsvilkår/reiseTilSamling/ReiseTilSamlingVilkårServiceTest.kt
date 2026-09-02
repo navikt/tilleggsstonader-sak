@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.verify
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
@@ -23,15 +24,18 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.LagreVilkårReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -235,6 +239,41 @@ class ReiseTilSamlingVilkårServiceTest {
     }
 
     @Test
+    fun `skal ikke bli oppfylt dersom ett av hovedvilkårene ikke er oppfylt`() {
+        val behandling =
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
+        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
+        every { unleashService.isEnabled(any()) } returns true
+
+        val vilkårSlot = slot<Vilkår>()
+        every { vilkårRepository.insert(capture(vilkårSlot)) } answers { firstArg() }
+
+        val vilkår =
+            nyttVilkår.copy(
+                svar =
+                    svarOffentligTransport +
+                        (
+                            RegelId.HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING to
+                                SvarOgBegrunnelse(svar = SvarId.NEI, begrunnelse = "begrunnelse")
+                        ),
+                fakta =
+                    FaktaOffentligTransport(
+                        reiseId = dummyReiseId,
+                        adresse = "Samlingsveien 1",
+                        utgifterOffentligTransport = 500.toBigDecimal(),
+                        aktivitetId = null,
+                    ),
+            )
+
+        reiseTilSamlingVilkårService.opprettNyttVilkår(
+            nyttVilkår = vilkår,
+            behandlingId = behandling.id,
+        )
+
+        assertThat(vilkårSlot.captured.resultat).isEqualTo(Vilkårsresultat.IKKE_OPPFYLT)
+    }
+
+    @Test
     fun `skal feile når aktivitet ikke finnes for privat bil`() {
         val behandling =
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSR))
@@ -383,5 +422,74 @@ class ReiseTilSamlingVilkårServiceTest {
                     aktivitetId = null,
                 )
             }.withMessage("Reiseavstand kan ikke være mindre enn 30 km")
+    }
+
+    @Test
+    fun `skal ikke bli oppfylt dersom dokumenterte utgifter er besvart nei`() {
+        val behandling =
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
+        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
+        every { unleashService.isEnabled(any()) } returns true
+
+        val vilkårSlot = slot<Vilkår>()
+        every { vilkårRepository.insert(capture(vilkårSlot)) } answers { firstArg() }
+
+        val svar =
+            mapOf(
+                RegelId.HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING to SvarOgBegrunnelse(svar = SvarId.JA),
+                RegelId.ER_SAMLING_OBLIGATORISK to SvarOgBegrunnelse(svar = SvarId.JA),
+                RegelId.AVSTAND_OVER_TRETTI_KM to SvarOgBegrunnelse(svar = SvarId.JA, begrunnelse = "begrunnelse"),
+                RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelse(svar = SvarId.JA),
+                RegelId.DOKUMENTERTE_UTGIFTER to SvarOgBegrunnelse(svar = SvarId.NEI, begrunnelse = "begrunnelse"),
+            )
+
+        val vilkår =
+            nyttVilkår.copy(
+                svar = svar,
+                fakta =
+                    FaktaOffentligTransport(
+                        reiseId = dummyReiseId,
+                        adresse = "Samlingsveien 1",
+                        utgifterOffentligTransport = 500.toBigDecimal(),
+                        aktivitetId = null,
+                    ),
+            )
+
+        reiseTilSamlingVilkårService.opprettNyttVilkår(
+            nyttVilkår = vilkår,
+            behandlingId = behandling.id,
+        )
+
+        assertThat(vilkårSlot.captured.resultat).isEqualTo(Vilkårsresultat.IKKE_OPPFYLT)
+    }
+
+    @Test
+    fun `skal bli ikke oppfylt umiddelbart dersom ett hovedspørsmål er besvart nei`() {
+        val behandling =
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
+        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
+        every { unleashService.isEnabled(any()) } returns true
+
+        val vilkårSlot = slot<Vilkår>()
+        every { vilkårRepository.insert(capture(vilkårSlot)) } answers { firstArg() }
+
+        val svar =
+            mapOf(
+                RegelId.HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING to
+                    SvarOgBegrunnelse(svar = SvarId.NEI, begrunnelse = "begrunnelse"),
+            )
+
+        val vilkår =
+            nyttVilkår.copy(
+                svar = svar,
+                fakta = FaktaUbestemtType(reiseId = dummyReiseId, adresse = "Samlingsveien 1"),
+            )
+
+        reiseTilSamlingVilkårService.opprettNyttVilkår(
+            nyttVilkår = vilkår,
+            behandlingId = behandling.id,
+        )
+
+        assertThat(vilkårSlot.captured.resultat).isEqualTo(Vilkårsresultat.IKKE_OPPFYLT)
     }
 }
