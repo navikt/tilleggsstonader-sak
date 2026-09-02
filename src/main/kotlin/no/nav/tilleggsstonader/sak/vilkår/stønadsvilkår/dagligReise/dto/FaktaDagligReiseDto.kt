@@ -96,8 +96,8 @@ data class FaktaDagligReisePrivatBilDto(
             brukerfeilHvis(delperiode.bompengerPerDag != null && delperiode.bompengerPerDag > BigDecimal(500)) {
                 "Skal du innvilge med bompenger høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet"
             }
-            brukerfeilHvis(delperiode.fergekostnadPerDag != null && delperiode.fergekostnadPerDag > BigDecimal(500)) {
-                "Skal du innvilge med fergekostnader høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet"
+            brukerfeilHvis(delperiode.fergekostnadPerDag != null && delperiode.fergekostnadPerDag > BigDecimal(900)) {
+                "Skal du innvilge med fergekostnader høyere enn 900kr må du ta kontakt med Tilleggsstønader-temet"
             }
         }
     }
