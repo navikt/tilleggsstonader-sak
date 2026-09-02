@@ -17,11 +17,14 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørPassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperiodeLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperioderLæremidlerMapper.finnDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.detaljerteVedtaksperioder.DetaljertVedtaksperiodePassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.detaljerteVedtaksperioder.DetaljertVedtaksperioderPassAvBarnMapper.finnDetaljerteVedtaksperioder
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.detaljerteVedtaksperioder.DetaljertVedtaksperiodeReiseTilSamling
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.detaljerteVedtaksperioder.DetaljertVedtaksperioderReiseTilSamlingMapper.finnDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.springframework.stereotype.Service
@@ -51,6 +54,14 @@ class VedtaksperioderOversiktService(
             dagligReiseTsr =
                 fagsaker.dagligReiseTsr?.let { oppsummerVedtaksperioderDagligReiseTsr(it.id) }
                     ?: emptyList(),
+            reiseTilSamlingTso =
+                fagsaker.reiseTilSamlingTso?.let {
+                    oppsummerVedtaksperioderReiseTilSamling(it.id, Stønadstype.REISE_TIL_SAMLING_TSO)
+                } ?: emptyList(),
+            reiseTilSamlingTsr =
+                fagsaker.reiseTilSamlingTsr?.let {
+                    oppsummerVedtaksperioderReiseTilSamling(it.id, Stønadstype.REISE_TIL_SAMLING_TSR)
+                } ?: emptyList(),
         )
     }
 
@@ -69,8 +80,10 @@ class VedtaksperioderOversiktService(
             ->
                 finnDetaljerteVedtaksperioderForDagligReise(behandling = behandling)
 
-            Stønadstype.REISE_TIL_SAMLING_TSO -> TODO()
-            Stønadstype.REISE_TIL_SAMLING_TSR -> TODO()
+            Stønadstype.REISE_TIL_SAMLING_TSO,
+            Stønadstype.REISE_TIL_SAMLING_TSR,
+            ->
+                finnDetaljerteVedtaksperioderForReiseTilSamling(behandling = behandling)
             Stønadstype.FLYTTING_TSO,
             Stønadstype.FLYTTING_TSR,
             -> TODO()
@@ -176,6 +189,31 @@ class VedtaksperioderOversiktService(
             adresserTsr = adresserTsr,
         )
     }
+
+    private fun finnDetaljerteVedtaksperioderForReiseTilSamling(behandling: Saksbehandling): List<DetaljertVedtaksperiode> {
+        val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(behandling.fagsakPersonId)
+        val fagsakIdTso = fagsaker.reiseTilSamlingTso?.id
+        val fagsakIdTsr = fagsaker.reiseTilSamlingTsr?.id
+
+        val vedtaksdataTso =
+            fagsakIdTso?.let { hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørReiseTilSamling>(it) }
+        val vedtaksdataTsr =
+            fagsakIdTsr?.let { hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørReiseTilSamling>(it) }
+
+        return listOfNotNull(
+            vedtaksdataTso?.finnDetaljerteVedtaksperioder(Stønadstype.REISE_TIL_SAMLING_TSO),
+            vedtaksdataTsr?.finnDetaljerteVedtaksperioder(Stønadstype.REISE_TIL_SAMLING_TSR),
+        ).flatten()
+            .sortedByDescending { it.fom }
+    }
+
+    private fun oppsummerVedtaksperioderReiseTilSamling(
+        fagsakId: FagsakId,
+        stønadstype: Stønadstype,
+    ): List<DetaljertVedtaksperiodeReiseTilSamling> =
+        hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørReiseTilSamling>(fagsakId)
+            ?.finnDetaljerteVedtaksperioder(stønadstype)
+            ?: emptyList()
 
     private inline fun <reified T : Vedtaksdata> hentVedtaksdataForSisteIverksatteBehandling(fagsakId: FagsakId): T? =
         behandlingService.finnSisteIverksatteBehandling(fagsakId)?.let {
