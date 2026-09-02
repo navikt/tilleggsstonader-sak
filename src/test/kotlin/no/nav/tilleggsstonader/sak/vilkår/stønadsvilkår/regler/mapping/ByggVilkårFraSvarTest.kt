@@ -124,5 +124,4 @@ class ByggVilkårFraSvarTest {
                 )
             }.hasMessageContaining("Ikke alle svar kunne mappes til vurderinger")
     }
-
 }
