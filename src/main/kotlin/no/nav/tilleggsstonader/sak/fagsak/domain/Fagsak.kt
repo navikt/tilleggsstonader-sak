@@ -22,17 +22,9 @@ data class Fagsaker(
 
     fun alleFagsaker() = fagsaker.values
 
-    fun alleFagsakerMedUtbetalingPåGammeltFagområde() =
-        alleFagsaker().filter {
-            it.utbetalPåNyttFagområde != null &&
-                !it.utbetalPåNyttFagområde
-        }
+    fun alleFagsakerMedUtbetalingPåGammeltFagområde() = alleFagsaker().filter { it.utbetalPåNyttFagområde == false }
 
-    fun alleFagsakerMedUtbetalingPåNyttFagområde() =
-        alleFagsaker().filter {
-            it.utbetalPåNyttFagområde != null &&
-                it.utbetalPåNyttFagområde
-        }
+    fun alleFagsakerMedUtbetalingPåNyttFagområde() = alleFagsaker().filter { it.utbetalPåNyttFagområde == true }
 }
 
 data class Fagsak(
