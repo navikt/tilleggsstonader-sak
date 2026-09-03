@@ -1,16 +1,5 @@
 {
   "type": "UTDANNING_REISE_TIL_SAMLING_TSR",
-  "fakta": {
-    "aktivitetsdager": 3
-  },
-  "vurderinger": {
-    "harUtgifter": {
-      "svar": "JA",
-      "resultat": "OPPFYLT"
-    },
-    "erAktivitetenObligatorisk": {
-      "svar": "JA",
-      "resultat": "OPPFYLT"
-    }
-  }
+  "fakta": {},
+  "vurderinger": {}
 }
