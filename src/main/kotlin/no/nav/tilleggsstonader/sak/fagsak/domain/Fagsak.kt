@@ -1,10 +1,6 @@
 package no.nav.tilleggsstonader.sak.fagsak.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
-import no.nav.tilleggsstonader.kontrakter.felles.gjelderFlytting
-import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseOppstartAvslutningHjemreise
-import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseTilSamling
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.Sporbar
@@ -32,22 +28,10 @@ data class Fagsaker(
                 !it.utbetalPåNyttFagområde
         }
 
-    fun alleFagsakerAvStønadstypeUavhengigAvTema(stønadstype: Stønadstype) =
-        when (stønadstype) {
-            Stønadstype.DAGLIG_REISE_TSO, Stønadstype.DAGLIG_REISE_TSR -> fagsaker.values.filter { it.stønadstype.gjelderDagligReise() }
-            Stønadstype.REISE_TIL_SAMLING_TSO, Stønadstype.REISE_TIL_SAMLING_TSR ->
-                fagsaker.values.filter {
-                    it.stønadstype
-                        .gjelderReiseTilSamling()
-                }
-            Stønadstype.FLYTTING_TSO, Stønadstype.FLYTTING_TSR -> fagsaker.values.filter { it.stønadstype.gjelderFlytting() }
-            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
-            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
-            -> fagsaker.values.filter { it.stønadstype.gjelderReiseOppstartAvslutningHjemreise() }
-            Stønadstype.BARNETILSYN,
-            Stønadstype.LÆREMIDLER,
-            Stønadstype.BOUTGIFTER,
-            -> alleFagsaker().filter { it.stønadstype == stønadstype }
+    fun alleFagsakerMedUtbetalingPåNyttFagområde() =
+        alleFagsaker().filter {
+            it.utbetalPåNyttFagområde != null &&
+                it.utbetalPåNyttFagområde
         }
 }
 
