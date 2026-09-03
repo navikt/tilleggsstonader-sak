@@ -19,20 +19,18 @@ sealed interface AktivitetReiseTilSamlingTsr :
     override val type: AktivitetReiseTilSamlingTsrType
 }
 
-data class TiltakReiseTilSamlingTsr(
-    override val vurderinger: VurderingTiltakReiseTilSamlingTsr,
-    override val fakta: FaktaAktivitetReiseTilSamlingTsr,
-) : AktivitetReiseTilSamlingTsr {
+data object TiltakReiseTilSamlingTsr : AktivitetReiseTilSamlingTsr {
     override val type: AktivitetReiseTilSamlingTsrType =
         AktivitetReiseTilSamlingTsrType.TILTAK_REISE_TIL_SAMLING_TSR
+    override val fakta: IngenFakta = IngenFakta
+    override val vurderinger: Vurderinger = IngenVurderinger
 }
 
-data class UtdanningReiseTilSamlingTsr(
-    override val vurderinger: VurderingUtdanningReiseTilSamlingTsr,
-    override val fakta: FaktaAktivitetReiseTilSamlingTsr,
-) : AktivitetReiseTilSamlingTsr {
+data object UtdanningReiseTilSamlingTsr : AktivitetReiseTilSamlingTsr {
     override val type: AktivitetReiseTilSamlingTsrType =
         AktivitetReiseTilSamlingTsrType.UTDANNING_REISE_TIL_SAMLING_TSR
+    override val fakta: IngenFakta = IngenFakta
+    override val vurderinger: Vurderinger = IngenVurderinger
 }
 
 data object IngenAktivitetReiseTilSamlingTsr : AktivitetReiseTilSamlingTsr {
@@ -80,25 +78,6 @@ data class InnsattIFengselReiseTilSamlingTsr(
         MålgruppeReiseTilSamlingTsrType.INNSATT_I_FENGSEL_REISE_TIL_SAMLING_TSR
     override val fakta: IngenFakta = IngenFakta
 }
-
-data class VurderingTiltakReiseTilSamlingTsr(
-    override val lønnet: VurderingLønnet,
-    override val harUtgifter: VurderingHarUtgifter,
-    override val erAktivitetenObligatorisk: VurderingErAktivitetenObligatorisk,
-) : HarUtgifterVurdering,
-    LønnetVurdering,
-    ErAktivitetenObligatoriskVurdering
-
-data class VurderingUtdanningReiseTilSamlingTsr(
-    override val harUtgifter: VurderingHarUtgifter,
-    override val erAktivitetenObligatorisk: VurderingErAktivitetenObligatorisk,
-) : HarUtgifterVurdering,
-    ErAktivitetenObligatoriskVurdering
-
-data class FaktaAktivitetReiseTilSamlingTsr(
-    override val aktivitetsdager: Int? = null,
-) : Fakta,
-    FaktaAktivitetsdagerNullable
 
 sealed interface TypeFaktaOgVurderingReiseTilSamlingTsr : TypeFaktaOgVurdering
 

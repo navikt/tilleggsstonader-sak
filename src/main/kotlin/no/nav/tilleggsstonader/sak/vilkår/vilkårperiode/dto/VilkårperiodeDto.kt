@@ -164,16 +164,9 @@ data class AktivitetDagligReiseTsrFaktaOgVurderingerDto(
 
 data class AktivitetReiseTilSamlingTsoFaktaOgVurderingerDto(
     val lønnet: VurderingDto? = null,
-    val harUtgifter: VurderingDto? = null,
-    val erAktivitetenObligatorisk: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
-data class AktivitetReiseTilSamlingTsrFaktaOgVurderingerDto(
-    val lønnet: VurderingDto? = null,
-    val harUtgifter: VurderingDto? = null,
-    val erAktivitetenObligatorisk: VurderingDto? = null,
-    val aktivitetsdager: Int? = null,
-) : FaktaOgVurderingerDto()
+data object AktivitetReiseTilSamlingTsrFaktaOgVurderingerDto : FaktaOgVurderingerDto()
 
 data class AktivitetReiseOppstartAvslutningHjemreiseTsoFaktaOgVurderingerDto(
     val lønnet: VurderingDto? = null,
@@ -265,25 +258,9 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                 is FaktaOgVurderingReiseTilSamlingTso ->
                     AktivitetReiseTilSamlingTsoFaktaOgVurderingerDto(
                         lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
-                        harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
-                        erAktivitetenObligatorisk =
-                            vurderinger
-                                .takeIfVurderinger<ErAktivitetenObligatoriskVurdering>()
-                                ?.erAktivitetenObligatorisk
-                                ?.tilDto(),
                     )
 
-                is FaktaOgVurderingReiseTilSamlingTsr ->
-                    AktivitetReiseTilSamlingTsrFaktaOgVurderingerDto(
-                        lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
-                        harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
-                        erAktivitetenObligatorisk =
-                            vurderinger
-                                .takeIfVurderinger<ErAktivitetenObligatoriskVurdering>()
-                                ?.erAktivitetenObligatorisk
-                                ?.tilDto(),
-                        aktivitetsdager = fakta.takeIfFakta<FaktaAktivitetsdagerNullable>()?.aktivitetsdager,
-                    )
+                is FaktaOgVurderingReiseTilSamlingTsr -> AktivitetReiseTilSamlingTsrFaktaOgVurderingerDto
 
                 is FaktaOgVurderingReiseOppstartAvslutningHjemreiseTso ->
                     AktivitetReiseOppstartAvslutningHjemreiseTsoFaktaOgVurderingerDto(
