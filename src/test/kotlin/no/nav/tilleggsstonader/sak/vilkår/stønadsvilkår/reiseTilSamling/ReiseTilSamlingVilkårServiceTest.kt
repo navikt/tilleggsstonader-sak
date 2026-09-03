@@ -20,11 +20,9 @@ import no.nav.tilleggsstonader.sak.util.faktaOffentligTransportReiseTilSamling
 import no.nav.tilleggsstonader.sak.util.faktaPrivatBilReiseTilSamling
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegelTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.LagreVilkårReiseTilSamling
@@ -52,22 +50,8 @@ class ReiseTilSamlingVilkårServiceTest {
             unleashService = unleashService,
         )
 
-    val svarOffentligTransport =
-        mapOf(
-            RegelId.AVSTAND_OVER_TRETTI_KM to SvarOgBegrunnelse(svar = SvarId.JA, begrunnelse = "begrunnelse"),
-            RegelId.DOKUMENTERTE_UTGIFTER to SvarOgBegrunnelse(svar = SvarId.JA, begrunnelse = "begrunnelse"),
-            RegelId.DEKKET_AV_ANNET_STIPEND to SvarOgBegrunnelse(svar = SvarId.NEI),
-            RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelse(svar = SvarId.JA),
-        )
-
-    val svarPrivatBil =
-        mapOf(
-            RegelId.AVSTAND_OVER_TRETTI_KM to SvarOgBegrunnelse(svar = SvarId.JA, begrunnelse = "begrunnelse"),
-            RegelId.DOKUMENTERTE_UTGIFTER to SvarOgBegrunnelse(svar = SvarId.JA, begrunnelse = "begrunnelse"),
-            RegelId.DEKKET_AV_ANNET_STIPEND to SvarOgBegrunnelse(svar = SvarId.NEI),
-            RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelse(svar = SvarId.NEI, begrunnelse = "begrunnelse"),
-            RegelId.KAN_REISE_MED_EGEN_BIL to SvarOgBegrunnelse(svar = SvarId.JA),
-        )
+    val svarOffentligTransport = ReiseTilSamlingRegelTestUtil.oppfylteSvarReiseTilSamlingOffentligTransport()
+    val svarPrivatBil = ReiseTilSamlingRegelTestUtil.oppfylteSvarReiseTilSamlingPrivatBil()
 
     val nyttVilkår =
         LagreVilkårReiseTilSamling(

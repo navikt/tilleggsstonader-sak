@@ -85,6 +85,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresult
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegelTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto
@@ -107,7 +108,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.util.UUID
-import kotlin.collections.List
 import kotlin.random.Random
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport as FaktaOffentligTransportReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil as FaktaPrivatBilReiseTilSamling
@@ -764,12 +764,7 @@ fun lagreReiseTilSamlingDto(
     reiseId: ReiseId = dummyReiseId,
     utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
     svar: Map<RegelId, SvarOgBegrunnelseDto> =
-        mapOf(
-            RegelId.AVSTAND_OVER_TRETTI_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
-            RegelId.DOKUMENTERTE_UTGIFTER to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
-            RegelId.DEKKET_AV_ANNET_STIPEND to SvarOgBegrunnelseDto(svar = SvarId.NEI),
-            RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
-        ),
+        ReiseTilSamlingRegelTestUtil.oppfylteSvarReiseTilSamlingOffentligTransportDto(),
     fakta: FaktaReiseTilSamlingDto =
         faktaOffentligTransportReiseTilSamling(
             adresse = adresse,

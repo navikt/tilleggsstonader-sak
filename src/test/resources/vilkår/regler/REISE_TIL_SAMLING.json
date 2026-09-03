@@ -1,11 +1,41 @@
 {
   "regler": {
-    "AVSTAND_OVER_TRETTI_KM": {
-      "regelId": "AVSTAND_OVER_TRETTI_KM",
+    "HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING": {
+      "regelId": "HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING",
       "erHovedregel": true,
       "svarMapping": {
         "JA": {
-          "regelId": "DOKUMENTERTE_UTGIFTER",
+          "regelId": "AVSTAND_OVER_TRETTI_KM",
+          "begrunnelseType": "VALGFRI"
+        },
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "tilhørendeFaktaType": null,
+          "regelId": "SLUTT_NODE"
+        }
+      }
+    },
+    "ER_SAMLING_OBLIGATORISK": {
+      "regelId": "ER_SAMLING_OBLIGATORISK",
+      "erHovedregel": false,
+      "svarMapping": {
+        "JA": {
+          "regelId": "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
+          "begrunnelseType": "VALGFRI"
+        },
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "tilhørendeFaktaType": null,
+          "regelId": "SLUTT_NODE"
+        }
+      }
+    },
+    "AVSTAND_OVER_TRETTI_KM": {
+      "regelId": "AVSTAND_OVER_TRETTI_KM",
+      "erHovedregel": false,
+      "svarMapping": {
+        "JA": {
+          "regelId": "ER_SAMLING_OBLIGATORISK",
           "begrunnelseType": "PÅKREVD"
         },
         "NEI": {
@@ -20,9 +50,8 @@
       "erHovedregel": false,
       "svarMapping": {
         "JA": {
-          "begrunnelseType": "UTEN",
-          "tilhørendeFaktaType": "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT",
-          "regelId": "SLUTT_NODE"
+          "regelId": "DOKUMENTERTE_UTGIFTER",
+          "begrunnelseType": "VALGFRI"
         },
         "NEI": {
           "regelId": "KAN_REISE_MED_EGEN_BIL",
@@ -35,8 +64,9 @@
       "erHovedregel": false,
       "svarMapping": {
         "JA": {
-          "regelId": "DEKKET_AV_ANNET_STIPEND",
-          "begrunnelseType": "VALGFRI"
+          "begrunnelseType": "UTEN",
+          "tilhørendeFaktaType": "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT",
+          "regelId": "SLUTT_NODE"
         },
         "NEI": {
           "begrunnelseType": "PÅKREVD",
@@ -58,21 +88,6 @@
           "begrunnelseType": "PÅKREVD",
           "tilhørendeFaktaType": null,
           "regelId": "SLUTT_NODE"
-        }
-      }
-    },
-    "DEKKET_AV_ANNET_STIPEND": {
-      "regelId": "DEKKET_AV_ANNET_STIPEND",
-      "erHovedregel": false,
-      "svarMapping": {
-        "JA": {
-          "begrunnelseType": "PÅKREVD",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
-        },
-        "NEI": {
-          "regelId": "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
-          "begrunnelseType": "UTEN"
         }
       }
     }
