@@ -38,7 +38,7 @@ enum class RegelId(
     KAN_REISE_MED_TAXI("Kan søker benytte seg av taxi?"),
 
     // REISE TIL SAMLING
-    HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING("Har bruker nødvendige utgifter til reise til samling?"),
+    HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING("Har søker nødvendige utgifter til reise til samling?"),
     AVSTAND_OVER_TRETTI_KM("Er reiseavstanden over 30km?"),
     ER_SAMLING_OBLIGATORISK("Er samlingen obligatorisk?"),
     KAN_REISE_MED_EGEN_BIL("Kan søker benytte privat bil?"),
