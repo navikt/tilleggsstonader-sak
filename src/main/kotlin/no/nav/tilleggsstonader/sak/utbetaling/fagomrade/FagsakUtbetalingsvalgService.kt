@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.utbetaling.fagomrade
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseTilSamling
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
@@ -26,11 +27,8 @@ class FagsakUtbetalingsvalgService(
     }
 
     private fun utledUtbetalPåNyttFagområde(stønadstype: Stønadstype): Boolean =
-        if (stønadstype.skalBrukeNyttFagområde()) {
-            true
-        } else {
-            unleashService.isEnabled(Toggle.BRUK_NYTT_FAGOMRADE_FOR_UTBETALING)
-        }
+        stønadstype.skalBrukeNyttFagområde() || unleashService.isEnabled(Toggle.BRUK_NYTT_FAGOMRADE_FOR_UTBETALING)
 
-    private fun Stønadstype.skalBrukeNyttFagområde(): Boolean = gjelderDagligReise() || gjelderReiseTilSamling()
+    private fun Stønadstype.skalBrukeNyttFagområde(): Boolean =
+        gjelderDagligReise() || gjelderReiseTilSamling() || gjelderReiseOppstartAvslutningHjemreise()
 }
