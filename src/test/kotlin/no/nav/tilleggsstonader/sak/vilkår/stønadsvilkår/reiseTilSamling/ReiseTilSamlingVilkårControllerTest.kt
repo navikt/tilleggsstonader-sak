@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.DelvilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegelTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingPrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingUbestemtDto
@@ -32,23 +33,6 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
     val fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO)
     val behandling = behandling(fagsak = fagsak, steg = StegType.VILKÅR)
 
-    val svarOffentligTransport =
-        mapOf(
-            RegelId.AVSTAND_OVER_TRETTI_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
-            RegelId.DOKUMENTERTE_UTGIFTER to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "dokumentert"),
-            RegelId.DEKKET_AV_ANNET_STIPEND to SvarOgBegrunnelseDto(svar = SvarId.NEI),
-            RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
-        )
-
-    val svarPrivatBil =
-        mapOf(
-            RegelId.AVSTAND_OVER_TRETTI_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
-            RegelId.DOKUMENTERTE_UTGIFTER to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "dokumentert"),
-            RegelId.DEKKET_AV_ANNET_STIPEND to SvarOgBegrunnelseDto(svar = SvarId.NEI),
-            RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.NEI, begrunnelse = "begrunnelse"),
-            RegelId.KAN_REISE_MED_EGEN_BIL to SvarOgBegrunnelseDto(svar = SvarId.JA),
-        )
-
     @BeforeEach
     fun setUp() {
         testoppsettService.opprettBehandlingMedFagsak(behandling)
@@ -63,7 +47,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 tom = 31 januar 2025,
                 adresse = "Samlingsveien 1",
                 reiseId = dummyReiseId,
-                svar = svarOffentligTransport,
+                svar = ReiseTilSamlingRegelTestUtil.oppfylteSvarReiseTilSamlingOffentligTransportDto(),
                 fakta = faktaOffentligTransport(),
             )
 
@@ -132,7 +116,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 tom = tom,
                 adresse = "Samlingsveien 1",
                 reiseId = dummyReiseId,
-                svar = svarPrivatBil,
+                svar = ReiseTilSamlingRegelTestUtil.oppfylteSvarReiseTilSamlingPrivatBilDto(),
                 fakta = faktaPrivatBil(aktivitet = aktivitet),
             )
 
@@ -172,7 +156,8 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
     fun `skal kunne lagre ned et vilkår med fakta UBESTEMT om vilkår ikke er oppfylt`() {
         val svarAvstandIkkeOppfylt =
             mapOf(
-                RegelId.AVSTAND_OVER_TRETTI_KM to SvarOgBegrunnelseDto(svar = SvarId.NEI, begrunnelse = "antall km"),
+                RegelId.HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING to
+                    SvarOgBegrunnelseDto(svar = SvarId.NEI, begrunnelse = "Ingen begrunnelse"),
             )
 
         val nyttVilkår =
@@ -227,7 +212,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 tom = tom,
                 adresse = "Samlingsveien 1",
                 reiseId = dummyReiseId,
-                svar = svarPrivatBil,
+                svar = ReiseTilSamlingRegelTestUtil.oppfylteSvarReiseTilSamlingPrivatBilDto(),
                 fakta =
                     faktaPrivatBil(
                         bompenger = BigDecimal("50"),
