@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -161,7 +162,10 @@ val tiltaksvariantTilTypeAndelMapDagligReiseTsr =
 
 fun finnTypeAndelFraTiltaksvariant(tiltaksvariant: TypeAktivitet): TypeAndel =
     tiltaksvariantTilTypeAndelMapDagligReiseTsr[tiltaksvariant]
-        ?: error("Kan ikke mappe til TypeAndel fra TypeAktivitet $tiltaksvariant")
+        ?: feil(
+            "Tiltaksvariant ${tiltaksvariant.name} (${tiltaksvariant.beskrivelse}) er ikke støttet for " +
+                "innvilgelse av daglig reise TSR. Ta kontakt med utviklerteamet.",
+        )
 
 fun finnPeriodeFraAndel(
     beregningsresultat: BeregningsresultatDagligReise,
