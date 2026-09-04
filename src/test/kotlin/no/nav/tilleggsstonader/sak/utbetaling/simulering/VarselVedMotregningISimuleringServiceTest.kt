@@ -79,6 +79,51 @@ internal class VarselVedMotregningISimuleringServiceTest {
     }
 
     @Test
+    fun `true når annen iverksetting også på nytt fagområde er i dag`() {
+        val behandlingId = behandling(fagsak).id
+        val fagsakDagligReiseTso =
+            fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.DAGLIG_REISE_TSO).copy(
+                utbetalPåNyttFagområde = true,
+            )
+        val fagsakReiseTilSamlingTsr =
+            fagsak(fagsakpersoner(setOf(personIdent)), Stønadstype.REISE_TIL_SAMLING_TSR).copy(
+                utbetalPåNyttFagområde = true,
+            )
+
+        val alleFagsaker =
+            Fagsaker(listOf(fagsakDagligReiseTso, fagsakReiseTilSamlingTsr).associateBy { it.stønadstype })
+        val idag = LocalDate.now()
+
+        every { fagsakService.hentFagsakForBehandling(any()) } returns fagsakDagligReiseTso
+        every { fagsakService.finnFagsakerForFagsakPersonId(any()) } returns alleFagsaker
+
+        val behandling = behandling(fagsakDagligReiseTso)
+        every { behandlingService.finnSisteIverksatteBehandling(any()) } returns behandling
+
+        val tilkjentYtelse =
+            tilkjentYtelse(
+                behandlingId = behandling.id,
+                andeler =
+                    listOf(
+                        tilkjentYtelse(
+                            behandlingId = behandlingId,
+                        ).andelerTilkjentYtelse.first().copy(
+                            iverksetting =
+                                mockk {
+                                    every { iverksettingTidspunkt } returns idag.atStartOfDay()
+                                },
+                        ),
+                    ).toTypedArray(),
+            )
+
+        every { tilkjentYtelseService.hentForBehandling(any()) } returns tilkjentYtelse
+
+        val resultat = varselVedMotregningISimuleringService.finnesUtbetalingerPåSammeFagområdeSomIkkeErRegistrertIUR(behandlingId)
+
+        assertThat(resultat).isTrue
+    }
+
+    @Test
     fun `false når annen iverksetting på samme fagområde ikke er i dag`() {
         val behandlingId = behandling(fagsak).id
         val fagsakDagligReiseTso =
