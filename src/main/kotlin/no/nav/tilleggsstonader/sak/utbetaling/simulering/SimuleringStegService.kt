@@ -22,13 +22,13 @@ class SimuleringStegService(
             !tilgangService.harTilgangTilRolle(BehandlerRolle.SAKSBEHANDLER) ||
             !tilgangService.harSkrivetilgangTilBehandling(saksbehandling)
         ) {
-            return simuleringService.hentLagretSimulering(saksbehandling.id)?.tilDto()
+            return simuleringService.hentLagretSimulering(saksbehandling.id)?.tilDto(saksbehandling.stønadstype)
         } else {
             if (saksbehandling.steg == StegType.SIMULERING) {
                 stegService.håndterSteg(saksbehandling.id, StegType.SIMULERING)
             }
 
-            return simuleringService.hentLagretSimulering(saksbehandling.id)?.tilDto()
+            return simuleringService.hentLagretSimulering(saksbehandling.id)?.tilDto(saksbehandling.stønadstype)
         }
     }
 }
