@@ -12,12 +12,16 @@ import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KafkaFake
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.Oppgavestatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeRepository
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagRequest
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikUke
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
@@ -26,6 +30,7 @@ import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.avrundetStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -215,6 +220,33 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
             testoppsettService
                 .hentBehandlinger(førstegangsBehandlingContext.fagsakId)
                 .single { it.type == BehandlingType.KJØRELISTE && it.id != førsteKjørelistebehandling.id }
+
+        // Uken overlapper med en uke det allerede er sendt inn og godkjent kjøreliste for på et annet rammevedtak,
+        // så uken må godkjennes manuelt av saksbehandler før behandlingen kan ferdigstilles.
+        tilordneÅpenBehandlingOppgaveForBehandling(andreKjørelistebehandling.id)
+        val reisevurderingAndreKjørelistebehandling =
+            kall.privatBil
+                .hentReisevurderingForBehandling(andreKjørelistebehandling.id)
+                .single { it.reiseId == ReiseId.fromString(rammevedtak2.reiseId) }
+        val ukeMedAvvik =
+            reisevurderingAndreKjørelistebehandling.uker.single {
+                it.avvik.contains(TypeAvvikUke.OVERLAPPER_MED_ANNET_RAMMEVEDTAK)
+            }
+        kall.privatBil.oppdaterUke(
+            behandlingId = andreKjørelistebehandling.id,
+            avklartUkeId = ukeMedAvvik.avklartUkeId!!,
+            avklarteDager =
+                ukeMedAvvik.dager.map { dag ->
+                    val kjørelisteDag = dag.kjørelisteDag
+                    val harKjørt = kjørelisteDag?.harKjørt == true
+                    EndreAvklartDagRequest(
+                        dato = dag.dato,
+                        godkjentGjennomførtKjøring = if (harKjørt) GodkjentGjennomførtKjøring.JA else GodkjentGjennomførtKjøring.NEI,
+                        parkeringsutgift = if (harKjørt) kjørelisteDag.parkeringsutgift else null,
+                        begrunnelse = "Manuell vurdering av uke med overlappende kjøreliste",
+                    )
+                },
+        )
 
         gjennomførKjørelisteBehandling(andreKjørelistebehandling)
 

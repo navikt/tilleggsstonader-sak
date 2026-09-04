@@ -42,6 +42,7 @@ abstract class CleanDatabaseIntegrationTest : IntegrationTest() {
                 behandling_ekstern,
                 tilbakekreving_hendelse,
                 avklart_kjort_dag,
+                avklart_kjort_uke_avvik,
                 avklart_kjort_uke,
                 kjoreliste,
                 kjoreliste_behandling_brev,

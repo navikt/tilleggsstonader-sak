@@ -105,7 +105,7 @@ class EndreAvklarteUkerTest : CleanDatabaseIntegrationTest() {
         assertThat(oppdatertUke.status).isEqualTo(UkeStatus.OK_MANUELT)
         // Originalt avvik skal ikke fjernes ved manuell oppdatering, da det kan være relevant for saksbehandler å
         // se at det har vært et avvik som førte til manuell behandling
-        assertThat(oppdatertUke.avvik!!.typeAvvik).isEqualTo(TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK)
+        assertThat(oppdatertUke.avvik).containsExactly(TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK)
 
         oppdatertUke.validerOppdaterteDager(request)
     }
