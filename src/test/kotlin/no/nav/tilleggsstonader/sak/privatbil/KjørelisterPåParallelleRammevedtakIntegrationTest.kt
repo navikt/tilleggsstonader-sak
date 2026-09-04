@@ -15,6 +15,8 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomf�
 import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDagStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatus
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikUke
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
 import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
@@ -151,6 +153,23 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
         reisevurderingerBehandling2.ramme2!!.uker.forEach {
             assertThat(it.kjørelisteInnsendtDato).isNotNull()
             assertThat(it.avklartUkeId).isNotNull()
+        }
+
+        // Ukene i ramme2 som overlapper med uker der ramme1 har kjørte dager skal få avvik
+        // som sier at det finnes overlappende kjørelister, slik at saksbehandler må sjekke totalt antall dager.
+        val ukenummereMedKjørteDagerIRamme1 =
+            reisevurderingerBehandling1.ramme1.uker
+                .filter { uke -> uke.dager.any { it.kjørelisteDag?.harKjørt == true } }
+                .map { it.ukenummer }
+                .toSet()
+
+        reisevurderingerBehandling2.ramme2.uker.forEach { uke ->
+            if (uke.ukenummer in ukenummereMedKjørteDagerIRamme1) {
+                assertThat(uke.avvik).contains(TypeAvvikUke.OVERLAPPER_MED_ANNET_RAMMEVEDTAK)
+                assertThat(uke.status).isEqualTo(UkeStatus.AVVIK)
+            } else {
+                assertThat(uke.avvik).doesNotContain(TypeAvvikUke.OVERLAPPER_MED_ANNET_RAMMEVEDTAK)
+            }
         }
     }
 

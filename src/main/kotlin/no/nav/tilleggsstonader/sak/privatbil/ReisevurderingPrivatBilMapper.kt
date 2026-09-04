@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.alleDatoerGruppertPåUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtDag
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.typeAvvik
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
@@ -94,7 +95,7 @@ object ReisevurderingPrivatBilMapper {
             tilDato = datoer.max(),
             erUkeSlettet = erUkeSlettet,
             status = avklartUke?.status ?: UkeStatus.IKKE_MOTTATT_KJØRELISTE,
-            avvik = avklartUke?.typeAvvik?.let { AvvikUke(typeAvvik = it) },
+            avvik = avklartUke?.typeAvvik ?: emptyList(),
             kjørelisteInnsendtDato = kjøreliste?.datoMottatt?.toLocalDate(),
             kjørelisteId = kjøreliste?.id,
             erKjørelisteManueltRegistrert = kjøreliste?.manueltLagretIBehandling != null,
