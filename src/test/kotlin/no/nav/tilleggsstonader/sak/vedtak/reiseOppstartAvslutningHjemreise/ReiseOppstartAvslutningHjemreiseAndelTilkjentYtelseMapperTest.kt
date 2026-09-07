@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.feil.Feil
 import no.nav.tilleggsstonader.libs.test.assertions.catchThrowableOfType
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
@@ -43,10 +44,10 @@ class ReiseOppstartAvslutningHjemreiseAndelTilkjentYtelseMapperTest {
     @Test
     fun `kaster feil for tiltaksvariant som ikke er en del av reise oppstart sitt reduserte tiltakssett`() {
         val feil =
-            catchThrowableOfType<IllegalStateException> {
+            catchThrowableOfType<Feil> {
                 finnTypeAndelFraTiltaksvariantReiseOppstart(TypeAktivitet.UTVOPPFOPL)
             }
-        assertThat(feil.message).contains("Kan ikke mappe til TypeAndel")
+        assertThat(feil.message).contains("Ta kontakt med utviklerteamet")
     }
 
     @Test

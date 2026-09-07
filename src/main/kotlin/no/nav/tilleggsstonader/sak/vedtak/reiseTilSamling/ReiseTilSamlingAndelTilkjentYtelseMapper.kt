@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -154,4 +155,7 @@ val tiltaksvariantTilTypeAndelMapReiseTilSamlingTsr =
 
 fun finnTypeAndelFraTiltaksvariantReiseTilSamling(tiltaksvariant: TypeAktivitet): TypeAndel =
     tiltaksvariantTilTypeAndelMapReiseTilSamlingTsr[tiltaksvariant]
-        ?: error("Kan ikke mappe til TypeAndel fra TypeAktivitet $tiltaksvariant")
+        ?: feil(
+            "Tiltaksvariant ${tiltaksvariant.name} (${tiltaksvariant.beskrivelse}) er ikke støttet for " +
+                "innvilgelse av reise til samling TSR. Ta kontakt med utviklerteamet.",
+        )

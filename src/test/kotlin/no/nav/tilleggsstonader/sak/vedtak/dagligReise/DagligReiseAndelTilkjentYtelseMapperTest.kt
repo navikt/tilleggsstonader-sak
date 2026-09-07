@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise
 
+import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.feil.Feil
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
@@ -20,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 
 class DagligReiseAndelTilkjentYtelseMapperTest {
@@ -407,5 +410,24 @@ class DagligReiseAndelTilkjentYtelseMapperTest {
                     )
                 },
         )
+    }
+
+    @Nested
+    inner class FinnTypeAndelFraTiltaksvariant {
+        @Test
+        fun `mapper kjent tiltaksvariant til riktig TypeAndel`() {
+            assertThat(finnTypeAndelFraTiltaksvariant(TypeAktivitet.ARBFORB))
+                .isEqualTo(TypeAndel.DAGLIG_REISE_TILTAK_ARBEIDSFORBEREDENDE)
+        }
+
+        @Test
+        fun `kaster Feil med brukervendt melding når tiltaksvariant ikke er mappet til en TypeAndel`() {
+            val tiltaksvariantUtenMapping =
+                TypeAktivitet.entries.first { it !in tiltaksvariantTilTypeAndelMapDagligReiseTsr }
+
+            val feil = assertThrows<Feil> { finnTypeAndelFraTiltaksvariant(tiltaksvariantUtenMapping) }
+
+            assertThat(feil.message).contains("Ta kontakt med utviklerteamet")
+        }
     }
 }

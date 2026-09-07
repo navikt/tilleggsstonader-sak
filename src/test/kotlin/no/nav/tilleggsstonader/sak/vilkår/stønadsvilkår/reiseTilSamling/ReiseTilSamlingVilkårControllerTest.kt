@@ -154,7 +154,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
 
     @Test
     fun `skal kunne lagre ned et vilkår med fakta UBESTEMT om vilkår ikke er oppfylt`() {
-        val svarAvstandIkkeOppfylt =
+        val svarIkkeNødvendigeUtgifter =
             mapOf(
                 RegelId.HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING to
                     SvarOgBegrunnelseDto(svar = SvarId.NEI, begrunnelse = "Ingen begrunnelse"),
@@ -166,7 +166,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 tom = 31 januar 2025,
                 adresse = "Samlingsveien 1",
                 reiseId = dummyReiseId,
-                svar = svarAvstandIkkeOppfylt,
+                svar = svarIkkeNødvendigeUtgifter,
                 fakta = FaktaReiseTilSamlingUbestemtDto,
             )
 
