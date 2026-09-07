@@ -34,6 +34,7 @@ data class BeregningsresultatPrivatBilDto(
     val bompenger: BigDecimal?,
     val fergekostnad: BigDecimal?,
     val parkering: BigDecimal?,
+    val piggdekkavgift: BigDecimal?,
     val beløp: BigDecimal,
     val aktivitetId: VilkårperiodeGlobalId?,
 )
@@ -72,6 +73,7 @@ fun BeregningsresultatPrivatBil.tilDto() =
         bompenger = grunnlag.bompenger,
         fergekostnad = grunnlag.fergekostnad,
         parkering = grunnlag.parkering,
+        piggdekkavgift = grunnlag.piggdekkavgift,
         beløp = beløp,
         aktivitetId = aktivitetId,
     )

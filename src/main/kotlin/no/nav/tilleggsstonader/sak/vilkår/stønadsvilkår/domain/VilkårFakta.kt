@@ -56,6 +56,7 @@ data class FaktaReiseTilSamlingPrivatBil(
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,
     val parkering: BigDecimal? = null,
+    val piggdekkavgift: BigDecimal? = null,
 ) : VilkårFakta
 
 data class FaktaReiseTilSamlingUbestemt(

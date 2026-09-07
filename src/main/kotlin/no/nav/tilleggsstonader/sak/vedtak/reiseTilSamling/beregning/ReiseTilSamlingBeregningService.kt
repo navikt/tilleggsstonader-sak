@@ -156,6 +156,7 @@ class ReiseTilSamlingBeregningService(
                     bompenger = fakta.bompenger,
                     fergekostnad = fakta.fergekostnad,
                     parkering = fakta.parkering,
+                    piggdekkavgift = fakta.piggdekkavgift,
                     vedtaksperioder =
                         vedtaksperioder
                             .filter { it.overlapper(samling) }
@@ -179,6 +180,7 @@ class ReiseTilSamlingBeregningService(
                 .plus(grunnlag.bompenger ?: BigDecimal.ZERO)
                 .plus(grunnlag.fergekostnad ?: BigDecimal.ZERO)
                 .plus(grunnlag.parkering ?: BigDecimal.ZERO)
+                .plus(grunnlag.piggdekkavgift ?: BigDecimal.ZERO)
         ).setScale(0, RoundingMode.HALF_UP)
 }
 

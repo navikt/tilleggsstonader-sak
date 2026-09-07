@@ -37,6 +37,7 @@ data class BeregningsgrunnlagPrivatBilForSamling(
     val bompenger: BigDecimal?,
     val fergekostnad: BigDecimal?,
     val parkering: BigDecimal?,
+    val piggdekkavgift: BigDecimal?,
     val vedtaksperioder: List<VedtaksperiodeGrunnlag>,
     val brukersNavKontor: String?,
 )
