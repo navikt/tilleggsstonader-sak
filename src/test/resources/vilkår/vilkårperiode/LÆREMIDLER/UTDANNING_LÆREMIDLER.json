@@ -1,17 +1,17 @@
 {
-  "type": "UTDANNING_LÆREMIDLER",
   "fakta": {
     "prosent": 70,
     "studienivå": "HØYERE_UTDANNING"
   },
+  "type": "UTDANNING_LÆREMIDLER",
   "vurderinger": {
-    "harUtgifter": {
-      "svar": "JA",
-      "resultat": "OPPFYLT"
-    },
     "harRettTilUtstyrsstipend": {
-      "svar": "NEI",
-      "resultat": "OPPFYLT"
+      "resultat": "OPPFYLT",
+      "svar": "NEI"
+    },
+    "harUtgifter": {
+      "resultat": "OPPFYLT",
+      "svar": "JA"
     }
   }
 }

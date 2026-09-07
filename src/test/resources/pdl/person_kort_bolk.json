@@ -1,31 +1,25 @@
 {
   "data": {
-    "personBolk": [
-      {
-        "ident": "11111122222",
-        "code": "ok",
-        "person": {
-          "adressebeskyttelse": [
-            {
-              "gradering": "UGRADERT",
-              "metadata":  {
-                "historisk": false
-              }
-            }
-          ],
-          "doedsfall": [],
-          "navn": [
-            {
-              "fornavn": "BRÅKETE",
-              "mellomnavn": null,
-              "etternavn": "KAMELEON",
-              "metadata": {
-                "historisk": false
-              }
-            }
-          ]
-        }
+    "personBolk": [ {
+      "code": "ok",
+      "ident": "11111122222",
+      "person": {
+        "adressebeskyttelse": [ {
+          "gradering": "UGRADERT",
+          "metadata": {
+            "historisk": false
+          }
+        } ],
+        "doedsfall": [ ],
+        "navn": [ {
+          "etternavn": "KAMELEON",
+          "fornavn": "BRÅKETE",
+          "mellomnavn": null,
+          "metadata": {
+            "historisk": false
+          }
+        } ]
       }
-    ]
+    } ]
   }
 }

@@ -1,59 +1,47 @@
 {
-  "type": "OPPHØR_TILSYN_BARN",
-  "vedtaksperioder" : [],
-  "årsaker": [
-    "ENDRING_AKTIVITET"
-  ],
   "begrunnelse": "En begrunnelse",
-  "beregningsplan" : {
-    "omfang" : "FRA_DATO",
-    "fraDato" : "2024-01-01"
+  "beregningsplan": {
+    "fraDato": "2024-01-01",
+    "omfang": "FRA_DATO"
   },
   "beregningsresultat": {
-    "perioder": [
-      {
-        "dagsats": 10.11,
-        "månedsbeløp": 1000,
-        "grunnlag": {
-          "måned": "2024-01",
-          "makssats": 200,
-          "vedtaksperiodeGrunnlag": [
-            {
-              "vedtaksperiode": {
-                "fom": "2024-01-01",
-                "tom": "2024-01-02",
-                "målgruppe": "NEDSATT_ARBEIDSEVNE",
-                "aktivitet": "TILTAK"
-              },
-              "aktiviteter": [
-                {
-                  "id": "5cac3675-f862-4302-94ea-4b9a3c453079",
-                  "type": "TILTAK",
-                  "fom": "2024-01-01",
-                  "tom": "2024-01-02",
-                  "aktivitetsdager": 3
-                }
-              ],
-              "antallDager": 2
-            }
-          ],
-          "utgifter": [
-            {
-              "barnId": "0ac59506-1685-40df-a004-ba176ee35edb",
-              "utgift": 3000
-            }
-          ],
-          "utgifterTotal": 3000,
-          "antallBarn": 1
-        },
-        "beløpsperioder": [
-          {
-            "dato": "2024-01-01",
-            "beløp": 10,
-            "målgruppe": "NEDSATT_ARBEIDSEVNE"
+    "perioder": [ {
+      "beløpsperioder": [ {
+        "beløp": 10,
+        "dato": "2024-01-01",
+        "målgruppe": "NEDSATT_ARBEIDSEVNE"
+      } ],
+      "dagsats": 10.11,
+      "grunnlag": {
+        "antallBarn": 1,
+        "makssats": 200,
+        "måned": "2024-01",
+        "utgifter": [ {
+          "barnId": "0ac59506-1685-40df-a004-ba176ee35edb",
+          "utgift": 3000
+        } ],
+        "utgifterTotal": 3000,
+        "vedtaksperiodeGrunnlag": [ {
+          "aktiviteter": [ {
+            "aktivitetsdager": 3,
+            "fom": "2024-01-01",
+            "id": "5cac3675-f862-4302-94ea-4b9a3c453079",
+            "tom": "2024-01-02",
+            "type": "TILTAK"
+          } ],
+          "antallDager": 2,
+          "vedtaksperiode": {
+            "aktivitet": "TILTAK",
+            "fom": "2024-01-01",
+            "målgruppe": "NEDSATT_ARBEIDSEVNE",
+            "tom": "2024-01-02"
           }
-        ]
-      }
-    ]
-  }
+        } ]
+      },
+      "månedsbeløp": 1000
+    } ]
+  },
+  "type": "OPPHØR_TILSYN_BARN",
+  "vedtaksperioder": [ ],
+  "årsaker": [ "ENDRING_AKTIVITET" ]
 }

@@ -1,36 +1,5 @@
 {
   "data": {
-    "dineOpplysninger": {
-      "fornavn": "FORNUFTIG",
-      "etternavn": "SØNNAVIND",
-      "identitet": {
-        "identitetsnummer": "29500474120"
-      },
-      "adresse": {
-        "gyldigFraOgMed": "2004-10-29",
-        "adresse": "Hestehagen 2",
-        "postnummer": "2069",
-        "bySted": "JESSHEIM",
-        "landkode": "NOR",
-        "land": {
-          "label": "Norge",
-          "value": "NO"
-        }
-      },
-      "reiseFraFolkeregistrertAdr": "ja"
-    },
-    "hovedytelse": {
-      "arbeidsavklaringspenger": false,
-      "overgangsstonad": true,
-      "gjenlevendepensjon": false,
-      "uforetrygd": false,
-      "tiltakspenger": false,
-      "dagpenger": false,
-      "sykepenger": false,
-      "kvalifiseringsstonad": false,
-      "mottarIngenPengestotte": false,
-      "ingenAvAlternativenePasserForMeg": false
-    },
     "aktiviteter": {
       "aktiviteterOgMaalgruppe": {
         "134124111": false,
@@ -39,65 +8,90 @@
       },
       "arbeidsrettetAktivitet": "tiltakArbeidsrettetUtredning",
       "faktiskeUtgifter": {
-        "garDuPaVideregaendeEllerGrunnskole": "videregaendeSkole",
-        "erDuLaerling": "ja",
         "arbeidsgiverDekkerUtgift": "ja",
-        "under25": "ja",
         "betalerForReisenTilSkolenSelv": "ja",
-        "lonnGjennomTiltak": "ja"
+        "erDuLaerling": "ja",
+        "garDuPaVideregaendeEllerGrunnskole": "videregaendeSkole",
+        "lonnGjennomTiltak": "ja",
+        "under25": "ja"
       }
     },
-    "reise": [
-      {
-        "gateadresse": "Osloveien 42",
-        "postnr": "0482",
-        "poststed": "Oslo",
-        "fom": "2025-01-01",
-        "tom": "2025-01-01",
-        "kanDuReiseMedOffentligTransport": "nei",
-        "harDu6KmReisevei": "ja",
-        "hvorMangeDagerIUkenSkalDuMoteOppPaAktivitetstedet": {
-          "label": "4",
-          "value": "4"
+    "dineOpplysninger": {
+      "adresse": {
+        "adresse": "Hestehagen 2",
+        "bySted": "JESSHEIM",
+        "gyldigFraOgMed": "2004-10-29",
+        "land": {
+          "label": "Norge",
+          "value": "NO"
         },
-        "hvorLangErReiseveienDin": 14,
-        "hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport": {
-          "helsemessigeArsaker": false,
-          "darligTransporttilbud": true,
-          "leveringHentingIBarnehageEllerSkolefritidsordningSfoAks": false
-        },
-        "kanKjoreMedEgenBil": "nei",
-        "hvorforIkkeBil": {
-          "helsemessigeArsaker": true,
-          "harIkkeBilEllerForerkort": false,
-          "annet": false
-        },
-        "reiseMedTaxi": "ja",
-        "ttKort": "ja",
-        "skalDuBetaleForReisenSelv": "nei"
-      }
-    ]
+        "landkode": "NOR",
+        "postnummer": "2069"
+      },
+      "etternavn": "SØNNAVIND",
+      "fornavn": "FORNUFTIG",
+      "identitet": {
+        "identitetsnummer": "29500474120"
+      },
+      "reiseFraFolkeregistrertAdr": "ja"
+    },
+    "hovedytelse": {
+      "arbeidsavklaringspenger": false,
+      "dagpenger": false,
+      "gjenlevendepensjon": false,
+      "ingenAvAlternativenePasserForMeg": false,
+      "kvalifiseringsstonad": false,
+      "mottarIngenPengestotte": false,
+      "overgangsstonad": true,
+      "sykepenger": false,
+      "tiltakspenger": false,
+      "uforetrygd": false
+    },
+    "reise": [ {
+      "fom": "2025-01-01",
+      "gateadresse": "Osloveien 42",
+      "harDu6KmReisevei": "ja",
+      "hvaErViktigsteGrunnerTilAtDuIkkeKanBrukeOffentligTransport": {
+        "darligTransporttilbud": true,
+        "helsemessigeArsaker": false,
+        "leveringHentingIBarnehageEllerSkolefritidsordningSfoAks": false
+      },
+      "hvorLangErReiseveienDin": 14,
+      "hvorMangeDagerIUkenSkalDuMoteOppPaAktivitetstedet": {
+        "label": "4",
+        "value": "4"
+      },
+      "hvorforIkkeBil": {
+        "annet": false,
+        "harIkkeBilEllerForerkort": false,
+        "helsemessigeArsaker": true
+      },
+      "kanDuReiseMedOffentligTransport": "nei",
+      "kanKjoreMedEgenBil": "nei",
+      "postnr": "0482",
+      "poststed": "Oslo",
+      "reiseMedTaxi": "ja",
+      "skalDuBetaleForReisenSelv": "nei",
+      "tom": "2025-01-01",
+      "ttKort": "ja"
+    } ]
   },
   "metadata": {
     "dataFetcher": {
       "aktiviteter": {
         "aktiviteterOgMaalgruppe": {
-          "data": [
-            {
-              "value": "134125430",
-              "label": "Høyere utdanning: 10. september 2025 - 30. juni 2026",
-              "type": "TILTAK"
-            },
-            {
-              "value": "134124111",
-              "label": "Arbeidstrening: 16. juni 2025 - 31. juli 2025",
-              "type": "TILTAK"
-            },
-            {
-              "label": "Annet",
-              "value": "annet"
-            }
-          ]
+          "data": [ {
+            "label": "Høyere utdanning: 10. september 2025 - 30. juni 2026",
+            "type": "TILTAK",
+            "value": "134125430"
+          }, {
+            "label": "Arbeidstrening: 16. juni 2025 - 31. juli 2025",
+            "type": "TILTAK",
+            "value": "134124111"
+          }, {
+            "label": "Annet",
+            "value": "annet"
+          } ]
         }
       }
     }
