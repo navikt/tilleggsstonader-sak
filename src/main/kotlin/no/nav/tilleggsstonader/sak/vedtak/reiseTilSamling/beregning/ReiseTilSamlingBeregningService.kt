@@ -200,7 +200,6 @@ fun validerUtgifter(
         "Det er ikke lagt inn noen oppfylte utgiftsperioder"
     }
 
-
     val ikkePositivUtgift =
         utgifter
             .mapNotNull {
