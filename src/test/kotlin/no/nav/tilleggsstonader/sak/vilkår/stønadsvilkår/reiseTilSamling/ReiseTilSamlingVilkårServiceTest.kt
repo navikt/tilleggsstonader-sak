@@ -64,6 +64,7 @@ class ReiseTilSamlingVilkårServiceTest {
                         reiseId = it.reiseId,
                         adresse = it.adresse,
                         utgifterOffentligTransport = it.utgifterOffentligTransport,
+                        begrunnelse = it.begrunnelse,
                         aktivitetId = it.aktivitetId,
                     )
                 },
@@ -149,6 +150,7 @@ class ReiseTilSamlingVilkårServiceTest {
                         reiseId = dummyReiseId,
                         adresse = "Samlingsveien 1",
                         utgifterOffentligTransport = 500.toBigDecimal(),
+                        begrunnelse = "Togbillett mellom bosted og samling",
                         aktivitetId = aktivitetId,
                     ),
             )
@@ -175,6 +177,7 @@ class ReiseTilSamlingVilkårServiceTest {
                         reiseId = dummyReiseId,
                         adresse = "Samlingsveien 1",
                         utgifterOffentligTransport = 500.toBigDecimal(),
+                        begrunnelse = "Togbillett mellom bosted og samling",
                         aktivitetId = null,
                     ),
             )
@@ -203,6 +206,7 @@ class ReiseTilSamlingVilkårServiceTest {
                         reiseId = dummyReiseId,
                         adresse = "Samlingsveien 1",
                         utgifterOffentligTransport = 500.toBigDecimal(),
+                        begrunnelse = "Togbillett mellom bosted og samling",
                         aktivitetId = null,
                     ),
             )
@@ -234,6 +238,7 @@ class ReiseTilSamlingVilkårServiceTest {
                             reiseId = it.reiseId,
                             adresse = it.adresse,
                             reiseavstand = it.reiseavstand,
+                            begrunnelse = it.begrunnelse,
                             aktivitetId = it.aktivitetId,
                         )
                     },
@@ -268,6 +273,7 @@ class ReiseTilSamlingVilkårServiceTest {
                             reiseId = it.reiseId,
                             adresse = it.adresse,
                             reiseavstand = it.reiseavstand,
+                            begrunnelse = it.begrunnelse,
                             aktivitetId = it.aktivitetId,
                         )
                     },
@@ -305,6 +311,7 @@ class ReiseTilSamlingVilkårServiceTest {
                             reiseId = it.reiseId,
                             adresse = it.adresse,
                             reiseavstand = it.reiseavstand,
+                            begrunnelse = it.begrunnelse,
                             aktivitetId = it.aktivitetId,
                         )
                     },
@@ -343,6 +350,7 @@ class ReiseTilSamlingVilkårServiceTest {
                         reiseId = dummyReiseId,
                         adresse = "Samlingsveien 1",
                         reiseavstand = 40.toBigDecimal(),
+                        begrunnelse = "Drivstoff og slitasje",
                         aktivitetId = aktivitetId,
                     ),
             )
@@ -363,6 +371,7 @@ class ReiseTilSamlingVilkårServiceTest {
                     reiseId = dummyReiseId,
                     adresse = "Samlingsveien 1",
                     reiseavstand = 20.toBigDecimal(),
+                    begrunnelse = "Drivstoff og slitasje",
                     aktivitetId = null,
                 )
             }.withMessage("Reiseavstand kan ikke være mindre enn 30 km")

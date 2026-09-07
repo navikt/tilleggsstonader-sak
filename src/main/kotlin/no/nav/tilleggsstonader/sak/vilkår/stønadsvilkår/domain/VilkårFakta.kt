@@ -45,6 +45,7 @@ data class FaktaReiseTilSamlingOffentligTransport(
     override val reiseId: ReiseId,
     override val adresse: String?,
     val utgifterOffentligTransport: BigDecimal,
+    val begrunnelse: String,
     val aktivitetId: VilkårperiodeGlobalId? = null,
 ) : VilkårFakta
 
@@ -52,6 +53,7 @@ data class FaktaReiseTilSamlingPrivatBil(
     override val reiseId: ReiseId,
     override val adresse: String?,
     val reiseavstand: BigDecimal,
+    val begrunnelse: String,
     val aktivitetId: VilkårperiodeGlobalId? = null,
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,
