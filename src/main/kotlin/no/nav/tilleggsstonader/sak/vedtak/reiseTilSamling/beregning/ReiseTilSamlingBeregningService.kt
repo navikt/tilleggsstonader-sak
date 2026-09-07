@@ -200,9 +200,6 @@ fun validerUtgifter(
         "Det er ikke lagt inn noen oppfylte utgiftsperioder"
     }
 
-    feilHvis(utgifter.overlapper()) {
-        "Utgiftsperioder overlapper"
-    }
 
     val ikkePositivUtgift =
         utgifter

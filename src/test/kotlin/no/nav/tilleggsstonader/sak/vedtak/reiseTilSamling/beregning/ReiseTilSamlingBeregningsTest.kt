@@ -233,6 +233,51 @@ class ReiseTilSamlingBeregningsTest {
     }
 
     @Test
+    fun `skal ikke kaste feil hvis 2 reiser overlapper i tid`() {
+        every { vilkårService.hentOppfylteReiseTilSamlingVilkår(behandling.id) } returns
+            listOf(
+                vilkår(
+                    behandlingId = behandling.id,
+                    type = VilkårType.REISE_TIL_SAMLING,
+                    resultat = Vilkårsresultat.OPPFYLT,
+                    status = VilkårStatus.NY,
+                    fom = 1 januar 2025,
+                    tom = 31 januar 2025,
+                    fakta =
+                        FaktaReiseTilSamlingOffentligTransport(
+                            reiseId = dummyReiseId,
+                            adresse = "Samlingsgata 1",
+                            utgifterOffentligTransport = 300.toBigDecimal(),
+                        ),
+                ),
+                vilkår(
+                    behandlingId = behandling.id,
+                    type = VilkårType.REISE_TIL_SAMLING,
+                    resultat = Vilkårsresultat.OPPFYLT,
+                    status = VilkårStatus.NY,
+                    fom = 1 januar 2025,
+                    tom = 31 januar 2025,
+                    fakta =
+                        FaktaReiseTilSamlingOffentligTransport(
+                            reiseId = dummyReiseId,
+                            adresse = "Samlingsgata 1",
+                            utgifterOffentligTransport = 100.toBigDecimal(),
+                        ),
+                ),
+            )
+
+        val result =
+            beregningService.beregn(
+                behandling,
+                vedtaksperioder,
+                TypeVedtak.INNVILGELSE,
+                beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+            )
+
+        assertThat(result.offentligTransport).hasSize(2)
+    }
+
+    @Test
     fun `kaster brukerfeil hvis ingen oppfylte vilkår`() {
         every { vilkårService.hentOppfylteReiseTilSamlingVilkår(behandling.id) } returns emptyList()
 
