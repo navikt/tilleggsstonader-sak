@@ -3,10 +3,12 @@ package no.nav.tilleggsstonader.sak.utbetaling.simulering
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.utbetaling.UtbetalingFagområde
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Periode
+import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.Postering
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.kontrakt.PosteringType
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import org.slf4j.LoggerFactory
 import java.time.YearMonth
+import kotlin.collections.component1
 
 /**
  * Brukes til å finne ut hvor mye av beløpet i en periode fra simuleringen som tilhører andre
@@ -33,20 +35,24 @@ object PosteringStønadstypeMapper {
         perioder
             .flatMap { it.posteringer }
             .filter { it.type == PosteringType.YTELSE }
-            .mapNotNull { postering ->
-                val stønadstype = finnStønadstype(postering.klassekode) ?: return@mapNotNull null
-                if (stønadstype == egenStønadstype) {
-                    null
-                } else {
-                    Triple(YearMonth.from(postering.fom), stønadstype, postering.beløp)
-                }
-            }.groupBy({ it.first }, { it.second to it.third })
-            .mapValues { (_, verdier) ->
-                verdier
-                    .groupBy({ it.first }, { it.second })
-                    .mapValues { (_, beløp) -> beløp.sum() }
-                    .filterValues { it != 0 }
-            }.filterValues { it.isNotEmpty() }
+            .grupperPåMånedMedStønadstypeOgBeløp(egenStønadstype)
+            .mapValues { (_, verdier) -> verdier.summerPåStønadstype() }
+            .filterValues { it.isNotEmpty() }
+
+    private fun Collection<Postering>.grupperPåMånedMedStønadstypeOgBeløp(egenStønadstype: Stønadstype) =
+        mapNotNull { postering ->
+            val stønadstype = finnStønadstype(postering.klassekode) ?: return@mapNotNull null
+            if (stønadstype == egenStønadstype) {
+                null
+            } else {
+                Triple(YearMonth.from(postering.fom), stønadstype, postering.beløp)
+            }
+        }.groupBy({ it.first }, { it.second to it.third })
+
+    private fun List<Pair<Stønadstype, Int>>.summerPåStønadstype() =
+        groupBy({ it.first }, { it.second })
+            .mapValues { (_, beløp) -> beløp.sum() }
+            .filterValues { it != 0 }
 
     /**
      * Grupperer posteringer per måned med en klassekode vi ikke klarer å mappe til en
@@ -63,14 +69,18 @@ object PosteringStønadstypeMapper {
             .flatMap { it.posteringer }
             .filter { it.type == PosteringType.YTELSE }
             .filter { finnStønadstype(it.klassekode) == null }
-            .map { postering -> Triple(YearMonth.from(postering.fom), postering.fagområde, postering.beløp) }
+            .grupperPåMånedMedFagområdeOgBeløp()
+            .mapValues { (_, verdier) -> verdier.summerPåFagområde() }
+            .filterValues { it.isNotEmpty() }
+
+    private fun Collection<Postering>.grupperPåMånedMedFagområdeOgBeløp() =
+        map { postering -> Triple(YearMonth.from(postering.fom), postering.fagområde, postering.beløp) }
             .groupBy({ it.first }, { it.second to it.third })
-            .mapValues { (_, verdier) ->
-                verdier
-                    .groupBy({ it.first }, { it.second })
-                    .mapValues { (_, beløp) -> beløp.sum() }
-                    .filterValues { it != 0 }
-            }.filterValues { it.isNotEmpty() }
+
+    private fun List<Pair<UtbetalingFagområde, Int>>.summerPåFagområde() =
+        groupBy({ it.first }, { it.second })
+            .mapValues { (_, beløp) -> beløp.sum() }
+            .filterValues { it != 0 }
 
     private fun finnStønadstype(klassekode: String): Stønadstype? {
         val typeAndel = klassekodeTilTypeAndel[klassekode]
