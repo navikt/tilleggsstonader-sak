@@ -1,135 +1,135 @@
 {
-  "behandling" : {
-    "behandlingId" : "001464ca-20dc-4f6c-b3e8-c83bd98b3e31",
-    "eksternFagsakId" : 1673,
-    "stønadstype" : "LÆREMIDLER",
-    "årsak" : "SØKNAD",
-    "ident" : "123456789012",
-    "opprettetTidspunkt" : "2024-02-05T00:00:00",
-    "resultat" : "INNVILGET",
-    "vedtakstidspunkt" : "2024-01-01T00:00:00",
-    "saksbehandler" : "saksbehandler",
-    "beslutter" : "saksbeh2"
-  },
-  "søknad" : {
-    "mottattTidspunkt" : "2023-01-01T00:00:00"
-  },
-  "målgrupper" : [ {
-    "type" : "AAP",
-    "fom" : "2024-02-05",
-    "tom" : "2024-02-10",
-    "faktaOgVurderinger" : {
-      "@type" : "MÅLGRUPPE_LÆREMIDLER",
-      "medlemskap" : {
-        "svar" : "JA_IMPLISITT",
-        "resultat" : "OPPFYLT"
+  "aktiviteter": [ {
+    "begrunnelse": null,
+    "faktaOgVurderinger": {
+      "@type": "AKTIVITET_LÆREMIDLER",
+      "harRettTilUtstyrsstipend": {
+        "resultat": "OPPFYLT",
+        "svar": "NEI"
       },
-      "utgifterDekketAvAnnetRegelverk" : {
-        "svar" : "NEI",
-        "resultat" : "OPPFYLT"
+      "harUtgifter": {
+        "resultat": "OPPFYLT",
+        "svar": "JA"
       },
-      "aldersvilkår" : {
-        "svar" : "JA",
-        "resultat" : "OPPFYLT"
-      }
+      "prosent": 80,
+      "studienivå": "HØYERE_UTDANNING"
     },
-    "kilde" : "MANUELL",
-    "resultat" : "OPPFYLT",
-    "begrunnelse" : "målgruppe aap",
-    "slettetKommentar" : null,
-    "tiltaksvariant" : null
+    "fom": "2024-12-10",
+    "kilde": "MANUELL",
+    "resultat": "OPPFYLT",
+    "slettetKommentar": null,
+    "tiltaksvariant": null,
+    "tom": "2024-12-15",
+    "type": "TILTAK"
   }, {
-    "type" : "OVERGANGSSTØNAD",
-    "fom" : "2024-02-05",
-    "tom" : "2024-02-10",
-    "faktaOgVurderinger" : {
-      "@type" : "MÅLGRUPPE_LÆREMIDLER",
-      "medlemskap" : {
-        "svar" : "JA_IMPLISITT",
-        "resultat" : "OPPFYLT"
+    "begrunnelse": null,
+    "faktaOgVurderinger": {
+      "@type": "AKTIVITET_LÆREMIDLER",
+      "harRettTilUtstyrsstipend": {
+        "resultat": "IKKE_OPPFYLT",
+        "svar": "JA"
       },
-      "utgifterDekketAvAnnetRegelverk" : null,
-      "aldersvilkår" : null
-    },
-    "kilde" : "MANUELL",
-    "resultat" : "OPPFYLT",
-    "begrunnelse" : "målgruppe os",
-    "slettetKommentar" : null,
-    "tiltaksvariant" : null
-  } ],
-  "aktiviteter" : [ {
-    "type" : "TILTAK",
-    "fom" : "2024-12-10",
-    "tom" : "2024-12-15",
-    "faktaOgVurderinger" : {
-      "@type" : "AKTIVITET_LÆREMIDLER",
-      "prosent" : 80,
-      "studienivå" : "HØYERE_UTDANNING",
-      "harUtgifter" : {
-        "svar" : "JA",
-        "resultat" : "OPPFYLT"
+      "harUtgifter": {
+        "resultat": "OPPFYLT",
+        "svar": "JA"
       },
-      "harRettTilUtstyrsstipend" : {
-        "svar" : "NEI",
-        "resultat" : "OPPFYLT"
-      }
+      "prosent": 80,
+      "studienivå": "VIDEREGÅENDE"
     },
-    "kilde" : "MANUELL",
-    "resultat" : "OPPFYLT",
-    "begrunnelse" : null,
-    "slettetKommentar" : null,
-    "tiltaksvariant" : null
-  }, {
-    "type" : "UTDANNING",
-    "fom" : "2024-12-10",
-    "tom" : "2024-12-15",
-    "faktaOgVurderinger" : {
-      "@type" : "AKTIVITET_LÆREMIDLER",
-      "prosent" : 80,
-      "studienivå" : "VIDEREGÅENDE",
-      "harUtgifter" : {
-        "svar" : "JA",
-        "resultat" : "OPPFYLT"
-      },
-      "harRettTilUtstyrsstipend" : {
-        "svar" : "JA",
-        "resultat" : "IKKE_OPPFYLT"
-      }
-    },
-    "kilde" : "MANUELL",
-    "resultat" : "IKKE_OPPFYLT",
-    "begrunnelse" : null,
-    "slettetKommentar" : null,
-    "tiltaksvariant" : null
+    "fom": "2024-12-10",
+    "kilde": "MANUELL",
+    "resultat": "IKKE_OPPFYLT",
+    "slettetKommentar": null,
+    "tiltaksvariant": null,
+    "tom": "2024-12-15",
+    "type": "UTDANNING"
   } ],
-  "vedtaksperioder" : [ {
-    "fom" : "2024-01-01",
-    "tom" : "2024-03-31",
-    "målgruppe" : "NEDSATT_ARBEIDSEVNE",
-    "aktivitet" : "TILTAK"
-  } ],
-  "vilkår" : [ ],
-  "vedtak" : {
-    "innvilgelseBegrunnelse" : "Sånn her vil en begrunnelse se ut",
-    "type" : "INNVILGELSE"
+  "behandling": {
+    "behandlingId": "001464ca-20dc-4f6c-b3e8-c83bd98b3e31",
+    "beslutter": "saksbeh2",
+    "eksternFagsakId": 1673,
+    "ident": "123456789012",
+    "opprettetTidspunkt": "2024-02-05T00:00:00",
+    "resultat": "INNVILGET",
+    "saksbehandler": "saksbehandler",
+    "stønadstype": "LÆREMIDLER",
+    "vedtakstidspunkt": "2024-01-01T00:00:00",
+    "årsak": "SØKNAD"
   },
-  "beregningsresultat" : {
-    "tilsynBarn" : null,
-    "læremidler" : [ {
-      "fom" : "2024-01-01",
-      "tom" : "2024-02-29",
-      "antallMåneder" : 2,
-      "studienivå" : "HØYERE_UTDANNING",
-      "studieprosent" : 100,
-      "stønadsbeløpPerMåned" : 951,
-      "stønadsbeløpForPeriode" : 1902,
-      "utbetalingsdato" : "2024-01-01",
-      "målgruppe" : "NEDSATT_ARBEIDSEVNE",
-      "aktivitet" : "TILTAK",
-      "delAvTidligereUtbetaling" : false
+  "beregningsresultat": {
+    "boutgifter": null,
+    "dagligReise": null,
+    "læremidler": [ {
+      "aktivitet": "TILTAK",
+      "antallMåneder": 2,
+      "delAvTidligereUtbetaling": false,
+      "fom": "2024-01-01",
+      "målgruppe": "NEDSATT_ARBEIDSEVNE",
+      "studienivå": "HØYERE_UTDANNING",
+      "studieprosent": 100,
+      "stønadsbeløpForPeriode": 1902,
+      "stønadsbeløpPerMåned": 951,
+      "tom": "2024-02-29",
+      "utbetalingsdato": "2024-01-01"
     } ],
-    "boutgifter" : null,
-    "dagligReise" : null
+    "tilsynBarn": null
   },
-  "rammevedtakPrivatBil" : null
+  "målgrupper": [ {
+    "begrunnelse": "målgruppe aap",
+    "faktaOgVurderinger": {
+      "@type": "MÅLGRUPPE_LÆREMIDLER",
+      "aldersvilkår": {
+        "resultat": "OPPFYLT",
+        "svar": "JA"
+      },
+      "medlemskap": {
+        "resultat": "OPPFYLT",
+        "svar": "JA_IMPLISITT"
+      },
+      "utgifterDekketAvAnnetRegelverk": {
+        "resultat": "OPPFYLT",
+        "svar": "NEI"
+      }
+    },
+    "fom": "2024-02-05",
+    "kilde": "MANUELL",
+    "resultat": "OPPFYLT",
+    "slettetKommentar": null,
+    "tiltaksvariant": null,
+    "tom": "2024-02-10",
+    "type": "AAP"
+  }, {
+    "begrunnelse": "målgruppe os",
+    "faktaOgVurderinger": {
+      "@type": "MÅLGRUPPE_LÆREMIDLER",
+      "aldersvilkår": null,
+      "medlemskap": {
+        "resultat": "OPPFYLT",
+        "svar": "JA_IMPLISITT"
+      },
+      "utgifterDekketAvAnnetRegelverk": null
+    },
+    "fom": "2024-02-05",
+    "kilde": "MANUELL",
+    "resultat": "OPPFYLT",
+    "slettetKommentar": null,
+    "tiltaksvariant": null,
+    "tom": "2024-02-10",
+    "type": "OVERGANGSSTØNAD"
+  } ],
+  "rammevedtakPrivatBil": null,
+  "søknad": {
+    "mottattTidspunkt": "2023-01-01T00:00:00"
+  },
+  "vedtak": {
+    "innvilgelseBegrunnelse": "Sånn her vil en begrunnelse se ut",
+    "type": "INNVILGELSE"
+  },
+  "vedtaksperioder": [ {
+    "aktivitet": "TILTAK",
+    "fom": "2024-01-01",
+    "målgruppe": "NEDSATT_ARBEIDSEVNE",
+    "tom": "2024-03-31"
+  } ],
+  "vilkår": [ ]
 }

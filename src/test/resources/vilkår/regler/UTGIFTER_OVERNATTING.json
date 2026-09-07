@@ -1,66 +1,66 @@
 {
   "regler": {
     "DOKUMENTERT_DELTAKELSE": {
-      "regelId": "DOKUMENTERT_DELTAKELSE",
       "erHovedregel": true,
+      "regelId": "DOKUMENTERT_DELTAKELSE",
       "svarMapping": {
         "JA": {
           "begrunnelseType": "VALGFRI",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
         },
         "NEI": {
           "begrunnelseType": "PÅKREVD",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
         }
       }
     },
     "DOKUMENTERT_UTGIFTER_OVERNATTING": {
-      "regelId": "DOKUMENTERT_UTGIFTER_OVERNATTING",
       "erHovedregel": true,
+      "regelId": "DOKUMENTERT_UTGIFTER_OVERNATTING",
       "svarMapping": {
         "JA": {
           "begrunnelseType": "VALGFRI",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
         },
         "NEI": {
           "begrunnelseType": "PÅKREVD",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
-        }
-      }
-    },
-    "NØDVENDIGE_MERUTGIFTER": {
-      "regelId": "NØDVENDIGE_MERUTGIFTER",
-      "erHovedregel": true,
-      "svarMapping": {
-        "JA": {
-          "begrunnelseType": "PÅKREVD",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
-        },
-        "NEI": {
-          "begrunnelseType": "PÅKREVD",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
         }
       }
     },
     "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER": {
-      "regelId": "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER",
       "erHovedregel": true,
+      "regelId": "HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER",
       "svarMapping": {
         "JA": {
           "begrunnelseType": "PÅKREVD",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
         },
         "NEI": {
           "begrunnelseType": "VALGFRI",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
+        }
+      }
+    },
+    "NØDVENDIGE_MERUTGIFTER": {
+      "erHovedregel": true,
+      "regelId": "NØDVENDIGE_MERUTGIFTER",
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
+        },
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
         }
       }
     }

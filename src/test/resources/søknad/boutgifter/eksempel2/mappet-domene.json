@@ -1,39 +1,39 @@
 {
-  "personopplysninger" : {
-    "adresse" : {
-      "gyldigFraOgMed" : "2004-10-29",
-      "adresse" : "Hestehagen 2",
-      "postnummer" : null,
-      "poststed" : "JESSHEIM",
-      "landkode" : "Land1"
-    }
-  },
-  "hovedytelse" : {
-    "hovedytelse" : [ "AAP" ],
-    "harNedsattArbeidsevne" : null,
-    "arbeidOgOpphold" : null
-  },
-  "aktivitet" : {
-    "aktiviteter" : [ {
-      "id" : "ANNET",
-      "label" : "Jeg får ikke opp noen aktiviteter her som stemmer med det jeg vil søke om"
+  "aktivitet": {
+    "aktiviteter": [ {
+      "id": "ANNET",
+      "label": "Jeg får ikke opp noen aktiviteter her som stemmer med det jeg vil søke om"
     } ],
-    "annenAktivitet" : null,
-    "lønnetAktivitet" : null
+    "annenAktivitet": null,
+    "lønnetAktivitet": null
   },
-  "boutgifter" : {
-    "typeUtgifter" : "SAMLING",
-    "fasteUtgifter" : null,
-    "samling" : {
-      "periodeForSamling" : [ {
-        "fom" : "2025-03-05",
-        "tom" : "2025-03-14",
-        "trengteEkstraOvernatting" : "JA",
-        "utgifterTilOvernatting" : 3000
+  "boutgifter": {
+    "fasteUtgifter": null,
+    "harSærligStoreUtgifterPgaFunksjonsnedsettelse": "NEI",
+    "samling": {
+      "periodeForSamling": [ {
+        "fom": "2025-03-05",
+        "tom": "2025-03-14",
+        "trengteEkstraOvernatting": "JA",
+        "utgifterTilOvernatting": 3000
       } ]
     },
-    "harSærligStoreUtgifterPgaFunksjonsnedsettelse" : "NEI"
+    "typeUtgifter": "SAMLING"
   },
-  "dokumentasjon" : [ ],
-  "harNedsattArbeidsevne" : null
+  "dokumentasjon": [ ],
+  "harNedsattArbeidsevne": null,
+  "hovedytelse": {
+    "arbeidOgOpphold": null,
+    "harNedsattArbeidsevne": null,
+    "hovedytelse": [ "AAP" ]
+  },
+  "personopplysninger": {
+    "adresse": {
+      "adresse": "Hestehagen 2",
+      "gyldigFraOgMed": "2004-10-29",
+      "landkode": "Land1",
+      "postnummer": null,
+      "poststed": "JESSHEIM"
+    }
+  }
 }

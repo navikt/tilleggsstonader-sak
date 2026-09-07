@@ -1,6 +1,6 @@
 {
+  "fakta": { },
   "type": "NEDSATT_ARBEIDSEVNE_REISE_TIL_SAMLING_TSO",
-  "fakta": {},
   "vurderinger": {
     "aldersvilkår": {
       "resultat": "OPPFYLT",
@@ -10,12 +10,12 @@
       }
     },
     "dekketAvAnnetRegelverk": {
-      "svar": "NEI",
-      "resultat": "OPPFYLT"
+      "resultat": "OPPFYLT",
+      "svar": "NEI"
     },
     "medlemskap": {
-      "svar": "JA",
-      "resultat": "OPPFYLT"
+      "resultat": "OPPFYLT",
+      "svar": "JA"
     },
     "mottarSykepengerForFulltidsstilling": {
       "resultat": "OPPFYLT",

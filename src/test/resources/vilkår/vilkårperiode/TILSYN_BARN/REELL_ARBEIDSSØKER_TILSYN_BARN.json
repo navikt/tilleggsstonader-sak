@@ -1,8 +1,7 @@
 {
-  "type": "REELL_ARBEIDSSØKER_TILSYN_BARN",
   "fakta": {
     "aktivitetsdager": 3
   },
-  "vurderinger": {
-  }
+  "type": "REELL_ARBEIDSSØKER_TILSYN_BARN",
+  "vurderinger": { }
 }

@@ -1,69 +1,58 @@
 {
   "data": {
-    "personBolk": [
-      {
-        "ident": "11111122222",
-        "code": "ok",
-        "person": {
-          "adressebeskyttelse": [
-            {
-              "gradering": "STRENGT_FORTROLIG",
-              "metadata": {
-                "historisk": true
-              }
-            },
-            {
-              "gradering": "UGRADERT",
-              "metadata": {
-                "historisk": false
-              }
-            }
-          ],
-          "bostedsadresse": [
-            {
-              "metadata": {
-                "historisk": false
-              },
-              "angittFlyttedato": null,
-              "gyldigFraOgMed": "1966-11-18",
-              "gyldigTilOgMed": null,
-              "coAdressenavn": null,
-              "vegadresse": {
-                "husnummer": "77",
-                "husbokstav": null,
-                "bruksenhetsnummer": null,
-                "adressenavn": "INNGJERDSVEGEN",
-                "kommunenummer": "0301",
-                "tilleggsnavn": null,
-                "postnummer": "0862"
-              },
-              "ukjentBosted": null
-            }
-          ],
-          "deltBosted": [],
-          "doedsfall": [],
-          "forelderBarnRelasjon": [],
-          "foedselsdato": [
-            {
-              "foedselsaar": null,
-              "foedselsdato": "1966-11-18",
-              "metadata": {
-                "historisk": false
-              }
-            }
-          ],
-          "navn": [
-            {
-              "fornavn": "BRÅKETE",
-              "mellomnavn": null,
-              "etternavn": "KAMELEON",
-              "metadata": {
-                "historisk": false
-              }
-            }
-          ]
-        }
+    "personBolk": [ {
+      "code": "ok",
+      "ident": "11111122222",
+      "person": {
+        "adressebeskyttelse": [ {
+          "gradering": "STRENGT_FORTROLIG",
+          "metadata": {
+            "historisk": true
+          }
+        }, {
+          "gradering": "UGRADERT",
+          "metadata": {
+            "historisk": false
+          }
+        } ],
+        "bostedsadresse": [ {
+          "angittFlyttedato": null,
+          "coAdressenavn": null,
+          "gyldigFraOgMed": "1966-11-18",
+          "gyldigTilOgMed": null,
+          "metadata": {
+            "historisk": false
+          },
+          "ukjentBosted": null,
+          "vegadresse": {
+            "adressenavn": "INNGJERDSVEGEN",
+            "bruksenhetsnummer": null,
+            "husbokstav": null,
+            "husnummer": "77",
+            "kommunenummer": "0301",
+            "postnummer": "0862",
+            "tilleggsnavn": null
+          }
+        } ],
+        "deltBosted": [ ],
+        "doedsfall": [ ],
+        "foedselsdato": [ {
+          "foedselsaar": null,
+          "foedselsdato": "1966-11-18",
+          "metadata": {
+            "historisk": false
+          }
+        } ],
+        "forelderBarnRelasjon": [ ],
+        "navn": [ {
+          "etternavn": "KAMELEON",
+          "fornavn": "BRÅKETE",
+          "mellomnavn": null,
+          "metadata": {
+            "historisk": false
+          }
+        } ]
       }
-    ]
+    } ]
   }
 }

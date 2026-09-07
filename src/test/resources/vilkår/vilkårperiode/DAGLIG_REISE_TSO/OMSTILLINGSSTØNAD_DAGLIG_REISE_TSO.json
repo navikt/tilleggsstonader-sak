@@ -1,6 +1,6 @@
 {
+  "fakta": { },
   "type": "OMSTILLINGSSTØNAD_DAGLIG_REISE_TSO",
-  "fakta": {},
   "vurderinger": {
     "aldersvilkår": {
       "resultat": "OPPFYLT",
@@ -10,8 +10,8 @@
       }
     },
     "medlemskap": {
-      "svar": "JA",
-      "resultat": "OPPFYLT"
+      "resultat": "OPPFYLT",
+      "svar": "JA"
     }
   }
 }

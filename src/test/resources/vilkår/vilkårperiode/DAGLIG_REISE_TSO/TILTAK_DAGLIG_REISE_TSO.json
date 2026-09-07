@@ -1,16 +1,16 @@
 {
-  "type": "TILTAK_DAGLIG_REISE_TSO",
   "fakta": {
     "aktivitetsdager": 3
   },
+  "type": "TILTAK_DAGLIG_REISE_TSO",
   "vurderinger": {
-    "lønnet": {
-      "svar": "NEI",
-      "resultat": "OPPFYLT"
-    },
     "harUtgifter": {
-      "svar": "JA",
-      "resultat": "OPPFYLT"
+      "resultat": "OPPFYLT",
+      "svar": "JA"
+    },
+    "lønnet": {
+      "resultat": "OPPFYLT",
+      "svar": "NEI"
     }
   }
 }

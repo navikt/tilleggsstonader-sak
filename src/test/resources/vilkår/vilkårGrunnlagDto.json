@@ -1,81 +1,81 @@
 {
-  "@type" : "BARNETILSYN",
-  "søknadMottattTidspunkt" : "2023-01-01T00:00:00",
-  "hovedytelse" : {
-    "søknadsgrunnlag" : {
-      "hovedytelse" : [ "AAP" ],
-      "arbeidOgOpphold" : {
-        "jobberIAnnetLand" : "JA",
-        "jobbAnnetLand" : "Sverige",
-        "harPengestøtteAnnetLand" : [ "SYKEPENGER" ],
-        "pengestøtteAnnetLand" : "Finland",
-        "harOppholdUtenforNorgeSiste12mnd" : "JA",
-        "oppholdUtenforNorgeSiste12mnd" : [ {
-          "land" : "Sverige",
-          "årsak" : [ "JOBB" ],
-          "fom" : "2024-01-01",
-          "tom" : "2024-01-01"
-        } ],
-        "harOppholdUtenforNorgeNeste12mnd" : "JA",
-        "oppholdUtenforNorgeNeste12mnd" : [ {
-          "land" : "Sverige",
-          "årsak" : [ "JOBB" ],
-          "fom" : "2024-01-01",
-          "tom" : "2024-01-01"
-        } ]
-      },
-      "harNedsattArbeidsevne" : null
+  "@type": "BARNETILSYN",
+  "aktivitet": {
+    "søknadsgrunnlag": {
+      "aktiviteter": [ ],
+      "annenAktivitet": "TILTAK",
+      "dekkesUtgiftenAvAndre": null,
+      "lønnetAktivitet": "NEI"
     }
   },
-  "dokumentasjon" : {
-    "journalpostId" : "testId",
-    "dokumentasjon" : [ {
-      "type" : "Dokumentasjon av utgifter til privat pass",
-      "dokumenter" : [ {
-        "dokumentInfoId" : "688ad1dc-e35e-4ab8-a534-17c6e691463f"
-      } ]
-    } ]
+  "arena": {
+    "vedtakTom": "2024-01-01"
   },
-  "arena" : {
-    "vedtakTom" : "2024-01-01"
-  },
-  "aktivitet" : {
-    "søknadsgrunnlag" : {
-      "aktiviteter" : [ ],
-      "annenAktivitet" : "TILTAK",
-      "lønnetAktivitet" : "NEI",
-      "dekkesUtgiftenAvAndre" : null
-    }
-  },
-  "barn" : [ {
-    "ident" : "1",
-    "barnId" : "60921c76-f8ef-4000-9824-f127a50a575e",
-    "registergrunnlag" : {
-      "navn" : "Fornavn mellomnavn Etternavn",
-      "fødselsdato" : "2024-06-04",
-      "alder" : 0,
-      "dødsdato" : null,
-      "saksinformasjonAndreForeldre" : {
-        "hentetTidspunkt" : "2025-01-02T00:00:00",
-        "harBehandlingUnderArbeid" : true,
-        "vedtaksperioderBarn" : [ {
-          "fom" : "2025-01-01",
-          "tom" : "2025-01-31"
+  "barn": [ {
+    "barnId": "60921c76-f8ef-4000-9824-f127a50a575e",
+    "ident": "1",
+    "registergrunnlag": {
+      "alder": 0,
+      "dødsdato": null,
+      "fødselsdato": "2024-06-04",
+      "navn": "Fornavn mellomnavn Etternavn",
+      "saksinformasjonAndreForeldre": {
+        "harBehandlingUnderArbeid": true,
+        "hentetTidspunkt": "2025-01-02T00:00:00",
+        "vedtaksperioderBarn": [ {
+          "fom": "2025-01-01",
+          "tom": "2025-01-31"
         } ]
       }
     },
-    "søknadgrunnlag" : {
-      "type" : "BARNEHAGE_SFO_AKS",
-      "startetIFemte" : "JA",
-      "utgifter" : {
-        "harUtgifterTilPassHelePerioden" : "NEI",
-        "fom" : "2025-01-01",
-        "tom" : "2025-05-31"
+    "søknadgrunnlag": {
+      "startetIFemte": "JA",
+      "type": "BARNEHAGE_SFO_AKS",
+      "utgifter": {
+        "fom": "2025-01-01",
+        "harUtgifterTilPassHelePerioden": "NEI",
+        "tom": "2025-05-31"
       },
-      "årsak" : "MYE_BORTE_ELLER_UVANLIG_ARBEIDSTID"
+      "årsak": "MYE_BORTE_ELLER_UVANLIG_ARBEIDSTID"
     },
-    "vilkårFakta" : {
-      "harFullførtFjerdetrinn" : null
+    "vilkårFakta": {
+      "harFullførtFjerdetrinn": null
     }
-  } ]
+  } ],
+  "dokumentasjon": {
+    "dokumentasjon": [ {
+      "dokumenter": [ {
+        "dokumentInfoId": "688ad1dc-e35e-4ab8-a534-17c6e691463f"
+      } ],
+      "type": "Dokumentasjon av utgifter til privat pass"
+    } ],
+    "journalpostId": "testId"
+  },
+  "hovedytelse": {
+    "søknadsgrunnlag": {
+      "arbeidOgOpphold": {
+        "harOppholdUtenforNorgeNeste12mnd": "JA",
+        "harOppholdUtenforNorgeSiste12mnd": "JA",
+        "harPengestøtteAnnetLand": [ "SYKEPENGER" ],
+        "jobbAnnetLand": "Sverige",
+        "jobberIAnnetLand": "JA",
+        "oppholdUtenforNorgeNeste12mnd": [ {
+          "fom": "2024-01-01",
+          "land": "Sverige",
+          "tom": "2024-01-01",
+          "årsak": [ "JOBB" ]
+        } ],
+        "oppholdUtenforNorgeSiste12mnd": [ {
+          "fom": "2024-01-01",
+          "land": "Sverige",
+          "tom": "2024-01-01",
+          "årsak": [ "JOBB" ]
+        } ],
+        "pengestøtteAnnetLand": "Finland"
+      },
+      "harNedsattArbeidsevne": null,
+      "hovedytelse": [ "AAP" ]
+    }
+  },
+  "søknadMottattTidspunkt": "2023-01-01T00:00:00"
 }

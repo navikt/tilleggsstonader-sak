@@ -1,26 +1,7 @@
 {
-  "language": "nb-NO",
   "data": {
+    "_vnote": "",
     "data": {
-      "jegBekrefterAtJegVilSvareSaRiktigSomJegKan": true,
-      "dineOpplysninger": {
-        "fornavn": "FORNUFTIG",
-        "etternavn": "SØNNAVIND",
-        "identitet": {
-          "identitetsnummer": "29500474120"
-        },
-        "adresse": {
-          "gyldigFraOgMed": "2004-10-29",
-          "adresse": "Hestehagen 2",
-          "postnummer": null,
-          "bySted": "JESSHEIM",
-          "landkode": "NOR",
-          "land": {
-            "label": "Norge",
-            "value": "NO"
-          }
-        }
-      },
       "aktiviteter": {
         "aktiviteterOgMaalgruppe": {
           "aktivitet": {
@@ -30,43 +11,60 @@
         }
       },
       "boligEllerOvernatting": {
-        "typeUtgifter": "midlertidigUtgift",
+        "harSaerligStoreUtgifterPaGrunnAvFunksjonsnedsettelse": "nei",
         "samling": {
-          "periodeForSamling": [
-            {
-              "utgifterTilOvernatting": 3000,
-              "fom": "2025-03-05",
-              "tom": "2025-03-14",
-              "trengteEkstraOvernatting": "ja"
-            }
-          ]
+          "periodeForSamling": [ {
+            "fom": "2025-03-05",
+            "tom": "2025-03-14",
+            "trengteEkstraOvernatting": "ja",
+            "utgifterTilOvernatting": 3000
+          } ]
         },
-        "harSaerligStoreUtgifterPaGrunnAvFunksjonsnedsettelse": "nei"
+        "typeUtgifter": "midlertidigUtgift"
+      },
+      "dineOpplysninger": {
+        "adresse": {
+          "adresse": "Hestehagen 2",
+          "bySted": "JESSHEIM",
+          "gyldigFraOgMed": "2004-10-29",
+          "land": {
+            "label": "Norge",
+            "value": "NO"
+          },
+          "landkode": "NOR",
+          "postnummer": null
+        },
+        "etternavn": "SØNNAVIND",
+        "fornavn": "FORNUFTIG",
+        "identitet": {
+          "identitetsnummer": "29500474120"
+        }
       },
       "hovedytelse": {
         "arbeidsavklaringspenger": true,
-        "overgangsstonad": false,
-        "gjenlevendepensjon": false,
-        "uforetrygd": false,
-        "tiltakspenger": false,
         "dagpenger": false,
-        "sykepenger": false,
+        "gjenlevendepensjon": false,
+        "ingenAvAlternativenePasserForMeg": false,
         "kvalifiseringsstonad": false,
         "mottarIngenPengestotte": false,
-        "ingenAvAlternativenePasserForMeg": false
-      }
+        "overgangsstonad": false,
+        "sykepenger": false,
+        "tiltakspenger": false,
+        "uforetrygd": false
+      },
+      "jegBekrefterAtJegVilSvareSaRiktigSomJegKan": true
     },
     "metadata": {
-      "timezone": "Europe/Oslo",
-      "offset": 120,
-      "origin": "https://skjemadelingslenke.ekstern.dev.nav.no",
-      "referrer": "https://skjemadelingslenke.ekstern.dev.nav.no/fyllut/nav111219/paabegynt?sub=digital",
       "browserName": "Netscape",
-      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36",
+      "offset": 120,
+      "onLine": true,
+      "origin": "https://skjemadelingslenke.ekstern.dev.nav.no",
       "pathName": "/fyllut/nav111219/boligEllerOvernattingPanel",
-      "onLine": true
+      "referrer": "https://skjemadelingslenke.ekstern.dev.nav.no/fyllut/nav111219/paabegynt?sub=digital",
+      "timezone": "Europe/Oslo",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"
     },
-    "state": "submitted",
-    "_vnote": ""
-  }
+    "state": "submitted"
+  },
+  "language": "nb-NO"
 }

@@ -1,74 +1,74 @@
 {
-  "personopplysninger" : {
-    "adresse" : {
-      "gyldigFraOgMed" : "2004-10-29",
-      "adresse" : "Hestehagen 2",
-      "postnummer" : "2069",
-      "poststed" : "JESSHEIM",
-      "landkode" : "Land1"
+  "aktivitet": {
+    "aktiviteter": [ {
+      "id": "annet",
+      "label": "Annet",
+      "type": null
+    } ],
+    "annenAktivitet": "TILTAK",
+    "dekkesUtgiftenAvAndre": {
+      "arbeidsgiverDekkerUtgift": "JA",
+      "betalerForReisenTilSkolenSelv": "JA",
+      "erUnder25år": "JA",
+      "lærling": "JA",
+      "lønnetAktivitet": "JA",
+      "typeUtdanning": "VIDEREGÅENDE"
     }
   },
-  "hovedytelse" : {
-    "hovedytelse" : [ "OVERGANGSSTØNAD" ],
-    "harNedsattArbeidsevne" : null,
-    "arbeidOgOpphold" : null
+  "dokumentasjon": [ ],
+  "hovedytelse": {
+    "arbeidOgOpphold": null,
+    "harNedsattArbeidsevne": null,
+    "hovedytelse": [ "OVERGANGSSTØNAD" ]
   },
-  "aktivitet" : {
-    "aktiviteter" : [ {
-      "id" : "annet",
-      "label" : "Annet",
-      "type" : null
-    } ],
-    "dekkesUtgiftenAvAndre" : {
-      "typeUtdanning" : "VIDEREGÅENDE",
-      "lærling" : "JA",
-      "arbeidsgiverDekkerUtgift" : "JA",
-      "erUnder25år" : "JA",
-      "betalerForReisenTilSkolenSelv" : "JA",
-      "lønnetAktivitet" : "JA"
-    },
-    "annenAktivitet" : "TILTAK"
+  "personopplysninger": {
+    "adresse": {
+      "adresse": "Hestehagen 2",
+      "gyldigFraOgMed": "2004-10-29",
+      "landkode": "Land1",
+      "postnummer": "2069",
+      "poststed": "JESSHEIM"
+    }
   },
-  "reiser" : [ {
-    "skalReiseFraFolkeregistrertAdresse" : "JA",
-    "adresseDetSkalReisesFra" : {
-      "gateadresse" : "Hestehagen 2",
-      "postnummer" : "2069",
-      "poststed" : "JESSHEIM"
+  "reiser": [ {
+    "adresse": {
+      "gateadresse": "Osloveien 42",
+      "postnummer": "0482",
+      "poststed": "Oslo"
     },
-    "adresse" : {
-      "gateadresse" : "Osloveien 42",
-      "postnummer" : "0482",
-      "poststed" : "Oslo"
+    "adresseDetSkalReisesFra": {
+      "gateadresse": "Hestehagen 2",
+      "postnummer": "2069",
+      "poststed": "JESSHEIM"
     },
-    "periode" : {
-      "fom" : "2025-01-01",
-      "tom" : "2025-01-01"
+    "dagerPerUke": "4",
+    "harBehovForTransportUavhengigAvReisensLengde": null,
+    "harMerEnn6KmReisevei": "JA",
+    "kanReiseMedOffentligTransport": "NEI",
+    "lengdeReisevei": 14.0,
+    "leveringOgHentingIBarnehage": {
+      "gateadresse": "EksempelSvar",
+      "postnummer": "EksempelSvar"
     },
-    "dagerPerUke" : "4",
-    "harMerEnn6KmReisevei" : "JA",
-    "lengdeReisevei" : 14.0,
-    "harBehovForTransportUavhengigAvReisensLengde" : null,
-    "leveringOgHentingIBarnehage" : {
-      "gateadresse" : "EksempelSvar",
-      "postnummer" : "EksempelSvar"
+    "offentligTransport": null,
+    "periode": {
+      "fom": "2025-01-01",
+      "tom": "2025-01-01"
     },
-    "kanReiseMedOffentligTransport" : "NEI",
-    "offentligTransport" : null,
-    "privatTransport" : {
-      "årsakIkkeOffentligTransport" : [ "DÅRLIG_TRANSPORTTILBUD" ],
-      "kanKjøreMedEgenBil" : "JA",
-      "utgifterBil" : {
-        "mottarGrunnstønad" : null,
-        "drivstofftype" : "BENSIN",
-        "parkering" : "JA",
-        "bompenger" : 43,
-        "ferge" : 0,
-        "piggdekkavgift" : 22
+    "privatTransport": {
+      "kanKjøreMedEgenBil": "JA",
+      "taxi": null,
+      "utgifterBil": {
+        "bompenger": 43,
+        "drivstofftype": "BENSIN",
+        "ferge": 0,
+        "mottarGrunnstønad": null,
+        "parkering": "JA",
+        "piggdekkavgift": 22
       },
-      "taxi" : null
+      "årsakIkkeOffentligTransport": [ "DÅRLIG_TRANSPORTTILBUD" ]
     },
-    "skalDuBetaleForReisenSelv" : "JA"
-  } ],
-  "dokumentasjon" : [ ]
+    "skalDuBetaleForReisenSelv": "JA",
+    "skalReiseFraFolkeregistrertAdresse": "JA"
+  } ]
 }

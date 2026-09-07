@@ -1,77 +1,77 @@
 {
   "regler": {
     "AVSTAND_OVER_SEKS_KM": {
-      "regelId": "AVSTAND_OVER_SEKS_KM",
       "erHovedregel": true,
+      "regelId": "AVSTAND_OVER_SEKS_KM",
       "svarMapping": {
         "JA": {
-          "regelId": "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
-          "begrunnelseType": "PÅKREVD"
-        },
-        "NEI": {
-          "regelId": "UNNTAK_SEKS_KM",
-          "begrunnelseType": "PÅKREVD"
-        }
-      }
-    },
-    "UNNTAK_SEKS_KM": {
-      "regelId": "UNNTAK_SEKS_KM",
-      "erHovedregel": false,
-      "svarMapping": {
-        "JA": {
-          "regelId": "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
-          "begrunnelseType": "PÅKREVD"
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "KAN_REISE_MED_OFFENTLIG_TRANSPORT"
         },
         "NEI": {
           "begrunnelseType": "PÅKREVD",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
-        }
-      }
-    },
-    "KAN_REISE_MED_OFFENTLIG_TRANSPORT": {
-      "regelId": "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
-      "erHovedregel": false,
-      "svarMapping": {
-        "JA": {
-          "begrunnelseType": "VALGFRI",
-          "tilhørendeFaktaType": "DAGLIG_REISE_OFFENTLIG_TRANSPORT",
-          "regelId": "SLUTT_NODE"
-        },
-        "NEI": {
-          "regelId": "KAN_KJØRE_MED_EGEN_BIL",
-          "begrunnelseType": "PÅKREVD"
+          "regelId": "UNNTAK_SEKS_KM"
         }
       }
     },
     "KAN_KJØRE_MED_EGEN_BIL": {
-      "regelId": "KAN_KJØRE_MED_EGEN_BIL",
       "erHovedregel": false,
+      "regelId": "KAN_KJØRE_MED_EGEN_BIL",
       "svarMapping": {
         "JA": {
           "begrunnelseType": "VALGFRI",
-          "tilhørendeFaktaType": "DAGLIG_REISE_PRIVAT_BIL",
-          "regelId": "SLUTT_NODE"
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": "DAGLIG_REISE_PRIVAT_BIL"
         },
         "NEI": {
-          "regelId": "KAN_REISE_MED_TAXI",
-          "begrunnelseType": "PÅKREVD"
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "KAN_REISE_MED_TAXI"
+        }
+      }
+    },
+    "KAN_REISE_MED_OFFENTLIG_TRANSPORT": {
+      "erHovedregel": false,
+      "regelId": "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": "DAGLIG_REISE_OFFENTLIG_TRANSPORT"
+        },
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "KAN_KJØRE_MED_EGEN_BIL"
         }
       }
     },
     "KAN_REISE_MED_TAXI": {
-      "regelId": "KAN_REISE_MED_TAXI",
       "erHovedregel": false,
+      "regelId": "KAN_REISE_MED_TAXI",
       "svarMapping": {
         "JA": {
           "begrunnelseType": "UTEN",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
         },
         "NEI": {
           "begrunnelseType": "PÅKREVD",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
+        }
+      }
+    },
+    "UNNTAK_SEKS_KM": {
+      "erHovedregel": false,
+      "regelId": "UNNTAK_SEKS_KM",
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "KAN_REISE_MED_OFFENTLIG_TRANSPORT"
+        },
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
         }
       }
     }

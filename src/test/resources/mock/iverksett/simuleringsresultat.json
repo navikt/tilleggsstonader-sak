@@ -1,460 +1,385 @@
 {
-  "oppsummeringer": [
-    {
-      "fom": "2023-05-01",
-      "tom": "2023-05-01",
-      "tidligereUtbetalt": 0,
-      "nyUtbetaling": 11,
-      "totalEtterbetaling": 11,
-      "totalFeilutbetaling": 0
-    },
-    {
-      "fom": "2023-06-01",
-      "tom": "2023-06-01",
-      "tidligereUtbetalt": 0,
-      "nyUtbetaling": 10,
-      "totalEtterbetaling": 10,
-      "totalFeilutbetaling": 0
-    },
-    {
-      "fom": "2023-07-03",
-      "tom": "2023-07-03",
-      "tidligereUtbetalt": 0,
-      "nyUtbetaling": 10,
-      "totalEtterbetaling": 10,
-      "totalFeilutbetaling": 0
-    },
-    {
-      "fom": "2023-08-01",
-      "tom": "2023-08-01",
-      "tidligereUtbetalt": 0,
-      "nyUtbetaling": 11,
-      "totalEtterbetaling": 11,
-      "totalFeilutbetaling": 0
-    },
-    {
-      "fom": "2023-09-01",
-      "tom": "2023-09-01",
-      "tidligereUtbetalt": 0,
-      "nyUtbetaling": 10,
-      "totalEtterbetaling": 10,
-      "totalFeilutbetaling": 0
-    },
-    {
-      "fom": "2023-10-02",
-      "tom": "2023-10-02",
-      "tidligereUtbetalt": 0,
-      "nyUtbetaling": 10,
-      "totalEtterbetaling": 10,
-      "totalFeilutbetaling": 0
-    },
-    {
-      "fom": "2023-11-01",
-      "tom": "2023-11-01",
-      "tidligereUtbetalt": 0,
-      "nyUtbetaling": 10,
-      "totalEtterbetaling": 10,
-      "totalFeilutbetaling": 0
-    },
-    {
-      "fom": "2023-12-01",
-      "tom": "2023-12-01",
-      "tidligereUtbetalt": 0,
-      "nyUtbetaling": 10,
-      "totalEtterbetaling": 10,
-      "totalFeilutbetaling": 0
-    },
-    {
-      "fom": "2024-01-01",
-      "tom": "2024-01-01",
-      "tidligereUtbetalt": 0,
-      "nyUtbetaling": 11,
-      "totalEtterbetaling": 11,
-      "totalFeilutbetaling": 0
-    },
-    {
-      "fom": "2024-02-01",
-      "tom": "2024-02-01",
-      "tidligereUtbetalt": 0,
-      "nyUtbetaling": 10,
-      "totalEtterbetaling": 10,
-      "totalFeilutbetaling": 0
-    },
-    {
-      "fom": "2024-03-01",
-      "tom": "2024-03-01",
-      "tidligereUtbetalt": 0,
-      "nyUtbetaling": 10,
-      "totalEtterbetaling": 10,
-      "totalFeilutbetaling": 0
-    },
-    {
-      "fom": "2024-04-01",
-      "tom": "2024-04-01",
-      "tidligereUtbetalt": 0,
-      "nyUtbetaling": 10,
-      "totalEtterbetaling": 10,
-      "totalFeilutbetaling": 0
-    },
-    {
-      "fom": "2024-05-01",
-      "tom": "2024-05-01",
-      "tidligereUtbetalt": 0,
-      "nyUtbetaling": 11,
-      "totalEtterbetaling": 0,
-      "totalFeilutbetaling": 0
-    },
-    {
-      "fom": "2024-05-02",
-      "tom": "2024-05-02",
-      "tidligereUtbetalt": 1624,
-      "nyUtbetaling": -11,
-      "totalEtterbetaling": 0,
-      "totalFeilutbetaling": 1624
-    },
-    {
-      "fom": "2024-06-03",
-      "tom": "2024-06-03",
-      "tidligereUtbetalt": 1477,
-      "nyUtbetaling": 118,
-      "totalEtterbetaling": 0,
-      "totalFeilutbetaling": 1359
-    },
-    {
-      "fom": "2024-07-01",
-      "tom": "2024-07-01",
-      "tidligereUtbetalt": 0,
-      "nyUtbetaling": 136,
-      "totalEtterbetaling": 136,
-      "totalFeilutbetaling": 0
-    }
-  ],
   "detaljer": {
-    "gjelderId": "22448843487",
     "datoBeregnet": "2024-07-03",
-    "totalBeløp": 259,
-    "perioder": [
-      {
+    "gjelderId": "22448843487",
+    "perioder": [ {
+      "fom": "2023-05-01",
+      "posteringer": [ {
+        "beløp": 11,
+        "fagområde": "TILLEGGSSTØNADER",
         "fom": "2023-05-01",
+        "klassekode": "TSTBASISP4-OP",
+        "sakId": "200000269",
         "tom": "2023-05-01",
-        "posteringer": [
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2023-05-01",
-            "tom": "2023-05-01",
-            "beløp": 11,
-            "type": "YTELSE",
-            "klassekode": "TSTBASISP4-OP"
-          }
-        ]
-      },
-      {
+        "type": "YTELSE"
+      } ],
+      "tom": "2023-05-01"
+    }, {
+      "fom": "2023-06-01",
+      "posteringer": [ {
+        "beløp": 10,
+        "fagområde": "TILLEGGSSTØNADER",
         "fom": "2023-06-01",
+        "klassekode": "TSTBASISP4-OP",
+        "sakId": "200000269",
         "tom": "2023-06-01",
-        "posteringer": [
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2023-06-01",
-            "tom": "2023-06-01",
-            "beløp": 10,
-            "type": "YTELSE",
-            "klassekode": "TSTBASISP4-OP"
-          }
-        ]
-      },
-      {
+        "type": "YTELSE"
+      } ],
+      "tom": "2023-06-01"
+    }, {
+      "fom": "2023-07-03",
+      "posteringer": [ {
+        "beløp": 10,
+        "fagområde": "TILLEGGSSTØNADER",
         "fom": "2023-07-03",
+        "klassekode": "TSTBASISP4-OP",
+        "sakId": "200000269",
         "tom": "2023-07-03",
-        "posteringer": [
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2023-07-03",
-            "tom": "2023-07-03",
-            "beløp": 10,
-            "type": "YTELSE",
-            "klassekode": "TSTBASISP4-OP"
-          }
-        ]
-      },
-      {
+        "type": "YTELSE"
+      } ],
+      "tom": "2023-07-03"
+    }, {
+      "fom": "2023-08-01",
+      "posteringer": [ {
+        "beløp": 11,
+        "fagområde": "TILLEGGSSTØNADER",
         "fom": "2023-08-01",
+        "klassekode": "TSTBASISP4-OP",
+        "sakId": "200000269",
         "tom": "2023-08-01",
-        "posteringer": [
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2023-08-01",
-            "tom": "2023-08-01",
-            "beløp": 11,
-            "type": "YTELSE",
-            "klassekode": "TSTBASISP4-OP"
-          }
-        ]
-      },
-      {
+        "type": "YTELSE"
+      } ],
+      "tom": "2023-08-01"
+    }, {
+      "fom": "2023-09-01",
+      "posteringer": [ {
+        "beløp": 10,
+        "fagområde": "TILLEGGSSTØNADER",
         "fom": "2023-09-01",
+        "klassekode": "TSTBASISP4-OP",
+        "sakId": "200000269",
         "tom": "2023-09-01",
-        "posteringer": [
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2023-09-01",
-            "tom": "2023-09-01",
-            "beløp": 10,
-            "type": "YTELSE",
-            "klassekode": "TSTBASISP4-OP"
-          }
-        ]
-      },
-      {
+        "type": "YTELSE"
+      } ],
+      "tom": "2023-09-01"
+    }, {
+      "fom": "2023-10-02",
+      "posteringer": [ {
+        "beløp": 10,
+        "fagområde": "TILLEGGSSTØNADER",
         "fom": "2023-10-02",
+        "klassekode": "TSTBASISP4-OP",
+        "sakId": "200000269",
         "tom": "2023-10-02",
-        "posteringer": [
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2023-10-02",
-            "tom": "2023-10-02",
-            "beløp": 10,
-            "type": "YTELSE",
-            "klassekode": "TSTBASISP4-OP"
-          }
-        ]
-      },
-      {
+        "type": "YTELSE"
+      } ],
+      "tom": "2023-10-02"
+    }, {
+      "fom": "2023-11-01",
+      "posteringer": [ {
+        "beløp": 10,
+        "fagområde": "TILLEGGSSTØNADER",
         "fom": "2023-11-01",
+        "klassekode": "TSTBASISP4-OP",
+        "sakId": "200000269",
         "tom": "2023-11-01",
-        "posteringer": [
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2023-11-01",
-            "tom": "2023-11-01",
-            "beløp": 10,
-            "type": "YTELSE",
-            "klassekode": "TSTBASISP4-OP"
-          }
-        ]
-      },
-      {
+        "type": "YTELSE"
+      } ],
+      "tom": "2023-11-01"
+    }, {
+      "fom": "2023-12-01",
+      "posteringer": [ {
+        "beløp": 10,
+        "fagområde": "TILLEGGSSTØNADER",
         "fom": "2023-12-01",
+        "klassekode": "TSTBASISP4-OP",
+        "sakId": "200000269",
         "tom": "2023-12-01",
-        "posteringer": [
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2023-12-01",
-            "tom": "2023-12-01",
-            "beløp": 10,
-            "type": "YTELSE",
-            "klassekode": "TSTBASISP4-OP"
-          }
-        ]
-      },
-      {
+        "type": "YTELSE"
+      } ],
+      "tom": "2023-12-01"
+    }, {
+      "fom": "2024-01-01",
+      "posteringer": [ {
+        "beløp": 11,
+        "fagområde": "TILLEGGSSTØNADER",
         "fom": "2024-01-01",
+        "klassekode": "TSTBASISP4-OP",
+        "sakId": "200000269",
         "tom": "2024-01-01",
-        "posteringer": [
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2024-01-01",
-            "tom": "2024-01-01",
-            "beløp": 11,
-            "type": "YTELSE",
-            "klassekode": "TSTBASISP4-OP"
-          }
-        ]
-      },
-      {
+        "type": "YTELSE"
+      } ],
+      "tom": "2024-01-01"
+    }, {
+      "fom": "2024-02-01",
+      "posteringer": [ {
+        "beløp": 10,
+        "fagområde": "TILLEGGSSTØNADER",
         "fom": "2024-02-01",
+        "klassekode": "TSTBASISP4-OP",
+        "sakId": "200000269",
         "tom": "2024-02-01",
-        "posteringer": [
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2024-02-01",
-            "tom": "2024-02-01",
-            "beløp": 10,
-            "type": "YTELSE",
-            "klassekode": "TSTBASISP4-OP"
-          }
-        ]
-      },
-      {
+        "type": "YTELSE"
+      } ],
+      "tom": "2024-02-01"
+    }, {
+      "fom": "2024-03-01",
+      "posteringer": [ {
+        "beløp": 10,
+        "fagområde": "TILLEGGSSTØNADER",
         "fom": "2024-03-01",
+        "klassekode": "TSTBASISP4-OP",
+        "sakId": "200000269",
         "tom": "2024-03-01",
-        "posteringer": [
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2024-03-01",
-            "tom": "2024-03-01",
-            "beløp": 10,
-            "type": "YTELSE",
-            "klassekode": "TSTBASISP4-OP"
-          }
-        ]
-      },
-      {
+        "type": "YTELSE"
+      } ],
+      "tom": "2024-03-01"
+    }, {
+      "fom": "2024-04-01",
+      "posteringer": [ {
+        "beløp": 10,
+        "fagområde": "TILLEGGSSTØNADER",
         "fom": "2024-04-01",
+        "klassekode": "TSTBASISP4-OP",
+        "sakId": "200000269",
         "tom": "2024-04-01",
-        "posteringer": [
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2024-04-01",
-            "tom": "2024-04-01",
-            "beløp": 10,
-            "type": "YTELSE",
-            "klassekode": "TSTBASISP4-OP"
-          }
-        ]
-      },
-      {
+        "type": "YTELSE"
+      } ],
+      "tom": "2024-04-01"
+    }, {
+      "fom": "2024-05-01",
+      "posteringer": [ {
+        "beløp": -11,
+        "fagområde": "TILLEGGSSTØNADER",
         "fom": "2024-05-01",
+        "klassekode": "KL_KODE_JUST_ARBYT",
+        "sakId": "200000269",
         "tom": "2024-05-01",
-        "posteringer": [
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2024-05-01",
-            "tom": "2024-05-01",
-            "beløp": -11,
-            "type": "FEILUTBETALING",
-            "klassekode": "KL_KODE_JUST_ARBYT"
-          },
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2024-05-01",
-            "tom": "2024-05-01",
-            "beløp": 11,
-            "type": "YTELSE",
-            "klassekode": "TSTBASISP4-OP"
-          }
-        ]
-      },
-      {
+        "type": "FEILUTBETALING"
+      }, {
+        "beløp": 11,
+        "fagområde": "TILLEGGSSTØNADER",
+        "fom": "2024-05-01",
+        "klassekode": "TSTBASISP4-OP",
+        "sakId": "200000269",
+        "tom": "2024-05-01",
+        "type": "YTELSE"
+      } ],
+      "tom": "2024-05-01"
+    }, {
+      "fom": "2024-05-02",
+      "posteringer": [ {
+        "beløp": 11,
+        "fagområde": "TILLEGGSSTØNADER",
         "fom": "2024-05-02",
+        "klassekode": "KL_KODE_JUST_ARBYT",
+        "sakId": "200000269",
         "tom": "2024-05-02",
-        "posteringer": [
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2024-05-02",
-            "tom": "2024-05-02",
-            "beløp": 11,
-            "type": "FEILUTBETALING",
-            "klassekode": "KL_KODE_JUST_ARBYT"
-          },
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2024-05-02",
-            "tom": "2024-05-02",
-            "beløp": 1613,
-            "type": "YTELSE",
-            "klassekode": "TSTBASISP4-OP"
-          },
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2024-05-02",
-            "tom": "2024-05-02",
-            "beløp": 1613,
-            "type": "FEILUTBETALING",
-            "klassekode": "KL_KODE_FEIL_ARBYT"
-          },
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2024-05-02",
-            "tom": "2024-05-02",
-            "beløp": -1613,
-            "type": "MOTPOSTERING",
-            "klassekode": "TBMOTOBS"
-          },
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2024-05-02",
-            "tom": "2024-05-02",
-            "beløp": -1624,
-            "type": "YTELSE",
-            "klassekode": "TSTBASISP4-OP"
-          }
-        ]
-      },
-      {
+        "type": "FEILUTBETALING"
+      }, {
+        "beløp": 1613,
+        "fagområde": "TILLEGGSSTØNADER",
+        "fom": "2024-05-02",
+        "klassekode": "TSTBASISP4-OP",
+        "sakId": "200000269",
+        "tom": "2024-05-02",
+        "type": "YTELSE"
+      }, {
+        "beløp": 1613,
+        "fagområde": "TILLEGGSSTØNADER",
+        "fom": "2024-05-02",
+        "klassekode": "KL_KODE_FEIL_ARBYT",
+        "sakId": "200000269",
+        "tom": "2024-05-02",
+        "type": "FEILUTBETALING"
+      }, {
+        "beløp": -1613,
+        "fagområde": "TILLEGGSSTØNADER",
+        "fom": "2024-05-02",
+        "klassekode": "TBMOTOBS",
+        "sakId": "200000269",
+        "tom": "2024-05-02",
+        "type": "MOTPOSTERING"
+      }, {
+        "beløp": -1624,
+        "fagområde": "TILLEGGSSTØNADER",
+        "fom": "2024-05-02",
+        "klassekode": "TSTBASISP4-OP",
+        "sakId": "200000269",
+        "tom": "2024-05-02",
+        "type": "YTELSE"
+      } ],
+      "tom": "2024-05-02"
+    }, {
+      "fom": "2024-06-03",
+      "posteringer": [ {
+        "beløp": 1359,
+        "fagområde": "TILLEGGSSTØNADER",
         "fom": "2024-06-03",
+        "klassekode": "TSTBASISP4-OP",
+        "sakId": "200000269",
         "tom": "2024-06-03",
-        "posteringer": [
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2024-06-03",
-            "tom": "2024-06-03",
-            "beløp": 1359,
-            "type": "YTELSE",
-            "klassekode": "TSTBASISP4-OP"
-          },
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2024-06-03",
-            "tom": "2024-06-03",
-            "beløp": 118,
-            "type": "YTELSE",
-            "klassekode": "TSTBASISP4-OP"
-          },
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2024-06-03",
-            "tom": "2024-06-03",
-            "beløp": 1359,
-            "type": "FEILUTBETALING",
-            "klassekode": "KL_KODE_FEIL_ARBYT"
-          },
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2024-06-03",
-            "tom": "2024-06-03",
-            "beløp": -1359,
-            "type": "MOTPOSTERING",
-            "klassekode": "TBMOTOBS"
-          },
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2024-06-03",
-            "tom": "2024-06-03",
-            "beløp": -1477,
-            "type": "YTELSE",
-            "klassekode": "TSTBASISP4-OP"
-          }
-        ]
-      },
-      {
+        "type": "YTELSE"
+      }, {
+        "beløp": 118,
+        "fagområde": "TILLEGGSSTØNADER",
+        "fom": "2024-06-03",
+        "klassekode": "TSTBASISP4-OP",
+        "sakId": "200000269",
+        "tom": "2024-06-03",
+        "type": "YTELSE"
+      }, {
+        "beløp": 1359,
+        "fagområde": "TILLEGGSSTØNADER",
+        "fom": "2024-06-03",
+        "klassekode": "KL_KODE_FEIL_ARBYT",
+        "sakId": "200000269",
+        "tom": "2024-06-03",
+        "type": "FEILUTBETALING"
+      }, {
+        "beløp": -1359,
+        "fagområde": "TILLEGGSSTØNADER",
+        "fom": "2024-06-03",
+        "klassekode": "TBMOTOBS",
+        "sakId": "200000269",
+        "tom": "2024-06-03",
+        "type": "MOTPOSTERING"
+      }, {
+        "beløp": -1477,
+        "fagområde": "TILLEGGSSTØNADER",
+        "fom": "2024-06-03",
+        "klassekode": "TSTBASISP4-OP",
+        "sakId": "200000269",
+        "tom": "2024-06-03",
+        "type": "YTELSE"
+      } ],
+      "tom": "2024-06-03"
+    }, {
+      "fom": "2024-07-01",
+      "posteringer": [ {
+        "beløp": 136,
+        "fagområde": "TILLEGGSSTØNADER",
         "fom": "2024-07-01",
+        "klassekode": "TSTBASISP4-OP",
+        "sakId": "200000269",
         "tom": "2024-07-01",
-        "posteringer": [
-          {
-            "fagområde": "TILLEGGSSTØNADER",
-            "sakId": "200000269",
-            "fom": "2024-07-01",
-            "tom": "2024-07-01",
-            "beløp": 136,
-            "type": "YTELSE",
-            "klassekode": "TSTBASISP4-OP"
-          }
-        ]
-      }
-    ]
-  }
+        "type": "YTELSE"
+      } ],
+      "tom": "2024-07-01"
+    } ],
+    "totalBeløp": 259
+  },
+  "oppsummeringer": [ {
+    "fom": "2023-05-01",
+    "nyUtbetaling": 11,
+    "tidligereUtbetalt": 0,
+    "tom": "2023-05-01",
+    "totalEtterbetaling": 11,
+    "totalFeilutbetaling": 0
+  }, {
+    "fom": "2023-06-01",
+    "nyUtbetaling": 10,
+    "tidligereUtbetalt": 0,
+    "tom": "2023-06-01",
+    "totalEtterbetaling": 10,
+    "totalFeilutbetaling": 0
+  }, {
+    "fom": "2023-07-03",
+    "nyUtbetaling": 10,
+    "tidligereUtbetalt": 0,
+    "tom": "2023-07-03",
+    "totalEtterbetaling": 10,
+    "totalFeilutbetaling": 0
+  }, {
+    "fom": "2023-08-01",
+    "nyUtbetaling": 11,
+    "tidligereUtbetalt": 0,
+    "tom": "2023-08-01",
+    "totalEtterbetaling": 11,
+    "totalFeilutbetaling": 0
+  }, {
+    "fom": "2023-09-01",
+    "nyUtbetaling": 10,
+    "tidligereUtbetalt": 0,
+    "tom": "2023-09-01",
+    "totalEtterbetaling": 10,
+    "totalFeilutbetaling": 0
+  }, {
+    "fom": "2023-10-02",
+    "nyUtbetaling": 10,
+    "tidligereUtbetalt": 0,
+    "tom": "2023-10-02",
+    "totalEtterbetaling": 10,
+    "totalFeilutbetaling": 0
+  }, {
+    "fom": "2023-11-01",
+    "nyUtbetaling": 10,
+    "tidligereUtbetalt": 0,
+    "tom": "2023-11-01",
+    "totalEtterbetaling": 10,
+    "totalFeilutbetaling": 0
+  }, {
+    "fom": "2023-12-01",
+    "nyUtbetaling": 10,
+    "tidligereUtbetalt": 0,
+    "tom": "2023-12-01",
+    "totalEtterbetaling": 10,
+    "totalFeilutbetaling": 0
+  }, {
+    "fom": "2024-01-01",
+    "nyUtbetaling": 11,
+    "tidligereUtbetalt": 0,
+    "tom": "2024-01-01",
+    "totalEtterbetaling": 11,
+    "totalFeilutbetaling": 0
+  }, {
+    "fom": "2024-02-01",
+    "nyUtbetaling": 10,
+    "tidligereUtbetalt": 0,
+    "tom": "2024-02-01",
+    "totalEtterbetaling": 10,
+    "totalFeilutbetaling": 0
+  }, {
+    "fom": "2024-03-01",
+    "nyUtbetaling": 10,
+    "tidligereUtbetalt": 0,
+    "tom": "2024-03-01",
+    "totalEtterbetaling": 10,
+    "totalFeilutbetaling": 0
+  }, {
+    "fom": "2024-04-01",
+    "nyUtbetaling": 10,
+    "tidligereUtbetalt": 0,
+    "tom": "2024-04-01",
+    "totalEtterbetaling": 10,
+    "totalFeilutbetaling": 0
+  }, {
+    "fom": "2024-05-01",
+    "nyUtbetaling": 11,
+    "tidligereUtbetalt": 0,
+    "tom": "2024-05-01",
+    "totalEtterbetaling": 0,
+    "totalFeilutbetaling": 0
+  }, {
+    "fom": "2024-05-02",
+    "nyUtbetaling": -11,
+    "tidligereUtbetalt": 1624,
+    "tom": "2024-05-02",
+    "totalEtterbetaling": 0,
+    "totalFeilutbetaling": 1624
+  }, {
+    "fom": "2024-06-03",
+    "nyUtbetaling": 118,
+    "tidligereUtbetalt": 1477,
+    "tom": "2024-06-03",
+    "totalEtterbetaling": 0,
+    "totalFeilutbetaling": 1359
+  }, {
+    "fom": "2024-07-01",
+    "nyUtbetaling": 136,
+    "tidligereUtbetalt": 0,
+    "tom": "2024-07-01",
+    "totalEtterbetaling": 136,
+    "totalFeilutbetaling": 0
+  } ]
 }

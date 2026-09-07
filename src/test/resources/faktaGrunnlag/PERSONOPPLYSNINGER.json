@@ -1,25 +1,23 @@
 {
-  "type": "PERSONOPPLYSNINGER",
-  "navn": {
-    "fornavn": "Fornavn",
-    "mellomnavn": "Mellomnavn",
-    "etternavn": "Etternavn"
-  },
+  "barn": [ {
+    "alder": 0,
+    "dødsdato": "2025-01-02",
+    "fødselsdato": "2025-01-01",
+    "ident": "11111122222",
+    "navn": {
+      "etternavn": "Etternavn barn",
+      "fornavn": "Fornavn barn",
+      "mellomnavn": "Mellomnavn barn"
+    }
+  } ],
   "fødsel": {
     "fødselsdato": "2025-01-01",
     "fødselsår": 2025
   },
-  "barn": [
-    {
-      "ident": "11111122222",
-      "navn": {
-        "fornavn": "Fornavn barn",
-        "mellomnavn": "Mellomnavn barn",
-        "etternavn": "Etternavn barn"
-      },
-      "fødselsdato": "2025-01-01",
-      "alder": 0,
-      "dødsdato": "2025-01-02"
-    }
-  ]
+  "navn": {
+    "etternavn": "Etternavn",
+    "fornavn": "Fornavn",
+    "mellomnavn": "Mellomnavn"
+  },
+  "type": "PERSONOPPLYSNINGER"
 }
