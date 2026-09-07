@@ -41,6 +41,6 @@ enum class RegelId(
     HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING("Har bruker nødvendige utgifter til reise til samling?"),
     AVSTAND_OVER_TRETTI_KM("Er reiseavstanden over 30km?"),
     ER_SAMLING_OBLIGATORISK("Er samlingen obligatorisk?"),
-    KAN_REISE_MED_EGEN_BIL("Kan søker benytte privat bil?"),
-    DOKUMENTERTE_UTGIFTER("Har søker dokumenterte utgifter til reise?"),
+    KAN_REISE_MED_EGEN_BIL("Kan bruker benytte privat bil?"),
+    DOKUMENTERTE_UTGIFTER("Har bruker dokumenterte utgifter til reise?"),
 }
