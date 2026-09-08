@@ -403,7 +403,9 @@ private data object BarnetilsynKoblerSkall : AndelTilVedtaksperiodeIdKobler {
         vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
     ): List<Vedtaksperiode> {
         val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørPassAvBarn
-        TODO("Implementeres av ansvarlig for BARNETILSYN")
+
+        val periode = finnPeriodeFraAndel(vedtak.beregningsresultat, andel)
+        return vedtak.vedtaksperioder.filter { it.overlapper(periode) }
     }
 }
 
