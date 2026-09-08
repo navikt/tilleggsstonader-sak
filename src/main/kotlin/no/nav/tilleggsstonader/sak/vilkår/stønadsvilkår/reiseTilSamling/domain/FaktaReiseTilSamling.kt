@@ -66,6 +66,7 @@ data class FaktaPrivatBil(
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,
     val parkering: BigDecimal? = null,
+    val piggdekkavgift: BigDecimal? = null,
 ) : FaktaReiseTilSamling {
     override val type = TypeReiseTilSamling.PRIVAT_BIL
 
@@ -83,6 +84,7 @@ data class FaktaPrivatBil(
             bompenger = bompenger,
             fergekostnad = fergekostnad,
             parkering = parkering,
+            piggdekkavgift = piggdekkavgift,
         )
 
     private fun validerIngenNegativReiseavstand() {
@@ -102,6 +104,9 @@ data class FaktaPrivatBil(
         }
         brukerfeilHvis(parkering != null && parkering < BigDecimal.ZERO) {
             "Parkering kan ikke være negativ"
+        }
+        brukerfeilHvis(piggdekkavgift != null && piggdekkavgift < BigDecimal.ZERO) {
+            "Piggdekkavgift kan ikke være negativ"
         }
     }
 }

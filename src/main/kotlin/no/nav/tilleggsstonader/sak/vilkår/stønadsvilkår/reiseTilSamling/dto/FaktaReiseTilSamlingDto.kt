@@ -54,6 +54,7 @@ data class FaktaReiseTilSamlingPrivatBilDto(
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,
     val parkering: BigDecimal? = null,
+    val piggdekkavgift: BigDecimal? = null,
 ) : FaktaReiseTilSamlingDto {
     override val type = TypeReiseTilSamling.PRIVAT_BIL
 
@@ -68,6 +69,7 @@ data class FaktaReiseTilSamlingPrivatBilDto(
         bompenger = bompenger,
         fergekostnad = fergekostnad,
         parkering = parkering,
+        piggdekkavgift = piggdekkavgift,
     )
 }
 

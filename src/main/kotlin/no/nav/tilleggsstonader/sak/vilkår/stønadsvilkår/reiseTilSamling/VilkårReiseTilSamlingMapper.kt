@@ -70,6 +70,7 @@ object VilkårReiseTilSamlingMapper {
             bompenger = this.bompenger,
             fergekostnad = this.fergekostnad,
             parkering = this.parkering,
+            piggdekkavgift = this.piggdekkavgift,
         )
 
     private fun FaktaReiseTilSamlingUbestemt.mapTilFakta() =

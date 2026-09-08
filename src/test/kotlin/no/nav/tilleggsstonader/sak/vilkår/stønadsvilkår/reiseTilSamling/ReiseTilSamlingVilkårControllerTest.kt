@@ -179,7 +179,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `skal lagre og hente bompenger, fergekostnad og parkering for privat bil`() {
+    fun `skal lagre og hente bompenger, fergekostnad, parkering og piggdekkavgift for privat bil`() {
         val fom = 1 januar 2025
         val tom = 31 januar 2025
 
@@ -218,6 +218,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
                         bompenger = BigDecimal("50"),
                         fergekostnad = BigDecimal("120"),
                         parkering = BigDecimal("75.50"),
+                        piggdekkavgift = BigDecimal("60"),
                         aktivitet = aktivitet,
                     ),
             )
@@ -251,12 +252,14 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
         bompenger: BigDecimal? = null,
         fergekostnad: BigDecimal? = null,
         parkering: BigDecimal? = null,
+        piggdekkavgift: BigDecimal? = null,
         aktivitet: VilkårperiodeDto,
     ) = FaktaReiseTilSamlingPrivatBilDto(
         reiseavstand = reiseavstand,
         bompenger = bompenger,
         fergekostnad = fergekostnad,
         parkering = parkering,
+        piggdekkavgift = piggdekkavgift,
         aktivitetId = aktivitet.globalId,
     )
 
