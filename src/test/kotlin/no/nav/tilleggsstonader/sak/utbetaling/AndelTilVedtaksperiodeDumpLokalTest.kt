@@ -410,7 +410,11 @@ private data object LæremidlerKoblerSkall : AndelTilVedtaksperiodeIdKobler {
         vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
     ): List<Vedtaksperiode> {
         val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørLæremidler
-        TODO("Implementeres av ansvarlig for LÆREMIDLER")
+        val beregningsperioder = vedtak.beregningsresultat.perioder.filter {
+            it.grunnlag.utbetalingsdato == andel.fom
+        }
+
+        return vedtak.vedtaksperioder.filter { vedtaksperiode -> beregningsperioder.any { b -> b.overlapper(vedtaksperiode) } }
     }
 }
 
