@@ -11,7 +11,14 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtel
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørPassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørReiseOppstartAvslutningHjemreise
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Disabled
@@ -36,7 +43,6 @@ import javax.sql.DataSource
  */
 //@Disabled("Kun for lokal manuell testing mot tabeller i schema dump")
 class AndelTilVedtaksperiodeDumpLokalTest {
-
     private val databaseConfig =
         DatabaseConfig(
             url = "jdbc:postgresql://localhost:5432/tilleggsstonader-sak",
@@ -92,15 +98,27 @@ class AndelTilVedtaksperiodeDumpLokalTest {
         val tilkjenteYtelser =
             tilkjentYtelseRepository.finnTilkjenteYtelserMedAndeler(
                 andelTypeFilter = andeltyperForStønadstype,
-                antall = 50,
+                antall = 1000,
             )
-        val andelMedBehandling = finnAndel(tilkjenteYtelser, ønsketAndelId)
-        val vedtak =
-            vedtakRepository
-                .finnVedtakForBehandlinger(listOf(andelMedBehandling.behandlingId))
-                .getValue(andelMedBehandling.behandlingId)
 
-        kobler.finnVedtaksperiodeIder(andelMedBehandling.andelTilkjentYtelse, vedtak)
+        tilkjenteYtelser.forEach { tilkjentYtelse ->
+            val vedtak =
+                vedtakRepository
+                    .finnVedtakForBehandlinger(listOf(tilkjentYtelse.behandlingId))
+                    .values
+                    .single()
+
+            tilkjentYtelse.andelerTilkjentYtelse.forEach { andelTilkjentYtelse ->
+                val vedtaksperioder = kobler.finnVedtaksperioder(andelTilkjentYtelse, vedtak)
+
+                println("Andel=$andelTilkjentYtelse")
+                vedtaksperioder.forEach { vedtaksperiode ->
+                    println("Vedtaksperiode=$vedtaksperiode")
+                }
+
+                println()
+            }
+        }
     }
 
     @Test
@@ -142,7 +160,6 @@ private data class AndelMedBehandlingId(
 private class TilkjentYtelseDumpRepository(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
 ) {
-
     fun finnTilkjenteYtelserMedAndeler(
         andelTypeFilter: List<String>,
         antall: Int,
@@ -217,7 +234,6 @@ private class TilkjentYtelseDumpRepository(
 private class VedtakDumpRepository(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
 ) {
-
     fun finnVedtakForBehandlinger(behandlingIder: List<BehandlingId>): Map<BehandlingId, GeneriskVedtak<out Vedtaksdata>> {
         if (behandlingIder.isEmpty()) return emptyMap()
 
@@ -225,14 +241,16 @@ private class VedtakDumpRepository(
             MapSqlParameterSource()
                 .addValue("behandlingIder", behandlingIder.map { it.id })
 
-        return jdbcTemplate.query(
-            """
-            SELECT behandling_id, type, data, git_versjon, tidligste_endring, opphorsdato
-            FROM dump.vedtak
-            WHERE behandling_id IN (:behandlingIder)
-            """.trimIndent(),
-            params,
-        ) { rs, _ -> mapTilVedtak(rs) }.associateBy { it.behandlingId }
+        return jdbcTemplate
+            .query(
+                """
+                SELECT behandling_id, type, data, git_versjon, tidligste_endring, opphorsdato
+                FROM dump.vedtak
+                WHERE behandling_id IN (:behandlingIder)
+                """.trimIndent(),
+                params,
+            ) { rs, _ -> mapTilVedtak(rs) }
+            .associateBy { it.behandlingId }
     }
 
     fun finnVedtak(antall: Int): List<GeneriskVedtak<out Vedtaksdata>> =
@@ -367,38 +385,68 @@ private fun defaultKoblingSkall(): Map<Stønadstype, AndelTilVedtaksperiodeIdKob
     )
 
 private fun interface AndelTilVedtaksperiodeIdKobler {
-    fun finnVedtaksperiodeIder(
+    fun finnVedtaksperioder(
         andel: AndelTilkjentYtelse,
-        vedtak: GeneriskVedtak<out Vedtaksdata>,
-    ): List<UUID>
+        vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
+    ): List<Vedtaksperiode>
 }
 
 private data object BarnetilsynKoblerSkall : AndelTilVedtaksperiodeIdKobler {
-    override fun finnVedtaksperiodeIder(andel: AndelTilkjentYtelse, vedtak: GeneriskVedtak<out Vedtaksdata>): List<UUID> =
+    override fun finnVedtaksperioder(
+        andel: AndelTilkjentYtelse,
+        vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
+    ): List<Vedtaksperiode> {
+        val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørPassAvBarn
         TODO("Implementeres av ansvarlig for BARNETILSYN")
+    }
 }
 
 private data object LæremidlerKoblerSkall : AndelTilVedtaksperiodeIdKobler {
-    override fun finnVedtaksperiodeIder(andel: AndelTilkjentYtelse, vedtak: GeneriskVedtak<out Vedtaksdata>): List<UUID> =
+    override fun finnVedtaksperioder(
+        andel: AndelTilkjentYtelse,
+        vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
+    ): List<Vedtaksperiode> {
+        val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørLæremidler
         TODO("Implementeres av ansvarlig for LÆREMIDLER")
+    }
 }
 
 private data object BoutgifterKoblerSkall : AndelTilVedtaksperiodeIdKobler {
-    override fun finnVedtaksperiodeIder(andel: AndelTilkjentYtelse, vedtak: GeneriskVedtak<out Vedtaksdata>): List<UUID> =
+    override fun finnVedtaksperioder(
+        andel: AndelTilkjentYtelse,
+        vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
+    ): List<Vedtaksperiode> {
+        val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørBoutgifter
         TODO("Implementeres av ansvarlig for BOUTGIFTER")
+    }
 }
 
 private data object DagligReiseKoblerSkall : AndelTilVedtaksperiodeIdKobler {
-    override fun finnVedtaksperiodeIder(andel: AndelTilkjentYtelse, vedtak: GeneriskVedtak<out Vedtaksdata>): List<UUID> =
+    override fun finnVedtaksperioder(
+        andel: AndelTilkjentYtelse,
+        vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
+    ): List<Vedtaksperiode> {
+        val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørDagligReise
         TODO("Implementeres av ansvarlig for DAGLIG_REISE")
+    }
 }
 
 private data object ReiseTilSamlingKoblerSkall : AndelTilVedtaksperiodeIdKobler {
-    override fun finnVedtaksperiodeIder(andel: AndelTilkjentYtelse, vedtak: GeneriskVedtak<out Vedtaksdata>): List<UUID> =
+    override fun finnVedtaksperioder(
+        andel: AndelTilkjentYtelse,
+        vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
+    ): List<Vedtaksperiode> {
+        val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørReiseTilSamling
         TODO("Implementeres av ansvarlig for REISE_TIL_SAMLING")
+    }
 }
 
 private data object ReiseOppstartKoblerSkall : AndelTilVedtaksperiodeIdKobler {
-    override fun finnVedtaksperiodeIder(andel: AndelTilkjentYtelse, vedtak: GeneriskVedtak<out Vedtaksdata>): List<UUID> =
+    override fun finnVedtaksperioder(
+        andel: AndelTilkjentYtelse,
+        vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
+    ): List<Vedtaksperiode> {
+        val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørReiseOppstartAvslutningHjemreise
         TODO("Implementeres av ansvarlig for REISE_OPPSTART_AVSLUTNING_HJEMREISE")
+    }
 }
