@@ -376,4 +376,18 @@ class ReiseTilSamlingVilkårServiceTest {
                 )
             }.withMessage("Reiseavstand kan ikke være mindre enn 30 km")
     }
+
+    @Test
+    fun `skal feile når begrunnelse mangler`() {
+        assertThatExceptionOfType(ApiFeil::class.java)
+            .isThrownBy {
+                FaktaOffentligTransport(
+                    reiseId = dummyReiseId,
+                    adresse = "Samlingsveien 1",
+                    utgifterOffentligTransport = 500.toBigDecimal(),
+                    begrunnelse = " ",
+                    aktivitetId = null,
+                )
+            }.withMessage("Spesifikasjon av utgift må fylles ut")
+    }
 }
