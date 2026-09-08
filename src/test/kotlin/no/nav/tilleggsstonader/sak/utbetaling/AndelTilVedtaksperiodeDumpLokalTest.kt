@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverks
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
+import no.nav.tilleggsstonader.sak.util.iDagHvisMandagEllerForrigeMandag
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
@@ -23,7 +24,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -43,7 +43,7 @@ import javax.sql.DataSource
  * 3. Sett evt. ønsketAndelId hvis du vil teste en konkret andel.
  * 4. Fjern @Disabled og kjør testen.
  */
-@Disabled("Kun for lokal manuell testing mot tabeller i schema dump")
+// @Disabled("Kun for lokal manuell testing mot tabeller i schema dump")
 class AndelTilVedtaksperiodeDumpLokalTest {
     private val databaseConfig =
         DatabaseConfig(
@@ -52,7 +52,7 @@ class AndelTilVedtaksperiodeDumpLokalTest {
             password = "test",
         )
 
-    private val stønadstypeSomSkalTrigges = Stønadstype.BOUTGIFTER
+    private val stønadstypeSomSkalTrigges = Stønadstype.DAGLIG_REISE_TSO
     private val andeltyperForStønadstype: List<String> =
         finnTypeAndelerForStønadstype(stønadstypeSomSkalTrigges).map { it.name }
     private val ønsketAndelId: UUID? = null
@@ -93,7 +93,6 @@ class AndelTilVedtaksperiodeDumpLokalTest {
         println("Stønadstype=$stønadstypeSomSkalTrigges, typeAndeler=${typeAndeler.map { it.name }}")
     }
 
-    @Disabled("TODO: Implementer faktisk kobling fra AndelTilkjentYtelse til VedtaksperiodeId for valgt stønadstype")
     @Test
     fun `TODO - koble andel til vedtaksperiodeIder`() {
         val kobler = defaultKoblingSkall().getValue(stønadstypeSomSkalTrigges)
@@ -205,7 +204,11 @@ private class TilkjentYtelseDumpRepository(
                                 rs.getObject("iverksetting_id", UUID::class.java)?.let { iverksettingId ->
                                     Iverksetting(
                                         iverksettingId = iverksettingId,
-                                        iverksettingTidspunkt = rs.getObject("iverksetting_tidspunkt", LocalDateTime::class.java),
+                                        iverksettingTidspunkt =
+                                            rs.getObject(
+                                                "iverksetting_tidspunkt",
+                                                LocalDateTime::class.java,
+                                            ),
                                     )
                                 },
                             endretTid = rs.getObject("endret_tid", LocalDateTime::class.java),
@@ -425,13 +428,15 @@ private data object BoutgifterKoblerSkall : AndelTilVedtaksperiodeIdKobler {
     ): List<Vedtaksperiode> {
         val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørBoutgifter
 
-        val beregningsperiode = vedtak.beregningsresultat.perioder.single {
-            it.fom.tilFørsteDagIMåneden().datoEllerNesteMandagHvisLørdagEllerSøndag() == andel.fom
-        }
+        val beregningsperiode =
+            vedtak.beregningsresultat.perioder.single {
+                it.fom.tilFørsteDagIMåneden().datoEllerNesteMandagHvisLørdagEllerSøndag() == andel.fom
+            }
 
-        val vedtaksperioder = vedtak.vedtaksperioder.filter {
-            beregningsperiode.overlapper(it)
-        }
+        val vedtaksperioder =
+            vedtak.vedtaksperioder.filter {
+                beregningsperiode.overlapper(it)
+            }
 
         return vedtaksperioder
     }
@@ -443,7 +448,35 @@ private data object DagligReiseKoblerSkall : AndelTilVedtaksperiodeIdKobler {
         vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
     ): List<Vedtaksperiode> {
         val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørDagligReise
-        TODO("Implementeres av ansvarlig for DAGLIG_REISE")
+
+        val andelTilhørerPrivatBil = andel.reiseId != null
+
+        if (andelTilhørerPrivatBil) {
+            val beregningsresultat = vedtak.beregningsresultat.privatBil!!
+
+            val reiseperioder =
+                beregningsresultat.reiser
+                    .single {
+                        it.reiseId == andel.reiseId
+                    }.perioder
+
+            val periode =
+                reiseperioder.single {
+                    it.fom.iDagHvisMandagEllerForrigeMandag() == andel.fom
+                }
+
+            return vedtak.vedtaksperioder.filter {
+                periode.overlapper(it)
+            }
+        } else {
+            val beregningsresultat =
+                vedtak.beregningsresultat.offentligTransport
+                    ?: throw RuntimeException(
+                        "Mangler beregningsresultat for offentlig transport i vedtak for behandling ${vedtaksdata.behandlingId}",
+                    )
+
+            return emptyList()
+        }
     }
 }
 
