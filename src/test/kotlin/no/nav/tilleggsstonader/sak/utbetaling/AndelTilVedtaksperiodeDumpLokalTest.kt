@@ -53,7 +53,7 @@ class AndelTilVedtaksperiodeDumpLokalTest {
             password = "test",
         )
 
-    private val stønadstypeSomSkalTrigges = Stønadstype.LÆREMIDLER
+    private val stønadstypeSomSkalTrigges = Stønadstype.BOUTGIFTER
     private val andeltyperForStønadstype: List<String> =
         finnTypeAndelerForStønadstype(stønadstypeSomSkalTrigges).map { it.name }
 
@@ -61,8 +61,8 @@ class AndelTilVedtaksperiodeDumpLokalTest {
     private val tilkjentYtelseRepository = TilkjentYtelseDumpRepository(jdbcTemplate)
     private val vedtakRepository = VedtakDumpRepository(jdbcTemplate)
 
-    var andelerMedFlereVedtaksperioder: MutableList<Pair<AndelTilkjentYtelse, List<Vedtaksperiode>>> = arrayListOf()
-    var andelerSomIkkeOverlapperMedVedtaksperioder: MutableList<Pair<AndelTilkjentYtelse, List<Vedtaksperiode>>> = arrayListOf()
+    var andelerMedFlereVedtaksperioder: MutableList<Triple<BehandlingId, AndelTilkjentYtelse, List<Vedtaksperiode>>> = arrayListOf()
+    var andelerSomIkkeOverlapperMedVedtaksperioder: MutableList<Triple<BehandlingId, AndelTilkjentYtelse, List<Vedtaksperiode>>> = arrayListOf()
 
     @Test
     fun `skal kunne hente alle typeandeler for en gitt stønadstype`() {
@@ -89,16 +89,18 @@ class AndelTilVedtaksperiodeDumpLokalTest {
                     .single()
 
             tilkjentYtelse.andelerTilkjentYtelse.forEach { andelTilkjentYtelse ->
-                val vedtaksperioder = kobler.finnVedtaksperioder(andelTilkjentYtelse, vedtak)
+                val vedtaksperioder = runCatching { kobler.finnVedtaksperioder(andelTilkjentYtelse, vedtak) }
+                    .onFailure { println(it) }
+                    .getOrNull() ?: emptyList()
 
                 if (vedtaksperioder.isEmpty()) {
                     error("Ingen vedtaksperioder funnet for andel $andelTilkjentYtelse")
                 }
                 if (vedtaksperioder.none { v -> v.inneholder(andelTilkjentYtelse.fom) }) {
-                    andelerSomIkkeOverlapperMedVedtaksperioder.add(andelTilkjentYtelse to vedtaksperioder)
+                    andelerSomIkkeOverlapperMedVedtaksperioder.add(Triple(tilkjentYtelse.behandlingId, andelTilkjentYtelse, vedtaksperioder))
                 }
                 if (vedtaksperioder.size > 1) {
-                    andelerMedFlereVedtaksperioder.add(andelTilkjentYtelse to vedtaksperioder)
+                    andelerMedFlereVedtaksperioder.add(Triple(tilkjentYtelse.behandlingId, andelTilkjentYtelse, vedtaksperioder))
                 }
             }
         }
@@ -106,7 +108,8 @@ class AndelTilVedtaksperiodeDumpLokalTest {
         if (andelerSomIkkeOverlapperMedVedtaksperioder.isNotEmpty()) {
             println("---------")
             println("Andeler som ikke overlapper med vedtaksperioder: ${andelerSomIkkeOverlapperMedVedtaksperioder.size}")
-            andelerSomIkkeOverlapperMedVedtaksperioder.forEach { (andel, vedtaksperioder) ->
+            andelerSomIkkeOverlapperMedVedtaksperioder.forEach { (behandlingId, andel, vedtaksperioder) ->
+                println("BehandlingId=$behandlingId")
                 println(andel)
                 vedtaksperioder.forEach { vedtaksperiode ->
                     println(vedtaksperiode)
@@ -120,7 +123,8 @@ class AndelTilVedtaksperiodeDumpLokalTest {
         if (andelerMedFlereVedtaksperioder.isNotEmpty()) {
             println("---------")
             println("Andeler som matcher med flere vedtaksperioder: ${andelerMedFlereVedtaksperioder.size}")
-            andelerMedFlereVedtaksperioder.forEach { (andel, vedtaksperioder) ->
+            andelerMedFlereVedtaksperioder.forEach { (behandlingId, andel, vedtaksperioder) ->
+                println("BehandlingId=$behandlingId")
                 println(andel)
                 vedtaksperioder.forEach { vedtaksperiode ->
                     println(vedtaksperiode)
@@ -401,13 +405,13 @@ private data object BoutgifterKoblerSkall : AndelTilVedtaksperiodeIdKobler {
         val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørBoutgifter
 
         val beregningsperiode =
-            vedtak.beregningsresultat.perioder.single {
+            vedtak.beregningsresultat.perioder.filter {
                 it.fom.tilFørsteDagIMåneden().datoEllerNesteMandagHvisLørdagEllerSøndag() == andel.fom
             }
 
         val vedtaksperioder =
             vedtak.vedtaksperioder.filter {
-                beregningsperiode.overlapper(it)
+                beregningsperiode.any { b -> b.overlapper(it) }
             }
 
         return vedtaksperioder
