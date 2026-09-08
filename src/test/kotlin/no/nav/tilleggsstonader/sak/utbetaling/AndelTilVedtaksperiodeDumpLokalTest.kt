@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørReiseOpp
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.finnPeriodeFraAndel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -52,39 +53,16 @@ class AndelTilVedtaksperiodeDumpLokalTest {
             password = "test",
         )
 
-    private val stønadstypeSomSkalTrigges = Stønadstype.DAGLIG_REISE_TSO
+    private val stønadstypeSomSkalTrigges = Stønadstype.LÆREMIDLER
     private val andeltyperForStønadstype: List<String> =
         finnTypeAndelerForStønadstype(stønadstypeSomSkalTrigges).map { it.name }
-    private val ønsketAndelId: UUID? = null
 
     private val jdbcTemplate = NamedParameterJdbcTemplate(opprettDataSource(databaseConfig))
     private val tilkjentYtelseRepository = TilkjentYtelseDumpRepository(jdbcTemplate)
     private val vedtakRepository = VedtakDumpRepository(jdbcTemplate)
 
-    @Test
-    fun `skal kunne hente entiteter som trengs for å koble andel til vedtaksperiodeId`() {
-        val tilkjenteYtelser =
-            tilkjentYtelseRepository.finnTilkjenteYtelserMedAndeler(
-                andelTypeFilter = andeltyperForStønadstype,
-                antall = 50,
-            )
-
-        assertThat(tilkjenteYtelser).isNotEmpty
-
-        val andelMedBehandling =
-            finnAndel(tilkjenteYtelser, ønsketAndelId)
-        val vedtak =
-            vedtakRepository.finnVedtakForBehandlinger(listOf(andelMedBehandling.behandlingId))[andelMedBehandling.behandlingId]
-
-        assertThat(andelMedBehandling.andelTilkjentYtelse).isNotNull
-        assertThat(andelMedBehandling.tilkjentYtelse).isNotNull
-        assertThat(vedtak).isNotNull
-        assertThat(vedtak?.vedtaksperioderHvisFinnes()).isNotEmpty
-
-        println("AndelId=${andelMedBehandling.andelTilkjentYtelse.id}")
-        println("BehandlingId=${andelMedBehandling.behandlingId}")
-        println("VedtaksperiodeIder=${vedtak?.vedtaksperioderHvisFinnes()?.map { it.id }}")
-    }
+    var andelerMedFlereVedtaksperioder: MutableList<Pair<AndelTilkjentYtelse, List<Vedtaksperiode>>> = arrayListOf()
+    var andelerSomIkkeOverlapperMedVedtaksperioder: MutableList<Pair<AndelTilkjentYtelse, List<Vedtaksperiode>>> = arrayListOf()
 
     @Test
     fun `skal kunne hente alle typeandeler for en gitt stønadstype`() {
@@ -93,13 +71,14 @@ class AndelTilVedtaksperiodeDumpLokalTest {
         println("Stønadstype=$stønadstypeSomSkalTrigges, typeAndeler=${typeAndeler.map { it.name }}")
     }
 
+    //@Disabled("TODO: Implementer faktisk kobling fra AndelTilkjentYtelse til VedtaksperiodeId for valgt stønadstype")
     @Test
     fun `TODO - koble andel til vedtaksperiodeIder`() {
         val kobler = defaultKoblingSkall().getValue(stønadstypeSomSkalTrigges)
         val tilkjenteYtelser =
             tilkjentYtelseRepository.finnTilkjenteYtelserMedAndeler(
                 andelTypeFilter = andeltyperForStønadstype,
-                antall = 1000,
+                antall = 100_000,
             )
 
         tilkjenteYtelser.forEach { tilkjentYtelse ->
@@ -112,38 +91,46 @@ class AndelTilVedtaksperiodeDumpLokalTest {
             tilkjentYtelse.andelerTilkjentYtelse.forEach { andelTilkjentYtelse ->
                 val vedtaksperioder = kobler.finnVedtaksperioder(andelTilkjentYtelse, vedtak)
 
-                println("BehandlingId=${tilkjentYtelse.behandlingId}")
-                println("Andel=$andelTilkjentYtelse")
-                vedtaksperioder.forEach { vedtaksperiode ->
-                    println("Vedtaksperiode=$vedtaksperiode")
+                if (vedtaksperioder.isEmpty()) {
+                    error("Ingen vedtaksperioder funnet for andel $andelTilkjentYtelse")
                 }
-
-                println()
+                if (vedtaksperioder.none { v -> v.inneholder(andelTilkjentYtelse.fom) }) {
+                    andelerSomIkkeOverlapperMedVedtaksperioder.add(andelTilkjentYtelse to vedtaksperioder)
+                }
+                if (vedtaksperioder.size > 1) {
+                    andelerMedFlereVedtaksperioder.add(andelTilkjentYtelse to vedtaksperioder)
+                }
             }
         }
-    }
 
-    @Test
-    fun `skal kunne hente generiske vedtak fra dump-schema`() {
-        val vedtak = vedtakRepository.finnVedtak(antall = 200)
-
-        assertThat(vedtak).isNotEmpty
-        println("Fant vedtakstyper=${vedtak.mapNotNull { it.data.type::class.simpleName }.distinct().sorted()}")
-    }
-
-    private fun finnAndel(
-        tilkjenteYtelser: List<TilkjentYtelse>,
-        andelId: UUID?,
-    ): AndelMedBehandlingId {
-        val andeler =
-            tilkjenteYtelser.flatMap { ty ->
-                ty.andelerTilkjentYtelse.map { andel -> AndelMedBehandlingId(ty, ty.behandlingId, andel) }
+        if (andelerSomIkkeOverlapperMedVedtaksperioder.isNotEmpty()) {
+            println("---------")
+            println("Andeler som ikke overlapper med vedtaksperioder: ${andelerSomIkkeOverlapperMedVedtaksperioder.size}")
+            andelerSomIkkeOverlapperMedVedtaksperioder.forEach { (andel, vedtaksperioder) ->
+                println(andel)
+                vedtaksperioder.forEach { vedtaksperiode ->
+                    println(vedtaksperiode)
+                }
+                println()
             }
+            println("---------")
 
-        return andelId?.let { id ->
-            andeler.firstOrNull { it.andelTilkjentYtelse.id == id }
-                ?: error("Fant ikke andel med id=$id for stønadstype=$stønadstypeSomSkalTrigges")
-        } ?: andeler.first()
+            println()
+        }
+        if (andelerMedFlereVedtaksperioder.isNotEmpty()) {
+            println("---------")
+            println("Andeler som matcher med flere vedtaksperioder: ${andelerMedFlereVedtaksperioder.size}")
+            andelerMedFlereVedtaksperioder.forEach { (andel, vedtaksperioder) ->
+                println(andel)
+                vedtaksperioder.forEach { vedtaksperiode ->
+                    println(vedtaksperiode)
+                }
+                println()
+            }
+            println("---------")
+
+            println()
+        }
     }
 }
 
@@ -151,12 +138,6 @@ private data class DatabaseConfig(
     val url: String,
     val username: String,
     val password: String,
-)
-
-private data class AndelMedBehandlingId(
-    val tilkjentYtelse: TilkjentYtelse,
-    val behandlingId: BehandlingId,
-    val andelTilkjentYtelse: AndelTilkjentYtelse,
 )
 
 private class TilkjentYtelseDumpRepository(
@@ -258,17 +239,6 @@ private class VedtakDumpRepository(
             ) { rs, _ -> mapTilVedtak(rs) }
             .associateBy { it.behandlingId }
     }
-
-    fun finnVedtak(antall: Int): List<GeneriskVedtak<out Vedtaksdata>> =
-        jdbcTemplate.query(
-            """
-            SELECT behandling_id, type, data, git_versjon, tidligste_endring, opphorsdato
-            FROM dump.vedtak
-            ORDER BY behandling_id
-            LIMIT :antall
-            """.trimIndent(),
-            MapSqlParameterSource().addValue("antall", antall),
-        ) { rs, _ -> mapTilVedtak(rs) }
 
     private fun mapTilVedtak(rs: java.sql.ResultSet): GeneriskVedtak<out Vedtaksdata> {
         val dataJson = rs.getString("data")
