@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.utbetaling
 
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.tilFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
@@ -9,6 +10,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
@@ -41,7 +43,7 @@ import javax.sql.DataSource
  * 3. Sett evt. ønsketAndelId hvis du vil teste en konkret andel.
  * 4. Fjern @Disabled og kjør testen.
  */
-//@Disabled("Kun for lokal manuell testing mot tabeller i schema dump")
+@Disabled("Kun for lokal manuell testing mot tabeller i schema dump")
 class AndelTilVedtaksperiodeDumpLokalTest {
     private val databaseConfig =
         DatabaseConfig(
@@ -111,6 +113,7 @@ class AndelTilVedtaksperiodeDumpLokalTest {
             tilkjentYtelse.andelerTilkjentYtelse.forEach { andelTilkjentYtelse ->
                 val vedtaksperioder = kobler.finnVedtaksperioder(andelTilkjentYtelse, vedtak)
 
+                println("BehandlingId=${tilkjentYtelse.behandlingId}")
                 println("Andel=$andelTilkjentYtelse")
                 vedtaksperioder.forEach { vedtaksperiode ->
                     println("Vedtaksperiode=$vedtaksperiode")
@@ -417,7 +420,16 @@ private data object BoutgifterKoblerSkall : AndelTilVedtaksperiodeIdKobler {
         vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
     ): List<Vedtaksperiode> {
         val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørBoutgifter
-        TODO("Implementeres av ansvarlig for BOUTGIFTER")
+
+        val beregningsperiode = vedtak.beregningsresultat.perioder.single {
+            it.fom.tilFørsteDagIMåneden().datoEllerNesteMandagHvisLørdagEllerSøndag() == andel.fom
+        }
+
+        val vedtaksperioder = vedtak.vedtaksperioder.filter {
+            beregningsperiode.overlapper(it)
+        }
+
+        return vedtaksperioder
     }
 }
 
