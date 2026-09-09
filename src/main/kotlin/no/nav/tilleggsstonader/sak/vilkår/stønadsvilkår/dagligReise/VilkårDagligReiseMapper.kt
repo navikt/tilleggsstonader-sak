@@ -27,6 +27,7 @@ object VilkårDagligReiseMapper {
             status = this.status,
             delvilkårsett = this.delvilkårsett,
             fakta = this.fakta.mapTilFaktaDagligReise(),
+            slettetKommentar = this.slettetKommentar,
         )
 
     fun VilkårDagligReise.mapTilVilkår() =
