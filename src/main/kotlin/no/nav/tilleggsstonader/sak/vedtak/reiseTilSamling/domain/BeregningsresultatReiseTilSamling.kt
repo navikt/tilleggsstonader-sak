@@ -18,7 +18,7 @@ data class BeregningsresultatOffentligTransport(
     val reiseId: ReiseId,
     val grunnlag: BeregningsgrunnlagOffentligTransportForSamling,
     val beløp: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId? = null,
+    val aktivitetId: VilkårperiodeGlobalId?,
 )
 
 data class BeregningsresultatPrivatBil(
