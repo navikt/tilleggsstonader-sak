@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling
 
+import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.tilFørsteDagIMåneden
@@ -53,7 +54,7 @@ class AndelTilVedtaksperiodeDumpLokalTest {
             password = "test",
         )
 
-    private val stønadstypeSomSkalTrigges = Stønadstype.BOUTGIFTER
+    private val stønadstypeSomSkalTrigges = Stønadstype.DAGLIG_REISE_TSO
     private val andeltyperForStønadstype: List<String> =
         finnTypeAndelerForStønadstype(stønadstypeSomSkalTrigges).map { it.name }
 
@@ -61,8 +62,10 @@ class AndelTilVedtaksperiodeDumpLokalTest {
     private val tilkjentYtelseRepository = TilkjentYtelseDumpRepository(jdbcTemplate)
     private val vedtakRepository = VedtakDumpRepository(jdbcTemplate)
 
-    var andelerMedFlereVedtaksperioder: MutableList<Triple<BehandlingId, AndelTilkjentYtelse, List<Vedtaksperiode>>> = arrayListOf()
-    var andelerSomIkkeOverlapperMedVedtaksperioder: MutableList<Triple<BehandlingId, AndelTilkjentYtelse, List<Vedtaksperiode>>> = arrayListOf()
+    var andelerMedFlereVedtaksperioder: MutableList<Triple<BehandlingId, AndelTilkjentYtelse, List<Vedtaksperiode>>> =
+        arrayListOf()
+    var andelerSomIkkeOverlapperMedVedtaksperioder: MutableList<Triple<BehandlingId, AndelTilkjentYtelse, List<Vedtaksperiode>>> =
+        arrayListOf()
 
     @Test
     fun `skal kunne hente alle typeandeler for en gitt stønadstype`() {
@@ -71,7 +74,7 @@ class AndelTilVedtaksperiodeDumpLokalTest {
         println("Stønadstype=$stønadstypeSomSkalTrigges, typeAndeler=${typeAndeler.map { it.name }}")
     }
 
-    //@Disabled("TODO: Implementer faktisk kobling fra AndelTilkjentYtelse til VedtaksperiodeId for valgt stønadstype")
+    // @Disabled("TODO: Implementer faktisk kobling fra AndelTilkjentYtelse til VedtaksperiodeId for valgt stønadstype")
     @Test
     fun `TODO - koble andel til vedtaksperiodeIder`() {
         val kobler = defaultKoblingSkall().getValue(stønadstypeSomSkalTrigges)
@@ -89,18 +92,31 @@ class AndelTilVedtaksperiodeDumpLokalTest {
                     .single()
 
             tilkjentYtelse.andelerTilkjentYtelse.forEach { andelTilkjentYtelse ->
-                val vedtaksperioder = runCatching { kobler.finnVedtaksperioder(andelTilkjentYtelse, vedtak) }
-                    .onFailure { println(it) }
-                    .getOrNull() ?: emptyList()
+                val vedtaksperioder =
+                    runCatching { kobler.finnVedtaksperioder(andelTilkjentYtelse, vedtak) }
+                        .onFailure { println(it) }
+                        .getOrNull() ?: emptyList()
 
                 if (vedtaksperioder.isEmpty()) {
                     error("Ingen vedtaksperioder funnet for andel $andelTilkjentYtelse")
                 }
                 if (vedtaksperioder.none { v -> v.inneholder(andelTilkjentYtelse.fom) }) {
-                    andelerSomIkkeOverlapperMedVedtaksperioder.add(Triple(tilkjentYtelse.behandlingId, andelTilkjentYtelse, vedtaksperioder))
+                    andelerSomIkkeOverlapperMedVedtaksperioder.add(
+                        Triple(
+                            tilkjentYtelse.behandlingId,
+                            andelTilkjentYtelse,
+                            vedtaksperioder,
+                        ),
+                    )
                 }
                 if (vedtaksperioder.size > 1) {
-                    andelerMedFlereVedtaksperioder.add(Triple(tilkjentYtelse.behandlingId, andelTilkjentYtelse, vedtaksperioder))
+                    andelerMedFlereVedtaksperioder.add(
+                        Triple(
+                            tilkjentYtelse.behandlingId,
+                            andelTilkjentYtelse,
+                            vedtaksperioder,
+                        ),
+                    )
                 }
             }
         }
@@ -389,11 +405,18 @@ private data object LæremidlerKoblerSkall : AndelTilVedtaksperiodeIdKobler {
         vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
     ): List<Vedtaksperiode> {
         val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørLæremidler
-        val beregningsperioder = vedtak.beregningsresultat.perioder.filter {
-            it.grunnlag.utbetalingsdato == andel.fom
-        }
+        val beregningsperioder =
+            vedtak.beregningsresultat.perioder.filter {
+                it.grunnlag.utbetalingsdato == andel.fom
+            }
 
-        return vedtak.vedtaksperioder.filter { vedtaksperiode -> beregningsperioder.any { b -> b.overlapper(vedtaksperiode) } }
+        return vedtak.vedtaksperioder.filter { vedtaksperiode ->
+            beregningsperioder.any { b ->
+                b.overlapper(
+                    vedtaksperiode,
+                )
+            }
+        }
     }
 }
 
@@ -451,7 +474,19 @@ private data object DagligReiseKoblerSkall : AndelTilVedtaksperiodeIdKobler {
                         "Mangler beregningsresultat for offentlig transport i vedtak for behandling ${vedtaksdata.behandlingId}",
                     )
 
-            return emptyList()
+            val perioder =
+                beregningsresultat.reiser.flatMap { reise ->
+                    reise.perioder.filter {
+                        it.grunnlag.fom.datoEllerNesteMandagHvisLørdagEllerSøndag() == andel.fom
+                    }
+                }
+
+            val helPeriode =
+                Datoperiode(fom = perioder.minOf { it.grunnlag.fom }, tom = perioder.maxOf { it.grunnlag.tom })
+
+            return vedtak.vedtaksperioder.filter {
+                helPeriode.overlapper(it)
+            }
         }
     }
 }
