@@ -245,6 +245,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
     private fun faktaOffentligTransport(utgifterOffentligTransport: BigDecimal = BigDecimal("100")) =
         FaktaReiseTilSamlingOffentligTransportDto(
             utgifterOffentligTransport = utgifterOffentligTransport,
+            begrunnelse = "Togbillett mellom bosted og samling",
         )
 
     private fun faktaPrivatBil(
@@ -256,6 +257,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
         aktivitet: VilkårperiodeDto,
     ) = FaktaReiseTilSamlingPrivatBilDto(
         reiseavstand = reiseavstand,
+        begrunnelse = "Drivstoff og slitasje",
         bompenger = bompenger,
         fergekostnad = fergekostnad,
         parkering = parkering,

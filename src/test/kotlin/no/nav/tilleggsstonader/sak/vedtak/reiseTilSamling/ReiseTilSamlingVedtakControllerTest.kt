@@ -105,6 +105,7 @@ class ReiseTilSamlingVedtakControllerTest : CleanDatabaseIntegrationTest() {
                         reiseId = dummyReiseId,
                         adresse = "Samlingsgata 1",
                         utgifterOffentligTransport = 500.toBigDecimal(),
+                        begrunnelse = "Togbillett",
                     ),
             ),
         )

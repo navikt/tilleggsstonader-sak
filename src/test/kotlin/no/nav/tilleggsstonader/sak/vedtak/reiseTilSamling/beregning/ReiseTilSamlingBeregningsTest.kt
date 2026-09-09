@@ -74,6 +74,7 @@ class ReiseTilSamlingBeregningsTest {
                             reiseId = dummyReiseId,
                             adresse = "Samlingsgata 1",
                             utgifterOffentligTransport = 500.toBigDecimal(),
+                            begrunnelse = "Togbillett",
                             aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
                         ),
                 ),
@@ -89,6 +90,7 @@ class ReiseTilSamlingBeregningsTest {
                             reiseId = dummyReiseId,
                             adresse = "B",
                             utgifterOffentligTransport = 200.toBigDecimal(),
+                            begrunnelse = "Bussbillett",
                         ),
                 ),
             )
@@ -123,6 +125,7 @@ class ReiseTilSamlingBeregningsTest {
                             reiseId = dummyReiseId,
                             adresse = "Samlingsgata 1",
                             reiseavstand = 40.toBigDecimal(),
+                            begrunnelse = "Drivstoff",
                             aktivitetId = aktivitetId,
                         ),
                 ),
@@ -159,6 +162,7 @@ class ReiseTilSamlingBeregningsTest {
                             reiseId = dummyReiseId,
                             adresse = "Samlingsgata 1",
                             reiseavstand = 40.toBigDecimal(),
+                            begrunnelse = "Drivstoff",
                             bompenger = 50.toBigDecimal(),
                             fergekostnad = 100.toBigDecimal(),
                             parkering = 75.toBigDecimal(),
@@ -204,6 +208,7 @@ class ReiseTilSamlingBeregningsTest {
                             reiseId = dummyReiseId,
                             adresse = "A",
                             utgifterOffentligTransport = 300.toBigDecimal(),
+                            begrunnelse = "Togbillett",
                         ),
                 ),
                 vilkår(
@@ -218,6 +223,7 @@ class ReiseTilSamlingBeregningsTest {
                             reiseId = dummyReiseId,
                             adresse = "B",
                             utgifterOffentligTransport = 200.toBigDecimal(),
+                            begrunnelse = "Bussbillett",
                         ),
                 ),
             )
