@@ -21,28 +21,25 @@ class UtbetalingStatusHåndterer(
         melding: UtbetalingStatusRecord,
         utbetalingGjelderFagsystem: String,
     ) {
-        logger.info(
-            "Mottok melding fra fagsystem: $utbetalingGjelderFagsystem, iverksettingId: $iverksettingId og ytelse: ${melding.detaljer?.ytelse} med status: ${melding.status}",
-        )
         if (utbetalingGjelderFagsystem != FAGSYSTEM_TILLEGGSSTØNADER) {
             return
         }
 
-        val utbetalingsstatus = melding.status
+        logger.info(
+            "Mottak utbetaling-status for fagområde ${melding.detaljer?.ytelse}, med iverksettingId=$iverksettingId og status=${melding.status}",
+        )
 
-        if (utbetalingsstatus == UtbetalingStatus.FEILET) {
-            logger.error("Utbetaling feilet med ${melding.error} for iverksettingId=$iverksettingId.")
-        }
+        val utbetalingsstatus = melding.status
 
         val andeler = andelTilkjentYtelseRepository.findByIverksettingIverksettingId(UUID.fromString(iverksettingId))
 
         if (andeler.isNotEmpty()) {
-            logger.info(
-                "Mottatt utbetalingsstatus=${utbetalingsstatus.name} for iverksettingId=$iverksettingId. Oppdaterer${andeler.size} andel(er)",
-            )
+            loggStatusendringPåIverksetting(iverksettingId, utbetalingsstatus, andeler.size)
+
             feilHvis(andelerHarUforventetStatus(andeler)) {
                 "Det finnes andeler på iverksetting=$iverksettingId som har en uforventet status"
             }
+
             if (skalOppdatereStatus(andeler, utbetalingsstatus.tilStatusIverksetting())) {
                 andelTilkjentYtelseRepository.updateAll(
                     andeler.map {
@@ -50,6 +47,26 @@ class UtbetalingStatusHåndterer(
                     },
                 )
             }
+        } else {
+            logger.warn(
+                "Mottatt feilet status for iverksettingId=$iverksettingId som ikke refererer noen andel. Gjelder sannsynligvis simulering. BehandlingIder: ${melding.detaljer?.alleBehandlingIder()}",
+            )
+        }
+    }
+
+    private fun loggStatusendringPåIverksetting(
+        iverksettingId: String,
+        utbetalingStatus: UtbetalingStatus,
+        antallAndelerSomOppdateres: Int,
+    ) {
+        if (utbetalingStatus == UtbetalingStatus.FEILET) {
+            logger.error(
+                "Mottatt feilet utbetaling med status=${utbetalingStatus.name} for iverksettingId=$iverksettingId. Gjelder $antallAndelerSomOppdateres andel(er)",
+            )
+        } else {
+            logger.info(
+                "Mottatt utbetalingsstatus=${utbetalingStatus.name} for iverksettingId=$iverksettingId. Gjelder $antallAndelerSomOppdateres andel(er)",
+            )
         }
     }
 
