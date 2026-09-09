@@ -701,11 +701,13 @@ fun faktaOffentligTransportReiseTilSamling(
     reiseId: ReiseId = dummyReiseId,
     adresse: String = "Tiltaksveien 1",
     utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
+    begrunnelse: String = "Spesifisert offentlig transportutgift",
     aktivitetId: VilkårperiodeGlobalId? = null,
 ) = FaktaOffentligTransportReiseTilSamling(
     reiseId = reiseId,
     adresse = adresse,
     utgifterOffentligTransport = utgifterOffentligTransport,
+    begrunnelse = begrunnelse,
     aktivitetId = aktivitetId,
 )
 
@@ -713,6 +715,7 @@ fun faktaPrivatBilReiseTilSamling(
     reiseId: ReiseId = dummyReiseId,
     adresse: String = "Tiltaksveien 1",
     reiseavstand: BigDecimal = 40.toBigDecimal(),
+    begrunnelse: String = "Spesifisert privatbilutgift",
     bompenger: BigDecimal? = null,
     fergekostnad: BigDecimal? = null,
     parkering: BigDecimal? = null,
@@ -721,6 +724,7 @@ fun faktaPrivatBilReiseTilSamling(
     reiseId = reiseId,
     adresse = adresse,
     reiseavstand = reiseavstand,
+    begrunnelse = begrunnelse,
     bompenger = bompenger,
     fergekostnad = fergekostnad,
     parkering = parkering,
@@ -763,6 +767,7 @@ fun lagreReiseTilSamlingDto(
     adresse: String = "Tiltaksveien 1",
     reiseId: ReiseId = dummyReiseId,
     utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
+    begrunnelse: String = "Spesifisert offentlig transportutgift",
     svar: Map<RegelId, SvarOgBegrunnelseDto> =
         ReiseTilSamlingRegelTestUtil.oppfylteSvarReiseTilSamlingOffentligTransportDto(),
     fakta: FaktaReiseTilSamlingDto =
@@ -770,9 +775,11 @@ fun lagreReiseTilSamlingDto(
             adresse = adresse,
             reiseId = reiseId,
             utgifterOffentligTransport = utgifterOffentligTransport,
+            begrunnelse = begrunnelse,
         ).run {
             FaktaReiseTilSamlingOffentligTransportDto(
                 utgifterOffentligTransport = utgifterOffentligTransport,
+                begrunnelse = begrunnelse,
             )
         },
 ) = LagreVilkårReiseTilSamlingDto(

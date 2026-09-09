@@ -58,6 +58,7 @@ object VilkårReiseTilSamlingMapper {
             reiseId = this.reiseId,
             adresse = this.adresse,
             utgifterOffentligTransport = this.utgifterOffentligTransport,
+            begrunnelse = this.begrunnelse,
             aktivitetId = this.aktivitetId,
         )
 
@@ -66,10 +67,12 @@ object VilkårReiseTilSamlingMapper {
             reiseId = this.reiseId,
             adresse = this.adresse,
             reiseavstand = this.reiseavstand,
+            begrunnelse = this.begrunnelse,
             aktivitetId = this.aktivitetId,
             bompenger = this.bompenger,
             fergekostnad = this.fergekostnad,
             parkering = this.parkering,
+            piggdekkavgift = this.piggdekkavgift,
         )
 
     private fun FaktaReiseTilSamlingUbestemt.mapTilFakta() =

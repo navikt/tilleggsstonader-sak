@@ -213,8 +213,6 @@ class OpprettVilkårperiodeDsl {
                 faktaOgSvar =
                     FaktaOgSvarAktivitetReiseTilSamlingTsoDto(
                         svarLønnet = SvarJaNei.NEI,
-                        svarHarUtgifter = SvarJaNei.JA,
-                        svarErAktivitetenObligatorisk = SvarJaNei.JA,
                     ),
             )
         }

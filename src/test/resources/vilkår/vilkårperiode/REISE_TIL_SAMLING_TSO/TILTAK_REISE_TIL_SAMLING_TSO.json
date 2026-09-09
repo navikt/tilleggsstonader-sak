@@ -5,14 +5,6 @@
     "lønnet": {
       "svar": "NEI",
       "resultat": "OPPFYLT"
-    },
-    "harUtgifter": {
-      "svar": "JA",
-      "resultat": "OPPFYLT"
-    },
-    "erAktivitetenObligatorisk": {
-      "svar": "JA",
-      "resultat": "OPPFYLT"
     }
   }
 }

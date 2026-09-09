@@ -33,6 +33,7 @@ sealed interface FaktaReiseTilSamlingDto {
 
 data class FaktaReiseTilSamlingOffentligTransportDto(
     val utgifterOffentligTransport: BigDecimal,
+    val begrunnelse: String,
     val aktivitetId: VilkårperiodeGlobalId? = null,
 ) : FaktaReiseTilSamlingDto {
     override val type = TypeReiseTilSamling.OFFENTLIG_TRANSPORT
@@ -44,16 +45,19 @@ data class FaktaReiseTilSamlingOffentligTransportDto(
         reiseId = reiseId,
         adresse = adresse,
         utgifterOffentligTransport = utgifterOffentligTransport,
+        begrunnelse = begrunnelse,
         aktivitetId = aktivitetId,
     )
 }
 
 data class FaktaReiseTilSamlingPrivatBilDto(
     val reiseavstand: BigDecimal,
+    val begrunnelse: String,
     val aktivitetId: VilkårperiodeGlobalId? = null,
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,
     val parkering: BigDecimal? = null,
+    val piggdekkavgift: BigDecimal? = null,
 ) : FaktaReiseTilSamlingDto {
     override val type = TypeReiseTilSamling.PRIVAT_BIL
 
@@ -64,10 +68,12 @@ data class FaktaReiseTilSamlingPrivatBilDto(
         reiseId = reiseId,
         adresse = adresse,
         reiseavstand = reiseavstand,
+        begrunnelse = begrunnelse,
         aktivitetId = aktivitetId,
         bompenger = bompenger,
         fergekostnad = fergekostnad,
         parkering = parkering,
+        piggdekkavgift = piggdekkavgift,
     )
 }
 

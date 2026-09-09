@@ -61,6 +61,7 @@ fun lagBeregningsresultatForPrivatBil(
             bompenger = null,
             fergekostnad = null,
             parkering = null,
+            piggdekkavgift = null,
             vedtaksperioder = listOf(lagVedtaksperiodeGrunnlag(fom, tom)),
             brukersNavKontor = null,
         )

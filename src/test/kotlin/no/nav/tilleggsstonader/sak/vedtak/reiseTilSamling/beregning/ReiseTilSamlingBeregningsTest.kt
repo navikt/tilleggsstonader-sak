@@ -74,6 +74,7 @@ class ReiseTilSamlingBeregningsTest {
                             reiseId = dummyReiseId,
                             adresse = "Samlingsgata 1",
                             utgifterOffentligTransport = 500.toBigDecimal(),
+                            begrunnelse = "Togbillett",
                             aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
                         ),
                 ),
@@ -89,6 +90,7 @@ class ReiseTilSamlingBeregningsTest {
                             reiseId = dummyReiseId,
                             adresse = "B",
                             utgifterOffentligTransport = 200.toBigDecimal(),
+                            begrunnelse = "Bussbillett",
                         ),
                 ),
             )
@@ -123,6 +125,7 @@ class ReiseTilSamlingBeregningsTest {
                             reiseId = dummyReiseId,
                             adresse = "Samlingsgata 1",
                             reiseavstand = 40.toBigDecimal(),
+                            begrunnelse = "Drivstoff",
                             aktivitetId = aktivitetId,
                         ),
                 ),
@@ -144,7 +147,7 @@ class ReiseTilSamlingBeregningsTest {
     }
 
     @Test
-    fun `beregner privat bil med bompenger, fergekostnad og parkering`() {
+    fun `beregner privat bil med bompenger, fergekostnad, parkering og piggdekkavgift`() {
         every { vilkårService.hentOppfylteReiseTilSamlingVilkår(behandling.id) } returns
             listOf(
                 vilkår(
@@ -159,9 +162,11 @@ class ReiseTilSamlingBeregningsTest {
                             reiseId = dummyReiseId,
                             adresse = "Samlingsgata 1",
                             reiseavstand = 40.toBigDecimal(),
+                            begrunnelse = "Drivstoff",
                             bompenger = 50.toBigDecimal(),
                             fergekostnad = 100.toBigDecimal(),
                             parkering = 75.toBigDecimal(),
+                            piggdekkavgift = 60.toBigDecimal(),
                         ),
                 ),
             )
@@ -179,11 +184,12 @@ class ReiseTilSamlingBeregningsTest {
 
         val privatBil = result.privatBil
         assertThat(privatBil).hasSize(1)
-        // 40 * 2.94 + 50 + 100 + 75 = 342,6 = 343
-        assertThat(privatBil.first().beløp).isEqualTo(343.toBigDecimal())
+        // 40 * 2.94 + 50 + 100 + 75 + 60 = 402,6 = 403
+        assertThat(privatBil.first().beløp).isEqualTo(403.toBigDecimal())
         assertThat(privatBil.first().grunnlag.bompenger).isEqualTo(50.toBigDecimal())
         assertThat(privatBil.first().grunnlag.fergekostnad).isEqualTo(100.toBigDecimal())
         assertThat(privatBil.first().grunnlag.parkering).isEqualTo(75.toBigDecimal())
+        assertThat(privatBil.first().grunnlag.piggdekkavgift).isEqualTo(60.toBigDecimal())
     }
 
     @Test
@@ -202,6 +208,7 @@ class ReiseTilSamlingBeregningsTest {
                             reiseId = dummyReiseId,
                             adresse = "A",
                             utgifterOffentligTransport = 300.toBigDecimal(),
+                            begrunnelse = "Togbillett",
                         ),
                 ),
                 vilkår(
@@ -216,6 +223,7 @@ class ReiseTilSamlingBeregningsTest {
                             reiseId = dummyReiseId,
                             adresse = "B",
                             utgifterOffentligTransport = 200.toBigDecimal(),
+                            begrunnelse = "Bussbillett",
                         ),
                 ),
             )
