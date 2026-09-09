@@ -664,6 +664,7 @@ fun lagreVilkårperiodeAktivitet(
         FaktaOgSvarAktivitetDagligReiseTsoDto(
             svarLønnet = SvarJaNei.NEI,
             svarHarUtgifter = SvarJaNei.JA,
+            aktivitetsdager = 3,
         ),
     begrunnelse: String = "begrunnelse",
     kildeId: String? = null,
