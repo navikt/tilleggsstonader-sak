@@ -1,0 +1,1 @@
+ALTER TABLE avklart_kjort_uke ADD CONSTRAINT uke_reiseid_behandling_unik UNIQUE (behandling_id, reise_id, uke);
