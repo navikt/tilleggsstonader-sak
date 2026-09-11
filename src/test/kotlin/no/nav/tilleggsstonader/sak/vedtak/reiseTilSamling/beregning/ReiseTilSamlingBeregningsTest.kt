@@ -256,6 +256,7 @@ class ReiseTilSamlingBeregningsTest {
                             reiseId = dummyReiseId,
                             adresse = "Samlingsgata 1",
                             utgifterOffentligTransport = 300.toBigDecimal(),
+                            begrunnelse = "Begrunnelsen",
                         ),
                 ),
                 vilkår(
@@ -270,6 +271,7 @@ class ReiseTilSamlingBeregningsTest {
                             reiseId = dummyReiseId,
                             adresse = "Samlingsgata 1",
                             utgifterOffentligTransport = 100.toBigDecimal(),
+                            begrunnelse = "Begrunnelsen",
                         ),
                 ),
             )
