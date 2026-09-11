@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.Beregningsresul
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.VedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -28,6 +29,8 @@ fun lagBeregningsresultatForOffentligTransport(
     tom: LocalDate = fom,
     reiseId: ReiseId = ReiseId.random(),
     beløp: BigDecimal = BigDecimal.ZERO,
+    aktivitetId: VilkårperiodeGlobalId? = null,
+    brukersNavKontor: String? = null,
 ): BeregningsresultatOffentligTransport {
     val grunnlag =
         BeregningsgrunnlagOffentligTransportForSamling(
@@ -35,13 +38,14 @@ fun lagBeregningsresultatForOffentligTransport(
             fom = fom,
             tom = tom,
             vedtaksperioder = listOf(lagVedtaksperiodeGrunnlag(fom, tom)),
-            brukersNavKontor = null,
+            brukersNavKontor = brukersNavKontor,
         )
 
     return BeregningsresultatOffentligTransport(
         reiseId = reiseId,
         grunnlag = grunnlag,
         beløp = beløp,
+        aktivitetId = aktivitetId,
     )
 }
 
@@ -50,6 +54,8 @@ fun lagBeregningsresultatForPrivatBil(
     tom: LocalDate = fom,
     reiseId: ReiseId = ReiseId.random(),
     beløp: BigDecimal = BigDecimal.ZERO,
+    aktivitetId: VilkårperiodeGlobalId? = null,
+    brukersNavKontor: String? = null,
 ): BeregningsresultatPrivatBil {
     val grunnlag =
         BeregningsgrunnlagPrivatBilForSamling(
@@ -63,13 +69,13 @@ fun lagBeregningsresultatForPrivatBil(
             parkering = null,
             piggdekkavgift = null,
             vedtaksperioder = listOf(lagVedtaksperiodeGrunnlag(fom, tom)),
-            brukersNavKontor = null,
+            brukersNavKontor = brukersNavKontor,
         )
 
     return BeregningsresultatPrivatBil(
         reiseId = reiseId,
         grunnlag = grunnlag,
         beløp = beløp,
-        aktivitetId = null,
+        aktivitetId = aktivitetId,
     )
 }

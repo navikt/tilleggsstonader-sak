@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetReiseTilSamlingTsrDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import org.assertj.core.api.Assertions.assertThat
@@ -242,6 +243,33 @@ class VilkårperiodeControllerTest : CleanDatabaseIntegrationTest() {
                         svarHarUtgifter = SvarJaNei.JA,
                         aktivitetsdager = 3,
                     ),
+                behandlingId = behandling.id,
+            )
+
+        kall.vilkårperiode.apiRespons
+            .opprett(originalLagreRequest)
+            .expectProblemDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Mangler data: tiltaksvariant må være satt for aktivitet TILTAK",
+            )
+    }
+
+    @Test
+    fun `skal kaste feil hvis aktivitet er tiltak og ingen type aktivitet for reise til samling TSR`() {
+        val behandling =
+            testoppsettService.opprettBehandlingMedFagsak(
+                behandling(),
+                stønadstype = Stønadstype.REISE_TIL_SAMLING_TSR,
+            )
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
+
+        val originalLagreRequest =
+            LagreVilkårperiode(
+                type = AktivitetType.TILTAK,
+                tiltaksvariant = null,
+                fom = LocalDate.now(),
+                tom = LocalDate.now(),
+                faktaOgSvar = FaktaOgSvarAktivitetReiseTilSamlingTsrDto,
                 behandlingId = behandling.id,
             )
 
