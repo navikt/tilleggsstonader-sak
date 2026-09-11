@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFaktaGrunnlag
@@ -284,19 +285,28 @@ private fun mapAktiviteterPassAvBarn(
     when (aktivitetType) {
         AktivitetType.TILTAK -> {
             TiltakPassAvBarn(
-                fakta = FaktaAktivitetPassAvBarn(aktivitetsdager = faktaOgSvar.aktivitetsdager!!),
+                fakta =
+                    FaktaAktivitetPassAvBarn(
+                        aktivitetsdager = hentPåkrevdeAktivitetsdager(faktaOgSvar.aktivitetsdager),
+                    ),
                 vurderinger = VurderingTiltakPassAvBarn(lønnet = VurderingLønnet(faktaOgSvar.svarLønnet)),
             )
         }
 
         AktivitetType.UTDANNING ->
             UtdanningPassAvBarn(
-                fakta = FaktaAktivitetPassAvBarn(aktivitetsdager = faktaOgSvar.aktivitetsdager!!),
+                fakta =
+                    FaktaAktivitetPassAvBarn(
+                        aktivitetsdager = hentPåkrevdeAktivitetsdager(faktaOgSvar.aktivitetsdager),
+                    ),
             )
 
         AktivitetType.REELL_ARBEIDSSØKER ->
             ReellArbeidsøkerPassAvBarn(
-                fakta = FaktaAktivitetPassAvBarn(aktivitetsdager = faktaOgSvar.aktivitetsdager!!),
+                fakta =
+                    FaktaAktivitetPassAvBarn(
+                        aktivitetsdager = hentPåkrevdeAktivitetsdager(faktaOgSvar.aktivitetsdager),
+                    ),
             )
 
         AktivitetType.INGEN_AKTIVITET -> {
@@ -316,7 +326,7 @@ fun mapAktiviteterLæremidler(
             TiltakLæremidler(
                 fakta =
                     FaktaAktivitetLæremidler(
-                        prosent = faktaOgSvar.prosent!!,
+                        prosent = hentPåkrevdProsentForLæremidler(faktaOgSvar.prosent),
                         studienivå = faktaOgSvar.studienivå,
                     ),
                 vurderinger =
@@ -330,7 +340,7 @@ fun mapAktiviteterLæremidler(
             UtdanningLæremidler(
                 fakta =
                     FaktaAktivitetLæremidler(
-                        prosent = faktaOgSvar.prosent!!,
+                        prosent = hentPåkrevdProsentForLæremidler(faktaOgSvar.prosent),
                         studienivå = faktaOgSvar.studienivå,
                     ),
                 vurderinger =
@@ -377,7 +387,7 @@ private fun mapAktiviteterDagligReiseTso(
                     ),
                 fakta =
                     FaktaAktivitetDagligReiseTso(
-                        faktaOgSvar.aktivitetsdager,
+                        hentPåkrevdeAktivitetsdager(faktaOgSvar.aktivitetsdager),
                     ),
             )
         }
@@ -388,7 +398,7 @@ private fun mapAktiviteterDagligReiseTso(
                     VurderingUtdanningDagligReiseTso(
                         harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
                     ),
-                fakta = FaktaAktivitetDagligReiseTso(faktaOgSvar.aktivitetsdager),
+                fakta = FaktaAktivitetDagligReiseTso(hentPåkrevdeAktivitetsdager(faktaOgSvar.aktivitetsdager)),
             )
 
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetDagligReiseTso
@@ -406,7 +416,7 @@ private fun mapAktiviteterDagligReiseTsr(
                     VurderingTiltakDagligReiseTsr(
                         harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
                     ),
-                fakta = FaktaAktivitetDagligReiseTsr(faktaOgSvar.aktivitetsdager),
+                fakta = FaktaAktivitetDagligReiseTsr(hentPåkrevdeAktivitetsdager(faktaOgSvar.aktivitetsdager)),
             )
         }
 
@@ -417,6 +427,18 @@ private fun mapAktiviteterDagligReiseTsr(
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetDagligReiseTsr
         AktivitetType.REELL_ARBEIDSSØKER -> feil("Reell arbeidssøker er ikke en gyldig aktivitet for daglige reiser TSR")
     }
+
+private fun hentPåkrevdeAktivitetsdager(aktivitetsdager: Int?): Int {
+    brukerfeilHvis(aktivitetsdager == null || aktivitetsdager !in 1..5) {
+        "Mangler data: aktivitetsdager må være satt og være et heltall mellom 1 og 5"
+    }
+    return aktivitetsdager
+}
+
+private fun hentPåkrevdProsentForLæremidler(prosent: Int?): Int {
+    brukerfeilHvis(prosent == null) { "Mangler data: prosent må være satt for læremidleraktivitet" }
+    return prosent
+}
 
 private fun mapAktiviteterReiseTilSamlingTso(
     aktivitetType: AktivitetType,
