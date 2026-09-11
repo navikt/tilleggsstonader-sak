@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
+import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -13,6 +14,12 @@ data class BeregningsresultatForReisePrivatBil(
     val reiseId: ReiseId,
     val perioder: List<BeregningsresultatForReisePrivatBilPeriode>,
 ) {
+    init {
+        require(!perioder.overlapper()) {
+            "Beregningsresultat for reiseId=$reiseId har perioder som overlapper"
+        }
+    }
+
     fun markerAllePerioderSomFraTidligereVedtak() =
         this.copy(
             perioder = this.perioder.map { it.markerSomFraTidligereVedtak() },
