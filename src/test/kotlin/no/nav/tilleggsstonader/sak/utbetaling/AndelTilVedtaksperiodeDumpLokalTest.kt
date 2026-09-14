@@ -2,7 +2,9 @@ package no.nav.tilleggsstonader.sak.utbetaling
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
 import no.nav.tilleggsstonader.kontrakter.felles.tilFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -54,7 +56,11 @@ class AndelTilVedtaksperiodeDumpLokalTest {
             password = "test",
         )
 
+    //private val stønadstypeSomSkalTrigges = Stønadstype.BOUTGIFTER
+    //private val stønadstypeSomSkalTrigges = Stønadstype.LÆREMIDLER
+    //private val stønadstypeSomSkalTrigges = Stønadstype.BARNETILSYN
     private val stønadstypeSomSkalTrigges = Stønadstype.DAGLIG_REISE_TSO
+    //private val stønadstypeSomSkalTrigges = Stønadstype.DAGLIG_REISE_TSR
     private val andeltyperForStønadstype: List<String> =
         finnTypeAndelerForStønadstype(stønadstypeSomSkalTrigges).map { it.name }
 
@@ -66,6 +72,8 @@ class AndelTilVedtaksperiodeDumpLokalTest {
         arrayListOf()
     var andelerSomIkkeOverlapperMedVedtaksperioder: MutableList<Triple<BehandlingId, AndelTilkjentYtelse, List<Vedtaksperiode>>> =
         arrayListOf()
+    var andelerIkkeISammeMånedSomVedtaksperioder: MutableList<Triple<BehandlingId, AndelTilkjentYtelse, List<Vedtaksperiode>>> =
+        arrayListOf()
 
     @Test
     fun `skal kunne hente alle typeandeler for en gitt stønadstype`() {
@@ -74,9 +82,12 @@ class AndelTilVedtaksperiodeDumpLokalTest {
         println("Stønadstype=$stønadstypeSomSkalTrigges, typeAndeler=${typeAndeler.map { it.name }}")
     }
 
-    // @Disabled("TODO: Implementer faktisk kobling fra AndelTilkjentYtelse til VedtaksperiodeId for valgt stønadstype")
+    private val ignorerteBehandlingIder = listOf(
+        BehandlingId.fromString("da5f2963-6576-4178-a6f6-7455a88dc4db")
+    )
+
     @Test
-    fun `TODO - koble andel til vedtaksperiodeIder`() {
+    fun `koble andel til vedtaksperiodeIder`() {
         val kobler = defaultKoblingSkall().getValue(stønadstypeSomSkalTrigges)
         val tilkjenteYtelser =
             tilkjentYtelseRepository.finnTilkjenteYtelserMedAndeler(
@@ -84,18 +95,22 @@ class AndelTilVedtaksperiodeDumpLokalTest {
                 antall = 100_000,
             )
 
-        tilkjenteYtelser.forEach { tilkjentYtelse ->
+        tilkjenteYtelser
+            .filterNot { it.behandlingId in ignorerteBehandlingIder }
+            .forEach { tilkjentYtelse ->
             val vedtak =
-                vedtakRepository
-                    .finnVedtakForBehandlinger(listOf(tilkjentYtelse.behandlingId))
-                    .values
-                    .single()
+                try {
+                    vedtakRepository
+                        .finnVedtakForBehandlinger(listOf(tilkjentYtelse.behandlingId))
+                        .values
+                        .single()
+                } catch (e: Exception) {
+                    error("Feil ved henting av vedtak for behandlingId=${tilkjentYtelse.behandlingId}")
+                }
 
             tilkjentYtelse.andelerTilkjentYtelse.forEach { andelTilkjentYtelse ->
                 val vedtaksperioder =
-                    runCatching { kobler.finnVedtaksperioder(andelTilkjentYtelse, vedtak) }
-                        .onFailure { println(it) }
-                        .getOrNull() ?: emptyList()
+                    kobler.finnVedtaksperioder(andelTilkjentYtelse, vedtak)
 
                 if (vedtaksperioder.isEmpty()) {
                     error("Ingen vedtaksperioder funnet for andel $andelTilkjentYtelse")
@@ -116,6 +131,15 @@ class AndelTilVedtaksperiodeDumpLokalTest {
                             andelTilkjentYtelse,
                             vedtaksperioder,
                         ),
+                    )
+                }
+                if (!vedtaksperioder.alleMånederIPeriode().contains(andelTilkjentYtelse.fom.month)) {
+                    andelerIkkeISammeMånedSomVedtaksperioder.add(
+                        Triple(
+                            tilkjentYtelse.behandlingId,
+                            andelTilkjentYtelse,
+                            vedtaksperioder,
+                        )
                     )
                 }
             }
@@ -151,7 +175,29 @@ class AndelTilVedtaksperiodeDumpLokalTest {
 
             println()
         }
+        if (andelerIkkeISammeMånedSomVedtaksperioder.isNotEmpty()) {
+            println("---------")
+            println("Andeler som ikke er i samme måned som vedtaksperioder: ${andelerIkkeISammeMånedSomVedtaksperioder.size}")
+            andelerIkkeISammeMånedSomVedtaksperioder.forEach { (behandlingId, andel, vedtaksperioder) ->
+                println("BehandlingId=$behandlingId")
+                println(andel)
+                vedtaksperioder.forEach { vedtaksperiode ->
+                    println(vedtaksperiode)
+                }
+                println()
+            }
+            println("---------")
+
+            println()
+        }
+
+        println("Andeler som ikke overlapper med vedtaksperioder: ${andelerSomIkkeOverlapperMedVedtaksperioder.size}")
+        println("Andeler som matcher med flere vedtaksperioder: ${andelerMedFlereVedtaksperioder.size}")
+        println("Andeler som ikke er i samme måned som vedtaksperioder: ${andelerIkkeISammeMånedSomVedtaksperioder.size}")
     }
+
+    private fun Collection<Periode<LocalDate>>.alleMånederIPeriode() =
+        flatMap { it.alleDatoer().map { d -> d.month } }.toSet()
 }
 
 private data class DatabaseConfig(
@@ -458,6 +504,11 @@ private data object DagligReiseKoblerSkall : AndelTilVedtaksperiodeIdKobler {
                     .single {
                         it.reiseId == andel.reiseId
                     }.perioder
+
+            if (reiseperioder.filter {
+                    it.fom.iDagHvisMandagEllerForrigeMandag() == andel.fom
+                }.size > 1) {
+            }
 
             val periode =
                 reiseperioder.single {
