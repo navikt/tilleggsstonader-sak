@@ -13,7 +13,7 @@ val wiremockVersion = "3.13.2"
 val mockkVersion = "1.14.11"
 val testcontainerVersion = "1.21.4"
 val springDocVersion = "3.1.0"
-val shedlockVersion = "7.9.0"
+val shedlockVersion = "7.10.0"
 
 group = "no.nav.tilleggsstonader.sak"
 version = "1.0.0"
@@ -22,7 +22,7 @@ plugins {
     application
 
     kotlin("jvm") version "2.4.10"
-    id("com.diffplug.spotless") version "8.10.1"
+    id("com.diffplug.spotless") version "8.10.2"
     id("io.github.ben-manes.versions") version "0.61.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
 
