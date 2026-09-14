@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
@@ -28,6 +29,11 @@ data class VedtaksperioderDvh(
     val tom: LocalDate,
     val aktivitet: AktivitetTypeDvh,
     val lovverketsMålgruppe: LovverketsMålgruppeDvh,
+    /**
+     * TODO: er foreløpig alltid null for LÆREMIDLER og BARNETILSYN, ettersom disse periodene
+     * bygges fra sammenslåtte beregningsperioder som ikke er 1:1 med en lagret [no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode].
+     */
+    val id: VedtaksperiodeId? = null,
     // Tilsyn barn
     val antallBarn: Int? = null,
     val barn: BarnDvh.JsonWrapper? = null,
@@ -79,6 +85,8 @@ data class VedtaksperioderDvh(
                                 tom = it.tom,
                                 aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
                                 lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
+                                // TODO: vedtaksperiode-id er ikke tilgjengelig for læremidler ennå, se doc på feltet
+                                id = null,
                                 studienivå = StudienivåDvh.fraDomene(it.studienivå),
                             )
                         },
@@ -97,6 +105,8 @@ data class VedtaksperioderDvh(
                             tom = it.tom,
                             lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
                             aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
+                            // TODO: vedtaksperiode-id er ikke tilgjengelig for barnetilsyn ennå, se doc på feltet
+                            id = null,
                             antallBarn = it.antallBarn,
                             barn = BarnDvh.fraDomene(it.barn.finnFødselsnumre(barnIBehandlingen)),
                         )
@@ -112,6 +122,7 @@ data class VedtaksperioderDvh(
                             tom = it.tom,
                             aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
                             lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
+                            id = it.id,
                         )
                     },
             )
@@ -125,6 +136,7 @@ data class VedtaksperioderDvh(
                             tom = it.tom,
                             aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
                             lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
+                            id = it.id,
                         )
                     },
             )
@@ -138,6 +150,7 @@ data class VedtaksperioderDvh(
                             tom = it.tom,
                             aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
                             lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
+                            id = it.id,
                         )
                     },
             )
@@ -152,6 +165,7 @@ data class VedtaksperioderDvh(
                         tom = it.tom,
                         aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
                         lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
+                        id = it.id,
                     )
                 },
         )

@@ -43,6 +43,7 @@ class UtbetalingerDvhTest {
                             beløp = stønadsbeløp,
                             makssats = makssats,
                             beløpErBegrensetAvMakssats = false,
+                            vedtaksperiodeIder = innvilgelsePassAvBarn.data.vedtaksperioder.map { it.id },
                         ),
                     ),
             )
@@ -68,6 +69,7 @@ class UtbetalingerDvhTest {
                             beløp = 11554,
                             makssats = null,
                             beløpErBegrensetAvMakssats = null,
+                            vedtaksperiodeIder = innvilgelse.data.vedtaksperioder.map { it.id },
                         ),
                     ),
             )
@@ -111,6 +113,7 @@ class UtbetalingerDvhTest {
                             type = AndelstypeDvh.DAGLIG_REISE_AAP,
                             beløp = stønadsbeløp,
                             beløpErBegrensetAvMakssats = null,
+                            vedtaksperiodeIder = vedtaksdata.vedtaksperioder.map { it.id },
                         ),
                     ),
             )
@@ -157,6 +160,7 @@ class UtbetalingerDvhTest {
                             beløp = makssats,
                             makssats = makssats,
                             beløpErBegrensetAvMakssats = true,
+                            vedtaksperiodeIder = vedtaksdata.vedtaksperioder.map { it.id },
                         ),
                     ),
             )

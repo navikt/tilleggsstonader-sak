@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvh.Companion.finnFødselsnumre
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.avslag
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.defaultBarn1
@@ -75,9 +76,10 @@ class VedtaksperioderDvhTest {
 
     @Test
     fun `fraDomene kan mappe for InnvilgelseDagligReise`() {
+        val vedtak = innvilgelseDagligReise()
         val resultat =
             VedtaksperioderDvh.fraDomene(
-                vedtak = innvilgelseDagligReise(),
+                vedtak = vedtak,
                 barn = emptyList(),
             )
 
@@ -90,6 +92,7 @@ class VedtaksperioderDvhTest {
                             tom = LocalDate.of(2024, 1, 7),
                             aktivitet = AktivitetTypeDvh.TILTAK,
                             lovverketsMålgruppe = LovverketsMålgruppeDvh.NEDSATT_ARBEIDSEVNE,
+                            id = (vedtak.data as InnvilgelseEllerOpphørDagligReise).vedtaksperioder.single().id,
                         ),
                     ),
             )

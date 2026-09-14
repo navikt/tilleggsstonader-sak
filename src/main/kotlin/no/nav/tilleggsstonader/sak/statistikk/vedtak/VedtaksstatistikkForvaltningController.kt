@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
 import io.swagger.v3.oas.annotations.tags.Tag
 import no.nav.security.token.support.core.api.ProtectedWithClaims
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.log.logger
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
@@ -28,5 +29,23 @@ class VedtaksstatistikkForvaltningController(
         tilgangService.validerHarUtviklerrolle()
         logger.info("Oppdaterer vedtaksstatistikk for behandling $behandlingId")
         vedtaksstatistikkService.oppdaterVedtaksstatistikkV2(behandlingId)
+    }
+
+    /**
+     * Oppretter en task for hver behandling med vedtak for gitt [stønadstype],
+     * som oppdaterer den eksisterende raden i vedtaksstatistikk-tabellen.
+     */
+    @PostMapping("/oppdater-alle/{stønadstype}")
+    fun oppdaterVedtaksstatistikkForAlleVedtatteBehandlinger(
+        @PathVariable stønadstype: Stønadstype,
+    ): List<BehandlingId> {
+        tilgangService.validerHarUtviklerrolle()
+        val behandlingIder = vedtaksstatistikkService.opprettTaskerForOppdateringAvVedtaksstatistikk(stønadstype)
+        logger.info(
+            "Oppretter {} tasker for oppdatering av vedtaksstatistikk for stønadstype {}",
+            behandlingIder.size,
+            stønadstype,
+        )
+        return behandlingIder
     }
 }

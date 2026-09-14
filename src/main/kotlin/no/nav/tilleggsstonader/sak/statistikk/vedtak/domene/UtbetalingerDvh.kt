@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.MakssatsDvhUtil.Companion.finnMakssats
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
@@ -13,6 +14,7 @@ data class UtbetalingerDvh(
     val beløp: Int,
     val makssats: Int? = null,
     val beløpErBegrensetAvMakssats: Boolean? = null,
+    val vedtaksperiodeIder: List<VedtaksperiodeId> = emptyList(),
 ) {
     data class JsonWrapper(
         val utbetalinger: List<UtbetalingerDvh>,
@@ -43,6 +45,10 @@ data class UtbetalingerDvh(
                             beløp = it.beløp,
                             makssats = makssats,
                             beløpErBegrensetAvMakssats = beløpErBegrensetAvMakssats,
+                            vedtaksperiodeIder =
+                                AndelTilVedtaksperiodeMapper
+                                    .finnVedtaksperioder(it, vedtak)
+                                    .map { vedtaksperiode -> vedtaksperiode.id },
                         )
                     },
             )

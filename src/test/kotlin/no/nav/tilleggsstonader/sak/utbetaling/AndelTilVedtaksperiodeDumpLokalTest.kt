@@ -1,31 +1,27 @@
 package no.nav.tilleggsstonader.sak.utbetaling
 
-import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.alleDatoer
-import no.nav.tilleggsstonader.kontrakter.felles.tilFørsteDagIMåneden
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AndelTilVedtaksperiodeIdKobler
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BarnetilsynAndelTilVedtaksperiodeIdKobler
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.BoutgifterAndelTilVedtaksperiodeIdKobler
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.DagligReiseAndelTilVedtaksperiodeIdKobler
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.LæremidlerAndelTilVedtaksperiodeIdKobler
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ReiseOppstartAndelTilVedtaksperiodeIdKobler
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ReiseTilSamlingAndelTilVedtaksperiodeIdKobler
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
-import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
-import no.nav.tilleggsstonader.sak.util.iDagHvisMandagEllerForrigeMandag
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørPassAvBarn
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørReiseOppstartAvslutningHjemreise
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.finnPeriodeFraAndel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -46,8 +42,9 @@ import javax.sql.DataSource
  * 2. Velg stønadstype som skal trigges.
  * 3. Sett evt. ønsketAndelId hvis du vil teste en konkret andel.
  * 4. Fjern @Disabled og kjør testen.
+ *
+ * @Disabled("Kun for lokal manuell testing mot tabeller i schema dump")
  */
-// @Disabled("Kun for lokal manuell testing mot tabeller i schema dump")
 class AndelTilVedtaksperiodeDumpLokalTest {
     private val databaseConfig =
         DatabaseConfig(
@@ -56,11 +53,12 @@ class AndelTilVedtaksperiodeDumpLokalTest {
             password = "test",
         )
 
-    //private val stønadstypeSomSkalTrigges = Stønadstype.BOUTGIFTER
-    //private val stønadstypeSomSkalTrigges = Stønadstype.LÆREMIDLER
-    //private val stønadstypeSomSkalTrigges = Stønadstype.BARNETILSYN
+    // private val stønadstypeSomSkalTrigges = Stønadstype.BOUTGIFTER
+    // private val stønadstypeSomSkalTrigges = Stønadstype.LÆREMIDLER
+    // private val stønadstypeSomSkalTrigges = Stønadstype.BARNETILSYN
     private val stønadstypeSomSkalTrigges = Stønadstype.DAGLIG_REISE_TSO
-    //private val stønadstypeSomSkalTrigges = Stønadstype.DAGLIG_REISE_TSR
+
+    // private val stønadstypeSomSkalTrigges = Stønadstype.DAGLIG_REISE_TSR
     private val andeltyperForStønadstype: List<String> =
         finnTypeAndelerForStønadstype(stønadstypeSomSkalTrigges).map { it.name }
 
@@ -82,9 +80,10 @@ class AndelTilVedtaksperiodeDumpLokalTest {
         println("Stønadstype=$stønadstypeSomSkalTrigges, typeAndeler=${typeAndeler.map { it.name }}")
     }
 
-    private val ignorerteBehandlingIder = listOf(
-        BehandlingId.fromString("da5f2963-6576-4178-a6f6-7455a88dc4db")
-    )
+    private val ignorerteBehandlingIder =
+        listOf(
+            BehandlingId.fromString("da5f2963-6576-4178-a6f6-7455a88dc4db"),
+        )
 
     @Test
     fun `koble andel til vedtaksperiodeIder`() {
@@ -98,52 +97,52 @@ class AndelTilVedtaksperiodeDumpLokalTest {
         tilkjenteYtelser
             .filterNot { it.behandlingId in ignorerteBehandlingIder }
             .forEach { tilkjentYtelse ->
-            val vedtak =
-                try {
-                    vedtakRepository
-                        .finnVedtakForBehandlinger(listOf(tilkjentYtelse.behandlingId))
-                        .values
-                        .single()
-                } catch (e: Exception) {
-                    error("Feil ved henting av vedtak for behandlingId=${tilkjentYtelse.behandlingId}")
-                }
+                val vedtak =
+                    try {
+                        vedtakRepository
+                            .finnVedtakForBehandlinger(listOf(tilkjentYtelse.behandlingId))
+                            .values
+                            .single()
+                    } catch (e: Exception) {
+                        error("Feil ved henting av vedtak for behandlingId=${tilkjentYtelse.behandlingId}")
+                    }
 
-            tilkjentYtelse.andelerTilkjentYtelse.forEach { andelTilkjentYtelse ->
-                val vedtaksperioder =
-                    kobler.finnVedtaksperioder(andelTilkjentYtelse, vedtak)
+                tilkjentYtelse.andelerTilkjentYtelse.forEach { andelTilkjentYtelse ->
+                    val vedtaksperioder =
+                        kobler.finnVedtaksperioder(andelTilkjentYtelse, vedtak)
 
-                if (vedtaksperioder.isEmpty()) {
-                    error("Ingen vedtaksperioder funnet for andel $andelTilkjentYtelse")
-                }
-                if (vedtaksperioder.none { v -> v.inneholder(andelTilkjentYtelse.fom) }) {
-                    andelerSomIkkeOverlapperMedVedtaksperioder.add(
-                        Triple(
-                            tilkjentYtelse.behandlingId,
-                            andelTilkjentYtelse,
-                            vedtaksperioder,
-                        ),
-                    )
-                }
-                if (vedtaksperioder.size > 1) {
-                    andelerMedFlereVedtaksperioder.add(
-                        Triple(
-                            tilkjentYtelse.behandlingId,
-                            andelTilkjentYtelse,
-                            vedtaksperioder,
-                        ),
-                    )
-                }
-                if (!vedtaksperioder.alleMånederIPeriode().contains(andelTilkjentYtelse.fom.month)) {
-                    andelerIkkeISammeMånedSomVedtaksperioder.add(
-                        Triple(
-                            tilkjentYtelse.behandlingId,
-                            andelTilkjentYtelse,
-                            vedtaksperioder,
+                    if (vedtaksperioder.isEmpty()) {
+                        error("Ingen vedtaksperioder funnet for andel $andelTilkjentYtelse")
+                    }
+                    if (vedtaksperioder.none { v -> v.inneholder(andelTilkjentYtelse.fom) }) {
+                        andelerSomIkkeOverlapperMedVedtaksperioder.add(
+                            Triple(
+                                tilkjentYtelse.behandlingId,
+                                andelTilkjentYtelse,
+                                vedtaksperioder,
+                            ),
                         )
-                    )
+                    }
+                    if (vedtaksperioder.size > 1) {
+                        andelerMedFlereVedtaksperioder.add(
+                            Triple(
+                                tilkjentYtelse.behandlingId,
+                                andelTilkjentYtelse,
+                                vedtaksperioder,
+                            ),
+                        )
+                    }
+                    if (!vedtaksperioder.alleMånederIPeriode().contains(andelTilkjentYtelse.fom.month)) {
+                        andelerIkkeISammeMånedSomVedtaksperioder.add(
+                            Triple(
+                                tilkjentYtelse.behandlingId,
+                                andelTilkjentYtelse,
+                                vedtaksperioder,
+                            ),
+                        )
+                    }
                 }
             }
-        }
 
         if (andelerSomIkkeOverlapperMedVedtaksperioder.isNotEmpty()) {
             println("---------")
@@ -196,8 +195,7 @@ class AndelTilVedtaksperiodeDumpLokalTest {
         println("Andeler som ikke er i samme måned som vedtaksperioder: ${andelerIkkeISammeMånedSomVedtaksperioder.size}")
     }
 
-    private fun Collection<Periode<LocalDate>>.alleMånederIPeriode() =
-        flatMap { it.alleDatoer().map { d -> d.month } }.toSet()
+    private fun Collection<Periode<LocalDate>>.alleMånederIPeriode() = flatMap { it.alleDatoer().map { d -> d.month } }.toSet()
 }
 
 private data class DatabaseConfig(
@@ -415,149 +413,13 @@ private fun TypeAndel.tilStønadstype(): Stønadstype? =
 
 private fun defaultKoblingSkall(): Map<Stønadstype, AndelTilVedtaksperiodeIdKobler> =
     mapOf(
-        Stønadstype.BARNETILSYN to BarnetilsynKoblerSkall,
-        Stønadstype.LÆREMIDLER to LæremidlerKoblerSkall,
-        Stønadstype.BOUTGIFTER to BoutgifterKoblerSkall,
-        Stønadstype.DAGLIG_REISE_TSO to DagligReiseKoblerSkall,
-        Stønadstype.DAGLIG_REISE_TSR to DagligReiseKoblerSkall,
-        Stønadstype.REISE_TIL_SAMLING_TSO to ReiseTilSamlingKoblerSkall,
-        Stønadstype.REISE_TIL_SAMLING_TSR to ReiseTilSamlingKoblerSkall,
-        Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO to ReiseOppstartKoblerSkall,
-        Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR to ReiseOppstartKoblerSkall,
+        Stønadstype.BARNETILSYN to BarnetilsynAndelTilVedtaksperiodeIdKobler,
+        Stønadstype.LÆREMIDLER to LæremidlerAndelTilVedtaksperiodeIdKobler,
+        Stønadstype.BOUTGIFTER to BoutgifterAndelTilVedtaksperiodeIdKobler,
+        Stønadstype.DAGLIG_REISE_TSO to DagligReiseAndelTilVedtaksperiodeIdKobler,
+        Stønadstype.DAGLIG_REISE_TSR to DagligReiseAndelTilVedtaksperiodeIdKobler,
+        Stønadstype.REISE_TIL_SAMLING_TSO to ReiseTilSamlingAndelTilVedtaksperiodeIdKobler,
+        Stønadstype.REISE_TIL_SAMLING_TSR to ReiseTilSamlingAndelTilVedtaksperiodeIdKobler,
+        Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO to ReiseOppstartAndelTilVedtaksperiodeIdKobler,
+        Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR to ReiseOppstartAndelTilVedtaksperiodeIdKobler,
     )
-
-private fun interface AndelTilVedtaksperiodeIdKobler {
-    fun finnVedtaksperioder(
-        andel: AndelTilkjentYtelse,
-        vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
-    ): List<Vedtaksperiode>
-}
-
-private data object BarnetilsynKoblerSkall : AndelTilVedtaksperiodeIdKobler {
-    override fun finnVedtaksperioder(
-        andel: AndelTilkjentYtelse,
-        vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
-    ): List<Vedtaksperiode> {
-        val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørPassAvBarn
-
-        val periode = finnPeriodeFraAndel(vedtak.beregningsresultat, andel)
-        return vedtak.vedtaksperioder.filter { it.overlapper(periode) }
-    }
-}
-
-private data object LæremidlerKoblerSkall : AndelTilVedtaksperiodeIdKobler {
-    override fun finnVedtaksperioder(
-        andel: AndelTilkjentYtelse,
-        vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
-    ): List<Vedtaksperiode> {
-        val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørLæremidler
-        val beregningsperioder =
-            vedtak.beregningsresultat.perioder.filter {
-                it.grunnlag.utbetalingsdato == andel.fom
-            }
-
-        return vedtak.vedtaksperioder.filter { vedtaksperiode ->
-            beregningsperioder.any { b ->
-                b.overlapper(
-                    vedtaksperiode,
-                )
-            }
-        }
-    }
-}
-
-private data object BoutgifterKoblerSkall : AndelTilVedtaksperiodeIdKobler {
-    override fun finnVedtaksperioder(
-        andel: AndelTilkjentYtelse,
-        vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
-    ): List<Vedtaksperiode> {
-        val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørBoutgifter
-
-        val beregningsperiode =
-            vedtak.beregningsresultat.perioder.filter {
-                it.fom.tilFørsteDagIMåneden().datoEllerNesteMandagHvisLørdagEllerSøndag() == andel.fom
-            }
-
-        val vedtaksperioder =
-            vedtak.vedtaksperioder.filter {
-                beregningsperiode.any { b -> b.overlapper(it) }
-            }
-
-        return vedtaksperioder
-    }
-}
-
-private data object DagligReiseKoblerSkall : AndelTilVedtaksperiodeIdKobler {
-    override fun finnVedtaksperioder(
-        andel: AndelTilkjentYtelse,
-        vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
-    ): List<Vedtaksperiode> {
-        val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørDagligReise
-
-        val andelTilhørerPrivatBil = andel.reiseId != null
-
-        if (andelTilhørerPrivatBil) {
-            val beregningsresultat = vedtak.beregningsresultat.privatBil!!
-
-            val reiseperioder =
-                beregningsresultat.reiser
-                    .single {
-                        it.reiseId == andel.reiseId
-                    }.perioder
-
-            if (reiseperioder.filter {
-                    it.fom.iDagHvisMandagEllerForrigeMandag() == andel.fom
-                }.size > 1) {
-            }
-
-            val periode =
-                reiseperioder.single {
-                    it.fom.iDagHvisMandagEllerForrigeMandag() == andel.fom
-                }
-
-            return vedtak.vedtaksperioder.filter {
-                periode.overlapper(it)
-            }
-        } else {
-            val beregningsresultat =
-                vedtak.beregningsresultat.offentligTransport
-                    ?: throw RuntimeException(
-                        "Mangler beregningsresultat for offentlig transport i vedtak for behandling ${vedtaksdata.behandlingId}",
-                    )
-
-            val perioder =
-                beregningsresultat.reiser.flatMap { reise ->
-                    reise.perioder.filter {
-                        it.grunnlag.fom.datoEllerNesteMandagHvisLørdagEllerSøndag() == andel.fom
-                    }
-                }
-
-            val helPeriode =
-                Datoperiode(fom = perioder.minOf { it.grunnlag.fom }, tom = perioder.maxOf { it.grunnlag.tom })
-
-            return vedtak.vedtaksperioder.filter {
-                helPeriode.overlapper(it)
-            }
-        }
-    }
-}
-
-private data object ReiseTilSamlingKoblerSkall : AndelTilVedtaksperiodeIdKobler {
-    override fun finnVedtaksperioder(
-        andel: AndelTilkjentYtelse,
-        vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
-    ): List<Vedtaksperiode> {
-        val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørReiseTilSamling
-        TODO("Implementeres av ansvarlig for REISE_TIL_SAMLING")
-    }
-}
-
-private data object ReiseOppstartKoblerSkall : AndelTilVedtaksperiodeIdKobler {
-    override fun finnVedtaksperioder(
-        andel: AndelTilkjentYtelse,
-        vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
-    ): List<Vedtaksperiode> {
-        val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørReiseOppstartAvslutningHjemreise
-        TODO("Implementeres av ansvarlig for REISE_OPPSTART_AVSLUTNING_HJEMREISE")
-    }
-}

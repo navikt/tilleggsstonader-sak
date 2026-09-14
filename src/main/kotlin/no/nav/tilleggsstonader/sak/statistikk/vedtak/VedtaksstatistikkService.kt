@@ -1,7 +1,10 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
+import no.nav.familie.prosessering.internal.TaskService
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnRepository
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
@@ -26,10 +29,12 @@ import org.springframework.stereotype.Service
 class VedtaksstatistikkService(
     private val vedtaksstatistikkRepositoryV2: VedtaksstatistikkRepositoryV2,
     private val behandlingService: BehandlingService,
+    private val behandlingRepository: BehandlingRepository,
     private val personService: PersonService,
     private val vedtakService: VedtakService,
     private val barnRepository: BarnRepository,
     private val tilkjentYtelseService: TilkjentYtelseService,
+    private val taskService: TaskService,
 ) {
     fun lagreVedtaksstatistikkV2(behandlingId: BehandlingId) {
         val vedtaksstatistikkV2 = mapTilVedtaksstatistikkV2(behandlingId)
@@ -39,6 +44,25 @@ class VedtaksstatistikkService(
     fun oppdaterVedtaksstatistikkV2(behandlingId: BehandlingId) {
         val vedtaksstatistikkV2 = mapTilVedtaksstatistikkV2(behandlingId)
         vedtaksstatistikkRepositoryV2.update(vedtaksstatistikkV2)
+    }
+
+    /**
+     * Oppretter en [OppdaterVedtaksstatistikkTask] for alle behandlinger med vedtak for gitt [stønadstype],
+     * slik at eksisterende rader i vedtaksstatistikk-tabellen kan oppdateres på nytt.
+     */
+    fun opprettTaskerForOppdateringAvVedtaksstatistikk(stønadstype: Stønadstype): List<BehandlingId> {
+        val behandlingIder = behandlingRepository.finnBehandlingerMedVedtak(stønadstype)
+
+        taskService.saveAll(
+            behandlingIder.map {
+                OppdaterVedtaksstatistikkTask.opprettOppdaterVedtaksstatistikkTask(
+                    behandlingId = it,
+                    stønadstype = stønadstype,
+                )
+            },
+        )
+
+        return behandlingIder
     }
 
     private fun mapTilVedtaksstatistikkV2(behandlingId: BehandlingId): VedtaksstatistikkV2 {
