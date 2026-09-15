@@ -55,7 +55,7 @@ class JournalpostController(
         val (journalpost, personIdent) = journalpostService.finnJournalpostOgPersonIdent(journalpostId)
         tilgangService.validerTilgangTilPerson(personIdent, AuditLoggerEvent.ACCESS)
         val valgbareStønadstyperForJournalpost =
-            håndterSøknadService.finnStønadstyperSomKanOpprettesFraJournalpost(journalpost)
+            håndterSøknadService.finnStønadstyperSomKanOpprettesFraJournalpost(journalpost, filtrerStønadstyperSomIkkeErAktivert = true)
         return JournalpostResponse(
             journalpost = journalpost,
             personIdent = personIdent,
