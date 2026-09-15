@@ -1,21 +1,12 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 
 import no.nav.tilleggsstonader.kontrakter.felles.IdentSkjematype
-import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
-import no.nav.tilleggsstonader.sak.ekstern.stønad.HarBehandlingRequest
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 
 class HarBehandlingKall(
     private val testklient: Testklient,
 ) {
-    fun harBehandling(identStønadstype: IdentStønadstype): Boolean =
-        apiRespons
-            .harBehandling(
-                HarBehandlingRequest(identStønadstype.ident, stønadstype = identStønadstype.stønadstype),
-            ).expectOkWithBody()
-
-    fun harBehandling(identSkjematype: IdentSkjematype): Boolean =
-        apiRespons.harBehandling(HarBehandlingRequest(identSkjematype.ident, skjematype = identSkjematype.skjematype)).expectOkWithBody()
+    fun harBehandling(identSkjematype: IdentSkjematype): Boolean = apiRespons.harBehandling(identSkjematype).expectOkWithBody()
 
     // Gir tilgang til "rå"-endepunktet slik at tester kan skrive egne assertions på responsen.
     val apiRespons = HarBehandlingApi()
