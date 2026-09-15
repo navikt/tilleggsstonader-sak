@@ -68,6 +68,8 @@ class InterntVedtakGenereringTest {
             "BOUTGIFTER",
             "DAGLIG_REISE_TSO",
             "DAGLIG_REISE_TSR",
+            "REISE_TIL_SAMLING_TSO",
+            "REISE_TIL_SAMLING_TSR",
         ],
     )
     fun `json til htmlify er riktig`(stønadstype: Stønadstype) {
@@ -93,6 +95,8 @@ class InterntVedtakGenereringTest {
             "BOUTGIFTER",
             "DAGLIG_REISE_TSO",
             "DAGLIG_REISE_TSR",
+            "REISE_TIL_SAMLING_TSO",
+            "REISE_TIL_SAMLING_TSR",
         ],
     )
     fun `lag html og pdf`(stønadstype: Stønadstype) {
@@ -113,9 +117,8 @@ class InterntVedtakGenereringTest {
             Stønadstype.BOUTGIFTER -> mockBoutgifter()
             Stønadstype.DAGLIG_REISE_TSO -> mockDagligReiseTso()
             Stønadstype.DAGLIG_REISE_TSR -> mockDagligReiseTsr()
-            Stønadstype.REISE_TIL_SAMLING_TSO,
-            Stønadstype.REISE_TIL_SAMLING_TSR,
-            -> TODO("mockReiseTilSamlingTso")
+            Stønadstype.REISE_TIL_SAMLING_TSO -> mockReiseTilSamlingTso()
+            Stønadstype.REISE_TIL_SAMLING_TSR -> mockReiseTilSamlingTsr()
             Stønadstype.FLYTTING_TSO,
             Stønadstype.FLYTTING_TSR,
             -> TODO("mockFlytting")
@@ -172,6 +175,28 @@ class InterntVedtakGenereringTest {
             InterntVedtakTestdata.DagligReise.vilkårOffentligTransport +
             InterntVedtakTestdata.DagligReise.vilkårPrivatBil
         every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.DagligReise.innvilgetVedtakTsr()
+    }
+
+    private fun mockReiseTilSamlingTso() {
+        every { behandlingService.hentSaksbehandling(behandlingId) } returns InterntVedtakTestdata.ReiseTilSamling.behandling
+        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.ReiseTilSamling.vilkårperioderTso
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.ReiseTilSamling.grunnlagsdata
+        every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
+        every { vilkårService.hentVilkår(behandlingId) } returns
+            InterntVedtakTestdata.ReiseTilSamling.vilkårOffentligTransport +
+            InterntVedtakTestdata.ReiseTilSamling.vilkårPrivatBil
+        every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.ReiseTilSamling.innvilgetVedtakTso()
+    }
+
+    private fun mockReiseTilSamlingTsr() {
+        every { behandlingService.hentSaksbehandling(behandlingId) } returns InterntVedtakTestdata.ReiseTilSamling.behandlingTsr
+        every { vilkårperiodeService.hentVilkårperioder(behandlingId) } returns InterntVedtakTestdata.ReiseTilSamling.vilkårperioderTsr
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns InterntVedtakTestdata.ReiseTilSamling.grunnlagsdata
+        every { barnService.finnBarnPåBehandling(behandlingId) } returns emptyList()
+        every { vilkårService.hentVilkår(behandlingId) } returns
+            InterntVedtakTestdata.ReiseTilSamling.vilkårOffentligTransport +
+            InterntVedtakTestdata.ReiseTilSamling.vilkårPrivatBil
+        every { vedtakService.hentVedtak(behandlingId) } returns InterntVedtakTestdata.ReiseTilSamling.innvilgetVedtakTsr()
     }
 
     @Test

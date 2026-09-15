@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetPassAvBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetReiseTilSamlingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppeLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenMålgruppePassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.InnsattIFengselDagligReiseTsr
@@ -42,6 +43,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakPassAvBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakReiseTilSamlingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakspengerDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdPassAvBarn
@@ -49,6 +51,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningPassAvBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningReiseTilSamlingTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningReiseTilSamlingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAPLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
@@ -66,6 +70,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakPassAvBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakReiseTilSamlingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygdLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUtdanningDagligReiseTso
@@ -490,6 +495,43 @@ object VilkårperiodeTestUtil {
 
             else -> {
                 throw IllegalArgumentException("$type er ikke en gyldig aktivitetstype for daglig reise tiltaksenheten")
+            }
+        }
+
+    fun faktaOgVurderingAktivitetReiseTilSamlingTso(
+        type: AktivitetType = AktivitetType.TILTAK,
+        lønnet: VurderingLønnet = vurderingLønnet(),
+    ): AktivitetFaktaOgVurdering =
+        when (type) {
+            AktivitetType.TILTAK ->
+                TiltakReiseTilSamlingTso(
+                    vurderinger = VurderingTiltakReiseTilSamlingTso(lønnet = lønnet),
+                )
+
+            AktivitetType.UTDANNING ->
+                UtdanningReiseTilSamlingTso
+
+            AktivitetType.INGEN_AKTIVITET -> IngenAktivitetReiseTilSamlingTso
+
+            else -> {
+                throw IllegalArgumentException("$type er ikke en gyldig aktivitetstype for daglig reise nay")
+            }
+        }
+
+    fun faktaOgVurderingAktivitetReiseTilSamlingTsr(
+        type: AktivitetType = AktivitetType.TILTAK,
+        lønnet: VurderingLønnet = vurderingLønnet(),
+    ): AktivitetFaktaOgVurdering =
+        when (type) {
+            AktivitetType.TILTAK ->
+                TiltakReiseTilSamlingTso(
+                    vurderinger = VurderingTiltakReiseTilSamlingTso(lønnet = lønnet),
+                )
+
+            AktivitetType.UTDANNING -> UtdanningReiseTilSamlingTsr
+
+            else -> {
+                throw IllegalArgumentException("$type er ikke en gyldig aktivitetstype for daglig reise nay")
             }
         }
 }
