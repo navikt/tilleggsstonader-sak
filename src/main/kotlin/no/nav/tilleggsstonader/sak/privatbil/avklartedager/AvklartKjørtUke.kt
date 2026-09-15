@@ -29,7 +29,8 @@ data class AvklartKjørtUke(
     @Column("uke")
     val uke: UkeIÅr,
     val status: UkeStatus,
-    val typeAvvik: TypeAvvikUke? = null,
+    @MappedCollection(idColumn = "avklart_kjort_uke_id")
+    val avvik: Set<AvklartKjørtUkeAvvik> = emptySet(),
     @MappedCollection(idColumn = "avklart_kjort_uke_id")
     val dager: Set<AvklartKjørtDag>,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_EMPTY)
@@ -47,6 +48,7 @@ data class AvklartKjørtUke(
         copy(
             id = UUID.randomUUID(),
             behandlingId = nyBehandlingId,
+            avvik = avvik.map { it.copy(id = UUID.randomUUID()) }.toSet(),
             dager =
                 dager
                     .filter { it.avklartKjørtDagStatus != AvklartKjørtDagStatus.SLETTET }
@@ -55,6 +57,31 @@ data class AvklartKjørtUke(
             avklartKjørtUkeStatus = AvklartKjørtUkeStatus.UENDRET,
         )
 }
+
+/**
+ * Wrapper-entitet for å representere [TypeAvvikUke] som en liste på [AvklartKjørtUke].
+ *
+ * Spring Data JDBC klarer ikke (per Spring Data 4.1) å konvertere et VARCHAR[]-array til en
+ * List<Enum> når property'et ligger direkte på aggregatroten - i motsetning til når det ligger
+ * på en nested @MappedCollection-entitet (som f.eks. [AvklartKjørtDag.avvik]), der default-
+ * konverteringen fungerer korrekt. Vi bruker derfor samme, velprøvde mønster her (egen
+ * child-tabell) i stedet for et array-felt direkte på [AvklartKjørtUke].
+ */
+@Table(name = "avklart_kjort_uke_avvik")
+data class AvklartKjørtUkeAvvik(
+    @Id
+    val id: UUID = UUID.randomUUID(),
+    val typeAvvik: TypeAvvikUke,
+)
+
+/**
+ * Bekvemmelighetsfunksjon for å lese avvikene på uken som en enkel liste av [TypeAvvikUke],
+ * uten å måtte forholde seg til wrapper-entiteten [AvklartKjørtUkeAvvik] i forretningslogikken.
+ */
+val AvklartKjørtUke.typeAvvik: List<TypeAvvikUke>
+    get() = avvik.map { it.typeAvvik }
+
+fun List<TypeAvvikUke>.tilAvklartKjørtUkeAvvik(): Set<AvklartKjørtUkeAvvik> = this.map { AvklartKjørtUkeAvvik(typeAvvik = it) }.toSet()
 
 enum class UkeStatus {
     OK_AUTOMATISK, // brukes hvis automatisk godkjent
@@ -65,6 +92,7 @@ enum class UkeStatus {
 
 enum class TypeAvvikUke {
     FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK,
+    OVERLAPPER_MED_ANNET_RAMMEVEDTAK,
 }
 
 enum class AvklartKjørtUkeStatus {

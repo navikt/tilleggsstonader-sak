@@ -51,6 +51,7 @@ class GjennopprettAvklarteDagerService(
                     ukeSomSkalGjenopprettes = slettetUke,
                     behandlingId = behandlingId,
                     rammevedtak = rammevedtak,
+                    avklarteUker = avklarteUker,
                 )
             }
 
@@ -89,7 +90,15 @@ class GjennopprettAvklarteDagerService(
             ukeSomSkalGjenopprettes.reisedager.filter { rammevedtakForReise.grunnlag.inneholder(it.dato) }
         if (reisedagerInnenforNyttRammevedtak.isEmpty()) return null
 
-        val avvikForUke = utledAvvikForUke(rammevedtakForReise, reisedagerInnenforNyttRammevedtak)
+        val andreReisersUkerSammeBehandling =
+            avklarteUker.filter { it.reiseId != ukeSomSkalGjenopprettes.reiseId }
+        val avvikForUke =
+            utledAvvikForUke(
+                rammevedtakForReise,
+                reisedagerInnenforNyttRammevedtak,
+                andreReisersUkerSammeBehandling,
+                ukeSomSkalGjenopprettes.uke,
+            )
 
         val (reisedagerSomSkalAvklaresPåNytt, reisedagerSomErAvklartFraTidligre) =
             reisedagerInnenforNyttRammevedtak
@@ -106,7 +115,7 @@ class GjennopprettAvklarteDagerService(
             fom = alleAvklarteDager.minOf { it.dato },
             tom = alleAvklarteDager.maxOf { it.dato },
             status = utledAutomatiskStatusForUke(alleAvklarteDager, avvikForUke),
-            typeAvvik = avvikForUke,
+            avvik = avvikForUke.tilAvklartKjørtUkeAvvik(),
             dager = alleAvklarteDager.toSet(),
         )
     }
@@ -115,6 +124,7 @@ class GjennopprettAvklarteDagerService(
         ukeSomSkalGjenopprettes: KjørelisteUke,
         behandlingId: BehandlingId,
         rammevedtak: RammevedtakPrivatBil,
+        avklarteUker: List<AvklartKjørtUke>,
     ): AvklartKjørtUke? {
         val rammevedtakForReise =
             rammevedtak.reiser.find { it.reiseId == ukeSomSkalGjenopprettes.reiseId } ?: return null
@@ -122,12 +132,16 @@ class GjennopprettAvklarteDagerService(
             ukeSomSkalGjenopprettes.reisedager.filter { rammevedtakForReise.grunnlag.inneholder(it.dato) }
         if (reisedagerInnenforNyttRammevedtak.isEmpty()) return null
 
+        val andreReisersUkerSammeBehandling =
+            avklarteUker.filter { it.reiseId != ukeSomSkalGjenopprettes.reiseId }
+
         return utledAvklartUke(
             behandlingId = behandlingId,
             kjørelisteId = ukeSomSkalGjenopprettes.kjørelisteId,
             ukeIÅr = ukeSomSkalGjenopprettes.uke,
             reisedager = reisedagerInnenforNyttRammevedtak,
             rammevedtak = rammevedtakForReise,
+            andreReisersUkerSammeBehandling = andreReisersUkerSammeBehandling,
         )
     }
 
