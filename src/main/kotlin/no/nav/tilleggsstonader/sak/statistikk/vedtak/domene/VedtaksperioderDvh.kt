@@ -32,6 +32,7 @@ data class VedtaksperioderDvh(
     /**
      * TODO: er foreløpig alltid null for LÆREMIDLER og BARNETILSYN, ettersom disse periodene
      * bygges fra sammenslåtte beregningsperioder som ikke er 1:1 med en lagret [no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode].
+     * Se [VedtaksperiodeDvhIdUtil] for skall til en løsning basert på en deterministisk, DVH-intern id.
      */
     val id: VedtaksperiodeId? = null,
     // Tilsyn barn
@@ -85,7 +86,11 @@ data class VedtaksperioderDvh(
                                 tom = it.tom,
                                 aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
                                 lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
-                                // TODO: vedtaksperiode-id er ikke tilgjengelig for læremidler ennå, se doc på feltet
+                                // TODO: skall - ta i bruk deterministisk id, se [VedtaksperiodeDvhIdUtil]
+                                // id = VedtaksperiodeDvhIdUtil.genererDeterministiskId(
+                                //     behandlingId = ...,
+                                //     it.fom, it.tom, it.målgruppe, it.aktivitet, it.studienivå,
+                                // ),
                                 id = null,
                                 studienivå = StudienivåDvh.fraDomene(it.studienivå),
                             )
@@ -105,7 +110,11 @@ data class VedtaksperioderDvh(
                             tom = it.tom,
                             lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
                             aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
-                            // TODO: vedtaksperiode-id er ikke tilgjengelig for barnetilsyn ennå, se doc på feltet
+                            // TODO: skall - ta i bruk deterministisk id, se [VedtaksperiodeDvhIdUtil]
+                            // id = VedtaksperiodeDvhIdUtil.genererDeterministiskId(
+                            //     behandlingId = ...,
+                            //     it.fom, it.tom, it.målgruppe, it.aktivitet, it.antallBarn,
+                            // ),
                             id = null,
                             antallBarn = it.antallBarn,
                             barn = BarnDvh.fraDomene(it.barn.finnFødselsnumre(barnIBehandlingen)),
