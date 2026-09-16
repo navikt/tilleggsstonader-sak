@@ -391,7 +391,7 @@ private fun mapAktiviteterDagligReiseTso(
                     ),
                 fakta =
                     FaktaAktivitetDagligReiseTso(
-                        hentAktivitetsdager(faktaOgSvar.aktivitetsdager, kreverAktivitetsdager),
+                        hentAktivitetsdagerDagligReise(faktaOgSvar.aktivitetsdager, kreverAktivitetsdager),
                     ),
             )
         }
@@ -403,7 +403,7 @@ private fun mapAktiviteterDagligReiseTso(
                         harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
                     ),
                 fakta =
-                    FaktaAktivitetDagligReiseTso(hentAktivitetsdager(faktaOgSvar.aktivitetsdager, kreverAktivitetsdager)),
+                    FaktaAktivitetDagligReiseTso(hentAktivitetsdagerDagligReise(faktaOgSvar.aktivitetsdager, kreverAktivitetsdager)),
             )
 
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetDagligReiseTso
@@ -423,7 +423,7 @@ private fun mapAktiviteterDagligReiseTsr(
                         harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
                     ),
                 fakta =
-                    FaktaAktivitetDagligReiseTsr(hentAktivitetsdager(faktaOgSvar.aktivitetsdager, kreverAktivitetsdager)),
+                    FaktaAktivitetDagligReiseTsr(hentAktivitetsdagerDagligReise(faktaOgSvar.aktivitetsdager, kreverAktivitetsdager)),
             )
         }
 
@@ -449,7 +449,7 @@ private fun hentPåkrevdeAktivitetsdager(aktivitetsdager: Int?): Int {
  * var satt fra før, skal man ikke tvinges til å fylle det inn. Er det derimot fylt ut en
  * verdi skal den fortsatt valideres.
  */
-private fun hentAktivitetsdager(
+private fun hentAktivitetsdagerDagligReise(
     aktivitetsdager: Int?,
     kreverAktivitetsdager: Boolean,
 ): Int? {
