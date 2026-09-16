@@ -478,12 +478,13 @@ object VilkårperiodeTestUtil {
     fun faktaOgVurderingAktivitetDagligReiseTsr(
         type: AktivitetType = AktivitetType.TILTAK,
         harUtgifter: VurderingHarUtgifter = vurderingHarUtgifter(),
+        aktivitetsdager: Int? = 3,
     ): AktivitetFaktaOgVurdering =
         when (type) {
             AktivitetType.TILTAK ->
                 TiltakDagligReiseTsr(
                     vurderinger = VurderingTiltakDagligReiseTsr(harUtgifter = harUtgifter),
-                    fakta = FaktaAktivitetDagligReiseTsr(aktivitetsdager = 3),
+                    fakta = FaktaAktivitetDagligReiseTsr(aktivitetsdager = aktivitetsdager),
                 )
 
             AktivitetType.INGEN_AKTIVITET -> IngenAktivitetDagligReiseTso

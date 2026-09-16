@@ -35,6 +35,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeU
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeUtil.takeIfType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdagerNullable
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.MålgruppeFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.mapFaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
@@ -202,6 +204,11 @@ class VilkårperiodeService(
         behandling: Saksbehandling,
         fødselFaktaGrunnlag: FødselFaktaGrunnlag?,
     ): Vilkårperiode {
+        val aktivitetsdagerVarSattFraFør =
+            eksisterendeVilkårperiode.faktaOgVurdering.fakta
+                .takeIfFakta<FaktaAktivitetsdagerNullable>()
+                ?.aktivitetsdager != null
+
         val oppdatert =
             eksisterendeVilkårperiode.medVilkårOgVurdering(
                 fom = vilkårperiode.fom,
@@ -212,6 +219,7 @@ class VilkårperiodeService(
                         stønadstype = behandling.stønadstype,
                         vilkårperiode = vilkårperiode,
                         fødselFaktaGrunnlag = fødselFaktaGrunnlag,
+                        kreverAktivitetsdager = aktivitetsdagerVarSattFraFør,
                     ),
             )
 

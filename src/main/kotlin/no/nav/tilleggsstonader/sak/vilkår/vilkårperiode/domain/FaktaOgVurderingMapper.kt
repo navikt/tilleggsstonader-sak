@@ -153,9 +153,11 @@ fun mapFaktaOgSvarDto(
     vilkårperiode: LagreVilkårperiode,
     stønadstype: Stønadstype,
     fødselFaktaGrunnlag: FødselFaktaGrunnlag?,
+    kreverAktivitetsdager: Boolean = true,
 ): FaktaOgVurdering =
     when (vilkårperiode.type) {
-        is AktivitetType -> mapAktiviteter(stønadstype = stønadstype, aktivitet = vilkårperiode)
+        is AktivitetType ->
+            mapAktiviteter(stønadstype = stønadstype, aktivitet = vilkårperiode, kreverAktivitetsdager = kreverAktivitetsdager)
         is MålgruppeType ->
             mapMålgruppe(
                 stønadstype = stønadstype,
@@ -167,6 +169,7 @@ fun mapFaktaOgSvarDto(
 private fun mapAktiviteter(
     stønadstype: Stønadstype,
     aktivitet: LagreVilkårperiode,
+    kreverAktivitetsdager: Boolean,
 ): AktivitetFaktaOgVurdering {
     val type = aktivitet.type
     require(type is AktivitetType)
@@ -190,12 +193,12 @@ private fun mapAktiviteter(
 
         Stønadstype.DAGLIG_REISE_TSO -> {
             require(faktaOgSvar is FaktaOgSvarAktivitetDagligReiseTsoDto)
-            return mapAktiviteterDagligReiseTso(type, faktaOgSvar)
+            return mapAktiviteterDagligReiseTso(type, faktaOgSvar, kreverAktivitetsdager)
         }
 
         Stønadstype.DAGLIG_REISE_TSR -> {
             require(faktaOgSvar is FaktaOgSvarAktivitetDagligReiseTsrDto)
-            return mapAktiviteterDagligReiseTsr(type, faktaOgSvar)
+            return mapAktiviteterDagligReiseTsr(type, faktaOgSvar, kreverAktivitetsdager)
         }
 
         Stønadstype.REISE_TIL_SAMLING_TSO -> {
@@ -376,6 +379,7 @@ private fun mapAktiviteterBoutgifter(
 private fun mapAktiviteterDagligReiseTso(
     aktivitetType: AktivitetType,
     faktaOgSvar: FaktaOgSvarAktivitetDagligReiseTsoDto,
+    kreverAktivitetsdager: Boolean,
 ): AktivitetDagligReiseTso =
     when (aktivitetType) {
         AktivitetType.TILTAK -> {
@@ -387,7 +391,7 @@ private fun mapAktiviteterDagligReiseTso(
                     ),
                 fakta =
                     FaktaAktivitetDagligReiseTso(
-                        hentPåkrevdeAktivitetsdager(faktaOgSvar.aktivitetsdager),
+                        hentAktivitetsdager(faktaOgSvar.aktivitetsdager, kreverAktivitetsdager),
                     ),
             )
         }
@@ -398,7 +402,8 @@ private fun mapAktiviteterDagligReiseTso(
                     VurderingUtdanningDagligReiseTso(
                         harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
                     ),
-                fakta = FaktaAktivitetDagligReiseTso(hentPåkrevdeAktivitetsdager(faktaOgSvar.aktivitetsdager)),
+                fakta =
+                    FaktaAktivitetDagligReiseTso(hentAktivitetsdager(faktaOgSvar.aktivitetsdager, kreverAktivitetsdager)),
             )
 
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetDagligReiseTso
@@ -408,6 +413,7 @@ private fun mapAktiviteterDagligReiseTso(
 private fun mapAktiviteterDagligReiseTsr(
     aktivitetType: AktivitetType,
     faktaOgSvar: FaktaOgSvarAktivitetDagligReiseTsrDto,
+    kreverAktivitetsdager: Boolean,
 ): AktivitetDagligReiseTsr =
     when (aktivitetType) {
         AktivitetType.TILTAK -> {
@@ -416,7 +422,8 @@ private fun mapAktiviteterDagligReiseTsr(
                     VurderingTiltakDagligReiseTsr(
                         harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
                     ),
-                fakta = FaktaAktivitetDagligReiseTsr(hentPåkrevdeAktivitetsdager(faktaOgSvar.aktivitetsdager)),
+                fakta =
+                    FaktaAktivitetDagligReiseTsr(hentAktivitetsdager(faktaOgSvar.aktivitetsdager, kreverAktivitetsdager)),
             )
         }
 
@@ -433,6 +440,23 @@ private fun hentPåkrevdeAktivitetsdager(aktivitetsdager: Int?): Int {
         "Mangler data: aktivitetsdager må være satt og være et heltall mellom 1 og 5"
     }
     return aktivitetsdager
+}
+
+/**
+ * Aktivitetsdager er påkrevd når man legger til en ny aktivitet, eller når det allerede
+ * var satt en verdi på den eksisterende aktiviteten (avgjøres av [kreverAktivitetsdager]
+ * hos kallende kode). Ved endring av en eksisterende aktivitet der aktivitetsdager ikke
+ * var satt fra før, skal man ikke tvinges til å fylle det inn. Er det derimot fylt ut en
+ * verdi skal den fortsatt valideres.
+ */
+private fun hentAktivitetsdager(
+    aktivitetsdager: Int?,
+    kreverAktivitetsdager: Boolean,
+): Int? {
+    if (!kreverAktivitetsdager && aktivitetsdager == null) {
+        return null
+    }
+    return hentPåkrevdeAktivitetsdager(aktivitetsdager)
 }
 
 private fun hentPåkrevdProsentForLæremidler(prosent: Int?): Int {
