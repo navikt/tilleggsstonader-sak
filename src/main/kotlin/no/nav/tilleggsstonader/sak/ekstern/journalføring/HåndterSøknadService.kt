@@ -52,7 +52,7 @@ class HåndterSøknadService(
     fun håndterSøknad(journalpost: Journalpost): Behandling? {
         val personIdent = journalpostService.hentIdentFraJournalpost(journalpost)
         val stønadstype =
-            finnStønadstyperSomKanOpprettesFraJournalpost(journalpost).defaultStønadstype
+            finnStønadstyperSomKanOpprettesFraJournalpost(journalpost, filtrerStønadstyperSomIkkeErAktivert = false).defaultStønadstype
                 ?: error("Fant ikke dokument brevkode for journalpost")
 
         if (kanAutomatiskJournalføre(journalpost)) {
@@ -77,8 +77,14 @@ class HåndterSøknadService(
     /**
      * OBS - ved nye stønadstyper bør "valgbareStønadstyperForIkkeStøttetSkjematype()" returneres inntil det er prod-klart,
      * hvis ikke er det mulig for saksbehandler å opprette saker av denne typen i prod.
+     *
+     * @param filtrerStønadstyperSomIkkeErAktivert - hvis true, returnerer ikke stønadsdtypen som tilhører brevkoden
+     * hvis ikke den er skrudd på i prod
      */
-    fun finnStønadstyperSomKanOpprettesFraJournalpost(journalpost: Journalpost): ValgbareStønadstyperForJournalpost {
+    fun finnStønadstyperSomKanOpprettesFraJournalpost(
+        journalpost: Journalpost,
+        filtrerStønadstyperSomIkkeErAktivert: Boolean,
+    ): ValgbareStønadstyperForJournalpost {
         val skjematype = journalpost.dokumentBrevkode()?.tilSkjematype()
 
         return when (skjematype) {
@@ -92,7 +98,7 @@ class HåndterSøknadService(
                 )
 
             Skjematype.SØKNAD_REISE_TIL_SAMLING ->
-                if (unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_TIL_SAMLING)) {
+                if (unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_TIL_SAMLING) || !filtrerStønadstyperSomIkkeErAktivert) {
                     ValgbareStønadstyperForJournalpost(
                         defaultStønadstype = finnStønadstypeForReiseTilSamling(journalpost),
                         valgbareStønadstyper = Stønadstype.entries.filter { it.gjelderReiseTilSamling() },
@@ -104,7 +110,7 @@ class HåndterSøknadService(
 
             // TODO utled TSO eller TSR
             Skjematype.SØKNAD_FLYTTING ->
-                if (unleashService.isEnabled(Toggle.KAN_BEHANDLE_FLYTTING)) {
+                if (unleashService.isEnabled(Toggle.KAN_BEHANDLE_FLYTTING) || !filtrerStønadstyperSomIkkeErAktivert) {
                     ValgbareStønadstyperForJournalpost(
                         defaultStønadstype = finnStønadstypeForFlytting(journalpost),
                         valgbareStønadstyper = Stønadstype.entries.filter { it.gjelderFlytting() },
@@ -116,7 +122,9 @@ class HåndterSøknadService(
 
             // TODO utled TSO eller TSR
             Skjematype.SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE ->
-                if (unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_OPPSTART_AVSLUTNING_HJEMREISE)) {
+                if (unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_OPPSTART_AVSLUTNING_HJEMREISE) ||
+                    !filtrerStønadstyperSomIkkeErAktivert
+                ) {
                     ValgbareStønadstyperForJournalpost(
                         defaultStønadstype = finnStønadstypeForReiseOppstartAvslutningHjemreise(journalpost),
                         valgbareStønadstyper = Stønadstype.entries.filter { it.gjelderReiseOppstartAvslutningHjemreise() },
@@ -271,9 +279,9 @@ class HåndterSøknadService(
         journalpost: Journalpost,
     ) {
         val opprettOppgave =
-            if (stønadstype.gjelderDagligReise() && !journalpost.harStrukturertSøknad()) {
-                // Kommer journalposter på daglige reiser inn fra skanning før vi har tatt i bruk i prod, ønsker ikke å legge de i vår mappe
-                // Kan fjernes etter daglige reiser er i prod. Se https://nav-it.slack.com/archives/C049HPU424F/p1758780000577149
+            if (!erSaksbehandlingSkruddPåForStønadstype(stønadstype) && !journalpost.harStrukturertSøknad()) {
+                // Kommer journalposter inn fra skanning på stønadstyper vi ikke har prodsatt, ønsker ikke å legge de i vår mappe
+                // Kan fjernes etter vi støtter alle tilleggsstønader
                 OpprettOppgave(
                     oppgavetype = Oppgavetype.Journalføring,
                     beskrivelse =
@@ -298,6 +306,28 @@ class HåndterSøknadService(
             ),
         )
     }
+
+    private fun erSaksbehandlingSkruddPåForStønadstype(stønadstype: Stønadstype): Boolean =
+        when (stønadstype) {
+            Stønadstype.BARNETILSYN,
+            Stønadstype.LÆREMIDLER,
+            Stønadstype.BOUTGIFTER,
+            Stønadstype.DAGLIG_REISE_TSO,
+            Stønadstype.DAGLIG_REISE_TSR,
+            -> true
+            Stønadstype.REISE_TIL_SAMLING_TSO,
+            Stønadstype.REISE_TIL_SAMLING_TSR,
+            ->
+                unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_TIL_SAMLING)
+            Stønadstype.FLYTTING_TSO,
+            Stønadstype.FLYTTING_TSR,
+            ->
+                unleashService.isEnabled(Toggle.KAN_BEHANDLE_FLYTTING)
+            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+            ->
+                unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_OPPSTART_AVSLUTNING_HJEMREISE)
+        }
 
     private fun lagOppgavebeskrivelseForJournalføringsoppgave(journalpost: Journalpost): String {
         if (journalpost.dokumenter.isNullOrEmpty()) error("Journalpost ${journalpost.journalpostId} mangler dokumenter")

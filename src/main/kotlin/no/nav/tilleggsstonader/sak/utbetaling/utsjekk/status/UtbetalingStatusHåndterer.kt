@@ -34,7 +34,7 @@ class UtbetalingStatusHåndterer(
         val andeler = andelTilkjentYtelseRepository.findByIverksettingIverksettingId(UUID.fromString(iverksettingId))
 
         if (andeler.isNotEmpty()) {
-            loggStatusendringPåIverksetting(iverksettingId, utbetalingsstatus, andeler.size)
+            loggStatusendringPåIverksetting(iverksettingId, utbetalingsstatus, andeler.size, melding.error)
 
             feilHvis(andelerHarUforventetStatus(andeler)) {
                 "Det finnes andeler på iverksetting=$iverksettingId som har en uforventet status"
@@ -49,7 +49,7 @@ class UtbetalingStatusHåndterer(
             }
         } else {
             logger.warn(
-                "Mottatt feilet status for iverksettingId=$iverksettingId som ikke refererer noen andel. Gjelder sannsynligvis simulering. BehandlingIder: ${melding.detaljer?.alleBehandlingIder()}",
+                "Mottatt feilet status for iverksettingId=$iverksettingId som ikke refererer noen andel. Gjelder sannsynligvis simulering. BehandlingIder: ${melding.detaljer?.alleBehandlingIder()}. Feil: ${melding.error}",
             )
         }
     }
@@ -58,10 +58,11 @@ class UtbetalingStatusHåndterer(
         iverksettingId: String,
         utbetalingStatus: UtbetalingStatus,
         antallAndelerSomOppdateres: Int,
+        error: UtbetalingError?,
     ) {
         if (utbetalingStatus == UtbetalingStatus.FEILET) {
             logger.error(
-                "Mottatt feilet utbetaling med status=${utbetalingStatus.name} for iverksettingId=$iverksettingId. Gjelder $antallAndelerSomOppdateres andel(er)",
+                "Mottatt feilet utbetaling med status=${utbetalingStatus.name} for iverksettingId=$iverksettingId. Gjelder $antallAndelerSomOppdateres andel(er). Feil: $error",
             )
         } else {
             logger.info(

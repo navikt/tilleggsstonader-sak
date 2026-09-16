@@ -33,6 +33,7 @@ import no.nav.tilleggsstonader.sak.hendelser.TypeHendelse
 import no.nav.tilleggsstonader.sak.hendelser.journalføring.JournalhendelseKafkaHåndtererTask
 import no.nav.tilleggsstonader.sak.hendelser.journalføring.JournalpostHendelseType
 import no.nav.tilleggsstonader.sak.infrastruktur.mocks.Oppgavelager
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettJournalpost
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
@@ -339,7 +340,10 @@ class MottaSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `mottar scannet daglig-reise søknad fra kafka, opprettes journalføringsoppgave uten mappetilknytting`() {
+    fun `mottar scannet reise-til-samling søknad fra kafka, opprettes journalføringsoppgave uten mappetilknytting`() {
+        // Når toggle KAN_BEHANDLE_REISE_TIL_SAMLING fjernes, testen oppdateres til reise oppstart, flytting eller reise arbeid,
+        // altså andre ikke-støttede søknader/stønadstyper
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_REISE_TIL_SAMLING) } returns false
         val hendelse = journalfoeringHendelseRecord(mottaksKanal = "SKAN_IM")
 
         journalhendelseKafkaListener.listen(
@@ -350,7 +354,7 @@ class MottaSøknadIntegrationTest : CleanDatabaseIntegrationTest() {
         assertThat(hendelseRepository.findByTypeAndId(TypeHendelse.JOURNALPOST, hendelse.hendelsesId)).isNotNull
 
         val journalpost =
-            mockJournalpost(brevkode = DokumentBrevkode.DAGLIG_REISE, søknad = null, journalpostKanal = "SKAN_IM")
+            mockJournalpost(brevkode = DokumentBrevkode.REISE_TIL_SAMLING, søknad = null, journalpostKanal = "SKAN_IM")
         kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 
         val oppgaveSlot = mutableListOf<OpprettOppgaveRequest>()
