@@ -230,7 +230,7 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
                 .single { it.reiseId == ReiseId.fromString(rammevedtak2.reiseId) }
         val ukeMedAvvik =
             reisevurderingAndreKjørelistebehandling.uker.single {
-                it.avvik.contains(TypeAvvikUke.OVERLAPPER_MED_ANNET_RAMMEVEDTAK)
+                it.avvik.contains(TypeAvvikUke.INNSENDTE_DAGER_OVERLAPPER_MED_DAGER_DEKT_AV_ANNEN_REISE)
             }
         kall.privatBil.oppdaterUke(
             behandlingId = andreKjørelistebehandling.id,

@@ -42,10 +42,10 @@ fun utledAvklartUke(
     ukeIÅr: UkeIÅr,
     reisedager: List<KjørelisteDag>,
     rammevedtak: RammevedtakForReiseMedPrivatBil,
-    andreReisersUkerSammeBehandling: List<AvklartKjørtUke> = emptyList(),
+    avklarteUkerForAndreReiserISammeBehandling: List<AvklartKjørtUke> = emptyList(),
     avklartKjørtUkeStatus: AvklartKjørtUkeStatus = AvklartKjørtUkeStatus.NY,
 ): AvklartKjørtUke {
-    val avvikUke = utledAvvikForUke(rammevedtak, reisedager, andreReisersUkerSammeBehandling, ukeIÅr)
+    val avvikUke = utledAvvikForUke(rammevedtak, reisedager, avklarteUkerForAndreReiserISammeBehandling, ukeIÅr)
 
     val avklarteDager = reisedager.map { utledAvklartDag(it, avvikUke) }
 
@@ -68,7 +68,7 @@ fun utledAvklartUke(
 fun utledAvvikForUke(
     rammevedtak: RammevedtakForReiseMedPrivatBil,
     reisedager: List<KjørelisteDag>,
-    andreReisersUkerSammeBehandling: List<AvklartKjørtUke> = emptyList(),
+    avklarteUkerForAndreReiserISammeBehandling: List<AvklartKjørtUke> = emptyList(),
     ukeIÅr: UkeIÅr? = null,
 ): List<TypeAvvikUke> {
     val delperiodeForUke =
@@ -80,19 +80,19 @@ fun utledAvvikForUke(
         TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK.takeIf {
             !erAntallDagerInnenforRamme(reisedager, delperiodeForUke)
         },
-        TypeAvvikUke.OVERLAPPER_MED_ANNET_RAMMEVEDTAK.takeIf {
+        TypeAvvikUke.INNSENDTE_DAGER_OVERLAPPER_MED_DAGER_DEKT_AV_ANNEN_REISE.takeIf {
             val uke = ukeIÅr ?: reisedager.minOf { it.dato }.tilUkeIÅr()
-            harAnnenReiseKjørtDagerForUke(andreReisersUkerSammeBehandling, rammevedtak.reiseId, uke)
+            dekkesReisedagAlleredeAvAnnenReise(avklarteUkerForAndreReiserISammeBehandling, rammevedtak.reiseId, uke)
         },
     )
 }
 
-private fun harAnnenReiseKjørtDagerForUke(
-    andreReisersUkerSammeBehandling: List<AvklartKjørtUke>,
+private fun dekkesReisedagAlleredeAvAnnenReise(
+    avklarteUkerForAndreReiserISammeBehandling: List<AvklartKjørtUke>,
     reiseId: ReiseId,
     ukeIÅr: UkeIÅr,
 ): Boolean =
-    andreReisersUkerSammeBehandling
+    avklarteUkerForAndreReiserISammeBehandling
         .filter { it.reiseId != reiseId && it.uke == ukeIÅr && it.avklartKjørtUkeStatus != AvklartKjørtUkeStatus.SLETTET }
         .any { uke ->
             uke.dager.any { dag ->

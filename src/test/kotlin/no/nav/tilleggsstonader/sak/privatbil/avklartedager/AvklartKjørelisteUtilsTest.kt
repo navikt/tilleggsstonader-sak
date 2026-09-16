@@ -32,7 +32,7 @@ class AvklartKjørelisteUtilsTest {
             utledAvvikForUke(
                 rammevedtak = rammevedtak,
                 reisedager = kjørelisteDager(mandag, tirsdag),
-                andreReisersUkerSammeBehandling = emptyList(),
+                avklarteUkerForAndreReiserISammeBehandling = emptyList(),
             )
 
         assertThat(avvik).isEmpty()
@@ -52,10 +52,10 @@ class AvklartKjørelisteUtilsTest {
             utledAvvikForUke(
                 rammevedtak = rammevedtak,
                 reisedager = kjørelisteDager(mandag, tirsdag),
-                andreReisersUkerSammeBehandling = andreReisersUker,
+                avklarteUkerForAndreReiserISammeBehandling = andreReisersUker,
             )
 
-        assertThat(avvik).containsExactly(TypeAvvikUke.OVERLAPPER_MED_ANNET_RAMMEVEDTAK)
+        assertThat(avvik).containsExactly(TypeAvvikUke.INNSENDTE_DAGER_OVERLAPPER_MED_DAGER_DEKT_AV_ANNEN_REISE)
     }
 
     @Test
@@ -72,10 +72,10 @@ class AvklartKjørelisteUtilsTest {
             utledAvvikForUke(
                 rammevedtak = rammevedtak,
                 reisedager = kjørelisteDager(mandag, tirsdag),
-                andreReisersUkerSammeBehandling = andreReisersUker,
+                avklarteUkerForAndreReiserISammeBehandling = andreReisersUker,
             )
 
-        assertThat(avvik).containsExactly(TypeAvvikUke.OVERLAPPER_MED_ANNET_RAMMEVEDTAK)
+        assertThat(avvik).containsExactly(TypeAvvikUke.INNSENDTE_DAGER_OVERLAPPER_MED_DAGER_DEKT_AV_ANNEN_REISE)
     }
 
     @Test
@@ -92,7 +92,7 @@ class AvklartKjørelisteUtilsTest {
             utledAvvikForUke(
                 rammevedtak = rammevedtak,
                 reisedager = kjørelisteDager(mandag, tirsdag),
-                andreReisersUkerSammeBehandling = andreReisersUker,
+                avklarteUkerForAndreReiserISammeBehandling = andreReisersUker,
             )
 
         assertThat(avvik).isEmpty()
@@ -113,7 +113,7 @@ class AvklartKjørelisteUtilsTest {
             utledAvvikForUke(
                 rammevedtak = rammevedtak,
                 reisedager = kjørelisteDager(mandag, tirsdag),
-                andreReisersUkerSammeBehandling = andreReisersUker,
+                avklarteUkerForAndreReiserISammeBehandling = andreReisersUker,
             )
 
         assertThat(avvik).isEmpty()
@@ -133,7 +133,7 @@ class AvklartKjørelisteUtilsTest {
             utledAvvikForUke(
                 rammevedtak = rammevedtak,
                 reisedager = kjørelisteDager(mandag, tirsdag),
-                andreReisersUkerSammeBehandling = andreReisersUker,
+                avklarteUkerForAndreReiserISammeBehandling = andreReisersUker,
             )
 
         assertThat(avvik).isEmpty()
@@ -157,7 +157,7 @@ class AvklartKjørelisteUtilsTest {
             utledAvvikForUke(
                 rammevedtak = rammevedtak,
                 reisedager = kjørelisteDager(mandag, tirsdag),
-                andreReisersUkerSammeBehandling = andreReisersUker,
+                avklarteUkerForAndreReiserISammeBehandling = andreReisersUker,
             )
 
         assertThat(avvik).isEmpty()
@@ -179,13 +179,13 @@ class AvklartKjørelisteUtilsTest {
             utledAvvikForUke(
                 rammevedtak = rammevedtakMedFåDager,
                 reisedager = kjørelisteDager(mandag, tirsdag),
-                andreReisersUkerSammeBehandling = andreReisersUker,
+                avklarteUkerForAndreReiserISammeBehandling = andreReisersUker,
             )
 
         assertThat(avvik)
             .containsExactlyInAnyOrder(
                 TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK,
-                TypeAvvikUke.OVERLAPPER_MED_ANNET_RAMMEVEDTAK,
+                TypeAvvikUke.INNSENDTE_DAGER_OVERLAPPER_MED_DAGER_DEKT_AV_ANNEN_REISE,
             )
     }
 

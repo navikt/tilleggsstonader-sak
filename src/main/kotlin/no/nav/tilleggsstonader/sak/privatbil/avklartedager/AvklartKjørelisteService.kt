@@ -41,7 +41,7 @@ class AvklartKjørelisteService(
 
         validerAtAlleDagerIKjørelistaErInnenForRammevedtaket(rammeForReise, kjøreliste)
 
-        val andreReisersUkerSammeBehandling =
+        val avklarteUkerForAndreReiserISammeBehandling =
             hentAvklarteUkerForBehandling(behandlingId).filter { it.reiseId != kjøreliste.data.reiseId }
 
         val kjørelisteGruppertPåUker = kjøreliste.data.reisedager.groupBy { it.dato.tilUkeIÅr() }
@@ -54,7 +54,7 @@ class AvklartKjørelisteService(
                     reisedager = reisedager,
                     kjørelisteId = kjøreliste.id,
                     rammevedtak = rammeForReise,
-                    andreReisersUkerSammeBehandling = andreReisersUkerSammeBehandling,
+                    avklarteUkerForAndreReiserISammeBehandling = avklarteUkerForAndreReiserISammeBehandling,
                 )
             }
 
