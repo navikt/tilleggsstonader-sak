@@ -165,10 +165,10 @@ class KjørelisterPåParallelleRammevedtakIntegrationTest : CleanDatabaseIntegra
 
         reisevurderingerBehandling2.ramme2.uker.forEach { uke ->
             if (uke.ukenummer in ukenummereMedKjørteDagerIRamme1) {
-                assertThat(uke.avvik).contains(TypeAvvikUke.OVERLAPPER_MED_ANNET_RAMMEVEDTAK)
+                assertThat(uke.avvik).contains(TypeAvvikUke.INNSENDTE_DAGER_OVERLAPPER_MED_DAGER_DEKT_AV_ANNEN_REISE)
                 assertThat(uke.status).isEqualTo(UkeStatus.AVVIK)
             } else {
-                assertThat(uke.avvik).doesNotContain(TypeAvvikUke.OVERLAPPER_MED_ANNET_RAMMEVEDTAK)
+                assertThat(uke.avvik).doesNotContain(TypeAvvikUke.INNSENDTE_DAGER_OVERLAPPER_MED_DAGER_DEKT_AV_ANNEN_REISE)
             }
         }
     }

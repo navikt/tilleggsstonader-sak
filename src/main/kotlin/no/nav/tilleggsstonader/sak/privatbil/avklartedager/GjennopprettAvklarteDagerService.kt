@@ -90,13 +90,13 @@ class GjennopprettAvklarteDagerService(
             ukeSomSkalGjenopprettes.reisedager.filter { rammevedtakForReise.grunnlag.inneholder(it.dato) }
         if (reisedagerInnenforNyttRammevedtak.isEmpty()) return null
 
-        val andreReisersUkerSammeBehandling =
+        val avklarteUkerForAndreReiserISammeBehandling =
             avklarteUker.filter { it.reiseId != ukeSomSkalGjenopprettes.reiseId }
         val avvikForUke =
             utledAvvikForUke(
                 rammevedtakForReise,
                 reisedagerInnenforNyttRammevedtak,
-                andreReisersUkerSammeBehandling,
+                avklarteUkerForAndreReiserISammeBehandling,
                 ukeSomSkalGjenopprettes.uke,
             )
 
@@ -132,7 +132,7 @@ class GjennopprettAvklarteDagerService(
             ukeSomSkalGjenopprettes.reisedager.filter { rammevedtakForReise.grunnlag.inneholder(it.dato) }
         if (reisedagerInnenforNyttRammevedtak.isEmpty()) return null
 
-        val andreReisersUkerSammeBehandling =
+        val avklarteUkerForAndreReiserISammeBehandling =
             avklarteUker.filter { it.reiseId != ukeSomSkalGjenopprettes.reiseId }
 
         return utledAvklartUke(
@@ -141,7 +141,7 @@ class GjennopprettAvklarteDagerService(
             ukeIÅr = ukeSomSkalGjenopprettes.uke,
             reisedager = reisedagerInnenforNyttRammevedtak,
             rammevedtak = rammevedtakForReise,
-            andreReisersUkerSammeBehandling = andreReisersUkerSammeBehandling,
+            avklarteUkerForAndreReiserISammeBehandling = avklarteUkerForAndreReiserISammeBehandling,
         )
     }
 
