@@ -84,7 +84,7 @@
     "fødselsdatoBarn" : null,
     "fom" : "2024-02-01",
     "tom" : "2024-02-02",
-    "utgift" : null,
+    "utgift" : 3000,
     "slettetKommentar" : null,
     "fakta" : {
       "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
@@ -124,7 +124,7 @@
     "fødselsdatoBarn" : null,
     "fom" : "2025-01-01",
     "tom" : "2025-02-28",
-    "utgift" : null,
+    "utgift" : 380,
     "slettetKommentar" : null,
     "fakta" : {
       "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
@@ -132,10 +132,10 @@
       "reiseAvstant" : 40,
       "begrunnelse" : "Begrunnelse",
       "aktivitetId" : "02c86eca-36e5-451b-a22d-8501a0f7b8ee",
-      "bompenger" : 20,
-      "fergekostnad" : 30,
-      "parkering" : 10,
-      "piggdekkavgift" : 5,
+      "bompenger" : 40,
+      "fergekostnad" : 50,
+      "parkering" : 40,
+      "piggdekkavgift" : 50,
       "type" : "REISE_TIL_SAMLING_PRIVAT_BIL"
     }
   } ],
@@ -156,6 +156,13 @@
         "tom" : "2024-01-31",
         "beløp" : 3000,
         "aktivitetId" : "02c86eca-36e5-451b-a22d-8501a0f7b8ee"
+      }, {
+        "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
+        "adresse" : "Testveien 2, 2345 Testby",
+        "fom" : "2025-01-01",
+        "tom" : "2025-01-31",
+        "beløp" : 3000,
+        "aktivitetId" : "02c86eca-36e5-451b-a22d-8501a0f7b8ee"
       } ],
       "privatBil" : [ {
         "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
@@ -166,9 +173,9 @@
         "totaltReiseavstand" : 60,
         "bompenger" : 40,
         "fergekostnad" : 50,
-        "parkering" : null,
-        "piggdekkavgift" : null,
-        "beløp" : 4000,
+        "parkering" : 40,
+        "piggdekkavgift" : 40,
+        "beløp" : 380,
         "aktivitetId" : "02c86eca-36e5-451b-a22d-8501a0f7b8ee"
       } ],
       "beregningsplan" : {
