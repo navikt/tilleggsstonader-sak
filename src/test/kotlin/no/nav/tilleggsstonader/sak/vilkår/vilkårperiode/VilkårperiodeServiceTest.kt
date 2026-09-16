@@ -30,6 +30,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.aktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.dummyVilkårperiodeMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.tilOppdatering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -37,6 +38,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThat
@@ -275,6 +277,95 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
 
         assertThat(test.steg).isEqualTo(StegType.INNGANGSVILKÅR)
         assertThat(test.utfall).isEqualTo(StegUtfall.UTREDNING_PÅBEGYNT)
+    }
+
+    @Nested
+    inner class AktivitetsdagerValidering {
+        @Test
+        fun `skal feile hvis aktivitetsdager mangler ved opprettelse av ny aktivitet`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSR)
+
+            val nyAktivitet =
+                aktivitet(
+                    behandlingId = behandling.id,
+                    faktaOgVurdering =
+                        faktaOgVurderingAktivitetDagligReiseTsr(aktivitetsdager = null),
+                    tiltaksvariant = TypeAktivitet.GRUPPEAMO,
+                ).tilOppdatering()
+
+            assertThatThrownBy {
+                vilkårperiodeService.opprettVilkårperiode(nyAktivitet)
+            }.hasMessageContaining("Mangler data: aktivitetsdager må være satt og være et heltall mellom 1 og 5")
+        }
+
+        @Test
+        fun `skal ikke kreve aktivitetsdager ved oppdatering av eksisterende aktivitet der det ikke var satt fra før`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSR)
+
+            val eksisterendeVilkårperiode =
+                vilkårperiodeRepository.insert(
+                    aktivitet(
+                        behandlingId = behandling.id,
+                        faktaOgVurdering = faktaOgVurderingAktivitetDagligReiseTsr(aktivitetsdager = null),
+                        tiltaksvariant = TypeAktivitet.GRUPPEAMO,
+                    ),
+                )
+
+            val oppdatering =
+                eksisterendeVilkårperiode.tilOppdatering().copy(
+                    begrunnelse = "Oppdatert begrunnelse",
+                )
+
+            val oppdatert = vilkårperiodeService.oppdaterVilkårperiode(eksisterendeVilkårperiode.id, oppdatering)
+
+            assertThat(oppdatert.begrunnelse).isEqualTo("Oppdatert begrunnelse")
+        }
+
+        @Test
+        fun `skal fortsatt validere aktivitetsdager ved oppdatering hvis en ugyldig verdi sendes med`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSR)
+
+            val eksisterendeVilkårperiode =
+                vilkårperiodeRepository.insert(
+                    aktivitet(
+                        behandlingId = behandling.id,
+                        faktaOgVurdering = faktaOgVurderingAktivitetDagligReiseTsr(aktivitetsdager = null),
+                        tiltaksvariant = TypeAktivitet.GRUPPEAMO,
+                    ),
+                )
+
+            val oppdateringMedUgyldigAktivitetsdager =
+                eksisterendeVilkårperiode.tilOppdatering().let {
+                    it.copy(faktaOgSvar = (it.faktaOgSvar as FaktaOgSvarAktivitetDagligReiseTsrDto).copy(aktivitetsdager = 0))
+                }
+
+            assertThatThrownBy {
+                vilkårperiodeService.oppdaterVilkårperiode(eksisterendeVilkårperiode.id, oppdateringMedUgyldigAktivitetsdager)
+            }.hasMessageContaining("Mangler data: aktivitetsdager må være satt og være et heltall mellom 1 og 5")
+        }
+
+        @Test
+        fun `skal fortsatt kreve aktivitetsdager ved oppdatering hvis det var satt fra før`() {
+            val behandling = testoppsettService.opprettBehandlingMedFagsak(stønadstype = Stønadstype.DAGLIG_REISE_TSR)
+
+            val eksisterendeVilkårperiode =
+                vilkårperiodeRepository.insert(
+                    aktivitet(
+                        behandlingId = behandling.id,
+                        faktaOgVurdering = faktaOgVurderingAktivitetDagligReiseTsr(aktivitetsdager = 3),
+                        tiltaksvariant = TypeAktivitet.GRUPPEAMO,
+                    ),
+                )
+
+            val oppdateringUtenAktivitetsdager =
+                eksisterendeVilkårperiode.tilOppdatering().let {
+                    it.copy(faktaOgSvar = (it.faktaOgSvar as FaktaOgSvarAktivitetDagligReiseTsrDto).copy(aktivitetsdager = null))
+                }
+
+            assertThatThrownBy {
+                vilkårperiodeService.oppdaterVilkårperiode(eksisterendeVilkårperiode.id, oppdateringUtenAktivitetsdager)
+            }.hasMessageContaining("Mangler data: aktivitetsdager må være satt og være et heltall mellom 1 og 5")
+        }
     }
 
     @Nested
