@@ -156,7 +156,7 @@
     "fødselsdatoBarn" : null,
     "fom" : "2024-02-01",
     "tom" : "2024-02-02",
-    "utgift" : 3000,
+    "utgift" : null,
     "slettetKommentar" : null,
     "fakta" : {
       "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
@@ -196,7 +196,7 @@
     "fødselsdatoBarn" : null,
     "fom" : "2025-01-01",
     "tom" : "2025-02-28",
-    "utgift" : 380,
+    "utgift" : null,
     "slettetKommentar" : null,
     "fakta" : {
       "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
