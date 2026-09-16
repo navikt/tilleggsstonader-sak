@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.ekstern.stønad
 
 import no.nav.tilleggsstonader.kontrakter.felles.IdentSkjematype
-import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.tilStønadstyper
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
@@ -12,15 +11,6 @@ import org.springframework.stereotype.Service
 class HarBehandlingUnderArbeidService(
     private val fagsakService: FagsakService,
 ) {
-    fun harSøknadUnderBehandling(identStønadstype: IdentStønadstype): Boolean {
-        val behandlinger =
-            fagsakService.hentBehandlingerForPersonOgStønadstype(
-                identStønadstype.ident,
-                identStønadstype.stønadstype,
-            )
-        return behandlinger.any { erSøknadUnderBehandling(it.behandlingsÅrsak, it.status) }
-    }
-
     fun harSøknadUnderBehandling(identSkjematype: IdentSkjematype): Boolean =
         identSkjematype.skjematype.tilStønadstyper().any { stønadstype ->
             fagsakService
