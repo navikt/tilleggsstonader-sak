@@ -417,11 +417,11 @@ class InterntVedtakService(
                     fergekostnad = fakta.fergekostnad,
                     parkering = fakta.parkering,
                     piggdekkavgift = fakta.piggdekkavgift,
-                    reiseAvstant = fakta.reiseavstand,
+                    reiseAvstand = fakta.reiseavstand,
                     aktivitetId = fakta.aktivitetId,
                 )
             is FaktaReiseTilSamlingUbestemt ->
-                VilkårFaktaUbestemtInterntVedtak(
+                VilkårFaktaReiseTilSamlingUbestemtInterntVedtak(
                     reiseId = fakta.reiseId,
                     adresse = fakta.adresse,
                 )
