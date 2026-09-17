@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.behandling
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.feil.brukerfeil
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.sortertEtterVedtakstidspunkt
@@ -21,6 +22,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandlingsjournalpost
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingsjournalpostRepository
 import no.nav.tilleggsstonader.sak.behandling.domain.EksternBehandlingIdRepository
+import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
 import no.nav.tilleggsstonader.sak.behandling.domain.Journalposttype
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
@@ -191,6 +193,7 @@ class BehandlingService(
     ): Behandling {
         val behandling = hentBehandling(behandlingId)
         validerAtBehandlingenKanHenlegges(behandling)
+        validerBegrunnelseForHenleggelse(henlagt)
         val henlagtBehandling =
             behandling.copy(
                 henlagtÅrsak = henlagt.årsak,
@@ -224,6 +227,12 @@ class BehandlingService(
                 "Kan ikke henlegge en behandling med status ${behandling.status} for ${behandling.type}",
                 HttpStatus.BAD_REQUEST,
             )
+        }
+    }
+
+    private fun validerBegrunnelseForHenleggelse(henlagt: HenlagtDto) {
+        brukerfeilHvis(henlagt.årsak == HenlagtÅrsak.ANNET && henlagt.begrunnelse.isNullOrBlank()) {
+            "Begrunnelse må fylles ut når årsak er «Annet»"
         }
     }
 
