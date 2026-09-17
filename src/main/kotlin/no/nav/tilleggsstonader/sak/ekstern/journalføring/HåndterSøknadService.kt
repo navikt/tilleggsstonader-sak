@@ -10,10 +10,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseOppstartAvslutningH
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseTilSamling
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
-import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
-import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
-import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
-import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService.Companion.MASKINELL_JOURNALFOERENDE_ENHET
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -29,10 +25,9 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.tasks.OpprettOppgaveTask
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.Reise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
-import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SamlingPeriode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.tilMålgruppeType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilMålgruppe
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -43,8 +38,8 @@ class HåndterSøknadService(
     private val taskService: TaskService,
     private val journalføringService: JournalføringService,
     private val søknadService: SøknadService,
-    private val ytelseService: YtelseService,
     private val unleashService: UnleashService,
+    private val bestemTemaForJournalpostService: BestemTemaForJournalpostService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -168,9 +163,33 @@ class HåndterSøknadService(
     }
 
     private fun finnStønadstypeForReiseTilSamling(journalpost: Journalpost): Stønadstype {
-        return Stønadstype.REISE_TIL_SAMLING_TSO
+        if (!journalpost.harStrukturertSøknad()) {
+            return if (journalpost.tema == Tema.TSO.name) {
+                Stønadstype.REISE_TIL_SAMLING_TSO
+            } else {
+                Stønadstype.REISE_TIL_SAMLING_TSR
+            }
+        }
 
-        // TODO: Skill ut TSO fra TSR https://favro.com/organization/98c34fb974ce445eac854de0/4d617346d79341c7fbd9a40a?card=Nav-29445
+        val søknadsskjema =
+            journalpostService.hentSøknadFraJournalpost(journalpost, Stønadstype.REISE_TIL_SAMLING_TSO)
+        val søknad = søknadService.mapSøknad(søknadsskjema, journalpost)
+
+        if (søknad !is SøknadReiseTilSamling) {
+            error("Søknaden fra journalposten er ikke en reise-til-samling søknad")
+        }
+
+        return bestemTemaForJournalpostService.bestemStønadstype(
+            journalpost = journalpost,
+            stønadstypeTso = Stønadstype.REISE_TIL_SAMLING_TSO,
+            stønadstypeTsr = Stønadstype.REISE_TIL_SAMLING_TSR,
+            fom = søknad.data.samlinger.finnTidligsteDatoForSamling(),
+            tom = søknad.data.samlinger.finnSenesteDatoForSamling(),
+            målgrupperFraSøknad =
+                søknad.data.hovedytelse.hovedytelse
+                    .map { it.tilMålgruppeType() }
+                    .toSet(),
+        )
     }
 
     private fun finnStønadstypeForFlytting(journalpost: Journalpost): Stønadstype {
@@ -209,59 +228,26 @@ class HåndterSøknadService(
             error("Søknaden fra journalposten er ikke en daglige reiser søknad")
         }
 
-        val målgrupperFraRegister = hentMålgrupperFraRegister(journalpost, søknad).toSet()
-        val målgrupperFraSøknad =
-            søknad.data.hovedytelse.hovedytelse
-                .map { it.tilMålgruppeType() }
-                .toSet()
-
-        logger.info(
-            "Forsøker å finne stønadstype for journalpost ${journalpost.journalpostId}, målgrupper fra register: $målgrupperFraRegister, målgrupper fra søknad: $målgrupperFraSøknad",
+        return bestemTemaForJournalpostService.bestemStønadstype(
+            journalpost = journalpost,
+            stønadstypeTso = Stønadstype.DAGLIG_REISE_TSO,
+            stønadstypeTsr = Stønadstype.DAGLIG_REISE_TSR,
+            fom = søknad.data.reiser.finnTidligsteDato(),
+            tom = søknad.data.reiser.finnSenesteDato(),
+            målgrupperFraSøknad =
+                søknad.data.hovedytelse.hovedytelse
+                    .map { it.tilMålgruppeType() }
+                    .toSet(),
         )
-
-        val målgrupper = målgrupperFraRegister.takeIf { it.isNotEmpty() } ?: målgrupperFraSøknad
-
-        val stønadstype =
-            if (målgrupper.all { it.kanBrukesForStønad(Stønadstype.DAGLIG_REISE_TSO) }) {
-                Stønadstype.DAGLIG_REISE_TSO
-            } else {
-                Stønadstype.DAGLIG_REISE_TSR
-            }
-
-        logger.info("Stønadstype for ${journalpost.journalpostId}: $stønadstype")
-        return stønadstype
-    }
-
-    private fun hentMålgrupperFraRegister(
-        journalpost: Journalpost,
-        søknad: SøknadDagligReise,
-    ): List<MålgruppeType> {
-        feilHvis(journalpost.bruker == null) {
-            "Forventer at bruker skal være satt på journalpost"
-        }
-
-        return ytelseService
-            .hentYtelser(
-                ident = journalpost.bruker!!.id,
-                fom = søknad.data.reiser.finnTidligsteDato(),
-                tom = søknad.data.reiser.finnSenesteDato(),
-                typer = TypeYtelsePeriode.entries.toList(),
-            ).also { validerResultat(it.kildeResultat) }
-            .perioder
-            .map { it.type.tilMålgruppe() }
-    }
-
-    private fun validerResultat(kildeResultat: List<YtelsePerioderDto.KildeResultatYtelse>) {
-        val feiledeHentingerAvYtelse = kildeResultat.filter { it.resultat == ResultatKilde.FEILET }
-
-        feilHvis(feiledeHentingerAvYtelse.isNotEmpty()) {
-            "Feil ved henting av ytelser ${feiledeHentingerAvYtelse.map { it.type }}"
-        }
     }
 
     private fun List<Reise>.finnTidligsteDato() = flatMap { listOf(it.periode.fom, it.periode.tom) }.min()
 
     private fun List<Reise>.finnSenesteDato() = flatMap { listOf(it.periode.fom, it.periode.tom) }.max()
+
+    private fun List<SamlingPeriode>.finnTidligsteDatoForSamling() = flatMap { listOf(it.fom, it.tom) }.min()
+
+    private fun List<SamlingPeriode>.finnSenesteDatoForSamling() = flatMap { listOf(it.fom, it.tom) }.max()
 
     fun kanAutomatiskJournalføre(journalpost: Journalpost): Boolean {
         if (!journalpost.gjelderKanalNavNo()) {
