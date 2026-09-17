@@ -238,6 +238,11 @@ class BehandlingTestdataDsl internal constructor() {
         }
     }
 
+    /**
+     * Testdata for reise til samling gjelder tema **TSO**.
+     * Bruker målgruppe AAP, som ruter journalposten/behandlingen til TSO,
+     * jf. `MålgruppeType.kanBrukesForStønad`.
+     */
     fun defaultReiseTilSamlingTSOTestdata(
         fom: LocalDate = defaultFom,
         tom: LocalDate = defaultTom,
@@ -255,6 +260,32 @@ class BehandlingTestdataDsl internal constructor() {
         vilkår {
             opprett {
                 offentligTransportReiseTilSamling(fom, tom)
+            }
+        }
+    }
+
+    /**
+     * Testdata for reise til samling gjelder tema **TSR**.
+     * Bruker målgruppe TILTAKSPENGER, som ruter journalposten/behandlingen til TSR,
+     * jf. `MålgruppeType.kanBrukesForStønad`.
+     */
+    fun defaultReiseTilSamlingTSRTestdata(
+        fom: LocalDate = defaultFom,
+        tom: LocalDate = defaultTom,
+    ) {
+        aktivitet {
+            opprett {
+                aktivitetTiltakTsrReiseTilSamling(fom, tom)
+            }
+        }
+        målgruppe {
+            opprett {
+                målgruppeTiltakspenger(fom, tom)
+            }
+        }
+        vilkår {
+            opprett {
+                offentligTransportReiseTilSamling(fom, tom, hentAktivitetId = { it.single().globalId })
             }
         }
     }

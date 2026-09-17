@@ -769,6 +769,7 @@ fun lagreReiseTilSamlingDto(
     reiseId: ReiseId = dummyReiseId,
     utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
     begrunnelse: String = "Spesifisert offentlig transportutgift",
+    aktivitetId: VilkårperiodeGlobalId? = null,
     svar: Map<RegelId, SvarOgBegrunnelseDto> =
         ReiseTilSamlingRegelTestUtil.oppfylteSvarReiseTilSamlingOffentligTransportDto(),
     fakta: FaktaReiseTilSamlingDto =
@@ -777,10 +778,12 @@ fun lagreReiseTilSamlingDto(
             reiseId = reiseId,
             utgifterOffentligTransport = utgifterOffentligTransport,
             begrunnelse = begrunnelse,
+            aktivitetId = aktivitetId,
         ).run {
             FaktaReiseTilSamlingOffentligTransportDto(
                 utgifterOffentligTransport = utgifterOffentligTransport,
                 begrunnelse = begrunnelse,
+                aktivitetId = aktivitetId,
             )
         },
 ) = LagreVilkårReiseTilSamlingDto(
