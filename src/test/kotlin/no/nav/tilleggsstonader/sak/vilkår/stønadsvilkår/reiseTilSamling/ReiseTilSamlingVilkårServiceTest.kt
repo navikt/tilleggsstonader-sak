@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.util.dummyAktivitetId
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.faktaOffentligTransportReiseTilSamling
@@ -29,7 +30,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domai
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeAktivitet
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -137,11 +137,10 @@ class ReiseTilSamlingVilkårServiceTest {
         every { unleashService.isEnabled(any()) } returns true
         every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
 
-        val aktivitetId = VilkårperiodeGlobalId.random()
         val aktivitet = mockk<VilkårperiodeAktivitet>(relaxed = true)
         every { aktivitet.resultat } returns ResultatVilkårperiode.OPPFYLT
         every { aktivitet.inneholder(any<Periode<LocalDate>>()) } returns true
-        every { vilkårperiodeService.hentAktivitet(aktivitetId, any()) } returns aktivitet
+        every { vilkårperiodeService.hentAktivitet(dummyAktivitetId, any()) } returns aktivitet
 
         val vilkår =
             nyttVilkår.copy(
@@ -151,7 +150,7 @@ class ReiseTilSamlingVilkårServiceTest {
                         adresse = "Samlingsveien 1",
                         utgifterOffentligTransport = 500.toBigDecimal(),
                         begrunnelse = "Togbillett mellom bosted og samling",
-                        aktivitetId = aktivitetId,
+                        aktivitetId = dummyAktivitetId,
                     ),
             )
 
@@ -207,7 +206,7 @@ class ReiseTilSamlingVilkårServiceTest {
                         adresse = "Samlingsveien 1",
                         utgifterOffentligTransport = 500.toBigDecimal(),
                         begrunnelse = "Togbillett mellom bosted og samling",
-                        aktivitetId = null,
+                        aktivitetId = dummyAktivitetId,
                     ),
             )
 
@@ -334,7 +333,7 @@ class ReiseTilSamlingVilkårServiceTest {
         every { unleashService.isEnabled(any()) } returns true
         every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
 
-        val aktivitetId = VilkårperiodeGlobalId.random()
+        val aktivitetId = dummyAktivitetId
         val aktivitet = mockk<VilkårperiodeAktivitet>(relaxed = true)
         every { aktivitet.resultat } returns ResultatVilkårperiode.OPPFYLT
         every { aktivitet.fom } returns (1 januar 2025)

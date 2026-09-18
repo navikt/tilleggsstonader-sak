@@ -249,7 +249,8 @@
         "omfang" : "ALLE_PERIODER"
       },
       "tidligsteEndring" : null
-    }
+    },
+    "reiseTilSamling" : null
   },
   "rammevedtakPrivatBil" : {
     "reiser" : [ {
