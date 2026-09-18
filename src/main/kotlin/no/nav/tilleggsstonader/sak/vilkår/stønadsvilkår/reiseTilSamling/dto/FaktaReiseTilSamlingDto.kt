@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domai
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaUbestemtType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.AktivitetPåFaktaDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 
@@ -35,6 +36,9 @@ data class FaktaReiseTilSamlingOffentligTransportDto(
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String,
     val aktivitetId: VilkårperiodeGlobalId? = null,
+    @Deprecated("Bruk aktivitet.type")
+    val aktivitetType: String? = null,
+    val aktivitet: AktivitetPåFaktaDto? = null,
 ) : FaktaReiseTilSamlingDto {
     override val type = TypeReiseTilSamling.OFFENTLIG_TRANSPORT
 
@@ -54,6 +58,9 @@ data class FaktaReiseTilSamlingPrivatBilDto(
     val reiseavstand: BigDecimal,
     val begrunnelse: String,
     val aktivitetId: VilkårperiodeGlobalId? = null,
+    @Deprecated("Bruk aktivitet.type")
+    val aktivitetType: String? = null,
+    val aktivitet: AktivitetPåFaktaDto? = null,
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,
     val parkering: BigDecimal? = null,

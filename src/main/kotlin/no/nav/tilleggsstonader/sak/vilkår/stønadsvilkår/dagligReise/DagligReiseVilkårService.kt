@@ -133,6 +133,7 @@ class DagligReiseVilkårService(
                     prisTrettidagersbillett = this.prisTrettidagersbillett?.takeIf { it > 0 },
                     adresse = this.adresse,
                     periode = periode,
+                    aktivitetId = this.aktivitetId,
                     tiltaksvariant = this.tiltaksvariant,
                 )
             }
@@ -180,8 +181,8 @@ class DagligReiseVilkårService(
             validerAktivitetForPrivatBil(nyttVilkår, behandling.id)
         }
 
-        if (gjelderOffentligTransport && behandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR) {
-            validerAktivitetForOffentligTransport(nyttVilkår, behandling.id)
+        if (gjelderOffentligTransport) {
+            validerAktivitetForOffentligTransport(nyttVilkår, behandling, behandling.id)
         }
     }
 
@@ -232,16 +233,25 @@ class DagligReiseVilkårService(
 
     private fun validerAktivitetForOffentligTransport(
         nyttVilkår: LagreVilkårDagligReise,
+        behandling: Saksbehandling,
         behandlingId: BehandlingId,
     ) {
         val fakta = nyttVilkår.fakta as FaktaOffentligTransport
-        brukerfeilHvis(fakta.tiltaksvariant == null) {
+
+        brukerfeilHvis(behandling.stønadstype == Stønadstype.DAGLIG_REISE_TSR && fakta.aktivitetId == null) {
             "Aktivitet må velges for offentlig transport"
         }
-        vilkårperiodeService.validerAktivitetMedTiltaksvariantInnenforPeriode(
-            tiltaksvariant = fakta.tiltaksvariant,
-            periode = Datoperiode(fom = nyttVilkår.fom, tom = nyttVilkår.tom),
-            behandlingId = behandlingId,
-        )
+
+        val aktivitetId = fakta.aktivitetId ?: return
+        val aktivitet = vilkårperiodeService.hentAktivitet(aktivitetId, behandlingId)
+        brukerfeilHvis(aktivitet == null) {
+            "Aktiviteten finnes ikke"
+        }
+        brukerfeilHvis(aktivitet.resultat != ResultatVilkårperiode.OPPFYLT) {
+            "Aktiviteten er ikke oppfylt"
+        }
+        brukerfeilHvisIkke(aktivitet.inneholder(nyttVilkår)) {
+            "Aktiviteten er ikke oppfylt hele vilkårperioden"
+        }
     }
 }

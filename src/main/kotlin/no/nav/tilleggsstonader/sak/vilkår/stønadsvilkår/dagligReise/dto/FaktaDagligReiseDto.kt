@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.Fa
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaUbestemtType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.AktivitetPåFaktaDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
@@ -40,7 +41,10 @@ data class FaktaDagligReiseOffentligTransportDto(
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int?,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
+    @Deprecated("Bruk aktivitetId")
     val tiltaksvariant: TypeAktivitet? = null,
+    val aktivitet: AktivitetPåFaktaDto? = null,
 ) : FaktaDagligReiseDto {
     override val type = TypeDagligReise.OFFENTLIG_TRANSPORT
 
@@ -54,7 +58,8 @@ data class FaktaDagligReiseOffentligTransportDto(
         prisEnkelbillett = prisEnkelbillett,
         prisTrettidagersbillett = prisTrettidagersbillett,
         prisSyvdagersbillett = prisSyvdagersbillett,
-        tiltaksvariant = tiltaksvariant,
+        aktivitetId = aktivitetId,
+        tiltaksvariant = null,
     )
 }
 
@@ -63,7 +68,9 @@ data class FaktaDagligReisePrivatBilDto(
     val faktaDelperioder: List<FaktaDelperiodePrivatBilDto>,
     val aktivitetId: VilkårperiodeGlobalId,
     val adresse: String?,
-    val aktivitetType: String,
+    @Deprecated("Bruk aktivitet.type")
+    val aktivitetType: String? = null,
+    val aktivitet: AktivitetPåFaktaDto? = null,
 ) : FaktaDagligReiseDto {
     override val type = TypeDagligReise.PRIVAT_BIL
 

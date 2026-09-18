@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.AktivitetPåFaktaDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 
@@ -35,7 +36,10 @@ sealed interface FaktaReiseOppstartAvslutningHjemreiseDto {
 
 data class FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
     val utgifterOffentligTransport: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
+    @Deprecated("Bruk aktivitet.type")
+    val aktivitetType: String? = null,
+    val aktivitet: AktivitetPåFaktaDto? = null,
 ) : FaktaReiseOppstartAvslutningHjemreiseDto {
     override val type = TypeReiseOppstartAvslutningHjemreise.OFFENTLIG_TRANSPORT
 
@@ -55,6 +59,9 @@ data class FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
 data class FaktaReiseOppstartAvslutningHjemreisePrivatBilDto(
     val reiseavstand: BigDecimal,
     val aktivitetId: VilkårperiodeGlobalId,
+    @Deprecated("Bruk aktivitet.type")
+    val aktivitetType: String? = null,
+    val aktivitet: AktivitetPåFaktaDto? = null,
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,
 ) : FaktaReiseOppstartAvslutningHjemreiseDto {

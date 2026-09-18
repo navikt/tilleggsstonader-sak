@@ -71,7 +71,7 @@ data class FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
     override val adresse: String?,
     val typeReiseformål: TypeReiseformål,
     val utgifterOffentligTransport: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
 ) : VilkårFakta
 
 data class FaktaReiseOppstartAvslutningHjemreisePrivatBil(
@@ -102,6 +102,8 @@ data class FaktaDagligReiseOffentligTransport(
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int?,
     override val adresse: String?,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
+    @Deprecated("Bruk aktivitetId")
     val tiltaksvariant: TypeAktivitet? = null,
 ) : VilkårFakta
 

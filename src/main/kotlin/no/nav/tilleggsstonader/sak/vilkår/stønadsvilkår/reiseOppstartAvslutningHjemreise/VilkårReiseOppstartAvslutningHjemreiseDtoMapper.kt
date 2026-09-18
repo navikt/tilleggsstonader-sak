@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreisePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseUbestemtDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårReiseOppstartAvslutningHjemreiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.AktivitetPåFaktaDto
 
 object VilkårReiseOppstartAvslutningHjemreiseDtoMapper {
     fun AktivitetMedReiser.tilDto() =
@@ -22,10 +23,21 @@ object VilkårReiseOppstartAvslutningHjemreiseDtoMapper {
             tiltaksvariant = this.tiltaksvariant,
             fom = this.fom,
             tom = this.tom,
-            reiser = this.reiser.map { it.tilDto() },
+            reiser =
+                this.reiser.map {
+                    it.tilDto(
+                        aktivitet =
+                            AktivitetPåFaktaDto(
+                                aktivitetType = this.aktivitetType.name,
+                                tiltaksvariant = this.tiltaksvariant?.beskrivelse,
+                                fom = this.fom,
+                                tom = this.tom,
+                            ),
+                    )
+                },
         )
 
-    fun VilkårReiseOppstartAvslutningHjemreise.tilDto() =
+    fun VilkårReiseOppstartAvslutningHjemreise.tilDto(aktivitet: AktivitetPåFaktaDto? = null) =
         VilkårReiseOppstartAvslutningHjemreiseDto(
             id = this.id,
             fom = this.fom,
@@ -36,27 +48,31 @@ object VilkårReiseOppstartAvslutningHjemreiseDtoMapper {
             resultat = this.resultat,
             status = this.status,
             delvilkårsett = this.delvilkårsett.map { it.tilDto() },
-            fakta = this.fakta.tilDto(),
+            fakta = this.fakta.tilDto(aktivitet = aktivitet),
             slettetKommentar = this.slettetKommentar,
         )
 
-    private fun FaktaReiseOppstartAvslutningHjemreise.tilDto(): FaktaReiseOppstartAvslutningHjemreiseDto =
+    private fun FaktaReiseOppstartAvslutningHjemreise.tilDto(aktivitet: AktivitetPåFaktaDto?): FaktaReiseOppstartAvslutningHjemreiseDto =
         when (this) {
-            is FaktaOffentligTransport -> this.tilDto()
-            is FaktaPrivatBil -> this.tilDto()
+            is FaktaOffentligTransport -> this.tilDto(aktivitet = aktivitet)
+            is FaktaPrivatBil -> this.tilDto(aktivitet = aktivitet)
             is FaktaUbestemtType -> FaktaReiseOppstartAvslutningHjemreiseUbestemtDto
         }
 
-    private fun FaktaOffentligTransport.tilDto() =
+    private fun FaktaOffentligTransport.tilDto(aktivitet: AktivitetPåFaktaDto?) =
         FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
             utgifterOffentligTransport = this.utgifterOffentligTransport,
             aktivitetId = this.aktivitetId,
+            aktivitetType = aktivitet?.aktivitetType,
+            aktivitet = aktivitet,
         )
 
-    private fun FaktaPrivatBil.tilDto() =
+    private fun FaktaPrivatBil.tilDto(aktivitet: AktivitetPåFaktaDto?) =
         FaktaReiseOppstartAvslutningHjemreisePrivatBilDto(
             reiseavstand = this.reiseavstand,
             aktivitetId = this.aktivitetId,
+            aktivitetType = aktivitet?.aktivitetType,
+            aktivitet = aktivitet,
             bompenger = this.bompenger,
             fergekostnad = this.fergekostnad,
         )

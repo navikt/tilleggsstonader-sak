@@ -7,12 +7,17 @@ import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseDtoMapper.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreVilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårResultatDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.AktivitetPåFaktaDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilAktivitetPåFaktaDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelstrukturDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggRegelstrukturFraVilkårregel.tilRegelstruktur
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegel
@@ -45,7 +50,7 @@ class DagligReiseVilkårController(
         tilgangService.validerLesetilgangTilBehandling(behandlingId)
 
         return dagligReiseVilkårService.hentVilkårForBehandling(behandlingId).map {
-            it.tilDtoMedAktivitetType()
+            it.tilDtoMedAktivitetType(behandlingId)
         }
     }
 
@@ -61,7 +66,7 @@ class DagligReiseVilkårController(
             .opprettNyttVilkår(
                 nyttVilkår = lagreVilkårDto.tilDomain(),
                 behandlingId = behandlingId,
-            ).tilDtoMedAktivitetType()
+            ).tilDtoMedAktivitetType(behandlingId)
     }
 
     @PutMapping("{behandlingId}/{vilkårId}")
@@ -78,7 +83,7 @@ class DagligReiseVilkårController(
                 nyttVilkår = lagreVilkårDto.tilDomain(),
                 vilkårId = vilkårId,
                 behandlingId = behandlingId,
-            ).tilDtoMedAktivitetType()
+            ).tilDtoMedAktivitetType(behandlingId)
     }
 
     @DeleteMapping("{behandlingId}/{vilkårId}")
@@ -100,15 +105,26 @@ class DagligReiseVilkårController(
 
         return SlettVilkårResultatDto(
             slettetPermanent = slettetVilkårResultat.slettetPermanent,
-            vilkår = slettetVilkårResultat.vilkår.mapTilVilkårDagligReise().tilDtoMedAktivitetType(),
+            vilkår = slettetVilkårResultat.vilkår.mapTilVilkårDagligReise().tilDtoMedAktivitetType(behandlingId),
         )
     }
 
-    private fun VilkårDagligReise.tilDtoMedAktivitetType(): VilkårDagligReiseDto {
-        val aktivitetType =
-            (fakta as? FaktaPrivatBil)?.let {
-                vilkårperiodeService.hentAktivitetType(it.aktivitetId, behandlingId)
-            }
-        return tilDto(aktivitetType = aktivitetType?.name)
+    private fun VilkårDagligReise.tilDtoMedAktivitetType(behandlingId: BehandlingId): VilkårDagligReiseDto {
+        val aktivitet = fakta.aktivitetPåFakta(behandlingId)
+        return tilDto(aktivitet = aktivitet)
     }
+
+    private fun FaktaDagligReise.aktivitetPåFakta(behandlingId: BehandlingId): AktivitetPåFaktaDto? =
+        when (this) {
+            is FaktaOffentligTransport ->
+                this.aktivitetId?.let { vilkårperiodeService.hentAktivitet(it, behandlingId) }?.tilAktivitetPåFaktaDto()
+
+            is FaktaPrivatBil ->
+                vilkårperiodeService
+                    .hentAktivitet(this.aktivitetId, behandlingId)
+                    ?.tilAktivitetPåFaktaDto()
+                    ?: error("Finner ikke aktivitet med id=${this.aktivitetId} for behandling=$behandlingId")
+
+            is FaktaUbestemtType -> null
+        }
 }

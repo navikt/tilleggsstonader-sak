@@ -9,11 +9,19 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelstrukturD
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggRegelstrukturFraVilkårregel.tilRegelstruktur
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.VilkårReiseTilSamlingDtoMapper.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.VilkårReiseTilSamlingMapper.mapTilVilkårReiseTilSamling
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaUbestemtType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.VilkårReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.LagreVilkårReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.SlettVilkårResultatDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.VilkårReiseTilSamlingDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.tilDagligreiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.AktivitetPåFaktaDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilAktivitetPåFaktaDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -29,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController
 class ReiseTilSamlingVilkårController(
     private val tilgangService: TilgangService,
     private val reiseTilSamlingVilkårService: ReiseTilSamlingVilkårService,
+    private val vilkårperiodeService: VilkårperiodeService,
 ) {
     @GetMapping("regler")
     fun regler(): RegelstrukturDto = ReiseTilSamlingRegel().tilRegelstruktur()
@@ -41,7 +50,7 @@ class ReiseTilSamlingVilkårController(
         tilgangService.validerLesetilgangTilBehandling(behandlingId)
 
         return reiseTilSamlingVilkårService.hentVilkårForBehandling(behandlingId).map {
-            it.tilDto()
+            it.tilDtoMedAktivitet(behandlingId)
         }
     }
 
@@ -57,7 +66,7 @@ class ReiseTilSamlingVilkårController(
             .opprettNyttVilkår(
                 nyttVilkår = lagreVilkårDto.tilDomain(),
                 behandlingId = behandlingId,
-            ).tilDto()
+            ).tilDtoMedAktivitet(behandlingId)
     }
 
     @PutMapping("{behandlingId}/{vilkårId}")
@@ -74,7 +83,7 @@ class ReiseTilSamlingVilkårController(
                 nyttVilkår = lagreVilkårDto.tilDomain(),
                 vilkårId = vilkårId,
                 behandlingId = behandlingId,
-            ).tilDto()
+            ).tilDtoMedAktivitet(behandlingId)
     }
 
     @DeleteMapping("{behandlingId}/{vilkårId}")
@@ -86,11 +95,32 @@ class ReiseTilSamlingVilkårController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.DELETE)
 
-        return reiseTilSamlingVilkårService
+        val slettetVilkårResultat =
+            reiseTilSamlingVilkårService
             .slettVilkår(
                 behandlingId = behandlingId,
                 vilkårId = vilkårId,
                 slettetKommentar = slettVilkårRequestDto.kommentar,
-            ).tilDagligreiseDto()
+            )
+
+        return SlettVilkårResultatDto(
+            slettetPermanent = slettetVilkårResultat.slettetPermanent,
+            vilkår = slettetVilkårResultat.vilkår.mapTilVilkårReiseTilSamling().tilDtoMedAktivitet(behandlingId),
+        )
     }
+
+    private fun VilkårReiseTilSamling.tilDtoMedAktivitet(behandlingId: BehandlingId): VilkårReiseTilSamlingDto {
+        val aktivitet = fakta.aktivitetPåFakta(behandlingId)
+        return tilDto(aktivitet = aktivitet)
+    }
+
+    private fun FaktaReiseTilSamling.aktivitetPåFakta(behandlingId: BehandlingId): AktivitetPåFaktaDto? =
+        when (this) {
+            is FaktaOffentligTransport ->
+                this.aktivitetId?.let { vilkårperiodeService.hentAktivitet(it, behandlingId) }?.tilAktivitetPåFaktaDto()
+            is FaktaPrivatBil ->
+                this.aktivitetId?.let { vilkårperiodeService.hentAktivitet(it, behandlingId) }?.tilAktivitetPåFaktaDto()
+                    ?: error("Finner ikke aktivitet for privat bil med aktivitetId=${this.aktivitetId}")
+            is FaktaUbestemtType -> null
+        }
 }

@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise
 
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.libs.feil.feilHvis
@@ -81,7 +82,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
         validerFeatureToggle()
-        validerAktivitet(nyttVilkår, behandlingId)
+        validerAktivitet(nyttVilkår, behandling)
 
         val vilkår = lagVilkårMedVurderingerOgResultat(behandlingId, nyttVilkår)
         val lagretVilkår = vilkårRepository.insert(vilkår.mapTilVilkår())
@@ -98,7 +99,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
         validerFeatureToggle()
-        validerAktivitet(nyttVilkår, behandlingId)
+        validerAktivitet(nyttVilkår, behandling)
 
         val eksisterendeVilkår = vilkårRepository.findByIdOrThrow(vilkårId).mapTilVilkårReiseOppstartAvslutningHjemreise()
 
@@ -177,12 +178,21 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
     }
 
     /**
-     * Aktivitet valideres likt for TSO og TSR (i motsetning til reise til samling, der dette kun valideres for TSR).
+     * Privat bil krever alltid aktivitet. Offentlig transport krever aktivitet for TSR, og valideres for TSO når aktivitet er satt.
      */
     private fun validerAktivitet(
         nyttVilkår: LagreVilkårReiseOppstartAvslutningHjemreise,
-        behandlingId: BehandlingId,
+        behandling: Saksbehandling,
     ) {
+        brukerfeilHvis(
+            behandling.stønadstype == Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR &&
+                nyttVilkår.fakta is FaktaOffentligTransport &&
+                nyttVilkår.fakta.aktivitetId == null,
+        ) {
+            "Aktivitet må velges for offentlig transport"
+        }
+
+        val behandlingId = behandling.id
         val aktivitetId = nyttVilkår.fakta.aktivitetId() ?: return
 
         val aktivitet = vilkårperiodeService.hentAktivitet(aktivitetId, behandlingId)

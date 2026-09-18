@@ -101,7 +101,8 @@ class ReiseOppstartAvslutningHjemreiseBeregningService(
 
             BeregningsresultatOffentligTransport(
                 reiseId = fakta.reiseId,
-                aktivitetId = fakta.aktivitetId,
+                // TODO Vi kan ikke ha !! her
+                aktivitetId = fakta.aktivitetId!!,
                 grunnlag =
                     BeregningsgrunnlagOffentligTransport(
                         adresse = fakta.adresse,

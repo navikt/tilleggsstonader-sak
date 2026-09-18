@@ -11,9 +11,10 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.F
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingPrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingUbestemtDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.VilkårReiseTilSamlingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.AktivitetPåFaktaDto
 
 object VilkårReiseTilSamlingDtoMapper {
-    fun VilkårReiseTilSamling.tilDto() =
+    fun VilkårReiseTilSamling.tilDto(aktivitet: AktivitetPåFaktaDto? = null) =
         VilkårReiseTilSamlingDto(
             id = this.id,
             fom = this.fom,
@@ -23,29 +24,33 @@ object VilkårReiseTilSamlingDtoMapper {
             resultat = this.resultat,
             status = this.status,
             delvilkårsett = this.delvilkårsett.map { it.tilDto() },
-            fakta = this.fakta.tilDto(),
+            fakta = this.fakta.tilDto(aktivitet = aktivitet),
             slettetKommentar = this.slettetKommentar,
         )
 
-    private fun FaktaReiseTilSamling.tilDto(): FaktaReiseTilSamlingDto =
+    private fun FaktaReiseTilSamling.tilDto(aktivitet: AktivitetPåFaktaDto?): FaktaReiseTilSamlingDto =
         when (this) {
-            is FaktaOffentligTransport -> this.tilDto()
-            is FaktaPrivatBil -> this.tilDto()
+            is FaktaOffentligTransport -> this.tilDto(aktivitet = aktivitet)
+            is FaktaPrivatBil -> this.tilDto(aktivitet = aktivitet)
             is FaktaUbestemtType -> FaktaReiseTilSamlingUbestemtDto
         }
 
-    private fun FaktaOffentligTransport.tilDto() =
+    private fun FaktaOffentligTransport.tilDto(aktivitet: AktivitetPåFaktaDto?) =
         FaktaReiseTilSamlingOffentligTransportDto(
             utgifterOffentligTransport = this.utgifterOffentligTransport,
             begrunnelse = this.begrunnelse,
             aktivitetId = this.aktivitetId,
+            aktivitetType = aktivitet?.aktivitetType,
+            aktivitet = aktivitet,
         )
 
-    private fun FaktaPrivatBil.tilDto() =
+    private fun FaktaPrivatBil.tilDto(aktivitet: AktivitetPåFaktaDto?) =
         FaktaReiseTilSamlingPrivatBilDto(
             reiseavstand = this.reiseavstand,
             begrunnelse = this.begrunnelse,
             aktivitetId = this.aktivitetId,
+            aktivitetType = aktivitet?.aktivitetType,
+            aktivitet = aktivitet,
             bompenger = this.bompenger,
             fergekostnad = this.fergekostnad,
             parkering = this.parkering,
