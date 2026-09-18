@@ -39,10 +39,6 @@ class PrivatBilBeregningService(
     ): BeregningsresultatPrivatBil? {
         if (rammevedtak == null) return null
 
-        // if (beregningsplan.omfang == Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT) {
-        //    return forrigeBeregningsresultat
-        // }
-
         val avklarteUkerForBehandling = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandling.id)
 
         return beregn(
