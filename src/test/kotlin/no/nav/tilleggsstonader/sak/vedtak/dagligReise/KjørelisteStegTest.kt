@@ -109,6 +109,7 @@ class KjørelisteStegTest {
             tom = tom,
             uke = fom.tilUkeIÅr(),
             status = status,
+            avvik = emptySet(),
             avklartKjørtUkeStatus = AvklartKjørtUkeStatus.NY,
             dager = emptySet(),
         )
