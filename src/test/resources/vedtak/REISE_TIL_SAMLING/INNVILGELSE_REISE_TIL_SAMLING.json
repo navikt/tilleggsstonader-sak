@@ -23,7 +23,8 @@
           "brukersNavKontor": null
         },
         "beløp": 245365,
-        "aktivitetId": null
+        "aktivitetId": null,
+        "fraTidligereVedtak": false
       }
     ],
     "privatBil": []

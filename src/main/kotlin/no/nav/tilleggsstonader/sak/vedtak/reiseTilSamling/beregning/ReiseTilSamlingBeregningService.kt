@@ -3,11 +3,18 @@ package no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseReiseTilSamling
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingValidering.filtrerBortUtgifterSomIkkeOverlapperVedtaksperioder
@@ -29,6 +36,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domai
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.time.LocalDate
 
 @Service
 class ReiseTilSamlingBeregningService(
@@ -36,6 +44,7 @@ class ReiseTilSamlingBeregningService(
     private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
     private val satsPrivatBilProvider: SatsPrivatBilProvider,
     private val arbeidsfordelingService: ArbeidsfordelingService,
+    private val vedtakRepository: VedtakRepository,
 ) {
     fun beregn(
         behandling: Saksbehandling,
@@ -43,6 +52,14 @@ class ReiseTilSamlingBeregningService(
         typeVedtak: TypeVedtak,
         beregningsplan: Beregningsplan,
     ): BeregningsresultatReiseTilSamling {
+        val forrigeVedtak = hentForrigeIverksatteVedtak(behandling)
+
+        if (beregningsplan.omfang == Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT) {
+            return requireNotNull(forrigeVedtak) {
+                "Kan ikke gjenbruke forrige beregningsresultat uten forrige iverksatt vedtak"
+            }.beregningsresultat.markerAltSomFraTidligereVedtak()
+        }
+
         vedtaksperiodeValideringService.validerVedtaksperioder(
             vedtaksperioder = vedtaksperioder,
             behandling = behandling,
@@ -82,24 +99,111 @@ class ReiseTilSamlingBeregningService(
             vedtaksperioderBeregning,
         )
         validerFinnesSamling(utgifterTilBeregning)
+
+        val beregnFra = beregningsplan.beregnFra()
+        val (uendredeUtgifter, berørteUtgifter) = utgifterTilBeregning.splittPåBeregnFra(beregnFra)
+
         val offentligTransport =
-            beregnOffentligTransport(
-                utgifterTilBeregning,
-                vedtaksperioder,
-                brukersNavKontor,
-            )
+            gjenbrukOffentligTransport(uendredeUtgifter, forrigeVedtak) +
+                beregnOffentligTransport(
+                    berørteUtgifter,
+                    vedtaksperioder,
+                    brukersNavKontor,
+                )
 
         val privatBil =
-            beregnPrivatBil(
-                utgifterTilBeregning,
-                vedtaksperioder,
-                brukersNavKontor,
-            )
+            gjenbrukPrivatBil(uendredeUtgifter, forrigeVedtak) +
+                beregnPrivatBil(
+                    berørteUtgifter,
+                    vedtaksperioder,
+                    brukersNavKontor,
+                )
         return BeregningsresultatReiseTilSamling(
             offentligTransport = offentligTransport,
             privatBil = privatBil,
         )
     }
+
+    /**
+     * Reiser som ikke er berørt av [beregnFra] skal kopieres uendret fra forrige iverksatte vedtak,
+     * mens reiser som er berørt (eller nye) skal reberegnes fra bunnen.
+     * En reise regnes som berørt dersom den strekker seg til eller forbi [beregnFra], eller dersom
+     * [beregnFra] er null (dvs. førstegangsbehandling, alt skal beregnes).
+     */
+    private fun List<VilkårReiseTilSamling>.splittPåBeregnFra(
+        beregnFra: LocalDate?,
+    ): Pair<List<VilkårReiseTilSamling>, List<VilkårReiseTilSamling>> {
+        if (beregnFra == null) {
+            return emptyList<VilkårReiseTilSamling>() to this
+        }
+        return this.partition { it.tom < beregnFra }
+    }
+
+    private fun gjenbrukOffentligTransport(
+        uendredeUtgifter: List<VilkårReiseTilSamling>,
+        forrigeVedtak: InnvilgelseReiseTilSamling?,
+    ): List<BeregningsresultatOffentligTransport> {
+        val reiseIder =
+            uendredeUtgifter
+                .filter { it.fakta is FaktaOffentligTransport }
+                .map { (it.fakta as FaktaOffentligTransport).reiseId }
+        if (reiseIder.isEmpty()) return emptyList()
+
+        val forrigeResultater =
+            requireNotNull(forrigeVedtak) {
+                "Kan ikke gjenbruke tidligere reiser uten forrige iverksatt vedtak"
+            }.beregningsresultat.offentligTransport
+
+        return reiseIder.map { reiseId ->
+            val forrigeResultat =
+                forrigeResultater.find { it.reiseId == reiseId }
+                    ?: feil(
+                        "Fant ikke forrige beregningsresultat for offentlig transport med reiseId=$reiseId " +
+                            "ved gjenbruk fra tidligere vedtak",
+                    )
+            forrigeResultat.copy(fraTidligereVedtak = true)
+        }
+    }
+
+    private fun gjenbrukPrivatBil(
+        uendredeUtgifter: List<VilkårReiseTilSamling>,
+        forrigeVedtak: InnvilgelseReiseTilSamling?,
+    ): List<BeregningsresultatPrivatBil> {
+        val reiseIder =
+            uendredeUtgifter
+                .filter { it.fakta is FaktaPrivatBil }
+                .map { (it.fakta as FaktaPrivatBil).reiseId }
+        if (reiseIder.isEmpty()) return emptyList()
+
+        val forrigeResultater =
+            requireNotNull(forrigeVedtak) {
+                "Kan ikke gjenbruke tidligere reiser uten forrige iverksatt vedtak"
+            }.beregningsresultat.privatBil
+
+        return reiseIder.map { reiseId ->
+            val forrigeResultat =
+                forrigeResultater.find { it.reiseId == reiseId }
+                    ?: feil(
+                        "Fant ikke forrige beregningsresultat for privat bil med reiseId=$reiseId " +
+                            "ved gjenbruk fra tidligere vedtak",
+                    )
+            forrigeResultat.copy(fraTidligereVedtak = true)
+        }
+    }
+
+    private fun BeregningsresultatReiseTilSamling.markerAltSomFraTidligereVedtak() =
+        BeregningsresultatReiseTilSamling(
+            offentligTransport = offentligTransport.map { it.copy(fraTidligereVedtak = true) },
+            privatBil = privatBil.map { it.copy(fraTidligereVedtak = true) },
+        )
+
+    private fun hentForrigeIverksatteVedtak(behandling: Saksbehandling): InnvilgelseReiseTilSamling? =
+        behandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it) }?.data
+
+    private fun hentVedtak(behandlingId: BehandlingId) =
+        vedtakRepository
+            .findByIdOrThrow(behandlingId)
+            .withTypeOrThrow<InnvilgelseReiseTilSamling>()
 
     private fun beregnOffentligTransport(
         utgifter: List<VilkårReiseTilSamling>,
