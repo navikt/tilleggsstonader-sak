@@ -80,9 +80,17 @@ data class FaktaPrivatBil(
 ) : FaktaReiseTilSamling {
     override val type = TypeReiseTilSamling.PRIVAT_BIL
 
+    companion object {
+        val MAKS_BOMPENGER = BigDecimal(500)
+        val MAKS_FERGEKOSTNAD = BigDecimal(900)
+        val MAKS_PARKERING = BigDecimal(1000)
+        val MAKS_PIGGDEKKAVGIFT = BigDecimal(1400)
+    }
+
     init {
         validerIngenNegativReiseavstand()
         validerIngenNegativeUtgifter()
+        validerMaksbeløpUtgifter()
         validerBegrunnelse()
     }
 
@@ -119,6 +127,21 @@ data class FaktaPrivatBil(
         }
         brukerfeilHvis(piggdekkavgift != null && piggdekkavgift < BigDecimal.ZERO) {
             "Piggdekkavgift kan ikke være negativ"
+        }
+    }
+
+    private fun validerMaksbeløpUtgifter() {
+        brukerfeilHvis(bompenger != null && bompenger > MAKS_BOMPENGER) {
+            "Skal du innvilge med bompenger høyere enn ${MAKS_BOMPENGER}kr må du ta kontakt med Tilleggsstønader-temet"
+        }
+        brukerfeilHvis(fergekostnad != null && fergekostnad > MAKS_FERGEKOSTNAD) {
+            "Skal du innvilge med fergekostnad høyere enn ${MAKS_FERGEKOSTNAD}kr må du ta kontakt med Tilleggsstønader-temet"
+        }
+        brukerfeilHvis(parkering != null && parkering > MAKS_PARKERING) {
+            "Skal du innvilge med parkering høyere enn ${MAKS_PARKERING}kr må du ta kontakt med Tilleggsstønader-temet"
+        }
+        brukerfeilHvis(piggdekkavgift != null && piggdekkavgift > MAKS_PIGGDEKKAVGIFT) {
+            "Skal du innvilge med piggdekkavgift høyere enn ${MAKS_PIGGDEKKAVGIFT}kr må du ta kontakt med Tilleggsstønader-temet"
         }
     }
 
