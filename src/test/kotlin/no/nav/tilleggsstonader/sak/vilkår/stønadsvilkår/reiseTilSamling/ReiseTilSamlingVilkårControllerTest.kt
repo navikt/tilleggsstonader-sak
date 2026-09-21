@@ -107,12 +107,6 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 }
             }
 
-        val aktivitet =
-            kall.vilkårperiode
-                .hentForBehandling(behandlingContext.behandlingId)
-                .vilkårperioder.aktiviteter
-                .single()
-
         val nyttVilkår =
             LagreVilkårReiseTilSamlingDto(
                 fom = fom,
@@ -120,7 +114,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 adresse = "Samlingsveien 1",
                 reiseId = dummyReiseId,
                 svar = ReiseTilSamlingRegelTestUtil.oppfylteSvarReiseTilSamlingPrivatBilDto(),
-                fakta = faktaPrivatBil(aktivitet = aktivitet),
+                fakta = faktaPrivatBil(),
             )
 
         val resultat = kall.vilkårReiseTilSamling.opprettVilkår(behandlingContext.behandlingId, nyttVilkår)
@@ -131,7 +125,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
 
         val oppdatertVilkår =
             nyttVilkår.copy(
-                fakta = faktaPrivatBil(reiseavstand = BigDecimal("50"), aktivitet = aktivitet),
+                fakta = faktaPrivatBil(reiseavstand = BigDecimal("50")),
             )
 
         val resultatOppdatert =
@@ -196,11 +190,11 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
 
         val opprettetVilkår = kall.vilkårReiseTilSamling.opprettVilkår(behandling.id, nyttVilkår)
         val opprettetFakta = opprettetVilkår.fakta as FaktaReiseTilSamlingOffentligTransportDto
-        assertThat(opprettetFakta.aktivitet?.aktivitetId).isEqualTo(aktivitetId)
+        assertThat(opprettetFakta.aktivitet).isNull()
 
         val hentetVilkår = kall.vilkårReiseTilSamling.hentVilkår(behandling.id).single()
         val hentetFakta = hentetVilkår.fakta as FaktaReiseTilSamlingOffentligTransportDto
-        assertThat(hentetFakta.aktivitet?.aktivitetId).isEqualTo(aktivitetId)
+        assertThat(hentetFakta.aktivitet).isNull()
     }
 
     @Test
@@ -225,12 +219,6 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 }
             }
 
-        val aktivitet =
-            kall.vilkårperiode
-                .hentForBehandling(behandlingContext.behandlingId)
-                .vilkårperioder.aktiviteter
-                .single()
-
         val nyttVilkår =
             LagreVilkårReiseTilSamlingDto(
                 fom = fom,
@@ -244,7 +232,6 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
                         fergekostnad = BigDecimal("120"),
                         parkering = BigDecimal("75.50"),
                         piggdekkavgift = BigDecimal("60"),
-                        aktivitet = aktivitet,
                     ),
             )
 
@@ -291,7 +278,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
         fergekostnad: BigDecimal? = null,
         parkering: BigDecimal? = null,
         piggdekkavgift: BigDecimal? = null,
-        aktivitet: VilkårperiodeDto,
+        aktivitet: VilkårperiodeDto? = null,
     ) = FaktaReiseTilSamlingPrivatBilDto(
         reiseavstand = reiseavstand,
         begrunnelse = "Drivstoff og slitasje",
@@ -300,13 +287,15 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
         parkering = parkering,
         piggdekkavgift = piggdekkavgift,
         aktivitet =
-            AktivitetInfoDto(
-                aktivitetId = VilkårperiodeGlobalId(aktivitet.id),
-                aktivitetType = aktivitet.type.tilDbType(),
-                tiltaksvariant = aktivitet.tiltaksvariant.toString(),
-                fom = aktivitet.fom,
-                tom = aktivitet.tom,
-            ),
+            aktivitet?.let {
+                AktivitetInfoDto(
+                    aktivitetId = aktivitet.globalId,
+                    aktivitetType = aktivitet.type.tilDbType(),
+                    tiltaksvariant = aktivitet.tiltaksvariant.toString(),
+                    fom = aktivitet.fom,
+                    tom = aktivitet.tom,
+                )
+            },
     )
 
     private fun assertLagretVilkår(
@@ -325,7 +314,8 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
         delvilkår: List<DelvilkårDto>,
         svar: Map<RegelId, SvarOgBegrunnelseDto>,
     ) {
-        val brukteRegelIder = delvilkår.flatMap { it.vurderinger.map { vurdering -> vurdering.regelId } }.toSet()
+        val brukteRegelIder =
+            delvilkår.flatMap { it.vurderinger.map { vurdering -> vurdering.regelId } }.toSet()
 
         assertThat(brukteRegelIder).hasSize(svar.size)
     }

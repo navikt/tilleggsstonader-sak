@@ -357,7 +357,7 @@ class ReiseTilSamlingVilkårServiceTest {
     }
 
     @Test
-    fun `skal ikke validere aktivitetId for privat bil TSO selv om aktivitetId er satt`() {
+    fun `skal kunne opprette vilkår for privat bil når aktiviteten er oppfylt og dekker hele perioden`() {
         val behandling =
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
@@ -365,6 +365,12 @@ class ReiseTilSamlingVilkårServiceTest {
         every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
 
         val aktivitetId = VilkårperiodeGlobalId.random()
+        val aktivitet = mockk<VilkårperiodeAktivitet>(relaxed = true)
+        every { aktivitet.resultat } returns ResultatVilkårperiode.OPPFYLT
+        every { aktivitet.fom } returns (1 januar 2025)
+        every { aktivitet.tom } returns (31 januar 2025)
+        every { aktivitet.inneholder(any<Periode<LocalDate>>()) } returns true
+        every { vilkårperiodeService.hentAktivitet(aktivitetId, any()) } returns aktivitet
 
         val vilkår =
             nyttVilkår.copy(
@@ -385,7 +391,6 @@ class ReiseTilSamlingVilkårServiceTest {
         )
 
         verify(exactly = 1) { vilkårRepository.insert(any<Vilkår>()) }
-        verify(exactly = 0) { vilkårperiodeService.hentAktivitet(any(), any()) }
     }
 
     @Test
