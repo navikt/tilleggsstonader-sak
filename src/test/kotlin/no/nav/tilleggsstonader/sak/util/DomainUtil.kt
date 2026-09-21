@@ -704,7 +704,7 @@ fun faktaOffentligTransportReiseTilSamling(
     adresse: String = "Tiltaksveien 1",
     utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
     begrunnelse: String = "Spesifisert offentlig transportutgift",
-    aktivitetId: VilkårperiodeGlobalId = dummyAktivitetId,
+    aktivitetId: VilkårperiodeGlobalId? = dummyAktivitetId,
 ) = FaktaOffentligTransportReiseTilSamling(
     reiseId = reiseId,
     adresse = adresse,
