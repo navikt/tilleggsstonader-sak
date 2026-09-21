@@ -373,6 +373,8 @@ class BehandlingFaktaService(
             andelUtgifterBolig = utgifterNyBolig.andelUtgifterBolig,
             harHoyereUtgifterPaNyttBosted = mapJaNei(utgifterNyBolig.harHoyereUtgifterPaNyttBosted),
             mottarBostotte = mapJaNei(utgifterNyBolig.mottarBostotte),
+            andelUtgifterBoligHjemsted = utgifterNyBolig.andelUtgifterBoligHjemsted,
+            andelUtgifterBoligAktivitetssted = utgifterNyBolig.andelUtgifterBoligAktivitetssted,
         )
 
     private fun mapSamling(samling: UtgifterIForbindelseMedSamling?): Samling? =

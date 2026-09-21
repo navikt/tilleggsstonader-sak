@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.TypeU
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.kodeverk.KodeverkService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
@@ -198,13 +199,25 @@ class SøknadskjemaBoutgifterMapper(
 
     private fun mapUtgifterNyBolig(utgifterNyBolig: UtgifterNyBoligKontrakt?): UtgifterNyBolig? =
         utgifterNyBolig?.let {
+            validerAndelUtgifterNyBolig(it)
             UtgifterNyBolig(
                 delerBoutgifter = mapJaNei(it.delerBoutgifter),
                 andelUtgifterBolig = it.andelUtgifterBolig,
                 harHoyereUtgifterPaNyttBosted = mapJaNei(it.harHoyereUtgifterPaNyttBosted),
                 mottarBostotte = mapJaNei(it.mottarBostotte),
+                andelUtgifterBoligHjemsted = it.andelUtgifterBoligHjemsted,
+                andelUtgifterBoligAktivitetssted = it.andelUtgifterBoligAktivitetssted,
             )
         }
+
+    private fun validerAndelUtgifterNyBolig(utgifterNyBolig: UtgifterNyBoligKontrakt) {
+        feilHvis(
+            utgifterNyBolig.harHoyereUtgifterPaNyttBosted == JaNeiType.ja &&
+                (utgifterNyBolig.andelUtgifterBoligHjemsted == null || utgifterNyBolig.andelUtgifterBoligAktivitetssted == null),
+        ) {
+            "Mangler andelUtgifterBoligHjemsted eller andelUtgifterBoligAktivitetssted når harHoyereUtgifterPaNyttBosted er ja"
+        }
+    }
 
     private fun mapUtgifterFlereSteder(utgifterFlereSteder: UtgifterFlereStederKontrakt?): UtgifterFlereSteder? =
         utgifterFlereSteder?.let {

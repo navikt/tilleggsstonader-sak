@@ -66,6 +66,8 @@ object SøknadBoutgifterUtil {
                     andelUtgifterBolig = 900,
                     harHoyereUtgifterPaNyttBosted = JaNeiType.ja,
                     mottarBostotte = JaNeiType.nei,
+                    andelUtgifterBoligHjemsted = 1300,
+                    andelUtgifterBoligAktivitetssted = 1000,
                 ),
         )
 

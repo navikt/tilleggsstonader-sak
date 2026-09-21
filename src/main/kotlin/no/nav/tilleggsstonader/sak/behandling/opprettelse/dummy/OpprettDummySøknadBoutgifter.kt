@@ -112,6 +112,8 @@ class OpprettDummySøknadBoutgifter(
                                 andelUtgifterBolig = 900,
                                 harHoyereUtgifterPaNyttBosted = JaNeiType.ja,
                                 mottarBostotte = JaNeiType.nei,
+                                andelUtgifterBoligHjemsted = 1300,
+                                andelUtgifterBoligAktivitetssted = 1000,
                             ),
                     ),
                 samling = Samling(periodeForSamling = listOf(periodeForSamling, periodeForSamling2)),

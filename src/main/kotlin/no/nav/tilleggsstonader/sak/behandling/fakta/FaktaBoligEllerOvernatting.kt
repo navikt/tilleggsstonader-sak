@@ -46,6 +46,8 @@ data class FaktaUtgifterNyBolig(
     val andelUtgifterBolig: Int?,
     val harHoyereUtgifterPaNyttBosted: JaNei,
     val mottarBostotte: JaNei?,
+    val andelUtgifterBoligHjemsted: Int?,
+    val andelUtgifterBoligAktivitetssted: Int?,
 )
 
 fun BoligEllerOvernattingAvsnitt.tilFakta() =
@@ -87,4 +89,6 @@ private fun UtgifterNyBolig.tilFakta() =
         andelUtgifterBolig = this.andelUtgifterBolig,
         harHoyereUtgifterPaNyttBosted = this.harHoyereUtgifterPaNyttBosted,
         mottarBostotte = this.mottarBostotte,
+        andelUtgifterBoligHjemsted = this.andelUtgifterBoligHjemsted,
+        andelUtgifterBoligAktivitetssted = this.andelUtgifterBoligAktivitetssted,
     )
