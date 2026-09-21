@@ -71,7 +71,7 @@ data class FaktaPrivatBil(
     override val reiseId: ReiseId,
     override val adresse: String?,
     val reiseavstand: BigDecimal,
-    val begrunnelse: String,
+    val begrunnelse: String?,
     val aktivitetId: VilkårperiodeGlobalId? = null,
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,
@@ -91,7 +91,6 @@ data class FaktaPrivatBil(
         validerIngenNegativReiseavstand()
         validerIngenNegativeUtgifter()
         validerMaksbeløpUtgifter()
-        validerBegrunnelse()
     }
 
     override fun mapTilVilkårFakta() =
@@ -142,12 +141,6 @@ data class FaktaPrivatBil(
         }
         brukerfeilHvis(piggdekkavgift != null && piggdekkavgift > MAKS_PIGGDEKKAVGIFT) {
             "Skal du innvilge med piggdekkavgift høyere enn ${MAKS_PIGGDEKKAVGIFT}kr må du ta kontakt med Tilleggsstønader-temet"
-        }
-    }
-
-    private fun validerBegrunnelse() {
-        brukerfeilHvis(begrunnelse.isBlank()) {
-            "Spesifikasjon av utgift må fylles ut"
         }
     }
 }

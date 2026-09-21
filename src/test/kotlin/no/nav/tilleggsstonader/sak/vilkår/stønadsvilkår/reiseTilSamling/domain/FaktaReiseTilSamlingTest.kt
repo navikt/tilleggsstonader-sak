@@ -2,9 +2,11 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.doma
 
 import no.nav.tilleggsstonader.libs.feil.ApiFeil
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingPrivatBilDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import java.math.BigDecimal
 
@@ -16,11 +18,12 @@ class FaktaReiseTilSamlingTest {
             fergekostnad: BigDecimal? = null,
             parkering: BigDecimal? = null,
             piggdekkavgift: BigDecimal? = null,
+            begrunnelse: String? = "Spesifisert privatbilutgift",
         ) = FaktaPrivatBil(
             reiseId = dummyReiseId,
             adresse = "Tiltaksveien 1",
             reiseavstand = 40.toBigDecimal(),
-            begrunnelse = "Spesifisert privatbilutgift",
+            begrunnelse = begrunnelse,
             bompenger = bompenger,
             fergekostnad = fergekostnad,
             parkering = parkering,
@@ -91,6 +94,54 @@ class FaktaReiseTilSamlingTest {
         fun `skal fortsatt kaste feil hvis utgift er negativ`() {
             val feil = assertThrows<ApiFeil> { faktaPrivatBil(bompenger = BigDecimal("-1")) }
             assertThat(feil.message).isEqualTo("Bompenger kan ikke være negativt")
+        }
+
+        @Test
+        fun `skal godta null begrunnelse siden spesifikasjon av utgift er valgfritt for privatbil`() {
+            assertDoesNotThrow { faktaPrivatBil(begrunnelse = null) }
+        }
+
+        @Test
+        fun `skal godta blank begrunnelse siden spesifikasjon av utgift er valgfritt for privatbil`() {
+            assertDoesNotThrow { faktaPrivatBil(begrunnelse = "   ") }
+        }
+    }
+
+    @Nested
+    inner class OffentligTransport {
+        @Test
+        fun `skal kaste feil hvis begrunnelse er blank`() {
+            val feil =
+                assertThrows<ApiFeil> {
+                    FaktaOffentligTransport(
+                        reiseId = dummyReiseId,
+                        adresse = "Tiltaksveien 1",
+                        utgifterOffentligTransport = 40.toBigDecimal(),
+                        begrunnelse = " ",
+                    )
+                }
+            assertThat(feil.message).isEqualTo("Spesifikasjon av utgift må fylles ut")
+        }
+    }
+
+    @Nested
+    inner class PrivatBilDto {
+        private fun dto(begrunnelse: String?) =
+            FaktaReiseTilSamlingPrivatBilDto(
+                reiseavstand = 40.toBigDecimal(),
+                begrunnelse = begrunnelse,
+            )
+
+        @Test
+        fun `skal normalisere blank begrunnelse til null`() {
+            val fakta = dto("   ").mapTilFakta(reiseId = dummyReiseId, adresse = "Tiltaksveien 1")
+            assertThat(fakta.begrunnelse).isNull()
+        }
+
+        @Test
+        fun `skal beholde null begrunnelse som null`() {
+            val fakta = dto(null).mapTilFakta(reiseId = dummyReiseId, adresse = "Tiltaksveien 1")
+            assertThat(fakta.begrunnelse).isNull()
         }
     }
 }
