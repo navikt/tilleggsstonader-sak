@@ -54,4 +54,54 @@ class HenleggBehandlingIntegrationTest : IntegrationTest() {
             },
         ).isEmpty()
     }
+
+    @Test
+    fun `skal kunne henlegge behandling med årsak annet når begrunnelse er fylt ut`() {
+        val behandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.LÆREMIDLER,
+                tilSteg = StegType.SEND_TIL_BESLUTTER,
+            ) {
+                aktivitet {
+                    opprett {
+                        aktivitetUtdanningLæremidler(LocalDate.now(), LocalDate.now().plusMonths(1))
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(LocalDate.now(), LocalDate.now().plusMonths(1))
+                    }
+                }
+            }
+
+        kall.behandling.henlegg(
+            behandlingContext.behandlingId,
+            HenlagtDto(årsak = HenlagtÅrsak.ANNET, begrunnelse = "En annen begrunnelse"),
+        )
+    }
+
+    @Test
+    fun `skal ikke kunne henlegge behandling med årsak annet uten begrunnelse`() {
+        val behandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.LÆREMIDLER,
+                tilSteg = StegType.SEND_TIL_BESLUTTER,
+            ) {
+                aktivitet {
+                    opprett {
+                        aktivitetUtdanningLæremidler(LocalDate.now(), LocalDate.now().plusMonths(1))
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(LocalDate.now(), LocalDate.now().plusMonths(1))
+                    }
+                }
+            }
+
+        kall.behandling.apiRespons
+            .henlegg(behandlingContext.behandlingId, HenlagtDto(årsak = HenlagtÅrsak.ANNET))
+            .expectStatus()
+            .isBadRequest
+    }
 }
