@@ -222,6 +222,36 @@ class ReiseTilSamlingVilkårServiceTest {
     }
 
     @Test
+    fun `skal ikke validere aktivitetId for offentlig transport TSO selv om aktivitetId er satt`() {
+        val behandling =
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
+        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
+        every { unleashService.isEnabled(any()) } returns true
+        every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
+
+        val vilkår =
+            nyttVilkår.copy(
+                fakta =
+                    FaktaOffentligTransport(
+                        reiseId = dummyReiseId,
+                        adresse = "Samlingsveien 1",
+                        utgifterOffentligTransport = 500.toBigDecimal(),
+                        begrunnelse = "Togbillett mellom bosted og samling",
+                        aktivitetId = VilkårperiodeGlobalId.random(),
+                    ),
+            )
+
+        reiseTilSamlingVilkårService.opprettNyttVilkår(
+            nyttVilkår = vilkår,
+            behandlingId = behandling.id,
+        )
+
+        verify(exactly = 0) {
+            vilkårperiodeService.hentAktivitet(any(), any())
+        }
+    }
+
+    @Test
     fun `skal feile når aktivitet ikke finnes for privat bil`() {
         val behandling =
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSR))
@@ -327,7 +357,7 @@ class ReiseTilSamlingVilkårServiceTest {
     }
 
     @Test
-    fun `skal kunne opprette vilkår for privat bil når aktiviteten er oppfylt og dekker hele perioden`() {
+    fun `skal ikke validere aktivitetId for privat bil TSO selv om aktivitetId er satt`() {
         val behandling =
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
         every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
@@ -335,12 +365,6 @@ class ReiseTilSamlingVilkårServiceTest {
         every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
 
         val aktivitetId = VilkårperiodeGlobalId.random()
-        val aktivitet = mockk<VilkårperiodeAktivitet>(relaxed = true)
-        every { aktivitet.resultat } returns ResultatVilkårperiode.OPPFYLT
-        every { aktivitet.fom } returns (1 januar 2025)
-        every { aktivitet.tom } returns (31 januar 2025)
-        every { aktivitet.inneholder(any<Periode<LocalDate>>()) } returns true
-        every { vilkårperiodeService.hentAktivitet(aktivitetId, any()) } returns aktivitet
 
         val vilkår =
             nyttVilkår.copy(
@@ -361,6 +385,37 @@ class ReiseTilSamlingVilkårServiceTest {
         )
 
         verify(exactly = 1) { vilkårRepository.insert(any<Vilkår>()) }
+        verify(exactly = 0) { vilkårperiodeService.hentAktivitet(any(), any()) }
+    }
+
+    @Test
+    fun `skal ikke kreve aktivitetId for privat bil TSO`() {
+        val behandling =
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
+        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
+        every { unleashService.isEnabled(any()) } returns true
+        every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
+
+        val vilkår =
+            nyttVilkår.copy(
+                svar = svarPrivatBil,
+                fakta =
+                    FaktaPrivatBil(
+                        reiseId = dummyReiseId,
+                        adresse = "Samlingsveien 1",
+                        reiseavstand = 40.toBigDecimal(),
+                        begrunnelse = "Drivstoff og slitasje",
+                        aktivitetId = null,
+                    ),
+            )
+
+        reiseTilSamlingVilkårService.opprettNyttVilkår(
+            nyttVilkår = vilkår,
+            behandlingId = behandling.id,
+        )
+
+        verify(exactly = 1) { vilkårRepository.insert(any<Vilkår>()) }
+        verify(exactly = 0) { vilkårperiodeService.hentAktivitet(any(), any()) }
     }
 
     @Test
