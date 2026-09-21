@@ -131,16 +131,16 @@ data class FaktaPrivatBil(
 
     private fun validerMaksbeløpUtgifter() {
         brukerfeilHvis(bompenger != null && bompenger > MAKS_BOMPENGER) {
-            "Skal du innvilge med bompenger høyere enn ${MAKS_BOMPENGER}kr må du ta kontakt med Tilleggsstønader-temet"
+            "Skal du innvilge med bompenger høyere enn ${MAKS_BOMPENGER}kr må du ta kontakt med Tilleggsstønader-teamet"
         }
         brukerfeilHvis(fergekostnad != null && fergekostnad > MAKS_FERGEKOSTNAD) {
-            "Skal du innvilge med fergekostnad høyere enn ${MAKS_FERGEKOSTNAD}kr må du ta kontakt med Tilleggsstønader-temet"
+            "Skal du innvilge med fergekostnad høyere enn ${MAKS_FERGEKOSTNAD}kr må du ta kontakt med Tilleggsstønader-teamet"
         }
         brukerfeilHvis(parkering != null && parkering > MAKS_PARKERING) {
-            "Skal du innvilge med parkering høyere enn ${MAKS_PARKERING}kr må du ta kontakt med Tilleggsstønader-temet"
+            "Skal du innvilge med parkering høyere enn ${MAKS_PARKERING}kr må du ta kontakt med Tilleggsstønader-teamet"
         }
         brukerfeilHvis(piggdekkavgift != null && piggdekkavgift > MAKS_PIGGDEKKAVGIFT) {
-            "Skal du innvilge med piggdekkavgift høyere enn ${MAKS_PIGGDEKKAVGIFT}kr må du ta kontakt med Tilleggsstønader-temet"
+            "Skal du innvilge med piggdekkavgift høyere enn ${MAKS_PIGGDEKKAVGIFT}kr må du ta kontakt med Tilleggsstønader-teamet"
         }
     }
 }

@@ -42,7 +42,7 @@ class FaktaReiseTilSamlingTest {
                     faktaPrivatBil(bompenger = FaktaPrivatBil.MAKS_BOMPENGER.add(BigDecimal.ONE))
                 }
             assertThat(feil.message)
-                .isEqualTo("Skal du innvilge med bompenger høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet")
+                .isEqualTo("Skal du innvilge med bompenger høyere enn 500kr må du ta kontakt med Tilleggsstønader-teamet")
         }
 
         @Test
@@ -57,7 +57,7 @@ class FaktaReiseTilSamlingTest {
                     faktaPrivatBil(fergekostnad = FaktaPrivatBil.MAKS_FERGEKOSTNAD.add(BigDecimal.ONE))
                 }
             assertThat(feil.message)
-                .isEqualTo("Skal du innvilge med fergekostnad høyere enn 900kr må du ta kontakt med Tilleggsstønader-temet")
+                .isEqualTo("Skal du innvilge med fergekostnad høyere enn 900kr må du ta kontakt med Tilleggsstønader-teamet")
         }
 
         @Test
@@ -72,7 +72,7 @@ class FaktaReiseTilSamlingTest {
                     faktaPrivatBil(parkering = FaktaPrivatBil.MAKS_PARKERING.add(BigDecimal.ONE))
                 }
             assertThat(feil.message)
-                .isEqualTo("Skal du innvilge med parkering høyere enn 1000kr må du ta kontakt med Tilleggsstønader-temet")
+                .isEqualTo("Skal du innvilge med parkering høyere enn 1000kr må du ta kontakt med Tilleggsstønader-teamet")
         }
 
         @Test
@@ -87,7 +87,7 @@ class FaktaReiseTilSamlingTest {
                     faktaPrivatBil(piggdekkavgift = FaktaPrivatBil.MAKS_PIGGDEKKAVGIFT.add(BigDecimal.ONE))
                 }
             assertThat(feil.message)
-                .isEqualTo("Skal du innvilge med piggdekkavgift høyere enn 1400kr må du ta kontakt med Tilleggsstønader-temet")
+                .isEqualTo("Skal du innvilge med piggdekkavgift høyere enn 1400kr må du ta kontakt med Tilleggsstønader-teamet")
         }
 
         @Test
