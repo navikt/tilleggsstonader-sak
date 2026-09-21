@@ -17,10 +17,9 @@ import java.time.LocalDate
  * Bestemmer om en journalpost skal rutes til TSO- eller TSR-varianten av en gitt stønadstype.
  *
  * Rekkefølge:
- * 1. Hvis journalposten ikke har en strukturert søknad rutes den basert på journalpostens tema.
- * 2. Hvis bruker har ytelser fra register (Arena m.fl.) i den aktuelle perioden, brukes disse til å
+ * 1. Hvis bruker har ytelser fra register (Arena m.fl.) i den aktuelle perioden, brukes disse til å
  *    avgjøre målgruppe.
- * 3. Hvis registeret ikke gir treff, faller vi tilbake på ytelsene bruker selv har oppgitt i søknaden.
+ * 2. Hvis registeret ikke gir treff, faller vi tilbake på ytelsene bruker selv har oppgitt i søknaden.
  */
 @Service
 class BestemTemaForJournalpostService(
