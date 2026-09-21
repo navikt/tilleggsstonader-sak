@@ -13,7 +13,6 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørtUkeStatu
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.alleErUendret
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.finnDagerInnenforPeriode
-import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.avrundetStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBil
@@ -39,10 +38,6 @@ class PrivatBilBeregningService(
         forrigeBeregningsresultat: BeregningsresultatPrivatBil?,
     ): BeregningsresultatPrivatBil? {
         if (rammevedtak == null) return null
-
-        if (beregningsplan.omfang == Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT) {
-            return forrigeBeregningsresultat
-        }
 
         val avklarteUkerForBehandling = avklartKjørelisteService.hentAvklarteUkerForBehandling(behandling.id)
 
