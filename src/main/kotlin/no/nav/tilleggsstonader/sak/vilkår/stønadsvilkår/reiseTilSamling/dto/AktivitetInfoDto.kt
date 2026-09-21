@@ -8,7 +8,7 @@ import java.time.LocalDate
 data class AktivitetInfoDto(
     val aktivitetId: VilkårperiodeGlobalId,
     val aktivitetType: String,
-    val tiltaksvariant: String?,
+    val tiltaksvariantBeskrivelse: String?,
     val fom: LocalDate,
     val tom: LocalDate,
 )
@@ -17,7 +17,7 @@ fun VilkårperiodeAktivitet.tilAktivitetInfoDto() =
     AktivitetInfoDto(
         aktivitetId = this.globalId,
         aktivitetType = (this.type as? AktivitetType)?.name ?: error("Aktivitet har ugyldig type=${this.type}"),
-        tiltaksvariant = this.tiltaksvariant?.beskrivelse,
+        tiltaksvariantBeskrivelse = this.tiltaksvariant?.beskrivelse,
         fom = this.fom,
         tom = this.tom,
     )

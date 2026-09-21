@@ -265,7 +265,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 AktivitetInfoDto(
                     aktivitetId = it,
                     aktivitetType = "TYPE",
-                    tiltaksvariant = null,
+                    tiltaksvariantBeskrivelse = null,
                     fom = LocalDate.now(),
                     tom = LocalDate.now(),
                 )
@@ -291,7 +291,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 AktivitetInfoDto(
                     aktivitetId = aktivitet.globalId,
                     aktivitetType = aktivitet.type.tilDbType(),
-                    tiltaksvariant = aktivitet.tiltaksvariant.toString(),
+                    tiltaksvariantBeskrivelse = aktivitet.tiltaksvariant.toString(),
                     fom = aktivitet.fom,
                     tom = aktivitet.tom,
                 )
