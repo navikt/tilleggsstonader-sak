@@ -278,7 +278,7 @@ class FaktaDagligReiseTest {
 
             assertThat(
                 feil.message,
-            ).isEqualTo("Skal du innvilge med bompenger høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet")
+            ).isEqualTo("Skal du innvilge med bompenger høyere enn 500kr må du ta kontakt med Tilleggsstønader-teamet")
         }
 
         @Test
@@ -292,7 +292,7 @@ class FaktaDagligReiseTest {
 
             assertThat(
                 feil.message,
-            ).isEqualTo("Skal du innvilge med fergekostnader høyere enn 900kr må du ta kontakt med Tilleggsstønader-temet")
+            ).isEqualTo("Skal du innvilge med fergekostnader høyere enn 900kr må du ta kontakt med Tilleggsstønader-teamet")
         }
 
         private fun faktaPrivatBilDto(

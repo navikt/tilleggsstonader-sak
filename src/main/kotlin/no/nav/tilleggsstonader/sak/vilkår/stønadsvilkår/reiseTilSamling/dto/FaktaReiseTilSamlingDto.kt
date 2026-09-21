@@ -51,7 +51,7 @@ data class FaktaReiseTilSamlingOffentligTransportDto(
 
 data class FaktaReiseTilSamlingPrivatBilDto(
     val reiseavstand: BigDecimal,
-    val begrunnelse: String,
+    val begrunnelse: String?,
     val aktivitet: AktivitetInfoDto? = null,
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,
@@ -67,7 +67,7 @@ data class FaktaReiseTilSamlingPrivatBilDto(
         reiseId = reiseId,
         adresse = adresse,
         reiseavstand = reiseavstand,
-        begrunnelse = begrunnelse,
+        begrunnelse = begrunnelse?.ifBlank { null },
         aktivitetId = aktivitet?.aktivitetId,
         bompenger = bompenger,
         fergekostnad = fergekostnad,
