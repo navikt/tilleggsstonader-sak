@@ -131,7 +131,6 @@ class ReiseTilSamlingVilkårController(
             return null
         }
 
-        val aktivitet = vilkårperiodeService.hentAktivitet(this, behandlingId) ?: return null
-        return aktivitet.tilAktivitetInfoDto()
+        return vilkårperiodeService.hentAktivitet(this, behandlingId)?.tilAktivitetInfoDto()
     }
 }
