@@ -1,13 +1,11 @@
 package no.nav.tilleggsstonader.sak.ekstern.journalføring
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalpost
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.libs.feil.feilHvis
-import no.nav.tilleggsstonader.sak.journalføring.harStrukturertSøknad
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilMålgruppe
@@ -38,14 +36,6 @@ class BestemTemaForJournalpostService(
         tom: LocalDate,
         målgrupperFraSøknad: Set<MålgruppeType>,
     ): Stønadstype {
-        if (!journalpost.harStrukturertSøknad()) {
-            return if (journalpost.tema == Tema.TSO.name) {
-                stønadstypeTso
-            } else {
-                stønadstypeTsr
-            }
-        }
-
         val målgrupperFraRegister = hentMålgrupperFraRegister(journalpost, fom, tom).toSet()
         val målgrupper = målgrupperFraRegister.takeIf { it.isNotEmpty() } ?: målgrupperFraSøknad
 

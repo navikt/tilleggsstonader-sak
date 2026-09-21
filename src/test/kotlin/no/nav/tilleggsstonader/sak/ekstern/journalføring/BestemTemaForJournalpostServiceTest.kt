@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.ekstern.journalføring
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
@@ -27,40 +26,6 @@ class BestemTemaForJournalpostServiceTest {
 
     private val fom = 1 januar 2026
     private val tom = 31 desember 2026
-
-    @Test
-    fun `skal rute til TSO basert på tema når søknad ikke er strukturert`() {
-        val journalpost = journalpost(tema = Tema.TSO.name, dokumenter = null)
-
-        val stønadstype =
-            service.bestemStønadstype(
-                journalpost = journalpost,
-                stønadstypeTso = Stønadstype.REISE_TIL_SAMLING_TSO,
-                stønadstypeTsr = Stønadstype.REISE_TIL_SAMLING_TSR,
-                fom = fom,
-                tom = tom,
-                målgrupperFraSøknad = emptySet(),
-            )
-
-        assertThat(stønadstype).isEqualTo(Stønadstype.REISE_TIL_SAMLING_TSO)
-    }
-
-    @Test
-    fun `skal rute til TSR basert på tema når søknad ikke er strukturert`() {
-        val journalpost = journalpost(tema = Tema.TSR.name, dokumenter = null)
-
-        val stønadstype =
-            service.bestemStønadstype(
-                journalpost = journalpost,
-                stønadstypeTso = Stønadstype.REISE_TIL_SAMLING_TSO,
-                stønadstypeTsr = Stønadstype.REISE_TIL_SAMLING_TSR,
-                fom = fom,
-                tom = tom,
-                målgrupperFraSøknad = emptySet(),
-            )
-
-        assertThat(stønadstype).isEqualTo(Stønadstype.REISE_TIL_SAMLING_TSR)
-    }
 
     @Test
     fun `skal rute til TSO når målgruppe fra register kan brukes for TSO`() {
