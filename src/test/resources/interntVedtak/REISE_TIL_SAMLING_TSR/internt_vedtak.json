@@ -170,7 +170,7 @@
         "fom" : "2024-01-01",
         "tom" : "2024-01-31",
         "sats" : 3.5,
-        "totaltReiseavstand" : 60,
+        "reiseavstand" : 60,
         "bompenger" : 40,
         "fergekostnad" : 50,
         "parkering" : 40,

@@ -63,7 +63,7 @@ fun lagBeregningsresultatForPrivatBil(
             fom = fom,
             tom = tom,
             sats = BigDecimal.ZERO,
-            totaltReiseavstand = BigDecimal.ZERO,
+            reiseavstand = BigDecimal.ZERO,
             bompenger = null,
             fergekostnad = null,
             parkering = null,
