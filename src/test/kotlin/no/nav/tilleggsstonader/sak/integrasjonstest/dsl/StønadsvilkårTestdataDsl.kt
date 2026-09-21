@@ -144,13 +144,13 @@ class OpprettStønadsvilkårDsl {
     fun offentligTransportReiseTilSamling(
         fom: LocalDate,
         tom: LocalDate,
-        hentAktivitetId: (List<VilkårperiodeDto>) -> VilkårperiodeGlobalId? = { null },
+        hentAktivitet: (List<VilkårperiodeDto>) -> VilkårperiodeDto? = { null },
     ) {
         dtoer += { _, _, aktiviteter ->
             lagreReiseTilSamlingDto(
                 fom = fom,
                 tom = tom,
-                aktivitetId = hentAktivitetId(aktiviteter),
+                aktivitet = hentAktivitet(aktiviteter),
             )
         }
     }

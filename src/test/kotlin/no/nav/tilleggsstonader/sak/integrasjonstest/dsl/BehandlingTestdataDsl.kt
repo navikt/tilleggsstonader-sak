@@ -285,7 +285,7 @@ class BehandlingTestdataDsl internal constructor() {
         }
         vilkår {
             opprett {
-                offentligTransportReiseTilSamling(fom, tom, hentAktivitetId = { it.single().globalId })
+                offentligTransportReiseTilSamling(fom, tom, hentAktivitet = { it.single() })
             }
         }
     }
