@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domai
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaUbestemtType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 
 @JsonTypeInfo(
@@ -34,7 +33,7 @@ sealed interface FaktaReiseTilSamlingDto {
 data class FaktaReiseTilSamlingOffentligTransportDto(
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String,
-    val aktivitetId: VilkårperiodeGlobalId? = null,
+    val aktivitet: AktivitetInfoDto? = null,
 ) : FaktaReiseTilSamlingDto {
     override val type = TypeReiseTilSamling.OFFENTLIG_TRANSPORT
 
@@ -46,14 +45,14 @@ data class FaktaReiseTilSamlingOffentligTransportDto(
         adresse = adresse,
         utgifterOffentligTransport = utgifterOffentligTransport,
         begrunnelse = begrunnelse,
-        aktivitetId = aktivitetId,
+        aktivitetId = aktivitet?.aktivitetId,
     )
 }
 
 data class FaktaReiseTilSamlingPrivatBilDto(
     val reiseavstand: BigDecimal,
     val begrunnelse: String?,
-    val aktivitetId: VilkårperiodeGlobalId? = null,
+    val aktivitet: AktivitetInfoDto? = null,
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,
     val parkering: BigDecimal? = null,
@@ -69,7 +68,7 @@ data class FaktaReiseTilSamlingPrivatBilDto(
         adresse = adresse,
         reiseavstand = reiseavstand,
         begrunnelse = begrunnelse?.ifBlank { null },
-        aktivitetId = aktivitetId,
+        aktivitetId = aktivitet?.aktivitetId,
         bompenger = bompenger,
         fergekostnad = fergekostnad,
         parkering = parkering,

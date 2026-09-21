@@ -95,6 +95,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domai
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.LagreVilkårReiseTilSamlingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.tilAktivitetInfoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
@@ -103,6 +104,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -704,13 +706,13 @@ fun faktaOffentligTransportReiseTilSamling(
     adresse: String = "Tiltaksveien 1",
     utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
     begrunnelse: String = "Spesifisert offentlig transportutgift",
-    aktivitetId: VilkårperiodeGlobalId? = dummyAktivitetId,
+    aktivitet: VilkårperiodeDto? = null,
 ) = FaktaOffentligTransportReiseTilSamling(
     reiseId = reiseId,
     adresse = adresse,
     utgifterOffentligTransport = utgifterOffentligTransport,
     begrunnelse = begrunnelse,
-    aktivitetId = aktivitetId,
+    aktivitetId = aktivitet?.globalId,
 )
 
 fun faktaPrivatBilReiseTilSamling(
@@ -770,7 +772,7 @@ fun lagreReiseTilSamlingDto(
     reiseId: ReiseId = dummyReiseId,
     utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
     begrunnelse: String = "Spesifisert offentlig transportutgift",
-    aktivitetId: VilkårperiodeGlobalId? = null,
+    aktivitet: VilkårperiodeDto? = null,
     svar: Map<RegelId, SvarOgBegrunnelseDto> =
         ReiseTilSamlingRegelTestUtil.oppfylteSvarReiseTilSamlingOffentligTransportDto(),
     fakta: FaktaReiseTilSamlingDto =
@@ -779,12 +781,12 @@ fun lagreReiseTilSamlingDto(
             reiseId = reiseId,
             utgifterOffentligTransport = utgifterOffentligTransport,
             begrunnelse = begrunnelse,
-            aktivitetId = aktivitetId,
+            aktivitet = aktivitet,
         ).run {
             FaktaReiseTilSamlingOffentligTransportDto(
                 utgifterOffentligTransport = utgifterOffentligTransport,
                 begrunnelse = begrunnelse,
-                aktivitetId = aktivitetId,
+                aktivitet = aktivitet?.tilAktivitetInfoDto(),
             )
         },
 ) = LagreVilkårReiseTilSamlingDto(
