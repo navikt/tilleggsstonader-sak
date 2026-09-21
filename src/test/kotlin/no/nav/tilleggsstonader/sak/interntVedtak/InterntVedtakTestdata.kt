@@ -19,6 +19,7 @@ import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagFaktaGrunnlagPerson
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.behandlingBarn
+import no.nav.tilleggsstonader.sak.util.dummyAktivitetId
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -39,7 +40,6 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatF
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilDag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilPeriode
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilSatsForDelperiode
@@ -55,6 +55,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelsePassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -68,21 +69,31 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.vedtaksperiodeGrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.BeregningsresultatPassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsgrunnlagOffentligTransportForSamling
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsgrunnlagPrivatBilForSamling
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernatting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.oppfylteDelvilkårDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.oppfylteDelvilkårDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegelTestUtil.oppfylteDelvilkårReiseTilSamlingOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegelTestUtil.oppfylteDelvilkårReiseTilSamlingPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetPassAvBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetReiseTilSamlingTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetReiseTilSamlingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingMålgruppeLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.vurderingAldersVilkår
@@ -94,7 +105,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
@@ -103,7 +113,6 @@ import java.time.LocalDate
 import java.time.Month.FEBRUARY
 import java.time.Month.JANUARY
 import java.time.temporal.ChronoUnit
-import java.util.UUID
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning as VedtaksperiodeBeregningsgrunnlag
 
 object InterntVedtakTestdata {
@@ -830,7 +839,7 @@ object InterntVedtakTestdata {
         fun beregningsresultat(brukersNavKontor: String?) =
             BeregningsresultatDagligReise(
                 offentligTransport =
-                    BeregningsresultatOffentligTransport(
+                    no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatOffentligTransport(
                         reiser =
                             listOf(
                                 BeregningsresultatForReise(
@@ -1079,7 +1088,240 @@ object InterntVedtakTestdata {
                                         fergekostnadPerDag = BigDecimal("30"),
                                     ),
                                 ),
-                            aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
+                            aktivitetId = dummyAktivitetId,
+                        ),
+                ),
+            )
+    }
+
+    object ReiseTilSamling {
+        val fagsak =
+            fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()), stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO)
+        val fagsakTsr =
+            fagsak(eksternId = EksternFagsakId(1673L, FagsakId.random()), stønadstype = Stønadstype.REISE_TIL_SAMLING_TSR)
+        val behandling =
+            saksbehandling(
+                behandling =
+                    behandling(
+                        id = behandlingId,
+                        vedtakstidspunkt = LocalDate.of(2024, 2, 5).atStartOfDay(),
+                        opprettetTid = LocalDate.of(2024, 2, 10).atStartOfDay(),
+                        fagsak = fagsak,
+                        resultat = BehandlingResultat.INNVILGET,
+                        type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    ),
+                fagsak = fagsak,
+            )
+        val behandlingTsr =
+            saksbehandling(
+                behandling =
+                    behandling(
+                        id = behandlingId,
+                        vedtakstidspunkt = LocalDate.of(2024, 2, 5).atStartOfDay(),
+                        opprettetTid = LocalDate.of(2024, 2, 10).atStartOfDay(),
+                        fagsak = fagsakTsr,
+                        resultat = BehandlingResultat.INNVILGET,
+                        type = BehandlingType.FØRSTEGANGSBEHANDLING,
+                    ),
+                fagsak = fagsakTsr,
+            )
+        private val aktivitetererReiseTilSamlingTso =
+            listOf(
+                VilkårperiodeTestUtil.aktivitet(
+                    fom = LocalDate.of(2024, 2, 5),
+                    tom = LocalDate.of(2024, 2, 10),
+                    faktaOgVurdering = faktaOgVurderingAktivitetReiseTilSamlingTso(),
+                ),
+                VilkårperiodeTestUtil.aktivitet(
+                    fom = LocalDate.of(2024, 2, 5),
+                    tom = LocalDate.of(2024, 2, 10),
+                    resultat = ResultatVilkårperiode.IKKE_OPPFYLT,
+                    begrunnelse = "ikke oppfylt",
+                    faktaOgVurdering = faktaOgVurderingAktivitetReiseTilSamlingTso(type = AktivitetType.UTDANNING),
+                ),
+            )
+
+        private val aktivitetererReiseTilSamlingTsr =
+            listOf(
+                VilkårperiodeTestUtil.aktivitet(
+                    fom = LocalDate.of(2024, 2, 5),
+                    tom = LocalDate.of(2024, 2, 10),
+                    faktaOgVurdering = faktaOgVurderingAktivitetReiseTilSamlingTsr(),
+                    tiltaksvariant = TypeAktivitet.GRUPPEAMO,
+                ),
+            )
+
+        val vilkårperioderTso =
+            Vilkårperioder(
+                målgrupper = målgrupper,
+                aktiviteter = aktivitetererReiseTilSamlingTso,
+            )
+
+        val vilkårperioderTsr =
+            Vilkårperioder(
+                målgrupper = målgrupperTsr,
+                aktiviteter = aktivitetererReiseTilSamlingTsr,
+            )
+
+        val grunnlagsdata =
+            lagGrunnlagsdata(personopplysninger = lagFaktaGrunnlagPersonopplysninger(barn = emptyList()))
+
+        fun beregningsresultatTso() = beregningsresultat(brukersNavKontor = null)
+
+        fun beregningsresultatTsr() = beregningsresultat(brukersNavKontor = "1234")
+
+        fun beregningsresultat(brukersNavKontor: String?) =
+            BeregningsresultatReiseTilSamling(
+                offentligTransport =
+                    listOf(
+                        no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport(
+                            reiseId = dummyReiseId,
+                            grunnlag =
+                                BeregningsgrunnlagOffentligTransportForSamling(
+                                    adresse = "Testveien 1, 1234 Testby",
+                                    fom = LocalDate.of(2024, 1, 1),
+                                    tom = LocalDate.of(2024, 1, 31),
+                                    vedtaksperioder = emptyList(),
+                                    brukersNavKontor = null,
+                                ),
+                            beløp = BigDecimal(3000),
+                            aktivitetId = dummyAktivitetId,
+                        ),
+                        no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport(
+                            reiseId = dummyReiseId,
+                            grunnlag =
+                                BeregningsgrunnlagOffentligTransportForSamling(
+                                    adresse = "Testveien 2, 2345 Testby",
+                                    fom = LocalDate.of(2025, 1, 1),
+                                    tom = LocalDate.of(2025, 1, 31),
+                                    vedtaksperioder = emptyList(),
+                                    brukersNavKontor = null,
+                                ),
+                            beløp = BigDecimal(3000),
+                            aktivitetId = dummyAktivitetId,
+                        ),
+                    ),
+                privatBil =
+                    listOf(
+                        no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatPrivatBil(
+                            reiseId = dummyReiseId,
+                            grunnlag =
+                                BeregningsgrunnlagPrivatBilForSamling(
+                                    adresse = "Testveien 2, 1234 Testby",
+                                    fom = LocalDate.of(2024, 1, 1),
+                                    tom = LocalDate.of(2024, 1, 31),
+                                    sats = BigDecimal(3.50),
+                                    totaltReiseavstand = BigDecimal(60.0),
+                                    bompenger = BigDecimal(40),
+                                    fergekostnad = BigDecimal(50),
+                                    parkering = BigDecimal(40),
+                                    piggdekkavgift = BigDecimal(40),
+                                    vedtaksperioder = emptyList(),
+                                    brukersNavKontor = null,
+                                ),
+                            beløp = BigDecimal(380),
+                            aktivitetId = dummyAktivitetId,
+                        ),
+                    ),
+            )
+
+        val vedtaksperioderTso =
+            listOf(
+                Vedtaksperiode(
+                    id = vedtaksperiodeId,
+                    fom = LocalDate.of(2024, JANUARY, 1),
+                    tom = LocalDate.of(2024, FEBRUARY, 29),
+                    aktivitet = AktivitetType.TILTAK,
+                    målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                ),
+            )
+
+        val vedtaksperioderTsr =
+            listOf(
+                Vedtaksperiode(
+                    id = vedtaksperiodeId,
+                    fom = LocalDate.of(2024, JANUARY, 1),
+                    tom = LocalDate.of(2024, FEBRUARY, 29),
+                    aktivitet = AktivitetType.TILTAK,
+                    målgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
+                ),
+            )
+
+        fun innvilgetVedtakTso() = innvilgetVedtak(beregningsresultatTso(), vedtaksperioderTso)
+
+        fun innvilgetVedtakTsr() = innvilgetVedtak(beregningsresultatTsr(), vedtaksperioderTsr)
+
+        private fun innvilgetVedtak(
+            beregningsresultatReiseTilSamling: BeregningsresultatReiseTilSamling,
+            vedtaksperioder: List<Vedtaksperiode>,
+        ) = GeneriskVedtak(
+            behandlingId = behandlingId,
+            type = TypeVedtak.INNVILGELSE,
+            data =
+                InnvilgelseReiseTilSamling(
+                    vedtaksperioder = vedtaksperioder,
+                    beregningsresultat = beregningsresultatReiseTilSamling,
+                    begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
+                    beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+                ),
+            gitVersjon = Applikasjonsversjon.versjon,
+            tidligsteEndring = null,
+        )
+
+        val avslåttVedtak =
+            GeneriskVedtak(
+                behandlingId = behandlingId,
+                data =
+                    AvslagDagligReise(
+                        årsaker = listOf(ÅrsakAvslag.MANGELFULL_DOKUMENTASJON),
+                        begrunnelse = "Årsaken til avslaget",
+                    ),
+                type = TypeVedtak.AVSLAG,
+                gitVersjon = Applikasjonsversjon.versjon,
+                tidligsteEndring = null,
+            )
+
+        val vilkårOffentligTransport =
+            listOf(
+                vilkår(
+                    resultat = Vilkårsresultat.OPPFYLT,
+                    behandlingId = behandlingId,
+                    type = VilkårType.REISE_TIL_SAMLING,
+                    delvilkår = oppfylteDelvilkårReiseTilSamlingOffentligTransport(),
+                    fom = LocalDate.of(2024, FEBRUARY, 1),
+                    tom = LocalDate.of(2024, FEBRUARY, 2),
+                    utgift = null,
+                    fakta =
+                        FaktaReiseTilSamlingOffentligTransport(
+                            reiseId = dummyReiseId,
+                            adresse = "Tiltaksgata 1",
+                            utgifterOffentligTransport = 2000.toBigDecimal(),
+                            begrunnelse = "Begrunnelse",
+                            aktivitetId = dummyAktivitetId,
+                        ),
+                ),
+            )
+        val vilkårPrivatBil =
+            listOf(
+                vilkår(
+                    resultat = Vilkårsresultat.OPPFYLT,
+                    behandlingId = behandlingId,
+                    type = VilkårType.REISE_TIL_SAMLING,
+                    delvilkår = oppfylteDelvilkårReiseTilSamlingPrivatBil(),
+                    fom = LocalDate.of(2025, JANUARY, 1),
+                    tom = LocalDate.of(2025, FEBRUARY, 28),
+                    utgift = null,
+                    fakta =
+                        FaktaReiseTilSamlingPrivatBil(
+                            reiseId = dummyReiseId,
+                            adresse = "Tiltaksgata 1",
+                            reiseavstand = BigDecimal(40),
+                            begrunnelse = "Begrunnelse",
+                            aktivitetId = dummyAktivitetId,
+                            bompenger = BigDecimal(40),
+                            fergekostnad = BigDecimal(50),
+                            parkering = BigDecimal(40),
+                            piggdekkavgift = BigDecimal(50),
                         ),
                 ),
             )

@@ -24,7 +24,7 @@ data class Beregningsplan internal constructor(
         when (omfang) {
             Beregningsomfang.ALLE_PERIODER -> null
             Beregningsomfang.FRA_DATO -> fraDato
-            Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT -> error("beregnFra-dato er ikke relevant for $omfang")
+            Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT -> null
             Beregningsomfang.KUN_NYE_KJORELISTE_UKER -> null
         }
 

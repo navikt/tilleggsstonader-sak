@@ -80,7 +80,7 @@
       "erHovedregel": false,
       "svarMapping": {
         "JA": {
-          "begrunnelseType": "UTEN",
+          "begrunnelseType": "VALGFRI",
           "tilhørendeFaktaType": "REISE_TIL_SAMLING_PRIVAT_BIL",
           "regelId": "SLUTT_NODE"
         },

@@ -2,12 +2,12 @@
   "behandling" : {
     "behandlingId" : "001464ca-20dc-4f6c-b3e8-c83bd98b3e31",
     "eksternFagsakId" : 1673,
-    "stønadstype" : "BOUTGIFTER",
+    "stønadstype" : "REISE_TIL_SAMLING_TSO",
     "årsak" : "SØKNAD",
     "ident" : "123456789012",
-    "opprettetTidspunkt" : "2024-02-05T00:00:00",
+    "opprettetTidspunkt" : "2024-02-10T00:00:00",
     "resultat" : "INNVILGET",
-    "vedtakstidspunkt" : "2024-01-01T00:00:00",
+    "vedtakstidspunkt" : "2024-02-05T00:00:00",
     "saksbehandler" : "saksbehandler",
     "beslutter" : "saksbeh2"
   },
@@ -92,10 +92,10 @@
   } ],
   "aktiviteter" : [ {
     "type" : "TILTAK",
-    "fom" : "2024-12-10",
-    "tom" : "2024-12-15",
+    "fom" : "2024-02-05",
+    "tom" : "2024-02-10",
     "faktaOgVurderinger" : {
-      "@type" : "AKTIVITET_BOUTGIFTER",
+      "@type" : "AKTIVITET_REISE_TIL_SAMLING_TSO",
       "lønnet" : {
         "svar" : "NEI",
         "resultat" : "OPPFYLT"
@@ -108,10 +108,10 @@
     "tiltaksvariant" : null
   }, {
     "type" : "UTDANNING",
-    "fom" : "2024-12-10",
-    "tom" : "2024-12-15",
+    "fom" : "2024-02-05",
+    "tom" : "2024-02-10",
     "faktaOgVurderinger" : {
-      "@type" : "AKTIVITET_BOUTGIFTER",
+      "@type" : "AKTIVITET_REISE_TIL_SAMLING_TSO",
       "lønnet" : null
     },
     "kilde" : "MANUELL",
@@ -127,81 +127,89 @@
     "aktivitet" : "TILTAK"
   } ],
   "vilkår" : [ {
-    "type" : "UTGIFTER_OVERNATTING",
+    "type" : "REISE_TIL_SAMLING",
     "resultat" : "OPPFYLT",
     "delvilkår" : [ {
       "resultat" : "IKKE_TATT_STILLING_TIL",
       "vurderinger" : [ {
-        "regel" : "Har søker nødvendige merutgifter til overnatting?",
-        "svar" : "Ja",
-        "begrunnelse" : "En begrunnelse på delvilkåret"
-      } ]
-    }, {
-      "resultat" : "IKKE_TATT_STILLING_TIL",
-      "vurderinger" : [ {
-        "regel" : "Har søker dokumentert utgifter til overnatting tilfredsstillende?",
+        "regel" : "Har bruker nødvendige utgifter til reise til samling?",
         "svar" : "Ja",
         "begrunnelse" : null
-      } ]
-    }, {
-      "resultat" : "IKKE_TATT_STILLING_TIL",
-      "vurderinger" : [ {
-        "regel" : "Har søker dokumentert at de har samling/eksamen/opptaksprøve/kurs på datoene for overnatting?",
+      }, {
+        "regel" : "Er reiseavstanden over 30km?",
+        "svar" : "Ja",
+        "begrunnelse" : "antall km"
+      }, {
+        "regel" : "Er samlingen obligatorisk?",
         "svar" : "Ja",
         "begrunnelse" : null
-      } ]
-    }, {
-      "resultat" : "IKKE_TATT_STILLING_TIL",
-      "vurderinger" : [ {
-        "regel" : "Har søker høyere utgifter grunnet helsemessige årsaker?",
-        "svar" : "Nei",
+      }, {
+        "regel" : "Kan søker benytte seg av offentlig transport?",
+        "svar" : "Ja",
+        "begrunnelse" : null
+      }, {
+        "regel" : "Har bruker dokumenterte utgifter til reise?",
+        "svar" : "Ja",
         "begrunnelse" : null
       } ]
     } ],
     "fødselsdatoBarn" : null,
     "fom" : "2024-02-01",
     "tom" : "2024-02-02",
-    "utgift" : 3000,
+    "utgift" : null,
     "slettetKommentar" : null,
-    "fakta" : null
+    "fakta" : {
+      "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
+      "adresse" : "Tiltaksgata 1",
+      "utgifterOffentligTransport" : 2000,
+      "begrunnelse" : "Begrunnelse",
+      "aktivitetId" : "02c86eca-36e5-451b-a22d-8501a0f7b8ee",
+      "type" : "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT"
+    }
   }, {
-    "type" : "UTGIFTER_OVERNATTING",
+    "type" : "REISE_TIL_SAMLING",
     "resultat" : "OPPFYLT",
     "delvilkår" : [ {
       "resultat" : "IKKE_TATT_STILLING_TIL",
       "vurderinger" : [ {
-        "regel" : "Har søker nødvendige merutgifter til overnatting?",
-        "svar" : "Ja",
-        "begrunnelse" : "En begrunnelse på delvilkåret"
-      } ]
-    }, {
-      "resultat" : "IKKE_TATT_STILLING_TIL",
-      "vurderinger" : [ {
-        "regel" : "Har søker dokumentert utgifter til overnatting tilfredsstillende?",
+        "regel" : "Har bruker nødvendige utgifter til reise til samling?",
         "svar" : "Ja",
         "begrunnelse" : null
-      } ]
-    }, {
-      "resultat" : "IKKE_TATT_STILLING_TIL",
-      "vurderinger" : [ {
-        "regel" : "Har søker dokumentert at de har samling/eksamen/opptaksprøve/kurs på datoene for overnatting?",
+      }, {
+        "regel" : "Er reiseavstanden over 30km?",
+        "svar" : "Ja",
+        "begrunnelse" : "antall km"
+      }, {
+        "regel" : "Er samlingen obligatorisk?",
         "svar" : "Ja",
         "begrunnelse" : null
-      } ]
-    }, {
-      "resultat" : "IKKE_TATT_STILLING_TIL",
-      "vurderinger" : [ {
-        "regel" : "Har søker høyere utgifter grunnet helsemessige årsaker?",
+      }, {
+        "regel" : "Kan søker benytte seg av offentlig transport?",
         "svar" : "Nei",
+        "begrunnelse" : null
+      }, {
+        "regel" : "Kan bruker benytte privat bil?",
+        "svar" : "Ja",
         "begrunnelse" : null
       } ]
     } ],
     "fødselsdatoBarn" : null,
-    "fom" : "2024-02-26",
-    "tom" : "2024-02-29",
-    "utgift" : 4000,
+    "fom" : "2025-01-01",
+    "tom" : "2025-02-28",
+    "utgift" : null,
     "slettetKommentar" : null,
-    "fakta" : null
+    "fakta" : {
+      "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
+      "adresse" : "Tiltaksgata 1",
+      "reiseAvstand" : 40,
+      "begrunnelse" : "Begrunnelse",
+      "aktivitetId" : "02c86eca-36e5-451b-a22d-8501a0f7b8ee",
+      "bompenger" : 40,
+      "fergekostnad" : 50,
+      "parkering" : 40,
+      "piggdekkavgift" : 50,
+      "type" : "REISE_TIL_SAMLING_PRIVAT_BIL"
+    }
   } ],
   "vedtak" : {
     "innvilgelseBegrunnelse" : "Sånn her vil en begrunnelse se ut i det interne vedtaket",
@@ -210,47 +218,42 @@
   "beregningsresultat" : {
     "tilsynBarn" : null,
     "læremidler" : null,
-    "boutgifter" : [ {
-      "fom" : "2024-01-01",
-      "tom" : "2024-01-31",
-      "stønadsbeløp" : 3000,
-      "utgifter" : [ {
+    "boutgifter" : null,
+    "dagligReise" : null,
+    "reiseTilSamling" : {
+      "offentligTransport" : [ {
+        "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
+        "adresse" : "Testveien 1, 1234 Testby",
         "fom" : "2024-01-01",
         "tom" : "2024-01-31",
-        "utgift" : 3000,
-        "tilUtbetaling" : 3000,
-        "erFørTidligsteEndring" : false,
-        "skalFåDekketFaktiskeUtgifter" : false
+        "beløp" : 3000,
+        "aktivitetId" : "02c86eca-36e5-451b-a22d-8501a0f7b8ee"
+      }, {
+        "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
+        "adresse" : "Testveien 2, 2345 Testby",
+        "fom" : "2025-01-01",
+        "tom" : "2025-01-31",
+        "beløp" : 3000,
+        "aktivitetId" : "02c86eca-36e5-451b-a22d-8501a0f7b8ee"
       } ],
-      "sumUtgifter" : 3000,
-      "målgruppe" : "NEDSATT_ARBEIDSEVNE",
-      "aktivitet" : "TILTAK",
-      "makssatsBekreftet" : true,
-      "delAvTidligereUtbetaling" : false,
-      "skalFåDekketFaktiskeUtgifter" : false,
-      "inneholderUtgifterOvernatting" : true
-    }, {
-      "fom" : "2024-02-01",
-      "tom" : "2024-02-29",
-      "stønadsbeløp" : 4953,
-      "utgifter" : [ {
-        "fom" : "2024-02-26",
-        "tom" : "2024-02-29",
-        "utgift" : 4000,
-        "tilUtbetaling" : 4000,
-        "erFørTidligsteEndring" : false,
-        "skalFåDekketFaktiskeUtgifter" : false
+      "privatBil" : [ {
+        "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
+        "adresse" : "Testveien 2, 1234 Testby",
+        "fom" : "2024-01-01",
+        "tom" : "2024-01-31",
+        "sats" : 3.5,
+        "totaltReiseavstand" : 60,
+        "bompenger" : 40,
+        "fergekostnad" : 50,
+        "parkering" : 40,
+        "piggdekkavgift" : 40,
+        "beløp" : 380,
+        "aktivitetId" : "02c86eca-36e5-451b-a22d-8501a0f7b8ee"
       } ],
-      "sumUtgifter" : 4000,
-      "målgruppe" : "NEDSATT_ARBEIDSEVNE",
-      "aktivitet" : "TILTAK",
-      "makssatsBekreftet" : true,
-      "delAvTidligereUtbetaling" : false,
-      "skalFåDekketFaktiskeUtgifter" : false,
-      "inneholderUtgifterOvernatting" : true
-    } ],
-    "dagligReise" : null,
-    "reiseTilSamling" : null
+      "beregningsplan" : {
+        "omfang" : "ALLE_PERIODER"
+      }
+    }
   },
   "rammevedtakPrivatBil" : null
 }

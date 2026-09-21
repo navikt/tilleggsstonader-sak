@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatDagl
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.BeregningsresultatForMånedDto
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.BeregningsresultatReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.TypeVilkårFakta
@@ -19,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresult
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerDto
 import java.math.BigDecimal
@@ -45,6 +47,7 @@ data class BeregningsresultatInterntVedtakDto(
     val læremidler: List<BeregningsresultatDtoLæremidler>? = null,
     val boutgifter: List<BeregningsresultatDtoBoutgifter>? = null,
     val dagligReise: BeregningsresultatDagligReiseDto? = null,
+    val reiseTilSamling: BeregningsresultatReiseTilSamlingDto? = null,
 )
 
 data class Behandlinginfo(
@@ -148,6 +151,37 @@ data class VilkårFaktaPrivatBilInterntVedtak(
     val faktaDelperioder: List<FaktaDelperiodePrivatBil>,
 ) : VilkårFaktaInterntVedtak {
     override val type = TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL
+}
+
+data class VilkårFaktaReiseTilSamlingUbestemtInterntVedtak(
+    override val reiseId: ReiseId,
+    override val adresse: String?,
+) : VilkårFaktaInterntVedtak {
+    override val type = TypeVilkårFakta.REISE_TIL_SAMLING_UBESTEMT
+}
+
+data class VilkårFaktaReiseTilSamlingOffentligTransportInterntVedtak(
+    override val reiseId: ReiseId,
+    override val adresse: String?,
+    val utgifterOffentligTransport: BigDecimal,
+    val begrunnelse: String?,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
+) : VilkårFaktaInterntVedtak {
+    override val type = TypeVilkårFakta.REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT
+}
+
+data class VilkårFaktaReiseTilSamlingPrivatBilInterntVedtak(
+    override val reiseId: ReiseId,
+    override val adresse: String?,
+    val reiseAvstand: BigDecimal,
+    val begrunnelse: String?,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
+    val bompenger: BigDecimal?,
+    val fergekostnad: BigDecimal?,
+    val parkering: BigDecimal?,
+    val piggdekkavgift: BigDecimal?,
+) : VilkårFaktaInterntVedtak {
+    override val type = TypeVilkårFakta.REISE_TIL_SAMLING_PRIVAT_BIL
 }
 
 data class VurderingInterntVedtak(

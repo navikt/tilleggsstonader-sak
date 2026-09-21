@@ -590,6 +590,7 @@ fun totrinnskontroll(
 )
 
 val dummyReiseId = ReiseId.fromString("02c86eca-36e5-451b-a22d-8501a0f7b8dd")
+val dummyAktivitetId = VilkårperiodeGlobalId.fromString("02c86eca-36e5-451b-a22d-8501a0f7b8ee")
 
 fun faktaOffentligTransport(
     reiseId: ReiseId = dummyReiseId,
@@ -635,7 +636,7 @@ fun faktaPrivatBil(
     reiseavstandEnVei = reiseavstandEnVei,
     faktaDelperioder = reiseperioder,
     adresse = adresse,
-    aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
+    aktivitetId = dummyAktivitetId,
 )
 
 fun lagreVilkårperiodeMålgruppe(
@@ -703,7 +704,7 @@ fun faktaOffentligTransportReiseTilSamling(
     adresse: String = "Tiltaksveien 1",
     utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
     begrunnelse: String = "Spesifisert offentlig transportutgift",
-    aktivitetId: VilkårperiodeGlobalId? = null,
+    aktivitetId: VilkårperiodeGlobalId = dummyAktivitetId,
 ) = FaktaOffentligTransportReiseTilSamling(
     reiseId = reiseId,
     adresse = adresse,
@@ -720,7 +721,7 @@ fun faktaPrivatBilReiseTilSamling(
     bompenger: BigDecimal? = null,
     fergekostnad: BigDecimal? = null,
     parkering: BigDecimal? = null,
-    aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId.random(),
+    aktivitetId: VilkårperiodeGlobalId = dummyAktivitetId,
 ) = FaktaPrivatBilReiseTilSamling(
     reiseId = reiseId,
     adresse = adresse,
@@ -802,7 +803,7 @@ fun lagreReiseOppstartAvslutningHjemreiseDto(
     reiseId: ReiseId = dummyReiseId,
     typeReiseformål: TypeReiseformål = TypeReiseformål.OPPSTART,
     utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
-    aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId.random(),
+    aktivitetId: VilkårperiodeGlobalId = dummyAktivitetId,
     svar: Map<RegelId, SvarOgBegrunnelseDto> =
         mapOf(
             RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
@@ -848,7 +849,7 @@ fun lagreDagligReisePrivatBilDto(
                 ),
             RegelId.KAN_KJØRE_MED_EGEN_BIL to SvarOgBegrunnelseDto(svar = SvarId.JA),
         ),
-    aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId(UUID.randomUUID()),
+    aktivitetId: VilkårperiodeGlobalId = dummyAktivitetId,
     fakta: FaktaDagligReiseDto =
         FaktaDagligReisePrivatBilDto(
             reiseavstandEnVei = reiseavstandEnVei,
