@@ -28,3 +28,10 @@ data class InnvilgelseReiseTilSamlingTsoRequest(
 ) : InnvilgelseReiseTilSamlingRequest {
     override fun vedtaksperioder(): List<Vedtaksperiode> = vedtaksperioder.tilDomene()
 }
+
+data class InnvilgelseReiseTilSamlingTsrRequest(
+    val vedtaksperioder: List<VedtaksperiodeDto>,
+    override val begrunnelse: String? = null,
+) : InnvilgelseReiseTilSamlingRequest {
+    override fun vedtaksperioder(): List<Vedtaksperiode> = vedtaksperioder.tilDomene()
+}
