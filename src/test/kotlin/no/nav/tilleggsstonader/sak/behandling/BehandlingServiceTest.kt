@@ -155,6 +155,65 @@ internal class BehandlingServiceTest {
 
             assertThat(feil.httpStatus).isEqualTo(HttpStatus.BAD_REQUEST)
         }
+
+        @Test
+        internal fun `skal kunne henlegge behandling med årsak allerede behandlet`() {
+            val behandling =
+                behandling(fagsak(), type = BehandlingType.FØRSTEGANGSBEHANDLING, status = BehandlingStatus.UTREDES)
+            every {
+                behandlingRepository.findByIdOrThrow(any())
+            } returns behandling
+
+            behandlingService.henleggBehandling(behandling.id, HenlagtDto(HenlagtÅrsak.ALLEREDE_BEHANDLET))
+            assertThat(behandlingSlot.captured.henlagtÅrsak).isEqualTo(HenlagtÅrsak.ALLEREDE_BEHANDLET)
+        }
+
+        @Test
+        internal fun `skal kunne henlegge behandling med årsak annet når begrunnelse er fylt ut`() {
+            val behandling =
+                behandling(fagsak(), type = BehandlingType.FØRSTEGANGSBEHANDLING, status = BehandlingStatus.UTREDES)
+            every {
+                behandlingRepository.findByIdOrThrow(any())
+            } returns behandling
+
+            behandlingService.henleggBehandling(
+                behandling.id,
+                HenlagtDto(HenlagtÅrsak.ANNET, begrunnelse = "En annen begrunnelse"),
+            )
+            assertThat(behandlingSlot.captured.henlagtÅrsak).isEqualTo(HenlagtÅrsak.ANNET)
+        }
+
+        @Test
+        internal fun `skal ikke kunne henlegge behandling med årsak annet uten begrunnelse`() {
+            val behandling =
+                behandling(fagsak(), type = BehandlingType.FØRSTEGANGSBEHANDLING, status = BehandlingStatus.UTREDES)
+            every {
+                behandlingRepository.findByIdOrThrow(any())
+            } returns behandling
+
+            val feil: ApiFeil =
+                assertThrows {
+                    behandlingService.henleggBehandling(behandling.id, HenlagtDto(HenlagtÅrsak.ANNET))
+                }
+
+            assertThat(feil.httpStatus).isEqualTo(HttpStatus.BAD_REQUEST)
+        }
+
+        @Test
+        internal fun `skal ikke kunne henlegge behandling med årsak annet når begrunnelse kun er blanke tegn`() {
+            val behandling =
+                behandling(fagsak(), type = BehandlingType.FØRSTEGANGSBEHANDLING, status = BehandlingStatus.UTREDES)
+            every {
+                behandlingRepository.findByIdOrThrow(any())
+            } returns behandling
+
+            val feil: ApiFeil =
+                assertThrows {
+                    behandlingService.henleggBehandling(behandling.id, HenlagtDto(HenlagtÅrsak.ANNET, begrunnelse = "   "))
+                }
+
+            assertThat(feil.httpStatus).isEqualTo(HttpStatus.BAD_REQUEST)
+        }
     }
 
     @Nested

@@ -5,8 +5,11 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreDagligReiseDto
+import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreVilkårReiseTilSamlingDto
+import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.util.lagreDagligReisePrivatBilDto
+import no.nav.tilleggsstonader.sak.util.lagrePrivatBilReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.util.lagreReiseOppstartAvslutningHjemreiseDto
 import no.nav.tilleggsstonader.sak.util.lagreReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseOffentligTransportDto
@@ -27,11 +30,14 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBolig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.LagreVilkårReiseTilSamlingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.VilkårReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.SlettVilkårRequestDto as SlettVilkårReiseTilSamlingRequestDto
 
 @BehandlingTestdataDslMarker
 class StønadsvilkårTestdataDsl {
@@ -125,6 +131,47 @@ class StønadsvilkårTestdataDsl {
     fun slettDagligReise(block: (vilkårDagligReise: List<VilkårDagligReiseDto>) -> Pair<VilkårId, SlettVilkårRequestDto>) {
         deleteDagligReise += block
     }
+
+    internal val updateReiseTilSamling =
+        mutableListOf<(List<VilkårReiseTilSamlingDto>) -> Pair<VilkårId, LagreVilkårReiseTilSamlingDto>>()
+    internal val deleteReiseTilSamling =
+        mutableListOf<(List<VilkårReiseTilSamlingDto>) -> Pair<VilkårId, SlettVilkårReiseTilSamlingRequestDto>>()
+
+    fun oppdaterReiseTilSamling(
+        block: (vilkårReiseTilSamling: List<VilkårReiseTilSamlingDto>) -> Pair<VilkårId, LagreVilkårReiseTilSamlingDto>,
+    ) {
+        updateReiseTilSamling += block
+    }
+
+    fun slettReiseTilSamling(
+        block: (vilkårReiseTilSamling: List<VilkårReiseTilSamlingDto>) -> Pair<VilkårId, SlettVilkårReiseTilSamlingRequestDto>,
+    ) {
+        deleteReiseTilSamling += block
+    }
+
+    /**
+     * Endrer reisen med gitt [reiseId] (eller den eneste reisen dersom [reiseId] ikke er oppgitt), uten at
+     * testen selv trenger å slå opp vilkårId eller bygge en [LagreVilkårReiseTilSamlingDto] fra bunnen.
+     */
+    fun endreReiseTilSamling(
+        reiseId: ReiseId? = null,
+        endre: LagreVilkårReiseTilSamlingDto.() -> LagreVilkårReiseTilSamlingDto,
+    ) {
+        oppdaterReiseTilSamling { vilkår ->
+            val treff = reiseId?.let { id -> vilkår.single { it.reiseId == id } } ?: vilkår.single()
+            treff.id to treff.tilLagreVilkårReiseTilSamlingDto().endre()
+        }
+    }
+
+    /**
+     * Sletter reisen med gitt [reiseId] (eller den eneste reisen dersom [reiseId] ikke er oppgitt).
+     */
+    fun fjernReiseTilSamling(reiseId: ReiseId? = null) {
+        slettReiseTilSamling { vilkår ->
+            val treff = reiseId?.let { id -> vilkår.single { it.reiseId == id } } ?: vilkår.single()
+            treff.id to SlettVilkårReiseTilSamlingRequestDto(kommentar = "Slettet i test")
+        }
+    }
 }
 
 @BehandlingTestdataDslMarker
@@ -144,11 +191,33 @@ class OpprettStønadsvilkårDsl {
     fun offentligTransportReiseTilSamling(
         fom: LocalDate,
         tom: LocalDate,
+        reiseId: ReiseId = dummyReiseId,
+        utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
+        hentAktivitet: (List<VilkårperiodeDto>) -> VilkårperiodeDto? = { null },
     ) {
-        dtoer += { _, _, _ ->
+        dtoer += { _, _, aktiviteter ->
             lagreReiseTilSamlingDto(
                 fom = fom,
                 tom = tom,
+                reiseId = reiseId,
+                utgifterOffentligTransport = utgifterOffentligTransport,
+                aktivitet = hentAktivitet(aktiviteter),
+            )
+        }
+    }
+
+    fun privatBilReiseTilSamling(
+        fom: LocalDate,
+        tom: LocalDate,
+        reiseId: ReiseId = ReiseId.random(),
+        reiseavstand: BigDecimal = 40.toBigDecimal(),
+    ) {
+        dtoer += { _, _, _ ->
+            lagrePrivatBilReiseTilSamlingDto(
+                fom = fom,
+                tom = tom,
+                reiseId = reiseId,
+                reiseavstand = reiseavstand,
             )
         }
     }

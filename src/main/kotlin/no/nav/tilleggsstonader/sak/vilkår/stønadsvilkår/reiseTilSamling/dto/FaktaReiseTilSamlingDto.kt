@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domai
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaUbestemtType
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 
 @JsonTypeInfo(
@@ -33,7 +32,8 @@ sealed interface FaktaReiseTilSamlingDto {
 
 data class FaktaReiseTilSamlingOffentligTransportDto(
     val utgifterOffentligTransport: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId? = null,
+    val begrunnelse: String,
+    val aktivitet: AktivitetInfoDto? = null,
 ) : FaktaReiseTilSamlingDto {
     override val type = TypeReiseTilSamling.OFFENTLIG_TRANSPORT
 
@@ -44,16 +44,19 @@ data class FaktaReiseTilSamlingOffentligTransportDto(
         reiseId = reiseId,
         adresse = adresse,
         utgifterOffentligTransport = utgifterOffentligTransport,
-        aktivitetId = aktivitetId,
+        begrunnelse = begrunnelse,
+        aktivitetId = aktivitet?.aktivitetId,
     )
 }
 
 data class FaktaReiseTilSamlingPrivatBilDto(
     val reiseavstand: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId? = null,
+    val begrunnelse: String?,
+    val aktivitet: AktivitetInfoDto? = null,
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,
     val parkering: BigDecimal? = null,
+    val piggdekkavgift: BigDecimal? = null,
 ) : FaktaReiseTilSamlingDto {
     override val type = TypeReiseTilSamling.PRIVAT_BIL
 
@@ -64,10 +67,12 @@ data class FaktaReiseTilSamlingPrivatBilDto(
         reiseId = reiseId,
         adresse = adresse,
         reiseavstand = reiseavstand,
-        aktivitetId = aktivitetId,
+        begrunnelse = begrunnelse?.ifBlank { null },
+        aktivitetId = aktivitet?.aktivitetId,
         bompenger = bompenger,
         fergekostnad = fergekostnad,
         parkering = parkering,
+        piggdekkavgift = piggdekkavgift,
     )
 }
 

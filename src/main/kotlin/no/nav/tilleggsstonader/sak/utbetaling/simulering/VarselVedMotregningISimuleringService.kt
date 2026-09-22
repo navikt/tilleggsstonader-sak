@@ -33,12 +33,13 @@ class VarselVedMotregningISimuleringService(
         val skalVarsleOmNyligeUtbetalingerInnenforSammeFagområde =
             if (fagsak.utbetalPåNyttFagområde) {
                 finnesFagsakMedIverksatteAndelerInnenforPeriode(
-                    fagsaker = alleFagsaker.alleFagsakerAvStønadstypeUavhengigAvTema(fagsak.stønadstype),
+                    fagsaker = alleFagsaker.alleFagsakerMedUtbetalingPåNyttFagområde(),
                     periode = Datoperiode(LocalDate.now(), LocalDate.now()),
                 )
             } else {
                 finnesFagsakMedIverksatteAndelerInnenforPeriode(
                     fagsaker = alleFagsaker.alleFagsakerMedUtbetalingPåGammeltFagområde(),
+                    // Gammelt fagområde har en ventedag før utbetaling. Ser derfor på utbetalinger gjort i går og
                     periode = Datoperiode(LocalDate.now().forrigeVirkedag(), LocalDate.now()),
                 )
             }

@@ -14,7 +14,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetReiseTilSamlingTsrDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import org.assertj.core.api.Assertions.assertThat
@@ -131,7 +133,7 @@ class VilkårperiodeControllerTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `skal kunne lagre aktivitet uten aktivitetsdager når stønadstype daglig reise tsr`() {
+    fun `skal feile hvis aktivitetsdager mangler når stønadstype daglig reise tsr`() {
         val behandling =
             testoppsettService.opprettBehandlingMedFagsak(
                 behandling(),
@@ -152,7 +154,73 @@ class VilkårperiodeControllerTest : CleanDatabaseIntegrationTest() {
                 behandlingId = behandling.id,
             )
 
-        kall.vilkårperiode.opprett(originalLagreRequest)
+        kall.vilkårperiode.apiRespons
+            .opprett(originalLagreRequest)
+            .expectProblemDetail(
+                HttpStatus.BAD_REQUEST,
+                "Mangler data: aktivitetsdager må være satt og være et heltall mellom 1 og 5",
+            )
+    }
+
+    @Test
+    fun `skal feile hvis aktivitetsdager er utenfor gyldig intervall når stønadstype daglig reise tsr`() {
+        val behandling =
+            testoppsettService.opprettBehandlingMedFagsak(
+                behandling(),
+                stønadstype = Stønadstype.DAGLIG_REISE_TSR,
+            )
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
+
+        val lagreRequest =
+            LagreVilkårperiode(
+                type = AktivitetType.TILTAK,
+                tiltaksvariant = TypeAktivitet.GRUPPEAMO,
+                fom = LocalDate.now(),
+                tom = LocalDate.now(),
+                faktaOgSvar =
+                    FaktaOgSvarAktivitetDagligReiseTsrDto(
+                        svarHarUtgifter = SvarJaNei.JA,
+                        aktivitetsdager = 0,
+                    ),
+                behandlingId = behandling.id,
+            )
+
+        kall.vilkårperiode.apiRespons
+            .opprett(lagreRequest)
+            .expectProblemDetail(
+                HttpStatus.BAD_REQUEST,
+                "Mangler data: aktivitetsdager må være satt og være et heltall mellom 1 og 5",
+            )
+    }
+
+    @Test
+    fun `skal feile hvis aktivitetsdager mangler når stønadstype daglig reise tso`() {
+        val behandling =
+            testoppsettService.opprettBehandlingMedFagsak(
+                behandling(),
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            )
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
+
+        val lagreRequest =
+            LagreVilkårperiode(
+                type = AktivitetType.UTDANNING,
+                fom = LocalDate.now(),
+                tom = LocalDate.now(),
+                faktaOgSvar =
+                    FaktaOgSvarAktivitetDagligReiseTsoDto(
+                        svarLønnet = SvarJaNei.NEI,
+                        svarHarUtgifter = SvarJaNei.JA,
+                    ),
+                behandlingId = behandling.id,
+            )
+
+        kall.vilkårperiode.apiRespons
+            .opprett(lagreRequest)
+            .expectProblemDetail(
+                HttpStatus.BAD_REQUEST,
+                "Mangler data: aktivitetsdager må være satt og være et heltall mellom 1 og 5",
+            )
     }
 
     @Test
@@ -175,6 +243,33 @@ class VilkårperiodeControllerTest : CleanDatabaseIntegrationTest() {
                         svarHarUtgifter = SvarJaNei.JA,
                         aktivitetsdager = 3,
                     ),
+                behandlingId = behandling.id,
+            )
+
+        kall.vilkårperiode.apiRespons
+            .opprett(originalLagreRequest)
+            .expectProblemDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Mangler data: tiltaksvariant må være satt for aktivitet TILTAK",
+            )
+    }
+
+    @Test
+    fun `skal kaste feil hvis aktivitet er tiltak og ingen type aktivitet for reise til samling TSR`() {
+        val behandling =
+            testoppsettService.opprettBehandlingMedFagsak(
+                behandling(),
+                stønadstype = Stønadstype.REISE_TIL_SAMLING_TSR,
+            )
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
+
+        val originalLagreRequest =
+            LagreVilkårperiode(
+                type = AktivitetType.TILTAK,
+                tiltaksvariant = null,
+                fom = LocalDate.now(),
+                tom = LocalDate.now(),
+                faktaOgSvar = FaktaOgSvarAktivitetReiseTilSamlingTsrDto,
                 behandlingId = behandling.id,
             )
 

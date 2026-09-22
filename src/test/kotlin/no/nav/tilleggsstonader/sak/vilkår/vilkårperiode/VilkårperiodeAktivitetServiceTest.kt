@@ -157,6 +157,7 @@ class VilkårperiodeAktivitetServiceTest : CleanDatabaseIntegrationTest() {
             val faktaOgSvar =
                 FaktaOgSvarAktivitetDagligReiseTsrDto(
                     svarHarUtgifter = SvarJaNei.NEI,
+                    aktivitetsdager = 3,
                 )
 
             assertThatThrownBy {

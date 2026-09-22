@@ -18,7 +18,12 @@ data class BeregningsresultatOffentligTransport(
     val reiseId: ReiseId,
     val grunnlag: BeregningsgrunnlagOffentligTransportForSamling,
     val beløp: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId? = null,
+    val aktivitetId: VilkårperiodeGlobalId?,
+    /**
+     * Markerer at denne reisen er kopiert uendret fra forrige iverksatte vedtak ved revurdering,
+     * altså at den ikke ligger innenfor beregningsplanens `beregnFra` og derfor ikke er reberegnet.
+     */
+    val fraTidligereVedtak: Boolean = false,
 )
 
 data class BeregningsresultatPrivatBil(
@@ -26,6 +31,11 @@ data class BeregningsresultatPrivatBil(
     val grunnlag: BeregningsgrunnlagPrivatBilForSamling,
     val beløp: BigDecimal,
     val aktivitetId: VilkårperiodeGlobalId?,
+    /**
+     * Markerer at denne reisen er kopiert uendret fra forrige iverksatte vedtak ved revurdering,
+     * altså at den ikke ligger innenfor beregningsplanens `beregnFra` og derfor ikke er reberegnet.
+     */
+    val fraTidligereVedtak: Boolean = false,
 )
 
 data class BeregningsgrunnlagPrivatBilForSamling(
@@ -37,6 +47,7 @@ data class BeregningsgrunnlagPrivatBilForSamling(
     val bompenger: BigDecimal?,
     val fergekostnad: BigDecimal?,
     val parkering: BigDecimal?,
+    val piggdekkavgift: BigDecimal?,
     val vedtaksperioder: List<VedtaksperiodeGrunnlag>,
     val brukersNavKontor: String?,
 )

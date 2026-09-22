@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingDagligReiseTsr
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingReiseTilSamlingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfVurderinger
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.HarUtgifterVurdering
@@ -76,7 +77,11 @@ data class GeneriskVilkårperiode<T : FaktaOgVurdering>(
 
         validerBegrunnelse()
 
-        feilHvis(faktaOgVurdering is FaktaOgVurderingDagligReiseTsr && type == AktivitetType.TILTAK && tiltaksvariant == null) {
+        feilHvis(
+            (faktaOgVurdering is FaktaOgVurderingDagligReiseTsr || faktaOgVurdering is FaktaOgVurderingReiseTilSamlingTsr) &&
+                type == AktivitetType.TILTAK &&
+                tiltaksvariant == null,
+        ) {
             "Mangler data: tiltaksvariant må være satt for aktivitet TILTAK"
         }
 

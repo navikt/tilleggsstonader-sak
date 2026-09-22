@@ -1,14 +1,11 @@
 package no.nav.tilleggsstonader.sak.ekstern.stønad
 
 import no.nav.tilleggsstonader.kontrakter.felles.IdentSkjematype
-import no.nav.tilleggsstonader.kontrakter.felles.IdentStønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.Skjematype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
-import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
-import no.nav.tilleggsstonader.sak.ekstern.stønad.HarBehandlingRequest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -34,50 +31,6 @@ class HarBehandlingUnderArbeidControllerTest : CleanDatabaseIntegrationTest() {
             ),
             opprettGrunnlagsdata = false,
         )
-    }
-
-    @Nested
-    inner class MedIdentStønadstype {
-        @Test
-        fun `returnerer true når søknad er under behandling`() {
-            val svar = kall.harBehandling.harBehandling(IdentStønadstype(ident, Stønadstype.BARNETILSYN))
-            assertThat(svar).isTrue()
-        }
-
-        @Test
-        fun `returnerer false når det ikke finnes behandling for personen`() {
-            val svar = kall.harBehandling.harBehandling(IdentStønadstype("99999999999", Stønadstype.BARNETILSYN))
-            assertThat(svar).isFalse()
-        }
-
-        @Test
-        fun `returnerer false når behandling er ferdigstilt`() {
-            val fagsak =
-                testoppsettService.lagreFagsak(
-                    fagsak(
-                        identer = setOf(PersonIdent("11111111111")),
-                        stønadstype = Stønadstype.BARNETILSYN,
-                    ),
-                )
-            testoppsettService.lagre(
-                behandling(
-                    fagsak = fagsak,
-                    årsak = BehandlingÅrsak.SØKNAD,
-                    status = BehandlingStatus.FERDIGSTILT,
-                    resultat = BehandlingResultat.INNVILGET,
-                ),
-                opprettGrunnlagsdata = false,
-            )
-
-            val svar = kall.harBehandling.harBehandling(IdentStønadstype("11111111111", Stønadstype.BARNETILSYN))
-            assertThat(svar).isFalse()
-        }
-
-        @Test
-        fun `returnerer false for annen stønadstype`() {
-            val svar = kall.harBehandling.harBehandling(IdentStønadstype(ident, Stønadstype.LÆREMIDLER))
-            assertThat(svar).isFalse()
-        }
     }
 
     @Nested
@@ -128,7 +81,7 @@ class HarBehandlingUnderArbeidControllerTest : CleanDatabaseIntegrationTest() {
         @Test
         fun `returnerer 401 ved kall fra annen applikasjon enn soknad-api`() {
             kall.harBehandling.apiRespons
-                .harBehandlingMedFeilKlient(HarBehandlingRequest(ident, stønadstype = Stønadstype.BARNETILSYN))
+                .harBehandlingMedFeilKlient(IdentSkjematype(ident, skjematype = Skjematype.SØKNAD_BARNETILSYN))
                 .expectProblemDetail(HttpStatus.UNAUTHORIZED, "Kallet utføres ikke av en autorisert klient")
         }
     }

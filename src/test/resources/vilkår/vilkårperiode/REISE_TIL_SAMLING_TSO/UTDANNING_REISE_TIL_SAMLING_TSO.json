@@ -1,14 +1,5 @@
 {
-  "fakta": { },
   "type": "UTDANNING_REISE_TIL_SAMLING_TSO",
-  "vurderinger": {
-    "erAktivitetenObligatorisk": {
-      "resultat": "OPPFYLT",
-      "svar": "JA"
-    },
-    "harUtgifter": {
-      "resultat": "OPPFYLT",
-      "svar": "JA"
-    }
-  }
+  "fakta": {},
+  "vurderinger": {}
 }

@@ -1,18 +1,10 @@
 {
-  "fakta": { },
   "type": "TILTAK_REISE_TIL_SAMLING_TSO",
+  "fakta": {},
   "vurderinger": {
-    "erAktivitetenObligatorisk": {
-      "resultat": "OPPFYLT",
-      "svar": "JA"
-    },
-    "harUtgifter": {
-      "resultat": "OPPFYLT",
-      "svar": "JA"
-    },
     "lønnet": {
-      "resultat": "OPPFYLT",
-      "svar": "NEI"
+      "svar": "NEI",
+      "resultat": "OPPFYLT"
     }
   }
 }

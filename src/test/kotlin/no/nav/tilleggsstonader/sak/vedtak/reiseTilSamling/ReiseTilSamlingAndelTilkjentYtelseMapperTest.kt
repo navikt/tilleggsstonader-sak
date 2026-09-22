@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.saksbehandling
-import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatReiseTilSamling
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -16,6 +15,7 @@ import java.math.BigDecimal
 
 class ReiseTilSamlingAndelTilkjentYtelseMapperTest {
     val saksbehandling = saksbehandling(fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
+    val saksbehandlingTsr = saksbehandling(fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSR))
 
     @Nested
     inner class OffentligTransport {
@@ -23,13 +23,12 @@ class ReiseTilSamlingAndelTilkjentYtelseMapperTest {
         fun `fom og tom på andel tilkjent ytelse skal være lik fom til reisen hvis det er en ukedag`() {
             val mandag = 1 september 2025
             val belopOffentlig = BigDecimal.valueOf(123)
-            val beregningsresultat =
-                BeregningsresultatReiseTilSamling(
-                    offentligTransport = listOf(lagBeregningsresultatForOffentligTransport(mandag, beløp = belopOffentlig)),
-                    privatBil = emptyList(),
-                )
-            val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling)
-            with(andeler.single()) {
+
+            val andel =
+                lagBeregningsresultatForOffentligTransport(mandag, beløp = belopOffentlig)
+                    .mapTilAndelTilkjentYtelse(saksbehandling, tiltaksvariant = null)
+
+            with(andel) {
                 assertThat(fom).isEqualTo(mandag)
                 assertThat(tom).isEqualTo(mandag)
                 assertThat(utbetalingsdato).isEqualTo(mandag)
@@ -38,34 +37,24 @@ class ReiseTilSamlingAndelTilkjentYtelseMapperTest {
         }
 
         @Test
-        fun `reiser med ulike fom-datoer gir en andel per dato`() {
+        fun `for TSR skal TypeAndel utledes fra tiltaksvariant`() {
             val mandag = 1 september 2025
-            val tirsdag = 2 september 2025
 
-            val offentlig1 = lagBeregningsresultatForOffentligTransport(fom = mandag, tom = mandag)
-            val offentlig2 = lagBeregningsresultatForOffentligTransport(fom = tirsdag, tom = tirsdag)
+            val andel =
+                lagBeregningsresultatForOffentligTransport(fom = mandag, brukersNavKontor = "1234")
+                    .mapTilAndelTilkjentYtelse(saksbehandlingTsr, tiltaksvariant = TypeAktivitet.ARBFORB)
 
-            val beregningsresultat =
-                BeregningsresultatReiseTilSamling(
-                    offentligTransport = listOf(offentlig1, offentlig2),
-                    privatBil = emptyList(),
-                )
-
-            val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling)
-            assertThat(andeler.map { it.fom }).containsExactlyInAnyOrder(mandag, tirsdag)
-            assertThat(andeler.size).isEqualTo(2)
+            assertThat(andel.type).isEqualTo(TypeAndel.REISE_TIL_SAMLING_TILTAK_ARBEIDSFORBEREDENDE)
         }
 
         @Test
-        fun `når beregningsresultat ikke har offentlig transport returneres ingen andeler`() {
-            val beregningsresultat =
-                BeregningsresultatReiseTilSamling(
-                    offentligTransport = emptyList(),
-                    privatBil = emptyList(),
-                )
+        fun `for TSR kastes det feil dersom tiltaksvariant mangler`() {
+            val mandag = 1 september 2025
+            val beregningsresultat = lagBeregningsresultatForOffentligTransport(fom = mandag, brukersNavKontor = "1234")
 
-            val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling)
-            assertThat(andeler).isEmpty()
+            assertThrows<Feil> {
+                beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandlingTsr, tiltaksvariant = null)
+            }
         }
     }
 
@@ -75,13 +64,12 @@ class ReiseTilSamlingAndelTilkjentYtelseMapperTest {
         fun `fom og tom på andel tilkjent ytelse skal være lik fom til reisen hvis det er en ukedag`() {
             val mandag = 1 september 2025
             val belopPrivat = BigDecimal.valueOf(456)
-            val beregningsresultat =
-                BeregningsresultatReiseTilSamling(
-                    offentligTransport = emptyList(),
-                    privatBil = listOf(lagBeregningsresultatForPrivatBil(mandag, beløp = belopPrivat)),
-                )
-            val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling)
-            with(andeler.single()) {
+
+            val andel =
+                lagBeregningsresultatForPrivatBil(mandag, beløp = belopPrivat)
+                    .mapTilAndelTilkjentYtelse(saksbehandling, tiltaksvariant = null)
+
+            with(andel) {
                 assertThat(fom).isEqualTo(mandag)
                 assertThat(tom).isEqualTo(mandag)
                 assertThat(utbetalingsdato).isEqualTo(mandag)
@@ -90,15 +78,14 @@ class ReiseTilSamlingAndelTilkjentYtelseMapperTest {
         }
 
         @Test
-        fun `når beregningsresultat ikke har privat bil returneres ingen andeler`() {
-            val beregningsresultat =
-                BeregningsresultatReiseTilSamling(
-                    offentligTransport = emptyList(),
-                    privatBil = emptyList(),
-                )
+        fun `for TSR skal TypeAndel utledes fra tiltaksvariant`() {
+            val mandag = 1 september 2025
 
-            val andeler = beregningsresultat.mapTilAndelTilkjentYtelse(saksbehandling)
-            assertThat(andeler).isEmpty()
+            val andel =
+                lagBeregningsresultatForPrivatBil(fom = mandag, brukersNavKontor = "1234")
+                    .mapTilAndelTilkjentYtelse(saksbehandlingTsr, tiltaksvariant = TypeAktivitet.HOYEREUTD)
+
+            assertThat(andel.type).isEqualTo(TypeAndel.REISE_TIL_SAMLING_TILTAK_HØYERE_UTDANNING)
         }
     }
 

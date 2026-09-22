@@ -35,12 +35,14 @@ data class FaktaOffentligTransport(
     override val reiseId: ReiseId,
     override val adresse: String?,
     val utgifterOffentligTransport: BigDecimal,
+    val begrunnelse: String,
     val aktivitetId: VilkårperiodeGlobalId? = null,
 ) : FaktaReiseTilSamling {
     override val type = TypeReiseTilSamling.OFFENTLIG_TRANSPORT
 
     init {
         validerIngenNegativeUtgifter()
+        validerBegrunnelse()
     }
 
     override fun mapTilVilkårFakta() =
@@ -48,6 +50,7 @@ data class FaktaOffentligTransport(
             reiseId = reiseId,
             adresse = adresse,
             utgifterOffentligTransport = utgifterOffentligTransport,
+            begrunnelse = begrunnelse,
             aktivitetId = aktivitetId,
         )
 
@@ -56,22 +59,38 @@ data class FaktaOffentligTransport(
             "Utgifter til offentlig transport kan ikke være negative"
         }
     }
+
+    private fun validerBegrunnelse() {
+        brukerfeilHvis(begrunnelse.isBlank()) {
+            "Spesifikasjon av utgift må fylles ut"
+        }
+    }
 }
 
 data class FaktaPrivatBil(
     override val reiseId: ReiseId,
     override val adresse: String?,
     val reiseavstand: BigDecimal,
+    val begrunnelse: String?,
     val aktivitetId: VilkårperiodeGlobalId? = null,
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,
     val parkering: BigDecimal? = null,
+    val piggdekkavgift: BigDecimal? = null,
 ) : FaktaReiseTilSamling {
     override val type = TypeReiseTilSamling.PRIVAT_BIL
+
+    companion object {
+        val MAKS_BOMPENGER = BigDecimal(500)
+        val MAKS_FERGEKOSTNAD = BigDecimal(900)
+        val MAKS_PARKERING = BigDecimal(2000)
+        val MAKS_PIGGDEKKAVGIFT = BigDecimal(1400)
+    }
 
     init {
         validerIngenNegativReiseavstand()
         validerIngenNegativeUtgifter()
+        validerMaksbeløpUtgifter()
     }
 
     override fun mapTilVilkårFakta() =
@@ -79,10 +98,12 @@ data class FaktaPrivatBil(
             reiseId = reiseId,
             adresse = adresse,
             reiseavstand = reiseavstand,
+            begrunnelse = begrunnelse,
             aktivitetId = aktivitetId,
             bompenger = bompenger,
             fergekostnad = fergekostnad,
             parkering = parkering,
+            piggdekkavgift = piggdekkavgift,
         )
 
     private fun validerIngenNegativReiseavstand() {
@@ -102,6 +123,24 @@ data class FaktaPrivatBil(
         }
         brukerfeilHvis(parkering != null && parkering < BigDecimal.ZERO) {
             "Parkering kan ikke være negativ"
+        }
+        brukerfeilHvis(piggdekkavgift != null && piggdekkavgift < BigDecimal.ZERO) {
+            "Piggdekkavgift kan ikke være negativ"
+        }
+    }
+
+    private fun validerMaksbeløpUtgifter() {
+        brukerfeilHvis(bompenger != null && bompenger > MAKS_BOMPENGER) {
+            "Skal du innvilge med bompenger høyere enn ${MAKS_BOMPENGER}kr må du ta kontakt med Tilleggsstønader-teamet"
+        }
+        brukerfeilHvis(fergekostnad != null && fergekostnad > MAKS_FERGEKOSTNAD) {
+            "Skal du innvilge med fergekostnad høyere enn ${MAKS_FERGEKOSTNAD}kr må du ta kontakt med Tilleggsstønader-teamet"
+        }
+        brukerfeilHvis(parkering != null && parkering > MAKS_PARKERING) {
+            "Skal du innvilge med parkering høyere enn ${MAKS_PARKERING}kr må du ta kontakt med Tilleggsstønader-teamet"
+        }
+        brukerfeilHvis(piggdekkavgift != null && piggdekkavgift > MAKS_PIGGDEKKAVGIFT) {
+            "Skal du innvilge med piggdekkavgift høyere enn ${MAKS_PIGGDEKKAVGIFT}kr må du ta kontakt med Tilleggsstønader-teamet"
         }
     }
 }

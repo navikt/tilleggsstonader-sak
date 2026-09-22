@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
+import no.nav.tilleggsstonader.sak.util.dummyAktivitetId
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.faktaOffentligTransportReiseTilSamling
@@ -64,6 +65,7 @@ class ReiseTilSamlingVilkårServiceTest {
                         reiseId = it.reiseId,
                         adresse = it.adresse,
                         utgifterOffentligTransport = it.utgifterOffentligTransport,
+                        begrunnelse = it.begrunnelse,
                         aktivitetId = it.aktivitetId,
                     )
                 },
@@ -136,11 +138,10 @@ class ReiseTilSamlingVilkårServiceTest {
         every { unleashService.isEnabled(any()) } returns true
         every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
 
-        val aktivitetId = VilkårperiodeGlobalId.random()
         val aktivitet = mockk<VilkårperiodeAktivitet>(relaxed = true)
         every { aktivitet.resultat } returns ResultatVilkårperiode.OPPFYLT
         every { aktivitet.inneholder(any<Periode<LocalDate>>()) } returns true
-        every { vilkårperiodeService.hentAktivitet(aktivitetId, any()) } returns aktivitet
+        every { vilkårperiodeService.hentAktivitet(dummyAktivitetId, any()) } returns aktivitet
 
         val vilkår =
             nyttVilkår.copy(
@@ -149,7 +150,8 @@ class ReiseTilSamlingVilkårServiceTest {
                         reiseId = dummyReiseId,
                         adresse = "Samlingsveien 1",
                         utgifterOffentligTransport = 500.toBigDecimal(),
-                        aktivitetId = aktivitetId,
+                        begrunnelse = "Togbillett mellom bosted og samling",
+                        aktivitetId = dummyAktivitetId,
                     ),
             )
 
@@ -175,6 +177,7 @@ class ReiseTilSamlingVilkårServiceTest {
                         reiseId = dummyReiseId,
                         adresse = "Samlingsveien 1",
                         utgifterOffentligTransport = 500.toBigDecimal(),
+                        begrunnelse = "Togbillett mellom bosted og samling",
                         aktivitetId = null,
                     ),
             )
@@ -203,7 +206,38 @@ class ReiseTilSamlingVilkårServiceTest {
                         reiseId = dummyReiseId,
                         adresse = "Samlingsveien 1",
                         utgifterOffentligTransport = 500.toBigDecimal(),
-                        aktivitetId = null,
+                        begrunnelse = "Togbillett mellom bosted og samling",
+                        aktivitetId = dummyAktivitetId,
+                    ),
+            )
+
+        reiseTilSamlingVilkårService.opprettNyttVilkår(
+            nyttVilkår = vilkår,
+            behandlingId = behandling.id,
+        )
+
+        verify(exactly = 0) {
+            vilkårperiodeService.hentAktivitet(any(), any())
+        }
+    }
+
+    @Test
+    fun `skal ikke validere aktivitetId for offentlig transport TSO selv om aktivitetId er satt`() {
+        val behandling =
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
+        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
+        every { unleashService.isEnabled(any()) } returns true
+        every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
+
+        val vilkår =
+            nyttVilkår.copy(
+                fakta =
+                    FaktaOffentligTransport(
+                        reiseId = dummyReiseId,
+                        adresse = "Samlingsveien 1",
+                        utgifterOffentligTransport = 500.toBigDecimal(),
+                        begrunnelse = "Togbillett mellom bosted og samling",
+                        aktivitetId = VilkårperiodeGlobalId.random(),
                     ),
             )
 
@@ -234,6 +268,7 @@ class ReiseTilSamlingVilkårServiceTest {
                             reiseId = it.reiseId,
                             adresse = it.adresse,
                             reiseavstand = it.reiseavstand,
+                            begrunnelse = it.begrunnelse,
                             aktivitetId = it.aktivitetId,
                         )
                     },
@@ -268,6 +303,7 @@ class ReiseTilSamlingVilkårServiceTest {
                             reiseId = it.reiseId,
                             adresse = it.adresse,
                             reiseavstand = it.reiseavstand,
+                            begrunnelse = it.begrunnelse,
                             aktivitetId = it.aktivitetId,
                         )
                     },
@@ -305,6 +341,7 @@ class ReiseTilSamlingVilkårServiceTest {
                             reiseId = it.reiseId,
                             adresse = it.adresse,
                             reiseavstand = it.reiseavstand,
+                            begrunnelse = it.begrunnelse,
                             aktivitetId = it.aktivitetId,
                         )
                     },
@@ -327,7 +364,7 @@ class ReiseTilSamlingVilkårServiceTest {
         every { unleashService.isEnabled(any()) } returns true
         every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
 
-        val aktivitetId = VilkårperiodeGlobalId.random()
+        val aktivitetId = dummyAktivitetId
         val aktivitet = mockk<VilkårperiodeAktivitet>(relaxed = true)
         every { aktivitet.resultat } returns ResultatVilkårperiode.OPPFYLT
         every { aktivitet.fom } returns (1 januar 2025)
@@ -343,6 +380,7 @@ class ReiseTilSamlingVilkårServiceTest {
                         reiseId = dummyReiseId,
                         adresse = "Samlingsveien 1",
                         reiseavstand = 40.toBigDecimal(),
+                        begrunnelse = "Drivstoff og slitasje",
                         aktivitetId = aktivitetId,
                     ),
             )
@@ -356,6 +394,36 @@ class ReiseTilSamlingVilkårServiceTest {
     }
 
     @Test
+    fun `skal ikke kreve aktivitetId for privat bil TSO`() {
+        val behandling =
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
+        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
+        every { unleashService.isEnabled(any()) } returns true
+        every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
+
+        val vilkår =
+            nyttVilkår.copy(
+                svar = svarPrivatBil,
+                fakta =
+                    FaktaPrivatBil(
+                        reiseId = dummyReiseId,
+                        adresse = "Samlingsveien 1",
+                        reiseavstand = 40.toBigDecimal(),
+                        begrunnelse = "Drivstoff og slitasje",
+                        aktivitetId = null,
+                    ),
+            )
+
+        reiseTilSamlingVilkårService.opprettNyttVilkår(
+            nyttVilkår = vilkår,
+            behandlingId = behandling.id,
+        )
+
+        verify(exactly = 1) { vilkårRepository.insert(any<Vilkår>()) }
+        verify(exactly = 0) { vilkårperiodeService.hentAktivitet(any(), any()) }
+    }
+
+    @Test
     fun `skal feile når reiseavstand er mindre enn 30 km`() {
         assertThatExceptionOfType(ApiFeil::class.java)
             .isThrownBy {
@@ -363,8 +431,23 @@ class ReiseTilSamlingVilkårServiceTest {
                     reiseId = dummyReiseId,
                     adresse = "Samlingsveien 1",
                     reiseavstand = 20.toBigDecimal(),
+                    begrunnelse = "Drivstoff og slitasje",
                     aktivitetId = null,
                 )
             }.withMessage("Reiseavstand kan ikke være mindre enn 30 km")
+    }
+
+    @Test
+    fun `skal feile når begrunnelse mangler`() {
+        assertThatExceptionOfType(ApiFeil::class.java)
+            .isThrownBy {
+                FaktaOffentligTransport(
+                    reiseId = dummyReiseId,
+                    adresse = "Samlingsveien 1",
+                    utgifterOffentligTransport = 500.toBigDecimal(),
+                    begrunnelse = " ",
+                    aktivitetId = null,
+                )
+            }.withMessage("Spesifikasjon av utgift må fylles ut")
     }
 }

@@ -32,7 +32,7 @@ class ReiseTilSamlingBeregnYtelseSteg(
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
 ) : BeregnYtelseSteg<VedtakReiseTilSamlingRequest>(
-        stønadstype = listOf(Stønadstype.REISE_TIL_SAMLING_TSO),
+        stønadstype = listOf(Stønadstype.REISE_TIL_SAMLING_TSO, Stønadstype.REISE_TIL_SAMLING_TSR),
         vedtakRepository = vedtakRepository,
         tilkjentYtelseService = tilkjentYtelseService,
         simuleringService = simuleringService,

@@ -17,17 +17,20 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegelTestUtil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.AktivitetInfoDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingPrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingUbestemtDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.LagreVilkårReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.VilkårReiseTilSamlingDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
+import java.time.LocalDate
 
 class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
     val fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO)
@@ -104,12 +107,6 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 }
             }
 
-        val aktivitet =
-            kall.vilkårperiode
-                .hentForBehandling(behandlingContext.behandlingId)
-                .vilkårperioder.aktiviteter
-                .single()
-
         val nyttVilkår =
             LagreVilkårReiseTilSamlingDto(
                 fom = fom,
@@ -117,7 +114,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 adresse = "Samlingsveien 1",
                 reiseId = dummyReiseId,
                 svar = ReiseTilSamlingRegelTestUtil.oppfylteSvarReiseTilSamlingPrivatBilDto(),
-                fakta = faktaPrivatBil(aktivitet = aktivitet),
+                fakta = faktaPrivatBil(),
             )
 
         val resultat = kall.vilkårReiseTilSamling.opprettVilkår(behandlingContext.behandlingId, nyttVilkår)
@@ -128,7 +125,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
 
         val oppdatertVilkår =
             nyttVilkår.copy(
-                fakta = faktaPrivatBil(reiseavstand = BigDecimal("50"), aktivitet = aktivitet),
+                fakta = faktaPrivatBil(reiseavstand = BigDecimal("50")),
             )
 
         val resultatOppdatert =
@@ -179,7 +176,29 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
     }
 
     @Test
-    fun `skal lagre og hente bompenger, fergekostnad og parkering for privat bil`() {
+    fun `skal ikke feile ved ukjent aktivitetId for TSO når vilkår hentes`() {
+        val aktivitetId = VilkårperiodeGlobalId.random()
+        val nyttVilkår =
+            LagreVilkårReiseTilSamlingDto(
+                fom = 1 januar 2025,
+                tom = 31 januar 2025,
+                adresse = "Samlingsveien 1",
+                reiseId = dummyReiseId,
+                svar = ReiseTilSamlingRegelTestUtil.oppfylteSvarReiseTilSamlingOffentligTransportDto(),
+                fakta = faktaOffentligTransport(aktivitetId = aktivitetId),
+            )
+
+        val opprettetVilkår = kall.vilkårReiseTilSamling.opprettVilkår(behandling.id, nyttVilkår)
+        val opprettetFakta = opprettetVilkår.fakta as FaktaReiseTilSamlingOffentligTransportDto
+        assertThat(opprettetFakta.aktivitet).isNull()
+
+        val hentetVilkår = kall.vilkårReiseTilSamling.hentVilkår(behandling.id).single()
+        val hentetFakta = hentetVilkår.fakta as FaktaReiseTilSamlingOffentligTransportDto
+        assertThat(hentetFakta.aktivitet).isNull()
+    }
+
+    @Test
+    fun `skal lagre og hente bompenger, fergekostnad, parkering og piggdekkavgift for privat bil`() {
         val fom = 1 januar 2025
         val tom = 31 januar 2025
 
@@ -200,12 +219,6 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 }
             }
 
-        val aktivitet =
-            kall.vilkårperiode
-                .hentForBehandling(behandlingContext.behandlingId)
-                .vilkårperioder.aktiviteter
-                .single()
-
         val nyttVilkår =
             LagreVilkårReiseTilSamlingDto(
                 fom = fom,
@@ -218,7 +231,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
                         bompenger = BigDecimal("50"),
                         fergekostnad = BigDecimal("120"),
                         parkering = BigDecimal("75.50"),
-                        aktivitet = aktivitet,
+                        piggdekkavgift = BigDecimal("60"),
                     ),
             )
 
@@ -241,23 +254,48 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
         FileUtil.assertFileJsonIsEqual("vilkår/regelstruktur/REISE_TIL_SAMLING.json", resultat)
     }
 
-    private fun faktaOffentligTransport(utgifterOffentligTransport: BigDecimal = BigDecimal("100")) =
-        FaktaReiseTilSamlingOffentligTransportDto(
-            utgifterOffentligTransport = utgifterOffentligTransport,
-        )
+    private fun faktaOffentligTransport(
+        utgifterOffentligTransport: BigDecimal = BigDecimal("100"),
+        aktivitetId: VilkårperiodeGlobalId? = null,
+    ) = FaktaReiseTilSamlingOffentligTransportDto(
+        utgifterOffentligTransport = utgifterOffentligTransport,
+        begrunnelse = "Togbillett mellom bosted og samling",
+        aktivitet =
+            aktivitetId?.let {
+                AktivitetInfoDto(
+                    aktivitetId = it,
+                    aktivitetType = "TYPE",
+                    tiltaksvariantBeskrivelse = null,
+                    fom = LocalDate.now(),
+                    tom = LocalDate.now(),
+                )
+            },
+    )
 
     private fun faktaPrivatBil(
         reiseavstand: BigDecimal = BigDecimal("35"),
         bompenger: BigDecimal? = null,
         fergekostnad: BigDecimal? = null,
         parkering: BigDecimal? = null,
-        aktivitet: VilkårperiodeDto,
+        piggdekkavgift: BigDecimal? = null,
+        aktivitet: VilkårperiodeDto? = null,
     ) = FaktaReiseTilSamlingPrivatBilDto(
         reiseavstand = reiseavstand,
+        begrunnelse = "Drivstoff og slitasje",
         bompenger = bompenger,
         fergekostnad = fergekostnad,
         parkering = parkering,
-        aktivitetId = aktivitet.globalId,
+        piggdekkavgift = piggdekkavgift,
+        aktivitet =
+            aktivitet?.let {
+                AktivitetInfoDto(
+                    aktivitetId = aktivitet.globalId,
+                    aktivitetType = aktivitet.type.tilDbType(),
+                    tiltaksvariantBeskrivelse = aktivitet.tiltaksvariant.toString(),
+                    fom = aktivitet.fom,
+                    tom = aktivitet.tom,
+                )
+            },
     )
 
     private fun assertLagretVilkår(
@@ -276,7 +314,8 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
         delvilkår: List<DelvilkårDto>,
         svar: Map<RegelId, SvarOgBegrunnelseDto>,
     ) {
-        val brukteRegelIder = delvilkår.flatMap { it.vurderinger.map { vurdering -> vurdering.regelId } }.toSet()
+        val brukteRegelIder =
+            delvilkår.flatMap { it.vurderinger.map { vurdering -> vurdering.regelId } }.toSet()
 
         assertThat(brukteRegelIder).hasSize(svar.size)
     }

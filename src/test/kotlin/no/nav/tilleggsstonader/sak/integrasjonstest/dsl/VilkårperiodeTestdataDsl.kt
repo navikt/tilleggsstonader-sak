@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivit
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetPassAvBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetReiseOppstartAvslutningHjemreiseTsoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetReiseTilSamlingTsoDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetReiseTilSamlingTsrDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperiodeDto
@@ -213,9 +214,24 @@ class OpprettVilkårperiodeDsl {
                 faktaOgSvar =
                     FaktaOgSvarAktivitetReiseTilSamlingTsoDto(
                         svarLønnet = SvarJaNei.NEI,
-                        svarHarUtgifter = SvarJaNei.JA,
-                        svarErAktivitetenObligatorisk = SvarJaNei.JA,
                     ),
+            )
+        }
+    }
+
+    fun aktivitetTiltakTsrReiseTilSamling(
+        fom: LocalDate,
+        tom: LocalDate,
+        tiltaksvariant: TypeAktivitet = TypeAktivitet.GRUPPEAMO,
+    ) {
+        add { behandlingId ->
+            lagreVilkårperiodeAktivitet(
+                behandlingId = behandlingId,
+                fom = fom,
+                tom = tom,
+                aktivitetType = AktivitetType.TILTAK,
+                tiltaksvariant = tiltaksvariant,
+                faktaOgSvar = FaktaOgSvarAktivitetReiseTilSamlingTsrDto,
             )
         }
     }

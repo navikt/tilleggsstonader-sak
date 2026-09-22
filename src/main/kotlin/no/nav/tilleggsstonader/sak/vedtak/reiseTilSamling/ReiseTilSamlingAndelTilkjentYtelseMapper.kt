@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.feil.feil
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -14,17 +15,20 @@ import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.Beregningsresul
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.time.LocalDate
 
-fun BeregningsresultatReiseTilSamling.mapTilAndelTilkjentYtelse(saksbehandling: Saksbehandling): List<AndelTilkjentYtelse> =
-    offentligTransport.map { beregningsresultatOffentligTransport ->
-        beregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandling)
-    } +
-        privatBil.map { beregningsresultatPrivatBil ->
-            beregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(saksbehandling)
-        }
+fun BeregningsresultatReiseTilSamling.mapTilAndelTilkjentYtelse(
+    saksbehandling: Saksbehandling,
+    hentTiltaksvariant: (VilkårperiodeGlobalId?) -> TypeAktivitet?,
+): List<AndelTilkjentYtelse> =
+    offentligTransport.map { it.mapTilAndelTilkjentYtelse(saksbehandling, hentTiltaksvariant(it.aktivitetId)) } +
+        privatBil.map { it.mapTilAndelTilkjentYtelse(saksbehandling, hentTiltaksvariant(it.aktivitetId)) }
 
-fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandling: Saksbehandling): AndelTilkjentYtelse {
+fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(
+    saksbehandling: Saksbehandling,
+    tiltaksvariant: TypeAktivitet?,
+): AndelTilkjentYtelse {
     val målgrupper = grunnlag.vedtaksperioder.map { it.målgruppe }
 
     return lagAndelForReiseTilSamling(
@@ -32,12 +36,16 @@ fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(saksbehandlin
         fomUkedag = grunnlag.fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
         beløp = beløp.toInt(),
         målgruppe = målgrupper.singleOrNull() ?: error("Forventet nøyaktig én målgruppe, fant ${målgrupper.size}"),
+        tiltaksvariant = tiltaksvariant,
         brukersNavKontor = grunnlag.brukersNavKontor,
         reiseId = reiseId,
     )
 }
 
-fun BeregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(saksbehandling: Saksbehandling): AndelTilkjentYtelse {
+fun BeregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(
+    saksbehandling: Saksbehandling,
+    tiltaksvariant: TypeAktivitet?,
+): AndelTilkjentYtelse {
     val målgrupper = grunnlag.vedtaksperioder.map { it.målgruppe }
 
     return lagAndelForReiseTilSamling(
@@ -45,6 +53,7 @@ fun BeregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(saksbehandling: Saksbe
         fomUkedag = grunnlag.fom.datoEllerNesteMandagHvisLørdagEllerSøndag(),
         beløp = beløp.toInt(),
         målgruppe = målgrupper.singleOrNull() ?: error("Forventet nøyaktig én målgruppe, fant ${målgrupper.size}"),
+        tiltaksvariant = tiltaksvariant,
         brukersNavKontor = grunnlag.brukersNavKontor,
         reiseId = reiseId,
     )
@@ -55,6 +64,7 @@ private fun lagAndelForReiseTilSamling(
     fomUkedag: LocalDate,
     beløp: Int,
     målgruppe: FaktiskMålgruppe,
+    tiltaksvariant: TypeAktivitet?,
     brukersNavKontor: String?,
     reiseId: ReiseId?,
 ): AndelTilkjentYtelse {
@@ -65,7 +75,10 @@ private fun lagAndelForReiseTilSamling(
             }
 
             Stønadstype.REISE_TIL_SAMLING_TSR -> {
-                TODO("Har ikke satt opp reise til samling TSR")
+                feilHvis(tiltaksvariant == null) {
+                    "Tiltaksvariant skal alltid være satt for Reise til samling TSR. Var $tiltaksvariant"
+                }
+                finnTypeAndelFraTiltaksvariantReiseTilSamling(tiltaksvariant)
             }
 
             else -> {

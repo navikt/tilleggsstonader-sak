@@ -254,7 +254,7 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
             .oppdaterVilkår(oppdatertVilkår, opprettetVilkår.id, behandlingContext.behandlingId)
             .expectProblemDetail(
                 forventetStatus = HttpStatus.BAD_REQUEST,
-                forventetDetail = "Skal du innvilge med bompenger høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet",
+                forventetDetail = "Skal du innvilge med bompenger høyere enn 500kr må du ta kontakt med Tilleggsstønader-teamet",
             )
     }
 

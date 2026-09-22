@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FødselFaktaGrunnlag
@@ -29,7 +30,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetPassAvBarn
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetReiseTilSamlingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenAktivitetDagligReiseTso
@@ -132,13 +132,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakReiseOppstartAvslutningHjemreiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakReiseOppstartAvslutningHjemreiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakReiseTilSamlingTso
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakReiseTilSamlingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygdLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUtdanningDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUtdanningReiseOppstartAvslutningHjemreiseTso
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUtdanningReiseTilSamlingTso
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUtdanningReiseTilSamlingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingerUtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBoutgifterDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
@@ -156,9 +153,11 @@ fun mapFaktaOgSvarDto(
     vilkårperiode: LagreVilkårperiode,
     stønadstype: Stønadstype,
     fødselFaktaGrunnlag: FødselFaktaGrunnlag?,
+    kreverAktivitetsdager: Boolean = true,
 ): FaktaOgVurdering =
     when (vilkårperiode.type) {
-        is AktivitetType -> mapAktiviteter(stønadstype = stønadstype, aktivitet = vilkårperiode)
+        is AktivitetType ->
+            mapAktiviteter(stønadstype = stønadstype, aktivitet = vilkårperiode, kreverAktivitetsdager = kreverAktivitetsdager)
         is MålgruppeType ->
             mapMålgruppe(
                 stønadstype = stønadstype,
@@ -170,6 +169,7 @@ fun mapFaktaOgSvarDto(
 private fun mapAktiviteter(
     stønadstype: Stønadstype,
     aktivitet: LagreVilkårperiode,
+    kreverAktivitetsdager: Boolean,
 ): AktivitetFaktaOgVurdering {
     val type = aktivitet.type
     require(type is AktivitetType)
@@ -193,12 +193,12 @@ private fun mapAktiviteter(
 
         Stønadstype.DAGLIG_REISE_TSO -> {
             require(faktaOgSvar is FaktaOgSvarAktivitetDagligReiseTsoDto)
-            return mapAktiviteterDagligReiseTso(type, faktaOgSvar)
+            return mapAktiviteterDagligReiseTso(type, faktaOgSvar, kreverAktivitetsdager)
         }
 
         Stønadstype.DAGLIG_REISE_TSR -> {
             require(faktaOgSvar is FaktaOgSvarAktivitetDagligReiseTsrDto)
-            return mapAktiviteterDagligReiseTsr(type, faktaOgSvar)
+            return mapAktiviteterDagligReiseTsr(type, faktaOgSvar, kreverAktivitetsdager)
         }
 
         Stønadstype.REISE_TIL_SAMLING_TSO -> {
@@ -208,7 +208,7 @@ private fun mapAktiviteter(
 
         Stønadstype.REISE_TIL_SAMLING_TSR -> {
             require(faktaOgSvar is FaktaOgSvarAktivitetReiseTilSamlingTsrDto)
-            return mapAktiviteterReiseTilSamlingTsr(type, faktaOgSvar)
+            return mapAktiviteterReiseTilSamlingTsr(type)
         }
 
         Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO -> {
@@ -288,19 +288,28 @@ private fun mapAktiviteterPassAvBarn(
     when (aktivitetType) {
         AktivitetType.TILTAK -> {
             TiltakPassAvBarn(
-                fakta = FaktaAktivitetPassAvBarn(aktivitetsdager = faktaOgSvar.aktivitetsdager!!),
+                fakta =
+                    FaktaAktivitetPassAvBarn(
+                        aktivitetsdager = hentPåkrevdeAktivitetsdager(faktaOgSvar.aktivitetsdager),
+                    ),
                 vurderinger = VurderingTiltakPassAvBarn(lønnet = VurderingLønnet(faktaOgSvar.svarLønnet)),
             )
         }
 
         AktivitetType.UTDANNING ->
             UtdanningPassAvBarn(
-                fakta = FaktaAktivitetPassAvBarn(aktivitetsdager = faktaOgSvar.aktivitetsdager!!),
+                fakta =
+                    FaktaAktivitetPassAvBarn(
+                        aktivitetsdager = hentPåkrevdeAktivitetsdager(faktaOgSvar.aktivitetsdager),
+                    ),
             )
 
         AktivitetType.REELL_ARBEIDSSØKER ->
             ReellArbeidsøkerPassAvBarn(
-                fakta = FaktaAktivitetPassAvBarn(aktivitetsdager = faktaOgSvar.aktivitetsdager!!),
+                fakta =
+                    FaktaAktivitetPassAvBarn(
+                        aktivitetsdager = hentPåkrevdeAktivitetsdager(faktaOgSvar.aktivitetsdager),
+                    ),
             )
 
         AktivitetType.INGEN_AKTIVITET -> {
@@ -320,7 +329,7 @@ fun mapAktiviteterLæremidler(
             TiltakLæremidler(
                 fakta =
                     FaktaAktivitetLæremidler(
-                        prosent = faktaOgSvar.prosent!!,
+                        prosent = hentPåkrevdProsentForLæremidler(faktaOgSvar.prosent),
                         studienivå = faktaOgSvar.studienivå,
                     ),
                 vurderinger =
@@ -334,7 +343,7 @@ fun mapAktiviteterLæremidler(
             UtdanningLæremidler(
                 fakta =
                     FaktaAktivitetLæremidler(
-                        prosent = faktaOgSvar.prosent!!,
+                        prosent = hentPåkrevdProsentForLæremidler(faktaOgSvar.prosent),
                         studienivå = faktaOgSvar.studienivå,
                     ),
                 vurderinger =
@@ -370,6 +379,7 @@ private fun mapAktiviteterBoutgifter(
 private fun mapAktiviteterDagligReiseTso(
     aktivitetType: AktivitetType,
     faktaOgSvar: FaktaOgSvarAktivitetDagligReiseTsoDto,
+    kreverAktivitetsdager: Boolean,
 ): AktivitetDagligReiseTso =
     when (aktivitetType) {
         AktivitetType.TILTAK -> {
@@ -381,7 +391,7 @@ private fun mapAktiviteterDagligReiseTso(
                     ),
                 fakta =
                     FaktaAktivitetDagligReiseTso(
-                        faktaOgSvar.aktivitetsdager,
+                        hentAktivitetsdagerDagligReise(faktaOgSvar.aktivitetsdager, kreverAktivitetsdager),
                     ),
             )
         }
@@ -392,7 +402,8 @@ private fun mapAktiviteterDagligReiseTso(
                     VurderingUtdanningDagligReiseTso(
                         harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
                     ),
-                fakta = FaktaAktivitetDagligReiseTso(faktaOgSvar.aktivitetsdager),
+                fakta =
+                    FaktaAktivitetDagligReiseTso(hentAktivitetsdagerDagligReise(faktaOgSvar.aktivitetsdager, kreverAktivitetsdager)),
             )
 
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetDagligReiseTso
@@ -402,6 +413,7 @@ private fun mapAktiviteterDagligReiseTso(
 private fun mapAktiviteterDagligReiseTsr(
     aktivitetType: AktivitetType,
     faktaOgSvar: FaktaOgSvarAktivitetDagligReiseTsrDto,
+    kreverAktivitetsdager: Boolean,
 ): AktivitetDagligReiseTsr =
     when (aktivitetType) {
         AktivitetType.TILTAK -> {
@@ -410,7 +422,8 @@ private fun mapAktiviteterDagligReiseTsr(
                     VurderingTiltakDagligReiseTsr(
                         harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
                     ),
-                fakta = FaktaAktivitetDagligReiseTsr(faktaOgSvar.aktivitetsdager),
+                fakta =
+                    FaktaAktivitetDagligReiseTsr(hentAktivitetsdagerDagligReise(faktaOgSvar.aktivitetsdager, kreverAktivitetsdager)),
             )
         }
 
@@ -422,6 +435,35 @@ private fun mapAktiviteterDagligReiseTsr(
         AktivitetType.REELL_ARBEIDSSØKER -> feil("Reell arbeidssøker er ikke en gyldig aktivitet for daglige reiser TSR")
     }
 
+private fun hentPåkrevdeAktivitetsdager(aktivitetsdager: Int?): Int {
+    brukerfeilHvis(aktivitetsdager == null || aktivitetsdager !in 1..5) {
+        "Mangler data: aktivitetsdager må være satt og være et heltall mellom 1 og 5"
+    }
+    return aktivitetsdager
+}
+
+/**
+ * Aktivitetsdager er påkrevd når man legger til en ny aktivitet, eller når det allerede
+ * var satt en verdi på den eksisterende aktiviteten (avgjøres av [kreverAktivitetsdager]
+ * hos kallende kode). Ved endring av en eksisterende aktivitet der aktivitetsdager ikke
+ * var satt fra før, skal man ikke tvinges til å fylle det inn. Er det derimot fylt ut en
+ * verdi skal den fortsatt valideres.
+ */
+private fun hentAktivitetsdagerDagligReise(
+    aktivitetsdager: Int?,
+    kreverAktivitetsdager: Boolean,
+): Int? {
+    if (!kreverAktivitetsdager && aktivitetsdager == null) {
+        return null
+    }
+    return hentPåkrevdeAktivitetsdager(aktivitetsdager)
+}
+
+private fun hentPåkrevdProsentForLæremidler(prosent: Int?): Int {
+    brukerfeilHvis(prosent == null) { "Mangler data: prosent må være satt for læremidleraktivitet" }
+    return prosent
+}
+
 private fun mapAktiviteterReiseTilSamlingTso(
     aktivitetType: AktivitetType,
     faktaOgSvar: FaktaOgSvarAktivitetReiseTilSamlingTsoDto,
@@ -432,20 +474,11 @@ private fun mapAktiviteterReiseTilSamlingTso(
                 vurderinger =
                     VurderingTiltakReiseTilSamlingTso(
                         lønnet = VurderingLønnet(faktaOgSvar.svarLønnet),
-                        harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
-                        erAktivitetenObligatorisk = VurderingErAktivitetenObligatorisk(faktaOgSvar.svarErAktivitetenObligatorisk),
                     ),
             )
         }
 
-        AktivitetType.UTDANNING ->
-            UtdanningReiseTilSamlingTso(
-                vurderinger =
-                    VurderingUtdanningReiseTilSamlingTso(
-                        harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
-                        erAktivitetenObligatorisk = VurderingErAktivitetenObligatorisk(faktaOgSvar.svarErAktivitetenObligatorisk),
-                    ),
-            )
+        AktivitetType.UTDANNING -> UtdanningReiseTilSamlingTso
 
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetReiseTilSamlingTso
         AktivitetType.REELL_ARBEIDSSØKER -> feil("Reell arbeidssøker er ikke en gyldig aktivitet for reise til samling TSO")
@@ -800,32 +833,10 @@ private fun mapMålgruppeReiseTilSamlingTso(
         MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel for reise til samling tso")
     }
 
-private fun mapAktiviteterReiseTilSamlingTsr(
-    aktivitetType: AktivitetType,
-    faktaOgSvar: FaktaOgSvarAktivitetReiseTilSamlingTsrDto,
-): AktivitetReiseTilSamlingTsr =
+private fun mapAktiviteterReiseTilSamlingTsr(aktivitetType: AktivitetType): AktivitetReiseTilSamlingTsr =
     when (aktivitetType) {
-        AktivitetType.TILTAK ->
-            TiltakReiseTilSamlingTsr(
-                vurderinger =
-                    VurderingTiltakReiseTilSamlingTsr(
-                        lønnet = VurderingLønnet(faktaOgSvar.svarLønnet),
-                        harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
-                        erAktivitetenObligatorisk = VurderingErAktivitetenObligatorisk(faktaOgSvar.svarErAktivitetenObligatorisk),
-                    ),
-                fakta = FaktaAktivitetReiseTilSamlingTsr(faktaOgSvar.aktivitetsdager),
-            )
-
-        AktivitetType.UTDANNING ->
-            UtdanningReiseTilSamlingTsr(
-                vurderinger =
-                    VurderingUtdanningReiseTilSamlingTsr(
-                        harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
-                        erAktivitetenObligatorisk = VurderingErAktivitetenObligatorisk(faktaOgSvar.svarErAktivitetenObligatorisk),
-                    ),
-                fakta = FaktaAktivitetReiseTilSamlingTsr(faktaOgSvar.aktivitetsdager),
-            )
-
+        AktivitetType.TILTAK -> TiltakReiseTilSamlingTsr
+        AktivitetType.UTDANNING -> UtdanningReiseTilSamlingTsr
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetReiseTilSamlingTsr
         AktivitetType.REELL_ARBEIDSSØKER -> feil("Reell arbeidssøker er ikke en gyldig aktivitet for reise til samling TSR")
     }

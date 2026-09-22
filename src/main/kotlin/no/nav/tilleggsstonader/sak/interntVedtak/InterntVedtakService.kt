@@ -41,6 +41,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.VilkårDagligReiseMapper.mapTilVilkårDagligReise
@@ -124,6 +125,11 @@ class InterntVedtakService(
                         dagligReise = data.beregningsresultat.tilDto(data.beregningsplan, vilkårDagligReise),
                     )
                 }
+                is InnvilgelseReiseTilSamling -> {
+                    BeregningsresultatInterntVedtakDto(
+                        reiseTilSamling = data.beregningsresultat.tilDto(data.beregningsplan),
+                    )
+                }
 
                 is Innvilgelse,
                 -> error("Mangler mapping av beregningsresultat for ${data.type}")
@@ -191,6 +197,7 @@ class InterntVedtakService(
             is InnvilgelseLæremidler -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
             is InnvilgelseBoutgifter -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
             is InnvilgelseDagligReise -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
+            is InnvilgelseReiseTilSamling -> mapVedtaksperioder(vedtak.data.vedtaksperioder)
             is Avslag, is Opphør -> emptyList()
             else -> {
                 error("Kan ikke mappe vedtaksperioder for type ${vedtak?.data?.javaClass?.simpleName}")
@@ -360,6 +367,9 @@ class InterntVedtakService(
             Stønadstype.BOUTGIFTER -> {}
             Stønadstype.DAGLIG_REISE_TSO -> {}
             Stønadstype.DAGLIG_REISE_TSR -> {}
+            Stønadstype.REISE_TIL_SAMLING_TSO -> {}
+            Stønadstype.REISE_TIL_SAMLING_TSR -> {}
+
             else -> error("Internt vedtak håndterer ikke stønadstype=$stønadstype ennå")
         }
     }
@@ -390,9 +400,31 @@ class InterntVedtakService(
                     adresse = fakta.adresse,
                 )
 
-            is FaktaReiseTilSamlingOffentligTransport -> TODO()
-            is FaktaReiseTilSamlingPrivatBil -> TODO()
-            is FaktaReiseTilSamlingUbestemt -> TODO()
+            is FaktaReiseTilSamlingOffentligTransport ->
+                VilkårFaktaReiseTilSamlingOffentligTransportInterntVedtak(
+                    reiseId = fakta.reiseId,
+                    adresse = fakta.adresse,
+                    utgifterOffentligTransport = fakta.utgifterOffentligTransport,
+                    begrunnelse = fakta.begrunnelse,
+                    aktivitetId = fakta.aktivitetId,
+                )
+            is FaktaReiseTilSamlingPrivatBil ->
+                VilkårFaktaReiseTilSamlingPrivatBilInterntVedtak(
+                    reiseId = fakta.reiseId,
+                    adresse = fakta.adresse,
+                    begrunnelse = fakta.begrunnelse,
+                    bompenger = fakta.bompenger,
+                    fergekostnad = fakta.fergekostnad,
+                    parkering = fakta.parkering,
+                    piggdekkavgift = fakta.piggdekkavgift,
+                    reiseAvstand = fakta.reiseavstand,
+                    aktivitetId = fakta.aktivitetId,
+                )
+            is FaktaReiseTilSamlingUbestemt ->
+                VilkårFaktaReiseTilSamlingUbestemtInterntVedtak(
+                    reiseId = fakta.reiseId,
+                    adresse = fakta.adresse,
+                )
 
             is FaktaReiseOppstartAvslutningHjemreiseOffentligTransport -> TODO()
             is FaktaReiseOppstartAvslutningHjemreisePrivatBil -> TODO()
