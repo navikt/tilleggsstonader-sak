@@ -154,16 +154,21 @@ class ReiseTilSamlingVilkårService(
         nyttVilkår: LagreVilkårReiseTilSamling,
         behandling: Saksbehandling,
     ) {
-        if (behandling.stønadstype != Stønadstype.REISE_TIL_SAMLING_TSR) return
-
-        val aktivitetId =
+        if (behandling.stønadstype == Stønadstype.REISE_TIL_SAMLING_TSR) {
             when (nyttVilkår.fakta.type) {
-                TypeReiseTilSamling.PRIVAT_BIL -> (nyttVilkår.fakta as FaktaPrivatBil).aktivitetId
-                TypeReiseTilSamling.OFFENTLIG_TRANSPORT -> (nyttVilkår.fakta as FaktaOffentligTransport).aktivitetId
-                else -> return
-            }
+                TypeReiseTilSamling.PRIVAT_BIL -> {
+                    val aktivitetId = (nyttVilkår.fakta as FaktaPrivatBil).aktivitetId
+                    validerAktivitetId(aktivitetId, nyttVilkår, behandling.id)
+                }
 
-        validerAktivitetId(aktivitetId, nyttVilkår, behandling.id)
+                TypeReiseTilSamling.OFFENTLIG_TRANSPORT -> {
+                    val aktivitetId = (nyttVilkår.fakta as FaktaOffentligTransport).aktivitetId
+                    validerAktivitetId(aktivitetId, nyttVilkår, behandling.id)
+                }
+
+                TypeReiseTilSamling.UBESTEMT -> Unit
+            }
+        }
     }
 
     private fun validerAktivitetId(

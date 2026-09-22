@@ -30,6 +30,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domai
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeAktivitet
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -221,6 +222,36 @@ class ReiseTilSamlingVilkårServiceTest {
     }
 
     @Test
+    fun `skal ikke validere aktivitetId for offentlig transport TSO selv om aktivitetId er satt`() {
+        val behandling =
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
+        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
+        every { unleashService.isEnabled(any()) } returns true
+        every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
+
+        val vilkår =
+            nyttVilkår.copy(
+                fakta =
+                    FaktaOffentligTransport(
+                        reiseId = dummyReiseId,
+                        adresse = "Samlingsveien 1",
+                        utgifterOffentligTransport = 500.toBigDecimal(),
+                        begrunnelse = "Togbillett mellom bosted og samling",
+                        aktivitetId = VilkårperiodeGlobalId.random(),
+                    ),
+            )
+
+        reiseTilSamlingVilkårService.opprettNyttVilkår(
+            nyttVilkår = vilkår,
+            behandlingId = behandling.id,
+        )
+
+        verify(exactly = 0) {
+            vilkårperiodeService.hentAktivitet(any(), any())
+        }
+    }
+
+    @Test
     fun `skal feile når aktivitet ikke finnes for privat bil`() {
         val behandling =
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSR))
@@ -360,6 +391,36 @@ class ReiseTilSamlingVilkårServiceTest {
         )
 
         verify(exactly = 1) { vilkårRepository.insert(any<Vilkår>()) }
+    }
+
+    @Test
+    fun `skal ikke kreve aktivitetId for privat bil TSO`() {
+        val behandling =
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO))
+        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
+        every { unleashService.isEnabled(any()) } returns true
+        every { vilkårRepository.insert(any<Vilkår>()) } answers { firstArg() }
+
+        val vilkår =
+            nyttVilkår.copy(
+                svar = svarPrivatBil,
+                fakta =
+                    FaktaPrivatBil(
+                        reiseId = dummyReiseId,
+                        adresse = "Samlingsveien 1",
+                        reiseavstand = 40.toBigDecimal(),
+                        begrunnelse = "Drivstoff og slitasje",
+                        aktivitetId = null,
+                    ),
+            )
+
+        reiseTilSamlingVilkårService.opprettNyttVilkår(
+            nyttVilkår = vilkår,
+            behandlingId = behandling.id,
+        )
+
+        verify(exactly = 1) { vilkårRepository.insert(any<Vilkår>()) }
+        verify(exactly = 0) { vilkårperiodeService.hentAktivitet(any(), any()) }
     }
 
     @Test
