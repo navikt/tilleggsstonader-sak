@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseReiseTilSamling
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.tilVedtaksperiodeBeregning
@@ -141,7 +141,7 @@ class ReiseTilSamlingBeregningService(
 
     private fun gjenbrukOffentligTransport(
         uendredeUtgifter: List<VilkårReiseTilSamling>,
-        forrigeVedtak: InnvilgelseReiseTilSamling?,
+        forrigeVedtak: InnvilgelseEllerOpphørReiseTilSamling?,
     ): List<BeregningsresultatOffentligTransport> {
         val reiseIder =
             uendredeUtgifter
@@ -167,7 +167,7 @@ class ReiseTilSamlingBeregningService(
 
     private fun gjenbrukPrivatBil(
         uendredeUtgifter: List<VilkårReiseTilSamling>,
-        forrigeVedtak: InnvilgelseReiseTilSamling?,
+        forrigeVedtak: InnvilgelseEllerOpphørReiseTilSamling?,
     ): List<BeregningsresultatPrivatBil> {
         val reiseIder =
             uendredeUtgifter
@@ -197,13 +197,13 @@ class ReiseTilSamlingBeregningService(
             privatBil = privatBil.map { it.copy(fraTidligereVedtak = true) },
         )
 
-    private fun hentForrigeIverksatteVedtak(behandling: Saksbehandling): InnvilgelseReiseTilSamling? =
+    private fun hentForrigeIverksatteVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørReiseTilSamling? =
         behandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it) }?.data
 
     private fun hentVedtak(behandlingId: BehandlingId) =
         vedtakRepository
             .findByIdOrThrow(behandlingId)
-            .withTypeOrThrow<InnvilgelseReiseTilSamling>()
+            .withTypeOrThrow<InnvilgelseEllerOpphørReiseTilSamling>()
 
     private fun beregnOffentligTransport(
         utgifter: List<VilkårReiseTilSamling>,
