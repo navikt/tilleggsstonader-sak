@@ -155,7 +155,7 @@ class SøknadskjemaBoutgifterMapper(
         } ?: emptyList()
 
     private fun mapAktivitet(aktiviteter: Aktiviteter): AktivitetAvsnitt {
-        val aktivitet = aktiviteter.aktiviteterOgMaalgruppe.aktivitet
+        val aktivitet = aktiviteter.aktiviteterOgMaalgruppe
         // Fyll ut setter aktivitetId til "ingenAktivitet" og vi har ellers mapping til ANNET som brukes i vår søknad
         val id = if (aktivitet.aktivitetId == "ingenAktivitet") "ANNET" else aktivitet.aktivitetId
         return AktivitetAvsnitt(
@@ -200,20 +200,26 @@ class SøknadskjemaBoutgifterMapper(
     private fun mapUtgifterNyBolig(utgifterNyBolig: UtgifterNyBoligKontrakt?): UtgifterNyBolig? =
         utgifterNyBolig?.let {
             validerAndelUtgifterNyBolig(it)
+            val fordelingUtgifter = it.fordelingUtgifter
             UtgifterNyBolig(
-                delerBoutgifter = mapJaNei(it.delerBoutgifter),
-                andelUtgifterBolig = it.andelUtgifterBolig,
+                delerBoutgifter = null,
+                delerBoutgifterNy = fordelingUtgifter?.let { fordeling -> mapDelerBoutgifterFlereSteder(fordeling.delerBoutgifter) },
+                andelUtgifterBolig = null,
                 harHoyereUtgifterPaNyttBosted = mapJaNei(it.harHoyereUtgifterPaNyttBosted),
-                mottarBostotte = mapJaNei(it.mottarBostotte),
-                andelUtgifterBoligHjemsted = it.andelUtgifterBoligHjemsted,
-                andelUtgifterBoligAktivitetssted = it.andelUtgifterBoligAktivitetssted,
+                mottarBostotte = fordelingUtgifter?.mottarBostotte?.let(::mapJaNei),
+                andelUtgifterBoligHjemsted = fordelingUtgifter?.andelUtgifterBoligHjemsted,
+                andelUtgifterBoligAktivitetssted = fordelingUtgifter?.andelUtgifterBoligAktivitetssted,
             )
         }
 
     private fun validerAndelUtgifterNyBolig(utgifterNyBolig: UtgifterNyBoligKontrakt) {
+        val fordelingUtgifter = utgifterNyBolig.fordelingUtgifter
         feilHvis(
             utgifterNyBolig.harHoyereUtgifterPaNyttBosted == JaNeiType.ja &&
-                (utgifterNyBolig.andelUtgifterBoligHjemsted == null || utgifterNyBolig.andelUtgifterBoligAktivitetssted == null),
+                (
+                    fordelingUtgifter?.andelUtgifterBoligHjemsted == null ||
+                        fordelingUtgifter.andelUtgifterBoligAktivitetssted == null
+                ),
         ) {
             "Mangler andelUtgifterBoligHjemsted eller andelUtgifterBoligAktivitetssted når harHoyereUtgifterPaNyttBosted er ja"
         }

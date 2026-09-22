@@ -50,10 +50,13 @@
         "andelUtgifterBoligAktivitetssted" : 100
       },
       "utgifterNyBolig" : {
-        "delerBoutgifter" : "JA",
-        "andelUtgifterBolig" : 100,
+        "delerBoutgifter" : null,
+        "delerBoutgifterNy" : [ "HJEMSTED", "AKTIVITETSSTED", "NEI" ],
+        "andelUtgifterBolig" : null,
         "harHoyereUtgifterPaNyttBosted" : "JA",
-        "mottarBostotte" : "JA"
+        "mottarBostotte" : "JA",
+        "andelUtgifterBoligHjemsted" : 100,
+        "andelUtgifterBoligAktivitetssted" : 100
       }
     },
     "samling" : {
