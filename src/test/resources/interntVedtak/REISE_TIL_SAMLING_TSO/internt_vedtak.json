@@ -1,262 +1,262 @@
 {
-  "behandling" : {
-    "behandlingId" : "001464ca-20dc-4f6c-b3e8-c83bd98b3e31",
-    "eksternFagsakId" : 1673,
-    "stønadstype" : "REISE_TIL_SAMLING_TSO",
-    "årsak" : "SØKNAD",
-    "ident" : "123456789012",
-    "opprettetTidspunkt" : "2024-02-10T00:00:00",
-    "resultat" : "INNVILGET",
-    "vedtakstidspunkt" : "2024-02-05T00:00:00",
-    "saksbehandler" : "saksbehandler",
-    "beslutter" : "saksbeh2"
+  "aktiviteter": [ {
+    "begrunnelse": null,
+    "faktaOgVurderinger": {
+      "@type": "AKTIVITET_REISE_TIL_SAMLING_TSO",
+      "lønnet": {
+        "resultat": "OPPFYLT",
+        "svar": "NEI"
+      }
+    },
+    "fom": "2024-02-05",
+    "kilde": "MANUELL",
+    "resultat": "OPPFYLT",
+    "slettetKommentar": null,
+    "tiltaksvariant": null,
+    "tom": "2024-02-10",
+    "type": "TILTAK"
+  }, {
+    "begrunnelse": "ikke oppfylt",
+    "faktaOgVurderinger": {
+      "@type": "AKTIVITET_REISE_TIL_SAMLING_TSO",
+      "lønnet": null
+    },
+    "fom": "2024-02-05",
+    "kilde": "MANUELL",
+    "resultat": "IKKE_OPPFYLT",
+    "slettetKommentar": null,
+    "tiltaksvariant": null,
+    "tom": "2024-02-10",
+    "type": "UTDANNING"
+  } ],
+  "behandling": {
+    "behandlingId": "001464ca-20dc-4f6c-b3e8-c83bd98b3e31",
+    "beslutter": "saksbeh2",
+    "eksternFagsakId": 1673,
+    "ident": "123456789012",
+    "opprettetTidspunkt": "2024-02-10T00:00:00",
+    "resultat": "INNVILGET",
+    "saksbehandler": "saksbehandler",
+    "stønadstype": "REISE_TIL_SAMLING_TSO",
+    "vedtakstidspunkt": "2024-02-05T00:00:00",
+    "årsak": "SØKNAD"
   },
-  "søknad" : {
-    "mottattTidspunkt" : "2023-01-01T00:00:00"
+  "beregningsresultat": {
+    "boutgifter": null,
+    "dagligReise": null,
+    "læremidler": null,
+    "reiseTilSamling": {
+      "beregningsplan": {
+        "omfang": "ALLE_PERIODER"
+      },
+      "offentligTransport": [ {
+        "adresse": "Testveien 1, 1234 Testby",
+        "aktivitetId": "02c86eca-36e5-451b-a22d-8501a0f7b8ee",
+        "beløp": 3000,
+        "fom": "2024-01-01",
+        "fraTidligereVedtak": false,
+        "reiseId": "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
+        "tom": "2024-01-31"
+      }, {
+        "adresse": "Testveien 2, 2345 Testby",
+        "aktivitetId": "02c86eca-36e5-451b-a22d-8501a0f7b8ee",
+        "beløp": 3000,
+        "fom": "2025-01-01",
+        "fraTidligereVedtak": false,
+        "reiseId": "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
+        "tom": "2025-01-31"
+      } ],
+      "privatBil": [ {
+        "adresse": "Testveien 2, 1234 Testby",
+        "aktivitetId": "02c86eca-36e5-451b-a22d-8501a0f7b8ee",
+        "beløp": 380,
+        "bompenger": 40,
+        "fergekostnad": 50,
+        "fom": "2024-01-01",
+        "fraTidligereVedtak": false,
+        "parkering": 40,
+        "piggdekkavgift": 40,
+        "reiseId": "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
+        "sats": 3.5,
+        "tom": "2024-01-31",
+        "totaltReiseavstand": 60
+      } ]
+    },
+    "tilsynBarn": null
   },
-  "målgrupper" : [ {
-    "type" : "AAP",
-    "fom" : "2024-02-05",
-    "tom" : "2024-02-10",
-    "faktaOgVurderinger" : {
-      "@type" : "MÅLGRUPPE",
-      "medlemskap" : {
-        "svar" : "JA_IMPLISITT",
-        "resultat" : "OPPFYLT"
+  "målgrupper": [ {
+    "begrunnelse": "målgruppe aap",
+    "faktaOgVurderinger": {
+      "@type": "MÅLGRUPPE",
+      "aldersvilkår": {
+        "resultat": "OPPFYLT",
+        "svar": "JA"
       },
-      "utgifterDekketAvAnnetRegelverk" : {
-        "svar" : "NEI",
-        "resultat" : "OPPFYLT"
+      "medlemskap": {
+        "resultat": "OPPFYLT",
+        "svar": "JA_IMPLISITT"
       },
-      "aldersvilkår" : {
-        "svar" : "JA",
-        "resultat" : "OPPFYLT"
+      "mottarSykepengerForFulltidsstilling": {
+        "resultat": "OPPFYLT",
+        "svar": "NEI_IMPLISITT"
       },
-      "mottarSykepengerForFulltidsstilling" : {
-        "svar" : "NEI_IMPLISITT",
-        "resultat" : "OPPFYLT"
+      "utgifterDekketAvAnnetRegelverk": {
+        "resultat": "OPPFYLT",
+        "svar": "NEI"
       }
     },
-    "kilde" : "MANUELL",
-    "resultat" : "OPPFYLT",
-    "begrunnelse" : "målgruppe aap",
-    "slettetKommentar" : null,
-    "tiltaksvariant" : null
+    "fom": "2024-02-05",
+    "kilde": "MANUELL",
+    "resultat": "OPPFYLT",
+    "slettetKommentar": null,
+    "tiltaksvariant": null,
+    "tom": "2024-02-10",
+    "type": "AAP"
   }, {
-    "type" : "OVERGANGSSTØNAD",
-    "fom" : "2024-02-05",
-    "tom" : "2024-02-10",
-    "faktaOgVurderinger" : {
-      "@type" : "MÅLGRUPPE",
-      "medlemskap" : {
-        "svar" : "JA_IMPLISITT",
-        "resultat" : "OPPFYLT"
+    "begrunnelse": "målgruppe os",
+    "faktaOgVurderinger": {
+      "@type": "MÅLGRUPPE",
+      "aldersvilkår": null,
+      "medlemskap": {
+        "resultat": "OPPFYLT",
+        "svar": "JA_IMPLISITT"
       },
-      "utgifterDekketAvAnnetRegelverk" : null,
-      "aldersvilkår" : null,
-      "mottarSykepengerForFulltidsstilling" : null
+      "mottarSykepengerForFulltidsstilling": null,
+      "utgifterDekketAvAnnetRegelverk": null
     },
-    "kilde" : "MANUELL",
-    "resultat" : "OPPFYLT",
-    "begrunnelse" : "målgruppe os",
-    "slettetKommentar" : null,
-    "tiltaksvariant" : null
+    "fom": "2024-02-05",
+    "kilde": "MANUELL",
+    "resultat": "OPPFYLT",
+    "slettetKommentar": null,
+    "tiltaksvariant": null,
+    "tom": "2024-02-10",
+    "type": "OVERGANGSSTØNAD"
   }, {
-    "type" : "NEDSATT_ARBEIDSEVNE",
-    "fom" : "2024-02-05",
-    "tom" : "2024-02-10",
-    "faktaOgVurderinger" : {
-      "@type" : "MÅLGRUPPE",
-      "medlemskap" : {
-        "svar" : "JA",
-        "resultat" : "OPPFYLT"
+    "begrunnelse": "målgruppe na",
+    "faktaOgVurderinger": {
+      "@type": "MÅLGRUPPE",
+      "aldersvilkår": {
+        "resultat": "OPPFYLT",
+        "svar": "JA"
       },
-      "utgifterDekketAvAnnetRegelverk" : {
-        "svar" : null,
-        "resultat" : "IKKE_VURDERT"
+      "medlemskap": {
+        "resultat": "OPPFYLT",
+        "svar": "JA"
       },
-      "aldersvilkår" : {
-        "svar" : "JA",
-        "resultat" : "OPPFYLT"
+      "mottarSykepengerForFulltidsstilling": {
+        "resultat": "OPPFYLT",
+        "svar": "NEI"
       },
-      "mottarSykepengerForFulltidsstilling" : {
-        "svar" : "NEI",
-        "resultat" : "OPPFYLT"
+      "utgifterDekketAvAnnetRegelverk": {
+        "resultat": "IKKE_VURDERT",
+        "svar": null
       }
     },
-    "kilde" : "MANUELL",
-    "resultat" : "IKKE_VURDERT",
-    "begrunnelse" : "målgruppe na",
-    "slettetKommentar" : null,
-    "tiltaksvariant" : null
+    "fom": "2024-02-05",
+    "kilde": "MANUELL",
+    "resultat": "IKKE_VURDERT",
+    "slettetKommentar": null,
+    "tiltaksvariant": null,
+    "tom": "2024-02-10",
+    "type": "NEDSATT_ARBEIDSEVNE"
   } ],
-  "aktiviteter" : [ {
-    "type" : "TILTAK",
-    "fom" : "2024-02-05",
-    "tom" : "2024-02-10",
-    "faktaOgVurderinger" : {
-      "@type" : "AKTIVITET_REISE_TIL_SAMLING_TSO",
-      "lønnet" : {
-        "svar" : "NEI",
-        "resultat" : "OPPFYLT"
-      }
-    },
-    "kilde" : "MANUELL",
-    "resultat" : "OPPFYLT",
-    "begrunnelse" : null,
-    "slettetKommentar" : null,
-    "tiltaksvariant" : null
-  }, {
-    "type" : "UTDANNING",
-    "fom" : "2024-02-05",
-    "tom" : "2024-02-10",
-    "faktaOgVurderinger" : {
-      "@type" : "AKTIVITET_REISE_TIL_SAMLING_TSO",
-      "lønnet" : null
-    },
-    "kilde" : "MANUELL",
-    "resultat" : "IKKE_OPPFYLT",
-    "begrunnelse" : "ikke oppfylt",
-    "slettetKommentar" : null,
-    "tiltaksvariant" : null
+  "rammevedtakPrivatBil": null,
+  "søknad": {
+    "mottattTidspunkt": "2023-01-01T00:00:00"
+  },
+  "vedtak": {
+    "innvilgelseBegrunnelse": "Sånn her vil en begrunnelse se ut i det interne vedtaket",
+    "type": "INNVILGELSE"
+  },
+  "vedtaksperioder": [ {
+    "aktivitet": "TILTAK",
+    "fom": "2024-01-01",
+    "målgruppe": "NEDSATT_ARBEIDSEVNE",
+    "tom": "2024-02-29"
   } ],
-  "vedtaksperioder" : [ {
-    "fom" : "2024-01-01",
-    "tom" : "2024-02-29",
-    "målgruppe" : "NEDSATT_ARBEIDSEVNE",
-    "aktivitet" : "TILTAK"
-  } ],
-  "vilkår" : [ {
-    "type" : "REISE_TIL_SAMLING",
-    "resultat" : "OPPFYLT",
-    "delvilkår" : [ {
-      "resultat" : "IKKE_TATT_STILLING_TIL",
-      "vurderinger" : [ {
-        "regel" : "Har bruker nødvendige utgifter til reise til samling?",
-        "svar" : "Ja",
-        "begrunnelse" : null
+  "vilkår": [ {
+    "delvilkår": [ {
+      "resultat": "IKKE_TATT_STILLING_TIL",
+      "vurderinger": [ {
+        "begrunnelse": null,
+        "regel": "Har bruker nødvendige utgifter til reise til samling?",
+        "svar": "Ja"
       }, {
-        "regel" : "Er reiseavstanden over 30km?",
-        "svar" : "Ja",
-        "begrunnelse" : "antall km"
+        "begrunnelse": "antall km",
+        "regel": "Er reiseavstanden over 30km?",
+        "svar": "Ja"
       }, {
-        "regel" : "Er samlingen obligatorisk?",
-        "svar" : "Ja",
-        "begrunnelse" : null
+        "begrunnelse": null,
+        "regel": "Er samlingen obligatorisk?",
+        "svar": "Ja"
       }, {
-        "regel" : "Kan søker benytte seg av offentlig transport?",
-        "svar" : "Ja",
-        "begrunnelse" : null
+        "begrunnelse": null,
+        "regel": "Kan søker benytte seg av offentlig transport?",
+        "svar": "Ja"
       }, {
-        "regel" : "Har bruker dokumenterte utgifter til reise?",
-        "svar" : "Ja",
-        "begrunnelse" : null
+        "begrunnelse": null,
+        "regel": "Har bruker dokumenterte utgifter til reise?",
+        "svar": "Ja"
       } ]
     } ],
-    "fødselsdatoBarn" : null,
-    "fom" : "2024-02-01",
-    "tom" : "2024-02-02",
-    "utgift" : null,
-    "slettetKommentar" : null,
-    "fakta" : {
-      "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
-      "adresse" : "Tiltaksgata 1",
-      "utgifterOffentligTransport" : 2000,
-      "begrunnelse" : "Begrunnelse",
-      "aktivitetId" : "02c86eca-36e5-451b-a22d-8501a0f7b8ee",
-      "type" : "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT"
-    }
+    "fakta": {
+      "adresse": "Tiltaksgata 1",
+      "aktivitetId": "02c86eca-36e5-451b-a22d-8501a0f7b8ee",
+      "begrunnelse": "Begrunnelse",
+      "reiseId": "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
+      "type": "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT",
+      "utgifterOffentligTransport": 2000
+    },
+    "fom": "2024-02-01",
+    "fødselsdatoBarn": null,
+    "resultat": "OPPFYLT",
+    "slettetKommentar": null,
+    "tom": "2024-02-02",
+    "type": "REISE_TIL_SAMLING",
+    "utgift": null
   }, {
-    "type" : "REISE_TIL_SAMLING",
-    "resultat" : "OPPFYLT",
-    "delvilkår" : [ {
-      "resultat" : "IKKE_TATT_STILLING_TIL",
-      "vurderinger" : [ {
-        "regel" : "Har bruker nødvendige utgifter til reise til samling?",
-        "svar" : "Ja",
-        "begrunnelse" : null
+    "delvilkår": [ {
+      "resultat": "IKKE_TATT_STILLING_TIL",
+      "vurderinger": [ {
+        "begrunnelse": null,
+        "regel": "Har bruker nødvendige utgifter til reise til samling?",
+        "svar": "Ja"
       }, {
-        "regel" : "Er reiseavstanden over 30km?",
-        "svar" : "Ja",
-        "begrunnelse" : "antall km"
+        "begrunnelse": "antall km",
+        "regel": "Er reiseavstanden over 30km?",
+        "svar": "Ja"
       }, {
-        "regel" : "Er samlingen obligatorisk?",
-        "svar" : "Ja",
-        "begrunnelse" : null
+        "begrunnelse": null,
+        "regel": "Er samlingen obligatorisk?",
+        "svar": "Ja"
       }, {
-        "regel" : "Kan søker benytte seg av offentlig transport?",
-        "svar" : "Nei",
-        "begrunnelse" : null
+        "begrunnelse": null,
+        "regel": "Kan søker benytte seg av offentlig transport?",
+        "svar": "Nei"
       }, {
-        "regel" : "Kan bruker benytte privat bil?",
-        "svar" : "Ja",
-        "begrunnelse" : null
+        "begrunnelse": null,
+        "regel": "Kan bruker benytte privat bil?",
+        "svar": "Ja"
       } ]
     } ],
-    "fødselsdatoBarn" : null,
-    "fom" : "2025-01-01",
-    "tom" : "2025-02-28",
-    "utgift" : null,
-    "slettetKommentar" : null,
-    "fakta" : {
-      "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
-      "adresse" : "Tiltaksgata 1",
-      "reiseAvstand" : 40,
-      "begrunnelse" : "Begrunnelse",
-      "aktivitetId" : "02c86eca-36e5-451b-a22d-8501a0f7b8ee",
-      "bompenger" : 40,
-      "fergekostnad" : 50,
-      "parkering" : 40,
-      "piggdekkavgift" : 50,
-      "type" : "REISE_TIL_SAMLING_PRIVAT_BIL"
-    }
-  } ],
-  "vedtak" : {
-    "innvilgelseBegrunnelse" : "Sånn her vil en begrunnelse se ut i det interne vedtaket",
-    "type" : "INNVILGELSE"
-  },
-  "beregningsresultat" : {
-    "tilsynBarn" : null,
-    "læremidler" : null,
-    "boutgifter" : null,
-    "dagligReise" : null,
-    "reiseTilSamling" : {
-      "offentligTransport" : [ {
-        "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
-        "adresse" : "Testveien 1, 1234 Testby",
-        "fom" : "2024-01-01",
-        "tom" : "2024-01-31",
-        "beløp" : 3000,
-        "aktivitetId" : "02c86eca-36e5-451b-a22d-8501a0f7b8ee",
-        "fraTidligereVedtak" : false
-      }, {
-        "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
-        "adresse" : "Testveien 2, 2345 Testby",
-        "fom" : "2025-01-01",
-        "tom" : "2025-01-31",
-        "beløp" : 3000,
-        "aktivitetId" : "02c86eca-36e5-451b-a22d-8501a0f7b8ee",
-        "fraTidligereVedtak" : false
-      } ],
-      "privatBil" : [ {
-        "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
-        "adresse" : "Testveien 2, 1234 Testby",
-        "fom" : "2024-01-01",
-        "tom" : "2024-01-31",
-        "sats" : 3.5,
-        "totaltReiseavstand" : 60,
-        "bompenger" : 40,
-        "fergekostnad" : 50,
-        "parkering" : 40,
-        "piggdekkavgift" : 40,
-        "beløp" : 380,
-        "aktivitetId" : "02c86eca-36e5-451b-a22d-8501a0f7b8ee",
-        "fraTidligereVedtak" : false
-      } ],
-      "beregningsplan" : {
-        "omfang" : "ALLE_PERIODER"
-      }
-    }
-  },
-  "rammevedtakPrivatBil" : null
+    "fakta": {
+      "adresse": "Tiltaksgata 1",
+      "aktivitetId": "02c86eca-36e5-451b-a22d-8501a0f7b8ee",
+      "begrunnelse": "Begrunnelse",
+      "bompenger": 40,
+      "fergekostnad": 50,
+      "parkering": 40,
+      "piggdekkavgift": 50,
+      "reiseAvstand": 40,
+      "reiseId": "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
+      "type": "REISE_TIL_SAMLING_PRIVAT_BIL"
+    },
+    "fom": "2025-01-01",
+    "fødselsdatoBarn": null,
+    "resultat": "OPPFYLT",
+    "slettetKommentar": null,
+    "tom": "2025-02-28",
+    "type": "REISE_TIL_SAMLING",
+    "utgift": null
+  } ]
 }

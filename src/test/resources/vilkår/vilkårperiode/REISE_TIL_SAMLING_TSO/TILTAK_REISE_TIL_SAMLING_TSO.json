@@ -1,10 +1,10 @@
 {
+  "fakta": { },
   "type": "TILTAK_REISE_TIL_SAMLING_TSO",
-  "fakta": {},
   "vurderinger": {
     "lønnet": {
-      "svar": "NEI",
-      "resultat": "OPPFYLT"
+      "resultat": "OPPFYLT",
+      "svar": "NEI"
     }
   }
 }
