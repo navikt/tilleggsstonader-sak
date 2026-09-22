@@ -8,10 +8,14 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetDagligRei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetDagligReiseTsrFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetLæremidlerFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetPassAvBarnFaktaOgVurderingerDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetReiseTilSamlingTsoFaktaOgVurderingerDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.AktivitetReiseTilSamlingTsrFaktaOgVurderingerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetPassAvBarnDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetReiseTilSamlingTsoDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetReiseTilSamlingTsrDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgVurderingerDto
@@ -74,6 +78,14 @@ private fun FaktaOgVurderingerDto.tilFaktaOgSvarDto(): FaktaOgSvarDto =
                 svarLønnet = this.lønnet?.svar,
             )
         }
+
+        is AktivitetReiseTilSamlingTsoFaktaOgVurderingerDto -> {
+            FaktaOgSvarAktivitetReiseTilSamlingTsoDto(
+                svarLønnet = this.lønnet?.svar,
+            )
+        }
+
+        is AktivitetReiseTilSamlingTsrFaktaOgVurderingerDto -> FaktaOgSvarAktivitetReiseTilSamlingTsrDto
 
         is MålgruppeFaktaOgVurderingerDto -> {
             FaktaOgSvarMålgruppeDto(

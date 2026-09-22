@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
@@ -35,6 +36,7 @@ class ReiseTilSamlingBeregningsTest {
     private val vedtaksperiodeValideringService = mockk<VedtaksperiodeValideringService>()
     private val satsReiseTilSamlingPrivatBilProvider = mockk<SatsPrivatBilProvider>()
     private val arbeidsfordelingService = mockk<ArbeidsfordelingService>()
+    private val vedtakRepository = mockk<VedtakRepository>()
 
     private val beregningService =
         ReiseTilSamlingBeregningService(
@@ -42,6 +44,7 @@ class ReiseTilSamlingBeregningsTest {
             vedtaksperiodeValideringService,
             satsReiseTilSamlingPrivatBilProvider,
             arbeidsfordelingService,
+            vedtakRepository,
         )
 
     private val behandling = saksbehandling()

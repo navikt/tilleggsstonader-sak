@@ -15,6 +15,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
@@ -304,6 +306,26 @@ data class TidligsteEndringIBehandlingUtleder(
                     faktaNå.reiseavstandEnVei != faktaTidligere.reiseavstandEnVei ||
                     normaliserPrivatBilDelperioder(faktaNå, sammenligningsFom, sammenligningsTom) !=
                     normaliserPrivatBilDelperioder(faktaTidligere, sammenligningsFom, sammenligningsTom)
+            }
+
+            vilkårNå.fakta is FaktaReiseTilSamlingOffentligTransport &&
+                vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingPrivatBil -> {
+                true
+            }
+
+            vilkårNå.fakta is FaktaReiseTilSamlingPrivatBil &&
+                vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingOffentligTransport -> {
+                true
+            }
+
+            vilkårNå.fakta is FaktaReiseTilSamlingOffentligTransport &&
+                vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingOffentligTransport -> {
+                vilkårNå.fakta != vilkårTidligereBehandling.fakta
+            }
+
+            vilkårNå.fakta is FaktaReiseTilSamlingPrivatBil &&
+                vilkårTidligereBehandling.fakta is FaktaReiseTilSamlingPrivatBil -> {
+                vilkårNå.fakta != vilkårTidligereBehandling.fakta
             }
 
             else -> {

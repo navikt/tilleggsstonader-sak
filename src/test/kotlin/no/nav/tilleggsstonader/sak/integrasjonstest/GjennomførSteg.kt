@@ -39,6 +39,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårReiseOppstartAvslutningHjemreiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.LagreVilkårReiseTilSamlingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.VilkårReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.SlettVikårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.VilkårperioderDto
 import org.springframework.test.web.servlet.client.RestTestClient
@@ -140,6 +141,10 @@ fun IntegrationTest.gjennomførVilkårSteg(
         kall.vilkårDagligReise.hentVilkår(behandlingId)
     }
 
+    val vilkårReiseTilSamling: List<VilkårReiseTilSamlingDto> by lazy {
+        kall.vilkårReiseTilSamling.hentVilkår(behandlingId)
+    }
+
     val vilkår: VilkårsvurderingDto by lazy {
         kall.vilkår.hentVilkår(behandlingId)
     }
@@ -188,6 +193,14 @@ fun IntegrationTest.gjennomførVilkårSteg(
         testdata.vilkår.deleteDagligReise
             .map { it(vilkårDagligReise) }
             .forEach { (vilkårId, dto) -> kall.vilkårDagligReise.slettVilkår(behandlingId, vilkårId, dto) }
+    } else if (stønadstype.gjelderReiseTilSamling()) {
+        testdata.vilkår.updateReiseTilSamling
+            .map { it(vilkårReiseTilSamling) }
+            .forEach { (vilkårId, dto) -> kall.vilkårReiseTilSamling.oppdaterVilkår(dto, vilkårId, behandlingId) }
+
+        testdata.vilkår.deleteReiseTilSamling
+            .map { it(vilkårReiseTilSamling) }
+            .forEach { (vilkårId, dto) -> kall.vilkårReiseTilSamling.slettVilkår(behandlingId, vilkårId, dto) }
     } else {
         testdata.vilkår.update
             .map { it(vilkår) }

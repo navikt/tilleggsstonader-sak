@@ -155,14 +155,16 @@
         "fom" : "2024-01-01",
         "tom" : "2024-01-31",
         "beløp" : 3000,
-        "aktivitetId" : "02c86eca-36e5-451b-a22d-8501a0f7b8ee"
+        "aktivitetId" : "02c86eca-36e5-451b-a22d-8501a0f7b8ee",
+        "fraTidligereVedtak" : false
       }, {
         "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
         "adresse" : "Testveien 2, 2345 Testby",
         "fom" : "2025-01-01",
         "tom" : "2025-01-31",
         "beløp" : 3000,
-        "aktivitetId" : "02c86eca-36e5-451b-a22d-8501a0f7b8ee"
+        "aktivitetId" : "02c86eca-36e5-451b-a22d-8501a0f7b8ee",
+        "fraTidligereVedtak" : false
       } ],
       "privatBil" : [ {
         "reiseId" : "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
@@ -176,7 +178,8 @@
         "parkering" : 40,
         "piggdekkavgift" : 40,
         "beløp" : 380,
-        "aktivitetId" : "02c86eca-36e5-451b-a22d-8501a0f7b8ee"
+        "aktivitetId" : "02c86eca-36e5-451b-a22d-8501a0f7b8ee",
+        "fraTidligereVedtak" : false
       } ],
       "beregningsplan" : {
         "omfang" : "ALLE_PERIODER"
