@@ -72,7 +72,7 @@ class FaktaReiseTilSamlingTest {
                     faktaPrivatBil(parkering = FaktaPrivatBil.MAKS_PARKERING.add(BigDecimal.ONE))
                 }
             assertThat(feil.message)
-                .isEqualTo("Skal du innvilge med parkering høyere enn 1000kr må du ta kontakt med Tilleggsstønader-teamet")
+                .isEqualTo("Skal du innvilge med parkering høyere enn 2000kr må du ta kontakt med Tilleggsstønader-teamet")
         }
 
         @Test
