@@ -45,7 +45,7 @@ object FileUtil {
      *
      * Kan også settes via environment variable: SKRIV_TIL_FIL=true
      */
-    val SKRIV_TIL_FIL = System.getenv("SKRIV_TIL_FIL")?.toBoolean() ?: true
+    val SKRIV_TIL_FIL = System.getenv("SKRIV_TIL_FIL")?.toBoolean() ?: false
 
     fun assertFileJsonIsEqual(
         filnavn: String,
