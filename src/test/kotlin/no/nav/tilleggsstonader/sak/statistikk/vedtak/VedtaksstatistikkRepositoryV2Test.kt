@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak
 
-import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -18,7 +17,7 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtakResultatDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
-import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
+import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileJsonIsEqual
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
@@ -45,9 +44,9 @@ class VedtaksstatistikkRepositoryV2Test : CleanDatabaseIntegrationTest() {
                 columnNames
                     .filter { it != "endret_tid" } // endret_tid endrer seg hver gang man lagrer vedtaksstatistikk
                     .associate { it to rs.getString(it) }
+                    .toMap()
             }
-        val json = jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(res)
-        assertFileIsEqual("statistikk/vedtaksstatistikk.json", json)
+        assertFileJsonIsEqual("statistikk/vedtaksstatistikk.json", res)
     }
 
     private fun vedtaksstatistikk() =
