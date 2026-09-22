@@ -31,7 +31,8 @@ import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.OpphørPassAvBarnReques
 import no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise.dto.InnvilgelseReiseOppstartAvslutningHjemreiseTsoRequest
 import no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise.dto.InnvilgelseReiseOppstartAvslutningHjemreiseTsrRequest
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.AvslagReiseTilSamlingDto
-import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingVedtakRequest
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingTsoRequest
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingTsrRequest
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.dto.BeslutteVedtakDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreVilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
@@ -264,10 +265,12 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                                     vedtaksperioder = vedtaksperioder.tilVedtaksperiodeDagligReiseDto(),
                                 )
 
-                            Stønadstype.REISE_TIL_SAMLING_TSO,
-                            Stønadstype.REISE_TIL_SAMLING_TSR,
-                            ->
-                                InnvilgelseReiseTilSamlingVedtakRequest(
+                            Stønadstype.REISE_TIL_SAMLING_TSO ->
+                                InnvilgelseReiseTilSamlingTsoRequest(
+                                    vedtaksperioder = vedtaksperioder,
+                                )
+                            Stønadstype.REISE_TIL_SAMLING_TSR ->
+                                InnvilgelseReiseTilSamlingTsrRequest(
                                     vedtaksperioder = vedtaksperioder,
                                 )
 

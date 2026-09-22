@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseOppstartAvslutningHjemreise
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseTilSamling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
@@ -68,6 +69,7 @@ class VedtakKall(
         innvilgelseDto: VedtakRequest,
     ) {
         if (stønadstype.gjelderDagligReise() ||
+            stønadstype.gjelderReiseTilSamling() ||
             stønadstype.gjelderReiseOppstartAvslutningHjemreise()
         ) {
             return lagreEnhetsspesifiktVedtak(
@@ -118,6 +120,7 @@ class VedtakKall(
             innvilgelseDto: VedtakRequest,
         ): RestTestClient.ResponseSpec {
             if (stønadstype.gjelderDagligReise() ||
+                stønadstype.gjelderReiseTilSamling() ||
                 stønadstype.gjelderReiseOppstartAvslutningHjemreise()
             ) {
                 return lagreEnhetsspesifiktVedtak(
