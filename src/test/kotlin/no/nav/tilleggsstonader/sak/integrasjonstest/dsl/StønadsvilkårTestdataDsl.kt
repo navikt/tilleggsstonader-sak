@@ -193,14 +193,16 @@ class OpprettStønadsvilkårDsl {
         tom: LocalDate,
         reiseId: ReiseId = dummyReiseId,
         utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
+        hentAktivitet: (List<VilkårperiodeDto>) -> VilkårperiodeDto? = { null },
     ) {
-        dtoer += { _, _, _ ->
+        dtoer += { _, _, aktiviteter ->
             lagreReiseTilSamlingDto(
                 fom = fom,
                 tom = tom,
                 reiseId = reiseId,
                 utgifterOffentligTransport = utgifterOffentligTransport,
-            )
+                aktivitet = hentAktivitet(aktiviteter),
+                )
         }
     }
 

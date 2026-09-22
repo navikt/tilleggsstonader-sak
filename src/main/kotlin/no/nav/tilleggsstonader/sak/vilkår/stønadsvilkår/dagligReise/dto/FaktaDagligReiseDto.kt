@@ -94,10 +94,10 @@ data class FaktaDagligReisePrivatBilDto(
     private fun validerBompengerOgFergekostnader() {
         faktaDelperioder.forEach { delperiode ->
             brukerfeilHvis(delperiode.bompengerPerDag != null && delperiode.bompengerPerDag > BigDecimal(500)) {
-                "Skal du innvilge med bompenger høyere enn 500kr må du ta kontakt med Tilleggsstønader-temet"
+                "Skal du innvilge med bompenger høyere enn 500kr må du ta kontakt med Tilleggsstønader-teamet"
             }
             brukerfeilHvis(delperiode.fergekostnadPerDag != null && delperiode.fergekostnadPerDag > BigDecimal(900)) {
-                "Skal du innvilge med fergekostnader høyere enn 900kr må du ta kontakt med Tilleggsstønader-temet"
+                "Skal du innvilge med fergekostnader høyere enn 900kr må du ta kontakt med Tilleggsstønader-teamet"
             }
         }
     }

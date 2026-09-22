@@ -71,7 +71,7 @@ data class FaktaPrivatBil(
     override val reiseId: ReiseId,
     override val adresse: String?,
     val reiseavstand: BigDecimal,
-    val begrunnelse: String,
+    val begrunnelse: String?,
     val aktivitetId: VilkårperiodeGlobalId? = null,
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,
@@ -80,10 +80,17 @@ data class FaktaPrivatBil(
 ) : FaktaReiseTilSamling {
     override val type = TypeReiseTilSamling.PRIVAT_BIL
 
+    companion object {
+        val MAKS_BOMPENGER = BigDecimal(500)
+        val MAKS_FERGEKOSTNAD = BigDecimal(900)
+        val MAKS_PARKERING = BigDecimal(2000)
+        val MAKS_PIGGDEKKAVGIFT = BigDecimal(1400)
+    }
+
     init {
         validerIngenNegativReiseavstand()
         validerIngenNegativeUtgifter()
-        validerBegrunnelse()
+        validerMaksbeløpUtgifter()
     }
 
     override fun mapTilVilkårFakta() =
@@ -122,9 +129,18 @@ data class FaktaPrivatBil(
         }
     }
 
-    private fun validerBegrunnelse() {
-        brukerfeilHvis(begrunnelse.isBlank()) {
-            "Spesifikasjon av utgift må fylles ut"
+    private fun validerMaksbeløpUtgifter() {
+        brukerfeilHvis(bompenger != null && bompenger > MAKS_BOMPENGER) {
+            "Skal du innvilge med bompenger høyere enn ${MAKS_BOMPENGER}kr må du ta kontakt med Tilleggsstønader-teamet"
+        }
+        brukerfeilHvis(fergekostnad != null && fergekostnad > MAKS_FERGEKOSTNAD) {
+            "Skal du innvilge med fergekostnad høyere enn ${MAKS_FERGEKOSTNAD}kr må du ta kontakt med Tilleggsstønader-teamet"
+        }
+        brukerfeilHvis(parkering != null && parkering > MAKS_PARKERING) {
+            "Skal du innvilge med parkering høyere enn ${MAKS_PARKERING}kr må du ta kontakt med Tilleggsstønader-teamet"
+        }
+        brukerfeilHvis(piggdekkavgift != null && piggdekkavgift > MAKS_PIGGDEKKAVGIFT) {
+            "Skal du innvilge med piggdekkavgift høyere enn ${MAKS_PIGGDEKKAVGIFT}kr må du ta kontakt med Tilleggsstønader-teamet"
         }
     }
 }

@@ -78,7 +78,7 @@ private fun IntegrationTest.mockStrukturertSøknadForJournalpost(
     journalpost: Journalpost,
     stønadstype: Stønadstype,
 ) {
-    if (stønadstype == Stønadstype.DAGLIG_REISE_TSO) {
+    if (stønadstype == Stønadstype.DAGLIG_REISE_TSO || stønadstype == Stønadstype.REISE_TIL_SAMLING_TSO) {
         // Samme søknad for TSO og TSR, rutes ved sjekk på ytelser i HåndterSøknadService
         every { ytelseClient.hentYtelser(any()) } returns ytelsePerioderDtoAAP()
     }
