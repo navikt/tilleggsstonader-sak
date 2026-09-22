@@ -202,7 +202,7 @@ class OpprettStønadsvilkårDsl {
                 reiseId = reiseId,
                 utgifterOffentligTransport = utgifterOffentligTransport,
                 aktivitet = hentAktivitet(aktiviteter),
-                )
+            )
         }
     }
 
