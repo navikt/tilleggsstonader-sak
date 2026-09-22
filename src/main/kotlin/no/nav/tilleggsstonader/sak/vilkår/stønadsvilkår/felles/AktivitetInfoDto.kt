@@ -1,4 +1,4 @@
-package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto
+package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.felles
 
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeAktivitet

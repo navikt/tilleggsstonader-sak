@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.felles.AktivitetInfoDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling

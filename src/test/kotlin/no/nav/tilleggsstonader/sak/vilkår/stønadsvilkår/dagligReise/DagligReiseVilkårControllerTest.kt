@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.Fakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReisePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseUbestemtDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.felles.AktivitetInfoDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreVilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
@@ -119,6 +120,51 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 aktivitet {
                     opprett {
                         aktivitetTiltakTso(fom = fom, tom = tom)
+                    }
+
+                    @Test
+                    fun `skal kunne lagre privat bil med ny aktivitet-shape`() {
+                        val fom = 1 januar 2026
+                        val tom = 31 januar 2026
+
+                        val behandlingContext =
+                            opprettBehandlingOgGjennomførBehandlingsløp(
+                                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+                                tilSteg = StegType.VILKÅR,
+                            ) {
+                                aktivitet {
+                                    opprett {
+                                        aktivitetTiltakTso(fom = fom, tom = tom)
+                                    }
+                                }
+                                målgruppe {
+                                    opprett {
+                                        målgruppeAAP(fom = fom, tom = tom)
+                                    }
+                                }
+                            }
+
+                        val aktivitet =
+                            kall.vilkårperiode
+                                .hentForBehandling(behandlingContext.behandlingId)
+                                .vilkårperioder.aktiviteter
+                                .single()
+
+                        val nyttVilkår =
+                            LagreVilkårDagligReiseDto(
+                                fom = fom,
+                                tom = tom,
+                                adresse = "Tiltaksveien 1",
+                                reiseId = dummyReiseId,
+                                svar = svarPrivatBil,
+                                fakta = faktaPrivatBilNyShape(aktivitet),
+                            )
+
+                        val opprettetVilkår = kall.vilkårDagligReise.opprettVilkår(behandlingContext.behandlingId, nyttVilkår)
+
+                        val fakta = opprettetVilkår.fakta as FaktaDagligReisePrivatBilDto
+                        assertThat(fakta.aktivitet).isNotNull
+                        assertThat(fakta.aktivitetId).isEqualTo(aktivitet.globalId)
                     }
                 }
                 målgruppe {
@@ -327,13 +373,60 @@ class DagligReiseVilkårControllerTest : CleanDatabaseIntegrationTest() {
         aktivitetType = aktivitet.type.toString(),
     )
 
+    private fun faktaPrivatBilNyShape(
+        aktivitet: VilkårperiodeDto,
+    ) = FaktaDagligReisePrivatBilDto(
+        reiseavstandEnVei = BigDecimal("10"),
+        faktaDelperioder =
+            listOf(
+                FaktaDelperiodePrivatBilDto(
+                    fom = 1 januar 2026,
+                    tom = 31 januar 2026,
+                    reisedagerPerUke = 5,
+                    bompengerPerDag = null,
+                    fergekostnadPerDag = null,
+                ),
+            ),
+        aktivitet =
+            AktivitetInfoDto(
+                aktivitetId = aktivitet.globalId,
+                aktivitetType = aktivitet.type.toString(),
+                tiltaksvariantBeskrivelse = aktivitet.tiltaksvariant?.beskrivelse,
+                fom = aktivitet.fom,
+                tom = aktivitet.tom,
+            ),
+        aktivitetId = null,
+        aktivitetType = null,
+        adresse = "Tiltaksveien 1",
+    )
+
     private fun assertLagretVilkår(
         lagreVilkårRequest: LagreVilkårDagligReiseDto,
         resultat: VilkårDagligReiseDto,
     ) {
         assertThat(resultat.fom).isEqualTo(lagreVilkårRequest.fom)
         assertThat(resultat.tom).isEqualTo(lagreVilkårRequest.tom)
-        assertThat(resultat.fakta).isEqualTo(lagreVilkårRequest.fakta)
+        assertThat(resultat.fakta.type).isEqualTo(lagreVilkårRequest.fakta.type)
+        when (val lagretFakta = resultat.fakta) {
+            is FaktaDagligReiseOffentligTransportDto -> {
+                val requestFakta = lagreVilkårRequest.fakta as FaktaDagligReiseOffentligTransportDto
+                assertThat(lagretFakta.reisedagerPerUke).isEqualTo(requestFakta.reisedagerPerUke)
+                assertThat(lagretFakta.prisEnkelbillett).isEqualTo(requestFakta.prisEnkelbillett)
+                assertThat(lagretFakta.prisSyvdagersbillett).isEqualTo(requestFakta.prisSyvdagersbillett)
+                assertThat(lagretFakta.prisTrettidagersbillett).isEqualTo(requestFakta.prisTrettidagersbillett)
+            }
+
+            is FaktaDagligReisePrivatBilDto -> {
+                val requestFakta = lagreVilkårRequest.fakta as FaktaDagligReisePrivatBilDto
+                assertThat(lagretFakta.reiseavstandEnVei).isEqualTo(requestFakta.reiseavstandEnVei)
+                assertThat(lagretFakta.faktaDelperioder).isEqualTo(requestFakta.faktaDelperioder)
+                assertThat(lagretFakta.aktivitetId).isEqualTo(requestFakta.aktivitetId)
+            }
+
+            FaktaDagligReiseUbestemtDto -> {
+                assertThat(lagreVilkårRequest.fakta).isEqualTo(FaktaDagligReiseUbestemtDto)
+            }
+        }
         assertThat(resultat.delvilkårsett).hasSize(1)
 
         assertAlleSvarHarFåttVurdering(delvilkår = resultat.delvilkårsett, svar = lagreVilkårRequest.svar)

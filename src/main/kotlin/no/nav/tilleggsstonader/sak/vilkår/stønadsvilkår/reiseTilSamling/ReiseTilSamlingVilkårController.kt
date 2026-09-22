@@ -7,6 +7,8 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.felles.AktivitetInfoDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.felles.tilAktivitetInfoDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelstrukturDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggRegelstrukturFraVilkårregel.tilRegelstruktur
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegel
@@ -17,12 +19,10 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domai
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.VilkårReiseTilSamling
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.AktivitetInfoDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.LagreVilkårReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.SlettVilkårResultatDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.VilkårReiseTilSamlingDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.tilAktivitetInfoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import org.springframework.web.bind.annotation.DeleteMapping

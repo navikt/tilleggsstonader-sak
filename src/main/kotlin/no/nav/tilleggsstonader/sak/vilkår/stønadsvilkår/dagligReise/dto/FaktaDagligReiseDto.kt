@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.felles.AktivitetInfoDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.FaktaPrivatBil
@@ -40,6 +41,8 @@ data class FaktaDagligReiseOffentligTransportDto(
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int?,
+    val aktivitet: AktivitetInfoDto? = null,
+    @Deprecated("Bruk aktivitet. Fjernes i neste PR.")
     val tiltaksvariant: TypeAktivitet? = null,
 ) : FaktaDagligReiseDto {
     override val type = TypeDagligReise.OFFENTLIG_TRANSPORT
@@ -54,6 +57,7 @@ data class FaktaDagligReiseOffentligTransportDto(
         prisEnkelbillett = prisEnkelbillett,
         prisTrettidagersbillett = prisTrettidagersbillett,
         prisSyvdagersbillett = prisSyvdagersbillett,
+        aktivitetId = aktivitet?.aktivitetId,
         tiltaksvariant = tiltaksvariant,
     )
 }
@@ -61,9 +65,12 @@ data class FaktaDagligReiseOffentligTransportDto(
 data class FaktaDagligReisePrivatBilDto(
     val reiseavstandEnVei: BigDecimal,
     val faktaDelperioder: List<FaktaDelperiodePrivatBilDto>,
-    val aktivitetId: VilkårperiodeGlobalId,
+    val aktivitet: AktivitetInfoDto? = null,
+    @Deprecated("Bruk aktivitet. Fjernes i neste PR.")
+    val aktivitetId: VilkårperiodeGlobalId? = null,
     val adresse: String?,
-    val aktivitetType: String,
+    @Deprecated("Bruk aktivitet. Fjernes i neste PR.")
+    val aktivitetType: String? = null,
 ) : FaktaDagligReiseDto {
     override val type = TypeDagligReise.PRIVAT_BIL
 
@@ -87,7 +94,7 @@ data class FaktaDagligReisePrivatBilDto(
                     )
                 },
             adresse = adresse,
-            aktivitetId = aktivitetId,
+            aktivitetId = aktivitet?.aktivitetId ?: aktivitetId ?: error("aktivitetId må være satt for privat bil"),
         )
     }
 

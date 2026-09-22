@@ -102,6 +102,8 @@ data class FaktaDagligReiseOffentligTransport(
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int?,
     override val adresse: String?,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
+    @Deprecated("Bruk aktivitetId. Fjernes i neste PR.")
     val tiltaksvariant: TypeAktivitet? = null,
 ) : VilkårFakta
 

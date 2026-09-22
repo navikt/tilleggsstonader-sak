@@ -32,6 +32,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggVi
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegel
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -133,6 +134,7 @@ class DagligReiseVilkårService(
                     prisTrettidagersbillett = this.prisTrettidagersbillett?.takeIf { it > 0 },
                     adresse = this.adresse,
                     periode = periode,
+                    aktivitetId = this.aktivitetId,
                     tiltaksvariant = this.tiltaksvariant,
                 )
             }
@@ -218,7 +220,45 @@ class DagligReiseVilkårService(
         behandlingId: BehandlingId,
     ) {
         val fakta = nyttVilkår.fakta as FaktaPrivatBil
-        val aktivitet = vilkårperiodeService.hentAktivitet(fakta.aktivitetId, behandlingId)
+        validerAktivitetInnenforVilkårsperiode(
+            aktivitetId = fakta.aktivitetId,
+            nyttVilkår = nyttVilkår,
+            behandlingId = behandlingId,
+        )
+    }
+
+    private fun validerAktivitetForOffentligTransport(
+        nyttVilkår: LagreVilkårDagligReise,
+        behandlingId: BehandlingId,
+    ) {
+        val fakta = nyttVilkår.fakta as FaktaOffentligTransport
+        val aktivitetId = fakta.aktivitetId
+        if (aktivitetId != null) {
+            validerAktivitetInnenforVilkårsperiode(
+                aktivitetId = aktivitetId,
+                nyttVilkår = nyttVilkår,
+                behandlingId = behandlingId,
+            )
+            return
+        }
+
+        val tiltaksvariant = fakta.tiltaksvariant
+        brukerfeilHvis(tiltaksvariant == null) {
+            "Aktivitet må velges for offentlig transport (aktivitetId eller tiltaksvariant)"
+        }
+        vilkårperiodeService.validerAktivitetMedTiltaksvariantInnenforPeriode(
+            tiltaksvariant = tiltaksvariant,
+            periode = Datoperiode(fom = nyttVilkår.fom, tom = nyttVilkår.tom),
+            behandlingId = behandlingId,
+        )
+    }
+
+    private fun validerAktivitetInnenforVilkårsperiode(
+        aktivitetId: VilkårperiodeGlobalId,
+        nyttVilkår: LagreVilkårDagligReise,
+        behandlingId: BehandlingId,
+    ) {
+        val aktivitet = vilkårperiodeService.hentAktivitet(aktivitetId, behandlingId)
         brukerfeilHvis(aktivitet == null) {
             "Aktiviteten finnes ikke"
         }
@@ -228,20 +268,5 @@ class DagligReiseVilkårService(
         brukerfeilHvisIkke(aktivitet.inneholder(nyttVilkår)) {
             "Aktiviteten er ikke oppfylt hele vilkårperioden"
         }
-    }
-
-    private fun validerAktivitetForOffentligTransport(
-        nyttVilkår: LagreVilkårDagligReise,
-        behandlingId: BehandlingId,
-    ) {
-        val fakta = nyttVilkår.fakta as FaktaOffentligTransport
-        brukerfeilHvis(fakta.tiltaksvariant == null) {
-            "Aktivitet må velges for offentlig transport"
-        }
-        vilkårperiodeService.validerAktivitetMedTiltaksvariantInnenforPeriode(
-            tiltaksvariant = fakta.tiltaksvariant,
-            periode = Datoperiode(fom = nyttVilkår.fom, tom = nyttVilkår.tom),
-            behandlingId = behandlingId,
-        )
     }
 }

@@ -96,7 +96,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.F
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingPrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.LagreVilkårReiseTilSamlingDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.tilAktivitetInfoDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.felles.tilAktivitetInfoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType

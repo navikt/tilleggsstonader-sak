@@ -11,10 +11,11 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.Fakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDagligReiseUbestemtDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.FaktaDelperiodePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.felles.AktivitetInfoDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
 
 object VilkårDagligReiseDtoMapper {
-    fun VilkårDagligReise.tilDto(aktivitetType: String? = null) =
+    fun VilkårDagligReise.tilDto(aktivitet: AktivitetInfoDto? = null) =
         VilkårDagligReiseDto(
             id = this.id,
             fom = this.fom,
@@ -24,27 +25,28 @@ object VilkårDagligReiseDtoMapper {
             resultat = this.resultat,
             status = this.status,
             delvilkårsett = this.delvilkårsett.map { it.tilDto() },
-            fakta = this.fakta.tilDto(aktivitetType = aktivitetType),
+            fakta = this.fakta.tilDto(aktivitet = aktivitet),
             slettetKommentar = this.slettetKommentar,
         )
 
-    private fun FaktaDagligReise.tilDto(aktivitetType: String? = null): FaktaDagligReiseDto =
+    private fun FaktaDagligReise.tilDto(aktivitet: AktivitetInfoDto?): FaktaDagligReiseDto =
         when (this) {
-            is FaktaOffentligTransport -> this.tilDto()
-            is FaktaPrivatBil -> this.tilDto(aktivitetType = aktivitetType ?: error("aktivitetType må være satt for privat bil"))
+            is FaktaOffentligTransport -> this.tilDto(aktivitet = aktivitet)
+            is FaktaPrivatBil -> this.tilDto(aktivitet = aktivitet)
             is FaktaUbestemtType -> FaktaDagligReiseUbestemtDto
         }
 
-    private fun FaktaOffentligTransport.tilDto() =
+    private fun FaktaOffentligTransport.tilDto(aktivitet: AktivitetInfoDto?) =
         FaktaDagligReiseOffentligTransportDto(
             reisedagerPerUke = reisedagerPerUke,
             prisEnkelbillett = prisEnkelbillett,
             prisSyvdagersbillett = prisSyvdagersbillett,
             prisTrettidagersbillett = prisTrettidagersbillett,
+            aktivitet = aktivitet,
             tiltaksvariant = tiltaksvariant,
         )
 
-    private fun FaktaPrivatBil.tilDto(aktivitetType: String) =
+    private fun FaktaPrivatBil.tilDto(aktivitet: AktivitetInfoDto?) =
         FaktaDagligReisePrivatBilDto(
             reiseavstandEnVei = reiseavstandEnVei,
             faktaDelperioder =
@@ -58,7 +60,8 @@ object VilkårDagligReiseDtoMapper {
                     )
                 },
             adresse = adresse,
-            aktivitetId = aktivitetId,
-            aktivitetType = aktivitetType,
+            aktivitet = aktivitet,
+            aktivitetId = aktivitet?.aktivitetId,
+            aktivitetType = aktivitet?.aktivitetType,
         )
 }
