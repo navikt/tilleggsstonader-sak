@@ -33,7 +33,6 @@ data class BeregningsgrunnlagPrivatBilForSamling(
     val fom: LocalDate,
     val tom: LocalDate,
     val sats: BigDecimal,
-    @com.fasterxml.jackson.annotation.JsonAlias("totaltReiseavstand")
     val reiseavstand: BigDecimal,
     val bompenger: BigDecimal?,
     val fergekostnad: BigDecimal?,
