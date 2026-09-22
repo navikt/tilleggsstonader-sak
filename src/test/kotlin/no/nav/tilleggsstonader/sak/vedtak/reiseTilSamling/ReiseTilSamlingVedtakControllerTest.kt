@@ -21,7 +21,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.BeregningsresultatOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.BeregningsresultatReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingResponse
-import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingTsoRequest
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingVedtakRequest
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -121,7 +121,7 @@ class ReiseTilSamlingVedtakControllerTest : CleanDatabaseIntegrationTest() {
 
     @Test
     fun `hent ut lagrede vedtak av type innvilgelse`() {
-        val vedtakRequest = InnvilgelseReiseTilSamlingTsoRequest(listOf(dummyVedtaksperiode.tilDto()))
+        val vedtakRequest = InnvilgelseReiseTilSamlingVedtakRequest(listOf(dummyVedtaksperiode.tilDto()))
 
         kall.vedtak.lagreInnvilgelse(
             Stønadstype.REISE_TIL_SAMLING_TSO,
@@ -143,11 +143,11 @@ class ReiseTilSamlingVedtakControllerTest : CleanDatabaseIntegrationTest() {
         fun `beregner offentlig transport basert på relevante vilkårperioder`() {
             val utgifter = 500.toBigDecimal()
 
-            val request = InnvilgelseReiseTilSamlingTsoRequest(listOf(vedtaksperiode(fom = fom, tom = tom).tilDto()))
+            val request = InnvilgelseReiseTilSamlingVedtakRequest(listOf(vedtaksperiode(fom = fom, tom = tom).tilDto()))
 
             val respons =
                 kall.testklient
-                    .post("/api/vedtak/reise-til-samling/$dummyBehandlingId/tso/beregn", request)
+                    .post("/api/vedtak/reise-til-samling/$dummyBehandlingId/beregn", request)
                     .expectOkWithBody<BeregningsresultatReiseTilSamlingDto>()
 
             val offentligTransport = checkNotNull(respons.offentligTransport)

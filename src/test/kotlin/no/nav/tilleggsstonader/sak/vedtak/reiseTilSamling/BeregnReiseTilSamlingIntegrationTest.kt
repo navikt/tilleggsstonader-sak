@@ -7,7 +7,7 @@ import no.nav.tilleggsstonader.sak.IntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
-import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingTsoRequest
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingVedtakRequest
 import org.junit.jupiter.api.Test
 
 class BeregnReiseTilSamlingIntegrationTest : IntegrationTest() {
@@ -47,7 +47,7 @@ class BeregnReiseTilSamlingIntegrationTest : IntegrationTest() {
         kall.beregnReiseTilSamling
             .beregn(
                 behandlingContextNay.behandlingId,
-                InnvilgelseReiseTilSamlingTsoRequest(
+                InnvilgelseReiseTilSamlingVedtakRequest(
                     vedtaksperioder = vedtaksperioder,
                 ),
             ).expectStatus()

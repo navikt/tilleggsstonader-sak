@@ -22,7 +22,7 @@ sealed interface InnvilgelseReiseTilSamlingRequest : VedtakReiseTilSamlingReques
     fun vedtaksperioder(): List<Vedtaksperiode>
 }
 
-data class InnvilgelseReiseTilSamlingTsoRequest(
+data class InnvilgelseReiseTilSamlingVedtakRequest(
     val vedtaksperioder: List<VedtaksperiodeDto>,
     override val begrunnelse: String? = null,
 ) : InnvilgelseReiseTilSamlingRequest {

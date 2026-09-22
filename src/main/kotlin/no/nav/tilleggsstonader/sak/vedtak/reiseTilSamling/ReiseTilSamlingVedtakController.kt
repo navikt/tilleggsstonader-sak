@@ -18,7 +18,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSamlingBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.AvslagReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.BeregningsresultatReiseTilSamlingDto
-import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingTsoRequest
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingVedtakRequest
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.VedtakReiseTilSamlingRequest
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
@@ -54,10 +54,10 @@ class ReiseTilSamlingVedtakController(
         return vedtakDtoMapper.toDto(vedtak, behandling.forrigeIverksatteBehandlingId)
     }
 
-    @PostMapping("{behandlingId}/tso/beregn")
+    @PostMapping("{behandlingId}/beregn")
     fun beregn(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtak: InnvilgelseReiseTilSamlingTsoRequest,
+        @RequestBody vedtak: InnvilgelseReiseTilSamlingVedtakRequest,
     ): BeregningsresultatReiseTilSamlingDto = beregnVedtak(behandlingId, vedtak.vedtaksperioder())
 
     private fun beregnVedtak(
@@ -81,10 +81,10 @@ class ReiseTilSamlingVedtakController(
         return beregningsresultat.tilDto(beregningsplan = plan)
     }
 
-    @PostMapping("{behandlingId}/tso/innvilgelse")
+    @PostMapping("{behandlingId}/innvilgelse")
     fun innvilge(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtak: InnvilgelseReiseTilSamlingTsoRequest,
+        @RequestBody vedtak: InnvilgelseReiseTilSamlingVedtakRequest,
     ): StegFerdigstiltResponse = lagreVedtak(behandlingId, vedtak).tilStegFerdigstiltResponse()
 
     @PostMapping("{behandlingId}/avslag")
