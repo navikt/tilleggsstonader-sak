@@ -93,6 +93,61 @@ class RevurderingReiseTilSamlingIntegrationTest(
     }
 
     @Test
+    fun `ny reise legges til i tillegg til uendret privatbil-reise - ny reberegnes, gammel gjenbrukes`() {
+        val reiseA = ReiseId.random()
+        val reiseB = ReiseId.random()
+
+        val førstegangsbehandling =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO,
+            ) {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTsoReiseTilSamling(1 januar 2025, 31 januar 2025)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(1 januar 2025, 31 januar 2025)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        privatBilReiseTilSamling(1 januar 2025, 31 januar 2025, reiseId = reiseA)
+                    }
+                }
+            }
+
+        testoppsettService.settAndelerTilOkForBehandling(førstegangsbehandling.behandlingId)
+
+        val revurderingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = førstegangsbehandling.behandlingId,
+            ) {
+                aktivitet {
+                    oppdaterTomPåEnesteAktivitet(28 februar 2025)
+                }
+                målgruppe {
+                    oppdaterTomPåEnesteMålgruppe(28 februar 2025)
+                }
+                vilkår {
+                    opprett {
+                        privatBilReiseTilSamling(1 februar 2025, 28 februar 2025, reiseId = reiseB)
+                    }
+                }
+            }
+
+        val resultat = hentBeregningsresultat(revurderingId)
+        assertThat(resultat.privatBil).hasSize(2)
+
+        val gammelReise = resultat.privatBil.single { it.reiseId == reiseA }
+        val nyReise = resultat.privatBil.single { it.reiseId == reiseB }
+
+        assertThat(gammelReise.fraTidligereVedtak).isTrue()
+        assertThat(nyReise.fraTidligereVedtak).isFalse()
+    }
+
+    @Test
     fun `endret beløp på eksisterende offentlig transport-reise reberegnes med nytt beløp`() {
         val førstegangsbehandling =
             opprettBehandlingOgGjennomførBehandlingsløp(
@@ -222,6 +277,45 @@ class RevurderingReiseTilSamlingIntegrationTest(
         val resultat = hentBeregningsresultat(revurderingId)
         val reise = resultat.offentligTransport.single()
         assertThat(reise.beløp).isEqualTo(opprinneligBeløp)
+    }
+
+    @Test
+    fun `forkortet reise reberegnes selv om ny sluttdato er før beregnFra, slik at gammel sluttdato ikke henger igjen`() {
+        val førstegangsbehandling =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO,
+            ) {
+                defaultReiseTilSamlingTSOTestdata(fom = 1 januar 2025, tom = 31 januar 2025)
+            }
+
+        testoppsettService.settAndelerTilOkForBehandling(førstegangsbehandling.behandlingId)
+
+        // Reisen forkortes fra 31 januar til 15 januar. beregnFra blir dagen etter ny sluttdato (16 januar),
+        // som gjør at den forkortede reisen sin nye tom (15 januar) er før beregnFra. Uten fiksen for
+        // "forkortet reise kan beholde foreldet sluttdato ved gjenbruk" ville reisen da blitt feilaktig
+        // gjenbrukt fra forrige vedtak med den gamle, lengre sluttdatoen (31 januar).
+        val revurderingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = førstegangsbehandling.behandlingId,
+            ) {
+                aktivitet {
+                    oppdaterTomPåEnesteAktivitet(15 januar 2025)
+                }
+                målgruppe {
+                    oppdaterTomPåEnesteMålgruppe(15 januar 2025)
+                }
+                vilkår {
+                    endreReiseTilSamling {
+                        copy(tom = 15 januar 2025)
+                    }
+                }
+            }
+
+        val resultat = hentBeregningsresultat(revurderingId)
+        val reise = resultat.offentligTransport.single()
+
+        assertThat(reise.fraTidligereVedtak).isFalse()
+        assertThat(reise.grunnlag.tom).isEqualTo(15 januar 2025)
     }
 
     @Test

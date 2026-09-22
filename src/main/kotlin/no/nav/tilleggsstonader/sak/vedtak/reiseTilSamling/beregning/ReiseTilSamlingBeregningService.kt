@@ -29,6 +29,7 @@ import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.VedtaksperiodeG
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.VilkårReiseTilSamlingMapper.mapTilVilkårReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
@@ -101,7 +102,7 @@ class ReiseTilSamlingBeregningService(
         validerFinnesSamling(utgifterTilBeregning)
 
         val beregnFra = beregningsplan.beregnFra()
-        val (uendredeUtgifter, berørteUtgifter) = utgifterTilBeregning.splittPåBeregnFra(beregnFra)
+        val (uendredeUtgifter, berørteUtgifter) = utgifterTilBeregning.splittPåBeregnFra(beregnFra, forrigeVedtak)
 
         val offentligTransport =
             gjenbrukOffentligTransport(uendredeUtgifter, forrigeVedtak) +
@@ -132,12 +133,27 @@ class ReiseTilSamlingBeregningService(
      */
     private fun List<VilkårReiseTilSamling>.splittPåBeregnFra(
         beregnFra: LocalDate?,
+        forrigeVedtak: InnvilgelseEllerOpphørReiseTilSamling?,
     ): Pair<List<VilkårReiseTilSamling>, List<VilkårReiseTilSamling>> {
         if (beregnFra == null) {
             return emptyList<VilkårReiseTilSamling>() to this
         }
-        return this.partition { it.tom < beregnFra }
+        return this.partition { it.erUendretFraForrigeVedtak(beregnFra) }
     }
+
+    /**
+     * En reise som slutter før [beregnFra] er som hovedregel uendret og kan gjenbrukes.
+     * Unntaket er en reise som er forkortet (status ENDRET),da blir [beregnFra] dagen etter den forkortede reisen.
+     * Er vilkåret UENDRET er det ikke vits i å slå opp i forrige vedtak, siden reisen ikke kan ha blitt forkortet.
+     */
+    private fun VilkårReiseTilSamling.erUendretFraForrigeVedtak(beregnFra: LocalDate): Boolean =
+        if (tom >= beregnFra) {
+            false
+        } else if (tom.plusDays(1) == beregnFra && status == VilkårStatus.ENDRET) {
+            false
+        } else {
+            true
+        }
 
     private fun gjenbrukOffentligTransport(
         uendredeUtgifter: List<VilkårReiseTilSamling>,
