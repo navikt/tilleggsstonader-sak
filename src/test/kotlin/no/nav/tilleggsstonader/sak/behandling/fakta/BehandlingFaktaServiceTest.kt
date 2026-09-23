@@ -27,7 +27,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Avreisea
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Reisemåte
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SamlingPeriode
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SkjemaReiseTilSamling
-import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
+import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileJsonIsEqual
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagFaktaGrunnlagPersonopplysninger
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdataBarn
@@ -88,7 +88,7 @@ internal class BehandlingFaktaServiceTest {
         every { fagsakService.hentFagsakForBehandling(behandlingId) } returns fagsak
 
         val data = service.hentFakta(behandlingId)
-        assertFileIsEqual("vilkår/vilkårGrunnlagDto.json", data)
+        assertFileJsonIsEqual("vilkår/vilkårGrunnlagDto.json", data)
     }
 
     @Nested

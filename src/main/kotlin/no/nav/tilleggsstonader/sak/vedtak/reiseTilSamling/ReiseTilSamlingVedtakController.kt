@@ -19,6 +19,8 @@ import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning.ReiseTilSaml
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.AvslagReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.BeregningsresultatReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingTsoRequest
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingTsrRequest
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.OpphørReiseTilSamlingRequest
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.VedtakReiseTilSamlingRequest
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
@@ -60,6 +62,12 @@ class ReiseTilSamlingVedtakController(
         @RequestBody vedtak: InnvilgelseReiseTilSamlingTsoRequest,
     ): BeregningsresultatReiseTilSamlingDto = beregnVedtak(behandlingId, vedtak.vedtaksperioder())
 
+    @PostMapping("{behandlingId}/tsr/beregn")
+    fun beregn(
+        @PathVariable behandlingId: BehandlingId,
+        @RequestBody vedtak: InnvilgelseReiseTilSamlingTsrRequest,
+    ): BeregningsresultatReiseTilSamlingDto = beregnVedtak(behandlingId, vedtak.vedtaksperioder())
+
     private fun beregnVedtak(
         behandlingId: BehandlingId,
         vedtaksperioder: List<Vedtaksperiode>,
@@ -87,6 +95,12 @@ class ReiseTilSamlingVedtakController(
         @RequestBody vedtak: InnvilgelseReiseTilSamlingTsoRequest,
     ): StegFerdigstiltResponse = lagreVedtak(behandlingId, vedtak).tilStegFerdigstiltResponse()
 
+    @PostMapping("{behandlingId}/tsr/innvilgelse")
+    fun innvilge(
+        @PathVariable behandlingId: BehandlingId,
+        @RequestBody vedtak: InnvilgelseReiseTilSamlingTsrRequest,
+    ): StegFerdigstiltResponse = lagreVedtak(behandlingId, vedtak).tilStegFerdigstiltResponse()
+
     @PostMapping("{behandlingId}/avslag")
     fun avslå(
         @PathVariable behandlingId: BehandlingId,
@@ -102,6 +116,12 @@ class ReiseTilSamlingVedtakController(
 
         return lagreVedtak(behandlingId, vedtak).tilStegFerdigstiltResponse()
     }
+
+    @PostMapping("{behandlingId}/opphor")
+    fun opphør(
+        @PathVariable behandlingId: BehandlingId,
+        @RequestBody vedtak: OpphørReiseTilSamlingRequest,
+    ): StegFerdigstiltResponse = lagreVedtak(behandlingId, vedtak).tilStegFerdigstiltResponse()
 
     private fun lagreVedtak(
         behandlingId: BehandlingId,

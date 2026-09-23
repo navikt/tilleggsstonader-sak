@@ -1,18 +1,18 @@
 {
+  "fakta": { },
   "type": "TILTAK_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR",
-  "fakta": {},
   "vurderinger": {
-    "lønnet": {
-      "svar": "NEI",
-      "resultat": "OPPFYLT"
+    "erAktivitetenObligatorisk": {
+      "resultat": "OPPFYLT",
+      "svar": "JA"
     },
     "harUtgifter": {
-      "svar": "JA",
-      "resultat": "OPPFYLT"
+      "resultat": "OPPFYLT",
+      "svar": "JA"
     },
-    "erAktivitetenObligatorisk": {
-      "svar": "JA",
-      "resultat": "OPPFYLT"
+    "lønnet": {
+      "resultat": "OPPFYLT",
+      "svar": "NEI"
     }
   }
 }

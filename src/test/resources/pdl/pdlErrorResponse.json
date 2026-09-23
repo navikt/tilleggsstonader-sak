@@ -1,23 +1,17 @@
 {
-  "errors": [
-    {
-      "message": "Ukjent problem oppsto, feilen har blitt logget og følges opp",
-      "locations": [
-        {
-          "line": 2,
-          "column": 5
-        }
-      ],
-      "path": [
-        "hentPerson", "bostedsadresse"
-      ],
-      "extensions": {
-        "code": "server_error",
-        "classification": "ExecutionAborted"
-      }
-    }
-  ],
   "data": {
-    "person":null
-  }
+    "person": null
+  },
+  "errors": [ {
+    "extensions": {
+      "classification": "ExecutionAborted",
+      "code": "server_error"
+    },
+    "locations": [ {
+      "column": 5,
+      "line": 2
+    } ],
+    "message": "Ukjent problem oppsto, feilen har blitt logget og følges opp",
+    "path": [ "hentPerson", "bostedsadresse" ]
+  } ]
 }

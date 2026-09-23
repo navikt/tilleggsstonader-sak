@@ -1,42 +1,36 @@
 {
   "begrunnelse": "En begrunnelse",
-  "type": "INNVILGELSE_BOUTGIFTER",
   "beregningsplan": {
     "omfang": "ALLE_PERIODER"
   },
-  "vedtaksperioder": [
-    {
-      "id": "550e8400-e29b-41d4-a716-446655440000",
-      "fom": "2024-01-01",
-      "tom": "2024-01-31",
-      "målgruppe": "NEDSATT_ARBEIDSEVNE",
-      "aktivitet": "TILTAK"
-    }
-  ],
   "beregningsresultat": {
-    "perioder": [
-      {
-        "grunnlag": {
-          "fom": "2024-01-01",
-          "tom": "2024-01-31",
-          "utgifter": {
-            "UTGIFTER_OVERNATTING": [
-              {
-                "fom": "2024-01-01",
-                "tom": "2024-01-20",
-                "utgift": 2000,
-                "skalFåDekketFaktiskeUtgifter": false
-              }
-            ]
-          },
-          "makssats": 4953,
-          "makssatsBekreftet": true,
-          "målgruppe": "NEDSATT_ARBEIDSEVNE",
-          "aktivitet": "TILTAK"
-        },
-        "stønadsbeløp": 2000,
-        "delAvTidligereUtbetaling" : false
-      }
-    ]
-  }
+    "perioder": [ {
+      "delAvTidligereUtbetaling": false,
+      "grunnlag": {
+        "aktivitet": "TILTAK",
+        "fom": "2024-01-01",
+        "makssats": 4953,
+        "makssatsBekreftet": true,
+        "målgruppe": "NEDSATT_ARBEIDSEVNE",
+        "tom": "2024-01-31",
+        "utgifter": {
+          "UTGIFTER_OVERNATTING": [ {
+            "fom": "2024-01-01",
+            "skalFåDekketFaktiskeUtgifter": false,
+            "tom": "2024-01-20",
+            "utgift": 2000
+          } ]
+        }
+      },
+      "stønadsbeløp": 2000
+    } ]
+  },
+  "type": "INNVILGELSE_BOUTGIFTER",
+  "vedtaksperioder": [ {
+    "aktivitet": "TILTAK",
+    "fom": "2024-01-01",
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "målgruppe": "NEDSATT_ARBEIDSEVNE",
+    "tom": "2024-01-31"
+  } ]
 }

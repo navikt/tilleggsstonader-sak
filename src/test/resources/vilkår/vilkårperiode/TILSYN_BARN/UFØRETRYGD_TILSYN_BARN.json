@@ -1,19 +1,19 @@
 {
+  "fakta": { },
   "type": "UFØRETRYGD_TILSYN_BARN",
-  "fakta": {},
   "vurderinger": {
     "aldersvilkår": {
-      "svar": "GAMMEL_MANGLER_DATA",
       "resultat": "IKKE_VURDERT",
+      "svar": "GAMMEL_MANGLER_DATA",
       "vurderingFaktaEtterlevelse": null
     },
     "dekketAvAnnetRegelverk": {
-      "svar": "NEI",
-      "resultat": "OPPFYLT"
+      "resultat": "OPPFYLT",
+      "svar": "NEI"
     },
     "medlemskap": {
-      "svar": "JA",
-      "resultat": "OPPFYLT"
+      "resultat": "OPPFYLT",
+      "svar": "JA"
     },
     "mottarSykepengerForFulltidsstilling": {
       "resultat": "OPPFYLT",

@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
@@ -99,7 +98,9 @@ class ReiseTilSamlingBeregningService(
             utgifterTilBeregning,
             vedtaksperioderBeregning,
         )
-        validerFinnesSamling(utgifterTilBeregning)
+        if (typeVedtak == TypeVedtak.INNVILGELSE) {
+            validerFinnesSamling(utgifterTilBeregning)
+        }
 
         val beregnFra = beregningsplan.beregnFra()
         val (uendredeUtgifter, berørteUtgifter) = utgifterTilBeregning.splittPåBeregnFra(beregnFra, forrigeVedtak)
@@ -272,7 +273,7 @@ class ReiseTilSamlingBeregningService(
                     fom = samling.fom,
                     tom = samling.tom,
                     sats = sats.beløp,
-                    totaltReiseavstand = fakta.reiseavstand,
+                    totalReiseavstand = fakta.reiseavstand,
                     bompenger = fakta.bompenger,
                     fergekostnad = fakta.fergekostnad,
                     parkering = fakta.parkering,
@@ -295,7 +296,7 @@ class ReiseTilSamlingBeregningService(
 
     private fun beregnBelopForPrivatBil(grunnlag: BeregningsgrunnlagPrivatBilForSamling): BigDecimal =
         (
-            grunnlag.totaltReiseavstand
+            grunnlag.totalReiseavstand
                 .multiply(grunnlag.sats)
                 .plus(grunnlag.bompenger ?: BigDecimal.ZERO)
                 .plus(grunnlag.fergekostnad ?: BigDecimal.ZERO)

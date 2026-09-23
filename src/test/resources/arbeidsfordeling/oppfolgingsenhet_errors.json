@@ -1,9 +1,6 @@
 {
   "data": null,
-  "errors": [
-    {
-      "message": "Noe gikk galt"
-    }
-  ]
+  "errors": [ {
+    "message": "Noe gikk galt"
+  } ]
 }
-

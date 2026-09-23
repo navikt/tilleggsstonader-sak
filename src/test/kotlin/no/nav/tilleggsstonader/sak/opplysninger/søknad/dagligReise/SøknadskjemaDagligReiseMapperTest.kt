@@ -2,13 +2,12 @@ package no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaDagligReiseFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.dagligreise.fyllutsendinn.DagligReiseFyllUtSendInnData
 import no.nav.tilleggsstonader.sak.journalføring.SøknadsskjemaUtil
 import no.nav.tilleggsstonader.sak.opplysninger.kodeverk.KodeverkService
 import no.nav.tilleggsstonader.sak.util.FileUtil
-import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
+import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileJsonIsEqual
 import org.junit.jupiter.api.Test
 import tools.jackson.module.kotlin.readValue
 
@@ -28,8 +27,7 @@ class SøknadskjemaDagligReiseMapperTest {
         val skjema = mapSkjemadata("søknad/dagligReise/eksempel1/skjema-eksempel-offentlig-transport.json")
         val mappetSkjema = mapper.mapSkjema(skjema, emptyList())
 
-        val mappetJson = jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(mappetSkjema)
-        assertFileIsEqual("søknad/dagligReise/eksempel1/mappet-domene.json", mappetJson)
+        assertFileJsonIsEqual("søknad/dagligReise/eksempel1/mappet-domene.json", mappetSkjema)
     }
 
     @Test
@@ -37,8 +35,7 @@ class SøknadskjemaDagligReiseMapperTest {
         val skjema = mapSkjemadata("søknad/dagligReise/eksempel2/skjema-eksempel-egen-bil.json")
         val mappetSkjema = mapper.mapSkjema(skjema, emptyList())
 
-        val mappetJson = jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(mappetSkjema)
-        assertFileIsEqual("søknad/dagligReise/eksempel2/mappet-domene.json", mappetJson)
+        assertFileJsonIsEqual("søknad/dagligReise/eksempel2/mappet-domene.json", mappetSkjema)
     }
 
     @Test
@@ -46,8 +43,7 @@ class SøknadskjemaDagligReiseMapperTest {
         val skjema = mapSkjemadata("søknad/dagligReise/eksempel3/skjema-eksempel-taxi.json")
         val mappetSkjema = mapper.mapSkjema(skjema, emptyList())
 
-        val mappetJson = jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(mappetSkjema)
-        assertFileIsEqual("søknad/dagligReise/eksempel3/mappet-domene.json", mappetJson)
+        assertFileJsonIsEqual("søknad/dagligReise/eksempel3/mappet-domene.json", mappetSkjema)
     }
 
     @Test
@@ -55,8 +51,7 @@ class SøknadskjemaDagligReiseMapperTest {
         val skjema = mapSkjemadata("søknad/dagligReise/eksempel4/skjema-eksempel-offentlig-transport.json")
         val mappetSkjema = mapper.mapSkjema(skjema, emptyList())
 
-        val mappetJson = jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(mappetSkjema)
-        assertFileIsEqual("søknad/dagligReise/eksempel4/mappet-domene.json", mappetJson)
+        assertFileJsonIsEqual("søknad/dagligReise/eksempel4/mappet-domene.json", mappetSkjema)
     }
 
     private fun mapSkjemadata(skjemaJsonFil: String): SøknadsskjemaDagligReiseFyllUtSendInn {

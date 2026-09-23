@@ -137,7 +137,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningService(
                     fom = reise.fom,
                     tom = reise.tom,
                     sats = sats.beløp,
-                    totaltReiseavstand = fakta.reiseavstand,
+                    totalReiseavstand = fakta.reiseavstand,
                     vedtaksperioder =
                         vedtaksperioder
                             .filter { it.overlapper(reise) }
@@ -156,7 +156,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningService(
     }
 
     private fun beregnBelopForPrivatBil(grunnlag: BeregningsgrunnlagPrivatBil): BigDecimal {
-        val kjøreutgift = grunnlag.totaltReiseavstand.multiply(grunnlag.sats)
+        val kjøreutgift = grunnlag.totalReiseavstand.multiply(grunnlag.sats)
         val ekstrakostnader = (grunnlag.bompenger ?: BigDecimal.ZERO) + (grunnlag.fergekostnad ?: BigDecimal.ZERO)
         return (kjøreutgift + ekstrakostnader).setScale(0, RoundingMode.HALF_UP)
     }

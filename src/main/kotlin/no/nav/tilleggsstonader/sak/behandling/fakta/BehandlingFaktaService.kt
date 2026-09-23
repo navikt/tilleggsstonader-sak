@@ -2,13 +2,6 @@ package no.nav.tilleggsstonader.sak.behandling.fakta
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
-import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.BoligEllerOvernatting
-import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.DelerBoutgifterType
-import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HarUtgifterTilBoligToStederType
-import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.JaNeiType
-import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.PeriodeForSamling
-import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Samling
-import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.TypeUtgifterType
 import no.nav.tilleggsstonader.libs.utils.fnr.Fødselsnummer
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
@@ -20,15 +13,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.Grunnlag
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.FaktaGrunnlagBarnAndreForeldreSaksinformasjon
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GrunnlagBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.BoligEllerOvernattingAvsnitt
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.DelerUtgifterFlereStederType
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.DokumentasjonBoutgifter
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.FasteUtgifter
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.TypeFasteUtgifter
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.TypeUtgifter
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.UtgifterFlereSteder
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.UtgifterIForbindelseMedSamling
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.UtgifterNyBolig
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.AktivitetDagligReiseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.DokumentasjonDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ReiseAdresse
@@ -45,9 +30,6 @@ import no.nav.tilleggsstonader.sak.util.antallÅrSiden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelUtil.harFullførtFjerdetrinn
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.FasteUtgifter as FasteUtgifterKontraktor
-import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterFlereSteder as UtgifterFlereStederKontraktor
-import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.UtgifterNyBolig as UtgifterNyBoligKontrakt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.DekkesUtgiftenAvAndre as DekkesUtgiftenAvAndreKontrakt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.Reise as ReiseDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon as SøknadDokumentasjon
@@ -78,6 +60,7 @@ class BehandlingFaktaService(
             Stønadstype.FLYTTING_TSO,
             Stønadstype.FLYTTING_TSR,
             -> error("Henting av fakta for $stønadstype er ikke implementert")
+
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
             -> hentFaktaDtoForReiseOppstartAvslutningHjemreise(behandlingId)
@@ -306,55 +289,6 @@ class BehandlingFaktaService(
             )
         }
 
-    private fun mapBoligEllerOvernatting(boutgifter: BoligEllerOvernattingAvsnitt?) =
-        BoligEllerOvernatting(
-            typeUtgifter = mapTypeUtgifter(boutgifter?.typeUtgifter!!),
-            fasteUtgifter = mapFasteUtgifter(boutgifter.fasteUtgifter),
-            samling = mapSamling(boutgifter.samling),
-            harSaerligStoreUtgifterPaGrunnAvFunksjonsnedsettelse =
-                mapJaNei(boutgifter.harSærligStoreUtgifterPgaFunksjonsnedsettelse),
-        )
-
-    private fun mapTypeUtgifter(verdi: TypeUtgifter): TypeUtgifterType =
-        when (verdi) {
-            TypeUtgifter.FASTE -> TypeUtgifterType.fastUtgift
-            TypeUtgifter.SAMLING -> TypeUtgifterType.midlertidigUtgift
-        }
-
-    private fun mapFasteUtgifter(fasteUtgifter: FasteUtgifter?): FasteUtgifterKontraktor =
-        FasteUtgifterKontraktor(
-            harUtgifterTilBoligToSteder = mapTypeFasteUtgifter(fasteUtgifter?.typeFasteUtgifter),
-            utgifterFlereSteder = mapUtgifterFlereSteder(fasteUtgifter?.utgifterFlereSteder),
-            utgifterNyBolig = mapUtgifterNyBolig(fasteUtgifter?.utgifterNyBolig),
-        )
-
-    private fun mapTypeFasteUtgifter(verdi: TypeFasteUtgifter?): HarUtgifterTilBoligToStederType =
-        when (verdi) {
-            TypeFasteUtgifter.EKSTRA_BOLIG -> HarUtgifterTilBoligToStederType.ekstraBolig
-            TypeFasteUtgifter.NY_BOLIG -> HarUtgifterTilBoligToStederType.nyBolig
-            null -> throw IllegalArgumentException("TypeUtgifter can’t be null")
-        }
-
-    private fun mapUtgifterFlereSteder(utgifterFlereSteder: UtgifterFlereSteder?): UtgifterFlereStederKontraktor? =
-        UtgifterFlereStederKontraktor(
-            delerBoutgifter = mapDelerBoutgifterFlereSteder(utgifterFlereSteder!!.delerBoutgifter),
-            andelUtgifterBoligHjemsted = utgifterFlereSteder.andelUtgifterBoligHjemsted,
-            andelUtgifterBoligAktivitetssted = utgifterFlereSteder.andelUtgifterBoligAktivitetssted,
-        )
-
-    fun mapDelerBoutgifterFlereSteder(typer: List<DelerUtgifterFlereStederType>): Map<DelerBoutgifterType, Boolean> =
-        mapOf(
-            DelerBoutgifterType.hjemsted to typer.contains(DelerUtgifterFlereStederType.HJEMSTED),
-            DelerBoutgifterType.aktivitetssted to typer.contains(DelerUtgifterFlereStederType.AKTIVITETSSTED),
-            DelerBoutgifterType.nei to typer.contains(DelerUtgifterFlereStederType.NEI),
-        )
-
-    private fun mapJaNei(verdi: JaNei): JaNeiType =
-        when (verdi) {
-            JaNei.JA -> JaNeiType.ja
-            JaNei.NEI -> JaNeiType.nei
-        }
-
     private fun mapHovedytelse(hovedytelseAvsnitt: HovedytelseAvsnitt?) =
         FaktaHovedytelse(
             søknadsgrunnlag =
@@ -366,29 +300,6 @@ class BehandlingFaktaService(
                     )
                 },
         )
-
-    private fun mapUtgifterNyBolig(utgifterNyBolig: UtgifterNyBolig?): UtgifterNyBoligKontrakt? =
-        UtgifterNyBoligKontrakt(
-            delerBoutgifter = mapJaNei(utgifterNyBolig!!.delerBoutgifter),
-            andelUtgifterBolig = utgifterNyBolig.andelUtgifterBolig,
-            harHoyereUtgifterPaNyttBosted = mapJaNei(utgifterNyBolig.harHoyereUtgifterPaNyttBosted),
-            mottarBostotte = mapJaNei(utgifterNyBolig.mottarBostotte),
-        )
-
-    private fun mapSamling(samling: UtgifterIForbindelseMedSamling?): Samling? =
-        samling?.let {
-            Samling(
-                periodeForSamling =
-                    it.periodeForSamling.map { periode ->
-                        PeriodeForSamling(
-                            fom = periode.fom,
-                            tom = periode.tom,
-                            trengteEkstraOvernatting = mapJaNei(periode.trengteEkstraOvernatting),
-                            utgifterTilOvernatting = periode.utgifterTilOvernatting,
-                        )
-                    },
-            )
-        }
 
     private fun mapUtdanning(utdanningAvsnitt: UtdanningAvsnitt?) =
         FaktaUtdanning(

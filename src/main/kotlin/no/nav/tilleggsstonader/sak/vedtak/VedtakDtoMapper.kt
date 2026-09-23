@@ -28,6 +28,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørPassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakDagligReise
@@ -54,6 +55,7 @@ import no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise.dto.V
 import no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.AvslagReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingResponse
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.OpphørReiseTilSamlingResponse
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.VedtakReiseTilSamlingResponse
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligReiseVilkårService
@@ -283,6 +285,16 @@ class VedtakDtoMapper(
                 AvslagReiseTilSamlingDto(
                     årsakerAvslag = data.årsaker,
                     begrunnelse = data.begrunnelse,
+                )
+            is OpphørReiseTilSamling ->
+                OpphørReiseTilSamlingResponse(
+                    årsakerOpphør = data.årsaker,
+                    begrunnelse = data.begrunnelse,
+                    vedtaksperioder =
+                        data.vedtaksperioder.tilLagretVedtaksperiodeDto(
+                            hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
+                        ),
+                    opphørsdato = vedtak.opphørsdato ?: feil("Opphørsdato er obligatorisk for opphør"),
                 )
         }
 

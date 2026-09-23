@@ -1,70 +1,70 @@
 {
   "regler": {
-    "UTGIFTER_DOKUMENTERT": {
-      "regelId": "UTGIFTER_DOKUMENTERT",
-      "erHovedregel": true,
-      "svarMapping": {
-        "JA": {
-          "begrunnelseType": "VALGFRI",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
-        },
-        "NEI": {
-          "begrunnelseType": "PÅKREVD",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
-        }
-      }
-    },
     "ANNEN_FORELDER_MOTTAR_STØTTE": {
-      "regelId": "ANNEN_FORELDER_MOTTAR_STØTTE",
       "erHovedregel": true,
+      "regelId": "ANNEN_FORELDER_MOTTAR_STØTTE",
       "svarMapping": {
         "JA": {
           "begrunnelseType": "PÅKREVD",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
         },
         "NEI": {
           "begrunnelseType": "VALGFRI",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
         }
       }
     },
     "HAR_FULLFØRT_FJERDEKLASSE": {
-      "regelId": "HAR_FULLFØRT_FJERDEKLASSE",
       "erHovedregel": true,
+      "regelId": "HAR_FULLFØRT_FJERDEKLASSE",
       "svarMapping": {
         "JA": {
-          "regelId": "UNNTAK_ALDER",
-          "begrunnelseType": "UTEN"
+          "begrunnelseType": "UTEN",
+          "regelId": "UNNTAK_ALDER"
         },
         "NEI": {
           "begrunnelseType": "VALGFRI",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
         }
       }
     },
     "UNNTAK_ALDER": {
-      "regelId": "UNNTAK_ALDER",
       "erHovedregel": false,
+      "regelId": "UNNTAK_ALDER",
       "svarMapping": {
-        "TRENGER_MER_TILSYN_ENN_JEVNALDRENDE": {
-          "begrunnelseType": "VALGFRI",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
-        },
         "FORSØRGER_HAR_LANGVARIG_ELLER_UREGELMESSIG_ARBEIDSTID": {
           "begrunnelseType": "VALGFRI",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
         },
         "NEI": {
           "begrunnelseType": "PÅKREVD",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
+        },
+        "TRENGER_MER_TILSYN_ENN_JEVNALDRENDE": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
+        }
+      }
+    },
+    "UTGIFTER_DOKUMENTERT": {
+      "erHovedregel": true,
+      "regelId": "UTGIFTER_DOKUMENTERT",
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
+        },
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
         }
       }
     }

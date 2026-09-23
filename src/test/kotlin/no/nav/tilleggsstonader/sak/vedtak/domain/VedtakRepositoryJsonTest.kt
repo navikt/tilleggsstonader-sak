@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.util.EnumUtil.enumName
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.util.toDeepSortedMap
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaVurderingerJsonFilesUtil.tilTypeFaktaOgVurderingSuffix
@@ -41,8 +42,8 @@ class VedtakRepositoryJsonTest : CleanDatabaseIntegrationTest() {
 
         opprettVedtak(fil.typeVedtaksdata().typeVedtak, json)
         val vedtak = repository.findByIdOrThrow(behandling.id)
-        val jsonFraObj = jsonMapper.convertValue<Map<String, Any>>(vedtak.data).toSortedMap()
-        val jsonFraFil = jsonMapper.readValue<Map<String, Any>>(json).toSortedMap()
+        val jsonFraObj = jsonMapper.convertValue<Map<String, Any>>(vedtak.data).toDeepSortedMap()
+        val jsonFraFil = jsonMapper.readValue<Map<String, Any>>(json).toDeepSortedMap()
 
         assertThat(vedtak.data).isInstanceOf(forventetType(fil.typeVedtaksdata()))
         assertThat(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonFraObj))
@@ -126,6 +127,7 @@ class VedtakRepositoryJsonTest : CleanDatabaseIntegrationTest() {
             TypeVedtakDagligReise.OPPHØR_DAGLIG_REISE -> OpphørDagligReise::class
             TypeVedtakReiseTilSamling.INNVILGELSE_REISE_TIL_SAMLING -> InnvilgelseReiseTilSamling::class
             TypeVedtakReiseTilSamling.AVSLAG_REISE_TIL_SAMLING -> AvslagReiseTilSamling::class
+            TypeVedtakReiseTilSamling.OPPHØR_REISE_TIL_SAMLING -> OpphørReiseTilSamling::class
             TypeVedtakReiseOppstartAvslutningHjemreise.INNVILGELSE_REISE_OPPSTART_AVSLUTNING_HJEMREISE ->
                 InnvilgelseReiseOppstartAvslutningHjemreise::class
         }.java

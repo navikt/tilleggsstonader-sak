@@ -32,6 +32,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Personopplysninge
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
 import no.nav.tilleggsstonader.sak.vedlegg.BrevkodeVedlegg
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArbeidOgOpphold as ArbeidOgOppholdKontrakt
@@ -45,6 +46,8 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Utgif
 class SøknadskjemaBoutgifterMapper(
     private val kodeverkService: KodeverkService,
 ) {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     fun map(
         mottattTidspunkt: LocalDateTime,
         språk: Språkkode,
@@ -198,13 +201,64 @@ class SøknadskjemaBoutgifterMapper(
 
     private fun mapUtgifterNyBolig(utgifterNyBolig: UtgifterNyBoligKontrakt?): UtgifterNyBolig? =
         utgifterNyBolig?.let {
+            validerAndelUtgifterNyBolig(it)
+            val fordelingUtgifter = it.fordelingUtgifter
+            val fordelingUtgifterMidlertidig = it.test
+
+            if (fordelingUtgifter != null) {
+                return UtgifterNyBolig(
+                    delerBoutgifter = null,
+                    delerBoutgifterNy = mapDelerBoutgifterFlereSteder(fordelingUtgifter.delerBoutgifter),
+                    andelUtgifterBolig = null,
+                    harHoyereUtgifterPaNyttBosted = mapJaNei(it.harHoyereUtgifterPaNyttBosted),
+                    mottarBostotte = fordelingUtgifter.mottarBostotte.let(::mapJaNei),
+                    andelUtgifterBoligHjemsted = fordelingUtgifter.andelUtgifterBoligHjemsted,
+                    andelUtgifterBoligAktivitetssted = fordelingUtgifter.andelUtgifterBoligAktivitetssted,
+                )
+            }
+
+            if (fordelingUtgifterMidlertidig != null) {
+                return UtgifterNyBolig(
+                    delerBoutgifter = null,
+                    delerBoutgifterNy = mapDelerBoutgifterFlereSteder(fordelingUtgifterMidlertidig.delerBoutgifter1),
+                    andelUtgifterBolig = null,
+                    harHoyereUtgifterPaNyttBosted = mapJaNei(it.harHoyereUtgifterPaNyttBosted),
+                    mottarBostotte = fordelingUtgifterMidlertidig.mottarBostotte.let(::mapJaNei),
+                    andelUtgifterBoligHjemsted = fordelingUtgifterMidlertidig.andelUtgifterBoligHjemsted,
+                    andelUtgifterBoligAktivitetssted = fordelingUtgifterMidlertidig.andelUtgifterBoligAktivitetssted,
+                )
+            }
+
             UtgifterNyBolig(
-                delerBoutgifter = mapJaNei(it.delerBoutgifter),
-                andelUtgifterBolig = it.andelUtgifterBolig,
+                delerBoutgifter = null,
+                delerBoutgifterNy = null,
+                andelUtgifterBolig = null,
                 harHoyereUtgifterPaNyttBosted = mapJaNei(it.harHoyereUtgifterPaNyttBosted),
-                mottarBostotte = mapJaNei(it.mottarBostotte),
+                mottarBostotte = null,
+                andelUtgifterBoligHjemsted = null,
+                andelUtgifterBoligAktivitetssted = null,
             )
         }
+
+    private fun validerAndelUtgifterNyBolig(utgifterNyBolig: UtgifterNyBoligKontrakt) {
+        val andelUtgifterBoligHjemsted =
+            utgifterNyBolig.fordelingUtgifter?.andelUtgifterBoligHjemsted
+                ?: utgifterNyBolig.test?.andelUtgifterBoligHjemsted
+        val andelUtgifterBoligAktivitetssted =
+            utgifterNyBolig.fordelingUtgifter?.andelUtgifterBoligAktivitetssted
+                ?: utgifterNyBolig.test?.andelUtgifterBoligAktivitetssted
+
+        val manglerFordelingUtgifter =
+            andelUtgifterBoligHjemsted == null ||
+                andelUtgifterBoligAktivitetssted == null
+
+        if (utgifterNyBolig.harHoyereUtgifterPaNyttBosted == JaNeiType.ja && manglerFordelingUtgifter) {
+            logger.error(
+                "Søknad for boutgifter manglet andelUtgifterBoligHjemsted eller andelUtgifterBoligAktivitetssted " +
+                    "når harHoyereUtgifterPaNyttBosted er ja. Dette skal ikke skje med nye søknader for boutgifter",
+            )
+        }
+    }
 
     private fun mapUtgifterFlereSteder(utgifterFlereSteder: UtgifterFlereStederKontrakt?): UtgifterFlereSteder? =
         utgifterFlereSteder?.let {

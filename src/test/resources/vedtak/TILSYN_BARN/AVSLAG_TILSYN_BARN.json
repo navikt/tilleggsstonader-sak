@@ -1,5 +1,5 @@
 {
+  "begrunnelse": "En begrunnelse",
   "type": "AVSLAG_TILSYN_BARN",
-  "årsaker": ["IKKE_I_MÅLGRUPPE"],
-  "begrunnelse": "En begrunnelse"
+  "årsaker": [ "IKKE_I_MÅLGRUPPE" ]
 }

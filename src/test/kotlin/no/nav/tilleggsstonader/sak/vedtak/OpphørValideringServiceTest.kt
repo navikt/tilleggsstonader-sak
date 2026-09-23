@@ -2,12 +2,14 @@ package no.nav.tilleggsstonader.sak.vedtak
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
+import no.nav.tilleggsstonader.sak.util.fagsak
 import no.nav.tilleggsstonader.sak.util.fagsakBoutgifter
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
@@ -83,6 +85,22 @@ class OpphørValideringServiceTest {
         vilkår(
             behandlingId = saksbehandlingBoutgifter.id,
             type = VilkårType.LØPENDE_UTGIFTER_EN_BOLIG,
+            resultat = Vilkårsresultat.OPPFYLT,
+            status = VilkårStatus.ENDRET,
+            fom = fom,
+            tom = tom,
+        )
+
+    val saksbehandlingReiseTilSamling =
+        saksbehandling(
+            type = BehandlingType.REVURDERING,
+            fagsak = fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO),
+        )
+
+    val vilkårReiseTilSamling =
+        vilkår(
+            behandlingId = saksbehandlingReiseTilSamling.id,
+            type = VilkårType.REISE_TIL_SAMLING,
             resultat = Vilkårsresultat.OPPFYLT,
             status = VilkårStatus.ENDRET,
             fom = fom,
@@ -297,5 +315,35 @@ class OpphørValideringServiceTest {
         assertThatThrownBy {
             opphørValideringService.validerVilkårperioder(saksbehandlingBoutgifter, opphørsdato)
         }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret vilkår er etter opphørsdato")
+    }
+
+    @Test
+    fun `Kaster feil ved vilkår flyttet til etter opphørt dato for reise til samling`() {
+        every { vilkårService.hentVilkår(saksbehandlingReiseTilSamling.id) } returns
+            listOf(
+                vilkårReiseTilSamling.copy(
+                    status = VilkårStatus.ENDRET,
+                    tom = opphørsdato.plusDays(1),
+                ),
+            )
+
+        assertThatThrownBy {
+            opphørValideringService.validerVilkårperioder(saksbehandlingReiseTilSamling, opphørsdato)
+        }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi til og med dato for endret vilkår er etter opphørsdato")
+    }
+
+    @Test
+    fun `Kaster ikke feil ved vilkår for reise til samling som avsluttes samme dag som opphørsdato`() {
+        every { vilkårService.hentVilkår(saksbehandlingReiseTilSamling.id) } returns
+            listOf(
+                vilkårReiseTilSamling.copy(
+                    status = VilkårStatus.ENDRET,
+                    tom = opphørsdato,
+                ),
+            )
+
+        assertThatCode {
+            opphørValideringService.validerVilkårperioder(saksbehandlingReiseTilSamling, opphørsdato)
+        }.doesNotThrowAnyException()
     }
 }

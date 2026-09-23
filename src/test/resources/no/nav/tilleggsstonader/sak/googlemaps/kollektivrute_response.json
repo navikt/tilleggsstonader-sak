@@ -1,271 +1,254 @@
 {
-  "routes": [
-    {
-      "routeLabels": ["DEFAULT_ROUTE"],
-      "polyline": {
-        "encodedPolyline": "{bm}Jukxl@o@jAwA^]M_AMoBs@kAg@sAyBQSYz@?PH\\rBtDLx@{Ag@cGuF_A}Cc@eCYgACMQt@OUETLPMY{AwBaA}@a@K[?_@RUXqxBdrFUhAGp@EhGDb@@?AjGL~QFp@?tBI|@KtEY~Ec@bE_@zBWx@_@d@QNWH"
-      },
-      "distanceMeters": 4579,
-      "staticDuration": "2067s",
-      "legs": [
-        {
-          "steps": [
-            {
-              "travelMode": "WALK",
-              "startLocation": {
-                "latLng": {
-                  "latitude": 62.659176200000005,
-                  "longitude": 7.502830500000001
-                }
-              },
-              "endLocation": {
-                "latLng": {
-                  "latitude": 62.6617806,
-                  "longitude": 7.5036007
-                }
-              },
-              "navigationInstruction": {
-                "maneuver": "DEPART"
-              },
-              "transitDetails": null,
-              "distanceMeters": 310,
-              "staticDuration": "225s"
-            },
-            {
-              "travelMode": "WALK",
-              "startLocation": {
-                "latLng": {
-                  "latitude": 62.6617806,
-                  "longitude": 7.5036007
-                }
-              },
-              "endLocation": {
-                "latLng": {
-                  "latitude": 62.66190749999999,
-                  "longitude": 7.503214400000001
-                }
-              },
-              "navigationInstruction": {
-                "maneuver": "TURN_LEFT"
-              },
-              "transitDetails": null,
-              "distanceMeters": 25,
-              "staticDuration": "18s"
-            },
-            {
-              "travelMode": "WALK",
-              "startLocation": {
-                "latLng": {
-                  "latitude": 62.66190749999999,
-                  "longitude": 7.503214400000001
-                }
-              },
-              "endLocation": {
-                "latLng": {
-                  "latitude": 62.66121429999999,
-                  "longitude": 7.501864800000001
-                }
-              },
-              "navigationInstruction": {
-                "maneuver": "TURN_LEFT"
-              },
-              "transitDetails": null,
-              "distanceMeters": 105,
-              "staticDuration": "77s"
-            },
-            {
-              "travelMode": "WALK",
-              "startLocation": {
-                "latLng": {
-                  "latitude": 62.66121429999999,
-                  "longitude": 7.501864800000001
-                }
-              },
-              "endLocation": {
-                "latLng": {
-                  "latitude": 62.6635992,
-                  "longitude": 7.505111899999999
-                }
-              },
-              "navigationInstruction": {
-                "maneuver": "TURN_RIGHT"
-              },
-              "transitDetails": null,
-              "distanceMeters": 324,
-              "staticDuration": "250s"
-            },
-            {
-              "travelMode": "WALK",
-              "startLocation": {
-                "latLng": {
-                  "latitude": 62.6635992,
-                  "longitude": 7.505111899999999
-                }
-              },
-              "endLocation": {
-                "latLng": {
-                  "latitude": 62.6636162,
-                  "longitude": 7.505180800000001
-                }
-              },
-              "navigationInstruction": {
-                "maneuver": "NAME_CHANGE"
-              },
-              "transitDetails": null,
-              "distanceMeters": 7,
-              "staticDuration": "16s"
-            },
-            {
-              "travelMode": "WALK",
-              "startLocation": {
-                "latLng": {
-                  "latitude": 62.6636162,
-                  "longitude": 7.505180800000001
-                }
-              },
-              "endLocation": {
-                "latLng": {
-                  "latitude": 62.663711299999996,
-                  "longitude": 7.5049122
-                }
-              },
-              "navigationInstruction": {
-                "maneuver": "TURN_LEFT"
-              },
-              "transitDetails": null,
-              "distanceMeters": 24,
-              "staticDuration": "17s"
-            },
-            {
-              "travelMode": "WALK",
-              "startLocation": {
-                "latLng": {
-                  "latitude": 62.663711299999996,
-                  "longitude": 7.5049122
-                }
-              },
-              "endLocation": {
-                "latLng": {
-                  "latitude": 62.6637923,
-                  "longitude": 7.505022500000001
-                }
-              },
-              "navigationInstruction": {
-                "maneuver": "TURN_RIGHT"
-              },
-              "transitDetails": null,
-              "distanceMeters": 10,
-              "staticDuration": "8s"
-            },
-            {
-              "travelMode": "WALK",
-              "startLocation": {
-                "latLng": {
-                  "latitude": 62.6637923,
-                  "longitude": 7.505022500000001
-                }
-              },
-              "endLocation": {
-                "latLng": {
-                  "latitude": 62.6637524,
-                  "longitude": 7.5048151
-                }
-              },
-              "navigationInstruction": {
-                "maneuver": null
-              },
-              "transitDetails": null,
-              "distanceMeters": 10,
-              "staticDuration": "20s"
-            },
-            {
-              "travelMode": "TRANSIT",
-              "startLocation": {
-                "latLng": {
-                  "latitude": 62.663816,
-                  "longitude": 7.504952
-                }
-              },
-              "endLocation": {
+  "geocodingResults": {
+    "destination": {
+      "placeId": "ChIJ6fHTti_5E0YRJhSJLbVl_Rk"
+    },
+    "origin": {
+      "placeId": "ChIJtS1aVfb4E0YRRJobI6t2Mdw"
+    }
+  },
+  "routes": [ {
+    "distanceMeters": 4579,
+    "legs": [ {
+      "steps": [ {
+        "distanceMeters": 310,
+        "endLocation": {
+          "latLng": {
+            "latitude": 62.6617806,
+            "longitude": 7.5036007
+          }
+        },
+        "navigationInstruction": {
+          "maneuver": "DEPART"
+        },
+        "startLocation": {
+          "latLng": {
+            "latitude": 62.659176200000005,
+            "longitude": 7.502830500000001
+          }
+        },
+        "staticDuration": "225s",
+        "transitDetails": null,
+        "travelMode": "WALK"
+      }, {
+        "distanceMeters": 25,
+        "endLocation": {
+          "latLng": {
+            "latitude": 62.66190749999999,
+            "longitude": 7.503214400000001
+          }
+        },
+        "navigationInstruction": {
+          "maneuver": "TURN_LEFT"
+        },
+        "startLocation": {
+          "latLng": {
+            "latitude": 62.6617806,
+            "longitude": 7.5036007
+          }
+        },
+        "staticDuration": "18s",
+        "transitDetails": null,
+        "travelMode": "WALK"
+      }, {
+        "distanceMeters": 105,
+        "endLocation": {
+          "latLng": {
+            "latitude": 62.66121429999999,
+            "longitude": 7.501864800000001
+          }
+        },
+        "navigationInstruction": {
+          "maneuver": "TURN_LEFT"
+        },
+        "startLocation": {
+          "latLng": {
+            "latitude": 62.66190749999999,
+            "longitude": 7.503214400000001
+          }
+        },
+        "staticDuration": "77s",
+        "transitDetails": null,
+        "travelMode": "WALK"
+      }, {
+        "distanceMeters": 324,
+        "endLocation": {
+          "latLng": {
+            "latitude": 62.6635992,
+            "longitude": 7.505111899999999
+          }
+        },
+        "navigationInstruction": {
+          "maneuver": "TURN_RIGHT"
+        },
+        "startLocation": {
+          "latLng": {
+            "latitude": 62.66121429999999,
+            "longitude": 7.501864800000001
+          }
+        },
+        "staticDuration": "250s",
+        "transitDetails": null,
+        "travelMode": "WALK"
+      }, {
+        "distanceMeters": 7,
+        "endLocation": {
+          "latLng": {
+            "latitude": 62.6636162,
+            "longitude": 7.505180800000001
+          }
+        },
+        "navigationInstruction": {
+          "maneuver": "NAME_CHANGE"
+        },
+        "startLocation": {
+          "latLng": {
+            "latitude": 62.6635992,
+            "longitude": 7.505111899999999
+          }
+        },
+        "staticDuration": "16s",
+        "transitDetails": null,
+        "travelMode": "WALK"
+      }, {
+        "distanceMeters": 24,
+        "endLocation": {
+          "latLng": {
+            "latitude": 62.663711299999996,
+            "longitude": 7.5049122
+          }
+        },
+        "navigationInstruction": {
+          "maneuver": "TURN_LEFT"
+        },
+        "startLocation": {
+          "latLng": {
+            "latitude": 62.6636162,
+            "longitude": 7.505180800000001
+          }
+        },
+        "staticDuration": "17s",
+        "transitDetails": null,
+        "travelMode": "WALK"
+      }, {
+        "distanceMeters": 10,
+        "endLocation": {
+          "latLng": {
+            "latitude": 62.6637923,
+            "longitude": 7.505022500000001
+          }
+        },
+        "navigationInstruction": {
+          "maneuver": "TURN_RIGHT"
+        },
+        "startLocation": {
+          "latLng": {
+            "latitude": 62.663711299999996,
+            "longitude": 7.5049122
+          }
+        },
+        "staticDuration": "8s",
+        "transitDetails": null,
+        "travelMode": "WALK"
+      }, {
+        "distanceMeters": 10,
+        "endLocation": {
+          "latLng": {
+            "latitude": 62.6637524,
+            "longitude": 7.5048151
+          }
+        },
+        "navigationInstruction": {
+          "maneuver": null
+        },
+        "startLocation": {
+          "latLng": {
+            "latitude": 62.6637923,
+            "longitude": 7.505022500000001
+          }
+        },
+        "staticDuration": "20s",
+        "transitDetails": null,
+        "travelMode": "WALK"
+      }, {
+        "distanceMeters": 3218,
+        "endLocation": {
+          "latLng": {
+            "latitude": 62.684788,
+            "longitude": 7.464652
+          }
+        },
+        "navigationInstruction": {
+          "maneuver": null
+        },
+        "startLocation": {
+          "latLng": {
+            "latitude": 62.663816,
+            "longitude": 7.504952
+          }
+        },
+        "staticDuration": "900s",
+        "transitDetails": {
+          "stopCount": 2,
+          "stopDetails": {
+            "arrivalStop": {
+              "location": {
                 "latLng": {
                   "latitude": 62.684788,
                   "longitude": 7.464652
                 }
               },
-              "navigationInstruction": {
-                "maneuver": null
-              },
-              "transitDetails": {
-                "stopDetails": {
-                  "departureStop": {
-                    "name": "Åfarnes ferjekai",
-                    "location": {
-                      "latLng": {
-                        "latitude": 62.663816,
-                        "longitude": 7.504952
-                      }
-                    }
-                  },
-                  "arrivalStop": {
-                    "name": "Sølsnes ferjekai",
-                    "location": {
-                      "latLng": {
-                        "latitude": 62.684788,
-                        "longitude": 7.464652
-                      }
-                    }
-                  }
-                },
-                "transitLine": {
-                  "shortName": null,
-                  "name": "Sølsnes-Åfarnes",
-                  "vehicle": {
-                    "type": "FERRY"
-                  },
-                  "agencies": [
-                    {
-                      "name": "Møre og Romsdal fylkeskommune",
-                      "uri": "https://frammr.no/"
-                    }
-                  ]
-                },
-                "stopCount": 2
-              },
-              "distanceMeters": 3218,
-              "staticDuration": "900s"
+              "name": "Sølsnes ferjekai"
             },
-            {
-              "travelMode": "WALK",
-              "startLocation": {
+            "departureStop": {
+              "location": {
                 "latLng": {
-                  "latitude": 62.684777600000004,
-                  "longitude": 7.4646517
+                  "latitude": 62.663816,
+                  "longitude": 7.504952
                 }
               },
-              "endLocation": {
-                "latLng": {
-                  "latitude": 62.685745999999995,
-                  "longitude": 7.454721900000001
-                }
-              },
-              "navigationInstruction": {
-                "maneuver": "DEPART"
-              },
-              "transitDetails": null,
-              "distanceMeters": 546,
-              "staticDuration": "534s"
+              "name": "Åfarnes ferjekai"
             }
-          ]
-        }
-      ]
-    }
-  ],
-  "geocodingResults": {
-    "origin": {
-      "placeId": "ChIJtS1aVfb4E0YRRJobI6t2Mdw"
+          },
+          "transitLine": {
+            "agencies": [ {
+              "name": "Møre og Romsdal fylkeskommune",
+              "uri": "https://frammr.no/"
+            } ],
+            "name": "Sølsnes-Åfarnes",
+            "shortName": null,
+            "vehicle": {
+              "type": "FERRY"
+            }
+          }
+        },
+        "travelMode": "TRANSIT"
+      }, {
+        "distanceMeters": 546,
+        "endLocation": {
+          "latLng": {
+            "latitude": 62.685745999999995,
+            "longitude": 7.454721900000001
+          }
+        },
+        "navigationInstruction": {
+          "maneuver": "DEPART"
+        },
+        "startLocation": {
+          "latLng": {
+            "latitude": 62.684777600000004,
+            "longitude": 7.4646517
+          }
+        },
+        "staticDuration": "534s",
+        "transitDetails": null,
+        "travelMode": "WALK"
+      } ]
+    } ],
+    "polyline": {
+      "encodedPolyline": "{bm}Jukxl@o@jAwA^]M_AMoBs@kAg@sAyBQSYz@?PH\\rBtDLx@{Ag@cGuF_A}Cc@eCYgACMQt@OUETLPMY{AwBaA}@a@K[?_@RUXqxBdrFUhAGp@EhGDb@@?AjGL~QFp@?tBI|@KtEY~Ec@bE_@zBWx@_@d@QNWH"
     },
-    "destination": {
-      "placeId": "ChIJ6fHTti_5E0YRJhSJLbVl_Rk"
-    }
-  }
+    "routeLabels": [ "DEFAULT_ROUTE" ],
+    "staticDuration": "2067s"
+  } ]
 }
