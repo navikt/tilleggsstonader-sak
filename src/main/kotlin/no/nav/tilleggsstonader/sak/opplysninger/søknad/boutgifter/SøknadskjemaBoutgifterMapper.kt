@@ -22,7 +22,6 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.TypeU
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.TypePengestøtte
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNorge
-import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.opplysninger.kodeverk.KodeverkService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
@@ -33,6 +32,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Personopplysninge
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
 import no.nav.tilleggsstonader.sak.vedlegg.BrevkodeVedlegg
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArbeidOgOpphold as ArbeidOgOppholdKontrakt
@@ -46,6 +46,8 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Utgif
 class SøknadskjemaBoutgifterMapper(
     private val kodeverkService: KodeverkService,
 ) {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     fun map(
         mottattTidspunkt: LocalDateTime,
         språk: Språkkode,
@@ -214,14 +216,16 @@ class SøknadskjemaBoutgifterMapper(
 
     private fun validerAndelUtgifterNyBolig(utgifterNyBolig: UtgifterNyBoligKontrakt) {
         val fordelingUtgifter = utgifterNyBolig.fordelingUtgifter
-        feilHvis(
-            utgifterNyBolig.harHoyereUtgifterPaNyttBosted == JaNeiType.ja &&
-                (
-                    fordelingUtgifter?.andelUtgifterBoligHjemsted == null ||
-                        fordelingUtgifter.andelUtgifterBoligAktivitetssted == null
-                ),
-        ) {
-            "Mangler andelUtgifterBoligHjemsted eller andelUtgifterBoligAktivitetssted når harHoyereUtgifterPaNyttBosted er ja"
+
+        val manglerFordelingUtgifter =
+            fordelingUtgifter?.andelUtgifterBoligHjemsted == null ||
+                fordelingUtgifter.andelUtgifterBoligAktivitetssted == null
+
+        if (utgifterNyBolig.harHoyereUtgifterPaNyttBosted == JaNeiType.ja && manglerFordelingUtgifter) {
+            logger.error(
+                "Søknad for boutgifter manglet andelUtgifterBoligHjemsted eller andelUtgifterBoligAktivitetssted " +
+                    "når harHoyereUtgifterPaNyttBosted er ja. Dette skal ikke skje med nye søknader for boutgifter",
+            )
         }
     }
 
