@@ -1,20 +1,22 @@
 {
   "aktiviteter": {
     "aktiviteterOgMaalgruppe": {
-      "aktivitetId": "123",
-      "maalgruppe": {
-        "gyldighetsperiode": {
+      "aktivitet": {
+        "aktivitetId": "123",
+        "maalgruppe": {
+          "gyldighetsperiode": {
+            "fom": "2025-01-01",
+            "tom": "2025-01-01"
+          },
+          "maalgruppenavn": "maalgruppenavn",
+          "maalgruppetype": "NEDSARBEVN"
+        },
+        "periode": {
           "fom": "2025-01-01",
           "tom": "2025-01-01"
         },
-        "maalgruppenavn": "maalgruppenavn",
-        "maalgruppetype": "NEDSARBEVN"
-      },
-      "periode": {
-        "fom": "2025-01-01",
-        "tom": "2025-01-01"
-      },
-      "text": "Jeg får ikke opp noen aktiviteter her som stemmer med det jeg vil søke om"
+        "text": "Jeg får ikke opp noen aktiviteter her som stemmer med det jeg vil søke om"
+      }
     },
     "arbeidsrettetAktivitet": "tiltakArbeidsrettetUtredning",
     "mottarLonnGjennomTiltak": "ja"

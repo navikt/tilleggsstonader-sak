@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.journalpost.Journalposttype
 import no.nav.tilleggsstonader.kontrakter.journalpost.Journalstatus
 import no.nav.tilleggsstonader.kontrakter.søknad.InnsendtSkjema
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Aktivitet
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Aktiviteter
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.AktiviteterOgMålgruppe
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArbeidOgOpphold
@@ -69,10 +70,13 @@ class OpprettDummySøknadBoutgifter(
             Aktiviteter(
                 aktiviteterOgMaalgruppe =
                     AktiviteterOgMålgruppe(
-                        aktivitetId = "ingenAktivitet",
-                        text = "",
-                        periode = null,
-                        maalgruppe = null,
+                        aktivitet =
+                            Aktivitet(
+                                aktivitetId = "ingenAktivitet",
+                                text = "",
+                                periode = null,
+                                maalgruppe = null,
+                            ),
                     ),
                 arbeidsrettetAktivitet = ArbeidsrettetAktivitetType.tiltakArbeidsrettetUtredning,
                 mottarLonnGjennomTiltak = JaNeiType.nei,

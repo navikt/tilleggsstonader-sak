@@ -157,7 +157,7 @@ class SøknadskjemaBoutgifterMapper(
         } ?: emptyList()
 
     private fun mapAktivitet(aktiviteter: Aktiviteter): AktivitetAvsnitt {
-        val aktivitet = aktiviteter.aktiviteterOgMaalgruppe
+        val aktivitet = aktiviteter.aktiviteterOgMaalgruppe.aktivitet
         // Fyll ut setter aktivitetId til "ingenAktivitet" og vi har ellers mapping til ANNET som brukes i vår søknad
         val id = if (aktivitet.aktivitetId == "ingenAktivitet") "ANNET" else aktivitet.aktivitetId
         return AktivitetAvsnitt(
