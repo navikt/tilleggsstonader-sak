@@ -88,6 +88,52 @@ class OpphørReiseTilSamlingIntegrationTest(
     }
 
     @Test
+    fun `skal kunne opphøre hele saken når opphørsdato er før første reise`() {
+        val førstegangsbehandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO,
+            ) {
+                // Aktivitet og målgruppe strekker seg gjennom hele januar-mars, men den eneste
+                // reisen ligger i mars. Opphørsdato settes midt i januar, altså god tid før den
+                // første (og eneste) reisen. Da skal opphøret fjerne hele vedtaksperioden, og
+                // vedtaket blir et opphør av hele saken uten noen gjenværende vedtaksperioder.
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTsoReiseTilSamling(1 januar 2025, 31 mars 2025)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(1 januar 2025, 31 mars 2025)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        offentligTransportReiseTilSamling(1 mars 2025, 31 mars 2025)
+                    }
+                }
+            }
+
+        testoppsettService.settAndelerTilOkForBehandling(førstegangsbehandlingContext.behandlingId)
+
+        val revurderingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = førstegangsbehandlingContext.behandlingId,
+                tilSteg = StegType.SIMULERING,
+            ) {
+                vedtak {
+                    opphør(opphørsdato = 1 mars 2025)
+                }
+            }
+
+        val vedtak = hentOpphør(revurderingId)
+
+        assertThat(vedtak.type).isEqualTo(TypeVedtak.OPPHØR)
+        assertThat(vedtak.opphørsdato).isEqualTo(1 mars 2025)
+        assertThat(vedtak.data.vedtaksperioder).isEmpty()
+    }
+
+    @Test
     fun `skal ikke kunne opphøre midt i en oppfylt samlingsperiode`() {
         val førstegangsbehandlingContext =
             opprettBehandlingOgGjennomførBehandlingsløp(
