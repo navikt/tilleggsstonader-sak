@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.AvslagReiseTilSaml
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.BeregningsresultatReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingTsoRequest
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingTsrRequest
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.OpphørReiseTilSamlingRequest
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.VedtakReiseTilSamlingRequest
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
@@ -115,6 +116,12 @@ class ReiseTilSamlingVedtakController(
 
         return lagreVedtak(behandlingId, vedtak).tilStegFerdigstiltResponse()
     }
+
+    @PostMapping("{behandlingId}/opphor")
+    fun opphør(
+        @PathVariable behandlingId: BehandlingId,
+        @RequestBody vedtak: OpphørReiseTilSamlingRequest,
+    ): StegFerdigstiltResponse = lagreVedtak(behandlingId, vedtak).tilStegFerdigstiltResponse()
 
     private fun lagreVedtak(
         behandlingId: BehandlingId,

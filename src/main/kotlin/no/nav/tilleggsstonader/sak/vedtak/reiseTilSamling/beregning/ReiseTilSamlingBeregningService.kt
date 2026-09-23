@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.beregning
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
-import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
@@ -99,7 +98,9 @@ class ReiseTilSamlingBeregningService(
             utgifterTilBeregning,
             vedtaksperioderBeregning,
         )
-        validerFinnesSamling(utgifterTilBeregning)
+        if (typeVedtak == TypeVedtak.INNVILGELSE) {
+            validerFinnesSamling(utgifterTilBeregning)
+        }
 
         val beregnFra = beregningsplan.beregnFra()
         val (uendredeUtgifter, berørteUtgifter) = utgifterTilBeregning.splittPåBeregnFra(beregnFra, forrigeVedtak)
