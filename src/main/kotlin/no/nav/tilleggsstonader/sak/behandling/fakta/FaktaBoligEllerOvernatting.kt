@@ -42,10 +42,13 @@ data class FaktaPeriodeForSamling(
 )
 
 data class FaktaUtgifterNyBolig(
-    val delerBoutgifter: JaNei,
+    val delerBoutgifter: JaNei?,
+    val delerBoutgifterNy: List<DelerUtgifterFlereStederType>?,
     val andelUtgifterBolig: Int?,
     val harHoyereUtgifterPaNyttBosted: JaNei,
     val mottarBostotte: JaNei?,
+    val andelUtgifterBoligHjemsted: Int?,
+    val andelUtgifterBoligAktivitetssted: Int?,
 )
 
 fun BoligEllerOvernattingAvsnitt.tilFakta() =
@@ -84,7 +87,10 @@ private fun UtgifterFlereSteder.tilFakta() =
 private fun UtgifterNyBolig.tilFakta() =
     FaktaUtgifterNyBolig(
         delerBoutgifter = this.delerBoutgifter,
+        delerBoutgifterNy = this.delerBoutgifterNy,
         andelUtgifterBolig = this.andelUtgifterBolig,
         harHoyereUtgifterPaNyttBosted = this.harHoyereUtgifterPaNyttBosted,
         mottarBostotte = this.mottarBostotte,
+        andelUtgifterBoligHjemsted = this.andelUtgifterBoligHjemsted,
+        andelUtgifterBoligAktivitetssted = this.andelUtgifterBoligAktivitetssted,
     )

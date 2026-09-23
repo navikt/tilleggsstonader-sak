@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
-import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Aktivitet
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Aktiviteter
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.AktiviteterOgMålgruppe
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArbeidsrettetAktivitetType
@@ -10,6 +9,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Boutg
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.DelerBoutgifterType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.DineOpplysninger
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.FasteUtgifter
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.FordelingUtgifter
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HarUtgifterTilBoligToStederType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.HovedytelseType
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Identitet
@@ -62,10 +62,14 @@ object SøknadBoutgifterUtil {
                 ),
             utgifterNyBolig =
                 UtgifterNyBolig(
-                    delerBoutgifter = JaNeiType.ja,
-                    andelUtgifterBolig = 900,
                     harHoyereUtgifterPaNyttBosted = JaNeiType.ja,
-                    mottarBostotte = JaNeiType.nei,
+                    fordelingUtgifter =
+                        FordelingUtgifter(
+                            delerBoutgifter = mapOf(DelerBoutgifterType.aktivitetssted to true),
+                            andelUtgifterBoligHjemsted = 1300,
+                            andelUtgifterBoligAktivitetssted = 1000,
+                            mottarBostotte = JaNeiType.nei,
+                        ),
                 ),
         )
 
@@ -109,13 +113,10 @@ object SøknadBoutgifterUtil {
         Aktiviteter(
             aktiviteterOgMaalgruppe =
                 AktiviteterOgMålgruppe(
-                    aktivitet =
-                        Aktivitet(
-                            aktivitetId = "ingenAktivitet",
-                            text = "",
-                            periode = null,
-                            maalgruppe = null,
-                        ),
+                    aktivitetId = "ingenAktivitet",
+                    text = "",
+                    periode = null,
+                    maalgruppe = null,
                 ),
             arbeidsrettetAktivitet = ArbeidsrettetAktivitetType.tiltakArbeidsrettetUtredning,
             mottarLonnGjennomTiltak = JaNeiType.nei,

@@ -32,6 +32,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Personopplysninge
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
 import no.nav.tilleggsstonader.sak.vedlegg.BrevkodeVedlegg
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArbeidOgOpphold as ArbeidOgOppholdKontrakt
@@ -45,6 +46,8 @@ import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Utgif
 class SøknadskjemaBoutgifterMapper(
     private val kodeverkService: KodeverkService,
 ) {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     fun map(
         mottattTidspunkt: LocalDateTime,
         språk: Språkkode,
@@ -154,7 +157,7 @@ class SøknadskjemaBoutgifterMapper(
         } ?: emptyList()
 
     private fun mapAktivitet(aktiviteter: Aktiviteter): AktivitetAvsnitt {
-        val aktivitet = aktiviteter.aktiviteterOgMaalgruppe.aktivitet
+        val aktivitet = aktiviteter.aktiviteterOgMaalgruppe
         // Fyll ut setter aktivitetId til "ingenAktivitet" og vi har ellers mapping til ANNET som brukes i vår søknad
         val id = if (aktivitet.aktivitetId == "ingenAktivitet") "ANNET" else aktivitet.aktivitetId
         return AktivitetAvsnitt(
@@ -198,13 +201,33 @@ class SøknadskjemaBoutgifterMapper(
 
     private fun mapUtgifterNyBolig(utgifterNyBolig: UtgifterNyBoligKontrakt?): UtgifterNyBolig? =
         utgifterNyBolig?.let {
+            validerAndelUtgifterNyBolig(it)
+            val fordelingUtgifter = it.fordelingUtgifter
             UtgifterNyBolig(
-                delerBoutgifter = mapJaNei(it.delerBoutgifter),
-                andelUtgifterBolig = it.andelUtgifterBolig,
+                delerBoutgifter = null,
+                delerBoutgifterNy = fordelingUtgifter?.let { fordeling -> mapDelerBoutgifterFlereSteder(fordeling.delerBoutgifter) },
+                andelUtgifterBolig = null,
                 harHoyereUtgifterPaNyttBosted = mapJaNei(it.harHoyereUtgifterPaNyttBosted),
-                mottarBostotte = mapJaNei(it.mottarBostotte),
+                mottarBostotte = fordelingUtgifter?.mottarBostotte?.let(::mapJaNei),
+                andelUtgifterBoligHjemsted = fordelingUtgifter?.andelUtgifterBoligHjemsted,
+                andelUtgifterBoligAktivitetssted = fordelingUtgifter?.andelUtgifterBoligAktivitetssted,
             )
         }
+
+    private fun validerAndelUtgifterNyBolig(utgifterNyBolig: UtgifterNyBoligKontrakt) {
+        val fordelingUtgifter = utgifterNyBolig.fordelingUtgifter
+
+        val manglerFordelingUtgifter =
+            fordelingUtgifter?.andelUtgifterBoligHjemsted == null ||
+                fordelingUtgifter.andelUtgifterBoligAktivitetssted == null
+
+        if (utgifterNyBolig.harHoyereUtgifterPaNyttBosted == JaNeiType.ja && manglerFordelingUtgifter) {
+            logger.error(
+                "Søknad for boutgifter manglet andelUtgifterBoligHjemsted eller andelUtgifterBoligAktivitetssted " +
+                    "når harHoyereUtgifterPaNyttBosted er ja. Dette skal ikke skje med nye søknader for boutgifter",
+            )
+        }
+    }
 
     private fun mapUtgifterFlereSteder(utgifterFlereSteder: UtgifterFlereStederKontrakt?): UtgifterFlereSteder? =
         utgifterFlereSteder?.let {

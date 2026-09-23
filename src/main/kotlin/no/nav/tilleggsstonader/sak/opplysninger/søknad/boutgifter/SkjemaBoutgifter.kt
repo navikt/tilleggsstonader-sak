@@ -44,10 +44,13 @@ data class FasteUtgifter(
 )
 
 data class UtgifterNyBolig(
-    val delerBoutgifter: JaNei,
+    val delerBoutgifter: JaNei?,
+    val delerBoutgifterNy: List<DelerUtgifterFlereStederType>?,
     val andelUtgifterBolig: Int?,
     val harHoyereUtgifterPaNyttBosted: JaNei,
-    val mottarBostotte: JaNei,
+    val mottarBostotte: JaNei?,
+    val andelUtgifterBoligHjemsted: Int?,
+    val andelUtgifterBoligAktivitetssted: Int?,
 )
 
 data class UtgifterFlereSteder(
