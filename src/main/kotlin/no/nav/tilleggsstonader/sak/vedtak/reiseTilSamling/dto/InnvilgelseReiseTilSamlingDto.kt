@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeTsrDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import java.time.LocalDate
 
@@ -30,7 +31,7 @@ data class InnvilgelseReiseTilSamlingTsoRequest(
 }
 
 data class InnvilgelseReiseTilSamlingTsrRequest(
-    val vedtaksperioder: List<VedtaksperiodeDto>,
+    val vedtaksperioder: List<VedtaksperiodeTsrDto>,
     override val begrunnelse: String? = null,
 ) : InnvilgelseReiseTilSamlingRequest {
     override fun vedtaksperioder(): List<Vedtaksperiode> = vedtaksperioder.tilDomene()

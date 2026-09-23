@@ -13,7 +13,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.dsl.BehandlingTestdataDsl
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsessering
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
-import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilVedtaksperiodeDagligReiseDto
+import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilVedtaksperiodeTsrDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.AvslagBoutgifterDto
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.OpphørBoutgifterRequest
@@ -263,7 +263,7 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                             Stønadstype.DAGLIG_REISE_TSO -> InnvilgelseDagligReiseTsoRequest(vedtaksperioder = vedtaksperioder)
                             Stønadstype.DAGLIG_REISE_TSR ->
                                 InnvilgelseDagligReiseTsrRequest(
-                                    vedtaksperioder = vedtaksperioder.tilVedtaksperiodeDagligReiseDto(),
+                                    vedtaksperioder = vedtaksperioder.tilVedtaksperiodeTsrDto(),
                                 )
 
                             Stønadstype.REISE_TIL_SAMLING_TSO ->
@@ -272,7 +272,7 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                                 )
                             Stønadstype.REISE_TIL_SAMLING_TSR ->
                                 InnvilgelseReiseTilSamlingTsrRequest(
-                                    vedtaksperioder = vedtaksperioder,
+                                    vedtaksperioder = vedtaksperioder.tilVedtaksperiodeTsrDto(),
                                 )
 
                             Stønadstype.FLYTTING_TSO,

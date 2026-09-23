@@ -1,12 +1,12 @@
 package no.nav.tilleggsstonader.sak.integrasjonstest.testdata
 
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtaksperiodeDagligReiseTsrDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeTsrDto
 
-fun List<VedtaksperiodeDto>.tilVedtaksperiodeDagligReiseDto() = map { it.tilVedtaksperiodeDagligReiseDto() }
+fun List<VedtaksperiodeDto>.tilVedtaksperiodeTsrDto() = map { it.tilVedtaksperiodeTsrDto() }
 
-fun VedtaksperiodeDto.tilVedtaksperiodeDagligReiseDto() =
-    VedtaksperiodeDagligReiseTsrDto(
+fun VedtaksperiodeDto.tilVedtaksperiodeTsrDto() =
+    VedtaksperiodeTsrDto(
         id = id,
         fom = fom,
         tom = tom,
