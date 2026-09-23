@@ -126,6 +126,7 @@ class VedtakRepositoryJsonTest : CleanDatabaseIntegrationTest() {
             TypeVedtakDagligReise.OPPHØR_DAGLIG_REISE -> OpphørDagligReise::class
             TypeVedtakReiseTilSamling.INNVILGELSE_REISE_TIL_SAMLING -> InnvilgelseReiseTilSamling::class
             TypeVedtakReiseTilSamling.AVSLAG_REISE_TIL_SAMLING -> AvslagReiseTilSamling::class
+            TypeVedtakReiseTilSamling.OPPHØR_REISE_TIL_SAMLING -> OpphørReiseTilSamling::class
             TypeVedtakReiseOppstartAvslutningHjemreise.INNVILGELSE_REISE_OPPSTART_AVSLUTNING_HJEMREISE ->
                 InnvilgelseReiseOppstartAvslutningHjemreise::class
         }.java

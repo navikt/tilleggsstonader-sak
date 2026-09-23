@@ -31,6 +31,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørPassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakDagligReise
@@ -335,6 +336,12 @@ class InterntVedtakService(
                 VedtakAvslagInternt(
                     årsakerAvslag = vedtak.årsaker,
                     avslagBegrunnelse = vedtak.begrunnelse,
+                )
+
+            is OpphørReiseTilSamling ->
+                VedtakOpphørInternt(
+                    årsakerOpphør = vedtak.årsaker,
+                    opphørBegrunnelse = vedtak.begrunnelse,
                 )
         }
 

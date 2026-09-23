@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.BeregningsresultatPassAvBarn
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -75,6 +76,26 @@ class OpphørValideringService(
                     ) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter opphørsdato" }
                 }
         }
+    }
+
+    fun validerIngenUtbetalingEtterOpphørsdatoReiseTilSamling(
+        beregningsresultatReiseTilSamling: BeregningsresultatReiseTilSamling,
+        opphørsdato: LocalDate,
+    ) {
+        beregningsresultatReiseTilSamling.offentligTransport
+            .filter { it.beløp > 0.toBigDecimal() }
+            .forEach {
+                brukerfeilHvis(
+                    it.grunnlag.fom >= opphørsdato,
+                ) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter opphørsdato" }
+            }
+        beregningsresultatReiseTilSamling.privatBil
+            .filter { it.beløp > 0.toBigDecimal() }
+            .forEach {
+                brukerfeilHvis(
+                    it.grunnlag.fom >= opphørsdato,
+                ) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter opphørsdato" }
+            }
     }
 
     fun validerVedtaksperioderAvkortetVedOpphør(
