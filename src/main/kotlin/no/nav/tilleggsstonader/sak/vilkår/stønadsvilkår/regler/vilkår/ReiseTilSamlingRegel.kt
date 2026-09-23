@@ -55,7 +55,7 @@ class ReiseTilSamlingRegel :
                         hvisJa =
                             SluttSvarRegel(
                                 resultat = Resultat.OPPFYLT,
-                                begrunnelseType = BegrunnelseType.UTEN,
+                                begrunnelseType = BegrunnelseType.VALGFRI,
                                 tilhørendeFaktaType = TypeVilkårFakta.REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT,
                             ),
                         hvisNei = IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
