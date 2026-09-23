@@ -11,7 +11,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.FileUtil.SKRIV_TIL_FIL
-import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
+import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileJsonIsEqual
 import no.nav.tilleggsstonader.sak.util.FileUtil.skrivTilFil
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.totrinnskontroll.TotrinnskontrollService
@@ -75,7 +75,7 @@ class InterntVedtakGenereringTest {
     fun `json til htmlify er riktig`(stønadstype: Stønadstype) {
         mock(stønadstype)
         val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
-        assertFileIsEqual("interntVedtak/$stønadstype/internt_vedtak.json", interntVedtak)
+        assertFileJsonIsEqual("interntVedtak/$stønadstype/internt_vedtak.json", interntVedtak)
     }
 
     /**

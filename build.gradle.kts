@@ -45,6 +45,12 @@ spotless {
     kotlin {
         ktlint("1.8.0")
     }
+    json {
+        target("src/**/*.json")
+        targetExclude("**/build/**")
+        jackson()
+            .feature("ORDER_MAP_ENTRIES_BY_KEYS", true)
+    }
 }
 
 configurations.all {
@@ -147,7 +153,7 @@ application {
 }
 
 if (project.hasProperty("skipLint")) {
-    gradle.startParameter.excludedTaskNames += "spotlessKotlinCheck"
+    gradle.startParameter.excludedTaskNames += "spotlessCheck"
 }
 
 // Oppretter version.properties med git-sha som version

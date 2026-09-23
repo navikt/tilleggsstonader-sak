@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.util.EnumUtil.enumName
 import no.nav.tilleggsstonader.sak.util.FileUtil
+import no.nav.tilleggsstonader.sak.util.toDeepSortedMap
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -39,8 +40,8 @@ class FaktaGrunnlagDataTest {
 
         val parsetJson = jsonMapper.readValue<FaktaGrunnlagData>(json)
 
-        val jsonFraObj = jsonMapper.convertValue<Map<String, Any>>(parsetJson).toSortedMap()
-        val jsonFraFil = jsonMapper.readValue<Map<String, Any>>(json).toSortedMap()
+        val jsonFraObj = jsonMapper.convertValue<Map<String, Any>>(parsetJson).toDeepSortedMap()
+        val jsonFraFil = jsonMapper.readValue<Map<String, Any>>(json).toDeepSortedMap()
 
         assertThat(parsetJson).isInstanceOf(parsetJson.type.kClass.java)
         assertThat(jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonFraFil))

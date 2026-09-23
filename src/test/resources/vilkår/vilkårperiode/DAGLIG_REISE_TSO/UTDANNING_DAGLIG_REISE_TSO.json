@@ -1,12 +1,12 @@
 {
-  "type": "UTDANNING_DAGLIG_REISE_TSO",
   "fakta": {
     "aktivitetsdager": 3
   },
+  "type": "UTDANNING_DAGLIG_REISE_TSO",
   "vurderinger": {
     "harUtgifter": {
-      "svar": null,
-      "resultat": "IKKE_VURDERT"
+      "resultat": "IKKE_VURDERT",
+      "svar": null
     }
   }
 }

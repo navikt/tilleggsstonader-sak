@@ -2,14 +2,13 @@ package no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapperFailOnUnknownProperties
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.BoutgifterFyllUtSendInnData
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.SkjemaBoutgifter
 import no.nav.tilleggsstonader.sak.opplysninger.kodeverk.KodeverkService
 import no.nav.tilleggsstonader.sak.util.FileUtil
-import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileIsEqual
+import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileJsonIsEqual
 import org.junit.jupiter.api.Test
 import tools.jackson.module.kotlin.readValue
 
@@ -35,8 +34,7 @@ class SøknadskjemaBoutgifterMapperTest {
             SøknadsskjemaBoutgifterFyllUtSendInn("nb-NO", BoutgifterFyllUtSendInnData(boutgifter), emptyList(), 1)
         val mappetSkjema = mapper.mapSkjema(skjema, emptyList())
 
-        val mappetJson = jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(mappetSkjema)
-        assertFileIsEqual("søknad/boutgifter/eksempel1/mappet-domene.json", mappetJson)
+        assertFileJsonIsEqual("søknad/boutgifter/eksempel1/mappet-domene.json", mappetSkjema)
     }
 
     /**
@@ -48,7 +46,6 @@ class SøknadskjemaBoutgifterMapperTest {
         val boutgifter = jsonMapperFailOnUnknownProperties.readValue<SøknadsskjemaBoutgifterFyllUtSendInn>(json)
         val mappetSkjema = mapper.mapSkjema(boutgifter, emptyList())
 
-        val mappetJson = jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(mappetSkjema)
-        assertFileIsEqual("søknad/boutgifter/eksempel2/mappet-domene.json", mappetJson)
+        assertFileJsonIsEqual("søknad/boutgifter/eksempel2/mappet-domene.json", mappetSkjema)
     }
 }

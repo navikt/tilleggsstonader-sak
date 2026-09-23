@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider
 import org.assertj.core.api.Assertions.assertThat
-import tools.jackson.databind.JsonNode
+import tools.jackson.module.kotlin.convertValue
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -47,34 +47,32 @@ object FileUtil {
      */
     val SKRIV_TIL_FIL = System.getenv("SKRIV_TIL_FIL")?.toBoolean() ?: false
 
+    /**
+     * Sammenligner [json] mot json i [filnavn].
+     *
+     * Sammenligningen gjøres ved å normalisere begge sider til en sortert Map/List-struktur og deretter
+     * pretty-printe dem til strenger, i stedet for å sammenligne [tools.jackson.databind.JsonNode] direkte. Dette er bevisst:
+     * - En pretty-printet json-string gir en langt mer lesbar diff enn å sammenligne JsonNode-trær.
+     * - Talltyper kan divergere mellom en json-fil (som f.eks. deserialiseres til Int) og et kotlin-objekt
+     *   (som f.eks. har et felt av typen BigInteger). JsonNode-likhet skiller på nodetype (IntNode != BigIntegerNode)
+     *   selv om verdien er den samme, mens en tekstlig sammenligning av json ikke gjør det.
+     *
+     * Fungerer uansett om roten i json er et objekt eller en array.
+     */
     fun assertFileJsonIsEqual(
         filnavn: String,
         json: Any,
     ) {
-        val jsonNode = JsonMapperProvider.jsonMapper.valueToTree<JsonNode>(json)
-        val filJsonNode = JsonMapperProvider.jsonMapper.readTree(readFile(filnavn))
+        val forventetJson = JsonMapperProvider.jsonMapper.readTree(readFile(filnavn)).tilSortertPrettyJson()
+        val faktiskJson = json.tilSortertPrettyJson()
 
-        skrivTilFil(
-            filnavn,
-            JsonMapperProvider.jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode),
-        )
-        assertThat(jsonNode).isEqualTo(filJsonNode)
+        skrivTilFil(filnavn, faktiskJson)
+        assertThat(faktiskJson).isEqualTo(forventetJson)
     }
 
-    fun assertFileIsEqual(
-        filnavn: String,
-        data: Any,
-    ) {
-        val json = JsonMapperProvider.jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(data)
-        assertFileIsEqual(filnavn, json)
-    }
-
-    fun assertFileIsEqual(
-        filnavn: String,
-        data: String,
-    ) {
-        skrivTilFil(filnavn, data)
-        assertThat(data).isEqualTo(readFile(filnavn))
+    private fun Any.tilSortertPrettyJson(): String {
+        val sortert = JsonMapperProvider.jsonMapper.convertValue<Any?>(this).toDeepSorted()
+        return JsonMapperProvider.jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(sortert)
     }
 
     fun skrivTilFil(

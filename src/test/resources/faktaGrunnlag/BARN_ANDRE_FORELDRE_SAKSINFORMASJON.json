@@ -1,16 +1,12 @@
 {
-  "type": "BARN_ANDRE_FORELDRE_SAKSINFORMASJON",
+  "andreForeldre": [ {
+    "harBehandlingUnderArbeid": true,
+    "ident": "forelder1",
+    "vedtaksperioderBarn": [ {
+      "fom": "2025-01-01",
+      "tom": "2025-01-31"
+    } ]
+  } ],
   "identBarn": "ident1",
-  "andreForeldre": [
-    {
-      "ident": "forelder1",
-      "harBehandlingUnderArbeid": true,
-      "vedtaksperioderBarn": [
-        {
-          "fom": "2025-01-01",
-          "tom": "2025-01-31"
-        }
-      ]
-    }
-  ]
+  "type": "BARN_ANDRE_FORELDRE_SAKSINFORMASJON"
 }
