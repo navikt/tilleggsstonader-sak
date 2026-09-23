@@ -203,54 +203,23 @@ class SøknadskjemaBoutgifterMapper(
         utgifterNyBolig?.let {
             validerAndelUtgifterNyBolig(it)
             val fordelingUtgifter = it.fordelingUtgifter
-            val fordelingUtgifterMidlertidig = it.test
-
-            if (fordelingUtgifter != null) {
-                return UtgifterNyBolig(
-                    delerBoutgifter = null,
-                    delerBoutgifterNy = mapDelerBoutgifterFlereSteder(fordelingUtgifter.delerBoutgifter),
-                    andelUtgifterBolig = null,
-                    harHoyereUtgifterPaNyttBosted = mapJaNei(it.harHoyereUtgifterPaNyttBosted),
-                    mottarBostotte = fordelingUtgifter.mottarBostotte.let(::mapJaNei),
-                    andelUtgifterBoligHjemsted = fordelingUtgifter.andelUtgifterBoligHjemsted,
-                    andelUtgifterBoligAktivitetssted = fordelingUtgifter.andelUtgifterBoligAktivitetssted,
-                )
-            }
-
-            if (fordelingUtgifterMidlertidig != null) {
-                return UtgifterNyBolig(
-                    delerBoutgifter = null,
-                    delerBoutgifterNy = mapDelerBoutgifterFlereSteder(fordelingUtgifterMidlertidig.delerBoutgifter1),
-                    andelUtgifterBolig = null,
-                    harHoyereUtgifterPaNyttBosted = mapJaNei(it.harHoyereUtgifterPaNyttBosted),
-                    mottarBostotte = fordelingUtgifterMidlertidig.mottarBostotte.let(::mapJaNei),
-                    andelUtgifterBoligHjemsted = fordelingUtgifterMidlertidig.andelUtgifterBoligHjemsted,
-                    andelUtgifterBoligAktivitetssted = fordelingUtgifterMidlertidig.andelUtgifterBoligAktivitetssted,
-                )
-            }
-
             UtgifterNyBolig(
                 delerBoutgifter = null,
-                delerBoutgifterNy = null,
+                delerBoutgifterNy = fordelingUtgifter?.let { mapDelerBoutgifterFlereSteder(it.delerBoutgifter) },
                 andelUtgifterBolig = null,
                 harHoyereUtgifterPaNyttBosted = mapJaNei(it.harHoyereUtgifterPaNyttBosted),
-                mottarBostotte = null,
-                andelUtgifterBoligHjemsted = null,
-                andelUtgifterBoligAktivitetssted = null,
+                mottarBostotte = fordelingUtgifter?.mottarBostotte?.let(::mapJaNei),
+                andelUtgifterBoligHjemsted = fordelingUtgifter?.andelUtgifterBoligHjemsted,
+                andelUtgifterBoligAktivitetssted = fordelingUtgifter?.andelUtgifterBoligAktivitetssted,
             )
         }
 
     private fun validerAndelUtgifterNyBolig(utgifterNyBolig: UtgifterNyBoligKontrakt) {
-        val andelUtgifterBoligHjemsted =
-            utgifterNyBolig.fordelingUtgifter?.andelUtgifterBoligHjemsted
-                ?: utgifterNyBolig.test?.andelUtgifterBoligHjemsted
-        val andelUtgifterBoligAktivitetssted =
-            utgifterNyBolig.fordelingUtgifter?.andelUtgifterBoligAktivitetssted
-                ?: utgifterNyBolig.test?.andelUtgifterBoligAktivitetssted
+        val fordelingUtgifter = utgifterNyBolig.fordelingUtgifter
 
         val manglerFordelingUtgifter =
-            andelUtgifterBoligHjemsted == null ||
-                andelUtgifterBoligAktivitetssted == null
+            fordelingUtgifter?.andelUtgifterBoligHjemsted == null ||
+                fordelingUtgifter.andelUtgifterBoligAktivitetssted == null
 
         if (utgifterNyBolig.harHoyereUtgifterPaNyttBosted == JaNeiType.ja && manglerFordelingUtgifter) {
             logger.error(
