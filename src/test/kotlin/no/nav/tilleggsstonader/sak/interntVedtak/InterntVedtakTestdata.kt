@@ -1211,7 +1211,7 @@ object InterntVedtakTestdata {
                                     fom = LocalDate.of(2024, 1, 1),
                                     tom = LocalDate.of(2024, 1, 31),
                                     sats = BigDecimal(3.50),
-                                    totaltReiseavstand = BigDecimal(60.0),
+                                    totalReiseavstand = BigDecimal(60.0),
                                     bompenger = BigDecimal(40),
                                     fergekostnad = BigDecimal(50),
                                     parkering = BigDecimal(40),
