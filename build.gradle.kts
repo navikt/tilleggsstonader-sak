@@ -4,7 +4,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 val javaVersion = JavaLanguageVersion.of(21)
 val familieProsesseringVersion = "2.20260817115650_f13f507"
 val tilleggsstønaderLibsVersion = "2026.08.07-12.32.dfeb3286fb52"
-val tilleggsstønaderKontrakterVersion = "2026.09.09-21.30.e4b853b68321"
+val tilleggsstønaderKontrakterVersion = "2026.09.22-13.31.d6d7d5f8b690"
 val avroVersion = "1.12.2"
 val confluentVersion = "8.0.1"
 val joarkHendelseVersion = "1.1.11"
@@ -44,6 +44,12 @@ apply(plugin = "com.diffplug.spotless")
 spotless {
     kotlin {
         ktlint("1.8.0")
+    }
+    json {
+        target("src/**/*.json")
+        targetExclude("**/build/**")
+        jackson()
+            .feature("ORDER_MAP_ENTRIES_BY_KEYS", true)
     }
 }
 
@@ -147,7 +153,7 @@ application {
 }
 
 if (project.hasProperty("skipLint")) {
-    gradle.startParameter.excludedTaskNames += "spotlessKotlinCheck"
+    gradle.startParameter.excludedTaskNames += "spotlessCheck"
 }
 
 // Oppretter version.properties med git-sha som version

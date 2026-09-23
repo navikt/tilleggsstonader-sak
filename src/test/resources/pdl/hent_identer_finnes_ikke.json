@@ -1,23 +1,17 @@
 {
-  "errors": [
-    {
-      "message": "Fant ikke person",
-      "locations": [
-        {
-          "line": 2,
-          "column": 5
-        }
-      ],
-      "path": [
-        "hentIdenter"
-      ],
-      "extensions": {
-        "code": "not_found",
-        "classification": "ExecutionAborted"
-      }
-    }
-  ],
   "data": {
     "hentIdenter": null
-  }
+  },
+  "errors": [ {
+    "extensions": {
+      "classification": "ExecutionAborted",
+      "code": "not_found"
+    },
+    "locations": [ {
+      "column": 5,
+      "line": 2
+    } ],
+    "message": "Fant ikke person",
+    "path": [ "hentIdenter" ]
+  } ]
 }

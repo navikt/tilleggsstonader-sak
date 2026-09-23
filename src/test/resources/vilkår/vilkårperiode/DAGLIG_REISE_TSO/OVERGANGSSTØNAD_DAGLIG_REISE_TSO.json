@@ -1,10 +1,10 @@
 {
+  "fakta": { },
   "type": "OVERGANGSSTØNAD_DAGLIG_REISE_TSO",
-  "fakta": {},
   "vurderinger": {
     "medlemskap": {
-      "svar": "JA_IMPLISITT",
-      "resultat": "OPPFYLT"
+      "resultat": "OPPFYLT",
+      "svar": "JA_IMPLISITT"
     }
   }
 }

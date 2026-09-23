@@ -4,35 +4,29 @@
     "omfang": "ALLE_PERIODER"
   },
   "beregningsresultat": {
-    "offentligTransport": [
-      {
-        "reiseId": "01a01909-7c2e-72dc-a318-f8c08154a603",
-        "grunnlag": {
-          "adresse": "rfg",
+    "offentligTransport": [ {
+      "aktivitetId": "29dc9897-4d0c-442a-a101-95295ac10222",
+      "beløp": 245365,
+      "grunnlag": {
+        "adresse": "rfg",
+        "fom": "2026-08-20",
+        "tom": "2026-08-20",
+        "vedtaksperioder": [ {
           "fom": "2026-08-20",
-          "tom": "2026-08-20",
-          "vedtaksperioder": [
-            {
-              "id": "29dc9897-4d0c-442a-a101-95295ac10111",
-              "fom": "2026-08-20",
-              "tom": "2026-08-22"
-            }
-          ]
-        },
-        "beløp": 245365,
-        "aktivitetId": "29dc9897-4d0c-442a-a101-95295ac10222"
-      }
-    ],
-    "privatBil": []
+          "id": "29dc9897-4d0c-442a-a101-95295ac10111",
+          "tom": "2026-08-22"
+        } ]
+      },
+      "reiseId": "01a01909-7c2e-72dc-a318-f8c08154a603"
+    } ],
+    "privatBil": [ ]
   },
   "type": "INNVILGELSE_REISE_OPPSTART_AVSLUTNING_HJEMREISE",
-  "vedtaksperioder": [
-    {
-      "id": "29dc9897-4d0c-442a-a101-95295ac10111",
-      "fom": "2026-08-20",
-      "tom": "2026-08-22",
-      "målgruppe": "NEDSATT_ARBEIDSEVNE",
-      "aktivitet": "TILTAK"
-    }
-  ]
+  "vedtaksperioder": [ {
+    "aktivitet": "TILTAK",
+    "fom": "2026-08-20",
+    "id": "29dc9897-4d0c-442a-a101-95295ac10111",
+    "målgruppe": "NEDSATT_ARBEIDSEVNE",
+    "tom": "2026-08-22"
+  } ]
 }

@@ -1,117 +1,117 @@
 {
-  "personopplysninger" : {
-    "adresse" : {
-      "gyldigFraOgMed" : "2004-10-29",
-      "adresse" : "Hestehagen 2",
-      "postnummer" : "2069",
-      "poststed" : "JESSHEIM",
-      "landkode" : "Land1"
-    }
-  },
-  "hovedytelse" : {
-    "hovedytelse" : [ "AAP" ],
-    "harNedsattArbeidsevne" : null,
-    "arbeidOgOpphold" : {
-      "jobberIAnnetLand" : "JA",
-      "jobbAnnetLand" : "Land1",
-      "harPengestøtteAnnetLand" : [ "SYKEPENGER", "PENSJON", "ANNEN_PENGESTØTTE", "MOTTAR_IKKE" ],
-      "pengestøtteAnnetLand" : "Land1",
-      "harOppholdUtenforNorgeSiste12mnd" : "JA",
-      "oppholdUtenforNorgeSiste12mnd" : [ {
-        "land" : "AF",
-        "årsak" : [ "JOBB", "STUDIER", "MEDISINSK_BEHANDLING", "FERIE", "FAMILIE_BESØK", "ANNET" ],
-        "fom" : "2025-01-01",
-        "tom" : "2025-01-01"
-      } ],
-      "harOppholdUtenforNorgeNeste12mnd" : "JA",
-      "oppholdUtenforNorgeNeste12mnd" : [ {
-        "land" : "AF",
-        "årsak" : [ "JOBB", "STUDIER", "MEDISINSK_BEHANDLING", "FERIE", "FAMILIE_BESØK", "ANNET" ],
-        "fom" : "2025-01-01",
-        "tom" : "2025-01-01"
-      } ]
-    }
-  },
-  "aktivitet" : {
-    "aktiviteter" : [ {
-      "id" : "134125430",
-      "label" : "Høyere utdanning: 10. september 2025 - 30. juni 2026",
-      "type" : "TILTAK"
+  "aktivitet": {
+    "aktiviteter": [ {
+      "id": "134125430",
+      "label": "Høyere utdanning: 10. september 2025 - 30. juni 2026",
+      "type": "TILTAK"
     }, {
-      "id" : "134124111",
-      "label" : "Arbeidstrening: 16. juni 2025 - 31. juli 2025",
-      "type" : "TILTAK"
+      "id": "134124111",
+      "label": "Arbeidstrening: 16. juni 2025 - 31. juli 2025",
+      "type": "TILTAK"
     } ],
-    "dekkesUtgiftenAvAndre" : {
-      "typeUtdanning" : "VIDEREGÅENDE",
-      "lærling" : "JA",
-      "arbeidsgiverDekkerUtgift" : "JA",
-      "erUnder25år" : "JA",
-      "betalerForReisenTilSkolenSelv" : "JA",
-      "lønnetAktivitet" : "JA"
-    },
-    "annenAktivitet" : "TILTAK"
+    "annenAktivitet": "TILTAK",
+    "dekkesUtgiftenAvAndre": {
+      "arbeidsgiverDekkerUtgift": "JA",
+      "betalerForReisenTilSkolenSelv": "JA",
+      "erUnder25år": "JA",
+      "lærling": "JA",
+      "lønnetAktivitet": "JA",
+      "typeUtdanning": "VIDEREGÅENDE"
+    }
   },
-  "reiser" : [ {
-    "skalReiseFraFolkeregistrertAdresse" : "NEI",
-    "adresseDetSkalReisesFra" : {
-      "gateadresse" : "Annen gate 2",
-      "postnummer" : "0482",
-      "poststed" : "Oslo"
+  "dokumentasjon": [ ],
+  "hovedytelse": {
+    "arbeidOgOpphold": {
+      "harOppholdUtenforNorgeNeste12mnd": "JA",
+      "harOppholdUtenforNorgeSiste12mnd": "JA",
+      "harPengestøtteAnnetLand": [ "SYKEPENGER", "PENSJON", "ANNEN_PENGESTØTTE", "MOTTAR_IKKE" ],
+      "jobbAnnetLand": "Land1",
+      "jobberIAnnetLand": "JA",
+      "oppholdUtenforNorgeNeste12mnd": [ {
+        "fom": "2025-01-01",
+        "land": "AF",
+        "tom": "2025-01-01",
+        "årsak": [ "JOBB", "STUDIER", "MEDISINSK_BEHANDLING", "FERIE", "FAMILIE_BESØK", "ANNET" ]
+      } ],
+      "oppholdUtenforNorgeSiste12mnd": [ {
+        "fom": "2025-01-01",
+        "land": "AF",
+        "tom": "2025-01-01",
+        "årsak": [ "JOBB", "STUDIER", "MEDISINSK_BEHANDLING", "FERIE", "FAMILIE_BESØK", "ANNET" ]
+      } ],
+      "pengestøtteAnnetLand": "Land1"
     },
-    "adresse" : {
-      "gateadresse" : "Oslogate 42",
-      "postnummer" : "0482",
-      "poststed" : "Olso"
+    "harNedsattArbeidsevne": null,
+    "hovedytelse": [ "AAP" ]
+  },
+  "personopplysninger": {
+    "adresse": {
+      "adresse": "Hestehagen 2",
+      "gyldigFraOgMed": "2004-10-29",
+      "landkode": "Land1",
+      "postnummer": "2069",
+      "poststed": "JESSHEIM"
+    }
+  },
+  "reiser": [ {
+    "adresse": {
+      "gateadresse": "Oslogate 42",
+      "postnummer": "0482",
+      "poststed": "Olso"
     },
-    "periode" : {
-      "fom" : "2025-01-01",
-      "tom" : "2025-01-01"
+    "adresseDetSkalReisesFra": {
+      "gateadresse": "Annen gate 2",
+      "postnummer": "0482",
+      "poststed": "Oslo"
     },
-    "dagerPerUke" : "4",
-    "harMerEnn6KmReisevei" : "JA",
-    "lengdeReisevei" : 18.5,
-    "harBehovForTransportUavhengigAvReisensLengde" : null,
-    "leveringOgHentingIBarnehage" : null,
-    "kanReiseMedOffentligTransport" : "JA",
-    "offentligTransport" : {
-      "billettTyperValgt" : [ "ENKELTBILLETT", "TRETTIDAGERSBILLETT" ],
-      "enkeltbillettPris" : 44,
-      "syvdagersbillettPris" : null,
-      "månedskortPris" : 788
+    "dagerPerUke": "4",
+    "harBehovForTransportUavhengigAvReisensLengde": null,
+    "harMerEnn6KmReisevei": "JA",
+    "kanReiseMedOffentligTransport": "JA",
+    "lengdeReisevei": 18.5,
+    "leveringOgHentingIBarnehage": null,
+    "offentligTransport": {
+      "billettTyperValgt": [ "ENKELTBILLETT", "TRETTIDAGERSBILLETT" ],
+      "enkeltbillettPris": 44,
+      "månedskortPris": 788,
+      "syvdagersbillettPris": null
     },
-    "privatTransport" : null,
-    "skalDuBetaleForReisenSelv" : "JA"
+    "periode": {
+      "fom": "2025-01-01",
+      "tom": "2025-01-01"
+    },
+    "privatTransport": null,
+    "skalDuBetaleForReisenSelv": "JA",
+    "skalReiseFraFolkeregistrertAdresse": "NEI"
   }, {
-    "skalReiseFraFolkeregistrertAdresse" : "NEI",
-    "adresseDetSkalReisesFra" : {
-      "gateadresse" : "Annen gate 2",
-      "postnummer" : "0482",
-      "poststed" : "Oslo"
+    "adresse": {
+      "gateadresse": "Drammensveien 42",
+      "postnummer": "0482",
+      "poststed": "Oslo"
     },
-    "adresse" : {
-      "gateadresse" : "Drammensveien 42",
-      "postnummer" : "0482",
-      "poststed" : "Oslo"
+    "adresseDetSkalReisesFra": {
+      "gateadresse": "Annen gate 2",
+      "postnummer": "0482",
+      "poststed": "Oslo"
     },
-    "periode" : {
-      "fom" : "2025-01-01",
-      "tom" : "2025-01-01"
+    "dagerPerUke": "1",
+    "harBehovForTransportUavhengigAvReisensLengde": "NEI",
+    "harMerEnn6KmReisevei": "NEI",
+    "kanReiseMedOffentligTransport": "JA",
+    "lengdeReisevei": 1.0,
+    "leveringOgHentingIBarnehage": null,
+    "offentligTransport": {
+      "billettTyperValgt": [ "SYVDAGERSBILLETT" ],
+      "enkeltbillettPris": null,
+      "månedskortPris": null,
+      "syvdagersbillettPris": 233
     },
-    "dagerPerUke" : "1",
-    "harMerEnn6KmReisevei" : "NEI",
-    "lengdeReisevei" : 1.0,
-    "harBehovForTransportUavhengigAvReisensLengde" : "NEI",
-    "leveringOgHentingIBarnehage" : null,
-    "kanReiseMedOffentligTransport" : "JA",
-    "offentligTransport" : {
-      "billettTyperValgt" : [ "SYVDAGERSBILLETT" ],
-      "enkeltbillettPris" : null,
-      "syvdagersbillettPris" : 233,
-      "månedskortPris" : null
+    "periode": {
+      "fom": "2025-01-01",
+      "tom": "2025-01-01"
     },
-    "privatTransport" : null,
-    "skalDuBetaleForReisenSelv" : null
-  } ],
-  "dokumentasjon" : [ ]
+    "privatTransport": null,
+    "skalDuBetaleForReisenSelv": null,
+    "skalReiseFraFolkeregistrertAdresse": "NEI"
+  } ]
 }

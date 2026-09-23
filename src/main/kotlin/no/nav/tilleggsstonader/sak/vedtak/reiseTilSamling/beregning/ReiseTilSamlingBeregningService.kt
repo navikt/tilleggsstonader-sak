@@ -273,7 +273,7 @@ class ReiseTilSamlingBeregningService(
                     fom = samling.fom,
                     tom = samling.tom,
                     sats = sats.beløp,
-                    totaltReiseavstand = fakta.reiseavstand,
+                    totalReiseavstand = fakta.reiseavstand,
                     bompenger = fakta.bompenger,
                     fergekostnad = fakta.fergekostnad,
                     parkering = fakta.parkering,
@@ -296,7 +296,7 @@ class ReiseTilSamlingBeregningService(
 
     private fun beregnBelopForPrivatBil(grunnlag: BeregningsgrunnlagPrivatBilForSamling): BigDecimal =
         (
-            grunnlag.totaltReiseavstand
+            grunnlag.totalReiseavstand
                 .multiply(grunnlag.sats)
                 .plus(grunnlag.bompenger ?: BigDecimal.ZERO)
                 .plus(grunnlag.fergekostnad ?: BigDecimal.ZERO)

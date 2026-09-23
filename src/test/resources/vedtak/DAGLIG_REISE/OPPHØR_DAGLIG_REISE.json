@@ -1,59 +1,49 @@
 {
   "begrunnelse": "En begrunnelse",
+  "beregningsplan": {
+    "fraDato": "2025-08-21",
+    "omfang": "FRA_DATO"
+  },
   "beregningsresultat": {
     "offentligTransport": {
-      "reiser": [
-        {
-          "reiseId": "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
-          "perioder": [
-            {
-              "grunnlag": {
-                "fom": "2025-08-21",
-                "tom": "2025-08-31",
-                "prisEnkeltbillett": 44,
-                "prisSyvdagersbillett": null,
-                "pris30dagersbillett": 750,
-                "antallReisedagerPerUke": 4,
-                "vedtaksperioder": [
-                  {
-                    "id": "d4c1944d-3ee5-435e-9618-8ae667b965a7",
-                    "fom": "2025-08-21",
-                    "tom": "2025-08-31",
-                    "målgruppe": "NEDSATT_ARBEIDSEVNE",
-                    "aktivitet": "TILTAK",
-                    "antallReisedagerIVedtaksperioden": 6
-                  }
-                ],
-                "antallReisedager": 6
-              },
-              "beløp": 528,
-              "billettdetaljer": {
-                "ENKELTBILLETT": 12
-              },
-              "fraTidligereVedtak": false
-            }
-          ]
-        }
-      ]
+      "reiser": [ {
+        "perioder": [ {
+          "beløp": 528,
+          "billettdetaljer": {
+            "ENKELTBILLETT": 12
+          },
+          "fraTidligereVedtak": false,
+          "grunnlag": {
+            "antallReisedager": 6,
+            "antallReisedagerPerUke": 4,
+            "fom": "2025-08-21",
+            "pris30dagersbillett": 750,
+            "prisEnkeltbillett": 44,
+            "prisSyvdagersbillett": null,
+            "tom": "2025-08-31",
+            "vedtaksperioder": [ {
+              "aktivitet": "TILTAK",
+              "antallReisedagerIVedtaksperioden": 6,
+              "fom": "2025-08-21",
+              "id": "d4c1944d-3ee5-435e-9618-8ae667b965a7",
+              "målgruppe": "NEDSATT_ARBEIDSEVNE",
+              "tom": "2025-08-31"
+            } ]
+          }
+        } ],
+        "reiseId": "02c86eca-36e5-451b-a22d-8501a0f7b8dd"
+      } ]
     },
-    "privatBil" : null
+    "privatBil": null
   },
   "rammevedtakPrivatBil": null,
-  "beregningsplan": {
-    "omfang": "FRA_DATO",
-    "fraDato": "2025-08-21"
-  },
   "type": "OPPHØR_DAGLIG_REISE",
-  "vedtaksperioder": [
-    {
-      "id": "d4c1944d-3ee5-435e-9618-8ae667b965a7",
-      "fom": "2025-08-21",
-      "tom": "2025-08-31",
-      "målgruppe": "NEDSATT_ARBEIDSEVNE",
-      "aktivitet": "TILTAK"
-    }
-  ],
-  "årsaker": [
-    "ANNET"
-  ]
+  "vedtaksperioder": [ {
+    "aktivitet": "TILTAK",
+    "fom": "2025-08-21",
+    "id": "d4c1944d-3ee5-435e-9618-8ae667b965a7",
+    "målgruppe": "NEDSATT_ARBEIDSEVNE",
+    "tom": "2025-08-31"
+  } ],
+  "årsaker": [ "ANNET" ]
 }
