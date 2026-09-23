@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.kontrakter.søknad.SøknadsskjemaBoutgifterFyllUtSendInn
+import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Aktivitet
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.Aktiviteter
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.AktiviteterOgMålgruppe
 import no.nav.tilleggsstonader.kontrakter.søknad.boutgifter.fyllutsendinn.ArbeidsrettetAktivitetType
@@ -113,10 +114,13 @@ object SøknadBoutgifterUtil {
         Aktiviteter(
             aktiviteterOgMaalgruppe =
                 AktiviteterOgMålgruppe(
-                    aktivitetId = "ingenAktivitet",
-                    text = "",
-                    periode = null,
-                    maalgruppe = null,
+                    aktivitet =
+                        Aktivitet(
+                            aktivitetId = "ingenAktivitet",
+                            text = "",
+                            periode = null,
+                            maalgruppe = null,
+                        ),
                 ),
             arbeidsrettetAktivitet = ArbeidsrettetAktivitetType.tiltakArbeidsrettetUtredning,
             mottarLonnGjennomTiltak = JaNeiType.nei,
