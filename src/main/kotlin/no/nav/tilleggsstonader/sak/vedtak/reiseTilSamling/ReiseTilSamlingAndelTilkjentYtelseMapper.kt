@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
@@ -37,6 +38,7 @@ fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(
         beløp = beløp.toInt(),
         målgruppe = målgrupper.singleOrNull() ?: error("Forventet nøyaktig én målgruppe, fant ${målgrupper.size}"),
         tiltaksvariant = tiltaksvariant,
+        statusIverksetting = StatusIverksetting.UBEHANDLET,
         brukersNavKontor = grunnlag.brukersNavKontor,
         reiseId = reiseId,
     )
@@ -54,6 +56,7 @@ fun BeregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(
         beløp = beløp.toInt(),
         målgruppe = målgrupper.singleOrNull() ?: error("Forventet nøyaktig én målgruppe, fant ${målgrupper.size}"),
         tiltaksvariant = tiltaksvariant,
+        statusIverksetting = StatusIverksetting.fraSatsBekreftet(grunnlag.satsBekreftet),
         brukersNavKontor = grunnlag.brukersNavKontor,
         reiseId = reiseId,
     )
@@ -65,6 +68,7 @@ private fun lagAndelForReiseTilSamling(
     beløp: Int,
     målgruppe: FaktiskMålgruppe,
     tiltaksvariant: TypeAktivitet?,
+    statusIverksetting: StatusIverksetting,
     brukersNavKontor: String?,
     reiseId: ReiseId?,
 ): AndelTilkjentYtelse {
@@ -94,6 +98,7 @@ private fun lagAndelForReiseTilSamling(
         tom = fomUkedag,
         satstype = Satstype.DAG,
         type = typeAndel,
+        statusIverksetting = statusIverksetting,
         utbetalingsdato = fomUkedag,
         brukersNavKontor = brukersNavKontor,
         reiseId = reiseId,
