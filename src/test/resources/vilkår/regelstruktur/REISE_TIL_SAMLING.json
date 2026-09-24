@@ -80,7 +80,7 @@
     "svaralternativer" : [ {
       "svarId" : "JA",
       "nesteRegelId" : null,
-      "begrunnelseType" : "UTEN",
+      "begrunnelseType" : "VALGFRI",
       "tilhørendeFaktaType" : "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT"
     }, {
       "svarId" : "NEI",

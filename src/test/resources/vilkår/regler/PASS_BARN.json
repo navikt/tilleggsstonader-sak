@@ -1,73 +1,73 @@
 {
-  "regler": {
-    "UTGIFTER_DOKUMENTERT": {
-      "regelId": "UTGIFTER_DOKUMENTERT",
-      "erHovedregel": true,
-      "svarMapping": {
-        "JA": {
-          "begrunnelseType": "VALGFRI",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
+  "regler" : {
+    "UTGIFTER_DOKUMENTERT" : {
+      "regelId" : "UTGIFTER_DOKUMENTERT",
+      "erHovedregel" : true,
+      "svarMapping" : {
+        "JA" : {
+          "begrunnelseType" : "VALGFRI",
+          "tilhørendeFaktaType" : null,
+          "regelId" : "SLUTT_NODE"
         },
-        "NEI": {
-          "begrunnelseType": "PÅKREVD",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
+        "NEI" : {
+          "begrunnelseType" : "PÅKREVD",
+          "tilhørendeFaktaType" : null,
+          "regelId" : "SLUTT_NODE"
         }
       }
     },
-    "ANNEN_FORELDER_MOTTAR_STØTTE": {
-      "regelId": "ANNEN_FORELDER_MOTTAR_STØTTE",
-      "erHovedregel": true,
-      "svarMapping": {
-        "JA": {
-          "begrunnelseType": "PÅKREVD",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
+    "ANNEN_FORELDER_MOTTAR_STØTTE" : {
+      "regelId" : "ANNEN_FORELDER_MOTTAR_STØTTE",
+      "erHovedregel" : true,
+      "svarMapping" : {
+        "JA" : {
+          "begrunnelseType" : "PÅKREVD",
+          "tilhørendeFaktaType" : null,
+          "regelId" : "SLUTT_NODE"
         },
-        "NEI": {
-          "begrunnelseType": "VALGFRI",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
+        "NEI" : {
+          "begrunnelseType" : "VALGFRI",
+          "tilhørendeFaktaType" : null,
+          "regelId" : "SLUTT_NODE"
         }
       }
     },
-    "HAR_FULLFØRT_FJERDEKLASSE": {
-      "regelId": "HAR_FULLFØRT_FJERDEKLASSE",
-      "erHovedregel": true,
-      "svarMapping": {
-        "JA": {
-          "regelId": "UNNTAK_ALDER",
-          "begrunnelseType": "UTEN"
+    "HAR_FULLFØRT_FJERDEKLASSE" : {
+      "regelId" : "HAR_FULLFØRT_FJERDEKLASSE",
+      "erHovedregel" : true,
+      "svarMapping" : {
+        "JA" : {
+          "regelId" : "UNNTAK_ALDER",
+          "begrunnelseType" : "UTEN"
         },
-        "NEI": {
-          "begrunnelseType": "VALGFRI",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
+        "NEI" : {
+          "begrunnelseType" : "VALGFRI",
+          "tilhørendeFaktaType" : null,
+          "regelId" : "SLUTT_NODE"
         }
       }
     },
-    "UNNTAK_ALDER": {
-      "regelId": "UNNTAK_ALDER",
-      "erHovedregel": false,
-      "svarMapping": {
-        "TRENGER_MER_TILSYN_ENN_JEVNALDRENDE": {
-          "begrunnelseType": "VALGFRI",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
+    "UNNTAK_ALDER" : {
+      "regelId" : "UNNTAK_ALDER",
+      "erHovedregel" : false,
+      "svarMapping" : {
+        "TRENGER_MER_TILSYN_ENN_JEVNALDRENDE" : {
+          "begrunnelseType" : "VALGFRI",
+          "tilhørendeFaktaType" : null,
+          "regelId" : "SLUTT_NODE"
         },
-        "FORSØRGER_HAR_LANGVARIG_ELLER_UREGELMESSIG_ARBEIDSTID": {
-          "begrunnelseType": "VALGFRI",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
+        "FORSØRGER_HAR_LANGVARIG_ELLER_UREGELMESSIG_ARBEIDSTID" : {
+          "begrunnelseType" : "VALGFRI",
+          "tilhørendeFaktaType" : null,
+          "regelId" : "SLUTT_NODE"
         },
-        "NEI": {
-          "begrunnelseType": "PÅKREVD",
-          "tilhørendeFaktaType": null,
-          "regelId": "SLUTT_NODE"
+        "NEI" : {
+          "begrunnelseType" : "PÅKREVD",
+          "tilhørendeFaktaType" : null,
+          "regelId" : "SLUTT_NODE"
         }
       }
     }
   },
-  "vilkårType": "PASS_BARN"
+  "vilkårType" : "PASS_BARN"
 }
