@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
@@ -32,11 +33,11 @@ data class VedtaksperioderDvh(
     val aktivitet: AktivitetTypeDvh,
     val lovverketsMålgruppe: LovverketsMålgruppeDvh,
     /**
-     * TODO: er foreløpig alltid null for LÆREMIDLER og BARNETILSYN, ettersom disse periodene
-     * bygges fra sammenslåtte beregningsperioder som ikke er 1:1 med en lagret [no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode].
-     * Se [VedtaksperiodeDvhIdUtil] for skall til en løsning basert på en deterministisk, DVH-intern id.
+     * Er `null` når [no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle.KNYTT_ANDEL_TIL_VEDTAKSPERIODE]
+     * er avskrudd, slik at feltet ikke er med i json-en som sendes til DVH (se [JsonInclude]).
      */
-    val id: VedtaksperiodeId,
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    val id: VedtaksperiodeId? = null,
     // Tilsyn barn
     val antallBarn: Int? = null,
     val barn: BarnDvh.JsonWrapper? = null,
@@ -52,6 +53,7 @@ data class VedtaksperioderDvh(
             vedtak: Vedtak,
             barn: List<BehandlingBarn>,
             behandlingId: BehandlingId,
+            knyttAndelTilVedtaksperiode: Boolean = true,
         ): JsonWrapper =
             when (val vedtaksdata = vedtak.data) {
                 is InnvilgelseEllerOpphørPassAvBarn ->
@@ -59,20 +61,23 @@ data class VedtaksperioderDvh(
                         beregningsresultat = vedtaksdata.beregningsresultat,
                         barnIBehandlingen = barn,
                         behandlingId = behandlingId,
+                        knyttAndelTilVedtaksperiode = knyttAndelTilVedtaksperiode,
                     )
 
                 is InnvilgelseEllerOpphørLæremidler ->
                     mapVedtaksperioderLæremidler(
                         beregningsresultat = vedtaksdata.beregningsresultat,
                         behandlingId = behandlingId,
+                        knyttAndelTilVedtaksperiode = knyttAndelTilVedtaksperiode,
                     )
 
-                is InnvilgelseEllerOpphørBoutgifter -> mapVedtaksperioderBoutgifter(vedtaksdata)
+                is InnvilgelseEllerOpphørBoutgifter -> mapVedtaksperioderBoutgifter(vedtaksdata, knyttAndelTilVedtaksperiode)
 
-                is InnvilgelseEllerOpphørDagligReise -> mapVedtaksperioderDagligReise(vedtaksdata)
-                is InnvilgelseEllerOpphørReiseTilSamling -> mapVedtaksperioderReiseTilSamling(vedtaksdata)
+                is InnvilgelseEllerOpphørDagligReise -> mapVedtaksperioderDagligReise(vedtaksdata, knyttAndelTilVedtaksperiode)
+                is InnvilgelseEllerOpphørReiseTilSamling ->
+                    mapVedtaksperioderReiseTilSamling(vedtaksdata, knyttAndelTilVedtaksperiode)
                 is InnvilgelseEllerOpphørReiseOppstartAvslutningHjemreise ->
-                    mapVedtaksperioderReiseOppstartAvslutningHjemreise(vedtaksdata)
+                    mapVedtaksperioderReiseOppstartAvslutningHjemreise(vedtaksdata, knyttAndelTilVedtaksperiode)
 
                 is AvslagBoutgifter, is AvslagLæremidler, is AvslagPassAvBarn, is AvslagDagligReise, is AvslagReiseTilSamling ->
                     JsonWrapper(
@@ -83,6 +88,7 @@ data class VedtaksperioderDvh(
         private fun mapVedtaksperioderLæremidler(
             beregningsresultat: BeregningsresultatLæremidler,
             behandlingId: BehandlingId,
+            knyttAndelTilVedtaksperiode: Boolean,
         ): JsonWrapper =
             JsonWrapper(
                 vedtaksperioder =
@@ -95,14 +101,18 @@ data class VedtaksperioderDvh(
                                 aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
                                 lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
                                 id =
-                                    VedtaksperiodeDvhIdUtil.genererDeterministiskIdLæremidler(
-                                        behandlingId = behandlingId,
-                                        fom = it.fom,
-                                        tom = it.tom,
-                                        faktiskMålgruppe = it.målgruppe,
-                                        aktivitetType = it.aktivitet,
-                                        studienivå = it.studienivå,
-                                    ),
+                                    if (knyttAndelTilVedtaksperiode) {
+                                        VedtaksperiodeDvhIdUtil.genererDeterministiskIdLæremidler(
+                                            behandlingId = behandlingId,
+                                            fom = it.fom,
+                                            tom = it.tom,
+                                            faktiskMålgruppe = it.målgruppe,
+                                            aktivitetType = it.aktivitet,
+                                            studienivå = it.studienivå,
+                                        )
+                                    } else {
+                                        null
+                                    },
                                 studienivå = StudienivåDvh.fraDomene(it.studienivå),
                             )
                         },
@@ -112,6 +122,7 @@ data class VedtaksperioderDvh(
             beregningsresultat: BeregningsresultatPassAvBarn,
             barnIBehandlingen: List<BehandlingBarn>,
             behandlingId: BehandlingId,
+            knyttAndelTilVedtaksperiode: Boolean,
         ) = JsonWrapper(
             vedtaksperioder =
                 VedtaksperiodePassAvBarnMapper
@@ -123,64 +134,27 @@ data class VedtaksperioderDvh(
                             lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
                             aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
                             id =
-                                VedtaksperiodeDvhIdUtil.genererDeterministiskIdPassAvBarn(
-                                    behandlingId = behandlingId,
-                                    fom = it.fom,
-                                    tom = it.tom,
-                                    faktiskMålgruppe = it.målgruppe,
-                                    aktivitetType = it.aktivitet,
-                                    antallBarn = it.antallBarn,
-                                ),
+                                if (knyttAndelTilVedtaksperiode) {
+                                    VedtaksperiodeDvhIdUtil.genererDeterministiskIdPassAvBarn(
+                                        behandlingId = behandlingId,
+                                        fom = it.fom,
+                                        tom = it.tom,
+                                        faktiskMålgruppe = it.målgruppe,
+                                        aktivitetType = it.aktivitet,
+                                        antallBarn = it.antallBarn,
+                                    )
+                                } else {
+                                    null
+                                },
                             antallBarn = it.antallBarn,
                             barn = BarnDvh.fraDomene(it.barn.finnFødselsnumre(barnIBehandlingen)),
                         )
                     },
         )
 
-        private fun mapVedtaksperioderBoutgifter(vedtaksdata: InnvilgelseEllerOpphørBoutgifter) =
-            JsonWrapper(
-                vedtaksperioder =
-                    vedtaksdata.vedtaksperioder.map {
-                        VedtaksperioderDvh(
-                            fom = it.fom,
-                            tom = it.tom,
-                            aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
-                            lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
-                            id = it.id,
-                        )
-                    },
-            )
-
-        private fun mapVedtaksperioderDagligReise(vedtaksdata: InnvilgelseEllerOpphørDagligReise) =
-            JsonWrapper(
-                vedtaksperioder =
-                    vedtaksdata.vedtaksperioder.map {
-                        VedtaksperioderDvh(
-                            fom = it.fom,
-                            tom = it.tom,
-                            aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
-                            lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
-                            id = it.id,
-                        )
-                    },
-            )
-
-        private fun mapVedtaksperioderReiseTilSamling(vedtaksdata: InnvilgelseEllerOpphørReiseTilSamling) =
-            JsonWrapper(
-                vedtaksperioder =
-                    vedtaksdata.vedtaksperioder.map {
-                        VedtaksperioderDvh(
-                            fom = it.fom,
-                            tom = it.tom,
-                            aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
-                            lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
-                            id = it.id,
-                        )
-                    },
-            )
-
-        private fun mapVedtaksperioderReiseOppstartAvslutningHjemreise(
-            vedtaksdata: InnvilgelseEllerOpphørReiseOppstartAvslutningHjemreise,
+        private fun mapVedtaksperioderBoutgifter(
+            vedtaksdata: InnvilgelseEllerOpphørBoutgifter,
+            knyttAndelTilVedtaksperiode: Boolean,
         ) = JsonWrapper(
             vedtaksperioder =
                 vedtaksdata.vedtaksperioder.map {
@@ -189,7 +163,55 @@ data class VedtaksperioderDvh(
                         tom = it.tom,
                         aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
                         lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
-                        id = it.id,
+                        id = it.id.takeIf { knyttAndelTilVedtaksperiode },
+                    )
+                },
+        )
+
+        private fun mapVedtaksperioderDagligReise(
+            vedtaksdata: InnvilgelseEllerOpphørDagligReise,
+            knyttAndelTilVedtaksperiode: Boolean,
+        ) = JsonWrapper(
+            vedtaksperioder =
+                vedtaksdata.vedtaksperioder.map {
+                    VedtaksperioderDvh(
+                        fom = it.fom,
+                        tom = it.tom,
+                        aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
+                        lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
+                        id = it.id.takeIf { knyttAndelTilVedtaksperiode },
+                    )
+                },
+        )
+
+        private fun mapVedtaksperioderReiseTilSamling(
+            vedtaksdata: InnvilgelseEllerOpphørReiseTilSamling,
+            knyttAndelTilVedtaksperiode: Boolean,
+        ) = JsonWrapper(
+            vedtaksperioder =
+                vedtaksdata.vedtaksperioder.map {
+                    VedtaksperioderDvh(
+                        fom = it.fom,
+                        tom = it.tom,
+                        aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
+                        lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
+                        id = it.id.takeIf { knyttAndelTilVedtaksperiode },
+                    )
+                },
+        )
+
+        private fun mapVedtaksperioderReiseOppstartAvslutningHjemreise(
+            vedtaksdata: InnvilgelseEllerOpphørReiseOppstartAvslutningHjemreise,
+            knyttAndelTilVedtaksperiode: Boolean,
+        ) = JsonWrapper(
+            vedtaksperioder =
+                vedtaksdata.vedtaksperioder.map {
+                    VedtaksperioderDvh(
+                        fom = it.fom,
+                        tom = it.tom,
+                        aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
+                        lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
+                        id = it.id.takeIf { knyttAndelTilVedtaksperiode },
                     )
                 },
         )

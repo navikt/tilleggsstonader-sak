@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.MakssatsDvhUtil.Companion.finnMakssats
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
@@ -14,7 +15,12 @@ data class UtbetalingerDvh(
     val beløp: Int,
     val makssats: Int? = null,
     val beløpErBegrensetAvMakssats: Boolean? = null,
-    val vedtaksperiodeIder: List<VedtaksperiodeId> = emptyList(),
+    /**
+     * Er `null` når [no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle.KNYTT_ANDEL_TIL_VEDTAKSPERIODE]
+     * er avskrudd, slik at feltet ikke er med i json-en som sendes til DVH (se [JsonInclude]).
+     */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    val vedtaksperiodeIder: List<VedtaksperiodeId>? = null,
 ) {
     data class JsonWrapper(
         val utbetalinger: List<UtbetalingerDvh>,
@@ -25,6 +31,7 @@ data class UtbetalingerDvh(
             andelerTilkjentYtelse: Set<AndelTilkjentYtelse>,
             vedtak: Vedtak,
             vedtaksperioder: List<VedtaksperioderDvh>,
+            knyttAndelTilVedtaksperiode: Boolean = true,
         ): JsonWrapper {
             val gyldigeAndeler =
                 andelerTilkjentYtelse
@@ -47,9 +54,13 @@ data class UtbetalingerDvh(
                             makssats = makssats,
                             beløpErBegrensetAvMakssats = beløpErBegrensetAvMakssats,
                             vedtaksperiodeIder =
-                                AndelTilVedtaksperiodeMapper
-                                    .finnVedtaksperioder(it, vedtak, vedtaksperioder)
-                                    .map { vedtaksperiode -> vedtaksperiode.id },
+                                if (knyttAndelTilVedtaksperiode) {
+                                    AndelTilVedtaksperiodeMapper
+                                        .finnVedtaksperioder(it, vedtak, vedtaksperioder)
+                                        .mapNotNull { vedtaksperiode -> vedtaksperiode.id }
+                                } else {
+                                    null
+                                },
                         )
                     },
             )

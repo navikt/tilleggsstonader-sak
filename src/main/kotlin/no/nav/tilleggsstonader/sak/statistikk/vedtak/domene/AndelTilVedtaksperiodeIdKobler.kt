@@ -180,7 +180,7 @@ data object ReiseTilSamlingAndelTilVedtaksperiodeIdKobler : AndelTilVedtaksperio
                 .grunnlag.vedtaksperioder
                 .map { it.id }
 
-        return vedtaksperioder.filter { it.id in vedtaksperiodeIder }
+        return vedtaksperioder.filter { it.id != null && it.id in vedtaksperiodeIder }
     }
 }
 

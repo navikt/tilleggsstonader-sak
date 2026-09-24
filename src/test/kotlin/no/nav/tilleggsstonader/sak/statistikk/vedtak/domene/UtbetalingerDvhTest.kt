@@ -45,7 +45,7 @@ class UtbetalingerDvhTest {
                             beløp = stønadsbeløp,
                             makssats = makssats,
                             beløpErBegrensetAvMakssats = false,
-                            vedtaksperiodeIder = vedtaksperioder.vedtaksperioder.map { it.id },
+                            vedtaksperiodeIder = vedtaksperioder.vedtaksperioder.mapNotNull { it.id },
                         ),
                     ),
             )
@@ -72,7 +72,7 @@ class UtbetalingerDvhTest {
                             beløp = 11554,
                             makssats = null,
                             beløpErBegrensetAvMakssats = null,
-                            vedtaksperiodeIder = vedtaksperioder.vedtaksperioder.map { it.id },
+                            vedtaksperiodeIder = vedtaksperioder.vedtaksperioder.mapNotNull { it.id },
                         ),
                     ),
             )
