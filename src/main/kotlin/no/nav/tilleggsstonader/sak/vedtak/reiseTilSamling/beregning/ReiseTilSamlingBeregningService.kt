@@ -283,6 +283,7 @@ class ReiseTilSamlingBeregningService(
                             .filter { it.overlapper(samling) }
                             .map(::VedtaksperiodeGrunnlag),
                     brukersNavKontor = brukersNavKontor,
+                    satsBekreftet = sats.bekreftet,
                 )
 
             BeregningsresultatPrivatBil(
