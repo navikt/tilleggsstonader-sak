@@ -13,7 +13,7 @@
   "soker_ident": "søkerIdent",
   "stonadstype": "BARNETILSYN",
   "tidspunkt_vedtak": "2024-05-07 20:30:00",
-  "utbetalinger": "[{\"fraOgMed\":\"2025-01-01\",\"tilOgMed\":\"2025-01-02\",\"type\":\"TILSYN_BARN_AAP\",\"beløp\":1,\"makssats\":100,\"beløpErBegrensetAvMakssats\":true}]",
+  "utbetalinger": "[{\"fraOgMed\":\"2025-01-01\",\"tilOgMed\":\"2025-01-02\",\"type\":\"TILSYN_BARN_AAP\",\"beløp\":1,\"makssats\":100,\"beløpErBegrensetAvMakssats\":true,\"vedtaksperiodeIder\":[]}]",
   "vedtak_resultat": "INNVILGET",
-  "vedtaksperioder": "[{\"fom\":\"2025-01-01\",\"tom\":\"2025-01-02\",\"aktivitet\":\"TILTAK\",\"lovverketsMålgruppe\":\"NEDSATT_ARBEIDSEVNE\",\"antallBarn\":3,\"barn\":{\"barn\":[{\"fnr\":\"fnr\"}]},\"studienivå\":\"VIDEREGÅENDE\"}]"
+  "vedtaksperioder": "[{\"fom\":\"2025-01-01\",\"tom\":\"2025-01-02\",\"aktivitet\":\"TILTAK\",\"lovverketsMålgruppe\":\"NEDSATT_ARBEIDSEVNE\",\"id\":\"34daeebe-cda5-39db-af77-da430f1b2d22\",\"antallBarn\":3,\"barn\":{\"barn\":[{\"fnr\":\"fnr\"}]},\"studienivå\":\"VIDEREGÅENDE\"}]"
 } ]

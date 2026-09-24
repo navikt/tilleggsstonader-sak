@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -30,7 +31,8 @@ class UtbetalingerDvhTest {
             )
 
         val innvilgelsePassAvBarn = PassAvBarnTestUtil.innvilgelse(vedtaksdata)
-        val resultat = UtbetalingerDvh.fraDomene(setOf(andelTilkjentYtelse), innvilgelsePassAvBarn)
+        val vedtaksperioder = VedtaksperioderDvh.fraDomene(innvilgelsePassAvBarn, emptyList(), BehandlingId.random())
+        val resultat = UtbetalingerDvh.fraDomene(setOf(andelTilkjentYtelse), innvilgelsePassAvBarn, vedtaksperioder.vedtaksperioder)
 
         val forventetResultat =
             UtbetalingerDvh.JsonWrapper(
@@ -43,7 +45,7 @@ class UtbetalingerDvhTest {
                             beløp = stønadsbeløp,
                             makssats = makssats,
                             beløpErBegrensetAvMakssats = false,
-                            vedtaksperiodeIder = innvilgelsePassAvBarn.data.vedtaksperioder.map { it.id },
+                            vedtaksperiodeIder = vedtaksperioder.vedtaksperioder.map { it.id },
                         ),
                     ),
             )
@@ -55,8 +57,9 @@ class UtbetalingerDvhTest {
     fun `mappes riktig for læremidler`() {
         val innvilgelse = LæremidlerTestUtil.innvilgelse()
         val andlelerTilkjentYtelse = setOf(andelTilkjentYtelse(fom = 1 januar 2024))
+        val vedtaksperioder = VedtaksperioderDvh.fraDomene(innvilgelse, emptyList(), BehandlingId.random())
 
-        val resultat = UtbetalingerDvh.fraDomene(andlelerTilkjentYtelse, innvilgelse)
+        val resultat = UtbetalingerDvh.fraDomene(andlelerTilkjentYtelse, innvilgelse, vedtaksperioder.vedtaksperioder)
 
         val forventetResultat =
             UtbetalingerDvh.JsonWrapper(
@@ -69,7 +72,7 @@ class UtbetalingerDvhTest {
                             beløp = 11554,
                             makssats = null,
                             beløpErBegrensetAvMakssats = null,
-                            vedtaksperiodeIder = innvilgelse.data.vedtaksperioder.map { it.id },
+                            vedtaksperiodeIder = vedtaksperioder.vedtaksperioder.map { it.id },
                         ),
                     ),
             )
@@ -101,7 +104,9 @@ class UtbetalingerDvhTest {
                 opphørsdato = null,
             )
 
-        val resultat = UtbetalingerDvh.fraDomene(setOf(andelTilkjentYtelse), innvilgelseDagligReise)
+        val vedtaksperioder = VedtaksperioderDvh.fraDomene(innvilgelseDagligReise, emptyList(), BehandlingId.random())
+
+        val resultat = UtbetalingerDvh.fraDomene(setOf(andelTilkjentYtelse), innvilgelseDagligReise, vedtaksperioder.vedtaksperioder)
 
         val forventetResultat =
             UtbetalingerDvh.JsonWrapper(
@@ -147,7 +152,9 @@ class UtbetalingerDvhTest {
                 opphørsdato = null,
             )
 
-        val resultat = UtbetalingerDvh.fraDomene(setOf(andelTilkjentYtelse), innvilgelse)
+        val vedtaksperioder = VedtaksperioderDvh.fraDomene(innvilgelse, emptyList(), BehandlingId.random())
+
+        val resultat = UtbetalingerDvh.fraDomene(setOf(andelTilkjentYtelse), innvilgelse, vedtaksperioder.vedtaksperioder)
 
         val forventetResultat =
             UtbetalingerDvh.JsonWrapper(
@@ -174,7 +181,9 @@ class UtbetalingerDvhTest {
         val innvilgelse = LæremidlerTestUtil.innvilgelse()
         val andlelerTilkjentYtelse = setOf(andelTilkjentYtelse(fom = 1 januar 2024, beløp = 0))
 
-        val resultat = UtbetalingerDvh.fraDomene(andlelerTilkjentYtelse, innvilgelse)
+        val vedtaksperioder = VedtaksperioderDvh.fraDomene(innvilgelse, emptyList(), BehandlingId.random())
+
+        val resultat = UtbetalingerDvh.fraDomene(andlelerTilkjentYtelse, innvilgelse, vedtaksperioder.vedtaksperioder)
 
         val forventetResultat =
             UtbetalingerDvh.JsonWrapper(

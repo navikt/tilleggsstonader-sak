@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.DagligReiseAndelTilV
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.LæremidlerAndelTilVedtaksperiodeIdKobler
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ReiseOppstartAndelTilVedtaksperiodeIdKobler
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ReiseTilSamlingAndelTilVedtaksperiodeIdKobler
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvh
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
@@ -21,7 +22,6 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
-import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -66,11 +66,11 @@ class AndelTilVedtaksperiodeDumpLokalTest {
     private val tilkjentYtelseRepository = TilkjentYtelseDumpRepository(jdbcTemplate)
     private val vedtakRepository = VedtakDumpRepository(jdbcTemplate)
 
-    var andelerMedFlereVedtaksperioder: MutableList<Triple<BehandlingId, AndelTilkjentYtelse, List<Vedtaksperiode>>> =
+    var andelerMedFlereVedtaksperioder: MutableList<Triple<BehandlingId, AndelTilkjentYtelse, List<VedtaksperioderDvh>>> =
         arrayListOf()
-    var andelerSomIkkeOverlapperMedVedtaksperioder: MutableList<Triple<BehandlingId, AndelTilkjentYtelse, List<Vedtaksperiode>>> =
+    var andelerSomIkkeOverlapperMedVedtaksperioder: MutableList<Triple<BehandlingId, AndelTilkjentYtelse, List<VedtaksperioderDvh>>> =
         arrayListOf()
-    var andelerIkkeISammeMånedSomVedtaksperioder: MutableList<Triple<BehandlingId, AndelTilkjentYtelse, List<Vedtaksperiode>>> =
+    var andelerIkkeISammeMånedSomVedtaksperioder: MutableList<Triple<BehandlingId, AndelTilkjentYtelse, List<VedtaksperioderDvh>>> =
         arrayListOf()
 
     @Test
@@ -108,8 +108,9 @@ class AndelTilVedtaksperiodeDumpLokalTest {
                     }
 
                 tilkjentYtelse.andelerTilkjentYtelse.forEach { andelTilkjentYtelse ->
+                    val mappedeVedtaksperioder = VedtaksperioderDvh.fraDomene(vedtak, emptyList(), tilkjentYtelse.behandlingId)
                     val vedtaksperioder =
-                        kobler.finnVedtaksperioder(andelTilkjentYtelse, vedtak)
+                        kobler.finnVedtaksperioder(andelTilkjentYtelse, vedtak, mappedeVedtaksperioder.vedtaksperioder)
 
                     if (vedtaksperioder.isEmpty()) {
                         error("Ingen vedtaksperioder funnet for andel $andelTilkjentYtelse")

@@ -78,6 +78,7 @@ class VedtaksstatistikkService(
             tilkjentYtelseService.hentForBehandlingEllerNull(behandlingId)?.andelerTilkjentYtelse
                 ?: emptySet()
         val barn = barnRepository.findByBehandlingId(behandlingId)
+        val vedtaksperioderJsonWrapper = VedtaksperioderDvh.fraDomene(vedtak, barn, behandlingId)
 
         return VedtaksstatistikkV2(
             fagsakId = behandling.fagsakId,
@@ -92,8 +93,8 @@ class VedtaksstatistikkService(
             behandlingType = BehandlingTypeDvh.fraDomene(behandling.type),
             behandlingÅrsak = BehandlingÅrsakDvh.fraDomene(behandling.årsak),
             vedtakResultat = VedtakResultatDvh.fraDomene(behandling.resultat),
-            vedtaksperioder = VedtaksperioderDvh.fraDomene(vedtak, barn),
-            utbetalinger = UtbetalingerDvh.fraDomene(andelTilkjentYtelse, vedtak),
+            vedtaksperioder = vedtaksperioderJsonWrapper,
+            utbetalinger = UtbetalingerDvh.fraDomene(andelTilkjentYtelse, vedtak, vedtaksperioderJsonWrapper.vedtaksperioder),
             årsakerAvslag = ÅrsakAvslagDvh.fraDomene(vedtak.takeIfType<Avslag>()?.data?.årsaker),
             årsakerOpphør = ÅrsakOpphørDvh.fraDomene(vedtak.takeIfType<Opphør>()?.data?.årsaker),
         )

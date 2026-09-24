@@ -1,8 +1,14 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeLæremidlerMapper
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.VedtaksperiodePassAvBarnMapper
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.nio.charset.StandardCharsets
+import java.time.LocalDate
 import java.util.UUID
 
 /**
@@ -31,7 +37,7 @@ object VedtaksperiodeDvhIdUtil {
      *  definere en unik periode for stønadstypen (fom, tom, målgruppe, aktivitet, studienivå/antallBarn osv.),
      *  slik at to reelt ulike perioder aldri kan kollidere.
      */
-    fun genererDeterministiskId(
+    internal fun genererDeterministiskId(
         behandlingId: BehandlingId,
         vararg periodeEgenskaper: Any?,
     ): VedtaksperiodeId {
@@ -39,4 +45,36 @@ object VedtaksperiodeDvhIdUtil {
         val uuid = UUID.nameUUIDFromBytes(nøkkel.toByteArray(StandardCharsets.UTF_8))
         return VedtaksperiodeId(uuid)
     }
+
+    fun genererDeterministiskIdLæremidler(
+        behandlingId: BehandlingId,
+        fom: LocalDate,
+        tom: LocalDate,
+        faktiskMålgruppe: FaktiskMålgruppe,
+        aktivitetType: AktivitetType,
+        studienivå: Studienivå,
+    ) = genererDeterministiskId(
+        behandlingId = behandlingId,
+        fom,
+        tom,
+        faktiskMålgruppe,
+        aktivitetType,
+        studienivå,
+    )
+
+    fun genererDeterministiskIdPassAvBarn(
+        behandlingId: BehandlingId,
+        fom: LocalDate,
+        tom: LocalDate,
+        faktiskMålgruppe: FaktiskMålgruppe,
+        aktivitetType: AktivitetType,
+        antallBarn: Int,
+    ) = genererDeterministiskId(
+        behandlingId = behandlingId,
+        fom,
+        tom,
+        faktiskMålgruppe,
+        aktivitetType,
+        antallBarn,
+    )
 }

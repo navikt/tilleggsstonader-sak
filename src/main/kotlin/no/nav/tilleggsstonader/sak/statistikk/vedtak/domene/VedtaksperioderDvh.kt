@@ -1,7 +1,9 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
+import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.sak.behandling.barn.BehandlingBarn
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
@@ -25,8 +27,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeT
 import java.time.LocalDate
 
 data class VedtaksperioderDvh(
-    val fom: LocalDate,
-    val tom: LocalDate,
+    override val fom: LocalDate,
+    override val tom: LocalDate,
     val aktivitet: AktivitetTypeDvh,
     val lovverketsMålgruppe: LovverketsMålgruppeDvh,
     /**
@@ -34,13 +36,13 @@ data class VedtaksperioderDvh(
      * bygges fra sammenslåtte beregningsperioder som ikke er 1:1 med en lagret [no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode].
      * Se [VedtaksperiodeDvhIdUtil] for skall til en løsning basert på en deterministisk, DVH-intern id.
      */
-    val id: VedtaksperiodeId? = null,
+    val id: VedtaksperiodeId,
     // Tilsyn barn
     val antallBarn: Int? = null,
     val barn: BarnDvh.JsonWrapper? = null,
     // Løremidler
     val studienivå: StudienivåDvh? = null,
-) {
+) : Periode<LocalDate> {
     data class JsonWrapper(
         val vedtaksperioder: List<VedtaksperioderDvh>,
     )
@@ -49,17 +51,20 @@ data class VedtaksperioderDvh(
         fun fraDomene(
             vedtak: Vedtak,
             barn: List<BehandlingBarn>,
+            behandlingId: BehandlingId,
         ): JsonWrapper =
             when (val vedtaksdata = vedtak.data) {
                 is InnvilgelseEllerOpphørPassAvBarn ->
                     mapVedtaksperioderPassAvBarn(
                         beregningsresultat = vedtaksdata.beregningsresultat,
                         barnIBehandlingen = barn,
+                        behandlingId = behandlingId,
                     )
 
                 is InnvilgelseEllerOpphørLæremidler ->
                     mapVedtaksperioderLæremidler(
                         beregningsresultat = vedtaksdata.beregningsresultat,
+                        behandlingId = behandlingId,
                     )
 
                 is InnvilgelseEllerOpphørBoutgifter -> mapVedtaksperioderBoutgifter(vedtaksdata)
@@ -75,7 +80,10 @@ data class VedtaksperioderDvh(
                     )
             }
 
-        private fun mapVedtaksperioderLæremidler(beregningsresultat: BeregningsresultatLæremidler): JsonWrapper =
+        private fun mapVedtaksperioderLæremidler(
+            beregningsresultat: BeregningsresultatLæremidler,
+            behandlingId: BehandlingId,
+        ): JsonWrapper =
             JsonWrapper(
                 vedtaksperioder =
                     VedtaksperiodeLæremidlerMapper
@@ -86,12 +94,15 @@ data class VedtaksperioderDvh(
                                 tom = it.tom,
                                 aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
                                 lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
-                                // TODO: skall - ta i bruk deterministisk id, se [VedtaksperiodeDvhIdUtil]
-                                // id = VedtaksperiodeDvhIdUtil.genererDeterministiskId(
-                                //     behandlingId = ...,
-                                //     it.fom, it.tom, it.målgruppe, it.aktivitet, it.studienivå,
-                                // ),
-                                id = null,
+                                id =
+                                    VedtaksperiodeDvhIdUtil.genererDeterministiskIdLæremidler(
+                                        behandlingId = behandlingId,
+                                        fom = it.fom,
+                                        tom = it.tom,
+                                        faktiskMålgruppe = it.målgruppe,
+                                        aktivitetType = it.aktivitet,
+                                        studienivå = it.studienivå,
+                                    ),
                                 studienivå = StudienivåDvh.fraDomene(it.studienivå),
                             )
                         },
@@ -100,6 +111,7 @@ data class VedtaksperioderDvh(
         private fun mapVedtaksperioderPassAvBarn(
             beregningsresultat: BeregningsresultatPassAvBarn,
             barnIBehandlingen: List<BehandlingBarn>,
+            behandlingId: BehandlingId,
         ) = JsonWrapper(
             vedtaksperioder =
                 VedtaksperiodePassAvBarnMapper
@@ -110,12 +122,15 @@ data class VedtaksperioderDvh(
                             tom = it.tom,
                             lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
                             aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
-                            // TODO: skall - ta i bruk deterministisk id, se [VedtaksperiodeDvhIdUtil]
-                            // id = VedtaksperiodeDvhIdUtil.genererDeterministiskId(
-                            //     behandlingId = ...,
-                            //     it.fom, it.tom, it.målgruppe, it.aktivitet, it.antallBarn,
-                            // ),
-                            id = null,
+                            id =
+                                VedtaksperiodeDvhIdUtil.genererDeterministiskIdPassAvBarn(
+                                    behandlingId = behandlingId,
+                                    fom = it.fom,
+                                    tom = it.tom,
+                                    faktiskMålgruppe = it.målgruppe,
+                                    aktivitetType = it.aktivitet,
+                                    antallBarn = it.antallBarn,
+                                ),
                             antallBarn = it.antallBarn,
                             barn = BarnDvh.fraDomene(it.barn.finnFødselsnumre(barnIBehandlingen)),
                         )

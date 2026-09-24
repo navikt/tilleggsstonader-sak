@@ -24,6 +24,7 @@ data class UtbetalingerDvh(
         fun fraDomene(
             andelerTilkjentYtelse: Set<AndelTilkjentYtelse>,
             vedtak: Vedtak,
+            vedtaksperioder: List<VedtaksperioderDvh>,
         ): JsonWrapper {
             val gyldigeAndeler =
                 andelerTilkjentYtelse
@@ -47,7 +48,7 @@ data class UtbetalingerDvh(
                             beløpErBegrensetAvMakssats = beløpErBegrensetAvMakssats,
                             vedtaksperiodeIder =
                                 AndelTilVedtaksperiodeMapper
-                                    .finnVedtaksperioder(it, vedtak)
+                                    .finnVedtaksperioder(it, vedtak, vedtaksperioder)
                                     .map { vedtaksperiode -> vedtaksperiode.id },
                         )
                     },

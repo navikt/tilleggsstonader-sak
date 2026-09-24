@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.kontrakter.felles.tilFørsteDagIMåneden
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.util.iDagHvisMandagEllerForrigeMandag
@@ -31,7 +32,8 @@ fun interface AndelTilVedtaksperiodeIdKobler {
     fun finnVedtaksperioder(
         andel: AndelTilkjentYtelse,
         vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
-    ): List<Vedtaksperiode>
+        vedtaksperioder: List<VedtaksperioderDvh>,
+    ): List<VedtaksperioderDvh>
 }
 
 /**
@@ -44,7 +46,8 @@ object AndelTilVedtaksperiodeMapper {
     fun finnVedtaksperioder(
         andel: AndelTilkjentYtelse,
         vedtak: Vedtak,
-    ): List<Vedtaksperiode> = finnKobler(vedtak.data)?.finnVedtaksperioder(andel, vedtak) ?: emptyList()
+        vedtaksperioder: List<VedtaksperioderDvh>,
+    ): List<VedtaksperioderDvh> = finnKobler(vedtak.data)?.finnVedtaksperioder(andel, vedtak, vedtaksperioder) ?: emptyList()
 
     private fun finnKobler(vedtaksdata: Vedtaksdata): AndelTilVedtaksperiodeIdKobler? =
         when (vedtaksdata) {
@@ -62,11 +65,12 @@ data object BarnetilsynAndelTilVedtaksperiodeIdKobler : AndelTilVedtaksperiodeId
     override fun finnVedtaksperioder(
         andel: AndelTilkjentYtelse,
         vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
-    ): List<Vedtaksperiode> {
+        vedtaksperioder: List<VedtaksperioderDvh>,
+    ): List<VedtaksperioderDvh> {
         val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørPassAvBarn
 
         val periode = finnPeriodeFraAndel(vedtak.beregningsresultat, andel)
-        return vedtak.vedtaksperioder.filter { it.overlapper(periode) }
+        return vedtaksperioder.filter { it.overlapper(periode) }
     }
 }
 
@@ -74,14 +78,15 @@ data object LæremidlerAndelTilVedtaksperiodeIdKobler : AndelTilVedtaksperiodeId
     override fun finnVedtaksperioder(
         andel: AndelTilkjentYtelse,
         vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
-    ): List<Vedtaksperiode> {
+        vedtaksperioder: List<VedtaksperioderDvh>,
+    ): List<VedtaksperioderDvh> {
         val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørLæremidler
         val beregningsperioder =
             vedtak.beregningsresultat.perioder.filter {
                 it.grunnlag.utbetalingsdato == andel.fom
             }
 
-        return vedtak.vedtaksperioder.filter { vedtaksperiode ->
+        return vedtaksperioder.filter { vedtaksperiode ->
             beregningsperioder.any { b ->
                 b.overlapper(vedtaksperiode)
             }
@@ -93,7 +98,8 @@ data object BoutgifterAndelTilVedtaksperiodeIdKobler : AndelTilVedtaksperiodeIdK
     override fun finnVedtaksperioder(
         andel: AndelTilkjentYtelse,
         vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
-    ): List<Vedtaksperiode> {
+        vedtaksperioder: List<VedtaksperioderDvh>,
+    ): List<VedtaksperioderDvh> {
         val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørBoutgifter
 
         val beregningsperiode =
@@ -101,7 +107,7 @@ data object BoutgifterAndelTilVedtaksperiodeIdKobler : AndelTilVedtaksperiodeIdK
                 it.fom.tilFørsteDagIMåneden().datoEllerNesteMandagHvisLørdagEllerSøndag() == andel.fom
             }
 
-        return vedtak.vedtaksperioder.filter {
+        return vedtaksperioder.filter {
             beregningsperiode.any { b -> b.overlapper(it) }
         }
     }
@@ -111,7 +117,8 @@ data object DagligReiseAndelTilVedtaksperiodeIdKobler : AndelTilVedtaksperiodeId
     override fun finnVedtaksperioder(
         andel: AndelTilkjentYtelse,
         vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
-    ): List<Vedtaksperiode> {
+        vedtaksperioder: List<VedtaksperioderDvh>,
+    ): List<VedtaksperioderDvh> {
         val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørDagligReise
 
         val andelTilhørerPrivatBil = andel.reiseId != null
@@ -129,7 +136,7 @@ data object DagligReiseAndelTilVedtaksperiodeIdKobler : AndelTilVedtaksperiodeId
                     it.fom.iDagHvisMandagEllerForrigeMandag() == andel.fom
                 }
 
-            vedtak.vedtaksperioder.filter {
+            vedtaksperioder.filter {
                 periode.overlapper(it)
             }
         } else {
@@ -149,7 +156,7 @@ data object DagligReiseAndelTilVedtaksperiodeIdKobler : AndelTilVedtaksperiodeId
             val helPeriode =
                 Datoperiode(fom = perioder.minOf { it.grunnlag.fom }, tom = perioder.maxOf { it.grunnlag.tom })
 
-            vedtak.vedtaksperioder.filter {
+            vedtaksperioder.filter {
                 helPeriode.overlapper(it)
             }
         }
@@ -160,9 +167,20 @@ data object ReiseTilSamlingAndelTilVedtaksperiodeIdKobler : AndelTilVedtaksperio
     override fun finnVedtaksperioder(
         andel: AndelTilkjentYtelse,
         vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
-    ): List<Vedtaksperiode> {
-        vedtaksdata.data as InnvilgelseEllerOpphørReiseTilSamling
-        TODO("Implementeres av ansvarlig for REISE_TIL_SAMLING")
+        vedtaksperioder: List<VedtaksperioderDvh>,
+    ): List<VedtaksperioderDvh> {
+        val vedtak = vedtaksdata.data as InnvilgelseEllerOpphørReiseTilSamling
+        feilHvis(andel.reiseId == null) {
+            "Forventer at reiseId er satt på andeler for reise til samling"
+        }
+        val vedtaksperiodeIder =
+            vedtak.beregningsresultat
+                .alleSamlinger()
+                .single { it.reiseId == andel.reiseId }
+                .grunnlag.vedtaksperioder
+                .map { it.id }
+
+        return vedtaksperioder.filter { it.id in vedtaksperiodeIder }
     }
 }
 
@@ -170,7 +188,8 @@ data object ReiseOppstartAndelTilVedtaksperiodeIdKobler : AndelTilVedtaksperiode
     override fun finnVedtaksperioder(
         andel: AndelTilkjentYtelse,
         vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
-    ): List<Vedtaksperiode> {
+        vedtaksperioder: List<VedtaksperioderDvh>,
+    ): List<VedtaksperioderDvh> {
         vedtaksdata.data as InnvilgelseEllerOpphørReiseOppstartAvslutningHjemreise
         TODO("Implementeres av ansvarlig for REISE_OPPSTART_AVSLUTNING_HJEMREISE")
     }

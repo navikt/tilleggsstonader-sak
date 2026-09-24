@@ -1,12 +1,15 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvh.Companion.finnFødselsnumre
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil.avslag
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.defaultBarn1
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.defaultBarn2
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.defaultBehandling
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -20,6 +23,7 @@ class VedtaksperioderDvhTest {
     val tom: LocalDate = LocalDate.of(2025, 1, 31)
 
     val behandling = defaultBehandling
+    val behandlingId = defaultBehandling.id
 
     val barn1 = listOf(defaultBarn1)
     val barn2 = listOf(defaultBarn2)
@@ -32,11 +36,21 @@ class VedtaksperioderDvhTest {
                 .fraDomene(
                     innvilgelsePassAvBarn(),
                     barn = barn1,
+                    behandlingId,
                 ).vedtaksperioder
 
         val forventetResultat =
             listOf(
                 VedtaksperioderDvh(
+                    id =
+                        VedtaksperiodeDvhIdUtil.genererDeterministiskIdPassAvBarn(
+                            behandlingId = behandlingId,
+                            fom = fom,
+                            tom = tom,
+                            faktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                            aktivitetType = AktivitetType.TILTAK,
+                            antallBarn = 1,
+                        ),
                     fom = fom,
                     tom = tom,
                     lovverketsMålgruppe = LovverketsMålgruppeDvh.NEDSATT_ARBEIDSEVNE,
@@ -55,6 +69,7 @@ class VedtaksperioderDvhTest {
             VedtaksperioderDvh.fraDomene(
                 vedtak = innvilgelseLæremidler(),
                 barn = emptyList(),
+                behandlingId = behandlingId,
             )
 
         val forventetResultat =
@@ -62,6 +77,15 @@ class VedtaksperioderDvhTest {
                 vedtaksperioder =
                     listOf(
                         VedtaksperioderDvh(
+                            id =
+                                VedtaksperiodeDvhIdUtil.genererDeterministiskIdLæremidler(
+                                    behandlingId = behandlingId,
+                                    fom = LocalDate.of(2024, 1, 1),
+                                    tom = LocalDate.of(2024, 1, 7),
+                                    faktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                                    aktivitetType = AktivitetType.TILTAK,
+                                    studienivå = Studienivå.HØYERE_UTDANNING,
+                                ),
                             fom = LocalDate.of(2024, 1, 1),
                             tom = LocalDate.of(2024, 1, 7),
                             aktivitet = AktivitetTypeDvh.TILTAK,
@@ -81,6 +105,7 @@ class VedtaksperioderDvhTest {
             VedtaksperioderDvh.fraDomene(
                 vedtak = vedtak,
                 barn = emptyList(),
+                behandlingId = behandlingId,
             )
 
         val forventetResultat =
@@ -108,7 +133,7 @@ class VedtaksperioderDvhTest {
                 begrunnelse = "Begrunelse for avslag",
             )
 
-        val resultat = VedtaksperioderDvh.fraDomene(vedtak = avslag, barn = emptyList())
+        val resultat = VedtaksperioderDvh.fraDomene(vedtak = avslag, barn = emptyList(), behandlingId = behandlingId)
 
         val forventetResultat =
             VedtaksperioderDvh.JsonWrapper(

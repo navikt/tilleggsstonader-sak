@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.statistikk.vedtak
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AdressebeskyttelseDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AktivitetTypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.AndelstypeDvh
@@ -14,10 +15,12 @@ import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.StudienivåDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.StønadstypeDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.UtbetalingerDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtakResultatDvh
+import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperiodeDvhIdUtil
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakAvslagDvh
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.ÅrsakOpphørDvh
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileJsonIsEqual
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
@@ -76,6 +79,7 @@ class VedtaksstatistikkRepositoryV2Test : CleanDatabaseIntegrationTest() {
             vedtaksperioder =
                 listOf(
                     VedtaksperioderDvh(
+                        id = vedtaksperiodeId(),
                         fom = LocalDate.of(2025, 1, 1),
                         tom = LocalDate.of(2025, 1, 2),
                         aktivitet = AktivitetTypeDvh.TILTAK,
@@ -100,5 +104,15 @@ class VedtaksstatistikkRepositoryV2Test : CleanDatabaseIntegrationTest() {
                         beløpErBegrensetAvMakssats = true,
                     ),
                 ),
+        )
+
+    private fun vedtaksperiodeId() =
+        VedtaksperiodeDvhIdUtil.genererDeterministiskIdPassAvBarn(
+            behandlingId = id,
+            fom = LocalDate.of(2025, 1, 1),
+            tom = LocalDate.of(2025, 1, 2),
+            faktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+            aktivitetType = AktivitetType.TILTAK,
+            antallBarn = 3,
         )
 }
