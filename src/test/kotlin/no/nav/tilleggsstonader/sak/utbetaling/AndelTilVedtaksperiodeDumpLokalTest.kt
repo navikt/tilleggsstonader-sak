@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
@@ -45,6 +46,7 @@ import javax.sql.DataSource
  *
  * @Disabled("Kun for lokal manuell testing mot tabeller i schema dump")
  */
+@Disabled
 class AndelTilVedtaksperiodeDumpLokalTest {
     private val databaseConfig =
         DatabaseConfig(
