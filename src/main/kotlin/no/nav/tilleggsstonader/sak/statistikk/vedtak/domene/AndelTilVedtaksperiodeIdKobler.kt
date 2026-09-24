@@ -191,6 +191,6 @@ data object ReiseOppstartAndelTilVedtaksperiodeIdKobler : AndelTilVedtaksperiode
         vedtaksperioder: List<VedtaksperioderDvh>,
     ): List<VedtaksperioderDvh> {
         vedtaksdata.data as InnvilgelseEllerOpphørReiseOppstartAvslutningHjemreise
-        TODO("Implementeres av ansvarlig for REISE_OPPSTART_AVSLUTNING_HJEMREISE")
+        TODO("Implementer kobling mellom vedtaksperioder og andeler for ROAH")
     }
 }
