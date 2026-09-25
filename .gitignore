@@ -10,3 +10,4 @@ build
 .kotlin
 
 .DS_Store
+**dump.sql
