@@ -63,6 +63,7 @@ data class BeregningsgrunnlagPrivatBilForSamling(
     val piggdekkavgift: BigDecimal?,
     override val vedtaksperioder: List<VedtaksperiodeGrunnlag>,
     val brukersNavKontor: String?,
+    val satsBekreftet: Boolean = true,
 ) : BeregningsgrunnlagForSamling
 
 data class BeregningsgrunnlagOffentligTransportForSamling(
