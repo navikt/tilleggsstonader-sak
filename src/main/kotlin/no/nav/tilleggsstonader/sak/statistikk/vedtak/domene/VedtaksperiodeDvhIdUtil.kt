@@ -1,0 +1,69 @@
+package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
+
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
+import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.VedtaksperiodeLæremidlerMapper
+import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.VedtaksperiodePassAvBarnMapper
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
+import java.nio.charset.StandardCharsets
+import java.time.LocalDate
+import java.util.UUID
+
+/**
+ * For BARNETILSYN og LÆREMIDLER finnes det ingen naturlig 1:1-kobling mellom en persistert
+ * [no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode] og periodene som bygges opp av
+ * beregningsresultatet (se [VedtaksperiodePassAvBarnMapper]/[VedtaksperiodeLæremidlerMapper] og
+ * [VedtaksperioderDvh.id]).
+ *
+ * Denne utility-klassen skal brukes til å generere en deterministisk [VedtaksperiodeId] for disse
+ * sammenslåtte periodene, slik at samme periode alltid får samme id ved reprosessering
+ * (f.eks. [no.nav.tilleggsstonader.sak.statistikk.vedtak.OppdaterVedtaksstatistikkTask]).
+ *
+ * Denne id-en er kun ment for kobling internt mellom [VedtaksperioderDvh] og [UtbetalingerDvh],
+ * og representerer IKKE en persistert [no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode].
+ *
+ */
+object VedtaksperiodeDvhIdUtil {
+    internal fun genererDeterministiskId(
+        behandlingId: BehandlingId,
+        vararg periodeEgenskaper: Any?,
+    ): VedtaksperiodeId {
+        val nøkkel = (listOf(behandlingId) + periodeEgenskaper.toList()).joinToString("|")
+        val uuid = UUID.nameUUIDFromBytes(nøkkel.toByteArray(StandardCharsets.UTF_8))
+        return VedtaksperiodeId(uuid)
+    }
+
+    fun genererDeterministiskIdLæremidler(
+        behandlingId: BehandlingId,
+        fom: LocalDate,
+        tom: LocalDate,
+        faktiskMålgruppe: FaktiskMålgruppe,
+        aktivitetType: AktivitetType,
+        studienivå: Studienivå,
+    ) = genererDeterministiskId(
+        behandlingId = behandlingId,
+        fom,
+        tom,
+        faktiskMålgruppe,
+        aktivitetType,
+        studienivå,
+    )
+
+    fun genererDeterministiskIdPassAvBarn(
+        behandlingId: BehandlingId,
+        fom: LocalDate,
+        tom: LocalDate,
+        faktiskMålgruppe: FaktiskMålgruppe,
+        aktivitetType: AktivitetType,
+        antallBarn: Int,
+    ) = genererDeterministiskId(
+        behandlingId = behandlingId,
+        fom,
+        tom,
+        faktiskMålgruppe,
+        aktivitetType,
+        antallBarn,
+    )
+}

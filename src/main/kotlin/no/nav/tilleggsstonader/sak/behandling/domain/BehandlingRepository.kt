@@ -226,4 +226,21 @@ interface BehandlingRepository :
         """,
     )
     fun finnGjeldendeIverksatteBehandlingerMedRammevedtakPrivatBil(stønadstyper: List<Stønadstype>): List<Behandling>
+
+    /**
+     * En behandling regnes for å ha et vedtak når den er ferdigstilt og ikke er henlagt.
+     * I motsetning til [finnGjeldendeIverksatteBehandlinger] returneres ALLE slike behandlinger
+     * for stønadstypen, ikke bare den nyeste per fagsak.
+     */
+    @Query(
+        """
+            SELECT b.id
+            FROM behandling b
+            JOIN fagsak f ON f.id = b.fagsak_id
+            WHERE f.stonadstype = :stønadstype
+              AND b.status = 'FERDIGSTILT'
+              AND b.resultat != 'HENLAGT'
+        """,
+    )
+    fun finnBehandlingerMedVedtak(stønadstype: Stønadstype): List<BehandlingId>
 }
