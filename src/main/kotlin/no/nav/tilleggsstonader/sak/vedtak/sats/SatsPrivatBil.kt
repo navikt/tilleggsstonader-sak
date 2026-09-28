@@ -78,4 +78,6 @@ class SatsPrivatBilProvider {
         alleSatser.single {
             it.fom.year == år && it.tom.year == år
         }
+
+    fun alleSatser() = alleSatser
 }

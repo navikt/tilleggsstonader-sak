@@ -32,9 +32,13 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverks
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterBeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRequest
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeTsrDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerBeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.ReiseTilSamlingBeregnYtelseSteg
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingTsoRequest
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingTsrRequest
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -47,6 +51,7 @@ class UtførSatsjusteringService(
     private val vedtakservice: VedtakService,
     private val beregnYtelseStegLæremidler: LæremidlerBeregnYtelseSteg,
     private val beregnYtelseStegBoutgifter: BoutgifterBeregnYtelseSteg,
+    private val beregnYtelseStegReiseTilSamling: ReiseTilSamlingBeregnYtelseSteg,
     private val ferdigstillBehandlingSteg: FerdigstillBehandlingSteg,
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val iverksettService: IverksettService,
@@ -164,6 +169,26 @@ class UtførSatsjusteringService(
                 beregnYtelseStegBoutgifter.lagreVedtakForSatsjustering(
                     saksbehandling = revurdering,
                     vedtak = InnvilgelseBoutgifterRequest(vedtaksperioder = vedtaksperioder),
+                    satsjusteringFra = finnDatoForSatsjustering(revurdering),
+                )
+
+            Stønadstype.REISE_TIL_SAMLING_TSO ->
+                beregnYtelseStegReiseTilSamling.lagreVedtakForSatsjustering(
+                    saksbehandling = revurdering,
+                    vedtak = InnvilgelseReiseTilSamlingTsoRequest(vedtaksperioder = vedtaksperioder),
+                    satsjusteringFra = finnDatoForSatsjustering(revurdering),
+                )
+
+            Stønadstype.REISE_TIL_SAMLING_TSR ->
+                beregnYtelseStegReiseTilSamling.lagreVedtakForSatsjustering(
+                    saksbehandling = revurdering,
+                    vedtak =
+                        InnvilgelseReiseTilSamlingTsrRequest(
+                            vedtaksperioder =
+                                vedtaksperioder.map {
+                                    VedtaksperiodeTsrDto(id = it.id, fom = it.fom, tom = it.tom)
+                                },
+                        ),
                     satsjusteringFra = finnDatoForSatsjustering(revurdering),
                 )
 
