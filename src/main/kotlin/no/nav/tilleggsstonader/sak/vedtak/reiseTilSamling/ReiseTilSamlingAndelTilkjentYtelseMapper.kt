@@ -38,7 +38,6 @@ fun BeregningsresultatOffentligTransport.mapTilAndelTilkjentYtelse(
         beløp = beløp.toInt(),
         målgruppe = målgrupper.singleOrNull() ?: error("Forventet nøyaktig én målgruppe, fant ${målgrupper.size}"),
         tiltaksvariant = tiltaksvariant,
-        statusIverksetting = StatusIverksetting.UBEHANDLET,
         brukersNavKontor = grunnlag.brukersNavKontor,
         reiseId = reiseId,
     )
@@ -56,7 +55,7 @@ fun BeregningsresultatPrivatBil.mapTilAndelTilkjentYtelse(
         beløp = beløp.toInt(),
         målgruppe = målgrupper.singleOrNull() ?: error("Forventet nøyaktig én målgruppe, fant ${målgrupper.size}"),
         tiltaksvariant = tiltaksvariant,
-        statusIverksetting = StatusIverksetting.fraSatsBekreftet(grunnlag.satsBekreftet),
+        satsBekreftet = grunnlag.satsBekreftet,
         brukersNavKontor = grunnlag.brukersNavKontor,
         reiseId = reiseId,
     )
@@ -68,7 +67,7 @@ private fun lagAndelForReiseTilSamling(
     beløp: Int,
     målgruppe: FaktiskMålgruppe,
     tiltaksvariant: TypeAktivitet?,
-    statusIverksetting: StatusIverksetting,
+    satsBekreftet: Boolean = true,
     brukersNavKontor: String?,
     reiseId: ReiseId?,
 ): AndelTilkjentYtelse {
@@ -98,7 +97,7 @@ private fun lagAndelForReiseTilSamling(
         tom = fomUkedag,
         satstype = Satstype.DAG,
         type = typeAndel,
-        statusIverksetting = statusIverksetting,
+        statusIverksetting = StatusIverksetting.fraSatsBekreftet(satsBekreftet),
         utbetalingsdato = fomUkedag,
         brukersNavKontor = brukersNavKontor,
         reiseId = reiseId,
