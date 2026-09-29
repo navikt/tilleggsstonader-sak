@@ -9,6 +9,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseServi
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.beregning.SatsBoutgifterService
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.beregning.SatsLæremidlerService
+import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -19,11 +20,20 @@ class SatsjusteringService(
     private val satsBoutgifterService: SatsBoutgifterService,
     private val tilkjentYtelseService: TilkjentYtelseService,
     private val behandlingRepository: BehandlingRepository,
+    private val satsPrivatBilProvider: SatsPrivatBilProvider,
 ) {
     private val logger = LoggerFactory.getLogger(SatsjusteringService::class.java)
 
     fun opprettTaskerForBehandlingerSomKanSatsjusteres(stønadstype: Stønadstype): List<BehandlingId> {
-        feilHvis(stønadstype !in listOf(Stønadstype.LÆREMIDLER, Stønadstype.BOUTGIFTER)) {
+        feilHvis(
+            stønadstype !in
+                listOf(
+                    Stønadstype.LÆREMIDLER,
+                    Stønadstype.BOUTGIFTER,
+                    Stønadstype.REISE_TIL_SAMLING_TSO,
+                    Stønadstype.REISE_TIL_SAMLING_TSR,
+                ),
+        ) {
             "Stønadstype $stønadstype støttes ikke for satsjustering."
         }
 
@@ -60,6 +70,12 @@ class SatsjusteringService(
 
                 Stønadstype.BOUTGIFTER ->
                     satsBoutgifterService
+                        .alleSatser()
+                        .filter { it.bekreftet }
+                        .map { it.fom.year }
+
+                Stønadstype.REISE_TIL_SAMLING_TSO, Stønadstype.REISE_TIL_SAMLING_TSR ->
+                    satsPrivatBilProvider
                         .alleSatser()
                         .filter { it.bekreftet }
                         .map { it.fom.year }
