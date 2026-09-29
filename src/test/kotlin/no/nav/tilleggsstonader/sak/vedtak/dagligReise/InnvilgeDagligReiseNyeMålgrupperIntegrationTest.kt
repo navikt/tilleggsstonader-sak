@@ -85,7 +85,7 @@ class InnvilgeDagligReiseNyeMålgrupperIntegrationTest : IntegrationTest() {
         val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.behandlingId)!!.andelerTilkjentYtelse
 
         assertThat(andeler).isNotEmpty.allMatch { it.type == TypeAndel.DAGLIG_REISE_AKTIVITETSPENGER }
-        assertThat(utbetaling.utbetalinger.map { it.stønad }).containsOnly(StønadUtbetaling.DAGLIG_REISE_AAP)
+        assertThat(utbetaling.utbetalinger.map { it.stønad }).containsOnly(StønadUtbetaling.DAGLIG_REISE_AKTIVITETSPENGER)
     }
 
     private fun hentUtbetaling(): IverksettingDto =
