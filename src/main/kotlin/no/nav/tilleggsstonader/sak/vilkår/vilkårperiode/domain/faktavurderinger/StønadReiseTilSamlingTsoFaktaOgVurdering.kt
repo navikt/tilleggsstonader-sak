@@ -40,6 +40,14 @@ data class NedsattArbeidsevneReiseTilSamlingTso(
     override val fakta: IngenFakta = IngenFakta
 }
 
+data class AktivitetspengerReiseTilSamlingTso(
+    override val vurderinger: IngenVurderinger = IngenVurderinger,
+) : MålgruppeReiseTilSamlingTso {
+    override val type: MålgruppeReiseTilSamlingTsoType =
+        MålgruppeReiseTilSamlingTsoType.AKTIVITETSPENGER_REISE_TIL_SAMLING_TSO
+    override val fakta: IngenFakta = IngenFakta
+}
+
 data class OmstillingsstønadReiseTilSamlingTso(
     override val vurderinger: VurderingOmstillingsstønad,
 ) : MålgruppeReiseTilSamlingTso {
@@ -101,6 +109,7 @@ enum class MålgruppeReiseTilSamlingTsoType(
     OMSTILLINGSSTØNAD_REISE_TIL_SAMLING_TSO(MålgruppeType.OMSTILLINGSSTØNAD),
     OVERGANGSSTØNAD_REISE_TIL_SAMLING_TSO(MålgruppeType.OVERGANGSSTØNAD),
     NEDSATT_ARBEIDSEVNE_REISE_TIL_SAMLING_TSO(MålgruppeType.NEDSATT_ARBEIDSEVNE),
+    AKTIVITETSPENGER_REISE_TIL_SAMLING_TSO(MålgruppeType.AKTIVITETSPENGER),
     UFØRETRYGD_REISE_TIL_SAMLING_TSO(MålgruppeType.UFØRETRYGD),
     INGEN_MÅLGRUPPE_REISE_TIL_SAMLING_TSO(MålgruppeType.INGEN_MÅLGRUPPE),
 }

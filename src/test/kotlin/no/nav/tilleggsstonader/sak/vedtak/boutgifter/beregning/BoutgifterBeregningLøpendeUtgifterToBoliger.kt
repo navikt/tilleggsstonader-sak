@@ -37,6 +37,7 @@ class BoutgifterBeregningLøpendeUtgifterToBoliger {
     val vedtaksperiodeValideringService =
         VedtaksperiodeValideringService(
             vilkårperiodeService = vilkårperiodeService,
+            unleashService = mockk(relaxed = true),
         )
 
     val satsBoutgifterService =

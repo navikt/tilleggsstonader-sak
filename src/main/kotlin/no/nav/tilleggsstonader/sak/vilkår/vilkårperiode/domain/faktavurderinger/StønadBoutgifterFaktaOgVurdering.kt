@@ -40,6 +40,13 @@ data class NedsattArbeidsevneBoutgifter(
     override val fakta: IngenFakta = IngenFakta
 }
 
+data class AktivitetspengerBoutgifter(
+    override val vurderinger: IngenVurderinger = IngenVurderinger,
+) : MålgruppeBoutgifter {
+    override val type: MålgruppeBoutgifterType = MålgruppeBoutgifterType.AKTIVITETSPENGER_BOUTGIFTER
+    override val fakta: IngenFakta = IngenFakta
+}
+
 data class OmstillingsstønadBoutgifter(
     override val vurderinger: VurderingOmstillingsstønad,
 ) : MålgruppeBoutgifter {
@@ -101,6 +108,7 @@ enum class MålgruppeBoutgifterType(
     OMSTILLINGSSTØNAD_BOUTGIFTER(MålgruppeType.OMSTILLINGSSTØNAD),
     OVERGANGSSTØNAD_BOUTGIFTER(MålgruppeType.OVERGANGSSTØNAD),
     NEDSATT_ARBEIDSEVNE_BOUTGIFTER(MålgruppeType.NEDSATT_ARBEIDSEVNE),
+    AKTIVITETSPENGER_BOUTGIFTER(MålgruppeType.AKTIVITETSPENGER),
     UFØRETRYGD_BOUTGIFTER(MålgruppeType.UFØRETRYGD),
     INGEN_MÅLGRUPPE_BOUTGIFTER(MålgruppeType.INGEN_MÅLGRUPPE),
 }

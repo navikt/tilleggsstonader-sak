@@ -1,7 +1,10 @@
 package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse
 
+import no.nav.tilleggsstonader.libs.feil.feilHvis
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Iverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
@@ -17,6 +20,7 @@ import java.time.YearMonth
 @Service
 class TilkjentYtelseService(
     private val tilkjentYtelseRepository: TilkjentYtelseRepository,
+    private val unleashService: UnleashService,
 ) {
     fun hentForBehandlingEllerNull(behandlingId: BehandlingId): TilkjentYtelse? = tilkjentYtelseRepository.findByBehandlingId(behandlingId)
 
@@ -31,13 +35,21 @@ class TilkjentYtelseService(
     fun lagreTilkjentYtelse(
         behandlingId: BehandlingId,
         andeler: List<AndelTilkjentYtelse>,
-    ): TilkjentYtelse =
-        tilkjentYtelseRepository.insert(
+    ): TilkjentYtelse {
+        feilHvis(
+            andeler.any { it.type.gjelderAktivitetspenger() } &&
+                !unleashService.isEnabled(Toggle.KAN_BRUKE_MÅLGRUPPE_AKTIVITETSPENGER),
+        ) {
+            "Aktivitetspenger er ikke aktivert"
+        }
+
+        return tilkjentYtelseRepository.insert(
             TilkjentYtelse(
                 behandlingId = behandlingId,
                 andelerTilkjentYtelse = andeler.toSet(),
             ),
         )
+    }
 
     fun harLøpendeUtbetaling(behandlingId: BehandlingId): Boolean =
         tilkjentYtelseRepository
@@ -102,3 +114,14 @@ class TilkjentYtelseService(
         private val logger = LoggerFactory.getLogger(TilkjentYtelseService::class.java)
     }
 }
+
+private fun TypeAndel.gjelderAktivitetspenger(): Boolean =
+    this in
+        setOf(
+            TypeAndel.TILSYN_BARN_AKTIVITETSPENGER,
+            TypeAndel.LÆREMIDLER_AKTIVITETSPENGER,
+            TypeAndel.BOUTGIFTER_AKTIVITETSPENGER,
+            TypeAndel.DAGLIG_REISE_AKTIVITETSPENGER,
+            TypeAndel.REISE_TIL_SAMLING_AKTIVITETSPENGER,
+            TypeAndel.REISE_OPPSTART_AKTIVITETSPENGER,
+        )

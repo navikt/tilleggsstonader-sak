@@ -97,6 +97,34 @@ class OpprettVilkårperiodeDsl {
         }
     }
 
+    fun målgruppeUngdomsprogrammet(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) {
+        add { behandlingId ->
+            lagreVilkårperiodeMålgruppe(
+                behandlingId = behandlingId,
+                fom = fom,
+                tom = tom,
+                målgruppeType = MålgruppeType.UNGDOMSPROGRAMMET,
+            )
+        }
+    }
+
+    fun målgruppeAktivitetspenger(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) {
+        add { behandlingId ->
+            lagreVilkårperiodeMålgruppe(
+                behandlingId = behandlingId,
+                fom = fom,
+                tom = tom,
+                målgruppeType = MålgruppeType.AKTIVITETSPENGER,
+            )
+        }
+    }
+
     fun målgruppeDagpenger(
         fom: LocalDate,
         tom: LocalDate,

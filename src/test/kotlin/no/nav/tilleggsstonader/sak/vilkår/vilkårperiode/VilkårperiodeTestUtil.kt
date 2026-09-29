@@ -13,6 +13,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeU
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AAPPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetspengerLæremidler
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetspengerPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DagpengerDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetDagligReiseTsr
@@ -47,6 +49,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.TiltakspengerDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdPassAvBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UngdomsprogrammetDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningLæremidler
@@ -166,8 +169,11 @@ object VilkårperiodeTestUtil {
                         ),
                 )
 
+            MålgruppeType.AKTIVITETSPENGER -> AktivitetspengerPassAvBarn()
+
             MålgruppeType.DAGPENGER -> DagpengerDagligReiseTsr()
             MålgruppeType.TILTAKSPENGER -> TiltakspengerDagligReiseTsr()
+            MålgruppeType.UNGDOMSPROGRAMMET -> UngdomsprogrammetDagligReiseTsr()
             MålgruppeType.KVALIFISERINGSSTØNAD -> KvalifiseringsstønadDagligReiseTsr()
             MålgruppeType.INNSATT_I_FENGSEL -> InnsattIFengselDagligReiseTsr()
         }
@@ -220,8 +226,11 @@ object VilkårperiodeTestUtil {
                         ),
                 )
 
+            MålgruppeType.AKTIVITETSPENGER -> AktivitetspengerLæremidler()
+
             MålgruppeType.DAGPENGER -> DagpengerDagligReiseTsr()
             MålgruppeType.TILTAKSPENGER -> TiltakspengerDagligReiseTsr()
+            MålgruppeType.UNGDOMSPROGRAMMET -> UngdomsprogrammetDagligReiseTsr()
             MålgruppeType.KVALIFISERINGSSTØNAD -> KvalifiseringsstønadDagligReiseTsr()
             MålgruppeType.INNSATT_I_FENGSEL -> InnsattIFengselDagligReiseTsr()
         }

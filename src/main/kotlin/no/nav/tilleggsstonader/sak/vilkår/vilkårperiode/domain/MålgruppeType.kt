@@ -55,6 +55,14 @@ enum class MålgruppeType(
         gyldigeAktiviter = setOf(AktivitetType.TILTAK),
         faktiskMålgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
     ),
+    UNGDOMSPROGRAMMET(
+        gyldigeAktiviter = setOf(AktivitetType.TILTAK),
+        faktiskMålgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
+    ),
+    AKTIVITETSPENGER(
+        gyldigeAktiviter = setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING),
+        faktiskMålgruppe = FaktiskMålgruppe.AKTIVITETSPENGER,
+    ),
     ;
 
     override fun tilDbType(): String = this.name
@@ -62,6 +70,8 @@ enum class MålgruppeType(
     fun gjelderNedsattArbeidsevne() = this == NEDSATT_ARBEIDSEVNE || this == UFØRETRYGD || this == AAP
 
     fun faktiskMålgruppe() = this.faktiskMålgruppe ?: error("Mangler faktisk målgruppe for $this")
+
+    fun faktiskMålgruppeEllerNull() = faktiskMålgruppe
 
     override fun girIkkeRettPåVedtaksperiode() =
         this == INGEN_MÅLGRUPPE ||
@@ -82,6 +92,8 @@ enum class MålgruppeType(
             TILTAKSPENGER,
             KVALIFISERINGSSTØNAD,
             INNSATT_I_FENGSEL,
+            UNGDOMSPROGRAMMET,
+            AKTIVITETSPENGER,
             -> false
         }
 
@@ -92,6 +104,7 @@ enum class MålgruppeType(
                     listOf(
                         AAP,
                         NEDSATT_ARBEIDSEVNE,
+                        AKTIVITETSPENGER,
                         OMSTILLINGSSTØNAD,
                         OVERGANGSSTØNAD,
                         UFØRETRYGD,
@@ -101,13 +114,14 @@ enum class MålgruppeType(
 
             Stønadstype.DAGLIG_REISE_TSO,
             Stønadstype.REISE_TIL_SAMLING_TSO,
-            Stønadstype.FLYTTING_TSO,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+            Stønadstype.FLYTTING_TSO,
             ->
                 this in
                     listOf(
                         AAP,
                         NEDSATT_ARBEIDSEVNE,
+                        AKTIVITETSPENGER,
                         OMSTILLINGSSTØNAD,
                         OVERGANGSSTØNAD,
                         UFØRETRYGD,
@@ -116,13 +130,14 @@ enum class MålgruppeType(
 
             Stønadstype.DAGLIG_REISE_TSR,
             Stønadstype.REISE_TIL_SAMLING_TSR,
-            Stønadstype.FLYTTING_TSR,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
+            Stønadstype.FLYTTING_TSR,
             ->
                 this in
                     listOf(
                         INGEN_MÅLGRUPPE,
                         TILTAKSPENGER,
+                        UNGDOMSPROGRAMMET,
                         KVALIFISERINGSSTØNAD,
                         DAGPENGER,
                         INNSATT_I_FENGSEL,

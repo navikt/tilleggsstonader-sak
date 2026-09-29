@@ -23,6 +23,12 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetReiseOppstartAvslutningHjemreiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetReiseTilSamlingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetReiseTilSamlingTsr
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetspengerBoutgifter
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetspengerDagligReiseTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetspengerLæremidler
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetspengerPassAvBarn
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetspengerReiseOppstartAvslutningHjemreiseTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetspengerReiseTilSamlingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DagpengerDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DagpengerReiseOppstartAvslutningHjemreiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DagpengerReiseTilSamlingTsr
@@ -104,6 +110,9 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdReiseOppstartAvslutningHjemreiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UføretrygdReiseTilSamlingTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UngdomsprogrammetDagligReiseTsr
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UngdomsprogrammetReiseOppstartAvslutningHjemreiseTsr
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UngdomsprogrammetReiseTilSamlingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningLæremidler
@@ -541,7 +550,8 @@ private fun mapMålgruppePassAvBarn(
             )
         }
 
-        MålgruppeType.NEDSATT_ARBEIDSEVNE -> {
+        MålgruppeType.AKTIVITETSPENGER -> AktivitetspengerPassAvBarn()
+        MålgruppeType.NEDSATT_ARBEIDSEVNE ->
             NedsattArbeidsevnePassAvBarn(
                 vurderinger =
                     VurderingNedsattArbeidsevne(
@@ -554,10 +564,10 @@ private fun mapMålgruppePassAvBarn(
                             ),
                     ),
             )
-        }
 
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
         MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
+        MålgruppeType.UNGDOMSPROGRAMMET -> error("Håndterer ikke ungdomsprogrammet")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram")
         MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel")
     }
@@ -606,7 +616,8 @@ private fun mapMålgruppeLæremidler(
             )
         }
 
-        MålgruppeType.NEDSATT_ARBEIDSEVNE -> {
+        MålgruppeType.AKTIVITETSPENGER -> AktivitetspengerLæremidler()
+        MålgruppeType.NEDSATT_ARBEIDSEVNE ->
             NedsattArbeidsevneLæremidler(
                 vurderinger =
                     VurderingNedsattArbeidsevneLæremidler(
@@ -615,10 +626,10 @@ private fun mapMålgruppeLæremidler(
                         aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag),
                     ),
             )
-        }
 
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
         MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
+        MålgruppeType.UNGDOMSPROGRAMMET -> error("Håndterer ikke ungdomsprogrammet")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram")
         MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel")
     }
@@ -666,7 +677,8 @@ private fun mapMålgruppeBoutgfiter(
             )
         }
 
-        MålgruppeType.NEDSATT_ARBEIDSEVNE -> {
+        MålgruppeType.AKTIVITETSPENGER -> AktivitetspengerBoutgifter()
+        MålgruppeType.NEDSATT_ARBEIDSEVNE ->
             NedsattArbeidsevneBoutgifter(
                 vurderinger =
                     VurderingNedsattArbeidsevne(
@@ -679,11 +691,11 @@ private fun mapMålgruppeBoutgfiter(
                             ),
                     ),
             )
-        }
 
         MålgruppeType.SYKEPENGER_100_PROSENT -> error("Støtter ikke sykepenger for boutgifter")
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
         MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
+        MålgruppeType.UNGDOMSPROGRAMMET -> error("Håndterer ikke ungdomsprogrammet")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram")
         MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel")
     }
@@ -731,7 +743,8 @@ private fun mapMålgruppeDagligReiseTso(
             )
         }
 
-        MålgruppeType.NEDSATT_ARBEIDSEVNE -> {
+        MålgruppeType.AKTIVITETSPENGER -> AktivitetspengerDagligReiseTso()
+        MålgruppeType.NEDSATT_ARBEIDSEVNE ->
             NedsattArbeidsevneDagligReiseTso(
                 vurderinger =
                     VurderingNedsattArbeidsevne(
@@ -744,11 +757,11 @@ private fun mapMålgruppeDagligReiseTso(
                             ),
                     ),
             )
-        }
 
         MålgruppeType.SYKEPENGER_100_PROSENT -> error("Støtter ikke sykepenger for daglig reise tso")
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger")
         MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger")
+        MålgruppeType.UNGDOMSPROGRAMMET -> error("Håndterer ikke ungdomsprogrammet")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram")
         MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel")
     }
@@ -761,9 +774,11 @@ private fun mapMålgruppeDagligReiseTsr(type: MålgruppeType): MålgruppeDagligR
         MålgruppeType.AAP -> error("Håndterer ikke aap")
         MålgruppeType.UFØRETRYGD -> error("Håndterer ikke uføretrygd")
         MålgruppeType.NEDSATT_ARBEIDSEVNE -> error("Håndterer ikke nedsattArbeidsevne")
+        MålgruppeType.AKTIVITETSPENGER -> error("Håndterer ikke aktivitetspenger for daglige reiser TSR")
         MålgruppeType.SYKEPENGER_100_PROSENT -> error("Støtter ikke sykepenger for boutgifter")
         MålgruppeType.DAGPENGER -> DagpengerDagligReiseTsr()
         MålgruppeType.TILTAKSPENGER -> TiltakspengerDagligReiseTsr()
+        MålgruppeType.UNGDOMSPROGRAMMET -> UngdomsprogrammetDagligReiseTsr()
         MålgruppeType.KVALIFISERINGSSTØNAD -> KvalifiseringsstønadDagligReiseTsr()
         MålgruppeType.INNSATT_I_FENGSEL -> InnsattIFengselDagligReiseTsr()
     }
@@ -811,7 +826,8 @@ private fun mapMålgruppeReiseTilSamlingTso(
             )
         }
 
-        MålgruppeType.NEDSATT_ARBEIDSEVNE -> {
+        MålgruppeType.AKTIVITETSPENGER -> AktivitetspengerReiseTilSamlingTso()
+        MålgruppeType.NEDSATT_ARBEIDSEVNE ->
             NedsattArbeidsevneReiseTilSamlingTso(
                 vurderinger =
                     VurderingNedsattArbeidsevne(
@@ -824,11 +840,11 @@ private fun mapMålgruppeReiseTilSamlingTso(
                             ),
                     ),
             )
-        }
 
         MålgruppeType.SYKEPENGER_100_PROSENT -> error("Støtter ikke sykepenger for reise til samling tso")
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger for reise til samling tso")
         MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger for reise til samling tso")
+        MålgruppeType.UNGDOMSPROGRAMMET -> error("Håndterer ikke ungdomsprogrammet for reise til samling tso")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram for reise til samling tso")
         MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel for reise til samling tso")
     }
@@ -846,6 +862,7 @@ private fun mapMålgruppeReiseTilSamlingTsr(type: MålgruppeType): MålgruppeRei
         MålgruppeType.INGEN_MÅLGRUPPE -> IngenMålgruppeReiseTilSamlingTsr
         MålgruppeType.DAGPENGER -> DagpengerReiseTilSamlingTsr()
         MålgruppeType.TILTAKSPENGER -> TiltakspengerReiseTilSamlingTsr()
+        MålgruppeType.UNGDOMSPROGRAMMET -> UngdomsprogrammetReiseTilSamlingTsr()
         MålgruppeType.KVALIFISERINGSSTØNAD -> KvalifiseringsstønadReiseTilSamlingTsr()
         MålgruppeType.INNSATT_I_FENGSEL -> InnsattIFengselReiseTilSamlingTsr()
         MålgruppeType.OMSTILLINGSSTØNAD -> error("Håndterer ikke omstillingsstønad for reise til samling TSR")
@@ -853,6 +870,7 @@ private fun mapMålgruppeReiseTilSamlingTsr(type: MålgruppeType): MålgruppeRei
         MålgruppeType.AAP -> error("Håndterer ikke AAP for reise til samling TSR")
         MålgruppeType.UFØRETRYGD -> error("Håndterer ikke uføretrygd for reise til samling TSR")
         MålgruppeType.NEDSATT_ARBEIDSEVNE -> error("Håndterer ikke nedsatt arbeidsevne for reise til samling TSR")
+        MålgruppeType.AKTIVITETSPENGER -> error("Håndterer ikke aktivitetspenger for reise til samling TSR")
         MålgruppeType.SYKEPENGER_100_PROSENT -> error("Støtter ikke sykepenger for reise til samling TSR")
     }
 
@@ -931,7 +949,8 @@ private fun mapMålgruppeReiseOppstartAvslutningHjemreiseTso(
             )
         }
 
-        MålgruppeType.NEDSATT_ARBEIDSEVNE -> {
+        MålgruppeType.AKTIVITETSPENGER -> AktivitetspengerReiseOppstartAvslutningHjemreiseTso()
+        MålgruppeType.NEDSATT_ARBEIDSEVNE ->
             NedsattArbeidsevneReiseOppstartAvslutningHjemreiseTso(
                 vurderinger =
                     VurderingNedsattArbeidsevne(
@@ -944,11 +963,11 @@ private fun mapMålgruppeReiseOppstartAvslutningHjemreiseTso(
                             ),
                     ),
             )
-        }
 
         MålgruppeType.SYKEPENGER_100_PROSENT -> error("Støtter ikke sykepenger for reise oppstart/avslutning/hjemreise TSO")
         MålgruppeType.DAGPENGER -> error("Håndterer ikke dagpenger for reise oppstart/avslutning/hjemreise TSO")
         MålgruppeType.TILTAKSPENGER -> error("Håndterer ikke tiltakspenger for reise oppstart/avslutning/hjemreise TSO")
+        MålgruppeType.UNGDOMSPROGRAMMET -> error("Håndterer ikke ungdomsprogrammet for reise oppstart/avslutning/hjemreise TSO")
         MålgruppeType.KVALIFISERINGSSTØNAD -> error("Håndterer ikke kvalifiseringsprogram for reise oppstart/avslutning/hjemreise TSO")
         MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel for reise oppstart/avslutning/hjemreise TSO")
     }
@@ -990,5 +1009,7 @@ private fun mapMålgruppeReiseOppstartAvslutningHjemreiseTsr(type: MålgruppeTyp
         MålgruppeType.AAP -> error("Håndterer ikke AAP for reise oppstart/avslutning/hjemreise TSR")
         MålgruppeType.UFØRETRYGD -> error("Håndterer ikke uføretrygd for reise oppstart/avslutning/hjemreise TSR")
         MålgruppeType.NEDSATT_ARBEIDSEVNE -> error("Håndterer ikke nedsatt arbeidsevne for reise oppstart/avslutning/hjemreise TSR")
+        MålgruppeType.AKTIVITETSPENGER -> error("Håndterer ikke aktivitetspenger for reise oppstart/avslutning/hjemreise TSR")
+        MålgruppeType.UNGDOMSPROGRAMMET -> UngdomsprogrammetReiseOppstartAvslutningHjemreiseTsr()
         MålgruppeType.SYKEPENGER_100_PROSENT -> error("Støtter ikke sykepenger for reise oppstart/avslutning/hjemreise TSR")
     }

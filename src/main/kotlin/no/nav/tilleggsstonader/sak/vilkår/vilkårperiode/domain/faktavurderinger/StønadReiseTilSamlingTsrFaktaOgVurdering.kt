@@ -63,6 +63,13 @@ data class TiltakspengerReiseTilSamlingTsr(
     override val fakta: IngenFakta = IngenFakta
 }
 
+data class UngdomsprogrammetReiseTilSamlingTsr(
+    override val vurderinger: IngenVurderinger = IngenVurderinger,
+) : MålgruppeReiseTilSamlingTsr {
+    override val type: MålgruppeReiseTilSamlingTsrType = MålgruppeReiseTilSamlingTsrType.UNGDOMSPROGRAMMET_REISE_TIL_SAMLING_TSR
+    override val fakta: IngenFakta = IngenFakta
+}
+
 data class KvalifiseringsstønadReiseTilSamlingTsr(
     override val vurderinger: IngenVurderinger = IngenVurderinger,
 ) : MålgruppeReiseTilSamlingTsr {
@@ -97,6 +104,7 @@ enum class MålgruppeReiseTilSamlingTsrType(
     INGEN_MÅLGRUPPE_REISE_TIL_SAMLING_TSR(MålgruppeType.INGEN_MÅLGRUPPE),
     DAGPENGER_REISE_TIL_SAMLING_TSR(MålgruppeType.DAGPENGER),
     TILTAKSPENGER_REISE_TIL_SAMLING_TSR(MålgruppeType.TILTAKSPENGER),
+    UNGDOMSPROGRAMMET_REISE_TIL_SAMLING_TSR(MålgruppeType.UNGDOMSPROGRAMMET),
     KVALIFISERINGSSTØNAD_REISE_TIL_SAMLING_TSR(MålgruppeType.KVALIFISERINGSSTØNAD),
     INNSATT_I_FENGSEL_REISE_TIL_SAMLING_TSR(MålgruppeType.INNSATT_I_FENGSEL),
 }

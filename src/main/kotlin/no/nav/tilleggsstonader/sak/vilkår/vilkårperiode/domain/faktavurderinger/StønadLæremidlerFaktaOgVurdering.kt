@@ -44,6 +44,13 @@ data class NedsattArbeidsevneLæremidler(
     override val fakta: IngenFakta = IngenFakta
 }
 
+data class AktivitetspengerLæremidler(
+    override val vurderinger: IngenVurderinger = IngenVurderinger,
+) : MålgruppeLæremidler {
+    override val type: MålgruppeLæremidlerType = MålgruppeLæremidlerType.AKTIVITETSPENGER_LÆREMIDLER
+    override val fakta: IngenFakta = IngenFakta
+}
+
 data class OmstillingsstønadLæremidler(
     override val vurderinger: VurderingOmstillingsstønad,
 ) : MålgruppeLæremidler {
@@ -184,6 +191,7 @@ enum class MålgruppeLæremidlerType(
         MålgruppeType.OVERGANGSSTØNAD,
     ),
     NEDSATT_ARBEIDSEVNE_LÆREMIDLER(MålgruppeType.NEDSATT_ARBEIDSEVNE),
+    AKTIVITETSPENGER_LÆREMIDLER(MålgruppeType.AKTIVITETSPENGER),
     UFØRETRYGD_LÆREMIDLER(MålgruppeType.UFØRETRYGD),
     SYKEPENGER_100_PROSENT_LÆREMIDLER(
         MålgruppeType.SYKEPENGER_100_PROSENT,

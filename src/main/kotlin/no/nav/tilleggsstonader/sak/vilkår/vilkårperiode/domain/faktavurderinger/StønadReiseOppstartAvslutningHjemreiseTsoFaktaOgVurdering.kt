@@ -43,6 +43,14 @@ data class NedsattArbeidsevneReiseOppstartAvslutningHjemreiseTso(
     override val fakta: IngenFakta = IngenFakta
 }
 
+data class AktivitetspengerReiseOppstartAvslutningHjemreiseTso(
+    override val vurderinger: IngenVurderinger = IngenVurderinger,
+) : MålgruppeReiseOppstartAvslutningHjemreiseTso {
+    override val type: MålgruppeReiseOppstartAvslutningHjemreiseTsoType =
+        MålgruppeReiseOppstartAvslutningHjemreiseTsoType.AKTIVITETSPENGER_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO
+    override val fakta: IngenFakta = IngenFakta
+}
+
 data class OmstillingsstønadReiseOppstartAvslutningHjemreiseTso(
     override val vurderinger: VurderingOmstillingsstønad,
 ) : MålgruppeReiseOppstartAvslutningHjemreiseTso {
@@ -121,6 +129,7 @@ enum class MålgruppeReiseOppstartAvslutningHjemreiseTsoType(
     OMSTILLINGSSTØNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO(MålgruppeType.OMSTILLINGSSTØNAD),
     OVERGANGSSTØNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO(MålgruppeType.OVERGANGSSTØNAD),
     NEDSATT_ARBEIDSEVNE_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO(MålgruppeType.NEDSATT_ARBEIDSEVNE),
+    AKTIVITETSPENGER_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO(MålgruppeType.AKTIVITETSPENGER),
     UFØRETRYGD_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO(MålgruppeType.UFØRETRYGD),
     INGEN_MÅLGRUPPE_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO(MålgruppeType.INGEN_MÅLGRUPPE),
 }

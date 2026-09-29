@@ -8,6 +8,7 @@ import io.cucumber.java.no.Så
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -81,6 +82,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     val vedtakRepositoryFake = VedtakRepositoryFake()
     val tilkjentYtelseRepositoryFake = TilkjentYtelseRepositoryFake()
     val behandlingServiceMock = mockk<BehandlingService>()
+    val unleashService = mockk<UnleashService>(relaxed = true)
     val utledTidligsteEndringService =
         mockk<UtledTidligsteEndringService> {
             every { utledTidligsteEndringForBeregning(any(), any()) } returns null
@@ -110,6 +112,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
     val vedtaksperiodeValideringService =
         VedtaksperiodeValideringService(
             vilkårperiodeService = vilkårperiodeServiceMock,
+            unleashService = unleashService,
         )
     val simuleringServiceMock = mockk<SimuleringService>(relaxed = true)
 
@@ -136,7 +139,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
             opphørValideringService = opphørValideringService,
             beregningsplanUtleder = beregningsplanUtleder,
             vedtakRepository = vedtakRepositoryFake,
-            tilkjentYtelseService = TilkjentYtelseService(tilkjentYtelseRepositoryFake),
+            tilkjentYtelseService = TilkjentYtelseService(tilkjentYtelseRepositoryFake, unleashService),
             simuleringService = simuleringServiceMock,
         )
 

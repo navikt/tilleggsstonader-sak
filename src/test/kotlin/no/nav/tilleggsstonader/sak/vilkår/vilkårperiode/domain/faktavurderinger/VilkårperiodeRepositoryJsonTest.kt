@@ -171,6 +171,7 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
                     MålgruppePassAvBarnType.AAP_TILSYN_BARN -> AAPPassAvBarn::class
                     MålgruppePassAvBarnType.UFØRETRYGD_TILSYN_BARN -> UføretrygdPassAvBarn::class
                     MålgruppePassAvBarnType.NEDSATT_ARBEIDSEVNE_TILSYN_BARN -> NedsattArbeidsevnePassAvBarn::class
+                    MålgruppePassAvBarnType.AKTIVITETSPENGER_TILSYN_BARN -> AktivitetspengerPassAvBarn::class
                 }
             }
 
@@ -195,6 +196,7 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
                     MålgruppeLæremidlerType.OVERGANGSSTØNAD_LÆREMIDLER -> OvergangssstønadLæremidler::class
                     MålgruppeLæremidlerType.INGEN_MÅLGRUPPE_LÆREMIDLER -> IngenMålgruppeLæremidler::class
                     MålgruppeLæremidlerType.SYKEPENGER_100_PROSENT_LÆREMIDLER -> SykepengerLæremidler::class
+                    MålgruppeLæremidlerType.AKTIVITETSPENGER_LÆREMIDLER -> AktivitetspengerLæremidler::class
                 }
             }
 
@@ -217,6 +219,7 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
                     MålgruppeBoutgifterType.OMSTILLINGSSTØNAD_BOUTGIFTER -> OmstillingsstønadBoutgifter::class
                     MålgruppeBoutgifterType.OVERGANGSSTØNAD_BOUTGIFTER -> OvergangssstønadBoutgifter::class
                     MålgruppeBoutgifterType.INGEN_MÅLGRUPPE_BOUTGIFTER -> IngenMålgruppeBoutgifter::class
+                    MålgruppeBoutgifterType.AKTIVITETSPENGER_BOUTGIFTER -> AktivitetspengerBoutgifter::class
                 }
             }
 
@@ -239,6 +242,7 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
                     MålgruppeDagligReiseTsoType.OMSTILLINGSSTØNAD_DAGLIG_REISE_TSO -> OmstillingsstønadDagligReiseTso::class
                     MålgruppeDagligReiseTsoType.OVERGANGSSTØNAD_DAGLIG_REISE_TSO -> OvergangssstønadDagligReiseTso::class
                     MålgruppeDagligReiseTsoType.INGEN_MÅLGRUPPE_DAGLIG_REISE_TSO -> IngenMålgruppeDagligReiseTso::class
+                    MålgruppeDagligReiseTsoType.AKTIVITETSPENGER_DAGLIG_REISE_TSO -> AktivitetspengerDagligReiseTso::class
                 }
             }
 
@@ -260,6 +264,7 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
                     MålgruppeDagligReiseTsrType.KVALIFISERINGSSTØNAD_DAGLIG_REISE_TSR -> KvalifiseringsstønadDagligReiseTsr::class
                     MålgruppeDagligReiseTsrType.INGEN_MÅLGRUPPE_DAGLIG_REISE_TSR -> IngenMålgruppeDagligReiseTsr::class
                     MålgruppeDagligReiseTsrType.INNSATT_I_FENGSEL_DAGLIG_REISE_TSR -> InnsattIFengselDagligReiseTsr::class
+                    MålgruppeDagligReiseTsrType.UNGDOMSPROGRAMMET_DAGLIG_REISE_TSR -> UngdomsprogrammetDagligReiseTsr::class
                 }
             }
 
@@ -283,6 +288,7 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
                     MålgruppeReiseTilSamlingTsoType.OMSTILLINGSSTØNAD_REISE_TIL_SAMLING_TSO -> OmstillingsstønadReiseTilSamlingTso::class
                     MålgruppeReiseTilSamlingTsoType.OVERGANGSSTØNAD_REISE_TIL_SAMLING_TSO -> OvergangssstønadReiseTilSamlingTso::class
                     MålgruppeReiseTilSamlingTsoType.INGEN_MÅLGRUPPE_REISE_TIL_SAMLING_TSO -> IngenMålgruppeReiseTilSamlingTso::class
+                    MålgruppeReiseTilSamlingTsoType.AKTIVITETSPENGER_REISE_TIL_SAMLING_TSO -> AktivitetspengerReiseTilSamlingTso::class
                 }
             }
 
@@ -307,6 +313,7 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
                         KvalifiseringsstønadReiseTilSamlingTsr::class
                     MålgruppeReiseTilSamlingTsrType.INNSATT_I_FENGSEL_REISE_TIL_SAMLING_TSR -> InnsattIFengselReiseTilSamlingTsr::class
                     MålgruppeReiseTilSamlingTsrType.INGEN_MÅLGRUPPE_REISE_TIL_SAMLING_TSR -> IngenMålgruppeReiseTilSamlingTsr::class
+                    MålgruppeReiseTilSamlingTsrType.UNGDOMSPROGRAMMET_REISE_TIL_SAMLING_TSR -> UngdomsprogrammetReiseTilSamlingTsr::class
                 }
             }
 
@@ -337,6 +344,8 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
                         OvergangssstønadReiseOppstartAvslutningHjemreiseTso::class
                     MålgruppeReiseOppstartAvslutningHjemreiseTsoType.INGEN_MÅLGRUPPE_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO ->
                         IngenMålgruppeReiseOppstartAvslutningHjemreiseTso::class
+                    MålgruppeReiseOppstartAvslutningHjemreiseTsoType.AKTIVITETSPENGER_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO ->
+                        AktivitetspengerReiseOppstartAvslutningHjemreiseTso::class
                 }
             }
 
@@ -368,6 +377,8 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
                         InnsattIFengselReiseOppstartAvslutningHjemreiseTsr::class
                     MålgruppeReiseOppstartAvslutningHjemreiseTsrType.INGEN_MÅLGRUPPE_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR ->
                         IngenMålgruppeReiseOppstartAvslutningHjemreiseTsr::class
+                    MålgruppeReiseOppstartAvslutningHjemreiseTsrType.UNGDOMSPROGRAMMET_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR ->
+                        UngdomsprogrammetReiseOppstartAvslutningHjemreiseTsr::class
                 }
             }
 
