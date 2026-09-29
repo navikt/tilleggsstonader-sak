@@ -31,7 +31,7 @@ class TilkjentYtelseServiceTest {
     private val behandling = behandling(fagsak = fagsak)
 
     @Test
-    fun `skal avvise lagring av aktivitetspengerandel når togglen er avslått`() {
+    fun `skal avvise lagring av aktivitetspengerandel når toggelen er avslått`() {
         every { unleashService.isEnabled(Toggle.KAN_BRUKE_MÅLGRUPPE_AKTIVITETSPENGER) } returns false
         val andel =
             andelTilkjentYtelse(
