@@ -74,6 +74,10 @@ class SatsjusteringReiseTilSamlingPrivatBilTest(
         assertThat(andelerFørSatsjustering).hasSize(1)
         assertThat(andelerFørSatsjustering.single().statusIverksetting).isEqualTo(StatusIverksetting.VENTER_PÅ_SATS_ENDRING)
 
+        KafkaFake
+            .sendteMeldinger()
+            .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
+
         mockBekreftetSats()
 
         val behandlingerForSatsjustering =
@@ -116,41 +120,5 @@ class SatsjusteringReiseTilSamlingPrivatBilTest(
         every {
             satsPrivatBilProvider.alleSatser
         } returns bekreftedeSatser + nyBekreftetSats
-    }
-
-    @Test
-    fun `andel for privatbil-reise skal vente på satsendring når satsen ikke er bekreftet`() {
-        val behandlingContext =
-            opprettBehandlingOgGjennomførBehandlingsløp(
-                stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO,
-            ) {
-                aktivitet {
-                    opprett {
-                        aktivitetTiltakTsoReiseTilSamling(fom, tom)
-                    }
-                }
-                målgruppe {
-                    opprett {
-                        målgruppeAAP(fom, tom)
-                    }
-                }
-                vilkår {
-                    opprett {
-                        privatBilReiseTilSamling(fom, tom)
-                    }
-                }
-            }
-
-        val andeler =
-            tilkjentYtelseRepository
-                .findByBehandlingId(behandlingContext.behandlingId)!!
-                .andelerTilkjentYtelse
-
-        assertThat(andeler).hasSize(1)
-        assertThat(andeler.single().statusIverksetting).isEqualTo(StatusIverksetting.VENTER_PÅ_SATS_ENDRING)
-
-        KafkaFake
-            .sendteMeldinger()
-            .forventAntallMeldingerPåTopic(kafkaTopics.utbetaling, 0)
     }
 }
