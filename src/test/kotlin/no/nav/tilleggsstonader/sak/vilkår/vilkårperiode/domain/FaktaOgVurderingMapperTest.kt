@@ -2,14 +2,19 @@ package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
 import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdagerNullable
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenVurderinger
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarMålgruppeDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.LagreVilkårperiode
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -19,6 +24,28 @@ import java.time.LocalDate
 
 class FaktaOgVurderingMapperTest {
     private val behandlingId = BehandlingId.random()
+
+    @Test
+    fun `aktivitetspenger har ingen vurderinger`() {
+        val målgruppe =
+            LagreVilkårperiode(
+                behandlingId = behandlingId,
+                type = MålgruppeType.AKTIVITETSPENGER,
+                fom = 1 januar 2025,
+                tom = 31 januar 2025,
+                faktaOgSvar = FaktaOgSvarMålgruppeDto(),
+            )
+
+        val faktaOgVurdering =
+            mapFaktaOgSvarDto(
+                vilkårperiode = målgruppe,
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+                fødselFaktaGrunnlag = null,
+            )
+
+        assertThat(faktaOgVurdering.vurderinger).isSameAs(IngenVurderinger)
+        assertThat(faktaOgVurdering.utledResultat()).isEqualTo(ResultatVilkårperiode.OPPFYLT)
+    }
 
     private fun lagreVilkårperiodeDagligReiseTsr(aktivitetsdager: Int?) =
         LagreVilkårperiode(

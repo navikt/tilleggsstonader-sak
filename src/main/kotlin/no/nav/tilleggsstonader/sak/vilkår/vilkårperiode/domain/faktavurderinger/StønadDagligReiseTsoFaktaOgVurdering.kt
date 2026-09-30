@@ -40,6 +40,13 @@ data class NedsattArbeidsevneDagligReiseTso(
     override val fakta: IngenFakta = IngenFakta
 }
 
+data class AktivitetspengerDagligReiseTso(
+    override val vurderinger: IngenVurderinger = IngenVurderinger,
+) : MålgruppeDagligReiseTso {
+    override val type: MålgruppeDagligReiseTsoType = MålgruppeDagligReiseTsoType.AKTIVITETSPENGER_DAGLIG_REISE_TSO
+    override val fakta: IngenFakta = IngenFakta
+}
+
 data class OmstillingsstønadDagligReiseTso(
     override val vurderinger: VurderingOmstillingsstønad,
 ) : MålgruppeDagligReiseTso {
@@ -113,6 +120,7 @@ enum class MålgruppeDagligReiseTsoType(
     OMSTILLINGSSTØNAD_DAGLIG_REISE_TSO(MålgruppeType.OMSTILLINGSSTØNAD),
     OVERGANGSSTØNAD_DAGLIG_REISE_TSO(MålgruppeType.OVERGANGSSTØNAD),
     NEDSATT_ARBEIDSEVNE_DAGLIG_REISE_TSO(MålgruppeType.NEDSATT_ARBEIDSEVNE),
+    AKTIVITETSPENGER_DAGLIG_REISE_TSO(MålgruppeType.AKTIVITETSPENGER),
     UFØRETRYGD_DAGLIG_REISE_TSO(MålgruppeType.UFØRETRYGD),
     INGEN_MÅLGRUPPE_DAGLIG_REISE_TSO(MålgruppeType.INGEN_MÅLGRUPPE),
 }

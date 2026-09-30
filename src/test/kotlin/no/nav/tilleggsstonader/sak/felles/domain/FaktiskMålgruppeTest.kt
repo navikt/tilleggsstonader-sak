@@ -40,9 +40,31 @@ class FaktiskMålgruppeTest {
             .containsExactly(
                 FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                 FaktiskMålgruppe.ENSLIG_FORSØRGER,
+                FaktiskMålgruppe.AKTIVITETSPENGER,
                 FaktiskMålgruppe.GJENLEVENDE,
                 FaktiskMålgruppe.ARBEIDSSØKER,
             )
+    }
+
+    @Test
+    fun `aktivitetspenger skal bruke egne andelstyper for TSO-stønadene`() {
+        assertThat(
+            listOf(
+                FaktiskMålgruppe.AKTIVITETSPENGER.tilTypeAndel(Stønadstype.BARNETILSYN),
+                FaktiskMålgruppe.AKTIVITETSPENGER.tilTypeAndel(Stønadstype.LÆREMIDLER),
+                FaktiskMålgruppe.AKTIVITETSPENGER.tilTypeAndel(Stønadstype.BOUTGIFTER),
+                FaktiskMålgruppe.AKTIVITETSPENGER.tilTypeAndel(Stønadstype.DAGLIG_REISE_TSO),
+                FaktiskMålgruppe.AKTIVITETSPENGER.tilTypeAndel(Stønadstype.REISE_TIL_SAMLING_TSO),
+                FaktiskMålgruppe.AKTIVITETSPENGER.tilTypeAndel(Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO),
+            ),
+        ).containsExactlyInAnyOrder(
+            TypeAndel.TILSYN_BARN_AKTIVITETSPENGER,
+            TypeAndel.LÆREMIDLER_AKTIVITETSPENGER,
+            TypeAndel.BOUTGIFTER_AKTIVITETSPENGER,
+            TypeAndel.DAGLIG_REISE_AKTIVITETSPENGER,
+            TypeAndel.REISE_TIL_SAMLING_AKTIVITETSPENGER,
+            TypeAndel.REISE_OPPSTART_AKTIVITETSPENGER,
+        )
     }
 
     @Nested

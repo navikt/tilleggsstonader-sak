@@ -102,21 +102,25 @@ object PosteringStønadstypeMapper {
             TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER,
             TypeAndel.TILSYN_BARN_AAP,
             TypeAndel.TILSYN_BARN_ETTERLATTE,
+            TypeAndel.TILSYN_BARN_AKTIVITETSPENGER,
             -> Stønadstype.BARNETILSYN
 
             TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER,
             TypeAndel.LÆREMIDLER_AAP,
             TypeAndel.LÆREMIDLER_ETTERLATTE,
+            TypeAndel.LÆREMIDLER_AKTIVITETSPENGER,
             -> Stønadstype.LÆREMIDLER
 
             TypeAndel.BOUTGIFTER_AAP,
             TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER,
             TypeAndel.BOUTGIFTER_ETTERLATTE,
+            TypeAndel.BOUTGIFTER_AKTIVITETSPENGER,
             -> Stønadstype.BOUTGIFTER
 
             TypeAndel.DAGLIG_REISE_AAP,
             TypeAndel.DAGLIG_REISE_ENSLIG_FORSØRGER,
             TypeAndel.DAGLIG_REISE_ETTERLATTE,
+            TypeAndel.DAGLIG_REISE_AKTIVITETSPENGER,
             -> Stønadstype.DAGLIG_REISE_TSO
 
             TypeAndel.DAGLIG_REISE_TILTAK_ARBEIDSFORBEREDENDE,
@@ -141,6 +145,7 @@ object PosteringStønadstypeMapper {
             TypeAndel.REISE_TIL_SAMLING_AAP,
             TypeAndel.REISE_TIL_SAMLING_ENSLIG_FORSØRGER,
             TypeAndel.REISE_TIL_SAMLING_ETTERLATTE,
+            TypeAndel.REISE_TIL_SAMLING_AKTIVITETSPENGER,
             -> Stønadstype.REISE_TIL_SAMLING_TSO
 
             TypeAndel.REISE_TIL_SAMLING_TILTAK_ARBEIDSFORBEREDENDE,
@@ -159,6 +164,7 @@ object PosteringStønadstypeMapper {
             TypeAndel.REISE_OPPSTART_AAP,
             TypeAndel.REISE_OPPSTART_ENSLIG_FORSØRGER,
             TypeAndel.REISE_OPPSTART_ETTERLATTE,
+            TypeAndel.REISE_OPPSTART_AKTIVITETSPENGER,
             -> Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO
 
             TypeAndel.REISE_OPPSTART_TILTAK_ARBEIDSFORBEREDENDE,
@@ -185,6 +191,8 @@ object PosteringStønadstypeMapper {
      *
      * `internal` for å kunne verifisere i test at alle [TypeAndel] (unntatt [TypeAndel.UGYLDIG])
      * har en tilhørende klassekode her.
+     *
+     * TODO: Legg til aktivitetspenger-klassekodene etter https://jira.adeo.no/browse/FAGSYSTEM-447790
      */
     internal val klassekodeTilTypeAndel: Map<String, TypeAndel> =
         mapOf(

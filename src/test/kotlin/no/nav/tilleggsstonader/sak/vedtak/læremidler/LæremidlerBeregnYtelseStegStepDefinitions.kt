@@ -9,6 +9,7 @@ import io.mockk.justRun
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -79,6 +80,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     val vedtakRepository = VedtakRepositoryFake()
     val tilkjentYtelseRepository = TilkjentYtelseRepositoryFake()
     val behandlingService = mockk<BehandlingService>()
+    val unleashService = mockk<UnleashService>(relaxed = true)
     val utledTidligsteEndringService =
         mockk<UtledTidligsteEndringService> {
             every { utledTidligsteEndringForBeregning(any(), any()) } returns null
@@ -99,6 +101,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
     val vedtaksperiodeValideringService =
         VedtaksperiodeValideringService(
             vilkårperiodeService = vilkårperiodeService,
+            unleashService = unleashService,
         )
 
     val simuleringService =
@@ -116,7 +119,7 @@ class LæremidlerBeregnYtelseStegStepDefinitions {
                 ),
             opphørValideringService = mockk<OpphørValideringService>(relaxed = true),
             vedtakRepository = vedtakRepository,
-            tilkjentYtelseService = TilkjentYtelseService(tilkjentYtelseRepository),
+            tilkjentYtelseService = TilkjentYtelseService(tilkjentYtelseRepository, unleashService),
             simuleringService = simuleringService,
             beregningsplanUtleder = beregningsplanUtleder,
         )

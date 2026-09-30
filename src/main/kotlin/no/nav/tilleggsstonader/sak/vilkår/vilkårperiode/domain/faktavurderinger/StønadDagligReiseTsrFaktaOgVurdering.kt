@@ -52,6 +52,13 @@ data class TiltakspengerDagligReiseTsr(
     override val fakta: IngenFakta = IngenFakta
 }
 
+data class UngdomsprogrammetDagligReiseTsr(
+    override val vurderinger: IngenVurderinger = IngenVurderinger,
+) : MålgruppeDagligReiseTsr {
+    override val type: MålgruppeDagligReiseTsrType = MålgruppeDagligReiseTsrType.UNGDOMSPROGRAMMET_DAGLIG_REISE_TSR
+    override val fakta: IngenFakta = IngenFakta
+}
+
 data class KvalifiseringsstønadDagligReiseTsr(
     override val vurderinger: IngenVurderinger = IngenVurderinger,
 ) : MålgruppeDagligReiseTsr {
@@ -92,6 +99,7 @@ enum class MålgruppeDagligReiseTsrType(
     INGEN_MÅLGRUPPE_DAGLIG_REISE_TSR(MålgruppeType.INGEN_MÅLGRUPPE),
     DAGPENGER_DAGLIG_REISE_TSR(MålgruppeType.DAGPENGER),
     TILTAKSPENGER_DAGLIG_REISE_TSR(MålgruppeType.TILTAKSPENGER),
+    UNGDOMSPROGRAMMET_DAGLIG_REISE_TSR(MålgruppeType.UNGDOMSPROGRAMMET),
     KVALIFISERINGSSTØNAD_DAGLIG_REISE_TSR(MålgruppeType.KVALIFISERINGSSTØNAD),
     INNSATT_I_FENGSEL_DAGLIG_REISE_TSR(MålgruppeType.INNSATT_I_FENGSEL),
 }
