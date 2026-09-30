@@ -152,6 +152,8 @@ fun Hovedytelse.tilMålgruppeType(): MålgruppeType =
         Hovedytelse.GJENLEVENDEPENSJON -> MålgruppeType.OMSTILLINGSSTØNAD
         Hovedytelse.UFØRETRYGD -> MålgruppeType.UFØRETRYGD
         Hovedytelse.TILTAKSPENGER -> MålgruppeType.TILTAKSPENGER
+        Hovedytelse.UNGDOMSPROGRAMMET -> MålgruppeType.UNGDOMSPROGRAMMET
+        Hovedytelse.AKTIVITETSPENGER -> MålgruppeType.AKTIVITETSPENGER
         Hovedytelse.DAGPENGER -> MålgruppeType.DAGPENGER
         Hovedytelse.SYKEPENGER -> MålgruppeType.SYKEPENGER_100_PROSENT
         Hovedytelse.KVALIFISERINGSSTØNAD -> MålgruppeType.KVALIFISERINGSSTØNAD
