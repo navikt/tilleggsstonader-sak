@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.UNGDOMSPROGRAMMET
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.VedtaksperioderDvh.Companion.finnFødselsnumre
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
@@ -28,6 +29,12 @@ class VedtaksperioderDvhTest {
     val barn1 = listOf(defaultBarn1)
     val barn2 = listOf(defaultBarn2)
     val alleBarn = barn1 + barn2
+
+    @Test
+    fun `ungdomsprogrammet mappes til egen DVH-målgruppe`() {
+        assertThat(LovverketsMålgruppeDvh.fraDomene(UNGDOMSPROGRAMMET))
+            .isEqualTo(LovverketsMålgruppeDvh.UNGDOMSPROGRAMMET)
+    }
 
     @Test
     fun `fraDomene kan mappe for InnvilgelsePassAvBarn`() {

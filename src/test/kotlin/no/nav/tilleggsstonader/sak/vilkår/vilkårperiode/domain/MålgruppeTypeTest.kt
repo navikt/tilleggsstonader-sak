@@ -68,7 +68,7 @@ class MålgruppeTypeTest {
                             MålgruppeType.TILTAKSPENGER -> FaktiskMålgruppe.ARBEIDSSØKER
                             MålgruppeType.KVALIFISERINGSSTØNAD -> FaktiskMålgruppe.ARBEIDSSØKER
                             MålgruppeType.INNSATT_I_FENGSEL -> FaktiskMålgruppe.ARBEIDSSØKER
-                            MålgruppeType.UNGDOMSPROGRAMMET -> FaktiskMålgruppe.ARBEIDSSØKER
+                            MålgruppeType.UNGDOMSPROGRAMMET -> FaktiskMålgruppe.UNGDOMSPROGRAMMET
                             MålgruppeType.AKTIVITETSPENGER -> FaktiskMålgruppe.AKTIVITETSPENGER
                         }
                 }

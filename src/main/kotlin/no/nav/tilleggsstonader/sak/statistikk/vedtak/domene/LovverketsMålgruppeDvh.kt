@@ -7,6 +7,7 @@ enum class LovverketsMålgruppeDvh {
     ENSLIG_FORSØRGER,
     GJENLEVENDE,
     ARBEIDSSØKER,
+    UNGDOMSPROGRAMMET,
     AKTIVITETSPENGER,
     ;
 
@@ -17,6 +18,7 @@ enum class LovverketsMålgruppeDvh {
                 FaktiskMålgruppe.ENSLIG_FORSØRGER -> ENSLIG_FORSØRGER
                 FaktiskMålgruppe.GJENLEVENDE -> GJENLEVENDE
                 FaktiskMålgruppe.ARBEIDSSØKER -> ARBEIDSSØKER
+                FaktiskMålgruppe.UNGDOMSPROGRAMMET -> UNGDOMSPROGRAMMET
                 FaktiskMålgruppe.AKTIVITETSPENGER -> AKTIVITETSPENGER
             }
     }

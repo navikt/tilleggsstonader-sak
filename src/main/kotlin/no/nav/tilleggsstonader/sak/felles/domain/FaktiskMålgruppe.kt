@@ -27,6 +27,10 @@ enum class FaktiskMålgruppe(
         prioritet = 5,
         gyldigeAktiviter = setOf(AktivitetType.TILTAK),
     ),
+    UNGDOMSPROGRAMMET(
+        prioritet = 6,
+        gyldigeAktiviter = setOf(AktivitetType.TILTAK),
+    ),
     AKTIVITETSPENGER(
         prioritet = 3,
         gyldigeAktiviter = setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING),
