@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain
 
+import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import org.assertj.core.api.Assertions.assertThat
@@ -8,6 +9,14 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 
 class MålgruppeTypeTest {
+    @Test
+    fun `søknadens hovedytelser mappes til nye målgrupper`() {
+        assertThat(Hovedytelse.UNGDOMSPROGRAMMET.tilMålgruppeType())
+            .isEqualTo(MålgruppeType.UNGDOMSPROGRAMMET)
+        assertThat(Hovedytelse.AKTIVITETSPENGER.tilMålgruppeType())
+            .isEqualTo(MålgruppeType.AKTIVITETSPENGER)
+    }
+
     @Test
     fun `ungdomsprogrammet er tilgjengelig for stønadstyper med tiltaksøkonomi`() {
         assertThat(
