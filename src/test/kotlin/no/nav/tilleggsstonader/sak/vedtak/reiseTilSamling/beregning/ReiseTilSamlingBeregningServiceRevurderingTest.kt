@@ -130,6 +130,7 @@ class ReiseTilSamlingBeregningServiceRevurderingTest {
                 brukersNavKontor = null,
             ),
         beløp = beløp.toBigDecimal(),
+        begrunnelse = "Togbillett",
         fraTidligereVedtak = false,
     )
 

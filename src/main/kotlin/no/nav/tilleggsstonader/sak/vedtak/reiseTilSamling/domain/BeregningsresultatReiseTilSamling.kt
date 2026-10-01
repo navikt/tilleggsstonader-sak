@@ -17,6 +17,7 @@ data class BeregningsresultatReiseTilSamling(
 data class BeregningsresultatOffentligTransport(
     val reiseId: ReiseId,
     val grunnlag: BeregningsgrunnlagOffentligTransportForSamling,
+    val begrunnelse: String,
     val beløp: BigDecimal,
     val aktivitetId: VilkårperiodeGlobalId?,
     /**

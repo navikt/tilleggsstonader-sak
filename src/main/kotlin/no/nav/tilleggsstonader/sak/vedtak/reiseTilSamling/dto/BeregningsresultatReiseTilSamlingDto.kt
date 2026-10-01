@@ -21,6 +21,7 @@ data class BeregningsresultatOffentligTransportDto(
     val fom: LocalDate,
     val tom: LocalDate,
     val beløp: BigDecimal,
+    val begrunnelse: String,
     val aktivitetId: VilkårperiodeGlobalId? = null,
     val fraTidligereVedtak: Boolean,
 )
@@ -62,6 +63,7 @@ fun BeregningsresultatOffentligTransport.tilDto() =
         tom = grunnlag.tom,
         beløp = beløp,
         aktivitetId = aktivitetId,
+        begrunnelse = begrunnelse,
         fraTidligereVedtak = fraTidligereVedtak,
     )
 

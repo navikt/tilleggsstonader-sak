@@ -1185,6 +1185,7 @@ object InterntVedtakTestdata {
                                     brukersNavKontor = null,
                                 ),
                             beløp = BigDecimal(3000),
+                            begrunnelse = "Begrunnelse for offentlig transport",
                             aktivitetId = dummyAktivitetId,
                         ),
                         no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport(
@@ -1198,6 +1199,7 @@ object InterntVedtakTestdata {
                                     brukersNavKontor = null,
                                 ),
                             beløp = BigDecimal(3000),
+                            begrunnelse = "Begrunnelse for offentlig transport",
                             aktivitetId = dummyAktivitetId,
                         ),
                     ),

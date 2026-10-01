@@ -31,6 +31,7 @@ fun lagBeregningsresultatForOffentligTransport(
     beløp: BigDecimal = BigDecimal.ZERO,
     aktivitetId: VilkårperiodeGlobalId? = null,
     brukersNavKontor: String? = null,
+    begrunnelse: String = "Begrunnelse for offentlig transport",
 ): BeregningsresultatOffentligTransport {
     val grunnlag =
         BeregningsgrunnlagOffentligTransportForSamling(
@@ -46,6 +47,7 @@ fun lagBeregningsresultatForOffentligTransport(
         grunnlag = grunnlag,
         beløp = beløp,
         aktivitetId = aktivitetId,
+        begrunnelse = begrunnelse,
     )
 }
 

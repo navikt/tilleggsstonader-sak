@@ -75,6 +75,7 @@ class ReiseTilSamlingVedtakControllerTest : CleanDatabaseIntegrationTest() {
                                 fom = fom,
                                 tom = tom,
                                 beløp = 500.toBigDecimal(),
+                                begrunnelse = "Togbillett",
                                 fraTidligereVedtak = false,
                             ),
                         ),
