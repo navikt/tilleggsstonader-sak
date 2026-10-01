@@ -39,6 +39,7 @@
       "offentligTransport": [ {
         "adresse": "Testveien 1, 1234 Testby",
         "aktivitetId": "02c86eca-36e5-451b-a22d-8501a0f7b8ee",
+        "begrunnelse": "Begrunnelse for offentlig transport",
         "beløp": 3000,
         "fom": "2024-01-01",
         "fraTidligereVedtak": false,
@@ -47,6 +48,7 @@
       }, {
         "adresse": "Testveien 2, 2345 Testby",
         "aktivitetId": "02c86eca-36e5-451b-a22d-8501a0f7b8ee",
+        "begrunnelse": "Begrunnelse for offentlig transport",
         "beløp": 3000,
         "fom": "2025-01-01",
         "fraTidligereVedtak": false,
