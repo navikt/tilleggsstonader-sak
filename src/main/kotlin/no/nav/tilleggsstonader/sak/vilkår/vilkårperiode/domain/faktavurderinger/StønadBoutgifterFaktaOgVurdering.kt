@@ -41,7 +41,7 @@ data class NedsattArbeidsevneBoutgifter(
 }
 
 data class AktivitetspengerBoutgifter(
-    override val vurderinger: IngenVurderinger = IngenVurderinger,
+    override val vurderinger: VurderingAktivitetspenger,
 ) : MålgruppeBoutgifter {
     override val type: MålgruppeBoutgifterType = MålgruppeBoutgifterType.AKTIVITETSPENGER_BOUTGIFTER
     override val fakta: IngenFakta = IngenFakta

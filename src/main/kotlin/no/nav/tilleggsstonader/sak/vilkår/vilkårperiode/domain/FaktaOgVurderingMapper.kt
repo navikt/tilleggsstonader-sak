@@ -122,6 +122,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningReiseTilSamlingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAPLæremidler
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAktivitetspenger
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingErAktivitetenObligatorisk
@@ -550,7 +551,10 @@ private fun mapMålgruppePassAvBarn(
             )
         }
 
-        MålgruppeType.AKTIVITETSPENGER -> AktivitetspengerPassAvBarn()
+        MålgruppeType.AKTIVITETSPENGER ->
+            AktivitetspengerPassAvBarn(
+                vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
+            )
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
             NedsattArbeidsevnePassAvBarn(
                 vurderinger =
@@ -616,7 +620,10 @@ private fun mapMålgruppeLæremidler(
             )
         }
 
-        MålgruppeType.AKTIVITETSPENGER -> AktivitetspengerLæremidler()
+        MålgruppeType.AKTIVITETSPENGER ->
+            AktivitetspengerLæremidler(
+                vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
+            )
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
             NedsattArbeidsevneLæremidler(
                 vurderinger =
@@ -677,7 +684,10 @@ private fun mapMålgruppeBoutgfiter(
             )
         }
 
-        MålgruppeType.AKTIVITETSPENGER -> AktivitetspengerBoutgifter()
+        MålgruppeType.AKTIVITETSPENGER ->
+            AktivitetspengerBoutgifter(
+                vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
+            )
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
             NedsattArbeidsevneBoutgifter(
                 vurderinger =
@@ -743,7 +753,10 @@ private fun mapMålgruppeDagligReiseTso(
             )
         }
 
-        MålgruppeType.AKTIVITETSPENGER -> AktivitetspengerDagligReiseTso()
+        MålgruppeType.AKTIVITETSPENGER ->
+            AktivitetspengerDagligReiseTso(
+                vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
+            )
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
             NedsattArbeidsevneDagligReiseTso(
                 vurderinger =
@@ -826,7 +839,10 @@ private fun mapMålgruppeReiseTilSamlingTso(
             )
         }
 
-        MålgruppeType.AKTIVITETSPENGER -> AktivitetspengerReiseTilSamlingTso()
+        MålgruppeType.AKTIVITETSPENGER ->
+            AktivitetspengerReiseTilSamlingTso(
+                vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
+            )
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
             NedsattArbeidsevneReiseTilSamlingTso(
                 vurderinger =
@@ -949,7 +965,10 @@ private fun mapMålgruppeReiseOppstartAvslutningHjemreiseTso(
             )
         }
 
-        MålgruppeType.AKTIVITETSPENGER -> AktivitetspengerReiseOppstartAvslutningHjemreiseTso()
+        MålgruppeType.AKTIVITETSPENGER ->
+            AktivitetspengerReiseOppstartAvslutningHjemreiseTso(
+                vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
+            )
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
             NedsattArbeidsevneReiseOppstartAvslutningHjemreiseTso(
                 vurderinger =

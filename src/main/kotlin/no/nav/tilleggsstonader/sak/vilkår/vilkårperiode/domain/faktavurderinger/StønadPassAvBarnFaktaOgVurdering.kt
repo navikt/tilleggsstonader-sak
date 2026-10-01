@@ -41,7 +41,7 @@ data class NedsattArbeidsevnePassAvBarn(
 }
 
 data class AktivitetspengerPassAvBarn(
-    override val vurderinger: IngenVurderinger = IngenVurderinger,
+    override val vurderinger: VurderingAktivitetspenger,
 ) : MålgruppePassAvBarn {
     override val type: MålgruppePassAvBarnType = MålgruppePassAvBarnType.AKTIVITETSPENGER_TILSYN_BARN
     override val fakta: IngenFakta = IngenFakta
