@@ -57,6 +57,14 @@ data class TiltakspengerReiseOppstartAvslutningHjemreiseTsr(
     override val fakta: IngenFakta = IngenFakta
 }
 
+data class UngdomsprogrammetReiseOppstartAvslutningHjemreiseTsr(
+    override val vurderinger: IngenVurderinger = IngenVurderinger,
+) : MålgruppeReiseOppstartAvslutningHjemreiseTsr {
+    override val type: MålgruppeReiseOppstartAvslutningHjemreiseTsrType =
+        MålgruppeReiseOppstartAvslutningHjemreiseTsrType.UNGDOMSPROGRAMMET_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR
+    override val fakta: IngenFakta = IngenFakta
+}
+
 data class KvalifiseringsstønadReiseOppstartAvslutningHjemreiseTsr(
     override val vurderinger: IngenVurderinger = IngenVurderinger,
 ) : MålgruppeReiseOppstartAvslutningHjemreiseTsr {
@@ -98,6 +106,7 @@ enum class MålgruppeReiseOppstartAvslutningHjemreiseTsrType(
     INGEN_MÅLGRUPPE_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR(MålgruppeType.INGEN_MÅLGRUPPE),
     DAGPENGER_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR(MålgruppeType.DAGPENGER),
     TILTAKSPENGER_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR(MålgruppeType.TILTAKSPENGER),
+    UNGDOMSPROGRAMMET_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR(MålgruppeType.UNGDOMSPROGRAMMET),
     KVALIFISERINGSSTØNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR(MålgruppeType.KVALIFISERINGSSTØNAD),
     INNSATT_I_FENGSEL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR(MålgruppeType.INNSATT_I_FENGSEL),
 }

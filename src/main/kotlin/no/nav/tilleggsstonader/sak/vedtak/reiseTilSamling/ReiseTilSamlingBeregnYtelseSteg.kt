@@ -51,7 +51,29 @@ class ReiseTilSamlingBeregnYtelseSteg(
         vedtak: VedtakReiseTilSamlingRequest,
         satsjusteringFra: LocalDate,
     ) {
-        TODO("Not yet implemented")
+        logger.info("Lagrer vedtak for satsjustering for behandling=${saksbehandling.id}, satsjusteringFra=$satsjusteringFra")
+
+        val innvilgelse = vedtak as InnvilgelseReiseTilSamlingRequest
+        val vedtaksperioder = innvilgelse.vedtaksperioder()
+        val beregningsplan =
+            BeregningsplanUtleder.utledForOpphørEllerSatsjustering(
+                opphørsdato = satsjusteringFra,
+            )
+        val beregningsresultat =
+            beregningService.beregn(
+                vedtaksperioder = vedtaksperioder,
+                behandling = saksbehandling,
+                beregningsplan = beregningsplan,
+                typeVedtak = TypeVedtak.INNVILGELSE,
+            )
+        lagreInnvilgetVedtak(
+            behandling = saksbehandling,
+            beregningsresultat = beregningsresultat,
+            vedtaksperioder = vedtaksperioder,
+            begrunnelse = innvilgelse.begrunnelse,
+            beregningsplan = beregningsplan,
+        )
+        opprettAndelerReiseTilSamlingService.lagreAndelerForBehandling(saksbehandling)
     }
 
     override fun lagreVedtak(

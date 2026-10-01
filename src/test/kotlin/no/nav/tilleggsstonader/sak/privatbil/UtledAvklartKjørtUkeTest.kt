@@ -62,7 +62,7 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
 
         val innsendtUke = finnInnsendtUkeIKjørelistebehandling(rammebehandlingId)
 
-        assertThat(innsendtUke.avvik).isNull()
+        assertThat(innsendtUke.avvik).isEmpty()
         assertThat(innsendtUke.status).isEqualTo(UkeStatus.OK_AUTOMATISK)
         assertThat(innsendtUke.avklartUkeId).isNotNull()
 
@@ -132,7 +132,7 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
 
         val innsendtUke = finnInnsendtUkeIKjørelistebehandling(rammebehandlingId)
 
-        assertThat(innsendtUke.avvik!!.typeAvvik).isEqualTo(TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK)
+        assertThat(innsendtUke.avvik).containsExactly(TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK)
         assertThat(innsendtUke.status).isEqualTo(UkeStatus.AVVIK)
         assertThat(innsendtUke.avklartUkeId).isNotNull()
 
@@ -198,7 +198,7 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
 
         val innsendtUke = finnInnsendtUkeIKjørelistebehandling(rammebehandlingId)
 
-        assertThat(innsendtUke.avvik).isNull()
+        assertThat(innsendtUke.avvik).isEmpty()
         assertThat(innsendtUke.status).isEqualTo(UkeStatus.AVVIK)
         assertThat(innsendtUke.avklartUkeId).isNotNull()
 
@@ -244,7 +244,7 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
 
         val innsendtUke = finnInnsendtUkeIKjørelistebehandling(rammebehandlingId)
 
-        assertThat(innsendtUke.avvik).isNull()
+        assertThat(innsendtUke.avvik).isEmpty()
         assertThat(innsendtUke.status).isEqualTo(UkeStatus.AVVIK)
         assertThat(innsendtUke.avklartUkeId).isNotNull()
 
@@ -303,7 +303,7 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
 
         val innsendtUke = finnInnsendtUkeIKjørelistebehandling(rammebehandlingId)
 
-        assertThat(innsendtUke.avvik).isNull()
+        assertThat(innsendtUke.avvik).isEmpty()
         assertThat(innsendtUke.status).isEqualTo(UkeStatus.AVVIK)
         assertThat(innsendtUke.avklartUkeId).isNotNull()
 
@@ -398,7 +398,7 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
 
         ikkeInnsendteUker.forEach { uke ->
             assertThat(uke.status).isEqualTo(UkeStatus.IKKE_MOTTATT_KJØRELISTE)
-            assertThat(uke.avvik).isNull()
+            assertThat(uke.avvik).isEmpty()
             assertThat(uke.kjørelisteId).isNull()
             assertThat(uke.avklartUkeId).isNull()
 

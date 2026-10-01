@@ -155,6 +155,7 @@ class UtbetalingV3Mapper(
     private fun mapTilStønadUtbetaling(typeAndel: TypeAndel): StønadUtbetaling =
         when (typeAndel) {
             TypeAndel.DAGLIG_REISE_AAP -> StønadUtbetaling.DAGLIG_REISE_AAP
+            TypeAndel.DAGLIG_REISE_AKTIVITETSPENGER -> StønadUtbetaling.DAGLIG_REISE_AKTIVITETSPENGER
             TypeAndel.DAGLIG_REISE_ENSLIG_FORSØRGER -> StønadUtbetaling.DAGLIG_REISE_ENSLIG_FORSØRGER
             TypeAndel.DAGLIG_REISE_ETTERLATTE -> StønadUtbetaling.DAGLIG_REISE_ETTERLATTE
             TypeAndel.DAGLIG_REISE_TILTAK_ARBEIDSFORBEREDENDE -> StønadUtbetaling.DAGLIG_REISE_TILTAK_ARBEIDSFORBEREDENDE
@@ -181,6 +182,7 @@ class UtbetalingV3Mapper(
                 StønadUtbetaling.DAGLIG_REISE_TILTAK_UTVIDET_OPPFØLGING_I_OPPLÆRING
 
             TypeAndel.REISE_TIL_SAMLING_AAP -> StønadUtbetaling.REISE_TIL_SAMLING_AAP
+            TypeAndel.REISE_TIL_SAMLING_AKTIVITETSPENGER -> StønadUtbetaling.REISE_TIL_SAMLING_AKTIVITETSPENGER
             TypeAndel.REISE_TIL_SAMLING_ENSLIG_FORSØRGER -> StønadUtbetaling.REISE_TIL_SAMLING_ENSLIG_FORSØRGER
             TypeAndel.REISE_TIL_SAMLING_ETTERLATTE -> StønadUtbetaling.REISE_TIL_SAMLING_ETTERLATTE
 
@@ -200,6 +202,7 @@ class UtbetalingV3Mapper(
                 StønadUtbetaling.REISE_TIL_SAMLING_TILTAK_UTVIDET_OPPFØLGING_I_OPPLÆRING
 
             TypeAndel.REISE_OPPSTART_AAP -> StønadUtbetaling.REISE_OPPSTART_AAP
+            TypeAndel.REISE_OPPSTART_AKTIVITETSPENGER -> StønadUtbetaling.REISE_OPPSTART_AKTIVITETSPENGER
             TypeAndel.REISE_OPPSTART_ENSLIG_FORSØRGER -> StønadUtbetaling.REISE_OPPSTART_ENSLIG_FORSØRGER
             TypeAndel.REISE_OPPSTART_ETTERLATTE -> StønadUtbetaling.REISE_OPPSTART_ETTERLATTE
 
@@ -218,13 +221,16 @@ class UtbetalingV3Mapper(
 
             TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER -> StønadUtbetaling.LÆREMIDLER_ENSLIG_FORSØRGER
             TypeAndel.LÆREMIDLER_AAP -> StønadUtbetaling.LÆREMIDLER_AAP
+            TypeAndel.LÆREMIDLER_AKTIVITETSPENGER -> StønadUtbetaling.LÆREMIDLER_AKTIVITETSPENGER
             TypeAndel.LÆREMIDLER_ETTERLATTE -> StønadUtbetaling.LÆREMIDLER_ETTERLATTE
 
             TypeAndel.BOUTGIFTER_AAP -> StønadUtbetaling.BOUTGIFTER_AAP
+            TypeAndel.BOUTGIFTER_AKTIVITETSPENGER -> StønadUtbetaling.BOUTGIFTER_AKTIVITETSPENGER
             TypeAndel.BOUTGIFTER_ETTERLATTE -> StønadUtbetaling.BOUTGIFTER_ETTERLATTE
             TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER -> StønadUtbetaling.BOUTGIFTER_ENSLIG_FORSØRGER
 
             TypeAndel.TILSYN_BARN_AAP -> StønadUtbetaling.TILSYN_BARN_AAP
+            TypeAndel.TILSYN_BARN_AKTIVITETSPENGER -> StønadUtbetaling.TILSYN_BARN_AKTIVITETSPENGER
             TypeAndel.TILSYN_BARN_ETTERLATTE -> StønadUtbetaling.TILSYN_BARN_ETTERLATTE
             TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER -> StønadUtbetaling.TILSYN_BARN_ENSLIG_FORSØRGER
 

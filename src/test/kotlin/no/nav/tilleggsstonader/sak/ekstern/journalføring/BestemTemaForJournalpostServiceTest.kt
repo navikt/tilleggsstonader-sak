@@ -108,6 +108,46 @@ class BestemTemaForJournalpostServiceTest {
     }
 
     @Test
+    fun `skal rute aktivitetspenger fra søknad til TSO`() {
+        val journalpost = journalpostMedStrukturertSøknad(dokumentBrevkode = DokumentBrevkode.REISE_TIL_SAMLING)
+        every {
+            ytelseService.hentYtelser(any(), any(), any(), any())
+        } returns tomYtelsePerioderDto()
+
+        val stønadstype =
+            service.bestemStønadstype(
+                journalpost = journalpost,
+                stønadstypeTso = Stønadstype.REISE_TIL_SAMLING_TSO,
+                stønadstypeTsr = Stønadstype.REISE_TIL_SAMLING_TSR,
+                fom = fom,
+                tom = tom,
+                målgrupperFraSøknad = setOf(MålgruppeType.AKTIVITETSPENGER),
+            )
+
+        assertThat(stønadstype).isEqualTo(Stønadstype.REISE_TIL_SAMLING_TSO)
+    }
+
+    @Test
+    fun `skal rute ungdomsprogrammet fra søknad til TSR`() {
+        val journalpost = journalpostMedStrukturertSøknad(dokumentBrevkode = DokumentBrevkode.REISE_TIL_SAMLING)
+        every {
+            ytelseService.hentYtelser(any(), any(), any(), any())
+        } returns tomYtelsePerioderDto()
+
+        val stønadstype =
+            service.bestemStønadstype(
+                journalpost = journalpost,
+                stønadstypeTso = Stønadstype.REISE_TIL_SAMLING_TSO,
+                stønadstypeTsr = Stønadstype.REISE_TIL_SAMLING_TSR,
+                fom = fom,
+                tom = tom,
+                målgrupperFraSøknad = setOf(MålgruppeType.UNGDOMSPROGRAMMET),
+            )
+
+        assertThat(stønadstype).isEqualTo(Stønadstype.REISE_TIL_SAMLING_TSR)
+    }
+
+    @Test
     fun `skal kaste feil når journalpost mangler bruker`() {
         val journalpost =
             journalpostMedStrukturertSøknad(dokumentBrevkode = DokumentBrevkode.REISE_TIL_SAMLING)

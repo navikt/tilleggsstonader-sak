@@ -40,6 +40,13 @@ data class NedsattArbeidsevnePassAvBarn(
     override val fakta: IngenFakta = IngenFakta
 }
 
+data class AktivitetspengerPassAvBarn(
+    override val vurderinger: IngenVurderinger = IngenVurderinger,
+) : MålgruppePassAvBarn {
+    override val type: MålgruppePassAvBarnType = MålgruppePassAvBarnType.AKTIVITETSPENGER_TILSYN_BARN
+    override val fakta: IngenFakta = IngenFakta
+}
+
 data class OmstillingsstønadPassAvBarn(
     override val vurderinger: VurderingOmstillingsstønad,
 ) : MålgruppePassAvBarn {
@@ -125,6 +132,7 @@ enum class MålgruppePassAvBarnType(
     OMSTILLINGSSTØNAD_TILSYN_BARN(MålgruppeType.OMSTILLINGSSTØNAD),
     OVERGANGSSTØNAD_TILSYN_BARN(MålgruppeType.OVERGANGSSTØNAD),
     NEDSATT_ARBEIDSEVNE_TILSYN_BARN(MålgruppeType.NEDSATT_ARBEIDSEVNE),
+    AKTIVITETSPENGER_TILSYN_BARN(MålgruppeType.AKTIVITETSPENGER),
     UFØRETRYGD_TILSYN_BARN(MålgruppeType.UFØRETRYGD),
     SYKEPENGER_100_PROSENT_TILSYN_BARN(MålgruppeType.SYKEPENGER_100_PROSENT),
     INGEN_MÅLGRUPPE_TILSYN_BARN(MålgruppeType.INGEN_MÅLGRUPPE),

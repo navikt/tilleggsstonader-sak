@@ -2,10 +2,13 @@ package no.nav.tilleggsstonader.sak.vedtak.validering
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -28,9 +31,11 @@ import java.time.YearMonth
 
 class VedtaksperiodeValideringServiceTest {
     val vilkårperiodeService = mockk<VilkårperiodeService>()
+    val unleashService = mockk<UnleashService>(relaxed = true)
     val vedtaksperiodeValidingerService =
         VedtaksperiodeValideringService(
             vilkårperiodeService = vilkårperiodeService,
+            unleashService = unleashService,
         )
 
     val behandling = saksbehandling()
@@ -182,6 +187,57 @@ class VedtaksperiodeValideringServiceTest {
             assertThatThrownBy {
                 validerInnvilgelse(listOf(vedtaksperiodeJanuar))
             }.hasMessageContaining("Finner ingen perioder hvor vilkår for NEDSATT_ARBEIDSEVNE er oppfylt")
+        }
+    }
+
+    @Nested
+    inner class ValideringAvFeatureToggle {
+        @Test
+        fun `skal ikke validere toggle for aktivitetspenger når vedtaksperioden bruker en annen målgruppe`() {
+            val aktivitetspenger =
+                målgruppe(
+                    faktaOgVurdering =
+                        VilkårperiodeTestUtil.faktaOgVurderingMålgruppe(
+                            type = MålgruppeType.AKTIVITETSPENGER,
+                        ),
+                    fom = LocalDate.of(2025, 1, 1),
+                    tom = LocalDate.of(2025, 2, 28),
+                )
+            every { vilkårperiodeService.hentVilkårperioder(any()) } returns
+                Vilkårperioder(målgrupper = målgrupper + aktivitetspenger, aktiviteter = aktiviteter)
+            every { unleashService.isEnabled(Toggle.KAN_BRUKE_MÅLGRUPPE_AKTIVITETSPENGER) } returns false
+
+            assertDoesNotThrow {
+                validerInnvilgelse(listOf(vedtaksperiodeJanuar))
+            }
+
+            verify(exactly = 0) { unleashService.isEnabled(Toggle.KAN_BRUKE_MÅLGRUPPE_AKTIVITETSPENGER) }
+        }
+
+        @Test
+        fun `skal validere toggle for målgruppen som er satt på vedtaksperioden`() {
+            val aktivitetspenger =
+                målgruppe(
+                    faktaOgVurdering =
+                        VilkårperiodeTestUtil.faktaOgVurderingMålgruppe(
+                            type = MålgruppeType.AKTIVITETSPENGER,
+                        ),
+                    fom = LocalDate.of(2025, 1, 1),
+                    tom = LocalDate.of(2025, 2, 28),
+                )
+            every { vilkårperiodeService.hentVilkårperioder(any()) } returns
+                Vilkårperioder(målgrupper = listOf(aktivitetspenger), aktiviteter = aktiviteter)
+            every { unleashService.isEnabled(Toggle.KAN_BRUKE_MÅLGRUPPE_AKTIVITETSPENGER) } returns false
+
+            assertThatThrownBy {
+                validerInnvilgelse(
+                    listOf(
+                        lagVedtaksperiode(
+                            målgruppe = FaktiskMålgruppe.AKTIVITETSPENGER,
+                        ),
+                    ),
+                )
+            }.hasMessageContaining("Aktivitetspenger er ikke aktivert")
         }
     }
 

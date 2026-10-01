@@ -27,6 +27,10 @@ enum class FaktiskMålgruppe(
         prioritet = 5,
         gyldigeAktiviter = setOf(AktivitetType.TILTAK),
     ),
+    AKTIVITETSPENGER(
+        prioritet = 3,
+        gyldigeAktiviter = setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING),
+    ),
     ;
 
     fun prioritet() = prioritet ?: error("Målgruppe=${this.name} har ikke prioritet")
@@ -37,6 +41,7 @@ enum class FaktiskMålgruppe(
             Stønadstype.BARNETILSYN -> {
                 when (this) {
                     NEDSATT_ARBEIDSEVNE -> TypeAndel.TILSYN_BARN_AAP
+                    AKTIVITETSPENGER -> TypeAndel.TILSYN_BARN_AKTIVITETSPENGER
                     ENSLIG_FORSØRGER -> TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER
                     GJENLEVENDE -> TypeAndel.TILSYN_BARN_ETTERLATTE
                     else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
@@ -46,6 +51,7 @@ enum class FaktiskMålgruppe(
             Stønadstype.LÆREMIDLER -> {
                 when (this) {
                     NEDSATT_ARBEIDSEVNE -> TypeAndel.LÆREMIDLER_AAP
+                    AKTIVITETSPENGER -> TypeAndel.LÆREMIDLER_AKTIVITETSPENGER
                     ENSLIG_FORSØRGER -> TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER
                     GJENLEVENDE -> TypeAndel.LÆREMIDLER_ETTERLATTE
                     else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
@@ -55,6 +61,7 @@ enum class FaktiskMålgruppe(
             Stønadstype.BOUTGIFTER -> {
                 when (this) {
                     NEDSATT_ARBEIDSEVNE -> TypeAndel.BOUTGIFTER_AAP
+                    AKTIVITETSPENGER -> TypeAndel.BOUTGIFTER_AKTIVITETSPENGER
                     ENSLIG_FORSØRGER -> TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER
                     GJENLEVENDE -> TypeAndel.BOUTGIFTER_ETTERLATTE
                     else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
@@ -64,6 +71,7 @@ enum class FaktiskMålgruppe(
             Stønadstype.DAGLIG_REISE_TSO -> {
                 when (this) {
                     NEDSATT_ARBEIDSEVNE -> TypeAndel.DAGLIG_REISE_AAP
+                    AKTIVITETSPENGER -> TypeAndel.DAGLIG_REISE_AKTIVITETSPENGER
                     ENSLIG_FORSØRGER -> TypeAndel.DAGLIG_REISE_ENSLIG_FORSØRGER
                     GJENLEVENDE -> TypeAndel.DAGLIG_REISE_ETTERLATTE
                     else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
@@ -74,6 +82,7 @@ enum class FaktiskMålgruppe(
             -> {
                 when (this) {
                     NEDSATT_ARBEIDSEVNE -> TypeAndel.REISE_TIL_SAMLING_AAP
+                    AKTIVITETSPENGER -> TypeAndel.REISE_TIL_SAMLING_AKTIVITETSPENGER
                     ENSLIG_FORSØRGER -> TypeAndel.REISE_TIL_SAMLING_ENSLIG_FORSØRGER
                     GJENLEVENDE -> TypeAndel.REISE_TIL_SAMLING_ETTERLATTE
                     else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
@@ -92,6 +101,7 @@ enum class FaktiskMålgruppe(
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO -> {
                 when (this) {
                     NEDSATT_ARBEIDSEVNE -> TypeAndel.REISE_OPPSTART_AAP
+                    AKTIVITETSPENGER -> TypeAndel.REISE_OPPSTART_AKTIVITETSPENGER
                     ENSLIG_FORSØRGER -> TypeAndel.REISE_OPPSTART_ENSLIG_FORSØRGER
                     GJENLEVENDE -> TypeAndel.REISE_OPPSTART_ETTERLATTE
                     else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")

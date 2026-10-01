@@ -13,9 +13,21 @@ import java.time.YearMonth
 
 class PosteringStønadstypeMapperTest {
     @Test
-    fun `alle TypeAndel bortsett fra UGYLDIG skal ha en definert klassekode`() {
+    fun `alle TypeAndel med bestilte klassekoder skal ha en definert klassekode`() {
         val typeAndelerMedKlassekode = PosteringStønadstypeMapper.klassekodeTilTypeAndel.values.toSet()
-        val forventedeTypeAndeler = TypeAndel.entries.filterNot { it == TypeAndel.UGYLDIG }
+        val forventedeTypeAndeler =
+            TypeAndel.entries.filterNot {
+                it == TypeAndel.UGYLDIG ||
+                    it in
+                    setOf(
+                        TypeAndel.TILSYN_BARN_AKTIVITETSPENGER,
+                        TypeAndel.LÆREMIDLER_AKTIVITETSPENGER,
+                        TypeAndel.BOUTGIFTER_AKTIVITETSPENGER,
+                        TypeAndel.DAGLIG_REISE_AKTIVITETSPENGER,
+                        TypeAndel.REISE_TIL_SAMLING_AKTIVITETSPENGER,
+                        TypeAndel.REISE_OPPSTART_AKTIVITETSPENGER,
+                    )
+            }
 
         assertThat(typeAndelerMedKlassekode).containsExactlyInAnyOrderElementsOf(forventedeTypeAndeler)
     }

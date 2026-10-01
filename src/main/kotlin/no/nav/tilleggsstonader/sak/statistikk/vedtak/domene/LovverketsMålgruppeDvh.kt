@@ -7,6 +7,7 @@ enum class LovverketsMålgruppeDvh {
     ENSLIG_FORSØRGER,
     GJENLEVENDE,
     ARBEIDSSØKER,
+    AKTIVITETSPENGER,
     ;
 
     companion object {
@@ -16,6 +17,7 @@ enum class LovverketsMålgruppeDvh {
                 FaktiskMålgruppe.ENSLIG_FORSØRGER -> ENSLIG_FORSØRGER
                 FaktiskMålgruppe.GJENLEVENDE -> GJENLEVENDE
                 FaktiskMålgruppe.ARBEIDSSØKER -> ARBEIDSSØKER
+                FaktiskMålgruppe.AKTIVITETSPENGER -> AKTIVITETSPENGER
             }
     }
 }

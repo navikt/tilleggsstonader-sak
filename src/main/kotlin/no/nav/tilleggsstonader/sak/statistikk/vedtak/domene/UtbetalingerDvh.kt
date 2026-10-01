@@ -1,5 +1,7 @@
 package no.nav.tilleggsstonader.sak.statistikk.vedtak.domene
 
+import com.fasterxml.jackson.annotation.JsonInclude
+import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.statistikk.vedtak.domene.MakssatsDvhUtil.Companion.finnMakssats
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
@@ -13,6 +15,12 @@ data class UtbetalingerDvh(
     val beløp: Int,
     val makssats: Int? = null,
     val beløpErBegrensetAvMakssats: Boolean? = null,
+    /**
+     * Er `null` når [no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle.KNYTT_ANDEL_TIL_VEDTAKSPERIODE]
+     * er avskrudd, slik at feltet ikke er med i json-en som sendes til DVH (se [JsonInclude]).
+     */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    val vedtaksperiodeIder: List<VedtaksperiodeId>? = null,
 ) {
     data class JsonWrapper(
         val utbetalinger: List<UtbetalingerDvh>,
@@ -22,6 +30,8 @@ data class UtbetalingerDvh(
         fun fraDomene(
             andelerTilkjentYtelse: Set<AndelTilkjentYtelse>,
             vedtak: Vedtak,
+            vedtaksperioder: List<VedtaksperioderDvh>,
+            knyttAndelTilVedtaksperiode: Boolean = true,
         ): JsonWrapper {
             val gyldigeAndeler =
                 andelerTilkjentYtelse
@@ -43,6 +53,14 @@ data class UtbetalingerDvh(
                             beløp = it.beløp,
                             makssats = makssats,
                             beløpErBegrensetAvMakssats = beløpErBegrensetAvMakssats,
+                            vedtaksperiodeIder =
+                                if (knyttAndelTilVedtaksperiode) {
+                                    AndelTilVedtaksperiodeMapper
+                                        .finnVedtaksperioder(it, vedtak, vedtaksperioder)
+                                        .mapNotNull { vedtaksperiode -> vedtaksperiode.id }
+                                } else {
+                                    null
+                                },
                         )
                     },
             )
@@ -53,21 +71,26 @@ data class UtbetalingerDvh(
 enum class AndelstypeDvh {
     TILSYN_BARN_ENSLIG_FORSØRGER,
     TILSYN_BARN_AAP,
+    TILSYN_BARN_AKTIVITETSPENGER,
     TILSYN_BARN_ETTERLATTE,
 
     LÆREMIDLER_ENSLIG_FORSØRGER,
     LÆREMIDLER_AAP,
+    LÆREMIDLER_AKTIVITETSPENGER,
     LÆREMIDLER_ETTERLATTE,
 
     BOUTGIFTER_AAP,
+    BOUTGIFTER_AKTIVITETSPENGER,
     BOUTGIFTER_ETTERLATTE,
     BOUTGIFTER_ENSLIG_FORSØRGER,
 
     DAGLIG_REISE_AAP,
+    DAGLIG_REISE_AKTIVITETSPENGER,
     DAGLIG_REISE_ENSLIG_FORSØRGER,
     DAGLIG_REISE_ETTERLATTE,
 
     REISE_OPPSTART_AAP,
+    REISE_OPPSTART_AKTIVITETSPENGER,
     REISE_OPPSTART_ENSLIG_FORSØRGER,
     REISE_OPPSTART_ETTERLATTE,
 
@@ -90,6 +113,7 @@ enum class AndelstypeDvh {
     DAGLIG_REISE_TILTAK_UTVIDET_OPPFØLGING_I_OPPLÆRING,
 
     REISE_TIL_SAMLING_AAP,
+    REISE_TIL_SAMLING_AKTIVITETSPENGER,
     REISE_TIL_SAMLING_ENSLIG_FORSØRGER,
     REISE_TIL_SAMLING_ETTERLATTE,
     REISE_TIL_SAMLING_TILTAK_ARBEIDSFORBEREDENDE,
@@ -121,17 +145,22 @@ enum class AndelstypeDvh {
             when (typeAndel) {
                 TypeAndel.TILSYN_BARN_ENSLIG_FORSØRGER -> TILSYN_BARN_ENSLIG_FORSØRGER
                 TypeAndel.TILSYN_BARN_AAP -> TILSYN_BARN_AAP
+                TypeAndel.TILSYN_BARN_AKTIVITETSPENGER -> TILSYN_BARN_AKTIVITETSPENGER
                 TypeAndel.TILSYN_BARN_ETTERLATTE -> TILSYN_BARN_ETTERLATTE
                 TypeAndel.LÆREMIDLER_ENSLIG_FORSØRGER -> LÆREMIDLER_ENSLIG_FORSØRGER
                 TypeAndel.LÆREMIDLER_AAP -> LÆREMIDLER_AAP
+                TypeAndel.LÆREMIDLER_AKTIVITETSPENGER -> LÆREMIDLER_AKTIVITETSPENGER
                 TypeAndel.LÆREMIDLER_ETTERLATTE -> LÆREMIDLER_ETTERLATTE
                 TypeAndel.BOUTGIFTER_AAP -> BOUTGIFTER_AAP
+                TypeAndel.BOUTGIFTER_AKTIVITETSPENGER -> BOUTGIFTER_AKTIVITETSPENGER
                 TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER -> BOUTGIFTER_ENSLIG_FORSØRGER
                 TypeAndel.BOUTGIFTER_ETTERLATTE -> BOUTGIFTER_ETTERLATTE
                 TypeAndel.DAGLIG_REISE_AAP -> DAGLIG_REISE_AAP
+                TypeAndel.DAGLIG_REISE_AKTIVITETSPENGER -> DAGLIG_REISE_AKTIVITETSPENGER
                 TypeAndel.DAGLIG_REISE_ENSLIG_FORSØRGER -> DAGLIG_REISE_ENSLIG_FORSØRGER
                 TypeAndel.DAGLIG_REISE_ETTERLATTE -> DAGLIG_REISE_ETTERLATTE
                 TypeAndel.REISE_OPPSTART_AAP -> REISE_OPPSTART_AAP
+                TypeAndel.REISE_OPPSTART_AKTIVITETSPENGER -> REISE_OPPSTART_AKTIVITETSPENGER
                 TypeAndel.REISE_OPPSTART_ENSLIG_FORSØRGER -> REISE_OPPSTART_ENSLIG_FORSØRGER
                 TypeAndel.REISE_OPPSTART_ETTERLATTE -> REISE_OPPSTART_ETTERLATTE
                 TypeAndel.DAGLIG_REISE_TILTAK_ARBEIDSFORBEREDENDE -> DAGLIG_REISE_TILTAK_ARBEIDSFORBEREDENDE
@@ -154,6 +183,7 @@ enum class AndelstypeDvh {
                 TypeAndel.DAGLIG_REISE_TILTAK_UTVIDET_OPPFØLGING_I_OPPLÆRING -> DAGLIG_REISE_TILTAK_UTVIDET_OPPFØLGING_I_OPPLÆRING
 
                 TypeAndel.REISE_TIL_SAMLING_AAP -> REISE_TIL_SAMLING_AAP
+                TypeAndel.REISE_TIL_SAMLING_AKTIVITETSPENGER -> REISE_TIL_SAMLING_AKTIVITETSPENGER
                 TypeAndel.REISE_TIL_SAMLING_ENSLIG_FORSØRGER -> REISE_TIL_SAMLING_ENSLIG_FORSØRGER
                 TypeAndel.REISE_TIL_SAMLING_ETTERLATTE -> REISE_TIL_SAMLING_ETTERLATTE
                 TypeAndel.REISE_TIL_SAMLING_TILTAK_ARBEIDSFORBEREDENDE -> REISE_TIL_SAMLING_TILTAK_ARBEIDSFORBEREDENDE

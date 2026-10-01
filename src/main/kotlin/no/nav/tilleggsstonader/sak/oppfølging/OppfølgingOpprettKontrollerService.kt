@@ -232,12 +232,14 @@ class OppfølgingOpprettKontrollerService(
             MålgruppeType.DAGPENGER -> listOf(TypeYtelsePeriode.DAGPENGER)
             MålgruppeType.OMSTILLINGSSTØNAD -> listOf(TypeYtelsePeriode.OMSTILLINGSSTØNAD)
             MålgruppeType.OVERGANGSSTØNAD -> listOf(TypeYtelsePeriode.ENSLIG_FORSØRGER)
-            MålgruppeType.TILTAKSPENGER ->
+            MålgruppeType.TILTAKSPENGER,
+            ->
                 listOf(
                     TypeYtelsePeriode.TILTAKSPENGER_TPSAK,
                     TypeYtelsePeriode.TILTAKSPENGER_ARENA,
                 )
-
+            MålgruppeType.UNGDOMSPROGRAMMET,
+            MålgruppeType.AKTIVITETSPENGER,
             MålgruppeType.NEDSATT_ARBEIDSEVNE,
             MålgruppeType.UFØRETRYGD,
             MålgruppeType.SYKEPENGER_100_PROSENT,

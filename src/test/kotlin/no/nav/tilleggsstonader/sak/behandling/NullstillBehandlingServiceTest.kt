@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtK
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.TypeAvvikUke
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UkeStatus
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.UtfyltDagAutomatiskVurdering
+import no.nav.tilleggsstonader.sak.privatbil.avklartedager.tilAvklartKjørtUkeAvvik
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringTestUtil.simuleringsresultat
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.domain.SimuleringsresultatRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
@@ -147,7 +148,10 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
         val avklartKjørtUke = avklartKjørtUkeRepository.findByBehandlingId(behandling.id).single()
         val avklartKjørtUkeRevurdering = avklartKjørtUkeRepository.insert(avklartKjørtUke.kopierTilNyBehandling(revurdering.id))
         avklartKjørtUkeRepository.update(
-            avklartKjørtUkeRevurdering.copy(dager = emptySet(), typeAvvik = TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK),
+            avklartKjørtUkeRevurdering.copy(
+                dager = emptySet(),
+                avvik = listOf(TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK).tilAvklartKjørtUkeAvvik(),
+            ),
         )
 
         nullstillBehandlingService.nullstillBehandling(revurdering)
@@ -359,6 +363,7 @@ class NullstillBehandlingServiceTest : CleanDatabaseIntegrationTest() {
                 tom = LocalDate.now(),
                 uke = LocalDate.now().tilUkeIÅr(),
                 status = UkeStatus.OK_AUTOMATISK,
+                avvik = emptySet(),
                 avklartKjørtUkeStatus = AvklartKjørtUkeStatus.NY,
                 dager =
                     setOf(

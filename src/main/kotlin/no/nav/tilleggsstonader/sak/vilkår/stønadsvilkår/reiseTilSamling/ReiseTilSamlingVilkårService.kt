@@ -55,6 +55,7 @@ class ReiseTilSamlingVilkårService(
     ): VilkårReiseTilSamling {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
+        validerSamlingIkkeStrekkerSegOverNyttår(nyttVilkår)
         validerFeatureToggle()
         validerAktivitet(nyttVilkår, behandling)
 
@@ -72,6 +73,7 @@ class ReiseTilSamlingVilkårService(
     ): VilkårReiseTilSamling {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
+        validerSamlingIkkeStrekkerSegOverNyttår(nyttVilkår)
         validerFeatureToggle()
         validerAktivitet(nyttVilkår, behandling)
 
@@ -140,6 +142,12 @@ class ReiseTilSamlingVilkårService(
 
     private fun validerErRedigerbar(behandling: Saksbehandling) {
         behandling.status.validerKanBehandlingRedigeres()
+    }
+
+    private fun validerSamlingIkkeStrekkerSegOverNyttår(nyttVilkår: LagreVilkårReiseTilSamling) {
+        brukerfeilHvis(nyttVilkår.fom.year != nyttVilkår.tom.year) {
+            "Samlingen kan ikke registreres over nyttår."
+        }
     }
 
     private fun validerFeatureToggle() {

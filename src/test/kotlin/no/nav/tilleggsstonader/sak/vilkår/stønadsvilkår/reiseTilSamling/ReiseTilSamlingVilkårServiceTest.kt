@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.feil.ApiFeil
 import no.nav.tilleggsstonader.libs.feil.Feil
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
+import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
@@ -112,6 +113,39 @@ class ReiseTilSamlingVilkårServiceTest {
                     behandlingId = BehandlingId.random(),
                 )
             }.withMessage("Kan ikke oppdatere vilkår når behandling er på steg=INNGANGSVILKÅR.")
+    }
+
+    @Test
+    fun `skal feile ved opprettelse hvis samlingen strekker seg over nyttår`() {
+        val behandling = saksbehandling(steg = StegType.VILKÅR)
+        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
+
+        val vilkår = nyttVilkår.copy(fom = 31 desember 2025, tom = 1 januar 2026)
+
+        assertThatExceptionOfType(ApiFeil::class.java)
+            .isThrownBy {
+                reiseTilSamlingVilkårService.opprettNyttVilkår(
+                    nyttVilkår = vilkår,
+                    behandlingId = behandling.id,
+                )
+            }.withMessage("Samlingen kan ikke registreres over nyttår.")
+    }
+
+    @Test
+    fun `skal feile ved oppdatering hvis samlingen strekker seg over nyttår`() {
+        val behandling = saksbehandling(steg = StegType.VILKÅR)
+        every { behandlingService.hentSaksbehandling(any<BehandlingId>()) } returns behandling
+
+        val vilkår = nyttVilkår.copy(fom = 31 desember 2025, tom = 1 januar 2026)
+
+        assertThatExceptionOfType(ApiFeil::class.java)
+            .isThrownBy {
+                reiseTilSamlingVilkårService.oppdaterVilkår(
+                    nyttVilkår = vilkår,
+                    behandlingId = behandling.id,
+                    vilkårId = VilkårId.random(),
+                )
+            }.withMessage("Samlingen kan ikke registreres over nyttår.")
     }
 
     @Test

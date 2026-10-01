@@ -69,7 +69,7 @@ class OverskridAntallDagerIRammevedtakIntegrationTest : IntegrationTest() {
         val reisevurdering = kall.privatBil.hentReisevurderingForBehandling(kjørelistebehandling.id).single()
         val ukeMedAvvik =
             reisevurdering.uker.single {
-                it.avvik?.typeAvvik == TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK
+                it.avvik.contains(TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK)
             }
         assertThat(ukeMedAvvik.status).isEqualTo(UkeStatus.AVVIK)
 
@@ -98,7 +98,7 @@ class OverskridAntallDagerIRammevedtakIntegrationTest : IntegrationTest() {
             )
 
         assertThat(oppdatertUke.status).isEqualTo(UkeStatus.OK_MANUELT)
-        assertThat(oppdatertUke.avvik?.typeAvvik).isEqualTo(TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK)
+        assertThat(oppdatertUke.avvik).containsExactly(TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK)
         assertThat(
             oppdatertUke.dager.count {
                 it.avklartDag?.godkjentGjennomførtKjøring == GodkjentGjennomførtKjøring.JA

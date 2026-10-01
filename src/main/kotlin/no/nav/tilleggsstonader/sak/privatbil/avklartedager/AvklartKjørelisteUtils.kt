@@ -3,24 +3,26 @@ package no.nav.tilleggsstonader.sak.privatbil.avklartedager
 import io.github.mikaojk.holiday.getNorwegianHolidays
 import no.nav.tilleggsstonader.kontrakter.felles.Datoperiode
 import no.nav.tilleggsstonader.libs.utils.dato.UkeIÅr
+import no.nav.tilleggsstonader.libs.utils.dato.tilUkeIÅr
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammeForReiseMedPrivatBilDelperiode
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakForReiseMedPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import java.time.DayOfWeek
 import java.time.LocalDate
 
 fun utledAvklartDag(
     kjørelisteDag: KjørelisteDag,
-    avvikUke: TypeAvvikUke?,
+    avvikUke: List<TypeAvvikUke>,
 ): AvklartKjørtDag {
     val avvik = utledAvvik(kjørelisteDag)
 
     val godkjentGjennomførtKjøring =
         utledGodkjentGjennomførtKjøringAutomatisk(
             harKjørt = kjørelisteDag.harKjørt,
-            ukeEllerDagHarAvvik = (avvik.isNotEmpty() || avvikUke != null),
+            ukeEllerDagHarAvvik = (avvik.isNotEmpty() || avvikUke.isNotEmpty()),
         )
 
     return AvklartKjørtDag(
@@ -40,9 +42,10 @@ fun utledAvklartUke(
     ukeIÅr: UkeIÅr,
     reisedager: List<KjørelisteDag>,
     rammevedtak: RammevedtakForReiseMedPrivatBil,
+    avklarteUkerForAndreReiserISammeBehandling: List<AvklartKjørtUke> = emptyList(),
     avklartKjørtUkeStatus: AvklartKjørtUkeStatus = AvklartKjørtUkeStatus.NY,
 ): AvklartKjørtUke {
-    val avvikUke = utledAvvikForUke(rammevedtak, reisedager)
+    val avvikUke = utledAvvikForUke(rammevedtak, reisedager, avklarteUkerForAndreReiserISammeBehandling, ukeIÅr)
 
     val avklarteDager = reisedager.map { utledAvklartDag(it, avvikUke) }
 
@@ -56,7 +59,7 @@ fun utledAvklartUke(
         // Trengs denne? Kan lages i visningslogikk
         // Rart at den er avhengig av både ukeavvik og dagavvik
         status = utledAutomatiskStatusForUke(avklarteDager, avvikUke),
-        typeAvvik = avvikUke,
+        avvik = avvikUke.tilAvklartKjørtUkeAvvik(),
         dager = avklarteDager.toSet(),
         avklartKjørtUkeStatus = avklartKjørtUkeStatus,
     )
@@ -65,27 +68,43 @@ fun utledAvklartUke(
 fun utledAvvikForUke(
     rammevedtak: RammevedtakForReiseMedPrivatBil,
     reisedager: List<KjørelisteDag>,
-): TypeAvvikUke? {
+    avklarteUkerForAndreReiserISammeBehandling: List<AvklartKjørtUke> = emptyList(),
+    ukeIÅr: UkeIÅr? = null,
+): List<TypeAvvikUke> {
     val delperiodeForUke =
         rammevedtak.finnDelperiodeForPeriode(
             Datoperiode(reisedager.minOf { it.dato }, reisedager.maxOf { it.dato }),
         )
-    return when {
-        !erAntallDagerInnenforRamme(reisedager, delperiodeForUke) -> {
-            TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK
-        }
 
-        else -> {
-            null
-        }
-    }
+    return listOfNotNull(
+        TypeAvvikUke.FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK.takeIf {
+            !erAntallDagerInnenforRamme(reisedager, delperiodeForUke)
+        },
+        TypeAvvikUke.INNSENDTE_DAGER_OVERLAPPER_MED_DAGER_DEKT_AV_ANNEN_REISE.takeIf {
+            val uke = ukeIÅr ?: reisedager.minOf { it.dato }.tilUkeIÅr()
+            dekkesReisedagAlleredeAvAnnenReise(avklarteUkerForAndreReiserISammeBehandling, rammevedtak.reiseId, uke)
+        },
+    )
 }
+
+private fun dekkesReisedagAlleredeAvAnnenReise(
+    avklarteUkerForAndreReiserISammeBehandling: List<AvklartKjørtUke>,
+    reiseId: ReiseId,
+    ukeIÅr: UkeIÅr,
+): Boolean =
+    avklarteUkerForAndreReiserISammeBehandling
+        .filter { it.reiseId != reiseId && it.uke == ukeIÅr && it.avklartKjørtUkeStatus != AvklartKjørtUkeStatus.SLETTET }
+        .any { uke ->
+            uke.dager.any { dag ->
+                !dag.erSlettet() && dag.godkjentGjennomførtKjøring != GodkjentGjennomførtKjøring.NEI
+            }
+        }
 
 fun utledAutomatiskStatusForUke(
     avklarteDager: List<AvklartKjørtDag>,
-    avvikUke: TypeAvvikUke?,
+    avvikUke: List<TypeAvvikUke>,
 ): UkeStatus {
-    if (avvikUke != null) return UkeStatus.AVVIK
+    if (avvikUke.isNotEmpty()) return UkeStatus.AVVIK
 
     val automatiskeVurderingForDager = avklarteDager.map { it.automatiskVurdering }.toSet()
 

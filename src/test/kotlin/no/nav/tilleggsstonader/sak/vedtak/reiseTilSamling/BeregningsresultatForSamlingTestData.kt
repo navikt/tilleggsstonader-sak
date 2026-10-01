@@ -72,6 +72,7 @@ fun lagBeregningsresultatForPrivatBil(
             piggdekkavgift = null,
             vedtaksperioder = listOf(lagVedtaksperiodeGrunnlag(fom, tom)),
             brukersNavKontor = brukersNavKontor,
+            satsBekreftet = true,
         )
 
     return BeregningsresultatPrivatBil(

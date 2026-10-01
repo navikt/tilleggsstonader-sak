@@ -387,6 +387,7 @@ class AvklartKjørelisteServiceTest {
             tom = fredag,
             uke = mandag.tilUkeIÅr(),
             status = UkeStatus.OK_AUTOMATISK,
+            avvik = emptySet(),
             avklartKjørtUkeStatus = status,
             dager =
                 (0..4)
@@ -679,6 +680,7 @@ class AvklartKjørelisteServiceTest {
             tom = tom,
             uke = fom.tilUkeIÅr(),
             status = UkeStatus.OK_AUTOMATISK,
+            avvik = emptySet(),
             avklartKjørtUkeStatus = status,
             dager =
                 (0..4)
