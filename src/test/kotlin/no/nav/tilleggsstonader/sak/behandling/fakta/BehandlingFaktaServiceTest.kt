@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
-import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.KanBenytteEgenBil
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Transportmiddel
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
@@ -24,8 +24,9 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSa
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.AktivitetReiseTilSamlingAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Avreiseadresse
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.DrosjeInfo
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Reisemåte
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SamlingPeriode
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Samling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SkjemaReiseTilSamling
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileJsonIsEqual
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagFaktaGrunnlagPersonopplysninger
@@ -319,11 +320,10 @@ internal class BehandlingFaktaServiceTest {
                             ),
                         samlinger =
                             listOf(
-                                SamlingPeriode(
+                                Samling(
                                     fom = 12 februar 2026,
                                     tom = 14 februar 2026,
                                     erObligatorisk = JaNei.JA,
-                                    harBruktEkstraReiseDager = JaNei.NEI,
                                     adresse =
                                         Adresse(
                                             gyldigFraOgMed = null,
@@ -333,12 +333,20 @@ internal class BehandlingFaktaServiceTest {
                                             landkode = "NO",
                                         ),
                                     antallKilometerEnVei = "42",
+                                    reisemåte =
+                                        Reisemåte(
+                                            hvilkeTransportmidlerBleBenyttet = listOf(Transportmiddel.DROSJE),
+                                            unntakFraOffentligTransport = null,
+                                            unntakFraPrivatBil = null,
+                                            offentligTransport = null,
+                                            privatBil = null,
+                                            drosje = DrosjeInfo(harTTKort = JaNei.JA),
+                                        ),
                                 ),
-                                SamlingPeriode(
+                                Samling(
                                     fom = 10 mars 2026,
                                     tom = 12 mars 2026,
                                     erObligatorisk = JaNei.JA,
-                                    harBruktEkstraReiseDager = JaNei.NEI,
                                     adresse =
                                         Adresse(
                                             gyldigFraOgMed = null,
@@ -362,20 +370,6 @@ internal class BehandlingFaktaServiceTest {
                                         landkode = "NO",
                                     ),
                             ),
-                        reisemåte =
-                            Reisemåte(
-                                kanReiseMedOffentligTransport = JaNei.NEI,
-                                kanIkkeReiseMedOffentligTransportBegrunnelser = null,
-                                totalUtgifterOffentligTransport = null,
-                                kanBenytteEgenBil = KanBenytteEgenBil.NEI,
-                                ønskerDekketUtgifterForDrosje = JaNei.JA,
-                                barnehageGateadresse = null,
-                                barnehagePostnummer = null,
-                                kanIkkeBenytteEgenBilBegrunnelser = null,
-                                betalerForReiseSelv = null,
-                                harTTKort = null,
-                                reiseMedBilUtgifter = null,
-                            ),
                         dokumentasjon = emptyList(),
                     ),
             )
@@ -390,9 +384,19 @@ internal class BehandlingFaktaServiceTest {
         assertThat(fakta.avreiseadresse?.adresseDetSkalReisesFra?.gateadresse).isEqualTo("Mimes vei 1")
         assertThat(fakta.avreiseadresse?.adresseDetSkalReisesFra?.postnummer).isEqualTo("5132")
         assertThat(fakta.avreiseadresse?.adresseDetSkalReisesFra?.poststed).isEqualTo("Nyborg")
-        assertThat(fakta.reisemåte?.kanReiseMedOffentligTransport).isEqualTo(JaNei.NEI)
-        assertThat(fakta.reisemåte?.kanBenytteEgenBil).isEqualTo(KanBenytteEgenBil.NEI)
-        assertThat(fakta.reisemåte?.ønskerDekketUtgifterForDrosje).isEqualTo(JaNei.JA)
+        assertThat(
+            fakta.samlinger
+                .first()
+                .reisemåte
+                ?.hvilkeTransportmidlerBleBenyttet,
+        ).containsExactly(Transportmiddel.DROSJE)
+        assertThat(
+            fakta.samlinger
+                .first()
+                .reisemåte
+                ?.drosje
+                ?.harTTKort,
+        ).isEqualTo(JaNei.JA)
     }
 
     @Test

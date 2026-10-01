@@ -12,9 +12,10 @@ import no.nav.tilleggsstonader.kontrakter.søknad.felles.ÅrsakOppholdUtenforNor
 import no.nav.tilleggsstonader.kontrakter.søknad.læremidler.AnnenUtdanningType
 import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.TypeBarnepass
 import no.nav.tilleggsstonader.kontrakter.søknad.passavbarn.ÅrsakBarnepass
-import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.KanBenytteEgenBil
-import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.KanIkkeBenytteEgenBilBegrunnelser
-import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.KanIkkeReiseMedOffentligTransportBegrunnelser
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.DrivstoffType
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Transportmiddel
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.ÅrsakKanIkkeBenytteEgenBil
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.ÅrsakKanIkkeBenytteOffentligTransport
 import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.LeveringOgHentingIBarnehage
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.OffentligTransport
@@ -23,7 +24,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ReiseAdresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.Reiseperiode
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.TypeUtdanning
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Utgifter
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.ReiseMedBilUtgifter
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -97,7 +97,6 @@ data class BehandlingFaktaReiseTilSamlingDto(
     val aktiviteter: FaktaAktivitetReiseTilSamling,
     val samlinger: List<FaktaSamling>,
     val avreiseadresse: FaktaAvreiseadresse?,
-    val reisemåte: FaktaReisemåte?,
 ) : BehandlingFaktaDto
 
 data class BehandlingFaktaReiseOppstartAvslutningHjemreiseDto(
@@ -112,27 +111,60 @@ data class FaktaAvreiseadresse(
     val adresseDetSkalReisesFra: ReiseAdresse?,
 )
 
-data class FaktaReisemåte(
-    val kanReiseMedOffentligTransport: JaNei,
-    val kanIkkeReiseMedOffentligTransportBegrunnelser: List<KanIkkeReiseMedOffentligTransportBegrunnelser>?,
-    val totalUtgifterOffentligTransport: String?,
-    val kanBenytteEgenBil: KanBenytteEgenBil?,
-    val ønskerDekketUtgifterForDrosje: JaNei?,
-    val barnehageGateadresse: String?,
-    val barnehagePostnummer: String?,
-    val kanIkkeBenytteEgenBilBegrunnelser: List<KanIkkeBenytteEgenBilBegrunnelser>?,
-    val betalerForReiseSelv: JaNei?,
-    val harTTKort: JaNei?,
-    val reiseMedBilUtgifter: ReiseMedBilUtgifter?,
-)
-
 data class FaktaSamling(
     val fom: LocalDate,
     val tom: LocalDate,
     val erObligatorisk: JaNei,
-    val harBruktEkstraReiseDager: JaNei,
     val adresse: ReiseAdresse,
     val antallKilometerEnVei: String,
+    val reisemåte: FaktaReisemåte?,
+)
+
+data class FaktaReisemåte(
+    val hvilkeTransportmidlerBleBenyttet: List<Transportmiddel>?,
+    val unntakFraOffentligTransport: FaktaUnntakFraOffentligTransport?,
+    val unntakFraPrivatBil: List<ÅrsakKanIkkeBenytteEgenBil>?,
+    val offentligTransport: FaktaOffentligTransportInfo?,
+    val privatBil: FaktaPrivatBilInfo?,
+    val drosje: FaktaDrosjeInfo?,
+)
+
+data class FaktaOffentligTransportInfo(
+    val totalUtgifterOffentligTransport: String?,
+)
+
+data class FaktaPrivatBilInfo(
+    val benyttetEgenBil: JaNei?,
+    val betalteForReisen: JaNei?,
+    val infoBilKunDelerAvStrekning: FaktaInfoBilKunDelerAvStrekning?,
+    val utgifterPrivatBil: FaktaUtgifterPrivatBil?,
+)
+
+data class FaktaDrosjeInfo(
+    val harTTKort: JaNei?,
+)
+
+data class FaktaUnntakFraOffentligTransport(
+    val årsaker: List<ÅrsakKanIkkeBenytteOffentligTransport>?,
+    val leveringOgHentingIBarnehage: FaktaLeveringOgHentingIBarnehage?,
+)
+
+data class FaktaLeveringOgHentingIBarnehage(
+    val gateadresse: String?,
+    val postnummer: String?,
+)
+
+data class FaktaUtgifterPrivatBil(
+    val bompenger: String?,
+    val ferge: String?,
+    val piggdekkavgift: String?,
+    val parkering: String?,
+    val drivstoffType: DrivstoffType?,
+)
+
+data class FaktaInfoBilKunDelerAvStrekning(
+    val strekningHvorBilBleBenyttet: String?,
+    val antallKilometerKjørt: String?,
 )
 
 data class FaktaHovedytelse(

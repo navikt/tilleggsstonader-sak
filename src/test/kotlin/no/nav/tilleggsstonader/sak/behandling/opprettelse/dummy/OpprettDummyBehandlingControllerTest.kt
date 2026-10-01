@@ -101,6 +101,13 @@ class OpprettDummyBehandlingControllerTest : IntegrationTest() {
         Assertions.assertThat(søknad).isInstanceOf(SøknadReiseTilSamling::class.java)
         Assertions.assertThat(søknad.data.samlinger).hasSize(2)
         Assertions.assertThat(søknad.data.avreiseadresse.adresseDetSkalReisesFra).isNull()
-        Assertions.assertThat(søknad.data.reisemåte.ønskerDekketUtgifterForDrosje).isEqualTo(JaNei.NEI)
+        Assertions
+            .assertThat(
+                søknad.data.samlinger
+                    .first()
+                    .reisemåte
+                    ?.drosje
+                    ?.harTTKort,
+            ).isEqualTo(JaNei.NEI)
     }
 }

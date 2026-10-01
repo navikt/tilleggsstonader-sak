@@ -24,8 +24,12 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadPassAvBarn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.UtdanningAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.AktivitetReiseTilSamlingAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Avreiseadresse
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.DrosjeInfo
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.OffentligTransportInfo
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.PrivatBilInfo
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Reisemåte
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SamlingPeriode
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Samling
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.UnntakFraOffentligTransport
 import no.nav.tilleggsstonader.sak.util.antallÅrSiden
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelUtil.harFullførtFjerdetrinn
 import org.springframework.stereotype.Service
@@ -136,7 +140,6 @@ class BehandlingFaktaService(
             arena = arenaFakta(grunnlagsdata),
             samlinger = mapSamlinger(søknad?.data?.samlinger),
             avreiseadresse = mapAvreiseadresse(søknad?.data?.avreiseadresse),
-            reisemåte = mapReisemåte(søknad?.data?.reisemåte),
         )
     }
 
@@ -238,13 +241,12 @@ class BehandlingFaktaService(
             )
         }
 
-    private fun mapSamlinger(samlinger: List<SamlingPeriode>?): List<FaktaSamling> =
+    private fun mapSamlinger(samlinger: List<Samling>?): List<FaktaSamling> =
         samlinger?.map {
             FaktaSamling(
                 fom = it.fom,
                 tom = it.tom,
                 erObligatorisk = it.erObligatorisk,
-                harBruktEkstraReiseDager = it.harBruktEkstraReiseDager,
                 adresse =
                     it.adresse.let { adresse ->
                         ReiseAdresse(
@@ -254,6 +256,7 @@ class BehandlingFaktaService(
                         )
                     },
                 antallKilometerEnVei = it.antallKilometerEnVei,
+                reisemåte = mapReisemåte(it.reisemåte),
             )
         } ?: emptyList()
 
@@ -275,17 +278,65 @@ class BehandlingFaktaService(
     private fun mapReisemåte(reisemåte: Reisemåte?): FaktaReisemåte? =
         reisemåte?.let {
             FaktaReisemåte(
-                kanReiseMedOffentligTransport = it.kanReiseMedOffentligTransport,
-                kanIkkeReiseMedOffentligTransportBegrunnelser = it.kanIkkeReiseMedOffentligTransportBegrunnelser,
+                hvilkeTransportmidlerBleBenyttet = it.hvilkeTransportmidlerBleBenyttet,
+                unntakFraOffentligTransport = mapUnntakFraOffentligTransport(it.unntakFraOffentligTransport),
+                unntakFraPrivatBil = it.unntakFraPrivatBil,
+                offentligTransport = mapOffentligTransport(it.offentligTransport),
+                privatBil = mapPrivatBil(it.privatBil),
+                drosje = mapDrosje(it.drosje),
+            )
+        }
+
+    private fun mapUnntakFraOffentligTransport(unntak: UnntakFraOffentligTransport?): FaktaUnntakFraOffentligTransport? =
+        unntak?.let {
+            FaktaUnntakFraOffentligTransport(
+                årsaker = it.årsaker,
+                leveringOgHentingIBarnehage =
+                    it.leveringOgHentingIBarnehage?.let { barnehage ->
+                        FaktaLeveringOgHentingIBarnehage(
+                            gateadresse = barnehage.gateadresse,
+                            postnummer = barnehage.postnummer,
+                        )
+                    },
+            )
+        }
+
+    private fun mapOffentligTransport(offentligTransport: OffentligTransportInfo?): FaktaOffentligTransportInfo? =
+        offentligTransport?.let {
+            FaktaOffentligTransportInfo(
                 totalUtgifterOffentligTransport = it.totalUtgifterOffentligTransport,
-                kanBenytteEgenBil = it.kanBenytteEgenBil,
-                ønskerDekketUtgifterForDrosje = it.ønskerDekketUtgifterForDrosje,
-                barnehageGateadresse = it.barnehageGateadresse,
-                barnehagePostnummer = it.barnehagePostnummer,
-                kanIkkeBenytteEgenBilBegrunnelser = it.kanIkkeBenytteEgenBilBegrunnelser,
-                betalerForReiseSelv = it.betalerForReiseSelv,
+            )
+        }
+
+    private fun mapPrivatBil(privatBil: PrivatBilInfo?): FaktaPrivatBilInfo? =
+        privatBil?.let {
+            FaktaPrivatBilInfo(
+                benyttetEgenBil = it.benyttetEgenBil,
+                betalteForReisen = it.betalteForReisen,
+                infoBilKunDelerAvStrekning =
+                    it.infoBilKunDelerAvStrekning?.let { info ->
+                        FaktaInfoBilKunDelerAvStrekning(
+                            strekningHvorBilBleBenyttet = info.strekningHvorBilBleBenyttet,
+                            antallKilometerKjørt = info.antallKilometerKjørt,
+                        )
+                    },
+                utgifterPrivatBil =
+                    it.utgifterPrivatBil?.let { utgifter ->
+                        FaktaUtgifterPrivatBil(
+                            bompenger = utgifter.bompenger,
+                            ferge = utgifter.ferge,
+                            piggdekkavgift = utgifter.piggdekkavgift,
+                            parkering = utgifter.parkering,
+                            drivstoffType = utgifter.drivstoffType,
+                        )
+                    },
+            )
+        }
+
+    private fun mapDrosje(drosje: DrosjeInfo?): FaktaDrosjeInfo? =
+        drosje?.let {
+            FaktaDrosjeInfo(
                 harTTKort = it.harTTKort,
-                reiseMedBilUtgifter = it.reiseMedBilUtgifter,
             )
         }
 
