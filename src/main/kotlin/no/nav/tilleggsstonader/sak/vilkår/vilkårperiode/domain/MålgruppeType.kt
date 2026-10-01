@@ -60,7 +60,7 @@ enum class MålgruppeType(
         faktiskMålgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
     ),
     AKTIVITETSPENGER(
-        gyldigeAktiviter = setOf(AktivitetType.TILTAK, AktivitetType.UTDANNING),
+        gyldigeAktiviter = setOf(AktivitetType.TILTAK),
         faktiskMålgruppe = FaktiskMålgruppe.AKTIVITETSPENGER,
     ),
     ;
