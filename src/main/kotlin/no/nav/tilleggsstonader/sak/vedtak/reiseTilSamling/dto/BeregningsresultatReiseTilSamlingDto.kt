@@ -33,14 +33,21 @@ data class BeregningsresultatPrivatBilDto(
     val tom: LocalDate,
     val sats: BigDecimal,
     val totalReiseavstand: BigDecimal,
+    val parkering: BigDecimal?,
     val bompenger: BigDecimal?,
     val fergekostnad: BigDecimal?,
-    val parkering: BigDecimal?,
     val piggdekkavgift: BigDecimal?,
     val beløp: BigDecimal,
     val aktivitetId: VilkårperiodeGlobalId?,
     val fraTidligereVedtak: Boolean,
-)
+) {
+    // Kun bompenger + ferge + piggdekk - Sendes med for å unngå beregning i frontend
+    val ekstrakostnader: BigDecimal
+        get() =
+            (bompenger ?: BigDecimal.ZERO)
+                .plus(fergekostnad ?: BigDecimal.ZERO)
+                .plus(piggdekkavgift ?: BigDecimal.ZERO)
+}
 
 fun BeregningsresultatReiseTilSamling.tilDto(beregningsplan: Beregningsplan) =
     BeregningsresultatReiseTilSamlingDto(
@@ -75,9 +82,9 @@ fun BeregningsresultatPrivatBil.tilDto() =
         tom = grunnlag.tom,
         sats = grunnlag.sats,
         totalReiseavstand = grunnlag.totalReiseavstand,
+        parkering = grunnlag.parkering,
         bompenger = grunnlag.bompenger,
         fergekostnad = grunnlag.fergekostnad,
-        parkering = grunnlag.parkering,
         piggdekkavgift = grunnlag.piggdekkavgift,
         beløp = beløp,
         aktivitetId = aktivitetId,
