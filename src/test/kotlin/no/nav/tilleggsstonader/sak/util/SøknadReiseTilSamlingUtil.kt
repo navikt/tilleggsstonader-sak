@@ -14,10 +14,13 @@ import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Adresse
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.AvreiseadresseAvsnitt
-import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.KanBenytteEgenBil
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.DrosjeInfo
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.OffentligTransportInfo
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.PrivatBilInfo
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.ReiseTilSamlingAktivitetAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.ReisemåteAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Samling
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Transportmiddel
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import java.time.LocalDateTime
@@ -75,13 +78,6 @@ object SøknadReiseTilSamlingUtil {
                                         svarTekst = "Ja",
                                         alternativer = emptyList(),
                                     ),
-                                harBruktEkstraReiseDager =
-                                    EnumFelt(
-                                        label = "Brukte Ekstra reise?",
-                                        verdi = JaNei.NEI,
-                                        svarTekst = "Nei",
-                                        alternativer = emptyList(),
-                                    ),
                                 adresse =
                                     Adresse(
                                         land = SelectFelt("Land", "NO", "Norge"),
@@ -90,6 +86,35 @@ object SøknadReiseTilSamlingUtil {
                                         poststed = VerdiFelt(verdi = "Nyborg", label = "Poststed"),
                                     ),
                                 antallKilometerEnVei = VerdiFelt(verdi = "42", label = "Antall kilometer én vei"),
+                                reisemåte =
+                                    ReisemåteAvsnitt(
+                                        hvilkeTransportmidlerBleBenyttet =
+                                            EnumFlereValgFelt(
+                                                label = "Hvilke transportmidler ble benyttet?",
+                                                verdier = listOf(VerdiFelt(Transportmiddel.DROSJE, "Drosje")),
+                                                alternativer = emptyList(),
+                                            ),
+                                        unntakFraOffentligTransport = null,
+                                        unntakFraPrivatBil = null,
+                                        offentligTransport = null,
+                                        privatBil =
+                                            PrivatBilInfo(
+                                                benyttetEgenBil = null,
+                                                betalteForReisen = null,
+                                                infoBilKunDelerAvStrekning = null,
+                                                utgifterPrivatBil = null,
+                                            ),
+                                        drosje =
+                                            DrosjeInfo(
+                                                harTTKort =
+                                                    EnumFelt(
+                                                        label = "Har du TT-kort?",
+                                                        verdi = JaNei.NEI,
+                                                        svarTekst = "Nei",
+                                                        alternativer = emptyList(),
+                                                    ),
+                                            ),
+                                    ),
                             ),
                             Samling(
                                 fom = DatoFelt("Fra", 10 mars 2026),
@@ -101,13 +126,6 @@ object SøknadReiseTilSamlingUtil {
                                         svarTekst = "Ja",
                                         alternativer = emptyList(),
                                     ),
-                                harBruktEkstraReiseDager =
-                                    EnumFelt(
-                                        label = "Brukte Ekstra reise?",
-                                        verdi = JaNei.NEI,
-                                        svarTekst = "Nei",
-                                        alternativer = emptyList(),
-                                    ),
                                 adresse =
                                     Adresse(
                                         land = SelectFelt("Land", "NO", "Norge"),
@@ -116,6 +134,23 @@ object SøknadReiseTilSamlingUtil {
                                         poststed = VerdiFelt(verdi = "Nyborg", label = "Poststed"),
                                     ),
                                 antallKilometerEnVei = VerdiFelt(verdi = "42", label = "Antall kilometer én vei"),
+                                reisemåte =
+                                    ReisemåteAvsnitt(
+                                        hvilkeTransportmidlerBleBenyttet =
+                                            EnumFlereValgFelt(
+                                                label = "Hvilke transportmidler ble benyttet?",
+                                                verdier = listOf(VerdiFelt(Transportmiddel.OFFENTLIG_TRANSPORT, "Offentlig transport")),
+                                                alternativer = emptyList(),
+                                            ),
+                                        unntakFraOffentligTransport = null,
+                                        unntakFraPrivatBil = null,
+                                        offentligTransport =
+                                            OffentligTransportInfo(
+                                                totalUtgifterOffentligTransport = VerdiFelt(label = "Totale utgifter", verdi = "450"),
+                                            ),
+                                        privatBil = null,
+                                        drosje = null,
+                                    ),
                             ),
                         ),
                     avreiseadresse =
@@ -134,38 +169,6 @@ object SøknadReiseTilSamlingUtil {
                                     postnummer = VerdiFelt(verdi = "5132", label = "Postnummer"),
                                     poststed = VerdiFelt(verdi = "Pæddekummen", label = "Poststed"),
                                 ),
-                        ),
-                    reisemåte =
-                        ReisemåteAvsnitt(
-                            kanReiseMedOffentligTransport =
-                                EnumFelt(
-                                    label = "Kan du reise kollektivt til samlingen?",
-                                    verdi = JaNei.NEI,
-                                    svarTekst = "Nei",
-                                    alternativer = emptyList(),
-                                ),
-                            totalUtgifterOffentligTransport = null,
-                            kanBenytteEgenBil =
-                                EnumFelt(
-                                    label = "Kan du benytte egen bil?",
-                                    verdi = KanBenytteEgenBil.NEI,
-                                    svarTekst = "Nei",
-                                    alternativer = emptyList(),
-                                ),
-                            kanIkkeReiseMedOffentligTransportBegrunnelser = null,
-                            ønskerDekketUtgifterForDrosje =
-                                EnumFelt(
-                                    label = "Ønsker du å få dekket utgifter for drosje?",
-                                    verdi = JaNei.JA,
-                                    svarTekst = "Ja",
-                                    alternativer = emptyList(),
-                                ),
-                            barnehageGateadresse = null,
-                            barnehagePostnummer = null,
-                            kanIkkeBenytteEgenBilBegrunnelser = null,
-                            betalerForReiseSelv = null,
-                            harTTKort = null,
-                            reiseMedBilUtgifter = null,
                         ),
                     dokumentasjon = emptyList(),
                 ),

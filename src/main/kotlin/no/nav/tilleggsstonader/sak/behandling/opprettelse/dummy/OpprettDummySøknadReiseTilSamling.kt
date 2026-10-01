@@ -17,12 +17,11 @@ import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Adresse
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.AvreiseadresseAvsnitt
-import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.KanBenytteEgenBil
-import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.KanIkkeBenytteEgenBilBegrunnelser
-import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.KanIkkeReiseMedOffentligTransportBegrunnelser
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.OffentligTransportInfo
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.ReiseTilSamlingAktivitetAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.ReisemåteAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Samling
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Transportmiddel
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -96,13 +95,6 @@ class OpprettDummySøknadReiseTilSamling(
                                             svarTekst = "Ja",
                                             alternativer = emptyList(),
                                         ),
-                                    harBruktEkstraReiseDager =
-                                        EnumFelt(
-                                            label = "Brukte Ekstra reise?",
-                                            verdi = JaNei.NEI,
-                                            svarTekst = "Nei",
-                                            alternativer = emptyList(),
-                                        ),
                                     adresse =
                                         Adresse(
                                             land = SelectFelt("Land", "NO", "Norge"),
@@ -111,6 +103,33 @@ class OpprettDummySøknadReiseTilSamling(
                                             poststed = VerdiFelt(verdi = "Nyborg", label = "Poststed"),
                                         ),
                                     antallKilometerEnVei = VerdiFelt(verdi = "42", label = "Antall kilometer én vei"),
+                                    reisemåte =
+                                        ReisemåteAvsnitt(
+                                            hvilkeTransportmidlerBleBenyttet =
+                                                EnumFlereValgFelt(
+                                                    label = "Hvilke transportmidler ble benyttet?",
+                                                    verdier =
+                                                        listOf(
+                                                            VerdiFelt(
+                                                                Transportmiddel.OFFENTLIG_TRANSPORT,
+                                                                "Offentlig transport",
+                                                            ),
+                                                        ),
+                                                    alternativer = emptyList(),
+                                                ),
+                                            unntakFraOffentligTransport = null,
+                                            unntakFraPrivatBil = null,
+                                            offentligTransport =
+                                                OffentligTransportInfo(
+                                                    totalUtgifterOffentligTransport =
+                                                        VerdiFelt(
+                                                            label = "Totale utgifter",
+                                                            verdi = "200",
+                                                        ),
+                                                ),
+                                            privatBil = null,
+                                            drosje = null,
+                                        ),
                                 ),
                                 Samling(
                                     fom = DatoFelt("Fra", 10 mars 2026),
@@ -120,13 +139,6 @@ class OpprettDummySøknadReiseTilSamling(
                                             label = "Er samlingen obligatorisk?",
                                             verdi = JaNei.JA,
                                             svarTekst = "Ja",
-                                            alternativer = emptyList(),
-                                        ),
-                                    harBruktEkstraReiseDager =
-                                        EnumFelt(
-                                            label = "Brukte Ekstra reise?",
-                                            verdi = JaNei.NEI,
-                                            svarTekst = "Nei",
                                             alternativer = emptyList(),
                                         ),
                                     adresse =
@@ -149,60 +161,6 @@ class OpprettDummySøknadReiseTilSamling(
                                         alternativer = emptyList(),
                                     ),
                                 adresseDetSkalReisesFra = null,
-                            ),
-                        reisemåte =
-                            ReisemåteAvsnitt(
-                                kanReiseMedOffentligTransport =
-                                    EnumFelt(
-                                        label = "Kan du reise kollektivt til samlingen?",
-                                        verdi = JaNei.NEI,
-                                        svarTekst = "Nei",
-                                        alternativer = emptyList(),
-                                    ),
-                                totalUtgifterOffentligTransport = null,
-                                kanIkkeReiseMedOffentligTransportBegrunnelser =
-                                    EnumFlereValgFelt(
-                                        label = "Hvorfor kan du ikke reise kollektivt?",
-                                        verdier =
-                                            listOf(
-                                                VerdiFelt(
-                                                    KanIkkeReiseMedOffentligTransportBegrunnelser.DÅRLIG_TRANSPORTTILBUD,
-                                                    "Dårlig transporttilbud",
-                                                ),
-                                            ),
-                                        alternativer = emptyList(),
-                                    ),
-                                kanBenytteEgenBil =
-                                    EnumFelt(
-                                        label = "Kan du benytte egen bil?",
-                                        verdi = KanBenytteEgenBil.NEI,
-                                        svarTekst = "Nei",
-                                        alternativer = emptyList(),
-                                    ),
-                                kanIkkeBenytteEgenBilBegrunnelser =
-                                    EnumFlereValgFelt(
-                                        label = "Hvorfor kan du ikke benytte egen bil?",
-                                        verdier =
-                                            listOf(
-                                                VerdiFelt(
-                                                    KanIkkeBenytteEgenBilBegrunnelser.HAR_IKKE_BIL_ELLER_FØRERKORT,
-                                                    "Jeg har ikke bil eller førerkort",
-                                                ),
-                                            ),
-                                        alternativer = emptyList(),
-                                    ),
-                                ønskerDekketUtgifterForDrosje =
-                                    EnumFelt(
-                                        label = "Ønsker du å få dekket utgifter for drosje?",
-                                        verdi = JaNei.NEI,
-                                        svarTekst = "Nei",
-                                        alternativer = emptyList(),
-                                    ),
-                                barnehageGateadresse = null,
-                                barnehagePostnummer = null,
-                                betalerForReiseSelv = null,
-                                harTTKort = null,
-                                reiseMedBilUtgifter = null,
                             ),
                         dokumentasjon = emptyList(),
                     ),

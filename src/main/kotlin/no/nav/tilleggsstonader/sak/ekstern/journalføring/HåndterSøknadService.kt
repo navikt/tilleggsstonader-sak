@@ -26,7 +26,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.Reise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SamlingPeriode
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Samling
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.tilMålgruppeType
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -245,9 +245,9 @@ class HåndterSøknadService(
 
     private fun List<Reise>.finnSenesteDato() = flatMap { listOf(it.periode.fom, it.periode.tom) }.max()
 
-    private fun List<SamlingPeriode>.finnTidligsteDatoForSamling() = flatMap { listOf(it.fom, it.tom) }.min()
+    private fun List<Samling>.finnTidligsteDatoForSamling() = flatMap { listOf(it.fom, it.tom) }.min()
 
-    private fun List<SamlingPeriode>.finnSenesteDatoForSamling() = flatMap { listOf(it.fom, it.tom) }.max()
+    private fun List<Samling>.finnSenesteDatoForSamling() = flatMap { listOf(it.fom, it.tom) }.max()
 
     fun kanAutomatiskJournalføre(journalpost: Journalpost): Boolean {
         if (!journalpost.gjelderKanalNavNo()) {

@@ -4,9 +4,9 @@ import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.AktivitetTypeUtdanning
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.DrivstoffType
-import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.KanBenytteEgenBil
-import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.KanIkkeBenytteEgenBilBegrunnelser
-import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.KanIkkeReiseMedOffentligTransportBegrunnelser
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Transportmiddel
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.ÅrsakKanIkkeBenytteEgenBil
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.ÅrsakKanIkkeBenytteOffentligTransport
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
@@ -16,9 +16,8 @@ import java.time.LocalDate
 data class SkjemaReiseTilSamling(
     val hovedytelse: HovedytelseAvsnitt,
     val aktivitet: AktivitetReiseTilSamlingAvsnitt,
-    val samlinger: List<SamlingPeriode>,
+    val samlinger: List<Samling>,
     val avreiseadresse: Avreiseadresse,
-    val reisemåte: Reisemåte,
     val dokumentasjon: List<Dokumentasjon>,
 )
 
@@ -37,13 +36,13 @@ data class TilleggsopplysningerAnnenAktivitet(
     val måBetaleForReiseTilSkole: JaNei?,
 )
 
-data class SamlingPeriode(
+data class Samling(
     val fom: LocalDate,
     val tom: LocalDate,
     val erObligatorisk: JaNei,
-    val harBruktEkstraReiseDager: JaNei,
     val adresse: Adresse,
     val antallKilometerEnVei: String,
+    val reisemåte: Reisemåte? = null,
 )
 
 data class Avreiseadresse(
@@ -52,22 +51,48 @@ data class Avreiseadresse(
 )
 
 data class Reisemåte(
-    val kanReiseMedOffentligTransport: JaNei,
-    val kanIkkeReiseMedOffentligTransportBegrunnelser: List<KanIkkeReiseMedOffentligTransportBegrunnelser>?,
-    val totalUtgifterOffentligTransport: String?,
-    val kanBenytteEgenBil: KanBenytteEgenBil?,
-    val ønskerDekketUtgifterForDrosje: JaNei?,
-    val barnehageGateadresse: String?,
-    val barnehagePostnummer: String?,
-    val kanIkkeBenytteEgenBilBegrunnelser: List<KanIkkeBenytteEgenBilBegrunnelser>?,
-    val betalerForReiseSelv: JaNei?,
-    val harTTKort: JaNei?,
-    val reiseMedBilUtgifter: ReiseMedBilUtgifter?,
+    val hvilkeTransportmidlerBleBenyttet: List<Transportmiddel>?,
+    val unntakFraOffentligTransport: UnntakFraOffentligTransport?,
+    val unntakFraPrivatBil: List<ÅrsakKanIkkeBenytteEgenBil>?,
+    val offentligTransport: OffentligTransportInfo?,
+    val privatBil: PrivatBilInfo?,
+    val drosje: DrosjeInfo?,
 )
 
-data class ReiseMedBilUtgifter(
-    val drivstoffType: DrivstoffType,
+data class OffentligTransportInfo(
+    val totalUtgifterOffentligTransport: String?,
+)
+
+data class PrivatBilInfo(
+    val benyttetEgenBil: JaNei?,
+    val betalteForReisen: JaNei?,
+    val infoBilKunDelerAvStrekning: InfoBilKunDelerAvStrekning?,
+    val utgifterPrivatBil: UtgifterPrivatBil?,
+)
+
+data class DrosjeInfo(
+    val harTTKort: JaNei?,
+)
+
+data class UnntakFraOffentligTransport(
+    val årsaker: List<ÅrsakKanIkkeBenytteOffentligTransport>?,
+    val leveringOgHentingIBarnehage: LeveringOgHentingIBarnehage?,
+)
+
+data class LeveringOgHentingIBarnehage(
+    val gateadresse: String?,
+    val postnummer: String?,
+)
+
+data class UtgifterPrivatBil(
     val bompenger: String?,
     val ferge: String?,
     val piggdekkavgift: String?,
+    val parkering: String?,
+    val drivstoffType: DrivstoffType?,
+)
+
+data class InfoBilKunDelerAvStrekning(
+    val strekningHvorBilBleBenyttet: String?,
+    val antallKilometerKjørt: String?,
 )

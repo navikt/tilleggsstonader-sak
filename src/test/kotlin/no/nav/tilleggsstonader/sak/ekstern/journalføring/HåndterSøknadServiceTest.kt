@@ -28,8 +28,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadDagligReis
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.AktivitetReiseTilSamlingAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Avreiseadresse
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Reisemåte
-import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SamlingPeriode
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Samling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SkjemaReiseTilSamling
 import no.nav.tilleggsstonader.sak.util.dokumentInfo
 import no.nav.tilleggsstonader.sak.util.dokumentvariant
@@ -232,7 +231,7 @@ class HåndterSøknadServiceTest {
 
     private fun søknadReiseTilSamling(
         hovedytelse: List<Hovedytelse> = listOf(Hovedytelse.AAP),
-        samlinger: List<SamlingPeriode>,
+        samlinger: List<Samling>,
     ) = SøknadReiseTilSamling(
         journalpostId = "1",
         mottattTidspunkt = java.time.LocalDateTime.now(),
@@ -250,20 +249,6 @@ class HåndterSøknadServiceTest {
                     ),
                 samlinger = samlinger,
                 avreiseadresse = Avreiseadresse(skalReiseFraFolkeregistrertAdresse = JaNei.JA, adresseDetSkalReisesFra = null),
-                reisemåte =
-                    Reisemåte(
-                        kanReiseMedOffentligTransport = JaNei.JA,
-                        kanIkkeReiseMedOffentligTransportBegrunnelser = null,
-                        totalUtgifterOffentligTransport = null,
-                        kanBenytteEgenBil = null,
-                        ønskerDekketUtgifterForDrosje = null,
-                        barnehageGateadresse = null,
-                        barnehagePostnummer = null,
-                        kanIkkeBenytteEgenBilBegrunnelser = null,
-                        betalerForReiseSelv = null,
-                        harTTKort = null,
-                        reiseMedBilUtgifter = null,
-                    ),
                 dokumentasjon = emptyList(),
             ),
     )
@@ -271,11 +256,10 @@ class HåndterSøknadServiceTest {
     private fun samlingPeriode(
         fom: LocalDate,
         tom: LocalDate,
-    ) = SamlingPeriode(
+    ) = Samling(
         fom = fom,
         tom = tom,
         erObligatorisk = JaNei.JA,
-        harBruktEkstraReiseDager = JaNei.NEI,
         adresse = Adresse(gyldigFraOgMed = null, adresse = null, postnummer = null, poststed = null, landkode = null),
         antallKilometerEnVei = "10",
     )
