@@ -7,6 +7,7 @@
     "offentligTransport": [ {
       "aktivitetId": null,
       "beløp": 245365,
+      "begrunnelse": "diurgierhug",
       "fraTidligereVedtak": false,
       "grunnlag": {
         "adresse": "rfg",
