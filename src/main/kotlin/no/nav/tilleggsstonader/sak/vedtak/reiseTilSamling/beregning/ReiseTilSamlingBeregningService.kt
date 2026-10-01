@@ -233,8 +233,6 @@ class ReiseTilSamlingBeregningService(
         return oppfylteOffentligTransport.map { samling ->
             val fakta = samling.fakta as FaktaOffentligTransport
 
-            fakta.begrunnelse
-
             BeregningsresultatOffentligTransport(
                 reiseId = fakta.reiseId,
                 aktivitetId = fakta.aktivitetId,
