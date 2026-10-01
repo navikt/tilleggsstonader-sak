@@ -17,7 +17,7 @@ import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Adresse
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.AvreiseadresseAvsnitt
-import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.OffentligTransportInfo
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.DrosjeInfo
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.ReiseTilSamlingAktivitetAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.ReisemåteAvsnitt
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Samling
@@ -111,24 +111,25 @@ class OpprettDummySøknadReiseTilSamling(
                                                     verdier =
                                                         listOf(
                                                             VerdiFelt(
-                                                                Transportmiddel.OFFENTLIG_TRANSPORT,
-                                                                "Offentlig transport",
+                                                                Transportmiddel.DROSJE,
+                                                                "Drosje",
                                                             ),
                                                         ),
                                                     alternativer = emptyList(),
                                                 ),
                                             unntakFraOffentligTransport = null,
                                             unntakFraPrivatBil = null,
-                                            offentligTransport =
-                                                OffentligTransportInfo(
-                                                    totalUtgifterOffentligTransport =
-                                                        VerdiFelt(
-                                                            label = "Totale utgifter",
-                                                            verdi = "200",
-                                                        ),
-                                                ),
+                                            offentligTransport = null,
                                             privatBil = null,
-                                            drosje = null,
+                                            drosje =
+                                                DrosjeInfo(
+                                                    EnumFelt(
+                                                        label = "Har du TT-kort?",
+                                                        verdi = JaNei.NEI,
+                                                        svarTekst = "Nei",
+                                                        alternativer = emptyList(),
+                                                    ),
+                                                ),
                                         ),
                                 ),
                                 Samling(
