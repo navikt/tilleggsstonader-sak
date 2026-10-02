@@ -10,4 +10,5 @@ fun VedtaksperiodeDto.tilVedtaksperiodeTsrDto() =
         id = id,
         fom = fom,
         tom = tom,
+        målgruppeType = målgruppeType,
     )

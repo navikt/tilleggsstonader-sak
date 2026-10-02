@@ -43,6 +43,7 @@ class FaktiskMålgruppeTest {
                 FaktiskMålgruppe.AKTIVITETSPENGER,
                 FaktiskMålgruppe.GJENLEVENDE,
                 FaktiskMålgruppe.ARBEIDSSØKER,
+                FaktiskMålgruppe.UNGDOMSPROGRAMMET,
             )
     }
 
@@ -65,6 +66,14 @@ class FaktiskMålgruppeTest {
             TypeAndel.REISE_TIL_SAMLING_AKTIVITETSPENGER,
             TypeAndel.REISE_OPPSTART_AKTIVITETSPENGER,
         )
+    }
+
+    @Test
+    fun `ungdomsprogrammet skal ikke utlede TSO-andel fra faktisk målgruppe`() {
+        assertThatException()
+            .isThrownBy {
+                FaktiskMålgruppe.UNGDOMSPROGRAMMET.tilTypeAndel(Stønadstype.DAGLIG_REISE_TSO)
+            }.withMessage("Kan ikke opprette andel tilkjent ytelse for målgruppe UNGDOMSPROGRAMMET")
     }
 
     @Nested

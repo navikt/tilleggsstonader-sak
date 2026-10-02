@@ -239,6 +239,54 @@ class VedtaksperiodeValideringServiceTest {
                 )
             }.hasMessageContaining("Aktivitetspenger er ikke aktivert")
         }
+
+        @Test
+        fun `skal validere toggle for ungdomsprogrammet på vedtaksperioden`() {
+            val ungdomsprogrammet =
+                målgruppe(
+                    faktaOgVurdering =
+                        VilkårperiodeTestUtil.faktaOgVurderingMålgruppe(
+                            type = MålgruppeType.UNGDOMSPROGRAMMET,
+                        ),
+                    fom = vedtaksperiodeJanuar.fom,
+                    tom = vedtaksperiodeFebruar.tom,
+                )
+            every { vilkårperiodeService.hentVilkårperioder(any()) } returns
+                Vilkårperioder(målgrupper = listOf(ungdomsprogrammet), aktiviteter = aktiviteter)
+            every { unleashService.isEnabled(Toggle.KAN_BRUKE_MÅLGRUPPE_UNGDOMSPROGRAMMET) } returns false
+
+            assertThatThrownBy {
+                validerInnvilgelse(
+                    listOf(
+                        vedtaksperiodeJanuar.copy(målgruppe = FaktiskMålgruppe.UNGDOMSPROGRAMMET),
+                    ),
+                )
+            }.hasMessageContaining("Ungdomsprogrammet er ikke aktivert")
+        }
+
+        @Test
+        fun `skal godta ungdomsprogrammet på vedtaksperioden når toggle er aktivert`() {
+            val ungdomsprogrammet =
+                målgruppe(
+                    faktaOgVurdering =
+                        VilkårperiodeTestUtil.faktaOgVurderingMålgruppe(
+                            type = MålgruppeType.UNGDOMSPROGRAMMET,
+                        ),
+                    fom = vedtaksperiodeJanuar.fom,
+                    tom = vedtaksperiodeFebruar.tom,
+                )
+            every { vilkårperiodeService.hentVilkårperioder(any()) } returns
+                Vilkårperioder(målgrupper = listOf(ungdomsprogrammet), aktiviteter = aktiviteter)
+            every { unleashService.isEnabled(Toggle.KAN_BRUKE_MÅLGRUPPE_UNGDOMSPROGRAMMET) } returns true
+
+            assertDoesNotThrow {
+                validerInnvilgelse(
+                    listOf(
+                        vedtaksperiodeJanuar.copy(målgruppe = FaktiskMålgruppe.UNGDOMSPROGRAMMET),
+                    ),
+                )
+            }
+        }
     }
 
     private fun validerInnvilgelse(

@@ -7,21 +7,21 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import java.time.LocalDate
 
 /**
- * Forenklet vedtaksperiode for TSR-varianter (daglig reise og reise til samling), der
- * typeandel bestemmes av tiltaksvariant i stedet for målgruppe/aktivitet. Saksbehandler
- * trenger derfor kun å oppgi fom/tom - målgruppe og aktivitet settes til faste verdier.
+ * Forenklet vedtaksperiode for TSR-varianter der typeandel bestemmes av tiltaksvariant.
+ * Aktivitet settes til en fast verdi, mens saksbehandler velger faktisk målgruppe (avhengig av at toggle for målgruppe UNGDOMSPROGRAMMET er på).
  */
 data class VedtaksperiodeTsrDto(
     val id: VedtaksperiodeId = VedtaksperiodeId.random(),
     val fom: LocalDate,
     val tom: LocalDate,
+    val målgruppeType: FaktiskMålgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
 ) {
     fun tilDomene() =
         Vedtaksperiode(
             id = id,
             fom = fom,
             tom = tom,
-            målgruppe = FaktiskMålgruppe.ARBEIDSSØKER,
+            målgruppe = målgruppeType,
             aktivitet = AktivitetType.TILTAK,
         )
 }
