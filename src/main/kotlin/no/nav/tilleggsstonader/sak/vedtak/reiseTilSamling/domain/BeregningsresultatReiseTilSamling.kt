@@ -25,6 +25,7 @@ data class BeregningsresultatOffentligTransport(
     override val reiseId: ReiseId,
     override val grunnlag: BeregningsgrunnlagOffentligTransportForSamling,
     val beløp: BigDecimal,
+    val begrunnelse: String,
     val aktivitetId: VilkårperiodeGlobalId?,
     /**
      * Markerer at denne reisen er kopiert uendret fra forrige iverksatte vedtak ved revurdering,

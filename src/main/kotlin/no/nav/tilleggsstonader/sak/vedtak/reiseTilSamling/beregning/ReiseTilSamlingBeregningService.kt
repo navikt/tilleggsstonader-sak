@@ -248,6 +248,7 @@ class ReiseTilSamlingBeregningService(
                         brukersNavKontor = brukersNavKontor,
                     ),
                 beløp = fakta.utgifterOffentligTransport,
+                begrunnelse = fakta.begrunnelse,
             )
         }
     }

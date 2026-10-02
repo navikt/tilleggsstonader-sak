@@ -6,6 +6,7 @@
   "beregningsresultat": {
     "offentligTransport": [ {
       "aktivitetId": null,
+      "begrunnelse": "diurgierhug",
       "beløp": 245365,
       "fraTidligereVedtak": false,
       "grunnlag": {
