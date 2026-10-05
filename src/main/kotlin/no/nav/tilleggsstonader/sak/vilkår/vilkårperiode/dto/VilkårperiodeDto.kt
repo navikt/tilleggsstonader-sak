@@ -23,6 +23,8 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingDagligReiseTsr
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingFlyttingTso
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingFlyttingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingReiseOppstartAvslutningHjemreiseTso
@@ -119,6 +121,8 @@ fun Vurdering.tilDto() = VurderingDto(svar = svar, resultat = resultat)
         AktivitetReiseOppstartAvslutningHjemreiseTsrFaktaOgVurderingerDto::class,
         name = "AKTIVITET_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR",
     ),
+    JsonSubTypes.Type(AktivitetFlyttingTsoFaktaOgVurderingerDto::class, name = "AKTIVITET_FLYTTING_TSO"),
+    JsonSubTypes.Type(AktivitetFlyttingTsrFaktaOgVurderingerDto::class, name = "AKTIVITET_FLYTTING_TSR"),
 )
 sealed class FaktaOgVurderingerDto
 
@@ -175,6 +179,18 @@ data class AktivitetReiseOppstartAvslutningHjemreiseTsoFaktaOgVurderingerDto(
 ) : FaktaOgVurderingerDto()
 
 data class AktivitetReiseOppstartAvslutningHjemreiseTsrFaktaOgVurderingerDto(
+    val lønnet: VurderingDto? = null,
+    val harUtgifter: VurderingDto? = null,
+    val erAktivitetenObligatorisk: VurderingDto? = null,
+) : FaktaOgVurderingerDto()
+
+data class AktivitetFlyttingTsoFaktaOgVurderingerDto(
+    val lønnet: VurderingDto? = null,
+    val harUtgifter: VurderingDto? = null,
+    val erAktivitetenObligatorisk: VurderingDto? = null,
+) : FaktaOgVurderingerDto()
+
+data class AktivitetFlyttingTsrFaktaOgVurderingerDto(
     val lønnet: VurderingDto? = null,
     val harUtgifter: VurderingDto? = null,
     val erAktivitetenObligatorisk: VurderingDto? = null,
@@ -275,6 +291,28 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
 
                 is FaktaOgVurderingReiseOppstartAvslutningHjemreiseTsr ->
                     AktivitetReiseOppstartAvslutningHjemreiseTsrFaktaOgVurderingerDto(
+                        lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
+                        harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
+                        erAktivitetenObligatorisk =
+                            vurderinger
+                                .takeIfVurderinger<ErAktivitetenObligatoriskVurdering>()
+                                ?.erAktivitetenObligatorisk
+                                ?.tilDto(),
+                    )
+
+                is FaktaOgVurderingFlyttingTso ->
+                    AktivitetFlyttingTsoFaktaOgVurderingerDto(
+                        lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
+                        harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
+                        erAktivitetenObligatorisk =
+                            vurderinger
+                                .takeIfVurderinger<ErAktivitetenObligatoriskVurdering>()
+                                ?.erAktivitetenObligatorisk
+                                ?.tilDto(),
+                    )
+
+                is FaktaOgVurderingFlyttingTsr ->
+                    AktivitetFlyttingTsrFaktaOgVurderingerDto(
                         lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
                         harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
                         erAktivitetenObligatorisk =

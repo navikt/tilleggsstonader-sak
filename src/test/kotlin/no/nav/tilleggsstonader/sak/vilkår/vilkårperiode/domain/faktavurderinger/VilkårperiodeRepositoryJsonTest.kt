@@ -157,6 +157,8 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
             is TypeFaktaOgVurderingReiseTilSamlingTsr -> forventetTypeReiseTilSamlingTsr(type)
             is TypeFaktaOgVurderingReiseOppstartAvslutningHjemreiseTso -> forventetTypeReiseOppstartAvslutningHjemreiseTso(type)
             is TypeFaktaOgVurderingReiseOppstartAvslutningHjemreiseTsr -> forventetTypeReiseOppstartAvslutningHjemreiseTsr(type)
+            is TypeFaktaOgVurderingFlyttingTso -> forventetTypeFlyttingTso(type)
+            is TypeFaktaOgVurderingFlyttingTsr -> forventetTypeFlyttingTsr(type)
             else -> error("Ukjent type")
         }
 
@@ -388,6 +390,50 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
                         TiltakReiseOppstartAvslutningHjemreiseTsr::class
                     AktivitetReiseOppstartAvslutningHjemreiseTsrType.INGEN_AKTIVITET_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR ->
                         IngenAktivitetReiseOppstartAvslutningHjemreiseTsr::class
+                }
+            }
+        }.java
+
+    private fun forventetTypeFlyttingTso(type: TypeFaktaOgVurderingFlyttingTso): Class<out FaktaOgVurderingFlyttingTso> =
+        when (type) {
+            is MålgruppeFlyttingTsoType -> {
+                when (type) {
+                    MålgruppeFlyttingTsoType.AAP_FLYTTING_TSO -> AAPFlyttingTso::class
+                    MålgruppeFlyttingTsoType.UFØRETRYGD_FLYTTING_TSO -> UføretrygdFlyttingTso::class
+                    MålgruppeFlyttingTsoType.NEDSATT_ARBEIDSEVNE_FLYTTING_TSO -> NedsattArbeidsevneFlyttingTso::class
+                    MålgruppeFlyttingTsoType.OMSTILLINGSSTØNAD_FLYTTING_TSO -> OmstillingsstønadFlyttingTso::class
+                    MålgruppeFlyttingTsoType.OVERGANGSSTØNAD_FLYTTING_TSO -> OvergangssstønadFlyttingTso::class
+                    MålgruppeFlyttingTsoType.INGEN_MÅLGRUPPE_FLYTTING_TSO -> IngenMålgruppeFlyttingTso::class
+                    MålgruppeFlyttingTsoType.AKTIVITETSPENGER_FLYTTING_TSO -> AktivitetspengerFlyttingTso::class
+                }
+            }
+
+            is AktivitetFlyttingTsoType -> {
+                when (type) {
+                    AktivitetFlyttingTsoType.TILTAK_FLYTTING_TSO -> TiltakFlyttingTso::class
+                    AktivitetFlyttingTsoType.UTDANNING_FLYTTING_TSO -> UtdanningFlyttingTso::class
+                    AktivitetFlyttingTsoType.INGEN_AKTIVITET_FLYTTING_TSO -> IngenAktivitetFlyttingTso::class
+                }
+            }
+        }.java
+
+    private fun forventetTypeFlyttingTsr(type: TypeFaktaOgVurderingFlyttingTsr): Class<out FaktaOgVurderingFlyttingTsr> =
+        when (type) {
+            is MålgruppeFlyttingTsrType -> {
+                when (type) {
+                    MålgruppeFlyttingTsrType.DAGPENGER_FLYTTING_TSR -> DagpengerFlyttingTsr::class
+                    MålgruppeFlyttingTsrType.TILTAKSPENGER_FLYTTING_TSR -> TiltakspengerFlyttingTsr::class
+                    MålgruppeFlyttingTsrType.KVALIFISERINGSSTØNAD_FLYTTING_TSR -> KvalifiseringsstønadFlyttingTsr::class
+                    MålgruppeFlyttingTsrType.INNSATT_I_FENGSEL_FLYTTING_TSR -> InnsattIFengselFlyttingTsr::class
+                    MålgruppeFlyttingTsrType.INGEN_MÅLGRUPPE_FLYTTING_TSR -> IngenMålgruppeFlyttingTsr::class
+                    MålgruppeFlyttingTsrType.UNGDOMSPROGRAMMET_FLYTTING_TSR -> UngdomsprogrammetFlyttingTsr::class
+                }
+            }
+
+            is AktivitetFlyttingTsrType -> {
+                when (type) {
+                    AktivitetFlyttingTsrType.TILTAK_FLYTTING_TSR -> TiltakFlyttingTsr::class
+                    AktivitetFlyttingTsrType.INGEN_AKTIVITET_FLYTTING_TSR -> IngenAktivitetFlyttingTsr::class
                 }
             }
         }.java

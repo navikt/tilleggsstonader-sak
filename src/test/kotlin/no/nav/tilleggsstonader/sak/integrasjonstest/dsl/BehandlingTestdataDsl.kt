@@ -310,4 +310,25 @@ class BehandlingTestdataDsl internal constructor() {
             }
         }
     }
+
+    fun defaultFlyttingTSOTestdata(
+        fom: LocalDate = defaultFom,
+        tom: LocalDate = defaultTom,
+    ) {
+        aktivitet {
+            opprett {
+                aktivitetTiltakTsoFlytting(fom, tom)
+            }
+        }
+        målgruppe {
+            opprett {
+                målgruppeAAP(fom, tom)
+            }
+        }
+        vilkår {
+            opprett {
+                offentligTransportFlytting(fom = fom, tom = tom)
+            }
+        }
+    }
 }

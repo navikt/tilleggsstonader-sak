@@ -63,7 +63,7 @@ class BehandlingFaktaService(
 
             Stønadstype.FLYTTING_TSO,
             Stønadstype.FLYTTING_TSR,
-            -> error("Henting av fakta for $stønadstype er ikke implementert")
+            -> hentFaktaDtoForFlytting(behandlingId)
 
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
@@ -148,6 +148,13 @@ class BehandlingFaktaService(
     ): BehandlingFaktaReiseOppstartAvslutningHjemreiseDto {
         val grunnlagsdata = faktaGrunnlagService.hentGrunnlagsdata(behandlingId)
         return BehandlingFaktaReiseOppstartAvslutningHjemreiseDto(
+            arena = arenaFakta(grunnlagsdata),
+        )
+    }
+
+    private fun hentFaktaDtoForFlytting(behandlingId: BehandlingId): BehandlingFaktaFlyttingDto {
+        val grunnlagsdata = faktaGrunnlagService.hentGrunnlagsdata(behandlingId)
+        return BehandlingFaktaFlyttingDto(
             arena = arenaFakta(grunnlagsdata),
         )
     }

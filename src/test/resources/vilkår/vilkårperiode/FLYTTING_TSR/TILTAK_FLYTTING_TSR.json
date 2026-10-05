@@ -1,0 +1,18 @@
+{
+  "fakta": { },
+  "type": "TILTAK_FLYTTING_TSR",
+  "vurderinger": {
+    "erAktivitetenObligatorisk": {
+      "resultat": "OPPFYLT",
+      "svar": "JA"
+    },
+    "harUtgifter": {
+      "resultat": "OPPFYLT",
+      "svar": "JA"
+    },
+    "lønnet": {
+      "resultat": "OPPFYLT",
+      "svar": "NEI"
+    }
+  }
+}

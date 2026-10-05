@@ -157,6 +157,78 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
         IngenMålgruppeReiseOppstartAvslutningHjemreiseTsr::class,
         name = "INGEN_MÅLGRUPPE_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR",
     ),
+    JsonSubTypes.Type(
+        UtdanningFlyttingTso::class,
+        name = "UTDANNING_FLYTTING_TSO",
+    ),
+    JsonSubTypes.Type(
+        TiltakFlyttingTso::class,
+        name = "TILTAK_FLYTTING_TSO",
+    ),
+    JsonSubTypes.Type(
+        IngenAktivitetFlyttingTso::class,
+        name = "INGEN_AKTIVITET_FLYTTING_TSO",
+    ),
+    JsonSubTypes.Type(
+        AAPFlyttingTso::class,
+        name = "AAP_FLYTTING_TSO",
+    ),
+    JsonSubTypes.Type(
+        OmstillingsstønadFlyttingTso::class,
+        name = "OMSTILLINGSSTØNAD_FLYTTING_TSO",
+    ),
+    JsonSubTypes.Type(
+        OvergangssstønadFlyttingTso::class,
+        name = "OVERGANGSSTØNAD_FLYTTING_TSO",
+    ),
+    JsonSubTypes.Type(
+        NedsattArbeidsevneFlyttingTso::class,
+        name = "NEDSATT_ARBEIDSEVNE_FLYTTING_TSO",
+    ),
+    JsonSubTypes.Type(
+        AktivitetspengerFlyttingTso::class,
+        name = "AKTIVITETSPENGER_FLYTTING_TSO",
+    ),
+    JsonSubTypes.Type(
+        UføretrygdFlyttingTso::class,
+        name = "UFØRETRYGD_FLYTTING_TSO",
+    ),
+    JsonSubTypes.Type(
+        IngenMålgruppeFlyttingTso::class,
+        name = "INGEN_MÅLGRUPPE_FLYTTING_TSO",
+    ),
+    JsonSubTypes.Type(
+        TiltakFlyttingTsr::class,
+        name = "TILTAK_FLYTTING_TSR",
+    ),
+    JsonSubTypes.Type(
+        IngenAktivitetFlyttingTsr::class,
+        name = "INGEN_AKTIVITET_FLYTTING_TSR",
+    ),
+    JsonSubTypes.Type(
+        DagpengerFlyttingTsr::class,
+        name = "DAGPENGER_FLYTTING_TSR",
+    ),
+    JsonSubTypes.Type(
+        TiltakspengerFlyttingTsr::class,
+        name = "TILTAKSPENGER_FLYTTING_TSR",
+    ),
+    JsonSubTypes.Type(
+        UngdomsprogrammetFlyttingTsr::class,
+        name = "UNGDOMSPROGRAMMET_FLYTTING_TSR",
+    ),
+    JsonSubTypes.Type(
+        KvalifiseringsstønadFlyttingTsr::class,
+        name = "KVALIFISERINGSSTØNAD_FLYTTING_TSR",
+    ),
+    JsonSubTypes.Type(
+        InnsattIFengselFlyttingTsr::class,
+        name = "INNSATT_I_FENGSEL_FLYTTING_TSR",
+    ),
+    JsonSubTypes.Type(
+        IngenMålgruppeFlyttingTsr::class,
+        name = "INGEN_MÅLGRUPPE_FLYTTING_TSR",
+    ),
     failOnRepeatedNames = true,
 )
 sealed interface FaktaOgVurderingJson

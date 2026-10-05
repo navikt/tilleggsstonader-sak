@@ -411,4 +411,17 @@ internal class BehandlingFaktaServiceTest {
         assertThat(fakta.hovedytelse).isNull()
         assertThat(fakta.dokumentasjon).isNull()
     }
+
+    @Test
+    fun `skal mappe minimal fakta for flytting`() {
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns lagGrunnlagsdata()
+        every { fagsakService.hentFagsakForBehandling(behandlingId) } returns
+            fagsak(stønadstype = Stønadstype.FLYTTING_TSO)
+
+        val fakta = service.hentFakta(behandlingId) as BehandlingFaktaFlyttingDto
+
+        assertThat(fakta.søknadMottattTidspunkt).isNull()
+        assertThat(fakta.hovedytelse).isNull()
+        assertThat(fakta.dokumentasjon).isNull()
+    }
 }

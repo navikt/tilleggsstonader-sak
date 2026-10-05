@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBoutgifterDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetFlyttingTsoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetLæremidlerDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetPassAvBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetReiseOppstartAvslutningHjemreiseTsoDto
@@ -340,6 +341,26 @@ class OpprettVilkårperiodeDsl {
                 aktivitetType = AktivitetType.TILTAK,
                 faktaOgSvar =
                     FaktaOgSvarAktivitetReiseOppstartAvslutningHjemreiseTsoDto(
+                        svarLønnet = SvarJaNei.NEI,
+                        svarHarUtgifter = SvarJaNei.JA,
+                        svarErAktivitetenObligatorisk = SvarJaNei.JA,
+                    ),
+            )
+        }
+    }
+
+    fun aktivitetTiltakTsoFlytting(
+        fom: LocalDate,
+        tom: LocalDate,
+    ) {
+        add { behandlingId ->
+            lagreVilkårperiodeAktivitet(
+                behandlingId = behandlingId,
+                fom = fom,
+                tom = tom,
+                aktivitetType = AktivitetType.TILTAK,
+                faktaOgSvar =
+                    FaktaOgSvarAktivitetFlyttingTsoDto(
                         svarLønnet = SvarJaNei.NEI,
                         svarHarUtgifter = SvarJaNei.JA,
                         svarErAktivitetenObligatorisk = SvarJaNei.JA,

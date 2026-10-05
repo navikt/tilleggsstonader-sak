@@ -43,6 +43,8 @@ import java.time.LocalDateTime
         BehandlingFaktaReiseOppstartAvslutningHjemreiseDto::class,
         name = "REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR",
     ),
+    JsonSubTypes.Type(BehandlingFaktaFlyttingDto::class, name = "FLYTTING_TSO"),
+    JsonSubTypes.Type(BehandlingFaktaFlyttingDto::class, name = "FLYTTING_TSR"),
 )
 sealed interface BehandlingFaktaDto {
     val søknadMottattTidspunkt: LocalDateTime?
@@ -100,6 +102,13 @@ data class BehandlingFaktaReiseTilSamlingDto(
 ) : BehandlingFaktaDto
 
 data class BehandlingFaktaReiseOppstartAvslutningHjemreiseDto(
+    override val søknadMottattTidspunkt: LocalDateTime? = null,
+    override val hovedytelse: FaktaHovedytelse? = null,
+    override val dokumentasjon: FaktaDokumentasjon? = null,
+    override val arena: ArenaFakta? = null,
+) : BehandlingFaktaDto
+
+data class BehandlingFaktaFlyttingDto(
     override val søknadMottattTidspunkt: LocalDateTime? = null,
     override val hovedytelse: FaktaHovedytelse? = null,
     override val dokumentasjon: FaktaDokumentasjon? = null,

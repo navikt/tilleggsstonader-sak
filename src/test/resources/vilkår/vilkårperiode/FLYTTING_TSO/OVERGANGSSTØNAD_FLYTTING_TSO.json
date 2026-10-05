@@ -1,0 +1,10 @@
+{
+  "fakta": { },
+  "type": "OVERGANGSSTØNAD_FLYTTING_TSO",
+  "vurderinger": {
+    "medlemskap": {
+      "resultat": "OPPFYLT",
+      "svar": "JA_IMPLISITT"
+    }
+  }
+}

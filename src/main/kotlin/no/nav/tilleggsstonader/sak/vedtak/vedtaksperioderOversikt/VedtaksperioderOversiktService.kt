@@ -86,6 +86,7 @@ class VedtaksperioderOversiktService(
                 finnDetaljerteVedtaksperioderForReiseTilSamling(behandling = behandling)
             Stønadstype.FLYTTING_TSO,
             Stønadstype.FLYTTING_TSR,
+            // TODO: Implementer detaljerte vedtaksperioder for flytting (TSO/TSR)
             -> TODO()
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,

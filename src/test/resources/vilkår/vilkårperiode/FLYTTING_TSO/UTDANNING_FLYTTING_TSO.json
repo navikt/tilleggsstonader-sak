@@ -1,0 +1,14 @@
+{
+  "fakta": { },
+  "type": "UTDANNING_FLYTTING_TSO",
+  "vurderinger": {
+    "erAktivitetenObligatorisk": {
+      "resultat": "OPPFYLT",
+      "svar": "JA"
+    },
+    "harUtgifter": {
+      "resultat": "OPPFYLT",
+      "svar": "JA"
+    }
+  }
+}
