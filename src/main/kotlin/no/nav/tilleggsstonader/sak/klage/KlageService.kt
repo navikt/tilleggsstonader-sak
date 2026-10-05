@@ -55,6 +55,10 @@ class KlageService(
             dagligReiseTsr = klagebehandlingerPåEksternId[fagsaker.dagligReiseTsr?.eksternId?.id] ?: emptyList(),
             reiseTilSamlingTso = klagebehandlingerPåEksternId[fagsaker.reiseTilSamlingTso?.eksternId?.id] ?: emptyList(),
             reiseTilSamlingTsr = klagebehandlingerPåEksternId[fagsaker.reiseTilSamlingTsr?.eksternId?.id] ?: emptyList(),
+            reiseOppstartAvslutningHjemreiseTso = klagebehandlingerPåEksternId[fagsaker.reiseOppstartAvslutningHjemreiseTso?.eksternId?.id] ?: emptyList(),
+            reiseOppstartAvslutningHjemreiseTsr = klagebehandlingerPåEksternId[fagsaker.reiseOppstartAvslutningHjemreiseTsr?.eksternId?.id] ?: emptyList(),
+            flyttingTso = klagebehandlingerPåEksternId[fagsaker.flyttingTso?.eksternId?.id] ?: emptyList(),
+            flyttingTsr = klagebehandlingerPåEksternId[fagsaker.flyttingTsr?.eksternId?.id] ?: emptyList(),
         )
     }
 

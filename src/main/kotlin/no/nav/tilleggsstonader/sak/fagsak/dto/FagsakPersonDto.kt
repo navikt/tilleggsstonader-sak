@@ -11,4 +11,10 @@ class FagsakPersonDto(
     val boutgifter: FagsakId?,
     val dagligReiseTso: FagsakId?,
     val dagligReiseTsr: FagsakId?,
+    val reiseTilSamlingTso: FagsakId?,
+    val reiseTilSamlingTsr: FagsakId?,
+    val reiseOppstartAvslutningHjemreiseTso: FagsakId?,
+    val reiseOppstartAvslutningHjemreiseTsr: FagsakId?,
+    val flyttingTso: FagsakId?,
+    val flyttingTsr: FagsakId?,
 )

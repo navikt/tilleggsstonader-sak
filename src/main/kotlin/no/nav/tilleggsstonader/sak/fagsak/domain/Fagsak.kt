@@ -19,6 +19,10 @@ data class Fagsaker(
     val dagligReiseTsr: Fagsak? = fagsaker[Stønadstype.DAGLIG_REISE_TSR]
     val reiseTilSamlingTso: Fagsak? = fagsaker[Stønadstype.REISE_TIL_SAMLING_TSO]
     val reiseTilSamlingTsr: Fagsak? = fagsaker[Stønadstype.REISE_TIL_SAMLING_TSR]
+    val reiseOppstartAvslutningHjemreiseTso: Fagsak? = fagsaker[Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO]
+    val reiseOppstartAvslutningHjemreiseTsr: Fagsak? = fagsaker[Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR]
+    val flyttingTso: Fagsak? = fagsaker[Stønadstype.FLYTTING_TSO]
+    val flyttingTsr: Fagsak? = fagsaker[Stønadstype.FLYTTING_TSR]
 
     fun alleFagsaker() = fagsaker.values
 

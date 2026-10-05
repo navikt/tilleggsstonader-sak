@@ -46,6 +46,12 @@ class FagsakPersonController(
             boutgifter = fagsaker.boutgifter?.id,
             dagligReiseTso = fagsaker.dagligReiseTso?.id,
             dagligReiseTsr = fagsaker.dagligReiseTsr?.id,
+            reiseTilSamlingTso = fagsaker.reiseTilSamlingTso?.id,
+            reiseTilSamlingTsr = fagsaker.reiseTilSamlingTsr?.id,
+            reiseOppstartAvslutningHjemreiseTso = fagsaker.reiseOppstartAvslutningHjemreiseTso?.id,
+            reiseOppstartAvslutningHjemreiseTsr = fagsaker.reiseOppstartAvslutningHjemreiseTsr?.id,
+            flyttingTso = fagsaker.flyttingTso?.id,
+            flyttingTsr = fagsaker.flyttingTsr?.id,
         )
     }
 }
