@@ -63,10 +63,11 @@ object FileUtil {
         filnavn: String,
         json: Any,
     ) {
-        val forventetJson = JsonMapperProvider.jsonMapper.readTree(readFile(filnavn)).tilSortertPrettyJson()
         val faktiskJson = json.tilSortertPrettyJson()
-
         skrivTilFil(filnavn, faktiskJson)
+
+        val forventetJson = JsonMapperProvider.jsonMapper.readTree(readFile(filnavn)).tilSortertPrettyJson()
+
         assertThat(faktiskJson).isEqualTo(forventetJson)
     }
 

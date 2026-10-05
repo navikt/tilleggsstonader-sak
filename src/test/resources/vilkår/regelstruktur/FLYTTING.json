@@ -1,0 +1,32 @@
+{
+  "SKAL_BRUKE_FLYTTEBYRÅ": {
+    "erHovedregel": true,
+    "reglerSomMåNullstilles": [ "SKAL_KJØRE_SELV" ],
+    "svaralternativer": [ {
+      "begrunnelseType": "VALGFRI",
+      "nesteRegelId": null,
+      "svarId": "JA",
+      "tilhørendeFaktaType": "FLYTTING_FLYTTEBYRÅ"
+    }, {
+      "begrunnelseType": "VALGFRI",
+      "nesteRegelId": "SKAL_KJØRE_SELV",
+      "svarId": "NEI",
+      "tilhørendeFaktaType": null
+    } ]
+  },
+  "SKAL_KJØRE_SELV": {
+    "erHovedregel": false,
+    "reglerSomMåNullstilles": [ ],
+    "svaralternativer": [ {
+      "begrunnelseType": "VALGFRI",
+      "nesteRegelId": null,
+      "svarId": "JA",
+      "tilhørendeFaktaType": "FLYTTING_KJØRE_SELV"
+    }, {
+      "begrunnelseType": "PÅKREVD",
+      "nesteRegelId": null,
+      "svarId": "NEI",
+      "tilhørendeFaktaType": "FLYTTING_UBESTEMT"
+    } ]
+  }
+}

@@ -9,6 +9,9 @@ import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Studienivå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaKjøreSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
@@ -107,6 +110,9 @@ fun Vilkår.tilOppsummertVilkår(): OppsummertVilkår =
         utgift = this.utgift,
         typeFakta =
             when (this.fakta) {
+                is FaktaFlyttebyrå -> TypeVilkårFakta.FLYTTING_FLYTTEBYRÅ
+                is FaktaKjøreSelv -> TypeVilkårFakta.FLYTTING_KJØRE_SELV
+                is FaktaFlyttingUbestemt -> TypeVilkårFakta.FLYTTING_UBESTEMT
                 is FaktaDagligReiseOffentligTransport -> TypeVilkårFakta.DAGLIG_REISE_OFFENTLIG_TRANSPORT
                 is FaktaDagligReisePrivatBil -> TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL
                 is FaktaDagligReiseUbestemt -> TypeVilkårFakta.DAGLIG_REISE_UBESTEMT
