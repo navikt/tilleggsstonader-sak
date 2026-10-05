@@ -45,7 +45,7 @@ data class FaktaUtgifterNyBolig(
     val delerBoutgifter: JaNei?,
     val delerBoutgifterNy: List<DelerUtgifterFlereStederType>?,
     val andelUtgifterBolig: Int?,
-    val harHoyereUtgifterPaNyttBosted: JaNei,
+    val harHoyereUtgifterPaNyttBosted: JaNei?,
     val mottarBostotte: JaNei?,
     val andelUtgifterBoligHjemsted: Int?,
     val andelUtgifterBoligAktivitetssted: Int?,
