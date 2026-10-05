@@ -44,7 +44,7 @@ data class NedsattArbeidsevneReiseOppstartAvslutningHjemreiseTso(
 }
 
 data class AktivitetspengerReiseOppstartAvslutningHjemreiseTso(
-    override val vurderinger: IngenVurderinger = IngenVurderinger,
+    override val vurderinger: VurderingAktivitetspenger,
 ) : MålgruppeReiseOppstartAvslutningHjemreiseTso {
     override val type: MålgruppeReiseOppstartAvslutningHjemreiseTsoType =
         MålgruppeReiseOppstartAvslutningHjemreiseTsoType.AKTIVITETSPENGER_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO

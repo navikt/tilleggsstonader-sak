@@ -19,7 +19,11 @@ object AldersvilkårVurdering {
         feilHvis(fødselsdato == null) { "Kan ikke vurdere aldersvilkår uten å vite fødselsdato til bruker" }
 
         return when (vilkårperiode.type) {
-            MålgruppeType.AAP, MålgruppeType.NEDSATT_ARBEIDSEVNE, MålgruppeType.UFØRETRYGD ->
+            MålgruppeType.AAP,
+            MålgruppeType.NEDSATT_ARBEIDSEVNE,
+            MålgruppeType.UFØRETRYGD,
+            MålgruppeType.AKTIVITETSPENGER,
+            ->
                 vurderAldersvilkårForNedsattArbeidsevne(fødselsdato, vilkårperiode)
             MålgruppeType.OMSTILLINGSSTØNAD -> vurderAldersvilkårForOmstillingsstønad(fødselsdato, vilkårperiode)
             else -> feil("Aldersvilkår vurderes ikke for målgruppe: ${vilkårperiode.type}")

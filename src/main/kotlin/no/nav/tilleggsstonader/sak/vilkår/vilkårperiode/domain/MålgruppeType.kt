@@ -82,6 +82,7 @@ enum class MålgruppeType(
             AAP,
             UFØRETRYGD,
             NEDSATT_ARBEIDSEVNE,
+            AKTIVITETSPENGER,
             OMSTILLINGSSTØNAD,
             -> true
 
@@ -93,7 +94,6 @@ enum class MålgruppeType(
             KVALIFISERINGSSTØNAD,
             INNSATT_I_FENGSEL,
             UNGDOMSPROGRAMMET,
-            AKTIVITETSPENGER,
             -> false
         }
 

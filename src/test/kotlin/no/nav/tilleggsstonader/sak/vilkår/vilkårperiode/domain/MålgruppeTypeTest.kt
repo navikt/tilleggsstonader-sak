@@ -49,6 +49,11 @@ class MålgruppeTypeTest {
         assertThat(MålgruppeType.AKTIVITETSPENGER.kanBrukesForStønad(Stønadstype.DAGLIG_REISE_TSR)).isFalse
     }
 
+    @Test
+    fun `aktivitetspenger skal vurdere aldersvilkår`() {
+        assertThat(MålgruppeType.AKTIVITETSPENGER.skalVurdereAldersvilkår()).isTrue
+    }
+
     @Nested
     inner class MappingTilFaktiskMålgruppe {
         @Test

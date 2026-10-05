@@ -46,6 +46,14 @@ class AldersvilkårVurderingTest {
     }
 
     @Test
+    fun `Gyldige perioder med målgruppe AKTIVITETSPENGER skal gi svar JA`() {
+        val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.AKTIVITETSPENGER)
+        val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag()
+
+        assertThat(vurderAldersvilkår(målgruppe, fødselFaktaGrunnlag)).isEqualTo(SvarJaNei.JA)
+    }
+
+    @Test
     fun `Periode med målgruppe OVERGANGSSTØNAD skal kaste feil`() {
         val målgruppe = dummyVilkårperiodeMålgruppe().copy(type = MålgruppeType.OVERGANGSSTØNAD)
         val fødselFaktaGrunnlag = lagFødselFaktaGrunnlag()

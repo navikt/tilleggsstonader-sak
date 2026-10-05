@@ -4,13 +4,14 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagFødselFaktaGrunnlag
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetDagligReiseTsr
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AldersvilkårVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdagerNullable
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurderingUtil.takeIfFakta
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.IngenVurderinger
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsrDto
@@ -26,7 +27,7 @@ class FaktaOgVurderingMapperTest {
     private val behandlingId = BehandlingId.random()
 
     @Test
-    fun `aktivitetspenger har ingen vurderinger`() {
+    fun `aktivitetspenger har aldersvilkårsvurdering`() {
         val målgruppe =
             LagreVilkårperiode(
                 behandlingId = behandlingId,
@@ -40,10 +41,11 @@ class FaktaOgVurderingMapperTest {
             mapFaktaOgSvarDto(
                 vilkårperiode = målgruppe,
                 stønadstype = Stønadstype.DAGLIG_REISE_TSO,
-                fødselFaktaGrunnlag = null,
+                fødselFaktaGrunnlag = lagFødselFaktaGrunnlag(),
             )
 
-        assertThat(faktaOgVurdering.vurderinger).isSameAs(IngenVurderinger)
+        assertThat(faktaOgVurdering.vurderinger).isInstanceOf(AldersvilkårVurdering::class.java)
+        assertThat((faktaOgVurdering.vurderinger as AldersvilkårVurdering).aldersvilkår.svar).isEqualTo(SvarJaNei.JA)
         assertThat(faktaOgVurdering.utledResultat()).isEqualTo(ResultatVilkårperiode.OPPFYLT)
     }
 

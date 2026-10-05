@@ -41,7 +41,7 @@ data class NedsattArbeidsevneDagligReiseTso(
 }
 
 data class AktivitetspengerDagligReiseTso(
-    override val vurderinger: IngenVurderinger = IngenVurderinger,
+    override val vurderinger: VurderingAktivitetspenger,
 ) : MålgruppeDagligReiseTso {
     override val type: MålgruppeDagligReiseTsoType = MålgruppeDagligReiseTsoType.AKTIVITETSPENGER_DAGLIG_REISE_TSO
     override val fakta: IngenFakta = IngenFakta

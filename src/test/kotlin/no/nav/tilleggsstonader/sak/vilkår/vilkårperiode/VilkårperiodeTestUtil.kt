@@ -58,6 +58,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.UtdanningReiseTilSamlingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAP
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAAPLæremidler
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAktivitetspenger
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarRettTilUtstyrsstipend
@@ -169,7 +170,10 @@ object VilkårperiodeTestUtil {
                         ),
                 )
 
-            MålgruppeType.AKTIVITETSPENGER -> AktivitetspengerPassAvBarn()
+            MålgruppeType.AKTIVITETSPENGER ->
+                AktivitetspengerPassAvBarn(
+                    vurderinger = VurderingAktivitetspenger(aldersvilkår = aldersvilkår),
+                )
 
             MålgruppeType.DAGPENGER -> DagpengerDagligReiseTsr()
             MålgruppeType.TILTAKSPENGER -> TiltakspengerDagligReiseTsr()
@@ -226,7 +230,10 @@ object VilkårperiodeTestUtil {
                         ),
                 )
 
-            MålgruppeType.AKTIVITETSPENGER -> AktivitetspengerLæremidler()
+            MålgruppeType.AKTIVITETSPENGER ->
+                AktivitetspengerLæremidler(
+                    vurderinger = VurderingAktivitetspenger(aldersvilkår = aldersvilkår),
+                )
 
             MålgruppeType.DAGPENGER -> DagpengerDagligReiseTsr()
             MålgruppeType.TILTAKSPENGER -> TiltakspengerDagligReiseTsr()
