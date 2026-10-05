@@ -35,6 +35,7 @@ import java.time.LocalDateTime
     JsonSubTypes.Type(BehandlingFaktaDagligReiseDto::class, name = "DAGLIG_REISE_TSO"),
     JsonSubTypes.Type(BehandlingFaktaDagligReiseDto::class, name = "DAGLIG_REISE_TSR"),
     JsonSubTypes.Type(BehandlingFaktaReiseTilSamlingDto::class, name = "REISE_TIL_SAMLING_TSO"),
+    JsonSubTypes.Type(BehandlingFaktaReiseTilSamlingDto::class, name = "REISE_TIL_SAMLING_TSR"),
     JsonSubTypes.Type(
         BehandlingFaktaReiseOppstartAvslutningHjemreiseDto::class,
         name = "REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO",
