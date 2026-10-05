@@ -186,7 +186,7 @@ class UtførSatsjusteringService(
                         InnvilgelseReiseTilSamlingTsrRequest(
                             vedtaksperioder =
                                 vedtaksperioder.map {
-                                    VedtaksperiodeTsrDto(id = it.id, fom = it.fom, tom = it.tom)
+                                    VedtaksperiodeTsrDto(id = it.id, fom = it.fom, tom = it.tom, målgruppeType = it.målgruppeType)
                                 },
                         ),
                     satsjusteringFra = finnDatoForSatsjustering(revurdering),
