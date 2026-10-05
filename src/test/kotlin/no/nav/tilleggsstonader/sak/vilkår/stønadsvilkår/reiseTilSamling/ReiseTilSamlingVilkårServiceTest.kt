@@ -482,7 +482,7 @@ class ReiseTilSamlingVilkårServiceTest {
                     begrunnelse = "Drivstoff og slitasje",
                     aktivitetId = null,
                 )
-            }.withMessage("Reiseavstand må være et tall større enn 0.")
+            }.withMessage("Reiseavstand må være et tall større enn 0")
     }
 
     @Test
