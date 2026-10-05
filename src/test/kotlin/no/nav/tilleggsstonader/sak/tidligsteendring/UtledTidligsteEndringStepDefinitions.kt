@@ -263,7 +263,7 @@ class UtledTidligsteEndringStepDefinitions {
             }.toMap()
 
     private fun mapPrivatBilFakta(
-        rad: Map<String, String>,
+        rad: Map<String?, String?>,
         reisenr: Int,
     ) = FaktaDagligReisePrivatBil(
         reiseId = reiseIdFraReisenr(reisenr),
@@ -349,7 +349,7 @@ class UtledTidligsteEndringStepDefinitions {
             )
         }
 
-    private fun mapFaktaOgVurderingAktivitet(rad: Map<String, String>): AktivitetFaktaOgVurdering {
+    private fun mapFaktaOgVurderingAktivitet(rad: Map<String?, String?>): AktivitetFaktaOgVurdering {
         val stønadstype: Stønadstype = parseEnum(VilkårperiodeNøkler.STØNADSTYPE, rad)
 
         return when (stønadstype) {

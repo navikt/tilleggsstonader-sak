@@ -79,7 +79,7 @@ fun dummyBehandling(
 
 fun mapTilVilkårDagligReise(
     typeVilkår: TypeDagligReise,
-    rad: Map<String, String>,
+    rad: Map<String?, String?>,
     aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId.random(),
 ): LagreVilkårDagligReise =
     LagreVilkårDagligReise(
@@ -91,7 +91,7 @@ fun mapTilVilkårDagligReise(
 
 private fun mapFakta(
     type: TypeDagligReise,
-    rad: Map<String, String>,
+    rad: Map<String?, String?>,
     aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId.random(),
 ): FaktaDagligReise =
     when (type) {
@@ -100,7 +100,7 @@ private fun mapFakta(
         else -> FaktaUbestemtType(reiseId = dummyReiseId, adresse = "Tiltaksveien 1")
     }
 
-fun mapFaktaOffentligTransport(rad: Map<String, String>): FaktaOffentligTransport =
+fun mapFaktaOffentligTransport(rad: Map<String?, String?>): FaktaOffentligTransport =
     FaktaOffentligTransport(
         reiseId = dummyReiseId,
         adresse = "Tiltaksveien 1",
@@ -120,7 +120,7 @@ fun mapFaktaOffentligTransport(rad: Map<String, String>): FaktaOffentligTranspor
     )
 
 fun mapFaktaPrivatBil(
-    rad: Map<String, String>,
+    rad: Map<String?, String?>,
     aktivitetId: VilkårperiodeGlobalId = VilkårperiodeGlobalId.random(),
 ): FaktaPrivatBil =
     FaktaPrivatBil(

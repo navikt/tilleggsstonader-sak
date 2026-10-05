@@ -22,7 +22,7 @@ plugins {
     application
 
     kotlin("jvm") version "2.4.10"
-    id("com.diffplug.spotless") version "8.10.2"
+    id("com.diffplug.spotless") version "8.10.3"
     id("io.github.ben-manes.versions") version "0.64.0"
     id("se.patrikerdes.use-latest-versions") version "0.2.19"
 
@@ -130,7 +130,7 @@ dependencies {
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("no.nav.tilleggsstonader-libs:test-util:$tilleggsstønaderLibsVersion")
 
-    testImplementation(platform("io.cucumber:cucumber-bom:7.34.8"))
+    testImplementation(platform("io.cucumber:cucumber-bom:8.0.2"))
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
 

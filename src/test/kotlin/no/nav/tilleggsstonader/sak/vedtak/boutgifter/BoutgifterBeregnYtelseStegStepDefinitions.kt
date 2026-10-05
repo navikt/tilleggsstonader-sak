@@ -211,7 +211,7 @@ class BoutgifterBeregnYtelseStegStepDefinitions {
         }
 
     private fun mapDelvilkår(
-        rad: Map<String, String>,
+        rad: Map<String?, String?>,
         typeBoutgift: TypeBoutgift,
     ): List<DelvilkårDto> {
         val harHøyereUtgifter =
