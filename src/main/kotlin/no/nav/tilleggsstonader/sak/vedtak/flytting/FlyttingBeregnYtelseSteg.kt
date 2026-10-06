@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.flytting
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.feil.feil
-import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.utbetaling.simulering.SimuleringService
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
@@ -36,16 +35,16 @@ class FlyttingBeregnYtelseSteg(
         vedtak: InnvilgelseFlyttingRequest,
         satsjusteringFra: LocalDate,
     ) {
-        feil("Satsjustering for flytting støttes ikke i PoC-en")
+        feil(
+            "Det ble forsøkt å lagre vedtak for satsjustering for behandling med id ${saksbehandling.id}. " +
+                "Satsjustering for flytting er ikke implementert",
+        )
     }
 
     override fun lagreVedtak(
         saksbehandling: Saksbehandling,
         vedtak: InnvilgelseFlyttingRequest,
     ) {
-        feilHvis(saksbehandling.forrigeIverksatteBehandlingId != null) {
-            "Revurdering av flyttevedtak støttes ikke i PoC-en"
-        }
         val vedtaksperioder = vedtak.vedtaksperioder().sorted()
         val beregningsresultat = beregningService.beregn(saksbehandling, vedtaksperioder)
         val beregningsplan =

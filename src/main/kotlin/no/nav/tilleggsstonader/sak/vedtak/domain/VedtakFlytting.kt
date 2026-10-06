@@ -27,5 +27,3 @@ data class InnvilgelseFlytting(
     Innvilgelse {
     override val type: TypeVedtaksdata = TypeVedtakFlytting.INNVILGELSE_FLYTTING
 }
-
-// Avslag, opphør og revurdering støttes ikke i PoC-en.

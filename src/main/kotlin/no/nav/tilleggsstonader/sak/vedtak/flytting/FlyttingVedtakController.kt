@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegFerdigstiltResponse
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegService
-import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.behandlingsflyt.tilStegFerdigstiltResponse
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
@@ -86,7 +85,6 @@ class FlyttingVedtakController(
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerStønadstype(behandling, forventetStønadstype)
-        validerPoCOmfång(behandling)
         val vedtaksperioder = vedtak.vedtaksperioder()
         beregningsplanUtleder.utledForInnvilgelse(behandling, vedtaksperioder)
         return beregningService.beregn(behandling, vedtaksperioder).tilDto()
@@ -110,15 +108,6 @@ class FlyttingVedtakController(
     ) {
         brukerfeilHvisIkke(behandling.stønadstype == forventetStønadstype) {
             "Forventet stønadstype=$forventetStønadstype for flytteendepunkt"
-        }
-    }
-
-    private fun validerPoCOmfång(behandling: Saksbehandling) {
-        brukerfeilHvisIkke(behandling.steg == StegType.BEREGNE_YTELSE) {
-            "Flyttevedtak kan bare beregnes på steget BEREGNE_YTELSE"
-        }
-        brukerfeilHvisIkke(behandling.forrigeIverksatteBehandlingId == null) {
-            "Revurdering av flyttevedtak støttes ikke i PoC-en"
         }
     }
 }

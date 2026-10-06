@@ -138,6 +138,13 @@ enum class AndelstypeDvh {
     REISE_OPPSTART_TILTAK_HØYERE_UTDANNING,
     REISE_OPPSTART_TILTAK_JOBBKLUBB,
     REISE_OPPSTART_TILTAK_OPPFØLGING,
+
+    FLYTTING_AAP,
+    FLYTTING_ENSLIG_FORSØRGER,
+    FLYTTING_ETTERLATTE,
+    FLYTTING_AKTIVITETSPENGER,
+    FLYTTING_ARBEIDSSØKER,
+
     ;
 
     companion object {
@@ -208,12 +215,12 @@ enum class AndelstypeDvh {
                 TypeAndel.REISE_OPPSTART_TILTAK_HØYERE_UTDANNING -> REISE_OPPSTART_TILTAK_HØYERE_UTDANNING
                 TypeAndel.REISE_OPPSTART_TILTAK_JOBBKLUBB -> REISE_OPPSTART_TILTAK_JOBBKLUBB
                 TypeAndel.REISE_OPPSTART_TILTAK_OPPFØLGING -> REISE_OPPSTART_TILTAK_OPPFØLGING
-                TypeAndel.FLYTTING_AAP,
-                TypeAndel.FLYTTING_ENSLIG_FORSØRGER,
-                TypeAndel.FLYTTING_ETTERLATTE,
-                TypeAndel.FLYTTING_AKTIVITETSPENGER,
-                TypeAndel.FLYTTING_ARBEIDSSØKER,
-                -> error("Statistikk for flytteandeler støttes ikke i PoC-en")
+                // TODO Skal disse faktisk legges inn allerede?
+                TypeAndel.FLYTTING_AAP -> FLYTTING_AAP
+                TypeAndel.FLYTTING_ENSLIG_FORSØRGER -> FLYTTING_ENSLIG_FORSØRGER
+                TypeAndel.FLYTTING_ETTERLATTE -> FLYTTING_ETTERLATTE
+                TypeAndel.FLYTTING_AKTIVITETSPENGER -> FLYTTING_AKTIVITETSPENGER
+                TypeAndel.FLYTTING_ARBEIDSSØKER -> FLYTTING_ARBEIDSSØKER
 
                 TypeAndel.UGYLDIG -> throw Error("Trenger ikke statistikk på ugyldige betalinger")
             }
