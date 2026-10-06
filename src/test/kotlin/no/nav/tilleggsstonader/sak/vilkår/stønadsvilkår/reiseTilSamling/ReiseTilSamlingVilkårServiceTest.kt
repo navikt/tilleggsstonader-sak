@@ -34,6 +34,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeA
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import java.time.LocalDate
 
 class ReiseTilSamlingVilkårServiceTest {
@@ -458,17 +459,30 @@ class ReiseTilSamlingVilkårServiceTest {
     }
 
     @Test
-    fun `skal feile når reiseavstand er mindre enn 30 km`() {
+    fun `skal tillate at reiseavstand er under 30 km`() {
+        assertDoesNotThrow {
+            FaktaPrivatBil(
+                reiseId = dummyReiseId,
+                adresse = "Samlingsveien 1",
+                reiseavstand = 20.toBigDecimal(),
+                begrunnelse = "Drivstoff og slitasje",
+                aktivitetId = null,
+            )
+        }
+    }
+
+    @Test
+    fun `skal feile når reiseavstand er et negativt tall`() {
         assertThatExceptionOfType(ApiFeil::class.java)
             .isThrownBy {
                 FaktaPrivatBil(
                     reiseId = dummyReiseId,
                     adresse = "Samlingsveien 1",
-                    reiseavstand = 20.toBigDecimal(),
+                    reiseavstand = (-1).toBigDecimal(),
                     begrunnelse = "Drivstoff og slitasje",
                     aktivitetId = null,
                 )
-            }.withMessage("Reiseavstand kan ikke være mindre enn 30 km")
+            }.withMessage("Reiseavstand må være et tall større enn 0")
     }
 
     @Test

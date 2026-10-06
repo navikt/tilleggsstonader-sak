@@ -1,5 +1,13 @@
 {
   "fakta": { },
   "type": "AKTIVITETSPENGER_LÆREMIDLER",
-  "vurderinger": { }
+  "vurderinger": {
+    "aldersvilkår": {
+      "resultat": "OPPFYLT",
+      "svar": "JA",
+      "vurderingFaktaEtterlevelse": {
+        "fødselsdato": "2000-01-01"
+      }
+    }
+  }
 }

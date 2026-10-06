@@ -207,7 +207,7 @@ class SøknadskjemaBoutgifterMapper(
                 delerBoutgifter = null,
                 delerBoutgifterNy = fordelingUtgifter?.let { mapDelerBoutgifterFlereSteder(it.delerBoutgifter) },
                 andelUtgifterBolig = null,
-                harHoyereUtgifterPaNyttBosted = mapJaNei(it.harHoyereUtgifterPaNyttBosted),
+                harHoyereUtgifterPaNyttBosted = it.harHoyereUtgifterPaNyttBosted?.let(::mapJaNei),
                 mottarBostotte = fordelingUtgifter?.mottarBostotte?.let(::mapJaNei),
                 andelUtgifterBoligHjemsted = fordelingUtgifter?.andelUtgifterBoligHjemsted,
                 andelUtgifterBoligAktivitetssted = fordelingUtgifter?.andelUtgifterBoligAktivitetssted,

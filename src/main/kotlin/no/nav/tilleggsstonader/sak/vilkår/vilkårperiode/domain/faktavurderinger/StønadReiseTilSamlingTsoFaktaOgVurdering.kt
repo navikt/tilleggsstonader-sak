@@ -41,7 +41,7 @@ data class NedsattArbeidsevneReiseTilSamlingTso(
 }
 
 data class AktivitetspengerReiseTilSamlingTso(
-    override val vurderinger: IngenVurderinger = IngenVurderinger,
+    override val vurderinger: VurderingAktivitetspenger,
 ) : MålgruppeReiseTilSamlingTso {
     override val type: MålgruppeReiseTilSamlingTsoType =
         MålgruppeReiseTilSamlingTsoType.AKTIVITETSPENGER_REISE_TIL_SAMLING_TSO

@@ -49,6 +49,11 @@ class MålgruppeTypeTest {
         assertThat(MålgruppeType.AKTIVITETSPENGER.kanBrukesForStønad(Stønadstype.DAGLIG_REISE_TSR)).isFalse
     }
 
+    @Test
+    fun `aktivitetspenger skal vurdere aldersvilkår`() {
+        assertThat(MålgruppeType.AKTIVITETSPENGER.skalVurdereAldersvilkår()).isTrue
+    }
+
     @Nested
     inner class MappingTilFaktiskMålgruppe {
         @Test
@@ -68,7 +73,7 @@ class MålgruppeTypeTest {
                             MålgruppeType.TILTAKSPENGER -> FaktiskMålgruppe.ARBEIDSSØKER
                             MålgruppeType.KVALIFISERINGSSTØNAD -> FaktiskMålgruppe.ARBEIDSSØKER
                             MålgruppeType.INNSATT_I_FENGSEL -> FaktiskMålgruppe.ARBEIDSSØKER
-                            MålgruppeType.UNGDOMSPROGRAMMET -> FaktiskMålgruppe.ARBEIDSSØKER
+                            MålgruppeType.UNGDOMSPROGRAMMET -> FaktiskMålgruppe.UNGDOMSPROGRAMMET
                             MålgruppeType.AKTIVITETSPENGER -> FaktiskMålgruppe.AKTIVITETSPENGER
                         }
                 }
