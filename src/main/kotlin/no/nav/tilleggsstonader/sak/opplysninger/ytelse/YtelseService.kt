@@ -35,12 +35,8 @@ class YtelseService(
                 TypeYtelsePeriode.OMSTILLINGSSTØNAD,
                 TypeYtelsePeriode.TILTAKSPENGER_TPSAK,
                 TypeYtelsePeriode.TILTAKSPENGER_ARENA,
-            ) +
-                if (unleashService.isEnabled(Toggle.KAN_BRUKE_MÅLGRUPPE_AKTIVITETSPENGER)) {
-                    listOf(TypeYtelsePeriode.AKTIVITETSPENGER)
-                } else {
-                    emptyList()
-                }
+                TypeYtelsePeriode.AKTIVITETSPENGER,
+            ).filtrerAktivitetspengerHvisDeaktivert()
 
         return ytelseClient
             .hentYtelser(
@@ -118,9 +114,16 @@ class YtelseService(
         tom: LocalDate,
     ): YtelsePerioderDto {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        val typer = finnRelevanteYtelsesTyper(behandling.stønadstype)
+        val typer = finnRelevanteYtelsesTyper(behandling.stønadstype).filtrerAktivitetspengerHvisDeaktivert()
         return hentYtelser(behandling.ident, fom, tom, typer)
     }
+
+    private fun List<TypeYtelsePeriode>.filtrerAktivitetspengerHvisDeaktivert(): List<TypeYtelsePeriode> =
+        if (unleashService.isEnabled(Toggle.KAN_BRUKE_MÅLGRUPPE_AKTIVITETSPENGER)) {
+            this
+        } else {
+            filterNot { it == TypeYtelsePeriode.AKTIVITETSPENGER }
+        }
 
     fun hentYtelser(
         ident: String,
