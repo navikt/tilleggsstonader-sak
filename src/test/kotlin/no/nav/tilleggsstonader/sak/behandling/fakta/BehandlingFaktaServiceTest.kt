@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
+import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.AktivitetTypeUtdanning
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Transportmiddel
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
@@ -18,6 +19,7 @@ import no.nav.tilleggsstonader.sak.infrastruktur.mocks.KodeverkServiceUtil.mocke
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.faktagrunnlag.GeneriskFaktaGrunnlagTestUtil
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.TypeUtdanning
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
@@ -28,6 +30,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.DrosjeIn
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Reisemåte
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Samling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.SkjemaReiseTilSamling
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.TilleggsopplysningerAnnenAktivitet
 import no.nav.tilleggsstonader.sak.util.FileUtil.assertFileJsonIsEqual
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagFaktaGrunnlagPersonopplysninger
 import no.nav.tilleggsstonader.sak.util.GrunnlagsdataUtil.lagGrunnlagsdata
@@ -45,6 +48,8 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import java.time.LocalDate
 
 internal class BehandlingFaktaServiceTest {
@@ -297,81 +302,9 @@ internal class BehandlingFaktaServiceTest {
     fun `skal mappe fakta for reise til samling`() {
         every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns lagGrunnlagsdata()
         every { søknadService.hentSøknadReiseTilSamling(behandlingId) } returns
-            SøknadReiseTilSamling(
-                journalpostId = "journalpostId",
-                mottattTidspunkt = java.time.LocalDateTime.now(),
-                språk = no.nav.tilleggsstonader.kontrakter.felles.Språkkode.NB,
-                sporbar = Sporbar(),
-                data =
-                    SkjemaReiseTilSamling(
-                        hovedytelse =
-                            HovedytelseAvsnitt(
-                                hovedytelse = listOf(Hovedytelse.AAP),
-                                harNedsattArbeidsevne = null,
-                                arbeidOgOpphold = null,
-                            ),
-                        aktivitet =
-                            AktivitetReiseTilSamlingAvsnitt(
-                                aktiviteter = listOf(ValgtAktivitet(id = "1", label = "Tiltak")),
-                                annenAktivitet = AnnenAktivitetType.TILTAK,
-                                lønnetAktivitet = JaNei.NEI,
-                                tilleggsopplysningerAnnenAktivitet = null,
-                                annenAktivitetTypeUtdanning = null,
-                            ),
-                        samlinger =
-                            listOf(
-                                Samling(
-                                    fom = 12 februar 2026,
-                                    tom = 14 februar 2026,
-                                    erObligatorisk = JaNei.JA,
-                                    adresse =
-                                        Adresse(
-                                            gyldigFraOgMed = null,
-                                            adresse = "Mimes vei 1",
-                                            postnummer = "5132",
-                                            poststed = "Nyborg",
-                                            landkode = "NO",
-                                        ),
-                                    antallKilometerEnVei = "42",
-                                    reisemåte =
-                                        Reisemåte(
-                                            hvilkeTransportmidlerBleBenyttet = listOf(Transportmiddel.DROSJE),
-                                            unntakFraOffentligTransport = null,
-                                            unntakFraPrivatBil = null,
-                                            offentligTransport = null,
-                                            privatBil = null,
-                                            drosje = DrosjeInfo(harTTKort = JaNei.JA),
-                                        ),
-                                ),
-                                Samling(
-                                    fom = 10 mars 2026,
-                                    tom = 12 mars 2026,
-                                    erObligatorisk = JaNei.JA,
-                                    adresse =
-                                        Adresse(
-                                            gyldigFraOgMed = null,
-                                            adresse = "Mimes vei 1",
-                                            postnummer = "5132",
-                                            poststed = "Nyborg",
-                                            landkode = "NO",
-                                        ),
-                                    antallKilometerEnVei = "42",
-                                ),
-                            ),
-                        avreiseadresse =
-                            Avreiseadresse(
-                                skalReiseFraFolkeregistrertAdresse = JaNei.JA,
-                                adresseDetSkalReisesFra =
-                                    Adresse(
-                                        gyldigFraOgMed = null,
-                                        adresse = "Mimes vei 1",
-                                        postnummer = "5132",
-                                        poststed = "Nyborg",
-                                        landkode = "NO",
-                                    ),
-                            ),
-                        dokumentasjon = emptyList(),
-                    ),
+            søknadReiseTilSamling(
+                tilleggsopplysningerAnnenAktivitet = null,
+                annenAktivitetTypeUtdanning = null,
             )
 
         every { fagsakService.hentFagsakForBehandling(behandlingId) } returns
@@ -397,7 +330,202 @@ internal class BehandlingFaktaServiceTest {
                 ?.drosje
                 ?.harTTKort,
         ).isEqualTo(JaNei.JA)
+
+        // Begge tilleggsinput for "dekkes utgiften av andre" er null => ingen dekkesUtgiftenAvAndre
+        assertThat(
+            fakta.aktiviteter.aktivitet.søknadsgrunnlag
+                ?.dekkesUtgiftenAvAndre,
+        ).isNull()
     }
+
+    @Test
+    fun `skal mappe dekkesUtgiftenAvAndre for reise til samling når kun tilleggsopplysninger er utfylt`() {
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns lagGrunnlagsdata()
+        every { søknadService.hentSøknadReiseTilSamling(behandlingId) } returns
+            søknadReiseTilSamling(
+                tilleggsopplysningerAnnenAktivitet =
+                    TilleggsopplysningerAnnenAktivitet(
+                        erLærlingEllerLiknende = JaNei.JA,
+                        fårDekketReise = JaNei.NEI,
+                        erUnder25År = JaNei.JA,
+                        måBetaleForReiseTilSkole = JaNei.NEI,
+                    ),
+                annenAktivitetTypeUtdanning = null,
+            )
+        every { fagsakService.hentFagsakForBehandling(behandlingId) } returns
+            fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO)
+
+        val fakta = service.hentFakta(behandlingId) as BehandlingFaktaReiseTilSamlingDto
+
+        val dekkesUtgiftenAvAndre =
+            fakta.aktiviteter.aktivitet.søknadsgrunnlag
+                ?.dekkesUtgiftenAvAndre
+        assertThat(dekkesUtgiftenAvAndre?.typeUtdanning).isNull()
+        assertThat(dekkesUtgiftenAvAndre?.lærling).isEqualTo(JaNei.JA)
+        assertThat(dekkesUtgiftenAvAndre?.arbeidsgiverDekkerUtgift).isEqualTo(JaNei.NEI)
+        assertThat(dekkesUtgiftenAvAndre?.erUnder25år).isEqualTo(JaNei.JA)
+        assertThat(dekkesUtgiftenAvAndre?.betalerForReisenTilSkolenSelv).isEqualTo(JaNei.NEI)
+        assertThat(dekkesUtgiftenAvAndre?.lønnetAktivitet).isEqualTo(JaNei.NEI)
+    }
+
+    @Test
+    fun `skal mappe dekkesUtgiftenAvAndre for reise til samling når kun type utdanning er utfylt`() {
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns lagGrunnlagsdata()
+        every { søknadService.hentSøknadReiseTilSamling(behandlingId) } returns
+            søknadReiseTilSamling(
+                tilleggsopplysningerAnnenAktivitet = null,
+                annenAktivitetTypeUtdanning = AktivitetTypeUtdanning.VIDEREGÅENDE,
+            )
+        every { fagsakService.hentFagsakForBehandling(behandlingId) } returns
+            fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO)
+
+        val fakta = service.hentFakta(behandlingId) as BehandlingFaktaReiseTilSamlingDto
+
+        val dekkesUtgiftenAvAndre =
+            fakta.aktiviteter.aktivitet.søknadsgrunnlag
+                ?.dekkesUtgiftenAvAndre
+        assertThat(dekkesUtgiftenAvAndre?.typeUtdanning).isEqualTo(TypeUtdanning.VIDEREGÅENDE)
+        assertThat(dekkesUtgiftenAvAndre?.lærling).isNull()
+        assertThat(dekkesUtgiftenAvAndre?.arbeidsgiverDekkerUtgift).isNull()
+        assertThat(dekkesUtgiftenAvAndre?.erUnder25år).isNull()
+        assertThat(dekkesUtgiftenAvAndre?.betalerForReisenTilSkolenSelv).isNull()
+        assertThat(dekkesUtgiftenAvAndre?.lønnetAktivitet).isEqualTo(JaNei.NEI)
+    }
+
+    @Test
+    fun `skal mappe dekkesUtgiftenAvAndre for reise til samling når både tilleggsopplysninger og type utdanning er utfylt`() {
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns lagGrunnlagsdata()
+        every { søknadService.hentSøknadReiseTilSamling(behandlingId) } returns
+            søknadReiseTilSamling(
+                tilleggsopplysningerAnnenAktivitet =
+                    TilleggsopplysningerAnnenAktivitet(
+                        erLærlingEllerLiknende = JaNei.JA,
+                        fårDekketReise = JaNei.JA,
+                        erUnder25År = JaNei.NEI,
+                        måBetaleForReiseTilSkole = JaNei.JA,
+                    ),
+                annenAktivitetTypeUtdanning = AktivitetTypeUtdanning.OPPLÆRING_FOR_VOKSNE,
+            )
+        every { fagsakService.hentFagsakForBehandling(behandlingId) } returns
+            fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO)
+
+        val fakta = service.hentFakta(behandlingId) as BehandlingFaktaReiseTilSamlingDto
+
+        val dekkesUtgiftenAvAndre =
+            fakta.aktiviteter.aktivitet.søknadsgrunnlag
+                ?.dekkesUtgiftenAvAndre
+        assertThat(dekkesUtgiftenAvAndre?.typeUtdanning).isEqualTo(TypeUtdanning.OPPLÆRING_FOR_VOKSNE)
+        assertThat(dekkesUtgiftenAvAndre?.lærling).isEqualTo(JaNei.JA)
+        assertThat(dekkesUtgiftenAvAndre?.arbeidsgiverDekkerUtgift).isEqualTo(JaNei.JA)
+        assertThat(dekkesUtgiftenAvAndre?.erUnder25år).isEqualTo(JaNei.NEI)
+        assertThat(dekkesUtgiftenAvAndre?.betalerForReisenTilSkolenSelv).isEqualTo(JaNei.JA)
+        assertThat(dekkesUtgiftenAvAndre?.lønnetAktivitet).isEqualTo(JaNei.NEI)
+    }
+
+    @ParameterizedTest
+    @EnumSource(AktivitetTypeUtdanning::class)
+    fun `skal mappe alle verdier av AktivitetTypeUtdanning til riktig TypeUtdanning`(kildeVerdi: AktivitetTypeUtdanning) {
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns lagGrunnlagsdata()
+        every { søknadService.hentSøknadReiseTilSamling(behandlingId) } returns
+            søknadReiseTilSamling(
+                tilleggsopplysningerAnnenAktivitet = null,
+                annenAktivitetTypeUtdanning = kildeVerdi,
+            )
+        every { fagsakService.hentFagsakForBehandling(behandlingId) } returns
+            fagsak(stønadstype = Stønadstype.REISE_TIL_SAMLING_TSO)
+
+        val fakta = service.hentFakta(behandlingId) as BehandlingFaktaReiseTilSamlingDto
+
+        val typeUtdanning =
+            fakta.aktiviteter.aktivitet.søknadsgrunnlag
+                ?.dekkesUtgiftenAvAndre
+                ?.typeUtdanning
+        assertThat(typeUtdanning).isEqualTo(TypeUtdanning.valueOf(kildeVerdi.name))
+    }
+
+    /**
+     * Bygger en [SøknadReiseTilSamling] med fast innhold for samlinger/avreiseadresse,
+     * men konfigurerbare tilleggsinput for "dekkes utgiften av andre"-mappingen.
+     */
+    private fun søknadReiseTilSamling(
+        tilleggsopplysningerAnnenAktivitet: TilleggsopplysningerAnnenAktivitet?,
+        annenAktivitetTypeUtdanning: AktivitetTypeUtdanning?,
+    ) = SøknadReiseTilSamling(
+        journalpostId = "journalpostId",
+        mottattTidspunkt = java.time.LocalDateTime.now(),
+        språk = no.nav.tilleggsstonader.kontrakter.felles.Språkkode.NB,
+        sporbar = Sporbar(),
+        data =
+            SkjemaReiseTilSamling(
+                hovedytelse =
+                    HovedytelseAvsnitt(
+                        hovedytelse = listOf(Hovedytelse.AAP),
+                        harNedsattArbeidsevne = null,
+                        arbeidOgOpphold = null,
+                    ),
+                aktivitet =
+                    AktivitetReiseTilSamlingAvsnitt(
+                        aktiviteter = listOf(ValgtAktivitet(id = "1", label = "Tiltak")),
+                        annenAktivitet = AnnenAktivitetType.TILTAK,
+                        lønnetAktivitet = JaNei.NEI,
+                        tilleggsopplysningerAnnenAktivitet = tilleggsopplysningerAnnenAktivitet,
+                        annenAktivitetTypeUtdanning = annenAktivitetTypeUtdanning,
+                    ),
+                samlinger =
+                    listOf(
+                        Samling(
+                            fom = 12 februar 2026,
+                            tom = 14 februar 2026,
+                            erObligatorisk = JaNei.JA,
+                            adresse =
+                                Adresse(
+                                    gyldigFraOgMed = null,
+                                    adresse = "Mimes vei 1",
+                                    postnummer = "5132",
+                                    poststed = "Nyborg",
+                                    landkode = "NO",
+                                ),
+                            antallKilometerEnVei = "42",
+                            reisemåte =
+                                Reisemåte(
+                                    hvilkeTransportmidlerBleBenyttet = listOf(Transportmiddel.DROSJE),
+                                    unntakFraOffentligTransport = null,
+                                    unntakFraPrivatBil = null,
+                                    offentligTransport = null,
+                                    privatBil = null,
+                                    drosje = DrosjeInfo(harTTKort = JaNei.JA),
+                                ),
+                        ),
+                        Samling(
+                            fom = 10 mars 2026,
+                            tom = 12 mars 2026,
+                            erObligatorisk = JaNei.JA,
+                            adresse =
+                                Adresse(
+                                    gyldigFraOgMed = null,
+                                    adresse = "Mimes vei 1",
+                                    postnummer = "5132",
+                                    poststed = "Nyborg",
+                                    landkode = "NO",
+                                ),
+                            antallKilometerEnVei = "42",
+                        ),
+                    ),
+                avreiseadresse =
+                    Avreiseadresse(
+                        skalReiseFraFolkeregistrertAdresse = JaNei.JA,
+                        adresseDetSkalReisesFra =
+                            Adresse(
+                                gyldigFraOgMed = null,
+                                adresse = "Mimes vei 1",
+                                postnummer = "5132",
+                                poststed = "Nyborg",
+                                landkode = "NO",
+                            ),
+                    ),
+                dokumentasjon = emptyList(),
+            ),
+    )
 
     @Test
     fun `skal mappe minimal fakta for reise ved oppstart, avslutning og hjemreise`() {
