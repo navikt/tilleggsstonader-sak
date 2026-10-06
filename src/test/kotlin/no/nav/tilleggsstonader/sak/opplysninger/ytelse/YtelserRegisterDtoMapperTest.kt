@@ -4,6 +4,8 @@ import no.nav.tilleggsstonader.kontrakter.ytelse.EnsligForsørgerStønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.GjenståendeDagerFraTelleverk
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.kildeResultatAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.kildeResultatEnsligForsørger
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.periodeAAP
@@ -17,6 +19,20 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate.now
 
 class YtelserRegisterDtoMapperTest {
+    @Test
+    fun `skal mappe aktivitetspengerperioder til registervisning`() {
+        val periode = YtelsePeriode.Aktivitetspenger(fom = 1 januar 2026, tom = 31 januar 2026)
+
+        val dto = ytelsePerioderDto(perioder = listOf(periode)).tilDto()
+
+        assertThat(dto.perioder).containsExactly(
+            YtelsePeriodeRegisterDto.Aktivitetspenger(
+                fom = periode.fom,
+                tom = periode.tom,
+            ),
+        )
+    }
+
     @Test
     fun `skal mappe gjenstående dager fra telleverk`() {
         val gjenståendeDagerFraTelleverk = GjenståendeDagerFraTelleverk(dato = now(), antallDager = 5)

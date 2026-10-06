@@ -14,6 +14,7 @@ object YtelserUtil {
                     TypeYtelsePeriode.AAP,
                     TypeYtelsePeriode.ENSLIG_FORSØRGER,
                     TypeYtelsePeriode.OMSTILLINGSSTØNAD,
+                    TypeYtelsePeriode.AKTIVITETSPENGER,
                 )
             Stønadstype.REISE_TIL_SAMLING_TSO,
             Stønadstype.REISE_TIL_SAMLING_TSR,
@@ -31,6 +32,7 @@ object YtelserUtil {
                     TypeYtelsePeriode.TILTAKSPENGER_TPSAK,
                     TypeYtelsePeriode.TILTAKSPENGER_ARENA,
                     TypeYtelsePeriode.DAGPENGER,
+                    TypeYtelsePeriode.AKTIVITETSPENGER,
                 )
         }
 }

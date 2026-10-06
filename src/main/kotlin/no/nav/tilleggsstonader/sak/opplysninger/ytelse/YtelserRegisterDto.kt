@@ -25,6 +25,7 @@ sealed interface YtelsePeriodeRegisterDto {
                 is Omstillingsstønad -> TypeYtelsePeriode.OMSTILLINGSSTØNAD
                 is TiltakspengerTPSak -> TypeYtelsePeriode.TILTAKSPENGER_TPSAK
                 is TiltakspengerArena -> TypeYtelsePeriode.TILTAKSPENGER_ARENA
+                is Aktivitetspenger -> TypeYtelsePeriode.AKTIVITETSPENGER
             }
     val fom: LocalDate
     val tom: LocalDate?
@@ -59,6 +60,11 @@ sealed interface YtelsePeriodeRegisterDto {
     ) : YtelsePeriodeRegisterDto
 
     data class TiltakspengerArena(
+        override val fom: LocalDate,
+        override val tom: LocalDate?,
+    ) : YtelsePeriodeRegisterDto
+
+    data class Aktivitetspenger(
         override val fom: LocalDate,
         override val tom: LocalDate?,
     ) : YtelsePeriodeRegisterDto

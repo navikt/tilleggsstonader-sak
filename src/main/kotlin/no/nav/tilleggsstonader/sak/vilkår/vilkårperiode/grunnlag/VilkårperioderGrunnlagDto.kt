@@ -40,6 +40,7 @@ data class GrunnlagYtelseDto(
     JsonSubTypes.Type(value = PeriodeGrunnlagYtelseDto.Omstillingsstønad::class, name = "OMSTILLINGSSTØNAD"),
     JsonSubTypes.Type(value = PeriodeGrunnlagYtelseDto.TiltakspengerTPSak::class, name = "TILTAKSPENGER_TPSAK"),
     JsonSubTypes.Type(value = PeriodeGrunnlagYtelseDto.TiltakspengerArena::class, name = "TILTAKSPENGER_ARENA"),
+    JsonSubTypes.Type(value = PeriodeGrunnlagYtelseDto.Aktivitetspenger::class, name = "AKTIVITETSPENGER"),
 )
 sealed interface PeriodeGrunnlagYtelseDto {
     val fom: LocalDate
@@ -54,6 +55,7 @@ sealed interface PeriodeGrunnlagYtelseDto {
                 is Omstillingsstønad -> TypeYtelsePeriode.OMSTILLINGSSTØNAD
                 is TiltakspengerArena -> TypeYtelsePeriode.TILTAKSPENGER_ARENA
                 is TiltakspengerTPSak -> TypeYtelsePeriode.TILTAKSPENGER_TPSAK
+                is Aktivitetspenger -> TypeYtelsePeriode.AKTIVITETSPENGER
             }
 
     data class AAP(
@@ -101,6 +103,12 @@ sealed interface PeriodeGrunnlagYtelseDto {
     ) : PeriodeGrunnlagYtelseDto
 
     data class TiltakspengerArena(
+        override val fom: LocalDate,
+        override val tom: LocalDate?,
+        override val kanYtelseBrukesIBehandling: Boolean,
+    ) : PeriodeGrunnlagYtelseDto
+
+    data class Aktivitetspenger(
         override val fom: LocalDate,
         override val tom: LocalDate?,
         override val kanYtelseBrukesIBehandling: Boolean,
@@ -197,6 +205,13 @@ fun PeriodeGrunnlagYtelse.tilDto(stønadstype: Stønadstype) =
 
         is PeriodeGrunnlagYtelse.TiltakspengerTPSak ->
             PeriodeGrunnlagYtelseDto.TiltakspengerTPSak(
+                fom = this.fom,
+                tom = this.tom,
+                kanYtelseBrukesIBehandling = kanYtelseBrukesIBehandling(stønadstype, this),
+            )
+
+        is PeriodeGrunnlagYtelse.Aktivitetspenger ->
+            PeriodeGrunnlagYtelseDto.Aktivitetspenger(
                 fom = this.fom,
                 tom = this.tom,
                 kanYtelseBrukesIBehandling = kanYtelseBrukesIBehandling(stønadstype, this),

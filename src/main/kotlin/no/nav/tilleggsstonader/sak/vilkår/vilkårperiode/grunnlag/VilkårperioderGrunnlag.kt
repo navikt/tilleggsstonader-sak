@@ -123,6 +123,7 @@ sealed interface PeriodeGrunnlagYtelse {
                 is Omstillingsstønad -> TypeYtelsePeriode.OMSTILLINGSSTØNAD
                 is TiltakspengerArena -> TypeYtelsePeriode.TILTAKSPENGER_ARENA
                 is TiltakspengerTPSak -> TypeYtelsePeriode.TILTAKSPENGER_TPSAK
+                is Aktivitetspenger -> TypeYtelsePeriode.AKTIVITETSPENGER
             }
 
     data class AAP(
@@ -165,6 +166,11 @@ sealed interface PeriodeGrunnlagYtelse {
     ) : PeriodeGrunnlagYtelse
 
     data class TiltakspengerArena(
+        override val fom: LocalDate,
+        override val tom: LocalDate?,
+    ) : PeriodeGrunnlagYtelse
+
+    data class Aktivitetspenger(
         override val fom: LocalDate,
         override val tom: LocalDate?,
     ) : PeriodeGrunnlagYtelse

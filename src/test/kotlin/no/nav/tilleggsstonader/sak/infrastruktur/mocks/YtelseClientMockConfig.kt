@@ -73,6 +73,11 @@ class YtelseClientMockConfig {
                                         fom = LocalDate.now(),
                                         tom = LocalDate.now(),
                                     )
+                                TypeYtelsePeriode.AKTIVITETSPENGER ->
+                                    YtelsePeriode.Aktivitetspenger(
+                                        fom = LocalDate.now(),
+                                        tom = LocalDate.now(),
+                                    )
                             }
                         }.toMutableList()
                 if (request.typer.contains(TypeYtelsePeriode.AAP)) {
