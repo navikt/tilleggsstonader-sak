@@ -132,8 +132,8 @@ data class FaktaSamling(
 
 data class FaktaReisemåte(
     val hvilkeTransportmidlerBleBenyttet: List<Transportmiddel>?,
-    val unntakFraOffentligTransport: FaktaUnntakFraOffentligTransport?,
-    val unntakFraPrivatBil: List<ÅrsakKanIkkeBenytteEgenBil>?,
+    val årsakIkkeOffentligTransport: FaktaUnntakFraOffentligTransport?,
+    val årsakIkkePrivatBil: List<ÅrsakKanIkkeBenytteEgenBil>?,
     val offentligTransport: FaktaOffentligTransportInfo?,
     val privatBil: FaktaPrivatBilInfo?,
     val drosje: FaktaDrosjeInfo?,
