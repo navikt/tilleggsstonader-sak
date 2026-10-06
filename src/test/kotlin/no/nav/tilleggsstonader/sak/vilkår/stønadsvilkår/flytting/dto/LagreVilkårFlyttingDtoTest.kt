@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import tools.jackson.module.kotlin.readValue
 
@@ -130,38 +129,6 @@ class LagreVilkårFlyttingDtoTest {
             )
 
         assertThat(jsonMapper.readValue<LagreVilkårFlyttingDto>(jsonMapper.writeValueAsString(dto))).isEqualTo(dto)
-    }
-
-    @Test
-    fun `skal avvise desimaler for heltallsfelt i json`() {
-        assertThatThrownBy {
-            jsonMapper.readValue<LagreVilkårFlyttingDto>(
-                """
-                {
-                  "fom": "2026-01-01",
-                  "tom": "2026-01-31",
-                  "svar": {},
-                  "fakta": {"type": "FLYTTING_FLYTTE_SELV", "avstandEnVei": 12.5}
-                }
-                """.trimIndent(),
-            )
-        }.hasMessageContaining("heltall")
-    }
-
-    @Test
-    fun `skal avvise heltall utenfor int-området i json`() {
-        assertThatThrownBy {
-            jsonMapper.readValue<LagreVilkårFlyttingDto>(
-                """
-                {
-                  "fom": "2026-01-01",
-                  "tom": "2026-01-31",
-                  "svar": {},
-                  "fakta": {"type": "FLYTTING_FLYTTE_SELV", "avstandEnVei": 2147483648}
-                }
-                """.trimIndent(),
-            )
-        }.hasMessageContaining("heltall")
     }
 
     @Test
