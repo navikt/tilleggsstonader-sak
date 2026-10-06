@@ -25,18 +25,7 @@ class KlageService(
 ) {
     fun hentBehandlinger(fagsakPersonId: FagsakPersonId): KlagebehandlingerDto {
         val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(fagsakPersonId)
-        val eksterneFagsakIder =
-            listOfNotNull(
-                fagsaker.passAvBarn,
-                fagsaker.læremidler,
-                fagsaker.boutgifter,
-                fagsaker.dagligReiseTso,
-                fagsaker.dagligReiseTsr,
-                fagsaker.reiseTilSamlingTso,
-                fagsaker.reiseTilSamlingTsr,
-            ).map {
-                it.eksternId.id
-            }
+        val eksterneFagsakIder = fagsaker.alleFagsaker().map { it.eksternId.id }
 
         if (eksterneFagsakIder.isEmpty()) {
             return KlagebehandlingerDto.empty()
@@ -55,8 +44,10 @@ class KlageService(
             dagligReiseTsr = klagebehandlingerPåEksternId[fagsaker.dagligReiseTsr?.eksternId?.id] ?: emptyList(),
             reiseTilSamlingTso = klagebehandlingerPåEksternId[fagsaker.reiseTilSamlingTso?.eksternId?.id] ?: emptyList(),
             reiseTilSamlingTsr = klagebehandlingerPåEksternId[fagsaker.reiseTilSamlingTsr?.eksternId?.id] ?: emptyList(),
-            reiseOppstartAvslutningHjemreiseTso = klagebehandlingerPåEksternId[fagsaker.reiseOppstartAvslutningHjemreiseTso?.eksternId?.id] ?: emptyList(),
-            reiseOppstartAvslutningHjemreiseTsr = klagebehandlingerPåEksternId[fagsaker.reiseOppstartAvslutningHjemreiseTsr?.eksternId?.id] ?: emptyList(),
+            reiseOppstartAvslutningHjemreiseTso =
+                klagebehandlingerPåEksternId[fagsaker.reiseOppstartAvslutningHjemreiseTso?.eksternId?.id] ?: emptyList(),
+            reiseOppstartAvslutningHjemreiseTsr =
+                klagebehandlingerPåEksternId[fagsaker.reiseOppstartAvslutningHjemreiseTsr?.eksternId?.id] ?: emptyList(),
             flyttingTso = klagebehandlingerPåEksternId[fagsaker.flyttingTso?.eksternId?.id] ?: emptyList(),
             flyttingTsr = klagebehandlingerPåEksternId[fagsaker.flyttingTsr?.eksternId?.id] ?: emptyList(),
         )

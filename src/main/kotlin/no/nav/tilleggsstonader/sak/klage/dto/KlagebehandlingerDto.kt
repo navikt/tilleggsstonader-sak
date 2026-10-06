@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.klage.dto
 
 import no.nav.tilleggsstonader.kontrakter.klage.KlagebehandlingDto
-import no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise.domain.BeregningReiseOppstartAvslutningHjemreise
 
 data class KlagebehandlingerDto(
     // TODO TilsynBarn bør være PassAvBarn, men dette brukes eksternt
