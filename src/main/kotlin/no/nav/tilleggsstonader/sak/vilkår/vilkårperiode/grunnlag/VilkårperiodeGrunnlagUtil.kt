@@ -27,4 +27,5 @@ fun TypeYtelsePeriode.tilMålgruppe() =
         TypeYtelsePeriode.OMSTILLINGSSTØNAD -> MålgruppeType.OMSTILLINGSSTØNAD
         TypeYtelsePeriode.TILTAKSPENGER_TPSAK -> MålgruppeType.TILTAKSPENGER
         TypeYtelsePeriode.TILTAKSPENGER_ARENA -> MålgruppeType.TILTAKSPENGER
+        TypeYtelsePeriode.AKTIVITETSPENGER -> MålgruppeType.AKTIVITETSPENGER
     }

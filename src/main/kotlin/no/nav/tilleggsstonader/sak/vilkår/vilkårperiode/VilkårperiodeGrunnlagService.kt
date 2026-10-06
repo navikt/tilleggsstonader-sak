@@ -234,6 +234,12 @@ class VilkårperiodeGrunnlagService(
                                     fom = it.fom,
                                     tom = it.tom,
                                 )
+
+                            is YtelsePeriode.Aktivitetspenger ->
+                                PeriodeGrunnlagYtelse.Aktivitetspenger(
+                                    fom = it.fom,
+                                    tom = it.tom,
+                                )
                         }
                     }.slåSammenOverlappendeEllerPåfølgende(),
             kildeResultat =

@@ -15,12 +15,12 @@ class YtelseClient(
     @Value("\${clients.integrasjoner.uri}") private val baseUrl: URI,
     @Qualifier("azureClientCredential") private val restTemplate: RestTemplate,
 ) {
-    val uri =
+    val ytelseUri =
         UriComponentsBuilder
             .fromUri(baseUrl)
             .pathSegment("api", "ytelse", "finn")
             .encode()
             .toUriString()
 
-    fun hentYtelser(request: YtelsePerioderRequest): YtelsePerioderDto = restTemplate.postForEntity(uri, request)
+    fun hentYtelser(request: YtelsePerioderRequest): YtelsePerioderDto = restTemplate.postForEntity(ytelseUri, request)
 }

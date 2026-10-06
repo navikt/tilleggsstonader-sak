@@ -63,5 +63,6 @@ object SlåSammenPeriodeGrunnlagYtelseUtil {
             is PeriodeGrunnlagYtelse.Omstillingsstønad -> copy(fom = fom, tom = tom)
             is PeriodeGrunnlagYtelse.TiltakspengerArena -> copy(fom = fom, tom = tom)
             is PeriodeGrunnlagYtelse.TiltakspengerTPSak -> copy(fom = fom, tom = tom)
+            is PeriodeGrunnlagYtelse.Aktivitetspenger -> copy(fom = fom, tom = tom)
         }
 }

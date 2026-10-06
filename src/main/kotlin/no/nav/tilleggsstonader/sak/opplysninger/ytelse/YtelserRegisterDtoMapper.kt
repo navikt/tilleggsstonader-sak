@@ -63,5 +63,10 @@ object YtelserRegisterDtoMapper {
                     fom = fom,
                     tom = tom,
                 )
+            is YtelsePeriode.Aktivitetspenger ->
+                YtelsePeriodeRegisterDto.Aktivitetspenger(
+                    fom = fom,
+                    tom = tom,
+                )
         }
 }
