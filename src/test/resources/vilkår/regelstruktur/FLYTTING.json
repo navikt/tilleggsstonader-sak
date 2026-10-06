@@ -1,32 +1,17 @@
 {
-  "SKAL_BRUKE_FLYTTEBYRÅ": {
+  "HVORDAN_SKAL_BRUKER_FLYTTE": {
     "erHovedregel": true,
-    "reglerSomMåNullstilles": [ "SKAL_KJØRE_SELV" ],
-    "svaralternativer": [ {
-      "begrunnelseType": "VALGFRI",
-      "nesteRegelId": null,
-      "svarId": "JA",
-      "tilhørendeFaktaType": "FLYTTING_FLYTTEBYRÅ"
-    }, {
-      "begrunnelseType": "VALGFRI",
-      "nesteRegelId": "SKAL_KJØRE_SELV",
-      "svarId": "NEI",
-      "tilhørendeFaktaType": null
-    } ]
-  },
-  "SKAL_KJØRE_SELV": {
-    "erHovedregel": false,
     "reglerSomMåNullstilles": [ ],
     "svaralternativer": [ {
       "begrunnelseType": "VALGFRI",
       "nesteRegelId": null,
-      "svarId": "JA",
-      "tilhørendeFaktaType": "FLYTTING_KJØRE_SELV"
+      "svarId": "FLYTTEBYRÅ",
+      "tilhørendeFaktaType": "FLYTTING_FLYTTEBYRÅ"
     }, {
-      "begrunnelseType": "PÅKREVD",
+      "begrunnelseType": "VALGFRI",
       "nesteRegelId": null,
-      "svarId": "NEI",
-      "tilhørendeFaktaType": "FLYTTING_UBESTEMT"
+      "svarId": "FLYTTER_SELV",
+      "tilhørendeFaktaType": "FLYTTING_KJØRE_SELV"
     } ]
   }
 }

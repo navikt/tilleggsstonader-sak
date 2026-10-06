@@ -31,7 +31,7 @@ class FlyttingTsoIntegrationTest : CleanDatabaseIntegrationTest() {
             LagreVilkårFlyttingDto(
                 fom = 1 januar 2026,
                 tom = 31 januar 2026,
-                svar = mapOf(RegelId.SKAL_BRUKE_FLYTTEBYRÅ to SvarOgBegrunnelseDto(SvarId.JA)),
+                svar = mapOf(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTEBYRÅ)),
                 fakta =
                     FaktaFlyttebyråDto(
                         tilbud1 = FlyttebyråTilbudDto(navn = "Flyttebyrå A", pris = 10000),
@@ -56,8 +56,7 @@ class FlyttingTsoIntegrationTest : CleanDatabaseIntegrationTest() {
                 tom = 31 januar 2026,
                 svar =
                     mapOf(
-                        RegelId.SKAL_BRUKE_FLYTTEBYRÅ to SvarOgBegrunnelseDto(SvarId.NEI),
-                        RegelId.SKAL_KJØRE_SELV to SvarOgBegrunnelseDto(SvarId.JA),
+                        RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTER_SELV),
                     ),
                 fakta =
                     FaktaKjøreSelvDto(

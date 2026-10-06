@@ -51,18 +51,16 @@ object FlyttingVilkårValidering {
     fun erFullstendig(vilkår: LagreVilkårFlytting): Boolean {
         if (vilkår.fakta.adresse.isNullOrBlank()) return false
 
-        val flyttebyråSvar = vilkår.svar[RegelId.SKAL_BRUKE_FLYTTEBYRÅ]?.svar ?: return false
-        if (flyttebyråSvar == SvarId.JA) {
-            val fakta = vilkår.fakta as? FaktaFlyttebyrå ?: return false
-            val harNavnPåBeggeTilbud =
-                !fakta.tilbud1.navn.isNullOrBlank() && !fakta.tilbud2.navn.isNullOrBlank()
-            return harNavnPåBeggeTilbud && fakta.tilbud1.pris != null && fakta.tilbud2.pris != null
-        }
+        val flyttemåte = vilkår.svar[RegelId.HVORDAN_SKAL_BRUKER_FLYTTE]?.svar ?: return false
+        return when (flyttemåte) {
+            SvarId.FLYTTEBYRÅ -> {
+                val fakta = vilkår.fakta as? FaktaFlyttebyrå ?: return false
+                val harNavnPåBeggeTilbud =
+                    !fakta.tilbud1.navn.isNullOrBlank() && !fakta.tilbud2.navn.isNullOrBlank()
+                harNavnPåBeggeTilbud && fakta.tilbud1.pris != null && fakta.tilbud2.pris != null
+            }
 
-        val kjøreSelvSvar = vilkår.svar[RegelId.SKAL_KJØRE_SELV]?.svar ?: return false
-        return when (kjøreSelvSvar) {
-            SvarId.NEI -> true
-            SvarId.JA -> (vilkår.fakta as? FaktaKjøreSelv)?.avstandEnVei != null
+            SvarId.FLYTTER_SELV -> (vilkår.fakta as? FaktaKjøreSelv)?.avstandEnVei != null
             else -> false
         }
     }

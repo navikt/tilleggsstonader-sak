@@ -132,48 +132,32 @@ class FlyttingVilkårService(
 
     private fun validerFaktaOgSvar(innsendt: LagreVilkårFlytting) {
         FlyttingVilkårValidering.validerOppgitteFakta(innsendt.fakta)
-        val flyttebyråSvar = innsendt.svar[RegelId.SKAL_BRUKE_FLYTTEBYRÅ]?.svar
-        val kjøreSelvSvar = innsendt.svar[RegelId.SKAL_KJØRE_SELV]?.svar
-        brukerfeilHvis(
-            innsendt.svar.values.any { it.svar !in setOf(SvarId.JA, SvarId.NEI) },
-        ) { "Flyttevilkår må besvares med ja eller nei" }
-        when (flyttebyråSvar) {
+        val flyttemåte = innsendt.svar[RegelId.HVORDAN_SKAL_BRUKER_FLYTTE]?.svar
+
+        brukerfeilHvis(flyttemåte != null && flyttemåte !in setOf(SvarId.FLYTTEBYRÅ, SvarId.FLYTTER_SELV)) {
+            "Flyttevilkår må besvares med flyttebyrå eller flytter selv"
+        }
+
+        when (flyttemåte) {
             null -> {
-                brukerfeilHvis(kjøreSelvSvar != null || innsendt.fakta !is FaktaFlyttingUbestemt) {
-                    "Vurderingen av flyttebyrå må besvares før fakta registreres"
+                brukerfeilHvis(innsendt.fakta !is FaktaFlyttingUbestemt) {
+                    "Vurderingen av flyttemåte må besvares før fakta registreres"
                 }
             }
 
-            SvarId.JA -> {
+            SvarId.FLYTTEBYRÅ -> {
                 brukerfeilHvis(innsendt.fakta !is FaktaFlyttebyrå) {
                     "Fakta må inneholde to tilbud fra flyttebyrå når flyttebyrå er valgt"
                 }
-                brukerfeilHvis(kjøreSelvSvar != null) {
-                    "Vurdering av egen kjøring skal fjernes når flyttebyrå er valgt"
+            }
+
+            SvarId.FLYTTER_SELV -> {
+                brukerfeilHvis(innsendt.fakta !is FaktaKjøreSelv) {
+                    "Fakta må inneholde avstand og kostnader når bruker flytter selv"
                 }
             }
 
-            SvarId.NEI -> {
-                when (kjøreSelvSvar) {
-                    SvarId.JA -> {
-                        brukerfeilHvis(innsendt.fakta !is FaktaKjøreSelv) {
-                            "Fakta må inneholde avstand og kostnader når bruker skal kjøre selv"
-                        }
-                    }
-
-                    SvarId.NEI,
-                    null,
-                    -> {
-                        brukerfeilHvis(innsendt.fakta !is FaktaFlyttingUbestemt) {
-                            "Fakta skal være tomme når bruker ikke skal kjøre selv"
-                        }
-                    }
-
-                    else -> error("Ugyldig svar på om bruker skal kjøre selv")
-                }
-            }
-
-            else -> error("Ugyldig svar på om bruker skal bruke flyttebyrå")
+            else -> error("Ugyldig svar på flyttemåte")
         }
     }
 

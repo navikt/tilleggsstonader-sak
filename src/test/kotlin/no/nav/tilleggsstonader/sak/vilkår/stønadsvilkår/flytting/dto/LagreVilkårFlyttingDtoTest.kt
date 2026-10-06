@@ -24,15 +24,15 @@ class LagreVilkårFlyttingDtoTest {
 
     @Test
     fun `skal bevare svar og valgfri begrunnelse ved mapping til domene`() {
-        val svar = SvarOgBegrunnelseDto(svar = SvarId.NEI, begrunnelse = "Vurdering")
+        val svar = SvarOgBegrunnelseDto(svar = SvarId.FLYTTEBYRÅ, begrunnelse = "Vurdering")
         val domain =
             dto(
-                svar = mapOf(RegelId.SKAL_BRUKE_FLYTTEBYRÅ to svar),
+                svar = mapOf(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to svar),
                 fakta = FaktaFlyttingUbestemtDto(),
             ).tilDomain()
 
-        assertThat(domain.svar).containsOnlyKeys(RegelId.SKAL_BRUKE_FLYTTEBYRÅ)
-        assertThat(domain.svar[RegelId.SKAL_BRUKE_FLYTTEBYRÅ]).isEqualTo(svar.tilDomain())
+        assertThat(domain.svar).containsOnlyKeys(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE)
+        assertThat(domain.svar[RegelId.HVORDAN_SKAL_BRUKER_FLYTTE]).isEqualTo(svar.tilDomain())
     }
 
     @Test
@@ -95,8 +95,8 @@ class LagreVilkårFlyttingDtoTest {
             dto(
                 svar =
                     mapOf(
-                        RegelId.SKAL_BRUKE_FLYTTEBYRÅ to
-                            SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "To tilbud er mottatt"),
+                        RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to
+                            SvarOgBegrunnelseDto(svar = SvarId.FLYTTEBYRÅ, begrunnelse = "To tilbud er mottatt"),
                     ),
                 fakta =
                     FaktaFlyttebyråDto(
@@ -115,8 +115,8 @@ class LagreVilkårFlyttingDtoTest {
             dto(
                 svar =
                     mapOf(
-                        RegelId.SKAL_BRUKE_FLYTTEBYRÅ to SvarOgBegrunnelseDto(svar = SvarId.NEI),
-                        RegelId.SKAL_KJØRE_SELV to SvarOgBegrunnelseDto(svar = SvarId.JA),
+                        RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to
+                            SvarOgBegrunnelseDto(svar = SvarId.FLYTTER_SELV),
                     ),
                 fakta =
                     FaktaKjøreSelvDto(
@@ -165,10 +165,10 @@ class LagreVilkårFlyttingDtoTest {
     }
 
     @Test
-    fun `skal bevare manglende svar på om brukeren skal kjøre selv`() {
+    fun `skal bevare manglende svar på flyttemåte`() {
         val dto =
             dto(
-                svar = mapOf(RegelId.SKAL_BRUKE_FLYTTEBYRÅ to SvarOgBegrunnelseDto(svar = SvarId.NEI)),
+                svar = emptyMap(),
                 fakta = FaktaFlyttingUbestemtDto(),
             )
 

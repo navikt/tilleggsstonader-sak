@@ -80,18 +80,43 @@ class FlyttingVilkårValideringTest {
     }
 
     @Test
-    fun `skal være fullstendig når begge spørsmål er besvart med nei`() {
+    fun `skal være fullstendig når bruker benytter flyttebyrå med to komplette tilbud`() {
         assertThat(
             FlyttingVilkårValidering.erFullstendig(
                 LagreVilkårFlytting(
                     fom = 1 januar 2026,
                     tom = 31 januar 2026,
                     svar =
-                        mapOf(
-                            RegelId.SKAL_BRUKE_FLYTTEBYRÅ to SvarOgBegrunnelse(SvarId.NEI),
-                            RegelId.SKAL_KJØRE_SELV to SvarOgBegrunnelse(SvarId.NEI),
+                        mapOf(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelse(SvarId.FLYTTEBYRÅ)),
+                    fakta =
+                        FaktaFlyttebyrå(
+                            tilbud1 = FlyttebyråTilbud(navn = "Flyttebyrå A", pris = 10000),
+                            tilbud2 = FlyttebyråTilbud(navn = "Flyttebyrå B", pris = 12000),
+                            adresse = "Flytteveien 1",
                         ),
-                    fakta = FaktaFlyttingUbestemt(adresse = "Flytteveien 1"),
+                ),
+            ),
+        ).isTrue()
+    }
+
+    @Test
+    fun `skal være fullstendig når bruker flytter selv med oppgitt avstand`() {
+        assertThat(
+            FlyttingVilkårValidering.erFullstendig(
+                LagreVilkårFlytting(
+                    fom = 1 januar 2026,
+                    tom = 31 januar 2026,
+                    svar =
+                        mapOf(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelse(SvarId.FLYTTER_SELV)),
+                    fakta =
+                        FaktaKjøreSelv(
+                            avstandEnVei = 250,
+                            henger = null,
+                            bompenger = null,
+                            ferge = null,
+                            parkering = null,
+                            adresse = "Flytteveien 1",
+                        ),
                 ),
             ),
         ).isTrue()
@@ -105,11 +130,15 @@ class FlyttingVilkårValideringTest {
                     fom = 1 januar 2026,
                     tom = 31 januar 2026,
                     svar =
-                        mapOf(
-                            RegelId.SKAL_BRUKE_FLYTTEBYRÅ to SvarOgBegrunnelse(SvarId.NEI),
-                            RegelId.SKAL_KJØRE_SELV to SvarOgBegrunnelse(SvarId.NEI),
+                        mapOf(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelse(SvarId.FLYTTER_SELV)),
+                    fakta =
+                        FaktaKjøreSelv(
+                            avstandEnVei = 250,
+                            henger = null,
+                            bompenger = null,
+                            ferge = null,
+                            parkering = null,
                         ),
-                    fakta = FaktaFlyttingUbestemt(),
                 ),
             ),
         ).isFalse()
