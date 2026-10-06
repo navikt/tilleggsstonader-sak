@@ -263,8 +263,16 @@ class OpprettDummySøknadReiseTilSamling(
                                     ),
                                 infoBilKunDelerAvStrekning =
                                     InfoBilKunDelerAvStrekning(
-                                        strekningHvorBilBleBenyttet = null,
-                                        antallKilometerKjørt = null,
+                                        strekningHvorBilBleBenyttet =
+                                            VerdiFelt(
+                                                verdi = "Fra hjemmet til togstasjonen",
+                                                label = "Hvilken del av reisen ble kjørt med privat bil?",
+                                            ),
+                                        antallKilometerKjørt =
+                                            VerdiFelt(
+                                                verdi = "15",
+                                                label = "Hvor mange kilometer kjørte du totalt med privat bil?",
+                                            ),
                                     ),
                                 utgifterPrivatBil =
                                     UtgifterPrivatBil(
