@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.interntVedtak
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
@@ -56,6 +57,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOpps
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -383,6 +385,7 @@ class InterntVedtakService(
 
     private fun mapVilkårFakta(fakta: VilkårFakta?): VilkårFaktaInterntVedtak? =
         when (fakta) {
+            is FlyttingVilkårFakta -> feil("Internt vedtak for flytting støttes ikke ennå")
             is FaktaDagligReiseOffentligTransport ->
                 VilkårFaktaOffentligTransportInterntVedtak(
                     reisedagerPerUke = fakta.reisedagerPerUke,

@@ -1,0 +1,21 @@
+{
+  "regler": {
+    "HVORDAN_SKAL_BRUKER_FLYTTE": {
+      "erHovedregel": true,
+      "regelId": "HVORDAN_SKAL_BRUKER_FLYTTE",
+      "svarMapping": {
+        "FLYTTEBYRÅ": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": "FLYTTING_FLYTTEBYRÅ"
+        },
+        "FLYTTER_SELV": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": "FLYTTING_FLYTTE_SELV"
+        }
+      }
+    }
+  },
+  "vilkårType": "FLYTTING"
+}

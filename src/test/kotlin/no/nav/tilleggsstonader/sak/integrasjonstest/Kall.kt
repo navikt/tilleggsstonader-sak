@@ -21,6 +21,7 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.StegKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.TotrinnskontrollKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VedtakKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårDagligReiseKall
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårFlyttingKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårReiseOppstartAvslutningHjemreiseKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.VilkårReiseTilSamlingKall
@@ -50,6 +51,7 @@ class Kall(
     val beregnReiseTilSamling = BeregnReiseTilSamlingKall(testklient)
     val vilkår = VilkårKall(testklient)
     val vilkårDagligReise = VilkårDagligReiseKall(testklient)
+    val vilkårFlytting = VilkårFlyttingKall(testklient)
     val vilkårReiseTilSamling = VilkårReiseTilSamlingKall(testklient)
     val vilkårReiseOppstartAvslutningHjemreise = VilkårReiseOppstartAvslutningHjemreiseKall(testklient)
     val vilkårperiode = VilkårperiodeKall(testklient)

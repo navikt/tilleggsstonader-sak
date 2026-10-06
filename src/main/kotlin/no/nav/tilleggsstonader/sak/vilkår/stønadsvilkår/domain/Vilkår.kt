@@ -104,6 +104,8 @@ data class Vilkår(
                 // Dette er kun for tester foreløpig
             }
 
+            VilkårType.FLYTTING -> Unit
+
             VilkårType.EKSEMPEL -> {
                 // Dette er kun for tester foreløpig
             }
@@ -280,6 +282,12 @@ enum class VilkårType(
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
         ),
+    ),
+
+    // Flytting
+    FLYTTING(
+        "Flytting",
+        listOf(Stønadstype.FLYTTING_TSO, Stønadstype.FLYTTING_TSR),
     ),
     ;
 

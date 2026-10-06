@@ -1,0 +1,17 @@
+{
+  "HVORDAN_SKAL_BRUKER_FLYTTE": {
+    "erHovedregel": true,
+    "reglerSomMåNullstilles": [ ],
+    "svaralternativer": [ {
+      "begrunnelseType": "VALGFRI",
+      "nesteRegelId": null,
+      "svarId": "FLYTTEBYRÅ",
+      "tilhørendeFaktaType": "FLYTTING_FLYTTEBYRÅ"
+    }, {
+      "begrunnelseType": "VALGFRI",
+      "nesteRegelId": null,
+      "svarId": "FLYTTER_SELV",
+      "tilhørendeFaktaType": "FLYTTING_FLYTTE_SELV"
+    } ]
+  }
+}

@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegel
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.FlyttingRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.LøpendeUtgifterEnBoligRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.LøpendeUtgifterToBoligerRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegel
@@ -46,7 +47,7 @@ fun vilkårsreglerForStønad(stønadstype: Stønadstype): List<Vilkårsregel> =
         -> listOf(ReiseTilSamlingRegel())
         Stønadstype.FLYTTING_TSO,
         Stønadstype.FLYTTING_TSR,
-        -> emptyList() // TODO: legg til vilkårsregler for FLYTTING
+        -> listOf(FlyttingRegel())
         Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
         Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
         -> listOf(ReiseOppstartAvslutningHjemreiseRegel())

@@ -7,6 +7,10 @@ enum class SvarId(
     JA("Ja"),
     NEI("Nei"),
 
+    // FLYTTING
+    FLYTTEBYRÅ("Flyttebyrå"),
+    FLYTTER_SELV("Flytter selv"),
+
     // PASS_BARN
     FORSØRGER_HAR_LANGVARIG_ELLER_UREGELMESSIG_ARBEIDSTID(
         "Ja, tiltak/utdanningssted har dokumentert at søker er borte fra hjemmet utover vanlig arbeidstid",

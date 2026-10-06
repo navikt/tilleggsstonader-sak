@@ -27,6 +27,7 @@ import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.detaljerteVedtaksperio
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.detaljerteVedtaksperioder.DetaljertVedtaksperioderReiseTilSamlingMapper.finnDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseVilkårFakta
 import org.springframework.stereotype.Service
 
 @Service
@@ -225,7 +226,7 @@ class VedtaksperioderOversiktService(
         behandlingId
             ?.let { vilkårService.hentVilkår(it) }
             ?.mapNotNull { vilkår ->
-                vilkår.fakta?.let { fakta ->
+                (vilkår.fakta as? ReiseVilkårFakta)?.let { fakta ->
                     fakta.reiseId to (fakta.adresse ?: "adresse mangler")
                 }
             }?.toMap()

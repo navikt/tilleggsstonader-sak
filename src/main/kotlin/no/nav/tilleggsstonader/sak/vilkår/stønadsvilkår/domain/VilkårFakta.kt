@@ -34,12 +34,45 @@ import java.time.LocalDate
         FaktaReiseOppstartAvslutningHjemreiseUbestemt::class,
         name = "REISE_OPPSTART_AVSLUTNING_HJEMREISE_UBESTEMT",
     ),
+    JsonSubTypes.Type(FaktaFlyttebyrå::class, name = "FLYTTING_FLYTTEBYRÅ"),
+    JsonSubTypes.Type(FaktaKjøreSelv::class, name = "FLYTTING_FLYTTE_SELV"),
+    JsonSubTypes.Type(FaktaFlyttingUbestemt::class, name = "FLYTTING_UBESTEMT"),
     failOnRepeatedNames = true,
 )
-sealed interface VilkårFakta {
+sealed interface VilkårFakta
+
+sealed interface ReiseVilkårFakta : VilkårFakta {
     val reiseId: ReiseId
     val adresse: String?
 }
+
+sealed interface FlyttingVilkårFakta : VilkårFakta {
+    val adresse: String?
+}
+
+data class FaktaFlyttebyrå(
+    val tilbud1: FlyttebyråTilbud,
+    val tilbud2: FlyttebyråTilbud,
+    override val adresse: String? = null,
+) : FlyttingVilkårFakta
+
+data class FlyttebyråTilbud(
+    val navn: String?,
+    val pris: Int?,
+)
+
+data class FaktaKjøreSelv(
+    val avstandEnVei: Int?,
+    val henger: Int?,
+    val bompenger: Int?,
+    val ferge: Int?,
+    val parkering: Int?,
+    override val adresse: String? = null,
+) : FlyttingVilkårFakta
+
+data class FaktaFlyttingUbestemt(
+    override val adresse: String? = null,
+) : FlyttingVilkårFakta
 
 data class FaktaReiseTilSamlingOffentligTransport(
     override val reiseId: ReiseId,
@@ -47,7 +80,7 @@ data class FaktaReiseTilSamlingOffentligTransport(
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String,
     val aktivitetId: VilkårperiodeGlobalId? = null,
-) : VilkårFakta
+) : ReiseVilkårFakta
 
 data class FaktaReiseTilSamlingPrivatBil(
     override val reiseId: ReiseId,
@@ -59,12 +92,12 @@ data class FaktaReiseTilSamlingPrivatBil(
     val fergekostnad: BigDecimal? = null,
     val parkering: BigDecimal? = null,
     val piggdekkavgift: BigDecimal? = null,
-) : VilkårFakta
+) : ReiseVilkårFakta
 
 data class FaktaReiseTilSamlingUbestemt(
     override val reiseId: ReiseId,
     override val adresse: String?,
-) : VilkårFakta
+) : ReiseVilkårFakta
 
 data class FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
     override val reiseId: ReiseId,
@@ -72,7 +105,7 @@ data class FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
     val typeReiseformål: TypeReiseformål,
     val utgifterOffentligTransport: BigDecimal,
     val aktivitetId: VilkårperiodeGlobalId,
-) : VilkårFakta
+) : ReiseVilkårFakta
 
 data class FaktaReiseOppstartAvslutningHjemreisePrivatBil(
     override val reiseId: ReiseId,
@@ -82,18 +115,18 @@ data class FaktaReiseOppstartAvslutningHjemreisePrivatBil(
     val aktivitetId: VilkårperiodeGlobalId,
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,
-) : VilkårFakta
+) : ReiseVilkårFakta
 
 data class FaktaReiseOppstartAvslutningHjemreiseUbestemt(
     override val reiseId: ReiseId,
     override val adresse: String?,
     val typeReiseformål: TypeReiseformål,
-) : VilkårFakta
+) : ReiseVilkårFakta
 
 data class FaktaDagligReiseUbestemt(
     override val reiseId: ReiseId,
     override val adresse: String?,
-) : VilkårFakta
+) : ReiseVilkårFakta
 
 data class FaktaDagligReiseOffentligTransport(
     override val reiseId: ReiseId,
@@ -103,7 +136,7 @@ data class FaktaDagligReiseOffentligTransport(
     val prisTrettidagersbillett: Int?,
     override val adresse: String?,
     val tiltaksvariant: TypeAktivitet? = null,
-) : VilkårFakta
+) : ReiseVilkårFakta
 
 data class FaktaDagligReisePrivatBil(
     override val reiseId: ReiseId,
@@ -111,7 +144,7 @@ data class FaktaDagligReisePrivatBil(
     val faktaDelperioder: List<FaktaDelperiodePrivatBil>,
     override val adresse: String?,
     val aktivitetId: VilkårperiodeGlobalId,
-) : VilkårFakta
+) : ReiseVilkårFakta
 
 data class FaktaDelperiodePrivatBil(
     override val fom: LocalDate,
@@ -137,6 +170,9 @@ data class FaktaDelperiodePrivatBil(
 }
 
 enum class TypeVilkårFakta {
+    FLYTTING_FLYTTEBYRÅ,
+    FLYTTING_FLYTTE_SELV,
+    FLYTTING_UBESTEMT,
     DAGLIG_REISE_OFFENTLIG_TRANSPORT,
     DAGLIG_REISE_PRIVAT_BIL,
     DAGLIG_REISE_UBESTEMT,

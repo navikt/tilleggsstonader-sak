@@ -24,17 +24,12 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBolig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårReiseOppstartAvslutningHjemreiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.LagreVilkårReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.VilkårReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
@@ -239,32 +234,6 @@ class OpprettStønadsvilkårDsl {
                 tom = tom,
                 typeReiseformål = typeReiseformål,
                 aktivitetId = hentAktivitetId(aktiviteter),
-            )
-        }
-    }
-
-    fun offentligTransportFlytting(
-        fom: LocalDate,
-        tom: LocalDate,
-        typeReiseformål: TypeReiseformål = TypeReiseformål.OPPSTART,
-        hentAktivitetId: (List<VilkårperiodeDto>) -> VilkårperiodeGlobalId = { it.single().globalId },
-    ) {
-        dtoer += { _, _, aktiviteter ->
-            LagreVilkårReiseOppstartAvslutningHjemreiseDto(
-                fom = fom,
-                tom = tom,
-                reiseId = dummyReiseId,
-                adresse = "Tiltaksveien 1",
-                typeReiseformål = typeReiseformål,
-                svar =
-                    mapOf(
-                        RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
-                    ),
-                fakta =
-                    FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
-                        utgifterOffentligTransport = 40.toBigDecimal(),
-                        aktivitetId = hentAktivitetId(aktiviteter),
-                    ),
             )
         }
     }

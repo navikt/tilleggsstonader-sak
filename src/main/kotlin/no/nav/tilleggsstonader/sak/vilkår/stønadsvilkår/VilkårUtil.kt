@@ -67,6 +67,7 @@ object VilkårUtil {
                 VilkårType.DAGLIG_REISE -> true
                 VilkårType.REISE_TIL_SAMLING -> false // TODO: Sjekk om dette er riktig
                 VilkårType.REISE_OPPSTART_AVSLUTNING_HJEMREISE -> false
+                VilkårType.FLYTTING -> false
                 VilkårType.EKSEMPEL2 -> false
                 VilkårType.EKSEMPEL -> false
             }
