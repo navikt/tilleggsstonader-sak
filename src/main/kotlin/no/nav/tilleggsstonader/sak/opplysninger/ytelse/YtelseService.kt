@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelserRegisterDtoMapper.tilDto
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelserUtil.filtrerAktivitetspengerHvisDeaktivert
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelserUtil.finnRelevanteYtelsesTyper
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -119,11 +120,7 @@ class YtelseService(
     }
 
     private fun List<TypeYtelsePeriode>.filtrerAktivitetspengerHvisDeaktivert(): List<TypeYtelsePeriode> =
-        if (unleashService.isEnabled(Toggle.KAN_BRUKE_MÅLGRUPPE_AKTIVITETSPENGER)) {
-            this
-        } else {
-            filterNot { it == TypeYtelsePeriode.AKTIVITETSPENGER }
-        }
+        filtrerAktivitetspengerHvisDeaktivert(unleashService.isEnabled(Toggle.KAN_BRUKE_MÅLGRUPPE_AKTIVITETSPENGER))
 
     fun hentYtelser(
         ident: String,

@@ -6,7 +6,10 @@ import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.libs.feil.feilHvis
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelserUtil.filtrerAktivitetspengerHvisDeaktivert
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.grunnlag.tilMålgruppe
 import org.slf4j.LoggerFactory
@@ -24,6 +27,7 @@ import java.time.LocalDate
 @Service
 class BestemTemaForJournalpostService(
     private val ytelseService: YtelseService,
+    private val unleashService: UnleashService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -68,7 +72,10 @@ class BestemTemaForJournalpostService(
                 ident = journalpost.bruker!!.id,
                 fom = fom,
                 tom = tom,
-                typer = TypeYtelsePeriode.entries.toList(),
+                typer =
+                    TypeYtelsePeriode.entries.toList().filtrerAktivitetspengerHvisDeaktivert(
+                        unleashService.isEnabled(Toggle.KAN_BRUKE_MÅLGRUPPE_AKTIVITETSPENGER),
+                    ),
             ).also { validerResultat(it.kildeResultat) }
             .perioder
             .map { it.type.tilMålgruppe() }

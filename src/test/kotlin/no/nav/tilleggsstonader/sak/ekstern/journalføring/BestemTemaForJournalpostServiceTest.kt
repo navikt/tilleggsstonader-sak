@@ -2,13 +2,16 @@ package no.nav.tilleggsstonader.sak.ekstern.journalføring
 
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.sak.DokumentBrevkode
 import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
+import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.tomYtelsePerioderDto
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoAAP
 import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDtoTiltakspengerTpsak
@@ -19,13 +22,42 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class BestemTemaForJournalpostServiceTest {
     private val ytelseService = mockk<YtelseService>()
-    private val service = BestemTemaForJournalpostService(ytelseService = ytelseService)
+    private val unleashService =
+        mockk<UnleashService> {
+            every { isEnabled(Toggle.KAN_BRUKE_MÅLGRUPPE_AKTIVITETSPENGER) } returns false
+        }
+    private val service = BestemTemaForJournalpostService(ytelseService = ytelseService, unleashService = unleashService)
 
     private val fom = 1 januar 2026
     private val tom = 31 desember 2026
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `skal bare hente aktivitetspenger fra register når togglen er på`(aktivert: Boolean) {
+        val journalpost = journalpostMedStrukturertSøknad(dokumentBrevkode = DokumentBrevkode.REISE_TIL_SAMLING)
+        val typer = slot<List<TypeYtelsePeriode>>()
+        every { unleashService.isEnabled(Toggle.KAN_BRUKE_MÅLGRUPPE_AKTIVITETSPENGER) } returns aktivert
+        every {
+            ytelseService.hentYtelser(journalpost.bruker!!.id, fom, tom, capture(typer))
+        } returns tomYtelsePerioderDto()
+
+        service.bestemStønadstype(
+            journalpost = journalpost,
+            stønadstypeTso = Stønadstype.REISE_TIL_SAMLING_TSO,
+            stønadstypeTsr = Stønadstype.REISE_TIL_SAMLING_TSR,
+            fom = fom,
+            tom = tom,
+            målgrupperFraSøknad = setOf(MålgruppeType.AAP),
+        )
+
+        val forventedeTyper = TypeYtelsePeriode.entries.filter { aktivert || it != TypeYtelsePeriode.AKTIVITETSPENGER }
+        assertThat(typer.captured).containsExactlyElementsOf(forventedeTyper)
+    }
 
     @Test
     fun `skal rute til TSO når målgruppe fra register kan brukes for TSO`() {

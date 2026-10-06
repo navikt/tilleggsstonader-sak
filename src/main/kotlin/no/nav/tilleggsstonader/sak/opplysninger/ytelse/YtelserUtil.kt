@@ -4,6 +4,9 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 
 object YtelserUtil {
+    fun List<TypeYtelsePeriode>.filtrerAktivitetspengerHvisDeaktivert(aktivitetspengerAktivert: Boolean): List<TypeYtelsePeriode> =
+        if (aktivitetspengerAktivert) this else filterNot { it == TypeYtelsePeriode.AKTIVITETSPENGER }
+
     fun finnRelevanteYtelsesTyper(type: Stønadstype) =
         when (type) {
             Stønadstype.BARNETILSYN,
