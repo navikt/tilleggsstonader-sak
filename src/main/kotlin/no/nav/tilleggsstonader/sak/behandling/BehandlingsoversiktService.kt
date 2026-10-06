@@ -35,6 +35,10 @@ class BehandlingsoversiktService(
             dagligReiseTsr = hentFagsakMedBehandlinger(fagsak.dagligReiseTsr),
             reiseTilSamlingTso = hentFagsakMedBehandlinger(fagsak.reiseTilSamlingTso),
             reiseTilSamlingTsr = hentFagsakMedBehandlinger(fagsak.reiseTilSamlingTsr),
+            reiseOppstartAvslutningHjemreiseTso = hentFagsakMedBehandlinger(fagsak.reiseOppstartAvslutningHjemreiseTso),
+            reiseOppstartAvslutningHjemreiseTsr = hentFagsakMedBehandlinger(fagsak.reiseOppstartAvslutningHjemreiseTsr),
+            flyttingTso = hentFagsakMedBehandlinger(fagsak.flyttingTso),
+            flyttingTsr = hentFagsakMedBehandlinger(fagsak.flyttingTsr),
         )
     }
 
