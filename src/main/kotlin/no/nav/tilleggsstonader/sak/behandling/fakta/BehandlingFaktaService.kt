@@ -303,8 +303,8 @@ class BehandlingFaktaService(
         reisemåte?.let {
             FaktaReisemåte(
                 hvilkeTransportmidlerBleBenyttet = it.hvilkeTransportmidlerBleBenyttet,
-                årsakIkkeOffentligTransport = mapUnntakFraOffentligTransport(it.unntakFraOffentligTransport),
-                årsakIkkePrivatBil = it.unntakFraPrivatBil,
+                unntakFraOffentligTransport = mapUnntakFraOffentligTransport(it.unntakFraOffentligTransport),
+                unntakFraPrivatBil = it.unntakFraPrivatBil,
                 offentligTransport = mapOffentligTransport(it.offentligTransport),
                 privatBil = mapPrivatBil(it.privatBil),
                 drosje = mapDrosje(it.drosje),
