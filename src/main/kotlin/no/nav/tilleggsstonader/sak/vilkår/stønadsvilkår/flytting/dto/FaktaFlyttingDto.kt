@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 )
 @JsonSubTypes(
     JsonSubTypes.Type(FaktaFlyttebyråDto::class, name = "FLYTTING_FLYTTEBYRÅ"),
-    JsonSubTypes.Type(FaktaKjøreSelvDto::class, name = "FLYTTING_KJØRE_SELV"),
+    JsonSubTypes.Type(FaktaKjøreSelvDto::class, name = "FLYTTING_FLYTTE_SELV"),
     JsonSubTypes.Type(FaktaFlyttingUbestemtDto::class, name = "FLYTTING_UBESTEMT"),
 )
 sealed interface FaktaFlyttingDto {
@@ -21,7 +21,7 @@ sealed interface FaktaFlyttingDto {
 
 enum class TypeFaktaFlytting {
     FLYTTING_FLYTTEBYRÅ,
-    FLYTTING_KJØRE_SELV,
+    FLYTTING_FLYTTE_SELV,
     FLYTTING_UBESTEMT,
 }
 
@@ -46,7 +46,7 @@ data class FaktaKjøreSelvDto(
     val parkering: Int? = null,
     override val adresse: String? = null,
 ) : FaktaFlyttingDto {
-    override val type = TypeFaktaFlytting.FLYTTING_KJØRE_SELV
+    override val type = TypeFaktaFlytting.FLYTTING_FLYTTE_SELV
 }
 
 data class FaktaFlyttingUbestemtDto(

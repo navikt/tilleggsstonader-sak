@@ -11,7 +11,7 @@
       "begrunnelseType": "VALGFRI",
       "nesteRegelId": null,
       "svarId": "FLYTTER_SELV",
-      "tilhørendeFaktaType": "FLYTTING_KJØRE_SELV"
+      "tilhørendeFaktaType": "FLYTTING_FLYTTE_SELV"
     } ]
   }
 }

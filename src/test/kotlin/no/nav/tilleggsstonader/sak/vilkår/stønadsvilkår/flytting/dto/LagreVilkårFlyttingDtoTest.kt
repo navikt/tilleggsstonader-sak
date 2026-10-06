@@ -77,7 +77,7 @@ class LagreVilkårFlyttingDtoTest {
 
     @Test
     fun `skal deserialisere egen kjøring uten avstand og kostnader`() {
-        val fakta = jsonMapper.readValue<FaktaFlyttingDto>("""{"type": "FLYTTING_KJØRE_SELV"}""")
+        val fakta = jsonMapper.readValue<FaktaFlyttingDto>("""{"type": "FLYTTING_FLYTTE_SELV"}""")
 
         assertThat(fakta).isEqualTo(FaktaKjøreSelvDto())
     }
@@ -141,7 +141,7 @@ class LagreVilkårFlyttingDtoTest {
                   "fom": "2026-01-01",
                   "tom": "2026-01-31",
                   "svar": {},
-                  "fakta": {"type": "FLYTTING_KJØRE_SELV", "avstandEnVei": 12.5}
+                  "fakta": {"type": "FLYTTING_FLYTTE_SELV", "avstandEnVei": 12.5}
                 }
                 """.trimIndent(),
             )
@@ -157,7 +157,7 @@ class LagreVilkårFlyttingDtoTest {
                   "fom": "2026-01-01",
                   "tom": "2026-01-31",
                   "svar": {},
-                  "fakta": {"type": "FLYTTING_KJØRE_SELV", "avstandEnVei": 2147483648}
+                  "fakta": {"type": "FLYTTING_FLYTTE_SELV", "avstandEnVei": 2147483648}
                 }
                 """.trimIndent(),
             )

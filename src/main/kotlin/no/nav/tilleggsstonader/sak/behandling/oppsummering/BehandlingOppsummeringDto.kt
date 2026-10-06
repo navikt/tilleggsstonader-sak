@@ -111,7 +111,7 @@ fun Vilkår.tilOppsummertVilkår(): OppsummertVilkår =
         typeFakta =
             when (this.fakta) {
                 is FaktaFlyttebyrå -> TypeVilkårFakta.FLYTTING_FLYTTEBYRÅ
-                is FaktaKjøreSelv -> TypeVilkårFakta.FLYTTING_KJØRE_SELV
+                is FaktaKjøreSelv -> TypeVilkårFakta.FLYTTING_FLYTTE_SELV
                 is FaktaFlyttingUbestemt -> TypeVilkårFakta.FLYTTING_UBESTEMT
                 is FaktaDagligReiseOffentligTransport -> TypeVilkårFakta.DAGLIG_REISE_OFFENTLIG_TRANSPORT
                 is FaktaDagligReisePrivatBil -> TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL

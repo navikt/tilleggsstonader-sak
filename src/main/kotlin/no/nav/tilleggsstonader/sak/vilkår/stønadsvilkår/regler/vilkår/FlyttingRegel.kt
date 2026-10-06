@@ -32,7 +32,7 @@ class FlyttingRegel :
                             SluttSvarRegel(
                                 resultat = Resultat.OPPFYLT,
                                 begrunnelseType = BegrunnelseType.VALGFRI,
-                                tilhørendeFaktaType = TypeVilkårFakta.FLYTTING_KJØRE_SELV,
+                                tilhørendeFaktaType = TypeVilkårFakta.FLYTTING_FLYTTE_SELV,
                             ),
                     ),
             )
