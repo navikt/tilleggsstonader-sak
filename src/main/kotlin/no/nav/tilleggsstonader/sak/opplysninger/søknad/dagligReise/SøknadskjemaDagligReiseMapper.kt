@@ -396,6 +396,7 @@ class SøknadskjemaDagligReiseMapper(
             .filter { it.value }
             .map {
                 when (it.key) {
+                    HovedytelseType.aktivitetspenger -> Hovedytelse.AKTIVITETSPENGER
                     HovedytelseType.arbeidsavklaringspenger -> Hovedytelse.AAP
                     HovedytelseType.overgangsstonad -> Hovedytelse.OVERGANGSSTØNAD
                     HovedytelseType.gjenlevendepensjon -> Hovedytelse.GJENLEVENDEPENSJON
