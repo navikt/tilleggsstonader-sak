@@ -208,6 +208,13 @@ enum class AndelstypeDvh {
                 TypeAndel.REISE_OPPSTART_TILTAK_HØYERE_UTDANNING -> REISE_OPPSTART_TILTAK_HØYERE_UTDANNING
                 TypeAndel.REISE_OPPSTART_TILTAK_JOBBKLUBB -> REISE_OPPSTART_TILTAK_JOBBKLUBB
                 TypeAndel.REISE_OPPSTART_TILTAK_OPPFØLGING -> REISE_OPPSTART_TILTAK_OPPFØLGING
+                TypeAndel.FLYTTING_AAP,
+                TypeAndel.FLYTTING_ENSLIG_FORSØRGER,
+                TypeAndel.FLYTTING_ETTERLATTE,
+                TypeAndel.FLYTTING_AKTIVITETSPENGER,
+                TypeAndel.FLYTTING_ARBEIDSSØKER,
+                -> error("Statistikk for flytteandeler støttes ikke i PoC-en")
+
                 TypeAndel.UGYLDIG -> throw Error("Trenger ikke statistikk på ugyldige betalinger")
             }
     }

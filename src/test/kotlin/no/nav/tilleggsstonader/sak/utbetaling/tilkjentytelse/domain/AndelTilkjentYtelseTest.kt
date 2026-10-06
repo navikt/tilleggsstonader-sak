@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain
 
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import org.assertj.core.api.Assertions.assertThatCode
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -173,6 +174,55 @@ class AndelTilkjentYtelseTest {
                     tom = måned.atDay(1),
                 )
             }.hasMessageContaining("Forventet satstype=DAG for type=DAGLIG_REISE_AAP, men fikk ENGANGSBELØP")
+        }
+
+        @Nested
+        inner class Flytteandel {
+            private val flytteandelstyper =
+                listOf(
+                    TypeAndel.FLYTTING_AAP,
+                    TypeAndel.FLYTTING_ENSLIG_FORSØRGER,
+                    TypeAndel.FLYTTING_ETTERLATTE,
+                    TypeAndel.FLYTTING_AKTIVITETSPENGER,
+                    TypeAndel.FLYTTING_ARBEIDSSØKER,
+                )
+
+            @Test
+            fun `tillater kun engangsbeløp for flytteandeler`() {
+                flytteandelstyper.forEach { type ->
+                    assertThatCode {
+                        andelTilkjentYtelse(
+                            type = type,
+                            satstype = Satstype.ENGANGSBELØP,
+                            fom = 1 januar 2026,
+                            tom = 1 januar 2026,
+                        )
+                    }.doesNotThrowAnyException()
+                }
+            }
+
+            @Test
+            fun `avviser dag og måned for flytteandeler`() {
+                flytteandelstyper.forEach { type ->
+                    assertThatThrownBy {
+                        andelTilkjentYtelse(
+                            type = type,
+                            satstype = Satstype.DAG,
+                            fom = 1 januar 2026,
+                            tom = 1 januar 2026,
+                        )
+                    }.hasMessageContaining("Forventet satstype=ENGANGSBELØP")
+
+                    assertThatThrownBy {
+                        andelTilkjentYtelse(
+                            type = type,
+                            satstype = Satstype.MÅNED,
+                            fom = 1 januar 2026,
+                            tom = 31 januar 2026,
+                        )
+                    }.hasMessageContaining("Forventet satstype=ENGANGSBELØP")
+                }
+            }
         }
     }
 }

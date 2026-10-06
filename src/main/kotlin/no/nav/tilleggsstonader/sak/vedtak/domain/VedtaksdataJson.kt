@@ -36,6 +36,7 @@ import tools.jackson.databind.ValueDeserializer
         InnvilgelseReiseOppstartAvslutningHjemreise::class,
         name = "INNVILGELSE_REISE_OPPSTART_AVSLUTNING_HJEMREISE",
     ),
+    JsonSubTypes.Type(InnvilgelseFlytting::class, name = "INNVILGELSE_FLYTTING"),
     failOnRepeatedNames = true,
 )
 sealed interface VedtaksdataJson
@@ -60,4 +61,5 @@ val typerVedtaksdata: Map<String, TypeVedtaksdata> =
         TypeVedtakDagligReise.entries,
         TypeVedtakReiseTilSamling.entries,
         TypeVedtakReiseOppstartAvslutningHjemreise.entries,
+        TypeVedtakFlytting.entries,
     ).flatten().associateBy { it.name }

@@ -229,6 +229,12 @@ class UtbetalingV3Mapper(
             TypeAndel.BOUTGIFTER_ETTERLATTE -> StønadUtbetaling.BOUTGIFTER_ETTERLATTE
             TypeAndel.BOUTGIFTER_ENSLIG_FORSØRGER -> StønadUtbetaling.BOUTGIFTER_ENSLIG_FORSØRGER
 
+            TypeAndel.FLYTTING_AAP -> StønadUtbetaling.FLYTTING_AAP
+            TypeAndel.FLYTTING_ENSLIG_FORSØRGER -> StønadUtbetaling.FLYTTING_ENSLIG_FORSØRGER
+            TypeAndel.FLYTTING_ETTERLATTE -> StønadUtbetaling.FLYTTING_ETTERLATTE
+            TypeAndel.FLYTTING_AKTIVITETSPENGER -> StønadUtbetaling.FLYTTING_AKTIVITETSPENGER
+            TypeAndel.FLYTTING_ARBEIDSSØKER -> StønadUtbetaling.FLYTTING_ARBEIDSSØKER
+
             TypeAndel.TILSYN_BARN_AAP -> StønadUtbetaling.TILSYN_BARN_AAP
             TypeAndel.TILSYN_BARN_AKTIVITETSPENGER -> StønadUtbetaling.TILSYN_BARN_AKTIVITETSPENGER
             TypeAndel.TILSYN_BARN_ETTERLATTE -> StønadUtbetaling.TILSYN_BARN_ETTERLATTE

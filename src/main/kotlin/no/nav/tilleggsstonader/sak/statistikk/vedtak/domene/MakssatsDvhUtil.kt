@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.util.toYearMonth
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørReiseTilSamling
@@ -41,6 +42,7 @@ data class MakssatsDvhUtil(
                 is InnvilgelseEllerOpphørDagligReise -> ikkeRelevant
                 is InnvilgelseEllerOpphørReiseTilSamling -> ikkeRelevant
                 is InnvilgelseEllerOpphørReiseOppstartAvslutningHjemreise -> ikkeRelevant
+                is InnvilgelseEllerOpphørFlytting -> ikkeRelevant
             }
 
         private val ikkeRelevant = MakssatsDvhUtil(makssats = null, beløpErBegrensetAvMakssats = null)

@@ -64,6 +64,7 @@ data class AndelTilkjentYtelse(
                 validerLikFomOgTom()
                 validerFomIkkeLørdagEllerSøndag()
             }
+
             Satstype.MÅNED -> validerFørsteOgSisteIMåneden()
             Satstype.ENGANGSBELØP -> validerKrysserIkkeÅrsskifte()
             Satstype.UGYLDIG -> {}
@@ -145,6 +146,13 @@ data class AndelTilkjentYtelse(
 
             -> satstype skalVære Satstype.DAG
 
+            TypeAndel.FLYTTING_AAP,
+            TypeAndel.FLYTTING_ENSLIG_FORSØRGER,
+            TypeAndel.FLYTTING_ETTERLATTE,
+            TypeAndel.FLYTTING_AKTIVITETSPENGER,
+            TypeAndel.FLYTTING_ARBEIDSSØKER,
+            -> satstype skalVære Satstype.ENGANGSBELØP
+
             TypeAndel.UGYLDIG -> {}
         }
     }
@@ -204,6 +212,7 @@ data class AndelTilkjentYtelse(
             StatusIverksetting.OK,
             StatusIverksetting.SENDT,
             -> true
+
             else -> false
         }
 }
@@ -290,6 +299,12 @@ enum class TypeAndel {
     REISE_OPPSTART_TILTAK_HØYERE_UTDANNING, // TSROAHOYUTD-OP
     REISE_OPPSTART_TILTAK_JOBBKLUBB, // TSROAJK2009-OP
     REISE_OPPSTART_TILTAK_OPPFØLGING, // TSROAOPPFAG-OP
+
+    FLYTTING_AAP,
+    FLYTTING_ENSLIG_FORSØRGER,
+    FLYTTING_ETTERLATTE,
+    FLYTTING_AKTIVITETSPENGER,
+    FLYTTING_ARBEIDSSØKER,
 
     UGYLDIG,
 }

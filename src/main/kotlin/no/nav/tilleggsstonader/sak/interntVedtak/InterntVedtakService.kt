@@ -36,6 +36,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakReiseOppstartAvslutningHjemreise
@@ -261,6 +262,7 @@ class InterntVedtakService(
                 is VedtakDagligReise -> mapVedtakDagligReise(vedtak.data)
                 is VedtakReiseTilSamling -> mapVedtakReiseTilSamling(vedtak.data)
                 is VedtakReiseOppstartAvslutningHjemreise -> mapVedtakReiseOppstartAvslutningHjemreise(vedtak.data)
+                is VedtakFlytting -> feil("Internt vedtak for flytting støttes ikke i PoC-en")
             }
         }
 
@@ -378,6 +380,8 @@ class InterntVedtakService(
             Stønadstype.DAGLIG_REISE_TSR -> {}
             Stønadstype.REISE_TIL_SAMLING_TSO -> {}
             Stønadstype.REISE_TIL_SAMLING_TSR -> {}
+            Stønadstype.FLYTTING_TSO -> error("Internt vedtak for flytting støttes ikke i PoC-en")
+            Stønadstype.FLYTTING_TSR -> error("Internt vedtak for flytting støttes ikke i PoC-en")
 
             else -> error("Internt vedtak håndterer ikke stønadstype=$stønadstype ennå")
         }

@@ -13,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørReiseOppstartAvslutningHjemreise
@@ -78,6 +79,19 @@ data class VedtaksperioderDvh(
                     mapVedtaksperioderReiseTilSamling(vedtaksdata, knyttAndelTilVedtaksperiode)
                 is InnvilgelseEllerOpphørReiseOppstartAvslutningHjemreise ->
                     mapVedtaksperioderReiseOppstartAvslutningHjemreise(vedtaksdata, knyttAndelTilVedtaksperiode)
+                is InnvilgelseEllerOpphørFlytting ->
+                    JsonWrapper(
+                        vedtaksperioder =
+                            vedtaksdata.vedtaksperioder.map {
+                                VedtaksperioderDvh(
+                                    fom = it.fom,
+                                    tom = it.tom,
+                                    aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
+                                    lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
+                                    id = it.id.takeIf { knyttAndelTilVedtaksperiode },
+                                )
+                            },
+                    )
 
                 is AvslagBoutgifter, is AvslagLæremidler, is AvslagPassAvBarn, is AvslagDagligReise, is AvslagReiseTilSamling ->
                     JsonWrapper(

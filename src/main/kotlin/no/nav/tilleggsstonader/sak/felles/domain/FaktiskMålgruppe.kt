@@ -100,7 +100,15 @@ enum class FaktiskMålgruppe(
             -> error("Kan ikke utlede Typeandel for $stønadstype fra FaktiskMålgruppe")
 
             Stønadstype.FLYTTING_TSO,
-            -> error("Kan ikke utlede Typeandel for FLYTTING fra FaktiskMålgruppe - ikke implementert")
+            -> {
+                when (this) {
+                    NEDSATT_ARBEIDSEVNE -> TypeAndel.FLYTTING_AAP
+                    ENSLIG_FORSØRGER -> TypeAndel.FLYTTING_ENSLIG_FORSØRGER
+                    GJENLEVENDE -> TypeAndel.FLYTTING_ETTERLATTE
+                    AKTIVITETSPENGER -> TypeAndel.FLYTTING_AKTIVITETSPENGER
+                    else -> error("Kan ikke opprette andel tilkjent ytelse for målgruppe $this")
+                }
+            }
 
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO -> {
                 when (this) {

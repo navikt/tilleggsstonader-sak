@@ -130,6 +130,7 @@ class VedtakRepositoryJsonTest : CleanDatabaseIntegrationTest() {
             TypeVedtakReiseTilSamling.OPPHØR_REISE_TIL_SAMLING -> OpphørReiseTilSamling::class
             TypeVedtakReiseOppstartAvslutningHjemreise.INNVILGELSE_REISE_OPPSTART_AVSLUTNING_HJEMREISE ->
                 InnvilgelseReiseOppstartAvslutningHjemreise::class
+            TypeVedtakFlytting.INNVILGELSE_FLYTTING -> InnvilgelseFlytting::class
         }.java
 
     companion object {

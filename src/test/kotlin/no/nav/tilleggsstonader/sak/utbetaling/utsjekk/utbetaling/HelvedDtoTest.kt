@@ -1,13 +1,63 @@
 package no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling
 
+import io.mockk.every
+import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.sak.utbetaling.fagomrade.FagsakUtbetalingsvalgService
+import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingId
+import no.nav.tilleggsstonader.sak.utbetaling.id.FagsakUtbetalingIdService
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.util.saksbehandling
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
 class HelvedDtoTest {
+    @Test
+    fun `skal mappe og serialisere alle flytteandeler til riktig utbetalingsstønad`() {
+        val behandling = saksbehandling()
+        val idService = mockk<FagsakUtbetalingIdService>()
+        val utbetalingsvalgService = mockk<FagsakUtbetalingsvalgService>()
+        val mapper = UtbetalingV3Mapper(idService, utbetalingsvalgService, mockk())
+        every { utbetalingsvalgService.hentEllerSettUtbetalPåNyttFagområde(any(), any()) } returns true
+
+        val forventetMapping =
+            mapOf(
+                TypeAndel.FLYTTING_AAP to StønadUtbetaling.FLYTTING_AAP,
+                TypeAndel.FLYTTING_ENSLIG_FORSØRGER to StønadUtbetaling.FLYTTING_ENSLIG_FORSØRGER,
+                TypeAndel.FLYTTING_ETTERLATTE to StønadUtbetaling.FLYTTING_ETTERLATTE,
+                TypeAndel.FLYTTING_AKTIVITETSPENGER to StønadUtbetaling.FLYTTING_AKTIVITETSPENGER,
+                TypeAndel.FLYTTING_ARBEIDSSØKER to StønadUtbetaling.FLYTTING_ARBEIDSSØKER,
+            )
+        assertThat(forventetMapping.keys)
+            .containsExactlyInAnyOrderElementsOf(TypeAndel.entries.filter { it.name.startsWith("FLYTTING_") })
+
+        forventetMapping.forEach { (typeAndel, stønad) ->
+            val utbetalingId =
+                FagsakUtbetalingId(fagsakId = behandling.fagsakId, typeAndel = typeAndel, reiseId = null)
+            every { idService.hentEllerOpprettUtbetalingId(behandling.fagsakId, typeAndel, null) } returns utbetalingId
+            every { idService.hentUtbetalingIderForFagsakId(behandling.fagsakId) } returns listOf(utbetalingId)
+            val andel =
+                AndelTilkjentYtelse(
+                    beløp = 1000,
+                    fom = 1 januar 2026,
+                    tom = 1 januar 2026,
+                    utbetalingsdato = 1 januar 2026,
+                    satstype = Satstype.ENGANGSBELØP,
+                    type = typeAndel,
+                )
+
+            val dto = mapper.lagSimuleringDtoer(behandling, listOf(andel))
+            assertThat(dto.utbetalinger.single().stønad).isEqualTo(stønad)
+            val json = jsonMapper.readTree(jsonMapper.writeValueAsString(dto))
+            assertThat(json["utbetalinger"][0]["stønad"].stringValue()).isEqualTo(typeAndel.name)
+        }
+    }
+
     private val testUtbetalinger =
         listOf(
             UtbetalingDto(

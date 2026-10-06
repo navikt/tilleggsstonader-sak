@@ -19,7 +19,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 
-class FlyttingTsoIntegrationTest : IntegrationTest() {
+class FlyttingTsrIntegrationTest : IntegrationTest() {
     private val ident = FnrGenerator.generer()
 
     @Autowired
@@ -37,7 +37,7 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
             testoppsettService
                 .opprettBehandlingMedFagsak(
                     behandling = behandling(),
-                    stønadstype = Stønadstype.FLYTTING_TSO,
+                    stønadstype = Stønadstype.FLYTTING_TSR,
                     identer = setOf(PersonIdent(ident = ident)),
                 )
 
@@ -48,12 +48,12 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
         ) {
             aktivitet {
                 opprett {
-                    aktivitetTiltakTsoFlytting(fom, tom)
+                    aktivitetTiltakTsrFlytting(fom, tom)
                 }
             }
             målgruppe {
                 opprett {
-                    målgruppeAAP(fom, tom)
+                    målgruppeDagpenger(fom, tom)
                 }
             }
             vilkår {
@@ -68,7 +68,7 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
 
         val vedtak =
             kall.vedtak
-                .hentVedtak(Stønadstype.FLYTTING_TSO, behandling.id)
+                .hentVedtak(Stønadstype.FLYTTING_TSR, behandling.id)
                 .expectOkWithBody<InnvilgelseFlyttingResponse>()
 
         assertThat(vedtak.beregningsresultat.resultater).hasSize(1)
@@ -82,7 +82,7 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
 
         assertThat(andeler).hasSize(1)
         assertThat(andeler.single().beløp).isEqualTo(394)
-        assertThat(andeler.single().type).isEqualTo(TypeAndel.FLYTTING_AAP)
+        assertThat(andeler.single().type).isEqualTo(TypeAndel.FLYTTING_ARBEIDSSØKER)
     }
 
     @Test
@@ -94,7 +94,7 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
             testoppsettService
                 .opprettBehandlingMedFagsak(
                     behandling = behandling(),
-                    stønadstype = Stønadstype.FLYTTING_TSO,
+                    stønadstype = Stønadstype.FLYTTING_TSR,
                     identer = setOf(PersonIdent(ident = ident)),
                 )
 
@@ -105,12 +105,12 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
         ) {
             aktivitet {
                 opprett {
-                    aktivitetTiltakTsoFlytting(fom, tom)
+                    aktivitetTiltakTsrFlytting(fom, tom)
                 }
             }
             målgruppe {
                 opprett {
-                    målgruppeAAP(fom, tom)
+                    målgruppeDagpenger(fom, tom)
                 }
             }
             vilkår {
@@ -125,7 +125,7 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
 
         val vedtak =
             kall.vedtak
-                .hentVedtak(Stønadstype.FLYTTING_TSO, behandling.id)
+                .hentVedtak(Stønadstype.FLYTTING_TSR, behandling.id)
                 .expectOkWithBody<InnvilgelseFlyttingResponse>()
 
         assertThat(vedtak.beregningsresultat.resultater).hasSize(1)
@@ -139,6 +139,6 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
 
         assertThat(andeler).hasSize(1)
         assertThat(andeler.single().beløp).isEqualTo(5000)
-        assertThat(andeler.single().type).isEqualTo(TypeAndel.FLYTTING_AAP)
+        assertThat(andeler.single().type).isEqualTo(TypeAndel.FLYTTING_ARBEIDSSØKER)
     }
 }

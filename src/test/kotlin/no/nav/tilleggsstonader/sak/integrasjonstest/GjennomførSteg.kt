@@ -22,6 +22,8 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsrRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingTsoRequest
+import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingTsrRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
@@ -183,6 +185,10 @@ fun IntegrationTest.gjennomførVilkårSteg(
             }
         }
 
+    testdata.vilkår.opprettFlyttingScope
+        .map { it(behandlingId) }
+        .forEach { kall.vilkårFlytting.opprettVilkår(behandlingId, it) }
+
     if (stønadstype.gjelderDagligReise()) {
         val aktiviteter =
             kall.vilkårperiode
@@ -275,9 +281,11 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                                     vedtaksperioder = vedtaksperioder.tilVedtaksperiodeTsrDto(),
                                 )
 
-                            Stønadstype.FLYTTING_TSO,
-                            Stønadstype.FLYTTING_TSR,
-                            -> TODO("InnvilgelseFlyttingRequest")
+                            Stønadstype.FLYTTING_TSO -> InnvilgelseFlyttingTsoRequest(vedtaksperioder = vedtaksperioder)
+                            Stønadstype.FLYTTING_TSR ->
+                                InnvilgelseFlyttingTsrRequest(
+                                    vedtaksperioder = vedtaksperioder.tilVedtaksperiodeTsrDto(),
+                                )
                             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO ->
                                 InnvilgelseReiseOppstartAvslutningHjemreiseTsoRequest(
                                     vedtaksperioder = vedtaksperioder,

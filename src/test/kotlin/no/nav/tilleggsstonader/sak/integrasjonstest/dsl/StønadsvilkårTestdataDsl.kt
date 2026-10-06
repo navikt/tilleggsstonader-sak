@@ -24,9 +24,16 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.OpprettVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarPåVilkårDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.VilkårsvurderingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlytteSelvDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttebyråDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FlyttebyråTilbudDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.LagreVilkårFlyttingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBolig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarnDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
@@ -42,6 +49,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.S
 @BehandlingTestdataDslMarker
 class StønadsvilkårTestdataDsl {
     internal val opprettScope = OpprettStønadsvilkårDsl()
+    internal val opprettFlyttingScope = mutableListOf<(BehandlingId) -> LagreVilkårFlyttingDto>()
     internal val update = mutableListOf<(VilkårsvurderingDto) -> SvarPåVilkårDto>()
     internal val updateDagligReise =
         mutableListOf<(List<VilkårDagligReiseDto>, List<VilkårperiodeDto>) -> Pair<VilkårId, LagreVilkårDagligReiseDto>>()
@@ -51,6 +59,54 @@ class StønadsvilkårTestdataDsl {
 
     fun opprett(builder: OpprettStønadsvilkårDsl.() -> Unit) {
         opprettScope.apply(builder)
+    }
+
+    fun flyttingByrå(
+        fom: LocalDate,
+        tom: LocalDate,
+        tilbud1Pris: Int,
+        tilbud2Pris: Int,
+    ) {
+        opprettFlyttingScope += {
+            LagreVilkårFlyttingDto(
+                fom = fom,
+                tom = tom,
+                svar = mapOf(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTEBYRÅ)),
+                fakta =
+                    FaktaFlyttebyråDto(
+                        tilbud1 = FlyttebyråTilbudDto(navn = "Syntetisk tilbud 1", pris = tilbud1Pris),
+                        tilbud2 = FlyttebyråTilbudDto(navn = "Syntetisk tilbud 2", pris = tilbud2Pris),
+                        adresse = "Syntetisk adresse",
+                    ),
+            )
+        }
+    }
+
+    fun flyttingEgenKjøring(
+        fom: LocalDate,
+        tom: LocalDate,
+        avstandEnVei: Int,
+        henger: Int? = null,
+        bompenger: Int? = null,
+        ferge: Int? = null,
+        parkering: Int? = null,
+    ) {
+        opprettFlyttingScope += {
+            LagreVilkårFlyttingDto(
+                fom = fom,
+                tom = tom,
+                svar = mapOf(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTER_SELV)),
+                fakta =
+                    FaktaFlytteSelvDto(
+                        avstandEnVei = avstandEnVei,
+                        henger = henger,
+                        bompenger = bompenger,
+                        ferge = ferge,
+                        parkering = parkering,
+                        adresse = "Syntetisk adresse",
+                    ),
+            )
+        }
     }
 
     fun oppdater(block: (vilkårsvurderingDto: VilkårsvurderingDto) -> SvarPåVilkårDto) {

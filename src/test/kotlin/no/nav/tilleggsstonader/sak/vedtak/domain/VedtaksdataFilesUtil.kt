@@ -24,6 +24,9 @@ object VedtaksdataFilesUtil {
             Stønadstype.DAGLIG_REISE_TSR -> "DAGLIG_REISE"
             Stønadstype.REISE_TIL_SAMLING_TSO -> "REISE_TIL_SAMLING"
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO -> "REISE_OPPSTART_AVSLUTNING_HJEMREISE"
+            Stønadstype.FLYTTING_TSO,
+            Stønadstype.FLYTTING_TSR,
+            -> "FLYTTING"
             else -> name
         }
 

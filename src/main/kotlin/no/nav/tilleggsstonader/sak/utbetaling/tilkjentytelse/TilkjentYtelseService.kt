@@ -124,4 +124,5 @@ private fun TypeAndel.gjelderAktivitetspenger(): Boolean =
             TypeAndel.DAGLIG_REISE_AKTIVITETSPENGER,
             TypeAndel.REISE_TIL_SAMLING_AKTIVITETSPENGER,
             TypeAndel.REISE_OPPSTART_AKTIVITETSPENGER,
+            TypeAndel.FLYTTING_AKTIVITETSPENGER,
         )
