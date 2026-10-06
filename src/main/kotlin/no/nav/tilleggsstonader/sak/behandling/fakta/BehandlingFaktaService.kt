@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.boutgifter.Dokumentasjon
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.AktivitetDagligReiseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.DokumentasjonDagligReise
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.ReiseAdresse
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.TypeUtdanning
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.AktivitetAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadBarn
@@ -191,11 +192,27 @@ class BehandlingFaktaService(
                                 aktiviteter = avsnitt.aktiviteter?.map { it.label },
                                 annenAktivitet = avsnitt.annenAktivitet,
                                 lønnetAktivitet = avsnitt.lønnetAktivitet,
-                                dekkesUtgiftenAvAndre = null,
+                                dekkesUtgiftenAvAndre = mapDekkesUtgiftenAvAndreForReiseTilSamling(avsnitt),
                             )
                         },
                 ),
         )
+
+    private fun mapDekkesUtgiftenAvAndreForReiseTilSamling(avsnitt: AktivitetReiseTilSamlingAvsnitt): DekkesUtgiftenAvAndre? {
+        val tilleggsopplysninger = avsnitt.tilleggsopplysningerAnnenAktivitet
+        if (tilleggsopplysninger == null && avsnitt.annenAktivitetTypeUtdanning == null) {
+            return null
+        }
+
+        return DekkesUtgiftenAvAndre(
+            typeUtdanning = avsnitt.annenAktivitetTypeUtdanning?.let { TypeUtdanning.valueOf(it.name) },
+            lærling = tilleggsopplysninger?.erLærlingEllerLiknende,
+            arbeidsgiverDekkerUtgift = tilleggsopplysninger?.fårDekketReise,
+            erUnder25år = tilleggsopplysninger?.erUnder25År,
+            betalerForReisenTilSkolenSelv = tilleggsopplysninger?.måBetaleForReiseTilSkole,
+            lønnetAktivitet = avsnitt.lønnetAktivitet,
+        )
+    }
 
     private fun mapAktivitetForDagligReise(aktivitet: AktivitetDagligReiseAvsnitt?) =
         FaktaAktivitetDagligReise(
