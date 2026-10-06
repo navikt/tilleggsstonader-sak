@@ -40,6 +40,7 @@ data class GrunnlagYtelseDto(
     JsonSubTypes.Type(value = PeriodeGrunnlagYtelseDto.Omstillingsstønad::class, name = "OMSTILLINGSSTØNAD"),
     JsonSubTypes.Type(value = PeriodeGrunnlagYtelseDto.TiltakspengerTPSak::class, name = "TILTAKSPENGER_TPSAK"),
     JsonSubTypes.Type(value = PeriodeGrunnlagYtelseDto.TiltakspengerArena::class, name = "TILTAKSPENGER_ARENA"),
+    JsonSubTypes.Type(value = PeriodeGrunnlagYtelseDto.Aktivitetspenger::class, name = "AKTIVITETSPENGER"),
 )
 sealed interface PeriodeGrunnlagYtelseDto {
     val fom: LocalDate
