@@ -196,7 +196,7 @@ class ReiseTilSamlingVedtakControllerTest : CleanDatabaseIntegrationTest() {
             val privatBil = checkNotNull(respons.privatBil)
             val reise = privatBil.single { it.reiseId == privatBilReiseId }
 
-            assertThat(reise.beløpUtenAndreKostnader).isEqualTo(BigDecimal("115.2"))
+            assertThat(reise.beløpUtenAndreKostnader).isEqualTo(BigDecimal("115.20"))
         }
     }
 }
