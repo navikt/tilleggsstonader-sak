@@ -5,14 +5,12 @@ import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.avrundetStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagEgenKjøring
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlyttevilkår
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
-import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.Flyttemåte
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
@@ -80,38 +78,34 @@ class FlyttingBeregningService(
         tom: LocalDate,
     ): BeregningsresultatFlyttevilkår =
         when (val fakta = vilkår.fakta) {
-            is FaktaFlyttebyrå -> beregnFlyttebyrå(vilkår.id, fom, tom, fakta)
-            is FaktaFlytteSelv -> beregnEgenKjøring(vilkår.id, fom, tom, fakta)
+            is FaktaFlyttebyrå -> beregnFlyttebyrå(fom, tom, fakta)
+            is FaktaFlytteSelv -> beregnEgenKjøring(fom, tom, fakta)
             else -> feil("Flyttevilkår ${vilkår.id} mangler fullstendige flyttefakta")
         }
 
     private fun beregnFlyttebyrå(
-        vilkårId: VilkårId,
         fom: LocalDate,
         tom: LocalDate,
         fakta: FaktaFlyttebyrå,
     ): BeregningsresultatFlyttevilkår {
-        val tilbud1Pris = fakta.tilbud1.pris?.toBigDecimal() ?: feil("Flyttevilkår $vilkårId mangler pris på tilbud 1")
-        val tilbud2Pris = fakta.tilbud2.pris?.toBigDecimal() ?: feil("Flyttevilkår $vilkårId mangler pris på tilbud 2")
+        val tilbud1Pris = fakta.tilbud1.pris?.toBigDecimal() ?: feil("Flyttevilkår  mangler pris på tilbud 1")
+        val tilbud2Pris = fakta.tilbud2.pris?.toBigDecimal() ?: feil("Flyttevilkår  mangler pris på tilbud 2")
         feilHvis(tilbud1Pris.signum() < 0 || tilbud2Pris.signum() < 0) { "Flyttebyråtilbud kan ikke ha negativ pris" }
         val grunnlag = BeregningsgrunnlagFlyttebyrå(tilbud1Pris, tilbud2Pris)
         return BeregningsresultatFlyttevilkår(
-            vilkårId = vilkårId,
             fom = fom,
             tom = tom,
-            flyttemåte = Flyttemåte.FLYTTEBYRÅ,
             grunnlag = grunnlag,
             beløp = minOf(tilbud1Pris, tilbud2Pris).avrundetStønadsbeløp(),
         )
     }
 
     private fun beregnEgenKjøring(
-        vilkårId: VilkårId,
         fom: LocalDate,
         tom: LocalDate,
         fakta: FaktaFlytteSelv,
     ): BeregningsresultatFlyttevilkår {
-        val avstandEnVei = fakta.avstandEnVei ?: feil("Flyttevilkår $vilkårId mangler avstand én vei")
+        val avstandEnVei = fakta.avstandEnVei ?: feil("Flyttevilkår mangler avstand én vei")
         feilHvis(avstandEnVei < 0) { "Avstand én vei kan ikke være negativ" }
         val sats =
             satsPrivatBilProvider.finnRelevantKilometerSatsForPeriode(PeriodeDato(fom)).let {
@@ -135,10 +129,8 @@ class FlyttingBeregningService(
             avstandEnVei.toBigDecimal() * sats.first +
                 henger + bompenger + ferge + parkering
         return BeregningsresultatFlyttevilkår(
-            vilkårId = vilkårId,
             fom = fom,
             tom = tom,
-            flyttemåte = Flyttemåte.FLYTTE_SELV,
             grunnlag = grunnlag,
             beløp = beløp.avrundetStønadsbeløp(),
         )

@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.feil.Feil
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
-import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
@@ -13,7 +12,6 @@ import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagEgen
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlyttevilkår
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
-import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.Flyttemåte
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -75,7 +73,6 @@ class FlyttingAndelTilkjentYtelseMapperTest {
                     resultater =
                         listOf(
                             resultat.resultater.single().copy(
-                                flyttemåte = Flyttemåte.FLYTTE_SELV,
                                 grunnlag = grunnlag,
                             ),
                         ),
@@ -113,10 +110,8 @@ class FlyttingAndelTilkjentYtelseMapperTest {
         BeregningsresultatFlytting(
             listOf(
                 BeregningsresultatFlyttevilkår(
-                    vilkårId = VilkårId.random(),
                     fom = fom,
                     tom = fom.plusDays(10),
-                    flyttemåte = Flyttemåte.FLYTTEBYRÅ,
                     grunnlag = BeregningsgrunnlagFlyttebyrå(BigDecimal("100"), BigDecimal("120")),
                     beløp = BigDecimal("100"),
                 ),
