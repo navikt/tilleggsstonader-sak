@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto
 
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.SlettetVilkårResultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.VilkårFlyttingMapper.mapTilVilkårFlytting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.VilkårFlyttingMapper.tilVilkårFlyttingDto
 
 data class SlettVilkårFlyttingRequestDto(
@@ -15,5 +16,5 @@ data class SlettVilkårFlyttingResultatDto(
 fun SlettetVilkårResultat.tilVilkårFlyttingDto() =
     SlettVilkårFlyttingResultatDto(
         slettetPermanent = slettetPermanent,
-        vilkår = vilkår.tilVilkårFlyttingDto(),
+        vilkår = vilkår.mapTilVilkårFlytting().tilVilkårFlyttingDto(),
     )
