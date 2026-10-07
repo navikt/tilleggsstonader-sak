@@ -28,6 +28,7 @@ class FlyttingAndelTilkjentYtelseMapperTest {
                 FaktiskMålgruppe.AKTIVITETSPENGER to TypeAndel.FLYTTING_AKTIVITETSPENGER,
             )
         val lørdag = 3 januar 2026
+        val mandag = 5 januar 2026
 
         forventedeTyper.forEach { (målgruppe, typeAndel) ->
             val vedtak = listOf(vedtaksperiode(fom = 1 januar 2026, tom = 31 januar 2026, målgruppe = målgruppe))
@@ -35,10 +36,10 @@ class FlyttingAndelTilkjentYtelseMapperTest {
                 resultat(lørdag).mapTilAndeler(Stønadstype.FLYTTING_TSO, vedtak).single()
 
             assertThat(andel.type).isEqualTo(typeAndel)
-            assertThat(andel.satstype).isEqualTo(Satstype.ENGANGSBELØP)
-            assertThat(andel.fom).isEqualTo(lørdag)
-            assertThat(andel.tom).isEqualTo(lørdag)
-            assertThat(andel.utbetalingsdato).isEqualTo(lørdag)
+            assertThat(andel.satstype).isEqualTo(Satstype.DAG)
+            assertThat(andel.fom).isEqualTo(mandag)
+            assertThat(andel.tom).isEqualTo(mandag)
+            assertThat(andel.utbetalingsdato).isEqualTo(mandag)
             assertThat(andel.beløp).isEqualTo(100)
         }
     }

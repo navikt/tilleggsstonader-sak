@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjen
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
+import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagEgenKjøring
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
@@ -29,14 +30,15 @@ fun BeregningsresultatFlytting.mapTilAndeler(
             "Flyttebeløpet kan ikke lagres som andel"
         }
         val satsBekreftet = (resultat.grunnlag as? BeregningsgrunnlagEgenKjøring)?.satsBekreftet ?: true
+        val dato = resultat.fom.datoEllerNesteMandagHvisLørdagEllerSøndag()
         AndelTilkjentYtelse(
             beløp = beløp.intValueExact(),
-            fom = resultat.fom,
-            tom = resultat.fom,
-            satstype = Satstype.ENGANGSBELØP,
+            fom = dato,
+            tom = dato,
+            satstype = Satstype.DAG,
             type = typeAndel,
             statusIverksetting = StatusIverksetting.fraSatsBekreftet(satsBekreftet),
-            utbetalingsdato = resultat.fom,
+            utbetalingsdato = dato,
         )
     }
 

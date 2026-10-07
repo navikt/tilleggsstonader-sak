@@ -143,15 +143,13 @@ data class AndelTilkjentYtelse(
             TypeAndel.REISE_OPPSTART_TILTAK_HØYERE_UTDANNING,
             TypeAndel.REISE_OPPSTART_TILTAK_JOBBKLUBB,
             TypeAndel.REISE_OPPSTART_TILTAK_OPPFØLGING,
-
-            -> satstype skalVære Satstype.DAG
-
             TypeAndel.FLYTTING_AAP,
             TypeAndel.FLYTTING_ENSLIG_FORSØRGER,
             TypeAndel.FLYTTING_ETTERLATTE,
             TypeAndel.FLYTTING_AKTIVITETSPENGER,
             TypeAndel.FLYTTING_ARBEIDSSØKER,
-            -> satstype skalVære Satstype.ENGANGSBELØP
+
+            -> satstype skalVære Satstype.DAG
 
             TypeAndel.UGYLDIG -> {}
         }

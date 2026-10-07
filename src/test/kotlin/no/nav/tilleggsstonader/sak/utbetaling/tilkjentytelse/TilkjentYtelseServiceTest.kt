@@ -50,7 +50,7 @@ class TilkjentYtelseServiceTest {
         val andel =
             andelTilkjentYtelse(
                 type = TypeAndel.FLYTTING_AKTIVITETSPENGER,
-                satstype = Satstype.ENGANGSBELØP,
+                satstype = Satstype.DAG,
             )
 
         assertThatThrownBy {

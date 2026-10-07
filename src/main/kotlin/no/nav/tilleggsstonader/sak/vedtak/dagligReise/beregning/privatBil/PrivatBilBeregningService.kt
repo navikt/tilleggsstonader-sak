@@ -14,7 +14,7 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtK
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.alleErUendret
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.finnDagerInnenforPeriode
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.avrundetStønadsbeløp
+import no.nav.tilleggsstonader.sak.vedtak.avrundetStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilDag
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatForReisePrivatBilGrunnlag

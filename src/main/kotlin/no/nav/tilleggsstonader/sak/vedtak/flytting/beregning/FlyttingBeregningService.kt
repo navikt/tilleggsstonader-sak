@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.avrundetStønadsbeløp
+import no.nav.tilleggsstonader.sak.vedtak.avrundetStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagEgenKjøring
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
@@ -59,13 +59,11 @@ class FlyttingBeregningService(
             "Flyttevilkår ${vilkår.id} må være oppfylt før beregning"
         }
         val fom =
-            vilkår.fom ?: run {
-                feil("Flyttevilkår ${vilkår.id} mangler FOM")
-            }
+            vilkår.fom
+                ?: feil("Flyttevilkår ${vilkår.id} mangler FOM")
         val tom =
-            vilkår.tom ?: run {
-                feil("Flyttevilkår ${vilkår.id} mangler TOM")
-            }
+            vilkår.tom
+                ?: feil("Flyttevilkår ${vilkår.id} mangler TOM")
         feilHvisIkke(erFullstendigDekket(fom, tom, vedtaksperioder)) {
             "Vedtaksperiodene må dekke hele flyttevilkåret ${vilkår.id}"
         }

@@ -47,7 +47,7 @@ class HelvedDtoTest {
                     fom = 1 januar 2026,
                     tom = 1 januar 2026,
                     utbetalingsdato = 1 januar 2026,
-                    satstype = Satstype.ENGANGSBELØP,
+                    satstype = Satstype.DAG,
                     type = typeAndel,
                 )
 

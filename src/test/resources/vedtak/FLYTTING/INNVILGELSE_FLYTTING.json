@@ -6,15 +6,13 @@
   "beregningsresultat": {
     "resultater": [ {
       "beløp": 10000,
-      "flyttemåte": "FLYTTEBYRÅ",
       "fom": "2026-01-01",
       "grunnlag": {
         "tilbud1Pris": 10000,
         "tilbud2Pris": 12000,
         "type": "FLYTTEBYRÅ"
       },
-      "tom": "2026-01-31",
-      "vilkårId": "550e8400-e29b-41d4-a716-446655440001"
+      "tom": "2026-01-31"
     } ]
   },
   "type": "INNVILGELSE_FLYTTING",

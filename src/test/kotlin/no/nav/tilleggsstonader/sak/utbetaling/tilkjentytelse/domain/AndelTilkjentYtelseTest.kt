@@ -148,7 +148,7 @@ class AndelTilkjentYtelseTest {
         }
 
         @Test
-        fun `skal kaste feil dersom`() {
+        fun `skal kaste feil dersom utbetalingsdato ikke er i samme måned`() {
             val utbetalingsdato = LocalDate.of(2025, 7, 1)
             assertThatThrownBy {
                 andelTilkjentYtelse(
@@ -175,53 +175,53 @@ class AndelTilkjentYtelseTest {
                 )
             }.hasMessageContaining("Forventet satstype=DAG for type=DAGLIG_REISE_AAP, men fikk ENGANGSBELØP")
         }
+    }
 
-        @Nested
-        inner class Flytteandel {
-            private val flytteandelstyper =
-                listOf(
-                    TypeAndel.FLYTTING_AAP,
-                    TypeAndel.FLYTTING_ENSLIG_FORSØRGER,
-                    TypeAndel.FLYTTING_ETTERLATTE,
-                    TypeAndel.FLYTTING_AKTIVITETSPENGER,
-                    TypeAndel.FLYTTING_ARBEIDSSØKER,
-                )
+    @Nested
+    inner class Flytteandel {
+        private val flytteandelstyper =
+            listOf(
+                TypeAndel.FLYTTING_AAP,
+                TypeAndel.FLYTTING_ENSLIG_FORSØRGER,
+                TypeAndel.FLYTTING_ETTERLATTE,
+                TypeAndel.FLYTTING_AKTIVITETSPENGER,
+                TypeAndel.FLYTTING_ARBEIDSSØKER,
+            )
 
-            @Test
-            fun `tillater kun engangsbeløp for flytteandeler`() {
-                flytteandelstyper.forEach { type ->
-                    assertThatCode {
-                        andelTilkjentYtelse(
-                            type = type,
-                            satstype = Satstype.ENGANGSBELØP,
-                            fom = 1 januar 2026,
-                            tom = 1 januar 2026,
-                        )
-                    }.doesNotThrowAnyException()
-                }
+        @Test
+        fun `tillater kun dagsats for flytteandeler`() {
+            flytteandelstyper.forEach { type ->
+                assertThatCode {
+                    andelTilkjentYtelse(
+                        type = type,
+                        satstype = Satstype.DAG,
+                        fom = 1 januar 2026,
+                        tom = 1 januar 2026,
+                    )
+                }.doesNotThrowAnyException()
             }
+        }
 
-            @Test
-            fun `avviser dag og måned for flytteandeler`() {
-                flytteandelstyper.forEach { type ->
-                    assertThatThrownBy {
-                        andelTilkjentYtelse(
-                            type = type,
-                            satstype = Satstype.DAG,
-                            fom = 1 januar 2026,
-                            tom = 1 januar 2026,
-                        )
-                    }.hasMessageContaining("Forventet satstype=ENGANGSBELØP")
+        @Test
+        fun `avviser engangsbeløp og måned for flytteandeler`() {
+            flytteandelstyper.forEach { type ->
+                assertThatThrownBy {
+                    andelTilkjentYtelse(
+                        type = type,
+                        satstype = Satstype.ENGANGSBELØP,
+                        fom = 1 januar 2026,
+                        tom = 1 januar 2026,
+                    )
+                }.hasMessageContaining("Forventet satstype=DAG")
 
-                    assertThatThrownBy {
-                        andelTilkjentYtelse(
-                            type = type,
-                            satstype = Satstype.MÅNED,
-                            fom = 1 januar 2026,
-                            tom = 31 januar 2026,
-                        )
-                    }.hasMessageContaining("Forventet satstype=ENGANGSBELØP")
-                }
+                assertThatThrownBy {
+                    andelTilkjentYtelse(
+                        type = type,
+                        satstype = Satstype.MÅNED,
+                        fom = 1 januar 2026,
+                        tom = 31 januar 2026,
+                    )
+                }.hasMessageContaining("Forventet satstype=DAG")
             }
         }
     }
