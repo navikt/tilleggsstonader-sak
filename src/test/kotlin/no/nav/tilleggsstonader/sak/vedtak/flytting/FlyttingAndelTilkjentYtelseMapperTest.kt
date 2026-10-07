@@ -75,7 +75,7 @@ class FlyttingAndelTilkjentYtelseMapperTest {
                     resultater =
                         listOf(
                             resultat.resultater.single().copy(
-                                flyttemåte = Flyttemåte.EGEN_KJØRING,
+                                flyttemåte = Flyttemåte.FLYTTE_SELV,
                                 grunnlag = grunnlag,
                             ),
                         ),

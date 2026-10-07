@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.flytting.domain
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -11,23 +10,21 @@ data class BeregningsresultatFlytting(
 )
 
 data class BeregningsresultatFlyttevilkår(
-    val vilkårId: VilkårId,
     val fom: LocalDate,
     val tom: LocalDate,
-    val flyttemåte: Flyttemåte,
-    val grunnlag: BeregningsgrunnlagFlytting,
     val beløp: BigDecimal,
+    val grunnlag: BeregningsgrunnlagFlytting,
 )
 
 enum class Flyttemåte {
     FLYTTEBYRÅ,
-    EGEN_KJØRING,
+    FLYTTE_SELV,
 }
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
     JsonSubTypes.Type(BeregningsgrunnlagFlyttebyrå::class, name = "FLYTTEBYRÅ"),
-    JsonSubTypes.Type(BeregningsgrunnlagEgenKjøring::class, name = "EGEN_KJØRING"),
+    JsonSubTypes.Type(BeregningsgrunnlagEgenKjøring::class, name = "FLYTTE_SELV"),
 )
 sealed interface BeregningsgrunnlagFlytting
 

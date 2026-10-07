@@ -43,6 +43,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingResponse
+import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.VedtakFlyttingResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerResponse
@@ -108,6 +109,7 @@ class VedtakDtoMapper(
                     tidligsteEndring = vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
                 )
+
             is VedtakReiseTilSamling ->
                 mapVedtakReiseTilSamling(
                     vedtak = vedtak,
@@ -115,6 +117,7 @@ class VedtakDtoMapper(
                     tidligsteEndring = vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
                 )
+
             is VedtakReiseOppstartAvslutningHjemreise ->
                 mapVedtakReiseOppstartAvslutningHjemreise(
                     vedtak = vedtak,
@@ -122,15 +125,22 @@ class VedtakDtoMapper(
                     tidligsteEndring = vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
                 )
+
             is VedtakFlytting ->
-                when (data) {
-                    is InnvilgelseFlytting ->
-                        InnvilgelseFlyttingResponse(
-                            vedtaksperioder = data.vedtaksperioder.tilLagretVedtaksperiodeDto(null),
-                            beregningsresultat = data.beregningsresultat.tilFlyttingDto(),
-                            begrunnelse = data.begrunnelse,
-                        )
-                }
+                mapVedtakFlytting(
+                    vedtak = vedtak,
+                    data = data,
+                    tidligsteEndring = vedtak.tidligsteEndring,
+                    forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
+                )
+//                when (data) {
+//                    is InnvilgelseFlytting ->
+//                        InnvilgelseFlyttingResponse(
+//                            vedtaksperioder = data.vedtaksperioder.tilLagretVedtaksperiodeDto(null),
+//                            beregningsresultat = data.beregningsresultat.tilFlyttingDto(),
+//                            begrunnelse = data.begrunnelse,
+//                        )
+//                }
         }
 
     private fun mapVedtakPassAvBarn(
@@ -294,11 +304,13 @@ class VedtakDtoMapper(
                     begrunnelse = data.begrunnelse,
                 )
             }
+
             is AvslagReiseTilSamling ->
                 AvslagReiseTilSamlingDto(
                     årsakerAvslag = data.årsaker,
                     begrunnelse = data.begrunnelse,
                 )
+
             is OpphørReiseTilSamling ->
                 OpphørReiseTilSamlingResponse(
                     årsakerOpphør = data.årsaker,
@@ -325,6 +337,27 @@ class VedtakDtoMapper(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
                         ),
                     beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan),
+                    gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
+                    gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
+                    begrunnelse = data.begrunnelse,
+                )
+            }
+        }
+
+    private fun mapVedtakFlytting(
+        vedtak: Vedtak,
+        data: VedtakFlytting,
+        tidligsteEndring: LocalDate?,
+        forrigeIverksatteBehandlingId: BehandlingId?,
+    ): VedtakFlyttingResponse =
+        when (data) {
+            is InnvilgelseFlytting -> {
+                InnvilgelseFlyttingResponse(
+                    vedtaksperioder =
+                        data.vedtaksperioder.tilLagretVedtaksperiodeDto(
+                            hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
+                        ),
+                    beregningsresultat = data.beregningsresultat.tilFlyttingDto(),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,

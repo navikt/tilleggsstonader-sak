@@ -138,7 +138,7 @@ class FlyttingBeregningService(
             vilkårId = vilkårId,
             fom = fom,
             tom = tom,
-            flyttemåte = Flyttemåte.EGEN_KJØRING,
+            flyttemåte = Flyttemåte.FLYTTE_SELV,
             grunnlag = grunnlag,
             beløp = beløp.avrundetStønadsbeløp(),
         )
