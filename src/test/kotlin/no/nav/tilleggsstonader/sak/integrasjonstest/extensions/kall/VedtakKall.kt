@@ -4,14 +4,13 @@ import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
+import no.nav.tilleggsstonader.kontrakter.felles.gjelderFlytting
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseTilSamling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakRequest
-import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingTsoRequest
-import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingTsrRequest
 import org.springframework.test.web.servlet.client.RestTestClient
 
 class VedtakKall(
@@ -94,11 +93,7 @@ class VedtakKall(
             stønadstype: Stønadstype,
             behandlingId: BehandlingId,
         ) = testklient.get(
-            if (stønadstype == Stønadstype.FLYTTING_TSO || stønadstype == Stønadstype.FLYTTING_TSR) {
-                "/api/vedtak/flytting/$behandlingId"
-            } else {
-                "/api/vedtak/${stønadstype.tilPath()}/$behandlingId"
-            },
+            "/api/vedtak/${stønadstype.tilPath()}/$behandlingId",
         )
 
         fun foresåVedtaksperioder(behandlingId: BehandlingId) = testklient.get("/api/vedtak/$behandlingId/foresla")
@@ -108,12 +103,7 @@ class VedtakKall(
             behandlingId: BehandlingId,
             typeVedtakPath: String,
             vedtakDto: VedtakRequest,
-        ): RestTestClient.ResponseSpec =
-            if (stønadstype == Stønadstype.FLYTTING_TSO || stønadstype == Stønadstype.FLYTTING_TSR) {
-                lagreFlytting(stønadstype, behandlingId, typeVedtakPath, vedtakDto)
-            } else {
-                testklient.post("/api/vedtak/${stønadstype.tilPath()}/$behandlingId/$typeVedtakPath", vedtakDto)
-            }
+        ): RestTestClient.ResponseSpec = testklient.post("/api/vedtak/${stønadstype.tilPath()}/$behandlingId/$typeVedtakPath", vedtakDto)
 
         fun lagreEnhetsspesifiktVedtak(
             stønadstype: Stønadstype,
@@ -132,12 +122,10 @@ class VedtakKall(
             behandlingId: BehandlingId,
             innvilgelseDto: VedtakRequest,
         ): RestTestClient.ResponseSpec {
-            if (stønadstype == Stønadstype.FLYTTING_TSO || stønadstype == Stønadstype.FLYTTING_TSR) {
-                return lagreFlytting(stønadstype, behandlingId, "innvilgelse", innvilgelseDto)
-            }
             if (stønadstype.gjelderDagligReise() ||
                 stønadstype.gjelderReiseTilSamling() ||
-                stønadstype.gjelderReiseOppstartAvslutningHjemreise()
+                stønadstype.gjelderReiseOppstartAvslutningHjemreise() ||
+                stønadstype.gjelderFlytting()
             ) {
                 return lagreEnhetsspesifiktVedtak(
                     stønadstype,
@@ -149,36 +137,6 @@ class VedtakKall(
             }
             return lagreVedtak(stønadstype, behandlingId, "innvilgelse", innvilgelseDto)
         }
-
-        fun beregnFlyttingTso(
-            behandlingId: BehandlingId,
-            request: InnvilgelseFlyttingTsoRequest,
-        ) = testklient.post("/api/vedtak/flytting/$behandlingId/tso/beregn", request)
-
-        fun beregnFlyttingTsr(
-            behandlingId: BehandlingId,
-            request: InnvilgelseFlyttingTsrRequest,
-        ) = testklient.post("/api/vedtak/flytting/$behandlingId/tsr/beregn", request)
-
-        private fun lagreFlytting(
-            stønadstype: Stønadstype,
-            behandlingId: BehandlingId,
-            typeVedtakPath: String,
-            vedtakDto: VedtakRequest,
-        ): RestTestClient.ResponseSpec =
-            when (stønadstype) {
-                Stønadstype.FLYTTING_TSO -> {
-                    check(typeVedtakPath == "innvilgelse")
-                    check(vedtakDto is InnvilgelseFlyttingTsoRequest)
-                    testklient.post("/api/vedtak/flytting/$behandlingId/tso/innvilgelse", vedtakDto)
-                }
-                Stønadstype.FLYTTING_TSR -> {
-                    check(typeVedtakPath == "innvilgelse")
-                    check(vedtakDto is InnvilgelseFlyttingTsrRequest)
-                    testklient.post("/api/vedtak/flytting/$behandlingId/tsr/innvilgelse", vedtakDto)
-                }
-                else -> error("Forventer flytting, fikk $stønadstype")
-            }
 
         fun lagreOpphør(
             stønadstype: Stønadstype,
