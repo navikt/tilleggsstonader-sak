@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
+import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttebyråTilbud
@@ -24,7 +25,8 @@ import java.math.BigDecimal
 
 class FlyttingBeregningServiceTest {
     private val flyttingVilkårService = mockk<FlyttingVilkårService>()
-    private val beregningService = FlyttingBeregningService(flyttingVilkårService, SatsPrivatBilProvider())
+    private val vedtaksperiodeValideringService = mockk<VedtaksperiodeValideringService>(relaxed = true)
+    private val beregningService = FlyttingBeregningService(flyttingVilkårService, SatsPrivatBilProvider(), vedtaksperiodeValideringService)
     private val behandling = saksbehandling()
 
     @Test

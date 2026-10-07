@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.avrundetStønadsbeløp
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagEgenKjøring
@@ -12,6 +13,7 @@ import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyt
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlyttevilkår
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
+import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
@@ -26,12 +28,15 @@ import java.time.LocalDate
 class FlyttingBeregningService(
     private val flyttingVilkårService: FlyttingVilkårService,
     private val satsPrivatBilProvider: SatsPrivatBilProvider,
+    private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
 ) {
     fun beregn(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
     ): BeregningsresultatFlytting {
         feilHvis(vedtaksperioder.isEmpty()) { "Vedtaksperioder kan ikke være tomme" }
+        // TODO - ikke hardkode INNVILGELSE
+        vedtaksperiodeValideringService.validerVedtaksperioder(vedtaksperioder, behandling, typeVedtak = TypeVedtak.INNVILGELSE)
 
         val vilkår = flyttingVilkårService.hentVilkårForBehandling(behandling.id)
         val relevanteVilkår =
