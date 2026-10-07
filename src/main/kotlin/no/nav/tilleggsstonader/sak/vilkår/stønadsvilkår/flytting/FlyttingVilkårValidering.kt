@@ -1,8 +1,8 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting
 
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaKjøreSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.LagreVilkårFlytting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
@@ -33,7 +33,7 @@ object FlyttingVilkårValidering {
                 }
             }
 
-            is FaktaKjøreSelv -> {
+            is FaktaFlytteSelv -> {
                 brukerfeilHvis(fakta.avstandEnVei != null && fakta.avstandEnVei <= 0) {
                     "Avstanden må være større enn 0"
                 }
@@ -60,7 +60,7 @@ object FlyttingVilkårValidering {
                 harNavnPåBeggeTilbud && fakta.tilbud1.pris != null && fakta.tilbud2.pris != null
             }
 
-            SvarId.FLYTTER_SELV -> (vilkår.fakta as? FaktaKjøreSelv)?.avstandEnVei != null
+            SvarId.FLYTTER_SELV -> (vilkår.fakta as? FaktaFlytteSelv)?.avstandEnVei != null
             else -> false
         }
     }

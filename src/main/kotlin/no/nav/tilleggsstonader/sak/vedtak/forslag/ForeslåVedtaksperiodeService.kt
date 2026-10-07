@@ -7,6 +7,8 @@ import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FlyttingVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
 
@@ -18,6 +20,7 @@ class ForeslåVedtaksperiodeService(
     private val behandlingService: BehandlingService,
     private val vilkårperiodeService: VilkårperiodeService,
     private val vilkårService: VilkårService,
+    private val flyttingVilkårService: FlyttingVilkårService,
     private val vedtakService: VedtakService,
     private val utledTidligsteEndringService: UtledTidligsteEndringService,
 ) {
@@ -32,9 +35,17 @@ class ForeslåVedtaksperiodeService(
         val tidligsteEndring =
             utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(saksbehandling.id)
         return if (saksbehandling.stønadstype.skalHenteStønadsvilkår()) {
+            val vilkår =
+                when (saksbehandling.stønadstype) {
+                    Stønadstype.FLYTTING_TSO,
+                    Stønadstype.FLYTTING_TSR,
+                    -> flyttingVilkårService.hentVilkårForBehandling(saksbehandling.id).filter { it.status != VilkårStatus.SLETTET }
+
+                    else -> vilkårService.hentVilkår(saksbehandling.id)
+                }
             ForeslåVedtaksperiode.finnVedtaksperiode(
                 vilkårperioder = vilkårperioder,
-                vilkår = vilkårService.hentVilkår(saksbehandling.id),
+                vilkår = vilkår,
                 forrigeVedtaksperioder = forrigeVedtaksperioder,
                 tidligsteEndring = tidligsteEndring,
             )

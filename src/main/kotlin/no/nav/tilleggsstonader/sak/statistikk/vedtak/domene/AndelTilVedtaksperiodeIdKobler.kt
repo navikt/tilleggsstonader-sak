@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørReiseOppstartAvslutningHjemreise
@@ -57,6 +58,7 @@ object AndelTilVedtaksperiodeMapper {
             is InnvilgelseEllerOpphørDagligReise -> DagligReiseAndelTilVedtaksperiodeIdKobler
             is InnvilgelseEllerOpphørReiseTilSamling -> ReiseTilSamlingAndelTilVedtaksperiodeIdKobler
             is InnvilgelseEllerOpphørReiseOppstartAvslutningHjemreise -> ReiseOppstartAndelTilVedtaksperiodeIdKobler
+            is InnvilgelseEllerOpphørFlytting -> FlyttingAndelTilVedtaksperiodeIdKobler
             is AvslagBoutgifter, is AvslagLæremidler, is AvslagPassAvBarn, is AvslagDagligReise, is AvslagReiseTilSamling -> null
         }
 }
@@ -192,5 +194,16 @@ data object ReiseOppstartAndelTilVedtaksperiodeIdKobler : AndelTilVedtaksperiode
     ): List<VedtaksperioderDvh> {
         vedtaksdata.data as InnvilgelseEllerOpphørReiseOppstartAvslutningHjemreise
         TODO("Implementer kobling mellom vedtaksperioder og andeler for ROAH")
+    }
+}
+
+data object FlyttingAndelTilVedtaksperiodeIdKobler : AndelTilVedtaksperiodeIdKobler {
+    override fun finnVedtaksperioder(
+        andel: AndelTilkjentYtelse,
+        vedtaksdata: GeneriskVedtak<out Vedtaksdata>,
+        vedtaksperioder: List<VedtaksperioderDvh>,
+    ): List<VedtaksperioderDvh> {
+        vedtaksdata.data as InnvilgelseEllerOpphørFlytting
+        return vedtaksperioder.filter { !andel.fom.isBefore(it.fom) && !andel.fom.isAfter(it.tom) }
     }
 }

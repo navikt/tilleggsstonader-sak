@@ -35,7 +35,7 @@ import java.time.LocalDate
         name = "REISE_OPPSTART_AVSLUTNING_HJEMREISE_UBESTEMT",
     ),
     JsonSubTypes.Type(FaktaFlyttebyrå::class, name = "FLYTTING_FLYTTEBYRÅ"),
-    JsonSubTypes.Type(FaktaKjøreSelv::class, name = "FLYTTING_FLYTTE_SELV"),
+    JsonSubTypes.Type(FaktaFlytteSelv::class, name = "FLYTTING_FLYTTE_SELV"),
     JsonSubTypes.Type(FaktaFlyttingUbestemt::class, name = "FLYTTING_UBESTEMT"),
     failOnRepeatedNames = true,
 )
@@ -61,7 +61,7 @@ data class FlyttebyråTilbud(
     val pris: Int?,
 )
 
-data class FaktaKjøreSelv(
+data class FaktaFlytteSelv(
     val avstandEnVei: Int?,
     val henger: Int?,
     val bompenger: Int?,

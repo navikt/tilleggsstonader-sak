@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 )
 @JsonSubTypes(
     JsonSubTypes.Type(FaktaFlyttebyråDto::class, name = "FLYTTING_FLYTTEBYRÅ"),
-    JsonSubTypes.Type(FaktaKjøreSelvDto::class, name = "FLYTTING_FLYTTE_SELV"),
+    JsonSubTypes.Type(FaktaFlytteSelvDto::class, name = "FLYTTING_FLYTTE_SELV"),
     JsonSubTypes.Type(FaktaFlyttingUbestemtDto::class, name = "FLYTTING_UBESTEMT"),
 )
 sealed interface FaktaFlyttingDto {
@@ -38,7 +38,7 @@ data class FlyttebyråTilbudDto(
     val pris: Int? = null,
 )
 
-data class FaktaKjøreSelvDto(
+data class FaktaFlytteSelvDto(
     val avstandEnVei: Int? = null,
     val henger: Int? = null,
     val bompenger: Int? = null,

@@ -167,6 +167,14 @@ object PosteringStønadstypeMapper {
             TypeAndel.REISE_OPPSTART_AKTIVITETSPENGER,
             -> Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO
 
+            TypeAndel.FLYTTING_AAP,
+            TypeAndel.FLYTTING_ENSLIG_FORSØRGER,
+            TypeAndel.FLYTTING_ETTERLATTE,
+            TypeAndel.FLYTTING_AKTIVITETSPENGER,
+            -> Stønadstype.FLYTTING_TSO
+
+            TypeAndel.FLYTTING_ARBEIDSSØKER -> Stønadstype.FLYTTING_TSR
+
             TypeAndel.REISE_OPPSTART_TILTAK_ARBEIDSFORBEREDENDE,
             TypeAndel.REISE_OPPSTART_TILTAK_ARBEIDSTRENING,
             TypeAndel.REISE_OPPSTART_TILTAK_AVKLARING,

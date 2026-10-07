@@ -26,6 +26,11 @@ class PosteringStønadstypeMapperTest {
                         TypeAndel.DAGLIG_REISE_AKTIVITETSPENGER,
                         TypeAndel.REISE_TIL_SAMLING_AKTIVITETSPENGER,
                         TypeAndel.REISE_OPPSTART_AKTIVITETSPENGER,
+                        TypeAndel.FLYTTING_AAP,
+                        TypeAndel.FLYTTING_ENSLIG_FORSØRGER,
+                        TypeAndel.FLYTTING_ETTERLATTE,
+                        TypeAndel.FLYTTING_AKTIVITETSPENGER,
+                        TypeAndel.FLYTTING_ARBEIDSSØKER,
                     )
             }
 

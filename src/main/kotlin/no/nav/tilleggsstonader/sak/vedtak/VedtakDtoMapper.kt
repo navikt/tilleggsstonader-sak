@@ -20,6 +20,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelsePassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseReiseOppstartAvslutningHjemreise
@@ -32,6 +33,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakReiseOppstartAvslutningHjemreise
@@ -40,6 +42,8 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingResponse
+import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.VedtakFlyttingResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerResponse
@@ -62,6 +66,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.DagligRei
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.domain.VilkårDagligReise
 import org.springframework.stereotype.Component
 import java.time.LocalDate
+import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.tilDto as tilFlyttingDto
 
 @Component
 class VedtakDtoMapper(
@@ -104,6 +109,7 @@ class VedtakDtoMapper(
                     tidligsteEndring = vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
                 )
+
             is VedtakReiseTilSamling ->
                 mapVedtakReiseTilSamling(
                     vedtak = vedtak,
@@ -111,6 +117,7 @@ class VedtakDtoMapper(
                     tidligsteEndring = vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
                 )
+
             is VedtakReiseOppstartAvslutningHjemreise ->
                 mapVedtakReiseOppstartAvslutningHjemreise(
                     vedtak = vedtak,
@@ -118,6 +125,22 @@ class VedtakDtoMapper(
                     tidligsteEndring = vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
                 )
+
+            is VedtakFlytting ->
+                mapVedtakFlytting(
+                    vedtak = vedtak,
+                    data = data,
+                    tidligsteEndring = vedtak.tidligsteEndring,
+                    forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
+                )
+//                when (data) {
+//                    is InnvilgelseFlytting ->
+//                        InnvilgelseFlyttingResponse(
+//                            vedtaksperioder = data.vedtaksperioder.tilLagretVedtaksperiodeDto(null),
+//                            beregningsresultat = data.beregningsresultat.tilFlyttingDto(),
+//                            begrunnelse = data.begrunnelse,
+//                        )
+//                }
         }
 
     private fun mapVedtakPassAvBarn(
@@ -281,11 +304,13 @@ class VedtakDtoMapper(
                     begrunnelse = data.begrunnelse,
                 )
             }
+
             is AvslagReiseTilSamling ->
                 AvslagReiseTilSamlingDto(
                     årsakerAvslag = data.årsaker,
                     begrunnelse = data.begrunnelse,
                 )
+
             is OpphørReiseTilSamling ->
                 OpphørReiseTilSamlingResponse(
                     årsakerOpphør = data.årsaker,
@@ -312,6 +337,27 @@ class VedtakDtoMapper(
                             hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
                         ),
                     beregningsresultat = data.beregningsresultat.tilDto(beregningsplan = data.beregningsplan),
+                    gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
+                    gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
+                    begrunnelse = data.begrunnelse,
+                )
+            }
+        }
+
+    private fun mapVedtakFlytting(
+        vedtak: Vedtak,
+        data: VedtakFlytting,
+        tidligsteEndring: LocalDate?,
+        forrigeIverksatteBehandlingId: BehandlingId?,
+    ): VedtakFlyttingResponse =
+        when (data) {
+            is InnvilgelseFlytting -> {
+                InnvilgelseFlyttingResponse(
+                    vedtaksperioder =
+                        data.vedtaksperioder.tilLagretVedtaksperiodeDto(
+                            hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
+                        ),
+                    beregningsresultat = data.beregningsresultat.tilFlyttingDto(),
                     gjelderFraOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).minOfOrNull { it.fom },
                     gjelderTilOgMed = data.vedtaksperioder.avkortPerioderFør(tidligsteEndring).maxOfOrNull { it.tom },
                     begrunnelse = data.begrunnelse,

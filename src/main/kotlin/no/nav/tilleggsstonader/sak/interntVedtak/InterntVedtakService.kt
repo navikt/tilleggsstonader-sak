@@ -23,6 +23,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Innvilgelse
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelsePassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseReiseOppstartAvslutningHjemreise
@@ -36,6 +37,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakReiseOppstartAvslutningHjemreise
@@ -128,6 +130,7 @@ class InterntVedtakService(
                         dagligReise = data.beregningsresultat.tilDto(data.beregningsplan, vilkårDagligReise),
                     )
                 }
+
                 is InnvilgelseReiseTilSamling -> {
                     BeregningsresultatInterntVedtakDto(
                         reiseTilSamling = data.beregningsresultat.tilDto(data.beregningsplan),
@@ -261,6 +264,7 @@ class InterntVedtakService(
                 is VedtakDagligReise -> mapVedtakDagligReise(vedtak.data)
                 is VedtakReiseTilSamling -> mapVedtakReiseTilSamling(vedtak.data)
                 is VedtakReiseOppstartAvslutningHjemreise -> mapVedtakReiseOppstartAvslutningHjemreise(vedtak.data)
+                is VedtakFlytting -> mapVedtakFlytting(vedtak.data)
             }
         }
 
@@ -351,7 +355,15 @@ class InterntVedtakService(
         when (vedtak) {
             is InnvilgelseReiseOppstartAvslutningHjemreise ->
                 VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
+
             else -> TODO("Må lage opphør og avslag for reise oppstart, avslutning, hjemreise")
+        }
+
+    private fun mapVedtakFlytting(vedtak: VedtakFlytting) =
+        when (vedtak) {
+            is InnvilgelseFlytting -> VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
+
+            else -> TODO("Må lage opphør og avslag for flytting")
         }
 
     private fun mapRammevedtakPrivatBil(vedtak: Vedtak?): RammevedtakPrivatBil? =
@@ -360,6 +372,7 @@ class InterntVedtakService(
                 is InnvilgelseDagligReise -> {
                     vedtak.data.rammevedtakPrivatBil
                 }
+
                 else -> null
             }
         }
@@ -418,6 +431,7 @@ class InterntVedtakService(
                     begrunnelse = fakta.begrunnelse,
                     aktivitetId = fakta.aktivitetId,
                 )
+
             is FaktaReiseTilSamlingPrivatBil ->
                 VilkårFaktaReiseTilSamlingPrivatBilInterntVedtak(
                     reiseId = fakta.reiseId,
@@ -430,6 +444,7 @@ class InterntVedtakService(
                     reiseAvstand = fakta.reiseavstand,
                     aktivitetId = fakta.aktivitetId,
                 )
+
             is FaktaReiseTilSamlingUbestemt ->
                 VilkårFaktaReiseTilSamlingUbestemtInterntVedtak(
                     reiseId = fakta.reiseId,

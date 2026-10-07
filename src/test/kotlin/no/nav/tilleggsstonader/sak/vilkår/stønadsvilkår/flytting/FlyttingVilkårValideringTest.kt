@@ -2,9 +2,9 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting
 
 import no.nav.tilleggsstonader.libs.feil.ApiFeil
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaKjøreSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttebyråTilbud
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.LagreVilkårFlytting
@@ -46,7 +46,7 @@ class FlyttingVilkårValideringTest {
     fun `skal avvise negativ kostnad for henger`() {
         assertThrows<ApiFeil> {
             FlyttingVilkårValidering.validerOppgitteFakta(
-                FaktaKjøreSelv(
+                FaktaFlytteSelv(
                     avstandEnVei = 250,
                     henger = -1,
                     bompenger = null,
@@ -109,7 +109,7 @@ class FlyttingVilkårValideringTest {
                     svar =
                         mapOf(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelse(SvarId.FLYTTER_SELV)),
                     fakta =
-                        FaktaKjøreSelv(
+                        FaktaFlytteSelv(
                             avstandEnVei = 250,
                             henger = null,
                             bompenger = null,
@@ -132,7 +132,7 @@ class FlyttingVilkårValideringTest {
                     svar =
                         mapOf(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelse(SvarId.FLYTTER_SELV)),
                     fakta =
-                        FaktaKjøreSelv(
+                        FaktaFlytteSelv(
                             avstandEnVei = 250,
                             henger = null,
                             bompenger = null,

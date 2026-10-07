@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.andelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseUtil.tilkjentYtelse
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -36,6 +37,20 @@ class TilkjentYtelseServiceTest {
         val andel =
             andelTilkjentYtelse(
                 type = TypeAndel.DAGLIG_REISE_AKTIVITETSPENGER,
+            )
+
+        assertThatThrownBy {
+            tilkjentYtelseService.lagreTilkjentYtelse(behandling.id, listOf(andel))
+        }.hasMessage("Aktivitetspenger er ikke aktivert")
+    }
+
+    @Test
+    fun `flytteandel for aktivitetspenger følger eksisterende toggle`() {
+        every { unleashService.isEnabled(Toggle.KAN_BRUKE_MÅLGRUPPE_AKTIVITETSPENGER) } returns false
+        val andel =
+            andelTilkjentYtelse(
+                type = TypeAndel.FLYTTING_AKTIVITETSPENGER,
+                satstype = Satstype.DAG,
             )
 
         assertThatThrownBy {

@@ -7,10 +7,10 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FaktaFlyttingMapper.tilDomain
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FaktaFlyttingMapper.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlytteSelvDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttebyråDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttingUbestemtDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaKjøreSelvDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FlyttebyråTilbudDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -25,7 +25,7 @@ class FaktaFlyttingMapperTest {
                 tilbud1 = FlyttebyråTilbudDto(navn = "Flyttebyrå A"),
                 adresse = "Flytteveien 1",
             ),
-            FaktaKjøreSelvDto(adresse = "Flytteveien 1"),
+            FaktaFlytteSelvDto(adresse = "Flytteveien 1"),
         ).forEach { fakta ->
             assertThat(fakta.tilDomain().tilDto()).isEqualTo(fakta)
         }
@@ -39,7 +39,7 @@ class FaktaFlyttingMapperTest {
                 tilbud2 = FlyttebyråTilbudDto(navn = "Flyttebyrå B", pris = 12000),
                 adresse = "Flytteveien 1",
             ),
-            FaktaKjøreSelvDto(
+            FaktaFlytteSelvDto(
                 avstandEnVei = 250,
                 henger = 1500,
                 bompenger = 0,

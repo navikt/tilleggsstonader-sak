@@ -4,8 +4,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.KopierPeriode
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import java.math.BigDecimal
-import java.math.RoundingMode
 import java.time.LocalDate
 
 fun antallHverdagerIPeriodeInklusiv(
@@ -51,5 +49,3 @@ fun <P> finnSnittMellomReiseOgVedtaksperioder(
             ),
     )
 }
-
-fun BigDecimal.avrundetStønadsbeløp(): BigDecimal = setScale(0, RoundingMode.HALF_UP)
