@@ -83,6 +83,7 @@ class FlyttingVedtakController(
         vedtak: InnvilgelseFlyttingRequest,
     ): BeregningsresultatFlyttingDto {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerStønadstype(behandling, forventetStønadstype)
         val vedtaksperioder = vedtak.vedtaksperioder()
