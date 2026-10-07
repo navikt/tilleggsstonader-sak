@@ -23,6 +23,8 @@ import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.Beregningsresultat
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingResponse
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.InnvilgelseReiseTilSamlingTsoRequest
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -35,6 +37,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.math.BigDecimal
 
 class ReiseTilSamlingVedtakControllerTest : CleanDatabaseIntegrationTest() {
     @Autowired
@@ -160,6 +163,40 @@ class ReiseTilSamlingVedtakControllerTest : CleanDatabaseIntegrationTest() {
             assertThat(reise.fom).isEqualTo(fom)
             assertThat(reise.tom).isEqualTo(tom)
             assertThat(reise.beløp).isEqualTo(utgifter)
+        }
+
+        @Test
+        fun `beregner beløpUtenEkstrautgifter med to desimaler for privat bil`() {
+            val privatBilReiseId = ReiseId.random()
+            vilkårRepository.insert(
+                vilkår(
+                    behandlingId = dummyBehandlingId,
+                    type = VilkårType.REISE_TIL_SAMLING,
+                    resultat = Vilkårsresultat.OPPFYLT,
+                    status = VilkårStatus.NY,
+                    fom = fom,
+                    tom = tom,
+                    fakta =
+                        FaktaReiseTilSamlingPrivatBil(
+                            reiseId = privatBilReiseId,
+                            adresse = "Bilveien 1",
+                            reiseavstand = 40.toBigDecimal(),
+                            begrunnelse = "Må bruke bil",
+                        ),
+                ),
+            )
+
+            val request = InnvilgelseReiseTilSamlingTsoRequest(listOf(vedtaksperiode(fom = fom, tom = tom).tilDto()))
+
+            val respons =
+                kall.testklient
+                    .post("/api/vedtak/reise-til-samling/$dummyBehandlingId/tso/beregn", request)
+                    .expectOkWithBody<BeregningsresultatReiseTilSamlingDto>()
+
+            val privatBil = checkNotNull(respons.privatBil)
+            val reise = privatBil.single { it.reiseId == privatBilReiseId }
+
+            assertThat(reise.beløpUtenEkstrautgifter).isEqualTo(BigDecimal("115.20"))
         }
     }
 }
