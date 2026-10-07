@@ -7,7 +7,6 @@ import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.Beregningsresul
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
-import java.math.RoundingMode
 import java.time.LocalDate
 
 data class BeregningsresultatReiseTilSamlingDto(
@@ -43,7 +42,7 @@ data class BeregningsresultatPrivatBilDto(
     val fraTidligereVedtak: Boolean,
 ) {
     val beløpUtenEkstrautgifter: BigDecimal
-        get() = totalReiseavstand.multiply(sats).setScale(2, RoundingMode.HALF_UP)
+        get() = totalReiseavstand.multiply(sats)
 
     // Kun bompenger + ferge + piggdekk - Sendes med for å unngå beregning i frontend
     val ekstrakostnader: BigDecimal

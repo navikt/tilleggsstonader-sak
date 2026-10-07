@@ -166,7 +166,7 @@ class ReiseTilSamlingVedtakControllerTest : CleanDatabaseIntegrationTest() {
         }
 
         @Test
-        fun `beregner beløpUtenEkstrautgifter med to desimaler for privat bil`() {
+        fun `beregner beløpUtenEkstrautgifter for privat bil`() {
             val privatBilReiseId = ReiseId.random()
             vilkårRepository.insert(
                 vilkår(
@@ -196,7 +196,7 @@ class ReiseTilSamlingVedtakControllerTest : CleanDatabaseIntegrationTest() {
             val privatBil = checkNotNull(respons.privatBil)
             val reise = privatBil.single { it.reiseId == privatBilReiseId }
 
-            assertThat(reise.beløpUtenEkstrautgifter).isEqualTo(BigDecimal("115.20"))
+            assertThat(reise.beløpUtenEkstrautgifter).isEqualTo(BigDecimal("115.2"))
         }
     }
 }

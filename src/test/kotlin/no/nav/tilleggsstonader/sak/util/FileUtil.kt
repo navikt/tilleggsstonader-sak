@@ -2,8 +2,7 @@ package no.nav.tilleggsstonader.sak.util
 
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider
 import org.assertj.core.api.Assertions.assertThat
-import tools.jackson.databind.JsonNode
-import tools.jackson.databind.node.ObjectNode
+import tools.jackson.module.kotlin.convertValue
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -73,10 +72,8 @@ object FileUtil {
     }
 
     private fun Any.tilSortertPrettyJson(): String {
-        val mapper = JsonMapperProvider.jsonMapper
-        val jsonNode = mapper.readTree(mapper.writeValueAsBytes(this))
-        val sortert = jsonNode.toDeepSorted()
-        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(sortert)
+        val sortert = JsonMapperProvider.jsonMapper.convertValue<Any?>(this).toDeepSorted()
+        return JsonMapperProvider.jsonMapper.writerWithDefaultPrettyPrinter().writeValueAsString(sortert)
     }
 
     fun skrivTilFil(
@@ -100,25 +97,3 @@ object FileUtil {
         file.writeBytes(data)
     }
 }
-
-private fun JsonNode.toDeepSorted(): JsonNode =
-    when {
-        isObject -> {
-            val objectNode = this as ObjectNode
-            val sortedObject = JsonMapperProvider.jsonMapper.nodeFactory.objectNode()
-            objectNode
-                .properties()
-                .asSequence()
-                .sortedBy { it.key }
-                .forEach { (key, value) -> sortedObject.set(key, value.toDeepSorted()) }
-            sortedObject
-        }
-
-        isArray -> {
-            val sortedArray = JsonMapperProvider.jsonMapper.nodeFactory.arrayNode()
-            forEach { sortedArray.add(it.toDeepSorted()) }
-            sortedArray
-        }
-
-        else -> this
-    }
