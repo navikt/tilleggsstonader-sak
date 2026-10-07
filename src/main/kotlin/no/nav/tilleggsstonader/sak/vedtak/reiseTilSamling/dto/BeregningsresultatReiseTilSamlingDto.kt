@@ -41,7 +41,7 @@ data class BeregningsresultatPrivatBilDto(
     val aktivitetId: VilkårperiodeGlobalId?,
     val fraTidligereVedtak: Boolean,
 ) {
-    val beløpUtenEkstrautgifter: BigDecimal
+    val beløpUtenAndreKostnader: BigDecimal
         get() = totalReiseavstand.multiply(sats)
 
     // Kun bompenger + ferge + piggdekk - Sendes med for å unngå beregning i frontend
