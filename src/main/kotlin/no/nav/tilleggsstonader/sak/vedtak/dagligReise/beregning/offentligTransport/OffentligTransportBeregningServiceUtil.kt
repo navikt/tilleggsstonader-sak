@@ -32,7 +32,9 @@ fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: BeregningsgrunnlagOf
             finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag),
             grunnlag.månedsBillettMedPris(),
         ).min()
-
+    if (billigstePris.pris == grunnlag.månedsBillettMedPris()?.pris) {
+        return grunnlag.månedsBillettMedPris()?.tilRespons() ?: BilligsteBillettRespons(0, emptyMap())
+    }
     return billigstePris.tilRespons()
 }
 
