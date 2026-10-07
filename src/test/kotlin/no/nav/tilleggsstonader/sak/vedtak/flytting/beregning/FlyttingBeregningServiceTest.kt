@@ -8,16 +8,15 @@ import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
-import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttebyråTilbud
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FlyttingVilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.VilkårFlytting
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -78,22 +77,17 @@ class FlyttingBeregningServiceTest {
     }
 
     @Test
-    fun `velger sats fra vilkårets FOM og ikke fra hele vilkårsperioden`() {
+    fun `avviser egen kjøring når vilkårsperioden strekker seg over flere kalenderår`() {
         val vilkår = egenKjøring(fom = 31 desember 2025, tom = 1 januar 2026, fakta = FaktaFlytteSelv(100, null, null, null, null))
         every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns listOf(vilkår)
 
-        val resultat =
+        assertThatThrownBy {
             beregningService.beregn(
                 behandling,
                 listOf(vedtaksperiode(31 desember 2025, 1 januar 2026)),
             )
-
-        assertThat(resultat.resultater.single().beløp).isEqualByComparingTo("288")
-        val grunnlag =
-            resultat.resultater.single().grunnlag as
-                no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagEgenKjøring
-        assertThat(grunnlag.sats).isEqualByComparingTo("2.88")
-        assertThat(grunnlag.satsBekreftet).isTrue()
+        }.isInstanceOf(IllegalStateException::class.java)
+            .hasMessage("Kan ikke finne relevant kilometersats for $vilkår")
     }
 
     @Test
@@ -168,9 +162,9 @@ class FlyttingBeregningServiceTest {
         tilbud2: Int?,
         fom: java.time.LocalDate = 1 januar 2026,
         tom: java.time.LocalDate = 31 januar 2026,
-    ) = vilkår(
+    ) = VilkårFlytting(
         behandlingId = behandling.id,
-        type = VilkårType.FLYTTING,
+        delvilkårsett = emptyList(),
         resultat = Vilkårsresultat.OPPFYLT,
         status = VilkårStatus.NY,
         fom = fom,
@@ -186,9 +180,9 @@ class FlyttingBeregningServiceTest {
         fom: java.time.LocalDate = 1 januar 2026,
         tom: java.time.LocalDate = 31 januar 2026,
         fakta: FaktaFlytteSelv,
-    ) = vilkår(
+    ) = VilkårFlytting(
         behandlingId = behandling.id,
-        type = VilkårType.FLYTTING,
+        delvilkårsett = emptyList(),
         resultat = Vilkårsresultat.OPPFYLT,
         status = VilkårStatus.NY,
         fom = fom,

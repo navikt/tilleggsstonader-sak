@@ -11,20 +11,20 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
-import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.SlettetVilkårResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SlettVilkårRequest
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.VilkårFlyttingMapper.mapTilVilkår
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.VilkårFlyttingMapper.mapTilVilkårFlytting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.LagreVilkårFlytting
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.VilkårFlytting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelEvaluering
@@ -40,23 +40,24 @@ class FlyttingVilkårService(
     private val vilkårService: VilkårService,
     private val unleashService: UnleashService,
 ) {
-    fun hentVilkårForBehandling(behandlingId: BehandlingId): List<Vilkår> =
+    fun hentVilkårForBehandling(behandlingId: BehandlingId): List<VilkårFlytting> =
         vilkårRepository
             .findByBehandlingId(behandlingId)
             .filter { it.type == VilkårType.FLYTTING }
+            .map { it.mapTilVilkårFlytting() }
             .sortedBy { it.fom }
 
     @Transactional
     fun opprettVilkår(
         behandlingId: BehandlingId,
         innsendt: LagreVilkårFlytting,
-    ): Vilkår {
+    ): VilkårFlytting {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
         validerFaktaOgSvar(innsendt)
         val vilkår = byggVilkår(behandlingId, innsendt)
         validerIngenOverlapp(behandlingId, vilkår)
-        return vilkårRepository.insert(vilkår)
+        return vilkårRepository.insert(vilkår.mapTilVilkår()).mapTilVilkårFlytting()
     }
 
     @Transactional
@@ -64,15 +65,15 @@ class FlyttingVilkårService(
         behandlingId: BehandlingId,
         vilkårId: VilkårId,
         innsendt: LagreVilkårFlytting,
-    ): Vilkår {
+    ): VilkårFlytting {
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerBehandling(behandling)
         validerFaktaOgSvar(innsendt)
-        val eksisterende = vilkårRepository.findByIdOrThrow(vilkårId)
+        val eksisterende = vilkårRepository.findByIdOrThrow(vilkårId).mapTilVilkårFlytting()
         validerEierskapOgStatus(eksisterende, behandlingId)
         val oppdatert = byggVilkår(behandlingId, innsendt, eksisterende)
         validerIngenOverlapp(behandlingId, oppdatert, vilkårId)
-        return vilkårRepository.update(oppdatert)
+        return vilkårRepository.update(oppdatert.mapTilVilkår()).mapTilVilkårFlytting()
     }
 
     @Transactional
@@ -80,21 +81,20 @@ class FlyttingVilkårService(
         behandlingId: BehandlingId,
         vilkårId: VilkårId,
         kommentar: String?,
-    ): SlettetVilkårResultat {
-        val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        validerBehandling(behandling)
-        val eksisterende = vilkårRepository.findByIdOrThrow(vilkårId)
-        validerEierskapOgStatus(eksisterende, behandlingId)
-        return vilkårService.slettVilkår(
-            SlettVilkårRequest(id = vilkårId, behandlingId = behandlingId, kommentar = kommentar),
+    ): SlettetVilkårResultat =
+        vilkårService.slettVilkår(
+            SlettVilkårRequest(
+                id = vilkårId,
+                behandlingId = behandlingId,
+                kommentar = kommentar,
+            ),
         )
-    }
 
     private fun byggVilkår(
         behandlingId: BehandlingId,
         innsendt: LagreVilkårFlytting,
-        eksisterende: Vilkår? = null,
-    ): Vilkår {
+        eksisterende: VilkårFlytting? = null,
+    ): VilkårFlytting {
         brukerfeilHvis(innsendt.fom.isAfter(innsendt.tom)) { "Fra-dato må være før eller lik til-dato" }
         val delvilkår =
             ByggVilkårFraSvar.byggDelvilkårsettFraSvarOgVilkårsregel(
@@ -113,19 +113,15 @@ class FlyttingVilkårService(
             status = utledStatus(eksisterende),
             fom = innsendt.fom,
             tom = innsendt.tom,
-            delvilkårwrapper = DelvilkårWrapper(delvilkår),
+            delvilkårsett = delvilkår,
             fakta = fakta,
-        ) ?: Vilkår(
+        ) ?: VilkårFlytting(
             behandlingId = behandlingId,
             resultat = samletResultat,
             status = VilkårStatus.NY,
-            type = VilkårType.FLYTTING,
             fom = innsendt.fom,
             tom = innsendt.tom,
-            erFremtidigUtgift = false,
-            delvilkårwrapper = DelvilkårWrapper(delvilkår),
-            opphavsvilkår = null,
-            gitVersjon = Applikasjonsversjon.versjon,
+            delvilkårsett = delvilkår,
             fakta = fakta,
         )
     }
@@ -163,11 +159,9 @@ class FlyttingVilkårService(
 
     private fun validerIngenOverlapp(
         behandlingId: BehandlingId,
-        nyttVilkår: Vilkår,
+        nyttVilkår: VilkårFlytting,
         unntattVilkårId: VilkårId? = null,
     ) {
-        val periodeFom = nyttVilkår.fom ?: error("Forventer fom")
-        val periodeTom = nyttVilkår.tom ?: error("Forventer tom")
         val overlapper =
             vilkårRepository
                 .findByBehandlingId(behandlingId)
@@ -175,11 +169,7 @@ class FlyttingVilkårService(
                     it.type == VilkårType.FLYTTING &&
                         it.status != VilkårStatus.SLETTET &&
                         it.id != unntattVilkårId
-                }.any { eksisterende ->
-                    val eksisterendeFom = eksisterende.fom ?: return@any false
-                    val eksisterendeTom = eksisterende.tom ?: return@any false
-                    !periodeFom.isAfter(eksisterendeTom) && !eksisterendeFom.isAfter(periodeTom)
-                }
+                }.any { nyttVilkår.overlapper(it.mapTilVilkårFlytting()) }
         brukerfeilHvis(overlapper) { "Flyttevilkår kan ikke ha overlappende perioder" }
     }
 
@@ -197,16 +187,16 @@ class FlyttingVilkårService(
     }
 
     private fun validerEierskapOgStatus(
-        vilkår: Vilkår,
+        vilkår: VilkårFlytting,
         behandlingId: BehandlingId,
     ) {
-        feilHvisIkke(vilkår.behandlingId == behandlingId && vilkår.type == VilkårType.FLYTTING) {
+        feilHvisIkke(vilkår.behandlingId == behandlingId) {
             "Flyttevilkåret tilhører ikke behandlingen"
         }
         brukerfeilHvis(vilkår.status == VilkårStatus.SLETTET) { "Flyttevilkåret er allerede slettet" }
     }
 
-    private fun utledStatus(eksisterende: Vilkår): VilkårStatus? =
+    private fun utledStatus(eksisterende: VilkårFlytting): VilkårStatus? =
         when (eksisterende.status) {
             VilkårStatus.UENDRET -> VilkårStatus.ENDRET
             else -> eksisterende.status
