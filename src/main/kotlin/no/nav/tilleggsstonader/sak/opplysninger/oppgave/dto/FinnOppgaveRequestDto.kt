@@ -74,7 +74,7 @@ data class FinnOppgaveRequestDto(
             mappeId = if (this.oppgaverPåVent) ventemappe.id else klarmappe.id,
             limit = this.limit,
             offset = this.offset,
-            sorteringsrekkefolge = order,
-            sorteringsfelt = orderBy,
+            sorteringsrekkefolge = if (this.oppgaverPåVent) Sorteringsrekkefølge.ASC else order,
+            sorteringsfelt = if (this.oppgaverPåVent) Sorteringsfelt.FRIST else orderBy,
         )
 }
