@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsrRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.AvslagFlyttingDto
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingTsoRequest
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingTsrRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
@@ -341,7 +342,11 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                                 )
                             Stønadstype.FLYTTING_TSO,
                             Stønadstype.FLYTTING_TSR,
-                            -> TODO("AvslagFlyttingRequest")
+                            ->
+                                AvslagFlyttingDto(
+                                    årsakerAvslag = listOf(ÅrsakAvslag.ANNET),
+                                    begrunnelse = "begrunnelse",
+                                )
                             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
                             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
                             -> TODO("AvslagReiseOppstartAvslutningHjemreiseRequest")

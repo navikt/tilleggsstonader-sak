@@ -8,6 +8,7 @@ enum class TypeVedtakFlytting(
     override val typeVedtak: TypeVedtak,
 ) : TypeVedtaksdata {
     INNVILGELSE_FLYTTING(TypeVedtak.INNVILGELSE),
+    AVSLAG_FLYTTING(TypeVedtak.AVSLAG),
 }
 
 sealed interface VedtakFlytting : Vedtaksdata
@@ -26,4 +27,16 @@ data class InnvilgelseFlytting(
 ) : InnvilgelseEllerOpphørFlytting,
     Innvilgelse {
     override val type: TypeVedtaksdata = TypeVedtakFlytting.INNVILGELSE_FLYTTING
+}
+
+data class AvslagFlytting(
+    override val årsaker: List<ÅrsakAvslag>,
+    override val begrunnelse: String,
+) : VedtakFlytting,
+    Avslag {
+    override val type: TypeVedtaksdata = TypeVedtakFlytting.AVSLAG_FLYTTING
+
+    init {
+        this.validerÅrsakerOgBegrunnelse()
+    }
 }

@@ -1,6 +1,8 @@
 package no.nav.tilleggsstonader.sak.vedtak.flytting.dto
 
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
@@ -29,11 +31,25 @@ data class InnvilgelseFlyttingResponse(
     val begrunnelse: String?,
     val gjelderFraOgMed: LocalDate?,
     val gjelderTilOgMed: LocalDate?,
-) : VedtakFlyttingResponse
+) : VedtakFlyttingDto(TypeVedtak.INNVILGELSE),
+    VedtakFlyttingResponse
+
+data class AvslagFlyttingDto(
+    val årsakerAvslag: List<ÅrsakAvslag>,
+    val begrunnelse: String,
+) : VedtakFlyttingDto(TypeVedtak.AVSLAG),
+    VedtakFlyttingRequest,
+    VedtakFlyttingResponse
+
+sealed class VedtakFlyttingDto(
+    open val type: TypeVedtak,
+)
 
 sealed interface VedtakFlyttingResponse : VedtakResponse
 
-sealed interface InnvilgelseFlyttingRequest : VedtakRequest {
+sealed interface VedtakFlyttingRequest : VedtakRequest
+
+sealed interface InnvilgelseFlyttingRequest : VedtakFlyttingRequest {
     val begrunnelse: String?
 
     fun vedtaksperioder(): List<Vedtaksperiode>

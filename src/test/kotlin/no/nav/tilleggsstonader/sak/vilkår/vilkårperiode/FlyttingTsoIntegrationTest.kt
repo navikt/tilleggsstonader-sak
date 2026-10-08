@@ -4,6 +4,8 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.test.fnr.FnrGenerator
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.IntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
@@ -11,9 +13,12 @@ import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagEgenKjøring
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
+import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.AvslagFlyttingDto
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -27,6 +32,52 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
 
     @Autowired
     private lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
+
+    @Test
+    fun `skal gjennomføre avslag for flytting tso`() {
+        val fom = 1 januar 2026
+        val tom = 1 januar 2026
+        val behandling =
+            testoppsettService
+                .opprettBehandlingMedFagsak(
+                    behandling = behandling(),
+                    stønadstype = Stønadstype.FLYTTING_TSO,
+                    identer = setOf(PersonIdent(ident = ident)),
+                )
+
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
+        gjennomførBehandlingsløp(ident = ident, behandlingId = behandling.id) {
+            aktivitet {
+                opprett {
+                    aktivitetTiltakTsoFlytting(fom, tom)
+                }
+            }
+            målgruppe {
+                opprett {
+                    målgruppeAAP(fom, tom)
+                }
+            }
+            vilkår {
+                flyttingEgenKjøring(fom, tom, avstandEnVei = 100, bompenger = 100)
+            }
+            vedtak {
+                avslag()
+            }
+        }
+
+        val ferdigbehandling = kall.behandling.hent(behandling.id)
+        assertThat(ferdigbehandling.status).isEqualTo(BehandlingStatus.FERDIGSTILT)
+        assertThat(ferdigbehandling.steg).isEqualTo(StegType.BEHANDLING_FERDIGSTILT)
+
+        val avslag =
+            kall.vedtak
+                .hentVedtak(Stønadstype.FLYTTING_TSO, behandling.id)
+                .expectOkWithBody<AvslagFlyttingDto>()
+
+        assertThat(avslag.årsakerAvslag).isEqualTo(listOf(ÅrsakAvslag.ANNET))
+        assertThat(avslag.type).isEqualTo(TypeVedtak.AVSLAG)
+        assertThat(tilkjentYtelseRepository.findByBehandlingId(behandling.id)).isNull()
+    }
 
     @Test
     fun `skal kunne vedta og beregne flytting med flytting selv`() {
@@ -71,6 +122,7 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
                 .hentVedtak(Stønadstype.FLYTTING_TSO, behandling.id)
                 .expectOkWithBody<InnvilgelseFlyttingResponse>()
 
+        assertThat(vedtak.type).isEqualTo(TypeVedtak.INNVILGELSE)
         assertThat(vedtak.beregningsresultat.resultater).hasSize(1)
 
         val resultat = vedtak.beregningsresultat.resultater.single()

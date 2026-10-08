@@ -84,13 +84,19 @@ fun gyldigeAvslagsårsaker(
                 Avslagskategori.GENERELL -> generelleÅrsaker
             }
 
-        Stønadstype.FLYTTING_TSO,
-        Stønadstype.FLYTTING_TSR,
-        -> // TODO("hva er gyldige avslagsårsaker for FLYTTING?")
+        Stønadstype.FLYTTING_TSO ->
             when (gjelder) {
-                Avslagskategori.AKTIVITET -> emptySet()
-                Avslagskategori.MÅLGRUPPE -> emptySet()
-                Avslagskategori.STØNADSVILKÅR -> emptySet()
+                Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET, LØNN_I_TILTAK)
+                Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
+                Avslagskategori.STØNADSVILKÅR -> setOf(MANGELFULL_DOKUMENTASJON)
+                Avslagskategori.GENERELL -> generelleÅrsaker
+            }
+
+        Stønadstype.FLYTTING_TSR ->
+            when (gjelder) {
+                Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET)
+                Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
+                Avslagskategori.STØNADSVILKÅR -> setOf(MANGELFULL_DOKUMENTASJON)
                 Avslagskategori.GENERELL -> generelleÅrsaker
             }
 
