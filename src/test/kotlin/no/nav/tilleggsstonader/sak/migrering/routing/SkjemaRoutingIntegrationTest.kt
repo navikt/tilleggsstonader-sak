@@ -268,17 +268,14 @@ class SkjemaRoutingIntegrationTest(
                 assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
                 assertThat(routingHarBlittLagret(Skjematype.SØKNAD_REISE_TIL_SAMLING)).isTrue()
             }
-        }
 
-        @Nested
-        inner class Avsjekk {
             @Test
-            fun `skal svare avsjekk hvis ingen tidligere data og maks antall ikke er nådd`() {
+            fun `skal svare ny løsning hvis ingen tidligere data og maks antall ikke er nådd`() {
                 mockMaksAntall(Toggle.SØKNAD_ROUTING_REISE_TIL_SAMLING, 10)
 
                 val routingSjekk = kall.skjemaRouting.sjekk(reiseTilSamlingRoutingRequest)
 
-                assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK)
+                assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
                 assertThat(routingHarBlittLagret(Skjematype.SØKNAD_REISE_TIL_SAMLING)).isFalse()
             }
         }
