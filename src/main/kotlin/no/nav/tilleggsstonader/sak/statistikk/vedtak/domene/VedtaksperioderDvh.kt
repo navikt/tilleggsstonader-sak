@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VedtaksperiodeId
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagReiseTilSamling
@@ -93,7 +94,13 @@ data class VedtaksperioderDvh(
                             },
                     )
 
-                is AvslagBoutgifter, is AvslagLæremidler, is AvslagPassAvBarn, is AvslagDagligReise, is AvslagReiseTilSamling ->
+                is AvslagBoutgifter,
+                is AvslagDagligReise,
+                is AvslagFlytting,
+                is AvslagLæremidler,
+                is AvslagPassAvBarn,
+                is AvslagReiseTilSamling,
+                ->
                     JsonWrapper(
                         vedtaksperioder = emptyList(),
                     )

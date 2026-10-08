@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.VedtakDagligReiseRespo
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagReiseTilSamling
@@ -42,6 +43,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
+import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.AvslagFlyttingDto
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingResponse
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.VedtakFlyttingResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
@@ -363,6 +365,12 @@ class VedtakDtoMapper(
                     begrunnelse = data.begrunnelse,
                 )
             }
+
+            is AvslagFlytting ->
+                AvslagFlyttingDto(
+                    årsakerAvslag = data.årsaker,
+                    begrunnelse = data.begrunnelse,
+                )
         }
 
     private fun hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId: BehandlingId?): List<Vedtaksperiode>? =

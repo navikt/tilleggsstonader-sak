@@ -10,10 +10,13 @@ import no.nav.tilleggsstonader.sak.vedtak.BeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseFlytting
 import no.nav.tilleggsstonader.sak.vedtak.flytting.beregning.FlyttingBeregningService
+import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.AvslagFlyttingDto
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingRequest
+import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.VedtakFlyttingRequest
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -24,7 +27,7 @@ class FlyttingBeregnYtelseSteg(
     vedtakRepository: VedtakRepository,
     tilkjentYtelseService: TilkjentYtelseService,
     simuleringService: SimuleringService,
-) : BeregnYtelseSteg<InnvilgelseFlyttingRequest>(
+) : BeregnYtelseSteg<VedtakFlyttingRequest>(
         stønadstype = listOf(Stønadstype.FLYTTING_TSO, Stønadstype.FLYTTING_TSR),
         vedtakRepository = vedtakRepository,
         tilkjentYtelseService = tilkjentYtelseService,
@@ -32,7 +35,7 @@ class FlyttingBeregnYtelseSteg(
     ) {
     override fun lagreVedtakForSatsjustering(
         saksbehandling: Saksbehandling,
-        vedtak: InnvilgelseFlyttingRequest,
+        vedtak: VedtakFlyttingRequest,
         satsjusteringFra: LocalDate,
     ) {
         feil(
@@ -42,6 +45,16 @@ class FlyttingBeregnYtelseSteg(
     }
 
     override fun lagreVedtak(
+        saksbehandling: Saksbehandling,
+        vedtak: VedtakFlyttingRequest,
+    ) {
+        when (vedtak) {
+            is AvslagFlyttingDto -> lagreAvslag(saksbehandling, vedtak)
+            is InnvilgelseFlyttingRequest -> lagreInnvilgelse(saksbehandling, vedtak)
+        }
+    }
+
+    private fun lagreInnvilgelse(
         saksbehandling: Saksbehandling,
         vedtak: InnvilgelseFlyttingRequest,
     ) {
@@ -70,6 +83,21 @@ class FlyttingBeregnYtelseSteg(
         tilkjentYtelseService.lagreTilkjentYtelse(
             behandlingId = saksbehandling.id,
             andeler = beregningsresultat.mapTilAndeler(saksbehandling.stønadstype, vedtaksperioder),
+        )
+    }
+
+    private fun lagreAvslag(
+        saksbehandling: Saksbehandling,
+        vedtak: AvslagFlyttingDto,
+    ) {
+        vedtakRepository.insert(
+            GeneriskVedtak(
+                behandlingId = saksbehandling.id,
+                type = TypeVedtak.AVSLAG,
+                data = AvslagFlytting(årsaker = vedtak.årsakerAvslag, begrunnelse = vedtak.begrunnelse),
+                gitVersjon = Applikasjonsversjon.versjon,
+                tidligsteEndring = null,
+            ),
         )
     }
 }
