@@ -47,6 +47,7 @@ sealed interface ReiseVilkårFakta : VilkårFakta {
 }
 
 sealed interface FlyttingVilkårFakta : VilkårFakta {
+    val flyttingId: FlyttingId
     val adresse: String
 }
 
@@ -56,6 +57,7 @@ data class FaktaFlyttebyrå(
     // TODO Vurder hva navnet bør være her ut ifra hvordan spørsmål stilles
     val erBetalingDokumentert: Boolean,
     override val adresse: String,
+    override val flyttingId: FlyttingId = FlyttingId.random(),
 ) : FlyttingVilkårFakta
 
 data class FlyttebyråTilbud(
@@ -70,10 +72,12 @@ data class FaktaFlytteSelv(
     val ferge: Int?,
     val parkering: Int?,
     override val adresse: String,
+    override val flyttingId: FlyttingId = FlyttingId.random(),
 ) : FlyttingVilkårFakta
 
 data class FaktaFlyttingUbestemt(
     override val adresse: String,
+    override val flyttingId: FlyttingId = FlyttingId.random(),
 ) : FlyttingVilkårFakta
 
 data class FaktaReiseTilSamlingOffentligTransport(

@@ -2,13 +2,27 @@ package no.nav.tilleggsstonader.sak.vedtak.flytting.beregning
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.feil.ApiFeil
 import no.nav.tilleggsstonader.libs.feil.Feil
 import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseFlytting
+import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagEgenKjøring
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
+import no.nav.tilleggsstonader.sak.vedtak.flytting.mapTilAndeler
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
@@ -23,13 +37,20 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.util.Optional
 
 class FlyttingBeregningServiceTest {
     private val flyttingVilkårService = mockk<FlyttingVilkårService>()
     private val vedtaksperiodeValideringService = mockk<VedtaksperiodeValideringService>(relaxed = true)
+    private val vedtakRepository = mockk<VedtakRepository>()
     private val beregningService =
-        FlyttingBeregningService(flyttingVilkårService, SatsPrivatBilProvider(), vedtaksperiodeValideringService)
+        FlyttingBeregningService(flyttingVilkårService, SatsPrivatBilProvider(), vedtaksperiodeValideringService, vedtakRepository)
     private val behandling = saksbehandling()
+
+    private fun FlyttingBeregningService.beregn(
+        behandling: Saksbehandling,
+        vedtaksperioder: List<Vedtaksperiode>,
+    ) = beregn(behandling, vedtaksperioder, Beregningsplan(Beregningsomfang.ALLE_PERIODER))
 
     @Test
     fun `beholder beregnet beløp uansett betalingsdokumentasjon og viderefører dokumentasjonen`() {
@@ -136,7 +157,7 @@ class FlyttingBeregningServiceTest {
                 .single()
 
         assertThat(resultat.beløp).isEqualByComparingTo("294")
-        assertThat((resultat.grunnlag as no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagEgenKjøring).satsBekreftet)
+        assertThat((resultat.grunnlag as BeregningsgrunnlagEgenKjøring).satsBekreftet)
             .isFalse()
     }
 
@@ -196,7 +217,190 @@ class FlyttingBeregningServiceTest {
 
         assertThatThrownBy {
             beregningService.beregn(behandling, listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)))
-        }.isInstanceOf(Feil::class.java)
+        }.isInstanceOf(ApiFeil::class.java)
+    }
+
+    @Test
+    fun `uendret revurdering gjenbruker tidligere beløp sats og målgruppe`() {
+        val original = egenKjøring(fakta = FaktaFlytteSelv(100, null, null, null, null, "Adresse 1"))
+        val tidligere = tidligereResultat(listOf(original))
+        val lagret =
+            tidligere.resultater.single().copy(
+                beløp = 123.toBigDecimal(),
+                målgruppe = FaktiskMålgruppe.GJENLEVENDE,
+                grunnlag = (tidligere.resultater.single().grunnlag as BeregningsgrunnlagEgenKjøring).copy(sats = BigDecimal("1.23")),
+            )
+        val revurdering = forrigeVedtak(listOf(original), BeregningsresultatFlytting(listOf(lagret)))
+        val kopi = original.copy(id = VilkårId.random(), behandlingId = revurdering.id, status = VilkårStatus.UENDRET)
+        every { flyttingVilkårService.hentVilkårForBehandling(revurdering.id) } returns listOf(kopi)
+
+        val resultat =
+            beregningService.beregn(
+                revurdering,
+                listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)),
+                Beregningsplan(Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT),
+            )
+
+        assertThat(resultat.resultater).containsExactly(lagret.copy(fraTidligereVedtak = true))
+        assertThat(resultat.mapTilAndeler(Stønadstype.FLYTTING_TSO).single().beløp).isEqualTo(123)
+        assertThat(lagret.fraTidligereVedtak).isFalse()
+        val reberegnet =
+            beregningService
+                .beregn(
+                    revurdering,
+                    listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)),
+                    Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+                ).resultater
+                .single()
+        assertThat(reberegnet.beløp).isEqualTo(294.toBigDecimal())
+        assertThat(reberegnet.fraTidligereVedtak).isFalse()
+    }
+
+    @Test
+    fun `ny flytting beregnes mens gammel før grensen gjenbrukes i komplett snapshot`() {
+        val original = flyttebyrå(5000, 6000)
+        val tidligere = tidligereResultat(listOf(original))
+        val revurdering = forrigeVedtak(listOf(original), tidligere)
+        val kopi = original.copy(id = VilkårId.random(), behandlingId = revurdering.id, status = VilkårStatus.UENDRET)
+        val ny = flyttebyrå(3000, 4000, 1 februar 2026, 28 februar 2026).copy(behandlingId = revurdering.id)
+        every { flyttingVilkårService.hentVilkårForBehandling(revurdering.id) } returns listOf(ny, kopi)
+
+        val resultat =
+            beregningService.beregn(
+                revurdering,
+                listOf(vedtaksperiode(1 januar 2026, 28 februar 2026)),
+                Beregningsplan(Beregningsomfang.FRA_DATO, fraDato = 1 februar 2026),
+            )
+
+        assertThat(resultat.resultater.map { it.flyttingId }).containsExactly(original.fakta.flyttingId, ny.fakta.flyttingId)
+        assertThat(resultat.resultater.map { it.fraTidligereVedtak }).containsExactly(true, false)
+        assertThat(resultat.resultater.map { it.beløp }).containsExactly(5000.toBigDecimal(), 3000.toBigDecimal())
+        assertThat(resultat.mapTilAndeler(Stønadstype.FLYTTING_TSR).map { it.beløp }).containsExactly(5000, 3000)
+    }
+
+    @Test
+    fun `endret pris dokumentasjon dato forkorting og flyttemåte reberegnes også før grensen`() {
+        val original = flyttebyrå(5000, 6000)
+        val tidligere = tidligereResultat(listOf(original))
+        val revurdering = forrigeVedtak(listOf(original), tidligere)
+        val byrå = original.fakta as FaktaFlyttebyrå
+        val endringer =
+            listOf(
+                original.copy(fakta = byrå.copy(tilbud1 = byrå.tilbud1.copy(pris = 3000))),
+                original.copy(fakta = byrå.copy(erBetalingDokumentert = false)),
+                original.copy(fom = 2 januar 2026),
+                original.copy(tom = 15 januar 2026),
+                original.copy(fom = 2 januar 2026, tom = 2 januar 2026),
+                original.copy(fakta = FaktaFlytteSelv(100, null, null, null, null, "Adresse 1", byrå.flyttingId)),
+            )
+        endringer.forEach { endret ->
+            every { flyttingVilkårService.hentVilkårForBehandling(revurdering.id) } returns
+                listOf(endret.copy(id = VilkårId.random(), behandlingId = revurdering.id, status = VilkårStatus.ENDRET))
+            val resultat =
+                beregningService
+                    .beregn(
+                        revurdering,
+                        listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)),
+                        Beregningsplan(Beregningsomfang.FRA_DATO, fraDato = 1 februar 2026),
+                    ).resultater
+                    .single()
+            assertThat(resultat.fraTidligereVedtak).isFalse()
+            assertThat(resultat.flyttingId).isEqualTo(original.fakta.flyttingId)
+            assertThat(resultat.fom).isEqualTo(endret.fom)
+            assertThat(resultat.tom).isEqualTo(endret.tom)
+        }
+        assertThat(tidligere.resultater.single().beløp).isEqualTo(5000.toBigDecimal())
+    }
+
+    @Test
+    fun `dokumentasjon begge veier endrer andeler men beholder beløp og oppfylt resultat`() {
+        listOf(false, true).forEach { dokumentert ->
+            val original = flyttebyrå(5000, 6000, erBetalingDokumentert = dokumentert)
+            val tidligere = tidligereResultat(listOf(original))
+            val revurdering = forrigeVedtak(listOf(original), tidligere)
+            val byrå = original.fakta as FaktaFlyttebyrå
+            val endret = original.copy(fakta = byrå.copy(erBetalingDokumentert = !dokumentert), status = VilkårStatus.ENDRET)
+            every { flyttingVilkårService.hentVilkårForBehandling(revurdering.id) } returns listOf(endret)
+            val resultat =
+                beregningService.beregn(
+                    revurdering,
+                    listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)),
+                    Beregningsplan(Beregningsomfang.FRA_DATO, fraDato = 1 januar 2026),
+                )
+            assertThat(resultat.resultater.single().beløp).isEqualTo(5000.toBigDecimal())
+            assertThat(endret.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
+            listOf(Stønadstype.FLYTTING_TSO, Stønadstype.FLYTTING_TSR).forEach { stønadstype ->
+                assertThat(resultat.mapTilAndeler(stønadstype)).hasSize(if (dokumentert) 0 else 1)
+            }
+        }
+    }
+
+    @Test
+    fun `slettede flyttinger gjenbrukes aldri selv før grensen`() {
+        val original = flyttebyrå(5000, 6000)
+        val beholdt = flyttebyrå(3000, 4000, 1 februar 2026, 28 februar 2026)
+        val tidligere = tidligereResultat(listOf(original, beholdt))
+        val revurdering = forrigeVedtak(listOf(original, beholdt), tidligere)
+        every { flyttingVilkårService.hentVilkårForBehandling(revurdering.id) } returns
+            listOf(
+                original.copy(status = VilkårStatus.SLETTET, resultat = Vilkårsresultat.SLETTET),
+                beholdt.copy(status = VilkårStatus.UENDRET),
+            )
+        val resultat =
+            beregningService.beregn(
+                revurdering,
+                listOf(vedtaksperiode(1 januar 2026, 28 februar 2026)),
+                Beregningsplan(Beregningsomfang.FRA_DATO, fraDato = 1 januar 2026),
+            )
+        assertThat(resultat.resultater.map { it.flyttingId }).containsExactly(beholdt.fakta.flyttingId)
+        assertThat(resultat.mapTilAndeler(Stønadstype.FLYTTING_TSO).single().beløp).isEqualTo(3000)
+    }
+
+    @Test
+    fun `avviser manglende tidligere resultat og unsupported omfang`() {
+        val original = flyttebyrå(5000, 6000)
+        every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns listOf(original)
+        listOf(Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT, Beregningsomfang.KUN_NYE_KJORELISTE_UKER).forEach { omfang ->
+            assertThatThrownBy {
+                beregningService.beregn(behandling, listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)), Beregningsplan(omfang))
+            }.isInstanceOf(Feil::class.java)
+        }
+        val revurdering = forrigeVedtak(listOf(original), BeregningsresultatFlytting(emptyList()))
+        every { flyttingVilkårService.hentVilkårForBehandling(revurdering.id) } returns listOf(original)
+        assertThatThrownBy {
+            beregningService.beregn(
+                revurdering,
+                listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)),
+                Beregningsplan(Beregningsomfang.FRA_DATO, fraDato = 1 februar 2026),
+            )
+        }.isInstanceOf(Feil::class.java).hasMessageContaining("Fant ikke tidligere beregningsresultat")
+    }
+
+    private fun tidligereResultat(vilkår: List<VilkårFlytting>): BeregningsresultatFlytting {
+        every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns vilkår
+        return beregningService.beregn(behandling, listOf(vedtaksperiode(1 januar 2026, 28 februar 2026)))
+    }
+
+    private fun forrigeVedtak(
+        vilkår: List<VilkårFlytting>,
+        resultat: BeregningsresultatFlytting,
+    ): Saksbehandling {
+        every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns vilkår
+        every { vedtakRepository.findById(behandling.id) } returns
+            Optional.of(
+                GeneriskVedtak(
+                    behandlingId = behandling.id,
+                    data =
+                        InnvilgelseFlytting(
+                            vedtaksperioder = listOf(vedtaksperiode(1 januar 2026, 28 februar 2026)),
+                            beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+                            beregningsresultat = resultat,
+                        ),
+                    gitVersjon = null,
+                    tidligsteEndring = null,
+                ),
+            )
+        return saksbehandling(forrigeIverksatteBehandlingId = behandling.id)
     }
 
     private fun flyttebyrå(

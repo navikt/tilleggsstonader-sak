@@ -2,6 +2,8 @@ package no.nav.tilleggsstonader.sak.vedtak.flytting.domain
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingId
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -10,6 +12,9 @@ data class BeregningsresultatFlytting(
 )
 
 data class BeregningsresultatFlyttevilkår(
+    val flyttingId: FlyttingId,
+    val målgruppe: FaktiskMålgruppe,
+    val fraTidligereVedtak: Boolean = false,
     val fom: LocalDate,
     val tom: LocalDate,
     val beløp: BigDecimal,

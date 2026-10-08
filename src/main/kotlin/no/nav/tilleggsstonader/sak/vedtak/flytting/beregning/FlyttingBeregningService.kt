@@ -1,11 +1,19 @@
 package no.nav.tilleggsstonader.sak.vedtak.flytting.beregning
 
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.avrundetStønadsbeløp
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseFlytting
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagEgenKjøring
@@ -28,12 +36,19 @@ class FlyttingBeregningService(
     private val flyttingVilkårService: FlyttingVilkårService,
     private val satsPrivatBilProvider: SatsPrivatBilProvider,
     private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
+    private val vedtakRepository: VedtakRepository,
 ) {
     fun beregn(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
+        beregningsplan: Beregningsplan,
     ): BeregningsresultatFlytting {
-        feilHvis(vedtaksperioder.isEmpty()) { "Vedtaksperioder kan ikke være tomme" }
+        feilHvis(beregningsplan.omfang == Beregningsomfang.KUN_NYE_KJORELISTE_UKER) {
+            "Beregningsomfang ${beregningsplan.omfang} støttes ikke for flytting"
+        }
+        brukerfeilHvis(vedtaksperioder.isEmpty()) {
+            "Innvilgelse krever vedtaksperioder. Opphør av siste flytteutgift støttes ikke"
+        }
         // TODO - ikke hardkode INNVILGELSE
         vedtaksperiodeValideringService.validerVedtaksperioder(vedtaksperioder, behandling, typeVedtak = TypeVedtak.INNVILGELSE)
 
@@ -44,15 +59,73 @@ class FlyttingBeregningService(
                 .filter { vilkår -> overlapperVedtaksperiode(vilkår, vedtaksperioder) }
                 .sortedBy { it.fom }
 
-        feilHvis(relevanteVilkår.isEmpty()) { "Fant ingen flyttevilkår som kan beregnes for vedtaksperiodene" }
+        brukerfeilHvis(relevanteVilkår.isEmpty()) {
+            "Innvilgelse krever minst ett flyttevilkår. Opphør av siste flytteutgift støttes ikke"
+        }
+        feilHvis(relevanteVilkår.map { it.fakta.flyttingId }.distinct().size != relevanteVilkår.size) {
+            "Flere flyttevilkår har samme flyttingId"
+        }
+
+        val forrigeBehandlingId = behandling.forrigeIverksatteBehandlingId
+        val forrigeResultat =
+            if (beregningsplan.omfang != Beregningsomfang.ALLE_PERIODER) {
+                val id = forrigeBehandlingId ?: feil("Kan ikke gjenbruke flytting uten forrige iverksatt vedtak")
+                vedtakRepository
+                    .findByIdOrThrow(id)
+                    .withTypeOrThrow<InnvilgelseFlytting>()
+                    .data.beregningsresultat
+            } else {
+                null
+            }
+        val tidligereVilkår =
+            if (forrigeResultat != null) {
+                flyttingVilkårService
+                    .hentVilkårForBehandling(forrigeBehandlingId ?: feil("Mangler tidligere behandling"))
+                    .filter { it.status != VilkårStatus.SLETTET }
+                    .associateBy { it.fakta.flyttingId }
+            } else {
+                emptyMap()
+            }
+        val tidligereResultater = forrigeResultat?.resultater?.associateBy { it.flyttingId }.orEmpty()
 
         return BeregningsresultatFlytting(
             resultater =
                 relevanteVilkår.map { vilkår ->
                     validerVilkår(vilkår, vedtaksperioder)
-                    beregnVilkår(vilkår)
+                    val tidligere = tidligereVilkår[vilkår.fakta.flyttingId]
+                    val uendret =
+                        tidligere != null && tidligere.fom == vilkår.fom && tidligere.tom == vilkår.tom &&
+                            tidligere.fakta == vilkår.fakta && tidligere.resultat == vilkår.resultat
+                    val gjenbruk =
+                        when (beregningsplan.omfang) {
+                            Beregningsomfang.ALLE_PERIODER -> false
+                            Beregningsomfang.FRA_DATO ->
+                                uendret && vilkår.tom < (beregningsplan.fraDato ?: feil("FRA_DATO mangler beregningsgrense"))
+                            Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT -> {
+                                feilHvisIkke(uendret) { "Kan ikke gjenbruke endret eller nytt flyttevilkår" }
+                                true
+                            }
+                            Beregningsomfang.KUN_NYE_KJORELISTE_UKER -> feil("Ustøttet beregningsomfang for flytting")
+                        }
+                    if (gjenbruk) {
+                        val tidligereResultat =
+                            tidligereResultater[vilkår.fakta.flyttingId]
+                                ?: feil("Fant ikke tidligere beregningsresultat for flyttingId=${vilkår.fakta.flyttingId}")
+                        tidligereResultat.copy(fraTidligereVedtak = true)
+                    } else {
+                        beregnVilkår(vilkår, målgruppeVedFom(vilkår, vedtaksperioder))
+                    }
                 },
         )
+    }
+
+    private fun målgruppeVedFom(
+        vilkår: VilkårFlytting,
+        vedtaksperioder: List<Vedtaksperiode>,
+    ): FaktiskMålgruppe {
+        val målgrupper = vedtaksperioder.filter { vilkår.fom in it.fom..it.tom }.map { it.målgruppe }.distinct()
+        feilHvis(målgrupper.size != 1) { "Forventer én målgruppe ved flyttevilkårets FOM" }
+        return målgrupper.single()
     }
 
     private fun validerVilkår(
@@ -67,16 +140,20 @@ class FlyttingBeregningService(
         }
     }
 
-    private fun beregnVilkår(vilkår: VilkårFlytting): BeregningsresultatFlyttevilkår =
+    private fun beregnVilkår(
+        vilkår: VilkårFlytting,
+        målgruppe: FaktiskMålgruppe,
+    ): BeregningsresultatFlyttevilkår =
         when (val fakta = vilkår.fakta) {
-            is FaktaFlyttebyrå -> beregnFlyttebyrå(vilkår, fakta)
-            is FaktaFlytteSelv -> beregnEgenKjøring(vilkår, fakta)
+            is FaktaFlyttebyrå -> beregnFlyttebyrå(vilkår, fakta, målgruppe)
+            is FaktaFlytteSelv -> beregnEgenKjøring(vilkår, fakta, målgruppe)
             else -> feil("Flyttevilkår ${vilkår.id} mangler fullstendige flyttefakta")
         }
 
     private fun beregnFlyttebyrå(
         vilkår: VilkårFlytting,
         fakta: FaktaFlyttebyrå,
+        målgruppe: FaktiskMålgruppe,
     ): BeregningsresultatFlyttevilkår {
         val tilbud1Pris = fakta.tilbud1.pris?.toBigDecimal() ?: feil("Flyttevilkår  mangler pris på tilbud 1")
         val tilbud2Pris = fakta.tilbud2.pris?.toBigDecimal() ?: feil("Flyttevilkår  mangler pris på tilbud 2")
@@ -88,6 +165,8 @@ class FlyttingBeregningService(
                 erBetalingDokumentert = fakta.erBetalingDokumentert,
             )
         return BeregningsresultatFlyttevilkår(
+            flyttingId = fakta.flyttingId,
+            målgruppe = målgruppe,
             fom = vilkår.fom,
             tom = vilkår.tom,
             grunnlag = grunnlag,
@@ -98,6 +177,7 @@ class FlyttingBeregningService(
     private fun beregnEgenKjøring(
         vilkår: VilkårFlytting,
         fakta: FaktaFlytteSelv,
+        målgruppe: FaktiskMålgruppe,
     ): BeregningsresultatFlyttevilkår {
         val avstandEnVei = fakta.avstandEnVei ?: feil("Flyttevilkår mangler avstand én vei")
         feilHvis(avstandEnVei < 0) { "Avstand én vei kan ikke være negativ" }
@@ -123,6 +203,8 @@ class FlyttingBeregningService(
             avstandEnVei.toBigDecimal() * sats.first +
                 henger + bompenger + ferge + parkering
         return BeregningsresultatFlyttevilkår(
+            flyttingId = fakta.flyttingId,
+            målgruppe = målgruppe,
             fom = vilkår.fom,
             tom = vilkår.tom,
             grunnlag = grunnlag,

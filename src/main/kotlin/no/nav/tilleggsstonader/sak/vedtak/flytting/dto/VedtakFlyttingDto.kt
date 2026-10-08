@@ -1,5 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.flytting.dto
 
+import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakRequest
@@ -9,6 +10,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeTsrDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlytting
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingId
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -17,6 +19,9 @@ data class BeregningsresultatFlyttingDto(
 )
 
 data class BeregningsresultatFlyttevilkårDto(
+    val flyttingId: FlyttingId,
+    val målgruppe: FaktiskMålgruppe,
+    val fraTidligereVedtak: Boolean,
     val fom: LocalDate,
     val tom: LocalDate,
     val grunnlag: BeregningsgrunnlagFlytting,
@@ -58,6 +63,9 @@ fun BeregningsresultatFlytting.tilDto() =
         resultater =
             resultater.map {
                 BeregningsresultatFlyttevilkårDto(
+                    flyttingId = it.flyttingId,
+                    målgruppe = it.målgruppe,
+                    fraTidligereVedtak = it.fraTidligereVedtak,
                     fom = it.fom,
                     tom = it.tom,
                     grunnlag = it.grunnlag,

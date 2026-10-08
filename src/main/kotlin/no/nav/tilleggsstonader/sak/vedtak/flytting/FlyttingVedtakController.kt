@@ -87,8 +87,8 @@ class FlyttingVedtakController(
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         validerStønadstype(behandling, forventetStønadstype)
         val vedtaksperioder = vedtak.vedtaksperioder()
-        beregningsplanUtleder.utledForInnvilgelse(behandling, vedtaksperioder)
-        return beregningService.beregn(behandling, vedtaksperioder).tilDto()
+        val beregningsplan = beregningsplanUtleder.utledForInnvilgelse(behandling, vedtaksperioder)
+        return beregningService.beregn(behandling, vedtaksperioder, beregningsplan).tilDto()
     }
 
     private fun lagreVedtak(

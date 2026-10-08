@@ -2,8 +2,10 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting
 
 import no.nav.tilleggsstonader.libs.feil.Feil
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.VilkårFlyttingMapper.mapTilVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.VilkårFlyttingMapper.mapTilVilkårFlytting
@@ -21,6 +23,18 @@ class VilkårFlyttingMapperTest {
             utgift = null,
             fakta = FaktaFlyttingUbestemt("Testadresse"),
         )
+
+    @Test
+    fun `kopiering og mapping bevarer stabil identitet og opphav gjennom flere behandlinger`() {
+        val førsteKopi = lagret.kopierTilBehandling(BehandlingId.random())
+        val tilbakeført = førsteKopi.mapTilVilkårFlytting().mapTilVilkår()
+        val andreKopi = tilbakeført.kopierTilBehandling(BehandlingId.random())
+        assertThat(andreKopi.id).isNotEqualTo(lagret.id).isNotEqualTo(førsteKopi.id)
+        assertThat((andreKopi.fakta as FlyttingVilkårFakta).flyttingId)
+            .isEqualTo((lagret.fakta as FlyttingVilkårFakta).flyttingId)
+        assertThat(andreKopi.opphavsvilkår).isEqualTo(førsteKopi.opphavsvilkår)
+        assertThat(tilbakeført.opphavsvilkår).isEqualTo(førsteKopi.opphavsvilkår)
+    }
 
     @Test
     fun `bevarer null som status gjennom mapping`() {

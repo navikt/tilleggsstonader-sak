@@ -16,6 +16,7 @@ object FaktaFlyttingMapper {
         when (this) {
             is FaktaFlyttebyråDto ->
                 FaktaFlyttebyrå(
+                    flyttingId = flyttingId,
                     tilbud1 = FlyttebyråTilbud(navn = tilbud1.navn, pris = tilbud1.pris),
                     tilbud2 = FlyttebyråTilbud(navn = tilbud2.navn, pris = tilbud2.pris),
                     adresse = adresse,
@@ -24,6 +25,7 @@ object FaktaFlyttingMapper {
 
             is FaktaFlytteSelvDto ->
                 FaktaFlytteSelv(
+                    flyttingId = flyttingId,
                     avstandEnVei = avstandEnVei,
                     henger = henger,
                     bompenger = bompenger,
@@ -32,13 +34,14 @@ object FaktaFlyttingMapper {
                     adresse = adresse,
                 )
 
-            is FaktaFlyttingUbestemtDto -> FaktaFlyttingUbestemt(adresse = adresse)
+            is FaktaFlyttingUbestemtDto -> FaktaFlyttingUbestemt(adresse = adresse, flyttingId = flyttingId)
         }
 
     fun FlyttingVilkårFakta.tilDto(): FaktaFlyttingDto =
         when (this) {
             is FaktaFlyttebyrå ->
                 FaktaFlyttebyråDto(
+                    flyttingId = flyttingId,
                     tilbud1 = FlyttebyråTilbudDto(navn = tilbud1.navn, pris = tilbud1.pris),
                     tilbud2 = FlyttebyråTilbudDto(navn = tilbud2.navn, pris = tilbud2.pris),
                     adresse = adresse,
@@ -47,6 +50,7 @@ object FaktaFlyttingMapper {
 
             is FaktaFlytteSelv ->
                 FaktaFlytteSelvDto(
+                    flyttingId = flyttingId,
                     avstandEnVei = avstandEnVei,
                     henger = henger,
                     bompenger = bompenger,
@@ -55,6 +59,6 @@ object FaktaFlyttingMapper {
                     adresse = adresse,
                 )
 
-            is FaktaFlyttingUbestemt -> FaktaFlyttingUbestemtDto(adresse = adresse)
+            is FaktaFlyttingUbestemt -> FaktaFlyttingUbestemtDto(adresse = adresse, flyttingId = flyttingId)
         }
 }
