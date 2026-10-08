@@ -43,7 +43,7 @@ class FlyttingBeregningServiceTest {
                     .resultater
                     .single()
 
-            assertThat(resultat.beløp).isEqualByComparingTo("10000")
+            assertThat(resultat.beløp).isEqualTo(10000.toBigDecimal())
             assertThat((resultat.grunnlag as BeregningsgrunnlagFlyttebyrå).erBetalingDokumentert)
                 .isEqualTo(erBetalingDokumentert)
             assertThat(vilkår.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
@@ -62,7 +62,7 @@ class FlyttingBeregningServiceTest {
 
             val resultat = beregningService.beregn(behandling, listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)))
 
-            assertThat(resultat.resultater.single().beløp).isEqualByComparingTo("10000")
+            assertThat(resultat.resultater.single().beløp).isEqualTo(10000.toBigDecimal())
         }
     }
 
@@ -73,7 +73,7 @@ class FlyttingBeregningServiceTest {
 
         val resultat = beregningService.beregn(behandling, listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)))
 
-        assertThat(resultat.resultater.single().beløp).isEqualByComparingTo("3035")
+        assertThat(resultat.resultater.single().beløp).isEqualTo(10000.toBigDecimal())
     }
 
     @Test
