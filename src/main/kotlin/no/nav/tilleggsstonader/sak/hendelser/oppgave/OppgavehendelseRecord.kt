@@ -71,6 +71,7 @@ data class Kategorisering(
 )
 
 enum class Prioritet {
+    KRITISK,
     HOY,
     NORMAL,
     LAV,
