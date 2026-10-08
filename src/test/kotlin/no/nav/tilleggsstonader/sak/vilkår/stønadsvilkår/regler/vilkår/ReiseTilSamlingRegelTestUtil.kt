@@ -10,7 +10,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 object ReiseTilSamlingRegelTestUtil {
     fun oppfylteSvarReiseTilSamlingOffentligTransportDto() =
         mapOf(
-            RegelId.HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING to SvarOgBegrunnelseDto(svar = SvarId.JA),
+            RegelId.HAR_UTGIFTER_TIL_REISEN to SvarOgBegrunnelseDto(svar = SvarId.JA),
             RegelId.AVSTAND_OVER_TRETTI_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
             RegelId.ER_SAMLING_OBLIGATORISK to SvarOgBegrunnelseDto(svar = SvarId.JA),
             RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
@@ -22,7 +22,7 @@ object ReiseTilSamlingRegelTestUtil {
 
     fun oppfylteSvarReiseTilSamlingPrivatBilDto() =
         mapOf(
-            RegelId.HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING to SvarOgBegrunnelseDto(svar = SvarId.JA),
+            RegelId.HAR_UTGIFTER_TIL_REISEN to SvarOgBegrunnelseDto(svar = SvarId.JA),
             RegelId.AVSTAND_OVER_TRETTI_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
             RegelId.ER_SAMLING_OBLIGATORISK to SvarOgBegrunnelseDto(svar = SvarId.JA),
             RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to
@@ -45,7 +45,7 @@ object ReiseTilSamlingRegelTestUtil {
         listOf(
             delvilkår(
                 Vurdering(
-                    regelId = RegelId.HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING,
+                    regelId = RegelId.HAR_UTGIFTER_TIL_REISEN,
                     svar = SvarId.JA,
                 ),
                 Vurdering(
@@ -72,7 +72,7 @@ object ReiseTilSamlingRegelTestUtil {
         listOf(
             delvilkår(
                 Vurdering(
-                    regelId = RegelId.HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING,
+                    regelId = RegelId.HAR_UTGIFTER_TIL_REISEN,
                     svar = SvarId.JA,
                 ),
                 Vurdering(

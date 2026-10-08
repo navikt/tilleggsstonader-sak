@@ -17,7 +17,7 @@ class ReiseTilSamlingRegel :
         vilkårType = VilkårType.REISE_TIL_SAMLING,
         regler =
             setOf(
-                HAR_NØDVENDIGE_UTGIFTER_TIL_REISE,
+                HAR_UTGIFTER_TIL_REISE,
                 ER_SAMLING_OBLIGATORISK,
                 AVSTAND_OVER_TRETTI_KM,
                 KAN_REISE_MED_OFFENTLIG_TRANSPORT,
@@ -55,7 +55,7 @@ class ReiseTilSamlingRegel :
                         hvisJa =
                             SluttSvarRegel(
                                 resultat = Resultat.OPPFYLT,
-                                begrunnelseType = BegrunnelseType.UTEN,
+                                begrunnelseType = BegrunnelseType.VALGFRI,
                                 tilhørendeFaktaType = TypeVilkårFakta.REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT,
                             ),
                         hvisNei = IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
@@ -95,9 +95,9 @@ class ReiseTilSamlingRegel :
                     ),
             )
 
-        private val HAR_NØDVENDIGE_UTGIFTER_TIL_REISE =
+        private val HAR_UTGIFTER_TIL_REISE =
             RegelSteg(
-                regelId = RegelId.HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING,
+                regelId = RegelId.HAR_UTGIFTER_TIL_REISEN,
                 erHovedregel = true,
                 svarMapping =
                     jaNeiSvarRegel(

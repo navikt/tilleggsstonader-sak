@@ -183,7 +183,7 @@
       "resultat": "IKKE_TATT_STILLING_TIL",
       "vurderinger": [ {
         "begrunnelse": null,
-        "regel": "Har bruker nødvendige utgifter til reise til samling?",
+        "regel": "Har bruker utgifter til reisen?",
         "svar": "Ja"
       }, {
         "begrunnelse": "antall km",
@@ -223,7 +223,7 @@
       "resultat": "IKKE_TATT_STILLING_TIL",
       "vurderinger": [ {
         "begrunnelse": null,
-        "regel": "Har bruker nødvendige utgifter til reise til samling?",
+        "regel": "Har bruker utgifter til reisen?",
         "svar": "Ja"
       }, {
         "begrunnelse": "antall km",
