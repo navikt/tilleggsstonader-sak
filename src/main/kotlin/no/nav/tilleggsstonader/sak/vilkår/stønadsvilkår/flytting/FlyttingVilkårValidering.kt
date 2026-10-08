@@ -10,9 +10,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 
 object FlyttingVilkårValidering {
     fun validerOppgitteFakta(fakta: FlyttingVilkårFakta) {
-        brukerfeilHvis(fakta.adresse?.isBlank() == true) {
-            "Flytteadressen kan ikke være tom"
-        }
+        brukerfeilHvis(fakta.adresse.isBlank()) { "Flytteadressen kan ikke være tom" }
         when (fakta) {
             is FaktaFlyttebyrå -> {
                 val navn1 = fakta.tilbud1.navn?.trim()
@@ -37,8 +35,7 @@ object FlyttingVilkårValidering {
                 brukerfeilHvis(fakta.avstandEnVei != null && fakta.avstandEnVei <= 0) {
                     "Avstanden må være større enn 0"
                 }
-                listOf(fakta.henger, fakta.bompenger, fakta.ferge, fakta.parkering)
-                    .filterNotNull()
+                listOfNotNull(fakta.henger, fakta.bompenger, fakta.ferge, fakta.parkering)
                     .forEach { beløp ->
                         brukerfeilHvis(beløp < 0) { "Kostnader kan ikke være negative" }
                     }
@@ -49,7 +46,7 @@ object FlyttingVilkårValidering {
     }
 
     fun erFullstendig(vilkår: LagreVilkårFlytting): Boolean {
-        if (vilkår.fakta.adresse.isNullOrBlank()) return false
+        if (vilkår.fakta.adresse.isBlank()) return false
 
         val flyttemåte = vilkår.svar[RegelId.HVORDAN_SKAL_BRUKER_FLYTTE]?.svar ?: return false
         return when (flyttemåte) {

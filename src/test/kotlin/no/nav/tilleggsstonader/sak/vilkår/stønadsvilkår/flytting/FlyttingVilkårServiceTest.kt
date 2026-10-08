@@ -49,7 +49,7 @@ class FlyttingVilkårServiceTest {
             fom = 1 januar 2026,
             tom = 15 januar 2026,
             svar = emptyMap(),
-            fakta = FaktaFlyttingUbestemt(),
+            fakta = FaktaFlyttingUbestemt(adresse = "Adresse 1"),
         )
 
     private val eksisterendeVilkår =
@@ -60,7 +60,7 @@ class FlyttingVilkårServiceTest {
             resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
             status = VilkårStatus.NY,
             delvilkårsett = emptyList(),
-            fakta = FaktaFlyttingUbestemt(),
+            fakta = FaktaFlyttingUbestemt(adresse = "Adresse 1"),
         )
 
     @Test

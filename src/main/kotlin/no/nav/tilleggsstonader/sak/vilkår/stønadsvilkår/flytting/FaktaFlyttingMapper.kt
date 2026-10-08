@@ -19,7 +19,9 @@ object FaktaFlyttingMapper {
                     tilbud1 = FlyttebyråTilbud(navn = tilbud1.navn, pris = tilbud1.pris),
                     tilbud2 = FlyttebyråTilbud(navn = tilbud2.navn, pris = tilbud2.pris),
                     adresse = adresse,
+                    erBetalingDokumentert = erBetalingDokumentert,
                 )
+
             is FaktaFlytteSelvDto ->
                 FaktaFlytteSelv(
                     avstandEnVei = avstandEnVei,
@@ -29,6 +31,7 @@ object FaktaFlyttingMapper {
                     parkering = parkering,
                     adresse = adresse,
                 )
+
             is FaktaFlyttingUbestemtDto -> FaktaFlyttingUbestemt(adresse = adresse)
         }
 
@@ -39,7 +42,9 @@ object FaktaFlyttingMapper {
                     tilbud1 = FlyttebyråTilbudDto(navn = tilbud1.navn, pris = tilbud1.pris),
                     tilbud2 = FlyttebyråTilbudDto(navn = tilbud2.navn, pris = tilbud2.pris),
                     adresse = adresse,
+                    erBetalingDokumentert = erBetalingDokumentert,
                 )
+
             is FaktaFlytteSelv ->
                 FaktaFlytteSelvDto(
                     avstandEnVei = avstandEnVei,
@@ -49,6 +54,7 @@ object FaktaFlyttingMapper {
                     parkering = parkering,
                     adresse = adresse,
                 )
+
             is FaktaFlyttingUbestemt -> FaktaFlyttingUbestemtDto(adresse = adresse)
         }
 }

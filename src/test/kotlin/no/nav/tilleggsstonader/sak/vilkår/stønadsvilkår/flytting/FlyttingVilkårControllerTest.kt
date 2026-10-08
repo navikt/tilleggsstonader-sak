@@ -66,6 +66,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                     tilbud1 = FlyttebyråTilbudDto("Byrå A", 10000),
                     tilbud2 = FlyttebyråTilbudDto("Byrå B", 12000),
                     adresse = "Flytteveien 1",
+                    erBetalingDokumentert = true,
                 ),
         )
 
@@ -135,6 +136,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                         tilbud1 = FlyttebyråTilbudDto("Byrå C", 8000),
                         tilbud2 = FlyttebyråTilbudDto("Byrå D", 9000),
                         adresse = "Flytteveien 2",
+                        erBetalingDokumentert = true,
                     ),
             )
         val oppdatert = kall.vilkårFlytting.oppdaterVilkår(oppdatering, opprettet.id, behandling.id)
@@ -177,6 +179,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                         tilbud1 = FlyttebyråTilbudDto("Byrå A", 10000),
                         tilbud2 = FlyttebyråTilbudDto("Byrå B"),
                         adresse = "Flytteveien 1",
+                        erBetalingDokumentert = false,
                     ),
             )
 

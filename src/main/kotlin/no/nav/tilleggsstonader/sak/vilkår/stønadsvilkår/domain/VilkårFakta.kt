@@ -47,13 +47,15 @@ sealed interface ReiseVilkårFakta : VilkårFakta {
 }
 
 sealed interface FlyttingVilkårFakta : VilkårFakta {
-    val adresse: String?
+    val adresse: String
 }
 
 data class FaktaFlyttebyrå(
     val tilbud1: FlyttebyråTilbud,
     val tilbud2: FlyttebyråTilbud,
-    override val adresse: String? = null,
+    // TODO Vurder hva navnet bør være her ut ifra hvordan spørsmål stilles
+    val erBetalingDokumentert: Boolean,
+    override val adresse: String,
 ) : FlyttingVilkårFakta
 
 data class FlyttebyråTilbud(
@@ -67,11 +69,11 @@ data class FaktaFlytteSelv(
     val bompenger: Int?,
     val ferge: Int?,
     val parkering: Int?,
-    override val adresse: String? = null,
+    override val adresse: String,
 ) : FlyttingVilkårFakta
 
 data class FaktaFlyttingUbestemt(
-    override val adresse: String? = null,
+    override val adresse: String,
 ) : FlyttingVilkårFakta
 
 data class FaktaReiseTilSamlingOffentligTransport(

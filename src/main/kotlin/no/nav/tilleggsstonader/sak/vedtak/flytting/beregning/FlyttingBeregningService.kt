@@ -81,7 +81,12 @@ class FlyttingBeregningService(
         val tilbud1Pris = fakta.tilbud1.pris?.toBigDecimal() ?: feil("Flyttevilkår  mangler pris på tilbud 1")
         val tilbud2Pris = fakta.tilbud2.pris?.toBigDecimal() ?: feil("Flyttevilkår  mangler pris på tilbud 2")
         feilHvis(tilbud1Pris.signum() < 0 || tilbud2Pris.signum() < 0) { "Flyttebyråtilbud kan ikke ha negativ pris" }
-        val grunnlag = BeregningsgrunnlagFlyttebyrå(tilbud1Pris, tilbud2Pris)
+        val grunnlag =
+            BeregningsgrunnlagFlyttebyrå(
+                tilbud1Pris = tilbud1Pris,
+                tilbud2Pris = tilbud2Pris,
+                erBetalingDokumentert = fakta.erBetalingDokumentert,
+            )
         return BeregningsresultatFlyttevilkår(
             fom = vilkår.fom,
             tom = vilkår.tom,

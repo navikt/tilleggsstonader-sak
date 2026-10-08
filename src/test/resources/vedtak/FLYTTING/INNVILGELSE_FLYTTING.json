@@ -8,6 +8,7 @@
       "beløp": 10000,
       "fom": "2026-01-01",
       "grunnlag": {
+        "erBetalingDokumentert": true,
         "tilbud1Pris": 10000,
         "tilbud2Pris": 12000,
         "type": "FLYTTEBYRÅ"

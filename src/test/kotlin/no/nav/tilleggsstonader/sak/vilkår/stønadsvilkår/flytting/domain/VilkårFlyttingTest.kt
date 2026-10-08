@@ -18,7 +18,7 @@ class VilkårFlyttingTest {
             resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
             status = VilkårStatus.NY,
             delvilkårsett = emptyList(),
-            fakta = FaktaFlyttingUbestemt(),
+            fakta = FaktaFlyttingUbestemt("Adresse 1"),
         )
 
     @Test

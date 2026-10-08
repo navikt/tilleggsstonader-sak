@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting
 
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FaktaFlyttingMapper.tilDomain
@@ -24,6 +23,7 @@ class FaktaFlyttingMapperTest {
             FaktaFlyttebyråDto(
                 tilbud1 = FlyttebyråTilbudDto(navn = "Flyttebyrå A"),
                 adresse = "Flytteveien 1",
+                erBetalingDokumentert = true,
             ),
             FaktaFlytteSelvDto(adresse = "Flytteveien 1"),
         ).forEach { fakta ->
@@ -38,6 +38,7 @@ class FaktaFlyttingMapperTest {
                 tilbud1 = FlyttebyråTilbudDto(navn = "Flyttebyrå A", pris = 10000),
                 tilbud2 = FlyttebyråTilbudDto(navn = "Flyttebyrå B", pris = 12000),
                 adresse = "Flytteveien 1",
+                erBetalingDokumentert = false,
             ),
             FaktaFlytteSelvDto(
                 avstandEnVei = 250,
@@ -57,14 +58,6 @@ class FaktaFlyttingMapperTest {
             assertThat(json).contains("\"adresse\":\"Flytteveien 1\"")
             assertThat(json).doesNotContain("reiseId", "aktivitetId")
         }
-    }
-
-    @Test
-    fun `skal lese eldre flyttefakta uten adresse`() {
-        val json = """{"type":"FLYTTING_UBESTEMT"}"""
-        val fakta = jsonMapper.readValue<VilkårFakta>(json)
-
-        assertThat(fakta).isEqualTo(FaktaFlyttingUbestemt())
     }
 
     @Test

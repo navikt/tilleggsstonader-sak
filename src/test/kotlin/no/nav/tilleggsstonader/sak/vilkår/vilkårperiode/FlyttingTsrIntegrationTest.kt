@@ -86,7 +86,7 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
     }
 
     @Test
-    fun `skal kunne vedta og beregne flytting med flyttebyrå`() {
+    fun `skal kunne vedta og beregne flytting med flyttebyrå, og utbetale andeler hvis dokumentert`() {
         val fom = 1 januar 2026
         val tom = 1 januar 2026
 
@@ -119,6 +119,7 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
                     tom,
                     tilbud1Pris = 10000,
                     tilbud2Pris = 5000,
+                    erBetalingDokumentert = true,
                 )
             }
         }
@@ -140,5 +141,61 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
         assertThat(andeler).hasSize(1)
         assertThat(andeler.single().beløp).isEqualTo(5000)
         assertThat(andeler.single().type).isEqualTo(TypeAndel.FLYTTING_ARBEIDSSØKER)
+    }
+
+    @Test
+    fun `skal kunne vedta og beregne flytting med flyttebyrå, og ikke utbetale andeler hvis ikke dokumentert`() {
+        val fom = 1 januar 2026
+        val tom = 1 januar 2026
+
+        val behandling =
+            testoppsettService
+                .opprettBehandlingMedFagsak(
+                    behandling = behandling(),
+                    stønadstype = Stønadstype.FLYTTING_TSR,
+                    identer = setOf(PersonIdent(ident = ident)),
+                )
+
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
+        gjennomførBehandlingsløp(
+            ident = ident,
+            behandlingId = behandling.id,
+        ) {
+            aktivitet {
+                opprett {
+                    aktivitetTiltakTsrFlytting(fom, tom)
+                }
+            }
+            målgruppe {
+                opprett {
+                    målgruppeDagpenger(fom, tom)
+                }
+            }
+            vilkår {
+                flyttingByrå(
+                    fom,
+                    tom,
+                    tilbud1Pris = 10000,
+                    tilbud2Pris = 5000,
+                    erBetalingDokumentert = false,
+                )
+            }
+        }
+
+        val vedtak =
+            kall.vedtak
+                .hentVedtak(Stønadstype.FLYTTING_TSR, behandling.id)
+                .expectOkWithBody<InnvilgelseFlyttingResponse>()
+
+        assertThat(vedtak.beregningsresultat.resultater).hasSize(1)
+
+        val resultat = vedtak.beregningsresultat.resultater.single()
+
+        assertThat(resultat.beløp).isEqualTo(5000.toBigDecimal())
+        assertThat(resultat.grunnlag).isInstanceOf(BeregningsgrunnlagFlyttebyrå::class.java)
+
+        val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
+
+        assertThat(andeler).hasSize(0)
     }
 }

@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagEgenKjøring
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
 import java.math.BigDecimal
 
@@ -18,29 +19,35 @@ fun BeregningsresultatFlytting.mapTilAndeler(
     stønadstype: Stønadstype,
     vedtaksperioder: List<Vedtaksperiode>,
 ): List<AndelTilkjentYtelse> =
-    resultater.map { resultat ->
-        val typeAndel =
-            when (stønadstype) {
-                Stønadstype.FLYTTING_TSO -> målgruppeVedFom(resultat.fom, vedtaksperioder).tilTypeAndel(stønadstype)
-                Stønadstype.FLYTTING_TSR -> TypeAndel.FLYTTING_ARBEIDSSØKER
-                else -> feil("Flytting kan ikke opprette andeler for stønadstype=$stønadstype")
+    resultater
+        .filter { resultat ->
+            when (val grunnlag = resultat.grunnlag) {
+                is BeregningsgrunnlagFlyttebyrå -> grunnlag.erBetalingDokumentert
+                is BeregningsgrunnlagEgenKjøring -> true
             }
-        val beløp = resultat.beløp
-        feilHvis(beløp < BigDecimal.ZERO || beløp > Int.MAX_VALUE.toBigDecimal()) {
-            "Flyttebeløpet kan ikke lagres som andel"
+        }.map { resultat ->
+            val typeAndel =
+                when (stønadstype) {
+                    Stønadstype.FLYTTING_TSO -> målgruppeVedFom(resultat.fom, vedtaksperioder).tilTypeAndel(stønadstype)
+                    Stønadstype.FLYTTING_TSR -> TypeAndel.FLYTTING_ARBEIDSSØKER
+                    else -> feil("Flytting kan ikke opprette andeler for stønadstype=$stønadstype")
+                }
+            val beløp = resultat.beløp
+            feilHvis(beløp < BigDecimal.ZERO || beløp > Int.MAX_VALUE.toBigDecimal()) {
+                "Flyttebeløpet kan ikke lagres som andel"
+            }
+            val satsBekreftet = (resultat.grunnlag as? BeregningsgrunnlagEgenKjøring)?.satsBekreftet ?: true
+            val dato = resultat.fom.datoEllerNesteMandagHvisLørdagEllerSøndag()
+            AndelTilkjentYtelse(
+                beløp = beløp.intValueExact(),
+                fom = dato,
+                tom = dato,
+                satstype = Satstype.DAG,
+                type = typeAndel,
+                statusIverksetting = StatusIverksetting.fraSatsBekreftet(satsBekreftet),
+                utbetalingsdato = dato,
+            )
         }
-        val satsBekreftet = (resultat.grunnlag as? BeregningsgrunnlagEgenKjøring)?.satsBekreftet ?: true
-        val dato = resultat.fom.datoEllerNesteMandagHvisLørdagEllerSøndag()
-        AndelTilkjentYtelse(
-            beløp = beløp.intValueExact(),
-            fom = dato,
-            tom = dato,
-            satstype = Satstype.DAG,
-            type = typeAndel,
-            statusIverksetting = StatusIverksetting.fraSatsBekreftet(satsBekreftet),
-            utbetalingsdato = dato,
-        )
-    }
 
 private fun målgruppeVedFom(
     fom: java.time.LocalDate,

@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
@@ -21,12 +22,33 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
+import java.time.LocalDate
 
 class FlyttingBeregningServiceTest {
     private val flyttingVilkårService = mockk<FlyttingVilkårService>()
     private val vedtaksperiodeValideringService = mockk<VedtaksperiodeValideringService>(relaxed = true)
-    private val beregningService = FlyttingBeregningService(flyttingVilkårService, SatsPrivatBilProvider(), vedtaksperiodeValideringService)
+    private val beregningService =
+        FlyttingBeregningService(flyttingVilkårService, SatsPrivatBilProvider(), vedtaksperiodeValideringService)
     private val behandling = saksbehandling()
+
+    @Test
+    fun `beholder beregnet beløp uansett betalingsdokumentasjon og viderefører dokumentasjonen`() {
+        listOf(false, true).forEach { erBetalingDokumentert ->
+            val vilkår = flyttebyrå(10_000, 12_000, erBetalingDokumentert = erBetalingDokumentert)
+            every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns listOf(vilkår)
+
+            val resultat =
+                beregningService
+                    .beregn(behandling, listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)))
+                    .resultater
+                    .single()
+
+            assertThat(resultat.beløp).isEqualTo(10000.toBigDecimal())
+            assertThat((resultat.grunnlag as BeregningsgrunnlagFlyttebyrå).erBetalingDokumentert)
+                .isEqualTo(erBetalingDokumentert)
+            assertThat(vilkår.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
+        }
+    }
 
     @Test
     fun `velger laveste pris fra flyttebyrå uavhengig av tilbudsrekkefølge`() {
@@ -40,18 +62,18 @@ class FlyttingBeregningServiceTest {
 
             val resultat = beregningService.beregn(behandling, listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)))
 
-            assertThat(resultat.resultater.single().beløp).isEqualByComparingTo("10000")
+            assertThat(resultat.resultater.single().beløp).isEqualTo(10000.toBigDecimal())
         }
     }
 
     @Test
     fun `beregner egen kjøring med enveisavstand, tillegg og avrunding`() {
-        val vilkår = egenKjøring(fakta = FaktaFlytteSelv(250, 1500, 300, 400, 100))
+        val vilkår = egenKjøring(fakta = FaktaFlytteSelv(250, 1500, 300, 400, 100, "Adresse 1"))
         every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns listOf(vilkår)
 
         val resultat = beregningService.beregn(behandling, listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)))
 
-        assertThat(resultat.resultater.single().beløp).isEqualByComparingTo("3035")
+        assertThat(resultat.resultater.single().beløp).isEqualTo(3035.toBigDecimal())
     }
 
     @Test
@@ -59,7 +81,7 @@ class FlyttingBeregningServiceTest {
         val beregnedeBeløp =
             listOf(24 to "71", 26 to "76", 25 to "74").map { (avstand, forventet) ->
                 every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns
-                    listOf(egenKjøring(fakta = FaktaFlytteSelv(avstand, null, null, null, null)))
+                    listOf(egenKjøring(fakta = FaktaFlytteSelv(avstand, null, null, null, null, "Adresse 1")))
                 val resultat =
                     beregningService
                         .beregn(behandling, listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)))
@@ -78,7 +100,12 @@ class FlyttingBeregningServiceTest {
 
     @Test
     fun `avviser egen kjøring når vilkårsperioden strekker seg over flere kalenderår`() {
-        val vilkår = egenKjøring(fom = 31 desember 2025, tom = 1 januar 2026, fakta = FaktaFlytteSelv(100, null, null, null, null))
+        val vilkår =
+            egenKjøring(
+                fom = 31 desember 2025,
+                tom = 1 januar 2026,
+                fakta = FaktaFlytteSelv(100, null, null, null, null, "Adresse 1"),
+            )
         every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns listOf(vilkår)
 
         assertThatThrownBy {
@@ -92,7 +119,12 @@ class FlyttingBeregningServiceTest {
 
     @Test
     fun `bruker videreført ubekreftet sats når vilkåret starter etter siste bekreftede sats`() {
-        val vilkår = egenKjøring(fom = 1 januar 2027, tom = 31 januar 2027, fakta = FaktaFlytteSelv(100, null, null, null, null))
+        val vilkår =
+            egenKjøring(
+                fom = 1 januar 2027,
+                tom = 31 januar 2027,
+                fakta = FaktaFlytteSelv(100, null, null, null, null, "Adresse 1"),
+            )
         every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns listOf(vilkår)
 
         val resultat =
@@ -112,7 +144,11 @@ class FlyttingBeregningServiceTest {
     fun `lager ett resultat per vilkår selv når samme vilkår dekkes av flere perioder`() {
         val vilkårJanuar = flyttebyrå(10_000, 12_000, 1 januar 2026, 31 januar 2026)
         val vilkårFebruar = flyttebyrå(12_000, 10_000, 1 februar 2026, 28 februar 2026)
-        every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns listOf(vilkårFebruar, vilkårJanuar)
+        every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns
+            listOf(
+                vilkårFebruar,
+                vilkårJanuar,
+            )
 
         val resultat =
             beregningService.beregn(
@@ -136,7 +172,13 @@ class FlyttingBeregningServiceTest {
             beregningService.beregn(behandling, listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)))
         }.isInstanceOf(Feil::class.java)
 
-        every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns listOf(flyttebyrå(10_000, 12_000))
+        every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns
+            listOf(
+                flyttebyrå(
+                    10_000,
+                    12_000,
+                ),
+            )
         assertThatThrownBy {
             beregningService.beregn(behandling, listOf(vedtaksperiode(1 januar 2026, 30 januar 2026)))
         }.isInstanceOf(Feil::class.java)
@@ -160,8 +202,9 @@ class FlyttingBeregningServiceTest {
     private fun flyttebyrå(
         tilbud1: Int?,
         tilbud2: Int?,
-        fom: java.time.LocalDate = 1 januar 2026,
-        tom: java.time.LocalDate = 31 januar 2026,
+        fom: LocalDate = 1 januar 2026,
+        tom: LocalDate = 31 januar 2026,
+        erBetalingDokumentert: Boolean = true,
     ) = VilkårFlytting(
         behandlingId = behandling.id,
         delvilkårsett = emptyList(),
@@ -173,12 +216,14 @@ class FlyttingBeregningServiceTest {
             FaktaFlyttebyrå(
                 tilbud1 = FlyttebyråTilbud("A", tilbud1),
                 tilbud2 = FlyttebyråTilbud("B", tilbud2),
+                erBetalingDokumentert = erBetalingDokumentert,
+                adresse = "Adresse 1",
             ),
     )
 
     private fun egenKjøring(
-        fom: java.time.LocalDate = 1 januar 2026,
-        tom: java.time.LocalDate = 31 januar 2026,
+        fom: LocalDate = 1 januar 2026,
+        tom: LocalDate = 31 januar 2026,
         fakta: FaktaFlytteSelv,
     ) = VilkårFlytting(
         behandlingId = behandling.id,
