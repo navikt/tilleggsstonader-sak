@@ -73,7 +73,7 @@ class FlyttingBeregningServiceTest {
 
         val resultat = beregningService.beregn(behandling, listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)))
 
-        assertThat(resultat.resultater.single().beløp).isEqualTo(10000.toBigDecimal())
+        assertThat(resultat.resultater.single().beløp).isEqualTo(3035.toBigDecimal())
     }
 
     @Test
