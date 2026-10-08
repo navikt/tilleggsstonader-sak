@@ -13,12 +13,12 @@ import tools.jackson.module.kotlin.readValue
 class LagreVilkårFlyttingDtoTest {
     @Test
     fun `skal mappe ufullstendige delvilkår til domene uten å legge til svar`() {
-        val domain = dto(svar = emptyMap(), fakta = FaktaFlyttingUbestemtDto()).tilDomain()
+        val domain = dto(svar = emptyMap(), fakta = FaktaFlyttingUbestemtDto("Adresse 1")).tilDomain()
 
         assertThat(domain.fom).isEqualTo(1 januar 2026)
         assertThat(domain.tom).isEqualTo(31 januar 2026)
         assertThat(domain.svar).isEmpty()
-        assertThat(domain.fakta).isEqualTo(FaktaFlyttingUbestemt())
+        assertThat(domain.fakta).isEqualTo(FaktaFlyttingUbestemt("Adresse 1"))
     }
 
     @Test
@@ -27,7 +27,7 @@ class LagreVilkårFlyttingDtoTest {
         val domain =
             dto(
                 svar = mapOf(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to svar),
-                fakta = FaktaFlyttingUbestemtDto(),
+                fakta = FaktaFlyttingUbestemtDto("Adresse 1"),
             ).tilDomain()
 
         assertThat(domain.svar).containsOnlyKeys(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE)
@@ -62,7 +62,9 @@ class LagreVilkårFlyttingDtoTest {
                 {
                   "type": "FLYTTING_FLYTTEBYRÅ",
                   "tilbud1": {"navn": "Flyttebyrå A"},
-                  "tilbud2": {}
+                  "tilbud2": {},
+                  "adresse": "Flytteveien 1",
+                  "erBetalingDokumentert": false
                 }
                 """.trimIndent(),
             )
@@ -70,22 +72,18 @@ class LagreVilkårFlyttingDtoTest {
         assertThat(fakta).isEqualTo(
             FaktaFlyttebyråDto(
                 tilbud1 = FlyttebyråTilbudDto(navn = "Flyttebyrå A"),
+                adresse = "Flytteveien 1",
+                erBetalingDokumentert = false,
             ),
         )
     }
 
     @Test
     fun `skal deserialisere egen kjøring uten avstand og kostnader`() {
-        val fakta = jsonMapper.readValue<FaktaFlyttingDto>("""{"type": "FLYTTING_FLYTTE_SELV"}""")
+        val fakta =
+            jsonMapper.readValue<FaktaFlyttingDto>("""{"type": "FLYTTING_FLYTTE_SELV", "adresse": "Flytteveien 1"}""")
 
-        assertThat(fakta).isEqualTo(FaktaFlytteSelvDto())
-    }
-
-    @Test
-    fun `skal støtte eldre fakta uten adresse`() {
-        val fakta = jsonMapper.readValue<FaktaFlyttingDto>("""{"type": "FLYTTING_UBESTEMT"}""")
-
-        assertThat(fakta).isEqualTo(FaktaFlyttingUbestemtDto())
+        assertThat(fakta).isEqualTo(FaktaFlytteSelvDto(adresse = "Flytteveien 1"))
     }
 
     @Test
@@ -102,6 +100,7 @@ class LagreVilkårFlyttingDtoTest {
                         tilbud1 = FlyttebyråTilbudDto(navn = "Flyttebyrå A", pris = 10000),
                         tilbud2 = FlyttebyråTilbudDto(navn = "Flyttebyrå B", pris = 12000),
                         adresse = "Flytteveien 1",
+                        erBetalingDokumentert = true,
                     ),
             )
 
@@ -136,7 +135,7 @@ class LagreVilkårFlyttingDtoTest {
         val dto =
             dto(
                 svar = emptyMap(),
-                fakta = FaktaFlyttingUbestemtDto(),
+                fakta = FaktaFlyttingUbestemtDto(adresse = "Flytteveien 1"),
             )
 
         assertThat(jsonMapper.readValue<LagreVilkårFlyttingDto>(jsonMapper.writeValueAsString(dto))).isEqualTo(dto)

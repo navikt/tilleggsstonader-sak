@@ -66,6 +66,7 @@ class StønadsvilkårTestdataDsl {
         tom: LocalDate,
         tilbud1Pris: Int,
         tilbud2Pris: Int,
+        erBetalingDokumentert: Boolean,
     ) {
         opprettFlyttingScope += {
             LagreVilkårFlyttingDto(
@@ -77,6 +78,7 @@ class StønadsvilkårTestdataDsl {
                         tilbud1 = FlyttebyråTilbudDto(navn = "Syntetisk tilbud 1", pris = tilbud1Pris),
                         tilbud2 = FlyttebyråTilbudDto(navn = "Syntetisk tilbud 2", pris = tilbud2Pris),
                         adresse = "Syntetisk adresse",
+                        erBetalingDokumentert = erBetalingDokumentert,
                     ),
             )
         }

@@ -31,6 +31,7 @@ sealed interface BeregningsgrunnlagFlytting
 data class BeregningsgrunnlagFlyttebyrå(
     val tilbud1Pris: BigDecimal,
     val tilbud2Pris: BigDecimal,
+    val erBetalingDokumentert: Boolean,
 ) : BeregningsgrunnlagFlytting
 
 data class BeregningsgrunnlagEgenKjøring(

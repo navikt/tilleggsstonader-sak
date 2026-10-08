@@ -24,6 +24,7 @@ class FlyttingVilkårValideringTest {
                     tilbud1 = FlyttebyråTilbud(navn = "Flyttebyrå A", pris = null),
                     tilbud2 = FlyttebyråTilbud(navn = null, pris = null),
                     adresse = "Flytteveien 1",
+                    erBetalingDokumentert = true,
                 ),
             )
         }
@@ -37,6 +38,7 @@ class FlyttingVilkårValideringTest {
                     tilbud1 = FlyttebyråTilbud(navn = "Flyttebyrå A", pris = 10000),
                     tilbud2 = FlyttebyråTilbud(navn = " flyttebyrå a ", pris = 12000),
                     adresse = "Flytteveien 1",
+                    erBetalingDokumentert = true,
                 ),
             )
         }
@@ -60,8 +62,18 @@ class FlyttingVilkårValideringTest {
 
     @Test
     fun `skal avvise tom flytteadresse`() {
-        assertThrows<ApiFeil> {
-            FlyttingVilkårValidering.validerOppgitteFakta(FaktaFlyttingUbestemt(adresse = " "))
+        listOf("", " ", "\t\n").forEach { adresse ->
+            listOf(
+                FaktaFlyttingUbestemt(adresse = adresse),
+                FaktaFlytteSelv(null, null, null, null, null, adresse),
+                FaktaFlyttebyrå(FlyttebyråTilbud(null, null), FlyttebyråTilbud(null, null), false, adresse),
+            ).forEach { fakta ->
+                val feil =
+                    assertThrows<ApiFeil> {
+                        FlyttingVilkårValidering.validerOppgitteFakta(fakta)
+                    }
+                assertThat(feil.message).isEqualTo("Flytteadressen kan ikke være tom")
+            }
         }
     }
 
@@ -73,7 +85,7 @@ class FlyttingVilkårValideringTest {
                     fom = 1 januar 2026,
                     tom = 31 januar 2026,
                     svar = emptyMap(),
-                    fakta = FaktaFlyttingUbestemt(),
+                    fakta = FaktaFlyttingUbestemt(adresse = "Flytteveien 1"),
                 ),
             ),
         ).isFalse()
@@ -93,6 +105,7 @@ class FlyttingVilkårValideringTest {
                             tilbud1 = FlyttebyråTilbud(navn = "Flyttebyrå A", pris = 10000),
                             tilbud2 = FlyttebyråTilbud(navn = "Flyttebyrå B", pris = 12000),
                             adresse = "Flytteveien 1",
+                            erBetalingDokumentert = false,
                         ),
                 ),
             ),
@@ -120,27 +133,5 @@ class FlyttingVilkårValideringTest {
                 ),
             ),
         ).isTrue()
-    }
-
-    @Test
-    fun `skal ikke være fullstendig uten flytteadresse`() {
-        assertThat(
-            FlyttingVilkårValidering.erFullstendig(
-                LagreVilkårFlytting(
-                    fom = 1 januar 2026,
-                    tom = 31 januar 2026,
-                    svar =
-                        mapOf(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelse(SvarId.FLYTTER_SELV)),
-                    fakta =
-                        FaktaFlytteSelv(
-                            avstandEnVei = 250,
-                            henger = null,
-                            bompenger = null,
-                            ferge = null,
-                            parkering = null,
-                        ),
-                ),
-            ),
-        ).isFalse()
     }
 }

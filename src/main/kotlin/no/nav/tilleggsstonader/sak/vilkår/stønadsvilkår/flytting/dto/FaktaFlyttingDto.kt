@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 )
 sealed interface FaktaFlyttingDto {
     val type: TypeFaktaFlytting
-    val adresse: String?
+    val adresse: String
 }
 
 enum class TypeFaktaFlytting {
@@ -28,7 +28,8 @@ enum class TypeFaktaFlytting {
 data class FaktaFlyttebyråDto(
     val tilbud1: FlyttebyråTilbudDto = FlyttebyråTilbudDto(),
     val tilbud2: FlyttebyråTilbudDto = FlyttebyråTilbudDto(),
-    override val adresse: String? = null,
+    val erBetalingDokumentert: Boolean,
+    override val adresse: String,
 ) : FaktaFlyttingDto {
     override val type = TypeFaktaFlytting.FLYTTING_FLYTTEBYRÅ
 }
@@ -44,13 +45,13 @@ data class FaktaFlytteSelvDto(
     val bompenger: Int? = null,
     val ferge: Int? = null,
     val parkering: Int? = null,
-    override val adresse: String? = null,
+    override val adresse: String,
 ) : FaktaFlyttingDto {
     override val type = TypeFaktaFlytting.FLYTTING_FLYTTE_SELV
 }
 
 data class FaktaFlyttingUbestemtDto(
-    override val adresse: String? = null,
+    override val adresse: String,
 ) : FaktaFlyttingDto {
     override val type = TypeFaktaFlytting.FLYTTING_UBESTEMT
 }

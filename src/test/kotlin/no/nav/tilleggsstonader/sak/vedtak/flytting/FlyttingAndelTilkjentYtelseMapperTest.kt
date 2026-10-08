@@ -19,7 +19,7 @@ import java.math.BigDecimal
 
 class FlyttingAndelTilkjentYtelseMapperTest {
     @Test
-    fun `mapper hver TSO-målgruppe til egen flytteandel og beholder FOM på helg`() {
+    fun `mapper hver TSO-målgruppe til egen flytteandel og flytter helgedato til mandag`() {
         val forventedeTyper =
             mapOf(
                 FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE to TypeAndel.FLYTTING_AAP,
@@ -107,15 +107,60 @@ class FlyttingAndelTilkjentYtelseMapperTest {
         }.isInstanceOf(Feil::class.java)
     }
 
-    private fun resultat(fom: java.time.LocalDate) =
-        BeregningsresultatFlytting(
-            listOf(
-                BeregningsresultatFlyttevilkår(
-                    fom = fom,
-                    tom = fom.plusDays(10),
-                    grunnlag = BeregningsgrunnlagFlyttebyrå(BigDecimal("100"), BigDecimal("120")),
-                    beløp = BigDecimal("100"),
-                ),
+    @Test
+    fun `udokumentert byrå gir ingen andeler for TSO eller TSR`() {
+        listOf(Stønadstype.FLYTTING_TSO, Stønadstype.FLYTTING_TSR).forEach { stønadstype ->
+            assertThat(
+                resultat(1 januar 2026, erBetalingDokumentert = false).mapTilAndeler(stønadstype, emptyList()),
+            ).isEmpty()
+        }
+    }
+
+    @Test
+    fun `blandet beregning gir kun andeler for dokumentert byrå og egen kjøring`() {
+        val dato = 1 januar 2026
+        val egenKjøring =
+            resultat(dato).resultater.single().copy(
+                beløp = BigDecimal("294"),
+                grunnlag =
+                    BeregningsgrunnlagEgenKjøring(
+                        avstandEnVei = 100,
+                        sats = BigDecimal("2.94"),
+                        satsBekreftet = true,
+                        henger = BigDecimal.ZERO,
+                        bompenger = BigDecimal.ZERO,
+                        ferge = BigDecimal.ZERO,
+                        parkering = BigDecimal.ZERO,
+                    ),
+            )
+        val blandet =
+            BeregningsresultatFlytting(
+                resultat(dato, erBetalingDokumentert = false).resultater +
+                    resultat(dato, erBetalingDokumentert = true).resultater +
+                    egenKjøring,
+            )
+        listOf(Stønadstype.FLYTTING_TSO, Stønadstype.FLYTTING_TSR).forEach { stønadstype ->
+            val andeler = blandet.mapTilAndeler(stønadstype, listOf(vedtaksperiode(dato, 31 januar 2026)))
+            assertThat(andeler.map { it.beløp }).containsExactly(100, 294)
+            assertThat(blandet.resultater.map { it.beløp }).containsExactly(
+                BigDecimal("100"),
+                BigDecimal("100"),
+                BigDecimal("294"),
+            )
+        }
+    }
+
+    private fun resultat(
+        fom: java.time.LocalDate,
+        erBetalingDokumentert: Boolean = true,
+    ) = BeregningsresultatFlytting(
+        listOf(
+            BeregningsresultatFlyttevilkår(
+                fom = fom,
+                tom = fom.plusDays(10),
+                grunnlag = BeregningsgrunnlagFlyttebyrå(BigDecimal("100"), BigDecimal("120"), erBetalingDokumentert),
+                beløp = BigDecimal("100"),
             ),
-        )
+        ),
+    )
 }
