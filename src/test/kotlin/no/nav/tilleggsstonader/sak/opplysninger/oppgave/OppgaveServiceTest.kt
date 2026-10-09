@@ -23,6 +23,8 @@ import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveBrukerType
 import no.nav.tilleggsstonader.kontrakter.oppgave.OppgaveMappe
 import no.nav.tilleggsstonader.kontrakter.oppgave.Oppgavetype
 import no.nav.tilleggsstonader.kontrakter.oppgave.OpprettOppgaveRequest
+import no.nav.tilleggsstonader.kontrakter.oppgave.Sorteringsfelt
+import no.nav.tilleggsstonader.kontrakter.oppgave.Sorteringsrekkefølge
 import no.nav.tilleggsstonader.kontrakter.oppgave.StatusEnum
 import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
@@ -496,6 +498,33 @@ internal class OppgaveServiceTest {
 
         assertThat(oppgaveService.finnSisteBehandlingsoppgaveForBehandling(BEHANDLING_ID))
             .isEqualTo(behandleSakOppgave)
+    }
+
+    @Test
+    fun `skal bruke ventemappe og sortere på frist stigende når oppgaverPåVent er true`() {
+        every { oppgaveClient.hentOppgaver(any()) } returns
+            FinnOppgaveResponseDto(0, emptyList())
+
+        oppgaveService.hentOppgaver(
+            FinnOppgaveRequestDto(
+                ident = null,
+                oppgaverPåVent = true,
+                orderBy = Sorteringsfelt.FRIST,
+                order = Sorteringsrekkefølge.ASC,
+                enhet = Enhet.NAV_ARBEID_OG_YTELSER_TILLEGGSSTØNAD.enhetsnr,
+            ),
+        )
+
+        verify {
+            oppgaveClient.hentOppgaver(
+                match {
+                    it.erUtenMappe == false &&
+                        it.mappeId == OppgaveClientMockConfig.MAPPE_ID_PÅ_VENT &&
+                        it.sorteringsfelt == Sorteringsfelt.FRIST &&
+                        it.sorteringsrekkefolge == Sorteringsrekkefølge.ASC
+                },
+            )
+        }
     }
 
     private fun mockOpprettOppgave(slot: CapturingSlot<OpprettOppgaveRequest>) {
