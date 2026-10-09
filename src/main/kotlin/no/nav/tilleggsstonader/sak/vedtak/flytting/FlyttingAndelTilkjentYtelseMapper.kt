@@ -23,7 +23,9 @@ fun BeregningsresultatFlytting.mapTilAndeler(stønadstype: Stønadstype): List<A
         }.map { resultat ->
             val typeAndel =
                 when (stønadstype) {
-                    Stønadstype.FLYTTING_TSO -> resultat.målgruppe.tilTypeAndel(stønadstype)
+                    // TODO Hva er beste måten å faktisk hente ut målgruppe på? Hva bør vi lagre på beregningsgrunnlaget?
+                    // Trenger vi bare å lagre målgruppe eller skal vi lagre vedtaksperiodene også
+                    Stønadstype.FLYTTING_TSO -> TypeAndel.FLYTTING_AAP
                     Stønadstype.FLYTTING_TSR -> TypeAndel.FLYTTING_ARBEIDSSØKER
                     else -> feil("Flytting kan ikke opprette andeler for stønadstype=$stønadstype")
                 }

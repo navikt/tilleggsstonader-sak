@@ -10,7 +10,6 @@ import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagEgen
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlyttevilkår
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
@@ -143,8 +142,6 @@ class FlyttingAndelTilkjentYtelseMapperTest {
     ) = BeregningsresultatFlytting(
         listOf(
             BeregningsresultatFlyttevilkår(
-                flyttingId = FlyttingId.random(),
-                målgruppe = målgruppe,
                 fom = fom,
                 tom = fom.plusDays(10),
                 grunnlag = BeregningsgrunnlagFlyttebyrå(BigDecimal("100"), BigDecimal("120"), erBetalingDokumentert),
