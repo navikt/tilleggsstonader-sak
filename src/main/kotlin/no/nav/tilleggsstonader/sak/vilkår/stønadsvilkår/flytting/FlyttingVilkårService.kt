@@ -128,32 +128,57 @@ class FlyttingVilkårService(
 
     private fun validerFaktaOgSvar(innsendt: LagreVilkårFlytting) {
         FlyttingVilkårValidering.validerOppgitteFakta(innsendt.fakta)
+        val oppfyllerVilkår = innsendt.svar[RegelId.OPPFYLLER_VILKÅR_FOR_FLYTTING]?.svar
         val flyttemåte = innsendt.svar[RegelId.HVORDAN_SKAL_BRUKER_FLYTTE]?.svar
 
+        brukerfeilHvis(oppfyllerVilkår != null && oppfyllerVilkår !in setOf(SvarId.JA, SvarId.NEI)) {
+            "Vilkår for flytting må besvares med ja eller nei"
+        }
         brukerfeilHvis(flyttemåte != null && flyttemåte !in setOf(SvarId.FLYTTEBYRÅ, SvarId.FLYTTER_SELV)) {
             "Flyttevilkår må besvares med flyttebyrå eller flytter selv"
         }
 
-        when (flyttemåte) {
+        when (oppfyllerVilkår) {
             null -> {
                 brukerfeilHvis(innsendt.fakta !is FaktaFlyttingUbestemt) {
-                    "Vurderingen av flyttemåte må besvares før fakta registreres"
+                    "Vurderingen av om vilkårene for flytting er oppfylt må besvares før fakta registreres"
                 }
             }
 
-            SvarId.FLYTTEBYRÅ -> {
-                brukerfeilHvis(innsendt.fakta !is FaktaFlyttebyrå) {
-                    "Fakta må inneholde to tilbud fra flyttebyrå når flyttebyrå er valgt"
+            SvarId.NEI -> {
+                brukerfeilHvis(flyttemåte != null) {
+                    "Flyttemåte skal ikke besvares når vilkårene for flytting ikke er oppfylt"
+                }
+                brukerfeilHvis(innsendt.fakta !is FaktaFlyttingUbestemt) {
+                    "Fakta kan kun inneholde adresse når vilkårene for flytting ikke er oppfylt"
                 }
             }
 
-            SvarId.FLYTTER_SELV -> {
-                brukerfeilHvis(innsendt.fakta !is FaktaFlytteSelv) {
-                    "Fakta må inneholde avstand og kostnader når bruker flytter selv"
+            SvarId.JA -> {
+                when (flyttemåte) {
+                    null -> {
+                        brukerfeilHvis(innsendt.fakta !is FaktaFlyttingUbestemt) {
+                            "Vurderingen av flyttemåte må besvares før fakta registreres"
+                        }
+                    }
+
+                    SvarId.FLYTTEBYRÅ -> {
+                        brukerfeilHvis(innsendt.fakta !is FaktaFlyttebyrå) {
+                            "Fakta må inneholde to tilbud fra flyttebyrå når flyttebyrå er valgt"
+                        }
+                    }
+
+                    SvarId.FLYTTER_SELV -> {
+                        brukerfeilHvis(innsendt.fakta !is FaktaFlytteSelv) {
+                            "Fakta må inneholde avstand og kostnader når bruker flytter selv"
+                        }
+                    }
+
+                    else -> error("Ugyldig svar på flyttemåte")
                 }
             }
 
-            else -> error("Ugyldig svar på flyttemåte")
+            else -> error("Ugyldig svar på om vilkårene for flytting er oppfylt")
         }
     }
 

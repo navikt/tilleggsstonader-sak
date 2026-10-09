@@ -1,6 +1,6 @@
 {
   "HVORDAN_SKAL_BRUKER_FLYTTE": {
-    "erHovedregel": true,
+    "erHovedregel": false,
     "reglerSomMåNullstilles": [ ],
     "svaralternativer": [ {
       "begrunnelseType": "VALGFRI",
@@ -12,6 +12,21 @@
       "nesteRegelId": null,
       "svarId": "FLYTTER_SELV",
       "tilhørendeFaktaType": "FLYTTING_FLYTTE_SELV"
+    } ]
+  },
+  "OPPFYLLER_VILKÅR_FOR_FLYTTING": {
+    "erHovedregel": true,
+    "reglerSomMåNullstilles": [ "HVORDAN_SKAL_BRUKER_FLYTTE" ],
+    "svaralternativer": [ {
+      "begrunnelseType": "VALGFRI",
+      "nesteRegelId": "HVORDAN_SKAL_BRUKER_FLYTTE",
+      "svarId": "JA",
+      "tilhørendeFaktaType": null
+    }, {
+      "begrunnelseType": "PÅKREVD",
+      "nesteRegelId": null,
+      "svarId": "NEI",
+      "tilhørendeFaktaType": "FLYTTING_UBESTEMT"
     } ]
   }
 }
