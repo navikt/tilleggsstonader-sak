@@ -1,7 +1,7 @@
 {
   "collection": "nav-pilot",
-  "version": "2026.10.06-140548-f35e5d4",
-  "source_sha": "8ceea96d7adebdb4218496f71bf5f0cb6b43a183",
+  "version": "2026.10.08-225212-8936779",
+  "source_sha": "f1f3393973e26deb7dd16dace4be655f8400800c",
   "installed_at": "2026-04-13T13:37:44Z",
   "files": [
     {
@@ -16,8 +16,8 @@
     },
     {
       "path": ".github/agents/code-review.agent.md",
-      "hash": "5a019cbf3eda9ce2",
-      "revision": "8ceea96d7adebdb4218496f71bf5f0cb6b43a183"
+      "hash": "811b2a6765ff86de",
+      "revision": "f1f3393973e26deb7dd16dace4be655f8400800c"
     },
     {
       "path": ".github/agents/forfatter.agent.md",
@@ -40,8 +40,8 @@
     },
     {
       "path": ".github/agents/nav-pilot.agent.md",
-      "hash": "2ba916f4de76f1f9",
-      "revision": "8ceea96d7adebdb4218496f71bf5f0cb6b43a183"
+      "hash": "8c6cbe9101b541c5",
+      "revision": "f1f3393973e26deb7dd16dace4be655f8400800c"
     },
     {
       "path": ".github/agents/nav-pilot.metadata.json",
@@ -54,17 +54,21 @@
     },
     {
       "path": ".github/agents/rust.agent.md",
-      "hash": "f915a28c049a0f64",
-      "revision": "8ceea96d7adebdb4218496f71bf5f0cb6b43a183"
+      "hash": "e1cb55806cd87d8c",
+      "revision": "f1f3393973e26deb7dd16dace4be655f8400800c"
     },
     {
       "path": ".github/agents/security-champion.agent.md",
-      "hash": "09850437ed89c7bb",
-      "revision": "8ceea96d7adebdb4218496f71bf5f0cb6b43a183"
+      "hash": "65fed295fcdd5bd1",
+      "revision": "f1f3393973e26deb7dd16dace4be655f8400800c"
     },
     {
       "path": ".github/agents/security-champion.metadata.json",
       "hash": "9a134555f80a5d00"
+    },
+    {
+      "path": ".github/agents/worker.agent.md",
+      "hash": "43c860f99cd1337e"
     },
     {
       "path": ".github/hooks/ask-first-aria.py",
@@ -241,8 +245,8 @@
     },
     {
       "path": ".github/skills/nav-dekoratoren/",
-      "hash": "36a286dece9e2c63",
-      "revision": "8ceea96d7adebdb4218496f71bf5f0cb6b43a183"
+      "hash": "4b5d432477529d66",
+      "revision": "f1f3393973e26deb7dd16dace4be655f8400800c"
     },
     {
       "path": ".github/skills/nav-plan/",
