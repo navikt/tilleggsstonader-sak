@@ -133,7 +133,7 @@ class UtledTidligsteEndringServiceTest {
             fakta.copy(tilbud1 = fakta.tilbud1.copy(pris = 3000)),
             fakta.copy(erBetalingDokumentert = false),
             fakta.copy(adresse = "Ny syntetisk adresse"),
-            FaktaFlytteSelv(100, null, null, null, null, fakta.adresse, fakta.flyttingId),
+            FaktaFlytteSelv(100, null, null, null, null, fakta.adresse),
         ).forEach { endret ->
             assertThat(utleder.copy(vilkår = listOf(original.copy(fakta = endret))).utledTidligsteEndring()?.tidligsteEndring)
                 .isEqualTo(fom)

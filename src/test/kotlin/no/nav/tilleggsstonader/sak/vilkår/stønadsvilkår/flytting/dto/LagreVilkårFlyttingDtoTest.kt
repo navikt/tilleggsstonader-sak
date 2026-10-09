@@ -19,7 +19,7 @@ class LagreVilkårFlyttingDtoTest {
         assertThat(domain.fom).isEqualTo(1 januar 2026)
         assertThat(domain.tom).isEqualTo(31 januar 2026)
         assertThat(domain.svar).isEmpty()
-        assertThat(domain.fakta).isEqualTo(FaktaFlyttingUbestemt("Adresse 1", flyttingId = fakta.flyttingId))
+        assertThat(domain.fakta).isEqualTo(FaktaFlyttingUbestemt("Adresse 1"))
     }
 
     @Test
@@ -52,7 +52,7 @@ class LagreVilkårFlyttingDtoTest {
         assertThat(dto.fom).isEqualTo(1 januar 2026)
         assertThat(dto.tom).isEqualTo(31 januar 2026)
         assertThat(dto.svar).isEmpty()
-        assertThat(dto.fakta).isEqualTo(FaktaFlyttingUbestemtDto(adresse = "Flytteveien 1", flyttingId = dto.fakta.flyttingId))
+        assertThat(dto.fakta).isEqualTo(FaktaFlyttingUbestemtDto(adresse = "Flytteveien 1"))
     }
 
     @Test
@@ -75,7 +75,6 @@ class LagreVilkårFlyttingDtoTest {
                 tilbud1 = FlyttebyråTilbudDto(navn = "Flyttebyrå A"),
                 adresse = "Flytteveien 1",
                 erBetalingDokumentert = false,
-                flyttingId = fakta.flyttingId,
             ),
         )
     }
@@ -85,7 +84,7 @@ class LagreVilkårFlyttingDtoTest {
         val fakta =
             jsonMapper.readValue<FaktaFlyttingDto>("""{"type": "FLYTTING_FLYTTE_SELV", "adresse": "Flytteveien 1"}""")
 
-        assertThat(fakta).isEqualTo(FaktaFlytteSelvDto(adresse = "Flytteveien 1", flyttingId = fakta.flyttingId))
+        assertThat(fakta).isEqualTo(FaktaFlytteSelvDto(adresse = "Flytteveien 1"))
     }
 
     @Test

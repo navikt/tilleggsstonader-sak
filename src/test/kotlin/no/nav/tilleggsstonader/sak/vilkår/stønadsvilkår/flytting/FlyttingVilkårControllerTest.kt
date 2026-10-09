@@ -255,7 +255,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
     ) {
         assertThat(resultat.fom).isEqualTo(request.fom)
         assertThat(resultat.tom).isEqualTo(request.tom)
-        assertThat(resultat.fakta).usingRecursiveComparison().ignoringFields("flyttingId").isEqualTo(request.fakta)
+        assertThat(resultat.fakta).usingRecursiveComparison().isEqualTo(request.fakta)
         assertThat(resultat.delvilkårsett).hasSize(1)
         val vurderinger = resultat.delvilkårsett.single().vurderinger
         assertThat(vurderinger.map { it.regelId }).containsExactly(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE)

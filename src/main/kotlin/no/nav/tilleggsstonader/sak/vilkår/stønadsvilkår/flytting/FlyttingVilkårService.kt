@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -105,13 +104,8 @@ class FlyttingVilkårService(
                 vilkårsregel = FlyttingRegel(),
                 svar = innsendt.svar.mapValues { it.value },
             )
-        val flyttingId = eksisterende?.fakta?.flyttingId ?: FlyttingId.random()
-        val fakta =
-            when (val innsendteFakta = innsendt.fakta) {
-                is FaktaFlyttebyrå -> innsendteFakta.copy(flyttingId = flyttingId)
-                is FaktaFlytteSelv -> innsendteFakta.copy(flyttingId = flyttingId)
-                is FaktaFlyttingUbestemt -> innsendteFakta.copy(flyttingId = flyttingId)
-            }
+        val fakta = innsendt.fakta
+
         val samletResultat =
             if (FlyttingVilkårValidering.erFullstendig(innsendt)) {
                 RegelEvaluering.utledVilkårResultat(delvilkår)

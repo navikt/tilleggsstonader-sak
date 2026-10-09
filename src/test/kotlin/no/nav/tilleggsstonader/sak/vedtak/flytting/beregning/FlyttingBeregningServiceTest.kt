@@ -295,7 +295,7 @@ class FlyttingBeregningServiceTest {
                 original.copy(fom = 2 januar 2026),
                 original.copy(tom = 15 januar 2026),
                 original.copy(fom = 2 januar 2026, tom = 2 januar 2026),
-                original.copy(fakta = FaktaFlytteSelv(100, null, null, null, null, "Adresse 1", byrå.flyttingId)),
+                original.copy(fakta = FaktaFlytteSelv(100, null, null, null, null, "Adresse 1")),
             )
         endringer.forEach { endret ->
             every { flyttingVilkårService.hentOppfylteVilkårforBehandling(revurdering.id) } returns

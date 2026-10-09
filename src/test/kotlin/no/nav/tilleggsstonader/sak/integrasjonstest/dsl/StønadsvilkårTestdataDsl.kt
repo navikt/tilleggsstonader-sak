@@ -20,7 +20,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.Fakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.LagreVilkårDagligReiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dagligReise.dto.VilkårDagligReiseDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.LagreVilkår
@@ -168,7 +167,12 @@ class StønadsvilkårTestdataDsl {
                                 faktaDelperioder =
                                     this.fakta.faktaDelperioder.mapIndexed { index, delperiode ->
                                         when (index) {
-                                            0.takeIf { this.fakta.faktaDelperioder.size == 1 } -> delperiode.copy(fom = fom, tom = tom)
+                                            0.takeIf { this.fakta.faktaDelperioder.size == 1 } ->
+                                                delperiode.copy(
+                                                    fom = fom,
+                                                    tom = tom,
+                                                )
+
                                             0 -> delperiode.copy(fom = fom)
                                             this.fakta.faktaDelperioder.lastIndex -> delperiode.copy(tom = tom)
                                             else -> delperiode
@@ -176,11 +180,13 @@ class StønadsvilkårTestdataDsl {
                                     },
                             ),
                     )
+
                 is FaktaDagligReiseOffentligTransportDto ->
                     copy(
                         fom = fom,
                         tom = tom,
                     )
+
                 is FaktaDagligReiseUbestemtDto -> error("Uforventet type ${FaktaDagligReiseUbestemtDto::class}")
             }
         }
@@ -246,21 +252,19 @@ class StønadsvilkårTestdataDsl {
 
     fun endreFlytting(
         vilkårId: VilkårId? = null,
-        flyttingId: FlyttingId? = null,
         endre: LagreVilkårFlyttingDto.() -> LagreVilkårFlyttingDto,
     ) {
         oppdaterFlytting { vilkår ->
             val treff =
-                flyttingId?.let { id -> vilkår.single { it.fakta.flyttingId == id } }
-                    ?: vilkårId?.let { id -> vilkår.single { it.id == id } }
+                vilkårId?.let { id -> vilkår.single { it.id == id } }
                     ?: vilkår.single()
             treff.id to treff.tilLagreVilkårFlyttingDto().endre()
         }
     }
 
-    fun fjernFlytting(flyttingId: FlyttingId) {
+    fun fjernFlytting() {
         deleteFlytting += { vilkår ->
-            vilkår.single { it.fakta.flyttingId == flyttingId }.id to SlettVilkårFlyttingRequestDto(kommentar = "Slettet i test")
+            vilkår.single().id to SlettVilkårFlyttingRequestDto(kommentar = "Slettet i test")
         }
     }
 }

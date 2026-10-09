@@ -6,7 +6,6 @@
   "beregningsresultat": {
     "resultater": [ {
       "beløp": 10000,
-      "flyttingId": "00000000-0000-0000-0000-000000000001",
       "fom": "2026-01-01",
       "fraTidligereVedtak": false,
       "grunnlag": {
