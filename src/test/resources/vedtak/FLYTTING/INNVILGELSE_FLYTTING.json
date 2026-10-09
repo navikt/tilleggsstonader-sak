@@ -7,12 +7,14 @@
     "resultater": [ {
       "beløp": 10000,
       "fom": "2026-01-01",
+      "fraTidligereVedtak": false,
       "grunnlag": {
         "erBetalingDokumentert": true,
         "tilbud1Pris": 10000,
         "tilbud2Pris": 12000,
         "type": "FLYTTEBYRÅ"
       },
+      "målgruppe": "NEDSATT_ARBEIDSEVNE",
       "tom": "2026-01-31"
     } ]
   },

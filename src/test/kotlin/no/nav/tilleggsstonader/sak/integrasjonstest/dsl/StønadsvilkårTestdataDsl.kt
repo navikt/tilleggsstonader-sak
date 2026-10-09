@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BarnId
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreDagligReiseDto
+import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreVilkårFlyttingDto
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreVilkårReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.util.lagreDagligReiseDto
@@ -32,6 +33,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFly
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttebyråDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FlyttebyråTilbudDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.LagreVilkårFlyttingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.SlettVilkårFlyttingRequestDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.VilkårFlyttingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårLøpendeUtgifterEnBolig
@@ -164,7 +167,12 @@ class StønadsvilkårTestdataDsl {
                                 faktaDelperioder =
                                     this.fakta.faktaDelperioder.mapIndexed { index, delperiode ->
                                         when (index) {
-                                            0.takeIf { this.fakta.faktaDelperioder.size == 1 } -> delperiode.copy(fom = fom, tom = tom)
+                                            0.takeIf { this.fakta.faktaDelperioder.size == 1 } ->
+                                                delperiode.copy(
+                                                    fom = fom,
+                                                    tom = tom,
+                                                )
+
                                             0 -> delperiode.copy(fom = fom)
                                             this.fakta.faktaDelperioder.lastIndex -> delperiode.copy(tom = tom)
                                             else -> delperiode
@@ -172,11 +180,13 @@ class StønadsvilkårTestdataDsl {
                                     },
                             ),
                     )
+
                 is FaktaDagligReiseOffentligTransportDto ->
                     copy(
                         fom = fom,
                         tom = tom,
                     )
+
                 is FaktaDagligReiseUbestemtDto -> error("Uforventet type ${FaktaDagligReiseUbestemtDto::class}")
             }
         }
@@ -228,6 +238,33 @@ class StønadsvilkårTestdataDsl {
         slettReiseTilSamling { vilkår ->
             val treff = reiseId?.let { id -> vilkår.single { it.reiseId == id } } ?: vilkår.single()
             treff.id to SlettVilkårReiseTilSamlingRequestDto(kommentar = "Slettet i test")
+        }
+    }
+
+    internal val updateFlytting =
+        mutableListOf<(List<VilkårFlyttingDto>) -> Pair<VilkårId, LagreVilkårFlyttingDto>>()
+    internal val deleteFlytting =
+        mutableListOf<(List<VilkårFlyttingDto>) -> Pair<VilkårId, SlettVilkårFlyttingRequestDto>>()
+
+    fun oppdaterFlytting(block: (vilkårFlytting: List<VilkårFlyttingDto>) -> Pair<VilkårId, LagreVilkårFlyttingDto>) {
+        updateFlytting += block
+    }
+
+    fun endreFlytting(
+        vilkårId: VilkårId? = null,
+        endre: LagreVilkårFlyttingDto.() -> LagreVilkårFlyttingDto,
+    ) {
+        oppdaterFlytting { vilkår ->
+            val treff =
+                vilkårId?.let { id -> vilkår.single { it.id == id } }
+                    ?: vilkår.single()
+            treff.id to treff.tilLagreVilkårFlyttingDto().endre()
+        }
+    }
+
+    fun fjernFlytting() {
+        deleteFlytting += { vilkår ->
+            vilkår.single().id to SlettVilkårFlyttingRequestDto(kommentar = "Slettet i test")
         }
     }
 }

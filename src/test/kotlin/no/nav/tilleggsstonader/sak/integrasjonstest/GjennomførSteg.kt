@@ -210,6 +210,15 @@ fun IntegrationTest.gjennomførVilkårSteg(
         testdata.vilkår.deleteReiseTilSamling
             .map { it(vilkårReiseTilSamling) }
             .forEach { (vilkårId, dto) -> kall.vilkårReiseTilSamling.slettVilkår(behandlingId, vilkårId, dto) }
+    } else if (stønadstype in setOf(Stønadstype.FLYTTING_TSO, Stønadstype.FLYTTING_TSR)) {
+        testdata.vilkår.updateFlytting.forEach { oppdater ->
+            val (vilkårId, dto) = oppdater(kall.vilkårFlytting.hentVilkår(behandlingId))
+            kall.vilkårFlytting.oppdaterVilkår(dto, vilkårId, behandlingId)
+        }
+        testdata.vilkår.deleteFlytting.forEach { slett ->
+            val (vilkårId, dto) = slett(kall.vilkårFlytting.hentVilkår(behandlingId))
+            kall.vilkårFlytting.slettVilkår(behandlingId, vilkårId, dto)
+        }
     } else {
         testdata.vilkår.update
             .map { it(vilkår) }

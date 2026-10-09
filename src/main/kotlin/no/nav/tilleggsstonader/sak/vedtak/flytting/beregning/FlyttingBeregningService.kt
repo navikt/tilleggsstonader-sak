@@ -2,22 +2,22 @@ package no.nav.tilleggsstonader.sak.vedtak.flytting.beregning
 
 import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
-import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
-import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.util.isEqualOrAfter
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
+import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.avrundetStønadsbeløp
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.domain.mergeSammenhengende
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagEgenKjøring
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlyttevilkår
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
-import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FlyttingVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.VilkårFlytting
 import org.springframework.stereotype.Service
@@ -26,46 +26,58 @@ import java.math.BigDecimal
 @Service
 class FlyttingBeregningService(
     private val flyttingVilkårService: FlyttingVilkårService,
+    private val vedtakService: VedtakService,
     private val satsPrivatBilProvider: SatsPrivatBilProvider,
-    private val vedtaksperiodeValideringService: VedtaksperiodeValideringService,
 ) {
     fun beregn(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
+        beregningsplan: Beregningsplan,
     ): BeregningsresultatFlytting {
-        feilHvis(vedtaksperioder.isEmpty()) { "Vedtaksperioder kan ikke være tomme" }
-        // TODO - ikke hardkode INNVILGELSE
-        vedtaksperiodeValideringService.validerVedtaksperioder(vedtaksperioder, behandling, typeVedtak = TypeVedtak.INNVILGELSE)
+        val omfang = beregningsplan.omfang
 
-        val vilkår = flyttingVilkårService.hentVilkårForBehandling(behandling.id)
-        val relevanteVilkår =
-            vilkår
-                .filter { it.status != VilkårStatus.SLETTET }
-                .filter { vilkår -> overlapperVedtaksperiode(vilkår, vedtaksperioder) }
-                .sortedBy { it.fom }
+        // TODO Bør man sjekke noe overlapp i vedtaksperioder og sånt her?
+        // TODO Har sortering av resultater noe å si?
 
-        feilHvis(relevanteVilkår.isEmpty()) { "Fant ingen flyttevilkår som kan beregnes for vedtaksperiodene" }
+        val oppfylteVilkår = flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id)
+
+        val resultater =
+            when (omfang) {
+                Beregningsomfang.ALLE_PERIODER -> {
+                    oppfylteVilkår.map { beregnVilkår(it) }
+                }
+
+                Beregningsomfang.FRA_DATO -> {
+                    val (nyeVilkår, gamleVilkår) =
+                        oppfylteVilkår
+                            .partition {
+                                val beregningsplanFraDato = beregningsplan.fraDato ?: feil("TODO KAN DETTE SKJE??")
+                                it.fom.isEqualOrAfter(beregningsplanFraDato)
+                            }
+
+                    // TODO Trenger vi å beregne de gamle vilkårene på nytt?
+                    nyeVilkår.map { beregnVilkår(it) } + gamleVilkår.map { beregnVilkår(it).copy(fraTidligereVedtak = true) }
+                }
+
+                Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT -> {
+                    val forrigeVedtak = hentForrigeIverksatteVedtak(behandling)
+                    return forrigeVedtak?.beregningsresultat ?: feil("Forrige beregningsresultat mangler ved gjenbruk")
+                }
+
+                else -> {
+                    feil("Ustøttet beregningsomfang for flytting: $omfang")
+                }
+            }.sortedBy { it.fom }
 
         return BeregningsresultatFlytting(
-            resultater =
-                relevanteVilkår.map { vilkår ->
-                    validerVilkår(vilkår, vedtaksperioder)
-                    beregnVilkår(vilkår)
-                },
+            resultater = resultater,
         )
     }
 
-    private fun validerVilkår(
-        vilkår: VilkårFlytting,
-        vedtaksperioder: List<Vedtaksperiode>,
-    ) {
-        feilHvisIkke(vilkår.resultat == Vilkårsresultat.OPPFYLT) {
-            "Flyttevilkår ${vilkår.id} må være oppfylt før beregning"
-        }
-        feilHvisIkke(erFullstendigDekket(vilkår, vedtaksperioder)) {
-            "Vedtaksperiodene må dekke hele flyttevilkåret ${vilkår.id}"
-        }
-    }
+    private fun hentForrigeIverksatteVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørFlytting? =
+        behandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it) }?.data
+
+    private fun hentVedtak(behandlingId: BehandlingId) = vedtakService.hentVedtak<InnvilgelseEllerOpphørFlytting>(behandlingId)
 
     private fun beregnVilkår(vilkår: VilkårFlytting): BeregningsresultatFlyttevilkår =
         when (val fakta = vilkår.fakta) {
@@ -134,14 +146,4 @@ class FlyttingBeregningService(
         feilHvis(this != null && this < 0) { "Tilleggskostnader kan ikke være negative" }
         return this?.toBigDecimal() ?: BigDecimal.ZERO
     }
-
-    private fun overlapperVedtaksperiode(
-        vilkår: VilkårFlytting,
-        perioder: List<Vedtaksperiode>,
-    ): Boolean = perioder.any { it.overlapper(vilkår) }
-
-    private fun erFullstendigDekket(
-        vilkår: VilkårFlytting,
-        perioder: List<Vedtaksperiode>,
-    ): Boolean = perioder.mergeSammenhengende().any { it.inneholder(vilkår) }
 }

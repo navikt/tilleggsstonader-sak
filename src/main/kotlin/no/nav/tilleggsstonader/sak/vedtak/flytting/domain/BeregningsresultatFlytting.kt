@@ -10,6 +10,7 @@ data class BeregningsresultatFlytting(
 )
 
 data class BeregningsresultatFlyttevilkår(
+    val fraTidligereVedtak: Boolean = false,
     val fom: LocalDate,
     val tom: LocalDate,
     val beløp: BigDecimal,

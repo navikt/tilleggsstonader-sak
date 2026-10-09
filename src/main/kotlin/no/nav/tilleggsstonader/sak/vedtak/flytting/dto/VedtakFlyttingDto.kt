@@ -19,6 +19,7 @@ data class BeregningsresultatFlyttingDto(
 )
 
 data class BeregningsresultatFlyttevilkårDto(
+    val fraTidligereVedtak: Boolean,
     val fom: LocalDate,
     val tom: LocalDate,
     val grunnlag: BeregningsgrunnlagFlytting,
@@ -74,6 +75,7 @@ fun BeregningsresultatFlytting.tilDto() =
         resultater =
             resultater.map {
                 BeregningsresultatFlyttevilkårDto(
+                    fraTidligereVedtak = it.fraTidligereVedtak,
                     fom = it.fom,
                     tom = it.tom,
                     grunnlag = it.grunnlag,
