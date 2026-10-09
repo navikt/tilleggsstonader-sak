@@ -44,7 +44,6 @@ class FlyttingBeregningService(
         val resultater =
             when (omfang) {
                 Beregningsomfang.ALLE_PERIODER -> {
-                    // All periods are recalculated, no need to check for previous results
                     oppfylteVilkår.map { beregnVilkår(it) }
                 }
 
