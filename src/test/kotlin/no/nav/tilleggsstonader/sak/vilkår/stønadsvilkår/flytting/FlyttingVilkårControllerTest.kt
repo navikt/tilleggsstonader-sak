@@ -44,7 +44,11 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
         LagreVilkårFlyttingDto(
             fom = 1 januar 2026,
             tom = 15 januar 2026,
-            svar = mapOf(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTER_SELV, "Kjører selv")),
+            svar =
+                mapOf(
+                    RegelId.OPPFYLLER_VILKÅR_FOR_FLYTTING to SvarOgBegrunnelseDto(SvarId.JA),
+                    RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTER_SELV, "Kjører selv"),
+                ),
             fakta =
                 FaktaFlytteSelvDto(
                     avstandEnVei = 100,
@@ -60,7 +64,11 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
         LagreVilkårFlyttingDto(
             fom = 1 januar 2026,
             tom = 15 januar 2026,
-            svar = mapOf(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTEBYRÅ, "Bruker flyttebyrå")),
+            svar =
+                mapOf(
+                    RegelId.OPPFYLLER_VILKÅR_FOR_FLYTTING to SvarOgBegrunnelseDto(SvarId.JA),
+                    RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTEBYRÅ, "Bruker flyttebyrå"),
+                ),
             fakta =
                 FaktaFlyttebyråDto(
                     tilbud1 = FlyttebyråTilbudDto("Byrå A", 10000),
@@ -102,7 +110,11 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                         parkering = 200,
                         adresse = "Flytteveien 2",
                     ),
-                svar = mapOf(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTER_SELV, "Ny begrunnelse")),
+                svar =
+                    mapOf(
+                        RegelId.OPPFYLLER_VILKÅR_FOR_FLYTTING to SvarOgBegrunnelseDto(SvarId.JA),
+                        RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTER_SELV, "Ny begrunnelse"),
+                    ),
             )
         val oppdatert = kall.vilkårFlytting.oppdaterVilkår(oppdatering, opprettet.id, behandling.id)
 
@@ -248,6 +260,27 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
         FileUtil.assertFileJsonIsEqual("vilkår/regelstruktur/FLYTTING.json", resultat)
     }
 
+    @Test
+    fun `skal gi ikke oppfylt og kun kreve adresse når bruker ikke oppfyller vilkårene for flytting`() {
+        val nyttVilkår =
+            LagreVilkårFlyttingDto(
+                fom = 1 januar 2026,
+                tom = 15 januar 2026,
+                svar =
+                    mapOf(
+                        RegelId.OPPFYLLER_VILKÅR_FOR_FLYTTING to
+                            SvarOgBegrunnelseDto(SvarId.NEI, "Oppfyller ikke vilkårene"),
+                    ),
+                fakta = FaktaFlyttingUbestemtDto(adresse = "Flytteveien 1"),
+            )
+
+        val opprettet = kall.vilkårFlytting.opprettVilkår(behandling.id, nyttVilkår)
+
+        assertThat(opprettet.resultat).isEqualTo(Vilkårsresultat.IKKE_OPPFYLT)
+        assertLagretVilkår(nyttVilkår, opprettet)
+        assertThat(kall.vilkårFlytting.hentVilkår(behandling.id)).containsExactly(opprettet)
+    }
+
     private fun assertLagretVilkår(
         request: LagreVilkårFlyttingDto,
         resultat: VilkårFlyttingDto,
@@ -258,10 +291,18 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
         assertThat(resultat.fakta).isEqualTo(request.fakta)
         assertThat(resultat.delvilkårsett).hasSize(1)
         val vurderinger = resultat.delvilkårsett.single().vurderinger
-        assertThat(vurderinger.map { it.regelId }).containsExactly(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE)
-        val svar = request.svar[RegelId.HVORDAN_SKAL_BRUKER_FLYTTE]
-        assertThat(vurderinger.single().svar).isEqualTo(svar?.svar)
-        assertThat(vurderinger.single().begrunnelse).isEqualTo(svar?.begrunnelse)
+        val oppfyllerVilkårSvar = request.svar[RegelId.OPPFYLLER_VILKÅR_FOR_FLYTTING]?.svar
+        val forventedeRegelIderIRekkefølge =
+            buildList {
+                add(RegelId.OPPFYLLER_VILKÅR_FOR_FLYTTING)
+                if (oppfyllerVilkårSvar == SvarId.JA) add(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE)
+            }
+        assertThat(vurderinger.map { it.regelId }).containsExactlyElementsOf(forventedeRegelIderIRekkefølge)
+        vurderinger.forEach { vurdering ->
+            val svar = request.svar[vurdering.regelId]
+            assertThat(vurdering.svar).isEqualTo(svar?.svar)
+            assertThat(vurdering.begrunnelse).isEqualTo(svar?.begrunnelse)
+        }
 
         val lagret = vilkårRepository.findById(resultat.id).orElseThrow()
         assertThat(lagret.behandlingId).isEqualTo(behandlingId)

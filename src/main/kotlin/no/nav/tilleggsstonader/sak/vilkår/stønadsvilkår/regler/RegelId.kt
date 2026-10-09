@@ -43,5 +43,8 @@ enum class RegelId(
     ER_SAMLING_OBLIGATORISK("Er samlingen obligatorisk?"),
     KAN_REISE_MED_EGEN_BIL("Kan bruker benytte privat bil?"),
     DOKUMENTERTE_UTGIFTER("Har bruker dokumenterte utgifter til reise?"),
+
+    // FLYTTING
+    OPPFYLLER_VILKÅR_FOR_FLYTTING("Flytter bruker ifbm. aktivitetsgjennomføring eller ny stilling?"),
     HVORDAN_SKAL_BRUKER_FLYTTE("Skal bruker benytte seg av flyttebyrå, eller flytter bruker selv?"),
 }

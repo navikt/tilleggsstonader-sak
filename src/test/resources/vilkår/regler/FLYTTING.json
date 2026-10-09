@@ -1,7 +1,7 @@
 {
   "regler": {
     "HVORDAN_SKAL_BRUKER_FLYTTE": {
-      "erHovedregel": true,
+      "erHovedregel": false,
       "regelId": "HVORDAN_SKAL_BRUKER_FLYTTE",
       "svarMapping": {
         "FLYTTEBYRÅ": {
@@ -13,6 +13,21 @@
           "begrunnelseType": "VALGFRI",
           "regelId": "SLUTT_NODE",
           "tilhørendeFaktaType": "FLYTTING_FLYTTE_SELV"
+        }
+      }
+    },
+    "OPPFYLLER_VILKÅR_FOR_FLYTTING": {
+      "erHovedregel": true,
+      "regelId": "OPPFYLLER_VILKÅR_FOR_FLYTTING",
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "HVORDAN_SKAL_BRUKER_FLYTTE"
+        },
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": "FLYTTING_UBESTEMT"
         }
       }
     }
