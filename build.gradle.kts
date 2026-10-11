@@ -8,7 +8,7 @@ val tilleggsstønaderKontrakterVersion = "2026.10.06-21.19.1c0daeaf1077"
 val avroVersion = "1.12.2"
 val confluentVersion = "8.0.1"
 val joarkHendelseVersion = "2.0.0"
-val tokenSupportVersion = "6.0.12"
+val tokenSupportVersion = "6.0.13"
 val wiremockVersion = "3.13.2"
 val mockkVersion = "1.14.11"
 val testcontainerVersion = "1.21.4"
@@ -130,7 +130,7 @@ dependencies {
     testImplementation("no.nav.security:token-validation-spring-test:$tokenSupportVersion")
     testImplementation("no.nav.tilleggsstonader-libs:test-util:$tilleggsstønaderLibsVersion")
 
-    testImplementation(platform("io.cucumber:cucumber-bom:8.0.2"))
+    testImplementation(platform("io.cucumber:cucumber-bom:8.0.4"))
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
 
