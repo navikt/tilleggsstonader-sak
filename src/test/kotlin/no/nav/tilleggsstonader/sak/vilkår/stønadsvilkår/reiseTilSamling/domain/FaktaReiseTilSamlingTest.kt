@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain
 
 import no.nav.tilleggsstonader.libs.feil.ApiFeil
+import no.nav.tilleggsstonader.libs.feil.Feil
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingPrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.NødvendigUtgiftDto
@@ -171,7 +172,7 @@ class FaktaReiseTilSamlingTest {
         @Test
         fun `skal avvise GAMMEL_MANGLER_DATA i innsendt dto`() {
             val feil =
-                assertThrows<ApiFeil> {
+                assertThrows<Feil> {
                     FaktaReiseTilSamlingPrivatBilDto(
                         nødvendigUtgift = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNei.GAMMEL_MANGLER_DATA, begrunnelse = null),
                         reiseavstand = 40.toBigDecimal(),
