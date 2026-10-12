@@ -2,7 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport
@@ -88,7 +88,7 @@ data class NødvendigUtgiftDto(
     val begrunnelse: String?,
 ) {
     fun tilDomain(): NødvendigUtgift {
-        brukerfeilHvis(erUtgiftenNødvendig == SvarJaNei.GAMMEL_MANGLER_DATA) {
+        feilHvis(erUtgiftenNødvendig == SvarJaNei.GAMMEL_MANGLER_DATA) {
             "erNødvendig kan ikke settes til GAMMEL_MANGLER_DATA ved oppretting eller oppdatering"
         }
 
