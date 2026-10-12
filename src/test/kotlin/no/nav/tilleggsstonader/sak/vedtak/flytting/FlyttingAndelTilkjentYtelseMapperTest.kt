@@ -6,7 +6,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
-import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagEgenKjøring
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlytteSelv
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlyttevilkår
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
@@ -54,7 +54,7 @@ class FlyttingAndelTilkjentYtelseMapperTest {
     @Test
     fun `ubekreftet sats venter på satsendring før iverksetting`() {
         val grunnlag =
-            BeregningsgrunnlagEgenKjøring(
+            BeregningsgrunnlagFlytteSelv(
                 avstandEnVei = 100,
                 sats = BigDecimal("2.94"),
                 satsBekreftet = false,
@@ -108,7 +108,7 @@ class FlyttingAndelTilkjentYtelseMapperTest {
             resultat(dato).resultater.single().copy(
                 beløp = BigDecimal("294"),
                 grunnlag =
-                    BeregningsgrunnlagEgenKjøring(
+                    BeregningsgrunnlagFlytteSelv(
                         avstandEnVei = 100,
                         sats = BigDecimal("2.94"),
                         satsBekreftet = true,
@@ -146,6 +146,7 @@ class FlyttingAndelTilkjentYtelseMapperTest {
                 tom = fom.plusDays(10),
                 grunnlag = BeregningsgrunnlagFlyttebyrå(BigDecimal("100"), BigDecimal("120"), erBetalingDokumentert),
                 beløp = BigDecimal("100"),
+                målgruppe = målgruppe,
             ),
         ),
     )

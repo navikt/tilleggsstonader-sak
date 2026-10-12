@@ -12,7 +12,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtel
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagEgenKjøring
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlytteSelv
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingResponse
 import org.assertj.core.api.Assertions.assertThat
@@ -76,7 +76,7 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
         val resultat = vedtak.beregningsresultat.resultater.single()
 
         assertThat(resultat.beløp).isEqualTo(394.toBigDecimal())
-        assertThat(resultat.grunnlag).isInstanceOf(BeregningsgrunnlagEgenKjøring::class.java)
+        assertThat(resultat.grunnlag).isInstanceOf(BeregningsgrunnlagFlytteSelv::class.java)
 
         val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
 

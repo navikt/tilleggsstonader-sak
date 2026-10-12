@@ -8,7 +8,7 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverksetting
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
-import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagEgenKjøring
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlytteSelv
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
 import java.math.BigDecimal
@@ -18,14 +18,12 @@ fun BeregningsresultatFlytting.mapTilAndeler(stønadstype: Stønadstype): List<A
         .filter { resultat ->
             when (val grunnlag = resultat.grunnlag) {
                 is BeregningsgrunnlagFlyttebyrå -> grunnlag.erBetalingDokumentert
-                is BeregningsgrunnlagEgenKjøring -> true
+                is BeregningsgrunnlagFlytteSelv -> true
             }
         }.map { resultat ->
             val typeAndel =
                 when (stønadstype) {
-                    // TODO Hva er beste måten å faktisk hente ut målgruppe på? Hva bør vi lagre på beregningsgrunnlaget?
-                    // Trenger vi bare å lagre målgruppe eller skal vi lagre vedtaksperiodene også
-                    Stønadstype.FLYTTING_TSO -> TypeAndel.FLYTTING_AAP
+                    Stønadstype.FLYTTING_TSO -> resultat.målgruppe.tilTypeAndel(stønadstype)
                     Stønadstype.FLYTTING_TSR -> TypeAndel.FLYTTING_ARBEIDSSØKER
                     else -> feil("Flytting kan ikke opprette andeler for stønadstype=$stønadstype")
                 }
@@ -33,7 +31,7 @@ fun BeregningsresultatFlytting.mapTilAndeler(stønadstype: Stønadstype): List<A
             feilHvis(beløp < BigDecimal.ZERO || beløp > Int.MAX_VALUE.toBigDecimal()) {
                 "Flyttebeløpet kan ikke lagres som andel"
             }
-            val satsBekreftet = (resultat.grunnlag as? BeregningsgrunnlagEgenKjøring)?.satsBekreftet ?: true
+            val satsBekreftet = (resultat.grunnlag as? BeregningsgrunnlagFlytteSelv)?.satsBekreftet ?: true
             val dato = resultat.fom.datoEllerNesteMandagHvisLørdagEllerSøndag()
             AndelTilkjentYtelse(
                 beløp = beløp.intValueExact(),

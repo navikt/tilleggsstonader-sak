@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.flytting.beregning
 
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.feil.ApiFeil
@@ -18,11 +19,12 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
-import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagEgenKjøring
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlytteSelv
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
 import no.nav.tilleggsstonader.sak.vedtak.flytting.mapTilAndeler
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
+import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttebyråTilbud
@@ -32,6 +34,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FlyttingVilk
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.VilkårFlytting
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -39,11 +42,13 @@ import java.time.LocalDate
 class FlyttingBeregningServiceTest {
     private val flyttingVilkårService = mockk<FlyttingVilkårService>()
     private val vedtakService = mockk<VedtakService>()
+    private val vedtaksperiodeValideringService = mockk<VedtaksperiodeValideringService>()
     private val beregningService =
         FlyttingBeregningService(
             flyttingVilkårService = flyttingVilkårService,
             satsPrivatBilProvider = SatsPrivatBilProvider(),
             vedtakService = vedtakService,
+            vedtaksperiodeValideringService = vedtaksperiodeValideringService,
         )
     private val behandling = saksbehandling()
 
@@ -51,6 +56,13 @@ class FlyttingBeregningServiceTest {
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
     ) = beregn(behandling, vedtaksperioder, Beregningsplan(Beregningsomfang.ALLE_PERIODER))
+
+    @BeforeEach
+    fun setup() {
+        justRun {
+            vedtaksperiodeValideringService.validerVedtaksperioder(any(), any(), any())
+        }
+    }
 
     @Test
     fun `beholder beregnet beløp uansett betalingsdokumentasjon og viderefører dokumentasjonen`() {
@@ -157,7 +169,7 @@ class FlyttingBeregningServiceTest {
                 .single()
 
         assertThat(resultat.beløp).isEqualByComparingTo("294")
-        assertThat((resultat.grunnlag as BeregningsgrunnlagEgenKjøring).satsBekreftet)
+        assertThat((resultat.grunnlag as BeregningsgrunnlagFlytteSelv).satsBekreftet)
             .isFalse()
     }
 
@@ -228,7 +240,7 @@ class FlyttingBeregningServiceTest {
             tidligere.resultater.single().copy(
                 beløp = 123.toBigDecimal(),
                 grunnlag =
-                    (tidligere.resultater.single().grunnlag as BeregningsgrunnlagEgenKjøring).copy(
+                    (tidligere.resultater.single().grunnlag as BeregningsgrunnlagFlytteSelv).copy(
                         sats =
                             BigDecimal(
                                 "1.23",

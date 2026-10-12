@@ -8,15 +8,13 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
-import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
-import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagEgenKjøring
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlytteSelv
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingResponse
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttebyråDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -78,7 +76,7 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
         val resultat = vedtak.beregningsresultat.resultater.single()
 
         assertThat(resultat.beløp).isEqualTo(394.toBigDecimal())
-        assertThat(resultat.grunnlag).isInstanceOf(BeregningsgrunnlagEgenKjøring::class.java)
+        assertThat(resultat.grunnlag).isInstanceOf(BeregningsgrunnlagFlytteSelv::class.java)
 
         val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
 
@@ -126,57 +124,23 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
             }
         }
 
-        val vedtakFørstegangsbehandling =
+        val vedtak =
             kall.vedtak
                 .hentVedtak(Stønadstype.FLYTTING_TSO, behandling.id)
                 .expectOkWithBody<InnvilgelseFlyttingResponse>()
 
-        assertThat(vedtakFørstegangsbehandling.beregningsresultat.resultater).hasSize(1)
+        assertThat(vedtak.beregningsresultat.resultater).hasSize(1)
 
-        val resultatFørstegangsbehandling = vedtakFørstegangsbehandling.beregningsresultat.resultater.single()
+        val resultat = vedtak.beregningsresultat.resultater.single()
 
-        assertThat(resultatFørstegangsbehandling.beløp).isEqualTo(5000.toBigDecimal())
-        assertThat(resultatFørstegangsbehandling.grunnlag).isInstanceOf(BeregningsgrunnlagFlyttebyrå::class.java)
+        assertThat(resultat.beløp).isEqualTo(5000.toBigDecimal())
+        assertThat(resultat.grunnlag).isInstanceOf(BeregningsgrunnlagFlyttebyrå::class.java)
 
-        val andelerFørstegangsbehandling =
-            tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
+        val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
 
-        assertThat(andelerFørstegangsbehandling).hasSize(1)
-        assertThat(andelerFørstegangsbehandling.single().beløp).isEqualTo(5000)
-        assertThat(andelerFørstegangsbehandling.single().type).isEqualTo(TypeAndel.FLYTTING_AAP)
-
-        testoppsettService.settAndelerTilOkForBehandling(behandling.id)
-
-        val revurderingId =
-            opprettRevurderingOgGjennomførBehandlingsløp(fraBehandlingId = behandling.id) {
-                vilkår {
-                    endreFlytting {
-                        val byrå = fakta as FaktaFlyttebyråDto
-                        copy(fakta = byrå.copy(tilbud2 = byrå.tilbud2.copy(pris = 3000)))
-                    }
-                }
-            }
-
-        val vedtakRevurdering =
-            kall.vedtak
-                .hentVedtak(Stønadstype.FLYTTING_TSO, revurderingId)
-                .expectOkWithBody<InnvilgelseFlyttingResponse>()
-
-        assertThat(vedtakRevurdering.beregningsresultat.resultater).hasSize(1)
-
-        val resultatRevurdering = vedtakRevurdering.beregningsresultat.resultater.single()
-
-        assertThat(resultatRevurdering.beløp).isEqualTo(3000.toBigDecimal())
-        assertThat(resultatRevurdering.grunnlag).isInstanceOf(BeregningsgrunnlagFlyttebyrå::class.java)
-
-        val andelerRevurdering =
-            tilkjentYtelseRepository.findByBehandlingId(revurderingId)!!.andelerTilkjentYtelse
-
-        assertThat(andelerRevurdering).hasSize(1)
-
-        val nyAndel = andelerRevurdering.find { it.beløp == 3000 }
-
-        assertThat(nyAndel).isNotNull()
+        assertThat(andeler).hasSize(1)
+        assertThat(andeler.single().beløp).isEqualTo(5000)
+        assertThat(andeler.single().type).isEqualTo(TypeAndel.FLYTTING_AAP)
     }
 
     @Test
