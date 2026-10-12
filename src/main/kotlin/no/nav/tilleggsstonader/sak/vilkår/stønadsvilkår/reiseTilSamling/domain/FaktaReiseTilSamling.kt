@@ -49,7 +49,7 @@ data class NødvendigUtgift(
     private fun validerAtNeiHarBegrunnelse() {
         if (erUtgiftenNødvendig == SvarJaNei.NEI) {
             brukerfeilHvisIkke(!begrunnelse.isNullOrBlank()) {
-                "Begrunnelse må fylles ut når nødvendig utgift vurderes til NEI"
+                "Begrunnelse må fylles ut når utgift ikke vurderes som nødvendig"
             }
         }
     }
