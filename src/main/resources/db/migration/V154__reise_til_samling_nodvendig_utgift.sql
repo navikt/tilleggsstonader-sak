@@ -3,7 +3,7 @@ SET fakta = jsonb_set(
         fakta::jsonb,
         '{nødvendigUtgift}',
         jsonb_build_object(
-                'erNødvendig', 'GAMMEL_MANGLER_DATA',
+                'erUtgiftenNødvendig', 'GAMMEL_MANGLER_DATA',
                 'begrunnelse', null
         ),
         true
