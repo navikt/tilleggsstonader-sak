@@ -165,7 +165,7 @@ class FaktaReiseTilSamlingTest {
                 assertThrows<ApiFeil> {
                     NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.NEI, begrunnelse = " ")
                 }
-            assertThat(feil.message).isEqualTo("Begrunnelse må fylles ut når nødvendig utgift vurderes til NEI")
+            assertThat(feil.message).isEqualTo("Begrunnelse må fylles ut når utgift ikke vurderes som nødvendig")
         }
 
         @Test
