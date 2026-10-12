@@ -58,7 +58,7 @@ data class NødvendigUtgift(
 data class FaktaOffentligTransport(
     override val reiseId: ReiseId,
     override val adresse: String?,
-    val nødvendigUtgift: NødvendigUtgift = NødvendigUtgift(SvarJaNei.JA, null),
+    val nødvendigUtgift: NødvendigUtgift,
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String,
     val aktivitetId: VilkårperiodeGlobalId? = null,
@@ -96,7 +96,7 @@ data class FaktaOffentligTransport(
 data class FaktaPrivatBil(
     override val reiseId: ReiseId,
     override val adresse: String?,
-    val nødvendigUtgift: NødvendigUtgift = NødvendigUtgift(SvarJaNei.JA, null),
+    val nødvendigUtgift: NødvendigUtgift,
     val reiseavstand: BigDecimal,
     val begrunnelse: String?,
     val aktivitetId: VilkårperiodeGlobalId? = null,
