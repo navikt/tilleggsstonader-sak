@@ -91,6 +91,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårReiseOppstartAvslutningHjemreiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.VilkårReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingOffentligTransportDto
@@ -710,9 +711,11 @@ fun faktaOffentligTransportReiseTilSamling(
     utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
     begrunnelse: String = "Spesifisert offentlig transportutgift",
     aktivitet: VilkårperiodeDto? = null,
+    nødvendigUtgift: NødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNeiNødvendigUtgift.JA, begrunnelse = null),
 ) = FaktaOffentligTransportReiseTilSamling(
     reiseId = reiseId,
     adresse = adresse,
+    nødvendigUtgift = nødvendigUtgift,
     utgifterOffentligTransport = utgifterOffentligTransport,
     begrunnelse = begrunnelse,
     aktivitetId = aktivitet?.globalId,
@@ -723,6 +726,7 @@ fun faktaPrivatBilReiseTilSamling(
     adresse: String = "Tiltaksveien 1",
     reiseavstand: BigDecimal = 40.toBigDecimal(),
     begrunnelse: String = "Spesifisert privatbilutgift",
+    nødvendigUtgift: NødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNeiNødvendigUtgift.JA, begrunnelse = null),
     bompenger: BigDecimal? = null,
     fergekostnad: BigDecimal? = null,
     parkering: BigDecimal? = null,
@@ -730,6 +734,7 @@ fun faktaPrivatBilReiseTilSamling(
 ) = FaktaPrivatBilReiseTilSamling(
     reiseId = reiseId,
     adresse = adresse,
+    nødvendigUtgift = nødvendigUtgift,
     reiseavstand = reiseavstand,
     begrunnelse = begrunnelse,
     bompenger = bompenger,

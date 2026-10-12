@@ -28,6 +28,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseT
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.LagreVilkårReiseTilSamling
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.NødvendigUtgift
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeAktivitet
@@ -66,6 +68,7 @@ class ReiseTilSamlingVilkårServiceTest {
                     FaktaOffentligTransport(
                         reiseId = it.reiseId,
                         adresse = it.adresse,
+                        nødvendigUtgift = it.nødvendigUtgift,
                         utgifterOffentligTransport = it.utgifterOffentligTransport,
                         begrunnelse = it.begrunnelse,
                         aktivitetId = it.aktivitetId,
@@ -184,6 +187,7 @@ class ReiseTilSamlingVilkårServiceTest {
                     FaktaOffentligTransport(
                         reiseId = dummyReiseId,
                         adresse = "Samlingsveien 1",
+                        nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
                         utgifterOffentligTransport = 500.toBigDecimal(),
                         begrunnelse = "Togbillett mellom bosted og samling",
                         aktivitetId = dummyAktivitetId,
@@ -211,6 +215,7 @@ class ReiseTilSamlingVilkårServiceTest {
                     FaktaOffentligTransport(
                         reiseId = dummyReiseId,
                         adresse = "Samlingsveien 1",
+                        nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
                         utgifterOffentligTransport = 500.toBigDecimal(),
                         begrunnelse = "Togbillett mellom bosted og samling",
                         aktivitetId = null,
@@ -240,6 +245,7 @@ class ReiseTilSamlingVilkårServiceTest {
                     FaktaOffentligTransport(
                         reiseId = dummyReiseId,
                         adresse = "Samlingsveien 1",
+                        nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
                         utgifterOffentligTransport = 500.toBigDecimal(),
                         begrunnelse = "Togbillett mellom bosted og samling",
                         aktivitetId = dummyAktivitetId,
@@ -270,6 +276,7 @@ class ReiseTilSamlingVilkårServiceTest {
                     FaktaOffentligTransport(
                         reiseId = dummyReiseId,
                         adresse = "Samlingsveien 1",
+                        nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
                         utgifterOffentligTransport = 500.toBigDecimal(),
                         begrunnelse = "Togbillett mellom bosted og samling",
                         aktivitetId = VilkårperiodeGlobalId.random(),
@@ -302,6 +309,7 @@ class ReiseTilSamlingVilkårServiceTest {
                         FaktaPrivatBil(
                             reiseId = it.reiseId,
                             adresse = it.adresse,
+                            nødvendigUtgift = it.nødvendigUtgift,
                             reiseavstand = it.reiseavstand,
                             begrunnelse = it.begrunnelse,
                             aktivitetId = it.aktivitetId,
@@ -337,6 +345,7 @@ class ReiseTilSamlingVilkårServiceTest {
                         FaktaPrivatBil(
                             reiseId = it.reiseId,
                             adresse = it.adresse,
+                            nødvendigUtgift = it.nødvendigUtgift,
                             reiseavstand = it.reiseavstand,
                             begrunnelse = it.begrunnelse,
                             aktivitetId = it.aktivitetId,
@@ -375,6 +384,7 @@ class ReiseTilSamlingVilkårServiceTest {
                         FaktaPrivatBil(
                             reiseId = it.reiseId,
                             adresse = it.adresse,
+                            nødvendigUtgift = it.nødvendigUtgift,
                             reiseavstand = it.reiseavstand,
                             begrunnelse = it.begrunnelse,
                             aktivitetId = it.aktivitetId,
@@ -414,6 +424,7 @@ class ReiseTilSamlingVilkårServiceTest {
                     FaktaPrivatBil(
                         reiseId = dummyReiseId,
                         adresse = "Samlingsveien 1",
+                        nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
                         reiseavstand = 40.toBigDecimal(),
                         begrunnelse = "Drivstoff og slitasje",
                         aktivitetId = aktivitetId,
@@ -443,6 +454,7 @@ class ReiseTilSamlingVilkårServiceTest {
                     FaktaPrivatBil(
                         reiseId = dummyReiseId,
                         adresse = "Samlingsveien 1",
+                        nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
                         reiseavstand = 40.toBigDecimal(),
                         begrunnelse = "Drivstoff og slitasje",
                         aktivitetId = null,
@@ -464,6 +476,7 @@ class ReiseTilSamlingVilkårServiceTest {
             FaktaPrivatBil(
                 reiseId = dummyReiseId,
                 adresse = "Samlingsveien 1",
+                nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
                 reiseavstand = 20.toBigDecimal(),
                 begrunnelse = "Drivstoff og slitasje",
                 aktivitetId = null,
@@ -478,6 +491,7 @@ class ReiseTilSamlingVilkårServiceTest {
                 FaktaPrivatBil(
                     reiseId = dummyReiseId,
                     adresse = "Samlingsveien 1",
+                    nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
                     reiseavstand = (-1).toBigDecimal(),
                     begrunnelse = "Drivstoff og slitasje",
                     aktivitetId = null,
@@ -492,6 +506,7 @@ class ReiseTilSamlingVilkårServiceTest {
                 FaktaOffentligTransport(
                     reiseId = dummyReiseId,
                     adresse = "Samlingsveien 1",
+                    nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
                     utgifterOffentligTransport = 500.toBigDecimal(),
                     begrunnelse = " ",
                     aktivitetId = null,

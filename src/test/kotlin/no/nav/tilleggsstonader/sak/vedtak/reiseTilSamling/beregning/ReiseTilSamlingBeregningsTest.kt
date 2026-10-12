@@ -25,6 +25,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilS
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.NødvendigUtgift
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -76,6 +78,7 @@ class ReiseTilSamlingBeregningsTest {
                         FaktaReiseTilSamlingOffentligTransport(
                             reiseId = dummyReiseId,
                             adresse = "Samlingsgata 1",
+                            nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
                             utgifterOffentligTransport = 500.toBigDecimal(),
                             begrunnelse = "Togbillett",
                             aktivitetId = VilkårperiodeGlobalId(UUID.randomUUID()),
@@ -92,6 +95,7 @@ class ReiseTilSamlingBeregningsTest {
                         FaktaReiseTilSamlingOffentligTransport(
                             reiseId = dummyReiseId,
                             adresse = "B",
+                            nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
                             utgifterOffentligTransport = 200.toBigDecimal(),
                             begrunnelse = "Bussbillett",
                         ),
@@ -127,6 +131,7 @@ class ReiseTilSamlingBeregningsTest {
                         FaktaReiseTilSamlingPrivatBil(
                             reiseId = dummyReiseId,
                             adresse = "Samlingsgata 1",
+                            nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
                             reiseavstand = 40.toBigDecimal(),
                             begrunnelse = "Drivstoff",
                             aktivitetId = aktivitetId,
@@ -164,6 +169,7 @@ class ReiseTilSamlingBeregningsTest {
                         FaktaReiseTilSamlingPrivatBil(
                             reiseId = dummyReiseId,
                             adresse = "Samlingsgata 1",
+                            nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
                             reiseavstand = 40.toBigDecimal(),
                             begrunnelse = "Drivstoff",
                             bompenger = 50.toBigDecimal(),
@@ -210,6 +216,7 @@ class ReiseTilSamlingBeregningsTest {
                         FaktaReiseTilSamlingOffentligTransport(
                             reiseId = dummyReiseId,
                             adresse = "A",
+                            nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
                             utgifterOffentligTransport = 300.toBigDecimal(),
                             begrunnelse = "Togbillett",
                         ),
@@ -225,6 +232,7 @@ class ReiseTilSamlingBeregningsTest {
                         FaktaReiseTilSamlingOffentligTransport(
                             reiseId = dummyReiseId,
                             adresse = "B",
+                            nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
                             utgifterOffentligTransport = 200.toBigDecimal(),
                             begrunnelse = "Bussbillett",
                         ),
@@ -258,6 +266,7 @@ class ReiseTilSamlingBeregningsTest {
                         FaktaReiseTilSamlingOffentligTransport(
                             reiseId = dummyReiseId,
                             adresse = "Samlingsgata 1",
+                            nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
                             utgifterOffentligTransport = 300.toBigDecimal(),
                             begrunnelse = "Begrunnelsen",
                         ),
@@ -273,6 +282,7 @@ class ReiseTilSamlingBeregningsTest {
                         FaktaReiseTilSamlingOffentligTransport(
                             reiseId = dummyReiseId,
                             adresse = "Samlingsgata 1",
+                            nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
                             utgifterOffentligTransport = 100.toBigDecimal(),
                             begrunnelse = "Begrunnelsen",
                         ),

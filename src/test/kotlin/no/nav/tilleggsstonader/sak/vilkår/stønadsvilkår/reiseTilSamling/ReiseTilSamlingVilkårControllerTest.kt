@@ -116,7 +116,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 adresse = "Samlingsveien 1",
                 reiseId = dummyReiseId,
                 svar = ReiseTilSamlingRegelTestUtil.oppfylteSvarReiseTilSamlingPrivatBilDto(),
-                fakta = faktaPrivatBil(),
+                fakta = faktaPrivatBil(nødvendigUtgift = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNei.NEI, begrunnelse = "Billigere med buss")),
             )
 
         val resultat = kall.vilkårReiseTilSamling.opprettVilkår(behandlingContext.behandlingId, nyttVilkår)
@@ -282,8 +282,9 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
         parkering: BigDecimal? = null,
         piggdekkavgift: BigDecimal? = null,
         aktivitet: VilkårperiodeDto? = null,
+        nødvendigUtgift: NødvendigUtgiftDto = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
     ) = FaktaReiseTilSamlingPrivatBilDto(
-        nødvendigUtgift = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
+        nødvendigUtgift = nødvendigUtgift,
         reiseavstand = reiseavstand,
         begrunnelse = "Drivstoff og slitasje",
         bompenger = bompenger,
