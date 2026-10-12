@@ -48,16 +48,25 @@ object FlyttingVilkårValidering {
     fun erFullstendig(vilkår: LagreVilkårFlytting): Boolean {
         if (vilkår.fakta.adresse.isBlank()) return false
 
-        val flyttemåte = vilkår.svar[RegelId.HVORDAN_SKAL_BRUKER_FLYTTE]?.svar ?: return false
-        return when (flyttemåte) {
-            SvarId.FLYTTEBYRÅ -> {
-                val fakta = vilkår.fakta as? FaktaFlyttebyrå ?: return false
-                val harNavnPåBeggeTilbud =
-                    !fakta.tilbud1.navn.isNullOrBlank() && !fakta.tilbud2.navn.isNullOrBlank()
-                harNavnPåBeggeTilbud && fakta.tilbud1.pris != null && fakta.tilbud2.pris != null
+        val oppfyllerVilkår = vilkår.svar[RegelId.OPPFYLLER_VILKÅR_FOR_FLYTTING]?.svar ?: return false
+        return when (oppfyllerVilkår) {
+            SvarId.NEI -> true
+
+            SvarId.JA -> {
+                val flyttemåte = vilkår.svar[RegelId.HVORDAN_SKAL_BRUKER_FLYTTE]?.svar ?: return false
+                when (flyttemåte) {
+                    SvarId.FLYTTEBYRÅ -> {
+                        val fakta = vilkår.fakta as? FaktaFlyttebyrå ?: return false
+                        val harNavnPåBeggeTilbud =
+                            !fakta.tilbud1.navn.isNullOrBlank() && !fakta.tilbud2.navn.isNullOrBlank()
+                        harNavnPåBeggeTilbud && fakta.tilbud1.pris != null && fakta.tilbud2.pris != null
+                    }
+
+                    SvarId.FLYTTER_SELV -> (vilkår.fakta as? FaktaFlytteSelv)?.avstandEnVei != null
+                    else -> false
+                }
             }
 
-            SvarId.FLYTTER_SELV -> (vilkår.fakta as? FaktaFlytteSelv)?.avstandEnVei != null
             else -> false
         }
     }

@@ -18,7 +18,7 @@
     "erHovedregel": false,
     "reglerSomMåNullstilles": [ ],
     "svaralternativer": [ {
-      "begrunnelseType": "UTEN",
+      "begrunnelseType": "VALGFRI",
       "nesteRegelId": null,
       "svarId": "JA",
       "tilhørendeFaktaType": "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT"
@@ -44,7 +44,7 @@
       "tilhørendeFaktaType": null
     } ]
   },
-  "HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING": {
+  "HAR_UTGIFTER_TIL_REISEN": {
     "erHovedregel": true,
     "reglerSomMåNullstilles": [ "AVSTAND_OVER_TRETTI_KM", "ER_SAMLING_OBLIGATORISK", "KAN_REISE_MED_OFFENTLIG_TRANSPORT", "DOKUMENTERTE_UTGIFTER", "KAN_REISE_MED_EGEN_BIL" ],
     "svaralternativer": [ {

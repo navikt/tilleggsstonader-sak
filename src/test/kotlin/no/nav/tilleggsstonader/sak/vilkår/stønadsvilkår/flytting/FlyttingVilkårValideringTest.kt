@@ -99,7 +99,10 @@ class FlyttingVilkårValideringTest {
                     fom = 1 januar 2026,
                     tom = 31 januar 2026,
                     svar =
-                        mapOf(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelse(SvarId.FLYTTEBYRÅ)),
+                        mapOf(
+                            RegelId.OPPFYLLER_VILKÅR_FOR_FLYTTING to SvarOgBegrunnelse(SvarId.JA),
+                            RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelse(SvarId.FLYTTEBYRÅ),
+                        ),
                     fakta =
                         FaktaFlyttebyrå(
                             tilbud1 = FlyttebyråTilbud(navn = "Flyttebyrå A", pris = 10000),
@@ -120,7 +123,10 @@ class FlyttingVilkårValideringTest {
                     fom = 1 januar 2026,
                     tom = 31 januar 2026,
                     svar =
-                        mapOf(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelse(SvarId.FLYTTER_SELV)),
+                        mapOf(
+                            RegelId.OPPFYLLER_VILKÅR_FOR_FLYTTING to SvarOgBegrunnelse(SvarId.JA),
+                            RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelse(SvarId.FLYTTER_SELV),
+                        ),
                     fakta =
                         FaktaFlytteSelv(
                             avstandEnVei = 250,
@@ -130,6 +136,34 @@ class FlyttingVilkårValideringTest {
                             parkering = null,
                             adresse = "Flytteveien 1",
                         ),
+                ),
+            ),
+        ).isTrue()
+    }
+
+    @Test
+    fun `skal ikke være fullstendig når ja er besvart men flyttemåte mangler`() {
+        assertThat(
+            FlyttingVilkårValidering.erFullstendig(
+                LagreVilkårFlytting(
+                    fom = 1 januar 2026,
+                    tom = 31 januar 2026,
+                    svar = mapOf(RegelId.OPPFYLLER_VILKÅR_FOR_FLYTTING to SvarOgBegrunnelse(SvarId.JA)),
+                    fakta = FaktaFlyttingUbestemt(adresse = "Flytteveien 1"),
+                ),
+            ),
+        ).isFalse()
+    }
+
+    @Test
+    fun `skal være fullstendig med kun adresse når bruker ikke oppfyller vilkårene for flytting`() {
+        assertThat(
+            FlyttingVilkårValidering.erFullstendig(
+                LagreVilkårFlytting(
+                    fom = 1 januar 2026,
+                    tom = 31 januar 2026,
+                    svar = mapOf(RegelId.OPPFYLLER_VILKÅR_FOR_FLYTTING to SvarOgBegrunnelse(SvarId.NEI)),
+                    fakta = FaktaFlyttingUbestemt(adresse = "Flytteveien 1"),
                 ),
             ),
         ).isTrue()

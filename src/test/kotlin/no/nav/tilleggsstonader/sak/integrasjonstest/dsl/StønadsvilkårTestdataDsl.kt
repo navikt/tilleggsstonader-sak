@@ -75,7 +75,11 @@ class StønadsvilkårTestdataDsl {
             LagreVilkårFlyttingDto(
                 fom = fom,
                 tom = tom,
-                svar = mapOf(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTEBYRÅ)),
+                svar =
+                    mapOf(
+                        RegelId.OPPFYLLER_VILKÅR_FOR_FLYTTING to SvarOgBegrunnelseDto(SvarId.JA),
+                        RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTEBYRÅ),
+                    ),
                 fakta =
                     FaktaFlyttebyråDto(
                         tilbud1 = FlyttebyråTilbudDto(navn = "Syntetisk tilbud 1", pris = tilbud1Pris),
@@ -100,7 +104,11 @@ class StønadsvilkårTestdataDsl {
             LagreVilkårFlyttingDto(
                 fom = fom,
                 tom = tom,
-                svar = mapOf(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTER_SELV)),
+                svar =
+                    mapOf(
+                        RegelId.OPPFYLLER_VILKÅR_FOR_FLYTTING to SvarOgBegrunnelseDto(SvarId.JA),
+                        RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTER_SELV),
+                    ),
                 fakta =
                     FaktaFlytteSelvDto(
                         avstandEnVei = avstandEnVei,

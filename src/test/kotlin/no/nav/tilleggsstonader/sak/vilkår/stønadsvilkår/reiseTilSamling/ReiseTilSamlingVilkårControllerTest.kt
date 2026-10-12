@@ -153,7 +153,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
     fun `skal kunne lagre ned et vilkår med fakta UBESTEMT om vilkår ikke er oppfylt`() {
         val svarIkkeNødvendigeUtgifter =
             mapOf(
-                RegelId.HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING to
+                RegelId.HAR_UTGIFTER_TIL_REISEN to
                     SvarOgBegrunnelseDto(svar = SvarId.NEI, begrunnelse = "Ingen begrunnelse"),
             )
 

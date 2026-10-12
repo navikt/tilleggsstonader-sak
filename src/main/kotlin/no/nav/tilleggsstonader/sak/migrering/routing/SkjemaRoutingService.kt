@@ -93,6 +93,9 @@ class SkjemaRoutingService(
             lagreRouting(ident, skjematype, mapOf("harAktivAAP" to true))
             return SkjemaRoutingAksjon.NY_LØSNING
         }
+        if (skjematype == Skjematype.SØKNAD_REISE_TIL_SAMLING) {
+            return SkjemaRoutingAksjon.NY_LØSNING
+        }
 
         return SkjemaRoutingAksjon.AVSJEKK
     }

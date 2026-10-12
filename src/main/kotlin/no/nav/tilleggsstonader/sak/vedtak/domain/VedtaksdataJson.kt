@@ -37,6 +37,7 @@ import tools.jackson.databind.ValueDeserializer
         name = "INNVILGELSE_REISE_OPPSTART_AVSLUTNING_HJEMREISE",
     ),
     JsonSubTypes.Type(InnvilgelseFlytting::class, name = "INNVILGELSE_FLYTTING"),
+    JsonSubTypes.Type(AvslagFlytting::class, name = "AVSLAG_FLYTTING"),
     failOnRepeatedNames = true,
 )
 sealed interface VedtaksdataJson

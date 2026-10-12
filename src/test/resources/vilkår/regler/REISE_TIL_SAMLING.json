@@ -20,7 +20,7 @@
       "regelId": "DOKUMENTERTE_UTGIFTER",
       "svarMapping": {
         "JA": {
-          "begrunnelseType": "UTEN",
+          "begrunnelseType": "VALGFRI",
           "regelId": "SLUTT_NODE",
           "tilhørendeFaktaType": "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT"
         },
@@ -46,9 +46,9 @@
         }
       }
     },
-    "HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING": {
+    "HAR_UTGIFTER_TIL_REISEN": {
       "erHovedregel": true,
-      "regelId": "HAR_NØDVENDIGE_UTGIFTER_TIL_REISE_TIL_SAMLING",
+      "regelId": "HAR_UTGIFTER_TIL_REISEN",
       "svarMapping": {
         "JA": {
           "begrunnelseType": "VALGFRI",

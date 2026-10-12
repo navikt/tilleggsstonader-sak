@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøn
 import no.nav.tilleggsstonader.sak.util.iDagHvisMandagEllerForrigeMandag
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagReiseTilSamling
@@ -59,7 +60,13 @@ object AndelTilVedtaksperiodeMapper {
             is InnvilgelseEllerOpphørReiseTilSamling -> ReiseTilSamlingAndelTilVedtaksperiodeIdKobler
             is InnvilgelseEllerOpphørReiseOppstartAvslutningHjemreise -> ReiseOppstartAndelTilVedtaksperiodeIdKobler
             is InnvilgelseEllerOpphørFlytting -> FlyttingAndelTilVedtaksperiodeIdKobler
-            is AvslagBoutgifter, is AvslagLæremidler, is AvslagPassAvBarn, is AvslagDagligReise, is AvslagReiseTilSamling -> null
+            is AvslagBoutgifter,
+            is AvslagDagligReise,
+            is AvslagFlytting,
+            is AvslagLæremidler,
+            is AvslagPassAvBarn,
+            is AvslagReiseTilSamling,
+            -> null
         }
 }
 
