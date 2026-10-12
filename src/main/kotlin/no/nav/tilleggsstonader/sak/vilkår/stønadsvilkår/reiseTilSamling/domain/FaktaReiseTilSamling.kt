@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain
 
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
+import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
@@ -31,9 +32,33 @@ data class FaktaUbestemtType(
         )
 }
 
+enum class SvarJaNei {
+    JA,
+    NEI,
+    GAMMEL_MANGLER_DATA,
+}
+
+data class NødvendigUtgift(
+    val erUtgiftenNødvendig: SvarJaNei,
+    val begrunnelse: String?,
+) {
+    init {
+        validerAtNeiHarBegrunnelse()
+    }
+
+    private fun validerAtNeiHarBegrunnelse() {
+        if (erUtgiftenNødvendig == SvarJaNei.NEI) {
+            brukerfeilHvisIkke(!begrunnelse.isNullOrBlank()) {
+                "Begrunnelse må fylles ut når nødvendig utgift vurderes til NEI"
+            }
+        }
+    }
+}
+
 data class FaktaOffentligTransport(
     override val reiseId: ReiseId,
     override val adresse: String?,
+    val nødvendigUtgift: NødvendigUtgift = NødvendigUtgift(SvarJaNei.JA, null),
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String,
     val aktivitetId: VilkårperiodeGlobalId? = null,
@@ -49,6 +74,7 @@ data class FaktaOffentligTransport(
         FaktaReiseTilSamlingOffentligTransport(
             reiseId = reiseId,
             adresse = adresse,
+            nødvendigUtgift = nødvendigUtgift,
             utgifterOffentligTransport = utgifterOffentligTransport,
             begrunnelse = begrunnelse,
             aktivitetId = aktivitetId,
@@ -70,6 +96,7 @@ data class FaktaOffentligTransport(
 data class FaktaPrivatBil(
     override val reiseId: ReiseId,
     override val adresse: String?,
+    val nødvendigUtgift: NødvendigUtgift = NødvendigUtgift(SvarJaNei.JA, null),
     val reiseavstand: BigDecimal,
     val begrunnelse: String?,
     val aktivitetId: VilkårperiodeGlobalId? = null,
@@ -97,6 +124,7 @@ data class FaktaPrivatBil(
         FaktaReiseTilSamlingPrivatBil(
             reiseId = reiseId,
             adresse = adresse,
+            nødvendigUtgift = nødvendigUtgift,
             reiseavstand = reiseavstand,
             begrunnelse = begrunnelse,
             aktivitetId = aktivitetId,

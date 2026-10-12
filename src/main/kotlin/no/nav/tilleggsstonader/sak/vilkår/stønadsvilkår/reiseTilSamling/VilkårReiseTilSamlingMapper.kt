@@ -57,6 +57,7 @@ object VilkårReiseTilSamlingMapper {
         FaktaOffentligTransport(
             reiseId = this.reiseId,
             adresse = this.adresse,
+            nødvendigUtgift = this.nødvendigUtgift,
             utgifterOffentligTransport = this.utgifterOffentligTransport,
             begrunnelse = this.begrunnelse,
             aktivitetId = this.aktivitetId,
@@ -66,6 +67,7 @@ object VilkårReiseTilSamlingMapper {
         FaktaPrivatBil(
             reiseId = this.reiseId,
             adresse = this.adresse,
+            nødvendigUtgift = this.nødvendigUtgift,
             reiseavstand = this.reiseavstand,
             begrunnelse = this.begrunnelse,
             aktivitetId = this.aktivitetId,

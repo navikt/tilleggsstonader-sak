@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.doma
 import no.nav.tilleggsstonader.libs.feil.ApiFeil
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingPrivatBilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.NødvendigUtgiftDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -19,9 +20,11 @@ class FaktaReiseTilSamlingTest {
             parkering: BigDecimal? = null,
             piggdekkavgift: BigDecimal? = null,
             begrunnelse: String? = "Spesifisert privatbilutgift",
+            nødvendigUtgift: NødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
         ) = FaktaPrivatBil(
             reiseId = dummyReiseId,
             adresse = "Tiltaksveien 1",
+            nødvendigUtgift = nødvendigUtgift,
             reiseavstand = 40.toBigDecimal(),
             begrunnelse = begrunnelse,
             bompenger = bompenger,
@@ -116,6 +119,7 @@ class FaktaReiseTilSamlingTest {
                     FaktaOffentligTransport(
                         reiseId = dummyReiseId,
                         adresse = "Tiltaksveien 1",
+                        nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
                         utgifterOffentligTransport = 40.toBigDecimal(),
                         begrunnelse = " ",
                     )
@@ -128,6 +132,7 @@ class FaktaReiseTilSamlingTest {
     inner class PrivatBilDto {
         private fun dto(begrunnelse: String?) =
             FaktaReiseTilSamlingPrivatBilDto(
+                nødvendigUtgift = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
                 reiseavstand = 40.toBigDecimal(),
                 begrunnelse = begrunnelse,
             )
@@ -142,6 +147,39 @@ class FaktaReiseTilSamlingTest {
         fun `skal beholde null begrunnelse som null`() {
             val fakta = dto(null).mapTilFakta(reiseId = dummyReiseId, adresse = "Tiltaksveien 1")
             assertThat(fakta.begrunnelse).isNull()
+        }
+    }
+
+    @Nested
+    inner class NødvendigUtgiftValidering {
+        @Test
+        fun `skal godta JA uten begrunnelse`() {
+            assertDoesNotThrow {
+                NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null)
+            }
+        }
+
+        @Test
+        fun `skal kreve begrunnelse for NEI`() {
+            val feil =
+                assertThrows<ApiFeil> {
+                    NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.NEI, begrunnelse = " ")
+                }
+            assertThat(feil.message).isEqualTo("Begrunnelse må fylles ut når nødvendig utgift vurderes til NEI")
+        }
+
+        @Test
+        fun `skal avvise GAMMEL_MANGLER_DATA i innsendt dto`() {
+            val feil =
+                assertThrows<ApiFeil> {
+                    FaktaReiseTilSamlingPrivatBilDto(
+                        nødvendigUtgift = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNei.GAMMEL_MANGLER_DATA, begrunnelse = null),
+                        reiseavstand = 40.toBigDecimal(),
+                        begrunnelse = null,
+                    ).mapTilFakta(reiseId = dummyReiseId, adresse = "Tiltaksveien 1")
+                }
+            assertThat(feil.message)
+                .isEqualTo("erNødvendig kan ikke settes til GAMMEL_MANGLER_DATA ved oppretting eller oppdatering")
         }
     }
 }

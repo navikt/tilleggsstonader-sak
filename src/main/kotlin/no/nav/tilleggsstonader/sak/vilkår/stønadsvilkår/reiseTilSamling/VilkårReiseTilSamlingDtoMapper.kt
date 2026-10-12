@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.F
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingPrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingUbestemtDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.NødvendigUtgiftDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.VilkårReiseTilSamlingDto
 
 object VilkårReiseTilSamlingDtoMapper {
@@ -37,6 +38,11 @@ object VilkårReiseTilSamlingDtoMapper {
 
     private fun FaktaOffentligTransport.tilDto(aktivitet: AktivitetInfoDto?) =
         FaktaReiseTilSamlingOffentligTransportDto(
+            nødvendigUtgift =
+                NødvendigUtgiftDto(
+                    erUtgiftenNødvendig = this.nødvendigUtgift.erUtgiftenNødvendig,
+                    begrunnelse = this.nødvendigUtgift.begrunnelse,
+                ),
             utgifterOffentligTransport = this.utgifterOffentligTransport,
             begrunnelse = this.begrunnelse,
             aktivitet = aktivitet,
@@ -44,6 +50,11 @@ object VilkårReiseTilSamlingDtoMapper {
 
     private fun FaktaPrivatBil.tilDto(aktivitet: AktivitetInfoDto?) =
         FaktaReiseTilSamlingPrivatBilDto(
+            nødvendigUtgift =
+                NødvendigUtgiftDto(
+                    erUtgiftenNødvendig = this.nødvendigUtgift.erUtgiftenNødvendig,
+                    begrunnelse = this.nødvendigUtgift.begrunnelse,
+                ),
             reiseavstand = this.reiseavstand,
             begrunnelse = this.begrunnelse,
             aktivitet = aktivitet,
