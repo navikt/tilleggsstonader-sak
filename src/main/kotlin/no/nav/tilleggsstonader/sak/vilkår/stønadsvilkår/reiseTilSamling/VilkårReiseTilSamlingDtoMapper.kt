@@ -5,12 +5,14 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domai
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaUbestemtType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.VilkårReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.AktivitetInfoDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingPrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingUbestemtDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.NødvendigUtgiftDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.VilkårReiseTilSamlingDto
 
 object VilkårReiseTilSamlingDtoMapper {
@@ -37,6 +39,7 @@ object VilkårReiseTilSamlingDtoMapper {
 
     private fun FaktaOffentligTransport.tilDto(aktivitet: AktivitetInfoDto?) =
         FaktaReiseTilSamlingOffentligTransportDto(
+            nødvendigUtgift = nødvendigUtgift.tilDto(),
             utgifterOffentligTransport = this.utgifterOffentligTransport,
             begrunnelse = this.begrunnelse,
             aktivitet = aktivitet,
@@ -44,6 +47,7 @@ object VilkårReiseTilSamlingDtoMapper {
 
     private fun FaktaPrivatBil.tilDto(aktivitet: AktivitetInfoDto?) =
         FaktaReiseTilSamlingPrivatBilDto(
+            nødvendigUtgift = nødvendigUtgift.tilDto(),
             reiseavstand = this.reiseavstand,
             begrunnelse = this.begrunnelse,
             aktivitet = aktivitet,
@@ -51,5 +55,11 @@ object VilkårReiseTilSamlingDtoMapper {
             fergekostnad = this.fergekostnad,
             parkering = this.parkering,
             piggdekkavgift = this.piggdekkavgift,
+        )
+
+    private fun NødvendigUtgift.tilDto() =
+        NødvendigUtgiftDto(
+            erUtgiftenNødvendig = this.erUtgiftenNødvendig,
+            begrunnelse = this.begrunnelse,
         )
 }

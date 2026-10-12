@@ -91,11 +91,13 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårReiseOppstartAvslutningHjemreiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.VilkårReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingPrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.LagreVilkårReiseTilSamlingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.NødvendigUtgiftDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.tilAktivitetInfoDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
@@ -114,6 +116,7 @@ import java.util.UUID
 import kotlin.random.Random
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport as FaktaOffentligTransportReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil as FaktaPrivatBilReiseTilSamling
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.SvarJaNei as SvarJaNeiNødvendigUtgift
 
 fun oppgave(
     behandling: Behandling,
@@ -708,9 +711,11 @@ fun faktaOffentligTransportReiseTilSamling(
     utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
     begrunnelse: String = "Spesifisert offentlig transportutgift",
     aktivitet: VilkårperiodeDto? = null,
+    nødvendigUtgift: NødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNeiNødvendigUtgift.JA, begrunnelse = null),
 ) = FaktaOffentligTransportReiseTilSamling(
     reiseId = reiseId,
     adresse = adresse,
+    nødvendigUtgift = nødvendigUtgift,
     utgifterOffentligTransport = utgifterOffentligTransport,
     begrunnelse = begrunnelse,
     aktivitetId = aktivitet?.globalId,
@@ -721,6 +726,7 @@ fun faktaPrivatBilReiseTilSamling(
     adresse: String = "Tiltaksveien 1",
     reiseavstand: BigDecimal = 40.toBigDecimal(),
     begrunnelse: String = "Spesifisert privatbilutgift",
+    nødvendigUtgift: NødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNeiNødvendigUtgift.JA, begrunnelse = null),
     bompenger: BigDecimal? = null,
     fergekostnad: BigDecimal? = null,
     parkering: BigDecimal? = null,
@@ -728,6 +734,7 @@ fun faktaPrivatBilReiseTilSamling(
 ) = FaktaPrivatBilReiseTilSamling(
     reiseId = reiseId,
     adresse = adresse,
+    nødvendigUtgift = nødvendigUtgift,
     reiseavstand = reiseavstand,
     begrunnelse = begrunnelse,
     bompenger = bompenger,
@@ -772,6 +779,8 @@ fun lagreReiseTilSamlingDto(
     adresse: String = "Tiltaksveien 1",
     reiseId: ReiseId = dummyReiseId,
     utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
+    erNødvendig: SvarJaNeiNødvendigUtgift = SvarJaNeiNødvendigUtgift.JA,
+    begrunnelseNødvendigUtgift: String? = null,
     begrunnelse: String = "Spesifisert offentlig transportutgift",
     aktivitet: VilkårperiodeDto? = null,
     svar: Map<RegelId, SvarOgBegrunnelseDto> =
@@ -785,6 +794,11 @@ fun lagreReiseTilSamlingDto(
             aktivitet = aktivitet,
         ).run {
             FaktaReiseTilSamlingOffentligTransportDto(
+                nødvendigUtgift =
+                    NødvendigUtgiftDto(
+                        erUtgiftenNødvendig = erNødvendig,
+                        begrunnelse = begrunnelseNødvendigUtgift,
+                    ),
                 utgifterOffentligTransport = utgifterOffentligTransport,
                 begrunnelse = begrunnelse,
                 aktivitet = aktivitet?.tilAktivitetInfoDto(),
@@ -805,11 +819,18 @@ fun lagrePrivatBilReiseTilSamlingDto(
     adresse: String = "Tiltaksveien 1",
     reiseId: ReiseId = dummyReiseId,
     reiseavstand: BigDecimal = 40.toBigDecimal(),
+    erNødvendig: SvarJaNeiNødvendigUtgift = SvarJaNeiNødvendigUtgift.JA,
+    begrunnelseNødvendigUtgift: String? = null,
     begrunnelse: String = "Spesifisert privatbilutgift",
     svar: Map<RegelId, SvarOgBegrunnelseDto> =
         ReiseTilSamlingRegelTestUtil.oppfylteSvarReiseTilSamlingPrivatBilDto(),
     fakta: FaktaReiseTilSamlingDto =
         FaktaReiseTilSamlingPrivatBilDto(
+            nødvendigUtgift =
+                NødvendigUtgiftDto(
+                    erUtgiftenNødvendig = erNødvendig,
+                    begrunnelse = begrunnelseNødvendigUtgift,
+                ),
             reiseavstand = reiseavstand,
             begrunnelse = begrunnelse,
         ),

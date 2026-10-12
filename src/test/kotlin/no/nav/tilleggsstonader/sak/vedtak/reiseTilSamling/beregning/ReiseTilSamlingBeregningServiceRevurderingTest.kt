@@ -31,6 +31,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.NødvendigUtgift
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.SvarJaNei
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -87,6 +89,7 @@ class ReiseTilSamlingBeregningServiceRevurderingTest {
             FaktaReiseTilSamlingOffentligTransport(
                 reiseId = reiseId,
                 adresse = "Samlingsgata 1",
+                nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
                 utgifterOffentligTransport = beløp.toBigDecimal(),
                 begrunnelse = "Togbillett",
             ),

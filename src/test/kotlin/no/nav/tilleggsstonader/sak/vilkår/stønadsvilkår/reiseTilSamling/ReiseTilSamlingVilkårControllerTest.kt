@@ -17,11 +17,13 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegelTestUtil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.SvarJaNei
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.AktivitetInfoDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingPrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingUbestemtDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.LagreVilkårReiseTilSamlingDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.NødvendigUtgiftDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.VilkårReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
@@ -114,7 +116,10 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 adresse = "Samlingsveien 1",
                 reiseId = dummyReiseId,
                 svar = ReiseTilSamlingRegelTestUtil.oppfylteSvarReiseTilSamlingPrivatBilDto(),
-                fakta = faktaPrivatBil(),
+                fakta =
+                    faktaPrivatBil(
+                        nødvendigUtgift = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNei.NEI, begrunnelse = "Billigere med buss"),
+                    ),
             )
 
         val resultat = kall.vilkårReiseTilSamling.opprettVilkår(behandlingContext.behandlingId, nyttVilkår)
@@ -258,6 +263,7 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
         utgifterOffentligTransport: BigDecimal = BigDecimal("100"),
         aktivitetId: VilkårperiodeGlobalId? = null,
     ) = FaktaReiseTilSamlingOffentligTransportDto(
+        nødvendigUtgift = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
         utgifterOffentligTransport = utgifterOffentligTransport,
         begrunnelse = "Togbillett mellom bosted og samling",
         aktivitet =
@@ -279,7 +285,9 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
         parkering: BigDecimal? = null,
         piggdekkavgift: BigDecimal? = null,
         aktivitet: VilkårperiodeDto? = null,
+        nødvendigUtgift: NødvendigUtgiftDto = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
     ) = FaktaReiseTilSamlingPrivatBilDto(
+        nødvendigUtgift = nødvendigUtgift,
         reiseavstand = reiseavstand,
         begrunnelse = "Drivstoff og slitasje",
         bompenger = bompenger,

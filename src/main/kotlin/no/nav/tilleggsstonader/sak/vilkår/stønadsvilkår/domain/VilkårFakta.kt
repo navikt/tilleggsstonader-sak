@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.aktivitet.TypeAktivitet
 import no.nav.tilleggsstonader.kontrakter.felles.Periode
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -79,6 +80,7 @@ data class FaktaFlyttingUbestemt(
 data class FaktaReiseTilSamlingOffentligTransport(
     override val reiseId: ReiseId,
     override val adresse: String?,
+    val nødvendigUtgift: NødvendigUtgift,
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String,
     val aktivitetId: VilkårperiodeGlobalId? = null,
@@ -87,6 +89,7 @@ data class FaktaReiseTilSamlingOffentligTransport(
 data class FaktaReiseTilSamlingPrivatBil(
     override val reiseId: ReiseId,
     override val adresse: String?,
+    val nødvendigUtgift: NødvendigUtgift,
     val reiseavstand: BigDecimal,
     val begrunnelse: String?,
     val aktivitetId: VilkårperiodeGlobalId? = null,

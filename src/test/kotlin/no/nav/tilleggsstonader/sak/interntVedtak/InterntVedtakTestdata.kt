@@ -85,6 +85,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.Daglig
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegelTestUtil.oppfylteDelvilkårReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegelTestUtil.oppfylteDelvilkårReiseTilSamlingPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetDagligReiseTso
@@ -113,6 +114,7 @@ import java.time.Month.FEBRUARY
 import java.time.Month.JANUARY
 import java.time.temporal.ChronoUnit
 import no.nav.tilleggsstonader.sak.vedtak.domain.VedtaksperiodeBeregning as VedtaksperiodeBeregningsgrunnlag
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.SvarJaNei as SvarJaNeiReiseTilSamling
 
 object InterntVedtakTestdata {
     val behandlingId = BehandlingId.fromString("001464ca-20dc-4f6c-b3e8-c83bd98b3e31")
@@ -1300,6 +1302,7 @@ object InterntVedtakTestdata {
                             utgifterOffentligTransport = 2000.toBigDecimal(),
                             begrunnelse = "Begrunnelse",
                             aktivitetId = dummyAktivitetId,
+                            nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNeiReiseTilSamling.JA, begrunnelse = null),
                         ),
                 ),
             )
@@ -1324,6 +1327,7 @@ object InterntVedtakTestdata {
                             fergekostnad = BigDecimal(50),
                             parkering = BigDecimal(40),
                             piggdekkavgift = BigDecimal(50),
+                            nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNeiReiseTilSamling.JA, begrunnelse = null),
                         ),
                 ),
             )

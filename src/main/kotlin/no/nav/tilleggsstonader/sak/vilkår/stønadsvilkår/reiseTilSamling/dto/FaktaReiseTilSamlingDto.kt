@@ -2,12 +2,15 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaUbestemtType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.NødvendigUtgift
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.SvarJaNei
 import java.math.BigDecimal
 
 @JsonTypeInfo(
@@ -31,6 +34,7 @@ sealed interface FaktaReiseTilSamlingDto {
 }
 
 data class FaktaReiseTilSamlingOffentligTransportDto(
+    val nødvendigUtgift: NødvendigUtgiftDto,
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String,
     val aktivitet: AktivitetInfoDto? = null,
@@ -43,6 +47,7 @@ data class FaktaReiseTilSamlingOffentligTransportDto(
     ) = FaktaOffentligTransport(
         reiseId = reiseId,
         adresse = adresse,
+        nødvendigUtgift = nødvendigUtgift.tilDomain(),
         utgifterOffentligTransport = utgifterOffentligTransport,
         begrunnelse = begrunnelse,
         aktivitetId = aktivitet?.aktivitetId,
@@ -50,6 +55,7 @@ data class FaktaReiseTilSamlingOffentligTransportDto(
 }
 
 data class FaktaReiseTilSamlingPrivatBilDto(
+    val nødvendigUtgift: NødvendigUtgiftDto,
     val reiseavstand: BigDecimal,
     val begrunnelse: String?,
     val aktivitet: AktivitetInfoDto? = null,
@@ -66,6 +72,7 @@ data class FaktaReiseTilSamlingPrivatBilDto(
     ) = FaktaPrivatBil(
         reiseId = reiseId,
         adresse = adresse,
+        nødvendigUtgift = nødvendigUtgift.tilDomain(),
         reiseavstand = reiseavstand,
         begrunnelse = begrunnelse?.ifBlank { null },
         aktivitetId = aktivitet?.aktivitetId,
@@ -74,6 +81,22 @@ data class FaktaReiseTilSamlingPrivatBilDto(
         parkering = parkering,
         piggdekkavgift = piggdekkavgift,
     )
+}
+
+data class NødvendigUtgiftDto(
+    val erUtgiftenNødvendig: SvarJaNei,
+    val begrunnelse: String?,
+) {
+    fun tilDomain(): NødvendigUtgift {
+        feilHvis(erUtgiftenNødvendig == SvarJaNei.GAMMEL_MANGLER_DATA) {
+            "erNødvendig kan ikke settes til GAMMEL_MANGLER_DATA ved oppretting eller oppdatering"
+        }
+
+        return NødvendigUtgift(
+            erUtgiftenNødvendig = erUtgiftenNødvendig,
+            begrunnelse = begrunnelse?.ifBlank { null },
+        )
+    }
 }
 
 data object FaktaReiseTilSamlingUbestemtDto : FaktaReiseTilSamlingDto {
