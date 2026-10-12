@@ -1302,7 +1302,7 @@ object InterntVedtakTestdata {
                             utgifterOffentligTransport = 2000.toBigDecimal(),
                             begrunnelse = "Begrunnelse",
                             aktivitetId = dummyAktivitetId,
-                            nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNeiReiseTilSamling.JA, begrunnelse = null)
+                            nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNeiReiseTilSamling.JA, begrunnelse = null),
                         ),
                 ),
             )
@@ -1327,7 +1327,7 @@ object InterntVedtakTestdata {
                             fergekostnad = BigDecimal(50),
                             parkering = BigDecimal(40),
                             piggdekkavgift = BigDecimal(50),
-                            nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNeiReiseTilSamling.JA, begrunnelse = null)
+                            nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNeiReiseTilSamling.JA, begrunnelse = null),
                         ),
                 ),
             )

@@ -116,7 +116,10 @@ class ReiseTilSamlingVilkårControllerTest : CleanDatabaseIntegrationTest() {
                 adresse = "Samlingsveien 1",
                 reiseId = dummyReiseId,
                 svar = ReiseTilSamlingRegelTestUtil.oppfylteSvarReiseTilSamlingPrivatBilDto(),
-                fakta = faktaPrivatBil(nødvendigUtgift = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNei.NEI, begrunnelse = "Billigere med buss")),
+                fakta =
+                    faktaPrivatBil(
+                        nødvendigUtgift = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNei.NEI, begrunnelse = "Billigere med buss"),
+                    ),
             )
 
         val resultat = kall.vilkårReiseTilSamling.opprettVilkår(behandlingContext.behandlingId, nyttVilkår)
