@@ -166,15 +166,15 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
                 .hentVedtak(Stønadstype.FLYTTING_TSO, revurderingId)
                 .expectOkWithBody<InnvilgelseFlyttingResponse>()
 
-//        assertThat(vedtakRevurdering.beregningsresultat.resultater).hasSize(1)
-//
-//        val resultatRevurdering = vedtakRevurdering.beregningsresultat.resultater.single()
-//
-//        assertThat(resultatRevurdering.beløp).isEqualTo(5000.toBigDecimal())
-//        assertThat(resultatRevurdering.grunnlag).isInstanceOf(BeregningsgrunnlagFlyttebyrå::class.java)
+        assertThat(vedtakRevurdering.beregningsresultat.resultater).hasSize(1)
+
+        val resultatRevurdering = vedtakRevurdering.beregningsresultat.resultater.single()
+
+        assertThat(resultatRevurdering.beløp).isEqualTo(5000.toBigDecimal())
+        assertThat(resultatRevurdering.grunnlag).isInstanceOf(BeregningsgrunnlagFlyttebyrå::class.java)
 
         val andelerRevurdering =
-            tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
+            tilkjentYtelseRepository.findByBehandlingId(revurderingId)!!.andelerTilkjentYtelse
 
         assertThat(andelerRevurdering).hasSize(1)
         val nyAndel = andelerRevurdering.find { it.beløp == 5000 }

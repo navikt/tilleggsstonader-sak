@@ -36,14 +36,14 @@ class FlyttingBeregningService(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
         beregningsplan: Beregningsplan,
+        typeVedtak: TypeVedtak,
     ): BeregningsresultatFlytting {
         val omfang = beregningsplan.omfang
 
         vedtaksperiodeValideringService.validerVedtaksperioder(
             vedtaksperioder,
             behandling,
-            // TODO Hvor henter jeg denne?
-            typeVedtak = TypeVedtak.INNVILGELSE,
+            typeVedtak = typeVedtak,
         )
 
         val oppfylteVilkår = flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id)
@@ -55,11 +55,12 @@ class FlyttingBeregningService(
                 }
 
                 Beregningsomfang.FRA_DATO -> {
-                    val nyeVilkår =
+                    val (nyeVilkår, gamleVilkår) =
                         oppfylteVilkår
-                            .filter {
+                            .partition {
                                 val beregningsplanFraDato =
-                                    beregningsplan.fraDato ?: feil("Beregningsplan fraDato mangler når omfang er FRA_DATO, skal ikke skje")
+                                    beregningsplan.fraDato
+                                        ?: feil("Beregningsplan fraDato mangler når omfang er FRA_DATO, skal ikke skje")
                                 it.fom.isEqualOrAfter(beregningsplanFraDato)
                             }
 
@@ -71,11 +72,16 @@ class FlyttingBeregningService(
                             )
                         }
 
+                    val forrigeVedtaksresultater =
+                        hentForrigeIverksatteVedtak(behandling)?.beregningsresultat?.resultater
+
                     val gamleBeregningsresultat =
-                        (
-                            hentForrigeIverksatteVedtak(behandling)?.beregningsresultat?.resultater
-                                ?: emptyList()
-                        ).map { it.copy(fraTidligereVedtak = true) }
+                        gamleVilkår.mapNotNull { gammeltVilkår ->
+                            val vilkåretsResultat =
+                                forrigeVedtaksresultater?.find { gammeltVilkår.fom == it.fom && gammeltVilkår.tom == it.tom }
+
+                            vilkåretsResultat?.copy(fraTidligereVedtak = true)
+                        }
 
                     return BeregningsresultatFlytting(nyeBeregningsresultat + gamleBeregningsresultat)
                 }

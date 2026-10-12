@@ -15,6 +15,7 @@ import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseFlytting
@@ -55,7 +56,12 @@ class FlyttingBeregningServiceTest {
     private fun FlyttingBeregningService.beregn(
         behandling: Saksbehandling,
         vedtaksperioder: List<Vedtaksperiode>,
-    ) = beregn(behandling, vedtaksperioder, Beregningsplan(Beregningsomfang.ALLE_PERIODER))
+    ) = beregn(
+        behandling,
+        vedtaksperioder,
+        Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+        typeVedtak = TypeVedtak.INNVILGELSE,
+    )
 
     @BeforeEach
     fun setup() {
@@ -256,6 +262,7 @@ class FlyttingBeregningServiceTest {
                 revurdering,
                 listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)),
                 Beregningsplan(Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT),
+                typeVedtak = TypeVedtak.INNVILGELSE,
             )
 
         assertThat(resultat.resultater).containsExactly(lagret.copy(fraTidligereVedtak = true))
@@ -267,6 +274,7 @@ class FlyttingBeregningServiceTest {
                     revurdering,
                     listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)),
                     Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+                    typeVedtak = TypeVedtak.INNVILGELSE,
                 ).resultater
                 .single()
         assertThat(reberegnet.beløp).isEqualTo(294.toBigDecimal())
@@ -287,6 +295,7 @@ class FlyttingBeregningServiceTest {
                 revurdering,
                 listOf(vedtaksperiode(1 januar 2026, 28 februar 2026)),
                 Beregningsplan(Beregningsomfang.FRA_DATO, fraDato = 1 februar 2026),
+                typeVedtak = TypeVedtak.INNVILGELSE,
             )
 
         assertThat(resultat.resultater.map { it.fraTidligereVedtak }).contains(true, false)
@@ -324,6 +333,7 @@ class FlyttingBeregningServiceTest {
                         revurdering,
                         listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)),
                         Beregningsplan(Beregningsomfang.FRA_DATO, fraDato = 1 februar 2026),
+                        typeVedtak = TypeVedtak.INNVILGELSE,
                     ).resultater
                     .single()
             assertThat(resultat.fraTidligereVedtak).isFalse()
@@ -348,6 +358,7 @@ class FlyttingBeregningServiceTest {
                     revurdering,
                     listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)),
                     Beregningsplan(Beregningsomfang.FRA_DATO, fraDato = 1 januar 2026),
+                    typeVedtak = TypeVedtak.INNVILGELSE,
                 )
             assertThat(resultat.resultater.single().beløp).isEqualTo(5000.toBigDecimal())
             assertThat(endret.resultat).isEqualTo(Vilkårsresultat.OPPFYLT)
@@ -373,6 +384,7 @@ class FlyttingBeregningServiceTest {
                 revurdering,
                 listOf(vedtaksperiode(1 januar 2026, 28 februar 2026)),
                 Beregningsplan(Beregningsomfang.FRA_DATO, fraDato = 1 januar 2026),
+                typeVedtak = TypeVedtak.INNVILGELSE,
             )
         assertThat(resultat.mapTilAndeler(Stønadstype.FLYTTING_TSO).single().beløp).isEqualTo(3000)
     }
@@ -387,6 +399,7 @@ class FlyttingBeregningServiceTest {
                     behandling,
                     listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)),
                     Beregningsplan(omfang),
+                    typeVedtak = TypeVedtak.INNVILGELSE,
                 )
             }.isInstanceOf(Feil::class.java)
         }
@@ -397,6 +410,7 @@ class FlyttingBeregningServiceTest {
                 revurdering,
                 listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)),
                 Beregningsplan(Beregningsomfang.FRA_DATO, fraDato = 1 februar 2026),
+                typeVedtak = TypeVedtak.INNVILGELSE,
             )
         }.isInstanceOf(Feil::class.java).hasMessageContaining("Fant ikke tidligere beregningsresultat")
     }

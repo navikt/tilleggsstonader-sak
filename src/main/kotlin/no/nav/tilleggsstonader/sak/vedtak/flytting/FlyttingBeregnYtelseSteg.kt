@@ -64,11 +64,14 @@ class FlyttingBeregnYtelseSteg(
                 saksbehandling = saksbehandling,
                 vedtaksperioder = vedtaksperioder,
             )
-        val beregningsresultat = beregningService.beregn(saksbehandling, vedtaksperioder, beregningsplan)
+        val typeVedtak = TypeVedtak.INNVILGELSE
+
+        val beregningsresultat = beregningService.beregn(saksbehandling, vedtaksperioder, beregningsplan, typeVedtak)
+
         vedtakRepository.insert(
             GeneriskVedtak(
                 behandlingId = saksbehandling.id,
-                type = TypeVedtak.INNVILGELSE,
+                type = typeVedtak,
                 data =
                     InnvilgelseFlytting(
                         vedtaksperioder = vedtaksperioder,

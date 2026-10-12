@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tilgang.AuditLoggerEvent
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
 import no.nav.tilleggsstonader.sak.vedtak.BeregningsplanUtleder
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakDtoMapper
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
@@ -99,7 +100,9 @@ class FlyttingVedtakController(
         validerStønadstype(behandling, forventetStønadstype)
         val vedtaksperioder = vedtak.vedtaksperioder()
         val beregningsplan = beregningsplanUtleder.utledForInnvilgelse(behandling, vedtaksperioder)
-        return beregningService.beregn(behandling, vedtaksperioder, beregningsplan).tilDto()
+        return beregningService
+            .beregn(behandling, vedtaksperioder, beregningsplan, typeVedtak = TypeVedtak.INNVILGELSE)
+            .tilDto()
     }
 
     private fun lagreVedtak(
