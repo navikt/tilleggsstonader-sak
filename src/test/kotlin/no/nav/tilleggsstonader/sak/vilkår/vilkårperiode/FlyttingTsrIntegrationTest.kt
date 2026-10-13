@@ -58,7 +58,7 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
                 }
             }
             vilkår {
-                flyttingEgenKjøring(fom, tom, avstandEnVei = 100, bompenger = 100)
+                flyttingEgenKjøring(fom, avstandEnVei = 100, bompenger = 100)
             }
             vedtak {
                 avslag()
@@ -110,7 +110,6 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
             vilkår {
                 flyttingEgenKjøring(
                     fom,
-                    tom,
                     avstandEnVei = 100,
                     bompenger = 100,
                 )
@@ -167,7 +166,6 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
             vilkår {
                 flyttingByrå(
                     fom,
-                    tom,
                     tilbud1Pris = 10000,
                     tilbud2Pris = 5000,
                     erBetalingDokumentert = true,
@@ -225,7 +223,6 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
             vilkår {
                 flyttingByrå(
                     fom,
-                    tom,
                     tilbud1Pris = 10000,
                     tilbud2Pris = 5000,
                     erBetalingDokumentert = false,

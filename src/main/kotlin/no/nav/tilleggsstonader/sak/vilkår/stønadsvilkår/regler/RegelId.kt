@@ -45,6 +45,14 @@ enum class RegelId(
     DOKUMENTERTE_UTGIFTER("Har bruker dokumenterte utgifter til reise?"),
 
     // FLYTTING
-    OPPFYLLER_VILKÅR_FOR_FLYTTING("Flytter bruker ifbm. aktivitetsgjennomføring eller ny stilling?"),
+    HVILKEN_FORBINDELSE_FLYTTER_BRUKER("I hvilken forbindelse flytter bruker?"),
+    MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET("Må bruker flytte fra hjemstedet for å gjennomføre aktiviteten?"),
+
+    // TODO(flytting): Placeholder, endelig spørsmålstekst mangler
+    SAMMENHENG_FLYTTING_OG_ARBEID("PLACEHOLDER: Er det sammenheng mellom flyttingen og arbeidet?"),
+
+    // TODO(flytting): Placeholder, endelig spørsmålstekst mangler
+    FLYTTER_PGA_OPPSTART_ARBEID("PLACEHOLDER: Flytter bruker på grunn av oppstart i arbeid?"),
+    ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE("Er kostnader for flytting nødvendig?"),
     HVORDAN_SKAL_BRUKER_FLYTTE("Skal bruker benytte seg av flyttebyrå, eller flytter bruker selv?"),
 }

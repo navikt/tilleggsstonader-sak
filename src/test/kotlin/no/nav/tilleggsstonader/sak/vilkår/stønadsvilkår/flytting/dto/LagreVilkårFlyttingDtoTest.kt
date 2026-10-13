@@ -16,8 +16,7 @@ class LagreVilkårFlyttingDtoTest {
         val fakta = FaktaFlyttingUbestemtDto("Adresse 1")
         val domain = dto(svar = emptyMap(), fakta = fakta).tilDomain()
 
-        assertThat(domain.fom).isEqualTo(1 januar 2026)
-        assertThat(domain.tom).isEqualTo(31 januar 2026)
+        assertThat(domain.flytteDato).isEqualTo(1 januar 2026)
         assertThat(domain.svar).isEmpty()
         assertThat(domain.fakta).isEqualTo(FaktaFlyttingUbestemt("Adresse 1"))
     }
@@ -41,16 +40,14 @@ class LagreVilkårFlyttingDtoTest {
             jsonMapper.readValue<LagreVilkårFlyttingDto>(
                 """
                 {
-                  "fom": "2026-01-01",
-                  "tom": "2026-01-31",
+                  "flytteDato": "2026-01-01",
                   "svar": {},
                   "fakta": {"type": "FLYTTING_UBESTEMT", "adresse": "Flytteveien 1"}
                 }
                 """.trimIndent(),
             )
 
-        assertThat(dto.fom).isEqualTo(1 januar 2026)
-        assertThat(dto.tom).isEqualTo(31 januar 2026)
+        assertThat(dto.flytteDato).isEqualTo(1 januar 2026)
         assertThat(dto.svar).isEmpty()
         assertThat(dto.fakta).isEqualTo(FaktaFlyttingUbestemtDto(adresse = "Flytteveien 1"))
     }
@@ -146,8 +143,7 @@ class LagreVilkårFlyttingDtoTest {
         svar: Map<RegelId, SvarOgBegrunnelseDto>,
         fakta: FaktaFlyttingDto,
     ) = LagreVilkårFlyttingDto(
-        fom = 1 januar 2026,
-        tom = 31 januar 2026,
+        flytteDato = 1 januar 2026,
         svar = svar,
         fakta = fakta,
     )

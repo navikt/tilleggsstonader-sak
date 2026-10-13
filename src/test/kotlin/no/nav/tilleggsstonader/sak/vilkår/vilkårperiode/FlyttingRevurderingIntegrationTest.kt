@@ -66,7 +66,6 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             vilkår {
                 flyttingByrå(
                     fom,
-                    tom,
                     tilbud1Pris = 10000,
                     tilbud2Pris = 5000,
                     erBetalingDokumentert = true,
@@ -140,7 +139,6 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             vilkår {
                 flyttingByrå(
                     fom,
-                    tom,
                     tilbud1Pris = 10000,
                     tilbud2Pris = 5000,
                     erBetalingDokumentert = false,
@@ -231,7 +229,6 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             vilkår {
                 flyttingByrå(
                     fom,
-                    tom,
                     tilbud1Pris = 10000,
                     tilbud2Pris = 5000,
                     erBetalingDokumentert = true,
@@ -319,7 +316,6 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             vilkår {
                 flyttingByrå(
                     fom,
-                    tom,
                     tilbud1Pris = 10000,
                     tilbud2Pris = 5000,
                     erBetalingDokumentert = true,
@@ -338,7 +334,7 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             opprettRevurderingOgGjennomførBehandlingsløp(fraBehandlingId = behandling.id) {
                 vilkår {
                     endreFlytting {
-                        copy(fom = fom.plusDays(7), tom = tom.plusDays(7))
+                        copy(flytteDato = fom.plusDays(7))
                     }
                 }
             }

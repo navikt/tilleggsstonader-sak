@@ -18,7 +18,7 @@ class VilkårFlyttingMapperTest {
         vilkår(
             type = VilkårType.FLYTTING,
             fom = 1 januar 2026,
-            tom = 15 januar 2026,
+            tom = 1 januar 2026,
             utgift = null,
             fakta = FaktaFlyttingUbestemt("Testadresse"),
         )

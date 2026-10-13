@@ -79,8 +79,7 @@ class FlyttingBeregningServiceTest {
         every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
             listOf(
                 vilkår(
-                    fom = 1 januar 2025,
-                    tom = 31 januar 2025,
+                    flytteDato = 1 januar 2025,
                     fakta =
                         FaktaFlyttebyrå(
                             tilbud1 = FlyttebyråTilbud(navn = "Tilbud 1", pris = 123),
@@ -112,8 +111,7 @@ class FlyttingBeregningServiceTest {
         every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
             listOf(
                 vilkår(
-                    fom = 1 januar 2025,
-                    tom = 31 januar 2025,
+                    flytteDato = 1 januar 2025,
                     fakta =
                         FaktaFlytteSelv(
                             avstandEnVei = 100,
@@ -148,8 +146,7 @@ class FlyttingBeregningServiceTest {
         every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
             listOf(
                 vilkår(
-                    fom = 1 januar 2025,
-                    tom = 31 januar 2025,
+                    flytteDato = 1 januar 2025,
                     fakta =
                         FaktaFlytteSelv(
                             avstandEnVei = 1,
@@ -185,8 +182,8 @@ class FlyttingBeregningServiceTest {
 
     @Test
     fun `resultater beregnes for alle vilkår og sorteres etter startdato`() {
-        val førsteVilkår = vilkår(fom = 1 februar 2025, tom = 28 februar 2025)
-        val andreVilkår = vilkår(fom = 1 januar 2025, tom = 31 januar 2025)
+        val førsteVilkår = vilkår(flytteDato = 1 februar 2025)
+        val andreVilkår = vilkår(flytteDato = 1 januar 2025)
         val vedtaksperioder =
             listOf(
                 vedtaksperiode(
@@ -222,7 +219,7 @@ class FlyttingBeregningServiceTest {
             )
         stubForrigeVedtak(forrigeBehandlingId, forrigeResultat)
         every { flyttingVilkårService.hentOppfylteVilkårforBehandling(revurdering.id) } returns
-            listOf(vilkår(fom = 1 februar 2025, tom = 28 februar 2025, behandlingId = revurdering.id))
+            listOf(vilkår(flytteDato = 1 februar 2025, behandlingId = revurdering.id))
 
         val resultater =
             beregningService
@@ -283,7 +280,7 @@ class FlyttingBeregningServiceTest {
 
         ugyldigeFakta.forEach { fakta ->
             every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
-                listOf(vilkår(fom = 1 januar 2025, tom = 31 januar 2025, fakta = fakta))
+                listOf(vilkår(flytteDato = 1 januar 2025, fakta = fakta))
 
             assertThatThrownBy {
                 beregningService.beregn(
@@ -308,7 +305,7 @@ class FlyttingBeregningServiceTest {
 
         ugyldigeFakta.forEach { fakta ->
             every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
-                listOf(vilkår(fom = 1 januar 2025, tom = 31 januar 2025, fakta = fakta))
+                listOf(vilkår(flytteDato = 1 januar 2025, fakta = fakta))
 
             assertThatThrownBy {
                 beregningService.beregn(
@@ -324,8 +321,7 @@ class FlyttingBeregningServiceTest {
         every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
             listOf(
                 vilkår(
-                    fom = 1 januar 2025,
-                    tom = 31 januar 2025,
+                    flytteDato = 1 januar 2025,
                     fakta = FaktaFlyttingUbestemt(adresse = "Flytteveien 1"),
                 ),
             )
@@ -383,15 +379,14 @@ class FlyttingBeregningServiceTest {
     }
 
     private fun vilkår(
-        fom: LocalDate,
-        tom: LocalDate,
+        flytteDato: LocalDate,
         behandlingId: BehandlingId = behandling.id,
         fakta: FlyttingVilkårFakta = faktaFlyttebyrå(),
     ) = VilkårFlytting(
         id = VilkårId.random(),
         behandlingId = behandlingId,
-        fom = fom,
-        tom = tom,
+        fom = flytteDato,
+        tom = flytteDato,
         resultat = Vilkårsresultat.OPPFYLT,
         status = VilkårStatus.NY,
         delvilkårsett = emptyList(),

@@ -8,6 +8,12 @@ enum class SvarId(
     NEI("Nei"),
 
     // FLYTTING
+    FLYTTING_VED_START_AV_AKTIVITET("Flytting ved start av aktivitet"),
+    FLYTTING_VED_AVSLUTTET_AKTIVITET("Flytting ved avsluttet aktivitet"),
+    ARBEID_ETTER_GJENNOMFØRT_AKTIVITET("Arbeid etter gjennomført tiltak/utdanning"),
+
+    // TODO(flytting): Placeholder, endelig svartekst mangler
+    FLYTTING_ARBEIDSSØKER("PLACEHOLDER: Arbeidssøker"),
     FLYTTEBYRÅ("Flyttebyrå"),
     FLYTTER_SELV("Flytter selv"),
 

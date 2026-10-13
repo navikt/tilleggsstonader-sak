@@ -23,6 +23,6 @@ data class VilkårFlytting(
     val opphavsvilkår: Opphavsvilkår? = null,
 ) : Periode<LocalDate> {
     init {
-        validatePeriode()
+        require(fom == tom) { "For flytting så skal fom og tom være samme" }
     }
 }
