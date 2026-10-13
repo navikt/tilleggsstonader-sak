@@ -7,8 +7,11 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingVilkå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.LagreVilkårFlytting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.FlyttingRegel
 
 object FlyttingVilkårValidering {
+    private val flyttingRegel = FlyttingRegel()
+
     fun validerOppgitteFakta(fakta: FlyttingVilkårFakta) {
         brukerfeilHvis(fakta.adresse.isBlank()) { "Flytteadressen kan ikke være tom" }
         when (fakta) {
@@ -48,26 +51,22 @@ object FlyttingVilkårValidering {
     fun erFullstendig(vilkår: LagreVilkårFlytting): Boolean {
         if (vilkår.fakta.adresse.isBlank()) return false
 
-        val oppfyllerVilkår = vilkår.svar[RegelId.OPPFYLLER_VILKÅR_FOR_FLYTTING]?.svar ?: return false
-        return when (oppfyllerVilkår) {
-            SvarId.NEI -> true
+        val flyttemåte = vilkår.svar[RegelId.HVORDAN_SKAL_BRUKER_FLYTTE]?.svar
 
-            SvarId.JA -> {
-                val flyttemåte = vilkår.svar[RegelId.HVORDAN_SKAL_BRUKER_FLYTTE]?.svar ?: return false
-                when (flyttemåte) {
-                    SvarId.FLYTTEBYRÅ -> {
-                        val fakta = vilkår.fakta as? FaktaFlyttebyrå ?: return false
-                        val harNavnPåBeggeTilbud =
-                            !fakta.tilbud1.navn.isNullOrBlank() && !fakta.tilbud2.navn.isNullOrBlank()
-                        harNavnPåBeggeTilbud && fakta.tilbud1.pris != null && fakta.tilbud2.pris != null
-                    }
-
-                    SvarId.FLYTTER_SELV -> (vilkår.fakta as? FaktaFlytteSelv)?.avstandEnVei != null
-                    else -> false
+        if (flyttemåte != null) {
+            return when (flyttemåte) {
+                SvarId.FLYTTEBYRÅ -> {
+                    val fakta = vilkår.fakta as? FaktaFlyttebyrå ?: return false
+                    val harNavnPåBeggeTilbud =
+                        !fakta.tilbud1.navn.isNullOrBlank() && !fakta.tilbud2.navn.isNullOrBlank()
+                    harNavnPåBeggeTilbud && fakta.tilbud1.pris != null && fakta.tilbud2.pris != null
                 }
-            }
 
-            else -> false
+                SvarId.FLYTTER_SELV -> (vilkår.fakta as? FaktaFlytteSelv)?.avstandEnVei != null
+                else -> false
+            }
         }
+
+        return true
     }
 }

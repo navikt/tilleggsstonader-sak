@@ -21,6 +21,6 @@ data class VilkårFlytting(
     val slettetKommentar: String? = null,
 ) : Periode<LocalDate> {
     init {
-        validatePeriode()
+        require(fom == tom) { "For flytting så skal fom og tom være samme" }
     }
 }

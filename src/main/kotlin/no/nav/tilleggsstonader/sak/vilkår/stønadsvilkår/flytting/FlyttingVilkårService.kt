@@ -13,9 +13,6 @@ import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrT
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.SlettetVilkårResultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårRepository
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -25,8 +22,6 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.VilkårFlytt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.VilkårFlyttingMapper.mapTilVilkårFlytting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.LagreVilkårFlytting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.VilkårFlytting
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.evalutation.RegelEvaluering
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggVilkårFraSvar
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.FlyttingRegel
@@ -95,7 +90,6 @@ class FlyttingVilkårService(
         innsendt: LagreVilkårFlytting,
         eksisterende: VilkårFlytting? = null,
     ): VilkårFlytting {
-        brukerfeilHvis(innsendt.fom.isAfter(innsendt.tom)) { "Fra-dato må være før eller lik til-dato" }
         val delvilkår =
             ByggVilkårFraSvar.byggDelvilkårsettFraSvarOgVilkårsregel(
                 vilkårsregel = FlyttingRegel(),
@@ -111,16 +105,16 @@ class FlyttingVilkårService(
         return eksisterende?.copy(
             resultat = samletResultat,
             status = utledStatus(eksisterende),
-            fom = innsendt.fom,
-            tom = innsendt.tom,
+            fom = innsendt.flytteDato,
+            tom = innsendt.flytteDato,
             delvilkårsett = delvilkår,
             fakta = fakta,
         ) ?: VilkårFlytting(
             behandlingId = behandlingId,
             resultat = samletResultat,
             status = VilkårStatus.NY,
-            fom = innsendt.fom,
-            tom = innsendt.tom,
+            fom = innsendt.flytteDato,
+            tom = innsendt.flytteDato,
             delvilkårsett = delvilkår,
             fakta = fakta,
         )
@@ -128,58 +122,6 @@ class FlyttingVilkårService(
 
     private fun validerFaktaOgSvar(innsendt: LagreVilkårFlytting) {
         FlyttingVilkårValidering.validerOppgitteFakta(innsendt.fakta)
-        val oppfyllerVilkår = innsendt.svar[RegelId.OPPFYLLER_VILKÅR_FOR_FLYTTING]?.svar
-        val flyttemåte = innsendt.svar[RegelId.HVORDAN_SKAL_BRUKER_FLYTTE]?.svar
-
-        brukerfeilHvis(oppfyllerVilkår != null && oppfyllerVilkår !in setOf(SvarId.JA, SvarId.NEI)) {
-            "Vilkår for flytting må besvares med ja eller nei"
-        }
-        brukerfeilHvis(flyttemåte != null && flyttemåte !in setOf(SvarId.FLYTTEBYRÅ, SvarId.FLYTTER_SELV)) {
-            "Flyttevilkår må besvares med flyttebyrå eller flytter selv"
-        }
-
-        when (oppfyllerVilkår) {
-            null -> {
-                brukerfeilHvis(innsendt.fakta !is FaktaFlyttingUbestemt) {
-                    "Vurderingen av om vilkårene for flytting er oppfylt må besvares før fakta registreres"
-                }
-            }
-
-            SvarId.NEI -> {
-                brukerfeilHvis(flyttemåte != null) {
-                    "Flyttemåte skal ikke besvares når vilkårene for flytting ikke er oppfylt"
-                }
-                brukerfeilHvis(innsendt.fakta !is FaktaFlyttingUbestemt) {
-                    "Fakta kan kun inneholde adresse når vilkårene for flytting ikke er oppfylt"
-                }
-            }
-
-            SvarId.JA -> {
-                when (flyttemåte) {
-                    null -> {
-                        brukerfeilHvis(innsendt.fakta !is FaktaFlyttingUbestemt) {
-                            "Vurderingen av flyttemåte må besvares før fakta registreres"
-                        }
-                    }
-
-                    SvarId.FLYTTEBYRÅ -> {
-                        brukerfeilHvis(innsendt.fakta !is FaktaFlyttebyrå) {
-                            "Fakta må inneholde to tilbud fra flyttebyrå når flyttebyrå er valgt"
-                        }
-                    }
-
-                    SvarId.FLYTTER_SELV -> {
-                        brukerfeilHvis(innsendt.fakta !is FaktaFlytteSelv) {
-                            "Fakta må inneholde avstand og kostnader når bruker flytter selv"
-                        }
-                    }
-
-                    else -> error("Ugyldig svar på flyttemåte")
-                }
-            }
-
-            else -> error("Ugyldig svar på om vilkårene for flytting er oppfylt")
-        }
     }
 
     private fun validerIngenOverlapp(

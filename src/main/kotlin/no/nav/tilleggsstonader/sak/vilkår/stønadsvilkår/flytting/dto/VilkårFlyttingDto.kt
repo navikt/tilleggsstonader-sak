@@ -8,8 +8,7 @@ import java.time.LocalDate
 
 data class VilkårFlyttingDto(
     val id: VilkårId,
-    val fom: LocalDate,
-    val tom: LocalDate,
+    val flytteDato: LocalDate,
     val resultat: Vilkårsresultat,
     val status: VilkårStatus?,
     val delvilkårsett: List<DelvilkårDto>,

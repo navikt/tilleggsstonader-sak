@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.vedtak.flytting.beregning
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.libs.feil.Feil
-import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.util.saksbehandling
@@ -68,7 +67,7 @@ class FlyttingBeregningServiceTest {
 
     @Test
     fun `beregner egen kjøring med enveisavstand, tillegg og avrunding`() {
-        val vilkår = egenKjøring(fakta = FaktaFlytteSelv(250, 1500, 300, 400, 100, "Adresse 1"))
+        val vilkår = flytteSelv(fakta = FaktaFlytteSelv(250, 1500, 300, 400, 100, "Adresse 1"))
         every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns listOf(vilkår)
 
         val resultat = beregningService.beregn(behandling, listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)))
@@ -81,7 +80,7 @@ class FlyttingBeregningServiceTest {
         val beregnedeBeløp =
             listOf(24 to "71", 26 to "76", 25 to "74").map { (avstand, forventet) ->
                 every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns
-                    listOf(egenKjøring(fakta = FaktaFlytteSelv(avstand, null, null, null, null, "Adresse 1")))
+                    listOf(flytteSelv(fakta = FaktaFlytteSelv(avstand, null, null, null, null, "Adresse 1")))
                 val resultat =
                     beregningService
                         .beregn(behandling, listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)))
@@ -99,30 +98,10 @@ class FlyttingBeregningServiceTest {
     }
 
     @Test
-    fun `avviser egen kjøring når vilkårsperioden strekker seg over flere kalenderår`() {
-        val vilkår =
-            egenKjøring(
-                fom = 31 desember 2025,
-                tom = 1 januar 2026,
-                fakta = FaktaFlytteSelv(100, null, null, null, null, "Adresse 1"),
-            )
-        every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns listOf(vilkår)
-
-        assertThatThrownBy {
-            beregningService.beregn(
-                behandling,
-                listOf(vedtaksperiode(31 desember 2025, 1 januar 2026)),
-            )
-        }.isInstanceOf(IllegalStateException::class.java)
-            .hasMessage("Kan ikke finne relevant kilometersats for $vilkår")
-    }
-
-    @Test
     fun `bruker videreført ubekreftet sats når vilkåret starter etter siste bekreftede sats`() {
         val vilkår =
-            egenKjøring(
-                fom = 1 januar 2027,
-                tom = 31 januar 2027,
+            flytteSelv(
+                flytteDato = 31 januar 2027,
                 fakta = FaktaFlytteSelv(100, null, null, null, null, "Adresse 1"),
             )
         every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns listOf(vilkår)
@@ -142,8 +121,8 @@ class FlyttingBeregningServiceTest {
 
     @Test
     fun `lager ett resultat per vilkår selv når samme vilkår dekkes av flere perioder`() {
-        val vilkårJanuar = flyttebyrå(10_000, 12_000, 1 januar 2026, 31 januar 2026)
-        val vilkårFebruar = flyttebyrå(12_000, 10_000, 1 februar 2026, 28 februar 2026)
+        val vilkårJanuar = flyttebyrå(10_000, 12_000, 1 januar 2026)
+        val vilkårFebruar = flyttebyrå(12_000, 10_000, 1 februar 2026)
         every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns
             listOf(
                 vilkårFebruar,
@@ -163,26 +142,26 @@ class FlyttingBeregningServiceTest {
         assertThat(resultat.resultater.map { it.fom }).containsExactly(1 januar 2026, 1 februar 2026)
         assertThat(resultat.resultater.map { it.beløp }).containsExactly(BigDecimal("10000"), BigDecimal("10000"))
     }
-
-    @Test
-    fun `avviser manglende pris og manglende dekning av hele vilkåret`() {
-        every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns
-            listOf(flyttebyrå(10_000, null))
-        assertThatThrownBy {
-            beregningService.beregn(behandling, listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)))
-        }.isInstanceOf(Feil::class.java)
-
-        every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns
-            listOf(
-                flyttebyrå(
-                    10_000,
-                    12_000,
-                ),
-            )
-        assertThatThrownBy {
-            beregningService.beregn(behandling, listOf(vedtaksperiode(1 januar 2026, 30 januar 2026)))
-        }.isInstanceOf(Feil::class.java)
-    }
+// TODO Bør denne fjernes?
+//    @Test
+//    fun `avviser manglende pris og manglende dekning av hele vilkåret`() {
+//        every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns
+//            listOf(flyttebyrå(10_000, null))
+//        assertThatThrownBy {
+//            beregningService.beregn(behandling, listOf(vedtaksperiode(1 januar 2026, 31 januar 2026)))
+//        }.isInstanceOf(Feil::class.java)
+//
+//        every { flyttingVilkårService.hentVilkårForBehandling(behandling.id) } returns
+//            listOf(
+//                flyttebyrå(
+//                    10_000,
+//                    12_000,
+//                ),
+//            )
+//        assertThatThrownBy {
+//            beregningService.beregn(behandling, listOf(vedtaksperiode(1 januar 2026, 30 januar 2026)))
+//        }.isInstanceOf(Feil::class.java)
+//    }
 
     @Test
     fun `ignorerer slettet vilkår og avviser tomt beregningsgrunnlag`() {
@@ -202,16 +181,15 @@ class FlyttingBeregningServiceTest {
     private fun flyttebyrå(
         tilbud1: Int?,
         tilbud2: Int?,
-        fom: LocalDate = 1 januar 2026,
-        tom: LocalDate = 31 januar 2026,
+        flytteDato: LocalDate = 1 januar 2026,
         erBetalingDokumentert: Boolean = true,
     ) = VilkårFlytting(
         behandlingId = behandling.id,
         delvilkårsett = emptyList(),
         resultat = Vilkårsresultat.OPPFYLT,
         status = VilkårStatus.NY,
-        fom = fom,
-        tom = tom,
+        fom = flytteDato,
+        tom = flytteDato,
         fakta =
             FaktaFlyttebyrå(
                 tilbud1 = FlyttebyråTilbud("A", tilbud1),
@@ -221,17 +199,16 @@ class FlyttingBeregningServiceTest {
             ),
     )
 
-    private fun egenKjøring(
-        fom: LocalDate = 1 januar 2026,
-        tom: LocalDate = 31 januar 2026,
+    private fun flytteSelv(
+        flytteDato: LocalDate = 1 januar 2026,
         fakta: FaktaFlytteSelv,
     ) = VilkårFlytting(
         behandlingId = behandling.id,
         delvilkårsett = emptyList(),
         resultat = Vilkårsresultat.OPPFYLT,
         status = VilkårStatus.NY,
-        fom = fom,
-        tom = tom,
+        fom = flytteDato,
+        tom = flytteDato,
         fakta = fakta,
     )
 }

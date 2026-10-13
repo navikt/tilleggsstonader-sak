@@ -8,15 +8,13 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import java.time.LocalDate
 
 data class LagreVilkårFlyttingDto(
-    val fom: LocalDate,
-    val tom: LocalDate,
+    val flytteDato: LocalDate,
     val svar: Map<RegelId, SvarOgBegrunnelseDto>,
     val fakta: FaktaFlyttingDto,
 ) : LagreVilkår {
     fun tilDomain() =
         LagreVilkårFlytting(
-            fom = fom,
-            tom = tom,
+            flytteDato = flytteDato,
             svar = svar.mapValues { it.value.tilDomain() },
             fakta = fakta.tilDomain(),
         )

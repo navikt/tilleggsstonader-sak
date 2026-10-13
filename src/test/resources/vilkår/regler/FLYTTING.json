@@ -1,5 +1,58 @@
 {
   "regler": {
+    "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE": {
+      "erHovedregel": false,
+      "regelId": "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE",
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "HVORDAN_SKAL_BRUKER_FLYTTE"
+        },
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": "FLYTTING_UBESTEMT"
+        }
+      }
+    },
+    "FLYTTER_PGA_OPPSTART_ARBEID": {
+      "erHovedregel": false,
+      "regelId": "FLYTTER_PGA_OPPSTART_ARBEID",
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": "FLYTTING_UBESTEMT"
+        },
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": "FLYTTING_UBESTEMT"
+        }
+      }
+    },
+    "HVILKEN_FORBINDELSE_FLYTTER_BRUKER": {
+      "erHovedregel": true,
+      "regelId": "HVILKEN_FORBINDELSE_FLYTTER_BRUKER",
+      "svarMapping": {
+        "ARBEID_ETTER_GJENNOMFØRT_AKTIVITET": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "SAMMENHENG_FLYTTING_OG_ARBEID"
+        },
+        "FLYTTING_ARBEIDSSØKER": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "FLYTTER_PGA_OPPSTART_ARBEID"
+        },
+        "FLYTTING_VED_AVSLUTTET_AKTIVITET": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET"
+        },
+        "FLYTTING_VED_START_AV_AKTIVITET": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET"
+        }
+      }
+    },
     "HVORDAN_SKAL_BRUKER_FLYTTE": {
       "erHovedregel": false,
       "regelId": "HVORDAN_SKAL_BRUKER_FLYTTE",
@@ -16,13 +69,28 @@
         }
       }
     },
-    "OPPFYLLER_VILKÅR_FOR_FLYTTING": {
-      "erHovedregel": true,
-      "regelId": "OPPFYLLER_VILKÅR_FOR_FLYTTING",
+    "MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET": {
+      "erHovedregel": false,
+      "regelId": "MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET",
       "svarMapping": {
         "JA": {
-          "begrunnelseType": "VALGFRI",
-          "regelId": "HVORDAN_SKAL_BRUKER_FLYTTE"
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE"
+        },
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": "FLYTTING_UBESTEMT"
+        }
+      }
+    },
+    "SAMMENHENG_FLYTTING_OG_ARBEID": {
+      "erHovedregel": false,
+      "regelId": "SAMMENHENG_FLYTTING_OG_ARBEID",
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE"
         },
         "NEI": {
           "begrunnelseType": "PÅKREVD",

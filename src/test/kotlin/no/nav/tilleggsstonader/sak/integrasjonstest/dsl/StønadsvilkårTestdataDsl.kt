@@ -62,19 +62,21 @@ class StønadsvilkårTestdataDsl {
     }
 
     fun flyttingByrå(
-        fom: LocalDate,
-        tom: LocalDate,
+        flytteDato: LocalDate,
         tilbud1Pris: Int,
         tilbud2Pris: Int,
         erBetalingDokumentert: Boolean,
     ) {
         opprettFlyttingScope += {
             LagreVilkårFlyttingDto(
-                fom = fom,
-                tom = tom,
+                flytteDato = flytteDato,
                 svar =
                     mapOf(
-                        RegelId.OPPFYLLER_VILKÅR_FOR_FLYTTING to SvarOgBegrunnelseDto(SvarId.JA),
+                        RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
+                            SvarOgBegrunnelseDto(SvarId.FLYTTING_VED_START_AV_AKTIVITET),
+                        RegelId.MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET to
+                            SvarOgBegrunnelseDto(SvarId.JA, "Syntetisk begrunnelse"),
+                        RegelId.ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE to SvarOgBegrunnelseDto(SvarId.JA),
                         RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTEBYRÅ),
                     ),
                 fakta =
@@ -89,8 +91,7 @@ class StønadsvilkårTestdataDsl {
     }
 
     fun flyttingEgenKjøring(
-        fom: LocalDate,
-        tom: LocalDate,
+        flytteDato: LocalDate,
         avstandEnVei: Int,
         henger: Int? = null,
         bompenger: Int? = null,
@@ -99,11 +100,14 @@ class StønadsvilkårTestdataDsl {
     ) {
         opprettFlyttingScope += {
             LagreVilkårFlyttingDto(
-                fom = fom,
-                tom = tom,
+                flytteDato = flytteDato,
                 svar =
                     mapOf(
-                        RegelId.OPPFYLLER_VILKÅR_FOR_FLYTTING to SvarOgBegrunnelseDto(SvarId.JA),
+                        RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
+                            SvarOgBegrunnelseDto(SvarId.FLYTTING_VED_START_AV_AKTIVITET),
+                        RegelId.MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET to
+                            SvarOgBegrunnelseDto(SvarId.JA, "Syntetisk begrunnelse"),
+                        RegelId.ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE to SvarOgBegrunnelseDto(SvarId.JA),
                         RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTER_SELV),
                     ),
                 fakta =
