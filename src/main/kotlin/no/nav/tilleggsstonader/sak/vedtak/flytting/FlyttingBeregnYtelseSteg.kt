@@ -59,16 +59,19 @@ class FlyttingBeregnYtelseSteg(
         vedtak: InnvilgelseFlyttingRequest,
     ) {
         val vedtaksperioder = vedtak.vedtaksperioder().sorted()
-        val beregningsresultat = beregningService.beregn(saksbehandling, vedtaksperioder)
         val beregningsplan =
             beregningsplanUtleder.utledForInnvilgelse(
                 saksbehandling = saksbehandling,
                 vedtaksperioder = vedtaksperioder,
             )
+        val typeVedtak = TypeVedtak.INNVILGELSE
+
+        val beregningsresultat = beregningService.beregn(saksbehandling, vedtaksperioder, beregningsplan, typeVedtak)
+
         vedtakRepository.insert(
             GeneriskVedtak(
                 behandlingId = saksbehandling.id,
-                type = TypeVedtak.INNVILGELSE,
+                type = typeVedtak,
                 data =
                     InnvilgelseFlytting(
                         vedtaksperioder = vedtaksperioder,
@@ -82,7 +85,7 @@ class FlyttingBeregnYtelseSteg(
         )
         tilkjentYtelseService.lagreTilkjentYtelse(
             behandlingId = saksbehandling.id,
-            andeler = beregningsresultat.mapTilAndeler(saksbehandling.stønadstype, vedtaksperioder),
+            andeler = beregningsresultat.mapTilAndeler(saksbehandling.stønadstype),
         )
     }
 

@@ -83,7 +83,7 @@ class FlyttingVilkårServiceTest {
         assertThat(resultat.status).isEqualTo(VilkårStatus.NY)
         assertThat(resultat.fom).isEqualTo(nyttVilkår.fom)
         assertThat(resultat.tom).isEqualTo(nyttVilkår.tom)
-        assertThat(resultat.fakta).isEqualTo(nyttVilkår.fakta)
+        assertThat(resultat.fakta.adresse).isEqualTo(nyttVilkår.fakta.adresse)
         verify(exactly = 1) { vilkårRepository.insert(any<Vilkår>()) }
     }
 

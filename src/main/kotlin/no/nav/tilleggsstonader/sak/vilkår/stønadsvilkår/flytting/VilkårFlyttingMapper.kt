@@ -25,6 +25,7 @@ object VilkårFlyttingMapper {
             delvilkårsett = delvilkårsett,
             fakta = flyttefakta,
             slettetKommentar = slettetKommentar,
+            opphavsvilkår = opphavsvilkår,
         )
     }
 
@@ -39,7 +40,7 @@ object VilkårFlyttingMapper {
             tom = tom,
             erFremtidigUtgift = false,
             delvilkårwrapper = DelvilkårWrapper(delvilkårsett),
-            opphavsvilkår = null,
+            opphavsvilkår = opphavsvilkår,
             gitVersjon = Applikasjonsversjon.versjon,
             fakta = fakta,
             slettetKommentar = slettetKommentar,

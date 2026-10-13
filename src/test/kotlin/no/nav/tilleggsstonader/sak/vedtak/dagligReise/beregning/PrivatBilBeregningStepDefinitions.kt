@@ -73,7 +73,6 @@ class PrivatBilBeregningStepDefinitions {
             satsPrivatBilProvider = satsPrivatBilProvider,
             vilkårperiodeService = vilkårperiodeService,
             behandlingService = behandlingServiceMock,
-            unleashService = unleashServiceMock,
             privatBilBeregningRevurderingService = PrivatBilBeregningRevurderingService(unleashServiceMock),
         )
 

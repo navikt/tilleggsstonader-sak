@@ -12,11 +12,11 @@ fun VilkårReiseTilSamlingDto.tilLagreVilkårReiseTilSamlingDto() =
         tom = tom,
         adresse = adresse ?: error("Det er påkrevd å sende inn adresse når reisevilkår opprettes"),
         reiseId = reiseId,
-        svar = delvilkårsett.tilSvar(),
+        svar = delvilkårsett.tilSvarPåVilkår(),
         fakta = fakta,
     )
 
-private fun List<DelvilkårDto>.tilSvar(): Map<RegelId, SvarOgBegrunnelseDto> =
+internal fun List<DelvilkårDto>.tilSvarPåVilkår(): Map<RegelId, SvarOgBegrunnelseDto> =
     this
         .flatMap { it.vurderinger }
         .associate { vurderingDto ->

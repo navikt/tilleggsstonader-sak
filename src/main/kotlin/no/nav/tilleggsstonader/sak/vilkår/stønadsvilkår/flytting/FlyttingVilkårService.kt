@@ -47,6 +47,9 @@ class FlyttingVilkårService(
             .map { it.mapTilVilkårFlytting() }
             .sortedBy { it.fom }
 
+    fun hentOppfylteVilkårforBehandling(behandlingId: BehandlingId): List<VilkårFlytting> =
+        hentVilkårForBehandling(behandlingId).filter { it.resultat == Vilkårsresultat.OPPFYLT }
+
     @Transactional
     fun opprettVilkår(
         behandlingId: BehandlingId,
@@ -102,6 +105,7 @@ class FlyttingVilkårService(
                 svar = innsendt.svar.mapValues { it.value },
             )
         val fakta = innsendt.fakta
+
         val samletResultat =
             if (FlyttingVilkårValidering.erFullstendig(innsendt)) {
                 RegelEvaluering.utledVilkårResultat(delvilkår)

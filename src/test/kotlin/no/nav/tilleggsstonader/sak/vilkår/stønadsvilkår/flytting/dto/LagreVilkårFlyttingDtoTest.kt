@@ -13,7 +13,8 @@ import tools.jackson.module.kotlin.readValue
 class LagreVilkårFlyttingDtoTest {
     @Test
     fun `skal mappe ufullstendige delvilkår til domene uten å legge til svar`() {
-        val domain = dto(svar = emptyMap(), fakta = FaktaFlyttingUbestemtDto("Adresse 1")).tilDomain()
+        val fakta = FaktaFlyttingUbestemtDto("Adresse 1")
+        val domain = dto(svar = emptyMap(), fakta = fakta).tilDomain()
 
         assertThat(domain.fom).isEqualTo(1 januar 2026)
         assertThat(domain.tom).isEqualTo(31 januar 2026)
