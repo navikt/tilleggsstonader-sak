@@ -180,4 +180,83 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
         val nyAndel = andelerRevurdering.find { it.beløp == 5000 }
         assertThat(nyAndel).isNotNull()
     }
+
+    @Test
+    fun `skal kunne endre dato på flytting frem i tid i en revurdering`() {
+        val fom = 1 januar 2026
+        val tom = 1 januar 2026
+
+        val behandling =
+            testoppsettService
+                .opprettBehandlingMedFagsak(
+                    behandling = behandling(),
+                    stønadstype = Stønadstype.FLYTTING_TSO,
+                    identer = setOf(PersonIdent(ident = ident)),
+                )
+
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
+
+        gjennomførBehandlingsløp(
+            ident = ident,
+            behandlingId = behandling.id,
+        ) {
+            aktivitet {
+                opprett {
+                    aktivitetTiltakTsoFlytting(fom, tom.plusDays(7))
+                }
+            }
+
+            målgruppe {
+                opprett {
+                    målgruppeAAP(fom, tom.plusDays(7))
+                }
+            }
+            vilkår {
+                flyttingByrå(
+                    fom,
+                    tom,
+                    tilbud1Pris = 10000,
+                    tilbud2Pris = 5000,
+                    erBetalingDokumentert = true,
+                )
+            }
+        }
+
+        testoppsettService.settAndelerTilOkForBehandling(behandling.id)
+
+        val andelerFørstegangsbehandling =
+            tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
+
+        assertThat(andelerFørstegangsbehandling).hasSize(1)
+
+        val revurderingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(fraBehandlingId = behandling.id) {
+                vilkår {
+                    endreFlytting {
+                        copy(fom = fom.plusDays(7), tom = tom.plusDays(7))
+                    }
+                }
+            }
+
+        testoppsettService.settAndelerTilOkForBehandling(revurderingId)
+
+        val vedtakRevurdering =
+            kall.vedtak
+                .hentVedtak(Stønadstype.FLYTTING_TSO, revurderingId)
+                .expectOkWithBody<InnvilgelseFlyttingResponse>()
+
+        assertThat(vedtakRevurdering.beregningsresultat.resultater).hasSize(1)
+
+        val resultatRevurdering = vedtakRevurdering.beregningsresultat.resultater.single()
+
+        assertThat(resultatRevurdering.beløp).isEqualTo(5000.toBigDecimal())
+        assertThat(resultatRevurdering.grunnlag).isInstanceOf(BeregningsgrunnlagFlyttebyrå::class.java)
+
+        val andelerRevurdering =
+            tilkjentYtelseRepository.findByBehandlingId(revurderingId)!!.andelerTilkjentYtelse
+
+        assertThat(andelerRevurdering).hasSize(1)
+        val nyAndel = andelerRevurdering.find { it.beløp == 5000 }
+        assertThat(nyAndel).isNotNull()
+    }
 }

@@ -4,7 +4,6 @@ import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
-import no.nav.tilleggsstonader.sak.util.isEqualOrAfter
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
@@ -24,6 +23,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FlyttingVilk
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.VilkårFlytting
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
+import java.time.LocalDate
 
 @Service
 class FlyttingBeregningService(
@@ -55,42 +55,14 @@ class FlyttingBeregningService(
                 }
 
                 Beregningsomfang.FRA_DATO -> {
-                    val (nyeVilkår, gamleVilkår) =
-                        oppfylteVilkår
-                            .partition {
-                                val beregningsplanFraDato =
-                                    beregningsplan.fraDato
-                                        ?: feil("Beregningsplan fraDato mangler når omfang er FRA_DATO, skal ikke skje")
-                                it.fom.isEqualOrAfter(beregningsplanFraDato)
-                            }
-
-                    val nyeBeregningsresultat =
-                        nyeVilkår.map {
-                            beregnVilkår(
-                                it,
-                                finnTilhørendeVedtaksperiode(it, vedtaksperioder),
-                            )
-                        }
-
-                    val forrigeVedtaksresultater =
-                        hentForrigeIverksatteVedtak(behandling)?.beregningsresultat?.resultater
-
-                    val gamleBeregningsresultat =
-                        gamleVilkår.mapNotNull { gammeltVilkår ->
-                            val vilkåretsResultat =
-                                forrigeVedtaksresultater?.find { gammeltVilkår.fom == it.fom && gammeltVilkår.tom == it.tom }
-
-                            vilkåretsResultat?.copy(fraTidligereVedtak = true)
-                        }
-
-                    return BeregningsresultatFlytting(nyeBeregningsresultat + gamleBeregningsresultat)
+                    val nyeBeregningsresultat = oppfylteVilkår.map { beregnVilkår(it, finnTilhørendeVedtaksperiode(it, vedtaksperioder)) }
+                    val forrigeBeregningsresultat = hentForrigeIverksatteVedtak(behandling).beregningsresultat.resultater
+                    val beregnFraDato = beregningsplan.beregnFra() ?: feil("Forventer beregn-fra dato")
+                    slåSammenNyeOgGamleBeregningsresultatFraDato(forrigeBeregningsresultat, nyeBeregningsresultat, beregnFraDato)
                 }
 
                 Beregningsomfang.GJENBRUK_FORRIGE_RESULTAT -> {
-                    val forrigeVedtak =
-                        hentForrigeIverksatteVedtak(behandling)
-                            ?: feil("Forrige vedtak mangler ved gjenbruk av forrige resultat")
-
+                    val forrigeVedtak = hentForrigeIverksatteVedtak(behandling)
                     val resultat = forrigeVedtak.beregningsresultat
 
                     return resultat.copy(resultater = resultat.resultater.map { it.copy(fraTidligereVedtak = true) })
@@ -106,6 +78,14 @@ class FlyttingBeregningService(
         )
     }
 
+    private fun slåSammenNyeOgGamleBeregningsresultatFraDato(
+        forrigeBeregningsresultat: List<BeregningsresultatFlyttevilkår>,
+        nyeBeregningsresultat: List<BeregningsresultatFlyttevilkår>,
+        beregnFraDato: LocalDate,
+    ): List<BeregningsresultatFlyttevilkår> =
+        forrigeBeregningsresultat.filter { it.fom < beregnFraDato }.map { it.copy(fraTidligereVedtak = true) } +
+            nyeBeregningsresultat.filter { it.fom >= beregnFraDato }
+
     private fun finnTilhørendeVedtaksperiode(
         vilkår: VilkårFlytting,
         vedtaksperioder: List<Vedtaksperiode>,
@@ -114,8 +94,9 @@ class FlyttingBeregningService(
             it.overlapper(vilkår)
         }
 
-    private fun hentForrigeIverksatteVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørFlytting? =
+    private fun hentForrigeIverksatteVedtak(behandling: Saksbehandling): InnvilgelseEllerOpphørFlytting =
         behandling.forrigeIverksatteBehandlingId?.let { hentVedtak(it) }?.data
+            ?: feil("Finner ikke forrige iverksatte vedtak for behandling ${behandling.id}")
 
     private fun hentVedtak(behandlingId: BehandlingId) = vedtakService.hentVedtak<InnvilgelseEllerOpphørFlytting>(behandlingId)
 
@@ -185,7 +166,7 @@ class FlyttingBeregningService(
             avstandEnVei.toBigDecimal() * sats.first +
                 henger + bompenger + ferge + parkering
 
-        return grunnlag to beløp
+        return grunnlag to beløp.avrundetStønadsbeløp()
     }
 
     private fun Int?.tilBeløp(): BigDecimal {
