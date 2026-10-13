@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.tidligsteendring
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -13,9 +14,13 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttebyråTilbud
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernatting
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
@@ -92,6 +97,75 @@ class UtledTidligsteEndringServiceTest {
             listOf(
                 vedtaksperiode(originalFom, originalTom),
             )
+    }
+
+    @Test
+    fun `flyttefakta oppdager pris dokumentasjon adresse og bytte av flyttemåte`() {
+        val fom = 1 januar 2026
+        val tom = 31 januar 2026
+        val fakta =
+            FaktaFlyttebyrå(
+                tilbud1 = FlyttebyråTilbud("A", 5000),
+                tilbud2 = FlyttebyråTilbud("B", 6000),
+                erBetalingDokumentert = true,
+                adresse = "Syntetisk adresse",
+            )
+        val original =
+            vilkår(
+                fom = fom,
+                tom = tom,
+                type = VilkårType.FLYTTING,
+                resultat = Vilkårsresultat.OPPFYLT,
+                fakta = fakta,
+            )
+        val utleder =
+            TidligsteEndringIBehandlingUtleder(
+                vilkår = listOf(original),
+                vilkårTidligereBehandling = listOf(original),
+                vilkårsperioder = Vilkårperioder(emptyList(), emptyList()),
+                vilkårsperioderTidligereBehandling = Vilkårperioder(emptyList(), emptyList()),
+                vedtaksperioder = listOf(vedtaksperiode(fom, tom)),
+                vedtaksperioderTidligereBehandling = listOf(vedtaksperiode(fom, tom)),
+                barnIdTilIdentMap = emptyMap(),
+            )
+        assertThat(utleder.utledTidligsteEndring()).isNull()
+        listOf(
+            fakta.copy(tilbud1 = fakta.tilbud1.copy(pris = 3000)),
+            fakta.copy(erBetalingDokumentert = false),
+            fakta.copy(adresse = "Ny syntetisk adresse"),
+            FaktaFlytteSelv(100, null, null, null, null, fakta.adresse),
+        ).forEach { endret ->
+            assertThat(utleder.copy(vilkår = listOf(original.copy(fakta = endret))).utledTidligsteEndring()?.tidligsteEndring)
+                .isEqualTo(fom)
+        }
+    }
+
+    @Test
+    fun `egen flytting oppdager avstand og alle tilleggskostnader`() {
+        val fom = 1 januar 2026
+        val tom = 31 januar 2026
+        val fakta = FaktaFlytteSelv(100, 100, 100, 100, 100, "Syntetisk adresse")
+        val original = vilkår(fom = fom, tom = tom, type = VilkårType.FLYTTING, fakta = fakta)
+        val utleder =
+            TidligsteEndringIBehandlingUtleder(
+                vilkår = listOf(original),
+                vilkårTidligereBehandling = listOf(original),
+                vilkårsperioder = Vilkårperioder(emptyList(), emptyList()),
+                vilkårsperioderTidligereBehandling = Vilkårperioder(emptyList(), emptyList()),
+                vedtaksperioder = listOf(vedtaksperiode(fom, tom)),
+                vedtaksperioderTidligereBehandling = listOf(vedtaksperiode(fom, tom)),
+                barnIdTilIdentMap = emptyMap(),
+            )
+        listOf(
+            fakta.copy(avstandEnVei = 200),
+            fakta.copy(henger = 200),
+            fakta.copy(bompenger = 200),
+            fakta.copy(ferge = 200),
+            fakta.copy(parkering = 200),
+        ).forEach { endret ->
+            assertThat(utleder.copy(vilkår = listOf(original.copy(fakta = endret))).utledTidligsteEndring()?.tidligsteEndring)
+                .isEqualTo(fom)
+        }
     }
 
     @Test

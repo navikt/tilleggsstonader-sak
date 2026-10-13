@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligRei
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
@@ -273,6 +274,9 @@ data class TidligsteEndringIBehandlingUtleder(
         vilkårTidligereBehandling: Vilkår,
     ): Boolean =
         when {
+            vilkårNå.fakta is FlyttingVilkårFakta || vilkårTidligereBehandling.fakta is FlyttingVilkårFakta ->
+                vilkårNå.fakta != vilkårTidligereBehandling.fakta
+
             vilkårNå.fakta is FaktaDagligReiseOffentligTransport &&
                 vilkårTidligereBehandling.fakta is FaktaDagligReisePrivatBil -> {
                 true

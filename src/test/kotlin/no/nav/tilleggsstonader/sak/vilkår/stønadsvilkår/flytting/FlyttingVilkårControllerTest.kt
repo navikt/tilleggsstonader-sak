@@ -297,7 +297,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
         behandlingId: BehandlingId = behandling.id,
     ) {
         assertThat(resultat.flytteDato).isEqualTo(request.flytteDato)
-        assertThat(resultat.fakta).isEqualTo(request.fakta)
+        assertThat(resultat.fakta).usingRecursiveComparison().isEqualTo(request.fakta)
         assertThat(resultat.delvilkårsett).hasSize(1)
         val vurderinger = resultat.delvilkårsett.single().vurderinger
         val forventedeRegelIder = request.svar.keys.ifEmpty { setOf(RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER) }
@@ -312,7 +312,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
         assertThat(lagret.behandlingId).isEqualTo(behandlingId)
         assertThat(lagret.type).isEqualTo(VilkårType.FLYTTING)
         assertThat(lagret.fom).isEqualTo(request.flytteDato)
-        assertThat(lagret.fakta).isEqualTo(request.fakta.tilDomain())
+        assertThat(lagret.fakta).isEqualTo(resultat.fakta.tilDomain())
         assertThat(lagret.status).isEqualTo(resultat.status)
         assertThat(lagret.resultat).isEqualTo(resultat.resultat)
     }

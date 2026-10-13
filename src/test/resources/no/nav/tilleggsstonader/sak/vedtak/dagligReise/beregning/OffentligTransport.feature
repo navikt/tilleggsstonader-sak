@@ -216,6 +216,22 @@ Egenskap: Beregning av offentlig transport for daglig reise
       | Fom        | Tom        | Beløp | Enkeltbillett-antall | Syvdagersbillett-antall |
       | 01.01.2025 | 30.01.2025 | 1760  | 2                    | 4                       |
 
+  Scenario: Skal velge månedskort når månedskort har samme pris som billigste alternativ
+    Gitt følgende vedtaksperioder for daglig reise offentlig transport
+      | Fom        | Tom        | FaktiskMålgruppe    | Aktivitet |
+      | 06.01.2025 | 19.01.2025 | NEDSATT_ARBEIDSEVNE | TILTAK    |
+
+    Gitt følgende beregningsinput for offentlig transport
+      | Fom        | Tom        | Pris enkeltbillett | Pris syv-dagersbillett | Pris tretti-dagersbillett | Antall reisedager per uke |
+      | 06.01.2025 | 19.01.2025 | 80                 | 500                   | 960                  | 3                        |
+
+    Når beregner for daglig reise offentlig transport
+
+    Så forventer vi følgende beregningsrsultat for daglig reise offentlig transport, reiseNr=1
+      | Fom        | Tom        | Beløp | Trettidagersbillett-antall|
+      | 06.01.2025 | 19.01.2025 | 960  | 1|
+
+
 
 
 

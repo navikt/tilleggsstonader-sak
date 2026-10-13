@@ -9,3 +9,9 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+  automerge:
+    needs: sync
+    uses: navikt/tilleggsstonader/.github/workflows/automerge-copilot-sync.yml@main
+    permissions:
+      contents: write
+      pull-requests: write

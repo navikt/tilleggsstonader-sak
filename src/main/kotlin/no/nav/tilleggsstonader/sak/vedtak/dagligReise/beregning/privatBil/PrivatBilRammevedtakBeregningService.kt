@@ -8,7 +8,6 @@ import no.nav.tilleggsstonader.kontrakter.felles.overlapper
 import no.nav.tilleggsstonader.kontrakter.periode.beregnSnitt
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.libs.feil.feilHvis
-import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
@@ -38,7 +37,6 @@ class PrivatBilRammevedtakBeregningService(
     private val satsPrivatBilProvider: SatsPrivatBilProvider,
     private val vilkårperiodeService: VilkårperiodeService,
     private val behandlingService: BehandlingService,
-    private val unleashService: UnleashService,
     private val privatBilBeregningRevurderingService: PrivatBilBeregningRevurderingService,
 ) {
     fun beregnRammevedtak(
