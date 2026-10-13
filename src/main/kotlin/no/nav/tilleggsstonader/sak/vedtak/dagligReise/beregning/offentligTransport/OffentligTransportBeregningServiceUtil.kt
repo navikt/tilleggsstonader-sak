@@ -29,10 +29,9 @@ fun finnReisedagerIPeriode(
 fun finnBilligsteAlternativForTrettidagersPeriode(grunnlag: BeregningsgrunnlagOffentligTransport): BilligsteBillettRespons {
     val billigstePris =
         listOfNotNull(
-            finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag),
             grunnlag.månedsBillettMedPris(),
+            finnBilligsteKombinasjonAvEnkeltBillettOgSyvdagersBillett(grunnlag),
         ).min()
-
     return billigstePris.tilRespons()
 }
 
