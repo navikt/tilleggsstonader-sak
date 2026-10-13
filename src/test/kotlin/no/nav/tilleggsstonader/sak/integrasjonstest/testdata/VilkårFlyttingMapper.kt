@@ -5,8 +5,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.VilkårF
 
 fun VilkårFlyttingDto.tilLagreVilkårFlyttingDto() =
     LagreVilkårFlyttingDto(
-        fom = fom,
-        tom = tom,
+        flytteDato = flytteDato,
         svar = delvilkårsett.tilSvarPåVilkår(),
         fakta = fakta,
     )
