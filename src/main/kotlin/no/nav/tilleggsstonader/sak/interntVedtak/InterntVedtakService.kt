@@ -427,6 +427,7 @@ class InterntVedtakService(
                 VilkårFaktaReiseTilSamlingOffentligTransportInterntVedtak(
                     reiseId = fakta.reiseId,
                     adresse = fakta.adresse,
+                    nødvendigUtgift = fakta.nødvendigUtgift,
                     utgifterOffentligTransport = fakta.utgifterOffentligTransport,
                     begrunnelse = fakta.begrunnelse,
                     aktivitetId = fakta.aktivitetId,
@@ -436,6 +437,7 @@ class InterntVedtakService(
                 VilkårFaktaReiseTilSamlingPrivatBilInterntVedtak(
                     reiseId = fakta.reiseId,
                     adresse = fakta.adresse,
+                    nødvendigUtgift = fakta.nødvendigUtgift,
                     begrunnelse = fakta.begrunnelse,
                     bompenger = fakta.bompenger,
                     fergekostnad = fakta.fergekostnad,

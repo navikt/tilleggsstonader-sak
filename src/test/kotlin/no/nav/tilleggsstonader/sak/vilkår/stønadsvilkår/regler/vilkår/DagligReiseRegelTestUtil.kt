@@ -10,45 +10,64 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 object DagligReiseRegelTestUtil {
     fun oppfylteDelvilkårDagligReiseOffentligTransport() =
         listOf(
-            delvilkår(
-                Vurdering(
-                    regelId = RegelId.AVSTAND_OVER_SEKS_KM,
-                    svar = SvarId.JA,
-                    begrunnelse = "antall km",
-                ),
-                Vurdering(
-                    regelId = RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT,
-                    svar = SvarId.JA,
-                    begrunnelse = "En begrunnelse på delvilkåret",
-                ),
+            Delvilkår(
+                resultat = Vilkårsresultat.OPPFYLT,
+                vurderinger =
+                    listOf(
+                        Vurdering(
+                            regelId = RegelId.AVSTAND_OVER_SEKS_KM,
+                            svar = SvarId.JA,
+                            begrunnelse = "antall km",
+                        ),
+                        Vurdering(
+                            regelId = RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT,
+                            svar = SvarId.JA,
+                            begrunnelse = "En begrunnelse på delvilkåret",
+                        ),
+                    ),
             ),
         )
 
     fun oppfylteDelvilkårDagligReisePrivatBil() =
         listOf(
-            delvilkår(
-                Vurdering(
-                    regelId = RegelId.AVSTAND_OVER_SEKS_KM,
-                    svar = SvarId.JA,
-                    begrunnelse = "antall km",
-                ),
-                Vurdering(
-                    regelId = RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT,
-                    svar = SvarId.NEI,
-                    begrunnelse = "En begrunnelse på delvilkåret",
-                ),
-                Vurdering(
-                    regelId = RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT,
-                    svar = SvarId.JA,
-                    begrunnelse = "En begrunnelse på delvilkåret",
-                ),
+            Delvilkår(
+                resultat = Vilkårsresultat.OPPFYLT,
+                vurderinger =
+                    listOf(
+                        Vurdering(
+                            regelId = RegelId.AVSTAND_OVER_SEKS_KM,
+                            svar = SvarId.JA,
+                            begrunnelse = "antall km",
+                        ),
+                        Vurdering(
+                            regelId = RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT,
+                            svar = SvarId.NEI,
+                            begrunnelse = "En begrunnelse på delvilkåret",
+                        ),
+                        Vurdering(
+                            regelId = RegelId.KAN_KJØRE_MED_EGEN_BIL,
+                            svar = SvarId.JA,
+                            begrunnelse = "En begrunnelse på delvilkåret",
+                        ),
+                    ),
             ),
         )
 
-    private fun delvilkår(vararg vurderinger: Vurdering) =
-        Delvilkår(
-            resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-            vurderinger = vurderinger.toList(),
+    fun ikkeOppfylteDelvilkårDagligReise() =
+        listOf(
+            Delvilkår(
+                resultat = Vilkårsresultat.IKKE_OPPFYLT,
+                vurderinger =
+                    listOf(
+                        Vurdering(
+                            regelId = RegelId.AVSTAND_OVER_SEKS_KM,
+                            svar = SvarId.NEI,
+                            begrunnelse =
+                                "bare 3km. Med en gangske lang begrunnelse sånn at man kan se hvordan det ser ut " +
+                                    "når saksbehandler skriver veldig masse.",
+                        ),
+                    ),
+            ),
         )
 
     val oppfylteSvarOffentligtransport: Map<RegelId, SvarOgBegrunnelse> =

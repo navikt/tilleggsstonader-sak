@@ -108,7 +108,7 @@
   } ],
   "vilkår": [ {
     "delvilkår": [ {
-      "resultat": "IKKE_TATT_STILLING_TIL",
+      "resultat": "OPPFYLT",
       "vurderinger": [ {
         "begrunnelse": null,
         "regel": "Har bruker utgifter til reisen?",
@@ -135,6 +135,10 @@
       "adresse": "Tiltaksgata 1",
       "aktivitetId": "02c86eca-36e5-451b-a22d-8501a0f7b8ee",
       "begrunnelse": "Begrunnelse",
+      "nødvendigUtgift": {
+        "begrunnelse": null,
+        "erUtgiftenNødvendig": "JA"
+      },
       "reiseId": "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
       "type": "REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT",
       "utgifterOffentligTransport": 2000
@@ -148,7 +152,36 @@
     "utgift": null
   }, {
     "delvilkår": [ {
-      "resultat": "IKKE_TATT_STILLING_TIL",
+      "resultat": "IKKE_OPPFYLT",
+      "vurderinger": [ {
+        "begrunnelse": null,
+        "regel": "Har bruker utgifter til reisen?",
+        "svar": "Ja"
+      }, {
+        "begrunnelse": "antall km",
+        "regel": "Er reiseavstanden over 30km?",
+        "svar": "Ja"
+      }, {
+        "begrunnelse": "Ingen dokumentasjon sendt inn, og frist for svar har gått ut.",
+        "regel": "Er samlingen obligatorisk?",
+        "svar": "Nei"
+      } ]
+    } ],
+    "fakta": {
+      "adresse": "Tiltaksgata 2",
+      "reiseId": "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
+      "type": "REISE_TIL_SAMLING_UBESTEMT"
+    },
+    "fom": "2024-02-05",
+    "fødselsdatoBarn": null,
+    "resultat": "IKKE_OPPFYLT",
+    "slettetKommentar": null,
+    "tom": "2024-02-10",
+    "type": "REISE_TIL_SAMLING",
+    "utgift": null
+  }, {
+    "delvilkår": [ {
+      "resultat": "OPPFYLT",
       "vurderinger": [ {
         "begrunnelse": null,
         "regel": "Har bruker utgifter til reisen?",
@@ -177,6 +210,10 @@
       "begrunnelse": "Begrunnelse",
       "bompenger": 40,
       "fergekostnad": 50,
+      "nødvendigUtgift": {
+        "begrunnelse": "Ferge nr 2 kosta mye mindre",
+        "erUtgiftenNødvendig": "NEI"
+      },
       "parkering": 40,
       "piggdekkavgift": 50,
       "reiseAvstand": 40,
