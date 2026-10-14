@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.BeregningsresultatFlyttin
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingRequest
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingTsoRequest
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingTsrRequest
+import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.OpphørFlyttingRequest
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.VedtakFlyttingRequest
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.validering.ValiderGyldigÅrsakAvslag
@@ -78,6 +79,12 @@ class FlyttingVedtakController(
         @RequestBody vedtak: AvslagFlyttingDto,
     ): StegFerdigstiltResponse = lagreVedtak(behandlingId, vedtak).tilStegFerdigstiltResponse()
 
+    @PostMapping("{behandlingId}/opphor")
+    fun opphør(
+        @PathVariable behandlingId: BehandlingId,
+        @RequestBody vedtak: OpphørFlyttingRequest,
+    ): StegFerdigstiltResponse = lagreVedtak(behandlingId, vedtak).tilStegFerdigstiltResponse()
+
     @GetMapping("{behandlingId}")
     fun hentVedtak(
         @PathVariable behandlingId: BehandlingId,
@@ -114,10 +121,12 @@ class FlyttingVedtakController(
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
         forventetStønadstype?.let { validerStønadstype(behandling, it) }
-        if (vedtak is AvslagFlyttingDto) {
+        if (vedtak is AvslagFlyttingDto || vedtak is OpphørFlyttingRequest) {
             brukerfeilHvisIkke(behandling.stønadstype.gjelderFlytting()) {
                 "Forventet stønadstype for flytteendepunkt"
             }
+        }
+        if (vedtak is AvslagFlyttingDto) {
             validerGyldigÅrsakAvslag.validerAvslagErGyldig(
                 behandlingId = behandlingId,
                 årsakerAvslag = vedtak.årsakerAvslag,

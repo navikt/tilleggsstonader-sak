@@ -28,6 +28,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseReiseOppstartAvslutn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørReiseTilSamling
@@ -45,6 +46,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilLagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.AvslagFlyttingDto
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingResponse
+import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.OpphørFlyttingResponse
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.VedtakFlyttingResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerResponse
@@ -135,14 +137,6 @@ class VedtakDtoMapper(
                     tidligsteEndring = vedtak.tidligsteEndring,
                     forrigeIverksatteBehandlingId = forrigeIverksatteBehandlingId,
                 )
-//                when (data) {
-//                    is InnvilgelseFlytting ->
-//                        InnvilgelseFlyttingResponse(
-//                            vedtaksperioder = data.vedtaksperioder.tilLagretVedtaksperiodeDto(null),
-//                            beregningsresultat = data.beregningsresultat.tilFlyttingDto(),
-//                            begrunnelse = data.begrunnelse,
-//                        )
-//                }
         }
 
     private fun mapVedtakPassAvBarn(
@@ -365,6 +359,17 @@ class VedtakDtoMapper(
                     begrunnelse = data.begrunnelse,
                 )
             }
+
+            is OpphørFlytting ->
+                OpphørFlyttingResponse(
+                    årsakerOpphør = data.årsaker,
+                    begrunnelse = data.begrunnelse,
+                    vedtaksperioder =
+                        data.vedtaksperioder.tilLagretVedtaksperiodeDto(
+                            hentForrigeVedtaksperioder(forrigeIverksatteBehandlingId),
+                        ),
+                    opphørsdato = vedtak.opphørsdato ?: feil("Opphørsdato mangler for opphørsvedtak ${vedtak.behandlingId}"),
+                )
 
             is AvslagFlytting ->
                 AvslagFlyttingDto(

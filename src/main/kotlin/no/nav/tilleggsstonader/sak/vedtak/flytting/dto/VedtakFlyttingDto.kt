@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.flytting.dto
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
@@ -42,6 +43,14 @@ data class AvslagFlyttingDto(
     VedtakFlyttingRequest,
     VedtakFlyttingResponse
 
+data class OpphørFlyttingResponse(
+    val årsakerOpphør: List<ÅrsakOpphør>,
+    val begrunnelse: String,
+    val vedtaksperioder: List<LagretVedtaksperiodeDto>?,
+    val opphørsdato: LocalDate,
+) : VedtakFlyttingDto(TypeVedtak.OPPHØR),
+    VedtakFlyttingResponse
+
 sealed class VedtakFlyttingDto(
     open val type: TypeVedtak,
 )
@@ -49,6 +58,13 @@ sealed class VedtakFlyttingDto(
 sealed interface VedtakFlyttingResponse : VedtakResponse
 
 sealed interface VedtakFlyttingRequest : VedtakRequest
+
+data class OpphørFlyttingRequest(
+    val årsakerOpphør: List<ÅrsakOpphør>,
+    val begrunnelse: String,
+    val opphørsdato: LocalDate?,
+) : VedtakFlyttingDto(TypeVedtak.OPPHØR),
+    VedtakFlyttingRequest
 
 sealed interface InnvilgelseFlyttingRequest : VedtakFlyttingRequest {
     val begrunnelse: String?

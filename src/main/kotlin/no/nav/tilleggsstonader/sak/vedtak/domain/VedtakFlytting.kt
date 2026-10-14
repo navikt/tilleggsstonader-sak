@@ -9,6 +9,7 @@ enum class TypeVedtakFlytting(
 ) : TypeVedtaksdata {
     INNVILGELSE_FLYTTING(TypeVedtak.INNVILGELSE),
     AVSLAG_FLYTTING(TypeVedtak.AVSLAG),
+    OPPHØR_FLYTTING(TypeVedtak.OPPHØR),
 }
 
 sealed interface VedtakFlytting : Vedtaksdata
@@ -27,6 +28,21 @@ data class InnvilgelseFlytting(
 ) : InnvilgelseEllerOpphørFlytting,
     Innvilgelse {
     override val type: TypeVedtaksdata = TypeVedtakFlytting.INNVILGELSE_FLYTTING
+}
+
+data class OpphørFlytting(
+    override val vedtaksperioder: List<Vedtaksperiode>,
+    override val beregningsplan: Beregningsplan,
+    override val beregningsresultat: BeregningsresultatFlytting,
+    override val årsaker: List<ÅrsakOpphør>,
+    override val begrunnelse: String,
+) : InnvilgelseEllerOpphørFlytting,
+    Opphør {
+    override val type: TypeVedtaksdata = TypeVedtakFlytting.OPPHØR_FLYTTING
+
+    init {
+        this.validerÅrsakerOgBegrunnelse()
+    }
 }
 
 data class AvslagFlytting(
