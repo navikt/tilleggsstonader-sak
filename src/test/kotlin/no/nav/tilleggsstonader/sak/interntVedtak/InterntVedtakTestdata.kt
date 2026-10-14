@@ -74,15 +74,19 @@ import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.Beregningsgrunn
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.BoutgifterRegelTestUtil.oppfylteDelvilkårUtgifterOvernatting
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.ikkeOppfylteDelvilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.oppfylteDelvilkårDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.oppfylteDelvilkårDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegelTestUtil.ikkeOppfylteDelvilkårReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegelTestUtil.oppfylteDelvilkårReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegelTestUtil.oppfylteDelvilkårReiseTilSamlingPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.NødvendigUtgift
@@ -1059,9 +1063,19 @@ object InterntVedtakTestdata {
                             adresse = "Tiltaksgata 1",
                             reisedagerPerUke = 5,
                             prisEnkelbillett = 44,
-                            prisSyvdagersbillett = null,
+                            prisSyvdagersbillett = 340,
                             prisTrettidagersbillett = 750,
                         ),
+                ),
+                vilkår(
+                    resultat = Vilkårsresultat.IKKE_OPPFYLT,
+                    behandlingId = behandlingId,
+                    type = VilkårType.DAGLIG_REISE,
+                    delvilkår = ikkeOppfylteDelvilkårDagligReise(),
+                    fom = LocalDate.of(2024, FEBRUARY, 5),
+                    tom = LocalDate.of(2024, FEBRUARY, 10),
+                    utgift = null,
+                    fakta = FaktaDagligReiseUbestemt(reiseId = dummyReiseId, adresse = null),
                 ),
             )
         val vilkårPrivatBil =
@@ -1083,10 +1097,17 @@ object InterntVedtakTestdata {
                                 listOf(
                                     FaktaDelperiodePrivatBil(
                                         fom = LocalDate.of(2025, 1, 1),
-                                        tom = LocalDate.of(2025, 2, 28),
+                                        tom = LocalDate.of(2025, 1, 26),
                                         reisedagerPerUke = 3,
                                         bompengerPerDag = BigDecimal("20"),
                                         fergekostnadPerDag = BigDecimal("30"),
+                                    ),
+                                    FaktaDelperiodePrivatBil(
+                                        fom = LocalDate.of(2025, 1, 27),
+                                        tom = LocalDate.of(2025, 2, 28),
+                                        reisedagerPerUke = 5,
+                                        bompengerPerDag = BigDecimal("40"),
+                                        fergekostnadPerDag = BigDecimal("50"),
                                     ),
                                 ),
                             aktivitetId = dummyAktivitetId,
@@ -1302,7 +1323,25 @@ object InterntVedtakTestdata {
                             utgifterOffentligTransport = 2000.toBigDecimal(),
                             begrunnelse = "Begrunnelse",
                             aktivitetId = dummyAktivitetId,
-                            nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNeiReiseTilSamling.JA, begrunnelse = null),
+                            nødvendigUtgift =
+                                NødvendigUtgift(
+                                    erUtgiftenNødvendig = SvarJaNeiReiseTilSamling.JA,
+                                    begrunnelse = null,
+                                ),
+                        ),
+                ),
+                vilkår(
+                    resultat = Vilkårsresultat.IKKE_OPPFYLT,
+                    behandlingId = behandlingId,
+                    type = VilkårType.REISE_TIL_SAMLING,
+                    delvilkår = ikkeOppfylteDelvilkårReiseTilSamling(),
+                    fom = LocalDate.of(2024, FEBRUARY, 5),
+                    tom = LocalDate.of(2024, FEBRUARY, 10),
+                    utgift = null,
+                    fakta =
+                        FaktaReiseTilSamlingUbestemt(
+                            reiseId = dummyReiseId,
+                            adresse = "Tiltaksgata 2",
                         ),
                 ),
             )
@@ -1327,7 +1366,11 @@ object InterntVedtakTestdata {
                             fergekostnad = BigDecimal(50),
                             parkering = BigDecimal(40),
                             piggdekkavgift = BigDecimal(50),
-                            nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNeiReiseTilSamling.JA, begrunnelse = null),
+                            nødvendigUtgift =
+                                NødvendigUtgift(
+                                    erUtgiftenNødvendig = SvarJaNeiReiseTilSamling.NEI,
+                                    begrunnelse = "Ferge nr 2 kosta mye mindre",
+                                ),
                         ),
                 ),
             )

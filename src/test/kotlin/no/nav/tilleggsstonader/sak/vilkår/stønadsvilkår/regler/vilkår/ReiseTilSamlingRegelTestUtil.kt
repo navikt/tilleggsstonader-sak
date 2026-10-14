@@ -35,63 +35,89 @@ object ReiseTilSamlingRegelTestUtil {
 
     fun oppfylteSvarReiseTilSamlingPrivatBil() = oppfylteSvarReiseTilSamlingPrivatBilDto().mapValues { it.value.tilDomain() }
 
-    private fun delvilkår(vararg vurderinger: Vurdering) =
-        Delvilkår(
-            resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-            vurderinger = vurderinger.toList(),
-        )
-
     fun oppfylteDelvilkårReiseTilSamlingOffentligTransport() =
         listOf(
-            delvilkår(
-                Vurdering(
-                    regelId = RegelId.HAR_UTGIFTER_TIL_REISEN,
-                    svar = SvarId.JA,
-                ),
-                Vurdering(
-                    regelId = RegelId.AVSTAND_OVER_TRETTI_KM,
-                    svar = SvarId.JA,
-                    begrunnelse = "antall km",
-                ),
-                Vurdering(
-                    regelId = RegelId.ER_SAMLING_OBLIGATORISK,
-                    svar = SvarId.JA,
-                ),
-                Vurdering(
-                    regelId = RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT,
-                    svar = SvarId.JA,
-                ),
-                Vurdering(
-                    regelId = RegelId.DOKUMENTERTE_UTGIFTER,
-                    svar = SvarId.JA,
-                ),
+            Delvilkår(
+                resultat = Vilkårsresultat.OPPFYLT,
+                vurderinger =
+                    listOf(
+                        Vurdering(
+                            regelId = RegelId.HAR_UTGIFTER_TIL_REISEN,
+                            svar = SvarId.JA,
+                        ),
+                        Vurdering(
+                            regelId = RegelId.AVSTAND_OVER_TRETTI_KM,
+                            svar = SvarId.JA,
+                            begrunnelse = "antall km",
+                        ),
+                        Vurdering(
+                            regelId = RegelId.ER_SAMLING_OBLIGATORISK,
+                            svar = SvarId.JA,
+                        ),
+                        Vurdering(
+                            regelId = RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT,
+                            svar = SvarId.JA,
+                        ),
+                        Vurdering(
+                            regelId = RegelId.DOKUMENTERTE_UTGIFTER,
+                            svar = SvarId.JA,
+                        ),
+                    ),
             ),
         )
 
     fun oppfylteDelvilkårReiseTilSamlingPrivatBil() =
         listOf(
-            delvilkår(
-                Vurdering(
-                    regelId = RegelId.HAR_UTGIFTER_TIL_REISEN,
-                    svar = SvarId.JA,
-                ),
-                Vurdering(
-                    regelId = RegelId.AVSTAND_OVER_TRETTI_KM,
-                    svar = SvarId.JA,
-                    begrunnelse = "antall km",
-                ),
-                Vurdering(
-                    regelId = RegelId.ER_SAMLING_OBLIGATORISK,
-                    svar = SvarId.JA,
-                ),
-                Vurdering(
-                    regelId = RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT,
-                    svar = SvarId.NEI,
-                ),
-                Vurdering(
-                    regelId = RegelId.KAN_REISE_MED_EGEN_BIL,
-                    svar = SvarId.JA,
-                ),
+            Delvilkår(
+                resultat = Vilkårsresultat.OPPFYLT,
+                vurderinger =
+                    listOf(
+                        Vurdering(
+                            regelId = RegelId.HAR_UTGIFTER_TIL_REISEN,
+                            svar = SvarId.JA,
+                        ),
+                        Vurdering(
+                            regelId = RegelId.AVSTAND_OVER_TRETTI_KM,
+                            svar = SvarId.JA,
+                            begrunnelse = "antall km",
+                        ),
+                        Vurdering(
+                            regelId = RegelId.ER_SAMLING_OBLIGATORISK,
+                            svar = SvarId.JA,
+                        ),
+                        Vurdering(
+                            regelId = RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT,
+                            svar = SvarId.NEI,
+                        ),
+                        Vurdering(
+                            regelId = RegelId.KAN_REISE_MED_EGEN_BIL,
+                            svar = SvarId.JA,
+                        ),
+                    ),
+            ),
+        )
+
+    fun ikkeOppfylteDelvilkårReiseTilSamling() =
+        listOf(
+            Delvilkår(
+                resultat = Vilkårsresultat.IKKE_OPPFYLT,
+                vurderinger =
+                    listOf(
+                        Vurdering(
+                            regelId = RegelId.HAR_UTGIFTER_TIL_REISEN,
+                            svar = SvarId.JA,
+                        ),
+                        Vurdering(
+                            regelId = RegelId.AVSTAND_OVER_TRETTI_KM,
+                            svar = SvarId.JA,
+                            begrunnelse = "antall km",
+                        ),
+                        Vurdering(
+                            regelId = RegelId.ER_SAMLING_OBLIGATORISK,
+                            svar = SvarId.NEI,
+                            begrunnelse = "Ingen dokumentasjon sendt inn, og frist for svar har gått ut.",
+                        ),
+                    ),
             ),
         )
 }

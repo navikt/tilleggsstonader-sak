@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.TypeVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.KildeVilkårsperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
@@ -163,6 +164,7 @@ data class VilkårFaktaReiseTilSamlingUbestemtInterntVedtak(
 data class VilkårFaktaReiseTilSamlingOffentligTransportInterntVedtak(
     override val reiseId: ReiseId,
     override val adresse: String?,
+    val nødvendigUtgift: NødvendigUtgift,
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String?,
     val aktivitetId: VilkårperiodeGlobalId? = null,
@@ -173,6 +175,7 @@ data class VilkårFaktaReiseTilSamlingOffentligTransportInterntVedtak(
 data class VilkårFaktaReiseTilSamlingPrivatBilInterntVedtak(
     override val reiseId: ReiseId,
     override val adresse: String?,
+    val nødvendigUtgift: NødvendigUtgift,
     val reiseAvstand: BigDecimal,
     val begrunnelse: String?,
     val aktivitetId: VilkårperiodeGlobalId? = null,
