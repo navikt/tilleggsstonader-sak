@@ -47,11 +47,6 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
 
         opprettOgTilordneOppgaveForBehandling(behandling.id)
         gjennomførBehandlingsløp(ident = ident, behandlingId = behandling.id) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTsoFlytting(fom, tom)
-                }
-            }
             målgruppe {
                 opprett {
                     målgruppeAAP(fom, tom)
@@ -97,11 +92,6 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
             ident = ident,
             behandlingId = behandling.id,
         ) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTsoFlytting(fom, tom)
-                }
-            }
             målgruppe {
                 opprett {
                     målgruppeAAP(fom, tom)
@@ -154,11 +144,6 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
             ident = ident,
             behandlingId = behandling.id,
         ) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTsoFlytting(fom, tom)
-                }
-            }
             målgruppe {
                 opprett {
                     målgruppeAAP(fom, tom)
@@ -211,11 +196,6 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
             ident = ident,
             behandlingId = behandling.id,
         ) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTsoFlytting(fom, tom)
-                }
-            }
             målgruppe {
                 opprett {
                     målgruppeAAP(fom, tom)

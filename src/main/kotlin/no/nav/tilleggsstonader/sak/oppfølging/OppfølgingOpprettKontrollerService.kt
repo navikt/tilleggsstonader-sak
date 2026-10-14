@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.fagsak.domain.FagsakMetadata
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.harAktivitet
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingInngangsvilkårAktivitet.Companion.fraVilkårperioder
 import no.nav.tilleggsstonader.sak.oppfølging.domain.OppfølgingInngangsvilkårMålgruppe
@@ -148,7 +149,12 @@ class OppfølgingOpprettKontrollerService(
         }
 
         val inngangsvilkår = hentInngangsvilkår(behandling)
-        val kontrollerAktivitet = finnKontrollerAktiviteter(fagsak, inngangsvilkår, vedtaksperioder)
+        val kontrollerAktivitet =
+            if (fagsak.stønadstype.harAktivitet()) {
+                finnKontrollerAktiviteter(fagsak, inngangsvilkår, vedtaksperioder)
+            } else {
+                emptyList()
+            }
         val kontrollerMålgrupper = finnKontrollerMålgrupper(fagsak, inngangsvilkår, vedtaksperioder)
         return (kontrollerAktivitet + kontrollerMålgrupper).filter { it.trengerKontroll() }
     }

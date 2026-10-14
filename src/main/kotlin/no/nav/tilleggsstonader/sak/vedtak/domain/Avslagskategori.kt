@@ -84,20 +84,15 @@ fun gyldigeAvslagsårsaker(
                 Avslagskategori.GENERELL -> generelleÅrsaker
             }
 
-        Stønadstype.FLYTTING_TSO ->
+        // Flytting har ikke aktivitet
+        Stønadstype.FLYTTING_TSO,
+        Stønadstype.FLYTTING_TSR,
+        ->
             when (gjelder) {
-                Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET, LØNN_I_TILTAK)
+                Avslagskategori.AKTIVITET -> emptySet()
                 Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
                 Avslagskategori.STØNADSVILKÅR -> setOf(MANGELFULL_DOKUMENTASJON)
-                Avslagskategori.GENERELL -> generelleÅrsaker
-            }
-
-        Stønadstype.FLYTTING_TSR ->
-            when (gjelder) {
-                Avslagskategori.AKTIVITET -> setOf(INGEN_AKTIVITET)
-                Avslagskategori.MÅLGRUPPE -> setOf(IKKE_I_MÅLGRUPPE)
-                Avslagskategori.STØNADSVILKÅR -> setOf(MANGELFULL_DOKUMENTASJON)
-                Avslagskategori.GENERELL -> generelleÅrsaker
+                Avslagskategori.GENERELL -> setOf(ANNET)
             }
 
         Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,

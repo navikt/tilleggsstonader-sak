@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 
 sealed interface FaktaOgVurderingFlyttingTso : FaktaOgVurdering {
@@ -11,12 +10,6 @@ sealed interface MålgruppeFlyttingTso :
     MålgruppeFaktaOgVurdering,
     FaktaOgVurderingFlyttingTso {
     override val type: MålgruppeFlyttingTsoType
-}
-
-sealed interface AktivitetFlyttingTso :
-    AktivitetFaktaOgVurdering,
-    FaktaOgVurderingFlyttingTso {
-    override val type: AktivitetFlyttingTsoType
 }
 
 data class AAPFlyttingTso(
@@ -66,50 +59,7 @@ data object IngenMålgruppeFlyttingTso : MålgruppeFlyttingTso {
     override val fakta: IngenFakta = IngenFakta
 }
 
-data class TiltakFlyttingTso(
-    override val vurderinger: VurderingTiltakFlyttingTso,
-) : AktivitetFlyttingTso {
-    override val type: AktivitetFlyttingTsoType = AktivitetFlyttingTsoType.TILTAK_FLYTTING_TSO
-    override val fakta: IngenFakta = IngenFakta
-}
-
-data class UtdanningFlyttingTso(
-    override val vurderinger: VurderingUtdanningFlyttingTso,
-) : AktivitetFlyttingTso {
-    override val type: AktivitetFlyttingTsoType = AktivitetFlyttingTsoType.UTDANNING_FLYTTING_TSO
-    override val fakta: IngenFakta = IngenFakta
-}
-
-data object IngenAktivitetFlyttingTso : AktivitetFlyttingTso {
-    override val type: AktivitetFlyttingTsoType = AktivitetFlyttingTsoType.INGEN_AKTIVITET_FLYTTING_TSO
-    override val fakta: IngenFakta = IngenFakta
-    override val vurderinger: Vurderinger = IngenVurderinger
-}
-
-data class VurderingTiltakFlyttingTso(
-    override val lønnet: VurderingLønnet,
-    override val harUtgifter: VurderingHarUtgifter,
-    override val erAktivitetenObligatorisk: VurderingErAktivitetenObligatorisk,
-) : HarUtgifterVurdering,
-    LønnetVurdering,
-    ErAktivitetenObligatoriskVurdering
-
-data class VurderingUtdanningFlyttingTso(
-    override val harUtgifter: VurderingHarUtgifter,
-    override val erAktivitetenObligatorisk: VurderingErAktivitetenObligatorisk,
-) : HarUtgifterVurdering,
-    ErAktivitetenObligatoriskVurdering
-
 sealed interface TypeFaktaOgVurderingFlyttingTso : TypeFaktaOgVurdering
-
-enum class AktivitetFlyttingTsoType(
-    override val vilkårperiodeType: AktivitetType,
-) : TypeAktivitetOgVurdering,
-    TypeFaktaOgVurderingFlyttingTso {
-    UTDANNING_FLYTTING_TSO(AktivitetType.UTDANNING),
-    TILTAK_FLYTTING_TSO(AktivitetType.TILTAK),
-    INGEN_AKTIVITET_FLYTTING_TSO(AktivitetType.INGEN_AKTIVITET),
-}
 
 enum class MålgruppeFlyttingTsoType(
     override val vilkårperiodeType: MålgruppeType,

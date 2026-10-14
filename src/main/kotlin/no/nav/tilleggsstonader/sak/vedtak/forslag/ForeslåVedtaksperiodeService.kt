@@ -1,8 +1,9 @@
 package no.nav.tilleggsstonader.sak.vedtak.forslag
 
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.GrunnlagForVedtaksperiode
+import no.nav.tilleggsstonader.sak.felles.domain.grunnlagForVedtaksperiode
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -31,35 +32,29 @@ class ForeslåVedtaksperiodeService(
             } ?: emptyList()
         val tidligsteEndring =
             utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(saksbehandling.id)
-        return if (saksbehandling.stønadstype.skalHenteStønadsvilkår()) {
-            val vilkår = vilkårService.hentVilkår(saksbehandling.id)
-            ForeslåVedtaksperiode.finnVedtaksperiode(
-                vilkårperioder = vilkårperioder,
-                vilkår = vilkår,
-                forrigeVedtaksperioder = forrigeVedtaksperioder,
-                tidligsteEndring = tidligsteEndring,
-            )
-        } else {
-            ForeslåVedtaksperiode.finnVedtaksperiodeUtenVilkår(
-                vilkårperioder = vilkårperioder,
-                forrigeVedtaksperioder = forrigeVedtaksperioder,
-                tidligsteEndring = tidligsteEndring,
-            )
+        return when (saksbehandling.stønadstype.grunnlagForVedtaksperiode()) {
+            GrunnlagForVedtaksperiode.MÅLGRUPPE_AKTIVITET_OG_VILKÅR ->
+                ForeslåVedtaksperiode.finnVedtaksperiode(
+                    vilkårperioder = vilkårperioder,
+                    vilkår = vilkårService.hentVilkår(saksbehandling.id),
+                    forrigeVedtaksperioder = forrigeVedtaksperioder,
+                    tidligsteEndring = tidligsteEndring,
+                )
+
+            GrunnlagForVedtaksperiode.MÅLGRUPPE_OG_VILKÅR ->
+                ForeslåVedtaksperiode.finnVedtaksperiodeUtenAktivitet(
+                    vilkårperioder = vilkårperioder,
+                    vilkår = vilkårService.hentVilkår(saksbehandling.id),
+                    forrigeVedtaksperioder = forrigeVedtaksperioder,
+                    tidligsteEndring = tidligsteEndring,
+                )
+
+            GrunnlagForVedtaksperiode.MÅLGRUPPE_OG_AKTIVITET ->
+                ForeslåVedtaksperiode.finnVedtaksperiodeUtenVilkår(
+                    vilkårperioder = vilkårperioder,
+                    forrigeVedtaksperioder = forrigeVedtaksperioder,
+                    tidligsteEndring = tidligsteEndring,
+                )
         }
     }
-
-    private fun Stønadstype.skalHenteStønadsvilkår(): Boolean =
-        when (this) {
-            Stønadstype.LÆREMIDLER -> false
-            Stønadstype.BARNETILSYN -> true
-            Stønadstype.BOUTGIFTER -> true
-            Stønadstype.DAGLIG_REISE_TSO -> true
-            Stønadstype.DAGLIG_REISE_TSR -> true
-            Stønadstype.REISE_TIL_SAMLING_TSO -> true
-            Stønadstype.REISE_TIL_SAMLING_TSR -> true
-            Stønadstype.FLYTTING_TSO -> true
-            Stønadstype.FLYTTING_TSR -> true
-            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO -> true
-            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR -> true
-        }
 }

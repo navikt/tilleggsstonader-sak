@@ -34,9 +34,7 @@ val alleEnumTyperFaktaOgVurdering: List<Pair<Stønadstype, TypeFaktaOgVurdering>
             AktivitetReiseOppstartAvslutningHjemreiseTsrType.entries,
         Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR to
             MålgruppeReiseOppstartAvslutningHjemreiseTsrType.entries,
-        Stønadstype.FLYTTING_TSO to AktivitetFlyttingTsoType.entries,
         Stønadstype.FLYTTING_TSO to MålgruppeFlyttingTsoType.entries,
-        Stønadstype.FLYTTING_TSR to AktivitetFlyttingTsrType.entries,
         Stønadstype.FLYTTING_TSR to MålgruppeFlyttingTsrType.entries,
     ).flatMap { (stønadstype, enums) -> enums.map { stønadstype to it } }
 

@@ -1,6 +1,5 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger
 
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 
 sealed interface FaktaOgVurderingFlyttingTsr : FaktaOgVurdering {
@@ -11,25 +10,6 @@ sealed interface MålgruppeFlyttingTsr :
     MålgruppeFaktaOgVurdering,
     FaktaOgVurderingFlyttingTsr {
     override val type: MålgruppeFlyttingTsrType
-}
-
-sealed interface AktivitetFlyttingTsr :
-    AktivitetFaktaOgVurdering,
-    FaktaOgVurderingFlyttingTsr {
-    override val type: AktivitetFlyttingTsrType
-}
-
-data class TiltakFlyttingTsr(
-    override val vurderinger: VurderingTiltakFlyttingTsr,
-) : AktivitetFlyttingTsr {
-    override val type: AktivitetFlyttingTsrType = AktivitetFlyttingTsrType.TILTAK_FLYTTING_TSR
-    override val fakta: IngenFakta = IngenFakta
-}
-
-data object IngenAktivitetFlyttingTsr : AktivitetFlyttingTsr {
-    override val type: AktivitetFlyttingTsrType = AktivitetFlyttingTsrType.INGEN_AKTIVITET_FLYTTING_TSR
-    override val fakta: IngenFakta = IngenFakta
-    override val vurderinger: Vurderinger = IngenVurderinger
 }
 
 data object IngenMålgruppeFlyttingTsr : MålgruppeFlyttingTsr {
@@ -73,23 +53,7 @@ data class InnsattIFengselFlyttingTsr(
     override val fakta: IngenFakta = IngenFakta
 }
 
-data class VurderingTiltakFlyttingTsr(
-    override val lønnet: VurderingLønnet,
-    override val harUtgifter: VurderingHarUtgifter,
-    override val erAktivitetenObligatorisk: VurderingErAktivitetenObligatorisk,
-) : HarUtgifterVurdering,
-    LønnetVurdering,
-    ErAktivitetenObligatoriskVurdering
-
 sealed interface TypeFaktaOgVurderingFlyttingTsr : TypeFaktaOgVurdering
-
-enum class AktivitetFlyttingTsrType(
-    override val vilkårperiodeType: AktivitetType,
-) : TypeAktivitetOgVurdering,
-    TypeFaktaOgVurderingFlyttingTsr {
-    TILTAK_FLYTTING_TSR(AktivitetType.TILTAK),
-    INGEN_AKTIVITET_FLYTTING_TSR(AktivitetType.INGEN_AKTIVITET),
-}
 
 enum class MålgruppeFlyttingTsrType(
     override val vilkårperiodeType: MålgruppeType,

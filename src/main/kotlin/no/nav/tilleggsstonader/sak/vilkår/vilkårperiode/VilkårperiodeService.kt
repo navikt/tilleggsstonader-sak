@@ -11,6 +11,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingUtil.validerBehandlingId
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.felles.domain.harAktivitet
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.opplysninger.grunnlag.FaktaGrunnlagService
@@ -125,6 +126,9 @@ class VilkårperiodeService(
 
         if (vilkårperiode.type is MålgruppeType) {
             validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, vilkårperiode.type)
+        }
+        brukerfeilHvis(vilkårperiode.type is AktivitetType && !behandling.stønadstype.harAktivitet()) {
+            "Kan ikke registrere aktivitet for ${behandling.stønadstype.name}"
         }
 
         validerKildeIdFinnesIGrunnlaget(
