@@ -17,9 +17,14 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.IverksettingDto
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.StønadUtbetaling
 import no.nav.tilleggsstonader.sak.util.behandling
+import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørFlytting
+import no.nav.tilleggsstonader.sak.vedtak.domain.VedtakUtil.withTypeOrThrow
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingResponse
+import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.OpphørFlyttingResponse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttebyråDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -33,6 +38,175 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
 
     @Autowired
     private lateinit var tilkjentYtelseRepository: TilkjentYtelseRepository
+
+    @Test
+    fun `skal kunne innvilge flytting og senere opphøre den`() {
+        val fom = 1 januar 2026
+        val tom = fom
+        val opphørsdato = fom
+
+        val behandling =
+            testoppsettService
+                .opprettBehandlingMedFagsak(
+                    behandling = behandling(),
+                    stønadstype = Stønadstype.FLYTTING_TSO,
+                    identer = setOf(PersonIdent(ident = ident)),
+                )
+
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
+
+        gjennomførBehandlingsløp(
+            ident = ident,
+            behandlingId = behandling.id,
+        ) {
+            aktivitet {
+                opprett {
+                    aktivitetTiltakTsoFlytting(fom, tom)
+                }
+            }
+            målgruppe {
+                opprett {
+                    målgruppeAAP(fom, tom)
+                }
+            }
+            vilkår {
+                flyttingByrå(
+                    flytteDato = fom,
+                    tilbud1Pris = 10000,
+                    tilbud2Pris = 5000,
+                    erBetalingDokumentert = true,
+                )
+            }
+        }
+
+        testoppsettService.settAndelerTilOkForBehandling(behandling.id)
+
+        val opphørId =
+            opprettRevurderingOgGjennomførBehandlingsløp(fraBehandlingId = behandling.id) {
+                vedtak {
+                    opphør(
+                        årsaker = listOf(ÅrsakOpphør.ENDRING_AKTIVITET),
+                        begrunnelse = "Aktiviteten er avsluttet",
+                        opphørsdato = opphørsdato,
+                    )
+                }
+            }
+
+        val vedtakResponse =
+            kall.vedtak
+                .hentVedtak(Stønadstype.FLYTTING_TSO, opphørId)
+                .expectOkWithBody<OpphørFlyttingResponse>()
+        val lagretVedtak = vedtakRepository.findById(opphørId).orElseThrow().withTypeOrThrow<OpphørFlytting>()
+
+        assertThat(vedtakResponse.type).isEqualTo(TypeVedtak.OPPHØR)
+        assertThat(vedtakResponse.opphørsdato).isEqualTo(opphørsdato)
+        assertThat(vedtakResponse.årsakerOpphør).containsExactly(ÅrsakOpphør.ENDRING_AKTIVITET)
+        assertThat(vedtakResponse.begrunnelse).isEqualTo("Aktiviteten er avsluttet")
+        assertThat(vedtakResponse.vedtaksperioder).isEmpty()
+        assertThat(lagretVedtak.data.vedtaksperioder).isEmpty()
+        assertThat(lagretVedtak.data.beregningsresultat.resultater).isEmpty()
+
+        val andelerOpphør = tilkjentYtelseRepository.findByBehandlingId(opphørId)!!.andelerTilkjentYtelse
+        assertThat(andelerOpphør).hasSize(1)
+        assertThat(andelerOpphør.single().type).isEqualTo(TypeAndel.UGYLDIG)
+        assertThat(andelerOpphør.single().beløp).isZero()
+    }
+
+    @Test
+    fun `skal kunne opphøre én av to innvilgede flyttinger`() {
+        val førsteFlyttedato = 1 januar 2026
+        val andreFlyttedato = 8 januar 2026
+
+        val behandling =
+            testoppsettService
+                .opprettBehandlingMedFagsak(
+                    behandling = behandling(),
+                    stønadstype = Stønadstype.FLYTTING_TSO,
+                    identer = setOf(PersonIdent(ident = ident)),
+                )
+
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
+
+        gjennomførBehandlingsløp(
+            ident = ident,
+            behandlingId = behandling.id,
+        ) {
+            aktivitet {
+                opprett {
+                    aktivitetTiltakTsoFlytting(førsteFlyttedato, andreFlyttedato)
+                }
+            }
+            målgruppe {
+                opprett {
+                    målgruppeAAP(førsteFlyttedato, andreFlyttedato)
+                }
+            }
+            vilkår {
+                flyttingByrå(
+                    flytteDato = førsteFlyttedato,
+                    tilbud1Pris = 10000,
+                    tilbud2Pris = 5000,
+                    erBetalingDokumentert = true,
+                )
+                flyttingByrå(
+                    flytteDato = andreFlyttedato,
+                    tilbud1Pris = 8000,
+                    tilbud2Pris = 3000,
+                    erBetalingDokumentert = true,
+                )
+            }
+        }
+
+        val innvilgetVedtak =
+            kall.vedtak
+                .hentVedtak(Stønadstype.FLYTTING_TSO, behandling.id)
+                .expectOkWithBody<InnvilgelseFlyttingResponse>()
+        assertThat(innvilgetVedtak.beregningsresultat.resultater).hasSize(2)
+        assertThat(innvilgetVedtak.beregningsresultat.resultater.map { it.fom })
+            .containsExactly(førsteFlyttedato, andreFlyttedato)
+        assertThat(innvilgetVedtak.beregningsresultat.resultater.map { it.beløp })
+            .containsExactly(5000.toBigDecimal(), 3000.toBigDecimal())
+        assertThat(tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse).hasSize(2)
+
+        testoppsettService.settAndelerTilOkForBehandling(behandling.id)
+
+        val opphørId =
+            opprettRevurderingOgGjennomførBehandlingsløp(fraBehandlingId = behandling.id) {
+                vedtak {
+                    opphør(
+                        årsaker = listOf(ÅrsakOpphør.ENDRING_AKTIVITET),
+                        begrunnelse = "Den andre flyttingen gjennomføres ikke",
+                        opphørsdato = andreFlyttedato,
+                    )
+                }
+            }
+
+        val vedtakResponse =
+            kall.vedtak
+                .hentVedtak(Stønadstype.FLYTTING_TSO, opphørId)
+                .expectOkWithBody<OpphørFlyttingResponse>()
+        val lagretVedtak = vedtakRepository.findById(opphørId).orElseThrow().withTypeOrThrow<OpphørFlytting>()
+
+        assertThat(vedtakResponse.type).isEqualTo(TypeVedtak.OPPHØR)
+        assertThat(vedtakResponse.opphørsdato).isEqualTo(andreFlyttedato)
+        assertThat(vedtakResponse.vedtaksperioder).hasSize(1)
+        val vedtaksperiode = lagretVedtak.data.vedtaksperioder.single()
+        assertThat(vedtaksperiode.fom).isEqualTo(førsteFlyttedato)
+        assertThat(vedtaksperiode.tom).isEqualTo(førsteFlyttedato)
+
+        val beregningsresultat =
+            lagretVedtak.data.beregningsresultat.resultater
+                .single()
+        assertThat(beregningsresultat.fom).isEqualTo(førsteFlyttedato)
+        assertThat(beregningsresultat.beløp).isEqualTo(5000.toBigDecimal())
+        assertThat(beregningsresultat.fraTidligereVedtak).isTrue()
+
+        val andelerOpphør = tilkjentYtelseRepository.findByBehandlingId(opphørId)!!.andelerTilkjentYtelse
+        val andelOpphør = andelerOpphør.single()
+        assertThat(andelOpphør.fom).isEqualTo(førsteFlyttedato)
+        assertThat(andelOpphør.tom).isEqualTo(førsteFlyttedato)
+        assertThat(andelOpphør.beløp).isEqualTo(5000)
+    }
 
     @Test
     fun `skal kunne revurdere flytting og se at andeler stemmer for nye vilkårsvurderinger`() {
@@ -65,7 +239,7 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    fom,
+                    flytteDato = fom,
                     tilbud1Pris = 10000,
                     tilbud2Pris = 5000,
                     erBetalingDokumentert = true,
@@ -138,7 +312,7 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    fom,
+                    flytteDato = fom,
                     tilbud1Pris = 10000,
                     tilbud2Pris = 5000,
                     erBetalingDokumentert = false,
@@ -228,7 +402,7 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    fom,
+                    flytteDato = fom,
                     tilbud1Pris = 10000,
                     tilbud2Pris = 5000,
                     erBetalingDokumentert = true,
@@ -315,7 +489,7 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    fom,
+                    flytteDato = fom,
                     tilbud1Pris = 10000,
                     tilbud2Pris = 5000,
                     erBetalingDokumentert = true,

@@ -239,6 +239,31 @@ class FlyttingBeregningServiceTest {
     }
 
     @Test
+    fun `beregning fra dato gir tomt resultat når alle perioder er avkortet før vilkårene`() {
+        val forrigeBehandlingId = BehandlingId.random()
+        val revurdering = saksbehandling(forrigeIverksatteBehandlingId = forrigeBehandlingId)
+        val forrigeResultat =
+            resultat(
+                fom = 1 januar 2025,
+                tom = 1 januar 2025,
+                beløp = "500",
+            )
+        stubForrigeVedtak(forrigeBehandlingId, forrigeResultat)
+        every { flyttingVilkårService.hentOppfylteVilkårforBehandling(revurdering.id) } returns
+            listOf(vilkår(flytteDato = 1 januar 2025, behandlingId = revurdering.id))
+
+        val resultat =
+            beregningService.beregn(
+                revurdering,
+                emptyList(),
+                Beregningsplan(Beregningsomfang.FRA_DATO, fraDato = 1 januar 2025),
+                TypeVedtak.OPPHØR,
+            )
+
+        assertThat(resultat.resultater).isEmpty()
+    }
+
+    @Test
     fun `gjenbruk av forrige resultat merker alle resultater som tidligere vedtak`() {
         val forrigeBehandlingId = BehandlingId.random()
         val revurdering = saksbehandling(forrigeIverksatteBehandlingId = forrigeBehandlingId)

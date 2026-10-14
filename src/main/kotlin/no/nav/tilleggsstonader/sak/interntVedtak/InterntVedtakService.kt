@@ -17,6 +17,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagReiseTilSamling
@@ -31,6 +32,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Opphør
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørReiseTilSamling
@@ -362,8 +364,17 @@ class InterntVedtakService(
     private fun mapVedtakFlytting(vedtak: VedtakFlytting) =
         when (vedtak) {
             is InnvilgelseFlytting -> VedtakInnvilgelseInternt(innvilgelseBegrunnelse = vedtak.begrunnelse)
+            is AvslagFlytting ->
+                VedtakAvslagInternt(
+                    årsakerAvslag = vedtak.årsaker,
+                    avslagBegrunnelse = vedtak.begrunnelse,
+                )
 
-            else -> TODO("Må lage opphør og avslag for flytting")
+            is OpphørFlytting ->
+                VedtakOpphørInternt(
+                    årsakerOpphør = vedtak.årsaker,
+                    opphørBegrunnelse = vedtak.begrunnelse,
+                )
         }
 
     private fun mapRammevedtakPrivatBil(vedtak: Vedtak?): RammevedtakPrivatBil? =

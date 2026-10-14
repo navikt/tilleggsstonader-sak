@@ -25,6 +25,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.AvslagFlyttingDto
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingTsoRequest
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingTsrRequest
+import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.OpphørFlyttingRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
@@ -407,7 +408,12 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                                 )
                             Stønadstype.FLYTTING_TSO,
                             Stønadstype.FLYTTING_TSR,
-                            -> TODO("OpphørFlyttingRequest")
+                            ->
+                                OpphørFlyttingRequest(
+                                    årsakerOpphør = opprettVedtak.årsaker,
+                                    begrunnelse = opprettVedtak.begrunnelse,
+                                    opphørsdato = opprettVedtak.opphørsdato,
+                                )
                             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
                             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
                             -> TODO("OpphørReiseOppstartAvslutningHjemreiseRequest")

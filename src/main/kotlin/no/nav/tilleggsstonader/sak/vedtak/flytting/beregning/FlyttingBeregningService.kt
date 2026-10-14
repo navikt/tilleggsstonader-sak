@@ -55,7 +55,10 @@ class FlyttingBeregningService(
                 }
 
                 Beregningsomfang.FRA_DATO -> {
-                    val nyeBeregningsresultat = oppfylteVilkår.map { beregnVilkår(it, finnTilhørendeVedtaksperiode(it, vedtaksperioder)) }
+                    val nyeBeregningsresultat =
+                        oppfylteVilkår
+                            .filter { vilkår -> vedtaksperioder.any { it.overlapper(vilkår) } }
+                            .map { beregnVilkår(it, finnTilhørendeVedtaksperiode(it, vedtaksperioder)) }
                     val forrigeBeregningsresultat = hentForrigeIverksatteVedtak(behandling).beregningsresultat.resultater
                     val beregnFraDato = beregningsplan.beregnFra() ?: feil("Forventer beregn-fra dato")
                     slåSammenNyeOgGamleBeregningsresultatFraDato(forrigeBeregningsresultat, nyeBeregningsresultat, beregnFraDato)

@@ -1,0 +1,13 @@
+{
+  "begrunnelse": "Opphørsbegrunnelse",
+  "beregningsplan": {
+    "fraDato": "2026-01-02",
+    "omfang": "FRA_DATO"
+  },
+  "beregningsresultat": {
+    "resultater": [ ]
+  },
+  "type": "OPPHØR_FLYTTING",
+  "vedtaksperioder": [ ],
+  "årsaker": [ "ENDRING_AKTIVITET" ]
+}

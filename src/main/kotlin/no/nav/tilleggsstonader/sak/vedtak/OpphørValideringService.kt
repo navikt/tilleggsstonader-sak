@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.tidligsteendring.UtledTidligsteEndringService
+import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.AndelTilkjentYtelse
 import no.nav.tilleggsstonader.sak.util.norskFormat
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.BeregningsresultatDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -95,6 +96,19 @@ class OpphørValideringService(
                 brukerfeilHvis(
                     it.grunnlag.fom >= opphørsdato,
                 ) { "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter opphørsdato" }
+            }
+    }
+
+    fun validerIngenUtbetalingEtterOpphørsdatoFlytting(
+        andeler: List<AndelTilkjentYtelse>,
+        opphørsdato: LocalDate,
+    ) {
+        andeler
+            .filter { it.beløp > 0 }
+            .forEach {
+                brukerfeilHvis(it.utbetalingsdato >= opphørsdato) {
+                    "Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter opphørsdato"
+                }
             }
     }
 
