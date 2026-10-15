@@ -32,9 +32,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
-import java.time.Month.FEBRUARY
-import java.time.Month.JANUARY
 
 class InterntVedtakServiceTest {
     private val behandlingService = mockk<BehandlingService>()
@@ -174,13 +171,16 @@ class InterntVedtakServiceTest {
         @Test
         fun `vedtaksperiodefelter skal bli riktig mappet`() {
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+            val forventet =
+                InterntVedtakTestdata.PassAvBarn.vedtak.data.vedtaksperioder
+                    .single()
 
             assertThat(interntVedtak.vedtaksperioder).hasSize(1)
             with(interntVedtak.vedtaksperioder.single()) {
                 assertThat(målgruppe).isEqualTo(FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE)
                 assertThat(aktivitet).isEqualTo(AktivitetType.TILTAK)
-                assertThat(fom).isEqualTo(LocalDate.of(2024, 1, 1))
-                assertThat(tom).isEqualTo(LocalDate.of(2024, 2, 1))
+                assertThat(fom).isEqualTo(forventet.fom)
+                assertThat(tom).isEqualTo(forventet.tom)
             }
         }
     }
@@ -281,13 +281,14 @@ class InterntVedtakServiceTest {
         @Test
         fun `vedtaksperiodefelter skal bli riktig mappet`() {
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+            val forventet = InterntVedtakTestdata.Læremidler.vedtaksperioder.single()
 
             assertThat(interntVedtak.vedtaksperioder).hasSize(1)
             with(interntVedtak.vedtaksperioder.single()) {
-                assertThat(målgruppe).isEqualTo(FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE)
-                assertThat(aktivitet).isEqualTo(AktivitetType.TILTAK)
-                assertThat(fom).isEqualTo(LocalDate.of(2024, 1, 1))
-                assertThat(tom).isEqualTo(LocalDate.of(2024, 3, 31))
+                assertThat(målgruppe).isEqualTo(forventet.målgruppe)
+                assertThat(aktivitet).isEqualTo(forventet.aktivitet)
+                assertThat(fom).isEqualTo(forventet.fom)
+                assertThat(tom).isEqualTo(forventet.tom)
             }
         }
     }
@@ -362,23 +363,19 @@ class InterntVedtakServiceTest {
                     .single { it.resultat == ResultatVilkårperiode.OPPFYLT }
 
             with(interntVedtak.aktiviteter.single { it.resultat == ResultatVilkårperiode.OPPFYLT }) {
-                assertThat(type).isEqualTo(AktivitetType.TILTAK)
+                assertThat(type).isEqualTo(oppfyltAktivitet.type)
                 assertThat(fom).isEqualTo(oppfyltAktivitet.fom)
                 assertThat(tom).isEqualTo(oppfyltAktivitet.tom)
                 assertThat(kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
                 assertThat(resultat).isEqualTo(ResultatVilkårperiode.OPPFYLT)
                 assertThat(begrunnelse).isNull()
-                with((faktaOgVurderinger as AktivitetBoutgifterFaktaOgVurderingerDto).lønnet!!) {
-                    assertThat(svar).isEqualTo(SvarJaNei.NEI)
-                    assertThat(resultat).isEqualTo(ResultatDelvilkårperiode.OPPFYLT)
-                }
             }
 
             val ikkeOppfyltAktivitet =
                 InterntVedtakTestdata.Boutgifter.vilkårperioder.aktiviteter
                     .single { it.resultat == ResultatVilkårperiode.IKKE_OPPFYLT }
             with(interntVedtak.aktiviteter.single { it.resultat == ResultatVilkårperiode.IKKE_OPPFYLT }) {
-                assertThat(type).isEqualTo(AktivitetType.UTDANNING)
+                assertThat(type).isEqualTo(ikkeOppfyltAktivitet.type)
                 assertThat(fom).isEqualTo(ikkeOppfyltAktivitet.fom)
                 assertThat(tom).isEqualTo(ikkeOppfyltAktivitet.tom)
                 assertThat(kilde).isEqualTo(KildeVilkårsperiode.MANUELL)
@@ -394,7 +391,7 @@ class InterntVedtakServiceTest {
         fun `beregningsfelter skal bli riktig mappet`() {
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
 
-            assertThat(interntVedtak.beregningsresultat!!.boutgifter!!.size).isEqualTo(2)
+            assertThat(interntVedtak.beregningsresultat!!.boutgifter!!).hasSize(2)
 
             val forventet =
                 InterntVedtakTestdata.Boutgifter.innvilgetVedtak.data.beregningsresultat.perioder
@@ -411,13 +408,14 @@ class InterntVedtakServiceTest {
         @Test
         fun `vedtaksperiodefelter skal bli riktig mappet`() {
             val interntVedtak = service.lagInterntVedtak(behandlingId = behandlingId)
+            val forventedeVedtaksperioder = InterntVedtakTestdata.Boutgifter.innvilgetVedtak.data.vedtaksperioder
 
-            assertThat(interntVedtak.vedtaksperioder).hasSize(1)
-            with(interntVedtak.vedtaksperioder.single()) {
-                assertThat(målgruppe).isEqualTo(FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE)
-                assertThat(aktivitet).isEqualTo(AktivitetType.TILTAK)
-                assertThat(fom).isEqualTo(LocalDate.of(2024, JANUARY, 1))
-                assertThat(tom).isEqualTo(LocalDate.of(2024, FEBRUARY, 29))
+            assertThat(interntVedtak.vedtaksperioder).hasSize(forventedeVedtaksperioder.size)
+            interntVedtak.vedtaksperioder.zip(forventedeVedtaksperioder).forEach { (faktisk, forventet) ->
+                assertThat(faktisk.målgruppe).isEqualTo(forventet.målgruppe)
+                assertThat(faktisk.aktivitet).isEqualTo(forventet.aktivitet)
+                assertThat(faktisk.fom).isEqualTo(forventet.fom)
+                assertThat(faktisk.tom).isEqualTo(forventet.tom)
             }
         }
 

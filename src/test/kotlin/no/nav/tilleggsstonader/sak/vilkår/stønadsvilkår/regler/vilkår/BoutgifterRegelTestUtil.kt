@@ -64,7 +64,7 @@ object BoutgifterRegelTestUtil {
 
     fun ikkeOppfylteDelvilkårUtgifterOvernatting() =
         listOf(
-            delvilkår(Vurdering(RegelId.NØDVENDIGE_MERUTGIFTER, SvarId.NEI, "begrunnelse")),
+            delvilkår(Vurdering(RegelId.NØDVENDIGE_MERUTGIFTER, SvarId.NEI, "begrunnelse"), resultat = Vilkårsresultat.IKKE_OPPFYLT),
             delvilkår(Vurdering(RegelId.DOKUMENTERT_DELTAKELSE, SvarId.JA)),
             delvilkår(Vurdering(RegelId.DOKUMENTERT_UTGIFTER_OVERNATTING, SvarId.JA)),
             delvilkår(Vurdering(RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, SvarId.NEI)),
@@ -72,7 +72,10 @@ object BoutgifterRegelTestUtil {
 
     fun ikkeOppfylteDelvilkårLøpendeUtgifterEnBolig() =
         listOf(
-            delvilkår(Vurdering(RegelId.HØYERE_BOUTGIFTER_SAMMENLIGNET_MED_TIDLIGERE, SvarId.NEI, "begrunnelse")),
+            delvilkår(
+                Vurdering(RegelId.HØYERE_BOUTGIFTER_SAMMENLIGNET_MED_TIDLIGERE, SvarId.NEI, "begrunnelse"),
+                resultat = Vilkårsresultat.IKKE_OPPFYLT,
+            ),
             delvilkår(Vurdering(RegelId.NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET, SvarId.JA, begrunnelse = "påkrevd")),
             delvilkår(Vurdering(RegelId.RETT_TIL_BOSTØTTE, SvarId.NEI)),
             delvilkår(Vurdering(RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, SvarId.NEI)),
@@ -80,16 +83,21 @@ object BoutgifterRegelTestUtil {
 
     fun ikkeOppfylteDelvilkårLøpendeUtgifterToBoliger() =
         listOf(
-            delvilkår(Vurdering(RegelId.NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET, SvarId.NEI, "begrunnelse")),
+            delvilkår(
+                Vurdering(RegelId.NØDVENDIG_Å_BO_NÆRMERE_AKTIVITET, SvarId.NEI, "begrunnelse"),
+                resultat = Vilkårsresultat.IKKE_OPPFYLT,
+            ),
             delvilkår(Vurdering(RegelId.DOKUMENTERT_UTGIFTER_BOLIG, SvarId.JA)),
             delvilkår(Vurdering(RegelId.HØYERE_UTGIFTER_HELSEMESSIG_ÅRSAKER, SvarId.NEI)),
         )
 
-    private fun delvilkår(vararg vurderinger: Vurdering) =
-        Delvilkår(
-            resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-            vurderinger = vurderinger.toList(),
-        )
+    private fun delvilkår(
+        vararg vurderinger: Vurdering,
+        resultat: Vilkårsresultat = Vilkårsresultat.OPPFYLT,
+    ) = Delvilkår(
+        resultat = resultat,
+        vurderinger = vurderinger.toList(),
+    )
 
     private fun begrunnelseHøyereUtgifter(høyereUtgifter: SvarId): String? = if (høyereUtgifter == SvarId.JA) "begrunnelse" else null
 }

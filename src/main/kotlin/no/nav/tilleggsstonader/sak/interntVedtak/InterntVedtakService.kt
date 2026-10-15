@@ -14,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.oppsummerReise
 import no.nav.tilleggsstonader.sak.vedtak.domain.Avslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagDagligReise
@@ -67,6 +68,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.tilFaktaOgVurderingDto
 import org.springframework.stereotype.Service
 import java.time.LocalDate
+import kotlin.collections.map
 
 @Service
 class InterntVedtakService(
@@ -126,8 +128,18 @@ class InterntVedtakService(
 
                 is InnvilgelseDagligReise -> {
                     val vilkårDagligReise = vilkår.map { it.mapTilVilkårDagligReise() }
+                    val beregningsresultat = data.beregningsresultat.tilDto(data.beregningsplan, vilkårDagligReise)
                     BeregningsresultatInterntVedtakDto(
-                        dagligReise = data.beregningsresultat.tilDto(data.beregningsplan, vilkårDagligReise),
+                        dagligReise =
+                            BeregningsresultatDagligReiseInterntVedtak(
+                                offentligTransport = beregningsresultat.offentligTransport,
+                                privatBil =
+                                    data.hentRammevedtakMedBeregningsresultat().map { (beregningsresultatForReise, rammevedtakForReise) ->
+                                        beregningsresultatForReise.oppsummerReise(rammevedtakForReise)
+                                    },
+                                beregningsplan = beregningsresultat.beregningsplan,
+                                tidligsteEndring = beregningsresultat.tidligsteEndring,
+                            ),
                     )
                 }
 
