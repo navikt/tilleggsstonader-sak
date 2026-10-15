@@ -2,7 +2,6 @@ package no.nav.tilleggsstonader.sak.vedtak.flytting
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.periode.avkortFraOgMed
-import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
@@ -47,9 +46,36 @@ class FlyttingBeregnYtelseSteg(
         vedtak: VedtakFlyttingRequest,
         satsjusteringFra: LocalDate,
     ) {
-        feil(
-            "Det ble forsøkt å lagre vedtak for satsjustering for behandling med id ${saksbehandling.id}. " +
-                "Satsjustering for flytting er ikke implementert",
+        logger.info("Lagrer vedtak for satsjustering for behandling=${saksbehandling.id}, satsjusteringFra=$satsjusteringFra")
+
+        val innvilgelse = vedtak as InnvilgelseFlyttingRequest
+        val vedtaksperioder = innvilgelse.vedtaksperioder()
+        val beregningsplan = BeregningsplanUtleder.utledForOpphørEllerSatsjustering(satsjusteringFra)
+        val beregningsresultat =
+            beregningService.beregn(
+                behandling = saksbehandling,
+                vedtaksperioder = vedtaksperioder,
+                beregningsplan = beregningsplan,
+                typeVedtak = TypeVedtak.INNVILGELSE,
+            )
+
+        vedtakRepository.insert(
+            GeneriskVedtak(
+                behandlingId = saksbehandling.id,
+                type = TypeVedtak.INNVILGELSE,
+                data =
+                    InnvilgelseFlytting(
+                        vedtaksperioder = vedtaksperioder,
+                        beregningsplan = beregningsplan,
+                        beregningsresultat = beregningsresultat,
+                    ),
+                gitVersjon = Applikasjonsversjon.versjon,
+                tidligsteEndring = beregningsplan.legacyTidligsteEndring(),
+            ),
+        )
+        tilkjentYtelseService.lagreTilkjentYtelse(
+            behandlingId = saksbehandling.id,
+            andeler = beregningsresultat.mapTilAndeler(saksbehandling.stønadstype),
         )
     }
 
