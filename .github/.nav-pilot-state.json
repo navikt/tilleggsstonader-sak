@@ -1,7 +1,7 @@
 {
   "collection": "nav-pilot",
-  "version": "2026.10.13-214524-d66b802",
-  "source_sha": "00105ddba340d916ef5e778a6edf4e7e4f1fbdc5",
+  "version": "2026.10.14-155622-7fb753c",
+  "source_sha": "fa4193be71196c74b093e9ca67dc3ad50bf551b0",
   "installed_at": "2026-04-13T13:37:44Z",
   "files": [
     {
@@ -40,8 +40,8 @@
     },
     {
       "path": ".github/agents/nav-pilot.agent.md",
-      "hash": "92bc5b172dd16b1f",
-      "revision": "00105ddba340d916ef5e778a6edf4e7e4f1fbdc5"
+      "hash": "2339a650aeb79e66",
+      "revision": "fa4193be71196c74b093e9ca67dc3ad50bf551b0"
     },
     {
       "path": ".github/agents/nav-pilot.metadata.json",
@@ -68,7 +68,8 @@
     },
     {
       "path": ".github/agents/worker.agent.md",
-      "hash": "43c860f99cd1337e"
+      "hash": "30566b7b3fbd4e84",
+      "revision": "fa4193be71196c74b093e9ca67dc3ad50bf551b0"
     },
     {
       "path": ".github/hooks/ask-first-aria.py",
@@ -191,7 +192,8 @@
     },
     {
       "path": ".github/skills/appsec-advisory/",
-      "hash": "df4553adf505e61d"
+      "hash": "47dc8fb85cebb2bb",
+      "revision": "fa4193be71196c74b093e9ca67dc3ad50bf551b0"
     },
     {
       "path": ".github/skills/conventional-commit/",
