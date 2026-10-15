@@ -17,6 +17,6 @@ class OppfølgingslisteKall(
     inner class OppfølgingslisteApi {
         fun hentAktiveOppfølginger(tema: Tema) = testklient.get("/api/oppfolging/$tema")
 
-        fun startJobb(tema: Tema) = testklient.post("/api/oppfolging/start/$tema")
+        fun startJobb(tema: Tema) = testklient.post("/api/forvaltning/oppfolging/start/$tema")
     }
 }
