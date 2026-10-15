@@ -42,10 +42,13 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
 
     private val svarFramTilFlyttemåte =
         arrayOf(
-            RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to SvarOgBegrunnelseDto(SvarId.FLYTTING_VED_START_AV_AKTIVITET),
+            RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
+                SvarOgBegrunnelseDto(SvarId.FLYTTING_VED_START_AV_AKTIVITET, "Starter i aktivitet"),
             RegelId.MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET to SvarOgBegrunnelseDto(SvarId.JA, "Må flytte"),
-            RegelId.ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE to SvarOgBegrunnelseDto(SvarId.JA),
         )
+
+    private val kostnaderErNødvendige =
+        RegelId.ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE to SvarOgBegrunnelseDto(SvarId.JA)
 
     private val nyttVilkårFlytteSelv =
         LagreVilkårFlyttingDto(
@@ -54,6 +57,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 mapOf(
                     *svarFramTilFlyttemåte,
                     RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTER_SELV, "Kjører selv"),
+                    kostnaderErNødvendige,
                 ),
             fakta =
                 FaktaFlytteSelvDto(
@@ -73,6 +77,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 mapOf(
                     *svarFramTilFlyttemåte,
                     RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTEBYRÅ, "Bruker flyttebyrå"),
+                    kostnaderErNødvendige,
                 ),
             fakta =
                 FaktaFlyttebyråDto(
@@ -123,6 +128,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                                 SvarId.FLYTTER_SELV,
                                 "Ny begrunnelse",
                             ),
+                        kostnaderErNødvendige,
                     ),
             )
         val oppdatert = kall.vilkårFlytting.oppdaterVilkår(oppdatering, opprettet.id, behandling.id)
@@ -277,7 +283,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 svar =
                     mapOf(
                         RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
-                            SvarOgBegrunnelseDto(SvarId.FLYTTING_VED_AVSLUTTET_AKTIVITET),
+                            SvarOgBegrunnelseDto(SvarId.FLYTTING_VED_AVSLUTTET_AKTIVITET, "Avslutter aktivitet"),
                         RegelId.MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET to
                             SvarOgBegrunnelseDto(SvarId.NEI, "Må ikke flytte"),
                     ),
