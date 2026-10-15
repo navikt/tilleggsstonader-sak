@@ -279,6 +279,17 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
         assertThat(test.utfall).isEqualTo(StegUtfall.UTREDNING_PÅBEGYNT)
     }
 
+    @Test
+    fun `skal ikke kunne opprette aktivitet for flytting`() {
+        val behandling = testoppsettService.opprettBehandlingMedFagsak(stønadstype = Stønadstype.FLYTTING_TSO)
+
+        val nyAktivitet = aktivitet(behandlingId = behandling.id).tilOppdatering()
+
+        assertThatThrownBy {
+            vilkårperiodeService.opprettVilkårperiode(nyAktivitet)
+        }.hasMessageContaining("Kan ikke registrere aktivitet for FLYTTING_TSO")
+    }
+
     @Nested
     inner class AktivitetsdagerValidering {
         @Test

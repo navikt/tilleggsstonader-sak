@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vedtak.validering
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
+import no.nav.tilleggsstonader.sak.felles.domain.harAktivitet
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
@@ -86,6 +87,7 @@ class VedtaksperiodeValideringService(
                 vedtaksperiode = it,
                 målgruppePerioderPerType = målgrupper,
                 aktivitetPerioderPerType = aktiviteter,
+                stønadstypeHarAktivitet = behandling.stønadstype.harAktivitet,
             )
         }
     }

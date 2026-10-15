@@ -7,9 +7,6 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
-import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
-import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeTsrDto
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlytting
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
 import java.math.BigDecimal
@@ -73,14 +70,14 @@ sealed interface InnvilgelseFlyttingRequest : VedtakFlyttingRequest {
 }
 
 data class InnvilgelseFlyttingTsoRequest(
-    val vedtaksperioder: List<VedtaksperiodeDto>,
+    val vedtaksperioder: List<VedtaksperiodeFlyttingDto>,
     override val begrunnelse: String? = null,
 ) : InnvilgelseFlyttingRequest {
     override fun vedtaksperioder(): List<Vedtaksperiode> = vedtaksperioder.tilDomene()
 }
 
 data class InnvilgelseFlyttingTsrRequest(
-    val vedtaksperioder: List<VedtaksperiodeTsrDto>,
+    val vedtaksperioder: List<VedtaksperiodeFlyttingDto>,
     override val begrunnelse: String? = null,
 ) : InnvilgelseFlyttingRequest {
     override fun vedtaksperioder(): List<Vedtaksperiode> = vedtaksperioder.tilDomene()

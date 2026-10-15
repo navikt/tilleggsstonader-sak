@@ -407,14 +407,6 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
                     MålgruppeFlyttingTsoType.AKTIVITETSPENGER_FLYTTING_TSO -> AktivitetspengerFlyttingTso::class
                 }
             }
-
-            is AktivitetFlyttingTsoType -> {
-                when (type) {
-                    AktivitetFlyttingTsoType.TILTAK_FLYTTING_TSO -> TiltakFlyttingTso::class
-                    AktivitetFlyttingTsoType.UTDANNING_FLYTTING_TSO -> UtdanningFlyttingTso::class
-                    AktivitetFlyttingTsoType.INGEN_AKTIVITET_FLYTTING_TSO -> IngenAktivitetFlyttingTso::class
-                }
-            }
         }.java
 
     private fun forventetTypeFlyttingTsr(type: TypeFaktaOgVurderingFlyttingTsr): Class<out FaktaOgVurderingFlyttingTsr> =
@@ -427,13 +419,6 @@ class VilkårperiodeRepositoryJsonTest : CleanDatabaseIntegrationTest() {
                     MålgruppeFlyttingTsrType.INNSATT_I_FENGSEL_FLYTTING_TSR -> InnsattIFengselFlyttingTsr::class
                     MålgruppeFlyttingTsrType.INGEN_MÅLGRUPPE_FLYTTING_TSR -> IngenMålgruppeFlyttingTsr::class
                     MålgruppeFlyttingTsrType.UNGDOMSPROGRAMMET_FLYTTING_TSR -> UngdomsprogrammetFlyttingTsr::class
-                }
-            }
-
-            is AktivitetFlyttingTsrType -> {
-                when (type) {
-                    AktivitetFlyttingTsrType.TILTAK_FLYTTING_TSR -> TiltakFlyttingTsr::class
-                    AktivitetFlyttingTsrType.INGEN_AKTIVITET_FLYTTING_TSR -> IngenAktivitetFlyttingTsr::class
                 }
             }
         }.java

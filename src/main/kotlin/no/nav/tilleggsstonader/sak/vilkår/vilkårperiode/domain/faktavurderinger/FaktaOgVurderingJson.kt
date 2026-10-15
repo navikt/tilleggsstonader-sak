@@ -158,18 +158,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
         name = "INGEN_MÅLGRUPPE_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR",
     ),
     JsonSubTypes.Type(
-        UtdanningFlyttingTso::class,
-        name = "UTDANNING_FLYTTING_TSO",
-    ),
-    JsonSubTypes.Type(
-        TiltakFlyttingTso::class,
-        name = "TILTAK_FLYTTING_TSO",
-    ),
-    JsonSubTypes.Type(
-        IngenAktivitetFlyttingTso::class,
-        name = "INGEN_AKTIVITET_FLYTTING_TSO",
-    ),
-    JsonSubTypes.Type(
         AAPFlyttingTso::class,
         name = "AAP_FLYTTING_TSO",
     ),
@@ -196,14 +184,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
     JsonSubTypes.Type(
         IngenMålgruppeFlyttingTso::class,
         name = "INGEN_MÅLGRUPPE_FLYTTING_TSO",
-    ),
-    JsonSubTypes.Type(
-        TiltakFlyttingTsr::class,
-        name = "TILTAK_FLYTTING_TSR",
-    ),
-    JsonSubTypes.Type(
-        IngenAktivitetFlyttingTsr::class,
-        name = "INGEN_AKTIVITET_FLYTTING_TSR",
     ),
     JsonSubTypes.Type(
         DagpengerFlyttingTsr::class,

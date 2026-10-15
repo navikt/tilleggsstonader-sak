@@ -20,6 +20,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 
 class InngangsvilkårStegTest {
     val behandlingService = mockk<BehandlingService>()
@@ -79,6 +81,28 @@ class InngangsvilkårStegTest {
             assertDoesNotThrow {
                 steg.validerSteg(saksbehandling())
             }
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = Stønadstype::class, names = ["FLYTTING_TSO", "FLYTTING_TSR"])
+        fun `flytting skal kun kreve målgruppe`(stønadstype: Stønadstype) {
+            val behandling = saksbehandling(fagsak = fagsak(stønadstype = stønadstype))
+            every { vilkårperiodeService.hentVilkårperioder(any()) } returns
+                Vilkårperioder(listOf(målgruppe()), emptyList())
+
+            assertDoesNotThrow {
+                steg.validerSteg(behandling)
+            }
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = Stønadstype::class, names = ["FLYTTING_TSO", "FLYTTING_TSR"])
+        fun `flytting skal kaste feil dersom målgruppe mangler`(stønadstype: Stønadstype) {
+            val behandling = saksbehandling(fagsak = fagsak(stønadstype = stønadstype))
+
+            assertThatThrownBy {
+                steg.validerSteg(behandling)
+            }.hasMessageContaining("Du må registrere minst én målgruppe for å kunne gå videre.")
         }
     }
 }

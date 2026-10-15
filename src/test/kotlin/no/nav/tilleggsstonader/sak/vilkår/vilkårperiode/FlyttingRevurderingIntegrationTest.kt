@@ -59,11 +59,6 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             ident = ident,
             behandlingId = behandling.id,
         ) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTsoFlytting(fom, tom)
-                }
-            }
             målgruppe {
                 opprett {
                     målgruppeAAP(fom, tom)
@@ -131,11 +126,6 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             ident = ident,
             behandlingId = behandling.id,
         ) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTsoFlytting(førsteFlyttedato, andreFlyttedato)
-                }
-            }
             målgruppe {
                 opprett {
                     målgruppeAAP(førsteFlyttedato, andreFlyttedato)
@@ -227,11 +217,6 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             ident = ident,
             behandlingId = behandling.id,
         ) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTsoFlytting(fom, tom)
-                }
-            }
             målgruppe {
                 opprett {
                     målgruppeAAP(fom, tom)
@@ -300,11 +285,6 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             ident = ident,
             behandlingId = behandling.id,
         ) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTsoFlytting(fom, tom)
-                }
-            }
             målgruppe {
                 opprett {
                     målgruppeAAP(fom, tom)
@@ -390,11 +370,6 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             ident = ident,
             behandlingId = behandling.id,
         ) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTsoFlytting(fom, tom)
-                }
-            }
             målgruppe {
                 opprett {
                     målgruppeAAP(fom, tom)
@@ -476,12 +451,6 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
             ident = ident,
             behandlingId = behandling.id,
         ) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTsoFlytting(fom, tom.plusDays(7))
-                }
-            }
-
             målgruppe {
                 opprett {
                     målgruppeAAP(fom, tom.plusDays(7))

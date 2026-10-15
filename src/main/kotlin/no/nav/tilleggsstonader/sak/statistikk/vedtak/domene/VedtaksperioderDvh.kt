@@ -32,7 +32,10 @@ import java.time.LocalDate
 data class VedtaksperioderDvh(
     override val fom: LocalDate,
     override val tom: LocalDate,
-    val aktivitet: AktivitetTypeDvh,
+    /**
+     * Er `null` for stønadstyper uten aktivitet, eks flytting
+     */
+    val aktivitet: AktivitetTypeDvh?,
     val lovverketsMålgruppe: LovverketsMålgruppeDvh,
     /**
      * Er `null` når [no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle.KNYTT_ANDEL_TIL_VEDTAKSPERIODE]
@@ -87,7 +90,7 @@ data class VedtaksperioderDvh(
                                 VedtaksperioderDvh(
                                     fom = it.fom,
                                     tom = it.tom,
-                                    aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
+                                    aktivitet = it.aktivitet?.let { aktivitet -> AktivitetTypeDvh.fraDomene(aktivitet) },
                                     lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
                                     id = it.id.takeIf { knyttAndelTilVedtaksperiode },
                                 )
@@ -182,7 +185,7 @@ data class VedtaksperioderDvh(
                     VedtaksperioderDvh(
                         fom = it.fom,
                         tom = it.tom,
-                        aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
+                        aktivitet = it.aktivitet?.let { aktivitet -> AktivitetTypeDvh.fraDomene(aktivitet) },
                         lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
                         id = it.id.takeIf { knyttAndelTilVedtaksperiode },
                     )
@@ -198,7 +201,7 @@ data class VedtaksperioderDvh(
                     VedtaksperioderDvh(
                         fom = it.fom,
                         tom = it.tom,
-                        aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
+                        aktivitet = it.aktivitet?.let { aktivitet -> AktivitetTypeDvh.fraDomene(aktivitet) },
                         lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
                         id = it.id.takeIf { knyttAndelTilVedtaksperiode },
                     )
@@ -214,7 +217,7 @@ data class VedtaksperioderDvh(
                     VedtaksperioderDvh(
                         fom = it.fom,
                         tom = it.tom,
-                        aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
+                        aktivitet = it.aktivitet?.let { aktivitet -> AktivitetTypeDvh.fraDomene(aktivitet) },
                         lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
                         id = it.id.takeIf { knyttAndelTilVedtaksperiode },
                     )
@@ -230,7 +233,7 @@ data class VedtaksperioderDvh(
                     VedtaksperioderDvh(
                         fom = it.fom,
                         tom = it.tom,
-                        aktivitet = AktivitetTypeDvh.fraDomene(it.aktivitet),
+                        aktivitet = it.aktivitet?.let { aktivitet -> AktivitetTypeDvh.fraDomene(aktivitet) },
                         lovverketsMålgruppe = LovverketsMålgruppeDvh.fraDomene(it.målgruppe),
                         id = it.id.takeIf { knyttAndelTilVedtaksperiode },
                     )

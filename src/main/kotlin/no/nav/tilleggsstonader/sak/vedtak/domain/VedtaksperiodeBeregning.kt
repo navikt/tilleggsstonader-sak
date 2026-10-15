@@ -20,7 +20,9 @@ data class VedtaksperiodeBeregning(
         fom = vedtaksperiodeDto.fom,
         tom = vedtaksperiodeDto.tom,
         målgruppe = vedtaksperiodeDto.målgruppeType,
-        aktivitet = vedtaksperiodeDto.aktivitetType,
+        aktivitet =
+            vedtaksperiodeDto.aktivitetType
+                ?: error("Vedtaksperiode med id=${vedtaksperiodeDto.id} mangler aktivitet"),
     )
 
     init {
