@@ -150,7 +150,7 @@ class OppfølgingOpprettKontrollerService(
 
         val inngangsvilkår = hentInngangsvilkår(behandling)
         val kontrollerAktivitet =
-            if (fagsak.stønadstype.harAktivitet()) {
+            if (fagsak.stønadstype.harAktivitet) {
                 finnKontrollerAktiviteter(fagsak, inngangsvilkår, vedtaksperioder)
             } else {
                 emptyList()

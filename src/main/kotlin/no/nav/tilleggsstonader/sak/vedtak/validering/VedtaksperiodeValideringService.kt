@@ -87,7 +87,7 @@ class VedtaksperiodeValideringService(
                 vedtaksperiode = it,
                 målgruppePerioderPerType = målgrupper,
                 aktivitetPerioderPerType = aktiviteter,
-                stønadstypeHarAktivitet = behandling.stønadstype.harAktivitet(),
+                stønadstypeHarAktivitet = behandling.stønadstype.harAktivitet,
             )
         }
     }

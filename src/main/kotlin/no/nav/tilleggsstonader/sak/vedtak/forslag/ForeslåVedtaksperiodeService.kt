@@ -32,7 +32,7 @@ class ForeslåVedtaksperiodeService(
             } ?: emptyList()
         val tidligsteEndring =
             utledTidligsteEndringService.utledTidligsteEndringIgnorerVedtaksperioder(saksbehandling.id)
-        return when (saksbehandling.stønadstype.grunnlagForVedtaksperiode()) {
+        return when (saksbehandling.stønadstype.grunnlagForVedtaksperiode) {
             GrunnlagForVedtaksperiode.MÅLGRUPPE_AKTIVITET_OG_VILKÅR ->
                 ForeslåVedtaksperiode.finnVedtaksperiode(
                     vilkårperioder = vilkårperioder,

@@ -127,7 +127,7 @@ class VilkårperiodeService(
         if (vilkårperiode.type is MålgruppeType) {
             validerKanLeggeTilMålgruppeManuelt(behandling.stønadstype, vilkårperiode.type)
         }
-        brukerfeilHvis(vilkårperiode.type is AktivitetType && !behandling.stønadstype.harAktivitet()) {
+        brukerfeilHvis(vilkårperiode.type is AktivitetType && !behandling.stønadstype.harAktivitet) {
             "Kan ikke registrere aktivitet for ${behandling.stønadstype.name}"
         }
 

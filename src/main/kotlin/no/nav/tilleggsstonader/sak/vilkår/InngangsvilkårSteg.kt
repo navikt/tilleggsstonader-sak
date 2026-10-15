@@ -18,7 +18,7 @@ class InngangsvilkårSteg(
     override fun validerSteg(saksbehandling: Saksbehandling) {
         val vilkårperioder = vilkårperiodeService.hentVilkårperioder(saksbehandling.id)
 
-        if (saksbehandling.stønadstype.harAktivitet()) {
+        if (saksbehandling.stønadstype.harAktivitet) {
             brukerfeilHvis(vilkårperioder.målgrupper.isEmpty() || vilkårperioder.aktiviteter.isEmpty()) {
                 "Du må registrere minst én målgruppe og én aktivitet for å kunne gå videre."
             }
