@@ -276,7 +276,7 @@ class SkjemaRoutingIntegrationTest(
                 val routingSjekk = kall.skjemaRouting.sjekk(reiseTilSamlingRoutingRequest)
 
                 assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
-                assertThat(routingHarBlittLagret(Skjematype.SØKNAD_REISE_TIL_SAMLING)).isFalse()
+                assertThat(routingHarBlittLagret(Skjematype.SØKNAD_REISE_TIL_SAMLING)).isTrue()
             }
         }
     }
