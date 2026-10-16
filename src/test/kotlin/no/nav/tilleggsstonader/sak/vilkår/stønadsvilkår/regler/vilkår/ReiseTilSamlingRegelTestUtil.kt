@@ -12,7 +12,7 @@ object ReiseTilSamlingRegelTestUtil {
         mapOf(
             RegelId.HAR_UTGIFTER_TIL_REISEN to SvarOgBegrunnelseDto(svar = SvarId.JA),
             RegelId.AVSTAND_OVER_TRETTI_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
-            RegelId.ER_SAMLING_OBLIGATORISK to SvarOgBegrunnelseDto(svar = SvarId.JA),
+            RegelId.ER_SAMLING_OBLIGATORISK to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "obligatorisk"),
             RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
             RegelId.DOKUMENTERTE_UTGIFTER to SvarOgBegrunnelseDto(svar = SvarId.JA),
         )
@@ -24,7 +24,7 @@ object ReiseTilSamlingRegelTestUtil {
         mapOf(
             RegelId.HAR_UTGIFTER_TIL_REISEN to SvarOgBegrunnelseDto(svar = SvarId.JA),
             RegelId.AVSTAND_OVER_TRETTI_KM to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "antall km"),
-            RegelId.ER_SAMLING_OBLIGATORISK to SvarOgBegrunnelseDto(svar = SvarId.JA),
+            RegelId.ER_SAMLING_OBLIGATORISK to SvarOgBegrunnelseDto(svar = SvarId.JA, begrunnelse = "obligatorisk"),
             RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to
                 SvarOgBegrunnelseDto(
                     svar = SvarId.NEI,
@@ -53,6 +53,7 @@ object ReiseTilSamlingRegelTestUtil {
                         Vurdering(
                             regelId = RegelId.ER_SAMLING_OBLIGATORISK,
                             svar = SvarId.JA,
+                            begrunnelse = "obligatorisk",
                         ),
                         Vurdering(
                             regelId = RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT,
@@ -84,6 +85,7 @@ object ReiseTilSamlingRegelTestUtil {
                         Vurdering(
                             regelId = RegelId.ER_SAMLING_OBLIGATORISK,
                             svar = SvarId.JA,
+                            begrunnelse = "obligatorisk",
                         ),
                         Vurdering(
                             regelId = RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT,
