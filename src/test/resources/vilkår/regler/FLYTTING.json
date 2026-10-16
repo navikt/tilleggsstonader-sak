@@ -6,23 +6,23 @@
       "svarMapping": {
         "JA": {
           "begrunnelseType": "VALGFRI",
-          "regelId": "HVORDAN_SKAL_BRUKER_FLYTTE"
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
         },
         "NEI": {
           "begrunnelseType": "PÅKREVD",
           "regelId": "SLUTT_NODE",
-          "tilhørendeFaktaType": "FLYTTING_UBESTEMT"
+          "tilhørendeFaktaType": null
         }
       }
     },
-    "FLYTTER_PGA_OPPSTART_ARBEID": {
+    "FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET": {
       "erHovedregel": false,
-      "regelId": "FLYTTER_PGA_OPPSTART_ARBEID",
+      "regelId": "FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET",
       "svarMapping": {
         "JA": {
           "begrunnelseType": "PÅKREVD",
-          "regelId": "SLUTT_NODE",
-          "tilhørendeFaktaType": "FLYTTING_UBESTEMT"
+          "regelId": "HVORDAN_SKAL_BRUKER_FLYTTE"
         },
         "NEI": {
           "begrunnelseType": "PÅKREVD",
@@ -36,19 +36,19 @@
       "regelId": "HVILKEN_FORBINDELSE_FLYTTER_BRUKER",
       "svarMapping": {
         "ARBEID_ETTER_GJENNOMFØRT_AKTIVITET": {
-          "begrunnelseType": "VALGFRI",
-          "regelId": "SAMMENHENG_FLYTTING_OG_ARBEID"
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET"
         },
-        "FLYTTING_ARBEIDSSØKER": {
-          "begrunnelseType": "VALGFRI",
-          "regelId": "FLYTTER_PGA_OPPSTART_ARBEID"
+        "ENSLIG_FORSØRGER_ELLER_GJENLEVENDE_STARTER_I_ARBEID": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID"
         },
         "FLYTTING_VED_AVSLUTTET_AKTIVITET": {
-          "begrunnelseType": "VALGFRI",
+          "begrunnelseType": "PÅKREVD",
           "regelId": "MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET"
         },
         "FLYTTING_VED_START_AV_AKTIVITET": {
-          "begrunnelseType": "VALGFRI",
+          "begrunnelseType": "PÅKREVD",
           "regelId": "MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET"
         }
       }
@@ -59,12 +59,12 @@
       "svarMapping": {
         "FLYTTEBYRÅ": {
           "begrunnelseType": "VALGFRI",
-          "regelId": "SLUTT_NODE",
+          "regelId": "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE",
           "tilhørendeFaktaType": "FLYTTING_FLYTTEBYRÅ"
         },
         "FLYTTER_SELV": {
           "begrunnelseType": "VALGFRI",
-          "regelId": "SLUTT_NODE",
+          "regelId": "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE",
           "tilhørendeFaktaType": "FLYTTING_FLYTTE_SELV"
         }
       }
@@ -75,7 +75,7 @@
       "svarMapping": {
         "JA": {
           "begrunnelseType": "PÅKREVD",
-          "regelId": "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE"
+          "regelId": "HVORDAN_SKAL_BRUKER_FLYTTE"
         },
         "NEI": {
           "begrunnelseType": "PÅKREVD",
@@ -84,13 +84,13 @@
         }
       }
     },
-    "SAMMENHENG_FLYTTING_OG_ARBEID": {
+    "MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID": {
       "erHovedregel": false,
-      "regelId": "SAMMENHENG_FLYTTING_OG_ARBEID",
+      "regelId": "MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID",
       "svarMapping": {
         "JA": {
           "begrunnelseType": "PÅKREVD",
-          "regelId": "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE"
+          "regelId": "HVORDAN_SKAL_BRUKER_FLYTTE"
         },
         "NEI": {
           "begrunnelseType": "PÅKREVD",

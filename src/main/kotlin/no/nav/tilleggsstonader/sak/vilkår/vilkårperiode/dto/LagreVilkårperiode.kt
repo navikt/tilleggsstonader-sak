@@ -9,8 +9,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeT
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetBoutgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetDagligReiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetDagligReiseTsr
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFlyttingTso
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFlyttingTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetReiseOppstartAvslutningHjemreiseTso
@@ -64,8 +62,6 @@ data class LagreVilkårperiode(
         FaktaOgSvarAktivitetReiseOppstartAvslutningHjemreiseTsrDto::class,
         name = "AKTIVITET_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR",
     ),
-    JsonSubTypes.Type(FaktaOgSvarAktivitetFlyttingTsoDto::class, name = "AKTIVITET_FLYTTING_TSO"),
-    JsonSubTypes.Type(FaktaOgSvarAktivitetFlyttingTsrDto::class, name = "AKTIVITET_FLYTTING_TSR"),
 )
 sealed class FaktaOgSvarDto
 
@@ -115,19 +111,6 @@ data class FaktaOgSvarAktivitetReiseOppstartAvslutningHjemreiseTsoDto(
 ) : FaktaOgSvarDto()
 
 data class FaktaOgSvarAktivitetReiseOppstartAvslutningHjemreiseTsrDto(
-    val svarLønnet: SvarJaNei? = null,
-    val svarHarUtgifter: SvarJaNei? = null,
-    val svarErAktivitetenObligatorisk: SvarJaNei? = null,
-    val aktivitetsdager: Int? = null,
-) : FaktaOgSvarDto()
-
-data class FaktaOgSvarAktivitetFlyttingTsoDto(
-    val svarLønnet: SvarJaNei? = null,
-    val svarHarUtgifter: SvarJaNei? = null,
-    val svarErAktivitetenObligatorisk: SvarJaNei? = null,
-) : FaktaOgSvarDto()
-
-data class FaktaOgSvarAktivitetFlyttingTsrDto(
     val svarLønnet: SvarJaNei? = null,
     val svarHarUtgifter: SvarJaNei? = null,
     val svarErAktivitetenObligatorisk: SvarJaNei? = null,
@@ -242,45 +225,6 @@ fun FaktaOgVurdering.tilFaktaOgSvarDto(): FaktaOgSvarDto =
 
         is AktivitetReiseOppstartAvslutningHjemreiseTsr ->
             FaktaOgSvarAktivitetReiseOppstartAvslutningHjemreiseTsrDto(
-                svarLønnet =
-                    this.vurderinger
-                        .takeIfVurderinger<LønnetVurdering>()
-                        ?.lønnet
-                        ?.svar,
-                svarHarUtgifter =
-                    this.vurderinger
-                        .takeIfVurderinger<HarUtgifterVurdering>()
-                        ?.harUtgifter
-                        ?.svar,
-                svarErAktivitetenObligatorisk =
-                    this.vurderinger
-                        .takeIfVurderinger<ErAktivitetenObligatoriskVurdering>()
-                        ?.erAktivitetenObligatorisk
-                        ?.svar,
-                aktivitetsdager = this.fakta.takeIfFakta<FaktaAktivitetsdagerNullable>()?.aktivitetsdager,
-            )
-
-        is AktivitetFlyttingTso ->
-            FaktaOgSvarAktivitetFlyttingTsoDto(
-                svarLønnet =
-                    this.vurderinger
-                        .takeIfVurderinger<LønnetVurdering>()
-                        ?.lønnet
-                        ?.svar,
-                svarHarUtgifter =
-                    this.vurderinger
-                        .takeIfVurderinger<HarUtgifterVurdering>()
-                        ?.harUtgifter
-                        ?.svar,
-                svarErAktivitetenObligatorisk =
-                    this.vurderinger
-                        .takeIfVurderinger<ErAktivitetenObligatoriskVurdering>()
-                        ?.erAktivitetenObligatorisk
-                        ?.svar,
-            )
-
-        is AktivitetFlyttingTsr ->
-            FaktaOgSvarAktivitetFlyttingTsrDto(
                 svarLønnet =
                     this.vurderinger
                         .takeIfVurderinger<LønnetVurdering>()

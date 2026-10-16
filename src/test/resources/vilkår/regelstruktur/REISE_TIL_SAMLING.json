@@ -33,7 +33,7 @@
     "erHovedregel": false,
     "reglerSomMåNullstilles": [ "KAN_REISE_MED_OFFENTLIG_TRANSPORT", "DOKUMENTERTE_UTGIFTER", "KAN_REISE_MED_EGEN_BIL" ],
     "svaralternativer": [ {
-      "begrunnelseType": "VALGFRI",
+      "begrunnelseType": "PÅKREVD",
       "nesteRegelId": "KAN_REISE_MED_OFFENTLIG_TRANSPORT",
       "svarId": "JA",
       "tilhørendeFaktaType": null

@@ -20,27 +20,33 @@ object OppfølgingAktivitetKontrollerUtil {
         vedtaksperioder: List<Vedtaksperiode>,
         registerAktiviteter: OppfølgingRegisterAktiviteter,
         aktiviteter: List<OppfølgingInngangsvilkårAktivitet>,
-    ): List<PeriodeForKontroll> = vedtaksperioder.map { it.finnEndringer(registerAktiviteter, aktiviteter) }
+    ): List<PeriodeForKontroll> =
+        vedtaksperioder.mapNotNull { vedtaksperiode ->
+            // Vedtaksperioder uten aktivitet (eks flytting) har ingen aktivitet å kontrollere
+            vedtaksperiode.aktivitet?.let { vedtaksperiode.finnEndringer(it, registerAktiviteter, aktiviteter) }
+        }
 
     private fun Vedtaksperiode.finnEndringer(
+        aktivitet: AktivitetType,
         oppfølgingRegisterAktiviteter: OppfølgingRegisterAktiviteter,
         inngangsvilkår: List<OppfølgingInngangsvilkårAktivitet>,
     ): PeriodeForKontroll {
-        val endringerAktivitet = finnEndringIAktivitet(oppfølgingRegisterAktiviteter, inngangsvilkår)
+        val endringerAktivitet = finnEndringIAktivitet(aktivitet, oppfølgingRegisterAktiviteter, inngangsvilkår)
         return PeriodeForKontroll(
             fom = this.fom,
             tom = this.tom,
-            type = this.aktivitet,
+            type = aktivitet,
             endringer = endringerAktivitet,
         )
     }
 
     private fun Vedtaksperiode.finnEndringIAktivitet(
+        aktivitet: AktivitetType,
         oppfølgingRegisterAktiviteter: OppfølgingRegisterAktiviteter,
         aktiviteter: List<OppfølgingInngangsvilkårAktivitet>,
     ): List<Kontroll> {
         val kontroller =
-            when (this.aktivitet) {
+            when (aktivitet) {
                 AktivitetType.REELL_ARBEIDSSØKER -> mutableListOf() // Skal ikke kontrolleres
                 AktivitetType.INGEN_AKTIVITET -> error("Skal ikke være mulig å ha en stønadsperiode med ingen aktivitet")
                 AktivitetType.TILTAK ->

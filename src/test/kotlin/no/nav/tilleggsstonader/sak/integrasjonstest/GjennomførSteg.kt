@@ -22,9 +22,12 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReiseTsrRequest
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequest
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.AvslagFlyttingDto
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingTsoRequest
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingTsrRequest
+import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.OpphørFlyttingRequest
+import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.VedtaksperiodeFlyttingDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.OpphørLæremidlerRequest
@@ -291,11 +294,10 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                                     vedtaksperioder = vedtaksperioder.tilVedtaksperiodeTsrDto(),
                                 )
 
-                            Stønadstype.FLYTTING_TSO -> InnvilgelseFlyttingTsoRequest(vedtaksperioder = vedtaksperioder)
+                            Stønadstype.FLYTTING_TSO ->
+                                InnvilgelseFlyttingTsoRequest(vedtaksperioder = vedtaksperioder.tilVedtaksperiodeFlyttingDto())
                             Stønadstype.FLYTTING_TSR ->
-                                InnvilgelseFlyttingTsrRequest(
-                                    vedtaksperioder = vedtaksperioder.tilVedtaksperiodeTsrDto(),
-                                )
+                                InnvilgelseFlyttingTsrRequest(vedtaksperioder = vedtaksperioder.tilVedtaksperiodeFlyttingDto())
                             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO ->
                                 InnvilgelseReiseOppstartAvslutningHjemreiseTsoRequest(
                                     vedtaksperioder = vedtaksperioder,
@@ -407,7 +409,12 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                                 )
                             Stønadstype.FLYTTING_TSO,
                             Stønadstype.FLYTTING_TSR,
-                            -> TODO("OpphørFlyttingRequest")
+                            ->
+                                OpphørFlyttingRequest(
+                                    årsakerOpphør = opprettVedtak.årsaker,
+                                    begrunnelse = opprettVedtak.begrunnelse,
+                                    opphørsdato = opprettVedtak.opphørsdato,
+                                )
                             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
                             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
                             -> TODO("OpphørReiseOppstartAvslutningHjemreiseRequest")
@@ -465,3 +472,6 @@ fun IntegrationTest.gjennomførBeslutteVedtakSteg(behandlingId: BehandlingId): S
     // slik at gjennomførBehandlingsløp()-funksjon kan avslutte steg-gjennomføring
     return StegType.BEHANDLING_FERDIGSTILT
 }
+
+private fun List<VedtaksperiodeDto>.tilVedtaksperiodeFlyttingDto() =
+    map { VedtaksperiodeFlyttingDto(id = it.id, fom = it.fom, tom = it.tom, målgruppeType = it.målgruppeType) }

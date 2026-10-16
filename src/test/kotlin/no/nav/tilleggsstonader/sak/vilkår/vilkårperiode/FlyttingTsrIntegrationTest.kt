@@ -47,18 +47,13 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
 
         opprettOgTilordneOppgaveForBehandling(behandling.id)
         gjennomførBehandlingsløp(ident = ident, behandlingId = behandling.id) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTsrFlytting(fom, tom)
-                }
-            }
             målgruppe {
                 opprett {
                     målgruppeDagpenger(fom, tom)
                 }
             }
             vilkår {
-                flyttingEgenKjøring(fom, avstandEnVei = 100, bompenger = 100)
+                flyttingEgenKjøring(flytteDato = fom, avstandEnVei = 100, bompenger = 100)
             }
             vedtak {
                 avslag()
@@ -97,11 +92,6 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
             ident = ident,
             behandlingId = behandling.id,
         ) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTsrFlytting(fom, tom)
-                }
-            }
             målgruppe {
                 opprett {
                     målgruppeDagpenger(fom, tom)
@@ -109,7 +99,7 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingEgenKjøring(
-                    fom,
+                    flytteDato = fom,
                     avstandEnVei = 100,
                     bompenger = 100,
                 )
@@ -153,11 +143,6 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
             ident = ident,
             behandlingId = behandling.id,
         ) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTsrFlytting(fom, tom)
-                }
-            }
             målgruppe {
                 opprett {
                     målgruppeDagpenger(fom, tom)
@@ -165,7 +150,7 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    fom,
+                    flytteDato = fom,
                     tilbud1Pris = 10000,
                     tilbud2Pris = 5000,
                     erBetalingDokumentert = true,
@@ -210,11 +195,6 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
             ident = ident,
             behandlingId = behandling.id,
         ) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTsrFlytting(fom, tom)
-                }
-            }
             målgruppe {
                 opprett {
                     målgruppeDagpenger(fom, tom)
@@ -222,7 +202,7 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    fom,
+                    flytteDato = fom,
                     tilbud1Pris = 10000,
                     tilbud2Pris = 5000,
                     erBetalingDokumentert = false,

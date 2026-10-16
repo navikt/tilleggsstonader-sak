@@ -49,6 +49,41 @@ object ForeslåVedtaksperioderUtil {
         return forslag
     }
 
+    /**
+     * For stønadstyper uten aktivitet (eks flytting) foreslås vedtaksperioder kun ut fra målgrupper og vilkår
+     */
+    fun foreslåPerioderUtenAktivitet(
+        vilkårperioder: Vilkårperioder,
+        vilkår: List<Vilkår>,
+    ): List<Vedtaksperiode> {
+        val målgrupper = forenkledeMålgrupper(vilkårperioder)
+        målgrupper.forEach { målgruppe ->
+            brukerfeilHvis(målgrupper.any { it !== målgruppe && it.overlapper(målgruppe) }) {
+                "Foreløpig klarer vi bare å foreslå perioder når det ikke er overlapp mellom ulike målgrupper. Her må du i stedet legge inn periodene manuelt."
+            }
+        }
+        val forslag =
+            målgrupper
+                .flatMap { målgruppe ->
+                    vilkår.forenklet().mapNotNull { vilkårperiode ->
+                        målgruppe.beregnSnitt(vilkårperiode)?.let {
+                            Vedtaksperiode(
+                                id = VedtaksperiodeId.random(),
+                                fom = it.fom,
+                                tom = it.tom,
+                                målgruppe = målgruppe.type,
+                                aktivitet = null,
+                            )
+                        }
+                    }
+                }.mergeSammenhengende()
+                .map { it.copy(id = VedtaksperiodeId.random()) }
+        brukerfeilHvis(forslag.isEmpty()) {
+            "Fant ingen gyldig overlapp mellom målgruppe og utgiftsperiodene"
+        }
+        return forslag
+    }
+
     private fun forenkledeMålgrupper(vilkårperioder: Vilkårperioder): List<ForenkletVilkårperiode<FaktiskMålgruppe>> =
         vilkårperioder.målgrupper
             .forenklet { (it.type as MålgruppeType).faktiskMålgruppe() }

@@ -227,7 +227,7 @@ class LæremidlerBeregningService(
                     fom = it.fom,
                     tom = it.tom,
                     målgruppe = it.målgruppe,
-                    aktivitet = it.aktivitet,
+                    aktivitet = it.aktivitetEllerFeil(),
                 )
             }.sorted()
 

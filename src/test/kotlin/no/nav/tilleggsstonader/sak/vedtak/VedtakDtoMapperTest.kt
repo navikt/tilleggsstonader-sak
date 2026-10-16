@@ -15,9 +15,12 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.InnvilgelseDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseResponse
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.OpphørFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
+import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.OpphørFlyttingResponse
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerResponse
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.avslagVedtak
@@ -222,6 +225,37 @@ class VedtakDtoMapperTest {
             assertThat(dto.begrunnelse).isEqualTo(vedtak.data.begrunnelse)
             assertThat(dto.opphørsdato).isEqualTo(opphørsdato)
             assertThat(dto.type).isEqualTo(TypeVedtak.OPPHØR)
+        }
+
+        @Nested
+        inner class Flytting {
+            @Test
+            fun `skal mappe opphørt flyttevedtak til dto`() {
+                val opphørsdato = 1 februar 2025
+                val vedtak =
+                    GeneriskVedtak(
+                        behandlingId = BehandlingId.random(),
+                        type = TypeVedtak.OPPHØR,
+                        data =
+                            OpphørFlytting(
+                                vedtaksperioder = emptyList(),
+                                beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, opphørsdato),
+                                beregningsresultat = BeregningsresultatFlytting(emptyList()),
+                                årsaker = listOf(ÅrsakOpphør.ENDRING_AKTIVITET),
+                                begrunnelse = "begrunnelse",
+                            ),
+                        gitVersjon = Applikasjonsversjon.versjon,
+                        tidligsteEndring = null,
+                        opphørsdato = opphørsdato,
+                    )
+
+                val dto = vedtakDtoMapper.toDto(vedtak, forrigeIverksatteBehandlingId = null) as OpphørFlyttingResponse
+
+                assertThat(dto.årsakerOpphør).isEqualTo(vedtak.data.årsaker)
+                assertThat(dto.begrunnelse).isEqualTo(vedtak.data.begrunnelse)
+                assertThat(dto.opphørsdato).isEqualTo(opphørsdato)
+                assertThat(dto.type).isEqualTo(TypeVedtak.OPPHØR)
+            }
         }
     }
 }

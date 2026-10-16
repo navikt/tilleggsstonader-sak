@@ -3,12 +3,10 @@ package no.nav.tilleggsstonader.sak.vedtak.flytting.dto
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
+import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakRequest
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakResponse
-import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
-import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeTsrDto
-import no.nav.tilleggsstonader.sak.vedtak.dto.tilDomene
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlytting
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
 import java.math.BigDecimal
@@ -42,6 +40,14 @@ data class AvslagFlyttingDto(
     VedtakFlyttingRequest,
     VedtakFlyttingResponse
 
+data class OpphørFlyttingResponse(
+    val årsakerOpphør: List<ÅrsakOpphør>,
+    val begrunnelse: String,
+    val vedtaksperioder: List<LagretVedtaksperiodeDto>?,
+    val opphørsdato: LocalDate,
+) : VedtakFlyttingDto(TypeVedtak.OPPHØR),
+    VedtakFlyttingResponse
+
 sealed class VedtakFlyttingDto(
     open val type: TypeVedtak,
 )
@@ -50,6 +56,13 @@ sealed interface VedtakFlyttingResponse : VedtakResponse
 
 sealed interface VedtakFlyttingRequest : VedtakRequest
 
+data class OpphørFlyttingRequest(
+    val årsakerOpphør: List<ÅrsakOpphør>,
+    val begrunnelse: String,
+    val opphørsdato: LocalDate?,
+) : VedtakFlyttingDto(TypeVedtak.OPPHØR),
+    VedtakFlyttingRequest
+
 sealed interface InnvilgelseFlyttingRequest : VedtakFlyttingRequest {
     val begrunnelse: String?
 
@@ -57,14 +70,14 @@ sealed interface InnvilgelseFlyttingRequest : VedtakFlyttingRequest {
 }
 
 data class InnvilgelseFlyttingTsoRequest(
-    val vedtaksperioder: List<VedtaksperiodeDto>,
+    val vedtaksperioder: List<VedtaksperiodeFlyttingDto>,
     override val begrunnelse: String? = null,
 ) : InnvilgelseFlyttingRequest {
     override fun vedtaksperioder(): List<Vedtaksperiode> = vedtaksperioder.tilDomene()
 }
 
 data class InnvilgelseFlyttingTsrRequest(
-    val vedtaksperioder: List<VedtaksperiodeTsrDto>,
+    val vedtaksperioder: List<VedtaksperiodeFlyttingDto>,
     override val begrunnelse: String? = null,
 ) : InnvilgelseFlyttingRequest {
     override fun vedtaksperioder(): List<Vedtaksperiode> = vedtaksperioder.tilDomene()

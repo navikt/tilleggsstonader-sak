@@ -1,9 +1,24 @@
 {
   "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE": {
     "erHovedregel": false,
-    "reglerSomMåNullstilles": [ "HVORDAN_SKAL_BRUKER_FLYTTE" ],
+    "reglerSomMåNullstilles": [ ],
     "svaralternativer": [ {
       "begrunnelseType": "VALGFRI",
+      "nesteRegelId": null,
+      "svarId": "JA",
+      "tilhørendeFaktaType": null
+    }, {
+      "begrunnelseType": "PÅKREVD",
+      "nesteRegelId": null,
+      "svarId": "NEI",
+      "tilhørendeFaktaType": null
+    } ]
+  },
+  "FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET": {
+    "erHovedregel": false,
+    "reglerSomMåNullstilles": [ "HVORDAN_SKAL_BRUKER_FLYTTE", "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE" ],
+    "svaralternativer": [ {
+      "begrunnelseType": "PÅKREVD",
       "nesteRegelId": "HVORDAN_SKAL_BRUKER_FLYTTE",
       "svarId": "JA",
       "tilhørendeFaktaType": null
@@ -14,67 +29,52 @@
       "tilhørendeFaktaType": "FLYTTING_UBESTEMT"
     } ]
   },
-  "FLYTTER_PGA_OPPSTART_ARBEID": {
-    "erHovedregel": false,
-    "reglerSomMåNullstilles": [ ],
-    "svaralternativer": [ {
-      "begrunnelseType": "PÅKREVD",
-      "nesteRegelId": null,
-      "svarId": "JA",
-      "tilhørendeFaktaType": "FLYTTING_UBESTEMT"
-    }, {
-      "begrunnelseType": "PÅKREVD",
-      "nesteRegelId": null,
-      "svarId": "NEI",
-      "tilhørendeFaktaType": "FLYTTING_UBESTEMT"
-    } ]
-  },
   "HVILKEN_FORBINDELSE_FLYTTER_BRUKER": {
     "erHovedregel": true,
-    "reglerSomMåNullstilles": [ "MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET", "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE", "HVORDAN_SKAL_BRUKER_FLYTTE", "SAMMENHENG_FLYTTING_OG_ARBEID", "FLYTTER_PGA_OPPSTART_ARBEID" ],
+    "reglerSomMåNullstilles": [ "MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET", "HVORDAN_SKAL_BRUKER_FLYTTE", "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE", "FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET", "MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID" ],
     "svaralternativer": [ {
-      "begrunnelseType": "VALGFRI",
+      "begrunnelseType": "PÅKREVD",
       "nesteRegelId": "MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET",
       "svarId": "FLYTTING_VED_START_AV_AKTIVITET",
       "tilhørendeFaktaType": null
     }, {
-      "begrunnelseType": "VALGFRI",
+      "begrunnelseType": "PÅKREVD",
       "nesteRegelId": "MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET",
       "svarId": "FLYTTING_VED_AVSLUTTET_AKTIVITET",
       "tilhørendeFaktaType": null
     }, {
-      "begrunnelseType": "VALGFRI",
-      "nesteRegelId": "SAMMENHENG_FLYTTING_OG_ARBEID",
+      "begrunnelseType": "PÅKREVD",
+      "nesteRegelId": "FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET",
       "svarId": "ARBEID_ETTER_GJENNOMFØRT_AKTIVITET",
       "tilhørendeFaktaType": null
     }, {
-      "begrunnelseType": "VALGFRI",
-      "nesteRegelId": "FLYTTER_PGA_OPPSTART_ARBEID",
-      "svarId": "FLYTTING_ARBEIDSSØKER",
+      "begrunnelseType": "PÅKREVD",
+      "nesteRegelId": "MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID",
+      "svarId": "ENSLIG_FORSØRGER_ELLER_GJENLEVENDE_STARTER_I_ARBEID",
       "tilhørendeFaktaType": null
     } ]
   },
   "HVORDAN_SKAL_BRUKER_FLYTTE": {
     "erHovedregel": false,
-    "reglerSomMåNullstilles": [ ],
+    "reglerSomMåNullstilles": [ "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE" ],
     "svaralternativer": [ {
       "begrunnelseType": "VALGFRI",
-      "nesteRegelId": null,
+      "nesteRegelId": "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE",
       "svarId": "FLYTTEBYRÅ",
       "tilhørendeFaktaType": "FLYTTING_FLYTTEBYRÅ"
     }, {
       "begrunnelseType": "VALGFRI",
-      "nesteRegelId": null,
+      "nesteRegelId": "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE",
       "svarId": "FLYTTER_SELV",
       "tilhørendeFaktaType": "FLYTTING_FLYTTE_SELV"
     } ]
   },
   "MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET": {
     "erHovedregel": false,
-    "reglerSomMåNullstilles": [ "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE", "HVORDAN_SKAL_BRUKER_FLYTTE" ],
+    "reglerSomMåNullstilles": [ "HVORDAN_SKAL_BRUKER_FLYTTE", "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE" ],
     "svaralternativer": [ {
       "begrunnelseType": "PÅKREVD",
-      "nesteRegelId": "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE",
+      "nesteRegelId": "HVORDAN_SKAL_BRUKER_FLYTTE",
       "svarId": "JA",
       "tilhørendeFaktaType": null
     }, {
@@ -84,12 +84,12 @@
       "tilhørendeFaktaType": "FLYTTING_UBESTEMT"
     } ]
   },
-  "SAMMENHENG_FLYTTING_OG_ARBEID": {
+  "MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID": {
     "erHovedregel": false,
-    "reglerSomMåNullstilles": [ "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE", "HVORDAN_SKAL_BRUKER_FLYTTE" ],
+    "reglerSomMåNullstilles": [ "HVORDAN_SKAL_BRUKER_FLYTTE", "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE" ],
     "svaralternativer": [ {
       "begrunnelseType": "PÅKREVD",
-      "nesteRegelId": "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE",
+      "nesteRegelId": "HVORDAN_SKAL_BRUKER_FLYTTE",
       "svarId": "JA",
       "tilhørendeFaktaType": null
     }, {

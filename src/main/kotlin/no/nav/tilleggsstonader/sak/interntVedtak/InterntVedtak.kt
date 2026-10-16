@@ -206,5 +206,5 @@ data class VedtaksperiodeInterntVedtak(
     val fom: LocalDate,
     val tom: LocalDate,
     val målgruppe: FaktiskMålgruppe,
-    val aktivitet: AktivitetType,
+    val aktivitet: AktivitetType?,
 )

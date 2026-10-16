@@ -47,12 +47,8 @@ enum class RegelId(
     // FLYTTING
     HVILKEN_FORBINDELSE_FLYTTER_BRUKER("I hvilken forbindelse flytter bruker?"),
     MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET("Må bruker flytte fra hjemstedet for å gjennomføre aktiviteten?"),
-
-    // TODO(flytting): Placeholder, endelig spørsmålstekst mangler
-    SAMMENHENG_FLYTTING_OG_ARBEID("PLACEHOLDER: Er det sammenheng mellom flyttingen og arbeidet?"),
-
-    // TODO(flytting): Placeholder, endelig spørsmålstekst mangler
-    FLYTTER_PGA_OPPSTART_ARBEID("PLACEHOLDER: Flytter bruker på grunn av oppstart i arbeid?"),
+    FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET("Flytter bruker i forbindelse med arbeid etter at aktiviteten er gjennomført?"),
+    MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID("Må bruker flytte fra hjemstedet for å starte i arbeid på et annet sted?"),
     ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE("Er kostnader for flytting nødvendig?"),
     HVORDAN_SKAL_BRUKER_FLYTTE("Skal bruker benytte seg av flyttebyrå, eller flytter bruker selv?"),
 }

@@ -122,6 +122,7 @@ class InterntVedtakGenereringTest {
             Stønadstype.FLYTTING_TSO,
             Stønadstype.FLYTTING_TSR,
             -> TODO("mockFlytting")
+
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
             -> TODO("mockReiseOppstartAvslutningHjemreise")

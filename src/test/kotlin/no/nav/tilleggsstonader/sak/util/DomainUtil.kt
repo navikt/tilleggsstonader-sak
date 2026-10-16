@@ -449,7 +449,7 @@ fun vedtaksperiode(
     id: VedtaksperiodeId = VedtaksperiodeId.random(),
     fom: LocalDate = YearMonth.now().atDay(1),
     tom: LocalDate = YearMonth.now().atEndOfMonth(),
-    aktivitet: AktivitetType = AktivitetType.TILTAK,
+    aktivitet: AktivitetType? = AktivitetType.TILTAK,
     målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
 ) = Vedtaksperiode(
     id = id,
@@ -918,7 +918,7 @@ fun vedtaksperiode(
     fom: LocalDate = 1 januar 2025,
     tom: LocalDate = 31 januar 2025,
     målgruppe: FaktiskMålgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
-    aktivitet: AktivitetType = AktivitetType.TILTAK,
+    aktivitet: AktivitetType? = AktivitetType.TILTAK,
 ) = Vedtaksperiode(
     id = VedtaksperiodeId.random(),
     fom = fom,

@@ -14,6 +14,10 @@ import no.nav.tilleggsstonader.sak.util.fagsakBoutgifter
 import no.nav.tilleggsstonader.sak.util.saksbehandling
 import no.nav.tilleggsstonader.sak.util.vedtaksperiode
 import no.nav.tilleggsstonader.sak.util.vilkår
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlyttevilkår
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
+import no.nav.tilleggsstonader.sak.vedtak.flytting.mapTilAndeler
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil.beregningsresultatForMåned
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.beregning.PassAvBarnBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.domain.Beløpsperiode
@@ -31,6 +35,7 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -122,6 +127,105 @@ class OpphørValideringServiceTest {
 
     @Nested
     inner class `Valider ingen utbetaling etter opphør` {
+        @Test
+        fun `Flytting validerer at utbetaling ikke skjer på eller etter opphørsdato`() {
+            val resultat =
+                BeregningsresultatFlytting(
+                    resultater =
+                        listOf(
+                            BeregningsresultatFlyttevilkår(
+                                fom = 1 februar 2025,
+                                tom = 28 februar 2025,
+                                beløp = BigDecimal("100"),
+                                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                                grunnlag =
+                                    BeregningsgrunnlagFlyttebyrå(
+                                        tilbud1Pris = BigDecimal("100"),
+                                        tilbud2Pris = BigDecimal("120"),
+                                        erBetalingDokumentert = true,
+                                    ),
+                            ),
+                        ),
+                )
+
+            assertThatThrownBy {
+                opphørValideringService.validerIngenUtbetalingEtterOpphørsdatoFlytting(
+                    resultat.mapTilAndeler(Stønadstype.FLYTTING_TSO),
+                    1 februar 2025,
+                )
+            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter opphørsdato")
+        }
+
+        @Test
+        fun `Flytting avviser utbetaling som flyttes til mandag etter helg`() {
+            val resultat =
+                BeregningsresultatFlytting(
+                    resultater =
+                        listOf(
+                            BeregningsresultatFlyttevilkår(
+                                fom = 3 januar 2026,
+                                tom = 3 januar 2026,
+                                beløp = BigDecimal("100"),
+                                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                                grunnlag =
+                                    BeregningsgrunnlagFlyttebyrå(
+                                        tilbud1Pris = BigDecimal("100"),
+                                        tilbud2Pris = BigDecimal("120"),
+                                        erBetalingDokumentert = true,
+                                    ),
+                            ),
+                        ),
+                )
+
+            assertThatThrownBy {
+                opphørValideringService.validerIngenUtbetalingEtterOpphørsdatoFlytting(
+                    resultat.mapTilAndeler(Stønadstype.FLYTTING_TSO),
+                    4 januar 2026,
+                )
+            }.hasMessage("Opphør er et ugyldig vedtaksresultat fordi det er utbetalinger på eller etter opphørsdato")
+        }
+
+        @Test
+        fun `Flytting godtar utbetaling før opphørsdato og resultater uten beløp`() {
+            val resultat =
+                BeregningsresultatFlytting(
+                    resultater =
+                        listOf(
+                            BeregningsresultatFlyttevilkår(
+                                fom = 1 januar 2025,
+                                tom = 31 januar 2025,
+                                beløp = BigDecimal("100"),
+                                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                                grunnlag =
+                                    BeregningsgrunnlagFlyttebyrå(
+                                        tilbud1Pris = BigDecimal("100"),
+                                        tilbud2Pris = BigDecimal("120"),
+                                        erBetalingDokumentert = true,
+                                    ),
+                            ),
+                            BeregningsresultatFlyttevilkår(
+                                fom = 1 februar 2025,
+                                tom = 28 februar 2025,
+                                beløp = BigDecimal.ZERO,
+                                målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                                grunnlag =
+                                    BeregningsgrunnlagFlyttebyrå(
+                                        tilbud1Pris = BigDecimal.ZERO,
+                                        tilbud2Pris = BigDecimal.ZERO,
+                                        erBetalingDokumentert = true,
+                                    ),
+                            ),
+                        ),
+                )
+
+            assertThatCode {
+                opphørValideringService.validerIngenUtbetalingEtterOpphørsdatoFlytting(
+                    resultat.mapTilAndeler(Stønadstype.FLYTTING_TSO),
+                    1 februar 2025,
+                )
+            }.doesNotThrowAnyException()
+        }
+
         @Test
         fun `Kaster ikke feil ved korrekt data`() {
             assertThatCode {

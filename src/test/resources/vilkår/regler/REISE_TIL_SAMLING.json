@@ -36,7 +36,7 @@
       "regelId": "ER_SAMLING_OBLIGATORISK",
       "svarMapping": {
         "JA": {
-          "begrunnelseType": "VALGFRI",
+          "begrunnelseType": "PÅKREVD",
           "regelId": "KAN_REISE_MED_OFFENTLIG_TRANSPORT"
         },
         "NEI": {

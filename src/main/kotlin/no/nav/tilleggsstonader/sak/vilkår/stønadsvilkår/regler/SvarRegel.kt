@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonInclude
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.TypeVilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 
@@ -74,4 +75,6 @@ class SluttSvarRegel(
 data class NesteRegel(
     override val regelId: RegelId,
     override val begrunnelseType: BegrunnelseType = BegrunnelseType.UTEN,
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    val tilhørendeFaktaType: TypeVilkårFakta? = null,
 ) : SvarRegel

@@ -47,11 +47,6 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
 
         opprettOgTilordneOppgaveForBehandling(behandling.id)
         gjennomførBehandlingsløp(ident = ident, behandlingId = behandling.id) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTsoFlytting(fom, tom)
-                }
-            }
             målgruppe {
                 opprett {
                     målgruppeAAP(fom, tom)
@@ -97,11 +92,6 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
             ident = ident,
             behandlingId = behandling.id,
         ) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTsoFlytting(fom, tom)
-                }
-            }
             målgruppe {
                 opprett {
                     målgruppeAAP(fom, tom)
@@ -109,7 +99,7 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingEgenKjøring(
-                    fom,
+                    flytteDato = fom,
                     avstandEnVei = 100,
                     bompenger = 100,
                 )
@@ -154,11 +144,6 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
             ident = ident,
             behandlingId = behandling.id,
         ) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTsoFlytting(fom, tom)
-                }
-            }
             målgruppe {
                 opprett {
                     målgruppeAAP(fom, tom)
@@ -166,7 +151,7 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    fom,
+                    flytteDato = fom,
                     tilbud1Pris = 10000,
                     tilbud2Pris = 5000,
                     erBetalingDokumentert = true,
@@ -211,11 +196,6 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
             ident = ident,
             behandlingId = behandling.id,
         ) {
-            aktivitet {
-                opprett {
-                    aktivitetTiltakTsoFlytting(fom, tom)
-                }
-            }
             målgruppe {
                 opprett {
                     målgruppeAAP(fom, tom)
@@ -223,7 +203,7 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    fom,
+                    flytteDato = fom,
                     tilbud1Pris = 10000,
                     tilbud2Pris = 5000,
                     erBetalingDokumentert = false,

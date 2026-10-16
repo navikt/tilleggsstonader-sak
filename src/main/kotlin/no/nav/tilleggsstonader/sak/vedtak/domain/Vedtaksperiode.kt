@@ -26,7 +26,10 @@ data class Vedtaksperiode(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val målgruppe: FaktiskMålgruppe,
-    val aktivitet: AktivitetType,
+    /**
+     * Er null for stønadstyper uten aktivitet, se [no.nav.tilleggsstonader.sak.felles.domain.harAktivitet]
+     */
+    val aktivitet: AktivitetType?,
 ) : Periode<LocalDate>,
     KopierPeriode<Vedtaksperiode>,
     PeriodeMedId,
@@ -40,6 +43,8 @@ data class Vedtaksperiode(
         fom: LocalDate,
         tom: LocalDate,
     ): Vedtaksperiode = this.copy(fom = fom, tom = tom)
+
+    fun aktivitetEllerFeil(): AktivitetType = aktivitet ?: error("Vedtaksperiode med id=$id mangler aktivitet")
 
     fun erSammenhengendeMedLikMålgruppeOgAktivitet(other: Vedtaksperiode): Boolean =
         this.målgruppe == other.målgruppe &&
@@ -63,7 +68,7 @@ fun List<Vedtaksperiode>.tilVedtaksperiodeBeregning() =
             fom = it.fom,
             tom = it.tom,
             målgruppe = it.målgruppe,
-            aktivitet = it.aktivitet,
+            aktivitet = it.aktivitetEllerFeil(),
         )
     }
 

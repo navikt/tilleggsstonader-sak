@@ -69,7 +69,7 @@ data class VedtaksperiodeGrunnlag(
         fom = vedtaksperiode.fom,
         tom = vedtaksperiode.tom,
         målgruppe = vedtaksperiode.målgruppe,
-        aktivitet = vedtaksperiode.aktivitet,
+        aktivitet = vedtaksperiode.aktivitetEllerFeil(),
         antallReisedagerIVedtaksperioden = antallReisedager,
     )
 }

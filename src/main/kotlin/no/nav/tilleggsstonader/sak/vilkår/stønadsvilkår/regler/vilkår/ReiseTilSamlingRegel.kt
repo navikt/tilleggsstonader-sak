@@ -79,7 +79,7 @@ class ReiseTilSamlingRegel :
                 erHovedregel = false,
                 svarMapping =
                     jaNeiSvarRegel(
-                        hvisJa = NesteRegel(KAN_REISE_MED_OFFENTLIG_TRANSPORT.regelId, BegrunnelseType.VALGFRI),
+                        hvisJa = NesteRegel(KAN_REISE_MED_OFFENTLIG_TRANSPORT.regelId, BegrunnelseType.PÅKREVD),
                         hvisNei = IKKE_OPPFYLT_MED_PÅKREVD_BEGRUNNELSE,
                     ),
             )

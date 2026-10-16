@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.behandling.domain.Saksbehandling
 import no.nav.tilleggsstonader.sak.behandlingsflyt.BehandlingSteg
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
+import no.nav.tilleggsstonader.sak.felles.domain.harAktivitet
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.validerNyeMålgrupperOverlapperIkkeMedEksisterendeMålgrupper
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import org.springframework.stereotype.Service
@@ -17,8 +18,14 @@ class InngangsvilkårSteg(
     override fun validerSteg(saksbehandling: Saksbehandling) {
         val vilkårperioder = vilkårperiodeService.hentVilkårperioder(saksbehandling.id)
 
-        brukerfeilHvis((vilkårperioder.målgrupper.isEmpty() || vilkårperioder.aktiviteter.isEmpty())) {
-            "Du må registrere minst én målgruppe og én aktivitet for å kunne gå videre."
+        if (saksbehandling.stønadstype.harAktivitet) {
+            brukerfeilHvis(vilkårperioder.målgrupper.isEmpty() || vilkårperioder.aktiviteter.isEmpty()) {
+                "Du må registrere minst én målgruppe og én aktivitet for å kunne gå videre."
+            }
+        } else {
+            brukerfeilHvis(vilkårperioder.målgrupper.isEmpty()) {
+                "Du må registrere minst én målgruppe for å kunne gå videre."
+            }
         }
 
         validerNyeMålgrupperOverlapperIkkeMedEksisterendeMålgrupper(vilkårperioder)

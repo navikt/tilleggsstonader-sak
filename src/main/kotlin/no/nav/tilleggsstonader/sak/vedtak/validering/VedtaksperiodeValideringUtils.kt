@@ -60,25 +60,46 @@ object VedtaksperiodeValideringUtils {
         vedtaksperiode: Vedtaksperiode,
         målgruppePerioderPerType: Map<FaktiskMålgruppe, List<Datoperiode>>,
         aktivitetPerioderPerType: Map<AktivitetType, List<Datoperiode>>,
+        stønadstypeHarAktivitet: Boolean = true,
     ) {
-        brukerfeilHvisIkke(vedtaksperiode.målgruppe.gyldigeAktiviter.contains(vedtaksperiode.aktivitet)) {
-            "Kombinasjonen av ${vedtaksperiode.målgruppe} og ${vedtaksperiode.aktivitet} er ikke gyldig"
-        }
+        val aktivitet =
+            if (stønadstypeHarAktivitet) {
+                validerHarGyldigAktivitet(vedtaksperiode)
+            } else {
+                brukerfeilHvis(vedtaksperiode.aktivitet != null) {
+                    "Vedtaksperiode ${vedtaksperiode.formatertPeriodeNorskFormat()} skal ikke ha aktivitet"
+                }
+                null
+            }
 
         val målgrupper =
             målgruppePerioderPerType[vedtaksperiode.målgruppe]?.takeIf { it.isNotEmpty() }
                 ?: brukerfeil("Finner ingen perioder hvor vilkår for ${vedtaksperiode.målgruppe} er oppfylt")
         val aktiviteter =
-            aktivitetPerioderPerType[vedtaksperiode.aktivitet]?.takeIf { it.isNotEmpty() }
-                ?: brukerfeil("Finner ingen perioder hvor vilkår for ${vedtaksperiode.aktivitet} er oppfylt")
+            aktivitet?.let {
+                aktivitetPerioderPerType[it]?.takeIf { perioder -> perioder.isNotEmpty() }
+                    ?: brukerfeil("Finner ingen perioder hvor vilkår for $it er oppfylt")
+            }
 
         målgrupper.firstOrNull { it.inneholder(vedtaksperiode) }
             ?: brukerfeil(
                 "Finnes ingen periode med oppfylte vilkår for ${vedtaksperiode.målgruppe} i perioden ${vedtaksperiode.formatertPeriodeNorskFormat()}",
             )
-        aktiviteter.firstOrNull { it.inneholder(vedtaksperiode) }
-            ?: brukerfeil(
-                "Finnes ingen periode med oppfylte vilkår for ${vedtaksperiode.aktivitet} i perioden ${vedtaksperiode.formatertPeriodeNorskFormat()}",
-            )
+        if (aktiviteter != null) {
+            aktiviteter.firstOrNull { it.inneholder(vedtaksperiode) }
+                ?: brukerfeil(
+                    "Finnes ingen periode med oppfylte vilkår for $aktivitet i perioden ${vedtaksperiode.formatertPeriodeNorskFormat()}",
+                )
+        }
+    }
+
+    private fun validerHarGyldigAktivitet(vedtaksperiode: Vedtaksperiode): AktivitetType {
+        val aktivitet =
+            vedtaksperiode.aktivitet
+                ?: brukerfeil("Vedtaksperiode ${vedtaksperiode.formatertPeriodeNorskFormat()} mangler aktivitet")
+        brukerfeilHvisIkke(vedtaksperiode.målgruppe.gyldigeAktiviter.contains(aktivitet)) {
+            "Kombinasjonen av ${vedtaksperiode.målgruppe} og $aktivitet er ikke gyldig"
+        }
+        return aktivitet
     }
 }

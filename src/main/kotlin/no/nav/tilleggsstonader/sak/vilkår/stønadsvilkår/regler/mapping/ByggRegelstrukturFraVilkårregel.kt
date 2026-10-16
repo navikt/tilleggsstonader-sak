@@ -58,6 +58,7 @@ object ByggRegelstrukturFraVilkårregel {
                         svarId = svarId,
                         begrunnelseType = svarRegel.begrunnelseType,
                         nesteRegelId = svarRegel.regelId,
+                        tilhørendeFaktaType = svarRegel.tilhørendeFaktaType,
                     )
 
                 is SluttSvarRegel ->

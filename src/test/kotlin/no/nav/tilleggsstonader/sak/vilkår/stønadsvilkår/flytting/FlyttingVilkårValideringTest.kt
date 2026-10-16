@@ -101,6 +101,7 @@ class FlyttingVilkårValideringTest {
                         mapOf(
                             *oppfylteSvarFremTilFlyttemåte,
                             RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelse(SvarId.FLYTTEBYRÅ),
+                            RegelId.ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE to SvarOgBegrunnelse(SvarId.JA),
                         ),
                     fakta =
                         FaktaFlyttebyrå(
@@ -124,6 +125,7 @@ class FlyttingVilkårValideringTest {
                         mapOf(
                             *oppfylteSvarFremTilFlyttemåte,
                             RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelse(SvarId.FLYTTER_SELV),
+                            RegelId.ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE to SvarOgBegrunnelse(SvarId.JA),
                         ),
                     fakta =
                         FaktaFlytteSelv(
@@ -147,7 +149,7 @@ class FlyttingVilkårValideringTest {
                     svar =
                         mapOf(
                             RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
-                                SvarOgBegrunnelse(SvarId.FLYTTING_VED_START_AV_AKTIVITET),
+                                SvarOgBegrunnelse(SvarId.FLYTTING_VED_START_AV_AKTIVITET, "Start"),
                             RegelId.MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET to SvarOgBegrunnelse(SvarId.NEI, "Nei"),
                         ),
                 ),
@@ -156,27 +158,42 @@ class FlyttingVilkårValideringTest {
     }
 
     @Test
-    fun `skal være fullstendig med kun adresse når kostnader til flytting ikke er nødvendige`() {
+    fun `skal være fullstendig med kun adresse når bruker ikke flytter i forbindelse med arbeid`() {
         assertThat(
             FlyttingVilkårValidering.erFullstendig(
                 lagreVilkår(
                     svar =
                         mapOf(
                             RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
-                                SvarOgBegrunnelse(SvarId.ARBEID_ETTER_GJENNOMFØRT_AKTIVITET),
-                            RegelId.SAMMENHENG_FLYTTING_OG_ARBEID to SvarOgBegrunnelse(SvarId.JA, "Ja"),
-                            RegelId.ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE to SvarOgBegrunnelse(SvarId.NEI, "Nei"),
+                                SvarOgBegrunnelse(SvarId.ARBEID_ETTER_GJENNOMFØRT_AKTIVITET, "Arbeid"),
+                            RegelId.FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET to SvarOgBegrunnelse(SvarId.NEI, "Nei"),
                         ),
                 ),
             ),
         ).isTrue()
     }
 
+    @Test
+    fun `skal kreve fakta for flyttemåte selv om kostnader til flytting ikke er nødvendige`() {
+        assertThat(
+            FlyttingVilkårValidering.erFullstendig(
+                lagreVilkår(
+                    svar =
+                        mapOf(
+                            *oppfylteSvarFremTilFlyttemåte,
+                            RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelse(SvarId.FLYTTEBYRÅ),
+                            RegelId.ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE to SvarOgBegrunnelse(SvarId.NEI, "Nei"),
+                        ),
+                ),
+            ),
+        ).isFalse()
+    }
+
     private val oppfylteSvarFremTilFlyttemåte =
         arrayOf(
-            RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to SvarOgBegrunnelse(SvarId.FLYTTING_VED_START_AV_AKTIVITET),
+            RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
+                SvarOgBegrunnelse(SvarId.FLYTTING_VED_START_AV_AKTIVITET, "Start"),
             RegelId.MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET to SvarOgBegrunnelse(SvarId.JA, "Må flytte"),
-            RegelId.ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE to SvarOgBegrunnelse(SvarId.JA),
         )
 
     private fun lagreVilkår(

@@ -14,7 +14,7 @@ data class LagretVedtaksperiodeDto(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val målgruppeType: FaktiskMålgruppe,
-    val aktivitetType: AktivitetType,
+    val aktivitetType: AktivitetType?,
     val vedtaksperiodeFraForrigeVedtak: VedtaksperiodeDto?,
 ) : Periode<LocalDate>,
     KopierPeriode<LagretVedtaksperiodeDto> {
@@ -38,7 +38,7 @@ data class VedtaksperiodeDto(
     override val fom: LocalDate,
     override val tom: LocalDate,
     val målgruppeType: FaktiskMålgruppe,
-    val aktivitetType: AktivitetType,
+    val aktivitetType: AktivitetType?,
 ) : Periode<LocalDate> {
     fun tilDomene() =
         Vedtaksperiode(
