@@ -94,6 +94,7 @@ class SkjemaRoutingService(
             return SkjemaRoutingAksjon.NY_LØSNING
         }
         if (skjematype == Skjematype.SØKNAD_REISE_TIL_SAMLING) {
+            lagreRouting(ident, skjematype, mapOf("gjelderReiseTilSamling" to true))
             return SkjemaRoutingAksjon.NY_LØSNING
         }
 
