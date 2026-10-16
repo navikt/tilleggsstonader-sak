@@ -30,7 +30,6 @@ import org.springframework.http.converter.StringHttpMessageConverter
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter
 import java.math.BigDecimal
 import java.net.URI
-import java.time.LocalDate
 
 class GenererKjørelistebehandlingBrevTest : CleanDatabaseIntegrationTest() {
     val fom = 29 desember 2025
@@ -56,8 +55,9 @@ class GenererKjørelistebehandlingBrevTest : CleanDatabaseIntegrationTest() {
                 navn = "Navn",
                 ident = "Ident",
                 behandlendeEnhet = "NAV Arbeid og ytelser",
-                behandletDato = LocalDate.now(),
+                behandletDato = 1 januar 2026,
                 satser = oppsummertBeregningsresultat.finnSatserBruktIBeregning(),
+                begrunnelse = "Begrunnelse",
             )
 
         val html = lagHtmlifyClient().genererKjørelisteBehandlingBrev(req)

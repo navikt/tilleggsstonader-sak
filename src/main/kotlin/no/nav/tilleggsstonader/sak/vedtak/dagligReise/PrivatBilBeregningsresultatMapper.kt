@@ -16,6 +16,7 @@ import no.nav.tilleggsstonader.sak.vedtak.sats.satser
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.temporal.WeekFields
 
 fun oppsummerBeregningPrivatBil(
     beregningsresultatPrivatBil: BeregningsresultatPrivatBil,
@@ -35,7 +36,10 @@ fun BeregningsresultatForReisePrivatBil.oppsummerReise(rammevedtakForReise: Ramm
         reiseId = this.reiseId,
         reiseavstandEnVei = rammevedtakForReise.grunnlag.reiseavstandEnVei,
         aktivitetsadresse = rammevedtakForReise.aktivitetsadresse,
-        perioder = this.perioder.map { it.oppsummerPeriode(rammevedtakForReise) }.sortedBy { it.ukenummer },
+        perioder =
+            this.perioder
+                .map { it.oppsummerPeriode(rammevedtakForReise) }
+                .sortedWith(compareBy<OppsummertBeregningForPeriodeDto> { it.ukeår }.thenBy { it.ukenummer }),
         fraTidligereVedtak = this.perioder.all { it.fraTidligereVedtak },
     )
 
@@ -99,6 +103,7 @@ data class OppsummertBeregningForPeriodeDto(
     val stønadsbeløp: BigDecimal,
     val fraTidligereVedtak: Boolean,
 ) {
+    val ukeår = fom.get(WeekFields.ISO.weekBasedYear())
     val ukenummer = fom.ukenummer()
 }
 
