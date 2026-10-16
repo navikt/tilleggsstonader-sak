@@ -118,7 +118,7 @@
         "regel": "Er reiseavstanden over 30km?",
         "svar": "Ja"
       }, {
-        "begrunnelse": null,
+        "begrunnelse": "obligatorisk",
         "regel": "Er samlingen obligatorisk?",
         "svar": "Ja"
       }, {
@@ -191,7 +191,7 @@
         "regel": "Er reiseavstanden over 30km?",
         "svar": "Ja"
       }, {
-        "begrunnelse": null,
+        "begrunnelse": "obligatorisk",
         "regel": "Er samlingen obligatorisk?",
         "svar": "Ja"
       }, {
