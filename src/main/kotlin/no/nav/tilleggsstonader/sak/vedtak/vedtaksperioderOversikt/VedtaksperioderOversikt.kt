@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt
 
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.detaljerteVedtaksperioder.DetaljertVedtaksperiodeBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.flytting.detaljerteVedtaksperioder.DetaljertVedtaksperiodeFlytting
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperiodeLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.detaljerteVedtaksperioder.DetaljertVedtaksperiodePassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.detaljerteVedtaksperioder.DetaljertVedtaksperiodeReiseTilSamling
@@ -15,4 +16,6 @@ data class VedtaksperioderOversikt(
     val dagligReiseTsr: List<DetaljertVedtaksperiodeDagligReise>,
     val reiseTilSamlingTso: List<DetaljertVedtaksperiodeReiseTilSamling>,
     val reiseTilSamlingTsr: List<DetaljertVedtaksperiodeReiseTilSamling>,
+    val flyttingTso: List<DetaljertVedtaksperiodeFlytting>,
+    val flyttingTsr: List<DetaljertVedtaksperiodeFlytting>,
 )

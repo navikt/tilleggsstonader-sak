@@ -9,18 +9,14 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.StatusIverks
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.datoEllerNesteMandagHvisLørdagEllerSøndag
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlytteSelv
-import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.skalUtbetales
 import java.math.BigDecimal
 
 fun BeregningsresultatFlytting.mapTilAndeler(stønadstype: Stønadstype): List<AndelTilkjentYtelse> =
     resultater
-        .filter { resultat ->
-            when (val grunnlag = resultat.grunnlag) {
-                is BeregningsgrunnlagFlyttebyrå -> grunnlag.erBetalingDokumentert
-                is BeregningsgrunnlagFlytteSelv -> true
-            }
-        }.map { resultat ->
+        .filter { it.skalUtbetales() }
+        .map { resultat ->
             val typeAndel =
                 when (stønadstype) {
                     Stønadstype.FLYTTING_TSO -> resultat.målgruppe.tilTypeAndel(stønadstype)

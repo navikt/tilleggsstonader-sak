@@ -15,10 +15,13 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.
 import no.nav.tilleggsstonader.sak.vedtak.domain.DetaljertVedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørPassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseEllerOpphørReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksdata
+import no.nav.tilleggsstonader.sak.vedtak.flytting.detaljerteVedtaksperioder.DetaljertVedtaksperiodeFlytting
+import no.nav.tilleggsstonader.sak.vedtak.flytting.detaljerteVedtaksperioder.tilDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperiodeLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.detaljerteVedtaksperioder.DetaljertVedtaksperioderLæremidlerMapper.finnDetaljerteVedtaksperioder
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.detaljerteVedtaksperioder.DetaljertVedtaksperiodePassAvBarn
@@ -63,6 +66,12 @@ class VedtaksperioderOversiktService(
                 fagsaker.reiseTilSamlingTsr?.let {
                     oppsummerVedtaksperioderReiseTilSamling(it.id, Stønadstype.REISE_TIL_SAMLING_TSR)
                 } ?: emptyList(),
+            flyttingTso =
+                fagsaker.flyttingTso?.let { oppsummerVedtaksperioderFlytting(it.id, Stønadstype.FLYTTING_TSO) }
+                    ?: emptyList(),
+            flyttingTsr =
+                fagsaker.flyttingTsr?.let { oppsummerVedtaksperioderFlytting(it.id, Stønadstype.FLYTTING_TSR) }
+                    ?: emptyList(),
         )
     }
 
@@ -87,8 +96,8 @@ class VedtaksperioderOversiktService(
                 finnDetaljerteVedtaksperioderForReiseTilSamling(behandling = behandling)
             Stønadstype.FLYTTING_TSO,
             Stønadstype.FLYTTING_TSR,
-            // TODO: Implementer detaljerte vedtaksperioder for flytting (TSO/TSR)
-            -> TODO()
+            ->
+                finnDetaljerteVedtaksperioderForFlytting(behandling = behandling)
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
             -> TODO()
@@ -209,12 +218,39 @@ class VedtaksperioderOversiktService(
             .sortedByDescending { it.fom }
     }
 
+    private fun finnDetaljerteVedtaksperioderForFlytting(behandling: Saksbehandling): List<DetaljertVedtaksperiodeFlytting> {
+        val fagsaker = fagsakService.finnFagsakerForFagsakPersonId(behandling.fagsakPersonId)
+        val vedtaksdataTso =
+            fagsaker.flyttingTso?.id?.let {
+                hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørFlytting>(it)
+            }
+        val vedtaksdataTsr =
+            fagsaker.flyttingTsr?.id?.let {
+                hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørFlytting>(it)
+            }
+
+        return listOfNotNull(
+            vedtaksdataTso?.beregningsresultat?.tilDetaljerteVedtaksperioder(Stønadstype.FLYTTING_TSO),
+            vedtaksdataTsr?.beregningsresultat?.tilDetaljerteVedtaksperioder(Stønadstype.FLYTTING_TSR),
+        ).flatten()
+            .sortedByDescending { it.flyttedato }
+    }
+
     private fun oppsummerVedtaksperioderReiseTilSamling(
         fagsakId: FagsakId,
         stønadstype: Stønadstype,
     ): List<DetaljertVedtaksperiodeReiseTilSamling> =
         hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørReiseTilSamling>(fagsakId)
             ?.finnDetaljerteVedtaksperioder(stønadstype)
+            ?: emptyList()
+
+    private fun oppsummerVedtaksperioderFlytting(
+        fagsakId: FagsakId,
+        stønadstype: Stønadstype,
+    ): List<DetaljertVedtaksperiodeFlytting> =
+        hentVedtaksdataForSisteIverksatteBehandling<InnvilgelseEllerOpphørFlytting>(fagsakId)
+            ?.beregningsresultat
+            ?.tilDetaljerteVedtaksperioder(stønadstype)
             ?: emptyList()
 
     private inline fun <reified T : Vedtaksdata> hentVedtaksdataForSisteIverksatteBehandling(fagsakId: FagsakId): T? =
