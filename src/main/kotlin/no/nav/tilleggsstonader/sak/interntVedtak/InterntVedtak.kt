@@ -5,9 +5,11 @@ import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingÅrsak
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.OppsummertBeregningForReiseDto
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
-import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatDagligReiseDto
+import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.BeregningsresultatForMånedDto
@@ -47,8 +49,15 @@ data class BeregningsresultatInterntVedtakDto(
     val tilsynBarn: List<BeregningsresultatForMånedDto>? = null,
     val læremidler: List<BeregningsresultatDtoLæremidler>? = null,
     val boutgifter: List<BeregningsresultatDtoBoutgifter>? = null,
-    val dagligReise: BeregningsresultatDagligReiseDto? = null,
+    val dagligReise: BeregningsresultatDagligReiseInterntVedtak? = null,
     val reiseTilSamling: BeregningsresultatReiseTilSamlingDto? = null,
+)
+
+data class BeregningsresultatDagligReiseInterntVedtak(
+    val offentligTransport: BeregningsresultatOffentligTransportDto?,
+    val privatBil: List<OppsummertBeregningForReiseDto>? = null,
+    val beregningsplan: Beregningsplan,
+    val tidligsteEndring: LocalDate? = beregningsplan.legacyTidligsteEndring(),
 )
 
 data class Behandlinginfo(

@@ -10,25 +10,31 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
 object PassBarnRegelTestUtil {
     fun oppfylteDelvilkårPassBarn() =
         listOf(
-            delvilkår(Vurdering(RegelId.UTGIFTER_DOKUMENTERT, SvarId.JA)),
-            delvilkår(Vurdering(RegelId.ANNEN_FORELDER_MOTTAR_STØTTE, SvarId.NEI)),
-            delvilkår(Vurdering(RegelId.HAR_FULLFØRT_FJERDEKLASSE, SvarId.NEI, "en begrunnelse")),
+            Delvilkår(resultat = Vilkårsresultat.OPPFYLT, vurderinger = listOf(Vurdering(RegelId.UTGIFTER_DOKUMENTERT, SvarId.JA))),
+            Delvilkår(
+                resultat = Vilkårsresultat.OPPFYLT,
+                vurderinger = listOf(Vurdering(RegelId.ANNEN_FORELDER_MOTTAR_STØTTE, SvarId.NEI)),
+            ),
+            Delvilkår(
+                resultat = Vilkårsresultat.OPPFYLT,
+                vurderinger = listOf(Vurdering(RegelId.HAR_FULLFØRT_FJERDEKLASSE, SvarId.NEI, "en begrunnelse")),
+            ),
         )
 
     fun ikkeOppfylteDelvilkårPassBarn() =
         listOf(
-            delvilkår(Vurdering(RegelId.UTGIFTER_DOKUMENTERT, SvarId.JA)),
-            delvilkår(Vurdering(RegelId.ANNEN_FORELDER_MOTTAR_STØTTE, SvarId.JA, "en begrunnelse")),
-            delvilkår(Vurdering(RegelId.HAR_FULLFØRT_FJERDEKLASSE, SvarId.NEI, "en begrunnelse")),
+            Delvilkår(resultat = Vilkårsresultat.OPPFYLT, vurderinger = listOf(Vurdering(RegelId.UTGIFTER_DOKUMENTERT, SvarId.JA))),
+            Delvilkår(
+                resultat = Vilkårsresultat.IKKE_OPPFYLT,
+                vurderinger = listOf(Vurdering(RegelId.ANNEN_FORELDER_MOTTAR_STØTTE, SvarId.JA, "en begrunnelse")),
+            ),
+            Delvilkår(
+                resultat = Vilkårsresultat.OPPFYLT,
+                vurderinger = listOf(Vurdering(RegelId.HAR_FULLFØRT_FJERDEKLASSE, SvarId.NEI, "en begrunnelse")),
+            ),
         )
 
     fun oppfylteDelvilkårPassBarnDto() = oppfylteDelvilkårPassBarn().map { it.tilDto() }
 
     fun ikkeOppfylteDelvilkårPassBarnDto() = ikkeOppfylteDelvilkårPassBarn().map { it.tilDto() }
-
-    private fun delvilkår(vararg vurderinger: Vurdering) =
-        Delvilkår(
-            resultat = Vilkårsresultat.IKKE_TATT_STILLING_TIL,
-            vurderinger = vurderinger.toList(),
-        )
 }
