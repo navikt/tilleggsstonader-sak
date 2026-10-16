@@ -75,7 +75,8 @@
           } ],
           "stønadsbeløp": 600,
           "tom": "2025-01-26",
-          "ukenummer": 1
+          "ukenummer": 1,
+          "ukeår": 2025
         }, {
           "antallGodkjenteReisedager": 5,
           "bompengerTotalt": 200,
@@ -92,7 +93,8 @@
           } ],
           "stønadsbeløp": 1000,
           "tom": "2025-02-28",
-          "ukenummer": 5
+          "ukenummer": 5,
+          "ukeår": 2025
         } ],
         "reiseId": "02c86eca-36e5-451b-a22d-8501a0f7b8dd",
         "reiseavstandEnVei": 40.0,
