@@ -24,7 +24,7 @@ class OppfølgingScheduledJobb(
                 try {
                     oppfølgingOpprettKontrollerService.opprettTaskerForOppfølging(tema)
                 } catch (e: Exception) {
-                    logger.warn("Feilet start av oppfølgingjobb, se secure logs for flere detaljer")
+                    logger.error("Feilet start av oppfølgingjobb, se secure logs for flere detaljer")
                     secureLogger.error("Feilet start av oppfølgingjobb for tema=$tema", e)
                 }
             }
