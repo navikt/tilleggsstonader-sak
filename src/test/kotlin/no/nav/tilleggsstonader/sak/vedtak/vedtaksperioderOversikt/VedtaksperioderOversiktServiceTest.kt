@@ -85,17 +85,17 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
         assertThat(perioder)
             .containsExactly(
                 DetaljertVedtaksperiodeFlytting(
-                    stønadstype = Stønadstype.FLYTTING_TSO,
-                    flyttedato = 1 januar 2026,
-                    målgruppe = no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                    stønadstype = Stønadstype.FLYTTING_TSR,
+                    flyttedato = 2 januar 2026,
+                    målgruppe = no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.ARBEIDSSØKER,
                     beløp = BigDecimal("100"),
                     flyttemåte = Flyttemåte.FLYTTEBYRÅ,
                     skalUtbetales = true,
                 ),
                 DetaljertVedtaksperiodeFlytting(
-                    stønadstype = Stønadstype.FLYTTING_TSR,
-                    flyttedato = 2 januar 2026,
-                    målgruppe = no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.ARBEIDSSØKER,
+                    stønadstype = Stønadstype.FLYTTING_TSO,
+                    flyttedato = 1 januar 2026,
+                    målgruppe = no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
                     beløp = BigDecimal("100"),
                     flyttemåte = Flyttemåte.FLYTTEBYRÅ,
                     skalUtbetales = true,
