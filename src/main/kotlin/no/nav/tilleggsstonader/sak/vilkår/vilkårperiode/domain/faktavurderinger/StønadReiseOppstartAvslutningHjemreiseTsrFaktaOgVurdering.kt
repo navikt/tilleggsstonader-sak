@@ -19,12 +19,11 @@ sealed interface AktivitetReiseOppstartAvslutningHjemreiseTsr :
     override val type: AktivitetReiseOppstartAvslutningHjemreiseTsrType
 }
 
-data class TiltakReiseOppstartAvslutningHjemreiseTsr(
-    override val vurderinger: VurderingTiltakReiseOppstartAvslutningHjemreiseTsr,
-) : AktivitetReiseOppstartAvslutningHjemreiseTsr {
+data object TiltakReiseOppstartAvslutningHjemreiseTsr : AktivitetReiseOppstartAvslutningHjemreiseTsr {
     override val type: AktivitetReiseOppstartAvslutningHjemreiseTsrType =
         AktivitetReiseOppstartAvslutningHjemreiseTsrType.TILTAK_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR
     override val fakta: IngenFakta = IngenFakta
+    override val vurderinger: Vurderinger = IngenVurderinger
 }
 
 data object IngenAktivitetReiseOppstartAvslutningHjemreiseTsr : AktivitetReiseOppstartAvslutningHjemreiseTsr {
@@ -80,14 +79,6 @@ data class InnsattIFengselReiseOppstartAvslutningHjemreiseTsr(
         MålgruppeReiseOppstartAvslutningHjemreiseTsrType.INNSATT_I_FENGSEL_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR
     override val fakta: IngenFakta = IngenFakta
 }
-
-data class VurderingTiltakReiseOppstartAvslutningHjemreiseTsr(
-    override val lønnet: VurderingLønnet,
-    override val harUtgifter: VurderingHarUtgifter,
-    override val erAktivitetenObligatorisk: VurderingErAktivitetenObligatorisk,
-) : HarUtgifterVurdering,
-    LønnetVurdering,
-    ErAktivitetenObligatoriskVurdering
 
 sealed interface TypeFaktaOgVurderingReiseOppstartAvslutningHjemreiseTsr : TypeFaktaOgVurdering
 

@@ -16,7 +16,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AldersvilkårVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DekketAvAnnetRegelverkVurdering
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.ErAktivitetenObligatoriskVurdering
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdager
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaAktivitetsdagerNullable
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.FaktaOgVurdering
@@ -170,15 +169,9 @@ data object AktivitetReiseTilSamlingTsrFaktaOgVurderingerDto : FaktaOgVurderinge
 
 data class AktivitetReiseOppstartAvslutningHjemreiseTsoFaktaOgVurderingerDto(
     val lønnet: VurderingDto? = null,
-    val harUtgifter: VurderingDto? = null,
-    val erAktivitetenObligatorisk: VurderingDto? = null,
 ) : FaktaOgVurderingerDto()
 
-data class AktivitetReiseOppstartAvslutningHjemreiseTsrFaktaOgVurderingerDto(
-    val lønnet: VurderingDto? = null,
-    val harUtgifter: VurderingDto? = null,
-    val erAktivitetenObligatorisk: VurderingDto? = null,
-) : FaktaOgVurderingerDto()
+data object AktivitetReiseOppstartAvslutningHjemreiseTsrFaktaOgVurderingerDto : FaktaOgVurderingerDto()
 
 fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
     when (this) {
@@ -265,24 +258,9 @@ fun FaktaOgVurdering.tilFaktaOgVurderingDto(): FaktaOgVurderingerDto =
                 is FaktaOgVurderingReiseOppstartAvslutningHjemreiseTso ->
                     AktivitetReiseOppstartAvslutningHjemreiseTsoFaktaOgVurderingerDto(
                         lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
-                        harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
-                        erAktivitetenObligatorisk =
-                            vurderinger
-                                .takeIfVurderinger<ErAktivitetenObligatoriskVurdering>()
-                                ?.erAktivitetenObligatorisk
-                                ?.tilDto(),
                     )
 
-                is FaktaOgVurderingReiseOppstartAvslutningHjemreiseTsr ->
-                    AktivitetReiseOppstartAvslutningHjemreiseTsrFaktaOgVurderingerDto(
-                        lønnet = vurderinger.takeIfVurderinger<LønnetVurdering>()?.lønnet?.tilDto(),
-                        harUtgifter = vurderinger.takeIfVurderinger<HarUtgifterVurdering>()?.harUtgifter?.tilDto(),
-                        erAktivitetenObligatorisk =
-                            vurderinger
-                                .takeIfVurderinger<ErAktivitetenObligatoriskVurdering>()
-                                ?.erAktivitetenObligatorisk
-                                ?.tilDto(),
-                    )
+                is FaktaOgVurderingReiseOppstartAvslutningHjemreiseTsr -> AktivitetReiseOppstartAvslutningHjemreiseTsrFaktaOgVurderingerDto
             }
         }
     }

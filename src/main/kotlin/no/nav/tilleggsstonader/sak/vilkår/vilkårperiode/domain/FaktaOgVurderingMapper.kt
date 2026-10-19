@@ -141,7 +141,6 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAktivitetspenger
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingAldersVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingDekketAvAnnetRegelverk
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingErAktivitetenObligatorisk
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarRettTilUtstyrsstipend
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingHarUtgifter
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingLønnet
@@ -156,12 +155,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinge
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakPassAvBarn
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakReiseOppstartAvslutningHjemreiseTso
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakReiseOppstartAvslutningHjemreiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingTiltakReiseTilSamlingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygd
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUføretrygdLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUtdanningDagligReiseTso
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingUtdanningReiseOppstartAvslutningHjemreiseTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingerUtdanningLæremidler
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetBoutgifterDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.dto.FaktaOgSvarAktivitetDagligReiseTsoDto
@@ -244,7 +241,7 @@ private fun mapAktiviteter(
 
         Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR -> {
             require(faktaOgSvar is FaktaOgSvarAktivitetReiseOppstartAvslutningHjemreiseTsrDto)
-            return mapAktiviteterReiseOppstartAvslutningHjemreiseTsr(type, faktaOgSvar)
+            return mapAktiviteterReiseOppstartAvslutningHjemreiseTsr(type)
         }
 
         Stønadstype.FLYTTING_TSO,
@@ -919,21 +916,11 @@ private fun mapAktiviteterReiseOppstartAvslutningHjemreiseTso(
                 vurderinger =
                     VurderingTiltakReiseOppstartAvslutningHjemreiseTso(
                         lønnet = VurderingLønnet(faktaOgSvar.svarLønnet),
-                        harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
-                        erAktivitetenObligatorisk = VurderingErAktivitetenObligatorisk(faktaOgSvar.svarErAktivitetenObligatorisk),
                     ),
             )
         }
 
-        AktivitetType.UTDANNING ->
-            UtdanningReiseOppstartAvslutningHjemreiseTso(
-                vurderinger =
-                    VurderingUtdanningReiseOppstartAvslutningHjemreiseTso(
-                        harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
-                        erAktivitetenObligatorisk = VurderingErAktivitetenObligatorisk(faktaOgSvar.svarErAktivitetenObligatorisk),
-                    ),
-            )
-
+        AktivitetType.UTDANNING -> UtdanningReiseOppstartAvslutningHjemreiseTso
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetReiseOppstartAvslutningHjemreiseTso
         AktivitetType.REELL_ARBEIDSSØKER ->
             feil(
@@ -1010,20 +997,9 @@ private fun mapMålgruppeReiseOppstartAvslutningHjemreiseTso(
         MålgruppeType.INNSATT_I_FENGSEL -> error("Håndterer ikke innsatt i fengsel for reise oppstart/avslutning/hjemreise TSO")
     }
 
-private fun mapAktiviteterReiseOppstartAvslutningHjemreiseTsr(
-    aktivitetType: AktivitetType,
-    faktaOgSvar: FaktaOgSvarAktivitetReiseOppstartAvslutningHjemreiseTsrDto,
-): AktivitetReiseOppstartAvslutningHjemreiseTsr =
+private fun mapAktiviteterReiseOppstartAvslutningHjemreiseTsr(aktivitetType: AktivitetType): AktivitetReiseOppstartAvslutningHjemreiseTsr =
     when (aktivitetType) {
-        AktivitetType.TILTAK ->
-            TiltakReiseOppstartAvslutningHjemreiseTsr(
-                vurderinger =
-                    VurderingTiltakReiseOppstartAvslutningHjemreiseTsr(
-                        lønnet = VurderingLønnet(faktaOgSvar.svarLønnet),
-                        harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
-                        erAktivitetenObligatorisk = VurderingErAktivitetenObligatorisk(faktaOgSvar.svarErAktivitetenObligatorisk),
-                    ),
-            )
+        AktivitetType.TILTAK -> TiltakReiseOppstartAvslutningHjemreiseTsr
 
         AktivitetType.UTDANNING ->
             feil("Utdanning er ikke en gyldig aktivitet for reise oppstart/avslutning/hjemreise TSR")

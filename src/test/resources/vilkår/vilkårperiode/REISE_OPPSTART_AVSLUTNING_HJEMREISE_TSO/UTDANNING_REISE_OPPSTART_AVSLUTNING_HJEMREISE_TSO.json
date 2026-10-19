@@ -1,14 +1,5 @@
 {
   "fakta": { },
   "type": "UTDANNING_REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO",
-  "vurderinger": {
-    "erAktivitetenObligatorisk": {
-      "resultat": "OPPFYLT",
-      "svar": "JA"
-    },
-    "harUtgifter": {
-      "resultat": "OPPFYLT",
-      "svar": "JA"
-    }
-  }
+  "vurderinger": { }
 }
