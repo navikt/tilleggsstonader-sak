@@ -35,4 +35,4 @@ fun BeregningsresultatFlytting.tilDetaljerteVedtaksperioder(stønadstype: Støna
                     },
                 skalUtbetales = resultat.skalUtbetales(),
             )
-        }.sortedBy { it.flyttedato }
+        }.sortedByDescending { it.flyttedato }
