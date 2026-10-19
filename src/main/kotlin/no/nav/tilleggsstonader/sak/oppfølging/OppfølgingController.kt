@@ -3,7 +3,6 @@ package no.nav.tilleggsstonader.sak.oppfølging
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.tilleggsstonader.kontrakter.felles.Tema
 import no.nav.tilleggsstonader.libs.feil.feilHvisIkke
-import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.BehandlerRolle
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
@@ -11,7 +10,6 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
 import no.nav.tilleggsstonader.sak.tilgang.TilgangService
-import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -25,12 +23,9 @@ import org.springframework.web.bind.annotation.RestController
 class OppfølgingController(
     private val tilgangService: TilgangService,
     private val oppfølgingService: OppfølgingService,
-    private val oppfølgingOpprettKontrollerService: OppfølgingOpprettKontrollerService,
     private val unleashService: UnleashService,
     private val personService: PersonService,
 ) {
-    private val logger = LoggerFactory.getLogger(javaClass)
-
     @GetMapping("{tema}")
     fun hentAktiveOppfølginger(
         @PathVariable tema: Tema,
@@ -58,19 +53,6 @@ class OppfølgingController(
             it.tilDto(
                 navn = personService.hentVisningsnavnForPerson(it.behandlingsdetaljer.fagsakPersonIdent),
             )
-        }
-    }
-
-    @PostMapping("start/{tema}")
-    fun startJobb(
-        @PathVariable tema: Tema,
-    ) {
-        tilgangService.validerTilgangTilRolle(BehandlerRolle.VEILEDER)
-        try {
-            oppfølgingOpprettKontrollerService.opprettTaskerForOppfølging(tema)
-        } catch (e: Exception) {
-            logger.warn("Feilet start av oppfølgingjobb, se secure logs for flere detaljer")
-            secureLogger.error("Feilet start av oppfølgingjobb", e)
         }
     }
 

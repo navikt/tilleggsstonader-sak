@@ -10,6 +10,7 @@ import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.assertFinnesTaskMedType
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.opplysninger.aktivitet.ArenaKontraktUtil.aktivitetArenaDto
@@ -22,7 +23,7 @@ import java.time.LocalDate
 
 class OppfølgingIntegrasjonstest : CleanDatabaseIntegrationTest() {
     @Autowired
-    private lateinit var oppfølginController: OppfølgingController
+    private lateinit var oppfølgingScheduledJobb: OppfølgingScheduledJobb
 
     @Autowired
     private lateinit var oppfølgingRepository: OppfølgingRepository
@@ -40,8 +41,10 @@ class OppfølgingIntegrasjonstest : CleanDatabaseIntegrationTest() {
             stønadstype = Stønadstype.DAGLIG_REISE_TSR,
         ) { defaultDagligReiseTsrTestdata() }
 
-        kall.oppfølging.startJobb(Tema.TSO)
-        kall.oppfølging.startJobb(Tema.TSR)
+        medBrukercontext(roller = listOf(rolleConfig.utvikler)) {
+            kall.oppfølging.startJobb(Tema.TSO)
+            kall.oppfølging.startJobb(Tema.TSR)
+        }
 
         kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 
@@ -74,7 +77,9 @@ class OppfølgingIntegrasjonstest : CleanDatabaseIntegrationTest() {
             stønadstype = Stønadstype.DAGLIG_REISE_TSR,
         ) { defaultDagligReiseTsrTestdata() }
 
-        kall.oppfølging.startJobb(Tema.TSO)
+        medBrukercontext(roller = listOf(rolleConfig.utvikler)) {
+            kall.oppfølging.startJobb(Tema.TSO)
+        }
 
         kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 
@@ -155,7 +160,9 @@ class OppfølgingIntegrasjonstest : CleanDatabaseIntegrationTest() {
             }
         }
 
-        kall.oppfølging.startJobb(Tema.TSR)
+        medBrukercontext(roller = listOf(rolleConfig.utvikler)) {
+            kall.oppfølging.startJobb(Tema.TSR)
+        }
 
         kjørTasksKlareForProsesseringTilIngenTasksIgjen()
 
@@ -163,5 +170,27 @@ class OppfølgingIntegrasjonstest : CleanDatabaseIntegrationTest() {
             kall.oppfølging
                 .hentAktiveOppfølginger(Tema.TSR),
         ).isEmpty()
+    }
+
+    @Test
+    fun `planlagt jobb oppretter oppfølginger for både TSO og TSR`() {
+        opprettBehandlingOgGjennomførBehandlingsløp(
+            stønadstype = Stønadstype.BARNETILSYN,
+        ) { defaultPassAvBarnTestdata() }
+
+        opprettBehandlingOgGjennomførBehandlingsløp(
+            stønadstype = Stønadstype.DAGLIG_REISE_TSR,
+        ) { defaultDagligReiseTsrTestdata() }
+
+        oppfølgingScheduledJobb.opprettTaskerForOppfølging()
+        assertFinnesTaskMedType(OppfølgingTask.TYPE, antall = 2)
+    }
+
+    @Test
+    fun `manuell start av oppfølging krever utviklerrolle`() {
+        kall.oppfølging.apiRespons
+            .startJobb(Tema.TSO)
+            .expectStatus()
+            .isForbidden
     }
 }
