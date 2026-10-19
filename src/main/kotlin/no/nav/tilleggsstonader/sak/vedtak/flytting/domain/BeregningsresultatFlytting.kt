@@ -19,6 +19,12 @@ data class BeregningsresultatFlyttevilkår(
     val grunnlag: BeregningsgrunnlagFlytting,
 )
 
+fun BeregningsresultatFlyttevilkår.skalUtbetales(): Boolean =
+    when (val beregningsgrunnlag = grunnlag) {
+        is BeregningsgrunnlagFlyttebyrå -> beregningsgrunnlag.erBetalingDokumentert
+        is BeregningsgrunnlagFlytteSelv -> true
+    }
+
 enum class Flyttemåte {
     FLYTTEBYRÅ,
     FLYTTE_SELV,

@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vedtak.vedtaksperioderOversikt
 
 import io.mockk.every
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.september
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingResultat
@@ -14,6 +15,8 @@ import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelse
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil
 import no.nav.tilleggsstonader.sak.util.behandling
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsomfang
+import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.boutgifter.BoutgifterTestUtil.lagUtgiftBeregningBoutgifter
@@ -22,13 +25,21 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.DagligReiseTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.beregning.offentligTransport.Billettype
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertBeregningsperioder
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.detaljerteVedtaksperioder.DetaljertVedtaksperiodeDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.flytting.detaljerteVedtaksperioder.DetaljertVedtaksperiodeFlytting
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlyttevilkår
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.Flyttemåte
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.PassAvBarnTestUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.math.BigDecimal
 import java.time.LocalDate
 
 class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
@@ -47,6 +58,8 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
         opprettBehandlingOgVedtakBoutgifter(fagsakPerson)
         opprettBehandlingOgVedtakDagligReiseTso(fagsakPerson)
         opprettBehandlingOgVedtakDagligReiseTsr(fagsakPerson)
+        opprettBehandlingOgVedtakFlytting(fagsakPerson, Stønadstype.FLYTTING_TSO, 1 januar 2026)
+        opprettBehandlingOgVedtakFlytting(fagsakPerson, Stønadstype.FLYTTING_TSR, 2 januar 2026)
 
         val res = vedtaksperioderOversiktService.hentVedtaksperioderOversikt(fagsakPersonId = fagsakPerson.id)
 
@@ -55,6 +68,42 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
         assertThat(res.boutgifter).isNotEmpty()
         assertThat(res.dagligReiseTso).isNotEmpty()
         assertThat(res.dagligReiseTsr).isNotEmpty()
+        assertThat(res.flyttingTso).isNotEmpty()
+        assertThat(res.flyttingTsr).isNotEmpty()
+    }
+
+    @Test
+    fun `skal hente detaljerte perioder fra både flytting TSO og TSR`() {
+        val fagsakPerson = testoppsettService.opprettPerson("123")
+        val behandlingTso =
+            opprettBehandlingOgVedtakFlytting(fagsakPerson, Stønadstype.FLYTTING_TSO, 1 januar 2026)
+        opprettBehandlingOgVedtakFlytting(fagsakPerson, Stønadstype.FLYTTING_TSR, 2 januar 2026)
+
+        val perioder =
+            vedtaksperioderOversiktService.hentDetaljerteVedtaksperioderForBehandling(behandlingTso.id)
+
+        assertThat(perioder)
+            .containsExactly(
+                DetaljertVedtaksperiodeFlytting(
+                    stønadstype = Stønadstype.FLYTTING_TSR,
+                    flyttedato = 2 januar 2026,
+                    målgruppe = no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.ARBEIDSSØKER,
+                    beløp = BigDecimal("100"),
+                    flyttemåte = Flyttemåte.FLYTTEBYRÅ,
+                    skalUtbetales = true,
+                ),
+                DetaljertVedtaksperiodeFlytting(
+                    stønadstype = Stønadstype.FLYTTING_TSO,
+                    flyttedato = 1 januar 2026,
+                    målgruppe = no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
+                    beløp = BigDecimal("100"),
+                    flyttemåte = Flyttemåte.FLYTTEBYRÅ,
+                    skalUtbetales = true,
+                ),
+            )
+        val oversikt = vedtaksperioderOversiktService.hentVedtaksperioderOversikt(fagsakPerson.id)
+        assertThat(oversikt.flyttingTso).hasSize(1)
+        assertThat(oversikt.flyttingTsr).hasSize(1)
     }
 
     @Test
@@ -219,4 +268,52 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
 
         vedtakRepository.insert(DagligReiseTestUtil.innvilgelse(behandlingId = behandling.id))
     }
+
+    private fun opprettBehandlingOgVedtakFlytting(
+        fagsakPerson: FagsakPerson,
+        stønadstype: Stønadstype,
+        fom: LocalDate,
+    ) = testoppsettService
+        .opprettBehandlingMedFagsak(
+            behandling = behandling(status = BehandlingStatus.FERDIGSTILT, resultat = BehandlingResultat.INNVILGET),
+            stønadstype = stønadstype,
+            identer = fagsakPerson.identer,
+        ).also { behandling ->
+            vedtakRepository.insert(
+                GeneriskVedtak(
+                    behandlingId = behandling.id,
+                    data =
+                        InnvilgelseFlytting(
+                            vedtaksperioder = emptyList(),
+                            beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+                            beregningsresultat =
+                                BeregningsresultatFlytting(
+                                    listOf(
+                                        BeregningsresultatFlyttevilkår(
+                                            fom = fom,
+                                            tom = fom.plusDays(1),
+                                            beløp = BigDecimal("100"),
+                                            målgruppe =
+                                                when (stønadstype) {
+                                                    Stønadstype.FLYTTING_TSO ->
+                                                        no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
+                                                    Stønadstype.FLYTTING_TSR ->
+                                                        no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe.ARBEIDSSØKER
+                                                    else -> error("Forventet flytting")
+                                                },
+                                            grunnlag =
+                                                BeregningsgrunnlagFlyttebyrå(
+                                                    tilbud1Pris = BigDecimal("100"),
+                                                    tilbud2Pris = BigDecimal("100"),
+                                                    erBetalingDokumentert = true,
+                                                ),
+                                        ),
+                                    ),
+                                ),
+                        ),
+                    gitVersjon = null,
+                    tidligsteEndring = null,
+                ),
+            )
+        }
 }
