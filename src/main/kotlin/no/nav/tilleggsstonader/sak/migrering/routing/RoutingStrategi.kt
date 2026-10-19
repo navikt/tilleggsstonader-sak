@@ -46,12 +46,12 @@ fun bestemRoutingStrategi(skjematype: Skjematype): RoutingStrategi =
             )
         Skjematype.SØKNAD_FLYTTING ->
             RoutingStrategi.FlyttingOgROAH(
-                featureToggle = Toggle.SØKNAD_ROUTING_AKTIVITETSPENGER_FLYTTING,
+                featureToggle = Toggle.SØKNAD_ROUTING_FLYTTING,
                 kreverAktivtAapVedtak = false,
             )
         Skjematype.SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE ->
             RoutingStrategi.FlyttingOgROAH(
-                featureToggle = Toggle.SØKNAD_ROUTING_AKTIVITETSPENGER_REISE_OPPSTART_AVSLUTNING_HJEMREISE,
+                featureToggle = Toggle.SØKNAD_ROUTING_ROAH,
                 kreverAktivtAapVedtak = false,
             )
     }
