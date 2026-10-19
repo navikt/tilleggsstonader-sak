@@ -323,7 +323,6 @@ enum class Satstype {
  * Når man iverksetter oppdateres status til [StatusIverksetting.SENDT]
  * Når man mottatt kvittering oppdateres statusen til [StatusIverksetting.OK]
  * Hvis det er lagret en andel som ikke blir iverksatt fordi en ny behandling blir gjeldende, settes status til [StatusIverksetting.UAKTUELL]
- * TODO: Fyll inn resterende statuser når vi får info om hva de betyr
  */
 enum class StatusIverksetting {
     UBEHANDLET,

@@ -54,7 +54,6 @@ sealed interface FlyttingVilkårFakta : VilkårFakta {
 data class FaktaFlyttebyrå(
     val tilbud1: FlyttebyråTilbud,
     val tilbud2: FlyttebyråTilbud,
-    // TODO Vurder hva navnet bør være her ut ifra hvordan spørsmål stilles
     val erBetalingDokumentert: Boolean,
     override val adresse: String,
 ) : FlyttingVilkårFakta

@@ -215,7 +215,6 @@ enum class AndelstypeDvh {
                 TypeAndel.REISE_OPPSTART_TILTAK_HØYERE_UTDANNING -> REISE_OPPSTART_TILTAK_HØYERE_UTDANNING
                 TypeAndel.REISE_OPPSTART_TILTAK_JOBBKLUBB -> REISE_OPPSTART_TILTAK_JOBBKLUBB
                 TypeAndel.REISE_OPPSTART_TILTAK_OPPFØLGING -> REISE_OPPSTART_TILTAK_OPPFØLGING
-                // TODO Skal disse faktisk legges inn allerede?
                 TypeAndel.FLYTTING_AAP -> FLYTTING_AAP
                 TypeAndel.FLYTTING_ENSLIG_FORSØRGER -> FLYTTING_ENSLIG_FORSØRGER
                 TypeAndel.FLYTTING_ETTERLATTE -> FLYTTING_ETTERLATTE
