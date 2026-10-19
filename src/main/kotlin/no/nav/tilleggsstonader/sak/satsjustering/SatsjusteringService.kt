@@ -32,6 +32,8 @@ class SatsjusteringService(
                     Stønadstype.BOUTGIFTER,
                     Stønadstype.REISE_TIL_SAMLING_TSO,
                     Stønadstype.REISE_TIL_SAMLING_TSR,
+                    Stønadstype.FLYTTING_TSO,
+                    Stønadstype.FLYTTING_TSR,
                 ),
         ) {
             "Stønadstype $stønadstype støttes ikke for satsjustering."
@@ -74,7 +76,11 @@ class SatsjusteringService(
                         .filter { it.bekreftet }
                         .map { it.fom.year }
 
-                Stønadstype.REISE_TIL_SAMLING_TSO, Stønadstype.REISE_TIL_SAMLING_TSR ->
+                Stønadstype.REISE_TIL_SAMLING_TSO,
+                Stønadstype.REISE_TIL_SAMLING_TSR,
+                Stønadstype.FLYTTING_TSO,
+                Stønadstype.FLYTTING_TSR,
+                ->
                     satsPrivatBilProvider
                         .alleSatser()
                         .filter { it.bekreftet }
