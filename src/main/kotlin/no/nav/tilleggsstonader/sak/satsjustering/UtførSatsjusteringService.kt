@@ -35,8 +35,7 @@ import no.nav.tilleggsstonader.sak.vedtak.boutgifter.dto.InnvilgelseBoutgifterRe
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeTsrDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.tilDto
 import no.nav.tilleggsstonader.sak.vedtak.flytting.FlyttingBeregnYtelseSteg
-import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingTsoRequest
-import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingTsrRequest
+import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingRequest
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.VedtaksperiodeFlyttingDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerBeregnYtelseSteg
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.InnvilgelseLæremidlerRequest
@@ -197,29 +196,13 @@ class UtførSatsjusteringService(
                     satsjusteringFra = finnDatoForSatsjustering(revurdering),
                 )
 
-            Stønadstype.FLYTTING_TSO ->
+            Stønadstype.FLYTTING_TSO,
+            Stønadstype.FLYTTING_TSR,
+            ->
                 beregnYtelseStegFlytting.lagreVedtakForSatsjustering(
                     saksbehandling = revurdering,
                     vedtak =
-                        InnvilgelseFlyttingTsoRequest(
-                            vedtaksperioder =
-                                vedtaksperioder.map {
-                                    VedtaksperiodeFlyttingDto(
-                                        id = it.id,
-                                        fom = it.fom,
-                                        tom = it.tom,
-                                        målgruppeType = it.målgruppeType,
-                                    )
-                                },
-                        ),
-                    satsjusteringFra = finnDatoForSatsjustering(revurdering),
-                )
-
-            Stønadstype.FLYTTING_TSR ->
-                beregnYtelseStegFlytting.lagreVedtakForSatsjustering(
-                    saksbehandling = revurdering,
-                    vedtak =
-                        InnvilgelseFlyttingTsrRequest(
+                        InnvilgelseFlyttingRequest(
                             vedtaksperioder =
                                 vedtaksperioder.map {
                                     VedtaksperiodeFlyttingDto(

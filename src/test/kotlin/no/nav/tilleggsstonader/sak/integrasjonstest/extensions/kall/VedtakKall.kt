@@ -4,13 +4,13 @@ import no.nav.tilleggsstonader.kontrakter.felles.Enhet
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.behandlendeEnhet
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderDagligReise
-import no.nav.tilleggsstonader.kontrakter.felles.gjelderFlytting
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderReiseTilSamling
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
 import no.nav.tilleggsstonader.sak.vedtak.dto.LagretVedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtakRequest
+import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingRequest
 import org.springframework.test.web.servlet.client.RestTestClient
 
 class VedtakKall(
@@ -124,8 +124,7 @@ class VedtakKall(
         ): RestTestClient.ResponseSpec {
             if (stønadstype.gjelderDagligReise() ||
                 stønadstype.gjelderReiseTilSamling() ||
-                stønadstype.gjelderReiseOppstartAvslutningHjemreise() ||
-                stønadstype.gjelderFlytting()
+                stønadstype.gjelderReiseOppstartAvslutningHjemreise()
             ) {
                 return lagreEnhetsspesifiktVedtak(
                     stønadstype,
@@ -137,6 +136,11 @@ class VedtakKall(
             }
             return lagreVedtak(stønadstype, behandlingId, "innvilgelse", innvilgelseDto)
         }
+
+        fun beregnFlytting(
+            behandlingId: BehandlingId,
+            innvilgelseDto: InnvilgelseFlyttingRequest,
+        ): RestTestClient.ResponseSpec = testklient.post("/api/vedtak/flytting/$behandlingId/beregn", innvilgelseDto)
 
         fun lagreOpphør(
             stønadstype: Stønadstype,

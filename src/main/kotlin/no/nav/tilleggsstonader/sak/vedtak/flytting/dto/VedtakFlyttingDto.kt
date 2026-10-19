@@ -63,24 +63,11 @@ data class OpphørFlyttingRequest(
 ) : VedtakFlyttingDto(TypeVedtak.OPPHØR),
     VedtakFlyttingRequest
 
-sealed interface InnvilgelseFlyttingRequest : VedtakFlyttingRequest {
-    val begrunnelse: String?
-
-    fun vedtaksperioder(): List<Vedtaksperiode>
-}
-
-data class InnvilgelseFlyttingTsoRequest(
+data class InnvilgelseFlyttingRequest(
     val vedtaksperioder: List<VedtaksperiodeFlyttingDto>,
-    override val begrunnelse: String? = null,
-) : InnvilgelseFlyttingRequest {
-    override fun vedtaksperioder(): List<Vedtaksperiode> = vedtaksperioder.tilDomene()
-}
-
-data class InnvilgelseFlyttingTsrRequest(
-    val vedtaksperioder: List<VedtaksperiodeFlyttingDto>,
-    override val begrunnelse: String? = null,
-) : InnvilgelseFlyttingRequest {
-    override fun vedtaksperioder(): List<Vedtaksperiode> = vedtaksperioder.tilDomene()
+    val begrunnelse: String? = null,
+) : VedtakFlyttingRequest {
+    fun vedtaksperioder(): List<Vedtaksperiode> = vedtaksperioder.tilDomene()
 }
 
 fun BeregningsresultatFlytting.tilDto() =

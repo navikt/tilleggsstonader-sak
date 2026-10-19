@@ -24,8 +24,7 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.OpphørDagligReiseRequ
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.dto.VedtaksperiodeDto
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.AvslagFlyttingDto
-import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingTsoRequest
-import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingTsrRequest
+import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingRequest
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.OpphørFlyttingRequest
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.VedtaksperiodeFlyttingDto
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.dto.AvslagLæremidlerDto
@@ -294,10 +293,10 @@ fun IntegrationTest.gjennomførBeregningStegKall(
                                     vedtaksperioder = vedtaksperioder.tilVedtaksperiodeTsrDto(),
                                 )
 
-                            Stønadstype.FLYTTING_TSO ->
-                                InnvilgelseFlyttingTsoRequest(vedtaksperioder = vedtaksperioder.tilVedtaksperiodeFlyttingDto())
-                            Stønadstype.FLYTTING_TSR ->
-                                InnvilgelseFlyttingTsrRequest(vedtaksperioder = vedtaksperioder.tilVedtaksperiodeFlyttingDto())
+                            Stønadstype.FLYTTING_TSO,
+                            Stønadstype.FLYTTING_TSR,
+                            ->
+                                InnvilgelseFlyttingRequest(vedtaksperioder = vedtaksperioder.tilVedtaksperiodeFlyttingDto())
                             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO ->
                                 InnvilgelseReiseOppstartAvslutningHjemreiseTsoRequest(
                                     vedtaksperioder = vedtaksperioder,

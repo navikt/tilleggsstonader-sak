@@ -1,7 +1,6 @@
 package no.nav.tilleggsstonader.sak.vedtak.flytting
 
 import no.nav.security.token.support.core.api.ProtectedWithClaims
-import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.felles.gjelderFlytting
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -22,8 +21,6 @@ import no.nav.tilleggsstonader.sak.vedtak.flytting.beregning.FlyttingBeregningSe
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.AvslagFlyttingDto
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.BeregningsresultatFlyttingDto
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingRequest
-import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingTsoRequest
-import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.InnvilgelseFlyttingTsrRequest
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.OpphørFlyttingRequest
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.VedtakFlyttingRequest
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.tilDto
@@ -49,29 +46,27 @@ class FlyttingVedtakController(
     private val beregningsplanUtleder: BeregningsplanUtleder,
     private val validerGyldigÅrsakAvslag: ValiderGyldigÅrsakAvslag,
 ) {
-    @PostMapping("{behandlingId}/tso/beregn")
-    fun beregnTso(
+    @PostMapping("{behandlingId}/beregn")
+    fun beregn(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtak: InnvilgelseFlyttingTsoRequest,
-    ): BeregningsresultatFlyttingDto = beregn(behandlingId, Stønadstype.FLYTTING_TSO, vedtak)
+        @RequestBody vedtak: InnvilgelseFlyttingRequest,
+    ): BeregningsresultatFlyttingDto {
+        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
+        tilgangService.validerLesetilgangTilBehandling(behandlingId)
+        val behandling = behandlingService.hentSaksbehandling(behandlingId)
+        validerFlytting(behandling)
+        val vedtaksperioder = vedtak.vedtaksperioder()
+        val beregningsplan = beregningsplanUtleder.utledForInnvilgelse(behandling, vedtaksperioder)
+        return beregningService
+            .beregn(behandling, vedtaksperioder, beregningsplan, typeVedtak = TypeVedtak.INNVILGELSE)
+            .tilDto()
+    }
 
-    @PostMapping("{behandlingId}/tsr/beregn")
-    fun beregnTsr(
+    @PostMapping("{behandlingId}/innvilgelse")
+    fun innvilge(
         @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtak: InnvilgelseFlyttingTsrRequest,
-    ): BeregningsresultatFlyttingDto = beregn(behandlingId, Stønadstype.FLYTTING_TSR, vedtak)
-
-    @PostMapping("{behandlingId}/tso/innvilgelse")
-    fun innvilgeTso(
-        @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtak: InnvilgelseFlyttingTsoRequest,
-    ): StegFerdigstiltResponse = lagreVedtak(behandlingId, vedtak, Stønadstype.FLYTTING_TSO).tilStegFerdigstiltResponse()
-
-    @PostMapping("{behandlingId}/tsr/innvilgelse")
-    fun innvilgeTsr(
-        @PathVariable behandlingId: BehandlingId,
-        @RequestBody vedtak: InnvilgelseFlyttingTsrRequest,
-    ): StegFerdigstiltResponse = lagreVedtak(behandlingId, vedtak, Stønadstype.FLYTTING_TSR).tilStegFerdigstiltResponse()
+        @RequestBody vedtak: InnvilgelseFlyttingRequest,
+    ): StegFerdigstiltResponse = lagreVedtak(behandlingId, vedtak).tilStegFerdigstiltResponse()
 
     @PostMapping("{behandlingId}/avslag")
     fun avslå(
@@ -96,36 +91,14 @@ class FlyttingVedtakController(
         return vedtakDtoMapper.toDto(vedtak, behandling.forrigeIverksatteBehandlingId)
     }
 
-    private fun beregn(
-        behandlingId: BehandlingId,
-        forventetStønadstype: Stønadstype,
-        vedtak: InnvilgelseFlyttingRequest,
-    ): BeregningsresultatFlyttingDto {
-        tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
-        tilgangService.validerLesetilgangTilBehandling(behandlingId)
-        val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        validerStønadstype(behandling, forventetStønadstype)
-        val vedtaksperioder = vedtak.vedtaksperioder()
-        val beregningsplan = beregningsplanUtleder.utledForInnvilgelse(behandling, vedtaksperioder)
-        return beregningService
-            .beregn(behandling, vedtaksperioder, beregningsplan, typeVedtak = TypeVedtak.INNVILGELSE)
-            .tilDto()
-    }
-
     private fun lagreVedtak(
         behandlingId: BehandlingId,
         vedtak: VedtakFlyttingRequest,
-        forventetStønadstype: Stønadstype? = null,
     ): Behandling {
         tilgangService.settBehandlingsdetaljerForRequest(behandlingId)
         tilgangService.validerSkrivetilgangTilBehandling(behandlingId, AuditLoggerEvent.CREATE)
         val behandling = behandlingService.hentSaksbehandling(behandlingId)
-        forventetStønadstype?.let { validerStønadstype(behandling, it) }
-        if (vedtak is AvslagFlyttingDto || vedtak is OpphørFlyttingRequest) {
-            brukerfeilHvisIkke(behandling.stønadstype.gjelderFlytting()) {
-                "Forventet stønadstype for flytteendepunkt"
-            }
-        }
+        validerFlytting(behandling)
         if (vedtak is AvslagFlyttingDto) {
             validerGyldigÅrsakAvslag.validerAvslagErGyldig(
                 behandlingId = behandlingId,
@@ -136,12 +109,9 @@ class FlyttingVedtakController(
         return stegService.håndterSteg(behandlingId, beregnYtelseSteg, vedtak)
     }
 
-    private fun validerStønadstype(
-        behandling: Saksbehandling,
-        forventetStønadstype: Stønadstype,
-    ) {
-        brukerfeilHvisIkke(behandling.stønadstype == forventetStønadstype) {
-            "Forventet stønadstype=$forventetStønadstype for flytteendepunkt"
+    private fun validerFlytting(behandling: Saksbehandling) {
+        brukerfeilHvisIkke(behandling.stønadstype.gjelderFlytting()) {
+            "Forventet stønadstype for flytteendepunkt"
         }
     }
 }
