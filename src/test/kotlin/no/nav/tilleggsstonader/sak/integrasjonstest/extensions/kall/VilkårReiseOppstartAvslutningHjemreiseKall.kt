@@ -3,9 +3,9 @@ package no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.VilkårId
 import no.nav.tilleggsstonader.sak.integrasjonstest.Testklient
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelstrukturDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.AktivitetMedReiserDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårReiseOppstartAvslutningHjemreiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.RegelstrukturReiseOppstartAvslutningHjemreiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.SlettVilkårResultatDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårReiseOppstartAvslutningHjemreiseDto
@@ -34,7 +34,7 @@ class VilkårReiseOppstartAvslutningHjemreiseKall(
         dto: SlettVilkårRequestDto,
     ): SlettVilkårResultatDto = apiRespons.slettVilkår(behandlingId, vilkårId, dto).expectOkWithBody()
 
-    fun regler(): RegelstrukturDto = apiRespons.regler().expectOkWithBody()
+    fun regler(): RegelstrukturReiseOppstartAvslutningHjemreiseDto = apiRespons.regler().expectOkWithBody()
 
     // Gir tilgang til "rå"-endepunktene slik at tester kan skrive egne assertions på responsen.
     val apiRespons = VilkårReiseOppstartAvslutningHjemreiseApi()

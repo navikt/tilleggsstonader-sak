@@ -78,5 +78,8 @@ object VilkårReiseOppstartAvslutningHjemreiseMapper {
             reiseId = this.reiseId,
             adresse = this.adresse,
             typeReiseformål = this.typeReiseformål,
+            aktivitetId =
+                this.aktivitetId
+                    ?: feil("Fant reise oppstart/avslutning/hjemreise med ubestemt fakta uten aktivitetId"),
         )
 }

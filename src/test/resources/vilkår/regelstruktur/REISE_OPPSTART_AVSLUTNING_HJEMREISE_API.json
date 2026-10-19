@@ -1,0 +1,313 @@
+{
+  "avslutning" : {
+    "ROAH_BENYTTET_TAXI" : {
+      "erHovedregel" : false,
+      "reglerSomMåNullstilles" : [ "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG" ],
+      "svaralternativer" : [ {
+        "begrunnelseType" : "VALGFRI",
+        "nesteRegelId" : "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG",
+        "svarId" : "JA",
+        "tilhørendeFaktaType" : null
+      }, {
+        "begrunnelseType" : "PÅKREVD",
+        "nesteRegelId" : null,
+        "svarId" : "NEI",
+        "tilhørendeFaktaType" : null
+      } ]
+    },
+    "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG" : {
+      "erHovedregel" : false,
+      "reglerSomMåNullstilles" : [ ],
+      "svaralternativer" : [ {
+        "begrunnelseType" : "VALGFRI",
+        "nesteRegelId" : null,
+        "svarId" : "JA",
+        "tilhørendeFaktaType" : null
+      }, {
+        "begrunnelseType" : "PÅKREVD",
+        "nesteRegelId" : null,
+        "svarId" : "NEI",
+        "tilhørendeFaktaType" : null
+      } ]
+    },
+    "ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN" : {
+      "erHovedregel" : false,
+      "reglerSomMåNullstilles" : [ "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG" ],
+      "svaralternativer" : [ {
+        "begrunnelseType" : "VALGFRI",
+        "nesteRegelId" : "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG",
+        "svarId" : "JA",
+        "tilhørendeFaktaType" : "REISE_OPPSTART_AVSLUTNING_HJEMREISE_OFFENTLIG_TRANSPORT"
+      }, {
+        "begrunnelseType" : "PÅKREVD",
+        "nesteRegelId" : null,
+        "svarId" : "NEI",
+        "tilhørendeFaktaType" : null
+      } ]
+    },
+    "ROAH_HAR_UTGIFTER_TIL_REISEN" : {
+      "erHovedregel" : true,
+      "reglerSomMåNullstilles" : [ "ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT", "ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN", "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG", "ROAH_KAN_BENYTTE_PRIVAT_BIL", "ROAH_BENYTTET_TAXI" ],
+      "svaralternativer" : [ {
+        "begrunnelseType" : "VALGFRI",
+        "nesteRegelId" : "ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT",
+        "svarId" : "JA",
+        "tilhørendeFaktaType" : null
+      }, {
+        "begrunnelseType" : "PÅKREVD",
+        "nesteRegelId" : null,
+        "svarId" : "NEI",
+        "tilhørendeFaktaType" : null
+      } ]
+    },
+    "ROAH_KAN_BENYTTE_PRIVAT_BIL" : {
+      "erHovedregel" : false,
+      "reglerSomMåNullstilles" : [ "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG", "ROAH_BENYTTET_TAXI" ],
+      "svaralternativer" : [ {
+        "begrunnelseType" : "VALGFRI",
+        "nesteRegelId" : "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG",
+        "svarId" : "JA",
+        "tilhørendeFaktaType" : "REISE_OPPSTART_AVSLUTNING_HJEMREISE_PRIVAT_BIL"
+      }, {
+        "begrunnelseType" : "PÅKREVD",
+        "nesteRegelId" : "ROAH_BENYTTET_TAXI",
+        "svarId" : "NEI",
+        "tilhørendeFaktaType" : null
+      } ]
+    },
+    "ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT" : {
+      "erHovedregel" : false,
+      "reglerSomMåNullstilles" : [ "ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN", "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG", "ROAH_KAN_BENYTTE_PRIVAT_BIL", "ROAH_BENYTTET_TAXI" ],
+      "svaralternativer" : [ {
+        "begrunnelseType" : "VALGFRI",
+        "nesteRegelId" : "ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN",
+        "svarId" : "JA",
+        "tilhørendeFaktaType" : null
+      }, {
+        "begrunnelseType" : "PÅKREVD",
+        "nesteRegelId" : "ROAH_KAN_BENYTTE_PRIVAT_BIL",
+        "svarId" : "NEI",
+        "tilhørendeFaktaType" : null
+      } ]
+    }
+  },
+  "hjemreise" : {
+    "ROAH_BENYTTET_TAXI" : {
+      "erHovedregel" : false,
+      "reglerSomMåNullstilles" : [ "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG" ],
+      "svaralternativer" : [ {
+        "begrunnelseType" : "VALGFRI",
+        "nesteRegelId" : "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG",
+        "svarId" : "JA",
+        "tilhørendeFaktaType" : null
+      }, {
+        "begrunnelseType" : "PÅKREVD",
+        "nesteRegelId" : null,
+        "svarId" : "NEI",
+        "tilhørendeFaktaType" : null
+      } ]
+    },
+    "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG" : {
+      "erHovedregel" : false,
+      "reglerSomMåNullstilles" : [ ],
+      "svaralternativer" : [ {
+        "begrunnelseType" : "VALGFRI",
+        "nesteRegelId" : null,
+        "svarId" : "JA",
+        "tilhørendeFaktaType" : null
+      }, {
+        "begrunnelseType" : "PÅKREVD",
+        "nesteRegelId" : null,
+        "svarId" : "NEI",
+        "tilhørendeFaktaType" : null
+      } ]
+    },
+    "ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN" : {
+      "erHovedregel" : false,
+      "reglerSomMåNullstilles" : [ "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG" ],
+      "svaralternativer" : [ {
+        "begrunnelseType" : "VALGFRI",
+        "nesteRegelId" : "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG",
+        "svarId" : "JA",
+        "tilhørendeFaktaType" : "REISE_OPPSTART_AVSLUTNING_HJEMREISE_OFFENTLIG_TRANSPORT"
+      }, {
+        "begrunnelseType" : "PÅKREVD",
+        "nesteRegelId" : null,
+        "svarId" : "NEI",
+        "tilhørendeFaktaType" : null
+      } ]
+    },
+    "ROAH_HAR_UTGIFTER_TIL_REISEN" : {
+      "erHovedregel" : true,
+      "reglerSomMåNullstilles" : [ "ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT", "ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN", "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG", "ROAH_KAN_BENYTTE_PRIVAT_BIL", "ROAH_BENYTTET_TAXI" ],
+      "svaralternativer" : [ {
+        "begrunnelseType" : "VALGFRI",
+        "nesteRegelId" : "ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT",
+        "svarId" : "JA",
+        "tilhørendeFaktaType" : null
+      }, {
+        "begrunnelseType" : "PÅKREVD",
+        "nesteRegelId" : null,
+        "svarId" : "NEI",
+        "tilhørendeFaktaType" : null
+      } ]
+    },
+    "ROAH_HJEMREISE_BEHOV_FLERE_REISER" : {
+      "erHovedregel" : false,
+      "reglerSomMåNullstilles" : [ "ROAH_HAR_UTGIFTER_TIL_REISEN", "ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT", "ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN", "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG", "ROAH_KAN_BENYTTE_PRIVAT_BIL", "ROAH_BENYTTET_TAXI" ],
+      "svaralternativer" : [ {
+        "begrunnelseType" : "VALGFRI",
+        "nesteRegelId" : "ROAH_HAR_UTGIFTER_TIL_REISEN",
+        "svarId" : "ROAH_HAR_BARN_IKKE_FERDIG_MED_FJERDE_SKOLEÅR",
+        "tilhørendeFaktaType" : null
+      }, {
+        "begrunnelseType" : "PÅKREVD",
+        "nesteRegelId" : "ROAH_HAR_UTGIFTER_TIL_REISEN",
+        "svarId" : "ROAH_HAR_DOKUMENTERTE_ANDRE_SÆRSKILTE_BEHOV",
+        "tilhørendeFaktaType" : null
+      }, {
+        "begrunnelseType" : "PÅKREVD",
+        "nesteRegelId" : null,
+        "svarId" : "NEI",
+        "tilhørendeFaktaType" : null
+      } ]
+    },
+    "ROAH_HJEMREISE_INNENFOR_NORMALT_ANTALL" : {
+      "erHovedregel" : true,
+      "reglerSomMåNullstilles" : [ "ROAH_HAR_UTGIFTER_TIL_REISEN", "ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT", "ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN", "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG", "ROAH_KAN_BENYTTE_PRIVAT_BIL", "ROAH_BENYTTET_TAXI", "ROAH_HJEMREISE_BEHOV_FLERE_REISER" ],
+      "svaralternativer" : [ {
+        "begrunnelseType" : "VALGFRI",
+        "nesteRegelId" : "ROAH_HAR_UTGIFTER_TIL_REISEN",
+        "svarId" : "JA",
+        "tilhørendeFaktaType" : null
+      }, {
+        "begrunnelseType" : "VALGFRI",
+        "nesteRegelId" : "ROAH_HJEMREISE_BEHOV_FLERE_REISER",
+        "svarId" : "NEI",
+        "tilhørendeFaktaType" : null
+      } ]
+    },
+    "ROAH_KAN_BENYTTE_PRIVAT_BIL" : {
+      "erHovedregel" : false,
+      "reglerSomMåNullstilles" : [ "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG", "ROAH_BENYTTET_TAXI" ],
+      "svaralternativer" : [ {
+        "begrunnelseType" : "VALGFRI",
+        "nesteRegelId" : "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG",
+        "svarId" : "JA",
+        "tilhørendeFaktaType" : "REISE_OPPSTART_AVSLUTNING_HJEMREISE_PRIVAT_BIL"
+      }, {
+        "begrunnelseType" : "PÅKREVD",
+        "nesteRegelId" : "ROAH_BENYTTET_TAXI",
+        "svarId" : "NEI",
+        "tilhørendeFaktaType" : null
+      } ]
+    },
+    "ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT" : {
+      "erHovedregel" : false,
+      "reglerSomMåNullstilles" : [ "ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN", "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG", "ROAH_KAN_BENYTTE_PRIVAT_BIL", "ROAH_BENYTTET_TAXI" ],
+      "svaralternativer" : [ {
+        "begrunnelseType" : "VALGFRI",
+        "nesteRegelId" : "ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN",
+        "svarId" : "JA",
+        "tilhørendeFaktaType" : null
+      }, {
+        "begrunnelseType" : "PÅKREVD",
+        "nesteRegelId" : "ROAH_KAN_BENYTTE_PRIVAT_BIL",
+        "svarId" : "NEI",
+        "tilhørendeFaktaType" : null
+      } ]
+    }
+  },
+  "oppstart" : {
+    "ROAH_BENYTTET_TAXI" : {
+      "erHovedregel" : false,
+      "reglerSomMåNullstilles" : [ "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG" ],
+      "svaralternativer" : [ {
+        "begrunnelseType" : "VALGFRI",
+        "nesteRegelId" : "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG",
+        "svarId" : "JA",
+        "tilhørendeFaktaType" : null
+      }, {
+        "begrunnelseType" : "PÅKREVD",
+        "nesteRegelId" : null,
+        "svarId" : "NEI",
+        "tilhørendeFaktaType" : null
+      } ]
+    },
+    "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG" : {
+      "erHovedregel" : false,
+      "reglerSomMåNullstilles" : [ ],
+      "svaralternativer" : [ {
+        "begrunnelseType" : "VALGFRI",
+        "nesteRegelId" : null,
+        "svarId" : "JA",
+        "tilhørendeFaktaType" : null
+      }, {
+        "begrunnelseType" : "PÅKREVD",
+        "nesteRegelId" : null,
+        "svarId" : "NEI",
+        "tilhørendeFaktaType" : null
+      } ]
+    },
+    "ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN" : {
+      "erHovedregel" : false,
+      "reglerSomMåNullstilles" : [ "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG" ],
+      "svaralternativer" : [ {
+        "begrunnelseType" : "VALGFRI",
+        "nesteRegelId" : "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG",
+        "svarId" : "JA",
+        "tilhørendeFaktaType" : "REISE_OPPSTART_AVSLUTNING_HJEMREISE_OFFENTLIG_TRANSPORT"
+      }, {
+        "begrunnelseType" : "PÅKREVD",
+        "nesteRegelId" : null,
+        "svarId" : "NEI",
+        "tilhørendeFaktaType" : null
+      } ]
+    },
+    "ROAH_HAR_UTGIFTER_TIL_REISEN" : {
+      "erHovedregel" : true,
+      "reglerSomMåNullstilles" : [ "ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT", "ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN", "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG", "ROAH_KAN_BENYTTE_PRIVAT_BIL", "ROAH_BENYTTET_TAXI" ],
+      "svaralternativer" : [ {
+        "begrunnelseType" : "VALGFRI",
+        "nesteRegelId" : "ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT",
+        "svarId" : "JA",
+        "tilhørendeFaktaType" : null
+      }, {
+        "begrunnelseType" : "PÅKREVD",
+        "nesteRegelId" : null,
+        "svarId" : "NEI",
+        "tilhørendeFaktaType" : null
+      } ]
+    },
+    "ROAH_KAN_BENYTTE_PRIVAT_BIL" : {
+      "erHovedregel" : false,
+      "reglerSomMåNullstilles" : [ "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG", "ROAH_BENYTTET_TAXI" ],
+      "svaralternativer" : [ {
+        "begrunnelseType" : "VALGFRI",
+        "nesteRegelId" : "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG",
+        "svarId" : "JA",
+        "tilhørendeFaktaType" : "REISE_OPPSTART_AVSLUTNING_HJEMREISE_PRIVAT_BIL"
+      }, {
+        "begrunnelseType" : "PÅKREVD",
+        "nesteRegelId" : "ROAH_BENYTTET_TAXI",
+        "svarId" : "NEI",
+        "tilhørendeFaktaType" : null
+      } ]
+    },
+    "ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT" : {
+      "erHovedregel" : false,
+      "reglerSomMåNullstilles" : [ "ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN", "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG", "ROAH_KAN_BENYTTE_PRIVAT_BIL", "ROAH_BENYTTET_TAXI" ],
+      "svaralternativer" : [ {
+        "begrunnelseType" : "VALGFRI",
+        "nesteRegelId" : "ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN",
+        "svarId" : "JA",
+        "tilhørendeFaktaType" : null
+      }, {
+        "begrunnelseType" : "PÅKREVD",
+        "nesteRegelId" : "ROAH_KAN_BENYTTE_PRIVAT_BIL",
+        "svarId" : "NEI",
+        "tilhørendeFaktaType" : null
+      } ]
+    }
+  }
+}

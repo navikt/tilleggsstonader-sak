@@ -9,8 +9,10 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelstrukturD
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggRegelstrukturFraVilkårregel.tilRegelstruktur
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseOppstartAvslutningHjemreiseRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.VilkårReiseOppstartAvslutningHjemreiseDtoMapper.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.AktivitetMedReiserDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.LagreVilkårReiseOppstartAvslutningHjemreiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.RegelstrukturReiseOppstartAvslutningHjemreiseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.SlettVilkårRequestDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.SlettVilkårResultatDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårReiseOppstartAvslutningHjemreiseDto
@@ -32,7 +34,12 @@ class ReiseOppstartAvslutningHjemreiseVilkårController(
     private val reiseOppstartAvslutningHjemreiseVilkårService: ReiseOppstartAvslutningHjemreiseVilkårService,
 ) {
     @GetMapping("regler")
-    fun regler(): RegelstrukturDto = ReiseOppstartAvslutningHjemreiseRegel().tilRegelstruktur()
+    fun regler(): RegelstrukturReiseOppstartAvslutningHjemreiseDto =
+        RegelstrukturReiseOppstartAvslutningHjemreiseDto(
+            oppstart = reglerFor(TypeReiseformål.OPPSTART),
+            avslutning = reglerFor(TypeReiseformål.AVSLUTNING),
+            hjemreise = reglerFor(TypeReiseformål.HJEMREISE),
+        )
 
     @GetMapping("{behandlingId}")
     fun hentVilkår(
@@ -94,4 +101,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårController(
                 slettetKommentar = slettVilkårRequestDto.kommentar,
             ).tilReiseOppstartAvslutningHjemreiseDto()
     }
+
+    private fun reglerFor(typeReiseformål: TypeReiseformål): RegelstrukturDto =
+        ReiseOppstartAvslutningHjemreiseRegel.forType(typeReiseformål).tilRegelstruktur()
 }

@@ -8,6 +8,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtelseRepository
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
@@ -93,5 +94,54 @@ class ReiseOppstartAvslutningHjemreiseTsoIntegrationTest : CleanDatabaseIntegrat
         assertThat(andel.fom).isEqualTo(reisedato)
         assertThat(andel.tom).isEqualTo(reisedato)
         assertThat(andel.beløp).isEqualTo(40)
+    }
+
+    @Test
+    fun `skal kunne fullføre flyten for alle type reiseformål`() {
+        val reisedato = 1 januar 2026
+
+        TypeReiseformål.entries.forEach { typeReiseformål ->
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(
+                    behandling = behandling(),
+                    stønadstype = Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+                    identer = setOf(PersonIdent(ident = ident)),
+                )
+
+            opprettOgTilordneOppgaveForBehandling(behandling.id)
+
+            gjennomførBehandlingsløp(ident = ident, behandlingId = behandling.id, tilSteg = StegType.SIMULERING) {
+                aktivitet {
+                    opprett {
+                        aktivitetTiltakTsoReiseTilOppstart(reisedato, reisedato)
+                    }
+                }
+                målgruppe {
+                    opprett {
+                        målgruppeAAP(reisedato, reisedato)
+                    }
+                }
+                vilkår {
+                    opprett {
+                        offentligTransportReiseOppstartAvslutningHjemreise(
+                            fom = reisedato,
+                            tom = reisedato,
+                            typeReiseformål = typeReiseformål,
+                        )
+                    }
+                }
+            }
+
+            val vilkår = kall.vilkårReiseOppstartAvslutningHjemreise.hentVilkår(behandling.id)
+            assertThat(vilkår).hasSize(1)
+            assertThat(vilkår.single().reiser).hasSize(1)
+            assertThat(vilkår.single().reiser.single().typeReiseformål).isEqualTo(typeReiseformål)
+        }
+    }
+
+    @Test
+    fun `skal hente alle regler som tilhører reise oppstart avslutning hjemreise`() {
+        val resultat = kall.vilkårReiseOppstartAvslutningHjemreise.regler()
+        FileUtil.assertFileJsonIsEqual("vilkår/regelstruktur/REISE_OPPSTART_AVSLUTNING_HJEMREISE_API.json", resultat)
     }
 }

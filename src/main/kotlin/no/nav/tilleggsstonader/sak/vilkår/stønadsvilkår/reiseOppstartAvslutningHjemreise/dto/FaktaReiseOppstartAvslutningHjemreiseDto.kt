@@ -75,7 +75,9 @@ data class FaktaReiseOppstartAvslutningHjemreisePrivatBilDto(
     )
 }
 
-data object FaktaReiseOppstartAvslutningHjemreiseUbestemtDto : FaktaReiseOppstartAvslutningHjemreiseDto {
+data class FaktaReiseOppstartAvslutningHjemreiseUbestemtDto(
+    val aktivitetId: VilkårperiodeGlobalId,
+) : FaktaReiseOppstartAvslutningHjemreiseDto {
     override val type = TypeReiseOppstartAvslutningHjemreise.UBESTEMT
 
     override fun mapTilFakta(
@@ -86,5 +88,6 @@ data object FaktaReiseOppstartAvslutningHjemreiseUbestemtDto : FaktaReiseOppstar
         reiseId = reiseId,
         adresse = adresse,
         typeReiseformål = typeReiseformål,
+        aktivitetId = aktivitetId,
     )
 }

@@ -22,4 +22,8 @@ enum class SvarId(
         "Ja, tiltak/utdanningssted har dokumentert at søker er borte fra hjemmet utover vanlig arbeidstid",
     ),
     TRENGER_MER_TILSYN_ENN_JEVNALDRENDE("Ja, legeerklæring viser at barnet har behov for vesentlig mer pleie/tilsyn"),
+
+    // ROAH
+    ROAH_HAR_BARN_IKKE_FERDIG_MED_FJERDE_SKOLEÅR("Har barn som bor hjemme, som ikke er ferdig med fjerde skoleår"),
+    ROAH_HAR_DOKUMENTERTE_ANDRE_SÆRSKILTE_BEHOV("Har dokumentert andre særskilte behov for flere hjemreiser"),
 }

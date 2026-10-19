@@ -50,14 +50,18 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
             .map { it.mapTilVilkårReiseOppstartAvslutningHjemreise() }
             .sortedBy { it.fom }
 
-    /**
-     * Grupperer reisene per aktivitet fra inngangsvilkår. Inneholder alle aktiviteter for behandlingen, også de
-     * som ikke (ennå) har noen reise knyttet til seg. Reiser med fakta-type Ubestemt har ingen aktivitetId og vises
-     * derfor ikke i noen av gruppene.
-     */
     fun hentVilkårGruppertPåAktivitet(behandlingId: BehandlingId): List<AktivitetMedReiser> {
         val aktiviteter = vilkårperiodeService.hentVilkårperioder(behandlingId).aktiviteter
-        val reiserPerAktivitet = hentVilkårForBehandling(behandlingId).groupBy { it.fakta.aktivitetId() }
+        val reiser = hentVilkårForBehandling(behandlingId)
+        val aktivitetIder = aktiviteter.map { it.globalId }.toSet()
+        val reiserSomIkkeKanKnyttesTilAktivitet = reiser.filter { it.fakta.aktivitetId() !in aktivitetIder }
+
+        feilHvis(reiserSomIkkeKanKnyttesTilAktivitet.isNotEmpty()) {
+            "Fant ${reiserSomIkkeKanKnyttesTilAktivitet.size} reise(r) som ikke kan knyttes til aktivitet " +
+                "for behandling=$behandlingId. ReiseIder=${reiserSomIkkeKanKnyttesTilAktivitet.map { it.fakta.reiseId }}"
+        }
+
+        val reiserPerAktivitet = reiser.groupBy { it.fakta.aktivitetId() }
 
         return aktiviteter
             .sortedBy { it.fom }
@@ -127,9 +131,10 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         nyttVilkår: LagreVilkårReiseOppstartAvslutningHjemreise,
         eksisterendeVilkår: VilkårReiseOppstartAvslutningHjemreise? = null,
     ): VilkårReiseOppstartAvslutningHjemreise {
+        val vilkårsregel = ReiseOppstartAvslutningHjemreiseRegel.forType(nyttVilkår.fakta.typeReiseformål)
         val delvilkårsett =
             ByggVilkårFraSvar.byggDelvilkårsettFraSvarOgVilkårsregel(
-                vilkårsregel = ReiseOppstartAvslutningHjemreiseRegel(),
+                vilkårsregel = vilkårsregel,
                 svar = nyttVilkår.svar,
             )
 
@@ -183,7 +188,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         nyttVilkår: LagreVilkårReiseOppstartAvslutningHjemreise,
         behandlingId: BehandlingId,
     ) {
-        val aktivitetId = nyttVilkår.fakta.aktivitetId() ?: return
+        val aktivitetId = nyttVilkår.fakta.aktivitetId()
 
         val aktivitet = vilkårperiodeService.hentAktivitet(aktivitetId, behandlingId)
         brukerfeilHvis(aktivitet == null) {
@@ -198,9 +203,9 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
     }
 }
 
-private fun FaktaReiseOppstartAvslutningHjemreise.aktivitetId(): VilkårperiodeGlobalId? =
+private fun FaktaReiseOppstartAvslutningHjemreise.aktivitetId(): VilkårperiodeGlobalId =
     when (this) {
         is FaktaOffentligTransport -> this.aktivitetId
         is FaktaPrivatBil -> this.aktivitetId
-        is FaktaUbestemtType -> null
+        is FaktaUbestemtType -> this.aktivitetId
     }

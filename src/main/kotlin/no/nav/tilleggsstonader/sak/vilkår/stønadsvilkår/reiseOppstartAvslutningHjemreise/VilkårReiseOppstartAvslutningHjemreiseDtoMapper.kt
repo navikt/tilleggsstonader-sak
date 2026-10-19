@@ -44,7 +44,7 @@ object VilkårReiseOppstartAvslutningHjemreiseDtoMapper {
         when (this) {
             is FaktaOffentligTransport -> this.tilDto()
             is FaktaPrivatBil -> this.tilDto()
-            is FaktaUbestemtType -> FaktaReiseOppstartAvslutningHjemreiseUbestemtDto
+            is FaktaUbestemtType -> FaktaReiseOppstartAvslutningHjemreiseUbestemtDto(aktivitetId = this.aktivitetId)
         }
 
     private fun FaktaOffentligTransport.tilDto() =

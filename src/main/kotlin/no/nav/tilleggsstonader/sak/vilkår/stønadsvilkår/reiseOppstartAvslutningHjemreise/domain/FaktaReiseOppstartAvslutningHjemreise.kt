@@ -22,6 +22,7 @@ data class FaktaUbestemtType(
     override val typeReiseformål: TypeReiseformål,
     override val reiseId: ReiseId,
     override val adresse: String?,
+    val aktivitetId: VilkårperiodeGlobalId,
 ) : FaktaReiseOppstartAvslutningHjemreise {
     override val type = TypeReiseOppstartAvslutningHjemreise.UBESTEMT
 
@@ -30,6 +31,7 @@ data class FaktaUbestemtType(
             reiseId = reiseId,
             adresse = adresse,
             typeReiseformål = typeReiseformål,
+            aktivitetId = aktivitetId,
         )
 }
 

@@ -125,6 +125,7 @@ data class FaktaReiseOppstartAvslutningHjemreiseUbestemt(
     override val reiseId: ReiseId,
     override val adresse: String?,
     val typeReiseformål: TypeReiseformål,
+    val aktivitetId: VilkårperiodeGlobalId?,
 ) : ReiseVilkårFakta
 
 data class FaktaDagligReiseUbestemt(

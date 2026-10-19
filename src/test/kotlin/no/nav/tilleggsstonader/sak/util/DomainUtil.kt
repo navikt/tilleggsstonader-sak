@@ -851,10 +851,7 @@ fun lagreReiseOppstartAvslutningHjemreiseDto(
     typeReiseformål: TypeReiseformål = TypeReiseformål.OPPSTART,
     utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
     aktivitetId: VilkårperiodeGlobalId = dummyAktivitetId,
-    svar: Map<RegelId, SvarOgBegrunnelseDto> =
-        mapOf(
-            RegelId.KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
-        ),
+    svar: Map<RegelId, SvarOgBegrunnelseDto>? = null,
     fakta: FaktaReiseOppstartAvslutningHjemreiseDto =
         FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
             utgifterOffentligTransport = utgifterOffentligTransport,
@@ -866,9 +863,35 @@ fun lagreReiseOppstartAvslutningHjemreiseDto(
     reiseId = reiseId,
     adresse = adresse,
     typeReiseformål = typeReiseformål,
-    svar = svar,
+    svar = svar ?: standardSvarReiseOppstartAvslutningHjemreise(typeReiseformål),
     fakta = fakta,
 )
+
+private fun standardSvarReiseOppstartAvslutningHjemreise(typeReiseformål: TypeReiseformål): Map<RegelId, SvarOgBegrunnelseDto> =
+    when (typeReiseformål) {
+        TypeReiseformål.OPPSTART ->
+            mapOf(
+                RegelId.ROAH_HAR_UTGIFTER_TIL_REISEN to SvarOgBegrunnelseDto(svar = SvarId.JA),
+                RegelId.ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
+                RegelId.ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN to SvarOgBegrunnelseDto(svar = SvarId.JA),
+                RegelId.ROAH_ER_HELE_UTGIFTEN_NØDVENDIG to SvarOgBegrunnelseDto(svar = SvarId.JA),
+            )
+        TypeReiseformål.AVSLUTNING ->
+            mapOf(
+                RegelId.ROAH_HAR_UTGIFTER_TIL_REISEN to SvarOgBegrunnelseDto(svar = SvarId.JA),
+                RegelId.ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
+                RegelId.ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN to SvarOgBegrunnelseDto(svar = SvarId.JA),
+                RegelId.ROAH_ER_HELE_UTGIFTEN_NØDVENDIG to SvarOgBegrunnelseDto(svar = SvarId.JA),
+            )
+        TypeReiseformål.HJEMREISE ->
+            mapOf(
+                RegelId.ROAH_HJEMREISE_INNENFOR_NORMALT_ANTALL to SvarOgBegrunnelseDto(svar = SvarId.JA),
+                RegelId.ROAH_HAR_UTGIFTER_TIL_REISEN to SvarOgBegrunnelseDto(svar = SvarId.JA),
+                RegelId.ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT to SvarOgBegrunnelseDto(svar = SvarId.JA),
+                RegelId.ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN to SvarOgBegrunnelseDto(svar = SvarId.JA),
+                RegelId.ROAH_ER_HELE_UTGIFTEN_NØDVENDIG to SvarOgBegrunnelseDto(svar = SvarId.JA),
+            )
+    }
 
 fun lagreDagligReisePrivatBilDto(
     fom: LocalDate = 1 januar 2025,
