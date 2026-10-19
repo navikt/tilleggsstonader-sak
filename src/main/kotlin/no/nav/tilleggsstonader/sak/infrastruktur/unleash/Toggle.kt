@@ -27,9 +27,11 @@ enum class Toggle(
 
     SØKNAD_ROUTING_REISE_TIL_SAMLING("sak.soknad-routing.reise-til-samling"),
 
-    SØKNAD_ROUTING_FLYTTING("sak.soknad-routing.flytting"),
+    SØKNAD_ROUTING_AKTIVITETSPENGER_FLYTTING("sak.soknad-routing.aktivitetspenger.flytting"),
 
-    SØKNAD_ROUTING_REISE_OPPSTART_AVSLUTNING_HJEMREISE("sak.soknad-routing.reise-oppstart-avslutning-hjemreise"),
+    SØKNAD_ROUTING_AKTIVITETSPENGER_REISE_OPPSTART_AVSLUTNING_HJEMREISE(
+        "sak.soknad-routing.aktivitetspenger.reise-oppstart-avslutning-hjemreise",
+    ),
 
     KAN_OPPHØRE_PRIVAT_BIL("sak.opphore-privat-bil"),
     KAN_REVURDERE_PRIVAT_BIL("sak.revurdere-privat-bil"),

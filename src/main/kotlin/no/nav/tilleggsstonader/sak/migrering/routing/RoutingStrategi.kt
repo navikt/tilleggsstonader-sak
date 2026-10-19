@@ -19,6 +19,11 @@ sealed interface RoutingStrategi {
     data object DagligReise : RoutingStrategi
 
     data object KjørelisteRouting : RoutingStrategi
+
+    data class FlyttingOgROAH(
+        val featureToggle: ToggleId,
+        val kreverAktivtAapVedtak: Boolean,
+    ) : RoutingStrategi
 }
 
 fun bestemRoutingStrategi(skjematype: Skjematype): RoutingStrategi =
@@ -40,21 +45,13 @@ fun bestemRoutingStrategi(skjematype: Skjematype): RoutingStrategi =
                 featureToggleMaksAntallForPrivatBil = null,
             )
         Skjematype.SØKNAD_FLYTTING ->
-            RoutingStrategi.SendEnkelteBrukereTilNyLøsning(
-                featureToggleMaksAntallForStønad = Toggle.SØKNAD_ROUTING_FLYTTING,
-                kreverAtSøkerErUtenAktivtVedtakIArena = true,
+            RoutingStrategi.FlyttingOgROAH(
+                featureToggle = Toggle.SØKNAD_ROUTING_AKTIVITETSPENGER_FLYTTING,
                 kreverAktivtAapVedtak = false,
-                kreverUgradertAdresse = true,
-                alleMedAAPVedtakTilNyLøsning = false,
-                featureToggleMaksAntallForPrivatBil = null,
             )
         Skjematype.SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE ->
-            RoutingStrategi.SendEnkelteBrukereTilNyLøsning(
-                featureToggleMaksAntallForStønad = Toggle.SØKNAD_ROUTING_REISE_OPPSTART_AVSLUTNING_HJEMREISE,
-                kreverAtSøkerErUtenAktivtVedtakIArena = true,
+            RoutingStrategi.FlyttingOgROAH(
+                featureToggle = Toggle.SØKNAD_ROUTING_AKTIVITETSPENGER_REISE_OPPSTART_AVSLUTNING_HJEMREISE,
                 kreverAktivtAapVedtak = false,
-                kreverUgradertAdresse = true,
-                alleMedAAPVedtakTilNyLøsning = false,
-                featureToggleMaksAntallForPrivatBil = null,
             )
     }

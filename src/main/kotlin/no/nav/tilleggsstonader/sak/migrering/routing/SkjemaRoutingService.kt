@@ -64,6 +64,10 @@ class SkjemaRoutingService(
                 RoutingStrategi.KjørelisteRouting -> {
                     skalBrukerRoutesTilNyKjørelisteLøsning(ident, skjematype)
                 }
+
+                is RoutingStrategi.FlyttingOgROAH -> {
+                    skalBrukerRoutesTilNyLøsningFlyttingOgROAH(ident, skjematype, routingStrategi)
+                }
             }.also { loggRoutingResultatet(skjematype, it) }
         }
 
@@ -100,6 +104,36 @@ class SkjemaRoutingService(
 
         return SkjemaRoutingAksjon.AVSJEKK
     }
+
+    private fun skalBrukerRoutesTilNyLøsningFlyttingOgROAH(
+        ident: String,
+        skjematype: Skjematype,
+        kontekst: RoutingStrategi.FlyttingOgROAH,
+    ): SkjemaRoutingAksjon {
+        if (!unleashService.isEnabled(kontekst.featureToggle)) {
+            return SkjemaRoutingAksjon.GAMMEL_LØSNING
+        }
+        if (harBehandling(ident, skjematype)) {
+            lagreRoutingHvisIkkeLagret(ident, skjematype, mapOf("harBehandling" to true))
+            return SkjemaRoutingAksjon.NY_LØSNING
+        }
+        if (kontekst.kreverAktivtAapVedtak && !harAktivtAapVedtak(ident)) {
+            return SkjemaRoutingAksjon.GAMMEL_LØSNING
+        }
+        if (harAktivitetspenger(ident, skjematype)) {
+            lagreRoutingHvisIkkeLagret(ident, skjematype, mapOf("harAktivitetspenger" to true))
+            return SkjemaRoutingAksjon.NY_LØSNING
+        }
+        return SkjemaRoutingAksjon.AVSJEKK
+    }
+
+    private fun harAktivitetspenger(
+        ident: String,
+        skjematype: Skjematype,
+    ): Boolean =
+        ytelseService
+            .harAktivitetspengerIDagEllerFremITid(ident)
+            .also { logger.info("routing - skjematype=$skjematype harAktivitetspenger=$it") }
 
     private fun skalBrukerRoutesTilNyLøsningDagligReise(ident: String): SkjemaRoutingAksjon {
         val skjematype = Skjematype.SØKNAD_DAGLIG_REISE
@@ -204,6 +238,19 @@ class SkjemaRoutingService(
                 detaljer = JsonWrapper(jsonMapper.writeValueAsString(detaljer)),
             ),
         )
+    }
+
+    /**
+     * Lagres kun for statistikk. Unik indeks på (ident, type) gjør at vi ikke kan lagre samme routing to ganger.
+     */
+    private fun lagreRoutingHvisIkkeLagret(
+        ident: String,
+        skjematype: Skjematype,
+        detaljer: Any,
+    ) {
+        if (!harLagretRouting(ident, skjematype)) {
+            lagreRouting(ident, skjematype, detaljer)
+        }
     }
 
     private fun loggRoutingResultatet(
