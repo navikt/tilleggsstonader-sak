@@ -10,8 +10,11 @@
       "fraTidligereVedtak": false,
       "grunnlag": {
         "erBetalingDokumentert": true,
-        "tilbud1Pris": 10000,
-        "tilbud2Pris": 12000,
+        "tilbud": [
+          {"navn": "Syntetisk tilbud 1", "pris": 10000},
+          {"navn": "Syntetisk tilbud 2", "pris": 12000}
+        ],
+        "valgtTilbud": {"navn": "Syntetisk tilbud 1", "pris": 10000},
         "type": "FLYTTEBYRÅ"
       },
       "målgruppe": "NEDSATT_ARBEIDSEVNE",

@@ -31,6 +31,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeDagligReise
 import no.nav.tilleggsstonader.sak.vedtak.flytting.detaljerteVedtaksperioder.DetaljertVedtaksperiodeFlytting
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyråTilbud
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlyttevilkår
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.Flyttemåte
@@ -303,8 +304,12 @@ class VedtaksperioderOversiktServiceTest : CleanDatabaseIntegrationTest() {
                                                 },
                                             grunnlag =
                                                 BeregningsgrunnlagFlyttebyrå(
-                                                    tilbud1Pris = BigDecimal("100"),
-                                                    tilbud2Pris = BigDecimal("100"),
+                                                    tilbud =
+                                                        listOf(
+                                                            BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("100")),
+                                                            BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("100")),
+                                                        ),
+                                                    valgtTilbud = BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("100")),
                                                     erBetalingDokumentert = true,
                                                 ),
                                         ),

@@ -5,6 +5,7 @@ import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.felles.domain.FaktiskMålgruppe
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlytteSelv
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyråTilbud
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlyttevilkår
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.Flyttemåte
@@ -82,8 +83,12 @@ class DetaljertVedtaksperiodeFlyttingTest {
                 )
             } else {
                 BeregningsgrunnlagFlyttebyrå(
-                    tilbud1Pris = beløp,
-                    tilbud2Pris = beløp,
+                    tilbud =
+                        listOf(
+                            BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("100")),
+                            BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("100")),
+                        ),
+                    valgtTilbud = BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("100")),
                     erBetalingDokumentert = dokumentert,
                 )
             },

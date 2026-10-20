@@ -38,10 +38,15 @@ enum class Flyttemåte {
 sealed interface BeregningsgrunnlagFlytting
 
 data class BeregningsgrunnlagFlyttebyrå(
-    val tilbud1Pris: BigDecimal,
-    val tilbud2Pris: BigDecimal,
+    val tilbud: List<BeregningsgrunnlagFlyttebyråTilbud>,
+    val valgtTilbud: BeregningsgrunnlagFlyttebyråTilbud,
     val erBetalingDokumentert: Boolean,
 ) : BeregningsgrunnlagFlytting
+
+data class BeregningsgrunnlagFlyttebyråTilbud(
+    val navn: String,
+    val pris: BigDecimal,
+)
 
 data class BeregningsgrunnlagFlytteSelv(
     val avstandEnVei: Int,

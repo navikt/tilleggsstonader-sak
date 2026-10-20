@@ -16,8 +16,7 @@ object FaktaFlyttingMapper {
         when (this) {
             is FaktaFlyttebyråDto ->
                 FaktaFlyttebyrå(
-                    tilbud1 = FlyttebyråTilbud(navn = tilbud1.navn, pris = tilbud1.pris),
-                    tilbud2 = FlyttebyråTilbud(navn = tilbud2.navn, pris = tilbud2.pris),
+                    tilbud = tilbud.map { FlyttebyråTilbud(navn = it.navn, pris = it.pris) },
                     adresse = adresse,
                     erBetalingDokumentert = erBetalingDokumentert,
                 )
@@ -39,8 +38,7 @@ object FaktaFlyttingMapper {
         when (this) {
             is FaktaFlyttebyrå ->
                 FaktaFlyttebyråDto(
-                    tilbud1 = FlyttebyråTilbudDto(navn = tilbud1.navn, pris = tilbud1.pris),
-                    tilbud2 = FlyttebyråTilbudDto(navn = tilbud2.navn, pris = tilbud2.pris),
+                    tilbud = tilbud.map { FlyttebyråTilbudDto(navn = it.navn, pris = it.pris) },
                     adresse = adresse,
                     erBetalingDokumentert = erBetalingDokumentert,
                 )

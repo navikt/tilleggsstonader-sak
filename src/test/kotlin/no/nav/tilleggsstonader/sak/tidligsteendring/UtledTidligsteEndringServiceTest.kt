@@ -105,8 +105,7 @@ class UtledTidligsteEndringServiceTest {
         val tom = 31 januar 2026
         val fakta =
             FaktaFlyttebyrå(
-                tilbud1 = FlyttebyråTilbud("A", 5000),
-                tilbud2 = FlyttebyråTilbud("B", 6000),
+                tilbud = listOf(FlyttebyråTilbud("A", 5000), FlyttebyråTilbud("B", 6000)),
                 erBetalingDokumentert = true,
                 adresse = "Syntetisk adresse",
             )
@@ -130,7 +129,12 @@ class UtledTidligsteEndringServiceTest {
             )
         assertThat(utleder.utledTidligsteEndring()).isNull()
         listOf(
-            fakta.copy(tilbud1 = fakta.tilbud1.copy(pris = 3000)),
+            fakta.copy(
+                tilbud =
+                    fakta.tilbud.mapIndexed { index, tilbud ->
+                        if (index == 0) tilbud.copy(pris = 3000) else tilbud
+                    },
+            ),
             fakta.copy(erBetalingDokumentert = false),
             fakta.copy(adresse = "Ny syntetisk adresse"),
             FaktaFlytteSelv(100, null, null, null, null, fakta.adresse),

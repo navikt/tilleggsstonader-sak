@@ -21,7 +21,11 @@ class FaktaFlyttingMapperTest {
         listOf(
             FaktaFlyttingUbestemtDto(adresse = "Flytteveien 1"),
             FaktaFlyttebyråDto(
-                tilbud1 = FlyttebyråTilbudDto(navn = "Flyttebyrå A"),
+                tilbud =
+                    listOf(
+                        FlyttebyråTilbudDto(navn = "Flyttebyrå A"),
+                        FlyttebyråTilbudDto(),
+                    ),
                 adresse = "Flytteveien 1",
                 erBetalingDokumentert = true,
             ),
@@ -35,8 +39,11 @@ class FaktaFlyttingMapperTest {
     fun `skal bevare kostnader og tilbud gjennom lagringsformatet`() {
         listOf(
             FaktaFlyttebyråDto(
-                tilbud1 = FlyttebyråTilbudDto(navn = "Flyttebyrå A", pris = 10000),
-                tilbud2 = FlyttebyråTilbudDto(navn = "Flyttebyrå B", pris = 12000),
+                tilbud =
+                    listOf(
+                        FlyttebyråTilbudDto(navn = "Flyttebyrå B", pris = 12000),
+                        FlyttebyråTilbudDto(navn = "Flyttebyrå A", pris = 10000),
+                    ),
                 adresse = "Flytteveien 1",
                 erBetalingDokumentert = false,
             ),

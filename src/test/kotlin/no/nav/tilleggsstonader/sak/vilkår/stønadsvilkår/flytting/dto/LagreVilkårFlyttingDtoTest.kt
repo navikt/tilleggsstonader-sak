@@ -59,8 +59,7 @@ class LagreVilkårFlyttingDtoTest {
                 """
                 {
                   "type": "FLYTTING_FLYTTEBYRÅ",
-                  "tilbud1": {"navn": "Flyttebyrå A"},
-                  "tilbud2": {},
+                  "tilbud": [{"navn": "Flyttebyrå A"}, {}],
                   "adresse": "Flytteveien 1",
                   "erBetalingDokumentert": false
                 }
@@ -69,7 +68,11 @@ class LagreVilkårFlyttingDtoTest {
 
         assertThat(fakta).isEqualTo(
             FaktaFlyttebyråDto(
-                tilbud1 = FlyttebyråTilbudDto(navn = "Flyttebyrå A"),
+                tilbud =
+                    listOf(
+                        FlyttebyråTilbudDto(navn = "Flyttebyrå A"),
+                        FlyttebyråTilbudDto(),
+                    ),
                 adresse = "Flytteveien 1",
                 erBetalingDokumentert = false,
             ),
@@ -85,7 +88,7 @@ class LagreVilkårFlyttingDtoTest {
     }
 
     @Test
-    fun `skal bevare to tilbud og valgfri begrunnelse gjennom json`() {
+    fun `skal bevare tilbud i rekkefølge og valgfri begrunnelse gjennom json`() {
         val dto =
             dto(
                 svar =
@@ -95,8 +98,11 @@ class LagreVilkårFlyttingDtoTest {
                     ),
                 fakta =
                     FaktaFlyttebyråDto(
-                        tilbud1 = FlyttebyråTilbudDto(navn = "Flyttebyrå A", pris = 10000),
-                        tilbud2 = FlyttebyråTilbudDto(navn = "Flyttebyrå B", pris = 12000),
+                        tilbud =
+                            listOf(
+                                FlyttebyråTilbudDto(navn = "Flyttebyrå B", pris = 12000),
+                                FlyttebyråTilbudDto(navn = "Flyttebyrå A", pris = 10000),
+                            ),
                         adresse = "Flytteveien 1",
                         erBetalingDokumentert = true,
                     ),
