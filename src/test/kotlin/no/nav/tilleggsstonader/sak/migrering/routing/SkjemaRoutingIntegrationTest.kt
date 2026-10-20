@@ -8,6 +8,10 @@ import no.nav.tilleggsstonader.kontrakter.felles.IdentSkjematype
 import no.nav.tilleggsstonader.kontrakter.felles.Skjematype
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.SkjemaRoutingAksjon
+import no.nav.tilleggsstonader.kontrakter.ytelse.ResultatKilde
+import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
+import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto.KildeResultatYtelse
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.infrastruktur.database.JsonWrapper
@@ -21,6 +25,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PdlClient
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.AdressebeskyttelseGradering
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelsePerioderUtil.ytelsePerioderDto
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.util.RammevedtakPrivatBilUtil
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -38,6 +43,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDate
 
 class SkjemaRoutingIntegrationTest(
     @Autowired private val arenaClient: ArenaClient,
@@ -345,6 +351,134 @@ class SkjemaRoutingIntegrationTest(
                     rammevedtakPrivatBil = null,
                 )
             vedtakRepository.insert(vedtak)
+        }
+    }
+
+    @Nested
+    inner class FlyttingOgROAH {
+        @ParameterizedTest
+        @EnumSource(value = Skjematype::class, names = ["SØKNAD_FLYTTING", "SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
+        fun `skal route til gammel løsning hvis toggle er av`(skjematype: Skjematype) {
+            mockToggle(skjematype, skruddPå = false)
+            mockAktivitetspenger(harAktivitetspenger = true)
+
+            val routingSjekk = kall.skjemaRouting.sjekk(IdentSkjematype(jonasIdent, skjematype))
+
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.GAMMEL_LØSNING)
+            assertThat(routingHarBlittLagret(skjematype)).isFalse()
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = Skjematype::class, names = ["SØKNAD_FLYTTING", "SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
+        fun `skal lagre routing og svare ny løsning hvis bruker har aktivitetspenger`(skjematype: Skjematype) {
+            mockToggle(skjematype, skruddPå = true)
+            mockAktivitetspenger(harAktivitetspenger = true)
+
+            val routingSjekk = kall.skjemaRouting.sjekk(IdentSkjematype(jonasIdent, skjematype))
+
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
+            assertThat(routingHarBlittLagret(skjematype)).isTrue()
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = Skjematype::class, names = ["SØKNAD_FLYTTING", "SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
+        fun `skal svare avsjekk hvis bruker ikke har aktivitetspenger eller behandling`(skjematype: Skjematype) {
+            mockToggle(skjematype, skruddPå = true)
+            mockAktivitetspenger(harAktivitetspenger = false)
+
+            val routingSjekk = kall.skjemaRouting.sjekk(IdentSkjematype(jonasIdent, skjematype))
+
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK)
+            assertThat(routingHarBlittLagret(skjematype)).isFalse()
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = Skjematype::class, names = ["SØKNAD_FLYTTING", "SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
+        fun `skal svare avsjekk hvis henting av aktivitetspenger feiler`(skjematype: Skjematype) {
+            mockToggle(skjematype, skruddPå = true)
+            every { ytelseClient.hentYtelser(any()) } returns
+                ytelsePerioderDto(
+                    perioder = emptyList(),
+                    kildeResultat = listOf(KildeResultatYtelse(TypeYtelsePeriode.AKTIVITETSPENGER, ResultatKilde.FEILET)),
+                )
+
+            val routingSjekk = kall.skjemaRouting.sjekk(IdentSkjematype(jonasIdent, skjematype))
+
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK)
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = Skjematype::class, names = ["SØKNAD_FLYTTING", "SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
+        fun `skal svare avsjekk hvis kallet for å hente aktivitetspenger kaster feil`(skjematype: Skjematype) {
+            mockToggle(skjematype, skruddPå = true)
+            every { ytelseClient.hentYtelser(any()) } throws RuntimeException("ung-sak er nede")
+
+            val routingSjekk = kall.skjemaRouting.sjekk(IdentSkjematype(jonasIdent, skjematype))
+
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK)
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = Skjematype::class, names = ["SØKNAD_FLYTTING", "SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
+        fun `skal ikke svare ny løsning kun fordi routing er lagret tidligere`(skjematype: Skjematype) {
+            mockToggle(skjematype, skruddPå = true)
+            mockAktivitetspenger(harAktivitetspenger = false)
+            testoppsettService.lagreSøknadRouting(
+                SkjemaRouting(ident = jonasIdent, type = skjematype, detaljer = JsonWrapper("{}")),
+            )
+
+            val routingSjekk = kall.skjemaRouting.sjekk(IdentSkjematype(jonasIdent, skjematype))
+
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.AVSJEKK)
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = Skjematype::class, names = ["SØKNAD_FLYTTING", "SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE"])
+        fun `skal svare ny løsning flere ganger uten å feile på lagring av routing`(skjematype: Skjematype) {
+            mockToggle(skjematype, skruddPå = true)
+            mockAktivitetspenger(harAktivitetspenger = true)
+
+            kall.skjemaRouting.sjekk(IdentSkjematype(jonasIdent, skjematype))
+            val routingSjekk = kall.skjemaRouting.sjekk(IdentSkjematype(jonasIdent, skjematype))
+
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
+        }
+
+        @Test
+        fun `skal lagre routing og svare ny løsning hvis det finnes en flytting-behandling på personen`() {
+            val skjematype = Skjematype.SØKNAD_FLYTTING
+            mockToggle(skjematype, skruddPå = true)
+            mockAktivitetspenger(harAktivitetspenger = false)
+            val fagsak = fagsak(identer = setOf(PersonIdent(jonasIdent)), stønadstype = Stønadstype.FLYTTING_TSO)
+            testoppsettService.lagreFagsak(fagsak)
+            testoppsettService.lagre(behandling = behandling(fagsak), opprettGrunnlagsdata = false)
+
+            val routingSjekk = kall.skjemaRouting.sjekk(IdentSkjematype(jonasIdent, skjematype))
+
+            assertThat(routingSjekk.aksjon).isEqualTo(SkjemaRoutingAksjon.NY_LØSNING)
+            assertThat(routingHarBlittLagret(skjematype)).isTrue()
+        }
+
+        private fun mockToggle(
+            skjematype: Skjematype,
+            skruddPå: Boolean,
+        ) {
+            val routingStrategi = bestemRoutingStrategi(skjematype) as RoutingStrategi.FlyttingOgROAH
+            unleashService.mockIsEnabled(routingStrategi.featureToggle as Toggle, skruddPå)
+        }
+
+        private fun mockAktivitetspenger(harAktivitetspenger: Boolean) {
+            val perioder =
+                if (harAktivitetspenger) {
+                    listOf(YtelsePeriode.Aktivitetspenger(fom = LocalDate.now(), tom = LocalDate.now().plusMonths(3)))
+                } else {
+                    emptyList()
+                }
+            every { ytelseClient.hentYtelser(any()) } returns
+                ytelsePerioderDto(
+                    perioder = perioder,
+                    kildeResultat = listOf(KildeResultatYtelse(TypeYtelsePeriode.AKTIVITETSPENGER, ResultatKilde.OK)),
+                )
         }
     }
 

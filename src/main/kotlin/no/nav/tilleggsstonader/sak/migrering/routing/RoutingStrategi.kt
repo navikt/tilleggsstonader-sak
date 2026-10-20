@@ -19,6 +19,10 @@ sealed interface RoutingStrategi {
     data object DagligReise : RoutingStrategi
 
     data object KjørelisteRouting : RoutingStrategi
+
+    data class FlyttingOgROAH(
+        val featureToggle: ToggleId,
+    ) : RoutingStrategi
 }
 
 fun bestemRoutingStrategi(skjematype: Skjematype): RoutingStrategi =
@@ -40,21 +44,11 @@ fun bestemRoutingStrategi(skjematype: Skjematype): RoutingStrategi =
                 featureToggleMaksAntallForPrivatBil = null,
             )
         Skjematype.SØKNAD_FLYTTING ->
-            RoutingStrategi.SendEnkelteBrukereTilNyLøsning(
-                featureToggleMaksAntallForStønad = Toggle.SØKNAD_ROUTING_FLYTTING,
-                kreverAtSøkerErUtenAktivtVedtakIArena = true,
-                kreverAktivtAapVedtak = false,
-                kreverUgradertAdresse = true,
-                alleMedAAPVedtakTilNyLøsning = false,
-                featureToggleMaksAntallForPrivatBil = null,
+            RoutingStrategi.FlyttingOgROAH(
+                featureToggle = Toggle.SØKNAD_ROUTING_FLYTTING,
             )
         Skjematype.SØKNAD_REISE_OPPSTART_AVSLUTNING_HJEMREISE ->
-            RoutingStrategi.SendEnkelteBrukereTilNyLøsning(
-                featureToggleMaksAntallForStønad = Toggle.SØKNAD_ROUTING_REISE_OPPSTART_AVSLUTNING_HJEMREISE,
-                kreverAtSøkerErUtenAktivtVedtakIArena = true,
-                kreverAktivtAapVedtak = false,
-                kreverUgradertAdresse = true,
-                alleMedAAPVedtakTilNyLøsning = false,
-                featureToggleMaksAntallForPrivatBil = null,
+            RoutingStrategi.FlyttingOgROAH(
+                featureToggle = Toggle.SØKNAD_ROUTING_ROAH,
             )
     }
