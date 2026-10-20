@@ -30,14 +30,15 @@ class ReiseOppstartAvslutningHjemreiseFlyttePeriodeRegel :
             ),
     ) {
     companion object {
-        private val standardRegelsett = setOf(
-            RegelId.ROAH_HAR_UTGIFTER_TIL_REISEN,
-            RegelId.ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT,
-            RegelId.ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN,
-            RegelId.ROAH_KAN_BENYTTE_PRIVAT_BIL,
-            RegelId.ROAH_BENYTTET_TAXI,
-            RegelId.ROAH_ER_HELE_UTGIFTEN_NØDVENDIG,
-        )
+        private val standardRegelsett =
+            setOf(
+                RegelId.ROAH_HAR_UTGIFTER_TIL_REISEN,
+                RegelId.ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT,
+                RegelId.ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN,
+                RegelId.ROAH_KAN_BENYTTE_PRIVAT_BIL,
+                RegelId.ROAH_BENYTTET_TAXI,
+                RegelId.ROAH_ER_HELE_UTGIFTEN_NØDVENDIG,
+            )
 
         private val reglerPerTypeReiseformål: Map<TypeReiseformål, Set<RegelId>> =
             mapOf(

@@ -331,7 +331,7 @@ class OpprettStønadsvilkårDsl {
 
     fun offentligTransportReiseOppstartAvslutningHjemreise(
         fom: LocalDate,
-        tom: LocalDate,
+        tom: LocalDate? = null,
         typeReiseformål: TypeReiseformål = TypeReiseformål.OPPSTART,
         hentAktivitetId: (List<VilkårperiodeDto>) -> VilkårperiodeGlobalId = { it.single().globalId },
     ) {

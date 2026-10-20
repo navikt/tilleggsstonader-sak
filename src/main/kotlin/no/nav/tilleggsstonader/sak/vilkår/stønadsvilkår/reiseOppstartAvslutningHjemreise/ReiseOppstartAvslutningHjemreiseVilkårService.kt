@@ -23,16 +23,11 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseO
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.VilkårReiseOppstartAvslutningHjemreiseMapper.mapTilVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.VilkårReiseOppstartAvslutningHjemreiseMapper.mapTilVilkårReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.AktivitetMedReiser
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaOffentligTransport
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaPrivatBil
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaReiseOppstartAvslutningHjemreise
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.LagreVilkårReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -54,14 +49,14 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         val aktiviteter = vilkårperiodeService.hentVilkårperioder(behandlingId).aktiviteter
         val reiser = hentVilkårForBehandling(behandlingId)
         val aktivitetIder = aktiviteter.map { it.globalId }.toSet()
-        val reiserSomIkkeKanKnyttesTilAktivitet = reiser.filter { it.fakta.aktivitetId() !in aktivitetIder }
+        val reiserSomIkkeKanKnyttesTilAktivitet = reiser.filter { it.aktivitetId !in aktivitetIder }
 
         feilHvis(reiserSomIkkeKanKnyttesTilAktivitet.isNotEmpty()) {
             "Fant ${reiserSomIkkeKanKnyttesTilAktivitet.size} reise(r) som ikke kan knyttes til aktivitet " +
-                "for behandling=$behandlingId. ReiseIder=${reiserSomIkkeKanKnyttesTilAktivitet.map { it.fakta.reiseId }}"
+                "for behandling=$behandlingId. ReiseIder=${reiserSomIkkeKanKnyttesTilAktivitet.map { it.reiseId }}"
         }
 
-        val reiserPerAktivitet = reiser.groupBy { it.fakta.aktivitetId() }
+        val reiserPerAktivitet = reiser.groupBy { it.aktivitetId }
 
         return aktiviteter
             .sortedBy { it.fom }
@@ -131,7 +126,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         nyttVilkår: LagreVilkårReiseOppstartAvslutningHjemreise,
         eksisterendeVilkår: VilkårReiseOppstartAvslutningHjemreise? = null,
     ): VilkårReiseOppstartAvslutningHjemreise {
-        val vilkårsregel = ReiseOppstartAvslutningHjemreiseRegel.forType(nyttVilkår.fakta.typeReiseformål)
+        val vilkårsregel = ReiseOppstartAvslutningHjemreiseRegel.forType(nyttVilkår.typeReiseformål)
         val delvilkårsett =
             ByggVilkårFraSvar.byggDelvilkårsettFraSvarOgVilkårsregel(
                 vilkårsregel = vilkårsregel,
@@ -143,6 +138,9 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
             id = eksisterendeVilkår?.id ?: VilkårId.random(),
             fom = nyttVilkår.fom,
             tom = nyttVilkår.tom,
+            aktivitetId = nyttVilkår.aktivitetId,
+            reiseId = nyttVilkår.reiseId,
+            typeReiseformål = nyttVilkår.typeReiseformål,
             status = utledStatus(eksisterendeVilkår),
             delvilkårsett = delvilkårsett,
             resultat = RegelEvaluering.utledVilkårResultat(delvilkårsett),
@@ -188,9 +186,8 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         nyttVilkår: LagreVilkårReiseOppstartAvslutningHjemreise,
         behandlingId: BehandlingId,
     ) {
-        val aktivitetId = nyttVilkår.fakta.aktivitetId()
+        val aktivitet = vilkårperiodeService.hentAktivitet(nyttVilkår.aktivitetId, behandlingId)
 
-        val aktivitet = vilkårperiodeService.hentAktivitet(aktivitetId, behandlingId)
         brukerfeilHvis(aktivitet == null) {
             "Aktiviteten finnes ikke"
         }
@@ -202,10 +199,3 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         }
     }
 }
-
-private fun FaktaReiseOppstartAvslutningHjemreise.aktivitetId(): VilkårperiodeGlobalId =
-    when (this) {
-        is FaktaOffentligTransport -> this.aktivitetId
-        is FaktaPrivatBil -> this.aktivitetId
-        is FaktaUbestemtType -> this.aktivitetId
-    }

@@ -71,10 +71,10 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                     fakta =
                         FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
                             reiseId = dummyReiseId,
-                            adresse = "Oppstartsgata 1",
                             typeReiseformål = TypeReiseformål.OPPSTART,
                             utgifterOffentligTransport = 500.toBigDecimal(),
                             aktivitetId = aktivitetId1,
+                            begrunnelse = null,
                         ),
                 ),
                 vilkår(
@@ -87,10 +87,10 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                     fakta =
                         FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
                             reiseId = dummyReiseId,
-                            adresse = "B",
                             typeReiseformål = TypeReiseformål.HJEMREISE,
                             utgifterOffentligTransport = 200.toBigDecimal(),
                             aktivitetId = aktivitetId2,
+                            begrunnelse = null,
                         ),
                 ),
             )
@@ -123,10 +123,10 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                     fakta =
                         FaktaReiseOppstartAvslutningHjemreisePrivatBil(
                             reiseId = dummyReiseId,
-                            adresse = "Oppstartsgata 1",
                             typeReiseformål = TypeReiseformål.AVSLUTNING,
                             reiseavstand = 20.toBigDecimal(),
                             aktivitetId = aktivitetId,
+                            begrunnelse = null,
                         ),
                 ),
             )
@@ -160,10 +160,10 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                     fakta =
                         FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
                             reiseId = dummyReiseId,
-                            adresse = "A",
                             typeReiseformål = TypeReiseformål.OPPSTART,
                             utgifterOffentligTransport = 300.toBigDecimal(),
                             aktivitetId = VilkårperiodeGlobalId.random(),
+                            begrunnelse = null,
                         ),
                 ),
                 vilkår(
@@ -176,10 +176,10 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                     fakta =
                         FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
                             reiseId = dummyReiseId,
-                            adresse = "B",
                             typeReiseformål = TypeReiseformål.OPPSTART,
                             utgifterOffentligTransport = 200.toBigDecimal(),
                             aktivitetId = VilkårperiodeGlobalId.random(),
+                            begrunnelse = null,
                         ),
                 ),
             )
@@ -208,10 +208,10 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                     fakta =
                         FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
                             reiseId = dummyReiseId,
-                            adresse = "A",
                             typeReiseformål = TypeReiseformål.OPPSTART,
                             utgifterOffentligTransport = 300.toBigDecimal(),
                             aktivitetId = VilkårperiodeGlobalId.random(),
+                            begrunnelse = null,
                         ),
                 ),
             )

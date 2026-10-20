@@ -2,12 +2,14 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutn
 
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.tilleggsstonader.libs.feil.ApiFeil
 import no.nav.tilleggsstonader.libs.feil.Feil
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
+import no.nav.tilleggsstonader.sak.util.lagreReiseOppstartAvslutningHjemreiseDto
 import no.nav.tilleggsstonader.sak.util.vilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
@@ -54,7 +56,6 @@ class ReiseOppstartAvslutningHjemreiseVilkårServiceTest {
                     fakta =
                         FaktaReiseOppstartAvslutningHjemreiseUbestemt(
                             reiseId = dummyReiseId,
-                            adresse = "Tiltaksveien 1",
                             typeReiseformål = TypeReiseformål.OPPSTART,
                             aktivitetId = aktivitetIdPåReise,
                         ),
@@ -81,7 +82,6 @@ class ReiseOppstartAvslutningHjemreiseVilkårServiceTest {
                     fakta =
                         FaktaReiseOppstartAvslutningHjemreiseUbestemt(
                             reiseId = dummyReiseId,
-                            adresse = "Tiltaksveien 1",
                             typeReiseformål = TypeReiseformål.OPPSTART,
                             aktivitetId = aktivitetId,
                         ),
@@ -104,26 +104,42 @@ class ReiseOppstartAvslutningHjemreiseVilkårServiceTest {
     }
 
     @Test
-    fun `skal feile når ubestemt fakta mangler aktivitetId`() {
-        val behandlingId = BehandlingId.random()
+    fun `skal sette tom lik fom for oppstart når tom ikke er satt`() {
+        val fom = 10 januar 2026
 
-        every { vilkårRepository.findByBehandlingId(behandlingId) } returns
-            listOf(
-                vilkår(
-                    type = VilkårType.REISE_OPPSTART_AVSLUTNING_HJEMREISE,
-                    fakta =
-                        FaktaReiseOppstartAvslutningHjemreiseUbestemt(
-                            reiseId = dummyReiseId,
-                            adresse = "Tiltaksveien 1",
-                            typeReiseformål = TypeReiseformål.OPPSTART,
-                            aktivitetId = null,
-                        ),
-                ),
-            )
+        val domain =
+            lagreReiseOppstartAvslutningHjemreiseDto(
+                fom = fom,
+                tom = null,
+                typeReiseformål = TypeReiseformål.OPPSTART,
+            ).tilDomain()
 
-        assertThatThrownBy { service.hentVilkårForBehandling(behandlingId) }
-            .isInstanceOf(Feil::class.java)
-            .hasMessageContaining("ubestemt fakta uten aktivitetId")
+        assertThat(domain.fom).isEqualTo(fom)
+        assertThat(domain.tom).isEqualTo(fom)
+    }
+
+    @Test
+    fun `skal feile når tom er satt for avslutning`() {
+        assertThatThrownBy {
+            lagreReiseOppstartAvslutningHjemreiseDto(
+                fom = 10 januar 2026,
+                tom = 11 januar 2026,
+                typeReiseformål = TypeReiseformål.AVSLUTNING,
+            ).tilDomain()
+        }.isInstanceOf(ApiFeil::class.java)
+            .hasMessageContaining("tom skal ikke settes")
+    }
+
+    @Test
+    fun `skal feile når tom mangler for hjemreise`() {
+        assertThatThrownBy {
+            lagreReiseOppstartAvslutningHjemreiseDto(
+                fom = 10 januar 2026,
+                tom = null,
+                typeReiseformål = TypeReiseformål.HJEMREISE,
+            ).tilDomain()
+        }.isInstanceOf(ApiFeil::class.java)
+            .hasMessageContaining("tom må settes for hjemreise")
     }
 
     private fun aktivitet(aktivitetId: VilkårperiodeGlobalId): VilkårperiodeAktivitet {

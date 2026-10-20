@@ -845,8 +845,7 @@ fun lagrePrivatBilReiseTilSamlingDto(
 
 fun lagreReiseOppstartAvslutningHjemreiseDto(
     fom: LocalDate = 1 januar 2025,
-    tom: LocalDate = 31 januar 2025,
-    adresse: String = "Tiltaksveien 1",
+    tom: LocalDate? = null,
     reiseId: ReiseId = dummyReiseId,
     typeReiseformål: TypeReiseformål = TypeReiseformål.OPPSTART,
     utgifterOffentligTransport: BigDecimal = 40.toBigDecimal(),
@@ -855,13 +854,12 @@ fun lagreReiseOppstartAvslutningHjemreiseDto(
     fakta: FaktaReiseOppstartAvslutningHjemreiseDto =
         FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
             utgifterOffentligTransport = utgifterOffentligTransport,
-            aktivitetId = aktivitetId,
         ),
 ) = LagreVilkårReiseOppstartAvslutningHjemreiseDto(
     fom = fom,
     tom = tom,
     reiseId = reiseId,
-    adresse = adresse,
+    aktivitetId = aktivitetId,
     typeReiseformål = typeReiseformål,
     svar = svar ?: standardSvarReiseOppstartAvslutningHjemreise(typeReiseformål),
     fakta = fakta,

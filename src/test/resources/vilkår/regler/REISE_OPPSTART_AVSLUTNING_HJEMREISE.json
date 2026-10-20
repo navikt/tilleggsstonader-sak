@@ -1,129 +1,129 @@
 {
-  "regler" : {
-    "ROAH_BENYTTET_TAXI" : {
-      "erHovedregel" : false,
-      "regelId" : "ROAH_BENYTTET_TAXI",
-      "svarMapping" : {
-        "JA" : {
-          "begrunnelseType" : "VALGFRI",
-          "regelId" : "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG"
+  "regler": {
+    "ROAH_BENYTTET_TAXI": {
+      "erHovedregel": false,
+      "regelId": "ROAH_BENYTTET_TAXI",
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG"
         },
-        "NEI" : {
-          "begrunnelseType" : "PÅKREVD",
-          "regelId" : "SLUTT_NODE",
-          "tilhørendeFaktaType" : null
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
         }
       }
     },
-    "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG" : {
-      "erHovedregel" : false,
-      "regelId" : "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG",
-      "svarMapping" : {
-        "JA" : {
-          "begrunnelseType" : "VALGFRI",
-          "regelId" : "SLUTT_NODE",
-          "tilhørendeFaktaType" : null
+    "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG": {
+      "erHovedregel": false,
+      "regelId": "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG",
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
         },
-        "NEI" : {
-          "begrunnelseType" : "PÅKREVD",
-          "regelId" : "SLUTT_NODE",
-          "tilhørendeFaktaType" : null
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
         }
       }
     },
-    "ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN" : {
-      "erHovedregel" : false,
-      "regelId" : "ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN",
-      "svarMapping" : {
-        "JA" : {
-          "begrunnelseType" : "VALGFRI",
-          "regelId" : "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG",
-          "tilhørendeFaktaType" : "REISE_OPPSTART_AVSLUTNING_HJEMREISE_OFFENTLIG_TRANSPORT"
+    "ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN": {
+      "erHovedregel": false,
+      "regelId": "ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN",
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG",
+          "tilhørendeFaktaType": "REISE_OPPSTART_AVSLUTNING_HJEMREISE_OFFENTLIG_TRANSPORT"
         },
-        "NEI" : {
-          "begrunnelseType" : "PÅKREVD",
-          "regelId" : "SLUTT_NODE",
-          "tilhørendeFaktaType" : null
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
         }
       }
     },
-    "ROAH_HAR_UTGIFTER_TIL_REISEN" : {
-      "erHovedregel" : true,
-      "regelId" : "ROAH_HAR_UTGIFTER_TIL_REISEN",
-      "svarMapping" : {
-        "JA" : {
-          "begrunnelseType" : "VALGFRI",
-          "regelId" : "ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT"
+    "ROAH_HAR_UTGIFTER_TIL_REISEN": {
+      "erHovedregel": true,
+      "regelId": "ROAH_HAR_UTGIFTER_TIL_REISEN",
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT"
         },
-        "NEI" : {
-          "begrunnelseType" : "PÅKREVD",
-          "regelId" : "SLUTT_NODE",
-          "tilhørendeFaktaType" : null
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
         }
       }
     },
-    "ROAH_HJEMREISE_BEHOV_FLERE_REISER" : {
-      "erHovedregel" : false,
-      "regelId" : "ROAH_HJEMREISE_BEHOV_FLERE_REISER",
-      "svarMapping" : {
-        "NEI" : {
-          "begrunnelseType" : "PÅKREVD",
-          "regelId" : "SLUTT_NODE",
-          "tilhørendeFaktaType" : null
+    "ROAH_HJEMREISE_BEHOV_FLERE_REISER": {
+      "erHovedregel": false,
+      "regelId": "ROAH_HJEMREISE_BEHOV_FLERE_REISER",
+      "svarMapping": {
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "SLUTT_NODE",
+          "tilhørendeFaktaType": null
         },
-        "ROAH_HAR_BARN_IKKE_FERDIG_MED_FJERDE_SKOLEÅR" : {
-          "begrunnelseType" : "VALGFRI",
-          "regelId" : "ROAH_HAR_UTGIFTER_TIL_REISEN"
+        "ROAH_HAR_BARN_IKKE_FERDIG_MED_FJERDE_SKOLEÅR": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "ROAH_HAR_UTGIFTER_TIL_REISEN"
         },
-        "ROAH_HAR_DOKUMENTERTE_ANDRE_SÆRSKILTE_BEHOV" : {
-          "begrunnelseType" : "PÅKREVD",
-          "regelId" : "ROAH_HAR_UTGIFTER_TIL_REISEN"
+        "ROAH_HAR_DOKUMENTERTE_ANDRE_SÆRSKILTE_BEHOV": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "ROAH_HAR_UTGIFTER_TIL_REISEN"
         }
       }
     },
-    "ROAH_HJEMREISE_INNENFOR_NORMALT_ANTALL" : {
-      "erHovedregel" : true,
-      "regelId" : "ROAH_HJEMREISE_INNENFOR_NORMALT_ANTALL",
-      "svarMapping" : {
-        "JA" : {
-          "begrunnelseType" : "VALGFRI",
-          "regelId" : "ROAH_HAR_UTGIFTER_TIL_REISEN"
+    "ROAH_HJEMREISE_INNENFOR_NORMALT_ANTALL": {
+      "erHovedregel": true,
+      "regelId": "ROAH_HJEMREISE_INNENFOR_NORMALT_ANTALL",
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "ROAH_HAR_UTGIFTER_TIL_REISEN"
         },
-        "NEI" : {
-          "begrunnelseType" : "VALGFRI",
-          "regelId" : "ROAH_HJEMREISE_BEHOV_FLERE_REISER"
+        "NEI": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "ROAH_HJEMREISE_BEHOV_FLERE_REISER"
         }
       }
     },
-    "ROAH_KAN_BENYTTE_PRIVAT_BIL" : {
-      "erHovedregel" : false,
-      "regelId" : "ROAH_KAN_BENYTTE_PRIVAT_BIL",
-      "svarMapping" : {
-        "JA" : {
-          "begrunnelseType" : "VALGFRI",
-          "regelId" : "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG",
-          "tilhørendeFaktaType" : "REISE_OPPSTART_AVSLUTNING_HJEMREISE_PRIVAT_BIL"
+    "ROAH_KAN_BENYTTE_PRIVAT_BIL": {
+      "erHovedregel": false,
+      "regelId": "ROAH_KAN_BENYTTE_PRIVAT_BIL",
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "ROAH_ER_HELE_UTGIFTEN_NØDVENDIG",
+          "tilhørendeFaktaType": "REISE_OPPSTART_AVSLUTNING_HJEMREISE_PRIVAT_BIL"
         },
-        "NEI" : {
-          "begrunnelseType" : "PÅKREVD",
-          "regelId" : "ROAH_BENYTTET_TAXI"
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "ROAH_BENYTTET_TAXI"
         }
       }
     },
-    "ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT" : {
-      "erHovedregel" : false,
-      "regelId" : "ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT",
-      "svarMapping" : {
-        "JA" : {
-          "begrunnelseType" : "VALGFRI",
-          "regelId" : "ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN"
+    "ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT": {
+      "erHovedregel": false,
+      "regelId": "ROAH_KAN_REISE_MED_OFFENTLIG_TRANSPORT",
+      "svarMapping": {
+        "JA": {
+          "begrunnelseType": "VALGFRI",
+          "regelId": "ROAH_HAR_DOKUMENTERTE_UTGIFTER_TIL_REISEN"
         },
-        "NEI" : {
-          "begrunnelseType" : "PÅKREVD",
-          "regelId" : "ROAH_KAN_BENYTTE_PRIVAT_BIL"
+        "NEI": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "ROAH_KAN_BENYTTE_PRIVAT_BIL"
         }
       }
     }
   },
-  "vilkårType" : "REISE_OPPSTART_AVSLUTNING_HJEMREISE"
+  "vilkårType": "REISE_OPPSTART_AVSLUTNING_HJEMREISE"
 }
