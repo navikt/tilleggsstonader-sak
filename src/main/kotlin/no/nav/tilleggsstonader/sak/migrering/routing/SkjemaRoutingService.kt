@@ -117,9 +117,6 @@ class SkjemaRoutingService(
             lagreRoutingHvisIkkeLagret(ident, skjematype, mapOf("harBehandling" to true))
             return SkjemaRoutingAksjon.NY_LØSNING
         }
-        if (kontekst.kreverAktivtAapVedtak && !harAktivtAapVedtak(ident)) {
-            return SkjemaRoutingAksjon.GAMMEL_LØSNING
-        }
         if (harAktivitetspenger(ident, skjematype)) {
             lagreRoutingHvisIkkeLagret(ident, skjematype, mapOf("harAktivitetspenger" to true))
             return SkjemaRoutingAksjon.NY_LØSNING
