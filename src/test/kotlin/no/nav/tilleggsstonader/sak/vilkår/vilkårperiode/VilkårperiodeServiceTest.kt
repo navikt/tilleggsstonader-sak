@@ -6,6 +6,7 @@ import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.juni
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandling.domain.Behandling
@@ -33,6 +34,7 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.faktaOgVurderingAktivitetDagligReiseTsr
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.tilOppdatering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperiode
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
@@ -288,6 +290,22 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
         assertThatThrownBy {
             vilkårperiodeService.opprettVilkårperiode(nyAktivitet)
         }.hasMessageContaining("Kan ikke registrere aktivitet for FLYTTING_TSO")
+    }
+
+    @Test
+    fun `skal ikke kunne opprette opphørt stønads målgruppe med annen periode enn seks måneder`() {
+        val behandling = testoppsettService.opprettBehandlingMedFagsak(stønadstype = Stønadstype.FLYTTING_TSO)
+        val nyMålgruppe =
+            dummyVilkårperiodeMålgruppe(
+                type = MålgruppeType.OPPHØRT_OVERGANGSSTØNAD,
+                fom = 1 januar 2025,
+                tom = 30 juni 2025,
+                behandlingId = behandling.id,
+            )
+
+        assertThatThrownBy {
+            vilkårperiodeService.opprettVilkårperiode(nyMålgruppe)
+        }.hasMessage("Perioden for opphørt stønad må vare i seks måneder fra opphørsdatoen")
     }
 
     @Nested

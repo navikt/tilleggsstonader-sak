@@ -23,7 +23,15 @@ enum class MålgruppeType(
         gyldigeAktiviter = setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING),
         faktiskMålgruppe = FaktiskMålgruppe.GJENLEVENDE,
     ),
+    OPPHØRT_OMSTILLINGSSTØNAD(
+        gyldigeAktiviter = setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING),
+        faktiskMålgruppe = FaktiskMålgruppe.GJENLEVENDE,
+    ),
     OVERGANGSSTØNAD(
+        gyldigeAktiviter = setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING),
+        faktiskMålgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER,
+    ),
+    OPPHØRT_OVERGANGSSTØNAD(
         gyldigeAktiviter = setOf(AktivitetType.REELL_ARBEIDSSØKER, AktivitetType.UTDANNING),
         faktiskMålgruppe = FaktiskMålgruppe.ENSLIG_FORSØRGER,
     ),
@@ -87,6 +95,7 @@ enum class MålgruppeType(
             -> true
 
             OVERGANGSSTØNAD,
+            OPPHØRT_OVERGANGSSTØNAD,
             INGEN_MÅLGRUPPE,
             SYKEPENGER_100_PROSENT,
             DAGPENGER,
@@ -94,6 +103,7 @@ enum class MålgruppeType(
             KVALIFISERINGSSTØNAD,
             INNSATT_I_FENGSEL,
             UNGDOMSPROGRAMMET,
+            OPPHØRT_OMSTILLINGSSTØNAD,
             -> false
         }
 
@@ -112,10 +122,23 @@ enum class MålgruppeType(
                         INGEN_MÅLGRUPPE,
                     )
 
+            Stønadstype.FLYTTING_TSO ->
+                this in
+                    listOf(
+                        AAP,
+                        NEDSATT_ARBEIDSEVNE,
+                        AKTIVITETSPENGER,
+                        OMSTILLINGSSTØNAD,
+                        OPPHØRT_OMSTILLINGSSTØNAD,
+                        OVERGANGSSTØNAD,
+                        OPPHØRT_OVERGANGSSTØNAD,
+                        UFØRETRYGD,
+                        INGEN_MÅLGRUPPE,
+                    )
+
             Stønadstype.DAGLIG_REISE_TSO,
             Stønadstype.REISE_TIL_SAMLING_TSO,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
-            Stønadstype.FLYTTING_TSO,
             ->
                 this in
                     listOf(

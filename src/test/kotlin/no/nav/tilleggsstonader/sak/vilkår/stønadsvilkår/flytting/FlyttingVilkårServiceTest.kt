@@ -24,6 +24,10 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresult
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.VilkårFlyttingMapper.mapTilVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.LagreVilkårFlytting
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.VilkårFlytting
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeService
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.OpphørtOvergangsstønadFlyttingTso
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.Test
@@ -34,6 +38,11 @@ class FlyttingVilkårServiceTest {
     private val vilkårService = mockk<VilkårService>()
     private val behandlingService = mockk<BehandlingService>()
     private val unleashService = mockk<UnleashService>()
+    private val vilkårperiodeService = mockk<VilkårperiodeService>()
+
+    init {
+        every { vilkårperiodeService.hentVilkårperioder(any()) } returns Vilkårperioder(emptyList(), emptyList())
+    }
 
     private val flyttingVilkårService =
         FlyttingVilkårService(
@@ -41,6 +50,7 @@ class FlyttingVilkårServiceTest {
             behandlingService = behandlingService,
             vilkårService = vilkårService,
             unleashService = unleashService,
+            vilkårperiodeService = vilkårperiodeService,
         )
 
     private val nyttVilkår =
@@ -83,6 +93,33 @@ class FlyttingVilkårServiceTest {
         assertThat(resultat.tom).isEqualTo(nyttVilkår.flytteDato)
         assertThat(resultat.fakta.adresse).isEqualTo(nyttVilkår.fakta.adresse)
         verify(exactly = 1) { vilkårRepository.insert(any<Vilkår>()) }
+    }
+
+    @Test
+    fun `skal avvise flyttevilkår med opphørt stønad uten riktig flytteforbindelse`() {
+        val behandling =
+            saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.FLYTTING_TSO))
+        val opphørtStønad =
+            målgruppe(
+                behandlingId = behandling.id,
+                faktaOgVurdering = OpphørtOvergangsstønadFlyttingTso,
+            )
+        every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
+        every { unleashService.isEnabled(Toggle.KAN_BEHANDLE_FLYTTING) } returns true
+        every { vilkårperiodeService.hentVilkårperioder(behandling.id) } returns
+            Vilkårperioder(listOf(opphørtStønad), emptyList())
+
+        assertThatExceptionOfType(ApiFeil::class.java)
+            .isThrownBy {
+                flyttingVilkårService.opprettVilkår(
+                    behandlingId = behandling.id,
+                    innsendt = nyttVilkår,
+                )
+            }.withMessage(
+                "Du kan bare velge målgruppen for opphørt overgangs- eller omstillingsstønad sammen med svaret «Enslig forsørger eller gjenlevende som flytter fra hjemstedet for å starte i arbeid»",
+            )
+
+        verify(exactly = 0) { vilkårRepository.insert(any<Vilkår>()) }
     }
 
     @Test
