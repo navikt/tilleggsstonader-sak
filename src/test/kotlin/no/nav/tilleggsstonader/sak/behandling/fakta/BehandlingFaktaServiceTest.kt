@@ -3,12 +3,19 @@ package no.nav.tilleggsstonader.sak.behandling.fakta
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tilleggsstonader.kontrakter.felles.Hovedytelse
+import no.nav.tilleggsstonader.kontrakter.felles.Språkkode
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.kontrakter.søknad.EnumFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.JaNei
+import no.nav.tilleggsstonader.kontrakter.søknad.Vedleggstype
+import no.nav.tilleggsstonader.kontrakter.søknad.VerdiFelt
 import no.nav.tilleggsstonader.kontrakter.søknad.felles.AnnenAktivitetType
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.Flytteårsak
+import no.nav.tilleggsstonader.kontrakter.søknad.flytting.FlyttingDetaljer
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.AktivitetTypeUtdanning
 import no.nav.tilleggsstonader.kontrakter.søknad.reisetilsamling.Transportmiddel
 import no.nav.tilleggsstonader.libs.utils.dato.februar
+import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.behandling.barn.BarnService
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
@@ -22,8 +29,10 @@ import no.nav.tilleggsstonader.sak.opplysninger.søknad.SøknadService
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.dagligReise.TypeUtdanning
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Adresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.HovedytelseAvsnitt
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadFlytting
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.SøknadReiseTilSamling
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.ValgtAktivitet
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.flytting.SkjemaFlytting
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.AktivitetReiseTilSamlingAvsnitt
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.Avreiseadresse
 import no.nav.tilleggsstonader.sak.opplysninger.søknad.reiseTilSamling.DrosjeInfo
@@ -51,6 +60,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import java.time.LocalDate
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokument as SøknadDokument
+import no.nav.tilleggsstonader.sak.opplysninger.søknad.domain.Dokumentasjon as SøknadDokumentasjon
 
 internal class BehandlingFaktaServiceTest {
     val søknadService = mockk<SøknadService>()
@@ -542,6 +553,7 @@ internal class BehandlingFaktaServiceTest {
 
     @Test
     fun `skal mappe minimal fakta for flytting`() {
+        every { søknadService.hentSøknadFlytting(behandlingId) } returns null
         every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns lagGrunnlagsdata()
         every { fagsakService.hentFagsakForBehandling(behandlingId) } returns
             fagsak(stønadstype = Stønadstype.FLYTTING_TSO)
@@ -549,7 +561,69 @@ internal class BehandlingFaktaServiceTest {
         val fakta = service.hentFakta(behandlingId) as BehandlingFaktaFlyttingDto
 
         assertThat(fakta.søknadMottattTidspunkt).isNull()
-        assertThat(fakta.hovedytelse).isNull()
+        assertThat(fakta.hovedytelse?.søknadsgrunnlag).isNull()
         assertThat(fakta.dokumentasjon).isNull()
+    }
+
+    @Test
+    fun `skal mappe innsendte flytteopplysninger`() {
+        val flyttingDetaljer =
+            FlyttingDetaljer(
+                årsak =
+                    EnumFelt(
+                        label = "Hvorfor flytter du?",
+                        verdi = Flytteårsak.AKTIVITET,
+                        svarTekst = "Aktivitet",
+                        alternativer = listOf("Ny jobb", "Aktivitet"),
+                    ),
+                flyttedato = VerdiFelt(verdi = "2026-02-01", label = "Dato for flytting"),
+                førsteArbeidsdag = null,
+                adresse = null,
+                flyttemåte = null,
+                utgifterDekketPåAnnenMåte = null,
+                utgifterEgenFlytting = null,
+                flyttebyrå = null,
+            )
+        val søknad =
+            SøknadFlytting(
+                journalpostId = "journalpostId",
+                mottattTidspunkt = (1 januar 2026).atStartOfDay(),
+                språk = Språkkode.NB,
+                data =
+                    SkjemaFlytting(
+                        hovedytelse =
+                            HovedytelseAvsnitt(
+                                hovedytelse = listOf(Hovedytelse.AKTIVITETSPENGER),
+                                harNedsattArbeidsevne = null,
+                                arbeidOgOpphold = null,
+                            ),
+                        flyttingDetaljer = flyttingDetaljer,
+                        dokumentasjon =
+                            listOf(
+                                SøknadDokumentasjon(
+                                    type = Vedleggstype.TILBUD_FLYTTEBYRÅ_1,
+                                    dokumenter = listOf(SøknadDokument("dokumentInfoId")),
+                                ),
+                            ),
+                    ),
+            )
+        every { søknadService.hentSøknadFlytting(behandlingId) } returns søknad
+        every { faktaGrunnlagService.hentGrunnlagsdata(behandlingId) } returns lagGrunnlagsdata()
+        every { fagsakService.hentFagsakForBehandling(behandlingId) } returns
+            fagsak(stønadstype = Stønadstype.FLYTTING_TSO)
+
+        val fakta = service.hentFakta(behandlingId) as BehandlingFaktaFlyttingDto
+
+        assertThat(fakta.hovedytelse?.søknadsgrunnlag?.hovedytelse)
+            .containsExactly(Hovedytelse.AKTIVITETSPENGER)
+        assertThat(fakta.flyttingDetaljer).isEqualTo(flyttingDetaljer)
+        assertThat(fakta.dokumentasjon?.journalpostId).isEqualTo("journalpostId")
+        assertThat(fakta.dokumentasjon?.dokumentasjon)
+            .containsExactly(
+                Dokumentasjon(
+                    type = Vedleggstype.TILBUD_FLYTTEBYRÅ_1.tittel,
+                    dokumenter = listOf(Dokument("dokumentInfoId")),
+                ),
+            )
     }
 }

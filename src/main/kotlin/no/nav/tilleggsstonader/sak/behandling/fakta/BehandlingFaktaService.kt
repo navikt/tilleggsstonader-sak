@@ -154,9 +154,17 @@ class BehandlingFaktaService(
     }
 
     private fun hentFaktaDtoForFlytting(behandlingId: BehandlingId): BehandlingFaktaFlyttingDto {
+        val søknad = søknadService.hentSøknadFlytting(behandlingId)
         val grunnlagsdata = faktaGrunnlagService.hentGrunnlagsdata(behandlingId)
         return BehandlingFaktaFlyttingDto(
+            søknadMottattTidspunkt = søknad?.mottattTidspunkt,
+            hovedytelse = mapHovedytelse(søknad?.data?.hovedytelse),
+            dokumentasjon =
+                søknad?.let {
+                    mapDokumentasjonFlytting(it.data.dokumentasjon, it.journalpostId)
+                },
             arena = arenaFakta(grunnlagsdata),
+            flyttingDetaljer = søknad?.data?.flyttingDetaljer,
         )
     }
 
@@ -504,6 +512,21 @@ class BehandlingFaktaService(
             }
         return FaktaDokumentasjon(journalpostId, dokumentasjon)
     }
+
+    private fun mapDokumentasjonFlytting(
+        dokumentasjonListe: List<SøknadDokumentasjon>,
+        journalpostId: String,
+    ): FaktaDokumentasjon =
+        FaktaDokumentasjon(
+            journalpostId = journalpostId,
+            dokumentasjon =
+                dokumentasjonListe.map { dokumentasjon ->
+                    Dokumentasjon(
+                        type = dokumentasjon.type.tittel,
+                        dokumenter = dokumentasjon.dokumenter.map { Dokument(it.dokumentInfoId) },
+                    )
+                },
+        )
 
     private fun mapDokumentasjonDagligReise(
         dokumentasjonListe: List<DokumentasjonDagligReise>,
