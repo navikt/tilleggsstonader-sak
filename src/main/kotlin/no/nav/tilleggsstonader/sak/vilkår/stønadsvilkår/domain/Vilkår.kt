@@ -284,14 +284,6 @@ enum class VilkårType(
         ),
     ),
 
-    PERIODE_MED_REISE_OPPSTART_AVSLUTNING_HJEMREISE(
-        "Periode hvor bruker midlertidig må borte hjemmefra",
-        listOf(
-            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
-            Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSR,
-        ),
-    ),
-
     // Flytting
     FLYTTING(
         "Flytting",

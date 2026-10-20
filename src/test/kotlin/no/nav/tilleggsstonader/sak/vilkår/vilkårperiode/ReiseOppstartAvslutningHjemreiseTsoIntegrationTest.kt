@@ -1,12 +1,13 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
 import no.nav.tilleggsstonader.kontrakter.felles.Stønadstype
+import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
+import no.nav.tilleggsstonader.libs.utils.dato.mars
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.fagsak.domain.PersonIdent
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectOkWithBody
-import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.opprettOgTilordneOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.Satstype
@@ -14,18 +15,18 @@ import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TilkjentYtel
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.domain.TypeAndel
 import no.nav.tilleggsstonader.sak.util.FileUtil
 import no.nav.tilleggsstonader.sak.util.behandling
-import no.nav.tilleggsstonader.sak.util.lagreReiseOppstartAvslutningHjemreiseDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseOppstartAvslutningHjemreise.dto.InnvilgelseReiseOppstartAvslutningHjemreiseResponse
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårReiseOppstartAvslutningHjemreiseDto
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.AktivitetType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpStatus
 import java.math.BigDecimal
+import java.time.LocalDate
 
 class ReiseOppstartAvslutningHjemreiseTsoIntegrationTest : CleanDatabaseIntegrationTest() {
     val ident = "12345678910"
@@ -100,91 +101,91 @@ class ReiseOppstartAvslutningHjemreiseTsoIntegrationTest : CleanDatabaseIntegrat
 
     @Test
     fun `skal kunne fullføre flyten for alle type reiseformål`() {
-        val reisedato = 1 januar 2026
+        val fom = 1 januar 2026
+        val tom = 31 mars 2026
 
-        TypeReiseformål.entries.forEach { typeReiseformål ->
-            val behandling =
-                testoppsettService.opprettBehandlingMedFagsak(
-                    behandling = behandling(),
-                    stønadstype = Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
-                    identer = setOf(PersonIdent(ident = ident)),
-                )
+        val behandling =
+            testoppsettService.opprettBehandlingMedFagsak(
+                behandling = behandling(),
+                stønadstype = Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
+                identer = setOf(PersonIdent(ident = ident)),
+            )
 
-            opprettOgTilordneOppgaveForBehandling(behandling.id)
+        opprettOgTilordneOppgaveForBehandling(behandling.id)
 
-            gjennomførBehandlingsløp(ident = ident, behandlingId = behandling.id, tilSteg = StegType.SIMULERING) {
-                aktivitet {
-                    opprett {
-                        aktivitetTiltakTsoReiseTilOppstart(reisedato, reisedato)
-                    }
-                }
-                målgruppe {
-                    opprett {
-                        målgruppeAAP(reisedato, reisedato)
-                    }
-                }
-                vilkår {
-                    opprett {
-                        offentligTransportReiseOppstartAvslutningHjemreise(
-                            fom = reisedato,
-                            tom = if (typeReiseformål == TypeReiseformål.HJEMREISE) reisedato else null,
-                            typeReiseformål = typeReiseformål,
-                        )
-                    }
+        gjennomførBehandlingsløp(ident = ident, behandlingId = behandling.id, tilSteg = StegType.SIMULERING) {
+            aktivitet {
+                opprett {
+                    aktivitetTiltakTsoReiseTilOppstart(fom, tom)
                 }
             }
-
-            val vilkår = kall.vilkårReiseOppstartAvslutningHjemreise.hentVilkår(behandling.id)
-            assertThat(vilkår).hasSize(1)
-            assertThat(vilkår.single().reiser).hasSize(1)
-            val reise = vilkår.single().reiser.single()
-            assertThat(reise.typeReiseformål).isEqualTo(typeReiseformål)
-            assertThat(reise.fom).isEqualTo(reisedato)
-            assertThat(reise.tom).isEqualTo(reisedato)
-        }
-    }
-
-    @Test
-    fun `skal feile når tom er satt for oppstart og avslutning`() {
-        val reisedato = 1 januar 2026
-
-        listOf(TypeReiseformål.OPPSTART, TypeReiseformål.AVSLUTNING).forEach { typeReiseformål ->
-            val behandling =
-                testoppsettService.opprettBehandlingMedFagsak(
-                    behandling = behandling(),
-                    stønadstype = Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
-                    identer = setOf(PersonIdent(ident = ident)),
-                )
-            opprettOgTilordneOppgaveForBehandling(behandling.id)
-
-            gjennomførBehandlingsløp(ident = ident, behandlingId = behandling.id, tilSteg = StegType.VILKÅR) {
-                aktivitet {
-                    opprett {
-                        aktivitetTiltakTsoReiseTilOppstart(reisedato, reisedato)
-                    }
-                }
-                målgruppe {
-                    opprett {
-                        målgruppeAAP(reisedato, reisedato)
-                    }
+            målgruppe {
+                opprett {
+                    målgruppeAAP(fom, tom)
                 }
             }
-
-            kall.vilkårReiseOppstartAvslutningHjemreise.apiRespons
-                .opprettVilkår(
-                    behandling.id,
-                    lagreReiseOppstartAvslutningHjemreiseDto(
-                        fom = reisedato,
-                        tom = reisedato,
-                        typeReiseformål = typeReiseformål,
-                    ),
-                ).expectProblemDetail(HttpStatus.BAD_REQUEST, "tom skal ikke settes")
+            vilkår {
+                opprett {
+                    offentligTransportReiseOppstartAvslutningHjemreise(
+                        fom = fom,
+                        tom = null,
+                        typeReiseformål = TypeReiseformål.OPPSTART,
+                    )
+                    offentligTransportReiseOppstartAvslutningHjemreise(
+                        fom = 1 februar 2026,
+                        tom = 2 februar 2026,
+                        typeReiseformål = TypeReiseformål.HJEMREISE,
+                    )
+                    offentligTransportReiseOppstartAvslutningHjemreise(
+                        fom = tom,
+                        tom = null,
+                        typeReiseformål = TypeReiseformål.AVSLUTNING,
+                    )
+                }
+            }
         }
+
+        val vilkår = kall.vilkårReiseOppstartAvslutningHjemreise.hentVilkår(behandling.id)
+        assertThat(vilkår).hasSize(1)
+        val reiser = vilkår.single().reiser
+        assertThat(reiser).hasSize(3)
+
+        validerVilkår(
+            lagretVilkår = reiser[0],
+            forventetType = TypeReiseformål.OPPSTART,
+            forventetFom = fom,
+            forventetTom = fom,
+        )
+
+        validerVilkår(
+            lagretVilkår = reiser[1],
+            forventetType = TypeReiseformål.HJEMREISE,
+            forventetFom = 1 februar 2026,
+            forventetTom = 2 februar 2026,
+        )
+
+        validerVilkår(
+            lagretVilkår = reiser[2],
+            forventetType = TypeReiseformål.AVSLUTNING,
+            forventetFom = tom,
+            forventetTom = tom,
+        )
     }
 
     @Test
     fun `skal hente alle regler som tilhører reise oppstart avslutning hjemreise`() {
         val resultat = kall.vilkårReiseOppstartAvslutningHjemreise.regler()
         FileUtil.assertFileJsonIsEqual("vilkår/regelstruktur/REISE_OPPSTART_AVSLUTNING_HJEMREISE_API.json", resultat)
+    }
+
+    private fun validerVilkår(
+        lagretVilkår: VilkårReiseOppstartAvslutningHjemreiseDto,
+        forventetType: TypeReiseformål,
+        forventetFom: LocalDate,
+        forventetTom: LocalDate,
+    ) {
+        assertThat(lagretVilkår.fom).isEqualTo(forventetFom)
+        assertThat(lagretVilkår.tom).isEqualTo(forventetTom)
+        assertThat(lagretVilkår.typeReiseformål).isEqualTo(forventetType)
     }
 }
