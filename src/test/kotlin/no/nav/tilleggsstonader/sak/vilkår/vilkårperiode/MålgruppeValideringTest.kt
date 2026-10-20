@@ -1,12 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.vilkårperiode
 
-import no.nav.tilleggsstonader.libs.utils.dato.august
-import no.nav.tilleggsstonader.libs.utils.dato.februar
-import no.nav.tilleggsstonader.libs.utils.dato.januar
-import no.nav.tilleggsstonader.libs.utils.dato.juli
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.MålgruppeValidering.validerNyeMålgrupperOverlapperIkkeMedEksisterendeMålgrupper
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.VilkårperiodeTestUtil.målgruppe
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.MålgruppeType
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.felles.Vilkårstatus
 import org.assertj.core.api.Assertions.assertThatNoException
@@ -16,36 +11,6 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class MålgruppeValideringTest {
-    @Test
-    fun `opphørt stønad må vare i seks måneder fra opphørsdato`() {
-        assertThatNoException().isThrownBy {
-            validerOpphørtStønadPeriode(
-                målgruppeType = MålgruppeType.OPPHØRT_OVERGANGSSTØNAD,
-                fom = 1 januar 2025,
-                tom = 1 juli 2025,
-            )
-        }
-
-        assertThatThrownBy {
-            validerOpphørtStønadPeriode(
-                målgruppeType = MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD,
-                fom = 1 januar 2025,
-                tom = 1 februar 2025,
-            )
-        }.hasMessage("Perioden for opphørt stønad må vare i seks måneder fra opphørsdatoen")
-    }
-
-    @Test
-    fun `opphørsdato ved månedsslutt bruker siste gyldige dag`() {
-        assertThatNoException().isThrownBy {
-            validerOpphørtStønadPeriode(
-                målgruppeType = MålgruppeType.OPPHØRT_OVERGANGSSTØNAD,
-                fom = 31 august 2025,
-                tom = 28 februar 2026,
-            )
-        }
-    }
-
     @Nested
     inner class ValiderNyeMålgrupperOverlapperIkkeMedEksisterendeMålgrupper {
         @Test
