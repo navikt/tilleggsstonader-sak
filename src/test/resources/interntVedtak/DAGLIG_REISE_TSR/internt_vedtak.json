@@ -134,7 +134,7 @@
             "bompengerPerDag": 40,
             "fergekostnadPerDag": 50
           },
-          "erBehandleKjørelisteManuelt" : false,
+          "erBehandleKjørelisteManuelt": false,
           "fom": "2025-01-01",
           "reisedagerPerUke": 3,
           "satser": [ {
@@ -150,7 +150,7 @@
             "bompengerPerDag": 40,
             "fergekostnadPerDag": 50
           },
-          "erBehandleKjørelisteManuelt" : false,
+          "erBehandleKjørelisteManuelt": false,
           "fom": "2025-01-27",
           "reisedagerPerUke": 5,
           "satser": [ {
@@ -217,14 +217,14 @@
       "adresse": "Tiltaksgata 1",
       "faktaDelperioder": [ {
         "bompengerPerDag": 40,
-        "erBehandleKjørelisteManuelt" : false,
+        "erBehandleKjørelisteManuelt": false,
         "fergekostnadPerDag": 50,
         "fom": "2025-01-01",
         "reisedagerPerUke": 3,
         "tom": "2025-01-26"
       }, {
         "bompengerPerDag": 40,
-        "erBehandleKjørelisteManuelt" : false,
+        "erBehandleKjørelisteManuelt": false,
         "fergekostnadPerDag": 50,
         "fom": "2025-01-27",
         "reisedagerPerUke": 5,
