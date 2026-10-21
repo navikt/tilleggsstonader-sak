@@ -18,7 +18,7 @@ class LagreVilkårFlyttingDtoTest {
         val fakta = FaktaFlyttingUbestemtDto("Adresse 1")
         val domain = dto(svar = emptyMap(), fakta = fakta).tilDomene()
 
-        assertThat(domain.flytteDato).isEqualTo(1 januar 2026)
+        assertThat(domain.flyttedato).isEqualTo(1 januar 2026)
         assertThat(domain.svar).isEmpty()
         assertThat(domain.fakta).isEqualTo(FaktaFlyttingUbestemt("Adresse 1"))
     }

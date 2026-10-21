@@ -14,7 +14,7 @@ data class LagreVilkårFlyttingDto(
 ) : LagreVilkår {
     fun tilDomene() =
         LagreVilkårFlytting(
-            flytteDato = flytteDato,
+            flyttedato = flytteDato,
             svar = svar.mapValues { it.value.tilDomene() },
             fakta = fakta.tilDomene(),
         )
