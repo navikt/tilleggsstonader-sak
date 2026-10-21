@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling
 
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaDrosje
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling
@@ -8,6 +9,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domai
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.VilkårReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.AktivitetInfoDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingDrosjeDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingPrivatBilDto
@@ -34,6 +36,7 @@ object VilkårReiseTilSamlingDtoMapper {
         when (this) {
             is FaktaOffentligTransport -> this.tilDto(aktivitet = aktivitet)
             is FaktaPrivatBil -> this.tilDto(aktivitet = aktivitet)
+            is FaktaDrosje -> this.tilDto(aktivitet = aktivitet)
             is FaktaUbestemtType -> FaktaReiseTilSamlingUbestemtDto
         }
 
@@ -55,6 +58,14 @@ object VilkårReiseTilSamlingDtoMapper {
             fergekostnad = this.fergekostnad,
             parkering = this.parkering,
             piggdekkavgift = this.piggdekkavgift,
+        )
+
+    private fun FaktaDrosje.tilDto(aktivitet: AktivitetInfoDto?) =
+        FaktaReiseTilSamlingDrosjeDto(
+            nødvendigUtgift = nødvendigUtgift.tilDto(),
+            utgifterDrosje = this.utgifterDrosje,
+            begrunnelse = this.begrunnelse,
+            aktivitet = aktivitet,
         )
 
     private fun NødvendigUtgift.tilDto() =

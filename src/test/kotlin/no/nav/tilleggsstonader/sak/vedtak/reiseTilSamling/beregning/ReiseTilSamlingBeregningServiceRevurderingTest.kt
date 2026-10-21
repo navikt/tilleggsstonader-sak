@@ -20,12 +20,15 @@ import no.nav.tilleggsstonader.sak.vedtak.TypeVedtak
 import no.nav.tilleggsstonader.sak.vedtak.VedtakRepository
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseReiseTilSamling
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsgrunnlagDrosjeForSamling
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsgrunnlagOffentligTransportForSamling
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatDrosje
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatReiseTilSamling
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
 import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingDrosje
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
@@ -95,8 +98,31 @@ class ReiseTilSamlingBeregningServiceRevurderingTest {
             ),
     )
 
+    private fun drosjeVilkår(
+        reiseId: ReiseId,
+        fom: java.time.LocalDate,
+        tom: java.time.LocalDate,
+        beløp: Int,
+    ) = vilkår(
+        behandlingId = behandling.id,
+        type = VilkårType.REISE_TIL_SAMLING,
+        resultat = Vilkårsresultat.OPPFYLT,
+        status = VilkårStatus.UENDRET,
+        fom = fom,
+        tom = tom,
+        fakta =
+            FaktaReiseTilSamlingDrosje(
+                reiseId = reiseId,
+                adresse = "Samlingsgata 1",
+                nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null),
+                utgifterDrosje = beløp.toBigDecimal(),
+                begrunnelse = "Drosje",
+            ),
+    )
+
     private fun forrigeVedtakMedResultat(
         vararg resultater: BeregningsresultatOffentligTransport,
+        drosjeResultater: List<BeregningsresultatDrosje> = emptyList(),
     ): GeneriskVedtak<InnvilgelseReiseTilSamling> =
         GeneriskVedtak(
             behandlingId = forrigeBehandlingId,
@@ -106,6 +132,7 @@ class ReiseTilSamlingBeregningServiceRevurderingTest {
                         BeregningsresultatReiseTilSamling(
                             offentligTransport = resultater.toList(),
                             privatBil = emptyList(),
+                            drosje = drosjeResultater,
                         ),
                     vedtaksperioder = vedtaksperioder,
                     beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
@@ -115,6 +142,27 @@ class ReiseTilSamlingBeregningServiceRevurderingTest {
             tidligsteEndring = null,
             opphørsdato = null,
         )
+
+    private fun forrigeDrosjeResultat(
+        reiseId: ReiseId,
+        fom: java.time.LocalDate,
+        tom: java.time.LocalDate,
+        beløp: Int,
+    ) = BeregningsresultatDrosje(
+        reiseId = reiseId,
+        aktivitetId = null,
+        grunnlag =
+            BeregningsgrunnlagDrosjeForSamling(
+                adresse = "Samlingsgata 1",
+                fom = fom,
+                tom = tom,
+                vedtaksperioder = emptyList(),
+                brukersNavKontor = null,
+            ),
+        beløp = beløp.toBigDecimal(),
+        begrunnelse = "Drosje",
+        fraTidligereVedtak = false,
+    )
 
     private fun forrigeResultat(
         reiseId: ReiseId,
@@ -136,6 +184,32 @@ class ReiseTilSamlingBeregningServiceRevurderingTest {
         begrunnelse = "Togbillett",
         fraTidligereVedtak = false,
     )
+
+    @Test
+    fun `uendret drosje gjenbrukes med fraTidligereVedtak lik true`() {
+        val reiseId = ReiseId.random()
+        val beløp = 1250
+
+        every { vilkårService.hentOppfylteReiseTilSamlingVilkår(behandling.id) } returns
+            listOf(drosjeVilkår(reiseId, 1 januar 2025, 31 januar 2025, beløp))
+        every { vedtakRepository.findByIdOrThrow(forrigeBehandlingId) } returns
+            forrigeVedtakMedResultat(
+                drosjeResultater = listOf(forrigeDrosjeResultat(reiseId, 1 januar 2025, 31 januar 2025, beløp)),
+            )
+
+        val result =
+            beregningService.beregn(
+                behandling,
+                listOf(vedtaksperiode(fom = 1 januar 2025, tom = 31 januar 2025)),
+                TypeVedtak.INNVILGELSE,
+                beregningsplan = Beregningsplan(Beregningsomfang.FRA_DATO, fraDato = 1 februar 2025),
+            )
+
+        val drosje = result.drosje.single()
+        assertThat(drosje.reiseId).isEqualTo(reiseId)
+        assertThat(drosje.beløp).isEqualTo(beløp.toBigDecimal())
+        assertThat(drosje.fraTidligereVedtak).isTrue()
+    }
 
     @Test
     fun `uendret reise matches på reiseId mot forrige vedtak og gjenbrukes med fraTidligereVedtak lik true`() {

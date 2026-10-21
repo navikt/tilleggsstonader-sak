@@ -24,6 +24,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.mapping.ByggVi
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegel
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.VilkårReiseTilSamlingMapper.mapTilVilkår
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.VilkårReiseTilSamlingMapper.mapTilVilkårReiseTilSamling
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaDrosje
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.LagreVilkårReiseTilSamling
@@ -171,6 +172,11 @@ class ReiseTilSamlingVilkårService(
 
                 TypeReiseTilSamling.OFFENTLIG_TRANSPORT -> {
                     val aktivitetId = (nyttVilkår.fakta as FaktaOffentligTransport).aktivitetId
+                    validerAktivitetId(aktivitetId, nyttVilkår, behandling.id)
+                }
+
+                TypeReiseTilSamling.DROSJE -> {
+                    val aktivitetId = (nyttVilkår.fakta as FaktaDrosje).aktivitetId
                     validerAktivitetId(aktivitetId, nyttVilkår, behandling.id)
                 }
 

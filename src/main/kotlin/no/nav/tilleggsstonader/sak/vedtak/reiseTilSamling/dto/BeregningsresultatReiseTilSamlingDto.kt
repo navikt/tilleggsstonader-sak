@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto
 
 import no.nav.tilleggsstonader.sak.vedtak.Beregningsplan
+import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatDrosje
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatOffentligTransport
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatPrivatBil
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.domain.BeregningsresultatReiseTilSamling
@@ -12,6 +13,7 @@ import java.time.LocalDate
 data class BeregningsresultatReiseTilSamlingDto(
     val offentligTransport: List<BeregningsresultatOffentligTransportDto>?,
     val privatBil: List<BeregningsresultatPrivatBilDto>?,
+    val drosje: List<BeregningsresultatDrosjeDto>?,
     val beregningsplan: Beregningsplan,
 )
 
@@ -52,6 +54,17 @@ data class BeregningsresultatPrivatBilDto(
                 .plus(piggdekkavgift ?: BigDecimal.ZERO)
 }
 
+data class BeregningsresultatDrosjeDto(
+    val reiseId: ReiseId,
+    val adresse: String?,
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val beløp: BigDecimal,
+    val begrunnelse: String,
+    val aktivitetId: VilkårperiodeGlobalId? = null,
+    val fraTidligereVedtak: Boolean,
+)
+
 fun BeregningsresultatReiseTilSamling.tilDto(beregningsplan: Beregningsplan) =
     BeregningsresultatReiseTilSamlingDto(
         offentligTransport =
@@ -60,6 +73,10 @@ fun BeregningsresultatReiseTilSamling.tilDto(beregningsplan: Beregningsplan) =
                 ?.map { it.tilDto() },
         privatBil =
             privatBil
+                .takeIf { it.isNotEmpty() }
+                ?.map { it.tilDto() },
+        drosje =
+            drosje
                 .takeIf { it.isNotEmpty() }
                 ?.map { it.tilDto() },
         beregningsplan = beregningsplan,
@@ -90,6 +107,18 @@ fun BeregningsresultatPrivatBil.tilDto() =
         fergekostnad = grunnlag.fergekostnad,
         piggdekkavgift = grunnlag.piggdekkavgift,
         beløp = beløp,
+        aktivitetId = aktivitetId,
+        fraTidligereVedtak = fraTidligereVedtak,
+    )
+
+fun BeregningsresultatDrosje.tilDto() =
+    BeregningsresultatDrosjeDto(
+        reiseId = reiseId,
+        adresse = grunnlag.adresse,
+        fom = grunnlag.fom,
+        tom = grunnlag.tom,
+        beløp = beløp,
+        begrunnelse = begrunnelse,
         aktivitetId = aktivitetId,
         fraTidligereVedtak = fraTidligereVedtak,
     )
