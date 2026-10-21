@@ -2,15 +2,13 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.FaktaUbestemtType
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.NødvendigUtgift
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain.SvarJaNei
 import java.math.BigDecimal
 
 @JsonTypeInfo(
@@ -81,22 +79,6 @@ data class FaktaReiseTilSamlingPrivatBilDto(
         parkering = parkering,
         piggdekkavgift = piggdekkavgift,
     )
-}
-
-data class NødvendigUtgiftDto(
-    val erUtgiftenNødvendig: SvarJaNei,
-    val begrunnelse: String?,
-) {
-    fun tilDomain(): NødvendigUtgift {
-        feilHvis(erUtgiftenNødvendig == SvarJaNei.GAMMEL_MANGLER_DATA) {
-            "erNødvendig kan ikke settes til GAMMEL_MANGLER_DATA ved oppretting eller oppdatering"
-        }
-
-        return NødvendigUtgift(
-            erUtgiftenNødvendig = erUtgiftenNødvendig,
-            begrunnelse = begrunnelse?.ifBlank { null },
-        )
-    }
 }
 
 data object FaktaReiseTilSamlingUbestemtDto : FaktaReiseTilSamlingDto {

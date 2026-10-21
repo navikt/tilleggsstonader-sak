@@ -1,11 +1,11 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.domain
 
 import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
-import no.nav.tilleggsstonader.libs.feil.brukerfeilHvisIkke
 import no.nav.tilleggsstonader.sak.vedtak.domain.TypeReiseTilSamling
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
@@ -30,29 +30,6 @@ data class FaktaUbestemtType(
             reiseId = reiseId,
             adresse = adresse,
         )
-}
-
-enum class SvarJaNei {
-    JA,
-    NEI,
-    GAMMEL_MANGLER_DATA,
-}
-
-data class NødvendigUtgift(
-    val erUtgiftenNødvendig: SvarJaNei,
-    val begrunnelse: String?,
-) {
-    init {
-        validerAtNeiHarBegrunnelse()
-    }
-
-    private fun validerAtNeiHarBegrunnelse() {
-        if (erUtgiftenNødvendig == SvarJaNei.NEI) {
-            brukerfeilHvisIkke(!begrunnelse.isNullOrBlank()) {
-                "Begrunnelse må fylles ut når utgift ikke vurderes som nødvendig"
-            }
-        }
-    }
 }
 
 data class FaktaOffentligTransport(

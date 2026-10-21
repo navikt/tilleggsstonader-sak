@@ -32,10 +32,12 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyr
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttebyråTilbud
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingVilkårFakta
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FlyttingVilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.domain.VilkårFlytting
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
@@ -44,6 +46,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 class FlyttingBeregningServiceTest {
+    private val nødvendigUtgift = NødvendigUtgift(SvarJaNei.JA, null)
     private val flyttingVilkårService = mockk<FlyttingVilkårService>()
     private val vedtakService = mockk<VedtakService>()
     private val vedtaksperiodeValideringService = mockk<VedtaksperiodeValideringService>()
@@ -90,6 +93,7 @@ class FlyttingBeregningServiceTest {
                                 ),
                             erBetalingDokumentert = true,
                             adresse = "Flytteveien 1",
+                            nødvendigUtgift = nødvendigUtgift,
                         ),
                 ),
             )
@@ -158,6 +162,7 @@ class FlyttingBeregningServiceTest {
                             ferge = 30,
                             parkering = 40,
                             adresse = "Flytteveien 1",
+                            nødvendigUtgift = nødvendigUtgift,
                         ),
                 ),
             )
@@ -193,6 +198,7 @@ class FlyttingBeregningServiceTest {
                             ferge = null,
                             parkering = null,
                             adresse = "Flytteveien 1",
+                            nødvendigUtgift = nødvendigUtgift,
                         ),
                 ),
             )
@@ -477,6 +483,7 @@ class FlyttingBeregningServiceTest {
         tilbud = tilbud,
         erBetalingDokumentert = true,
         adresse = "Flytteveien 1",
+        nødvendigUtgift = nødvendigUtgift,
     )
 
     private fun faktaFlytteSelv(
@@ -492,6 +499,7 @@ class FlyttingBeregningServiceTest {
         ferge = ferge,
         parkering = parkering,
         adresse = "Flytteveien 1",
+        nødvendigUtgift = nødvendigUtgift,
     )
 
     private fun resultat(

@@ -3,8 +3,10 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.doma
 import no.nav.tilleggsstonader.libs.feil.ApiFeil
 import no.nav.tilleggsstonader.libs.feil.Feil
 import no.nav.tilleggsstonader.sak.util.dummyReiseId
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.FaktaReiseTilSamlingPrivatBilDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseTilSamling.dto.NødvendigUtgiftDto
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -180,7 +182,7 @@ class FaktaReiseTilSamlingTest {
                     ).mapTilFakta(reiseId = dummyReiseId, adresse = "Tiltaksveien 1")
                 }
             assertThat(feil.message)
-                .isEqualTo("erNødvendig kan ikke settes til GAMMEL_MANGLER_DATA ved oppretting eller oppdatering")
+                .isEqualTo("erUtgiftenNødvendig må være JA eller NEI")
         }
     }
 }

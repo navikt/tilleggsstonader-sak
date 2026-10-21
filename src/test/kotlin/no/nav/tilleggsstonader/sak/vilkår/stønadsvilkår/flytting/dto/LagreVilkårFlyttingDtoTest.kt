@@ -3,9 +3,11 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto
 import no.nav.tilleggsstonader.kontrakter.felles.JsonMapperProvider.jsonMapper
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelseDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import tools.jackson.module.kotlin.readValue
@@ -61,7 +63,8 @@ class LagreVilkårFlyttingDtoTest {
                   "type": "FLYTTING_FLYTTEBYRÅ",
                   "tilbud": [{"navn": "Flyttebyrå A"}, {}],
                   "adresse": "Flytteveien 1",
-                  "erBetalingDokumentert": false
+                  "erBetalingDokumentert": false,
+                  "nødvendigUtgift": {"erUtgiftenNødvendig": "JA", "begrunnelse": null}
                 }
                 """.trimIndent(),
             )
@@ -75,6 +78,7 @@ class LagreVilkårFlyttingDtoTest {
                     ),
                 adresse = "Flytteveien 1",
                 erBetalingDokumentert = false,
+                nødvendigUtgift = nødvendigUtgiftDto,
             ),
         )
     }
@@ -82,9 +86,13 @@ class LagreVilkårFlyttingDtoTest {
     @Test
     fun `skal deserialisere egen kjøring uten avstand og kostnader`() {
         val fakta =
-            jsonMapper.readValue<FaktaFlyttingDto>("""{"type": "FLYTTING_FLYTTE_SELV", "adresse": "Flytteveien 1"}""")
+            jsonMapper.readValue<FaktaFlyttingDto>(
+                """{"type": "FLYTTING_FLYTTE_SELV", "adresse": "Flytteveien 1", "nødvendigUtgift": {"erUtgiftenNødvendig": "JA", "begrunnelse": null}}""",
+            )
 
-        assertThat(fakta).isEqualTo(FaktaFlytteSelvDto(adresse = "Flytteveien 1"))
+        assertThat(fakta).isEqualTo(
+            FaktaFlytteSelvDto(adresse = "Flytteveien 1", nødvendigUtgift = nødvendigUtgiftDto),
+        )
     }
 
     @Test
@@ -105,6 +113,7 @@ class LagreVilkårFlyttingDtoTest {
                             ),
                         adresse = "Flytteveien 1",
                         erBetalingDokumentert = true,
+                        nødvendigUtgift = nødvendigUtgiftDto,
                     ),
             )
 
@@ -128,6 +137,7 @@ class LagreVilkårFlyttingDtoTest {
                         ferge = null,
                         parkering = 100,
                         adresse = "Flytteveien 1",
+                        nødvendigUtgift = nødvendigUtgiftDto,
                     ),
             )
 
@@ -153,4 +163,6 @@ class LagreVilkårFlyttingDtoTest {
         svar = svar,
         fakta = fakta,
     )
+
+    private val nødvendigUtgiftDto = NødvendigUtgiftDto(SvarJaNei.JA, null)
 }

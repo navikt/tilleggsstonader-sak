@@ -5,6 +5,8 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyr
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttebyråTilbud
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttingVilkårFakta
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlytteSelvDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttebyråDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttingDto
@@ -19,6 +21,7 @@ object FaktaFlyttingMapper {
                     tilbud = tilbud.map { FlyttebyråTilbud(navn = it.navn, pris = it.pris) },
                     adresse = adresse,
                     erBetalingDokumentert = erBetalingDokumentert,
+                    nødvendigUtgift = nødvendigUtgift.tilDomain(),
                 )
 
             is FaktaFlytteSelvDto ->
@@ -29,6 +32,7 @@ object FaktaFlyttingMapper {
                     ferge = ferge,
                     parkering = parkering,
                     adresse = adresse,
+                    nødvendigUtgift = nødvendigUtgift.tilDomain(),
                 )
 
             is FaktaFlyttingUbestemtDto -> FaktaFlyttingUbestemt(adresse = adresse)
@@ -41,6 +45,7 @@ object FaktaFlyttingMapper {
                     tilbud = tilbud.map { FlyttebyråTilbudDto(navn = it.navn, pris = it.pris) },
                     adresse = adresse,
                     erBetalingDokumentert = erBetalingDokumentert,
+                    nødvendigUtgift = nødvendigUtgift.tilDto(),
                 )
 
             is FaktaFlytteSelv ->
@@ -51,8 +56,15 @@ object FaktaFlyttingMapper {
                     ferge = ferge,
                     parkering = parkering,
                     adresse = adresse,
+                    nødvendigUtgift = nødvendigUtgift.tilDto(),
                 )
 
             is FaktaFlyttingUbestemt -> FaktaFlyttingUbestemtDto(adresse = adresse)
         }
+
+    private fun NødvendigUtgift.tilDto() =
+        NødvendigUtgiftDto(
+            erUtgiftenNødvendig = erUtgiftenNødvendig,
+            begrunnelse = begrunnelse,
+        )
 }
