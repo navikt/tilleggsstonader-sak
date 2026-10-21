@@ -892,7 +892,8 @@ class RevurderingPrivatBilIntegrationTest(
                                         reisedagerPerUke = 5,
                                         bompengerPerDag = bompengerDelperiode1.toBigDecimal(),
                                         fergekostnadPerDag = null,
-                                        erBehandleKjørelisteManuelt = false,
+                                        skalBehandlesManuelt = false,
+                                        begrunnelseManuellBehandling = null,
                                     ),
                                     FaktaDelperiodePrivatBilDto(
                                         fom = skilledato.plusDays(1),
@@ -900,7 +901,8 @@ class RevurderingPrivatBilIntegrationTest(
                                         reisedagerPerUke = 5,
                                         bompengerPerDag = bompengerDelperiode2.toBigDecimal(),
                                         fergekostnadPerDag = null,
-                                        erBehandleKjørelisteManuelt = false,
+                                        skalBehandlesManuelt = false,
+                                        begrunnelseManuellBehandling = null,
                                     ),
                                 ),
                         )

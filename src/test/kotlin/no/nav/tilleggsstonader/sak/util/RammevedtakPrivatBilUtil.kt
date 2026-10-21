@@ -55,7 +55,7 @@ object RammevedtakPrivatBilUtil {
                                             dagsatsUtenParkering = dagsatsUtenParkering,
                                         ),
                                     ),
-                                erBehandleKjørelisteManuelt = erBehandleKjørelisteManuelt,
+                                skalBehandlesManuelt = erBehandleKjørelisteManuelt,
                             ),
                         ),
                     reiseavstandEnVei = reiseavstandEnVei,

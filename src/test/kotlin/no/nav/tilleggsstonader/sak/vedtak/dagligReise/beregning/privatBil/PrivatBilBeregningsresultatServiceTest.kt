@@ -95,7 +95,7 @@ class PrivatBilBeregningsresultatServiceTest {
                             dagsatsUtenParkering = 150.toBigDecimal(),
                         ),
                     ),
-                erBehandleKjørelisteManuelt = false,
+                skalBehandlesManuelt = false,
             )
 
         val rammevedtakPrivatBil =
@@ -181,7 +181,7 @@ class PrivatBilBeregningsresultatServiceTest {
                             dagsatsUtenParkering = 150.toBigDecimal(),
                         ),
                     ),
-                erBehandleKjørelisteManuelt = false,
+                skalBehandlesManuelt = false,
             )
 
         val rammevedtakPrivatBil =
@@ -264,7 +264,7 @@ class PrivatBilBeregningsresultatServiceTest {
                             dagsatsUtenParkering = 160.toBigDecimal(),
                         ),
                     ),
-                erBehandleKjørelisteManuelt = false,
+                skalBehandlesManuelt = false,
             )
 
         val rammevedtakPrivatBil =
@@ -342,7 +342,7 @@ class PrivatBilBeregningsresultatServiceTest {
                         ),
                     ),
                 reisedagerPerUke = 5,
-                erBehandleKjørelisteManuelt = false,
+                skalBehandlesManuelt = false,
             )
 
         val rammevedtakPrivatBil =
@@ -457,7 +457,7 @@ class PrivatBilBeregningsresultatServiceTest {
                             dagsatsUtenParkering = 150.toBigDecimal(),
                         ),
                     ),
-                erBehandleKjørelisteManuelt = false,
+                skalBehandlesManuelt = false,
                 reisedagerPerUke = 5,
             )
 
@@ -546,7 +546,7 @@ class PrivatBilBeregningsresultatServiceTest {
                         ),
                     ),
                 reisedagerPerUke = 5,
-                erBehandleKjørelisteManuelt = false,
+                skalBehandlesManuelt = false,
             )
 
         val rammevedtakPrivatBil =
@@ -603,7 +603,7 @@ class PrivatBilBeregningsresultatServiceTest {
                         ),
                     ),
                 reisedagerPerUke = 5,
-                erBehandleKjørelisteManuelt = false,
+                skalBehandlesManuelt = false,
             )
 
         val rammevedtakPrivatBil =
@@ -917,7 +917,7 @@ class PrivatBilBeregningsresultatServiceTest {
                     dagsatsUtenParkering = 150.toBigDecimal(),
                 ),
             ),
-        erBehandleKjørelisteManuelt = false,
+        skalBehandlesManuelt = false,
     )
 
     private fun avklarUkerFraKjøreliste(kjøreliste: Kjøreliste): List<AvklartKjørtUke> =

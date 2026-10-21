@@ -81,7 +81,8 @@ class GenererKjørelistebehandlingBrevTest : CleanDatabaseIntegrationTest() {
                                 reisedagerPerUke = 3,
                                 bompengerPerDag = BigDecimal("50"),
                                 fergekostnadPerDag = null,
-                                erBehandleKjørelisteManuelt = false,
+                                skalBehandlesManuelt = false,
+                                begrunnelseManuellBehandling = null,
                             ),
                             FaktaDelperiodePrivatBilDto(
                                 fom = 5 januar 2026,
@@ -89,7 +90,8 @@ class GenererKjørelistebehandlingBrevTest : CleanDatabaseIntegrationTest() {
                                 reisedagerPerUke = 2,
                                 bompengerPerDag = BigDecimal("50"),
                                 fergekostnadPerDag = null,
-                                erBehandleKjørelisteManuelt = false,
+                                skalBehandlesManuelt = false,
+                                begrunnelseManuellBehandling = null,
                             ),
                             FaktaDelperiodePrivatBilDto(
                                 fom = 12 januar 2026,
@@ -97,7 +99,8 @@ class GenererKjørelistebehandlingBrevTest : CleanDatabaseIntegrationTest() {
                                 reisedagerPerUke = 2,
                                 bompengerPerDag = null,
                                 fergekostnadPerDag = BigDecimal("100"),
-                                erBehandleKjørelisteManuelt = false,
+                                skalBehandlesManuelt = false,
+                                begrunnelseManuellBehandling = null,
                             ),
                         ),
                 )

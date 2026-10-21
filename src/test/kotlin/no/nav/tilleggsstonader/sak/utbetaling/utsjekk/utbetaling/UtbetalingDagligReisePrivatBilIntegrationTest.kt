@@ -65,7 +65,8 @@ class UtbetalingDagligReisePrivatBilIntegrationTest : IntegrationTest() {
                     reisedagerPerUke = 5,
                     bompengerPerDag = null,
                     fergekostnadPerDag = null,
-                    erBehandleKjørelisteManuelt = false,
+                    skalBehandlesManuelt = false,
+                    begrunnelseManuellBehandling = null,
                 ),
             )
         val førstegangsBehandlingContext =

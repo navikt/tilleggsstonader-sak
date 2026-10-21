@@ -93,6 +93,7 @@ enum class UkeStatus {
 enum class TypeAvvikUke {
     FLERE_REISEDAGER_ENN_I_RAMMEVEDTAK,
     INNSENDTE_DAGER_OVERLAPPER_MED_DAGER_DEKT_AV_ANNEN_REISE,
+    SKAL_BEHANDLES_MANUELT,
 }
 
 enum class AvklartKjørtUkeStatus {

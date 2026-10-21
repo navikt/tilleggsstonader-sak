@@ -45,22 +45,9 @@ fun utledAvklartUke(
     avklarteUkerForAndreReiserISammeBehandling: List<AvklartKjørtUke> = emptyList(),
     avklartKjørtUkeStatus: AvklartKjørtUkeStatus = AvklartKjørtUkeStatus.NY,
 ): AvklartKjørtUke {
-    val delperiodeForUke =
-        rammevedtak.finnDelperiodeForPeriode(
-            Datoperiode(
-                reisedager.minOf { it.dato },
-                reisedager.maxOf { it.dato },
-            ),
-        )
     val avvikUke = utledAvvikForUke(rammevedtak, reisedager, avklarteUkerForAndreReiserISammeBehandling, ukeIÅr)
-
     val avklarteDager = reisedager.map { utledAvklartDag(it, avvikUke) }
-    val status =
-        if (delperiodeForUke.erBehandleKjørelisteManuelt) {
-            UkeStatus.AVVIK
-        } else {
-            utledAutomatiskStatusForUke(avklarteDager, avvikUke)
-        }
+    val status = utledAutomatiskStatusForUke(avklarteDager, avvikUke)
 
     return AvklartKjørtUke(
         behandlingId = behandlingId,
@@ -96,6 +83,9 @@ fun utledAvvikForUke(
         TypeAvvikUke.INNSENDTE_DAGER_OVERLAPPER_MED_DAGER_DEKT_AV_ANNEN_REISE.takeIf {
             val uke = ukeIÅr ?: reisedager.minOf { it.dato }.tilUkeIÅr()
             dekkesReisedagAlleredeAvAnnenReise(avklarteUkerForAndreReiserISammeBehandling, rammevedtak.reiseId, uke)
+        },
+        TypeAvvikUke.SKAL_BEHANDLES_MANUELT.takeIf {
+            delperiodeForUke.skalBehandlesManuelt
         },
     )
 }

@@ -291,7 +291,7 @@ private fun rammevedtakPrivatBil(perioder: List<PrivatBilPeriode>) =
                                             dagsatsUtenParkering = (periode.stønadsbeløp / dagerIperiode).toBigDecimal(),
                                         ),
                                     ),
-                                erBehandleKjørelisteManuelt = false,
+                                skalBehandlesManuelt = false,
                             )
                         },
                 ),

@@ -138,7 +138,8 @@ class InnvilgePrivatBilIntegrationTest : IntegrationTest() {
                                 reisedagerPerUke = 5,
                                 bompengerPerDag = null,
                                 fergekostnadPerDag = null,
-                                erBehandleKjørelisteManuelt = false,
+                                skalBehandlesManuelt = false,
+                                begrunnelseManuellBehandling = null,
                             ),
                             FaktaDelperiodePrivatBilDto(
                                 fom = fomDelperiode2,
@@ -146,7 +147,8 @@ class InnvilgePrivatBilIntegrationTest : IntegrationTest() {
                                 reisedagerPerUke = 2,
                                 bompengerPerDag = BigDecimal("100"),
                                 fergekostnadPerDag = BigDecimal("50"),
-                                erBehandleKjørelisteManuelt = false,
+                                skalBehandlesManuelt = false,
+                                begrunnelseManuellBehandling = null,
                             ),
                         ),
                 )

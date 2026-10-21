@@ -152,7 +152,7 @@ class RammevedtakPrivatBilAvkortingTest {
         reisedagerPerUke = 5,
         ekstrakostnader = RammeForReiseMedPrivatEkstrakostnader(null, null),
         satser = satser,
-        erBehandleKjørelisteManuelt = false,
+        skalBehandlesManuelt = false,
     )
 
     private fun lagSats(

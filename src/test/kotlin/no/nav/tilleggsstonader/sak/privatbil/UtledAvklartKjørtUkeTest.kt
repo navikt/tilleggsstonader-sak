@@ -46,7 +46,8 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
                                 reisedagerPerUke = 2,
                                 bompengerPerDag = null,
                                 fergekostnadPerDag = null,
-                                erBehandleKjørelisteManuelt = false,
+                                skalBehandlesManuelt = false,
+                                begrunnelseManuellBehandling = null,
                             ),
                         ),
                 )
@@ -115,7 +116,8 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
                                 reisedagerPerUke = 3,
                                 bompengerPerDag = null,
                                 fergekostnadPerDag = null,
-                                erBehandleKjørelisteManuelt = false,
+                                skalBehandlesManuelt = false,
+                                begrunnelseManuellBehandling = null,
                             ),
                         ),
                 )
@@ -377,7 +379,8 @@ class UtledAvklartKjørtUkeTest : CleanDatabaseIntegrationTest() {
                                 reisedagerPerUke = 3,
                                 bompengerPerDag = null,
                                 fergekostnadPerDag = null,
-                                erBehandleKjørelisteManuelt = false,
+                                skalBehandlesManuelt = false,
+                                begrunnelseManuellBehandling = null,
                             ),
                         ),
                 )

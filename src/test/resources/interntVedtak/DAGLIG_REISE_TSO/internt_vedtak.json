@@ -211,11 +211,12 @@
       "aktivitetsadresse": "Testveien 1, 1234 Testby",
       "grunnlag": {
         "delperioder": [ {
+          "begrunnelseManuellBehandling" : null,
           "ekstrakostnader": {
             "bompengerPerDag": 40,
             "fergekostnadPerDag": 50
           },
-          "erBehandleKjørelisteManuelt": false,
+          "skalBehandlesManuelt": false,
           "fom": "2025-01-01",
           "reisedagerPerUke": 3,
           "satser": [ {
@@ -227,11 +228,12 @@
           } ],
           "tom": "2025-01-26"
         }, {
+          "begrunnelseManuellBehandling" : null,
           "ekstrakostnader": {
             "bompengerPerDag": 40,
             "fergekostnadPerDag": 50
           },
-          "erBehandleKjørelisteManuelt": false,
+          "skalBehandlesManuelt": false,
           "fom": "2025-01-27",
           "reisedagerPerUke": 5,
           "satser": [ {
@@ -297,15 +299,17 @@
     "fakta": {
       "adresse": "Tiltaksgata 1",
       "faktaDelperioder": [ {
+        "begrunnelseManuellBehandling" : null,
         "bompengerPerDag": 40,
-        "erBehandleKjørelisteManuelt": false,
+        "skalBehandlesManuelt": false,
         "fergekostnadPerDag": 50,
         "fom": "2025-01-01",
         "reisedagerPerUke": 3,
         "tom": "2025-01-26"
       }, {
+        "begrunnelseManuellBehandling" : null,
         "bompengerPerDag": 40,
-        "erBehandleKjørelisteManuelt": false,
+        "skalBehandlesManuelt": false,
         "fergekostnadPerDag": 50,
         "fom": "2025-01-27",
         "reisedagerPerUke": 5,

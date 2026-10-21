@@ -138,7 +138,7 @@ private fun dummyDelperiode() =
         reisedagerPerUke = 1,
         bompengerPerDag = null,
         fergekostnadPerDag = null,
-        erBehandleKjørelisteManuelt = false,
+        skalBehandlesManuelt = false,
     )
 
 fun mapAktiviteter(
