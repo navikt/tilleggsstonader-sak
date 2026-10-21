@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.fagsak.domain.Fagsaker
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakPersonId
 import no.nav.tilleggsstonader.sak.klage.dto.OpprettKlageDto
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.util.fagsak
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -40,11 +41,14 @@ internal class KlageServiceTest {
 
     private val klageClient = mockk<KlageClient>()
 
+    private val ytelseService = mockk<YtelseService>()
+
     private val klageService =
         KlageService(
             fagsakService,
             arbeidsfordelingService,
             klageClient,
+            ytelseService,
         )
 
     private val fagsakId = FagsakId.random()
@@ -67,6 +71,7 @@ internal class KlageServiceTest {
                 "Nav arbeid og ytelser",
             )
         justRun { klageClient.opprettKlage(capture(opprettKlageSlot)) }
+        every { ytelseService.harAktivitetspengerIDagEllerFremITid(any()) } returns false
     }
 
     @Nested
@@ -84,6 +89,16 @@ internal class KlageServiceTest {
             assertThat(request.fagsystem).isEqualTo(Fagsystem.TILLEGGSSTONADER)
             assertThat(request.klageMottatt).isEqualTo(klageMottattTidspunkt)
             assertThat(request.behandlendeEnhet).isEqualTo(arbeidsfordelingEnhetNr)
+            assertThat(request.gjelderAktivitetspenger).isFalse()
+        }
+
+        @Test
+        internal fun `skal markere klage som aktivitetspenger når bruker har aktivitetspenger`() {
+            every { ytelseService.harAktivitetspengerIDagEllerFremITid(any()) } returns true
+
+            klageService.opprettKlage(fagsak.id, OpprettKlageDto(LocalDate.now()))
+
+            assertThat(opprettKlageSlot.captured.gjelderAktivitetspenger).isTrue()
         }
     }
 
