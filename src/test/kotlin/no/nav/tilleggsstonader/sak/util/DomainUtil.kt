@@ -187,6 +187,7 @@ fun behandling(
     vedtakstidspunkt: LocalDateTime? = null,
     kravMottatt: LocalDate? = null,
     årsakMetadata: ÅrsakMetadata? = null,
+    gjelderAktivitetspenger: Boolean = false,
 ): Behandling =
     Behandling(
         fagsakId = fagsak.id,
@@ -207,6 +208,7 @@ fun behandling(
         kravMottatt = kravMottatt,
         årsakMetadata = årsakMetadata,
         behandlingMetode = BehandlingMetode.MANUELL,
+        gjelderAktivitetspenger = gjelderAktivitetspenger,
     )
 
 fun henlagtBehandling(
