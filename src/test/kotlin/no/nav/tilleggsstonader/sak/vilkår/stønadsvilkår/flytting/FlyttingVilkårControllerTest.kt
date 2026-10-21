@@ -16,8 +16,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårReposit
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelseDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FaktaFlyttingMapper.tilDomain
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FaktaFlyttingMapper.tilDomene
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlytteSelvDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttebyråDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttingUbestemtDto
@@ -27,6 +28,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.SlettVil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.VilkårFlyttingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.RegelId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.SvarId
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -40,15 +42,18 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
     @Autowired
     private lateinit var vilkårRepository: VilkårRepository
 
+    private val nødvendigUtgiftDto = NødvendigUtgiftDto(SvarJaNei.JA, null)
+
     private val svarFramTilFlyttemåte =
         arrayOf(
             RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
-                SvarOgBegrunnelseDto(SvarId.FLYTTING_VED_START_AV_AKTIVITET, "Starter i aktivitet"),
-            RegelId.MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET to SvarOgBegrunnelseDto(SvarId.JA, "Må flytte"),
+                SvarOgBegrunnelseDto(
+                    SvarId.FLYTTING_VED_OPPSTART_ELLER_AVSLUTNING_AV_TILTAK_ELLER_UTDANNING,
+                    "Starter i aktivitet",
+                ),
+            RegelId.MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET to
+                SvarOgBegrunnelseDto(SvarId.FLYTTER_TIL_AKTIVITETSSTED, "Må flytte"),
         )
-
-    private val kostnaderErNødvendige =
-        RegelId.ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE to SvarOgBegrunnelseDto(SvarId.JA)
 
     private val nyttVilkårFlytteSelv =
         LagreVilkårFlyttingDto(
@@ -57,7 +62,6 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 mapOf(
                     *svarFramTilFlyttemåte,
                     RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTER_SELV, "Kjører selv"),
-                    kostnaderErNødvendige,
                 ),
             fakta =
                 FaktaFlytteSelvDto(
@@ -67,6 +71,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                     ferge = 400,
                     parkering = 100,
                     adresse = "Flytteveien 1",
+                    nødvendigUtgift = nødvendigUtgiftDto,
                 ),
         )
 
@@ -77,13 +82,13 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 mapOf(
                     *svarFramTilFlyttemåte,
                     RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTEBYRÅ, "Bruker flyttebyrå"),
-                    kostnaderErNødvendige,
                 ),
             fakta =
                 FaktaFlyttebyråDto(
                     tilbud = listOf(FlyttebyråTilbudDto("Byrå A", 10000), FlyttebyråTilbudDto("Byrå B", 12000)),
                     adresse = "Flytteveien 1",
                     erBetalingDokumentert = true,
+                    nødvendigUtgift = nødvendigUtgiftDto,
                 ),
         )
 
@@ -118,6 +123,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                         ferge = 600,
                         parkering = 200,
                         adresse = "Flytteveien 2",
+                        nødvendigUtgift = NødvendigUtgiftDto(SvarJaNei.NEI, "Utgiften er for høy"),
                     ),
                 svar =
                     mapOf(
@@ -127,7 +133,6 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                                 SvarId.FLYTTER_SELV,
                                 "Ny begrunnelse",
                             ),
-                        kostnaderErNødvendige,
                     ),
             )
         val oppdatert = kall.vilkårFlytting.oppdaterVilkår(oppdatering, opprettet.id, behandling.id)
@@ -162,6 +167,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                         tilbud = listOf(FlyttebyråTilbudDto("Byrå C", 8000), FlyttebyråTilbudDto("Byrå D", 9000)),
                         adresse = "Flytteveien 2",
                         erBetalingDokumentert = true,
+                        nødvendigUtgift = nødvendigUtgiftDto,
                     ),
             )
         val oppdatert = kall.vilkårFlytting.oppdaterVilkår(oppdatering, opprettet.id, behandling.id)
@@ -204,6 +210,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                         tilbud = listOf(FlyttebyråTilbudDto("Byrå A", 10000), FlyttebyråTilbudDto("Byrå B")),
                         adresse = "Flytteveien 1",
                         erBetalingDokumentert = false,
+                        nødvendigUtgift = nødvendigUtgiftDto,
                     ),
             )
 
@@ -223,6 +230,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                         tilbud = listOf(FlyttebyråTilbudDto("Byrå A", 10000)),
                         adresse = "Flytteveien 1",
                         erBetalingDokumentert = false,
+                        nødvendigUtgift = nødvendigUtgiftDto,
                     ),
             )
 
@@ -297,7 +305,10 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 svar =
                     mapOf(
                         RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
-                            SvarOgBegrunnelseDto(SvarId.FLYTTING_VED_AVSLUTTET_AKTIVITET, "Avslutter aktivitet"),
+                            SvarOgBegrunnelseDto(
+                                SvarId.FLYTTING_VED_OPPSTART_ELLER_AVSLUTNING_AV_TILTAK_ELLER_UTDANNING,
+                                "Avslutter aktivitet",
+                            ),
                         RegelId.MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET to
                             SvarOgBegrunnelseDto(SvarId.NEI, "Må ikke flytte"),
                     ),
@@ -332,7 +343,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
         assertThat(lagret.behandlingId).isEqualTo(behandlingId)
         assertThat(lagret.type).isEqualTo(VilkårType.FLYTTING)
         assertThat(lagret.fom).isEqualTo(request.flytteDato)
-        assertThat(lagret.fakta).isEqualTo(resultat.fakta.tilDomain())
+        assertThat(lagret.fakta).isEqualTo(resultat.fakta.tilDomene())
         assertThat(lagret.status).isEqualTo(resultat.status)
         assertThat(lagret.resultat).isEqualTo(resultat.resultat)
     }

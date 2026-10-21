@@ -68,7 +68,7 @@ class ReiseTilSamlingVilkårController(
 
         return reiseTilSamlingVilkårService
             .opprettNyttVilkår(
-                nyttVilkår = lagreVilkårDto.tilDomain(),
+                nyttVilkår = lagreVilkårDto.tilDomene(),
                 behandlingId = behandlingId,
             ).tilDtoMedAktivitet(behandlingId)
     }
@@ -84,7 +84,7 @@ class ReiseTilSamlingVilkårController(
 
         return reiseTilSamlingVilkårService
             .oppdaterVilkår(
-                nyttVilkår = lagreVilkårDto.tilDomain(),
+                nyttVilkår = lagreVilkårDto.tilDomene(),
                 vilkårId = vilkårId,
                 behandlingId = behandlingId,
             ).tilDtoMedAktivitet(behandlingId)

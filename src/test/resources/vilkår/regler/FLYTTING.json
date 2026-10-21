@@ -1,21 +1,5 @@
 {
   "regler": {
-    "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE": {
-      "erHovedregel": false,
-      "regelId": "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE",
-      "svarMapping": {
-        "JA": {
-          "begrunnelseType": "VALGFRI",
-          "regelId": "SLUTT_NODE",
-          "tilhørendeFaktaType": null
-        },
-        "NEI": {
-          "begrunnelseType": "PÅKREVD",
-          "regelId": "SLUTT_NODE",
-          "tilhørendeFaktaType": null
-        }
-      }
-    },
     "FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET": {
       "erHovedregel": false,
       "regelId": "FLYTTER_IFBM_ARBEID_ETTER_AKTIVITET",
@@ -43,11 +27,7 @@
           "begrunnelseType": "PÅKREVD",
           "regelId": "MÅ_FLYTTE_FOR_Å_STARTE_I_ARBEID"
         },
-        "FLYTTING_VED_AVSLUTTET_AKTIVITET": {
-          "begrunnelseType": "PÅKREVD",
-          "regelId": "MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET"
-        },
-        "FLYTTING_VED_START_AV_AKTIVITET": {
+        "FLYTTING_VED_OPPSTART_ELLER_AVSLUTNING_AV_TILTAK_ELLER_UTDANNING": {
           "begrunnelseType": "PÅKREVD",
           "regelId": "MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET"
         }
@@ -59,12 +39,12 @@
       "svarMapping": {
         "FLYTTEBYRÅ": {
           "begrunnelseType": "VALGFRI",
-          "regelId": "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE",
+          "regelId": "SLUTT_NODE",
           "tilhørendeFaktaType": "FLYTTING_FLYTTEBYRÅ"
         },
         "FLYTTER_SELV": {
           "begrunnelseType": "VALGFRI",
-          "regelId": "ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE",
+          "regelId": "SLUTT_NODE",
           "tilhørendeFaktaType": "FLYTTING_FLYTTE_SELV"
         }
       }
@@ -73,7 +53,11 @@
       "erHovedregel": false,
       "regelId": "MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET",
       "svarMapping": {
-        "JA": {
+        "FLYTTER_TIL_AKTIVITETSSTED": {
+          "begrunnelseType": "PÅKREVD",
+          "regelId": "HVORDAN_SKAL_BRUKER_FLYTTE"
+        },
+        "FLYTTER_TIL_HJEMSTED": {
           "begrunnelseType": "PÅKREVD",
           "regelId": "HVORDAN_SKAL_BRUKER_FLYTTE"
         },
