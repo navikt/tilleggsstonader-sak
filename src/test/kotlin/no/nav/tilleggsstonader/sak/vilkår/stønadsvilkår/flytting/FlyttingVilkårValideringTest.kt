@@ -146,7 +146,7 @@ class FlyttingVilkårValideringTest {
         assertThat(
             FlyttingVilkårValidering.erFullstendig(
                 LagreVilkårFlytting(
-                    flytteDato = 1 januar 2026,
+                    flyttedato = 1 januar 2026,
                     svar = emptyMap(),
                     fakta = FaktaFlyttingUbestemt(adresse = "Flytteveien 1"),
                 ),
@@ -159,7 +159,7 @@ class FlyttingVilkårValideringTest {
         assertThat(
             FlyttingVilkårValidering.erFullstendig(
                 LagreVilkårFlytting(
-                    flytteDato = 1 januar 2026,
+                    flyttedato = 1 januar 2026,
                     svar =
                         mapOf(
                             *oppfylteSvarFremTilFlyttemåte,
@@ -219,7 +219,7 @@ class FlyttingVilkårValideringTest {
         assertThat(
             FlyttingVilkårValidering.erFullstendig(
                 LagreVilkårFlytting(
-                    flytteDato = 1 januar 2026,
+                    flyttedato = 1 januar 2026,
                     svar =
                         mapOf(
                             *oppfylteSvarFremTilFlyttemåte,
@@ -316,7 +316,7 @@ class FlyttingVilkårValideringTest {
         svar: Map<RegelId, SvarOgBegrunnelse>,
         fakta: FlyttingVilkårFakta = FaktaFlyttingUbestemt(adresse = "Flytteveien 1"),
     ) = LagreVilkårFlytting(
-        flytteDato = 1 januar 2026,
+        flyttedato = 1 januar 2026,
         svar = svar,
         fakta = fakta,
     )

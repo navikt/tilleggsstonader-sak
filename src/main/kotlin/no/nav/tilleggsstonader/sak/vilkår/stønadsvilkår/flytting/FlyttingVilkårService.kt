@@ -46,7 +46,7 @@ class FlyttingVilkårService(
             .findByBehandlingId(behandlingId)
             .filter { it.type == VilkårType.FLYTTING }
             .map { it.mapTilVilkårFlytting() }
-            .sortedBy { it.fom }
+            .sortedBy { it.flyttedato }
 
     fun hentOppfylteVilkårforBehandling(behandlingId: BehandlingId): List<VilkårFlytting> =
         hentVilkårForBehandling(behandlingId).filter { it.resultat == Vilkårsresultat.OPPFYLT }
@@ -117,16 +117,14 @@ class FlyttingVilkårService(
         return eksisterende?.copy(
             resultat = samletResultat,
             status = utledStatus(eksisterende),
-            fom = innsendt.flytteDato,
-            tom = innsendt.flytteDato,
+            flyttedato = innsendt.flyttedato,
             delvilkårsett = delvilkår,
             fakta = fakta,
         ) ?: VilkårFlytting(
             behandlingId = behandlingId,
             resultat = samletResultat,
             status = VilkårStatus.NY,
-            fom = innsendt.flytteDato,
-            tom = innsendt.flytteDato,
+            flyttedato = innsendt.flyttedato,
             delvilkårsett = delvilkår,
             fakta = fakta,
         )
@@ -155,10 +153,10 @@ class FlyttingVilkårService(
                         )
                 }
 
-            val flytteDato = innsendt.flytteDato
+            val flyttedato = innsendt.flyttedato
 
             brukerfeilHvis(
-                godkjenteMålgrupperForSvar.none { it.inneholder(flytteDato) },
+                godkjenteMålgrupperForSvar.none { it.inneholder(flyttedato) },
             ) {
                 "Du kan bare velge svaret «${SvarId.ENSLIG_FORSØRGER_ELLER_GJENLEVENDE_STARTER_I_ARBEID.beskrivelse}» " +
                     "sammen med en målgruppeperiode for aktiv eller opphørt overgangs- eller omstillingsstønad som inneholder flyttedatoen"
@@ -178,7 +176,7 @@ class FlyttingVilkårService(
                     it.type == VilkårType.FLYTTING &&
                         it.status != VilkårStatus.SLETTET &&
                         it.id != unntattVilkårId
-                }.any { nyttVilkår.overlapper(it.mapTilVilkårFlytting()) }
+                }.any { nyttVilkår.flyttedato == it.mapTilVilkårFlytting().flyttedato }
         brukerfeilHvis(overlapper) { "Flyttevilkår kan ikke ha overlappende perioder" }
     }
 

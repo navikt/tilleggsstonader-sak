@@ -67,13 +67,13 @@ class StønadsvilkårTestdataDsl {
     }
 
     fun flyttingByrå(
-        flytteDato: LocalDate,
+        flyttedato: LocalDate,
         tilbudPriser: List<Int>,
         erBetalingDokumentert: Boolean,
     ) {
         opprettFlyttingScope += {
             LagreVilkårFlyttingDto(
-                flytteDato = flytteDato,
+                flyttedato = flyttedato,
                 svar =
                     mapOf(
                         RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
@@ -100,7 +100,7 @@ class StønadsvilkårTestdataDsl {
     }
 
     fun flyttingEgenKjøring(
-        flytteDato: LocalDate,
+        flyttedato: LocalDate,
         avstandEnVei: Int,
         henger: Int? = null,
         bompenger: Int? = null,
@@ -109,7 +109,7 @@ class StønadsvilkårTestdataDsl {
     ) {
         opprettFlyttingScope += {
             LagreVilkårFlyttingDto(
-                flytteDato = flytteDato,
+                flyttedato = flyttedato,
                 svar =
                     mapOf(
                         RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
