@@ -121,7 +121,7 @@ class FlyttingBeregningServiceTest {
         every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
             listOf(
                 vilkår(
-                    flytteDato = 1 januar 2025,
+                    flyttedato = 1 januar 2025,
                     fakta =
                         faktaFlyttebyrå(
                             listOf(

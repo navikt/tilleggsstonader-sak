@@ -153,10 +153,10 @@ class FlyttingVilkårService(
                         )
                 }
 
-            val flytteDato = innsendt.flytteDato
+            val flyttedato = innsendt.flyttedato
 
             brukerfeilHvis(
-                godkjenteMålgrupperForSvar.none { it.inneholder(flytteDato) },
+                godkjenteMålgrupperForSvar.none { it.inneholder(flyttedato) },
             ) {
                 "Du kan bare velge svaret «${SvarId.ENSLIG_FORSØRGER_ELLER_GJENLEVENDE_STARTER_I_ARBEID.beskrivelse}» " +
                     "sammen med en målgruppeperiode for aktiv eller opphørt overgangs- eller omstillingsstønad som inneholder flyttedatoen"

@@ -99,7 +99,7 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingEgenKjøring(
-                    flytteDato = fom,
+                    flyttedato = fom,
                     avstandEnVei = 100,
                     bompenger = 100,
                 )
@@ -151,7 +151,7 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    flytteDato = fom,
+                    flyttedato = fom,
                     tilbudPriser = listOf(10000, 5000),
                     erBetalingDokumentert = true,
                 )
@@ -207,7 +207,7 @@ class FlyttingTsoIntegrationTest : IntegrationTest() {
             }
             vilkår {
                 flyttingByrå(
-                    flytteDato = fom,
+                    flyttedato = fom,
                     tilbudPriser = listOf(10000, 5000),
                     erBetalingDokumentert = false,
                 )

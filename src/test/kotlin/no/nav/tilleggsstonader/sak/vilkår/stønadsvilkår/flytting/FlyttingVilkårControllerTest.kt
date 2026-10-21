@@ -57,7 +57,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
 
     private val nyttVilkårFlytteSelv =
         LagreVilkårFlyttingDto(
-            flytteDato = 1 januar 2026,
+            flyttedato = 1 januar 2026,
             svar =
                 mapOf(
                     *svarFramTilFlyttemåte,
@@ -77,7 +77,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
 
     private val nyttVilkårFlyttebyrå =
         LagreVilkårFlyttingDto(
-            flytteDato = 1 januar 2026,
+            flyttedato = 1 januar 2026,
             svar =
                 mapOf(
                     *svarFramTilFlyttemåte,
@@ -114,7 +114,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
 
         val oppdatering =
             nyttVilkårFlytteSelv.copy(
-                flytteDato = 20 januar 2026,
+                flyttedato = 20 januar 2026,
                 fakta =
                     FaktaFlytteSelvDto(
                         avstandEnVei = 200,
@@ -268,7 +268,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
         val opprettet = kall.vilkårFlytting.opprettVilkår(behandling.id, nyttVilkårFlytteSelv)
         val lagret = vilkårRepository.findById(opprettet.id).orElseThrow()
         vilkårRepository.update(lagret.copy(status = VilkårStatus.UENDRET))
-        val oppdatering = nyttVilkårFlytteSelv.copy(flytteDato = 20 januar 2026)
+        val oppdatering = nyttVilkårFlytteSelv.copy(flyttedato = 20 januar 2026)
 
         val oppdatert = kall.vilkårFlytting.oppdaterVilkår(oppdatering, opprettet.id, behandling.id)
 
@@ -281,7 +281,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
     @Test
     fun `skal returnere brukerfeil for like flyttedatoer`() {
         val opprettet = kall.vilkårFlytting.opprettVilkår(behandling.id, nyttVilkårFlytteSelv)
-        val overlappende = nyttVilkårFlytteSelv.copy(flytteDato = nyttVilkårFlytteSelv.flytteDato)
+        val overlappende = nyttVilkårFlytteSelv.copy(flyttedato = nyttVilkårFlytteSelv.flyttedato)
 
         kall.vilkårFlytting.apiRespons
             .opprettVilkår(behandling.id, overlappende)
@@ -301,7 +301,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
     fun `skal gi ikke oppfylt og kun kreve adresse når bruker ikke må flytte for å gjennomføre aktiviteten`() {
         val nyttVilkår =
             LagreVilkårFlyttingDto(
-                flytteDato = 1 januar 2026,
+                flyttedato = 1 januar 2026,
                 svar =
                     mapOf(
                         RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
@@ -327,7 +327,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
         resultat: VilkårFlyttingDto,
         behandlingId: BehandlingId = behandling.id,
     ) {
-        assertThat(resultat.flytteDato).isEqualTo(request.flytteDato)
+        assertThat(resultat.flyttedato).isEqualTo(request.flyttedato)
         assertThat(resultat.fakta).usingRecursiveComparison().isEqualTo(request.fakta)
         assertThat(resultat.delvilkårsett).hasSize(1)
         val vurderinger = resultat.delvilkårsett.single().vurderinger
@@ -342,7 +342,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
         val lagret = vilkårRepository.findById(resultat.id).orElseThrow()
         assertThat(lagret.behandlingId).isEqualTo(behandlingId)
         assertThat(lagret.type).isEqualTo(VilkårType.FLYTTING)
-        assertThat(lagret.fom).isEqualTo(request.flytteDato)
+        assertThat(lagret.fom).isEqualTo(request.flyttedato)
         assertThat(lagret.fakta).isEqualTo(resultat.fakta.tilDomene())
         assertThat(lagret.status).isEqualTo(resultat.status)
         assertThat(lagret.resultat).isEqualTo(resultat.resultat)

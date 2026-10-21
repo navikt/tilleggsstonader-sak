@@ -104,8 +104,8 @@ class FlyttingVilkårServiceTest {
         val annenMålgruppe =
             målgruppe(
                 behandlingId = behandling.id,
-                fom = nyttVilkår.flytteDato,
-                tom = nyttVilkår.flytteDato,
+                fom = nyttVilkår.flyttedato,
+                tom = nyttVilkår.flyttedato,
                 faktaOgVurdering = faktaOgVurderingMålgruppe(MålgruppeType.AAP),
             )
         val innsendt =
@@ -188,8 +188,8 @@ class FlyttingVilkårServiceTest {
         val overgangsstønad =
             målgruppe(
                 behandlingId = behandling.id,
-                fom = nyttVilkår.flytteDato,
-                tom = nyttVilkår.flytteDato,
+                fom = nyttVilkår.flyttedato,
+                tom = nyttVilkår.flyttedato,
                 faktaOgVurdering = faktaOgVurderingMålgruppe(MålgruppeType.OVERGANGSSTØNAD),
             )
         every { behandlingService.hentSaksbehandling(behandling.id) } returns behandling
@@ -245,7 +245,7 @@ class FlyttingVilkårServiceTest {
     }
 
     @Test
-    fun `skal ikke kunne opprette vilkår med samme flytteDato periode`() {
+    fun `skal ikke kunne opprette vilkår med samme flyttedato periode`() {
         val behandling =
             saksbehandling(steg = StegType.VILKÅR, fagsak = fagsak(stønadstype = Stønadstype.FLYTTING_TSO))
         val vilkår = eksisterendeVilkår.copy(behandlingId = behandling.id)

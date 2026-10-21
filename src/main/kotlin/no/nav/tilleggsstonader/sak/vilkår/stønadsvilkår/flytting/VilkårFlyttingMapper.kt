@@ -52,7 +52,7 @@ object VilkårFlyttingMapper {
     fun VilkårFlytting.tilVilkårFlyttingDto(): VilkårFlyttingDto =
         VilkårFlyttingDto(
             id = id,
-            flytteDato = flyttedato,
+            flyttedato = flyttedato,
             resultat = resultat,
             status = status,
             delvilkårsett = delvilkårsett.map { it.tilDto() },
