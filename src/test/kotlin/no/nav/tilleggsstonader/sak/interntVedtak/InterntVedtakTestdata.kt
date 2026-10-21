@@ -757,6 +757,7 @@ object InterntVedtakTestdata {
                                                             dagsatsUtenParkering = BigDecimal.valueOf(100.0),
                                                         ),
                                                     ),
+                                                erBehandleKjørelisteManuelt = false,
                                             ),
                                             RammeForReiseMedPrivatBilDelperiode(
                                                 fom = førsteJan.plusDays(26),
@@ -777,6 +778,7 @@ object InterntVedtakTestdata {
                                                             dagsatsUtenParkering = BigDecimal.valueOf(100.0),
                                                         ),
                                                     ),
+                                                erBehandleKjørelisteManuelt = false,
                                             ),
                                         ),
                                     reiseavstandEnVei = BigDecimal.valueOf(40.0),
@@ -1019,6 +1021,7 @@ object InterntVedtakTestdata {
                                         reisedagerPerUke = 3,
                                         bompengerPerDag = BigDecimal("40"),
                                         fergekostnadPerDag = BigDecimal("50"),
+                                        erBehandleKjørelisteManuelt = false,
                                     ),
                                     FaktaDelperiodePrivatBil(
                                         fom = 27 januar 2025,
@@ -1026,6 +1029,7 @@ object InterntVedtakTestdata {
                                         reisedagerPerUke = 5,
                                         bompengerPerDag = BigDecimal("40"),
                                         fergekostnadPerDag = BigDecimal("50"),
+                                        erBehandleKjørelisteManuelt = false,
                                     ),
                                 ),
                             aktivitetId = dummyAktivitetId,

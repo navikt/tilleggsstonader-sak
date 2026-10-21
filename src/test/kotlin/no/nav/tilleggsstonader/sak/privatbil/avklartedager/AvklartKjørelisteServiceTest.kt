@@ -12,6 +12,7 @@ import no.nav.tilleggsstonader.sak.behandling.BehandlingService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
+import no.nav.tilleggsstonader.sak.privatbil.KjørelisteDag
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteId
 import no.nav.tilleggsstonader.sak.privatbil.KjørelisteService
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
@@ -652,6 +653,68 @@ class AvklartKjørelisteServiceTest {
 
             verify(exactly = 0) { avklartKjørtUkeRepository.updateAll(any()) }
         }
+    }
+
+    @Test
+    fun `uke skal ha status AVVIK når kjøreliste skal behandles manuelt`() {
+        val rammevedtak =
+            rammeForReiseMedPrivatBil(
+                reiseId = reiseId,
+                fom = mandag,
+                tom = fredag,
+                erBehandleKjørelisteManuelt = true,
+            )
+
+        val reisedager =
+            (0..4).map { offset ->
+                KjørelisteDag(
+                    dato = mandag.plusDays(offset.toLong()),
+                    harKjørt = true,
+                    parkeringsutgift = null,
+                )
+            }
+
+        val avklartUke =
+            utledAvklartUke(
+                behandlingId = behandlingId,
+                kjørelisteId = KjørelisteId.random(),
+                ukeIÅr = mandag.tilUkeIÅr(),
+                reisedager = reisedager,
+                rammevedtak = rammevedtak,
+            )
+
+        assertThat(avklartUke.status).isEqualTo(UkeStatus.AVVIK)
+    }
+
+    @Test
+    fun `uke skal fortsatt behandles automatisk når flagget er false og ingen avvik finnes`() {
+        val rammevedtak =
+            rammeForReiseMedPrivatBil(
+                reiseId = reiseId,
+                fom = mandag,
+                tom = fredag,
+                erBehandleKjørelisteManuelt = false,
+            )
+
+        val reisedager =
+            (0..4).map { offset ->
+                KjørelisteDag(
+                    dato = mandag.plusDays(offset.toLong()),
+                    harKjørt = true,
+                    parkeringsutgift = null,
+                )
+            }
+
+        val avklartUke =
+            utledAvklartUke(
+                behandlingId = behandlingId,
+                kjørelisteId = KjørelisteId.random(),
+                ukeIÅr = mandag.tilUkeIÅr(),
+                reisedager = reisedager,
+                rammevedtak = rammevedtak,
+            )
+
+        assertThat(avklartUke.status).isEqualTo(UkeStatus.OK_AUTOMATISK)
     }
 
     private fun lagRammeForReise(

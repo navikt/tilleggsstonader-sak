@@ -121,6 +121,7 @@ data class RammeForReiseMedPrivatBilDelperiode(
     val ekstrakostnader: RammeForReiseMedPrivatEkstrakostnader,
     val reisedagerPerUke: Int,
     val satser: List<RammeForReiseMedPrivatBilSatsForDelperiode>,
+    val erBehandleKjørelisteManuelt: Boolean = false,
 ) : Periode<LocalDate>,
     KopierPeriode<RammeForReiseMedPrivatBilDelperiode> {
     override fun medPeriode(

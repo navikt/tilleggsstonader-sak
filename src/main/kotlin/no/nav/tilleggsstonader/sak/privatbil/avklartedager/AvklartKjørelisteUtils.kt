@@ -45,9 +45,22 @@ fun utledAvklartUke(
     avklarteUkerForAndreReiserISammeBehandling: List<AvklartKjørtUke> = emptyList(),
     avklartKjørtUkeStatus: AvklartKjørtUkeStatus = AvklartKjørtUkeStatus.NY,
 ): AvklartKjørtUke {
+    val delperiodeForUke =
+        rammevedtak.finnDelperiodeForPeriode(
+            Datoperiode(
+                reisedager.minOf { it.dato },
+                reisedager.maxOf { it.dato },
+            ),
+        )
     val avvikUke = utledAvvikForUke(rammevedtak, reisedager, avklarteUkerForAndreReiserISammeBehandling, ukeIÅr)
 
     val avklarteDager = reisedager.map { utledAvklartDag(it, avvikUke) }
+    val status =
+        if (delperiodeForUke.erBehandleKjørelisteManuelt) {
+            UkeStatus.AVVIK
+        } else {
+            utledAutomatiskStatusForUke(avklarteDager, avvikUke)
+        }
 
     return AvklartKjørtUke(
         behandlingId = behandlingId,
@@ -58,7 +71,7 @@ fun utledAvklartUke(
         uke = ukeIÅr,
         // Trengs denne? Kan lages i visningslogikk
         // Rart at den er avhengig av både ukeavvik og dagavvik
-        status = utledAutomatiskStatusForUke(avklarteDager, avvikUke),
+        status = status,
         avvik = avvikUke.tilAvklartKjørtUkeAvvik(),
         dager = avklarteDager.toSet(),
         avklartKjørtUkeStatus = avklartKjørtUkeStatus,

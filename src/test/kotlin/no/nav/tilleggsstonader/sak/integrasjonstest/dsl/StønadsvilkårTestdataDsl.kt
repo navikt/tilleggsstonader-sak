@@ -385,6 +385,7 @@ class OpprettStønadsvilkårDsl {
                             reisedagerPerUke = reisedagerPerUke,
                             bompengerPerDag = null,
                             fergekostnadPerDag = null,
+                            erBehandleKjørelisteManuelt = false,
                         ),
                     ),
                 aktivitetId = hentAktivitetId(aktiviteter),
