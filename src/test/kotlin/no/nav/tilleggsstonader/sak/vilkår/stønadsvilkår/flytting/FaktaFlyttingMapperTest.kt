@@ -5,7 +5,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligRei
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FaktaFlyttingMapper.tilDomain
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FaktaFlyttingMapper.tilDomene
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FaktaFlyttingMapper.tilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlytteSelvDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttebyråDto
@@ -34,7 +34,7 @@ class FaktaFlyttingMapperTest {
             ),
             FaktaFlytteSelvDto(adresse = "Flytteveien 1", nødvendigUtgift = nødvendigUtgiftDto),
         ).forEach { fakta ->
-            assertThat(fakta.tilDomain().tilDto()).isEqualTo(fakta)
+            assertThat(fakta.tilDomene().tilDto()).isEqualTo(fakta)
         }
     }
 
@@ -62,7 +62,7 @@ class FaktaFlyttingMapperTest {
             ),
             FaktaFlyttingUbestemtDto(adresse = "Flytteveien 1"),
         ).forEach { fakta ->
-            val domain = fakta.tilDomain()
+            val domain = fakta.tilDomene()
             val json = jsonMapper.writerFor(VilkårFakta::class.java).writeValueAsString(domain)
 
             assertThat(jsonMapper.readValue<VilkårFakta>(json)).isEqualTo(domain)

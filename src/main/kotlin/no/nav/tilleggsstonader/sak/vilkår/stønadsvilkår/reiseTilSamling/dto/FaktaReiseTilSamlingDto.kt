@@ -45,7 +45,7 @@ data class FaktaReiseTilSamlingOffentligTransportDto(
     ) = FaktaOffentligTransport(
         reiseId = reiseId,
         adresse = adresse,
-        nødvendigUtgift = nødvendigUtgift.tilDomain(),
+        nødvendigUtgift = nødvendigUtgift.tilDomene(),
         utgifterOffentligTransport = utgifterOffentligTransport,
         begrunnelse = begrunnelse,
         aktivitetId = aktivitet?.aktivitetId,
@@ -70,7 +70,7 @@ data class FaktaReiseTilSamlingPrivatBilDto(
     ) = FaktaPrivatBil(
         reiseId = reiseId,
         adresse = adresse,
-        nødvendigUtgift = nødvendigUtgift.tilDomain(),
+        nødvendigUtgift = nødvendigUtgift.tilDomene(),
         reiseavstand = reiseavstand,
         begrunnelse = begrunnelse?.ifBlank { null },
         aktivitetId = aktivitet?.aktivitetId,

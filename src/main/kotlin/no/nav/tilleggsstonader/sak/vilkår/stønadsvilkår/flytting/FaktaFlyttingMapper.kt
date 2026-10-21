@@ -14,14 +14,14 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFly
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FlyttebyråTilbudDto
 
 object FaktaFlyttingMapper {
-    fun FaktaFlyttingDto.tilDomain(): FlyttingVilkårFakta =
+    fun FaktaFlyttingDto.tilDomene(): FlyttingVilkårFakta =
         when (this) {
             is FaktaFlyttebyråDto ->
                 FaktaFlyttebyrå(
                     tilbud = tilbud.map { FlyttebyråTilbud(navn = it.navn, pris = it.pris) },
                     adresse = adresse,
                     erBetalingDokumentert = erBetalingDokumentert,
-                    nødvendigUtgift = nødvendigUtgift.tilDomain(),
+                    nødvendigUtgift = nødvendigUtgift.tilDomene(),
                 )
 
             is FaktaFlytteSelvDto ->
@@ -32,7 +32,7 @@ object FaktaFlyttingMapper {
                     ferge = ferge,
                     parkering = parkering,
                     adresse = adresse,
-                    nødvendigUtgift = nødvendigUtgift.tilDomain(),
+                    nødvendigUtgift = nødvendigUtgift.tilDomene(),
                 )
 
             is FaktaFlyttingUbestemtDto -> FaktaFlyttingUbestemt(adresse = adresse)

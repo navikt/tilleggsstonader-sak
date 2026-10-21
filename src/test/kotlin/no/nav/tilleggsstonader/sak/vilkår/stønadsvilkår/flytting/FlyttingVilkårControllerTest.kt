@@ -18,7 +18,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.SvarOgBegrunnelseDto
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FaktaFlyttingMapper.tilDomain
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.FaktaFlyttingMapper.tilDomene
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlytteSelvDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttebyråDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.flytting.dto.FaktaFlyttingUbestemtDto
@@ -343,7 +343,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
         assertThat(lagret.behandlingId).isEqualTo(behandlingId)
         assertThat(lagret.type).isEqualTo(VilkårType.FLYTTING)
         assertThat(lagret.fom).isEqualTo(request.flytteDato)
-        assertThat(lagret.fakta).isEqualTo(resultat.fakta.tilDomain())
+        assertThat(lagret.fakta).isEqualTo(resultat.fakta.tilDomene())
         assertThat(lagret.status).isEqualTo(resultat.status)
         assertThat(lagret.resultat).isEqualTo(resultat.resultat)
     }

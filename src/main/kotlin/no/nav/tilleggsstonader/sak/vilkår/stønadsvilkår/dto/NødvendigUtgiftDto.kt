@@ -8,7 +8,7 @@ data class NødvendigUtgiftDto(
     val erUtgiftenNødvendig: SvarJaNei,
     val begrunnelse: String?,
 ) {
-    fun tilDomain(): NødvendigUtgift {
+    fun tilDomene(): NødvendigUtgift {
         feilHvis(erUtgiftenNødvendig != SvarJaNei.JA && erUtgiftenNødvendig != SvarJaNei.NEI) {
             "erUtgiftenNødvendig må være JA eller NEI"
         }

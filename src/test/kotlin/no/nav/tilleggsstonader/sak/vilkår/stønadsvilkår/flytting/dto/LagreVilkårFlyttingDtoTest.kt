@@ -16,7 +16,7 @@ class LagreVilkårFlyttingDtoTest {
     @Test
     fun `skal mappe ufullstendige delvilkår til domene uten å legge til svar`() {
         val fakta = FaktaFlyttingUbestemtDto("Adresse 1")
-        val domain = dto(svar = emptyMap(), fakta = fakta).tilDomain()
+        val domain = dto(svar = emptyMap(), fakta = fakta).tilDomene()
 
         assertThat(domain.flytteDato).isEqualTo(1 januar 2026)
         assertThat(domain.svar).isEmpty()
@@ -30,10 +30,10 @@ class LagreVilkårFlyttingDtoTest {
             dto(
                 svar = mapOf(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to svar),
                 fakta = FaktaFlyttingUbestemtDto("Adresse 1"),
-            ).tilDomain()
+            ).tilDomene()
 
         assertThat(domain.svar).containsOnlyKeys(RegelId.HVORDAN_SKAL_BRUKER_FLYTTE)
-        assertThat(domain.svar[RegelId.HVORDAN_SKAL_BRUKER_FLYTTE]).isEqualTo(svar.tilDomain())
+        assertThat(domain.svar[RegelId.HVORDAN_SKAL_BRUKER_FLYTTE]).isEqualTo(svar.tilDomene())
     }
 
     @Test
