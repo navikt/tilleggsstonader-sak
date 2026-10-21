@@ -11,17 +11,15 @@
       "grunnlag": {
         "erBetalingDokumentert": true,
         "tilbud": [ {
+          "erValgt": true,
           "navn": "Syntetisk tilbud 1",
           "pris": 10000
         }, {
+          "erValgt": false,
           "navn": "Syntetisk tilbud 2",
           "pris": 12000
         } ],
-        "type": "FLYTTEBYRÅ",
-        "valgtTilbud": {
-          "navn": "Syntetisk tilbud 1",
-          "pris": 10000
-        }
+        "type": "FLYTTEBYRÅ"
       },
       "målgruppe": "NEDSATT_ARBEIDSEVNE",
       "tom": "2026-01-31"

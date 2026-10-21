@@ -102,10 +102,9 @@ class FlyttingBeregningServiceTest {
                 BeregningsgrunnlagFlyttebyrå(
                     tilbud =
                         listOf(
-                            BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("124")),
-                            BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("123")),
+                            BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("124"), erValgt = false),
+                            BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("123"), erValgt = true),
                         ),
-                    valgtTilbud = BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("123")),
                     erBetalingDokumentert = true,
                 ),
             )
@@ -138,9 +137,10 @@ class FlyttingBeregningServiceTest {
                 .single()
 
         val grunnlag = resultat.grunnlag as BeregningsgrunnlagFlyttebyrå
-        assertThat(grunnlag.valgtTilbud).isEqualTo(grunnlag.tilbud.first())
-        assertThat(grunnlag.valgtTilbud.navn).isEqualTo("Første byrå")
-        assertThat(resultat.beløp).isEqualByComparingTo(grunnlag.valgtTilbud.pris)
+        val valgtTilbud = grunnlag.tilbud.single { it.erValgt }
+        assertThat(valgtTilbud).isEqualTo(grunnlag.tilbud.first())
+        assertThat(valgtTilbud.navn).isEqualTo("Første byrå")
+        assertThat(resultat.beløp).isEqualByComparingTo(valgtTilbud.pris)
     }
 
     @Test
@@ -507,10 +507,9 @@ class FlyttingBeregningServiceTest {
             BeregningsgrunnlagFlyttebyrå(
                 tilbud =
                     listOf(
-                        BeregningsgrunnlagFlyttebyråTilbud("Tilbud 1", BigDecimal("500")),
-                        BeregningsgrunnlagFlyttebyråTilbud("Tilbud 2", BigDecimal("600")),
+                        BeregningsgrunnlagFlyttebyråTilbud("Tilbud 1", BigDecimal("500"), erValgt = true),
+                        BeregningsgrunnlagFlyttebyråTilbud("Tilbud 2", BigDecimal("600"), erValgt = false),
                     ),
-                valgtTilbud = BeregningsgrunnlagFlyttebyråTilbud("Tilbud 1", BigDecimal("500")),
                 erBetalingDokumentert = true,
             ),
     )

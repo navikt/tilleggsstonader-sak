@@ -170,8 +170,9 @@ class FlyttingTsrIntegrationTest : IntegrationTest() {
         assertThat(resultat.grunnlag).isInstanceOf(BeregningsgrunnlagFlyttebyrå::class.java)
         val grunnlag = resultat.grunnlag as BeregningsgrunnlagFlyttebyrå
         assertThat(grunnlag.tilbud.map { it.navn }).containsExactly("Syntetisk tilbud 1", "Syntetisk tilbud 2")
-        assertThat(grunnlag.valgtTilbud).isEqualTo(grunnlag.tilbud[1])
-        assertThat(resultat.beløp).isEqualTo(grunnlag.valgtTilbud.pris)
+        val valgtTilbud = grunnlag.tilbud.single { it.erValgt }
+        assertThat(valgtTilbud).isEqualTo(grunnlag.tilbud[1])
+        assertThat(resultat.beløp).isEqualTo(valgtTilbud.pris)
 
         val andeler = tilkjentYtelseRepository.findByBehandlingId(behandling.id)!!.andelerTilkjentYtelse
 

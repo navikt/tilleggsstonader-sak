@@ -188,8 +188,9 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
         assertThat(beregningsresultat.beløp).isEqualTo(5000.toBigDecimal())
         assertThat(beregningsresultat.fraTidligereVedtak).isTrue()
         val grunnlag = beregningsresultat.grunnlag as BeregningsgrunnlagFlyttebyrå
-        assertThat(grunnlag.valgtTilbud.navn).isEqualTo("Syntetisk tilbud 2")
-        assertThat(beregningsresultat.beløp).isEqualTo(grunnlag.valgtTilbud.pris)
+        val valgtTilbud = grunnlag.tilbud.single { it.erValgt }
+        assertThat(valgtTilbud.navn).isEqualTo("Syntetisk tilbud 2")
+        assertThat(beregningsresultat.beløp).isEqualTo(valgtTilbud.pris)
 
         val andelerOpphør = tilkjentYtelseRepository.findByBehandlingId(opphørId)!!.andelerTilkjentYtelse
         val andelOpphør = andelerOpphør.single()
@@ -263,9 +264,10 @@ class FlyttingRevurderingIntegrationTest : IntegrationTest() {
         assertThat(resultatRevurdering.beløp).isEqualTo(3000.toBigDecimal())
         assertThat(resultatRevurdering.grunnlag).isInstanceOf(BeregningsgrunnlagFlyttebyrå::class.java)
         val grunnlagRevurdering = resultatRevurdering.grunnlag as BeregningsgrunnlagFlyttebyrå
-        assertThat(grunnlagRevurdering.valgtTilbud.navn).isEqualTo("Syntetisk tilbud 2")
-        assertThat(grunnlagRevurdering.valgtTilbud.pris).isEqualTo(3000.toBigDecimal())
-        assertThat(resultatRevurdering.beløp).isEqualTo(grunnlagRevurdering.valgtTilbud.pris)
+        val valgtTilbud = grunnlagRevurdering.tilbud.single { it.erValgt }
+        assertThat(valgtTilbud.navn).isEqualTo("Syntetisk tilbud 2")
+        assertThat(valgtTilbud.pris).isEqualTo(3000.toBigDecimal())
+        assertThat(resultatRevurdering.beløp).isEqualTo(valgtTilbud.pris)
 
         val andelerRevurdering =
             tilkjentYtelseRepository.findByBehandlingId(revurderingId)!!.andelerTilkjentYtelse

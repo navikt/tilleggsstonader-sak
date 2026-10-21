@@ -135,20 +135,19 @@ class FlyttingBeregningService(
                 val pris =
                     flyttebyråtilbud.pris?.takeIf { it > 0 }?.toBigDecimal()
                         ?: feil("Flyttevilkår mangler gyldig pris på flyttebyråtilbud")
-                BeregningsgrunnlagFlyttebyråTilbud(navn = navn, pris = pris)
+                BeregningsgrunnlagFlyttebyråTilbud(navn = navn, pris = pris, erValgt = false)
             }
         feilHvis(tilbud.map { it.navn.trim().lowercase() }.distinct().size != tilbud.size) {
             "Flyttebyråtilbud må være fra forskjellige flyttebyråer"
         }
-        val valgtTilbud = tilbud.minBy { it.pris }
+        val valgtTilbudIndeks = tilbud.indices.minBy { tilbud[it].pris }
 
         val grunnlag =
             BeregningsgrunnlagFlyttebyrå(
-                tilbud = tilbud,
-                valgtTilbud = valgtTilbud,
+                tilbud = tilbud.mapIndexed { indeks, tilbud -> tilbud.copy(erValgt = indeks == valgtTilbudIndeks) },
                 erBetalingDokumentert = fakta.erBetalingDokumentert,
             )
-        val beløp = valgtTilbud.pris.avrundetStønadsbeløp()
+        val beløp = tilbud[valgtTilbudIndeks].pris.avrundetStønadsbeløp()
 
         return grunnlag to beløp
     }

@@ -39,13 +39,17 @@ sealed interface BeregningsgrunnlagFlytting
 
 data class BeregningsgrunnlagFlyttebyrå(
     val tilbud: List<BeregningsgrunnlagFlyttebyråTilbud>,
-    val valgtTilbud: BeregningsgrunnlagFlyttebyråTilbud,
     val erBetalingDokumentert: Boolean,
-) : BeregningsgrunnlagFlytting
+) : BeregningsgrunnlagFlytting {
+    init {
+        require(tilbud.filter { it.erValgt }.size == 1) { "Det må være nøyaktig ett valgt tilbud" }
+    }
+}
 
 data class BeregningsgrunnlagFlyttebyråTilbud(
     val navn: String,
     val pris: BigDecimal,
+    val erValgt: Boolean,
 )
 
 data class BeregningsgrunnlagFlytteSelv(

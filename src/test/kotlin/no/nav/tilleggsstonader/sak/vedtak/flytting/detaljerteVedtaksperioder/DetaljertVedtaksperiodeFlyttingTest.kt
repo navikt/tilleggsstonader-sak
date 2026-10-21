@@ -85,10 +85,9 @@ class DetaljertVedtaksperiodeFlyttingTest {
                 BeregningsgrunnlagFlyttebyrå(
                     tilbud =
                         listOf(
-                            BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("100")),
-                            BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("100")),
+                            BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("100"), erValgt = true),
+                            BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("100"), erValgt = false),
                         ),
-                    valgtTilbud = BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("100")),
                     erBetalingDokumentert = dokumentert,
                 )
             },
