@@ -21,8 +21,10 @@ import no.nav.tilleggsstonader.libs.log.SecureLogger.secureLogger
 import no.nav.tilleggsstonader.libs.spring.cache.getCachedOrLoad
 import no.nav.tilleggsstonader.libs.spring.cache.getValue
 import no.nav.tilleggsstonader.sak.arbeidsfordeling.ArbeidsfordelingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingRepository
 import no.nav.tilleggsstonader.sak.fagsak.FagsakService
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
+import no.nav.tilleggsstonader.sak.infrastruktur.database.repository.findByIdOrThrow
 import no.nav.tilleggsstonader.sak.infrastruktur.sikkerhet.SikkerhetContext
 import no.nav.tilleggsstonader.sak.klage.KlageService
 import no.nav.tilleggsstonader.sak.opplysninger.oppgave.OppgaveUtil.skalHåndteresAvTSSak
@@ -52,6 +54,7 @@ class OppgaveService(
     private val cacheManager: CacheManager,
     private val personService: PersonService,
     private val klageService: KlageService,
+    private val behandlingRepository: BehandlingRepository,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -108,14 +111,14 @@ class OppgaveService(
         finnOppgaveMetadataSak(oppgaver) + finnOppgaveMetadataKlage(oppgaver)
 
     private fun finnOppgaveMetadataSak(oppgaver: List<Oppgave>): Map<Long, OppgaveBehandlingMetadata> {
-        val oppgaveIder = oppgaver.filter { it.behandlingstype != Behandlingstype.Klage.value }.map { it.id }
+        val oppgaveIder = oppgaver.filterNot { Behandlingstype.erKlage(it.behandlingstype) }.map { it.id }
         return cacheManager.getCachedOrLoad("oppgaveMetadata", oppgaveIder) {
             oppgaveRepository.finnOppgaveMetadata(oppgaveIder).associateBy { it.gsakOppgaveId }
         }
     }
 
     private fun finnOppgaveMetadataKlage(oppgaver: List<Oppgave>): Map<Long, OppgaveBehandlingMetadata> {
-        val oppgaveIder = oppgaver.filter { it.behandlingstype == Behandlingstype.Klage.value }.map { it.id }
+        val oppgaveIder = oppgaver.filter { Behandlingstype.erKlage(it.behandlingstype) }.map { it.id }
         return cacheManager.getCachedOrLoad("oppgaveMetadataKlage", oppgaveIder) {
             klageService
                 .hentBehandlingIderForOppgaveIder(oppgaveIder)
@@ -200,7 +203,7 @@ class OppgaveService(
                 oppgave,
                 enhetsnummer,
                 mappeId,
-                behandlingstype,
+                behandlingstype ?: utledBehandlingstype(behandlingId),
             )
         val oppgave =
             OppgaveDomain(
@@ -215,6 +218,12 @@ class OppgaveService(
             )
         oppgaveRepository.insert(oppgave)
         return opprettetOppgaveId
+    }
+
+    private fun utledBehandlingstype(behandlingId: BehandlingId?): Behandlingstype? {
+        val gjelderAktivitetspenger =
+            behandlingId?.let { behandlingRepository.findByIdOrThrow(it).gjelderAktivitetspenger } ?: false
+        return if (gjelderAktivitetspenger) Behandlingstype.Aktivitetspenger else null
     }
 
     fun oppdaterOppgave(oppgave: Oppgave): OppdatertOppgaveResponse = oppgaveClient.oppdaterOppgave(oppgave)
