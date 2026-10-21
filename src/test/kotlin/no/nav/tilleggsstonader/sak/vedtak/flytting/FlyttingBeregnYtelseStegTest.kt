@@ -28,6 +28,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
 import no.nav.tilleggsstonader.sak.vedtak.flytting.beregning.FlyttingBeregningService
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyråTilbud
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlyttevilkår
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
 import no.nav.tilleggsstonader.sak.vedtak.flytting.dto.AvslagFlyttingDto
@@ -138,8 +139,11 @@ class FlyttingBeregnYtelseStegTest {
                         målgruppe = forrigeVedtaksperiode.målgruppe,
                         grunnlag =
                             BeregningsgrunnlagFlyttebyrå(
-                                tilbud1Pris = BigDecimal("100"),
-                                tilbud2Pris = BigDecimal("120"),
+                                tilbud =
+                                    listOf(
+                                        BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("100"), erValgt = true),
+                                        BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("120"), erValgt = false),
+                                    ),
                                 erBetalingDokumentert = true,
                             ),
                     ),

@@ -22,8 +22,11 @@ class FlyttingVilkårValideringTest {
         assertDoesNotThrow {
             FlyttingVilkårValidering.validerOppgitteFakta(
                 FaktaFlyttebyrå(
-                    tilbud1 = FlyttebyråTilbud(navn = "Flyttebyrå A", pris = null),
-                    tilbud2 = FlyttebyråTilbud(navn = null, pris = null),
+                    tilbud =
+                        listOf(
+                            FlyttebyråTilbud(navn = "Flyttebyrå A", pris = null),
+                            FlyttebyråTilbud(navn = null, pris = null),
+                        ),
                     adresse = "Flytteveien 1",
                     erBetalingDokumentert = true,
                 ),
@@ -36,12 +39,58 @@ class FlyttingVilkårValideringTest {
         assertThrows<ApiFeil> {
             FlyttingVilkårValidering.validerOppgitteFakta(
                 FaktaFlyttebyrå(
-                    tilbud1 = FlyttebyråTilbud(navn = "Flyttebyrå A", pris = 10000),
-                    tilbud2 = FlyttebyråTilbud(navn = " flyttebyrå a ", pris = 12000),
+                    tilbud =
+                        listOf(
+                            FlyttebyråTilbud(navn = "Flyttebyrå A", pris = 10000),
+                            FlyttebyråTilbud(navn = " flyttebyrå a ", pris = 12000),
+                        ),
                     adresse = "Flytteveien 1",
                     erBetalingDokumentert = true,
                 ),
             )
+        }
+    }
+
+    @Test
+    fun `skal avvise annet antall enn to tilbud`() {
+        listOf(
+            emptyList(),
+            listOf(FlyttebyråTilbud("A", 10000)),
+            listOf(FlyttebyråTilbud("A", 10000), FlyttebyråTilbud("B", 11000), FlyttebyråTilbud("C", 12000)),
+        ).forEach { tilbud ->
+            val feil =
+                assertThrows<ApiFeil> {
+                    FlyttingVilkårValidering.validerOppgitteFakta(
+                        FaktaFlyttebyrå(
+                            tilbud = tilbud,
+                            erBetalingDokumentert = true,
+                            adresse = "Flytteveien 1",
+                        ),
+                    )
+                }
+            assertThat(feil.message).isEqualTo("Det må være nøyaktig to tilbud fra flyttebyrå")
+        }
+    }
+
+    @Test
+    fun `skal avvise blankt oppgitt byrånavn og priser som ikke er positive`() {
+        val ugyldigeFakta =
+            listOf(
+                listOf(FlyttebyråTilbud(" ", 10000), FlyttebyråTilbud("Byrå B", 12000)),
+                listOf(FlyttebyråTilbud("Byrå A", 0), FlyttebyråTilbud("Byrå B", 12000)),
+                listOf(FlyttebyråTilbud("Byrå A", -1), FlyttebyråTilbud("Byrå B", 12000)),
+            )
+
+        ugyldigeFakta.forEach { tilbud ->
+            assertThrows<ApiFeil> {
+                FlyttingVilkårValidering.validerOppgitteFakta(
+                    FaktaFlyttebyrå(
+                        tilbud = tilbud,
+                        adresse = "Flytteveien 1",
+                        erBetalingDokumentert = true,
+                    ),
+                )
+            }
         }
     }
 
@@ -67,7 +116,11 @@ class FlyttingVilkårValideringTest {
             listOf(
                 FaktaFlyttingUbestemt(adresse = adresse),
                 FaktaFlytteSelv(null, null, null, null, null, adresse),
-                FaktaFlyttebyrå(FlyttebyråTilbud(null, null), FlyttebyråTilbud(null, null), false, adresse),
+                FaktaFlyttebyrå(
+                    tilbud = listOf(FlyttebyråTilbud(null, null), FlyttebyråTilbud(null, null)),
+                    erBetalingDokumentert = false,
+                    adresse = adresse,
+                ),
             ).forEach { fakta ->
                 val feil =
                     assertThrows<ApiFeil> {
@@ -105,14 +158,50 @@ class FlyttingVilkårValideringTest {
                         ),
                     fakta =
                         FaktaFlyttebyrå(
-                            tilbud1 = FlyttebyråTilbud(navn = "Flyttebyrå A", pris = 10000),
-                            tilbud2 = FlyttebyråTilbud(navn = "Flyttebyrå B", pris = 12000),
+                            tilbud =
+                                listOf(
+                                    FlyttebyråTilbud(navn = "Flyttebyrå A", pris = 10000),
+                                    FlyttebyråTilbud(navn = "Flyttebyrå B", pris = 12000),
+                                ),
                             adresse = "Flytteveien 1",
                             erBetalingDokumentert = false,
                         ),
                 ),
             ),
         ).isTrue()
+    }
+
+    @Test
+    fun `skal ikke være fullstendig når tilbud mangler navn eller pris eller listen ikke har to tilbud`() {
+        val svar =
+            mapOf(
+                *oppfylteSvarFremTilFlyttemåte,
+                RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelse(SvarId.FLYTTEBYRÅ),
+                RegelId.ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE to SvarOgBegrunnelse(SvarId.JA),
+            )
+        val ugyldigeTilbud =
+            listOf(
+                emptyList(),
+                listOf(FlyttebyråTilbud("Byrå A", 10000)),
+                listOf(FlyttebyråTilbud("Byrå A", 10000), FlyttebyråTilbud("Byrå B", null)),
+                listOf(FlyttebyråTilbud("Byrå A", 10000), FlyttebyråTilbud(null, 12000)),
+            )
+
+        ugyldigeTilbud.forEach { tilbud ->
+            assertThat(
+                FlyttingVilkårValidering.erFullstendig(
+                    lagreVilkår(
+                        svar = svar,
+                        fakta =
+                            FaktaFlyttebyrå(
+                                tilbud = tilbud,
+                                adresse = "Flytteveien 1",
+                                erBetalingDokumentert = false,
+                            ),
+                    ),
+                ),
+            ).isFalse()
+        }
     }
 
     @Test

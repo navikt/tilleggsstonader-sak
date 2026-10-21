@@ -16,20 +16,17 @@ object FlyttingVilkårValidering {
         brukerfeilHvis(fakta.adresse.isBlank()) { "Flytteadressen kan ikke være tom" }
         when (fakta) {
             is FaktaFlyttebyrå -> {
-                val navn1 = fakta.tilbud1.navn?.trim()
-                val navn2 = fakta.tilbud2.navn?.trim()
-                brukerfeilHvis((navn1 != null && navn1.isEmpty()) || (navn2 != null && navn2.isEmpty())) {
+                brukerfeilHvis(fakta.tilbud.size != 2) {
+                    "Det må være nøyaktig to tilbud fra flyttebyrå"
+                }
+                val navn = fakta.tilbud.mapNotNull { it.navn?.trim() }
+                brukerfeilHvis(navn.any { it.isEmpty() }) {
                     "Firmanavn kan ikke være tomt"
                 }
-                brukerfeilHvis(
-                    navn1 != null && navn2 != null && navn1.equals(navn2, ignoreCase = true),
-                ) {
+                brukerfeilHvis(navn.distinctBy { it.lowercase() }.size != navn.size) {
                     "Tilbudene må være fra forskjellige flyttebyråer"
                 }
-                brukerfeilHvis(fakta.tilbud1.pris != null && fakta.tilbud1.pris <= 0) {
-                    "Prisen på tilbudet må være større enn 0"
-                }
-                brukerfeilHvis(fakta.tilbud2.pris != null && fakta.tilbud2.pris <= 0) {
+                brukerfeilHvis(fakta.tilbud.any { it.pris != null && it.pris <= 0 }) {
                     "Prisen på tilbudet må være større enn 0"
                 }
             }
@@ -57,9 +54,8 @@ object FlyttingVilkårValidering {
             return when (flyttemåte) {
                 SvarId.FLYTTEBYRÅ -> {
                     val fakta = vilkår.fakta as? FaktaFlyttebyrå ?: return false
-                    val harNavnPåBeggeTilbud =
-                        !fakta.tilbud1.navn.isNullOrBlank() && !fakta.tilbud2.navn.isNullOrBlank()
-                    harNavnPåBeggeTilbud && fakta.tilbud1.pris != null && fakta.tilbud2.pris != null
+                    fakta.tilbud.size == 2 &&
+                        fakta.tilbud.all { !it.navn.isNullOrBlank() && it.pris != null }
                 }
 
                 SvarId.FLYTTER_SELV -> (vilkår.fakta as? FaktaFlytteSelv)?.avstandEnVei != null

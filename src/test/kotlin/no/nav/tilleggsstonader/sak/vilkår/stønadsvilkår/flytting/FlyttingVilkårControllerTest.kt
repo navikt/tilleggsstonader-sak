@@ -81,8 +81,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 ),
             fakta =
                 FaktaFlyttebyråDto(
-                    tilbud1 = FlyttebyråTilbudDto("Byrå A", 10000),
-                    tilbud2 = FlyttebyråTilbudDto("Byrå B", 12000),
+                    tilbud = listOf(FlyttebyråTilbudDto("Byrå A", 10000), FlyttebyråTilbudDto("Byrå B", 12000)),
                     adresse = "Flytteveien 1",
                     erBetalingDokumentert = true,
                 ),
@@ -160,8 +159,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
             nyttVilkårFlyttebyrå.copy(
                 fakta =
                     FaktaFlyttebyråDto(
-                        tilbud1 = FlyttebyråTilbudDto("Byrå C", 8000),
-                        tilbud2 = FlyttebyråTilbudDto("Byrå D", 9000),
+                        tilbud = listOf(FlyttebyråTilbudDto("Byrå C", 8000), FlyttebyråTilbudDto("Byrå D", 9000)),
                         adresse = "Flytteveien 2",
                         erBetalingDokumentert = true,
                     ),
@@ -203,8 +201,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
             nyttVilkårFlyttebyrå.copy(
                 fakta =
                     FaktaFlyttebyråDto(
-                        tilbud1 = FlyttebyråTilbudDto("Byrå A", 10000),
-                        tilbud2 = FlyttebyråTilbudDto("Byrå B"),
+                        tilbud = listOf(FlyttebyråTilbudDto("Byrå A", 10000), FlyttebyråTilbudDto("Byrå B")),
                         adresse = "Flytteveien 1",
                         erBetalingDokumentert = false,
                     ),
@@ -215,6 +212,23 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
         assertThat(opprettet.resultat).isEqualTo(Vilkårsresultat.IKKE_TATT_STILLING_TIL)
         assertLagretVilkår(nyttVilkår, opprettet)
         assertThat(kall.vilkårFlytting.hentVilkår(behandling.id)).containsExactly(opprettet)
+    }
+
+    @Test
+    fun `skal avvise annet antall flyttebyråtilbud`() {
+        val nyttVilkår =
+            nyttVilkårFlyttebyrå.copy(
+                fakta =
+                    FaktaFlyttebyråDto(
+                        tilbud = listOf(FlyttebyråTilbudDto("Byrå A", 10000)),
+                        adresse = "Flytteveien 1",
+                        erBetalingDokumentert = false,
+                    ),
+            )
+
+        kall.vilkårFlytting.apiRespons
+            .opprettVilkår(behandling.id, nyttVilkår)
+            .expectProblemDetail(HttpStatus.BAD_REQUEST, "Det må være nøyaktig to tilbud fra flyttebyrå")
     }
 
     @Test

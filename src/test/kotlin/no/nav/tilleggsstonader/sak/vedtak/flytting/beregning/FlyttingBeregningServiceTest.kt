@@ -22,6 +22,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlytteSelv
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyråTilbud
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlyttevilkår
 import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
 import no.nav.tilleggsstonader.sak.vedtak.sats.SatsPrivatBilProvider
@@ -74,7 +75,7 @@ class FlyttingBeregningServiceTest {
     }
 
     @Test
-    fun `flyttebyrå beregnes med laveste tilbudspris og riktig grunnlag`() {
+    fun `flyttebyrå velger billigste tilbud og lagrer byrånavn i grunnlaget`() {
         val periode = vedtaksperiode(fom = 1 januar 2025, tom = 31 januar 2025)
         every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
             listOf(
@@ -82,8 +83,11 @@ class FlyttingBeregningServiceTest {
                     flytteDato = 1 januar 2025,
                     fakta =
                         FaktaFlyttebyrå(
-                            tilbud1 = FlyttebyråTilbud(navn = "Tilbud 1", pris = 123),
-                            tilbud2 = FlyttebyråTilbud(navn = "Tilbud 2", pris = 124),
+                            tilbud =
+                                listOf(
+                                    FlyttebyråTilbud(navn = "Byrå A", pris = 124),
+                                    FlyttebyråTilbud(navn = "Byrå B", pris = 123),
+                                ),
                             erBetalingDokumentert = true,
                             adresse = "Flytteveien 1",
                         ),
@@ -96,13 +100,47 @@ class FlyttingBeregningServiceTest {
         assertThat(resultat.grunnlag)
             .isEqualTo(
                 BeregningsgrunnlagFlyttebyrå(
-                    tilbud1Pris = BigDecimal("123"),
-                    tilbud2Pris = BigDecimal("124"),
+                    tilbud =
+                        listOf(
+                            BeregningsgrunnlagFlyttebyråTilbud("Byrå A", BigDecimal("124"), erValgt = false),
+                            BeregningsgrunnlagFlyttebyråTilbud("Byrå B", BigDecimal("123"), erValgt = true),
+                        ),
                     erBetalingDokumentert = true,
                 ),
             )
         assertThat(resultat.målgruppe).isEqualTo(periode.målgruppe)
         assertThat(resultat.fraTidligereVedtak).isFalse()
+    }
+
+    @Test
+    fun `flyttebyrå velger første tilbud ved lik pris`() {
+        every { flyttingVilkårService.hentOppfylteVilkårforBehandling(behandling.id) } returns
+            listOf(
+                vilkår(
+                    flytteDato = 1 januar 2025,
+                    fakta =
+                        faktaFlyttebyrå(
+                            listOf(
+                                FlyttebyråTilbud("Første byrå", 123),
+                                FlyttebyråTilbud("Andre byrå", 123),
+                            ),
+                        ),
+                ),
+            )
+
+        val resultat =
+            beregningService
+                .beregn(
+                    behandling,
+                    listOf(vedtaksperiode(fom = 1 januar 2025, tom = 31 januar 2025)),
+                ).resultater
+                .single()
+
+        val grunnlag = resultat.grunnlag as BeregningsgrunnlagFlyttebyrå
+        val valgtTilbud = grunnlag.tilbud.single { it.erValgt }
+        assertThat(valgtTilbud).isEqualTo(grunnlag.tilbud.first())
+        assertThat(valgtTilbud.navn).isEqualTo("Første byrå")
+        assertThat(resultat.beløp).isEqualByComparingTo(valgtTilbud.pris)
     }
 
     @Test
@@ -294,13 +332,24 @@ class FlyttingBeregningServiceTest {
     }
 
     @Test
-    fun `flyttebyrå avviser manglende og negative tilbudspriser`() {
+    fun `flyttebyrå avviser ufullstendige tilbud og ugyldig antall`() {
         val ugyldigeFakta =
             listOf(
-                faktaFlyttebyrå(tilbud1Pris = null),
-                faktaFlyttebyrå(tilbud2Pris = null),
-                faktaFlyttebyrå(tilbud1Pris = -1),
-                faktaFlyttebyrå(tilbud2Pris = -1),
+                faktaFlyttebyrå(listOf(FlyttebyråTilbud("Byrå A", null), FlyttebyråTilbud("Byrå B", 123))),
+                faktaFlyttebyrå(listOf(FlyttebyråTilbud("Byrå A", 123), FlyttebyråTilbud("Byrå B", null))),
+                faktaFlyttebyrå(listOf(FlyttebyråTilbud(" ", 123), FlyttebyråTilbud("Byrå B", 124))),
+                faktaFlyttebyrå(listOf(FlyttebyråTilbud("Byrå A", 123), FlyttebyråTilbud(" byrå a ", 124))),
+                faktaFlyttebyrå(listOf(FlyttebyråTilbud("Byrå A", 0), FlyttebyråTilbud("Byrå B", 123))),
+                faktaFlyttebyrå(listOf(FlyttebyråTilbud("Byrå A", -1), FlyttebyråTilbud("Byrå B", 123))),
+                faktaFlyttebyrå(emptyList()),
+                faktaFlyttebyrå(listOf(FlyttebyråTilbud("Byrå A", 123))),
+                faktaFlyttebyrå(
+                    listOf(
+                        FlyttebyråTilbud("Byrå A", 123),
+                        FlyttebyråTilbud("Byrå B", 124),
+                        FlyttebyråTilbud("Byrå C", 125),
+                    ),
+                ),
             )
 
         ugyldigeFakta.forEach { fakta ->
@@ -419,11 +468,13 @@ class FlyttingBeregningServiceTest {
     )
 
     private fun faktaFlyttebyrå(
-        tilbud1Pris: Int? = 123,
-        tilbud2Pris: Int? = 124,
+        tilbud: List<FlyttebyråTilbud> =
+            listOf(
+                FlyttebyråTilbud(navn = "Tilbud 1", pris = 123),
+                FlyttebyråTilbud(navn = "Tilbud 2", pris = 124),
+            ),
     ) = FaktaFlyttebyrå(
-        tilbud1 = FlyttebyråTilbud(navn = "Tilbud 1", pris = tilbud1Pris),
-        tilbud2 = FlyttebyråTilbud(navn = "Tilbud 2", pris = tilbud2Pris),
+        tilbud = tilbud,
         erBetalingDokumentert = true,
         adresse = "Flytteveien 1",
     )
@@ -454,8 +505,11 @@ class FlyttingBeregningServiceTest {
         målgruppe = FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE,
         grunnlag =
             BeregningsgrunnlagFlyttebyrå(
-                tilbud1Pris = BigDecimal("500"),
-                tilbud2Pris = BigDecimal("600"),
+                tilbud =
+                    listOf(
+                        BeregningsgrunnlagFlyttebyråTilbud("Tilbud 1", BigDecimal("500"), erValgt = true),
+                        BeregningsgrunnlagFlyttebyråTilbud("Tilbud 2", BigDecimal("600"), erValgt = false),
+                    ),
                 erBetalingDokumentert = true,
             ),
     )

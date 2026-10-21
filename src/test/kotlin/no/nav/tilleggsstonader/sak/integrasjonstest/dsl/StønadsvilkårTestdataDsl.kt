@@ -66,8 +66,7 @@ class StønadsvilkårTestdataDsl {
 
     fun flyttingByrå(
         flytteDato: LocalDate,
-        tilbud1Pris: Int,
-        tilbud2Pris: Int,
+        tilbudPriser: List<Int>,
         erBetalingDokumentert: Boolean,
     ) {
         opprettFlyttingScope += {
@@ -84,8 +83,10 @@ class StønadsvilkårTestdataDsl {
                     ),
                 fakta =
                     FaktaFlyttebyråDto(
-                        tilbud1 = FlyttebyråTilbudDto(navn = "Syntetisk tilbud 1", pris = tilbud1Pris),
-                        tilbud2 = FlyttebyråTilbudDto(navn = "Syntetisk tilbud 2", pris = tilbud2Pris),
+                        tilbud =
+                            tilbudPriser.mapIndexed { index, pris ->
+                                FlyttebyråTilbudDto(navn = "Syntetisk tilbud ${index + 1}", pris = pris)
+                            },
                         adresse = "Syntetisk adresse",
                         erBetalingDokumentert = erBetalingDokumentert,
                     ),
