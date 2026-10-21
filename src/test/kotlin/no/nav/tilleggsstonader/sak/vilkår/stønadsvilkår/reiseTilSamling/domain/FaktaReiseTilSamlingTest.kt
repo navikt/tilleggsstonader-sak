@@ -46,7 +46,7 @@ class FaktaReiseTilSamlingTest {
                     faktaPrivatBil(bompenger = FaktaPrivatBil.MAKS_BOMPENGER.add(BigDecimal.ONE))
                 }
             assertThat(feil.message)
-                .isEqualTo("Skal du innvilge med bompenger høyere enn 500kr må du ta kontakt med Tilleggsstønader-teamet")
+                .isEqualTo("Skal du innvilge med bompenger høyere enn 900kr må du ta kontakt med Tilleggsstønader-teamet")
         }
 
         @Test

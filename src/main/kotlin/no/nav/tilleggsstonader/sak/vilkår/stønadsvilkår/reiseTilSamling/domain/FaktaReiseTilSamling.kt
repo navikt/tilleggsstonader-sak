@@ -108,7 +108,7 @@ data class FaktaPrivatBil(
     override val type = TypeReiseTilSamling.PRIVAT_BIL
 
     companion object {
-        val MAKS_BOMPENGER = BigDecimal(500)
+        val MAKS_BOMPENGER = BigDecimal(900)
         val MAKS_FERGEKOSTNAD = BigDecimal(900)
         val MAKS_PARKERING = BigDecimal(2000)
         val MAKS_PIGGDEKKAVGIFT = BigDecimal(1400)
