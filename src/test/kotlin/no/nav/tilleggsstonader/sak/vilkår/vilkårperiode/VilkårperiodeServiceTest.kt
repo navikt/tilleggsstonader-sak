@@ -351,7 +351,10 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
                 }
 
             assertThatThrownBy {
-                vilkårperiodeService.oppdaterVilkårperiode(eksisterendeVilkårperiode.id, oppdateringMedUgyldigAktivitetsdager)
+                vilkårperiodeService.oppdaterVilkårperiode(
+                    eksisterendeVilkårperiode.id,
+                    oppdateringMedUgyldigAktivitetsdager,
+                )
             }.hasMessageContaining("Mangler data: aktivitetsdager må være satt og være et heltall mellom 1 og 5")
         }
 
@@ -436,10 +439,15 @@ class VilkårperiodeServiceTest : CleanDatabaseIntegrationTest() {
 
         @BeforeEach
         fun setUp() {
-            val behandling = testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.UTREDES))
+            val behandling =
+                testoppsettService.opprettBehandlingMedFagsak(behandling(status = BehandlingStatus.UTREDES))
             lagretAktivitet =
                 vilkårperiodeRepository.insert(
-                    aktivitet(behandlingId = behandling.id, resultat = ResultatVilkårperiode.OPPFYLT, begrunnelse = "begrunnelse"),
+                    aktivitet(
+                        behandlingId = behandling.id,
+                        resultat = ResultatVilkårperiode.OPPFYLT,
+                        begrunnelse = "begrunnelse",
+                    ),
                 )
         }
 
