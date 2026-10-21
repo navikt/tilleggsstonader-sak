@@ -107,49 +107,38 @@ enum class MålgruppeType(
             -> false
         }
 
-    fun kanBrukesForStønad(stønadstype: Stønadstype): Boolean =
-        when (stønadstype) {
+    fun kanBrukesForStønad(stønadstype: Stønadstype): Boolean {
+        val baseTSO =
+            listOf(
+                AAP,
+                NEDSATT_ARBEIDSEVNE,
+                AKTIVITETSPENGER,
+                OMSTILLINGSSTØNAD,
+                OVERGANGSSTØNAD,
+                UFØRETRYGD,
+                INGEN_MÅLGRUPPE,
+            )
+
+        return when (stønadstype) {
             Stønadstype.BARNETILSYN, Stønadstype.LÆREMIDLER, Stønadstype.BOUTGIFTER ->
                 this in
                     listOf(
-                        AAP,
-                        NEDSATT_ARBEIDSEVNE,
-                        AKTIVITETSPENGER,
-                        OMSTILLINGSSTØNAD,
-                        OVERGANGSSTØNAD,
-                        UFØRETRYGD,
                         SYKEPENGER_100_PROSENT,
-                        INGEN_MÅLGRUPPE,
-                    )
+                    ) + baseTSO
 
             Stønadstype.FLYTTING_TSO ->
                 this in
                     listOf(
-                        AAP,
-                        NEDSATT_ARBEIDSEVNE,
-                        AKTIVITETSPENGER,
-                        OMSTILLINGSSTØNAD,
                         OPPHØRT_OMSTILLINGSSTØNAD,
-                        OVERGANGSSTØNAD,
                         OPPHØRT_OVERGANGSSTØNAD,
-                        UFØRETRYGD,
-                        INGEN_MÅLGRUPPE,
-                    )
+                    ) + baseTSO
 
             Stønadstype.DAGLIG_REISE_TSO,
             Stønadstype.REISE_TIL_SAMLING_TSO,
             Stønadstype.REISE_OPPSTART_AVSLUTNING_HJEMREISE_TSO,
             ->
                 this in
-                    listOf(
-                        AAP,
-                        NEDSATT_ARBEIDSEVNE,
-                        AKTIVITETSPENGER,
-                        OMSTILLINGSSTØNAD,
-                        OVERGANGSSTØNAD,
-                        UFØRETRYGD,
-                        INGEN_MÅLGRUPPE,
-                    )
+                    baseTSO
 
             Stønadstype.DAGLIG_REISE_TSR,
             Stønadstype.REISE_TIL_SAMLING_TSR,
@@ -166,6 +155,7 @@ enum class MålgruppeType(
                         INNSATT_I_FENGSEL,
                     )
         }
+    }
 }
 
 fun Hovedytelse.tilMålgruppeType(): MålgruppeType =

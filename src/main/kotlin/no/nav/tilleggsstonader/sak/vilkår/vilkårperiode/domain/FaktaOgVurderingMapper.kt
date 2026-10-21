@@ -185,11 +185,7 @@ fun mapFaktaOgSvarDto(
 ): FaktaOgVurdering =
     when (vilkårperiode.type) {
         is AktivitetType ->
-            mapAktiviteter(
-                stønadstype = stønadstype,
-                aktivitet = vilkårperiode,
-                kreverAktivitetsdager = kreverAktivitetsdager,
-            )
+            mapAktiviteter(stønadstype = stønadstype, aktivitet = vilkårperiode, kreverAktivitetsdager = kreverAktivitetsdager)
 
         is MålgruppeType ->
             mapMålgruppe(
@@ -427,9 +423,7 @@ private fun mapAktiviteterDagligReiseTso(
                         harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
                     ),
                 fakta =
-                    FaktaAktivitetDagligReiseTso(
-                        hentAktivitetsdagerDagligReise(faktaOgSvar.aktivitetsdager, kreverAktivitetsdager),
-                    ),
+                    FaktaAktivitetDagligReiseTso(hentAktivitetsdagerDagligReise(faktaOgSvar.aktivitetsdager, kreverAktivitetsdager)),
             )
         }
 
@@ -440,12 +434,7 @@ private fun mapAktiviteterDagligReiseTso(
                         harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
                     ),
                 fakta =
-                    FaktaAktivitetDagligReiseTso(
-                        hentAktivitetsdagerDagligReise(
-                            faktaOgSvar.aktivitetsdager,
-                            kreverAktivitetsdager,
-                        ),
-                    ),
+                    FaktaAktivitetDagligReiseTso(hentAktivitetsdagerDagligReise(faktaOgSvar.aktivitetsdager, kreverAktivitetsdager)),
             )
 
         AktivitetType.INGEN_AKTIVITET -> IngenAktivitetDagligReiseTso
@@ -464,13 +453,7 @@ private fun mapAktiviteterDagligReiseTsr(
                     VurderingTiltakDagligReiseTsr(
                         harUtgifter = VurderingHarUtgifter(faktaOgSvar.svarHarUtgifter),
                     ),
-                fakta =
-                    FaktaAktivitetDagligReiseTsr(
-                        hentAktivitetsdagerDagligReise(
-                            faktaOgSvar.aktivitetsdager,
-                            kreverAktivitetsdager,
-                        ),
-                    ),
+                fakta = FaktaAktivitetDagligReiseTsr(hentAktivitetsdagerDagligReise(faktaOgSvar.aktivitetsdager, kreverAktivitetsdager)),
             )
         }
 
@@ -590,14 +573,7 @@ private fun mapMålgruppePassAvBarn(
 
         MålgruppeType.AKTIVITETSPENGER ->
             AktivitetspengerPassAvBarn(
-                vurderinger =
-                    VurderingAktivitetspenger(
-                        aldersvilkår =
-                            lagVurderingAldersvilkår(
-                                målgruppe,
-                                fødselFaktaGrunnlag,
-                            ),
-                    ),
+                vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
             )
 
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
@@ -669,14 +645,7 @@ private fun mapMålgruppeLæremidler(
 
         MålgruppeType.AKTIVITETSPENGER ->
             AktivitetspengerLæremidler(
-                vurderinger =
-                    VurderingAktivitetspenger(
-                        aldersvilkår =
-                            lagVurderingAldersvilkår(
-                                målgruppe,
-                                fødselFaktaGrunnlag,
-                            ),
-                    ),
+                vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
             )
 
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
@@ -743,14 +712,7 @@ private fun mapMålgruppeBoutgfiter(
 
         MålgruppeType.AKTIVITETSPENGER ->
             AktivitetspengerBoutgifter(
-                vurderinger =
-                    VurderingAktivitetspenger(
-                        aldersvilkår =
-                            lagVurderingAldersvilkår(
-                                målgruppe,
-                                fødselFaktaGrunnlag,
-                            ),
-                    ),
+                vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
             )
 
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
@@ -822,14 +784,7 @@ private fun mapMålgruppeDagligReiseTso(
 
         MålgruppeType.AKTIVITETSPENGER ->
             AktivitetspengerDagligReiseTso(
-                vurderinger =
-                    VurderingAktivitetspenger(
-                        aldersvilkår =
-                            lagVurderingAldersvilkår(
-                                målgruppe,
-                                fødselFaktaGrunnlag,
-                            ),
-                    ),
+                vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
             )
 
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
@@ -920,14 +875,7 @@ private fun mapMålgruppeReiseTilSamlingTso(
 
         MålgruppeType.AKTIVITETSPENGER ->
             AktivitetspengerReiseTilSamlingTso(
-                vurderinger =
-                    VurderingAktivitetspenger(
-                        aldersvilkår =
-                            lagVurderingAldersvilkår(
-                                målgruppe,
-                                fødselFaktaGrunnlag,
-                            ),
-                    ),
+                vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
             )
 
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
@@ -1058,14 +1006,7 @@ private fun mapMålgruppeReiseOppstartAvslutningHjemreiseTso(
 
         MålgruppeType.AKTIVITETSPENGER ->
             AktivitetspengerReiseOppstartAvslutningHjemreiseTso(
-                vurderinger =
-                    VurderingAktivitetspenger(
-                        aldersvilkår =
-                            lagVurderingAldersvilkår(
-                                målgruppe,
-                                fødselFaktaGrunnlag,
-                            ),
-                    ),
+                vurderinger = VurderingAktivitetspenger(aldersvilkår = lagVurderingAldersvilkår(målgruppe, fødselFaktaGrunnlag)),
             )
 
         MålgruppeType.NEDSATT_ARBEIDSEVNE ->
@@ -1092,6 +1033,7 @@ private fun mapMålgruppeReiseOppstartAvslutningHjemreiseTso(
             error(
                 "Håndterer ikke opphørt omstillingsstønad for reise oppstart/avslutning/hjemreise TSO",
             )
+
         MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> error("Håndterer ikke opphørt overgangsstønad for reise oppstart/avslutning/hjemreise TSO")
     }
 
@@ -1139,6 +1081,7 @@ private fun mapMålgruppeReiseOppstartAvslutningHjemreiseTsr(type: MålgruppeTyp
             error(
                 "Håndterer ikke opphørt omstillingsstønad for reise oppstart/avslutning/hjemreise TSR",
             )
+
         MålgruppeType.OPPHØRT_OVERGANGSSTØNAD -> error("Håndterer ikke opphørt overgangsstønad for reise oppstart/avslutning/hjemreise TSR")
     }
 

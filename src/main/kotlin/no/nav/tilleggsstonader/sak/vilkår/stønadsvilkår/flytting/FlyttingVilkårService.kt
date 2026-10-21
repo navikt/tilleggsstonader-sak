@@ -140,22 +140,29 @@ class FlyttingVilkårService(
         behandlingId: BehandlingId,
         innsendt: LagreVilkårFlytting,
     ) {
-        val harOpphørtStønadsMålgruppe =
-            vilkårperiodeService.hentVilkårperioder(behandlingId).målgrupper.any {
-                it.status != Vilkårstatus.SLETTET &&
-                    it.type in
-                    setOf(
-                        MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD,
-                        MålgruppeType.OPPHØRT_OVERGANGSSTØNAD,
-                    )
-            }
         val valgtFlytteforbindelse = innsendt.svar[RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER]?.svar
 
-        brukerfeilHvis(
-            harOpphørtStønadsMålgruppe &&
-                valgtFlytteforbindelse != SvarId.ENSLIG_FORSØRGER_ELLER_GJENLEVENDE_STARTER_I_ARBEID,
-        ) {
-            "Du kan bare velge målgruppen for opphørt overgangs- eller omstillingsstønad sammen med svaret «Enslig forsørger eller gjenlevende som flytter fra hjemstedet for å starte i arbeid»"
+        if (valgtFlytteforbindelse == SvarId.ENSLIG_FORSØRGER_ELLER_GJENLEVENDE_STARTER_I_ARBEID) {
+            val godkjenteMålgrupperForSvar =
+                vilkårperiodeService.hentVilkårperioder(behandlingId).målgrupper.filter {
+                    it.status != Vilkårstatus.SLETTET &&
+                        it.type in
+                        setOf(
+                            MålgruppeType.OPPHØRT_OMSTILLINGSSTØNAD,
+                            MålgruppeType.OMSTILLINGSSTØNAD,
+                            MålgruppeType.OPPHØRT_OVERGANGSSTØNAD,
+                            MålgruppeType.OVERGANGSSTØNAD,
+                        )
+                }
+
+            val flytteDato = innsendt.flytteDato
+
+            brukerfeilHvis(
+                godkjenteMålgrupperForSvar.none { it.inneholder(flytteDato) },
+            ) {
+                "Du kan bare velge svaret «${SvarId.ENSLIG_FORSØRGER_ELLER_GJENLEVENDE_STARTER_I_ARBEID.beskrivelse}» " +
+                    "sammen med en målgruppeperiode for aktiv eller opphørt overgangs- eller omstillingsstønad som inneholder flyttedatoen"
+            }
         }
     }
 
