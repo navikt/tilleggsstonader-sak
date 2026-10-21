@@ -154,7 +154,6 @@ class FlyttingVilkårValideringTest {
                         mapOf(
                             *oppfylteSvarFremTilFlyttemåte,
                             RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelse(SvarId.FLYTTEBYRÅ),
-                            RegelId.ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE to SvarOgBegrunnelse(SvarId.JA),
                         ),
                     fakta =
                         FaktaFlyttebyrå(
@@ -177,7 +176,6 @@ class FlyttingVilkårValideringTest {
             mapOf(
                 *oppfylteSvarFremTilFlyttemåte,
                 RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelse(SvarId.FLYTTEBYRÅ),
-                RegelId.ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE to SvarOgBegrunnelse(SvarId.JA),
             )
         val ugyldigeTilbud =
             listOf(
@@ -214,7 +212,6 @@ class FlyttingVilkårValideringTest {
                         mapOf(
                             *oppfylteSvarFremTilFlyttemåte,
                             RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelse(SvarId.FLYTTER_SELV),
-                            RegelId.ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE to SvarOgBegrunnelse(SvarId.JA),
                         ),
                     fakta =
                         FaktaFlytteSelv(
@@ -238,7 +235,7 @@ class FlyttingVilkårValideringTest {
                     svar =
                         mapOf(
                             RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
-                                SvarOgBegrunnelse(SvarId.FLYTTING_VED_START_AV_AKTIVITET, "Start"),
+                                SvarOgBegrunnelse(SvarId.FLYTTING_VED_OPPSTART_ELLER_AVSLUTNING_AV_TILTAK_ELLER_UTDANNING, "Start"),
                             RegelId.MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET to SvarOgBegrunnelse(SvarId.NEI, "Nei"),
                         ),
                 ),
@@ -271,7 +268,6 @@ class FlyttingVilkårValideringTest {
                         mapOf(
                             *oppfylteSvarFremTilFlyttemåte,
                             RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelse(SvarId.FLYTTEBYRÅ),
-                            RegelId.ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE to SvarOgBegrunnelse(SvarId.NEI, "Nei"),
                         ),
                 ),
             ),
@@ -281,8 +277,8 @@ class FlyttingVilkårValideringTest {
     private val oppfylteSvarFremTilFlyttemåte =
         arrayOf(
             RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
-                SvarOgBegrunnelse(SvarId.FLYTTING_VED_START_AV_AKTIVITET, "Start"),
-            RegelId.MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET to SvarOgBegrunnelse(SvarId.JA, "Må flytte"),
+                SvarOgBegrunnelse(SvarId.FLYTTING_VED_OPPSTART_ELLER_AVSLUTNING_AV_TILTAK_ELLER_UTDANNING, "Start"),
+            RegelId.MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET to SvarOgBegrunnelse(SvarId.FLYTTER_TIL_AKTIVITETSSTED, "Må flytte"),
         )
 
     private fun lagreVilkår(

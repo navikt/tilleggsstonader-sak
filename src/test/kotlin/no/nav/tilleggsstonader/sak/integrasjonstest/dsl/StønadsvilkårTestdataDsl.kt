@@ -75,11 +75,10 @@ class StønadsvilkårTestdataDsl {
                 svar =
                     mapOf(
                         RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
-                            SvarOgBegrunnelseDto(SvarId.FLYTTING_VED_START_AV_AKTIVITET, "Syntetisk begrunnelse"),
+                            SvarOgBegrunnelseDto(SvarId.FLYTTING_VED_OPPSTART_ELLER_AVSLUTNING_AV_TILTAK_ELLER_UTDANNING, "Syntetisk begrunnelse"),
                         RegelId.MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET to
-                            SvarOgBegrunnelseDto(SvarId.JA, "Syntetisk begrunnelse"),
+                            SvarOgBegrunnelseDto(SvarId.FLYTTER_TIL_AKTIVITETSSTED, "Syntetisk begrunnelse"),
                         RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTEBYRÅ),
-                        RegelId.ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE to SvarOgBegrunnelseDto(SvarId.JA),
                     ),
                 fakta =
                     FaktaFlyttebyråDto(
@@ -108,11 +107,10 @@ class StønadsvilkårTestdataDsl {
                 svar =
                     mapOf(
                         RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
-                            SvarOgBegrunnelseDto(SvarId.FLYTTING_VED_START_AV_AKTIVITET, "Syntetisk begrunnelse"),
+                            SvarOgBegrunnelseDto(SvarId.FLYTTING_VED_OPPSTART_ELLER_AVSLUTNING_AV_TILTAK_ELLER_UTDANNING, "Syntetisk begrunnelse"),
                         RegelId.MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET to
-                            SvarOgBegrunnelseDto(SvarId.JA, "Syntetisk begrunnelse"),
+                            SvarOgBegrunnelseDto(SvarId.FLYTTER_TIL_AKTIVITETSSTED, "Syntetisk begrunnelse"),
                         RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTER_SELV),
-                        RegelId.ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE to SvarOgBegrunnelseDto(SvarId.JA),
                     ),
                 fakta =
                     FaktaFlytteSelvDto(

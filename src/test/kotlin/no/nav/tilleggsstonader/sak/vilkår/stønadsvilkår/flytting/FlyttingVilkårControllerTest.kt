@@ -43,12 +43,9 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
     private val svarFramTilFlyttemåte =
         arrayOf(
             RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
-                SvarOgBegrunnelseDto(SvarId.FLYTTING_VED_START_AV_AKTIVITET, "Starter i aktivitet"),
-            RegelId.MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET to SvarOgBegrunnelseDto(SvarId.JA, "Må flytte"),
+                SvarOgBegrunnelseDto(SvarId.FLYTTING_VED_OPPSTART_ELLER_AVSLUTNING_AV_TILTAK_ELLER_UTDANNING, "Starter i aktivitet"),
+            RegelId.MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET to SvarOgBegrunnelseDto(SvarId.FLYTTER_TIL_AKTIVITETSSTED, "Må flytte"),
         )
-
-    private val kostnaderErNødvendige =
-        RegelId.ER_KOSTNADER_TIL_FLYTTING_NØDVENDIGE to SvarOgBegrunnelseDto(SvarId.JA)
 
     private val nyttVilkårFlytteSelv =
         LagreVilkårFlyttingDto(
@@ -57,7 +54,6 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 mapOf(
                     *svarFramTilFlyttemåte,
                     RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTER_SELV, "Kjører selv"),
-                    kostnaderErNødvendige,
                 ),
             fakta =
                 FaktaFlytteSelvDto(
@@ -77,7 +73,6 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 mapOf(
                     *svarFramTilFlyttemåte,
                     RegelId.HVORDAN_SKAL_BRUKER_FLYTTE to SvarOgBegrunnelseDto(SvarId.FLYTTEBYRÅ, "Bruker flyttebyrå"),
-                    kostnaderErNødvendige,
                 ),
             fakta =
                 FaktaFlyttebyråDto(
@@ -297,7 +292,7 @@ class FlyttingVilkårControllerTest : IntegrationTest() {
                 svar =
                     mapOf(
                         RegelId.HVILKEN_FORBINDELSE_FLYTTER_BRUKER to
-                            SvarOgBegrunnelseDto(SvarId.FLYTTING_VED_AVSLUTTET_AKTIVITET, "Avslutter aktivitet"),
+                            SvarOgBegrunnelseDto(SvarId.FLYTTING_VED_OPPSTART_ELLER_AVSLUTNING_AV_TILTAK_ELLER_UTDANNING, "Avslutter aktivitet"),
                         RegelId.MÅ_FLYTTE_FOR_Å_GJENNOMFØRE_AKTIVITET to
                             SvarOgBegrunnelseDto(SvarId.NEI, "Må ikke flytte"),
                     ),
