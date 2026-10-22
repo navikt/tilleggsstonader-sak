@@ -12,9 +12,11 @@ import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBi
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.dto.BeregningsresultatOffentligTransportDto
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlytting
 import no.nav.tilleggsstonader.sak.vedtak.passAvBarn.dto.BeregningsresultatForMånedDto
 import no.nav.tilleggsstonader.sak.vedtak.reiseTilSamling.dto.BeregningsresultatReiseTilSamlingDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttebyråTilbud
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.TypeVilkårFakta
@@ -51,6 +53,20 @@ data class BeregningsresultatInterntVedtakDto(
     val boutgifter: List<BeregningsresultatDtoBoutgifter>? = null,
     val dagligReise: BeregningsresultatDagligReiseInterntVedtak? = null,
     val reiseTilSamling: BeregningsresultatReiseTilSamlingDto? = null,
+    val flytting: BeregningsresultatFlyttingInterntVedtak? = null,
+)
+
+data class BeregningsresultatFlyttingInterntVedtak(
+    val resultater: List<BeregningsresultatFlyttevilkårInterntVedtak>,
+)
+
+data class BeregningsresultatFlyttevilkårInterntVedtak(
+    val fraTidligereVedtak: Boolean,
+    val fom: LocalDate,
+    val tom: LocalDate,
+    val grunnlag: BeregningsgrunnlagFlytting,
+    val beløp: BigDecimal,
+    val målgruppe: FaktiskMålgruppe,
 )
 
 data class BeregningsresultatDagligReiseInterntVedtak(
@@ -131,15 +147,18 @@ data class DelvilkårInterntVedtak(
 )
 
 sealed interface VilkårFaktaInterntVedtak {
+    val type: TypeVilkårFakta
+}
+
+sealed interface ReiseVilkårFaktaInterntVedtak : VilkårFaktaInterntVedtak {
     val reiseId: ReiseId
     val adresse: String?
-    val type: TypeVilkårFakta
 }
 
 data class VilkårFaktaUbestemtInterntVedtak(
     override val reiseId: ReiseId,
     override val adresse: String?,
-) : VilkårFaktaInterntVedtak {
+) : ReiseVilkårFaktaInterntVedtak {
     override val type = TypeVilkårFakta.DAGLIG_REISE_UBESTEMT
 }
 
@@ -150,7 +169,7 @@ data class VilkårFaktaOffentligTransportInterntVedtak(
     val prisEnkelbillett: Int?,
     val prisSyvdagersbillett: Int?,
     val prisTrettidagersbillett: Int?,
-) : VilkårFaktaInterntVedtak {
+) : ReiseVilkårFaktaInterntVedtak {
     override val type = TypeVilkårFakta.DAGLIG_REISE_OFFENTLIG_TRANSPORT
 }
 
@@ -159,14 +178,14 @@ data class VilkårFaktaPrivatBilInterntVedtak(
     override val adresse: String?,
     val reiseavstandEnVei: BigDecimal,
     val faktaDelperioder: List<FaktaDelperiodePrivatBil>,
-) : VilkårFaktaInterntVedtak {
+) : ReiseVilkårFaktaInterntVedtak {
     override val type = TypeVilkårFakta.DAGLIG_REISE_PRIVAT_BIL
 }
 
 data class VilkårFaktaReiseTilSamlingUbestemtInterntVedtak(
     override val reiseId: ReiseId,
     override val adresse: String?,
-) : VilkårFaktaInterntVedtak {
+) : ReiseVilkårFaktaInterntVedtak {
     override val type = TypeVilkårFakta.REISE_TIL_SAMLING_UBESTEMT
 }
 
@@ -177,7 +196,7 @@ data class VilkårFaktaReiseTilSamlingOffentligTransportInterntVedtak(
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String?,
     val aktivitetId: VilkårperiodeGlobalId? = null,
-) : VilkårFaktaInterntVedtak {
+) : ReiseVilkårFaktaInterntVedtak {
     override val type = TypeVilkårFakta.REISE_TIL_SAMLING_OFFENTLIG_TRANSPORT
 }
 
@@ -192,8 +211,35 @@ data class VilkårFaktaReiseTilSamlingPrivatBilInterntVedtak(
     val fergekostnad: BigDecimal?,
     val parkering: BigDecimal?,
     val piggdekkavgift: BigDecimal?,
-) : VilkårFaktaInterntVedtak {
+) : ReiseVilkårFaktaInterntVedtak {
     override val type = TypeVilkårFakta.REISE_TIL_SAMLING_PRIVAT_BIL
+}
+
+data class VilkårFaktaFlyttebyråInterntVedtak(
+    val tilbud: List<FlyttebyråTilbud>,
+    val erBetalingDokumentert: Boolean,
+    val nødvendigUtgift: NødvendigUtgift,
+    val adresse: String,
+) : VilkårFaktaInterntVedtak {
+    override val type = TypeVilkårFakta.FLYTTING_FLYTTEBYRÅ
+}
+
+data class VilkårFaktaFlytteSelvInterntVedtak(
+    val avstandEnVei: Int?,
+    val henger: Int?,
+    val bompenger: Int?,
+    val ferge: Int?,
+    val parkering: Int?,
+    val nødvendigUtgift: NødvendigUtgift,
+    val adresse: String,
+) : VilkårFaktaInterntVedtak {
+    override val type = TypeVilkårFakta.FLYTTING_FLYTTE_SELV
+}
+
+data class VilkårFaktaFlyttingUbestemtInterntVedtak(
+    val adresse: String,
+) : VilkårFaktaInterntVedtak {
+    override val type = TypeVilkårFakta.FLYTTING_UBESTEMT
 }
 
 data class VurderingInterntVedtak(

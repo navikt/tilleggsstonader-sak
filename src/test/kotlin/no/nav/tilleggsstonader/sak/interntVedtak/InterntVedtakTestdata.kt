@@ -56,6 +56,7 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.AvslagLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.GeneriskVedtak
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseBoutgifter
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseDagligReise
+import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseFlytting
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseLæremidler
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelsePassAvBarn
 import no.nav.tilleggsstonader.sak.vedtak.domain.InnvilgelseReiseTilSamling
@@ -64,6 +65,11 @@ import no.nav.tilleggsstonader.sak.vedtak.domain.TypeBoutgift
 import no.nav.tilleggsstonader.sak.vedtak.domain.Vedtaksperiode
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakAvslag
 import no.nav.tilleggsstonader.sak.vedtak.domain.ÅrsakOpphør
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlytteSelv
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyrå
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsgrunnlagFlyttebyråTilbud
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlyttevilkår
+import no.nav.tilleggsstonader.sak.vedtak.flytting.domain.BeregningsresultatFlytting
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.LæremidlerTestUtil
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.Beregningsgrunnlag
 import no.nav.tilleggsstonader.sak.vedtak.læremidler.domain.BeregningsresultatForMåned
@@ -79,9 +85,13 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligRei
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDagligReiseUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaDelperiodePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlytteSelv
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttebyrå
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaFlyttingUbestemt
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseTilSamlingUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FlyttebyråTilbud
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
@@ -91,6 +101,9 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.Boutgi
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.ikkeOppfylteDelvilkårDagligReise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.oppfylteDelvilkårDagligReiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.DagligReiseRegelTestUtil.oppfylteDelvilkårDagligReisePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.FlyttingRegelTestUtil.ikkeOppfylteDelvilkårFlytting
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.FlyttingRegelTestUtil.oppfylteDelvilkårFlytteSelv
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.FlyttingRegelTestUtil.oppfylteDelvilkårFlyttebyrå
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.ikkeOppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.PassBarnRegelTestUtil.oppfylteDelvilkårPassBarn
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.regler.vilkår.ReiseTilSamlingRegelTestUtil.ikkeOppfylteDelvilkårReiseTilSamling
@@ -119,7 +132,10 @@ import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.ResultatVilkår
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeMålgruppe
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.Vilkårperioder
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.AktivitetFaktaOgVurdering
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.DagpengerFlyttingTsr
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.NedsattArbeidsevneFlyttingTso
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.VurderingNedsattArbeidsevne
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.Month.FEBRUARY
@@ -1270,6 +1286,181 @@ object InterntVedtakTestdata {
                         ),
                 ),
             )
+    }
+
+    object Flytting {
+        val flyttedato = 15 januar 2025
+
+        private val fagsakTso =
+            fagsak(eksternId = EksternFagsakId(1674L, FagsakId.random()), stønadstype = Stønadstype.FLYTTING_TSO)
+        private val fagsakTsr =
+            fagsak(eksternId = EksternFagsakId(1675L, FagsakId.random()), stønadstype = Stønadstype.FLYTTING_TSR)
+
+        fun behandling(stønadstype: Stønadstype) =
+            dummySaksbehandling(if (stønadstype == Stønadstype.FLYTTING_TSO) fagsakTso else fagsakTsr)
+
+        val grunnlagsdata =
+            lagGrunnlagsdata(personopplysninger = lagFaktaGrunnlagPersonopplysninger(barn = emptyList()))
+
+        val vilkår =
+            listOf(
+                vilkår(
+                    behandlingId = behandlingId,
+                    type = VilkårType.FLYTTING,
+                    resultat = Vilkårsresultat.OPPFYLT,
+                    delvilkår = oppfylteDelvilkårFlyttebyrå(),
+                    fom = flyttedato,
+                    tom = flyttedato,
+                    utgift = null,
+                    fakta =
+                        FaktaFlyttebyrå(
+                            tilbud =
+                                listOf(
+                                    FlyttebyråTilbud("Flyttebyrå A", 12000),
+                                    FlyttebyråTilbud("Flyttebyrå B", 10000),
+                                ),
+                            erBetalingDokumentert = true,
+                            nødvendigUtgift = NødvendigUtgift(SvarJaNeiReiseTilSamling.JA, null),
+                            adresse = "Flytteveien 1, 1234 Oslo",
+                        ),
+                ),
+                vilkår(
+                    behandlingId = behandlingId,
+                    type = VilkårType.FLYTTING,
+                    resultat = Vilkårsresultat.OPPFYLT,
+                    delvilkår = oppfylteDelvilkårFlytteSelv(),
+                    fom = flyttedato,
+                    tom = flyttedato,
+                    utgift = null,
+                    fakta =
+                        FaktaFlytteSelv(
+                            avstandEnVei = 100,
+                            henger = 200,
+                            bompenger = 300,
+                            ferge = 400,
+                            parkering = 500,
+                            nødvendigUtgift = NødvendigUtgift(SvarJaNeiReiseTilSamling.JA, null),
+                            adresse = "Flytteveien 2, 2345 Oslo",
+                        ),
+                ),
+                vilkår(
+                    behandlingId = behandlingId,
+                    type = VilkårType.FLYTTING,
+                    resultat = Vilkårsresultat.IKKE_OPPFYLT,
+                    delvilkår = ikkeOppfylteDelvilkårFlytting(),
+                    fom = flyttedato,
+                    tom = flyttedato,
+                    utgift = null,
+                    fakta = FaktaFlyttingUbestemt(adresse = "Flytteveien 3, 3456 Oslo"),
+                ),
+            )
+
+        fun vilkårperioder(stønadstype: Stønadstype) =
+            Vilkårperioder(
+                målgrupper =
+                    listOf(
+                        VilkårperiodeTestUtil.målgruppe(
+                            behandlingId = behandlingId,
+                            fom = førsteJan,
+                            tom = sisteFeb,
+                            begrunnelse = "Målgruppen er dokumentert.",
+                            faktaOgVurdering =
+                                if (stønadstype == Stønadstype.FLYTTING_TSO) {
+                                    NedsattArbeidsevneFlyttingTso(
+                                        vurderinger =
+                                            VurderingNedsattArbeidsevne(
+                                                medlemskap = vurderingMedlemskap(SvarJaNei.JA),
+                                                dekketAvAnnetRegelverk = vurderingDekketAvAnnetRegelverk(SvarJaNei.NEI),
+                                                aldersvilkår = vurderingAldersVilkår(),
+                                                mottarSykepengerForFulltidsstilling =
+                                                    vurderingMottarSykepengerForFulltidsstilling(SvarJaNei.NEI),
+                                            ),
+                                    )
+                                } else {
+                                    DagpengerFlyttingTsr()
+                                },
+                        ),
+                    ),
+                aktiviteter = emptyList(),
+            )
+
+        fun vedtak(stønadstype: Stønadstype) =
+            GeneriskVedtak(
+                behandlingId = behandlingId,
+                data =
+                    InnvilgelseFlytting(
+                        vedtaksperioder =
+                            listOf(
+                                Vedtaksperiode(
+                                    id = vedtaksperiodeId,
+                                    fom = flyttedato,
+                                    tom = flyttedato,
+                                    målgruppe = målgruppe(stønadstype),
+                                    aktivitet = null,
+                                ),
+                            ),
+                        beregningsplan = Beregningsplan(Beregningsomfang.ALLE_PERIODER),
+                        beregningsresultat = beregningsresultat(stønadstype),
+                        begrunnelse = "Sånn her vil en begrunnelse se ut i det interne vedtaket",
+                    ),
+                gitVersjon = Applikasjonsversjon.versjon,
+                tidligsteEndring = null,
+            )
+
+        private fun beregningsresultat(stønadstype: Stønadstype) =
+            BeregningsresultatFlytting(
+                resultater =
+                    listOf(
+                        BeregningsresultatFlyttevilkår(
+                            fraTidligereVedtak = true,
+                            fom = flyttedato,
+                            tom = flyttedato,
+                            beløp = BigDecimal("10000"),
+                            målgruppe = målgruppe(stønadstype),
+                            grunnlag =
+                                BeregningsgrunnlagFlyttebyrå(
+                                    tilbud =
+                                        listOf(
+                                            BeregningsgrunnlagFlyttebyråTilbud(
+                                                "Flyttebyrå A",
+                                                BigDecimal("12000"),
+                                                false,
+                                            ),
+                                            BeregningsgrunnlagFlyttebyråTilbud(
+                                                "Flyttebyrå B",
+                                                BigDecimal("10000"),
+                                                true,
+                                            ),
+                                        ),
+                                    erBetalingDokumentert = true,
+                                ),
+                        ),
+                        BeregningsresultatFlyttevilkår(
+                            fraTidligereVedtak = false,
+                            fom = flyttedato,
+                            tom = flyttedato,
+                            beløp = BigDecimal("5400"),
+                            målgruppe = målgruppe(stønadstype),
+                            grunnlag =
+                                BeregningsgrunnlagFlytteSelv(
+                                    avstandEnVei = 100,
+                                    sats = BigDecimal("2.94"),
+                                    satsBekreftet = true,
+                                    henger = BigDecimal("200"),
+                                    bompenger = BigDecimal("300"),
+                                    ferge = BigDecimal("400"),
+                                    parkering = BigDecimal("500"),
+                                ),
+                        ),
+                    ),
+            )
+
+        private fun målgruppe(stønadstype: Stønadstype) =
+            if (stønadstype == Stønadstype.FLYTTING_TSO) {
+                FaktiskMålgruppe.NEDSATT_ARBEIDSEVNE
+            } else {
+                FaktiskMålgruppe.ARBEIDSSØKER
+            }
     }
 
     private fun dummySaksbehandling(fagsak: Fagsak) =
