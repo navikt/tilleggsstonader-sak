@@ -35,7 +35,7 @@ data class LagreVilkårReiseOppstartAvslutningHjemreiseDto(
         when (typeReiseformål) {
             TypeReiseformål.HJEMREISE -> tom ?: brukerfeil("tom må settes for hjemreise")
             TypeReiseformål.OPPSTART, TypeReiseformål.AVSLUTNING -> {
-                brukerfeilHvis(tom != null) { "tom skal ikke settes for $typeReiseformål" }
+                brukerfeilHvis(tom != null && tom != fom) { "Tom kan ikke settes til noe annet enn lik fom for $typeReiseformål" }
                 fom
             }
         }
