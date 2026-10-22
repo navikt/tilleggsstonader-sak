@@ -95,6 +95,7 @@ class PrivatBilBeregningsresultatServiceTest {
                             dagsatsUtenParkering = 150.toBigDecimal(),
                         ),
                     ),
+                skalBehandlesManuelt = false,
             )
 
         val rammevedtakPrivatBil =
@@ -180,6 +181,7 @@ class PrivatBilBeregningsresultatServiceTest {
                             dagsatsUtenParkering = 150.toBigDecimal(),
                         ),
                     ),
+                skalBehandlesManuelt = false,
             )
 
         val rammevedtakPrivatBil =
@@ -262,6 +264,7 @@ class PrivatBilBeregningsresultatServiceTest {
                             dagsatsUtenParkering = 160.toBigDecimal(),
                         ),
                     ),
+                skalBehandlesManuelt = false,
             )
 
         val rammevedtakPrivatBil =
@@ -339,6 +342,7 @@ class PrivatBilBeregningsresultatServiceTest {
                         ),
                     ),
                 reisedagerPerUke = 5,
+                skalBehandlesManuelt = false,
             )
 
         val rammevedtakPrivatBil =
@@ -453,6 +457,7 @@ class PrivatBilBeregningsresultatServiceTest {
                             dagsatsUtenParkering = 150.toBigDecimal(),
                         ),
                     ),
+                skalBehandlesManuelt = false,
                 reisedagerPerUke = 5,
             )
 
@@ -541,6 +546,7 @@ class PrivatBilBeregningsresultatServiceTest {
                         ),
                     ),
                 reisedagerPerUke = 5,
+                skalBehandlesManuelt = false,
             )
 
         val rammevedtakPrivatBil =
@@ -597,6 +603,7 @@ class PrivatBilBeregningsresultatServiceTest {
                         ),
                     ),
                 reisedagerPerUke = 5,
+                skalBehandlesManuelt = false,
             )
 
         val rammevedtakPrivatBil =
@@ -910,6 +917,7 @@ class PrivatBilBeregningsresultatServiceTest {
                     dagsatsUtenParkering = 150.toBigDecimal(),
                 ),
             ),
+        skalBehandlesManuelt = false,
     )
 
     private fun avklarUkerFraKjøreliste(kjøreliste: Kjøreliste): List<AvklartKjørtUke> =

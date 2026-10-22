@@ -182,6 +182,7 @@ class AvklartKjørelisteValideringTest {
                                 ekstrakostnader = RammeForReiseMedPrivatEkstrakostnader(null, null),
                                 reisedagerPerUke = 2,
                                 satser = listOf(rammeForReiseMedPrivatBilSatsForDelperiode(fom = mandagUke1, tom = søndagUke1)),
+                                skalBehandlesManuelt = false,
                             ),
                             RammeForReiseMedPrivatBilDelperiode(
                                 fom = mandagUke2,
@@ -189,6 +190,7 @@ class AvklartKjørelisteValideringTest {
                                 ekstrakostnader = RammeForReiseMedPrivatEkstrakostnader(null, null),
                                 reisedagerPerUke = 1,
                                 satser = listOf(rammeForReiseMedPrivatBilSatsForDelperiode(fom = mandagUke2, tom = søndagUke2)),
+                                skalBehandlesManuelt = false,
                             ),
                         ),
                 )

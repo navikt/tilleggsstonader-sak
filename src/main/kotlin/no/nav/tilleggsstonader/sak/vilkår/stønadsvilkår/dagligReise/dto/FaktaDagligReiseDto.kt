@@ -84,6 +84,7 @@ data class FaktaDagligReisePrivatBilDto(
                         reisedagerPerUke = it.reisedagerPerUke,
                         bompengerPerDag = it.bompengerPerDag,
                         fergekostnadPerDag = it.fergekostnadPerDag,
+                        skalBehandlesManuelt = it.skalBehandlesManuelt,
                     )
                 },
             adresse = adresse,
@@ -109,6 +110,8 @@ data class FaktaDelperiodePrivatBilDto(
     val reisedagerPerUke: Int,
     val bompengerPerDag: BigDecimal?,
     val fergekostnadPerDag: BigDecimal?,
+    val skalBehandlesManuelt: Boolean,
+    val begrunnelseManuellBehandling: String?,
 )
 
 data object FaktaDagligReiseUbestemtDto : FaktaDagligReiseDto {

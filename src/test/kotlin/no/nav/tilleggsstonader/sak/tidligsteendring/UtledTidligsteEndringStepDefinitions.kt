@@ -286,6 +286,7 @@ class UtledTidligsteEndringStepDefinitions {
                         reisedagerPerUke = parseInt(DomenenøkkelPrivatBil.ANTALL_REISEDAGER_PER_UKE, it),
                         bompengerPerDag = parseValgfriBigDecimal(DomenenøkkelPrivatBil.BOMPENGER, it),
                         fergekostnadPerDag = parseValgfriBigDecimal(DomenenøkkelPrivatBil.FERGEKOSTNAD, it),
+                        skalBehandlesManuelt = false,
                     )
             }.groupBy { it.first }
             .mapValues { it.value.map { it.second } }

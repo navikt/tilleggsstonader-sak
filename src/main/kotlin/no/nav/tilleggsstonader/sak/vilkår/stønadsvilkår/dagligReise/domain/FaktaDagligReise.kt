@@ -162,6 +162,7 @@ data class FaktaPrivatBil(
                         reisedagerPerUke = it.reisedagerPerUke,
                         bompengerPerDag = it.bompengerPerDag,
                         fergekostnadPerDag = it.fergekostnadPerDag,
+                        skalBehandlesManuelt = it.skalBehandlesManuelt,
                     )
                 },
             adresse = adresse,
