@@ -57,7 +57,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
      */
     fun hentVilkårGruppertPåAktivitet(behandlingId: BehandlingId): List<AktivitetMedReiser> {
         val aktiviteter = vilkårperiodeService.hentVilkårperioder(behandlingId).aktiviteter
-        val reiserPerAktivitet = hentVilkårForBehandling(behandlingId).groupBy { it.fakta.aktivitetId() }
+        val reiserPerAktivitet = hentVilkårForBehandling(behandlingId).groupBy { it.aktivitetId }
 
         return aktiviteter
             .sortedBy { it.fom }
