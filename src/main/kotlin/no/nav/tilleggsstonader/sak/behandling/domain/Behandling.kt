@@ -41,7 +41,6 @@ data class Behandling(
     val vedtakstidspunkt: LocalDateTime? = null,
     @Embedded(onEmpty = Embedded.OnEmpty.USE_NULL)
     val årsakMetadata: ÅrsakMetadata? = null,
-    val gjelderAktivitetspenger: Boolean = false,
 ) {
     fun kanHenlegges(): Boolean = !status.behandlingErLåstForVidereRedigering()
 
