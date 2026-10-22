@@ -7,6 +7,7 @@ import no.nav.tilleggsstonader.kontrakter.ytelse.TypeYtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePeriode
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderDto
 import no.nav.tilleggsstonader.kontrakter.ytelse.YtelsePerioderRequest
+import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.libs.feil.feilHvis
 import no.nav.tilleggsstonader.libs.unleash.UnleashService
 import no.nav.tilleggsstonader.sak.behandling.BehandlingService
@@ -112,8 +113,21 @@ class YtelseService(
 
     /**
      * Returnerer false hvis kallet mot ung-sak feiler, slik at bruker kan svare selv på om de mottar aktivitetspenger.
+     * Bruk [harAktivitetspengerIDagEllerFremITidEllerFeil] når resultatet lagres uten bekreftelse fra bruker.
      */
-    fun harAktivitetspengerIDagEllerFremITid(ident: String): Boolean {
+    fun harAktivitetspengerIDagEllerFremITid(ident: String): Boolean = finnAktivitetspengerIDagEllerFremITid(ident) ?: false
+
+    /**
+     * Skiller feilet oppslag fra bekreftet nei, slik at oppretting kan feile og prøves på nytt.
+     */
+    fun harAktivitetspengerIDagEllerFremITidEllerFeil(ident: String): Boolean =
+        finnAktivitetspengerIDagEllerFremITid(ident)
+            ?: feil("Kunne ikke avgjøre om bruker har aktivitetspenger fordi kall mot ung-sak feilet")
+
+    /**
+     * Returnerer null hvis kallet mot ung-sak feiler.
+     */
+    private fun finnAktivitetspengerIDagEllerFremITid(ident: String): Boolean? {
         val ytelser =
             try {
                 ytelseClient.hentYtelser(
@@ -126,7 +140,7 @@ class YtelseService(
                 )
             } catch (e: Exception) {
                 logger.warn("Kall for å hente aktivitetspenger feilet", e)
-                return false
+                return null
             }
 
         val kallFeilet =
@@ -135,7 +149,7 @@ class YtelseService(
             }
         if (kallFeilet) {
             logger.warn("Henting av aktivitetspenger fra ung-sak feilet")
-            return false
+            return null
         }
 
         return ytelser.perioder.any { it.type == TypeYtelsePeriode.AKTIVITETSPENGER }

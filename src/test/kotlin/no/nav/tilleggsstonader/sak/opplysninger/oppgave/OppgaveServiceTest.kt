@@ -40,6 +40,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.oppgave.dto.FinnOppgaveRequestDt
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdent
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlIdenter
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.lagNavn
 import no.nav.tilleggsstonader.sak.util.PdlTestdataHelper.pdlPersonKort
 import no.nav.tilleggsstonader.sak.util.behandling
@@ -51,6 +52,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager
 import org.springframework.data.repository.findByIdOrNull
 import java.time.LocalDate
@@ -66,6 +68,7 @@ internal class OppgaveServiceTest {
     private val personService = mockk<PersonService>(relaxed = true)
     private val klageService = mockk<KlageService>(relaxed = true)
     private val behandlingRepository = mockk<BehandlingRepository>()
+    private val ytelseService = mockk<YtelseService>()
 
     private val oppgaveService =
         OppgaveService(
@@ -77,6 +80,7 @@ internal class OppgaveServiceTest {
             personService = personService,
             klageService = klageService,
             behandlingRepository = behandlingRepository,
+            ytelseService = ytelseService,
         )
 
     val opprettOppgaveDomainSlot = slot<OppgaveDomain>()
@@ -110,6 +114,7 @@ internal class OppgaveServiceTest {
     fun `Opprett oppgave skal kunne opprettes uten behandlingId`() {
         val slot = slot<OpprettOppgaveRequest>()
         mockOpprettOppgave(slot)
+        every { ytelseService.harAktivitetspengerIDagEllerFremITidEllerFeil(FNR) } returns false
 
         oppgaveService.opprettOppgave(
             personIdent = FNR,
@@ -184,6 +189,63 @@ internal class OppgaveServiceTest {
             )
 
             assertThat(slot.captured.behandlingstype).isEqualTo(Behandlingstype.Tilbakekreving.value)
+        }
+    }
+
+    @Nested
+    inner class BehandlingstypeAktivitetspengerUtenBehandling {
+        private val request = slot<OpprettOppgaveRequest>()
+
+        @BeforeEach
+        fun setUp() {
+            every { arbeidsfordelingService.hentNavEnhetId(any(), any(), any()) } returns ENHETSNUMMER
+            every { oppgaveClient.opprettOppgave(capture(request)) } returns GSAK_OPPGAVE_ID
+        }
+
+        private fun opprettJournalføringsoppgave() =
+            oppgaveService.opprettOppgave(
+                personIdent = FNR,
+                stønadstype = Stønadstype.BARNETILSYN,
+                behandlingId = null,
+                oppgave = OpprettOppgave(oppgavetype = Oppgavetype.Journalføring),
+            )
+
+        @Test
+        fun `skal sette behandlingstype aktivitetspenger ut fra person når oppgaven ikke har behandling`() {
+            every { ytelseService.harAktivitetspengerIDagEllerFremITidEllerFeil(FNR) } returns true
+
+            opprettJournalføringsoppgave()
+
+            assertThat(request.captured.behandlingstype).isEqualTo(Behandlingstype.Aktivitetspenger.value)
+        }
+
+        @Test
+        fun `skal ikke sette behandlingstype når ung-sak bekrefter at personen ikke har aktivitetspenger`() {
+            every { ytelseService.harAktivitetspengerIDagEllerFremITidEllerFeil(FNR) } returns false
+
+            opprettJournalføringsoppgave()
+
+            assertThat(request.captured.behandlingstype).isNull()
+        }
+
+        @Test
+        fun `skal ikke opprette oppgave når oppslag mot ung-sak feiler`() {
+            every { ytelseService.harAktivitetspengerIDagEllerFremITidEllerFeil(FNR) } throws
+                RuntimeException("ung-sak feilet")
+
+            assertThrows<RuntimeException> { opprettJournalføringsoppgave() }
+
+            verify(exactly = 0) { oppgaveClient.opprettOppgave(any()) }
+        }
+
+        @Test
+        fun `skal ikke slå opp ung-sak når oppgaven har behandling`() {
+            val slot = slot<OpprettOppgaveRequest>()
+            mockOpprettOppgave(slot, gjelderAktivitetspenger = true)
+
+            oppgaveService.opprettOppgave(BEHANDLING_ID, OpprettOppgave(oppgavetype = Oppgavetype.BehandleSak))
+
+            verify(exactly = 0) { ytelseService.harAktivitetspengerIDagEllerFremITidEllerFeil(any()) }
         }
     }
 
