@@ -103,29 +103,39 @@ data class FaktaReiseTilSamlingUbestemt(
     override val adresse: String?,
 ) : ReiseVilkårFakta
 
+sealed interface FaktaROAH : VilkårFakta {
+    val reiseId: ReiseId
+    val aktivitetId: VilkårperiodeGlobalId
+    val typeReiseformål: TypeReiseformål
+}
+
 data class FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
     override val reiseId: ReiseId,
-    override val adresse: String?,
-    val typeReiseformål: TypeReiseformål,
+    override val aktivitetId: VilkårperiodeGlobalId,
+    override val typeReiseformål: TypeReiseformål,
+    val nødvendigUtgift: NødvendigUtgift,
     val utgifterOffentligTransport: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId,
-) : ReiseVilkårFakta
+    val begrunnelse: String?,
+) : FaktaROAH
 
 data class FaktaReiseOppstartAvslutningHjemreisePrivatBil(
     override val reiseId: ReiseId,
-    override val adresse: String?,
-    val typeReiseformål: TypeReiseformål,
+    override val aktivitetId: VilkårperiodeGlobalId,
+    override val typeReiseformål: TypeReiseformål,
+    val nødvendigUtgift: NødvendigUtgift,
     val reiseavstand: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId,
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,
-) : ReiseVilkårFakta
+    val parkering: BigDecimal? = null,
+    val piggdekkavgift: BigDecimal? = null,
+    val begrunnelse: String?,
+) : FaktaROAH
 
 data class FaktaReiseOppstartAvslutningHjemreiseUbestemt(
     override val reiseId: ReiseId,
-    override val adresse: String?,
-    val typeReiseformål: TypeReiseformål,
-) : ReiseVilkårFakta
+    override val aktivitetId: VilkårperiodeGlobalId,
+    override val typeReiseformål: TypeReiseformål,
+) : FaktaROAH
 
 data class FaktaDagligReiseUbestemt(
     override val reiseId: ReiseId,

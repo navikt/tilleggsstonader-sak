@@ -3,6 +3,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutn
 import no.nav.tilleggsstonader.libs.feil.feil
 import no.nav.tilleggsstonader.sak.util.Applikasjonsversjon
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.DelvilkårWrapper
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaROAH
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
@@ -16,17 +17,33 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.VilkårReiseOppstartAvslutningHjemreise
 
 object VilkårReiseOppstartAvslutningHjemreiseMapper {
-    fun Vilkår.mapTilVilkårReiseOppstartAvslutningHjemreise() =
-        VilkårReiseOppstartAvslutningHjemreise(
+    fun Vilkår.mapTilVilkårReiseOppstartAvslutningHjemreise(): VilkårReiseOppstartAvslutningHjemreise {
+        val fakta = faktaROAHEllerFeil(this.fakta)
+        return VilkårReiseOppstartAvslutningHjemreise(
             id = id,
             behandlingId = behandlingId,
             fom = this.fom ?: error("Forventer at fom er satt"),
             tom = this.tom ?: error("Forventer at tom er satt"),
+            aktivitetId = fakta.aktivitetId,
+            reiseId = fakta.reiseId,
+            typeReiseformål = fakta.typeReiseformål,
             resultat = this.resultat,
             status = this.status,
             delvilkårsett = this.delvilkårsett,
-            fakta = this.fakta.mapTilFaktaReiseOppstartAvslutningHjemreise(),
+            fakta = fakta.mapTilFaktaReiseOppstartAvslutningHjemreise(),
         )
+    }
+
+    private fun faktaROAHEllerFeil(fakta: VilkårFakta?): FaktaROAH =
+        when (fakta) {
+            null -> feil("Fakta skal aldri være null for reise oppstart, avslutning og hjemreise")
+            is FaktaROAH -> fakta
+            else ->
+                feil(
+                    "Ugyldig fakta for reise oppstart, avslutning og hjemreise. " +
+                        "Forventet FaktaROAH, fikk ${fakta::class.qualifiedName}",
+                )
+        }
 
     fun VilkårReiseOppstartAvslutningHjemreise.mapTilVilkår() =
         Vilkår(
@@ -41,42 +58,38 @@ object VilkårReiseOppstartAvslutningHjemreiseMapper {
             delvilkårwrapper = DelvilkårWrapper(this.delvilkårsett),
             opphavsvilkår = null,
             gitVersjon = Applikasjonsversjon.versjon,
-            fakta = this.fakta.mapTilVilkårFakta(),
+            fakta =
+                this.fakta.mapTilVilkårFakta(
+                    reiseId = this.reiseId,
+                    aktivitetId = this.aktivitetId,
+                    typeReiseformål = this.typeReiseformål,
+                ),
         )
 
-    private fun VilkårFakta?.mapTilFaktaReiseOppstartAvslutningHjemreise(): FaktaReiseOppstartAvslutningHjemreise =
+    private fun FaktaROAH.mapTilFaktaReiseOppstartAvslutningHjemreise(): FaktaReiseOppstartAvslutningHjemreise =
         when (this) {
             is FaktaReiseOppstartAvslutningHjemreiseOffentligTransport -> this.mapTilFakta()
             is FaktaReiseOppstartAvslutningHjemreisePrivatBil -> this.mapTilFakta()
             is FaktaReiseOppstartAvslutningHjemreiseUbestemt -> this.mapTilFakta()
-            null -> feil("Fakta skal aldri være null for reise oppstart, avslutning og hjemreise")
-            else -> feil("Ugyldig fakta for reise oppstart, avslutning og hjemreise")
         }
 
     private fun FaktaReiseOppstartAvslutningHjemreiseOffentligTransport.mapTilFakta() =
         FaktaOffentligTransport(
-            reiseId = this.reiseId,
-            adresse = this.adresse,
-            typeReiseformål = this.typeReiseformål,
+            nødvendigUtgift = this.nødvendigUtgift,
             utgifterOffentligTransport = this.utgifterOffentligTransport,
-            aktivitetId = this.aktivitetId,
+            begrunnelse = this.begrunnelse,
         )
 
     private fun FaktaReiseOppstartAvslutningHjemreisePrivatBil.mapTilFakta() =
         FaktaPrivatBil(
-            reiseId = this.reiseId,
-            adresse = this.adresse,
-            typeReiseformål = this.typeReiseformål,
+            nødvendigUtgift = this.nødvendigUtgift,
             reiseavstand = this.reiseavstand,
-            aktivitetId = this.aktivitetId,
             bompenger = this.bompenger,
             fergekostnad = this.fergekostnad,
+            parkering = this.parkering,
+            piggdekkavgift = this.piggdekkavgift,
+            begrunnelse = this.begrunnelse,
         )
 
-    private fun FaktaReiseOppstartAvslutningHjemreiseUbestemt.mapTilFakta() =
-        FaktaUbestemtType(
-            reiseId = this.reiseId,
-            adresse = this.adresse,
-            typeReiseformål = this.typeReiseformål,
-        )
+    private fun FaktaReiseOppstartAvslutningHjemreiseUbestemt.mapTilFakta() = FaktaUbestemtType
 }

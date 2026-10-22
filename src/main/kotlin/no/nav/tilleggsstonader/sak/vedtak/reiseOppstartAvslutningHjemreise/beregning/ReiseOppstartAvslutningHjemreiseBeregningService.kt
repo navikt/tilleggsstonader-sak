@@ -100,11 +100,11 @@ class ReiseOppstartAvslutningHjemreiseBeregningService(
             val fakta = reise.fakta as FaktaOffentligTransport
 
             BeregningsresultatOffentligTransport(
-                reiseId = fakta.reiseId,
-                aktivitetId = fakta.aktivitetId,
+                reiseId = reise.reiseId,
+                aktivitetId = reise.aktivitetId,
                 grunnlag =
                     BeregningsgrunnlagOffentligTransport(
-                        adresse = fakta.adresse,
+                        adresse = null,
                         fom = reise.fom,
                         tom = reise.tom,
                         vedtaksperioder =
@@ -133,7 +133,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningService(
 
             val grunnlag =
                 BeregningsgrunnlagPrivatBil(
-                    adresse = fakta.adresse,
+                    adresse = null,
                     fom = reise.fom,
                     tom = reise.tom,
                     sats = sats.beløp,
@@ -147,8 +147,8 @@ class ReiseOppstartAvslutningHjemreiseBeregningService(
                 )
 
             BeregningsresultatPrivatBil(
-                reiseId = fakta.reiseId,
-                aktivitetId = fakta.aktivitetId,
+                reiseId = reise.reiseId,
+                aktivitetId = reise.aktivitetId,
                 grunnlag = grunnlag,
                 beløp = beregnBelopForPrivatBil(grunnlag),
             )

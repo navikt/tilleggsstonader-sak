@@ -306,7 +306,7 @@ class BehandlingTestdataDsl internal constructor() {
         }
         vilkår {
             opprett {
-                offentligTransportReiseOppstartAvslutningHjemreise(fom = fom, tom = tom)
+                offentligTransportReiseOppstartAvslutningHjemreise(fom = fom)
             }
         }
     }
