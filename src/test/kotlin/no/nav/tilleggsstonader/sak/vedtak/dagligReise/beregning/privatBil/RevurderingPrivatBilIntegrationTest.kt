@@ -7,7 +7,12 @@ import no.nav.tilleggsstonader.libs.utils.dato.desember
 import no.nav.tilleggsstonader.libs.utils.dato.februar
 import no.nav.tilleggsstonader.libs.utils.dato.januar
 import no.nav.tilleggsstonader.sak.CleanDatabaseIntegrationTest
+import no.nav.tilleggsstonader.sak.behandling.BehandlingService
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingMetode
 import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingStatus
+import no.nav.tilleggsstonader.sak.behandling.domain.BehandlingType
+import no.nav.tilleggsstonader.sak.behandling.domain.HenlagtÅrsak
+import no.nav.tilleggsstonader.sak.behandling.dto.HenlagtDto
 import no.nav.tilleggsstonader.sak.behandlingsflyt.StegType
 import no.nav.tilleggsstonader.sak.felles.domain.BehandlingId
 import no.nav.tilleggsstonader.sak.felles.domain.FagsakId
@@ -16,11 +21,14 @@ import no.nav.tilleggsstonader.sak.infrastruktur.unleash.Toggle
 import no.nav.tilleggsstonader.sak.integrasjonstest.BehandlingContext
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.forventAntallMeldingerPåTopic
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.kall.expectProblemDetail
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tasks.kjørTasksKlareForProsesseringTilIngenTasksIgjen
+import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.tilordneÅpenBehandlingOppgaveForBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.extensions.verdiEllerFeil
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførBeregningStegKall
 import no.nav.tilleggsstonader.sak.integrasjonstest.gjennomførKjørelisteBehandling
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettBehandlingOgGjennomførBehandlingsløp
 import no.nav.tilleggsstonader.sak.integrasjonstest.opprettRevurderingOgGjennomførBehandlingsløp
+import no.nav.tilleggsstonader.sak.integrasjonstest.sendInnKjøreliste
 import no.nav.tilleggsstonader.sak.integrasjonstest.testdata.tilLagreDagligReiseDto
 import no.nav.tilleggsstonader.sak.integrasjonstest.utførStegOgReturnerNesteSteg
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.AvklartKjørelisteService
@@ -29,6 +37,7 @@ import no.nav.tilleggsstonader.sak.privatbil.avklartedager.EndreAvklartDagReques
 import no.nav.tilleggsstonader.sak.privatbil.avklartedager.GodkjentGjennomførtKjøring
 import no.nav.tilleggsstonader.sak.utbetaling.tilkjentytelse.TilkjentYtelseService
 import no.nav.tilleggsstonader.sak.utbetaling.utsjekk.utbetaling.IverksettingDto
+import no.nav.tilleggsstonader.sak.util.KjørelisteSkjemaUtil.kjørelisteSkjema
 import no.nav.tilleggsstonader.sak.util.KjørelisteUtil.KjørtDag
 import no.nav.tilleggsstonader.sak.vedtak.VedtakService
 import no.nav.tilleggsstonader.sak.vedtak.dagligReise.domain.RammevedtakPrivatBil
@@ -51,6 +60,7 @@ class RevurderingPrivatBilIntegrationTest(
     @Autowired private val vedtakService: VedtakService,
     @Autowired private val tilkjentYtelseService: TilkjentYtelseService,
     @Autowired private val avklartKjørelisteService: AvklartKjørelisteService,
+    @Autowired private val behandlingService: BehandlingService,
 ) : CleanDatabaseIntegrationTest() {
     val fom = 1 januar 2026
     val tom = 31 desember 2026
@@ -816,6 +826,69 @@ class RevurderingPrivatBilIntegrationTest(
             beregningPrivatBil.reiser.single { it.reiseId == førstegangsbehandlingContext.reiseId1 }.perioder
         assertThat(perioderReise1).isNotEmpty()
         assertThat(perioderReise1).allMatch { it.fraTidligereVedtak }
+    }
+
+    @Test
+    fun `nullstilling av revurdering feiler etter automatisk og henlagt kjørelistebehandling`() {
+        every { unleashService.isEnabled(Toggle.KAN_AUTOMATISK_BEHANDLE_KJØRELISTE) } returns true
+        val behandlingContext =
+            opprettBehandlingOgGjennomførBehandlingsløp(
+                stønadstype = Stønadstype.DAGLIG_REISE_TSO,
+            ) {
+                defaultDagligReisePrivatBilTsoTestdata(fom, tom)
+
+                sendInnKjøreliste {
+                    periode = Datoperiode(fom, 4 januar 2026)
+                    kjørteDager = listOf(KjørtDag(dato = 2 januar 2026, parkeringsutgift = 50))
+                }
+            }
+
+        val reiseId =
+            kall.privatBil
+                .hentRammevedtak(behandlingContext.ident)
+                .single()
+                .reiseId
+
+        sendInnKjøreliste(
+            kjøreliste =
+                kjørelisteSkjema(
+                    reiseId = reiseId,
+                    periode = Datoperiode(5 januar 2026, 8 januar 2026),
+                    dagerKjørt = listOf(KjørtDag(dato = 5 januar 2026, parkeringsutgift = 150)),
+                ),
+            ident = behandlingContext.ident,
+        )
+
+        val kjørelistebehandlinger =
+            behandlingService
+                .hentBehandlinger(behandlingContext.fagsakId)
+                .filter { it.type == BehandlingType.KJØRELISTE }
+
+        assertThat(kjørelistebehandlinger).hasSize(2)
+        assertThat(kjørelistebehandlinger.single { it.behandlingMetode == BehandlingMetode.AUTOMATISK }.status)
+            .isEqualTo(BehandlingStatus.FERDIGSTILT)
+        val manuellKjørelistebehandling =
+            kjørelistebehandlinger.single { it.behandlingMetode == BehandlingMetode.MANUELL }
+        assertThat(manuellKjørelistebehandling.status).isEqualTo(BehandlingStatus.OPPRETTET)
+
+        tilordneÅpenBehandlingOppgaveForBehandling(manuellKjørelistebehandling.id)
+        kall.behandling.hent(manuellKjørelistebehandling.id)
+        kall.behandling.henlegg(
+            manuellKjørelistebehandling.id,
+            HenlagtDto(årsak = HenlagtÅrsak.FEILREGISTRERT),
+        )
+        kjørTasksKlareForProsesseringTilIngenTasksIgjen()
+
+        // Til steg KJØRELISTE, fordi da vurderes de henlagte avklarte-ukene fra forrige behandling.
+        val revurderingId =
+            opprettRevurderingOgGjennomførBehandlingsløp(
+                fraBehandlingId = behandlingContext.behandlingId,
+                tilSteg = StegType.KJØRELISTE,
+            ) {}
+
+        assertThat(kall.behandling.hent(revurderingId).steg).isEqualTo(StegType.KJØRELISTE)
+        // Feiler fordi forsøker å vurdere de avklarte ukene hentet fra henlagte behandling, men vedtak finnes ikke enda
+        kall.behandling.nullstill(revurderingId)
     }
 
     /**
