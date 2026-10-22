@@ -37,6 +37,7 @@ import no.nav.tilleggsstonader.sak.opplysninger.pdl.PersonService
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.PdlPersonKort
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.gjeldende
 import no.nav.tilleggsstonader.sak.opplysninger.pdl.dto.visningsnavn
+import no.nav.tilleggsstonader.sak.opplysninger.ytelse.YtelseService
 import no.nav.tilleggsstonader.sak.util.DatoFormat
 import no.nav.tilleggsstonader.sak.util.FnrUtil
 import org.slf4j.LoggerFactory
@@ -55,6 +56,7 @@ class OppgaveService(
     private val personService: PersonService,
     private val klageService: KlageService,
     private val behandlingRepository: BehandlingRepository,
+    private val ytelseService: YtelseService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -203,7 +205,7 @@ class OppgaveService(
                 oppgave,
                 enhetsnummer,
                 mappeId,
-                behandlingstype ?: utledBehandlingstype(behandlingId),
+                behandlingstype ?: utledBehandlingstype(personIdent, behandlingId),
             )
         val oppgave =
             OppgaveDomain(
@@ -220,9 +222,20 @@ class OppgaveService(
         return opprettetOppgaveId
     }
 
-    private fun utledBehandlingstype(behandlingId: BehandlingId?): Behandlingstype? {
+    /**
+     * Bruker lagret flagg på behandlingen. Uten behandling slås personen opp mot ung-sak, og oppgaven
+     * opprettes ikke hvis oppslaget feiler slik at tasken kan prøves på nytt.
+     */
+    private fun utledBehandlingstype(
+        personIdent: String,
+        behandlingId: BehandlingId?,
+    ): Behandlingstype? {
         val gjelderAktivitetspenger =
-            behandlingId?.let { behandlingRepository.findByIdOrThrow(it).gjelderAktivitetspenger } ?: false
+            if (behandlingId != null) {
+                behandlingRepository.findByIdOrThrow(behandlingId).gjelderAktivitetspenger
+            } else {
+                ytelseService.harAktivitetspengerIDagEllerFremITidEllerFeil(personIdent)
+            }
         return if (gjelderAktivitetspenger) Behandlingstype.Aktivitetspenger else null
     }
 
