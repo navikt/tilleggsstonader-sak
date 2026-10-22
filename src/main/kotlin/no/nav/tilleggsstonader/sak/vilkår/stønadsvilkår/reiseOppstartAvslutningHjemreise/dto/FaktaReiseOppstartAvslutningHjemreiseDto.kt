@@ -2,14 +2,11 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutn
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaReiseOppstartAvslutningHjemreise
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaUbestemtType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseOppstartAvslutningHjemreise
-import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
-import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
 import java.math.BigDecimal
 
 @JsonTypeInfo(
@@ -26,65 +23,45 @@ import java.math.BigDecimal
 sealed interface FaktaReiseOppstartAvslutningHjemreiseDto {
     val type: TypeReiseOppstartAvslutningHjemreise
 
-    fun mapTilFakta(
-        reiseId: ReiseId,
-        adresse: String?,
-        typeReiseformål: TypeReiseformål,
-    ): FaktaReiseOppstartAvslutningHjemreise
+    fun mapTilFakta(): FaktaReiseOppstartAvslutningHjemreise
 }
 
 data class FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
     val utgifterOffentligTransport: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId,
+    val begrunnelse: String? = null,
 ) : FaktaReiseOppstartAvslutningHjemreiseDto {
     override val type = TypeReiseOppstartAvslutningHjemreise.OFFENTLIG_TRANSPORT
 
-    override fun mapTilFakta(
-        reiseId: ReiseId,
-        adresse: String?,
-        typeReiseformål: TypeReiseformål,
-    ) = FaktaOffentligTransport(
-        reiseId = reiseId,
-        adresse = adresse,
-        typeReiseformål = typeReiseformål,
-        utgifterOffentligTransport = utgifterOffentligTransport,
-        aktivitetId = aktivitetId,
-    )
+    override fun mapTilFakta() =
+        FaktaOffentligTransport(
+            utgifterOffentligTransport = utgifterOffentligTransport,
+            begrunnelse = begrunnelse,
+        )
 }
 
 data class FaktaReiseOppstartAvslutningHjemreisePrivatBilDto(
     val reiseavstand: BigDecimal,
-    val aktivitetId: VilkårperiodeGlobalId,
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,
+    val parkering: BigDecimal? = null,
+    val piggdekkavgift: BigDecimal? = null,
+    val begrunnelse: String? = null,
 ) : FaktaReiseOppstartAvslutningHjemreiseDto {
     override val type = TypeReiseOppstartAvslutningHjemreise.PRIVAT_BIL
 
-    override fun mapTilFakta(
-        reiseId: ReiseId,
-        adresse: String?,
-        typeReiseformål: TypeReiseformål,
-    ) = FaktaPrivatBil(
-        reiseId = reiseId,
-        adresse = adresse,
-        typeReiseformål = typeReiseformål,
-        reiseavstand = reiseavstand,
-        aktivitetId = aktivitetId,
-        bompenger = bompenger,
-        fergekostnad = fergekostnad,
-    )
+    override fun mapTilFakta() =
+        FaktaPrivatBil(
+            reiseavstand = reiseavstand,
+            bompenger = bompenger,
+            fergekostnad = fergekostnad,
+            parkering = parkering,
+            piggdekkavgift = piggdekkavgift,
+            begrunnelse = begrunnelse,
+        )
 }
 
 data object FaktaReiseOppstartAvslutningHjemreiseUbestemtDto : FaktaReiseOppstartAvslutningHjemreiseDto {
     override val type = TypeReiseOppstartAvslutningHjemreise.UBESTEMT
 
-    override fun mapTilFakta(
-        reiseId: ReiseId,
-        adresse: String?,
-        typeReiseformål: TypeReiseformål,
-    ) = FaktaUbestemtType(
-        reiseId = reiseId,
-        adresse = adresse,
-        typeReiseformål = typeReiseformål,
-    )
+    override fun mapTilFakta() = FaktaUbestemtType
 }

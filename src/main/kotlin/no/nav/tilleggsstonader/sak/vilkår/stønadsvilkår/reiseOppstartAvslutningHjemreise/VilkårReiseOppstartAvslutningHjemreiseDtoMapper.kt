@@ -30,9 +30,9 @@ object VilkårReiseOppstartAvslutningHjemreiseDtoMapper {
             id = this.id,
             fom = this.fom,
             tom = this.tom,
-            adresse = fakta.adresse,
-            reiseId = fakta.reiseId,
-            typeReiseformål = fakta.typeReiseformål,
+            reiseId = this.reiseId,
+            aktivitetId = this.aktivitetId,
+            typeReiseformål = this.typeReiseformål,
             resultat = this.resultat,
             status = this.status,
             delvilkårsett = this.delvilkårsett.map { it.tilDto() },
@@ -50,14 +50,16 @@ object VilkårReiseOppstartAvslutningHjemreiseDtoMapper {
     private fun FaktaOffentligTransport.tilDto() =
         FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
             utgifterOffentligTransport = this.utgifterOffentligTransport,
-            aktivitetId = this.aktivitetId,
+            begrunnelse = this.begrunnelse,
         )
 
     private fun FaktaPrivatBil.tilDto() =
         FaktaReiseOppstartAvslutningHjemreisePrivatBilDto(
             reiseavstand = this.reiseavstand,
-            aktivitetId = this.aktivitetId,
             bompenger = this.bompenger,
             fergekostnad = this.fergekostnad,
+            parkering = this.parkering,
+            piggdekkavgift = this.piggdekkavgift,
+            begrunnelse = this.begrunnelse,
         )
 }

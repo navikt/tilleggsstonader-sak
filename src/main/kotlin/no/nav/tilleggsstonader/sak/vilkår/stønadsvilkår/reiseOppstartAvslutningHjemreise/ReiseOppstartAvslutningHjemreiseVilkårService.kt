@@ -138,6 +138,9 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
             id = eksisterendeVilkår?.id ?: VilkårId.random(),
             fom = nyttVilkår.fom,
             tom = nyttVilkår.tom,
+            aktivitetId = nyttVilkår.aktivitetId,
+            reiseId = nyttVilkår.reiseId,
+            typeReiseformål = nyttVilkår.typeReiseformål,
             status = utledStatus(eksisterendeVilkår),
             delvilkårsett = delvilkårsett,
             resultat = RegelEvaluering.utledVilkårResultat(delvilkårsett),
@@ -183,9 +186,8 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         nyttVilkår: LagreVilkårReiseOppstartAvslutningHjemreise,
         behandlingId: BehandlingId,
     ) {
-        val aktivitetId = nyttVilkår.fakta.aktivitetId() ?: return
+        val aktivitet = vilkårperiodeService.hentAktivitet(nyttVilkår.aktivitetId, behandlingId)
 
-        val aktivitet = vilkårperiodeService.hentAktivitet(aktivitetId, behandlingId)
         brukerfeilHvis(aktivitet == null) {
             "Aktiviteten finnes ikke"
         }
@@ -197,10 +199,3 @@ class ReiseOppstartAvslutningHjemreiseVilkårService(
         }
     }
 }
-
-private fun FaktaReiseOppstartAvslutningHjemreise.aktivitetId(): VilkårperiodeGlobalId? =
-    when (this) {
-        is FaktaOffentligTransport -> this.aktivitetId
-        is FaktaPrivatBil -> this.aktivitetId
-        is FaktaUbestemtType -> null
-    }
