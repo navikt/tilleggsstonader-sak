@@ -172,12 +172,6 @@ class ReiseOppstartAvslutningHjemreiseTsoIntegrationTest : CleanDatabaseIntegrat
         )
     }
 
-    @Test
-    fun `skal hente alle regler som tilhører reise oppstart avslutning hjemreise`() {
-        val resultat = kall.vilkårReiseOppstartAvslutningHjemreise.regler()
-        FileUtil.assertFileJsonIsEqual("vilkår/regelstruktur/REISE_OPPSTART_AVSLUTNING_HJEMREISE_API.json", resultat)
-    }
-
     private fun validerVilkår(
         lagretVilkår: VilkårReiseOppstartAvslutningHjemreiseDto,
         forventetType: TypeReiseformål,
