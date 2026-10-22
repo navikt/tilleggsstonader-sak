@@ -2,6 +2,7 @@ package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutn
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaPrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaReiseOppstartAvslutningHjemreise
@@ -27,6 +28,7 @@ sealed interface FaktaReiseOppstartAvslutningHjemreiseDto {
 }
 
 data class FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
+    val nødvendigUtgift: NødvendigUtgiftDto,
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String? = null,
 ) : FaktaReiseOppstartAvslutningHjemreiseDto {
@@ -34,12 +36,14 @@ data class FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
 
     override fun mapTilFakta() =
         FaktaOffentligTransport(
+            nødvendigUtgift = nødvendigUtgift.tilDomene(),
             utgifterOffentligTransport = utgifterOffentligTransport,
             begrunnelse = begrunnelse,
         )
 }
 
 data class FaktaReiseOppstartAvslutningHjemreisePrivatBilDto(
+    val nødvendigUtgift: NødvendigUtgiftDto,
     val reiseavstand: BigDecimal,
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,
@@ -51,6 +55,7 @@ data class FaktaReiseOppstartAvslutningHjemreisePrivatBilDto(
 
     override fun mapTilFakta() =
         FaktaPrivatBil(
+            nødvendigUtgift = nødvendigUtgift.tilDomene(),
             reiseavstand = reiseavstand,
             bompenger = bompenger,
             fergekostnad = fergekostnad,

@@ -75,12 +75,14 @@ object VilkårReiseOppstartAvslutningHjemreiseMapper {
 
     private fun FaktaReiseOppstartAvslutningHjemreiseOffentligTransport.mapTilFakta() =
         FaktaOffentligTransport(
+            nødvendigUtgift = this.nødvendigUtgift,
             utgifterOffentligTransport = this.utgifterOffentligTransport,
             begrunnelse = this.begrunnelse,
         )
 
     private fun FaktaReiseOppstartAvslutningHjemreisePrivatBil.mapTilFakta() =
         FaktaPrivatBil(
+            nødvendigUtgift = this.nødvendigUtgift,
             reiseavstand = this.reiseavstand,
             bompenger = this.bompenger,
             fergekostnad = this.fergekostnad,

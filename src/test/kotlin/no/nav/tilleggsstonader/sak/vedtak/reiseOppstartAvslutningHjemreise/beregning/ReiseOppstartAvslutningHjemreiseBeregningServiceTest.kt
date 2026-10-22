@@ -20,11 +20,13 @@ import no.nav.tilleggsstonader.sak.vedtak.validering.VedtaksperiodeValideringSer
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.VilkårService
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreisePrivatBil
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårStatus
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårType
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.Vilkårsresultat
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.TypeReiseformål
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
+import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.faktavurderinger.SvarJaNei
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -47,6 +49,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
         listOf(
             vedtaksperiode(fom = 1 januar 2025, tom = 31 januar 2025),
         )
+    private val nødvendigUtgift = NødvendigUtgift(erUtgiftenNødvendig = SvarJaNei.JA, begrunnelse = null)
 
     @BeforeEach
     fun setup() {
@@ -72,6 +75,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                         FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
                             reiseId = dummyReiseId,
                             typeReiseformål = TypeReiseformål.OPPSTART,
+                            nødvendigUtgift = nødvendigUtgift,
                             utgifterOffentligTransport = 500.toBigDecimal(),
                             aktivitetId = aktivitetId1,
                             begrunnelse = null,
@@ -88,6 +92,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                         FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
                             reiseId = dummyReiseId,
                             typeReiseformål = TypeReiseformål.HJEMREISE,
+                            nødvendigUtgift = nødvendigUtgift,
                             utgifterOffentligTransport = 200.toBigDecimal(),
                             aktivitetId = aktivitetId2,
                             begrunnelse = null,
@@ -124,6 +129,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                         FaktaReiseOppstartAvslutningHjemreisePrivatBil(
                             reiseId = dummyReiseId,
                             typeReiseformål = TypeReiseformål.AVSLUTNING,
+                            nødvendigUtgift = nødvendigUtgift,
                             reiseavstand = 20.toBigDecimal(),
                             aktivitetId = aktivitetId,
                             begrunnelse = null,
@@ -161,6 +167,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                         FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
                             reiseId = dummyReiseId,
                             typeReiseformål = TypeReiseformål.OPPSTART,
+                            nødvendigUtgift = nødvendigUtgift,
                             utgifterOffentligTransport = 300.toBigDecimal(),
                             aktivitetId = VilkårperiodeGlobalId.random(),
                             begrunnelse = null,
@@ -177,6 +184,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                         FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
                             reiseId = dummyReiseId,
                             typeReiseformål = TypeReiseformål.OPPSTART,
+                            nødvendigUtgift = nødvendigUtgift,
                             utgifterOffentligTransport = 200.toBigDecimal(),
                             aktivitetId = VilkårperiodeGlobalId.random(),
                             begrunnelse = null,
@@ -209,6 +217,7 @@ class ReiseOppstartAvslutningHjemreiseBeregningServiceTest {
                         FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
                             reiseId = dummyReiseId,
                             typeReiseformål = TypeReiseformål.OPPSTART,
+                            nødvendigUtgift = nødvendigUtgift,
                             utgifterOffentligTransport = 300.toBigDecimal(),
                             aktivitetId = VilkårperiodeGlobalId.random(),
                             begrunnelse = null,

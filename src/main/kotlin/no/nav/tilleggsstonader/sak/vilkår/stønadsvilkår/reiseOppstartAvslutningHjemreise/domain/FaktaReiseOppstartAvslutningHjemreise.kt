@@ -4,6 +4,7 @@ import no.nav.tilleggsstonader.libs.feil.brukerfeilHvis
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreisePrivatBil
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.FaktaReiseOppstartAvslutningHjemreiseUbestemt
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.ReiseId
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.VilkårFakta
 import no.nav.tilleggsstonader.sak.vilkår.vilkårperiode.domain.VilkårperiodeGlobalId
@@ -34,6 +35,7 @@ data object FaktaUbestemtType : FaktaReiseOppstartAvslutningHjemreise {
 }
 
 data class FaktaOffentligTransport(
+    val nødvendigUtgift: NødvendigUtgift,
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String? = null,
 ) : FaktaReiseOppstartAvslutningHjemreise {
@@ -50,6 +52,7 @@ data class FaktaOffentligTransport(
     ) = FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
         reiseId = reiseId,
         typeReiseformål = typeReiseformål,
+        nødvendigUtgift = nødvendigUtgift,
         utgifterOffentligTransport = utgifterOffentligTransport,
         aktivitetId = aktivitetId,
         begrunnelse = begrunnelse,
@@ -63,6 +66,7 @@ data class FaktaOffentligTransport(
 }
 
 data class FaktaPrivatBil(
+    val nødvendigUtgift: NødvendigUtgift,
     val reiseavstand: BigDecimal,
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,
@@ -84,6 +88,7 @@ data class FaktaPrivatBil(
     ) = FaktaReiseOppstartAvslutningHjemreisePrivatBil(
         reiseId = reiseId,
         typeReiseformål = typeReiseformål,
+        nødvendigUtgift = nødvendigUtgift,
         reiseavstand = reiseavstand,
         aktivitetId = aktivitetId,
         bompenger = bompenger,

@@ -1,6 +1,7 @@
 package no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise
 
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.tilDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.domain.NødvendigUtgift
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.AktivitetMedReiser
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaOffentligTransport
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.domain.FaktaPrivatBil
@@ -13,6 +14,7 @@ import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutni
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreisePrivatBilDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.FaktaReiseOppstartAvslutningHjemreiseUbestemtDto
 import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.reiseOppstartAvslutningHjemreise.dto.VilkårReiseOppstartAvslutningHjemreiseDto
+import no.nav.tilleggsstonader.sak.vilkår.stønadsvilkår.dto.NødvendigUtgiftDto
 
 object VilkårReiseOppstartAvslutningHjemreiseDtoMapper {
     fun AktivitetMedReiser.tilDto() =
@@ -49,17 +51,25 @@ object VilkårReiseOppstartAvslutningHjemreiseDtoMapper {
 
     private fun FaktaOffentligTransport.tilDto() =
         FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
+            nødvendigUtgift = nødvendigUtgift.tilDto(),
             utgifterOffentligTransport = this.utgifterOffentligTransport,
             begrunnelse = this.begrunnelse,
         )
 
     private fun FaktaPrivatBil.tilDto() =
         FaktaReiseOppstartAvslutningHjemreisePrivatBilDto(
+            nødvendigUtgift = nødvendigUtgift.tilDto(),
             reiseavstand = this.reiseavstand,
             bompenger = this.bompenger,
             fergekostnad = this.fergekostnad,
             parkering = this.parkering,
             piggdekkavgift = this.piggdekkavgift,
+            begrunnelse = this.begrunnelse,
+        )
+
+    private fun NødvendigUtgift.tilDto() =
+        NødvendigUtgiftDto(
+            erUtgiftenNødvendig = this.erUtgiftenNødvendig,
             begrunnelse = this.begrunnelse,
         )
 }

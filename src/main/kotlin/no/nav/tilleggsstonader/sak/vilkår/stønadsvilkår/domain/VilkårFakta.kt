@@ -113,6 +113,7 @@ data class FaktaReiseOppstartAvslutningHjemreiseOffentligTransport(
     override val reiseId: ReiseId,
     override val aktivitetId: VilkårperiodeGlobalId,
     override val typeReiseformål: TypeReiseformål,
+    val nødvendigUtgift: NødvendigUtgift,
     val utgifterOffentligTransport: BigDecimal,
     val begrunnelse: String?,
 ) : FaktaROAH
@@ -121,6 +122,7 @@ data class FaktaReiseOppstartAvslutningHjemreisePrivatBil(
     override val reiseId: ReiseId,
     override val aktivitetId: VilkårperiodeGlobalId,
     override val typeReiseformål: TypeReiseformål,
+    val nødvendigUtgift: NødvendigUtgift,
     val reiseavstand: BigDecimal,
     val bompenger: BigDecimal? = null,
     val fergekostnad: BigDecimal? = null,

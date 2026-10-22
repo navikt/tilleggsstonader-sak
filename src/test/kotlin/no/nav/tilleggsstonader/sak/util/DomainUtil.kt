@@ -856,6 +856,7 @@ fun lagreReiseOppstartAvslutningHjemreiseDto(
         ),
     fakta: FaktaReiseOppstartAvslutningHjemreiseDto =
         FaktaReiseOppstartAvslutningHjemreiseOffentligTransportDto(
+            nødvendigUtgift = NødvendigUtgiftDto(erUtgiftenNødvendig = SvarJaNeiNødvendigUtgift.JA, begrunnelse = null),
             utgifterOffentligTransport = utgifterOffentligTransport,
         ),
 ) = LagreVilkårReiseOppstartAvslutningHjemreiseDto(
