@@ -91,7 +91,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårServiceTest {
     }
 
     @Test
-    fun `skal feile når tom er satt for avslutning`() {
+    fun `skal feile om tom ikke er lik fom for avslutning`() {
         assertThatThrownBy {
             lagreReiseOppstartAvslutningHjemreiseDto(
                 fom = 10 januar 2026,
@@ -99,7 +99,7 @@ class ReiseOppstartAvslutningHjemreiseVilkårServiceTest {
                 typeReiseformål = TypeReiseformål.AVSLUTNING,
             ).tilDomene()
         }.isInstanceOf(ApiFeil::class.java)
-            .hasMessageContaining("tom skal ikke settes")
+            .hasMessageContaining("Tom kan ikke settes til noe annet enn lik fom")
     }
 
     @Test
